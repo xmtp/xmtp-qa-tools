@@ -1,0 +1,72 @@
+[
+  {
+    "href": "/templates/ens",
+    "title": "ENS Agent",
+    "description": "A template for working with ENS domains.",
+    "icon": "🔗",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/simple",
+    "title": "Simple Template",
+    "description": "A simple template without skills.",
+    "icon": "🤖",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/paymentagent",
+    "title": "Payment Agent",
+    "description": "A template for a funding agents.",
+    "icon": "💸",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/hackathon-store",
+    "title": "Hackathon Store",
+    "description": "All the goodies needed in a hackathon.",
+    "icon": "🏪",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/faucet",
+    "title": "Faucet Agent",
+    "description": "A template for requesting testnet funds.",
+    "icon": "💧",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/gated-group",
+    "title": "Gated Group",
+    "description": "A template for a gated group.",
+    "icon": "🔒",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/gm",
+    "title": "GM Bot",
+    "description": "A template for a GM bot.",
+    "icon": "👑",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/circle-agent",
+    "title": "Circle Agent",
+    "description": "A template for a Circle agent.",
+    "icon": "⭕️",
+    "author": "raihankhan-rk"
+  },
+  {
+    "href": "/templates/toss",
+    "title": "Toss",
+    "description": "A template for a Cointoss bot.",
+    "icon": "🪙",
+    "author": "humanagent"
+  },
+  {
+    "href": "/templates/payroll-agent",
+    "title": "Payroll Agent",
+    "description": "An autonomous payroll management agent.",
+    "icon": "💰",
+    "author": "raihankhan-rk"
+  }
+]

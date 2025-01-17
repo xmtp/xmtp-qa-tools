@@ -1,0 +1,69 @@
+name: Build
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
+      - name: Install docs dependencies
+        run: |
+          cd packages/docs
+          yarn
+      - name: Build
+        run: yarn build
+      - name: Check code format
+        run: yarn format
+      - name: Check types
+        run: yarn typecheck
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
+      - name: Build
+        run: yarn build:message-kit
+      - name: Test client
+        run: yarn test:client
+        continue-on-error: true
+        env:
+          KEY: ${{ secrets.KEY }}
+          TEST_ENCRYPTION_KEY: ${{ secrets.TEST_ENCRYPTION_KEY }}
+      - name: Test parsing
+        run: yarn test:parsing
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      - name: Test Frames
+        run: yarn test:frames
+      - name: Test Prompting
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: yarn test:prompt
+      - name: Test Intent
+        continue-on-error: true
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: yarn test:intent
