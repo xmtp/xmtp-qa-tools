@@ -16,11 +16,13 @@
 
 This library provides a wrapper around [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) to make it easier to use in your agent.
 
+</div>
+
+## Install
+
 ```bash [yarn]
 yarn add @xmtp/agent-starter
 ```
-
-</div>
 
 ## Overview
 
