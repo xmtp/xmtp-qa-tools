@@ -25,7 +25,7 @@ async function main() {
         const response = await api("Hi, how are you?");
 
         //Send text message
-        await xmtp.send({
+        await agent.send({
           message: response,
           originalMessage: message,
         });
@@ -43,12 +43,12 @@ main().catch(console.error);
 Returns `true` if an address has XMTP enabled
 
 ```typescript
-const isOnXMTP = await xmtp.canMessage(address);
+const isOnXMTP = await agent.canMessage(address);
 ```
 
 ## Groups
 
-To learn more about groups, read the [XMTP documentation](https://docs.xmtp.org/inboxes/group-permissions).
+To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
 
 :::info
 You need to **add the agent to the group as a member**.
@@ -104,7 +104,7 @@ let textMessage: agentMessage = {
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
 };
-await xmtp.send(textMessage);
+await agent.send(textMessage);
 ```
 
 ```tsx [Reaction]
@@ -114,7 +114,7 @@ let reaction: agentMessage = {
   originalMessage: message, // optional
   typeId: "reaction",
 };
-await xmtp.send(reaction);
+await agent.send(reaction);
 ```
 
 ```tsx [Reply]
@@ -124,7 +124,7 @@ let reply: agentMessage = {
   originalMessage: message, // optional
   typeId: "reply",
 };
-await xmtp.send(reply);
+await agent.send(reply);
 ```
 
 ```tsx [Attachment]
@@ -134,7 +134,7 @@ let attachment: agentMessage = {
   originalMessage: message, // optional
   typeId: "attachment",
 };
-await xmtp.send(attachment);
+await agent.send(attachment);
 ```
 
 ```tsx [Agent]
@@ -152,7 +152,7 @@ let agentMessage: agentMessage = {
   originalMessage: message, // optional
   typeId: "agent",
 };
-await xmtp.send(agentMessage);
+await agent.send(agentMessage);
 ```
 
 :::
@@ -222,7 +222,7 @@ let textMessage: agentMessage = {
   originalMessage: message, // optional original reference
 };
 
-await xmtp.send(textMessage);
+await agent.send(textMessage);
 ```
 
 ## Cache

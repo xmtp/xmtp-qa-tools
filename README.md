@@ -13,10 +13,11 @@
 <img src="media/logo.png" alt="Logo" width="60" />
   
 # xmtp-agents
-
-This library provides a wrapper around [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) to make it easier to use in your agent.
+This library offers a convenient wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
 
 </div>
+
+---
 
 ## Install
 
@@ -41,7 +42,7 @@ async function main() {
         const response = await api("Hi, how are you?");
 
         //Send text message
-        await xmtp.send({
+        await agent.send({
           message: response,
           originalMessage: message,
         });
@@ -74,7 +75,7 @@ await group.sync();
 await group.addMembers([0xaddresses]);
 ```
 
-> To learn more about groups, read the [XMTP documentation](https://docs.xmtp.org/inboxes/group-permissions).
+> To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
 
 ## Receive messages
 
@@ -109,7 +110,7 @@ let textMessage: agentMessage = {
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
 };
-await xmtp.send(textMessage);
+await agent.send(textMessage);
 ```
 
 Agent message can be used to send any hidden metadata that is not meant to be read by inboxes allowing agents to communicate in a more flexible way, like in a JSON structure.
@@ -129,7 +130,7 @@ let agentMessage: agentMessage = {
   originalMessage: message, // optional
   typeId: "agent",
 };
-await xmtp.send(agentMessage);
+await agent.send(agentMessage);
 ```
 
 > See other types like [reactions, replies and attachments](/packages/agent-starter/)
@@ -139,7 +140,7 @@ await xmtp.send(agentMessage);
 Returns `true` if an address has XMTP enabled
 
 ```typescript
-const isOnXMTP = await xmtp.canMessage(address);
+const isOnXMTP = await agent.canMessage(address);
 ```
 
 ## Deployment
