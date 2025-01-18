@@ -12,7 +12,7 @@ const __dirname = path.dirname(__filename);
 // Add a flag to prevent multiple executions
 let isRunning = false;
 
-const templatesDir = path.resolve(__dirname, "../templates");
+const templatesDir = path.resolve(__dirname, "../recipes");
 const templates = fs.readdirSync(templatesDir).filter((file) => {
   return fs.statSync(path.join(templatesDir, file)).isDirectory();
 });
@@ -47,7 +47,7 @@ async function runSelectedTemplate() {
 
   const templatePath = path.resolve(
     __dirname,
-    `../templates/${selectedTemplate}`,
+    `../recipes/${selectedTemplate}`,
   );
 
   try {

@@ -18,8 +18,8 @@ These are the steps to initialize the XMTP listener and send messages.
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
-      const onMessage = async (message, user) => {
-        console.log(`Decoded message: ${message.content.text} by ${user.address}`);
+      const onMessage = async (message: Message) => {
+        console.log(`Decoded message: ${message.content.text} by ${message.sender.address}`);
 
         // Your AI model response
         const response = await api("Hi, how are you?");
@@ -72,8 +72,10 @@ await group.addMembers([0xaddresses]);
 ## Receive messages
 
 ```tsx
-const onMessage = async (message, user) => {
-  console.log(`Decoded message: ${message.content.text} by ${user.address}`);
+const onMessage = async (message: Message) => {
+  console.log(
+    `Decoded message: ${message.content.text} by ${message.sender.address}`,
+  );
   let typeId = message.typeId;
 
   if (typeId === "text") {
@@ -164,11 +166,11 @@ The resolver library provides tools for resolving identities to EVM addresses an
 ## Quick start
 
 ```typescript
-import { getUserInfo } from "@xmtp/agent-starter";
+import { resolve } from "@xmtp/agent-starter";
 
 // Because user identifiers come in all shapes and sizes!
 const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
-const userInfo = await getUserInfo(identifier);
+const userInfo = await resolve(identifier);
 
 console.log(userInfo);
 /*

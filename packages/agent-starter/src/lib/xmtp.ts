@@ -41,7 +41,7 @@ import * as fs from "fs";
 import {
   getEvmAddressFromDns,
   getEvmAddressFromHeaderTag,
-  getUserInfo,
+  resolve,
 } from "./resolver.js";
 import fetch from "node-fetch";
 
@@ -239,7 +239,7 @@ export class XMTP {
       }
       // Check if receiver is an ENS domain
       else if (receiver.endsWith(".eth")) {
-        resolvedAddress = (await getUserInfo(receiver))?.address || receiver;
+        resolvedAddress = (await resolve(receiver))?.address || receiver;
       } else if (isAddress(receiver)) {
         resolvedAddress =
           (await this.client?.getInboxIdByAddress(receiver)) || receiver;

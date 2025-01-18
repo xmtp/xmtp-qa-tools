@@ -7,8 +7,8 @@
 ![Status](https://img.shields.io/badge/interop-green)
 ![Status](https://img.shields.io/badge/e2ee-green)
 ![Status](https://img.shields.io/badge/decentralized-orange)
-[![MIT License](https://img.shields.io/github/license/tutim-io/tutim)](https://github.com/tutim-io/tutim/blob/main/LICENSE)
-[![Number of GitHub stars](https://img.shields.io/github/stars/tutim-io/tutim?logo=github)](https://github.com/ephemerahq/message-kit)
+[![MIT License](https://img.shields.io/github/license/ephemerahq/message-kit)](https://github.com/ephemerahq/message-kit/blob/main/LICENSE)
+[![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
 
 <img src="media/logo.png" alt="Logo" width="60" />
   
@@ -25,8 +25,6 @@ This library offers a convenient wrapper for the [XMTP SDK for Node](https://git
 yarn add @xmtp/agent-starter
 ```
 
-> Try XMTP using [xmtp.chat](https://xmtp.chat)
-
 ## Overview
 
 These are the steps to initialize the XMTP listener and send messages.
@@ -37,7 +35,7 @@ These are the steps to initialize the XMTP listener and send messages.
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
-      const onMessage = async (message, user) => {
+      const onMessage = async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
 
         // Your AI model response
@@ -84,8 +82,10 @@ await group.addMembers([0xaddresses]);
 ## Receive messages
 
 ```tsx
-const onMessage = async (message, user) => {
-  console.log(`Decoded message: ${message.content.text} by ${user.address}`);
+const onMessage = async (message: Message) => {
+  console.log(
+    `Decoded message: ${message.content.text} by ${message.sender.address}`,
+  );
   let typeId = message.typeId;
 
   if (typeId === "text") {

@@ -71,9 +71,9 @@ class UserInfoCache {
 }
 
 // Use the singleton instance
-export const userInfoCache = UserInfoCache.getInstance();
+export const cache = UserInfoCache.getInstance();
 
-export const getUserInfo = async (
+export const resolve = async (
   key: string | undefined,
   clientAddress?: string,
 ): Promise<UserInfo | undefined> => {
@@ -91,7 +91,7 @@ export const getUserInfo = async (
     return data;
   }
 
-  const cachedData = userInfoCache.get(key);
+  const cachedData = cache.get(key);
   if (cachedData) return cachedData;
 
   key = key?.toLowerCase();
@@ -182,7 +182,7 @@ export const getUserInfo = async (
     }
 
     data.preferredName = data.ensDomain || data.converseUsername || "Friend";
-    userInfoCache.set(keyToUse, data);
+    cache.set(keyToUse, data);
     return data;
   }
 };
@@ -243,7 +243,7 @@ export async function getEvmAddressFromHeaderTag(
 
     for (let i = 0; i < metaTags.length; i++) {
       const metaTag = metaTags[i];
-      if (metaTag.getAttribute("name") === "@xmtp/agent-starter") {
+      if (metaTag.getAttribute("xmtp") && metaTag.getAttribute("content")) {
         const content = metaTag.getAttribute("content");
         if (content) {
           const match = content.match(/^0x[a-fA-F0-9]+$/);

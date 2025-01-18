@@ -331,6 +331,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@clack/core@npm:0.4.1":
+  version: 0.4.1
+  resolution: "@clack/core@npm:0.4.1"
+  dependencies:
+    picocolors: "npm:^1.0.0"
+    sisteransi: "npm:^1.0.5"
+  checksum: 10/b7757a725a6ce3802e6499833c0a9fdf109a70274ddaaf8e38a13bc2270a798c3a4cdf95911fa29d29e3d0d9472c3dda8f90f91b5283e96b9c9bce64c463acc1
+  languageName: node
+  linkType: hard
+
+"@clack/prompts@npm:^0.9.1":
+  version: 0.9.1
+  resolution: "@clack/prompts@npm:0.9.1"
+  dependencies:
+    "@clack/core": "npm:0.4.1"
+    picocolors: "npm:^1.0.0"
+    sisteransi: "npm:^1.0.5"
+  checksum: 10/df0587bed14a978bcd3bb3ae950e400c49fc9ca4bf4556393de81f2907a010a7c4042d7a52f3125245c1de478ab371d041327a5f8bee06f3042ad39263835143
+  languageName: node
+  linkType: hard
+
 "@cspotcode/source-map-support@npm:^0.8.0":
   version: 0.8.1
   resolution: "@cspotcode/source-map-support@npm:0.8.1"
@@ -1468,6 +1489,37 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/resolver@workspace:packages/resolver":
+  version: 0.0.0-use.local
+  resolution: "@xmtp/resolver@workspace:packages/resolver"
+  dependencies:
+    "@changesets/changelog-git": "npm:^0.2.0"
+    "@changesets/cli": "npm:^2.27.5"
+    "@rollup/plugin-typescript": "npm:^11.1.6"
+    "@types/jsdom": "npm:^21.1.7"
+    "@types/node": "npm:^20.14.2"
+    "@vitest/coverage-v8": "npm:^2.1.4"
+    "@xmtp/content-type-primitives": "npm:^2.0.0"
+    "@xmtp/content-type-reaction": "npm:^2.0.0"
+    "@xmtp/content-type-read-receipt": "npm:^2.0.0"
+    "@xmtp/content-type-remote-attachment": "npm:^2.0.0"
+    "@xmtp/content-type-reply": "npm:^2.0.0"
+    "@xmtp/content-type-text": "npm:^2.0.0"
+    "@xmtp/node-sdk": "npm:^0.0.38"
+    dotenv: "npm:^16.4.5"
+    jsdom: "npm:^26.0.0"
+    node-fetch: "npm:^3.3.2"
+    prettier: "npm:^3.3.1"
+    rollup: "npm:^4.18.0"
+    rollup-plugin-dts: "npm:^6.1.1"
+    ts-node: "npm:^10.9.2"
+    turbo: "npm:^2.2.3"
+    typescript: "npm:^5.4.5"
+    viem: "npm:^2.16.3"
+    vitest: "npm:^2.1.4"
+  languageName: unknown
+  linkType: soft
+
 "@xmtp/tsconfig@workspace:shared/tsconfig":
   version: 0.0.0-use.local
   resolution: "@xmtp/tsconfig@workspace:shared/tsconfig"
@@ -2570,6 +2622,18 @@ __metadata:
   checksum: 10/288e95e310227bbe037076ea81b7c2598ccbc3122d87abc6dab39e1eec309aa14f0e366a98cdc45237ffcfcbad3db597778c0068217dcb1950fef6249104e1b1
   languageName: node
   linkType: hard
+
+"gm@workspace:recipes/gm":
+  version: 0.0.0-use.local
+  resolution: "gm@workspace:recipes/gm"
+  dependencies:
+    "@types/express": "npm:^4.17.20"
+    "@types/node": "npm:^20.14.2"
+    "@xmtp/agent-starter": "workspace:*"
+    express: "npm:^4.19.2"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
 
 "gopd@npm:^1.2.0":
   version: 1.2.0
@@ -3995,6 +4059,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"sisteransi@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "sisteransi@npm:1.0.5"
+  checksum: 10/aba6438f46d2bfcef94cf112c835ab395172c75f67453fe05c340c770d3c402363018ae1ab4172a1026a90c47eaccf3af7b6ff6fa749a680c2929bd7fa2b37a4
+  languageName: node
+  linkType: hard
+
 "slash@npm:^3.0.0":
   version: 3.0.0
   resolution: "slash@npm:3.0.0"
@@ -4896,6 +4967,7 @@ __metadata:
   dependencies:
     "@changesets/changelog-git": "npm:^0.2.0"
     "@changesets/cli": "npm:^2.27.5"
+    "@clack/prompts": "npm:^0.9.1"
     prettier: "npm:^3.3.1"
     prettier-plugin-packagejson: "npm:^2.5.0"
     punycode: "npm:^2.3.1"
