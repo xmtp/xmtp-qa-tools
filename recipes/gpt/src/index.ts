@@ -1,4 +1,8 @@
 import { Message, createAgent } from "@xmtp/agent-starter";
+import OpenAI from "openai";
+
+// Initialize OpenAI API
+const openai = new OpenAI();
 
 async function main() {
   const agent = await createAgent({
@@ -7,8 +11,24 @@ async function main() {
       console.log(
         `Decoded message: ${message?.content.text} by ${message.sender.address}`,
       );
+
+      // Send message content to GPT API
+      const completion = await openai.chat.completions.create({
+        model: "gpt-4o",
+        messages: [
+          { role: "developer", content: "You are a helpful assistant." },
+          {
+            role: "user",
+            content: message?.content.text ?? "",
+          },
+        ],
+      });
+
+      const gptMessage = completion.choices[0]?.message?.content?.trim();
+
+      // Use GPT response in your application
       await agent.send({
-        message: "gm",
+        message: gptMessage ?? "",
         originalMessage: message,
       });
     },
