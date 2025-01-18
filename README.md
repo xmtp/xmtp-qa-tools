@@ -19,15 +19,13 @@ This library offers a convenient wrapper for the [XMTP SDK for Node](https://git
 
 ---
 
-## XMTP.CHAT
-
-Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
-
 ## Install
 
 ```bash [yarn]
 yarn add @xmtp/agent-starter
 ```
+
+> Try XMTP using [xmtp.chat](https://xmtp.chat)
 
 ## Overview
 
@@ -58,6 +56,8 @@ async function main() {
 
 main().catch(console.error);
 ```
+
+> Try XMTP using [xmtp.chat](https://xmtp.chat)
 
 ## Groups
 
@@ -138,6 +138,10 @@ await agent.send(agentMessage);
 ```
 
 > See other types like [reactions, replies and attachments](/packages/agent-starter/)
+
+## Web inbox
+
+Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
 
 ## Address availability
 
