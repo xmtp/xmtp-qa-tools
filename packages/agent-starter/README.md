@@ -8,34 +8,39 @@ This library provides a wrapper around [XMTP SDK for Node](https://github.com/xm
 yarn add @xmtp/agent-starter
 ```
 
+> See the available [types](https://github.com/ephemeraHQ/xmtp-agents/blob/main/packages/agent-starter/src/lib/types.ts)
+
 ## Overview
 
 These are the steps to initialize the XMTP listener and send messages.
 
 - `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
 
-````tsx
+```tsx
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
-        console.log(`Decoded message: ${message.content.text} by ${message.sender.address}`);
+      console.log(
+        `Decoded message: ${message.content.text} by ${message.sender.address}`,
+      );
 
-        // Your AI model response
-        const response = await api("Hi, how are you?");
+      // Your AI model response
+      const response = await api("Hi, how are you?");
 
-        //Send text message
-        await agent.send({
-          message: response,
-          originalMessage: message,
-        });
-      }
+      //Send text message
+      await agent.send({
+        message: response,
+        originalMessage: message,
+      });
+    },
   });
 
   console.log("Agent is up and running...");
 }
 
 main().catch(console.error);
+```
 
 ## Address availability
 
@@ -43,7 +48,7 @@ Returns `true` if an address has XMTP enabled
 
 ```typescript
 const isOnXMTP = await agent.canMessage(address);
-````
+```
 
 ## Groups
 

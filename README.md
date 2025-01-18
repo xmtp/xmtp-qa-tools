@@ -13,7 +13,7 @@
 <img src="media/logo.png" alt="Logo" width="60" />
   
 # xmtp-agents
-This library offers a convenient wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
+This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
 
 </div>
 
@@ -24,6 +24,8 @@ This library offers a convenient wrapper for the [XMTP SDK for Node](https://git
 ```bash [yarn]
 yarn add @xmtp/agent-starter
 ```
+
+> See the available [types](https://github.com/ephemeraHQ/xmtp-agents/blob/main/packages/agent-starter/src/lib/types.ts)
 
 ## Overview
 
