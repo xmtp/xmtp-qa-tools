@@ -193,6 +193,18 @@ console.log(info);
 
 ## Development
 
+```bash
+git clone https://github.com/ephemeraHQ/xmtp-agents/
+cd xmtp-agents
+```
+
+Run it:
+
+```bash
+yarn install
+yarn recipes
+```
+
 ### Contribute
 
 Learn how to [contribute](/CONTRIBUTING.md) to the recipes directory.
