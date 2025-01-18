@@ -141,6 +141,8 @@ await agent.send(agentMessage);
 
 ## Web inbox
 
+![](/media/webinbox.png)
+
 Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
 
 ## Address availability
@@ -150,6 +152,31 @@ Returns `true` if an address has XMTP enabled
 ```typescript
 const isOnXMTP = await agent.canMessage(address);
 ```
+
+## Resolver library
+
+This library helps you to resolve identities into EVM addresses compatible with XMTP.
+
+```typescript
+import { resolve } from "@xmtp/resolver";
+
+const identifier = "vitalik.eth";
+const info = await resolve(identifier);
+
+console.log(info);
+/*
+{
+  ensDomain: 'vitalik.eth',
+  address: '0x1234...',
+  preferredName: 'vitalik.eth',
+  converseUsername: '',
+  avatar: 'https://...',
+  converseEndpoint: ''
+}
+*/
+```
+
+> Learn more about [`@xmtp/resolver`](/packages/resolver/) library
 
 ## Deployment
 
