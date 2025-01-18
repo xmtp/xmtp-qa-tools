@@ -1,5 +1,8 @@
 <div align="center">
 
+<div align="center">
+</div>
+
 ![Status](https://img.shields.io/badge/alpha-orange)
 ![Status](https://img.shields.io/badge/interop-green)
 ![Status](https://img.shields.io/badge/e2ee-green)
@@ -7,6 +10,8 @@
 [![MIT License](https://img.shields.io/github/license/tutim-io/tutim)](https://github.com/tutim-io/tutim/blob/main/LICENSE)
 [![Number of GitHub stars](https://img.shields.io/github/stars/tutim-io/tutim?logo=github)](https://github.com/ephemerahq/message-kit)
 
+<img src="media/logo.png" alt="Logo" width="60" />
+  
 # xmtp-agents
 
 This library provides a wrapper around [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) to make it easier to use in your agent.
