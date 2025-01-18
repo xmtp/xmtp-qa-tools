@@ -8,11 +8,11 @@
 
 # xmtp-agents
 
-**xmtp-agents** is a TypeScript library for building scalable, secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol
-
 </div>
 
-### Why XMTP?
+`xmtp-agents` is a library for building scalable, secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol
+
+#### Why XMTP?
 
 - **End-to-end & compliant**: Your servers see only ciphertext, meeting strict security and regulatory standards.
 - **Open-source & trustless**: Built on the [MLS](https://messaginglayersecurity.rocks/) protocol, it removes centralized certificate authorities with cryptographic proofs.
