@@ -36,8 +36,8 @@ console.log(info);
 - **ENS Domains** : Example: `vitalik.eth`
 - **Converse Usernames** : Example: `@fabri`
 - **Inbox ID** : Example: `0x1234...` (Converse inbox ID)
-- **Website Header Tag** : Example: `https://example.com` containing `xmtp=0x1234...`
-- **Website TXT Record** : Example: `meta="@xmtp/agent-starter" content="0x1234..."`
+- **Website TXT Record** : Example: `https://example.com` containing `xmtp=0x1234...`
+- **Website Header Tag** : Example: `meta="xmtp" content="0x1234..."`
 
 ### Returned UserInfo
 
