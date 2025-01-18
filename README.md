@@ -203,20 +203,21 @@ console.log(info);
 
 ## Development
 
-### Clone the repo
+#### Clone the repo
 
 ```bash
 git clone https://github.com/ephemeraHQ/xmtp-agents/
 cd xmtp-agents
 ```
 
-### Install packages
-
-Run it:
+#### Install packages & run
 
 ```bash
 yarn install
+# select examples from a list
 yarn examples
+# run a specific example
+yarn examples gm
 ```
 
 ### Environment variables
@@ -228,8 +229,7 @@ ENCRYPTION_KEY= # The private key of the wallet that will be used to send or rec
 FIXED_KEY= #  A secondary key that ensures local device encryption. Can be random.
 ```
 
-> [!TIP]
-> If not specified the `.env` file will be populated **randomly**.
+> Learn about generating [private keys](/packages/agent-starter/)
 
 ### Contribute
 
