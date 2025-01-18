@@ -1,4 +1,17 @@
-# Resolver library
+<div align="center">
+</div>
+
+![Release](https://img.shields.io/website/http/huggingface.co/docs/smolagents/index.html.svg?down_color=red&down_message=offline&up_message=online)
+[![MIT License](https://img.shields.io/github/license/ephemerahq/xmtp-agents)](https://github.com/ephemerahq/xmtp-agents/blob/main/LICENSE)
+[![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
+
+<img src="media/logo.png" alt="Logo" width="60" />
+
+# @xmtp/resolver
+
+A convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) simplifying agent delopment.
+
+</div>
 
 The resolver library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
 
