@@ -14,7 +14,9 @@ async function main() {
     },
   });
 
-  console.log("Agent is up and running...");
+  console.log(
+    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat`,
+  );
 }
 
 main().catch(console.error);

@@ -1,5 +1,3 @@
-console.log("Starting devTemplates script...");
-
 import { execSync } from "child_process";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -12,12 +10,16 @@ const __dirname = path.dirname(__filename);
 // Add a flag to prevent multiple executions
 let isRunning = false;
 
-const templatesDir = path.resolve(__dirname, "../recipes");
-const templates = fs.readdirSync(templatesDir).filter((file) => {
-  return fs.statSync(path.join(templatesDir, file)).isDirectory();
+const recipesDir = path.resolve(__dirname, "../recipes");
+const recipes = fs.readdirSync(recipesDir).filter((file) => {
+  return (
+    fs.statSync(path.join(recipesDir, file)).isDirectory() &&
+    file !== "replit" &&
+    file !== "railway"
+  );
 });
 
-async function runSelectedTemplate() {
+async function runSelectedRecipe() {
   // Prevent multiple executions
   if (isRunning) {
     console.log("Development server is already running.");
@@ -25,39 +27,36 @@ async function runSelectedTemplate() {
   }
 
   // Get template from command line argument if provided
-  const directTemplate = process.argv[2];
+  const directRecipe = process.argv[2];
 
-  let selectedTemplate;
-  if (directTemplate && templates.includes(directTemplate)) {
-    selectedTemplate = directTemplate;
+  let selectedRecipe;
+  if (directRecipe && recipes.includes(directRecipe)) {
+    selectedRecipe = directRecipe;
   } else {
-    selectedTemplate = await select({
-      message: "Select a template to run:",
-      options: templates.map((template) => ({
-        value: template,
-        label: template,
+    selectedRecipe = await select({
+      message: "Select a recipe to run:",
+      options: recipes.map((recipe) => ({
+        value: recipe,
+        label: recipe,
       })),
     });
   }
 
-  if (typeof selectedTemplate === "symbol" || !selectedTemplate) {
-    console.log("No template selected. Exiting.");
+  if (typeof selectedRecipe === "symbol" || !selectedRecipe) {
+    console.log("No recipe selected. Exiting.");
     return;
   }
 
-  const templatePath = path.resolve(
-    __dirname,
-    `../recipes/${selectedTemplate}`,
-  );
+  const recipePath = path.resolve(__dirname, `../recipes/${selectedRecipe}`);
 
   try {
     isRunning = true;
-    console.log(`Running dev for ${selectedTemplate}...`);
-    execSync(`cd ${templatePath} && yarn dev`, {
+    console.log(`Running recipe for ${selectedRecipe}...`);
+    execSync(`cd ${recipePath} && yarn dev`, {
       stdio: "inherit",
     });
   } catch (error) {
-    console.error(`Error running dev for ${selectedTemplate}:`, error);
+    console.error(`Error running recipe for ${selectedRecipe}:`, error);
   } finally {
     isRunning = false;
   }
@@ -65,5 +64,5 @@ async function runSelectedTemplate() {
 
 // Only run if this is the main module
 if (import.meta.url === `file://${__filename}`) {
-  runSelectedTemplate();
+  runSelectedRecipe();
 }

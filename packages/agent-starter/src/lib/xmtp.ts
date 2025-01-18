@@ -38,11 +38,6 @@ import path from "path";
 import { Message, agentMessage, UserReturnType, User, Agent } from "./types.js";
 import { readFile } from "fs/promises";
 import * as fs from "fs";
-import {
-  getEvmAddressFromDns,
-  getEvmAddressFromHeaderTag,
-  resolve,
-} from "./resolver.js";
 import fetch from "node-fetch";
 
 export async function createAgent(agent: Agent): Promise<XMTP> {
@@ -228,23 +223,12 @@ export class XMTP {
       agentMessage.receivers = [agentMessage.originalMessage?.sender.inboxId];
     }
     for (let receiver of agentMessage.receivers) {
-      let resolvedAddress = receiver;
-
-      // Check if receiver is a website
-      if (receiver.startsWith("http://") || receiver.startsWith("https://")) {
-        resolvedAddress =
-          (await getEvmAddressFromDns(receiver)) ||
-          (await getEvmAddressFromHeaderTag(receiver)) ||
-          receiver;
+      let resolvedAddress = isAddress(receiver)
+        ? receiver
+        : await this.client?.getInboxIdByAddress(receiver);
+      if (!resolvedAddress) {
+        throw new Error("Invalid receiver address");
       }
-      // Check if receiver is an ENS domain
-      else if (receiver.endsWith(".eth")) {
-        resolvedAddress = (await resolve(receiver))?.address || receiver;
-      } else if (isAddress(receiver)) {
-        resolvedAddress =
-          (await this.client?.getInboxIdByAddress(receiver)) || receiver;
-      }
-
       let conversation = await this.client?.conversations
         .list()
         .find(
@@ -318,14 +302,6 @@ async function streamMessages(
       const stream = await client?.conversations.streamAllMessages();
       if (stream) {
         if (xmtp.agent?.config?.hideInitLogMessage !== true) {
-          console.log(`XMTP agent initialized on ${xmtp?.address}`);
-          console.log(
-            `Send a message on:\n\t- https://xmtp.chat\n\t- https://converse.xyz/dm/${xmtp?.address}`,
-          );
-          console.log(
-            `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Logging new messages to console ↴`,
-          );
         }
         for await (const message of stream) {
           let conversation = await xmtp.getConversationFromMessage(message);

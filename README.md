@@ -1,6 +1,17 @@
-# xmtp-agents
+<div align="center">
 
-This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
+<div align="center">
+</div>
+
+![Release](https://img.shields.io/website/http/huggingface.co/docs/smolagents/index.html.svg?down_color=red&down_message=offline&up_message=online)
+[![MIT License](https://img.shields.io/github/license/ephemerahq/message-kit)](https://github.com/ephemerahq/message-kit/blob/main/LICENSE)
+[![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
+
+<img src="media/logo.png" alt="Logo" width="60" />
+
+</div>
+
+---
 
 ## Install
 
@@ -40,7 +51,11 @@ async function main() {
 main().catch(console.error);
 ```
 
-> Try XMTP using [xmtp.chat](https://xmtp.chat)
+> Try your agents on XMTP using [xmtp.chat](https://xmtp.chat)
+
+## Recipes
+
+See the avaialable [recipes](/recipes/) for examples to get started.
 
 ## Groups
 
