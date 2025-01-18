@@ -1,24 +1,24 @@
-## Create GM agent
+# GPT Agent
 
-> Try XMTP using [xmtp.chat](https://xmtp.chat)
+This example uses the [OpenAI](https://openai.com) API for GPT-based responses and the [XMTP](https://xmtp.org) protocol for secure messaging. You can test your agent on [xmtp.chat](https://xmtp.chat) or any other XMTP-compatible client.
 
-### .env
+## Environment variables
 
-Add the `OPENAI_API_KEY` to the .env file
+Add the following keys to a `.env` file:
 
 ```bash
-ENCRYPTION_KEY= # the private key of the wallet
-FIXED_KEY= # a second encryption key for encryption
-OPENAI_API_KEY= # sk-proj-...
+ENCRYPTION_KEY=    # Private key for XMTP
+FIXED_KEY=         # Secondary key for local encryption
+OPENAI_API_KEY=    # e.g., sk-xxx...
 ```
 
-This agent replies with the OpenAI api.
+## Usage
 
 ```tsx
 import { Message, runAgent } from "@xmtp/agent-starter";
 import OpenAI from "openai";
 
-// Initialize OpenAI API
+// Initialize OpenAI
 const openai = new OpenAI();
 
 async function main() {
@@ -26,24 +26,22 @@ async function main() {
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
-        `Decoded message: ${message?.content.text} by ${message.sender.address}`,
+        `Decoded message: ${message?.content.text} from ${message.sender.address}`,
       );
 
-      // Send message content to GPT API
+      // Send user text to OpenAI
       const completion = await openai.chat.completions.create({
-        model: "gpt-4o",
+        model: "gpt-4",
         messages: [
-          { role: "developer", content: "You are a helpful assistant." },
-          {
-            role: "user",
-            content: message?.content.text ?? "",
-          },
+          { role: "system", content: "You are a helpful assistant." },
+          { role: "user", content: message?.content.text ?? "" },
         ],
       });
 
+      // Extract GPT response
       const gptMessage = completion.choices[0]?.message?.content?.trim();
 
-      // Use GPT response in your application
+      // Send GPT response back via XMTP
       await agent.send({
         message: gptMessage ?? "",
         originalMessage: message,
@@ -52,9 +50,13 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+    `XMTP agent initialized on ${agent.address}\n` +
+      `Try sending a message at https://xmtp.chat/dm/${agent.address}`,
   );
 }
 
 main().catch(console.error);
 ```
+
+Run the agent and send a test message from [xmtp.chat](https://xmtp.chat).  
+Enjoy your GPT-powered XMTP agent!

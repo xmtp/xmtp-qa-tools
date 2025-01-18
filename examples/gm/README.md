@@ -1,4 +1,4 @@
-## Create GM agent
+## GM agent
 
 > Try XMTP using [xmtp.chat](https://xmtp.chat)
 
