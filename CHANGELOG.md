@@ -1,4 +1,4 @@
-### 0.1.2
+### 0.0.1
 
 - Intrododuced `@xmtp/resolver` helper library
 - Introduced a new `@xmtp/xmtp-starter` package for XMTP messaging

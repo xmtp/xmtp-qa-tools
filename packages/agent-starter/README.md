@@ -99,9 +99,11 @@ const onMessage = async (message: Message) => {
 
 ## Content types
 
-`agent-starter` provides an abstraction to XMTP [content typs](https://github.com/xmtp/xmtp-js/tree/main/content-types) to make it easier for devs to integrate different types of messages.
+`agent-starter` provides an abstraction to XMTP [content types](https://github.com/xmtp/xmtp-js/tree/main/content-types) to make it easier for devs to integrate different types of messages.
 
 ### Text
+
+> See [text content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
 
 ```tsx
 let textMessage: agentMessage = {
@@ -113,6 +115,8 @@ await agent.send(textMessage);
 ```
 
 ### Reaction
+
+> See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-text) for reference
 
 ```tsx
 let reaction: agentMessage = {
@@ -126,6 +130,8 @@ await agent.send(reaction);
 
 ### Reply
 
+> See [reply content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reply) for reference
+
 ```tsx
 let reply: agentMessage = {
   message: "Your message.",
@@ -138,6 +144,8 @@ await agent.send(reply);
 
 ### Attachment
 
+> See [attachment content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-attachment) for reference
+
 ```tsx
 let attachment: agentMessage = {
   message: "https://picsum.photos/200/300",
@@ -149,6 +157,8 @@ await agent.send(attachment);
 ```
 
 ### Agent
+
+> See [agent content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
 
 ```tsx
 let agentMessage: agentMessage = {
@@ -167,3 +177,6 @@ let agentMessage: agentMessage = {
 };
 await agent.send(agentMessage);
 ```
+
+> **Open for feedback**  
+> You are welcome to provide feedback on this implementation by commenting on the [Proposal for content type](https://community.xmtp.org/).
