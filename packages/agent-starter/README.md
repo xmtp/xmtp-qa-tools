@@ -94,8 +94,7 @@ await group.addMembers([0xaddresses]);
 
 - `FIXED_KEY`: The fixed key is an additional security measure. It is not linked to the public address and can be randomly generated or shared across different agents. It will also be generated and saved in the `.env` file using the methods described above.
 
-### Example
-
+#### Example
 
 ```tsx
 import { runAgent } from "@xmtp/agent-starter";
