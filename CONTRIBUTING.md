@@ -1,41 +1,43 @@
 # Contributing
 
-Templates help developers quickly bootstrap new agents. Here's how to contribute a template:
+We appreciate your contributions! Here’s how to add new templates or examples quickly:
 
-### Run locally
+## Getting started
 
 ```bash
 git clone https://github.com/ephemeraHQ/xmtp-agents/
 cd xmtp-agents
-```
-
-Run it:
-
-```bash
 yarn install
 yarn dev
 ```
 
-### Structure
+> This runs the base agent locally. You can also launch specific examples via `yarn examples`.
 
-Make it work in the playground:
+## Repo structure
 
-```tsx
+```
 xmtp-agents/
-└── packages/
-    └── agent-starter
-    └── resolver
+├── packages/
+│   ├── agent-starter
+│   └── resolver
 └── examples/
-    └── gated-group
-    // ... add your more examples
+    ├── gated-group
+    └── ... [your new example here]
 ```
 
-### Create example
+- **packages**: core libraries (`agent-starter`, `resolver`).
+- **examples**: standalone demos (e.g., `gated-group`).
 
-Create a example like [gated-group].
+## Adding an example
 
-### Create a PR
+1. Create a new folder under `examples/`.
+2. Include a minimal README.md describing what it does and how to run it.
+3. Validate locally with `yarn examples your-example-name`.
 
-Create a PR about your example
+## Submitting a PR
 
-- Wait until is merged!
+1. Open a PR against `main`.
+2. Briefly describe the purpose of your example or changes.
+3. Wait for reviews/feedback, then merge once approved.
+
+Thank you for contributing! Feel free to open an issue if you have questions or need help.
