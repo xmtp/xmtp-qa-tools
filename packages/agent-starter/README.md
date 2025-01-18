@@ -91,6 +91,7 @@ await group.addMembers([0xaddresses]);
 
    - If no private key is provided, the agent can automatically generate a new one upon startup:
      `ENCRYPTION_KEY=random_key`
+   - If exists in the .env file it will **not** generated a new key.
    - This method will save the key in the `.env` file for future use.
 
      ```tsx
