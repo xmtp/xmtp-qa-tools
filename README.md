@@ -20,7 +20,7 @@
 - **Decentralized**: Operates on a peer-to-peer network, eliminating single points of failure.
 - **Groups**: Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
 
-## Installation & setup
+## Setup
 
 This library is based on [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
 
