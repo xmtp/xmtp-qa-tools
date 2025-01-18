@@ -18,7 +18,7 @@ These are the steps to initialize the XMTP listener and send messages.
 
 ```tsx
 async function main() {
-  const agent = await createAgent({
+  const agent = await runAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
@@ -173,7 +173,7 @@ let agentMessage: agentMessage = {
   },
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
-  typeId: "agent",
+  typeId: "agent_message",
 };
 await agent.send(agentMessage);
 ```

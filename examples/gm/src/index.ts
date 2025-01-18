@@ -1,14 +1,7 @@
-## Create GM agent
-
-> Try XMTP using [xmtp.chat](https://xmtp.chat)
-
-This agent replies GM
-
-```tsx
-import { Message, createAgent } from "@xmtp/agent-starter";
+import { Message, runAgent } from "@xmtp/agent-starter";
 
 async function main() {
-  const agent = await createAgent({
+  const agent = await runAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
@@ -21,8 +14,9 @@ async function main() {
     },
   });
 
-  console.log("Agent is up and running...");
+  console.log(
+    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+  );
 }
 
 main().catch(console.error);
-```

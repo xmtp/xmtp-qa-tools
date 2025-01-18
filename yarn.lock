@@ -1709,6 +1709,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"axios@npm:^1.7.9":
+  version: 1.7.9
+  resolution: "axios@npm:1.7.9"
+  dependencies:
+    follow-redirects: "npm:^1.15.6"
+    form-data: "npm:^4.0.0"
+    proxy-from-env: "npm:^1.1.0"
+  checksum: 10/b7a5f660ea53ba9c2a745bf5ad77ad8bf4f1338e13ccc3f9f09f810267d6c638c03dac88b55dae8dc98b79c57d2d6835be651d58d2af97c174f43d289a9fd007
+  languageName: node
+  linkType: hard
+
 "balanced-match@npm:^1.0.0":
   version: 1.0.2
   resolution: "balanced-match@npm:1.0.2"
@@ -2464,6 +2475,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"follow-redirects@npm:^1.15.6":
+  version: 1.15.9
+  resolution: "follow-redirects@npm:1.15.9"
+  peerDependenciesMeta:
+    debug:
+      optional: true
+  checksum: 10/e3ab42d1097e90d28b913903841e6779eb969b62a64706a3eb983e894a5db000fbd89296f45f08885a0e54cd558ef62e81be1165da9be25a6c44920da10f424c
+  languageName: node
+  linkType: hard
+
 "foreground-child@npm:^3.1.0":
   version: 3.3.0
   resolution: "foreground-child@npm:3.3.0"
@@ -2582,9 +2603,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gated-group@workspace:recipes/gated-group":
+"gated-group@workspace:examples/gated-group":
   version: 0.0.0-use.local
-  resolution: "gated-group@workspace:recipes/gated-group"
+  resolution: "gated-group@workspace:examples/gated-group"
   dependencies:
     "@types/express": "npm:^4.17.20"
     "@types/node": "npm:^20.14.2"
@@ -2675,9 +2696,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gm@workspace:recipes/gm":
+"gm@workspace:examples/gm":
   version: 0.0.0-use.local
-  resolution: "gm@workspace:recipes/gm"
+  resolution: "gm@workspace:examples/gm"
   dependencies:
     "@types/express": "npm:^4.17.20"
     "@types/node": "npm:^20.14.2"
@@ -2693,9 +2714,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"gpt@workspace:recipes/gpt":
+"gpt@workspace:examples/gpt":
   version: 0.0.0-use.local
-  resolution: "gpt@workspace:recipes/gpt"
+  resolution: "gpt@workspace:examples/gpt"
   dependencies:
     "@types/node": "npm:^20.14.2"
     openai: "npm:latest"
@@ -3355,6 +3376,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"multi-agent-express@workspace:examples/express":
+  version: 0.0.0-use.local
+  resolution: "multi-agent-express@workspace:examples/express"
+  dependencies:
+    "@types/express": "npm:^4.17.20"
+    "@types/node": "npm:^20.14.2"
+    "@xmtp/agent-starter": "workspace:*"
+    axios: "npm:^1.7.9"
+    express: "npm:^4.19.2"
+    typescript: "npm:^5.4.5"
+  languageName: unknown
+  linkType: soft
+
 "nanoid@npm:^3.3.8":
   version: 3.3.8
   resolution: "nanoid@npm:3.3.8"
@@ -3776,6 +3810,13 @@ __metadata:
     forwarded: "npm:0.2.0"
     ipaddr.js: "npm:1.9.1"
   checksum: 10/f24a0c80af0e75d31e3451398670d73406ec642914da11a2965b80b1898ca6f66a0e3e091a11a4327079b2b268795f6fa06691923fef91887215c3d0e8ea3f68
+  languageName: node
+  linkType: hard
+
+"proxy-from-env@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "proxy-from-env@npm:1.1.0"
+  checksum: 10/f0bb4a87cfd18f77bc2fba23ae49c3b378fb35143af16cc478171c623eebe181678f09439707ad80081d340d1593cd54a33a0113f3ccb3f4bc9451488780ee23
   languageName: node
   linkType: hard
 

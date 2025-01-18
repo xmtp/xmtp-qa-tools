@@ -30,7 +30,7 @@ import {
   ContentTypeAgentMessage,
 } from "../content-types/agent-message.js";
 import { createWalletClient, http, isAddress, toBytes, toHex } from "viem";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { privateKeyToAccount } from "viem/accounts";
 import { mainnet } from "viem/chains";
 
 import { getRandomValues } from "crypto";
@@ -39,8 +39,9 @@ import { Message, agentMessage, UserReturnType, User, Agent } from "./types.js";
 import { readFile } from "fs/promises";
 import * as fs from "fs";
 import fetch from "node-fetch";
+import crypto from "crypto";
 
-export async function createAgent(agent: Agent): Promise<XMTP> {
+export async function runAgent(agent?: Agent): Promise<XMTP> {
   let xmtp: XMTP | null = null; // Ensure a single instance
   xmtp = new XMTP(agent);
   await xmtp.init();
@@ -60,11 +61,26 @@ export class XMTP {
   }
 
   async init(): Promise<XMTP> {
-    const testKey = await setupTestEncryptionKey();
-    const { key, isRandom } = setupPrivateKey(this.agent?.encryptionKey);
-    const user = createUser(key);
+    let fixedKey =
+      this.agent?.fixedKey ??
+      process.env["FIXED_KEY" + (this.agent?.name ?? "")] ??
+      toHex(getRandomValues(new Uint8Array(32)));
 
-    let env = process.env.XMTP_ENV as XmtpEnv;
+    if (!fixedKey.startsWith("0x")) {
+      fixedKey = "0x" + fixedKey;
+    }
+    let encryptionKey =
+      this.agent?.encryptionKey ??
+      process.env["ENCRYPTION_KEY" + (this.agent?.name ?? "")] ??
+      toHex(getRandomValues(new Uint8Array(32)));
+
+    if (!encryptionKey.startsWith("0x")) {
+      encryptionKey = "0x" + encryptionKey;
+    }
+
+    const user = createUser(encryptionKey);
+
+    let env = this.agent?.config?.env as XmtpEnv;
     if (!env) env = "production" as XmtpEnv;
 
     let volumePath =
@@ -95,7 +111,7 @@ export class XMTP {
 
     const client = await Client.create(
       createSigner(user),
-      testKey,
+      new Uint8Array(toBytes(fixedKey as `0x${string}`)),
       finalConfig,
     );
 
@@ -103,9 +119,27 @@ export class XMTP {
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     Promise.all([streamMessages(this.onMessage, client, this)]);
+    this.saveKeys(this.agent?.name ?? "", fixedKey, encryptionKey);
     return this;
   }
+  saveKeys(agentName: string, fixedKey: string, encryptionKey: string) {
+    const envFilePath = path.resolve(process.cwd(), ".env");
+    const envContent = `\nFIXED_KEY${agentName}=${fixedKey}\nENCRYPTION_KEY${agentName}=${encryptionKey}`;
 
+    // Read the existing .env file content
+    let existingEnvContent = "";
+    if (fs.existsSync(envFilePath)) {
+      existingEnvContent = fs.readFileSync(envFilePath, "utf8");
+    }
+
+    // Check if the keys already exist
+    if (
+      !existingEnvContent.includes(`FIXED_KEY${agentName}=`) &&
+      !existingEnvContent.includes(`ENCRYPTION_KEY${agentName}=`)
+    ) {
+      fs.appendFileSync(envFilePath, envContent);
+    }
+  }
   async getAttachment(source: string): Promise<Attachment | undefined> {
     try {
       let imgArray: Uint8Array;
@@ -211,7 +245,7 @@ export class XMTP {
         contentType: ContentTypeText,
         reference: agentMessage.originalMessage?.id,
       } as Reply;
-    } else if (agentMessage.typeId === "agentMessage") {
+    } else if (agentMessage.typeId === "agent_message") {
       message = new AgentMessage(
         agentMessage.message,
         agentMessage.metadata,
@@ -219,21 +253,22 @@ export class XMTP {
       contentType = ContentTypeAgentMessage;
     }
     if (!agentMessage.receivers || agentMessage.receivers.length == 0) {
-      agentMessage.receivers = [agentMessage.originalMessage?.sender.inboxId];
+      agentMessage.receivers = [
+        agentMessage.originalMessage?.sender.inboxId as string,
+      ];
     }
-    for (let receiver of agentMessage.receivers) {
-      let inboxId = !isAddress(receiver)
-        ? receiver
-        : await this.client?.getInboxIdByAddress(receiver);
+    for (let receiverAddress of agentMessage.receivers) {
+      let inboxId = !isAddress(receiverAddress)
+        ? receiverAddress
+        : await this.client?.getInboxIdByAddress(receiverAddress);
       if (!inboxId) {
         throw new Error("Invalid receiver address");
       }
-      let conversation = await this.client?.conversations
-        .list()
-        .find(
-          (conv: Conversation) =>
-            conv.dmPeerInboxId?.toLowerCase() === inboxId.toLowerCase(),
-        );
+      let conversation =
+        await this.client?.conversations.getDmByInboxId(inboxId);
+      if (!conversation) {
+        conversation = await this.client?.conversations.newDm(receiverAddress);
+      }
       return conversation?.send(message, contentType);
     }
   }
@@ -253,26 +288,6 @@ export class XMTP {
   getConversationKey(message: Message) {
     return `${message?.group?.id}`;
   }
-  async encryptMessage(message: Message): Promise<Message | undefined> {
-    return message;
-  }
-  async decryptMessage(messageId: string): Promise<Message | undefined> {
-    try {
-      // Fetch the message by ID
-      const message = await this.getMessageById(messageId);
-      if (!message) {
-        console.error(`Message with ID ${messageId} not found.`);
-        return undefined;
-      }
-      return parseMessage(message, undefined, this.client as Client);
-    } catch (error) {
-      console.error(
-        `Error fetching or decrypting message with ID ${messageId}:`,
-        error,
-      );
-      return undefined;
-    }
-  }
 
   getUserConversationKey(message: Message) {
     return `${message?.group?.id}`;
@@ -288,7 +303,163 @@ export class XMTP {
     const isOnXMTP = await this.client?.canMessage([address]);
     return isOnXMTP ? true : false;
   }
+  async getLastAgentMessageSharedSecret(
+    address: string,
+  ): Promise<string | undefined> {
+    try {
+      const inboxId = await this.client?.getInboxIdByAddress(address);
+      if (!inboxId) {
+        console.log(
+          `getLastAgentMessageSharedSecret: Invalid receiver address ${address}`,
+        );
+        return undefined;
+      }
+
+      const conversations = await this.client?.conversations.listDms();
+      if (!conversations) {
+        console.log(
+          `getLastAgentMessageSharedSecret: No conversations found ${inboxId}`,
+        );
+        return undefined;
+      }
+      const conversation = conversations?.find(
+        (c: Conversation) => c.dmPeerInboxId === inboxId,
+      );
+
+      if (!conversation) {
+        console.log(
+          `getLastAgentMessageSharedSecret: No conversation found ${conversations.length}`,
+        );
+        return undefined;
+      }
+      const messages = await conversation?.messages();
+      if (!messages) {
+        console.log(
+          `getLastAgentMessageSharedSecret: No messages found ${conversation.id}`,
+        );
+        return undefined;
+      }
+      const lastAgentMessageSharedSecret = messages
+        .reverse()
+        .find(
+          (msg: DecodedMessage) =>
+            msg.contentType?.typeId === "agent_message" &&
+            msg.content.metadata.sharedSecret,
+        );
+      if (!lastAgentMessageSharedSecret) {
+        console.log(
+          `getLastAgentMessageSharedSecret: No shared secret found ${conversation.id}`,
+        );
+        return undefined;
+      }
+      console.log(
+        `getLastAgentMessageSharedSecret: Shared secret found ${conversation.id}`,
+      );
+      return lastAgentMessageSharedSecret?.content?.metadata
+        .sharedSecret as string;
+    } catch (error) {
+      console.error(`Error getting last agent message shared secret: ${error}`);
+      return undefined;
+    }
+  }
+
+  async encrypt(
+    plaintext: string,
+    receiverAddress: string,
+  ): Promise<{ nonce: string; ciphertext: string }> {
+    try {
+      let sharedSecret =
+        await this.getLastAgentMessageSharedSecret(receiverAddress);
+      if (!sharedSecret) {
+        console.log(
+          "No shared secret found on encrypt, generating new one through a handshake",
+        );
+        sharedSecret = crypto.randomBytes(32).toString("hex");
+        let agentMessage: agentMessage = {
+          message: "",
+          metadata: {
+            sharedSecret,
+          },
+          receivers: [receiverAddress],
+          typeId: "agent_message",
+        };
+
+        await this.send(agentMessage as agentMessage);
+        console.log("Sent handshake message");
+      }
+      const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
+      if (!bufferFromSharedSecret) {
+        throw new Error("encrypt: No buffer secret found");
+      }
+      const nonce = crypto.randomBytes(12);
+      const cipher = crypto.createCipheriv(
+        "chacha20-poly1305",
+        bufferFromSharedSecret,
+        nonce,
+        { authTagLength: 16 },
+      );
+
+      const ciphertext = Buffer.concat([
+        cipher.update(plaintext, "utf8"),
+        cipher.final(),
+      ]);
+      const authTag = cipher.getAuthTag();
+      const encryptedPayload = Buffer.concat([ciphertext, authTag]);
+
+      return {
+        nonce: nonce.toString("hex"),
+        ciphertext: encryptedPayload.toString("hex"),
+      };
+    } catch (error) {
+      console.error("Error encrypting message:", error);
+      throw error;
+    }
+  }
+
+  async decrypt(
+    nonceHex: string,
+    ciphertextHex: string,
+    senderAddress: string,
+  ): Promise<string> {
+    try {
+      const nonce = Buffer.from(nonceHex, "hex");
+      const encryptedPayload = Buffer.from(ciphertextHex, "hex");
+
+      const authTag = encryptedPayload.slice(-16);
+      const ciphertext = encryptedPayload.slice(0, -16);
+
+      const sharedSecret =
+        await this.getLastAgentMessageSharedSecret(senderAddress);
+
+      if (!sharedSecret) {
+        throw new Error(
+          `decrypt: No sharedSecret secret found on decrypt for ${senderAddress}`,
+        );
+      }
+
+      const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
+
+      const decipher = crypto.createDecipheriv(
+        "chacha20-poly1305",
+        bufferFromSharedSecret,
+        nonce,
+        { authTagLength: 16 },
+      );
+      decipher.setAuthTag(authTag);
+
+      const decrypted = Buffer.concat([
+        decipher.update(ciphertext),
+        decipher.final(),
+      ]);
+
+      return decrypted.toString("utf8");
+    } catch (error) {
+      console.error("Error decrypting message:", error);
+      throw error;
+    }
+  }
 }
+
 async function streamMessages(
   onMessage: (message: Message) => Promise<void>,
   client: Client | undefined,
@@ -334,40 +505,6 @@ async function streamMessages(
   }
 }
 
-function setupPrivateKey(customKey?: string): {
-  key: string;
-  isRandom: boolean;
-} {
-  const envFilePath = path.resolve(process.cwd(), ".env");
-  let isRandom = false;
-
-  // Handle private key setup
-  let key = process?.env?.ENCRYPTION_KEY || customKey;
-  if (key && !key.startsWith("0x")) {
-    key = "0x" + key;
-  }
-
-  // Generate new key if none exists or invalid
-  if (!key || !checkPrivateKey(key)) {
-    key = generatePrivateKey();
-    isRandom = true;
-
-    if (fs) {
-      const envContent = `\nKEY=${key.substring(2)}`;
-      if (fs.existsSync(envFilePath)) {
-        fs.appendFileSync(envFilePath, envContent);
-      } else {
-        fs.writeFileSync(envFilePath, envContent);
-      }
-    }
-  }
-
-  return {
-    key,
-    isRandom,
-  };
-}
-
 function createSigner(user: UserReturnType) {
   return {
     getAddress: () => user.account.address,
@@ -379,41 +516,6 @@ function createSigner(user: UserReturnType) {
       return toBytes(signature);
     },
   };
-}
-
-async function setupTestEncryptionKey(): Promise<Uint8Array> {
-  const envFilePath = path.resolve(process.cwd(), ".env");
-
-  if (!process.env.FIXED_KEY) {
-    // Only perform file operations in Node.js environment
-
-    if (fs) {
-      // Generate new test encryption key
-      const testEncryptionKey = toHex(getRandomValues(new Uint8Array(32)));
-
-      // Prepare the env content
-      const envContent = `\nFIXED_KEY=${testEncryptionKey}`;
-
-      if (fs) {
-        if (fs.existsSync(envFilePath)) {
-          fs.appendFileSync(envFilePath, envContent);
-        } else {
-          fs.writeFileSync(envFilePath, envContent);
-        }
-      }
-    }
-  }
-
-  // Return as Uint8Array
-  return new Uint8Array(toBytes(process.env.FIXED_KEY as `0x${string}`));
-}
-
-function checkPrivateKey(key: string) {
-  try {
-    return privateKeyToAccount(key as `0x${string}`).address !== undefined;
-  } catch (e) {
-    return false;
-  }
 }
 
 export function createUser(key: string): UserReturnType {
@@ -466,7 +568,7 @@ export async function parseMessage(
     };
   } else if (typeId == "read_receipt") {
     //Log read receipt
-  } else if (typeId == "agent") {
+  } else if (typeId == "agent_message") {
     content = {
       text: message.content.text,
       metadata: message.content.metadata,

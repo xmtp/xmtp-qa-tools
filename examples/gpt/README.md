@@ -1,11 +1,28 @@
-import { Message, createAgent } from "@xmtp/agent-starter";
+## Create GM agent
+
+> Try XMTP using [xmtp.chat](https://xmtp.chat)
+
+### .env
+
+Add the `OPENAI_API_KEY` to the .env file
+
+```bash
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption
+OPENAI_API_KEY= # sk-proj-...
+```
+
+This agent replies with the OpenAI api.
+
+```tsx
+import { Message, runAgent } from "@xmtp/agent-starter";
 import OpenAI from "openai";
 
 // Initialize OpenAI API
 const openai = new OpenAI();
 
 async function main() {
-  const agent = await createAgent({
+  const agent = await runAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
@@ -40,3 +57,4 @@ async function main() {
 }
 
 main().catch(console.error);
+```

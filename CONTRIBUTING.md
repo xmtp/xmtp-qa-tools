@@ -25,17 +25,17 @@ xmtp-agents/
 └── packages/
     └── agent-starter
     └── resolver
-└── recipes/
+└── examples/
     └── gated-group
-    // ... add your more recipes
+    // ... add your more examples
 ```
 
-### Create recipe
+### Create example
 
-Create a recipe like [gated-group].
+Create a example like [gated-group].
 
 ### Create a PR
 
-Create a PR about your recipe
+Create a PR about your example
 
 - Wait until is merged!

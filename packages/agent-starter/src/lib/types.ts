@@ -6,7 +6,7 @@ export type { ClientOptions };
 
 export type agentMessage = {
   message: string;
-  originalMessage: Message;
+  originalMessage?: Message;
   metadata?: any;
   receivers?: string[];
   typeId?:
@@ -15,8 +15,8 @@ export type agentMessage = {
     | "reaction"
     | "reply"
     | "attachment"
-    | "readReceipt"
-    | "agentMessage";
+    | "read_receipt"
+    | "agent_message";
 };
 
 export interface UserReturnType {
@@ -31,8 +31,10 @@ export type xmtpConfig = {
 } & ClientOptions;
 
 export type Agent = {
-  encryptionKey: string;
-  onMessage: (message: Message) => Promise<void>;
+  name?: string;
+  encryptionKey?: string;
+  fixedKey?: string;
+  onMessage?: (message: Message) => Promise<void>;
   config?: xmtpConfig;
 };
 

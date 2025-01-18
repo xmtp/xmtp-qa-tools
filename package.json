@@ -5,21 +5,19 @@
   "workspaces": [
     "templates/*",
     "packages/*",
-    "recipes/*",
+    "examples/*",
     "shared/*"
   ],
   "scripts": {
-    "build": "yarn build:agent-starter && yarn build:recipes",
+    "build": "yarn build:agent-starter && yarn build:examples",
     "build:agent-starter": "turbo run build --filter=./packages/agent-starter --force",
-    "build:recipes": "turbo run build --filter='./recipes/*'",
+    "build:examples": "turbo run build --filter='./examples/*'",
     "changeset": " changeset add --type patch",
-    "clean": "turbo run clean && yarn cache clean && find recipes -name '.data' -type d -exec rm -rf {} +",
+    "clean": "turbo run clean && yarn cache clean && find examples -name '.data' -type d -exec rm -rf {} +",
+    "examples": "node scripts/examples.js",
     "format": "turbo run format",
     "publish": "changeset publish",
-    "recipes": "node scripts/recipes.js",
     "test": "FORCE_COLOR=1 turbo run test --force --concurrency=1",
-    "test:agent-starter": "cd packages/agent-starter/tests && yarn test",
-    "test:resolver": "cd packages/resolver/tests && yarn test",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck"
   },
   "resolutions": {

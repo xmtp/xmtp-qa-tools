@@ -3,18 +3,18 @@ node_modules/
 .DS_Store
 
 # Template specific ignores
-recipes/**/data/
-recipes/**/.data/
-recipes/**/.turbo/
-recipes/**/dist/
-recipes/**/.env
+examples/**/data/
+examples/**/.data/
+examples/**/.turbo/
+examples/**/dist/
+examples/**/.env
 
 # Specific template paths
-recipes/*/data/
-recipes/*/.data/
-recipes/*/.turbo/
-recipes/*/dist/
-recipes/*/.env
+examples/*/data/
+examples/*/.data/
+examples/*/.turbo/
+examples/*/dist/
+examples/*/.env
 
 # testing
 coverage

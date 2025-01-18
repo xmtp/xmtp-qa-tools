@@ -26,7 +26,7 @@
 
 ## Setup
 
-[` @xmtp/agent-starter`](/packages/agent-starter/) is convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) simplifying agent delopment.
+This package is based on [`@xmtp/agent-starter`](/packages/agent-starter/) which is a convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) simplifying agent delopment.
 
 ```bash [yarn]
 yarn add @xmtp/agent-starter
@@ -42,7 +42,7 @@ These are the steps to initialize the XMTP listener and send messages.
 
 ```tsx
 async function main() {
-  const agent = await createAgent({
+  const agent = await runAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
@@ -66,15 +66,16 @@ main().catch(console.error);
 
 > Try your agents on XMTP using [xmtp.chat](https://xmtp.chat)
 
-## Recipes
+## Examples
 
 Various examples and tutorials to help you get started with creating and deploying your own agents using XMTP.
 
-- [Gated group](/recipes/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
-- [GM](/recipes/gm/): A simple agent that replies with "GM".
-- [GPT](/recipes/gpt): A simple agent that interacts with OpenAI APIs.
+- [gated-group](/examples/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
+- [gm](/examples/gm/): A simple agent that replies with "GM".
+- [gpt](/examples/gpt): A simple agent that interacts with OpenAI APIs.
+- [express](/examples/express/): A example of how to communicate with traditional api endpoints using xmtp e2ee
 
-See all the avaialable [recipes](/recipes/).
+> See all the avaialable [examples](/examples/).
 
 ## Groups
 
@@ -151,7 +152,7 @@ let agentMessage: agentMessage = {
   },
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
-  typeId: "agent",
+  typeId: "agent_message",
 };
 await agent.send(agentMessage);
 ```
@@ -202,37 +203,38 @@ console.log(info);
 
 ## Development
 
+### Clone the repo
+
 ```bash
 git clone https://github.com/ephemeraHQ/xmtp-agents/
 cd xmtp-agents
 ```
 
+### Install packages
+
 Run it:
 
 ```bash
 yarn install
-yarn recipes
+yarn examples
 ```
 
-### .env
+### Environment variables
 
 XMTP requires 2 key to initiate your client.
 
-- `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
-- `FIXED_KEY`: A secondary key that ensures local device encryption. Can be random.
+```bash
+ENCRYPTION_KEY= # The private key of the wallet that will be used to send or receive messages.
+FIXED_KEY= #  A secondary key that ensures local device encryption. Can be random.
+```
 
 > [!TIP]
 > If not specified the `.env` file will be populated **randomly**.
 
-```bash
-ENCRYPTION_KEY= # the private key of the wallet
-FIXED_KEY= # a second encryption key for encryption, can be random
-```
-
 ### Contribute
 
-Learn how to [contribute](/CONTRIBUTING.md) to the recipes directory.
+Learn how to [contribute](/CONTRIBUTING.md) to the examples directory.
 
-### Deployment
+## Deployment
 
-Learn how to deploy with [Railway](/recipes/railway/) or [Replit](/recipes/replit/)
+Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/replit/)
