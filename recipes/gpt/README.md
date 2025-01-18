@@ -7,8 +7,8 @@
 Add the `OPENAI_API_KEY` to the .env file
 
 ```bash
-KEY= # the private key of the wallet
-TEST_ENCRYPTION_KEY= # a second encryption key for encryption
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption
 OPENAI_API_KEY= # sk-proj-...
 ```
 

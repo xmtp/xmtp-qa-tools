@@ -48,8 +48,8 @@ jobs:
         run: yarn test:client
         continue-on-error: true
         env:
-          KEY: ${{ secrets.KEY }}
-          TEST_ENCRYPTION_KEY: ${{ secrets.TEST_ENCRYPTION_KEY }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+          FIXED_KEY: ${{ secrets.FIXED_KEY }}
       - name: Test parsing
         run: yarn test:parsing
         continue-on-error: true

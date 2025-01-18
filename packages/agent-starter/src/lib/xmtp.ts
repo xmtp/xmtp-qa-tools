@@ -342,7 +342,7 @@ function setupPrivateKey(customKey?: string): {
   let isRandom = false;
 
   // Handle private key setup
-  let key = process?.env?.KEY || customKey;
+  let key = process?.env?.ENCRYPTION_KEY || customKey;
   if (key && !key.startsWith("0x")) {
     key = "0x" + key;
   }
@@ -384,7 +384,7 @@ function createSigner(user: UserReturnType) {
 async function setupTestEncryptionKey(): Promise<Uint8Array> {
   const envFilePath = path.resolve(process.cwd(), ".env");
 
-  if (!process.env.TEST_ENCRYPTION_KEY) {
+  if (!process.env.FIXED_KEY) {
     // Only perform file operations in Node.js environment
 
     if (fs) {
@@ -392,7 +392,7 @@ async function setupTestEncryptionKey(): Promise<Uint8Array> {
       const testEncryptionKey = toHex(getRandomValues(new Uint8Array(32)));
 
       // Prepare the env content
-      const envContent = `\nTEST_ENCRYPTION_KEY=${testEncryptionKey}`;
+      const envContent = `\nFIXED_KEY=${testEncryptionKey}`;
 
       if (fs) {
         if (fs.existsSync(envFilePath)) {
@@ -405,9 +405,7 @@ async function setupTestEncryptionKey(): Promise<Uint8Array> {
   }
 
   // Return as Uint8Array
-  return new Uint8Array(
-    toBytes(process.env.TEST_ENCRYPTION_KEY as `0x${string}`),
-  );
+  return new Uint8Array(toBytes(process.env.FIXED_KEY as `0x${string}`));
 }
 
 function checkPrivateKey(key: string) {

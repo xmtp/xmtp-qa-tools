@@ -10,7 +10,7 @@
 
 </div>
 
-`xmtp-agents` is a library that enables you to run powerful agents on top of [XMTP](https://xmtp.org/)
+`xmtp-agents` is a library that enables you to run scalable, secure and interoperable agents using [XMTP](https://xmtp.org/) as the standard.
 
 - **End-to-end**: Servers only see cipher text, preventing data exfiltration through server breaches or insider threats.
 - **Security**: XMTP is built on the IETF-standard Messaging Layer Security (MLS) protocol – the same open-source security foundation trusted by Mozilla, Google, Wire, and Cisco.
@@ -212,6 +212,21 @@ Run it:
 ```bash
 yarn install
 yarn recipes
+```
+
+### .env
+
+XMTP requires 2 key to initiate your client.
+
+- `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
+- `FIXED_KEY`: A secondary key that ensures local device encryption. Can be random.
+
+> [!TIP]
+> If not specified the `.env` file will be populated **randomly**.
+
+```bash
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption, can be random
 ```
 
 ### Contribute
