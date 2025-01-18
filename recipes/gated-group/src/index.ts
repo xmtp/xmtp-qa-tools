@@ -18,7 +18,7 @@ async function main() {
         );
         console.log("Group created", group?.id);
         await agent.send({
-          message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
+          message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://xmtp.chat/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
           originalMessage: message,
         });
         return;
