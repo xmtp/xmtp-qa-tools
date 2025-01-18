@@ -11,7 +11,7 @@
 
 # xmtp-agents
 
-This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
+This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying agent delopment.
 
 </div>
 
