@@ -19,6 +19,10 @@ This library offers a convenient wrapper for the [XMTP SDK for Node](https://git
 
 ---
 
+## XMTP.CHAT
+
+Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
+
 ## Install
 
 ```bash [yarn]

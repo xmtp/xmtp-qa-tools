@@ -1,5 +1,7 @@
 # Building a gated group with NFT verification
 
+> Try XMTP using [xmtp.chat](https://xmtp.chat)
+
 In this tutorial, you’ll learn how to create and manage a private group where membership is gated by NFT ownership. We’ll build an Express server that verifies a wallet before adding it to the group, making it easy to manage NFT-based access to a conversation.
 
 ## Start the XMTP agent
