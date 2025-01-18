@@ -81,39 +81,35 @@ await group.addMembers([0xaddresses]);
      - Store your private key in a `.env` file:
        `ENCRYPTION_KEY=0xYOUR_PRIVATE_KEY`
 
-  2. Generate the private key at runtime:
+     ```tsx
+     const agent = await runAgent({
+       encryptionKey: process.env.ENCRYPTION_KEY,
+     });
+     ```
 
-     - If no private key is provided, the agent can automatically generate a new one upon startup:
-       `ENCRYPTION_KEY=random_key`
-     - This method will save the key in the `.env` file for future use.
+2. Generate the private key at runtime:
 
-  3. Assign a name (alias) to the randomly generated key:
-     - Providing a "name" gives your key a meaningful identifier, aiding in organization and persistence.
-       `ENCRYPTION_KEY_agent-name=0xYOUR_PRIVATE_KEY`
-     - This method will also save the key in the `.env` file for future use.
+   - If no private key is provided, the agent can automatically generate a new one upon startup:
+     `ENCRYPTION_KEY=random_key`
+   - This method will save the key in the `.env` file for future use.
+
+     ```tsx
+     const agent = await runAgent({});
+     ```
+
+3. Assign a name (alias) to the randomly generated key:
+
+   - Providing a "name" gives your key a meaningful identifier, aiding in organization and persistence.
+     `ENCRYPTION_KEY_agentA=0xYOUR_PRIVATE_KEY`
+   - This method will also save the key in the `.env` file for future use.
+
+     ```tsx
+     const agent = await runAgent({
+       name: "_agentA", // Optional alias for this agent
+     });
+     ```
 
 - `FIXED_KEY`: The fixed key is an additional security measure. It is not linked to the public address and can be randomly generated or shared across different agents. It will also be generated and saved in the `.env` file using the methods described above.
-
-#### Example
-
-```tsx
-import { runAgent } from "@xmtp/agent-starter";
-
-export async function startAgentWithKey() {
-  // Pass an existing encryption key to the agent, or let it generate one automatically.
-  const agent = await runAgent({
-    encryptionKey: process.env.ENCRYPTION_KEY,
-    name: "_agent-name", // Optional alias for this agent
-    onMessage: async (message) => {
-      console.log("Received message:", message.content.text);
-      // Handle the message...
-    },
-  });
-
-  console.log("Agent initialized with inbox ID:", agent.address);
-  return agent;
-}
-```
 
 ## Receive messages
 
