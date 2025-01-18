@@ -222,14 +222,14 @@ yarn examples gm
 
 #### Environment variables
 
-XMTP requires 2 key to initiate your client.
+XMTP requires 2 encryption keys to initiate your client.
 
 ```bash
 ENCRYPTION_KEY= # The private key of the wallet that will be used to send or receive messages.
 FIXED_KEY= #  A secondary key that ensures local device encryption. Can be random.
 ```
 
-> Learn about generating [private keys](/packages/agent-starter/)
+> Learn about generating [encryption keys](/packages/agent-starter#encryption-keys)
 
 ### Contribute
 
