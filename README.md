@@ -31,8 +31,6 @@
 - **Groups**  
   Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
 
----
-
 ## Installation & setup
 
 This library is based on [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
@@ -133,27 +131,20 @@ const onMessage = async (message: Message) => {
     `Decoded message: ${message.content.text} from ${message.sender.address}`,
   );
 
-  switch (message.typeId) {
-    case "text":
-      // Handle text
-      break;
-    case "reaction":
-      // Handle reaction
-      break;
-    case "reply":
-      // Handle reply
-      break;
-    case "attachment":
-      // Handle attachment
-      break;
-    case "agent_message":
-      // Handle structured agent data
-      break;
-    case "group_updated":
-      // Handle group info updates
-      break;
-    default:
-      console.log("Unknown message type.");
+  let typeId = message.typeId;
+
+  if (typeId === "text") {
+    // Do something with the text
+  } else if (typeId === "reaction") {
+    // Do something with the reaction
+  } else if (typeId === "reply") {
+    // Do something with the `reply`
+  } else if (typeId === "attachment") {
+    // Do something with the attachment data url
+  } else if (typeId === "agent_message") {
+    // Do something with the agent message
+  } else if (typeId === "group_updated") {
+    // Do something with the group updated metadata
   }
 };
 ```
@@ -255,13 +246,9 @@ ENCRYPTION_KEY=
 FIXED_KEY=
 ```
 
----
-
 ## Contribute
 
 We welcome contributions! Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started.
-
----
 
 <p align="center">
 Built and maintained with ❤️ by EphemeraHQ.
