@@ -141,9 +141,9 @@ await agent.send(agentMessage);
 
 ## Web inbox
 
-![alt text](/media/chat.png)
-
 Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
+
+![alt text](/media/chat.png)
 
 ## Address availability
 
