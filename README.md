@@ -10,33 +10,49 @@
 
 </div>
 
-`xmtp-agents` is a library that enables you to run scalable, secure and interoperable agents using [XMTP](https://xmtp.org/) protocol for communication.
+## Introduction
 
-**End-to-end & compliant**: Ensures servers only see ciphertext, preventing exfiltration by insiders or breaches. Meets enterprise regulations that require sensitive data be inaccessible to intermediaries—something TLS alone can’t guarantee.
+**xmtp-agents** is a TypeScript library for building scalable, secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol for communication. Messages are end-to-end encrypted (E2EE) with the IETF-standard **Messaging Layer Security (MLS)**, ensuring only intended recipients can read them.
 
-**Open-source & trustless**: Built on the IETF-standard Messaging Layer Security (MLS) protocol—trusted by Mozilla and Google. By relying on cryptographic proofs rather than certificate authorities, XMTP avoids single points of failure.
+### Why xmtp?
 
-**Standardized & easy to integrate**: Seamlessly plugs into existing AI tooling or enterprise environments, standardizing secure e2ee agent communication without overhead.
+- **End-to-end & compliant**  
+  Your servers see only ciphertext, meeting strict security and regulatory standards.
 
-**Privacy & metadata protection**: Allows anonymous or pseudonymous usage. Prevents tracking of timestamps, routes, IP addresses, locations, or devices.
+- **Open-source & trustless**  
+  Built on the MLS protocol, it removes centralized certificate authorities with cryptographic proofs.
 
-**Decentralized**: Operates on a peer-to-peer network, eliminating reliance on central servers.
+- **Privacy & metadata protection**  
+  Offers anonymous or pseudonymous usage with no tracking of timestamps, routes, IPs, or device info.
 
-**Groups**: Securely supports multi-agent (and multi-human) group communication for collaborative private workflows.
+- **Decentralized**  
+  Operates on a peer-to-peer network, eliminating single points of failure.
+
+- **Groups**  
+  Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
 
 ---
 
-## Setup
+## Installation & setup
 
-This package is based on [`@xmtp/agent-starter`](/packages/agent-starter/) which is a convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) simplifying agent delopment.
+This library is based on [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
 
-```bash [yarn]
+```bash
 yarn add @xmtp/agent-starter
 ```
 
-> See the available [types](https://github.com/ephemeraHQ/xmtp-agents/blob/main/packages/agent-starter/src/lib/types.ts)
+### Environment variables
 
-## Overview
+To run your XMTP agent, you need two keys:
+
+```bash
+ENCRYPTION_KEY= # Private key for sending/receiving messages.
+FIXED_KEY=      # Additional key for local encryption (can be random).
+```
+
+> See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter#encryption-keys) to learn more.
+
+## Basic usage
 
 These are the steps to initialize the XMTP listener and send messages.
 
@@ -65,8 +81,6 @@ async function main() {
 
 main().catch(console.error);
 ```
-
-> Try your agents on XMTP using [xmtp.chat](https://xmtp.chat)
 
 ## Examples
 
@@ -105,63 +119,75 @@ await group.addMembers([0xaddresses]);
 
 > To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
 
-## Receive messages
+## Message handling
+
+`agent-starter` provides an abstraction to XMTP [content types](https://github.com/xmtp/xmtp-js/tree/main/content-types) to make it easier for devs to integrate different types of messages.
+
+### Receiving messages
+
+All new messages trigger the `onMessage` callback:
 
 ```tsx
 const onMessage = async (message: Message) => {
   console.log(
-    `Decoded message: ${message.content.text} by ${message.sender.address}`,
+    `Decoded message: ${message.content.text} from ${message.sender.address}`,
   );
-  let typeId = message.typeId;
 
-  if (typeId === "text") {
-    // Do something with the text
-  } else if (typeId === "reaction") {
-    // Do something with the reaction
-  } else if (typeId === "reply") {
-    // Do something with the `reply`
-  } else if (typeId === "attachment") {
-    // Do something with the attachment data url
-  } else if (typeId === "agent_message") {
-    // Do something with the agent message
-  } else if (typeId === "group_updated") {
-    // Do something with the group updated metadata
+  switch (message.typeId) {
+    case "text":
+      // Handle text
+      break;
+    case "reaction":
+      // Handle reaction
+      break;
+    case "reply":
+      // Handle reply
+      break;
+    case "attachment":
+      // Handle attachment
+      break;
+    case "agent_message":
+      // Handle structured agent data
+      break;
+    case "group_updated":
+      // Handle group info updates
+      break;
+    default:
+      console.log("Unknown message type.");
   }
 };
 ```
 
-## Send messages
+### Sending messages
 
-App messages are messages that are sent when you send a reply to a message and are highlighted differently by the apps.
+Use `agent.send()` for different message types.
 
-```tsx [Text]
-let textMessage: agentMessage = {
-  message: "Your message.",
+#### Text messages
+
+```tsx
+await agent.send({
+  message: "Hello from xmtp-agents!",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
-};
-await agent.send(textMessage);
+});
 ```
 
-Agent message can be used to send any hidden metadata that is not meant to be read by inboxes allowing agents to communicate in a more flexible way, like in a JSON structure.
+#### Agent messages
 
-```tsx [Agent]
-let agentMessage: agentMessage = {
-  message: "Would you like to approve this transaction?",
+Agent messages can contain metadata, enabling structured communication between agents:
+
+```tsx
+await agent.send({
+  message: "Transaction request",
   metadata: {
     amount: "10",
     token: "USDC",
-    chain: "base",
-    destinationAddress: "0x123...789",
   },
-  receivers: ["0x123..."], // optional
-  originalMessage: message, // optional
+  receivers: ["0x123..."],
+  originalMessage: message,
   typeId: "agent_message",
-};
-await agent.send(agentMessage);
+});
 ```
-
-> See other types like [reactions, replies and attachments](/packages/agent-starter/)
 
 ## Web inbox
 
@@ -207,34 +233,36 @@ console.log(info);
 
 ## Development
 
-#### Clone the repo
-
 ```bash
+# clone the repository
 git clone https://github.com/ephemeraHQ/xmtp-agents/
 cd xmtp-agents
-```
 
-#### Install packages & run
-
-```bash
+# install dependencies
 yarn install
-# select examples from a list
+
+# run sample agents from the examples directory
 yarn examples
-# run a specific example
+
+# or run a specific example
 yarn examples gm
 ```
 
-#### Environment variables
-
-XMTP requires 2 encryption keys to initiate your client.
+Use a `.env` file for your environment variables:
 
 ```bash
-ENCRYPTION_KEY= # The private key of the wallet that will be used to send or receive messages.
-FIXED_KEY= #  A secondary key that ensures local device encryption. Can be random.
+ENCRYPTION_KEY=
+FIXED_KEY=
 ```
 
-> Learn about generating [encryption keys](/packages/agent-starter#encryption-keys)
+---
 
 ## Contribute
 
-Learn how to [contribute](/CONTRIBUTING.md) to the examples directory.
+We welcome contributions! Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started.
+
+---
+
+<p align="center">
+Built and maintained with ❤️ by EphemeraHQ.
+</p>
