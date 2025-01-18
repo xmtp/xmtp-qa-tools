@@ -100,7 +100,6 @@ export class XMTP {
     );
 
     this.client = client;
-
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     Promise.all([streamMessages(this.onMessage, client, this)]);
@@ -223,17 +222,17 @@ export class XMTP {
       agentMessage.receivers = [agentMessage.originalMessage?.sender.inboxId];
     }
     for (let receiver of agentMessage.receivers) {
-      let resolvedAddress = isAddress(receiver)
+      let inboxId = !isAddress(receiver)
         ? receiver
         : await this.client?.getInboxIdByAddress(receiver);
-      if (!resolvedAddress) {
+      if (!inboxId) {
         throw new Error("Invalid receiver address");
       }
       let conversation = await this.client?.conversations
         .list()
         .find(
           (conv: Conversation) =>
-            conv.dmPeerInboxId?.toLowerCase() === resolvedAddress.toLowerCase(),
+            conv.dmPeerInboxId?.toLowerCase() === inboxId.toLowerCase(),
         );
       return conversation?.send(message, contentType);
     }
@@ -354,7 +353,7 @@ function setupPrivateKey(customKey?: string): {
     isRandom = true;
 
     if (fs) {
-      const envContent = `\nKEY=${key.substring(2)}\n`;
+      const envContent = `\nKEY=${key.substring(2)}`;
       if (fs.existsSync(envFilePath)) {
         fs.appendFileSync(envFilePath, envContent);
       } else {
@@ -393,7 +392,7 @@ async function setupTestEncryptionKey(): Promise<Uint8Array> {
       const testEncryptionKey = toHex(getRandomValues(new Uint8Array(32)));
 
       // Prepare the env content
-      const envContent = `\nTEST_ENCRYPTION_KEY=${testEncryptionKey}\n`;
+      const envContent = `\nTEST_ENCRYPTION_KEY=${testEncryptionKey}`;
 
       if (fs) {
         if (fs.existsSync(envFilePath)) {

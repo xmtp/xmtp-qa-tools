@@ -43,7 +43,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Build
-        run: yarn build:message-kit
+        run: yarn build:xmtp-agents
       - name: Test client
         run: yarn test:client
         continue-on-error: true

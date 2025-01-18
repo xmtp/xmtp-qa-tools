@@ -4,14 +4,14 @@
 </div>
 
 ![Release](https://img.shields.io/website/http/huggingface.co/docs/smolagents/index.html.svg?down_color=red&down_message=offline&up_message=online)
-[![MIT License](https://img.shields.io/github/license/ephemerahq/message-kit)](https://github.com/ephemerahq/message-kit/blob/main/LICENSE)
+[![MIT License](https://img.shields.io/github/license/ephemerahq/xmtp-agents)](https://github.com/ephemerahq/xmtp-agents/blob/main/LICENSE)
 [![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
 
 <img src="media/logo.png" alt="Logo" width="60" />
 
 # xmtp-agents
 
-This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying agent delopment.
+This library offers a convenient TypeScript wrapper for the [@xmtp/node-sdk](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying agent delopment.
 
 </div>
 

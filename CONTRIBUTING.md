@@ -21,7 +21,7 @@ yarn dev
 Make it work in the playground:
 
 ```tsx
-message-kit/
+xmtp-agents/
 └── packages/
     └── agent-starter
     └── resolver

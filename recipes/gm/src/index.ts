@@ -15,7 +15,7 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat`,
+    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
   );
 }
 

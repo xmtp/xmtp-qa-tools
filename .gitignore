@@ -3,18 +3,18 @@ node_modules/
 .DS_Store
 
 # Template specific ignores
-templates/**/data/
-templates/**/.data/
-templates/**/.turbo/
-templates/**/dist/
-templates/**/.env
+recipes/**/data/
+recipes/**/.data/
+recipes/**/.turbo/
+recipes/**/dist/
+recipes/**/.env
 
 # Specific template paths
-templates/*/data/
-templates/*/.data/
-templates/*/.turbo/
-templates/*/dist/
-templates/*/.env
+recipes/*/data/
+recipes/*/.data/
+recipes/*/.turbo/
+recipes/*/dist/
+recipes/*/.env
 
 # testing
 coverage
@@ -75,5 +75,3 @@ next-env.d.ts
 
 # remix
 .data
-
-packages/create-message-kit/templates/**/*

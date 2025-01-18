@@ -3,7 +3,7 @@
   "changelog": [
     "@changesets/changelog-git",
     {
-      "repo": "ephemeraHQ/message-kit"
+      "repo": "ephemeraHQ/xmtp-agents"
     }
   ],
   "commit": false,
@@ -12,5 +12,5 @@
   "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": ["base-links", "docs", "@xmtp/tsconfig"]
+  "ignore": ["@xmtp/tsconfig"]
 }
