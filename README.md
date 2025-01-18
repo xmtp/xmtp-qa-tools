@@ -85,7 +85,7 @@ See all the avaialable [recipes](/recipes/).
 To create a group from your agent, you can use the following code:
 
 ```tsx
-const group = await xmtp?.conversations.newGroup([address1, address2]);
+const group = await agent?.conversations.newGroup([address1, address2]);
 ```
 
 As an admin you can add members to the group.

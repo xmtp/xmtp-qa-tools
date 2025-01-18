@@ -18,8 +18,8 @@
     "publish": "yarn install && yarn build && node scripts/publish.js",
     "recipes": "node scripts/recipes.js",
     "test": "FORCE_COLOR=1 turbo run test --force --concurrency=1",
-    "test:client": "cd packages/agent-starter/tests && yarn test:client",
-    "test:e2e": "cd packages/agent-starter/tests && yarn test:e2e",
+    "test:agent-starter": "cd packages/agent-starter/tests && yarn test",
+    "test:resolver": "cd packages/resolver/tests && yarn test",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck"
   },
   "resolutions": {

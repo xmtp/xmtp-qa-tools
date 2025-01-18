@@ -11,8 +11,9 @@ describe("Client Private Key Configuration Tests", () => {
 
   test("creates a client with a provided private key", async () => {
     const encryptionKey = generatePrivateKey();
-    const xmtp = new XMTP(undefined, {
+    const xmtp = new XMTP({
       encryptionKey,
+      onMessage: async () => {},
     });
     await xmtp.init();
     expect(xmtp?.inboxId).toBeDefined();
@@ -21,8 +22,9 @@ describe("Client Private Key Configuration Tests", () => {
   test("fails gracefully with invalid private key format", async () => {
     const invalidKey = "invalid_key";
 
-    const xmtp = new XMTP(undefined, {
+    const xmtp = new XMTP({
       encryptionKey: invalidKey,
+      onMessage: async () => {},
     });
     await xmtp.init();
 
