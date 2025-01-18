@@ -14,22 +14,17 @@
 
 **xmtp-agents** is a TypeScript library for building scalable, secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol for communication. Messages are end-to-end encrypted (E2EE) with the IETF-standard **Messaging Layer Security (MLS)**, ensuring only intended recipients can read them.
 
-### Why xmtp?
+### Why XMTP?
 
-- **End-to-end & compliant**  
-  Your servers see only ciphertext, meeting strict security and regulatory standards.
+- **End-to-end & compliant**: Your servers see only ciphertext, meeting strict security and regulatory standards.
 
-- **Open-source & trustless**  
-  Built on the MLS protocol, it removes centralized certificate authorities with cryptographic proofs.
+- **Open-source & trustless**: Built on the MLS protocol, it removes centralized certificate authorities with cryptographic proofs.
 
-- **Privacy & metadata protection**  
-  Offers anonymous or pseudonymous usage with no tracking of timestamps, routes, IPs, or device info.
+- **Privacy & metadata protection**: Offers anonymous or pseudonymous usage with no tracking of timestamps, routes, IPs, or device info.
 
-- **Decentralized**  
-  Operates on a peer-to-peer network, eliminating single points of failure.
+- **Decentralized**: Operates on a peer-to-peer network, eliminating single points of failure.
 
-- **Groups**  
-  Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
+- **Groups**: Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
 
 ## Installation & setup
 
