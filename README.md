@@ -12,6 +12,19 @@ A convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/
 
 </div>
 
+`xmtp-agents` is a library that enables you to run powerful agents in a few lines of code with xmtp
+
+- **End-to-end**: Servers only see cipher text, preventing data exfiltration through server breaches or insider threats.
+- **Trustless**: Traditional TLS depends on certificate providers for trust. XMTP avoids single points of failure by leveraging mathematics.
+- **Ephemeral identities**: Users can remain pseudonymous, minimizing data collection while still enabling secure conversations.
+- **Metadata protection**: Prevents tracking of additional data like timestamps and message routes, IP, location or device
+- **Compliant**: Enterprise regulations increasingly require that sensitive data be inaccessible to employees or intermediaries, something **server-level TLS** cannot guarantee.
+- **Decentralized**: XMTP runs on a decentralized network enabling peer-to-peer messaging without relying on central servers.
+- **Security**: XMTP is built on the IETF-standard Messaging Layer Security (MLS) protocol – the same open-source security foundation trusted by Mozilla, Google, Wire, and Cisco.
+- **Permissionless**: Anyone can participate from the network just following simple instructions.
+
+To learn more go to [XMTP](https://xmtp.org/)
+
 ---
 
 ## Install
