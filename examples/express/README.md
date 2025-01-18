@@ -1,7 +1,9 @@
 # E2EE with XMTP Handshake
 
 > [!WARNING]
-> This a proof of concept, is not officially supported by the protocol.
+> This is a proof of concept and is not officially supported by the protocol.
+
+XMTP assists in verifying identities and establishing the initial handshake to share the shared secret. Afterward, you manage **end-to-end encryption** independently, ensuring complete privacy by never exposing plaintext messages outside your environment.
 
 1. **Use XMTP** only once to exchange public addresses.
 2. **Encrypt** messages locally with [`@xmtp/agent-starter`](https://github.com/xmtp-labs/agent-starter).
@@ -19,23 +21,29 @@ async function main() {
 
   // 2. Minimal server to receive encrypted data.
   const appA = express();
+
   appA.use(express.json());
+
   appA.post("/receive", async (req, res) => {
     const { nonce, ciphertext, fromAddress } = req.body;
     const msg = await agentA.decrypt(nonce, ciphertext, fromAddress);
     console.log("A decrypted:", msg);
     res.json({ success: true });
   });
+
   appA.listen(3000, () => console.log("Server A on 3000"));
 
   const appB = express();
+
   appB.use(express.json());
+
   appB.post("/receive", async (req, res) => {
     const { nonce, ciphertext, fromAddress } = req.body;
     const msg = await agentB.decrypt(nonce, ciphertext, fromAddress);
     console.log("B decrypted:", msg);
     res.json({ success: true });
   });
+
   appB.listen(3001, () => console.log("Server B on 3001"));
 
   // 3. Encrypt a message locally and POST the ciphertext to the other server.
@@ -54,5 +62,3 @@ async function main() {
 
 main();
 ```
-
-**TL;DR**: XMTP helps you discover and confirm addresses. After that, you handle **end-to-end encryption** on your own, ensuring absolute privacy by never exposing plaintext messages outside your environment.
