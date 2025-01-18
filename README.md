@@ -59,7 +59,13 @@ main().catch(console.error);
 
 ## Recipes
 
-See the avaialable [recipes](/recipes/) for examples to get started.
+Various examples and tutorials to help you get started with creating and deploying your own agents using XMTP.
+
+- [Gated group](/recipes/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
+- [GM](/recipes/gm/): A simple agent that replies with "GM".
+- [GPT](/recipes/gpt): A simple agent that interacts with OpenAI APIs.
+
+See all the avaialable [recipes](/recipes/).
 
 ## Groups
 
