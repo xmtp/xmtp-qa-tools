@@ -1,72 +1,44 @@
-# XMTP agent wrapper sdk for Node js
+# Agent starter
 
-This package provides the XMTP agent wrapper around [SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk).
-
-To keep up with the latest SDK developments, see the [Issues tab](https://github.com/xmtp/xmtp-js/issues) in this repo.
-
-To learn more about XMTP and get answers to frequently asked questions, see the [XMTP documentation](https://xmtp.org/docs).
-
-> [!CAUTION]
-> This SDK is currently in alpha. The API is subject to change and it is not yet recommended for production use.
-
-## Requirements
-
-- Node.js 20+
-- `glibc` 3.28+ (i.e. Ubuntu 24.04 or later)
+This library provides a wrapper around [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) to make it easier to use in your agent.
 
 ## Install
 
-**NPM**
-
-```bash
-npm install xmtp
+```bash [yarn]
+yarn add @xmtp/agent-starter
 ```
 
-**PNPM**
+## Overview
 
-```bash
-pnpm install xmtp
-```
+These are the steps to initialize the XMTP listener and send messages.
 
-**Yarn**
-
-```bash
-yarn add xmtp
-```
-
-## Usage
-
-This is how you can use the `xmtp` package to create a client and handle messages.
+- `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
 
 ```tsx
-import { XMTP } from "@xmtp/agent-starter";
+async function main() {
+  const agent = await createAgent({
+    encryptionKey: process.env.ENCRYPTION_KEY as string,
+      const onMessage = async (message, user) => {
+        console.log(`Decoded message: ${message.content.text} by ${user.address}`);
 
-const xmtp = new XMTP(onMessage, {
-  encryptionKey: process.env.ENCRYPTION_KERY,
-});
+        // Your AI model response
+        const response = await api("Hi, how are you?");
 
-await xmtp.init();
-
-const onMessage = async (message, user) => {
-  console.log(`Decoded message: ${message.content.text} by ${user.address}`);
-  // Your AI model response
-  await xmtp.send({
-    message: response,
-    originalMessage: message,
+        //Send text message
+        await xmtp.send({
+          message: response,
+          originalMessage: message,
+        });
+      };
   });
-};
+
+  console.log("Agent is up and running...");
+}
+
+main().catch(console.error);
 ```
 
-## Identity
-
-Each message comes with a sender object that contains the address, name, and avatar of the sender.
-
-- `inboxId`: A unique identifier for the user's message inbox. This remains consistent across different installations.
-- `address`: The primary blockchain address associated with the sender. This is typically an Ethereum address.
-- `accountAddresses`: An array of all blockchain addresses linked to this identity. Users can have multiple addresses associated with their XMTP identity.
-- `installationIds`: Array of unique identifiers for each installation/device where the user has XMTP enabled.
-
-### Address availability
+## Address availability
 
 Returns `true` if an address has XMTP enabled
 
@@ -94,9 +66,7 @@ As an admin you can add members to the group.
 // get the group
 await group.sync();
 //By address
-await group.addMembers([userAddresses]);
-//By inboxId
-await group.addMembersByInboxId([addedInboxes]);
+await group.addMembers([0xaddresses]);
 ```
 
 ## Receive messages
@@ -104,6 +74,7 @@ await group.addMembersByInboxId([addedInboxes]);
 ```tsx
 const onMessage = async (message, user) => {
   console.log(`Decoded message: ${message.content.text} by ${user.address}`);
+  let typeId = message.typeId;
 
   if (typeId === "text") {
     // Do something with the text
@@ -125,26 +96,147 @@ const onMessage = async (message, user) => {
 
 App messages are messages that are sent when you send a reply to a message and are highlighted differently by the apps.
 
+:::code-group
+
 ```tsx [Text]
-let textMessage: userMessage = {
+let textMessage: agentMessage = {
   message: "Your message.",
-  receivers: [message.sender.address],
-  originalMessage: message,
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
 };
 await xmtp.send(textMessage);
 ```
 
-## XMTP network environments
+```tsx [Reaction]
+let reaction: agentMessage = {
+  message: "😅",
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
+  typeId: "reaction",
+};
+await xmtp.send(reaction);
+```
 
-XMTP provides `production`, `dev`, and `local` network environments to support the development phases of your project. To learn more about these environments, see our [official documentation](https://xmtp.org/docs/build/authentication#environments).
+```tsx [Reply]
+let reply: agentMessage = {
+  message: "Your message.",
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
+  typeId: "reply",
+};
+await xmtp.send(reply);
+```
 
-## Developing
+```tsx [Attachment]
+let attachment: agentMessage = {
+  message: "https://picsum.photos/200/300",
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
+  typeId: "attachment",
+};
+await xmtp.send(attachment);
+```
 
-Run `yarn dev` to build the SDK and watch for changes, which will trigger a rebuild.
+```tsx [Agent]
+let agentMessage: agentMessage = {
+  message: "Would you like to approve this transaction?",
+  metadata: {
+    agentId: "payment-bot",
+    skillUsed: "approve-tx",
+    amount: "10",
+    token: "USDC",
+    chain: "base",
+    destinationAddress: "0x123...789",
+  },
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
+  typeId: "agent",
+};
+await xmtp.send(agentMessage);
+```
 
-### Useful commands
+:::
 
-- `yarn build`: Builds the SDK
-- `yarn clean`: Removes `node_modules`, `dist`, and `.turbo` folders
-- `yarn test`: Runs all tests
-- `yarn typecheck`: Runs `tsc`
+# Resolver library
+
+The resolver library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
+
+## Quick start
+
+```typescript
+import { getUserInfo } from "@xmtp/agent-starter";
+
+// Because user identifiers come in all shapes and sizes!
+const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
+const userInfo = await getUserInfo(identifier);
+
+console.log(userInfo);
+/*
+{
+  ensDomain: 'vitalik.eth',
+  address: '0x1234...',
+  preferredName: 'vitalik.eth',
+  converseUsername: '',
+  avatar: 'https://...',
+  converseEndpoint: ''
+}
+*/
+```
+
+## Supported identifiers
+
+- **Ethereum Addresses** : Example: `0x1234...`
+- **ENS Domains** : Example: `vitalik.eth`
+- **Converse Usernames** : Example: `@fabri`
+- **Inbox ID** : Example: `0x1234...` (Converse inbox ID)
+- **Website Header Tag** : Example: `https://example.com` containing `xmtp=0x1234...`
+- **Website TXT Record** : Example: `meta="@xmtp/agent-starter" content="0x1234..."`
+
+### Returned UserInfo
+
+The resolver always returns a `UserInfo` object with these fields:
+
+| Field                | Description                                |
+| -------------------- | ------------------------------------------ |
+| **ensDomain**        | The user’s ENS domain (if any)             |
+| **address**          | The Ethereum address                       |
+| **preferredName**    | Best name to display                       |
+| **converseUsername** | The user’s Converse username (if any)      |
+| **avatar**           | URL of the user’s profile picture (if any) |
+| **converseEndpoint** | Endpoint for the user’s Converse profile   |
+
+## Sending Messages
+
+Here’s a quick snippet showing how you can utilize the resolver for your messaging:
+
+```tsx
+// Example user message object
+let textMessage: agentMessage = {
+  message: "Hello, world!",
+  receivers: [
+    "0x123...", // Ethereum address
+    "vitalik.eth", // ENS
+    "@fabri", // Converse username
+    "https://example.com", // Website header tag or TXT record
+  ],
+  originalMessage: message, // optional original reference
+};
+
+await xmtp.send(textMessage);
+```
+
+## Cache
+
+Skip the repeated lookups—use the built-in cache to store user data. Clear it whenever you need a fresh slate:
+
+```typescript
+import { userInfoCache } from "@xmtp/agent-starter";
+
+// Clear the entire cache:
+userInfoCache.clear();
+
+// Clear a specific address from the cache:
+userInfoCache.clear("0x1234...");
+```
+
+This makes repeated lookups lightning-fast, so you can focus on building cool stuff instead of waiting on network calls.

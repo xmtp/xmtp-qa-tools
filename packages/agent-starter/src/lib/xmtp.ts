@@ -35,7 +35,7 @@ import { mainnet } from "viem/chains";
 
 import { getRandomValues } from "crypto";
 import path from "path";
-import { Message, userMessage, UserReturnType, User, Agent } from "./types.js";
+import { Message, agentMessage, UserReturnType, User, Agent } from "./types.js";
 import { readFile } from "fs/promises";
 import * as fs from "fs";
 import {
@@ -186,7 +186,7 @@ export class XMTP {
     }
   }
 
-  async send(userMessage: userMessage) {
+  async send(agentMessage: agentMessage) {
     let contentType:
       | typeof ContentTypeReaction
       | typeof ContentTypeText
@@ -196,38 +196,38 @@ export class XMTP {
       | typeof ContentTypeReply = ContentTypeText;
 
     let message: any;
-    if (!userMessage.typeId || userMessage.typeId === "text") {
-      message = userMessage.message;
+    if (!agentMessage.typeId || agentMessage.typeId === "text") {
+      message = agentMessage.message;
       contentType = ContentTypeText;
-    } else if (userMessage.typeId === "attachment") {
-      message = (await this.getAttachment(userMessage.message)) as Attachment;
+    } else if (agentMessage.typeId === "attachment") {
+      message = (await this.getAttachment(agentMessage.message)) as Attachment;
       contentType = ContentTypeRemoteAttachment;
-    } else if (userMessage.typeId === "reaction") {
+    } else if (agentMessage.typeId === "reaction") {
       message = {
-        content: userMessage.message,
+        content: agentMessage.message,
         action: "added",
-        reference: userMessage.originalMessage?.id,
+        reference: agentMessage.originalMessage?.id,
         schema: "unicode",
       } as Reaction;
       contentType = ContentTypeReaction;
-    } else if (userMessage.typeId === "reply") {
+    } else if (agentMessage.typeId === "reply") {
       contentType = ContentTypeReply;
       message = {
-        content: userMessage.message,
+        content: agentMessage.message,
         contentType: ContentTypeText,
-        reference: userMessage.originalMessage?.id,
+        reference: agentMessage.originalMessage?.id,
       } as Reply;
-    } else if (userMessage.typeId === "agentMessage") {
+    } else if (agentMessage.typeId === "agentMessage") {
       message = new AgentMessage(
-        userMessage.message,
-        userMessage.metadata,
+        agentMessage.message,
+        agentMessage.metadata,
       ) as AgentMessage;
       contentType = ContentTypeAgentMessage;
     }
-    if (!userMessage.receivers || userMessage.receivers.length == 0) {
-      userMessage.receivers = [userMessage.originalMessage?.sender.inboxId];
+    if (!agentMessage.receivers || agentMessage.receivers.length == 0) {
+      agentMessage.receivers = [agentMessage.originalMessage?.sender.inboxId];
     }
-    for (let receiver of userMessage.receivers) {
+    for (let receiver of agentMessage.receivers) {
       let resolvedAddress = receiver;
 
       // Check if receiver is a website

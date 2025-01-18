@@ -4,7 +4,7 @@ import { ClientOptions, Client } from "@xmtp/node-sdk";
 export type { Client };
 export type { ClientOptions };
 
-export type userMessage = {
+export type agentMessage = {
   message: string;
   originalMessage: Message;
   metadata?: any;
