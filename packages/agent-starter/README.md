@@ -208,8 +208,6 @@ await agent.send(attachment);
 let agentMessage: agentMessage = {
   message: "Would you like to approve this transaction?",
   metadata: {
-    agentId: "payment-bot",
-    skillUsed: "approve-tx",
     amount: "10",
     token: "USDC",
     chain: "base",

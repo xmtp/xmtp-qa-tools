@@ -145,8 +145,6 @@ Agent message can be used to send any hidden metadata that is not meant to be re
 let agentMessage: agentMessage = {
   message: "Would you like to approve this transaction?",
   metadata: {
-    agentId: "payment-bot",
-    skillUsed: "approve-tx",
     amount: "10",
     token: "USDC",
     chain: "base",
