@@ -244,7 +244,3 @@ FIXED_KEY=
 ## Contribute
 
 We welcome contributions! Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started.
-
-<p align="center">
-Built and maintained with ❤️ by EphemeraHQ.
-</p>
