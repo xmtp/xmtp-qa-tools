@@ -1,4 +1,4 @@
-# xmtp-agents
+<div align="center">
 
 ![Status](https://img.shields.io/badge/alpha-orange)
 ![Status](https://img.shields.io/badge/interop-green)
@@ -7,8 +7,11 @@
 [![MIT License](https://img.shields.io/github/license/tutim-io/tutim)](https://github.com/tutim-io/tutim/blob/main/LICENSE)
 [![Number of GitHub stars](https://img.shields.io/github/stars/tutim-io/tutim?logo=github)](https://github.com/ephemerahq/message-kit)
 
+# xmtp-agents
+
 This library provides a wrapper around [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk) to make it easier to use in your agent.
 
+</div>
 ## Install
 
 ```bash [yarn]
@@ -136,13 +139,3 @@ const isOnXMTP = await xmtp.canMessage(address);
 ## Deployment
 
 Learn how to deploy with [Railway](/recipes/railway/) or [Replit](/recipes/replit/)
-
-### 🤵 Need Help?
-
-[Open an issue](https://github.com/tutim-io/tutim/issues/new/choose) on the repo.
-
-![](https://contrib.rocks/image?repo=ephemerahq/xmtp-agents)
-
----
-
-Powered by [XMTP](https://xmtp.org)
