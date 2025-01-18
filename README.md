@@ -20,7 +20,7 @@
 - **Metadata protection**: Prevents tracking of data like timestamps, message routes, IP, location, or device.
 - **Compliant**: Ensures sensitive data is inaccessible to employees or intermediaries, unlike server-level TLS.
 - **Decentralized**: Enables peer-to-peer messaging on a decentralized network without central servers.
-- **Groups**: Supports secure group communication, essential for multi-agent and multi-human workflows.
+- **Groups**: Supports secure group communication, essential for multi-agent and multi-human confidential workflows.
 
 ---
 
