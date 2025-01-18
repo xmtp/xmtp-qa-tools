@@ -16,8 +16,8 @@ import { runAgent } from "@xmtp/agent-starter";
 
 async function main() {
   // 1. Create two agents with different keys (already got addresses from XMTP).
-  const agentA = await runAgent({ encryptionKey: "bob" });
-  const agentB = await runAgent({ encryptionKey: "alice" });
+  const agentA = await runAgent({ name: "bob" });
+  const agentB = await runAgent({ name: "alice" });
 
   // 2. Minimal server to receive encrypted data.
   const appA = express();
