@@ -182,7 +182,7 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 
 Returns `true` if an address has XMTP enabled
 
-```typescript
+```tsx
 const isOnXMTP = await agent.canMessage(address);
 ```
 
@@ -190,7 +190,7 @@ const isOnXMTP = await agent.canMessage(address);
 
 This library helps you to resolve identities into EVM addresses compatible with XMTP.
 
-```typescript
+```tsx
 import { resolve } from "@xmtp/resolver";
 
 const identifier = "vitalik.eth";
@@ -231,8 +231,8 @@ yarn examples gm
 Use a `.env` file for your environment variables:
 
 ```bash
-ENCRYPTION_KEY=
-FIXED_KEY=
+ENCRYPTION_KEY= # Private key for sending/receiving messages.
+FIXED_KEY=      # Additional key for local encryption (can be random).
 ```
 
 ## Contribute
