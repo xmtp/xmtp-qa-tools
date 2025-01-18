@@ -18,7 +18,6 @@ const external = [
   "crypto",
   "viem",
   "dotenv",
-  "openai",
   "viem/accounts",
   "fs/promises",
   "fs",

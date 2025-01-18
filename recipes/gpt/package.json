@@ -1,5 +1,5 @@
 {
-  "name": "gm",
+  "name": "gpt",
   "private": true,
   "type": "module",
   "scripts": {
@@ -8,10 +8,9 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
-    "@xmtp/agent-starter": "workspace:*"
+    "openai": "latest"
   },
   "devDependencies": {
-    "@types/express": "^4.17.20",
     "@types/node": "^20.14.2",
     "typescript": "^5.4.5"
   },
