@@ -14,11 +14,11 @@ These are the steps to initialize the XMTP listener and send messages.
 
 - `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
 
-```tsx
+````tsx
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
-      const onMessage = async (message: Message) => {
+    onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text} by ${message.sender.address}`);
 
         // Your AI model response
@@ -29,14 +29,13 @@ async function main() {
           message: response,
           originalMessage: message,
         });
-      };
+      }
   });
 
   console.log("Agent is up and running...");
 }
 
 main().catch(console.error);
-```
 
 ## Address availability
 
@@ -44,7 +43,7 @@ Returns `true` if an address has XMTP enabled
 
 ```typescript
 const isOnXMTP = await agent.canMessage(address);
-```
+````
 
 ## Groups
 

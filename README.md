@@ -35,7 +35,7 @@ These are the steps to initialize the XMTP listener and send messages.
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
-      const onMessage = async (message: Message) => {
+    onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
 
         // Your AI model response
