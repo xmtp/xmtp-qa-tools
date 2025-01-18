@@ -12,15 +12,15 @@
 
 `xmtp-agents` is a library that enables you to run scalable, secure and interoperable agents using [XMTP](https://xmtp.org/) as the standard.
 
-- **End-to-end**: Servers only see cipher text, preventing data exfiltration through server breaches or insider threats.
-- **Security**: XMTP is built on the IETF-standard Messaging Layer Security (MLS) protocol – the same open-source security foundation trusted by Mozilla, Google, Wire, and Cisco.
-- **Standardize**: XMTP plugs into existing AI tooling or enterprise environments stardazing secure agent communication without needing overhead in implementation.
-- **Trustless**: Traditional TLS depends on certificate providers for trust. XMTP avoids single points of failure by leveraging mathematics.
-- **Ephemeral identities**: Users can remain pseudonymous, minimizing data collection while still enabling secure conversations.
-- **Metadata protection**: Prevents tracking of additional data like timestamps and message routes, IP, location or device
-- **Compliant**: Enterprise regulations increasingly require that sensitive data be inaccessible to employees or intermediaries, something **server-level TLS** cannot guarantee.
-- **Decentralized**: XMTP runs on a decentralized network enabling peer-to-peer messaging without relying on central servers.
-- **Groups**: XMTP supports secure group communication among many agents (and humans), which is central to multi-agent and mult-human workflows.
+- **End-to-end**: Servers only see cipher text, preventing data exfiltration through breaches or insider threats.
+- **Security**: Built on the IETF-standard Messaging Layer Security (MLS) protocol, trusted by Mozilla, Google, Wire, and Cisco.
+- **Standardize**: Integrates with existing AI tools or enterprise environments, standardizing secure communication without extra implementation overhead.
+- **Trustless**: Avoids single points of failure by leveraging mathematics instead of relying on certificate providers.
+- **Anonymous**: Allows users to remain anonymous or pseudonymous, minimizing data collection.
+- **Metadata protection**: Prevents tracking of data like timestamps, message routes, IP, location, or device.
+- **Compliant**: Ensures sensitive data is inaccessible to employees or intermediaries, unlike server-level TLS.
+- **Decentralized**: Enables peer-to-peer messaging on a decentralized network without central servers.
+- **Groups**: Supports secure group communication, essential for multi-agent and multi-human workflows.
 
 ---
 
