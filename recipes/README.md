@@ -7,3 +7,7 @@ Here, you will find various examples and tutorials to help you get started with 
 - [GPT](/recipes/gpt): A simple agent that interacts with OpenAI APIs.
 - [Railway](/recipes/railway/): A tutorial on how to deploy your agent on Railway.
 - [Replit](/recipes/replit/): A tutorial on how to deploy your agent on Replit.
+
+### Contribute
+
+Learn how to [contribute](/CONTRIBUTING.md) to the recipes directory.

@@ -191,6 +191,12 @@ console.log(info);
 
 > Learn more about [`@xmtp/resolver`](/packages/resolver/) library
 
-## Deployment
+## Development
+
+### Contribute
+
+Learn how to [contribute](/CONTRIBUTING.md) to the recipes directory.
+
+### Deployment
 
 Learn how to deploy with [Railway](/recipes/railway/) or [Replit](/recipes/replit/)
