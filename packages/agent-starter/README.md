@@ -50,9 +50,8 @@ const isOnXMTP = await agent.canMessage(address);
 
 To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
 
-:::info
-You need to **add the agent to the group as a member**.
-:::
+> [!TIP]
+> You need to **add the agent to the group as a member**.
 
 To create a group from your agent, you can use the following code:
 
@@ -94,13 +93,13 @@ const onMessage = async (message: Message) => {
 };
 ```
 
-## Send messages
+## Content types
 
-App messages are messages that are sent when you send a reply to a message and are highlighted differently by the apps.
+`agent-starter` provides an abstraction to XMTP [content typs](https://github.com/xmtp/xmtp-js/tree/main/content-types) to make it easier for devs to integrate different types of messages.
 
-:::code-group
+### Text
 
-```tsx [Text]
+```tsx
 let textMessage: agentMessage = {
   message: "Your message.",
   receivers: ["0x123..."], // optional
@@ -109,7 +108,9 @@ let textMessage: agentMessage = {
 await agent.send(textMessage);
 ```
 
-```tsx [Reaction]
+### Reaction
+
+```tsx
 let reaction: agentMessage = {
   message: "😅",
   receivers: ["0x123..."], // optional
@@ -119,7 +120,9 @@ let reaction: agentMessage = {
 await agent.send(reaction);
 ```
 
-```tsx [Reply]
+### Reply
+
+```tsx
 let reply: agentMessage = {
   message: "Your message.",
   receivers: ["0x123..."], // optional
@@ -129,7 +132,9 @@ let reply: agentMessage = {
 await agent.send(reply);
 ```
 
-```tsx [Attachment]
+### Attachment
+
+```tsx
 let attachment: agentMessage = {
   message: "https://picsum.photos/200/300",
   receivers: ["0x123..."], // optional
@@ -139,7 +144,9 @@ let attachment: agentMessage = {
 await agent.send(attachment);
 ```
 
-```tsx [Agent]
+### Agent
+
+```tsx
 let agentMessage: agentMessage = {
   message: "Would you like to approve this transaction?",
   metadata: {
@@ -156,89 +163,3 @@ let agentMessage: agentMessage = {
 };
 await agent.send(agentMessage);
 ```
-
-:::
-
-# Resolver library
-
-The resolver library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
-
-## Quick start
-
-```typescript
-import { resolve } from "@xmtp/agent-starter";
-
-// Because user identifiers come in all shapes and sizes!
-const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
-const userInfo = await resolve(identifier);
-
-console.log(userInfo);
-/*
-{
-  ensDomain: 'vitalik.eth',
-  address: '0x1234...',
-  preferredName: 'vitalik.eth',
-  converseUsername: '',
-  avatar: 'https://...',
-  converseEndpoint: ''
-}
-*/
-```
-
-## Supported identifiers
-
-- **Ethereum Addresses** : Example: `0x1234...`
-- **ENS Domains** : Example: `vitalik.eth`
-- **Converse Usernames** : Example: `@fabri`
-- **Inbox ID** : Example: `0x1234...` (Converse inbox ID)
-- **Website Header Tag** : Example: `https://example.com` containing `xmtp=0x1234...`
-- **Website TXT Record** : Example: `meta="@xmtp/agent-starter" content="0x1234..."`
-
-### Returned UserInfo
-
-The resolver always returns a `UserInfo` object with these fields:
-
-| Field                | Description                                |
-| -------------------- | ------------------------------------------ |
-| **ensDomain**        | The user’s ENS domain (if any)             |
-| **address**          | The Ethereum address                       |
-| **preferredName**    | Best name to display                       |
-| **converseUsername** | The user’s Converse username (if any)      |
-| **avatar**           | URL of the user’s profile picture (if any) |
-| **converseEndpoint** | Endpoint for the user’s Converse profile   |
-
-## Sending Messages
-
-Here’s a quick snippet showing how you can utilize the resolver for your messaging:
-
-```tsx
-// Example user message object
-let textMessage: agentMessage = {
-  message: "Hello, world!",
-  receivers: [
-    "0x123...", // Ethereum address
-    "vitalik.eth", // ENS
-    "@fabri", // Converse username
-    "https://example.com", // Website header tag or TXT record
-  ],
-  originalMessage: message, // optional original reference
-};
-
-await agent.send(textMessage);
-```
-
-## Cache
-
-Skip the repeated lookups—use the built-in cache to store user data. Clear it whenever you need a fresh slate:
-
-```typescript
-import { userInfoCache } from "@xmtp/agent-starter";
-
-// Clear the entire cache:
-userInfoCache.clear();
-
-// Clear a specific address from the cache:
-userInfoCache.clear("0x1234...");
-```
-
-This makes repeated lookups lightning-fast, so you can focus on building cool stuff instead of waiting on network calls.

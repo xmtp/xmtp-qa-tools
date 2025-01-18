@@ -1,8 +1,7 @@
 # Replit
 
-:::tip{title="Deploy From Github"}
-You can quickly deploy your MessageKit agent by importing our [Replit Quickstart Template](https://replit.com/@raihankhan-rk/MessageKit-Quickstart-Template): The fastest way to get started.
-:::
+> [!TIP]
+> You need to **add the agent to the group as a member**.
 
 ## Introduction
 
