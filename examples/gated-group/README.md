@@ -9,44 +9,26 @@ In this tutorial, you’ll learn how to create and manage a private group where 
 Start your XMTP client and start listening to messages from the bot.
 
 ```tsx
-async function main() {
-  const agent = await runAgent({
-    encryptionKey: process.env.ENCRYPTION_KEY as string,
-    onMessage: async (message: Message) => {
-      if (message.typeId !== "text") return;
-      console.log(
-        `[${message.typeId}] ${message?.content.text} by ${message.sender.address}`,
+const agent = await runAgent({
+  onMessage: async (message: Message) => {
+    // Of message is /create then proceed to create a group.
+    if (message?.content.text === "/create") {
+      //This is a arbitrary trigger but you can embed this logic into any server.
+      console.log("Creating group");
+      const group = await createGroup(
+        agent?.client,
+        message?.sender?.address as string,
+        agent?.address as string,
       );
-
-      if (message?.content.text === "/create") {
-        console.log("Creating group");
-        const group = await createGroup(
-          agent?.client,
-          message?.sender?.address as string,
-          agent?.address as string,
-        );
-        console.log("Group created", group?.id);
-        await agent.send({
-          message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
-          originalMessage: message,
-        });
-        return;
-      } else {
-        await agent.send({
-          message:
-            "👋 Welcome to the Gated Bot Group!\nTo get started, type /create to set up a new group. 🚀\nThis example will check if the user has a particular nft and add them to the group if they do.\nOnce your group is created, you'll receive a unique Group ID and URL.\nShare the URL with friends to invite them to join your group!",
-          originalMessage: message,
-        });
-      }
-    },
-  });
-
-  console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
-  );
-}
-
-main().catch(console.error);
+      console.log("Group created", group?.id);
+      await agent.send({
+        message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
+        originalMessage: message,
+      });
+      return;
+    }
+  },
+});
 ```
 
 ## Create a gated group
