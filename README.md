@@ -1,4 +1,4 @@
-# Agent starter
+# xmtp-agents
 
 ![Status](https://img.shields.io/badge/alpha-orange)
 ![Status](https://img.shields.io/badge/interop-green)
