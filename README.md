@@ -79,6 +79,10 @@ Various examples and tutorials to help you get started with creating and deployi
 
 > See all the avaialable [examples](/examples/).
 
+#### Deployment
+
+Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/replit/)
+
 ## Groups
 
 > [!TIP]
@@ -231,10 +235,6 @@ FIXED_KEY= #  A secondary key that ensures local device encryption. Can be rando
 
 > Learn about generating [encryption keys](/packages/agent-starter#encryption-keys)
 
-### Contribute
+#### Contribute
 
 Learn how to [contribute](/CONTRIBUTING.md) to the examples directory.
-
-## Deployment
-
-Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/replit/)
