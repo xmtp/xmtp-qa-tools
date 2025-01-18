@@ -204,7 +204,7 @@ console.log(info);
   preferredName: 'vitalik.eth',
   converseUsername: '',
   avatar: 'https://...',
-  converseEndpoint: ''
+  converseEndpoint: 'https://converse.xyz/...'
 }
 */
 ```
