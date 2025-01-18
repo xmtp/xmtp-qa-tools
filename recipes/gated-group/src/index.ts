@@ -1,12 +1,13 @@
-import { XMTP, Client, Message, createAgent } from "@xmtp/agent-starter";
+import { Client, Message, createAgent } from "@xmtp/agent-starter";
 import express from "express";
 
 async function main() {
   const agent = await createAgent({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
+      if (message.typeId !== "text") return;
       console.log(
-        `Decoded message: ${message?.content.text} by ${message.sender.address}`,
+        `[${message.typeId}] ${message?.content.text} by ${message.sender.address}`,
       );
 
       if (message?.content.text === "/create") {
