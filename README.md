@@ -12,15 +12,17 @@
 
 `xmtp-agents` is a library that enables you to run scalable, secure and interoperable agents using [XMTP](https://xmtp.org/) as the standard.
 
-- **End-to-end**: Servers only see cipher text, preventing data exfiltration through breaches or insider threats.
-- **Security**: Built on the IETF-standard Messaging Layer Security (MLS) protocol, trusted by Mozilla, Google, Wire, and Cisco.
-- **Standardize**: Integrates with existing AI tools or enterprise environments, standardizing secure communication without extra implementation overhead.
-- **Trustless**: Avoids single points of failure by leveraging mathematics instead of relying on certificate providers.
-- **Anonymous**: Allows users to remain anonymous or pseudonymous, minimizing data collection.
-- **Metadata protection**: Prevents tracking of data like timestamps, message routes, IP, location, or device.
-- **Compliant**: Ensures sensitive data is inaccessible to employees or intermediaries, unlike server-level TLS.
-- **Decentralized**: Enables peer-to-peer messaging on a decentralized network without central servers.
-- **Groups**: Supports secure group communication, essential for multi-agent and multi-human confidential workflows.
+**End-to-end & Compliant**: Ensures servers only see ciphertext, preventing exfiltration by insiders or breaches. Meets enterprise regulations that require sensitive data be inaccessible to intermediaries—something TLS alone can’t guarantee.
+
+**Open-source & Trustless**: Built on the IETF-standard Messaging Layer Security (MLS) protocol—trusted by Mozilla and Google. By relying on cryptographic proofs rather than certificate authorities, XMTP avoids single points of failure.
+
+**Standardized & Easy to Integrate**: Seamlessly plugs into existing AI tooling or enterprise environments, standardizing secure e2ee agent communication without overhead.
+
+**Privacy & Metadata Protection**: Allows anonymous or pseudonymous usage. Prevents tracking of timestamps, routes, IP addresses, locations, or devices.
+
+**Decentralized** : Operates on a peer-to-peer network, eliminating reliance on central servers.
+
+**Groups** : Securely supports multi-agent (and multi-human) group communication for collaborative private workflows.
 
 ---
 
