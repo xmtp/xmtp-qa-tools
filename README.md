@@ -220,7 +220,7 @@ yarn examples
 yarn examples gm
 ```
 
-### Environment variables
+#### Environment variables
 
 XMTP requires 2 key to initiate your client.
 
