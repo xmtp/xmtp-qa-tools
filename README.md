@@ -1,23 +1,6 @@
-<div align="center">
-
-<div align="center">
-</div>
-
-![Status](https://img.shields.io/badge/alpha-orange)
-![Status](https://img.shields.io/badge/interop-green)
-![Status](https://img.shields.io/badge/e2ee-green)
-![Status](https://img.shields.io/badge/decentralized-orange)
-[![MIT License](https://img.shields.io/github/license/ephemerahq/message-kit)](https://github.com/ephemerahq/message-kit/blob/main/LICENSE)
-[![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
-
-<img src="media/logo.png" alt="Logo" width="60" />
-  
 # xmtp-agents
+
 This library offers a convenient TypeScript wrapper for the [XMTP SDK for Node](https://github.com/xmtp/xmtp-js/tree/main/sdks/node-sdk), simplifying its integration into your agent.
-
-</div>
-
----
 
 ## Install
 
