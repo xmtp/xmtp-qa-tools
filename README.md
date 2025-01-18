@@ -33,8 +33,8 @@ yarn add @xmtp/agent-starter
 To run your XMTP agent, you need two keys:
 
 ```bash
-ENCRYPTION_KEY= # Private key for sending/receiving messages.
-FIXED_KEY=      # Additional key for local encryption (can be random).
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption (can be random)
 ```
 
 > See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter#encryption-keys) to learn more.
@@ -231,8 +231,8 @@ yarn examples gm
 Use a `.env` file for your environment variables:
 
 ```bash
-ENCRYPTION_KEY= # Private key for sending/receiving messages.
-FIXED_KEY=      # Additional key for local encryption (can be random).
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption (can be random)
 ```
 
 ## Contribute
