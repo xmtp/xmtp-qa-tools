@@ -5,10 +5,20 @@ We appreciate your contributions! Here’s how to add new templates or examples 
 ## Getting started
 
 ```bash
+# clone the repository
 git clone https://github.com/ephemeraHQ/xmtp-agents/
 cd xmtp-agents
+
+# install dependencies
 yarn install
-yarn dev
+# build
+yarn build
+
+# run sample agents from the examples directory
+yarn examples
+
+# or run a specific example
+yarn examples gm
 ```
 
 > This runs the base agent locally. You can also launch specific examples via `yarn examples`.
