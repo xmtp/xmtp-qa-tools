@@ -241,4 +241,4 @@ FIXED_KEY= # a second encryption key for encryption (can be random)
 
 ## Contribute
 
-We welcome contributions! Check out the [CONTRIBUTING.md](CONTRIBUTING.md) file for more information on how to get started.
+We welcome contributions! Check out the [contributing](CONTRIBUTING.md) file for more information on how to get started.
