@@ -42,7 +42,7 @@ async function main() {
 main().catch(console.error);
 ```
 
-## Address availability
+#### Address availability
 
 Returns `true` if an address has XMTP enabled
 

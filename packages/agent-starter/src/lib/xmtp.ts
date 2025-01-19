@@ -309,7 +309,7 @@ export class XMTP {
     try {
       const inboxId = await this.client?.getInboxIdByAddress(address);
       if (!inboxId) {
-        console.log(
+        console.error(
           `getLastAgentMessageSharedSecret: Invalid receiver address ${address}`,
         );
         return undefined;
@@ -317,7 +317,7 @@ export class XMTP {
 
       const conversations = await this.client?.conversations.listDms();
       if (!conversations) {
-        console.log(
+        console.error(
           `getLastAgentMessageSharedSecret: No conversations found ${inboxId}`,
         );
         return undefined;
@@ -327,14 +327,14 @@ export class XMTP {
       );
 
       if (!conversation) {
-        console.log(
+        console.error(
           `getLastAgentMessageSharedSecret: No conversation found ${conversations.length}`,
         );
         return undefined;
       }
       const messages = await conversation?.messages();
       if (!messages) {
-        console.log(
+        console.error(
           `getLastAgentMessageSharedSecret: No messages found ${conversation.id}`,
         );
         return undefined;
@@ -347,14 +347,12 @@ export class XMTP {
             msg.content.metadata.sharedSecret,
         );
       if (!lastAgentMessageSharedSecret) {
-        console.log(
+        console.error(
           `getLastAgentMessageSharedSecret: No shared secret found ${conversation.id}`,
         );
         return undefined;
       }
-      console.log(
-        `getLastAgentMessageSharedSecret: Shared secret found ${conversation.id}`,
-      );
+      //console.info(`Shared secret found ${conversation.id}`);
       return lastAgentMessageSharedSecret?.content?.metadata
         .sharedSecret as string;
     } catch (error) {

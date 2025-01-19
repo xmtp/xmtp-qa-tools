@@ -71,6 +71,14 @@ async function main() {
 main().catch(console.error);
 ```
 
+#### Address availability
+
+Returns `true` if an address has XMTP enabled
+
+```typescript
+const isOnXMTP = await agent.canMessage(address);
+```
+
 ## Examples
 
 Various examples and tutorials to help you get started with creating and deploying your own agents using XMTP.
@@ -179,14 +187,6 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 
 > [!WARNING]
 > This React app isn't a complete solution. For example, the list of conversations doesn't update when new messages arrive in existing conversations.
-
-## Address availability
-
-Returns `true` if an address has XMTP enabled
-
-```tsx
-const isOnXMTP = await agent.canMessage(address);
-```
 
 ## Resolver library
 
