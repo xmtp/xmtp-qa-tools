@@ -28,7 +28,7 @@ This library is based on [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/x
 yarn add @xmtp/agent-starter
 ```
 
-### Environment variables
+#### Environment variables
 
 To run your XMTP agent, you need two keys:
 
@@ -78,7 +78,7 @@ Various examples and tutorials to help you get started with creating and deployi
 - [gated-group](/examples/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
 - [gm](/examples/gm/): A simple agent that replies with "GM".
 - [gpt](/examples/gpt): A simple agent that interacts with OpenAI APIs.
-- [express](/examples/express/): Communicate with traditional api endpoints using xmtp e2ee
+- [express](/examples/express/): Communicate with traditional APIs using xmtp e2ee
 
 > See all the available [examples](/examples/).
 

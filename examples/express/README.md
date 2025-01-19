@@ -9,11 +9,11 @@ XMTP assists in verifying identities and establishing the initial handshake to s
 2. **Encrypt** messages locally with [`@xmtp/agent-starter`](https://github.com/xmtp-labs/agent-starter).
 3. **Send** only `nonce` + `ciphertext` across your own servers, **no plaintext** ever leaves your app.
 
-## Code Example
+## Code example
 
 Below is a simple example using Node.js and Express to demonstrate the encryption and decryption process.
 
-### Import Dependencies
+### Import dependencies
 
 ```javascript
 import express from "express";
@@ -21,7 +21,7 @@ import fetch from "node-fetch";
 import { xmtpClient } from "@xmtp/agent-starter";
 ```
 
-### Create XMTP Agents
+### Create XMTP clients
 
 ```javascript
 async function main() {
@@ -31,7 +31,7 @@ async function main() {
 }
 ```
 
-### Encryption Process
+### Encryption
 
 Agent A encrypts a message intended for Agent B.
 
@@ -46,7 +46,7 @@ const { nonce, ciphertext } = await agentA.encrypt(
 - **nonce**: A unique number used once to ensure that the same plaintext will encrypt to different ciphertexts each time.
 - **ciphertext**: The encrypted version of the message that can be safely sent over the network.
 
-### Decryption Process
+### Decryption
 
 Agent B decrypts the received message.
 
@@ -62,7 +62,7 @@ appB.post("/receive", async (req, res) => {
 - **agentB.decrypt**: This function takes the `nonce`, `ciphertext`, and the sender's address (`fromAddress`) as inputs to decrypt the message.
 - **msg**: The decrypted plaintext message that was originally sent by Agent A.
 
-### Set Up Express Servers
+### Express servers
 
 #### Server for Agent A
 
@@ -96,7 +96,7 @@ appB.post("/receive", async (req, res) => {
 appB.listen(3001, () => console.log("Server B on 3001"));
 ```
 
-### Sending Encrypted Messages
+### Sending encrypted messages
 
 Agent A sends the encrypted message to Agent B's server.
 
