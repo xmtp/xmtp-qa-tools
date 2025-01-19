@@ -1,7 +1,7 @@
 # E2EE with XMTP Handshake
 
 > [!WARNING]
-> This is a proof of concept and is not officially supported by the protocol.
+> This is a proof of concept and is not officially supported by XMTP protocol.
 
 XMTP assists in verifying identities and establishing the initial handshake to share the shared secret. Afterward, you manage **end-to-end encryption** independently, ensuring complete privacy by never exposing plaintext messages outside your environment.
 
