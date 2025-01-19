@@ -15,10 +15,10 @@
 #### Why XMTP?
 
 - **End-to-end & compliant**: Servers and clients only see ciphertext, meeting strict security and regulatory standards.
-- **Open-source & trustless**: Built on the [MLS](https://messaginglayersecurity.rocks/) protocol, it removes centralized certificate authorities with cryptographic proofs.
+- **Open-source & trustless**: Built on the [MLS](https://messaginglayersecurity.rocks/) protocol, it replaces trust in centralized certificate authorities with cryptographic proofs.
 - **Privacy & metadata protection**: Offers anonymous or pseudonymous usage with no tracking of timestamps, routes, IPs, or device info.
 - **Decentralized**: Operates on a peer-to-peer network, eliminating single points of failure.
-- **Groups**: Allows multi-agent (or multi-human) group chats with access control and secure collaboration.
+- **Groups**: Allows multi-agent (or multi-human) or both with group chats with access control and secure collaboration.
 
 ## Setup
 
