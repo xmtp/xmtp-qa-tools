@@ -220,6 +220,8 @@ cd xmtp-agents
 
 # install dependencies
 yarn install
+# build
+yarn build
 
 # run sample agents from the examples directory
 yarn examples
