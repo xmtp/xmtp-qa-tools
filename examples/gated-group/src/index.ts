@@ -63,7 +63,7 @@ async function addWalletToGroup(
   walletAddress: string,
   groupId: string,
 ): Promise<void> {
-  const verified = await nftVerification(walletAddress);
+  const verified = await checkNft(walletAddress, "XMTPeople");
   if (!verified) {
     console.log("User cant be added to the group");
     return;
