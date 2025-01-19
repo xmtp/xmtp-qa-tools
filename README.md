@@ -37,7 +37,7 @@ ENCRYPTION_KEY= # the private key of the wallet
 FIXED_KEY= # a second encryption key for encryption (can be random)
 ```
 
-> See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter#encryption-keys) to learn more.
+> See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter/README.md#encryption-keys) to learn more.
 
 ## Basic usage
 
