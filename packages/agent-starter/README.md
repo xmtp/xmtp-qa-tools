@@ -106,7 +106,7 @@ await group.addMembers([0xaddresses]);
 
      ```tsx
      const agent = await xmtpClient({
-       name: "_agentA", // Optional alias for this agent
+       name: "_agentA", // Optional alias for this agent's key
      });
      ```
 
