@@ -10,7 +10,7 @@
 
 </div>
 
-`xmtp-agents` is a library for building scalable, secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol
+`xmtp-agents` is a library for building secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol.
 
 #### Why XMTP?
 

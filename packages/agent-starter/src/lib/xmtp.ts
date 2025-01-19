@@ -303,42 +303,44 @@ export class XMTP {
     const isOnXMTP = await this.client?.canMessage([address]);
     return isOnXMTP ? true : false;
   }
+
+  // Function to retrieve the last shared secret from agent messages
   async getLastAgentMessageSharedSecret(
     address: string,
   ): Promise<string | undefined> {
     try {
+      // Get the inbox ID for the given address
       const inboxId = await this.client?.getInboxIdByAddress(address);
       if (!inboxId) {
-        console.error(
-          `getLastAgentMessageSharedSecret: Invalid receiver address ${address}`,
-        );
+        console.error(`Invalid receiver address ${address}`);
         return undefined;
       }
 
+      // List all direct message conversations
       const conversations = await this.client?.conversations.listDms();
       if (!conversations) {
-        console.error(
-          `getLastAgentMessageSharedSecret: No conversations found ${inboxId}`,
-        );
+        console.error(`No conversations found ${inboxId}`);
         return undefined;
       }
+
+      // Find the conversation with the matching inbox ID
       const conversation = conversations?.find(
         (c: Conversation) => c.dmPeerInboxId === inboxId,
       );
 
       if (!conversation) {
-        console.error(
-          `getLastAgentMessageSharedSecret: No conversation found ${conversations.length}`,
-        );
+        console.error(`No conversation found ${conversations.length}`);
         return undefined;
       }
+
+      // Retrieve all messages from the conversation
       const messages = await conversation?.messages();
       if (!messages) {
-        console.error(
-          `getLastAgentMessageSharedSecret: No messages found ${conversation.id}`,
-        );
+        console.error(`No messages found ${conversation.id}`);
         return undefined;
       }
+
+      // Find the last agent message with a shared secret
       const lastAgentMessageSharedSecret = messages
         .reverse()
         .find(
@@ -347,12 +349,11 @@ export class XMTP {
             msg.content.metadata.sharedSecret,
         );
       if (!lastAgentMessageSharedSecret) {
-        console.error(
-          `getLastAgentMessageSharedSecret: No shared secret found ${conversation.id}`,
-        );
+        console.error(`No shared secret found ${conversation.id}`);
         return undefined;
       }
-      //console.info(`Shared secret found ${conversation.id}`);
+
+      // Return the shared secret
       return lastAgentMessageSharedSecret?.content?.metadata
         .sharedSecret as string;
     } catch (error) {
@@ -361,11 +362,13 @@ export class XMTP {
     }
   }
 
+  // Function to encrypt a plaintext message for a given receiver
   async encrypt(
     plaintext: string,
     receiverAddress: string,
   ): Promise<{ nonce: string; ciphertext: string }> {
     try {
+      // Retrieve the last shared secret or generate a new one if not found
       let sharedSecret =
         await this.getLastAgentMessageSharedSecret(receiverAddress);
       if (!sharedSecret) {
@@ -382,13 +385,18 @@ export class XMTP {
           typeId: "agent_message",
         };
 
+        // Send a handshake message with the new shared secret
         await this.send(agentMessage as agentMessage);
         console.log("Sent handshake message");
       }
+
+      // Convert the shared secret to a buffer
       const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
       if (!bufferFromSharedSecret) {
         throw new Error("encrypt: No buffer secret found");
       }
+
+      // Generate a nonce and create a cipher for encryption
       const nonce = crypto.randomBytes(12);
       const cipher = crypto.createCipheriv(
         "chacha20-poly1305",
@@ -397,6 +405,7 @@ export class XMTP {
         { authTagLength: 16 },
       );
 
+      // Encrypt the plaintext
       const ciphertext = Buffer.concat([
         cipher.update(plaintext, "utf8"),
         cipher.final(),
@@ -404,6 +413,7 @@ export class XMTP {
       const authTag = cipher.getAuthTag();
       const encryptedPayload = Buffer.concat([ciphertext, authTag]);
 
+      // Return the nonce and ciphertext
       return {
         nonce: nonce.toString("hex"),
         ciphertext: encryptedPayload.toString("hex"),
@@ -414,18 +424,22 @@ export class XMTP {
     }
   }
 
+  // Function to decrypt a message using the nonce and ciphertext
   async decrypt(
     nonceHex: string,
     ciphertextHex: string,
     senderAddress: string,
   ): Promise<string> {
     try {
+      // Convert nonce and ciphertext from hex to buffer
       const nonce = Buffer.from(nonceHex, "hex");
       const encryptedPayload = Buffer.from(ciphertextHex, "hex");
 
+      // Extract the authentication tag and ciphertext
       const authTag = encryptedPayload.slice(-16);
       const ciphertext = encryptedPayload.slice(0, -16);
 
+      // Retrieve the shared secret for decryption
       const sharedSecret =
         await this.getLastAgentMessageSharedSecret(senderAddress);
 
@@ -435,8 +449,10 @@ export class XMTP {
         );
       }
 
+      // Convert the shared secret to a buffer
       const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
 
+      // Create a decipher for decryption
       const decipher = crypto.createDecipheriv(
         "chacha20-poly1305",
         bufferFromSharedSecret,
@@ -445,11 +461,13 @@ export class XMTP {
       );
       decipher.setAuthTag(authTag);
 
+      // Decrypt the ciphertext
       const decrypted = Buffer.concat([
         decipher.update(ciphertext),
         decipher.final(),
       ]);
 
+      // Return the decrypted message as a string
       return decrypted.toString("utf8");
     } catch (error) {
       console.error("Error decrypting message:", error);
