@@ -1,8 +1,8 @@
-import { Client, Message, runAgent } from "@xmtp/agent-starter";
+import { Client, Message, xmtpClient } from "@xmtp/agent-starter";
 import express from "express";
 
 async function main() {
-  const agent = await runAgent({
+  const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;

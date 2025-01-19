@@ -9,7 +9,7 @@ In this tutorial, you’ll learn how to create and manage a private group where 
 Start your XMTP client and start listening to messages from the bot.
 
 ```tsx
-const agent = await runAgent({
+const agent = await xmtpClient({
   onMessage: async (message: Message) => {
     // Of message is /create then proceed to create a group.
     if (message?.content.text === "/create") {

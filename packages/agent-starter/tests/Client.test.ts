@@ -1,6 +1,6 @@
 import { describe, test, expect } from "vitest";
 import { generatePrivateKey } from "viem/accounts";
-import { XMTP, createUser, runAgent } from "@xmtp/agent-starter";
+import { XMTP, createUser, xmtpClient } from "@xmtp/agent-starter";
 
 describe("Client Private Key Configuration Tests", () => {
   test("creates a client with a random generated key", async () => {
@@ -30,7 +30,7 @@ describe("Client Private Key Configuration Tests", () => {
 
   test("Creates a key with a agent name", async () => {
     const agentName = "bob1";
-    const xmtp = await runAgent({
+    const xmtp = await xmtpClient({
       name: agentName,
     });
     expect(xmtp?.inboxId).toBeDefined();

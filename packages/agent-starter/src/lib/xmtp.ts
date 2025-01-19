@@ -41,7 +41,7 @@ import * as fs from "fs";
 import fetch from "node-fetch";
 import crypto from "crypto";
 
-export async function runAgent(agent?: Agent): Promise<XMTP> {
+export async function xmtpClient(agent?: Agent): Promise<XMTP> {
   let xmtp: XMTP | null = null; // Ensure a single instance
   xmtp = new XMTP(agent);
   await xmtp.init();

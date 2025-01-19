@@ -18,7 +18,7 @@ These are the steps to initialize the XMTP listener and send messages.
 
 ```tsx
 async function main() {
-  const agent = await runAgent({
+  const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
@@ -82,7 +82,7 @@ await group.addMembers([0xaddresses]);
        `ENCRYPTION_KEY=0xYOUR_PRIVATE_KEY`
 
      ```tsx
-     const agent = await runAgent({
+     const agent = await xmtpClient({
        encryptionKey: process.env.ENCRYPTION_KEY,
      });
      ```
@@ -95,7 +95,7 @@ await group.addMembers([0xaddresses]);
    - This method will save the key in the `.env` file for future use.
 
      ```tsx
-     const agent = await runAgent({});
+     const agent = await xmtpClient({});
      ```
 
 3. Assign a name (alias) to the randomly generated key:
@@ -105,7 +105,7 @@ await group.addMembers([0xaddresses]);
    - This method will also save the key in the `.env` file for future use.
 
      ```tsx
-     const agent = await runAgent({
+     const agent = await xmtpClient({
        name: "_agentA", // Optional alias for this agent
      });
      ```

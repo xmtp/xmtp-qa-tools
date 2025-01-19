@@ -12,12 +12,12 @@ XMTP assists in verifying identities and establishing the initial handshake to s
 ```js
 import express from "express";
 import fetch from "node-fetch";
-import { runAgent } from "@xmtp/agent-starter";
+import { xmtpClient } from "@xmtp/agent-starter";
 
 async function main() {
   // 1. Create two agents with different keys (already got addresses from XMTP).
-  const agentA = await runAgent({ name: "bob" });
-  const agentB = await runAgent({ name: "alice" });
+  const agentA = await xmtpClient({ name: "bob" });
+  const agentB = await xmtpClient({ name: "alice" });
 
   // 2. Minimal server to receive encrypted data.
   const appA = express();

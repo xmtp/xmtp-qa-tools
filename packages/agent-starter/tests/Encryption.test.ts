@@ -1,12 +1,12 @@
 import { describe, test, expect } from "vitest";
-import { runAgent } from "../src/lib/xmtp";
+import { xmtpClient } from "../src/lib/xmtp";
 
 describe("Encryption Tests", () => {
   test("decrypts a message with shared secret in metadata", async () => {
-    const agentA = await runAgent({
+    const agentA = await xmtpClient({
       name: "bob1",
     });
-    const agentB = await runAgent({
+    const agentB = await xmtpClient({
       name: "alice1",
     });
     console.log("agentA", agentA.address);

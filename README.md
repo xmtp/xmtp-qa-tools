@@ -46,8 +46,10 @@ These are the steps to initialize the XMTP listener and send messages.
 - `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
 
 ```tsx
+import { xmtpClient } from "@xmtp/agent-starter";
+
 async function main() {
-  const agent = await runAgent({
+  const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);

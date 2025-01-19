@@ -1,6 +1,6 @@
 import express from "express";
 import fetch from "node-fetch";
-import { runAgent, XMTP } from "@xmtp/agent-starter";
+import { xmtpClient, XMTP } from "@xmtp/agent-starter";
 
 async function createServer(port: number, agent: XMTP) {
   const app = express();
@@ -34,10 +34,10 @@ async function createServer(port: number, agent: XMTP) {
 
 async function main() {
   // 1. Initialize both agents
-  const agentA = await runAgent({
+  const agentA = await xmtpClient({
     name: "bob",
   });
-  const agentB = await runAgent({
+  const agentB = await xmtpClient({
     name: "alice",
   });
 

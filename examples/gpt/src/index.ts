@@ -1,11 +1,11 @@
-import { Message, runAgent } from "@xmtp/agent-starter";
+import { Message, xmtpClient } from "@xmtp/agent-starter";
 import OpenAI from "openai";
 
 // Initialize OpenAI API
 const openai = new OpenAI();
 
 async function main() {
-  const agent = await runAgent({
+  const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
