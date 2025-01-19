@@ -1,6 +1,6 @@
 # Replit
 
-> [!TIP]
+> [!INFO]
 > You need to **add the agent to the group as a member**.
 
 ## Introduction
