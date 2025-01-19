@@ -2,6 +2,11 @@ import { Client, Message, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import express from "express";
 import { Alchemy, Network } from "alchemy-sdk";
 
+const settings = {
+  apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key
+  network: Network.BASE_MAINNET, // Use the appropriate network
+};
+
 async function main() {
   const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
@@ -37,8 +42,14 @@ async function main() {
   app.post("/add-wallet", async (req, res) => {
     try {
       const { walletAddress, groupId } = req.body;
-      const result = await addWalletToGroup(agent, walletAddress, groupId);
-      res.status(200).send(result);
+      const verified = true; // (await checkNft(walletAddress, "XMTPeople"));
+      if (!verified) {
+        console.log("User cant be added to the group");
+        return;
+      } else {
+        await addToGroup(groupId, agent?.client as Client, walletAddress, true);
+        res.status(200).send("success");
+      }
     } catch (error: any) {
       res.status(400).send(error.message);
     }
@@ -58,23 +69,6 @@ async function main() {
 
 main().catch(console.error);
 
-async function addWalletToGroup(
-  agent: XMTP,
-  walletAddress: string,
-  groupId: string,
-): Promise<void> {
-  const verified = true; // (await checkNft(walletAddress, "XMTPeople"));
-  if (!verified) {
-    console.log("User cant be added to the group");
-    return;
-  } else {
-    try {
-      await addToGroup(groupId, agent?.client as Client, walletAddress, true);
-    } catch (error: any) {
-      console.log(error.message);
-    }
-  }
-}
 export async function createGroup(
   client: Client | undefined,
   senderAddress: string,
@@ -200,11 +194,6 @@ export async function addToGroup(
     console.error("Error adding to group", error);
   }
 }
-
-const settings = {
-  apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key
-  network: Network.BASE_MAINNET, // Use the appropriate network
-};
 
 export async function checkNft(
   walletAddress: string,
