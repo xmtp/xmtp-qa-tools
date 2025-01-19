@@ -183,7 +183,7 @@ Once your server is running (by default on port `3000`), test the `add-wallet` e
 ```bash
 curl -X POST http://localhost:3000/add-wallet \
  -H "Content-Type: application/json" \
- -d '{"walletAddress": "0x93E2fc3e99dFb1238eB9e0eF2580EFC5809C7204", "groupId": "b9ab876c87ef3cf63b81c8d45c824fae"}'
+ -d '{"walletAddress": "0x93E2fc3e99dFb1238eB9e0eF2580EFC5809C7204", "groupId": "5a785210f748ac8a5ec4a46e749a0c5d"}'
 ```
 
 If the wallet is verified for your NFT, you should get a `"success"` response, and the user will be added to the group. Otherwise, you’ll see `"not verified"` or `"error"` in the response.

@@ -1,14 +1,12 @@
-import { Client, Message, xmtpClient } from "@xmtp/agent-starter";
+import { Client, Message, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import express from "express";
+import { Alchemy, Network } from "alchemy-sdk";
 
 async function main() {
   const agent = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;
-      console.log(
-        `[${message.typeId}] ${message?.content.text} by ${message.sender.address}`,
-      );
 
       if (message?.content.text === "/create") {
         console.log("Creating group");
@@ -33,45 +31,13 @@ async function main() {
     },
   });
 
-  console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
-  );
-}
-
-main().catch(console.error);
-
-export function startGatedGroupServer(client: Client) {
-  async function addWalletToGroup(
-    walletAddress: string,
-    groupId: string,
-  ): Promise<string> {
-    const verified = true;
-    if (!verified) {
-      console.log("User cant be added to the group");
-      return "not verified";
-    } else {
-      try {
-        const added = await addToGroup(groupId, client, walletAddress, true);
-        if (added.code === 200) {
-          console.log(`Added wallet address: ${walletAddress} to the group`);
-          return "success";
-        } else {
-          return added.message;
-        }
-      } catch (error: any) {
-        console.log(error.message);
-        return "error";
-      }
-    }
-  }
-
   // Endpoint to add wallet address to a group from an external source
   const app = express();
   app.use(express.json());
   app.post("/add-wallet", async (req, res) => {
     try {
       const { walletAddress, groupId } = req.body;
-      const result = await addWalletToGroup(walletAddress, groupId);
+      const result = await addWalletToGroup(agent, walletAddress, groupId);
       res.status(200).send(result);
     } catch (error: any) {
       res.status(400).send(error.message);
@@ -85,8 +51,30 @@ export function startGatedGroupServer(client: Client) {
       `Use this endpoint to add a wallet to a group indicated by the groupId\n${url}/add-wallet <body: {walletAddress, groupId}>`,
     );
   });
+  console.log(
+    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+  );
 }
 
+main().catch(console.error);
+
+async function addWalletToGroup(
+  agent: XMTP,
+  walletAddress: string,
+  groupId: string,
+): Promise<void> {
+  const verified = await nftVerification(walletAddress);
+  if (!verified) {
+    console.log("User cant be added to the group");
+    return;
+  } else {
+    try {
+      await addToGroup(groupId, agent?.client as Client, walletAddress, true);
+    } catch (error: any) {
+      console.log(error.message);
+    }
+  }
+}
 export async function createGroup(
   client: Client | undefined,
   senderAddress: string,
@@ -133,16 +121,15 @@ export async function removeFromGroup(
   groupId: string,
   client: Client,
   senderAddress: string,
-): Promise<{ code: number; message: string }> {
+): Promise<void> {
   try {
     let lowerAddress = senderAddress.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
     console.warn("Checking if on XMTP: ", isOnXMTP);
-    if (!isOnXMTP)
-      return {
-        code: 400,
-        message: "You don't seem to have a v3 identity ",
-      };
+    if (!isOnXMTP) {
+      console.error("You don't seem to have a v3 identity ");
+      return;
+    }
     const conversation =
       await client.conversations.getConversationById(groupId);
     console.warn("removing from group", conversation?.id);
@@ -163,18 +150,14 @@ export async function removeFromGroup(
         }
       }
     }
-    return {
-      code: wasRemoved ? 200 : 400,
-      message: wasRemoved
-        ? "You have been removed from the group"
-        : "Failed to remove from group",
-    };
+    console.log(
+      "You have been removed from the group",
+      wasRemoved ? "success" : "failed",
+    );
+    return;
   } catch (error) {
     console.log("Error removing from group", error);
-    return {
-      code: 400,
-      message: "Failed to remove from group",
-    };
+    return;
   }
 }
 
@@ -183,15 +166,14 @@ export async function addToGroup(
   client: Client,
   address: string,
   asAdmin: boolean = false,
-): Promise<{ code: number; message: string }> {
+): Promise<void> {
   try {
     let lowerAddress = address.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
-    if (!isOnXMTP)
-      return {
-        code: 400,
-        message: "You don't seem to have a v3 identity ",
-      };
+    if (!isOnXMTP) {
+      console.error("You don't seem to have a v3 identity ");
+      return;
+    }
     const group = await client.conversations.getConversationById(groupId);
     console.warn("Adding to group", group?.id);
     await group?.sync();
@@ -209,21 +191,38 @@ export async function addToGroup(
         let lowerMemberAddress = member.accountAddresses[0].toLowerCase();
         if (lowerMemberAddress === lowerAddress) {
           console.warn("Member exists", lowerMemberAddress);
-          return {
-            code: 200,
-            message: "You have been added to the group",
-          };
+          return;
         }
       }
     }
-    return {
-      code: 400,
-      message: "Failed to add to group",
-    };
+    return;
   } catch (error) {
-    return {
-      code: 400,
-      message: "Failed to add to group",
-    };
+    console.error("Error adding to group", error);
   }
+}
+
+const settings = {
+  apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key
+  network: Network.BASE_MAINNET, // Use the appropriate network
+};
+
+export async function checkNft(
+  walletAddress: string,
+  collectionSlug: string,
+): Promise<boolean> {
+  const alchemy = new Alchemy(settings);
+  try {
+    const nfts = await alchemy.nft.getNftsForOwner(walletAddress);
+
+    const ownsNft = nfts.ownedNfts.some(
+      (nft: any) =>
+        nft.contract.name.toLowerCase() === collectionSlug.toLowerCase(),
+    );
+    console.log("is the nft owned: ", ownsNft);
+    return ownsNft as boolean;
+  } catch (error) {
+    console.error("Error fetching NFTs from Alchemy:", error);
+  }
+
+  return false;
 }

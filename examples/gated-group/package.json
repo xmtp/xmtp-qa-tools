@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@xmtp/agent-starter": "workspace:*",
+    "alchemy-sdk": "^3.5.1",
     "express": "^4.19.2"
   },
   "devDependencies": {
