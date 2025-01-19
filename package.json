@@ -14,6 +14,7 @@
     "build:examples": "turbo run build --filter='./examples/*'",
     "changeset": " changeset add --type patch",
     "clean": "turbo run clean && yarn cache clean && find examples -name '.data' -type d -exec rm -rf {} +",
+    "dev": "cd packages/agent-starter && yarn build:watch",
     "examples": "node scripts/examples.js",
     "format": "turbo run format",
     "publish": "changeset publish",
