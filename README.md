@@ -88,7 +88,7 @@ Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/rep
 
 ## Groups
 
-> [!INFO]
+> [!NOTE]
 > You need to add the agent **as a member** to the group.
 
 To create a group from your agent, you can use the following code:

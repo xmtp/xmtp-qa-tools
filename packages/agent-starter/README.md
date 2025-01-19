@@ -54,7 +54,7 @@ const isOnXMTP = await agent.canMessage(address);
 
 To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
 
-> [!INFO]
+> [!NOTE]
 > You need to **add the agent to the group as a member**.
 
 To create a group from your agent, you can use the following code:
