@@ -1,6 +1,6 @@
 # Lookup library
 
-The lookup library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
+The Lookup module provides a utility function to resolve various types of identifiers to their corresponding addresses or domains. This includes ENS names, reverse ENS lookups, website URLs, and Converse usernames.
 
 ## Overview
 
@@ -47,14 +47,6 @@ The lookup always returns a `UserInfo` object with these fields:
 | **converseEndpoint** | Endpoint for the user’s Converse profile   |
 
 Certainly! Here's the README content without code block separators:
-
-# Lookup module
-
-The Lookup module provides a utility function to resolve various types of identifiers to their corresponding addresses or domains. This includes ENS names, reverse ENS lookups, website URLs, and Converse usernames.
-
-## Installation
-
-To install the Lookup module, use the following command:
 
 ## Usage
 
