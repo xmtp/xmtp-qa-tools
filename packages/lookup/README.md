@@ -24,15 +24,6 @@ console.log(info);
 */
 ```
 
-## Supported identifiers
-
-- **Ethereum Addresses** : Example: `0x1234...`
-- **ENS Domains** : Example: `vitalik.eth`
-- **Converse Usernames** : Example: `@fabri`
-- **Inbox ID** : Example: `0x1234...` (Converse inbox ID)
-- **Website TXT Record** : Example: `https://example.com` containing `xmtp=0x1234...`
-- **Website Header Tag** : Example: `meta="xmtp" content="0x1234..."`
-
 The lookup always returns a `UserInfo` object with these fields:
 
 | Field                | Description                                |
@@ -44,11 +35,16 @@ The lookup always returns a `UserInfo` object with these fields:
 | **avatar**           | URL of the user’s profile picture (if any) |
 | **converseEndpoint** | Endpoint for the user’s Converse profile   |
 
-Certainly! Here's the README content without code block separators:
-
-## Usage
+## Supported identifiers
 
 Below are examples of how to use the `lookup` function in different scenarios.
+
+- **Ethereum Addresses** : Example: `0x1234...`
+- **ENS Domains** : Example: `vitalik.eth`
+- **Converse Usernames** : Example: `@fabri`
+- **Inbox ID** : Example: `0x1234...` (Converse inbox ID)
+- **Website TXT Record** : Example: `https://example.com` containing `xmtp=0x1234..`
+- **Website Header Tag** : Example: `meta="xmtp" content="0x1234..."`
 
 ### Install
 
@@ -84,6 +80,14 @@ async function reverseENS() {
 
 To resolve a website URL to an Ethereum address:
 
+Metatag on the website:
+
+```tsx
+<meta name="xmtp" content="0x93e2fc3e99dfb1238eb9e0ef2580efc5809c7204" />
+```
+
+Then you can fetch it's address
+
 ```tsx
 async function resolveWebsite() {
   const data = await lookup("https://messagekit.ephemerahq.com/");
@@ -93,7 +97,7 @@ async function resolveWebsite() {
 
 ### Converse username lookup
 
-To resolve a Converse username to an Ethereum address:
+To resolve a [Converse](https://converse.xyz/) username to an Ethereum address:
 
 ```tsx
 async function resolveConverseUsername() {
