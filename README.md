@@ -214,7 +214,7 @@ console.log(info);
 
 > Learn more about [`lookup`](/packages/lookup/) library
 
-## Development
+## Quickstart
 
 ```bash
 # clone the repository
@@ -227,9 +227,6 @@ yarn install
 # build
 yarn build
 
-# run sample agents from the examples directory
-yarn examples
-
 # or run a specific example
 yarn examples gm
 ```
@@ -240,7 +237,3 @@ Use a `.env` file for your environment variables:
 ENCRYPTION_KEY= # the private key of the wallet
 FIXED_KEY= # a second encryption key for encryption (can be random)
 ```
-
-## Contribute
-
-We welcome contributions! Check out the [contributing](CONTRIBUTING.md) file for more information on how to get started.

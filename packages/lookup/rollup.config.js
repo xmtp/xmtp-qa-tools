@@ -3,9 +3,7 @@ import { defineConfig } from "rollup";
 import { dts } from "rollup-plugin-dts";
 
 const external = [
-  "jsdom",
   "cross-fetch",
-  "node-fetch",
   "dns",
   "path",
   "viem",

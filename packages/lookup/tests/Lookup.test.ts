@@ -21,7 +21,6 @@ describe("Client Private Key Configuration Tests", () => {
 
     //Converse username lookup
     data = await lookup("@fabri");
-    console.log(data);
     expect(data?.address?.toLowerCase()).toBe(
       "0x93e2fc3e99dfb1238eb9e0ef2580efc5809c7204".toLowerCase(),
     );

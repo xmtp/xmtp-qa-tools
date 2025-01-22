@@ -9,6 +9,33 @@ Here, you will find various examples and tutorials to help you get started with 
 - [railway](/examples/railway/): A tutorial on how to deploy your agent on Railway.
 - [replit](/examples/replit/): A tutorial on how to deploy your agent on Replit.
 
-### Contribute
+## Development
 
-Learn how to [contribute](/CONTRIBUTING.md) to the examples directory.
+```bash
+# clone the repository
+git clone https://github.com/ephemeraHQ/xmtp-agents/
+cd xmtp-agents
+
+# install dependencies
+yarn install
+
+# build
+yarn build
+
+# run sample agents from the examples directory
+yarn examples
+
+# or run a specific example
+yarn examples gm
+```
+
+Use a `.env` file for your environment variables:
+
+```bash
+ENCRYPTION_KEY= # the private key of the wallet
+FIXED_KEY= # a second encryption key for encryption (can be random)
+```
+
+## Contribute
+
+We welcome contributions! Check out the [contributing](CONTRIBUTING.md) file for more information on how to get started.

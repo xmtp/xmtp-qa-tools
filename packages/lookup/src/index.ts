@@ -1,5 +1,4 @@
 import { isAddress } from "viem";
-import { JSDOM } from "jsdom";
 import dns from "dns";
 export const converseEndpointURL = "https://converse.xyz/profile/";
 
@@ -262,19 +261,14 @@ export async function getEvmAddressFromHeaderTag(
   try {
     const response = await fetch(website);
     const html = await response.text();
-    const dom = new JSDOM(html);
-    const metaTags = dom.window.document.getElementsByTagName("meta");
-    for (let i = 0; i < metaTags.length; i++) {
-      const metaTag = metaTags[i];
-      const name = metaTag.getAttribute("name");
-      const content = metaTag.getAttribute("content");
 
-      if (name === "xmtp" && content) {
-        const match = content.match(/^0x[a-fA-F0-9]+$/);
-        if (match) {
-          return match[0];
-        }
-      }
+    // Use regex to find the meta tag with name="xmtp"
+    const metaTagRegex =
+      /<meta\s+name=["']xmtp["']\s+content=["'](0x[a-fA-F0-9]+)["']/i;
+    const match = html.match(metaTagRegex);
+
+    if (match && match[1]) {
+      return match[1];
     }
   } catch (error) {
     console.error("Failed to fetch or parse the website:", error);

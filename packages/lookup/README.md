@@ -57,7 +57,7 @@ yarn add @xmtp/lookup
 To resolve an ENS name to an Ethereum address:
 
 ```tsx
-import { lookup } from "@your-package/lookup";
+import { lookup } from "@xmtp/lookup";
 
 async function resolveENS() {
   const data = await lookup("vitalik.eth");
