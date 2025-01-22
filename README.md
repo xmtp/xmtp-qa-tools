@@ -189,7 +189,7 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 > [!WARNING]
 > This React app isn't a complete solution. For example, the list of conversations doesn't update when new messages arrive in existing conversations.
 
-## Resolver library
+## Lookup library
 
 This library helps you to lookup identities into EVM addresses compatible with XMTP.
 
@@ -223,6 +223,7 @@ cd xmtp-agents
 
 # install dependencies
 yarn install
+
 # build
 yarn build
 

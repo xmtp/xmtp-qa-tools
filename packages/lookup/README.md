@@ -2,12 +2,6 @@
 
 The lookup library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
 
-## Install
-
-```bash [yarn]
-yarn add @xmtp/lookup
-```
-
 ## Overview
 
 ```typescript
@@ -51,6 +45,72 @@ The lookup always returns a `UserInfo` object with these fields:
 | **converseUsername** | The user’s Converse username (if any)      |
 | **avatar**           | URL of the user’s profile picture (if any) |
 | **converseEndpoint** | Endpoint for the user’s Converse profile   |
+
+Certainly! Here's the README content without code block separators:
+
+# Lookup module
+
+The Lookup module provides a utility function to resolve various types of identifiers to their corresponding addresses or domains. This includes ENS names, reverse ENS lookups, website URLs, and Converse usernames.
+
+## Installation
+
+To install the Lookup module, use the following command:
+
+## Usage
+
+Below are examples of how to use the `lookup` function in different scenarios.
+
+### Install
+
+```bash [yarn]
+yarn add @xmtp/lookup
+```
+
+### ENS lookup
+
+To resolve an ENS name to an Ethereum address:
+
+```tsx
+import { lookup } from "@your-package/lookup";
+
+async function resolveENS() {
+  const data = await lookup("vitalik.eth");
+  console.log(data?.address?.toLowerCase()); // Outputs: 0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045
+}
+```
+
+### ENS reverse lookup
+
+To resolve an Ethereum address to an ENS domain:
+
+```tsx
+async function reverseENS() {
+  const data = await lookup("0x93E2fc3e99dFb1238eB9e0eF2580EFC5809C7204");
+  console.log(data?.ensDomain?.toLowerCase()); // Outputs: humanagent.eth
+}
+```
+
+### Website lookup
+
+To resolve a website URL to an Ethereum address:
+
+```tsx
+async function resolveWebsite() {
+  const data = await lookup("https://messagekit.ephemerahq.com/");
+  console.log(data?.address?.toLowerCase()); // Outputs: 0x93e2fc3e99dfb1238eb9e0ef2580efc5809c7204
+}
+```
+
+### Converse username lookup
+
+To resolve a Converse username to an Ethereum address:
+
+```tsx
+async function resolveConverseUsername() {
+  const data = await lookup("@fabri");
+  console.log(data?.address?.toLowerCase()); // Outputs: 0x93e2fc3e99dfb1238eb9e0ef2580efc5809c7204
+}
+```
 
 ## Cache
 
