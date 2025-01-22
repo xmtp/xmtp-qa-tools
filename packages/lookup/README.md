@@ -33,8 +33,6 @@ console.log(info);
 - **Website TXT Record** : Example: `https://example.com` containing `xmtp=0x1234...`
 - **Website Header Tag** : Example: `meta="xmtp" content="0x1234..."`
 
-### Returned UserInfo
-
 The lookup always returns a `UserInfo` object with these fields:
 
 | Field                | Description                                |
