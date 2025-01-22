@@ -46,7 +46,7 @@ Below are examples of how to use the `lookup` function in different scenarios.
 - **Website TXT Record** : Example: `https://example.com` containing `xmtp=0x1234..`
 - **Website Header Tag** : Example: `meta="xmtp" content="0x1234..."`
 
-### Install
+## Install
 
 ```bash [yarn]
 yarn add @xmtp/lookup
