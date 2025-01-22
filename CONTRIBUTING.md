@@ -29,13 +29,13 @@ yarn examples gm
 xmtp-agents/
 ├── packages/
 │   ├── agent-starter
-│   └── resolver
+│   └── lookup
 └── examples/
     ├── gated-group
     └── ... [your new example here]
 ```
 
-- **packages**: core libraries (`agent-starter`, `resolver`).
+- **packages**: core libraries (`agent-starter`, `lookup`).
 - **examples**: standalone demos (e.g., `gated-group`).
 
 ## Adding an example

@@ -16,10 +16,6 @@ export const ContentTypeAgentMessage = new ContentTypeId({
 export class AgentMessage {
   public text: string;
   public metadata: {
-    agentId: string;
-    skillUsed?: string;
-    timestamp: number;
-    isAgent: boolean;
     [key: string]: any; // Allow for flexible metadata
   };
 

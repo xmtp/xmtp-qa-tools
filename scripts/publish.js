@@ -38,7 +38,7 @@ function updatePackageVersion(packagePath, versionType) {
 const versionType = process.argv[2];
 
 // Update versions for each package
-const packages = ["packages/resolver", "packages/agent-starter"];
+const packages = ["packages/lookup", "packages/agent-starter"];
 
 packages.forEach((packagePath) => {
   updatePackageVersion(packagePath, versionType);

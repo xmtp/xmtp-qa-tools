@@ -1862,6 +1862,30 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/lookup@workspace:packages/lookup":
+  version: 0.0.0-use.local
+  resolution: "@xmtp/lookup@workspace:packages/lookup"
+  dependencies:
+    "@changesets/changelog-git": "npm:^0.2.0"
+    "@changesets/cli": "npm:^2.27.5"
+    "@rollup/plugin-typescript": "npm:^11.1.6"
+    "@types/jsdom": "npm:^21.1.7"
+    "@types/node": "npm:^20.14.2"
+    "@vitest/coverage-v8": "npm:^2.1.4"
+    dotenv: "npm:^16.4.5"
+    jsdom: "npm:^26.0.0"
+    node-fetch: "npm:^3.3.2"
+    prettier: "npm:^3.3.1"
+    rollup: "npm:^4.18.0"
+    rollup-plugin-dts: "npm:^6.1.1"
+    ts-node: "npm:^10.9.2"
+    turbo: "npm:^2.2.3"
+    typescript: "npm:^5.4.5"
+    viem: "npm:^2.16.3"
+    vitest: "npm:^2.1.4"
+  languageName: unknown
+  linkType: soft
+
 "@xmtp/node-bindings@npm:^0.0.33":
   version: 0.0.33
   resolution: "@xmtp/node-bindings@npm:0.0.33"
@@ -1893,30 +1917,6 @@ __metadata:
   checksum: 10/0880307623e72a22ffaf2e3ec775bfbacd013225bbdc545c1abe362200bcce7e44d491d46114b3746b4ed1c539bc85f5321da8c5ca13441cd33e661d2c3881a5
   languageName: node
   linkType: hard
-
-"@xmtp/resolver@workspace:packages/resolver":
-  version: 0.0.0-use.local
-  resolution: "@xmtp/resolver@workspace:packages/resolver"
-  dependencies:
-    "@changesets/changelog-git": "npm:^0.2.0"
-    "@changesets/cli": "npm:^2.27.5"
-    "@rollup/plugin-typescript": "npm:^11.1.6"
-    "@types/jsdom": "npm:^21.1.7"
-    "@types/node": "npm:^20.14.2"
-    "@vitest/coverage-v8": "npm:^2.1.4"
-    dotenv: "npm:^16.4.5"
-    jsdom: "npm:^26.0.0"
-    node-fetch: "npm:^3.3.2"
-    prettier: "npm:^3.3.1"
-    rollup: "npm:^4.18.0"
-    rollup-plugin-dts: "npm:^6.1.1"
-    ts-node: "npm:^10.9.2"
-    turbo: "npm:^2.2.3"
-    typescript: "npm:^5.4.5"
-    viem: "npm:^2.16.3"
-    vitest: "npm:^2.1.4"
-  languageName: unknown
-  linkType: soft
 
 "@xmtp/tsconfig@workspace:shared/tsconfig":
   version: 0.0.0-use.local

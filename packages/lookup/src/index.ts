@@ -14,10 +14,12 @@ export type ConverseProfile = {
 export type UserInfo = {
   ensDomain?: string | undefined;
   address?: string | undefined;
+  webDomain?: string | undefined;
   preferredName: string | undefined;
   converseUsername?: string | undefined;
   ensInfo?: EnsData | undefined;
   avatar?: string | undefined;
+  inboxId?: string | undefined;
   converseEndpoint?: string | undefined;
 };
 
@@ -73,7 +75,7 @@ class UserInfoCache {
 // Use the singleton instance
 export const cache = UserInfoCache.getInstance();
 
-export const resolve = async (
+export const lookup = async (
   key: string | undefined,
   clientAddress?: string,
 ): Promise<UserInfo | undefined> => {
@@ -84,6 +86,7 @@ export const resolve = async (
     ensInfo: undefined,
     avatar: undefined,
     converseEndpoint: undefined,
+    inboxId: undefined,
     preferredName: undefined,
   };
   if (typeof key !== "string") {
@@ -104,6 +107,8 @@ export const resolve = async (
     data.address = key;
   } else if (key.includes(".eth")) {
     data.ensDomain = key;
+  } else if (key.includes("https://") || key.includes("http://")) {
+    data.webDomain = key;
   } else if (["@user", "@me", "@bot"].includes(key)) {
     data.address = clientAddress;
     data.ensDomain = key.replace("@", "") + ".eth";
@@ -118,7 +123,15 @@ export const resolve = async (
     data.converseUsername = key;
   }
 
-  data.preferredName = data.ensDomain || data.converseUsername || "Friend";
+  data.preferredName = data.ensDomain || data.converseUsername || data.address;
+
+  if (data.webDomain) {
+    //data.address = await getEvmAddressFromDns(data.webDomain);
+    if (!data.address) {
+      data.address = await getEvmAddressFromHeaderTag(data.webDomain);
+    }
+  }
+
   const keyToUse =
     data.address?.toLowerCase() || data.ensDomain || data.converseUsername;
 
@@ -126,7 +139,7 @@ export const resolve = async (
     console.log("Unable to determine a valid key for fetching user info.");
     return data;
   } else {
-    // Fetch ENS data
+    // Fetch EVM address from DNS
     try {
       const response = await fetch(`https://ensdata.net/${keyToUse}`);
       if (response.status !== 200) {
@@ -145,10 +158,9 @@ export const resolve = async (
     } catch (error) {
       console.error(`Failed to fetch ENS data for ${keyToUse}`);
     }
-    //Converse profile
+
     try {
-      const username = keyToUse.replace("@", "");
-      const converseEndpoint = `${converseEndpointURL}${username}`;
+      const converseEndpoint = `${converseEndpointURL}${data.converseUsername}`;
       const response = await fetchWithTimeout(
         converseEndpoint,
         {
@@ -157,7 +169,7 @@ export const resolve = async (
             "Content-Type": "application/json",
             Accept: "application/json",
           },
-          body: JSON.stringify({ peer: username }),
+          body: JSON.stringify({ peer: data.converseUsername }),
         },
         5000,
       );
@@ -210,26 +222,38 @@ const fetchWithTimeout = async (
 export async function getEvmAddressFromDns(
   domain: string,
 ): Promise<string | undefined> {
-  return new Promise((resolve, reject) => {
-    dns.resolveTxt(domain, (err, records) => {
-      if (err) {
-        console.error("Failed to resolve TXT records:", err);
-        return reject(err);
-      }
+  try {
+    try {
+      const records = await new Promise((resolve, reject) => {
+        dns.resolveTxt(domain, (err, records) => {
+          if (err) {
+            console.error("Failed to resolve TXT records:", err);
+            return reject(err);
+          }
+          resolve(records);
+        });
+      });
+      if (Array.isArray(records)) {
+        for (const recordArray of records) {
+          const recordText = recordArray.join("");
+          console.log(`Found TXT record: ${recordText}`);
 
-      for (const recordArray of records) {
-        const recordText = recordArray.join("");
-        console.log(`Found TXT record: ${recordText}`);
-
-        const match = recordText.match(/^xmtp=(0x[a-fA-F0-9]+)/);
-        if (match && match[1]) {
-          console.log(`Extracted EVM address: ${match[1]}`);
-          return resolve(match[1]);
+          const match = recordText.match(/^xmtp=(0x[a-fA-F0-9]+)/);
+          if (match && match[1]) {
+            return match[1];
+          }
         }
+      } else {
+        console.error("Expected records to be an array, but got:", records);
       }
-      resolve(undefined);
-    });
-  });
+      return undefined;
+    } catch (error) {
+      console.error("Failed to resolve TXT records:", error);
+      return undefined;
+    }
+  } catch (error) {
+    console.error("Failed to fetch or parse the website:", error);
+  }
 }
 
 export async function getEvmAddressFromHeaderTag(
@@ -240,16 +264,15 @@ export async function getEvmAddressFromHeaderTag(
     const html = await response.text();
     const dom = new JSDOM(html);
     const metaTags = dom.window.document.getElementsByTagName("meta");
-
     for (let i = 0; i < metaTags.length; i++) {
       const metaTag = metaTags[i];
-      if (metaTag.getAttribute("xmtp") && metaTag.getAttribute("content")) {
-        const content = metaTag.getAttribute("content");
-        if (content) {
-          const match = content.match(/^0x[a-fA-F0-9]+$/);
-          if (match) {
-            return match[0];
-          }
+      const name = metaTag.getAttribute("name");
+      const content = metaTag.getAttribute("content");
+
+      if (name === "xmtp" && content) {
+        const match = content.match(/^0x[a-fA-F0-9]+$/);
+        if (match) {
+          return match[0];
         }
       }
     }

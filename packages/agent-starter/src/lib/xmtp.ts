@@ -61,9 +61,10 @@ export class XMTP {
   }
 
   async init(): Promise<XMTP> {
+    let suffix = this.agent?.name ? "_" + this.agent?.name : "";
     let fixedKey =
       this.agent?.fixedKey ??
-      process.env["FIXED_KEY" + (this.agent?.name ?? "")] ??
+      process.env["FIXED_KEY" + suffix] ??
       toHex(getRandomValues(new Uint8Array(32)));
 
     if (!fixedKey.startsWith("0x")) {
@@ -71,7 +72,7 @@ export class XMTP {
     }
     let encryptionKey =
       this.agent?.encryptionKey ??
-      process.env["ENCRYPTION_KEY" + (this.agent?.name ?? "")] ??
+      process.env["ENCRYPTION_KEY" + suffix] ??
       toHex(getRandomValues(new Uint8Array(32)));
 
     if (!encryptionKey.startsWith("0x")) {
@@ -119,12 +120,12 @@ export class XMTP {
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     Promise.all([streamMessages(this.onMessage, client, this)]);
-    this.saveKeys(this.agent?.name ?? "", fixedKey, encryptionKey);
+    this.saveKeys(suffix, fixedKey, encryptionKey);
     return this;
   }
-  saveKeys(agentName: string, fixedKey: string, encryptionKey: string) {
+  saveKeys(suffix: string, fixedKey: string, encryptionKey: string) {
     const envFilePath = path.resolve(process.cwd(), ".env");
-    const envContent = `\nFIXED_KEY${agentName}=${fixedKey}\nENCRYPTION_KEY${agentName}=${encryptionKey}`;
+    const envContent = `\nFIXED_KEY${suffix}=${fixedKey}\nENCRYPTION_KEY${suffix}=${encryptionKey}`;
 
     // Read the existing .env file content
     let existingEnvContent = "";
@@ -134,8 +135,8 @@ export class XMTP {
 
     // Check if the keys already exist
     if (
-      !existingEnvContent.includes(`FIXED_KEY${agentName}=`) &&
-      !existingEnvContent.includes(`ENCRYPTION_KEY${agentName}=`)
+      !existingEnvContent.includes(`FIXED_KEY${suffix}=`) &&
+      !existingEnvContent.includes(`ENCRYPTION_KEY${suffix}=`)
     ) {
       fs.appendFileSync(envFilePath, envContent);
     }

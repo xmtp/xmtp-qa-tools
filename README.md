@@ -53,6 +53,7 @@ async function main() {
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
+        console.log(`from ${message.sender.address}`)
 
         // Your AI model response
         const response = await api("Hi, how are you?");
@@ -65,7 +66,7 @@ async function main() {
       };
   });
 
-  console.log("Agent is up and running...");
+  console.log("Agent is up and running on address " + agent.address);
 }
 
 main().catch(console.error);
@@ -190,13 +191,13 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 
 ## Resolver library
 
-This library helps you to resolve identities into EVM addresses compatible with XMTP.
+This library helps you to lookup identities into EVM addresses compatible with XMTP.
 
 ```tsx
-import { resolve } from "@xmtp/resolver";
+import { lookup } from "@xmtp/lookup";
 
 const identifier = "vitalik.eth";
-const info = await resolve(identifier);
+const info = await lookup(identifier);
 
 console.log(info);
 /*
@@ -211,7 +212,7 @@ console.log(info);
 */
 ```
 
-> Learn more about [`@xmtp/resolver`](/packages/resolver/) library
+> Learn more about [`lookup`](/packages/lookup/) library
 
 ## Development
 

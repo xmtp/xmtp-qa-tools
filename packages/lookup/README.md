@@ -1,21 +1,21 @@
-# @xmtp/resolver
+# Lookup library
 
-The resolver library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
+The lookup library provides tools for resolving identities to EVM addresses and keeping track of them in a cache
 
 ## Install
 
 ```bash [yarn]
-yarn add @xmtp/resolver
+yarn add @xmtp/lookup
 ```
 
 ## Overview
 
 ```typescript
-import { resolve } from "@xmtp/resolver";
+import { lookup } from "@xmtp/lookup";
 
 // Because user identifiers come in all shapes and sizes!
 const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
-const info = await resolve(identifier);
+const info = await lookup(identifier);
 
 console.log(info);
 /*
@@ -41,7 +41,7 @@ console.log(info);
 
 ### Returned UserInfo
 
-The resolver always returns a `UserInfo` object with these fields:
+The lookup always returns a `UserInfo` object with these fields:
 
 | Field                | Description                                |
 | -------------------- | ------------------------------------------ |
@@ -57,7 +57,7 @@ The resolver always returns a `UserInfo` object with these fields:
 Skip the repeated lookups—use the built-in cache to store user data. Clear it whenever you need a fresh slate:
 
 ```typescript
-import { cache } from "@xmtp/resolver";
+import { cache } from "@xmtp/lookup";
 
 // Clear the entire cache:
 cache.clear();
