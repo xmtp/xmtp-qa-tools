@@ -20,7 +20,6 @@
     "build": "rollup -c",
     "build:watch": "yarn build -w",
     "clean": "rm -rf .turbo && rm -rf node_modules && rm -rf dist",
-    "publish": "npm publish",
     "test": "vitest run"
   },
   "dependencies": {

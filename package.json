@@ -8,15 +8,13 @@
     "shared/*"
   ],
   "scripts": {
-    "build": "yarn build:agent-starter && yarn build:examples",
-    "build:agent-starter": "turbo run build --filter=./packages/agent-starter --force",
-    "build:examples": "turbo run build --filter='./examples/*'",
+    "build": "turbo run build",
     "changeset": " changeset add --type patch",
     "clean": "turbo run clean && yarn cache clean && find examples -name '.data' -type d -exec rm -rf {} +",
     "dev": "cd packages/agent-starter && yarn build:watch",
     "examples": "node scripts/examples.js",
     "format": "turbo run format",
-    "publish": "changeset publish",
+    "publish": "yarn build && changeset publish",
     "test": "FORCE_COLOR=1 turbo run test",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck"
   },
