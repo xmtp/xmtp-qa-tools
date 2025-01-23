@@ -60,7 +60,7 @@ app.post("/add-wallet", async (req, res) => {
 - Only verified addresses are added to the group with `addToGroup(...)`.
 - The server logs important messages to keep you informed.
 
-### Check the NFT with alchemy
+## Check the NFT with alchemy
 
 ```tsx
 import { Alchemy, Network } from "alchemy-sdk";
@@ -158,7 +158,7 @@ app.listen(PORT, () => {
 });
 ```
 
-### Test the Endpoint
+## Test the Endpoint
 
 Once your server is running (by default on port `3000`), test the `add-wallet` endpoint with your chosen wallet and the `groupId` you received from `createGroup`:
 

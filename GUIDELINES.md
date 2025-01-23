@@ -12,14 +12,10 @@ These principles create a safe foundation that we may thoughtfully expand over t
 
 Agents built with XMTP follow the trusted principles detailed here. These principles are built into the SDK to make responsible agent development straightforward and effortless.
 
-- **Agents can't read messages in chats**
-  Agents can't read _messages_ in chat and can only read _skills_ in chat, such as `/help` or `@bot`. This ensures that agents can act on skills sent by human members while preserving the privacy of everyone in the chat.
-- **Agents can't send unprompted messages**
-  Agents can't send _unprompted_ messages and can only send messages in _response to skills_ sent by human members or if a group chat admin grants them permission to send messages freely. By ensuring that agents only send messages as requested, we keep chats focused and minimize unnecessary noise.
-- **Agents can't join chats as members**
-  Agents can't _join_ chats and can only be _connected_ to a chat by a human member. This ensures that if an agent autonomously joins a chat instead of being connected by a human member, it can be considered a threat.
-- **Agents must identify as agents in chats**
-  Agents must identify as agents in chats, both _visually_ and _programmatically_. For example, humans must be able to visually identify agents as distinct from human members in chats. If an agent appears as a human member, it can be considered a threat.
+- **Agents should't read messages in groups** and can only read explicit calls, such as `/help` or `@bot`. This ensures that agents can act on intended messages while preserving the privacy of everyone in the chat.
+- **Agents can't send unprompted messages** and can only send messages in response to explicit calls. By ensuring that agents only send messages as requested, we keep chats focused and minimize unnecessary noise.
+- **Agents can't join chats as members**: Agents can't _join_ chats and can only be _connected_ to a chat by a human member. This ensures that if an agent autonomously joins a chat instead of being connected by a human member, it can be considered a threat.
+- **Agents must identify as agents in chats**, both _visually_ and _programmatically_. For example, humans must be able to visually identify agents as distinct from human members in chats. If an agent appears as a human member, it can be considered a threat.
 
 ## For everyone and for the long-term
 
