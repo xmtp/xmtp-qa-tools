@@ -30,6 +30,7 @@ async function main() {
       await agent.send({
         message: gptMessage ?? "",
         originalMessage: message,
+        metadata: {},
       });
     },
   });
