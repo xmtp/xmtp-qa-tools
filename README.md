@@ -199,14 +199,16 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 
 This library helps you to lookup identities into EVM addresses compatible with XMTP.
 
-```tsx
+````tsx
 import { lookup } from "@xmtp/lookup";
 
 const identifier = "vitalik.eth";
 const info = await lookup(identifier);
+```
 
-console.log(info);
-/*
+Result:
+
+```json
 {
   ensDomain: 'vitalik.eth',
   address: '0x1234...',
@@ -215,8 +217,7 @@ console.log(info);
   avatar: 'https://...',
   converseDeeplink: 'https://converse.xyz/...'
 }
-*/
-```
+````
 
 > Learn more about [`lookup`](/packages/lookup/) library
 

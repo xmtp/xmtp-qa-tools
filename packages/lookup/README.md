@@ -10,18 +10,19 @@ import { lookup } from "@xmtp/lookup";
 // Because user identifiers come in all shapes and sizes!
 const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
 const info = await lookup(identifier);
+```
 
-console.log(info);
-/*
+Result:
+
+```json
 {
-  ensDomain: 'vitalik.eth',
-  address: '0x1234...',
-  preferredName: 'vitalik.eth',
-  converseUsername: '',
-  avatar: 'https://...',
-  converseDeeplink: 'https://converse.xyz/dm/...'
+  "ensDomain": "vitalik.eth",
+  "address": "0x1234...",
+  "preferredName": "vitalik.eth",
+  "converseUsername": "",
+  "avatar": "https://...",
+  "converseDeeplink": "https://converse.xyz/dm/..."
 }
-*/
 ```
 
 The lookup always returns a `UserInfo` object with these fields:
