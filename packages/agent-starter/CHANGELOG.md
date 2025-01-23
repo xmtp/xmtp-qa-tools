@@ -4,4 +4,4 @@
 
 ### Patch Changes
 
-- d8fd67f: Fixed various code issues
+- d8fd67f: Fixed various type and code issues
