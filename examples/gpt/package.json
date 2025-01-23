@@ -1,5 +1,5 @@
 {
-  "name": "gpt",
+  "name": "@example/gpt",
   "private": true,
   "type": "module",
   "scripts": {

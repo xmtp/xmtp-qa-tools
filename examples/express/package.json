@@ -1,5 +1,5 @@
 {
-  "name": "multi-agent-express",
+  "name": "@example/multi-agent-express",
   "private": true,
   "type": "module",
   "scripts": {

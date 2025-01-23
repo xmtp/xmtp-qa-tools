@@ -1,5 +1,5 @@
 {
-  "name": "gm",
+  "name": "@example/gm",
   "private": true,
   "type": "module",
   "scripts": {
