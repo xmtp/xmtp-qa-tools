@@ -926,6 +926,7 @@ __metadata:
   resolution: "@example/gpt@workspace:examples/gpt"
   dependencies:
     "@types/node": "npm:^22.10.9"
+    "@xmtp/agent-starter": "workspace:*"
     openai: "npm:latest"
     typescript: "npm:^5.7.3"
   languageName: unknown
