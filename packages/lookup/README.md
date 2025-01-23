@@ -34,7 +34,7 @@ The lookup always returns a `UserInfo` object with these fields:
 | **preferredName**    | Best name to display                       |
 | **converseUsername** | The user’s Converse username (if any)      |
 | **avatar**           | URL of the user’s profile picture (if any) |
-| **converseDeeplink** | Endpoint for the user’s Converse profile   |
+| **converseDeeplink** | Deeplink for the user’s Converse profile   |
 
 ## Supported identifiers
 

@@ -49,7 +49,7 @@ These are the steps to initialize the XMTP listener and send messages.
 import { xmtpClient } from "@xmtp/agent-starter";
 
 async function main() {
-  const agent = await xmtpClient({
+  const client = await xmtpClient({
     walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
@@ -59,14 +59,14 @@ async function main() {
         const response = await api("Hi, how are you?");
 
         //Send text message
-        await agent.send({
+        await client.send({
           message: response,
           originalMessage: message,
         });
       };
   });
 
-  console.log("Agent is up and running on address " + agent.address);
+  console.log("XMTP client is up and running on address " + client.address);
 }
 
 main().catch(console.error);
@@ -77,7 +77,7 @@ main().catch(console.error);
 Returns `true` if an address is reachable on the xmtp network
 
 ```typescript
-const isOnXMTP = await agent.canMessage(address);
+const isOnXMTP = await client.canMessage(address);
 ```
 
 ## Examples
@@ -103,7 +103,7 @@ Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/rep
 To create a group from your agent, you can use the following code:
 
 ```tsx
-const group = await agent?.conversations.newGroup([address1, address2]);
+const group = await client?.conversations.newGroup([address1, address2]);
 ```
 
 As an admin you can add members to the group.
@@ -158,12 +158,12 @@ When you build an app with XMTP, all messages are encoded with a content type to
 Sends a text message.
 
 ```tsx
-let textMessage: agentMessage = {
+let textMessage: clientMessage = {
   message: "Your message.",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
 };
-await agent.send(textMessage);
+await client.send(textMessage);
 ```
 
 ### Agent message
@@ -171,7 +171,7 @@ await agent.send(textMessage);
 Allows to send structured metadata over the network that is displayed as plain-text in ecosystem inboxes.
 
 ```tsx
-let agentMessage: agentMessage = {
+let clientMessage: clientMessage = {
   message: "Would you like to approve this transaction?",
   metadata: {
     amount: "10",
@@ -181,7 +181,7 @@ let agentMessage: agentMessage = {
   originalMessage: message, // optional
   typeId: "agent_message",
 };
-await agent.send(agentMessage);
+await client.send(clientMessage);
 ```
 
 > See [content-types](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
@@ -215,7 +215,7 @@ Result:
   preferredName: 'vitalik.eth',
   converseUsername: '',
   avatar: 'https://...',
-  converseDeeplink: 'https://converse.xyz/...'
+  converseDeeplink: 'https://converse.xyz/dm/...'
 }
 ````
 

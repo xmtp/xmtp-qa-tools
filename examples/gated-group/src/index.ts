@@ -8,7 +8,7 @@ const settings = {
 };
 
 async function main() {
-  const agent = await xmtpClient({
+  const client = await xmtpClient({
     walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;
@@ -16,19 +16,19 @@ async function main() {
       if (message.content.text === "/create") {
         console.log("Creating group");
         const group = await createGroup(
-          agent.client,
+          client.client,
           message.sender.address,
-          agent.address as string,
+          client.address as string,
         );
         console.log("Group created", group?.id);
-        await agent.send({
+        await client.send({
           message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
           originalMessage: message,
           metadata: {},
         });
         return;
       } else {
-        await agent.send({
+        await client.send({
           message:
             "👋 Welcome to the Gated Bot Group!\nTo get started, type /create to set up a new group. 🚀\nThis example will check if the user has a particular nft and add them to the group if they do.\nOnce your group is created, you'll receive a unique Group ID and URL.\nShare the URL with friends to invite them to join your group!",
           originalMessage: message,
@@ -51,7 +51,7 @@ async function main() {
     //   console.log("User cant be added to the group");
     //   return;
     // } else {
-    addToGroup(groupId, agent.client as Client, walletAddress, true)
+    addToGroup(groupId, client.client as Client, walletAddress, true)
       .then(() => {
         res.status(200).send("success");
       })
@@ -68,7 +68,7 @@ async function main() {
     );
   });
   console.log(
-    `XMTP agent initialized on ${agent.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent.address}`,
+    `XMTP client initialized on ${client.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${client.address}`,
   );
 }
 

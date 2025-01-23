@@ -46,7 +46,7 @@ main().catch(console.error);
 Returns `true` if an address is reachable on the xmtp network
 
 ```typescript
-const isOnXMTP = await agent.canMessage(address);
+const isOnXMTP = await client.canMessage(address);
 ```
 
 ## Groups
@@ -155,12 +155,12 @@ When you build an app with XMTP, all messages are encoded with a content type to
 Sends a text message.
 
 ```tsx
-let textMessage: agentMessage = {
+let textMessage: clientMessage = {
   message: "Your message.",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
 };
-await agent.send(textMessage);
+await client.send(textMessage);
 ```
 
 > See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-text) for reference
@@ -170,13 +170,13 @@ await agent.send(textMessage);
 Sends an emoji reaction.
 
 ```tsx
-let reaction: agentMessage = {
+let reaction: clientMessage = {
   message: "😅",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
   typeId: "reaction",
 };
-await agent.send(reaction);
+await client.send(reaction);
 ```
 
 > See [text content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
@@ -186,13 +186,13 @@ await agent.send(reaction);
 Replies to a specific message.
 
 ```tsx
-let reply: agentMessage = {
+let reply: clientMessage = {
   message: "Your message.",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
   typeId: "reply",
 };
-await agent.send(reply);
+await client.send(reply);
 ```
 
 > See [reply content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reply) for reference
@@ -202,13 +202,13 @@ await agent.send(reply);
 Sends any media file or attachment lower to 1MB over the network.
 
 ```tsx
-let attachment: agentMessage = {
+let attachment: clientMessage = {
   message: "https://picsum.photos/200/300",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
   typeId: "attachment",
 };
-await agent.send(attachment);
+await client.send(attachment);
 ```
 
 > See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-remote-attachment) for reference
@@ -218,7 +218,7 @@ await agent.send(attachment);
 Allows to send structured metadata over the network that is displayed as plain-text in ecosystem inboxes.
 
 ```tsx
-let agentMessage: agentMessage = {
+let clientMessage: clientMessage = {
   message: "Would you like to approve this transaction?",
   metadata: {
     amount: "10",
@@ -228,7 +228,7 @@ let agentMessage: agentMessage = {
   originalMessage: message, // optional
   typeId: "agent_message",
 };
-await agent.send(agentMessage);
+await client.send(clientMessage);
 ```
 
 > Agent message is an implementation of a `custom` content-type and not yet officially supported by the protocol.

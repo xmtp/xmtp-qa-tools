@@ -10,7 +10,7 @@ export type Metadata = {
   [key: string]: any;
 };
 
-export type agentMessage = {
+export type clientMessage = {
   message: string;
   originalMessage?: Message;
   metadata: Metadata;

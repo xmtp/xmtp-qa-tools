@@ -42,7 +42,7 @@ async function main() {
       const gptMessage = completion.choices[0]?.message?.content?.trim();
 
       // Send GPT response back via XMTP
-      await agent.send({
+      await client.send({
         message: gptMessage ?? "",
         originalMessage: message,
       });
@@ -50,8 +50,8 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${agent.address}\n` +
-      `Try sending a message at https://xmtp.chat/dm/${agent.address}`,
+    `XMTP client initialized on ${client.address}\n` +
+      `Try sending a message at https://xmtp.chat/dm/${client.address}`,
   );
 }
 

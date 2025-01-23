@@ -158,9 +158,9 @@ export const lookup = async (
     }
 
     try {
-      const converseDeeplink = `${"https://converse.xyz/dm/"}${data.converseUsername}`;
+      const converseProfileUrl = `https://converse.xyz/profile/${data.converseUsername}`;
       const response = await fetchWithTimeout(
-        converseDeeplink,
+        converseProfileUrl,
         {
           method: "POST",
           headers: {
@@ -187,7 +187,7 @@ export const lookup = async (
         data.address =
           converseData.address?.toLowerCase() || data.address?.toLowerCase();
         data.avatar = converseData.avatar || data.avatar;
-        data.converseDeeplink = converseDeeplink;
+        data.converseDeeplink = `https://converse.xyz/dm/${data.converseUsername}`;
       }
     } catch (error) {
       console.error("Failed to fetch Converse profile:", error);
