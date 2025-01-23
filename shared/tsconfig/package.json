@@ -5,13 +5,7 @@
     "base.json"
   ],
   "scripts": {
-    "clean": "rm -rf .turbo && rm -rf node_modules",
-    "format": "yarn format:base -w .",
-    "format:base": "prettier --ignore-path ../../.gitignore",
-    "format:check": "yarn format:base -c ."
-  },
-  "devDependencies": {
-    "prettier": "^3.4.2"
+    "clean": "rm -rf .turbo && rm -rf node_modules"
   },
   "engines": {
     "node": ">=22"

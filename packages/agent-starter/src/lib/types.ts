@@ -1,13 +1,19 @@
-import { privateKeyToAccount } from "viem/accounts";
-import { createWalletClient } from "viem";
-import { ClientOptions, Client } from "@xmtp/node-sdk";
+import type { Client, ClientOptions } from "@xmtp/node-sdk";
+import type { createWalletClient } from "viem";
+import type { privateKeyToAccount } from "viem/accounts";
+
 export type { Client };
 export type { ClientOptions };
+
+export type Metadata = {
+  isAgent?: boolean;
+  [key: string]: any;
+};
 
 export type agentMessage = {
   message: string;
   originalMessage?: Message;
-  metadata?: any;
+  metadata: Metadata;
   receivers?: string[];
   typeId?:
     | "text"
@@ -53,23 +59,23 @@ export type Message = {
   sent: Date; // Date when the message was sent
   isDM: boolean; // Whether the message is a direct message
   content: {
-    text?: string | undefined; // Text content of the message
-    reply?: string | undefined; // Reply content if the message is a reply
-    previousMsg?: string | undefined; // Reference to the previous message
-    attachment?: string | undefined; // Attachment content if the message is an attachment
-    react?: string | undefined; // Reaction content if the message is a reaction
-    content?: any | undefined; // Any other content
-    metadata?: any | undefined; // Metadata for the message
-    remoteAttachment?: any | undefined; // Remote attachment content if the message is a remote attachment
-    readReceipt?: any | undefined; // Read receipt content if the message is a read receipt
-    agentMessage?: any | undefined; // Agent message content if the message is an agent message
-    reaction?: any | undefined; // Reaction content if the message is a reaction
-    params?: any | undefined; // Parameters for the message
-    reference?: string | undefined; // Reference ID for the message
-    skill?: string | undefined; // Skill associated with the message
+    text?: string; // Text content of the message
+    reply?: string; // Reply content if the message is a reply
+    previousMsg?: string; // Reference to the previous message
+    attachment?: string; // Attachment content if the message is an attachment
+    react?: string; // Reaction content if the message is a reaction
+    content: any; // Any other content
+    metadata?: any; // Metadata for the message
+    remoteAttachment?: any; // Remote attachment content if the message is a remote attachment
+    readReceipt?: any; // Read receipt content if the message is a read receipt
+    agentMessage?: any; // Agent message content if the message is an agent message
+    reaction?: any; // Reaction content if the message is a reaction
+    params?: any; // Parameters for the message
+    reference?: string; // Reference ID for the message
+    skill?: string; // Skill associated with the message
     any?: any; // Any other content
   };
-  group?: Conversation | undefined; // Group the message belongs to
+  group?: Conversation; // Group the message belongs to
   sender: User; // Sender of the message
   typeId: string; // Type identifier for the message
   client: {

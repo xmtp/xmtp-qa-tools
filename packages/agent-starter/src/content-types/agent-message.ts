@@ -1,8 +1,9 @@
-import { ContentTypeId } from "@xmtp/content-type-primitives";
-import type {
-  ContentCodec,
-  EncodedContent,
+import {
+  ContentTypeId,
+  type ContentCodec,
+  type EncodedContent,
 } from "@xmtp/content-type-primitives";
+import type { Metadata } from "../lib/types";
 
 // Create a unique identifier for your content type
 export const ContentTypeAgentMessage = new ContentTypeId({
@@ -15,14 +16,11 @@ export const ContentTypeAgentMessage = new ContentTypeId({
 // Define the message structure with metadata
 export class AgentMessage {
   public text: string;
-  public metadata: {
-    [key: string]: any; // Allow for flexible metadata
-  };
+  public metadata: Metadata;
 
-  constructor(text: string, metadata: any) {
+  constructor(text: string, metadata: Metadata) {
     this.text = text;
     this.metadata = {
-      timestamp: Date.now(),
       isAgent: true,
       ...metadata,
     };
@@ -45,7 +43,10 @@ export class AgentMessageCodec implements ContentCodec<AgentMessage> {
 
   decode(encodedContent: EncodedContent): AgentMessage {
     const decoded = new TextDecoder().decode(encodedContent.content);
-    const { text, metadata } = JSON.parse(decoded);
+    const { text, metadata } = JSON.parse(decoded) as {
+      text: string;
+      metadata: Metadata;
+    };
     return new AgentMessage(text, metadata);
   }
 

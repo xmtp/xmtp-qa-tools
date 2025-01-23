@@ -1,12 +1,12 @@
-import { describe, test, expect } from "vitest";
+import { createUser, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import { generatePrivateKey } from "viem/accounts";
-import { XMTP, createUser, xmtpClient } from "@xmtp/agent-starter";
+import { describe, expect, test } from "vitest";
 
 describe("Client Private Key Configuration Tests", () => {
   test("creates a client with a random generated key", async () => {
     const xmtp = new XMTP();
     await xmtp.init();
-    expect(xmtp?.inboxId).toBeDefined();
+    expect(xmtp.inboxId).toBeDefined();
   }, 25000); // Added 15 second timeout
 
   test("creates a client with a provided private key", async () => {
@@ -16,7 +16,7 @@ describe("Client Private Key Configuration Tests", () => {
       onMessage: async () => {},
     });
     await xmtp.init();
-    expect(xmtp?.inboxId).toBeDefined();
+    expect(xmtp.inboxId).toBeDefined();
   }, 15000); // Added 15 second timeout
 
   test("creates user with valid private key", () => {
@@ -33,7 +33,7 @@ describe("Client Private Key Configuration Tests", () => {
     const xmtp = await xmtpClient({
       name: agentName,
     });
-    expect(xmtp?.inboxId).toBeDefined();
+    expect(xmtp.inboxId).toBeDefined();
   });
 
   test("fails gracefully with invalid private key format", async () => {
@@ -49,7 +49,7 @@ describe("Client Private Key Configuration Tests", () => {
       throw new Error("Expected error was not thrown");
     } catch (error) {
       // Check if the error is the expected one
-      expect(error.message).toContain("invalid private key");
+      expect((error as Error).message).toContain("invalid private key");
     }
   }, 15000); // Added 15 second timeout
 });

@@ -1,6 +1,6 @@
-import { Client, Message, XMTP, xmtpClient } from "@xmtp/agent-starter";
-import express from "express";
+import { xmtpClient, type Client, type Message } from "@xmtp/agent-starter";
 import { Alchemy, Network } from "alchemy-sdk";
+import express, { type Request, type Response } from "express";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key
@@ -13,17 +13,18 @@ async function main() {
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;
 
-      if (message?.content.text === "/create") {
+      if (message.content.text === "/create") {
         console.log("Creating group");
         const group = await createGroup(
-          agent?.client,
-          message?.sender?.address as string,
-          agent?.address as string,
+          agent.client,
+          message.sender.address,
+          agent.address as string,
         );
         console.log("Group created", group?.id);
         await agent.send({
           message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
           originalMessage: message,
+          metadata: {},
         });
         return;
       } else {
@@ -31,6 +32,7 @@ async function main() {
           message:
             "👋 Welcome to the Gated Bot Group!\nTo get started, type /create to set up a new group. 🚀\nThis example will check if the user has a particular nft and add them to the group if they do.\nOnce your group is created, you'll receive a unique Group ID and URL.\nShare the URL with friends to invite them to join your group!",
           originalMessage: message,
+          metadata: {},
         });
       }
     },
@@ -39,20 +41,23 @@ async function main() {
   // Endpoint to add wallet address to a group from an external source
   const app = express();
   app.use(express.json());
-  app.post("/add-wallet", async (req, res) => {
-    try {
-      const { walletAddress, groupId } = req.body;
-      const verified = true; // (await checkNft(walletAddress, "XMTPeople"));
-      if (!verified) {
-        console.log("User cant be added to the group");
-        return;
-      } else {
-        await addToGroup(groupId, agent?.client as Client, walletAddress, true);
+  app.post("/add-wallet", (req: Request, res: Response) => {
+    const { walletAddress, groupId } = req.body as {
+      walletAddress: string;
+      groupId: string;
+    };
+    // const verified = true; // (await checkNft(walletAddress, "XMTPeople"));
+    // if (!verified) {
+    //   console.log("User cant be added to the group");
+    //   return;
+    // } else {
+    addToGroup(groupId, agent.client as Client, walletAddress, true)
+      .then(() => {
         res.status(200).send("success");
-      }
-    } catch (error: any) {
-      res.status(400).send(error.message);
-    }
+      })
+      .catch((error: unknown) => {
+        res.status(400).send((error as Error).message);
+      });
   });
   // Start the servfalcheer
   const PORT = process.env.PORT || 3000;
@@ -63,7 +68,7 @@ async function main() {
     );
   });
   console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+    `XMTP agent initialized on ${agent.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent.address}`,
   );
 }
 
@@ -80,15 +85,15 @@ export async function createGroup(
   try {
     let senderInboxId = "";
     await client.conversations.sync();
-    const conversations = await client.conversations.list();
+    const conversations = client.conversations.list();
     console.log("Conversations", conversations.length);
-    const group = await client?.conversations.newGroup([
+    const group = await client.conversations.newGroup([
       senderAddress,
       clientAddress,
     ]);
-    console.log("Group created", group?.id);
+    console.log("Group created", group.id);
     const members = await group.members();
-    const senderMember = members.find((member: any) =>
+    const senderMember = members.find((member) =>
       member.accountAddresses.includes(senderAddress.toLowerCase()),
     );
     if (senderMember) {
@@ -98,10 +103,7 @@ export async function createGroup(
       console.log("Sender not found in members list");
     }
     await group.addSuperAdmin(senderInboxId);
-    console.log(
-      "Sender is superAdmin",
-      await group.isSuperAdmin(senderInboxId),
-    );
+    console.log("Sender is superAdmin", group.isSuperAdmin(senderInboxId));
     await group.send(`Welcome to the new group!`);
     await group.send(`You are now the admin of this group as well as the bot`);
     return group;
@@ -117,15 +119,14 @@ export async function removeFromGroup(
   senderAddress: string,
 ): Promise<void> {
   try {
-    let lowerAddress = senderAddress.toLowerCase();
+    const lowerAddress = senderAddress.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
     console.warn("Checking if on XMTP: ", isOnXMTP);
-    if (!isOnXMTP) {
+    if (!isOnXMTP.get(lowerAddress)) {
       console.error("You don't seem to have a v3 identity ");
       return;
     }
-    const conversation =
-      await client.conversations.getConversationById(groupId);
+    const conversation = client.conversations.getConversationById(groupId);
     console.warn("removing from group", conversation?.id);
     await conversation?.sync();
     await conversation?.removeMembers([lowerAddress]);
@@ -137,7 +138,7 @@ export async function removeFromGroup(
     let wasRemoved = true;
     if (members) {
       for (const member of members) {
-        let lowerMemberAddress = member.accountAddresses[0].toLowerCase();
+        const lowerMemberAddress = member.accountAddresses[0].toLowerCase();
         if (lowerMemberAddress === lowerAddress) {
           wasRemoved = false;
           break;
@@ -162,13 +163,13 @@ export async function addToGroup(
   asAdmin: boolean = false,
 ): Promise<void> {
   try {
-    let lowerAddress = address.toLowerCase();
+    const lowerAddress = address.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
-    if (!isOnXMTP) {
+    if (!isOnXMTP.get(lowerAddress)) {
       console.error("You don't seem to have a v3 identity ");
       return;
     }
-    const group = await client.conversations.getConversationById(groupId);
+    const group = client.conversations.getConversationById(groupId);
     console.warn("Adding to group", group?.id);
     await group?.sync();
     await group?.addMembers([lowerAddress]);
@@ -182,7 +183,7 @@ export async function addToGroup(
 
     if (members) {
       for (const member of members) {
-        let lowerMemberAddress = member.accountAddresses[0].toLowerCase();
+        const lowerMemberAddress = member.accountAddresses[0].toLowerCase();
         if (lowerMemberAddress === lowerAddress) {
           console.warn("Member exists", lowerMemberAddress);
           return;
@@ -204,11 +205,11 @@ export async function checkNft(
     const nfts = await alchemy.nft.getNftsForOwner(walletAddress);
 
     const ownsNft = nfts.ownedNfts.some(
-      (nft: any) =>
-        nft.contract.name.toLowerCase() === collectionSlug.toLowerCase(),
+      (nft) =>
+        nft.contract.name?.toLowerCase() === collectionSlug.toLowerCase(),
     );
     console.log("is the nft owned: ", ownsNft);
-    return ownsNft as boolean;
+    return ownsNft;
   } catch (error) {
     console.error("Error fetching NFTs from Alchemy:", error);
   }
