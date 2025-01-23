@@ -1241,9 +1241,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@rollup/plugin-typescript@npm:^11.1.6":
-  version: 11.1.6
-  resolution: "@rollup/plugin-typescript@npm:11.1.6"
+"@rollup/plugin-typescript@npm:^12.1.2":
+  version: 12.1.2
+  resolution: "@rollup/plugin-typescript@npm:12.1.2"
   dependencies:
     "@rollup/pluginutils": "npm:^5.1.0"
     resolve: "npm:^1.22.1"
@@ -1256,7 +1256,7 @@ __metadata:
       optional: true
     tslib:
       optional: true
-  checksum: 10/4ae4d6cfc929393171288df2f18b5eb837fa53d8689118d9661b3064567341f6f6cf8389af55f1d5f015e3682abf30a64ab609fdf75ecb5a84224505e407eb69
+  checksum: 10/1fd201b9430125686bcdb3eecfa4f8d9d5005a9d454f2d733c0fdc0f58e28f772209ecbfe4f5d1a42a2a7ac25746a5f37d15897d695326eaea0fe3a30857375d
   languageName: node
   linkType: hard
 
@@ -1762,7 +1762,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/coverage-v8@npm:^2.1.4":
+"@vitest/coverage-v8@npm:^2.1.8":
   version: 2.1.8
   resolution: "@vitest/coverage-v8@npm:2.1.8"
   dependencies:
@@ -1875,16 +1875,16 @@ __metadata:
   dependencies:
     "@changesets/changelog-git": "npm:^0.2.0"
     "@changesets/cli": "npm:^2.27.11"
-    "@rollup/plugin-typescript": "npm:^11.1.6"
+    "@rollup/plugin-typescript": "npm:^12.1.2"
     "@types/node": "npm:^22.10.9"
-    "@vitest/coverage-v8": "npm:^2.1.4"
+    "@vitest/coverage-v8": "npm:^2.1.8"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-reaction": "npm:^2.0.0"
     "@xmtp/content-type-read-receipt": "npm:^2.0.0"
     "@xmtp/content-type-remote-attachment": "npm:^2.0.0"
     "@xmtp/content-type-reply": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-sdk": "npm:^0.0.38"
+    "@xmtp/node-sdk": "npm:^0.0.40"
     dotenv: "npm:^16.4.7"
     node-fetch: "npm:^3.3.2"
     prettier: "npm:^3.4.2"
@@ -1892,7 +1892,7 @@ __metadata:
     rollup-plugin-dts: "npm:^6.1.1"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.7.3"
-    viem: "npm:^2.16.3"
+    viem: "npm:^2.22.12"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -1970,37 +1970,37 @@ __metadata:
   dependencies:
     "@changesets/changelog-git": "npm:^0.2.0"
     "@changesets/cli": "npm:^2.27.11"
-    "@rollup/plugin-typescript": "npm:^11.1.6"
+    "@rollup/plugin-typescript": "npm:^12.1.2"
     "@types/node": "npm:^22.10.9"
-    "@vitest/coverage-v8": "npm:^2.1.4"
+    "@vitest/coverage-v8": "npm:^2.1.8"
     dotenv: "npm:^16.4.7"
     prettier: "npm:^3.4.2"
     rollup: "npm:^4.31.0"
     rollup-plugin-dts: "npm:^6.1.1"
     ts-node: "npm:^10.9.2"
     typescript: "npm:^5.7.3"
-    viem: "npm:^2.16.3"
+    viem: "npm:^2.22.12"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
 
-"@xmtp/node-bindings@npm:^0.0.33":
-  version: 0.0.33
-  resolution: "@xmtp/node-bindings@npm:0.0.33"
-  checksum: 10/ba4e9b16fc261fa5ec3dc8b934074347e28e75590e85d113c339579c9eebc58b8cb2114f113106ab111347793d739aa41efa855013a5a7919240344869a58a75
+"@xmtp/node-bindings@npm:^0.0.34":
+  version: 0.0.34
+  resolution: "@xmtp/node-bindings@npm:0.0.34"
+  checksum: 10/4f5314d40dc1f07e303e52a4be1d4517f1199089b4ac1677fabb11f64a6b4f57a989b25849b31036d6d228e9de494a8326d2b53386067146ee47e28691bba999
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:^0.0.38":
-  version: 0.0.38
-  resolution: "@xmtp/node-sdk@npm:0.0.38"
+"@xmtp/node-sdk@npm:^0.0.40":
+  version: 0.0.40
+  resolution: "@xmtp/node-sdk@npm:0.0.40"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.33"
+    "@xmtp/node-bindings": "npm:^0.0.34"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/22e22ba386fd12bec01f234bf6e821a8476c5f5d3c2e40d87645801e3156853b1e332c416f9b3c30fae92cfc412efd12cf6c9626fc794ce78b7838010550ab39
+  checksum: 10/eeed6072513dbf1c5ed7f0cfb9d5876c086d648b3fe93d757f0fefa87d03312a8aa5b3f3256b27339b37bbddf75c604eade1480a643909e04dc3865903915b2f
   languageName: node
   linkType: hard
 
@@ -5400,9 +5400,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"viem@npm:^2.16.3":
-  version: 2.22.9
-  resolution: "viem@npm:2.22.9"
+"viem@npm:^2.22.12":
+  version: 2.22.12
+  resolution: "viem@npm:2.22.12"
   dependencies:
     "@noble/curves": "npm:1.7.0"
     "@noble/hashes": "npm:1.6.1"
@@ -5417,7 +5417,7 @@ __metadata:
   peerDependenciesMeta:
     typescript:
       optional: true
-  checksum: 10/29ddd53851a66946393e0763f87849e467530d8f8bd0e270bcd1f1d5f5c718a7c0ae28a159fbfc0eb38dda6c1ce7cc1c31cf5cc81671140888cbcbbd011c92b8
+  checksum: 10/36a1753583ee412c6f50e98c4b1ce93c5b4d60f89a8661edf5f6cf7ea4cf16f79e82216d7e944e222310dc5ae376be4743e3bc336bf67d49ba5e952050cf9920
   languageName: node
   linkType: hard
 

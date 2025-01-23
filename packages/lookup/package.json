@@ -24,14 +24,14 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "viem": "^2.16.3"
+    "viem": "^2.22.12"
   },
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.0",
     "@changesets/cli": "^2.27.11",
-    "@rollup/plugin-typescript": "^11.1.6",
+    "@rollup/plugin-typescript": "^12.1.2",
     "@types/node": "^22.10.9",
-    "@vitest/coverage-v8": "^2.1.4",
+    "@vitest/coverage-v8": "^2.1.8",
     "dotenv": "^16.4.7",
     "prettier": "^3.4.2",
     "rollup": "^4.31.0",
