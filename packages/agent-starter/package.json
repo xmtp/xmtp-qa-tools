@@ -24,8 +24,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@changesets/changelog-git": "^0.2.0",
-    "@changesets/cli": "^2.27.5",
     "@xmtp/content-type-primitives": "^2.0.0",
     "@xmtp/content-type-reaction": "^2.0.0",
     "@xmtp/content-type-read-receipt": "^2.0.0",
@@ -33,23 +31,23 @@
     "@xmtp/content-type-reply": "^2.0.0",
     "@xmtp/content-type-text": "^2.0.0",
     "@xmtp/node-sdk": "^0.0.38",
-    "dotenv": "^16.4.5",
-    "typescript": "^5.4.5",
     "viem": "^2.16.3"
   },
   "devDependencies": {
+    "@changesets/changelog-git": "^0.2.0",
+    "@changesets/cli": "^2.27.11",
     "@rollup/plugin-typescript": "^11.1.6",
-    "@types/node": "^20.14.2",
+    "@types/node": "^22.10.9",
     "@vitest/coverage-v8": "^2.1.4",
+    "dotenv": "^16.4.7",
     "node-fetch": "^3.3.2",
-    "prettier": "^3.3.1",
-    "rollup": "^4.18.0",
+    "prettier": "^3.4.2",
+    "rollup": "^4.31.0",
     "rollup-plugin-dts": "^6.1.1",
     "ts-node": "^10.9.2",
-    "turbo": "^2.2.3",
-    "vitest": "^2.1.4"
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
   },
-  "packageManager": "yarn@4.5.1",
   "engines": {
     "node": ">=20"
   },

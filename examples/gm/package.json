@@ -11,9 +11,9 @@
     "@xmtp/agent-starter": "workspace:*"
   },
   "devDependencies": {
-    "@types/express": "^4.17.20",
-    "@types/node": "^20.14.2",
-    "typescript": "^5.4.5"
+    "@types/express": "^4.17.21",
+    "@types/node": "^22.10.9",
+    "typescript": "^5.7.3"
   },
   "packageManager": "yarn@4.5.1",
   "engines": {
