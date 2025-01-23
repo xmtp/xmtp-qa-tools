@@ -2,7 +2,6 @@
 
 [![GitHub release](https://img.shields.io/github/release/ephemerahq/xmtp-agents.svg)](https://github.com/huggingface/smolagents/releases)
 [![MIT License](https://img.shields.io/github/license/ephemerahq/xmtp-agents)](https://github.com/ephemerahq/xmtp-agents/blob/main/LICENSE)
-[![Number of GitHub stars](https://img.shields.io/github/stars/ephemerahq/message-kit?logo=github)](https://github.com/ephemerahq/message-kit)
 
 <img src="media/logo.png" alt="Logo" width="60" />
 
@@ -10,19 +9,20 @@
 
 </div>
 
-`xmtp-agents` is a library for building secure, and interoperable agents that use the [XMTP](https://xmtp.org/) protocol.
+[`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
+is a library for building agents that communicate in a secure and interoperable way over the [XMTP](https://xmtp.org/) network.
 
 #### Why XMTP?
 
-- **End-to-end & compliant**: Servers and clients only see ciphertext, meeting strict security and regulatory standards.
+- **End-to-end & compliant**: The server only sees ciphertext, meeting strict security and regulatory standards.
 - **Open-source & trustless**: Built on top of the [MLS](https://messaginglayersecurity.rocks/) protocol, it replaces trust in centralized certificate authorities with cryptographic proofs.
-- **Privacy & metadata protection**: Offers anonymous or pseudonymous usage with no tracking of timestamps, routes, IPs, or device info.
+- **Privacy & metadata protection**: Offers anonymous or pseudonymous usage with no tracking of sender routes, IPs, or device and message timestamps.
 - **Decentralized**: Operates on a peer-to-peer network, eliminating single points of failure.
-- **Groups**: Allows multi-agent (or multi-human) or both with group chats with access control and secure collaboration.
+- **Multi-tenant**: Allows multi-agent multi-human confidential communication over MLS group chats.
+
+> See [FAQ](https://docs.xmtp.org/intro/faq) for more detailed information.
 
 ## Setup
-
-This library is based on [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
 
 ```bash
 yarn add @xmtp/agent-starter
@@ -74,7 +74,7 @@ main().catch(console.error);
 
 #### Address availability
 
-Returns `true` if an address has XMTP enabled
+Returns `true` if an address is reachable on the xmtp network
 
 ```typescript
 const isOnXMTP = await agent.canMessage(address);
@@ -115,7 +115,7 @@ await group.sync();
 await group.addMembers([0xaddresses]);
 ```
 
-> To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
+> To learn more about groups, read the [XMTP documentation](https://docs.xmtp.org).
 
 ## Message handling
 
@@ -151,34 +151,40 @@ const onMessage = async (message: Message) => {
 
 ### Sending messages
 
-Use `agent.send()` for different message types.
+When you build an app with XMTP, all messages are encoded with a content type to ensure that an XMTP client knows how to encode and decode messages, ensuring interoperability and consistent display of messages across apps.
 
-#### Text messages
+### Text
+
+Sends a text message.
 
 ```tsx
-await agent.send({
-  message: "Hello from xmtp-agents!",
+let textMessage: agentMessage = {
+  message: "Your message.",
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
-});
+};
+await agent.send(textMessage);
 ```
 
-#### Agent messages
+### Agent message
 
-Agent messages can contain metadata, enabling structured communication between agents:
+Allows to send structured metadata over the network that is displayed as plain-text in ecosystem inboxes.
 
 ```tsx
-await agent.send({
-  message: "Transaction request",
+let agentMessage: agentMessage = {
+  message: "Would you like to approve this transaction?",
   metadata: {
     amount: "10",
     token: "USDC",
   },
-  receivers: ["0x123..."],
-  originalMessage: message,
+  receivers: ["0x123..."], // optional
+  originalMessage: message, // optional
   typeId: "agent_message",
-});
+};
+await agent.send(agentMessage);
 ```
+
+> See [content-types](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
 
 ## Web inbox
 

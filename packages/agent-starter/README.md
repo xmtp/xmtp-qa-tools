@@ -8,18 +8,17 @@ A convenient TypeScript wrapper around [@xmtp/node-sdk](https://github.com/xmtp/
 yarn add @xmtp/agent-starter
 ```
 
-> See the available [types](https://github.com/ephemeraHQ/xmtp-agents/blob/main/packages/agent-starter/src/lib/types.ts)
+> See the available TypeScript [Types](https://github.com/ephemeraHQ/xmtp-agents/blob/main/packages/agent-starter/src/lib/types.ts)
 
 ## Overview
 
-These are the steps to initialize the XMTP listener and send messages.
-
-- `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
+These are the steps to initialize an agent that listens and sends messages over the XMTP network.
 
 ```tsx
 async function main() {
-  const agent = await xmtpClient({
+  const client = await xmtpClient({
     encryptionKey: process.env.ENCRYPTION_KEY as string,
+    fixedKey: // optional
     onMessage: async (message: Message) => {
       console.log(
         `Decoded message: ${message.content.text} by ${message.sender.address}`,
@@ -29,7 +28,7 @@ async function main() {
       const response = await api("Hi, how are you?");
 
       //Send text message
-      await agent.send({
+      await client.send({
         message: response,
         originalMessage: message,
       });
@@ -44,7 +43,7 @@ main().catch(console.error);
 
 #### Address availability
 
-Returns `true` if an address has XMTP enabled
+Returns `true` if an address is reachable on the xmtp network
 
 ```typescript
 const isOnXMTP = await agent.canMessage(address);
@@ -52,7 +51,7 @@ const isOnXMTP = await agent.canMessage(address);
 
 ## Groups
 
-To learn more about groups, read the [XMTP documentation](https://docs.agent.org/inboxes/group-permissions).
+Any client may be part or create a new group and can control the initial permission policies applied to that group.
 
 > [!NOTE]
 > You need to **add the agent to the group as a member**.
@@ -66,11 +65,17 @@ const group = await agent?.conversations.newGroup([address1, address2]);
 As an admin you can add members to the group.
 
 ```tsx
-// get the group
+// sync group first
 await group.sync();
-//By address
-await group.addMembers([0xaddresses]);
+
+// get group members
+const members = await group.members();
+
+// add members to the group
+await group.addMembers([walletAddress]);
 ```
+
+> To learn more about groups, read the [XMTP groups](https://docs.xmtp.org/inboxes/group-permissions) documentation.
 
 ## Encryption keys
 
@@ -95,7 +100,7 @@ await group.addMembers([0xaddresses]);
    - This method will save the key in the `.env` file for future use.
 
      ```tsx
-     const agent = await xmtpClient({});
+     const agent = await xmtpClient();
      ```
 
 3. Assign a name (alias) to the randomly generated key:
@@ -141,11 +146,13 @@ const onMessage = async (message: Message) => {
 
 ## Content types
 
+When you build an app with XMTP, all messages are encoded with a content type to ensure that an XMTP client knows how to encode and decode messages, ensuring interoperability and consistent display of messages across apps.
+
 `agent-starter` provides an abstraction to XMTP [content types](https://github.com/xmtp/xmtp-js/tree/main/content-types) to make it easier for devs to integrate different types of messages.
 
 ### Text
 
-> See [text content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
+Sends a text message.
 
 ```tsx
 let textMessage: agentMessage = {
@@ -156,9 +163,11 @@ let textMessage: agentMessage = {
 await agent.send(textMessage);
 ```
 
+> See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-text) for reference
+
 ### Reaction
 
-> See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-text) for reference
+Sends an emoji reaction.
 
 ```tsx
 let reaction: agentMessage = {
@@ -170,9 +179,11 @@ let reaction: agentMessage = {
 await agent.send(reaction);
 ```
 
+> See [text content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
+
 ### Reply
 
-> See [reply content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reply) for reference
+Replies to a specific message.
 
 ```tsx
 let reply: agentMessage = {
@@ -184,9 +195,11 @@ let reply: agentMessage = {
 await agent.send(reply);
 ```
 
+> See [reply content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reply) for reference
+
 ### Attachment
 
-> See [attachment content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-attachment) for reference
+Sends any media file or attachment lower to 1MB over the network.
 
 ```tsx
 let attachment: agentMessage = {
@@ -198,9 +211,11 @@ let attachment: agentMessage = {
 await agent.send(attachment);
 ```
 
-### Agent
+> See [reaction content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-remote-attachment) for reference
 
-> See [agent content type](https://github.com/xmtp/xmtp-js/tree/main/content-types/content-type-reaction) for reference
+### Agent message
+
+Allows to send structured metadata over the network that is displayed as plain-text in ecosystem inboxes.
 
 ```tsx
 let agentMessage: agentMessage = {
@@ -208,8 +223,6 @@ let agentMessage: agentMessage = {
   metadata: {
     amount: "10",
     token: "USDC",
-    chain: "base",
-    destinationAddress: "0x123...789",
   },
   receivers: ["0x123..."], // optional
   originalMessage: message, // optional
@@ -218,5 +231,7 @@ let agentMessage: agentMessage = {
 await agent.send(agentMessage);
 ```
 
-> **Open for feedback**  
-> You are welcome to provide feedback on this implementation by commenting on the [Proposal for content type](https://community.xmtp.org/).
+> Agent message is an implementation of a custom content-type and not yet officially supported by the protocol.
+
+**Open for feedback**  
+You are welcome to provide feedback on this implementation by commenting on the [Proposal for content type](https://community.xmtp.org/).
