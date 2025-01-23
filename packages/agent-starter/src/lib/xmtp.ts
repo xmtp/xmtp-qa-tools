@@ -1,21 +1,19 @@
-import crypto, { getRandomValues } from "crypto";
-import * as fs from "fs";
-import { readFile } from "fs/promises";
-import path from "path";
+import crypto, { getRandomValues } from "node:crypto";
+import * as fs from "node:fs";
+import { readFile } from "node:fs/promises";
+import path from "node:path";
 import {
   ContentTypeReaction,
   ReactionCodec,
   type Reaction,
 } from "@xmtp/content-type-reaction";
-import {
-  ReadReceiptCodec,
-  type ContentTypeReadReceipt,
-} from "@xmtp/content-type-read-receipt";
+import { ReadReceiptCodec } from "@xmtp/content-type-read-receipt";
 import {
   AttachmentCodec,
   ContentTypeRemoteAttachment,
   RemoteAttachmentCodec,
   type Attachment,
+  type RemoteAttachment,
 } from "@xmtp/content-type-remote-attachment";
 import {
   ContentTypeReply,
@@ -28,7 +26,6 @@ import {
   type ClientOptions,
   type Conversation,
   type DecodedMessage,
-  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
@@ -90,15 +87,15 @@ export class XMTP {
 
     const user = createUser(encryptionKey);
 
-    let env = this.agent?.config?.env as XmtpEnv;
-    if (!env) env = "production" as XmtpEnv;
+    let env = this.agent?.config?.env;
+    if (!env) env = "production";
 
     const volumePath =
       process.env.RAILWAY_VOLUME_MOUNT_PATH ??
       this.agent?.config?.path ??
       ".data/xmtp";
 
-    if (fs && !fs.existsSync(volumePath)) {
+    if (!fs.existsSync(volumePath)) {
       fs.mkdirSync(volumePath, { recursive: true });
     }
 
@@ -128,7 +125,7 @@ export class XMTP {
     this.client = client;
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
-    Promise.all([streamMessages(this.onMessage, client, this)]);
+    void streamMessages(this.onMessage, client, this);
     this.saveKeys(suffix, fixedKey, encryptionKey);
     return this;
   }
@@ -196,10 +193,6 @@ export class XMTP {
       } else {
         // Handle file path
         const file = await readFile(source);
-        if (!file) {
-          console.error("File operations not supported in this environment");
-          return undefined;
-        }
 
         // Check file size
         if (file.length > MAX_SIZE) {
@@ -265,8 +258,7 @@ export class XMTP {
       if (!inboxId) {
         throw new Error("Invalid receiver address");
       }
-      let conversation =
-        await this.client?.conversations.getDmByInboxId(inboxId);
+      let conversation = this.client?.conversations.getDmByInboxId(inboxId);
       if (!conversation) {
         conversation = await this.client?.conversations.newDm(receiverAddress);
       }
@@ -274,16 +266,10 @@ export class XMTP {
     }
   }
 
-  async getConversationFromMessage(
-    message: DecodedMessage | null | undefined,
-  ): Promise<Conversation | null | undefined> {
+  getConversationFromMessage(message: DecodedMessage | null | undefined) {
     return this.client?.conversations.getConversationById(
       (message as DecodedMessage).conversationId,
     );
-  }
-
-  isConversation(conversation: Conversation): conversation is Conversation {
-    return conversation.id !== undefined;
   }
 
   getConversationKey(message: Message) {
@@ -294,7 +280,7 @@ export class XMTP {
     return `${message.group?.id}`;
   }
 
-  async getMessageById(reference: string) {
+  getMessageById(reference: string) {
     return this.client?.conversations.getMessageById.bind(
       this.client.conversations,
     )(reference);
@@ -318,7 +304,7 @@ export class XMTP {
       }
 
       // List all direct message conversations
-      const conversations = await this.client?.conversations.listDms();
+      const conversations = this.client?.conversations.listDms();
       if (!conversations) {
         console.error(`No conversations found ${inboxId}`);
         return undefined;
@@ -336,7 +322,7 @@ export class XMTP {
 
       // Retrieve all messages from the conversation
       const messages = await conversation.messages();
-      if (!messages) {
+      if (!messages.length) {
         console.error(`No messages found ${conversation.id}`);
         return undefined;
       }
@@ -347,7 +333,7 @@ export class XMTP {
         .find(
           (msg: DecodedMessage) =>
             msg.contentType?.typeId === "agent_message" &&
-            msg.content.metadata.sharedSecret,
+            (msg.content as AgentMessage).metadata.sharedSecret,
         );
       if (!lastAgentMessageSharedSecret) {
         console.error(`No shared secret found ${conversation.id}`);
@@ -355,10 +341,12 @@ export class XMTP {
       }
 
       // Return the shared secret
-      return lastAgentMessageSharedSecret.content?.metadata
+      return (lastAgentMessageSharedSecret.content as AgentMessage).metadata
         .sharedSecret as string;
     } catch (error) {
-      console.error(`Error getting last agent message shared secret: ${error}`);
+      console.error(
+        `Error getting last agent message shared secret: ${(error as Error).message}`,
+      );
       return undefined;
     }
   }
@@ -393,9 +381,6 @@ export class XMTP {
 
       // Convert the shared secret to a buffer
       const bufferFromSharedSecret = Buffer.from(sharedSecret, "hex");
-      if (!bufferFromSharedSecret) {
-        throw new Error("encrypt: No buffer secret found");
-      }
 
       // Generate a nonce and create a cipher for encryption
       const nonce = crypto.randomBytes(12);
@@ -482,42 +467,37 @@ async function streamMessages(
   client: Client | undefined,
   xmtp: XMTP,
 ) {
-  while (true) {
-    try {
-      await client?.conversations.sync();
-      await client?.conversations.list();
-      const stream = await client?.conversations.streamAllMessages();
-      if (stream) {
-        if (xmtp.agent?.config?.hideInitLogMessage !== true) {
-        }
-        for await (const message of stream) {
-          const conversation = await xmtp.getConversationFromMessage(message);
-          if (message && conversation) {
-            try {
-              const { senderInboxId, kind } = message;
+  try {
+    await client?.conversations.sync();
+    const stream = await client?.conversations.streamAllMessages();
+    if (stream) {
+      for await (const message of stream) {
+        const conversation = xmtp.getConversationFromMessage(message);
+        if (message && conversation) {
+          try {
+            const { senderInboxId, kind } = message;
 
-              if (
-                // Filter out membership_change messages and sent by one
-                senderInboxId.toLowerCase() === client?.inboxId.toLowerCase() &&
-                kind !== "membership_change"
-              ) {
-                continue;
-              }
-              const parsedMessage = await parseMessage(
-                message,
-                conversation,
-                client as Client,
-              );
-              await onMessage(parsedMessage as Message);
-            } catch (e) {
-              console.log(`error`, e);
+            if (
+              // Filter out membership_change messages and sent by one
+              senderInboxId.toLowerCase() === client?.inboxId.toLowerCase() &&
+              kind !== "membership_change"
+            ) {
+              continue;
             }
+            const parsedMessage = await parseMessage(
+              message,
+              conversation,
+              client as Client,
+            );
+            await onMessage(parsedMessage as Message);
+          } catch (e) {
+            console.log(`error`, e);
           }
         }
       }
-    } catch (err) {
-      console.error(`Stream encountered an error:`, err);
     }
+  } catch (err) {
+    console.error(`Stream encountered an error:`, err);
   }
 }
 
@@ -552,46 +532,53 @@ export async function parseMessage(
   conversation: Conversation | undefined,
   client: Client,
 ): Promise<Message | undefined> {
-  if (message == null) return undefined;
+  if (message === null || message === undefined) return undefined;
   const typeId = message.contentType?.typeId ?? "text";
-  let content = message.content;
+  let content: any;
   if (typeId == "text") {
     content = {
-      text: content,
+      text: message.content as string,
     };
   } else if (typeId == "reply") {
-    const previousMsg = await client.conversations.getMessageById(
-      message.content?.reference as string,
+    const previousMsg = client.conversations.getMessageById(
+      (message.content as Reply).reference,
     );
+    const messageContent = message.content as Reply;
     content = {
-      previousMsg: previousMsg,
-      reply: content.content,
-      text: content.content,
-      reference: content.reference,
+      previousMsg,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      reply: messageContent.content,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      text: messageContent.content,
+      reference: messageContent.reference,
     };
   } else if (typeId == "reaction") {
+    const messageContent = message.content as Reaction;
     content = {
-      reaction: content.content,
-      reference: content.reference,
+      reaction: messageContent.content,
+      reference: messageContent.reference,
     };
   } else if (message.contentType?.typeId == "remote_attachment") {
-    const attachment = await RemoteAttachmentCodec.load(
-      message.content,
+    const messageContent = message.content as RemoteAttachment;
+    const attachment = await RemoteAttachmentCodec.load<string>(
+      messageContent,
       client,
     );
     content = {
-      attachment: attachment as string,
+      attachment: attachment,
     };
   } else if (typeId == "read_receipt") {
     //Log read receipt
   } else if (typeId == "agent_message") {
+    const messageContent = message.content as AgentMessage;
     content = {
-      text: message.content.text,
-      metadata: message.content.metadata,
+      text: messageContent.text,
+      metadata: messageContent.metadata,
     };
   } else if (typeId == "attachment") {
-    const blobdecoded = new Blob([message.content.data], {
-      type: message.content.mimeType,
+    const messageContent = message.content as Attachment;
+    const blobdecoded = new Blob([messageContent.data], {
+      type: messageContent.mimeType,
     });
     const url = URL.createObjectURL(blobdecoded);
 
@@ -604,7 +591,7 @@ export async function parseMessage(
 
   await conversation?.sync();
   const members = await conversation?.members();
-  const membersArray = members?.map((member: any) => ({
+  const membersArray = members?.map((member) => ({
     inboxId: member.inboxId,
     address: member.accountAddresses[0],
     accountAddresses: member.accountAddresses,
@@ -626,6 +613,7 @@ export async function parseMessage(
       superAdmins: conversation?.superAdmins,
     },
     sent: date,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     content,
     typeId,
     client: {

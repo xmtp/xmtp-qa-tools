@@ -43,7 +43,7 @@ export interface EnsData {
 }
 
 class UserInfoCache {
-  private static instance: UserInfoCache;
+  private static instance: UserInfoCache | undefined;
   private cache: InfoCache = new Map();
 
   private constructor() {}
@@ -146,7 +146,7 @@ export const lookup = async (
         if (process.env.MSG_LOG === "true")
           console.log("- ENS data request failed for", keyToUse);
       } else {
-        const ensData = (await response.json()) as EnsData;
+        const ensData = (await response.json()) as EnsData | undefined;
         if (ensData) {
           data.ensInfo = ensData;
           data.ensDomain = ensData.ens || data.ensDomain;
@@ -155,7 +155,7 @@ export const lookup = async (
           data.avatar = ensData.avatar_url || data.avatar;
         }
       }
-    } catch (error) {
+    } catch {
       console.error(`Failed to fetch ENS data for ${keyToUse}`);
     }
 
@@ -178,7 +178,9 @@ export const lookup = async (
           `Converse profile request failed with status ${response?.status}`,
         );
       }
-      const converseData = (await response?.json()) as ConverseProfile;
+      const converseData = (await response?.json()) as
+        | ConverseProfile
+        | undefined;
       if (converseData) {
         data.converseUsername =
           converseData.formattedName ||
@@ -215,7 +217,7 @@ const fetchWithTimeout = async (
     });
     clearTimeout(id);
     return response;
-  } catch (error) {
+  } catch {
     clearTimeout(id);
     console.error("fetching");
   }
@@ -226,7 +228,7 @@ export async function getEvmAddressFromDns(
 ): Promise<string | undefined> {
   try {
     try {
-      const records = await new Promise((resolve, reject) => {
+      const records = await new Promise<string[][]>((resolve, reject) => {
         dns.resolveTxt(domain, (err, records) => {
           if (err) {
             console.error("Failed to resolve TXT records:", err);

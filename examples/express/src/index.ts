@@ -1,5 +1,5 @@
 import { xmtpClient, type XMTP } from "@xmtp/agent-starter";
-import express from "express";
+import express, { type Request, type Response } from "express";
 import fetch from "node-fetch";
 
 async function createServer(port: number, agent: XMTP) {
@@ -7,21 +7,22 @@ async function createServer(port: number, agent: XMTP) {
   app.use(express.json());
 
   // Endpoint to RECEIVE encrypted messages
-  app.post("/receive", async (req, res) => {
-    try {
-      const { nonce, ciphertext, fromAddress } = req.body;
-      const decryptedMessage = await agent.decrypt(
-        nonce,
-        ciphertext,
-        fromAddress,
-      );
-
-      console.log(`Server on port ${port} decrypted:`, decryptedMessage);
-      return res.json({ success: true, decryptedMessage });
-    } catch (error) {
-      console.error("Error in /receive:", error);
-      return res.status(500).json({ error: (error as Error).message });
-    }
+  app.post("/receive", (req: Request, res: Response) => {
+    const { nonce, ciphertext, fromAddress } = req.body as {
+      nonce: string;
+      ciphertext: string;
+      fromAddress: string;
+    };
+    agent
+      .decrypt(nonce, ciphertext, fromAddress)
+      .then((decryptedMessage) => {
+        console.log(`Server on port ${port} decrypted:`, decryptedMessage);
+        res.json({ success: true, decryptedMessage });
+      })
+      .catch((error: unknown) => {
+        console.error("Error in /receive:", error);
+        res.status(500).json({ error: (error as Error).message });
+      });
   });
 
   return new Promise((resolve) => {

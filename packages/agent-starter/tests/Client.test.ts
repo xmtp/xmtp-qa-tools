@@ -49,7 +49,7 @@ describe("Client Private Key Configuration Tests", () => {
       throw new Error("Expected error was not thrown");
     } catch (error) {
       // Check if the error is the expected one
-      expect(error.message).toContain("invalid private key");
+      expect((error as Error).message).toContain("invalid private key");
     }
   }, 15000); // Added 15 second timeout
 });
