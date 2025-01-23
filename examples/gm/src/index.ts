@@ -10,6 +10,7 @@ async function main() {
       await agent.send({
         message: "gm",
         originalMessage: message,
+        metadata: {},
       });
     },
   });
