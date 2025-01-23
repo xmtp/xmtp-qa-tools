@@ -190,7 +190,7 @@ await agent.send(agentMessage);
 
 Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
 
-![alt text](/media/chat.png)
+![](/media/chat.png)
 
 > [!WARNING]
 > This React app isn't a complete solution. For example, the list of conversations doesn't update when new messages arrive in existing conversations.

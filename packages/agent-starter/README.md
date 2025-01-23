@@ -231,7 +231,7 @@ let agentMessage: agentMessage = {
 await agent.send(agentMessage);
 ```
 
-> Agent message is an implementation of a custom content-type and not yet officially supported by the protocol.
+> Agent message is an implementation of a `custom` content-type and not yet officially supported by the protocol.
 
 **Open for feedback**  
 You are welcome to provide feedback on this implementation by commenting on the [Proposal for content type](https://community.xmtp.org/).
