@@ -1,6 +1,6 @@
-import { Client, ClientOptions } from "@xmtp/node-sdk";
-import { createWalletClient } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
+import type { Client, ClientOptions } from "@xmtp/node-sdk";
+import type { createWalletClient } from "viem";
+import type { privateKeyToAccount } from "viem/accounts";
 
 export type { Client };
 export type { ClientOptions };

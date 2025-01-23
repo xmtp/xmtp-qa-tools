@@ -1,4 +1,4 @@
-import { XMTP, xmtpClient } from "@xmtp/agent-starter";
+import { xmtpClient, type XMTP } from "@xmtp/agent-starter";
 import express from "express";
 import fetch from "node-fetch";
 
@@ -66,8 +66,8 @@ async function main() {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        nonce: nonce as string,
-        ciphertext: ciphertext as string,
+        nonce: nonce,
+        ciphertext: ciphertext,
         fromAddress: agentA.address as string, // the "sender"
       }),
     });

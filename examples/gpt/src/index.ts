@@ -1,4 +1,4 @@
-import { Message, xmtpClient } from "@xmtp/agent-starter";
+import { xmtpClient, type Message } from "@xmtp/agent-starter";
 import OpenAI from "openai";
 
 // Initialize OpenAI API
@@ -9,7 +9,7 @@ async function main() {
     encryptionKey: process.env.ENCRYPTION_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
-        `Decoded message: ${message?.content.text} by ${message.sender.address}`,
+        `Decoded message: ${message.content.text} by ${message.sender.address}`,
       );
 
       // Send message content to GPT API
@@ -19,7 +19,7 @@ async function main() {
           { role: "developer", content: "You are a helpful assistant." },
           {
             role: "user",
-            content: message?.content.text ?? "",
+            content: message.content.text ?? "",
           },
         ],
       });
@@ -35,7 +35,7 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+    `XMTP agent initialized on ${agent.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent.address}`,
   );
 }
 

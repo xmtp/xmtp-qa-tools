@@ -4,27 +4,31 @@ import { readFile } from "fs/promises";
 import path from "path";
 import {
   ContentTypeReaction,
-  Reaction,
   ReactionCodec,
+  type Reaction,
 } from "@xmtp/content-type-reaction";
 import {
-  ContentTypeReadReceipt,
   ReadReceiptCodec,
+  type ContentTypeReadReceipt,
 } from "@xmtp/content-type-read-receipt";
 import {
-  Attachment,
   AttachmentCodec,
   ContentTypeRemoteAttachment,
   RemoteAttachmentCodec,
+  type Attachment,
 } from "@xmtp/content-type-remote-attachment";
-import { ContentTypeReply, Reply, ReplyCodec } from "@xmtp/content-type-reply";
+import {
+  ContentTypeReply,
+  ReplyCodec,
+  type Reply,
+} from "@xmtp/content-type-reply";
 import { ContentTypeText, TextCodec } from "@xmtp/content-type-text";
 import {
   Client,
-  ClientOptions,
-  Conversation,
-  DecodedMessage,
-  XmtpEnv,
+  type ClientOptions,
+  type Conversation,
+  type DecodedMessage,
+  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
@@ -36,7 +40,13 @@ import {
   AgentMessageCodec,
   ContentTypeAgentMessage,
 } from "../content-types/agent-message.js";
-import { Agent, agentMessage, Message, User, UserReturnType } from "./types.js";
+import type {
+  Agent,
+  agentMessage,
+  Message,
+  User,
+  UserReturnType,
+} from "./types.js";
 
 dotenv.config();
 
@@ -60,7 +70,7 @@ export class XMTP {
   }
 
   async init(): Promise<XMTP> {
-    let suffix = this.agent?.name ? "_" + this.agent?.name : "";
+    const suffix = this.agent?.name ? "_" + this.agent.name : "";
     let fixedKey =
       this.agent?.fixedKey ??
       process.env["FIXED_KEY" + suffix] ??
@@ -83,7 +93,7 @@ export class XMTP {
     let env = this.agent?.config?.env as XmtpEnv;
     if (!env) env = "production" as XmtpEnv;
 
-    let volumePath =
+    const volumePath =
       process.env.RAILWAY_VOLUME_MOUNT_PATH ??
       this.agent?.config?.path ??
       ".data/xmtp";
@@ -94,7 +104,7 @@ export class XMTP {
 
     const defaultConfig: ClientOptions = {
       env: env,
-      dbPath: `${volumePath}/${user.account?.address.toLowerCase()}-${env}`,
+      dbPath: `${volumePath}/${user.account.address.toLowerCase()}-${env}`,
       codecs: [
         new TextCodec(),
         new ReactionCodec(),
@@ -215,13 +225,7 @@ export class XMTP {
   }
 
   async send(agentMessage: agentMessage) {
-    let contentType:
-      | typeof ContentTypeReaction
-      | typeof ContentTypeText
-      | typeof ContentTypeRemoteAttachment
-      | typeof ContentTypeAgentMessage
-      | typeof ContentTypeReadReceipt
-      | typeof ContentTypeReply = ContentTypeText;
+    let contentType: typeof ContentTypeReaction = ContentTypeText;
 
     let message: any;
     if (!agentMessage.typeId || agentMessage.typeId === "text") {
@@ -246,10 +250,7 @@ export class XMTP {
         reference: agentMessage.originalMessage?.id,
       } as Reply;
     } else if (agentMessage.typeId === "agent_message") {
-      message = new AgentMessage(
-        agentMessage.message,
-        agentMessage.metadata,
-      ) as AgentMessage;
+      message = new AgentMessage(agentMessage.message, agentMessage.metadata);
       contentType = ContentTypeAgentMessage;
     }
     if (!agentMessage.receivers || agentMessage.receivers.length == 0) {
@@ -257,8 +258,8 @@ export class XMTP {
         agentMessage.originalMessage?.sender.inboxId as string,
       ];
     }
-    for (let receiverAddress of agentMessage.receivers) {
-      let inboxId = !isAddress(receiverAddress)
+    for (const receiverAddress of agentMessage.receivers) {
+      const inboxId = !isAddress(receiverAddress)
         ? receiverAddress
         : await this.client?.getInboxIdByAddress(receiverAddress);
       if (!inboxId) {
@@ -276,26 +277,26 @@ export class XMTP {
   async getConversationFromMessage(
     message: DecodedMessage | null | undefined,
   ): Promise<Conversation | null | undefined> {
-    return await this.client?.conversations.getConversationById(
-      (message as DecodedMessage)?.conversationId as string,
+    return this.client?.conversations.getConversationById(
+      (message as DecodedMessage).conversationId,
     );
   }
 
   isConversation(conversation: Conversation): conversation is Conversation {
-    return conversation?.id !== undefined;
+    return conversation.id !== undefined;
   }
 
   getConversationKey(message: Message) {
-    return `${message?.group?.id}`;
+    return `${message.group?.id}`;
   }
 
   getUserConversationKey(message: Message) {
-    return `${message?.group?.id}`;
+    return `${message.group?.id}`;
   }
 
   async getMessageById(reference: string) {
-    return this.client?.conversations?.getMessageById?.bind(
-      this.client?.conversations,
+    return this.client?.conversations.getMessageById.bind(
+      this.client.conversations,
     )(reference);
   }
 
@@ -324,7 +325,7 @@ export class XMTP {
       }
 
       // Find the conversation with the matching inbox ID
-      const conversation = conversations?.find(
+      const conversation = conversations.find(
         (c: Conversation) => c.dmPeerInboxId === inboxId,
       );
 
@@ -334,7 +335,7 @@ export class XMTP {
       }
 
       // Retrieve all messages from the conversation
-      const messages = await conversation?.messages();
+      const messages = await conversation.messages();
       if (!messages) {
         console.error(`No messages found ${conversation.id}`);
         return undefined;
@@ -354,7 +355,7 @@ export class XMTP {
       }
 
       // Return the shared secret
-      return lastAgentMessageSharedSecret?.content?.metadata
+      return lastAgentMessageSharedSecret.content?.metadata
         .sharedSecret as string;
     } catch (error) {
       console.error(`Error getting last agent message shared secret: ${error}`);
@@ -376,7 +377,7 @@ export class XMTP {
           "No shared secret found on encrypt, generating new one through a handshake",
         );
         sharedSecret = crypto.randomBytes(32).toString("hex");
-        let agentMessage: agentMessage = {
+        const agentMessage: agentMessage = {
           message: "",
           metadata: {
             sharedSecret,
@@ -386,12 +387,12 @@ export class XMTP {
         };
 
         // Send a handshake message with the new shared secret
-        await this.send(agentMessage as agentMessage);
+        await this.send(agentMessage);
         console.log("Sent handshake message");
       }
 
       // Convert the shared secret to a buffer
-      const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
+      const bufferFromSharedSecret = Buffer.from(sharedSecret, "hex");
       if (!bufferFromSharedSecret) {
         throw new Error("encrypt: No buffer secret found");
       }
@@ -450,7 +451,7 @@ export class XMTP {
       }
 
       // Convert the shared secret to a buffer
-      const bufferFromSharedSecret = Buffer.from(sharedSecret as string, "hex");
+      const bufferFromSharedSecret = Buffer.from(sharedSecret, "hex");
 
       // Create a decipher for decryption
       const decipher = crypto.createDecipheriv(
@@ -490,15 +491,14 @@ async function streamMessages(
         if (xmtp.agent?.config?.hideInitLogMessage !== true) {
         }
         for await (const message of stream) {
-          let conversation = await xmtp.getConversationFromMessage(message);
+          const conversation = await xmtp.getConversationFromMessage(message);
           if (message && conversation) {
             try {
-              const { senderInboxId, kind } = message as DecodedMessage;
+              const { senderInboxId, kind } = message;
 
               if (
                 // Filter out membership_change messages and sent by one
-                senderInboxId?.toLowerCase() ===
-                  client?.inboxId.toLowerCase() &&
+                senderInboxId.toLowerCase() === client?.inboxId.toLowerCase() &&
                 kind !== "membership_change"
               ) {
                 continue;
@@ -553,14 +553,14 @@ export async function parseMessage(
   client: Client,
 ): Promise<Message | undefined> {
   if (message == null) return undefined;
-  let typeId = message.contentType?.typeId ?? "text";
+  const typeId = message.contentType?.typeId ?? "text";
   let content = message.content;
   if (typeId == "text") {
     content = {
       text: content,
     };
   } else if (typeId == "reply") {
-    let previousMsg = await client.conversations.getMessageById(
+    const previousMsg = await client.conversations.getMessageById(
       message.content?.reference as string,
     );
     content = {
@@ -599,21 +599,20 @@ export async function parseMessage(
       attachment: url,
     };
   }
-  let date = message.sentAt;
+  const date = message.sentAt;
   let sender: User | undefined = undefined;
 
   await conversation?.sync();
   const members = await conversation?.members();
-  let membersArray = members?.map((member: any) => ({
+  const membersArray = members?.map((member: any) => ({
     inboxId: member.inboxId,
     address: member.accountAddresses[0],
     accountAddresses: member.accountAddresses,
     installationIds: member.installationIds,
   })) as User[];
 
-  sender = membersArray?.find(
-    (member: User) =>
-      member.inboxId === (message as DecodedMessage).senderInboxId,
+  sender = membersArray.find(
+    (member: User) => member.inboxId === message.senderInboxId,
   );
   return {
     id: message.id,
@@ -626,7 +625,7 @@ export async function parseMessage(
       admins: conversation?.admins,
       superAdmins: conversation?.superAdmins,
     },
-    sent: date as Date,
+    sent: date,
     content,
     typeId,
     client: {

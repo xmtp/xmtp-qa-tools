@@ -1,4 +1,9 @@
-import { Client, Message, XMTP, xmtpClient } from "@xmtp/agent-starter";
+import {
+  XMTP,
+  xmtpClient,
+  type Client,
+  type Message,
+} from "@xmtp/agent-starter";
 import { Alchemy, Network } from "alchemy-sdk";
 import express from "express";
 
@@ -13,12 +18,12 @@ async function main() {
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;
 
-      if (message?.content.text === "/create") {
+      if (message.content.text === "/create") {
         console.log("Creating group");
         const group = await createGroup(
-          agent?.client,
-          message?.sender?.address as string,
-          agent?.address as string,
+          agent.client,
+          message.sender.address,
+          agent.address as string,
         );
         console.log("Group created", group?.id);
         await agent.send({
@@ -47,7 +52,7 @@ async function main() {
         console.log("User cant be added to the group");
         return;
       } else {
-        await addToGroup(groupId, agent?.client as Client, walletAddress, true);
+        await addToGroup(groupId, agent.client as Client, walletAddress, true);
         res.status(200).send("success");
       }
     } catch (error: any) {
@@ -63,7 +68,7 @@ async function main() {
     );
   });
   console.log(
-    `XMTP agent initialized on ${agent?.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent?.address}`,
+    `XMTP agent initialized on ${agent.address}\nSend a message on https://xmtp.chat or https://converse.xyz/dm/${agent.address}`,
   );
 }
 
@@ -82,11 +87,11 @@ export async function createGroup(
     await client.conversations.sync();
     const conversations = await client.conversations.list();
     console.log("Conversations", conversations.length);
-    const group = await client?.conversations.newGroup([
+    const group = await client.conversations.newGroup([
       senderAddress,
       clientAddress,
     ]);
-    console.log("Group created", group?.id);
+    console.log("Group created", group.id);
     const members = await group.members();
     const senderMember = members.find((member: any) =>
       member.accountAddresses.includes(senderAddress.toLowerCase()),
@@ -117,7 +122,7 @@ export async function removeFromGroup(
   senderAddress: string,
 ): Promise<void> {
   try {
-    let lowerAddress = senderAddress.toLowerCase();
+    const lowerAddress = senderAddress.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
     console.warn("Checking if on XMTP: ", isOnXMTP);
     if (!isOnXMTP) {
@@ -137,7 +142,7 @@ export async function removeFromGroup(
     let wasRemoved = true;
     if (members) {
       for (const member of members) {
-        let lowerMemberAddress = member.accountAddresses[0].toLowerCase();
+        const lowerMemberAddress = member.accountAddresses[0].toLowerCase();
         if (lowerMemberAddress === lowerAddress) {
           wasRemoved = false;
           break;
@@ -162,7 +167,7 @@ export async function addToGroup(
   asAdmin: boolean = false,
 ): Promise<void> {
   try {
-    let lowerAddress = address.toLowerCase();
+    const lowerAddress = address.toLowerCase();
     const isOnXMTP = await client.canMessage([lowerAddress]);
     if (!isOnXMTP) {
       console.error("You don't seem to have a v3 identity ");
@@ -182,7 +187,7 @@ export async function addToGroup(
 
     if (members) {
       for (const member of members) {
-        let lowerMemberAddress = member.accountAddresses[0].toLowerCase();
+        const lowerMemberAddress = member.accountAddresses[0].toLowerCase();
         if (lowerMemberAddress === lowerAddress) {
           console.warn("Member exists", lowerMemberAddress);
           return;
@@ -208,7 +213,7 @@ export async function checkNft(
         nft.contract.name.toLowerCase() === collectionSlug.toLowerCase(),
     );
     console.log("is the nft owned: ", ownsNft);
-    return ownsNft as boolean;
+    return ownsNft;
   } catch (error) {
     console.error("Error fetching NFTs from Alchemy:", error);
   }

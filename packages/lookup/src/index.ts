@@ -79,7 +79,7 @@ export const lookup = async (
   key: string | undefined,
   clientAddress?: string,
 ): Promise<UserInfo | undefined> => {
-  let data: UserInfo = {
+  const data: UserInfo = {
     ensDomain: undefined,
     address: undefined,
     converseUsername: undefined,
@@ -97,7 +97,7 @@ export const lookup = async (
   const cachedData = cache.get(key);
   if (cachedData) return cachedData;
 
-  key = key?.toLowerCase();
+  key = key.toLowerCase();
   clientAddress = clientAddress?.toLowerCase();
 
   // Determine user information based on provided key
@@ -205,7 +205,9 @@ const fetchWithTimeout = async (
   timeout = 5000,
 ) => {
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+  const id = setTimeout(() => {
+    controller.abort();
+  }, timeout);
   try {
     const response = await fetch(url, {
       ...options,
@@ -228,7 +230,8 @@ export async function getEvmAddressFromDns(
         dns.resolveTxt(domain, (err, records) => {
           if (err) {
             console.error("Failed to resolve TXT records:", err);
-            return reject(err);
+            reject(err);
+            return;
           }
           resolve(records);
         });
