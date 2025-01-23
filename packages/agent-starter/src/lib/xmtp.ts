@@ -68,14 +68,6 @@ export class XMTP {
 
   async init(): Promise<XMTP> {
     const suffix = this.agent?.name ? "_" + this.agent.name : "";
-    let fixedKey =
-      this.agent?.fixedKey ??
-      process.env["FIXED_KEY" + suffix] ??
-      toHex(getRandomValues(new Uint8Array(32)));
-
-    if (!fixedKey.startsWith("0x")) {
-      fixedKey = "0x" + fixedKey;
-    }
     let encryptionKey =
       this.agent?.encryptionKey ??
       process.env["ENCRYPTION_KEY" + suffix] ??
@@ -134,10 +126,10 @@ export class XMTP {
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     void streamMessages(this.onMessage, client, this);
-    this.saveKeys(suffix, fixedKey, encryptionKey);
+    this.saveKeys(suffix, walletKey, encryptionKey);
     return this;
   }
-  saveKeys(suffix: string, encryptionKey: string, walletKey: string) {
+  saveKeys(suffix: string, walletKey: string, encryptionKey: string) {
     const envFilePath = path.resolve(process.cwd(), ".env");
     const envContent = `\nENCRYPTION_KEY${suffix}=${encryptionKey}\nWALLET_KEY${suffix}=${walletKey}`;
 

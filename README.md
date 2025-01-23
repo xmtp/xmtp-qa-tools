@@ -34,7 +34,7 @@ To run your XMTP agent, you need two keys:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
+ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
 ```
 
 > See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter/README.md#encryption-keys) to learn more.
@@ -242,5 +242,5 @@ Use a `.env` file for your environment variables:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
+ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
 ```

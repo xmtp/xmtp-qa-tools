@@ -33,7 +33,7 @@ Use a `.env` file for your environment variables:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
+ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
 ```
 
 ## Contribute
