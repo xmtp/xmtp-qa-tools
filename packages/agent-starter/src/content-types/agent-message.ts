@@ -1,7 +1,7 @@
-import { ContentTypeId } from "@xmtp/content-type-primitives";
-import type {
-  ContentCodec,
-  EncodedContent,
+import {
+  ContentTypeId,
+  type ContentCodec,
+  type EncodedContent,
 } from "@xmtp/content-type-primitives";
 
 // Create a unique identifier for your content type

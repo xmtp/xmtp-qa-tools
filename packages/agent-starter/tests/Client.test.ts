@@ -1,6 +1,6 @@
-import { describe, test, expect } from "vitest";
+import { createUser, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import { generatePrivateKey } from "viem/accounts";
-import { XMTP, createUser, xmtpClient } from "@xmtp/agent-starter";
+import { describe, expect, test } from "vitest";
 
 describe("Client Private Key Configuration Tests", () => {
   test("creates a client with a random generated key", async () => {

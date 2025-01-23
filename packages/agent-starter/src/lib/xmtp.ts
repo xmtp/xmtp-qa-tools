@@ -1,45 +1,44 @@
-import dotenv from "dotenv";
-dotenv.config();
-import {
-  DecodedMessage,
-  Client,
-  ClientOptions,
-  XmtpEnv,
-  Conversation,
-} from "@xmtp/node-sdk";
-import { ContentTypeReply, Reply, ReplyCodec } from "@xmtp/content-type-reply";
+import crypto, { getRandomValues } from "crypto";
+import * as fs from "fs";
+import { readFile } from "fs/promises";
+import path from "path";
 import {
   ContentTypeReaction,
   Reaction,
   ReactionCodec,
 } from "@xmtp/content-type-reaction";
-import { ContentTypeText, TextCodec } from "@xmtp/content-type-text";
+import {
+  ContentTypeReadReceipt,
+  ReadReceiptCodec,
+} from "@xmtp/content-type-read-receipt";
 import {
   Attachment,
   AttachmentCodec,
   ContentTypeRemoteAttachment,
   RemoteAttachmentCodec,
 } from "@xmtp/content-type-remote-attachment";
+import { ContentTypeReply, Reply, ReplyCodec } from "@xmtp/content-type-reply";
+import { ContentTypeText, TextCodec } from "@xmtp/content-type-text";
 import {
-  ContentTypeReadReceipt,
-  ReadReceiptCodec,
-} from "@xmtp/content-type-read-receipt";
+  Client,
+  ClientOptions,
+  Conversation,
+  DecodedMessage,
+  XmtpEnv,
+} from "@xmtp/node-sdk";
+import dotenv from "dotenv";
+import fetch from "node-fetch";
+import { createWalletClient, http, isAddress, toBytes, toHex } from "viem";
+import { privateKeyToAccount } from "viem/accounts";
+import { mainnet } from "viem/chains";
 import {
   AgentMessage,
   AgentMessageCodec,
   ContentTypeAgentMessage,
 } from "../content-types/agent-message.js";
-import { createWalletClient, http, isAddress, toBytes, toHex } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { mainnet } from "viem/chains";
+import { Agent, agentMessage, Message, User, UserReturnType } from "./types.js";
 
-import { getRandomValues } from "crypto";
-import path from "path";
-import { Message, agentMessage, UserReturnType, User, Agent } from "./types.js";
-import { readFile } from "fs/promises";
-import * as fs from "fs";
-import fetch from "node-fetch";
-import crypto from "crypto";
+dotenv.config();
 
 export async function xmtpClient(agent?: Agent): Promise<XMTP> {
   let xmtp: XMTP | null = null; // Ensure a single instance

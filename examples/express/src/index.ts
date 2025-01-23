@@ -1,6 +1,6 @@
+import { XMTP, xmtpClient } from "@xmtp/agent-starter";
 import express from "express";
 import fetch from "node-fetch";
-import { xmtpClient, XMTP } from "@xmtp/agent-starter";
 
 async function createServer(port: number, agent: XMTP) {
   const app = express();

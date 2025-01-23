@@ -1,6 +1,6 @@
 import { Client, Message, XMTP, xmtpClient } from "@xmtp/agent-starter";
-import express from "express";
 import { Alchemy, Network } from "alchemy-sdk";
+import express from "express";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key

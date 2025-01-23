@@ -1,5 +1,6 @@
-import { isAddress } from "viem";
 import dns from "dns";
+import { isAddress } from "viem";
+
 export const converseEndpointURL = "https://converse.xyz/profile/";
 
 export type InfoCache = Map<string, UserInfo>;
