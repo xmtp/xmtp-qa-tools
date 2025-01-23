@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
+import fs from "fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import fs from "fs";
 import { select } from "@clack/prompts";
 
 const __filename = fileURLToPath(import.meta.url);

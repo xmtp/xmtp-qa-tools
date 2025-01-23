@@ -17,10 +17,6 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn
-      - name: Install docs dependencies
-        run: |
-          cd packages/docs
-          yarn
       - name: Build
         run: yarn build
       - name: Check code format
@@ -43,27 +39,6 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Build
-        run: yarn build:xmtp-agents
-      - name: Test client
-        run: yarn test:client
-        continue-on-error: true
-        env:
-          WALLET_KEY: ${{ secrets.WALLET_KEY }}
-          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-      - name: Test parsing
-        run: yarn test:parsing
-        continue-on-error: true
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      - name: Test Frames
-        run: yarn test:frames
-      - name: Test Prompting
-        continue-on-error: true
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: yarn test:prompt
-      - name: Test Intent
-        continue-on-error: true
-        env:
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: yarn test:intent
+        run: yarn build
+      - name: Run tests
+        run: yarn test

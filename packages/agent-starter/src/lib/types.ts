@@ -1,13 +1,19 @@
-import { privateKeyToAccount } from "viem/accounts";
-import { createWalletClient } from "viem";
-import { ClientOptions, Client } from "@xmtp/node-sdk";
+import type { Client, ClientOptions } from "@xmtp/node-sdk";
+import type { createWalletClient } from "viem";
+import type { privateKeyToAccount } from "viem/accounts";
+
 export type { Client };
 export type { ClientOptions };
+
+export type Metadata = {
+  isAgent?: boolean;
+  [key: string]: any;
+};
 
 export type agentMessage = {
   message: string;
   originalMessage?: Message;
-  metadata?: any;
+  metadata: Metadata;
   receivers?: string[];
   typeId?:
     | "text"
@@ -61,7 +67,7 @@ export type Message = {
     params?: any | undefined; // Parameters for the message
     reference?: string | undefined; // Reference ID for the message
   };
-  group?: Conversation | undefined; // Group the message belongs to
+  group?: Conversation; // Group the message belongs to
   sender: User; // Sender of the message
   typeId: string; // Type identifier for the message
   client: {

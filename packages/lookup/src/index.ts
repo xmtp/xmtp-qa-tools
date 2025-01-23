@@ -1,5 +1,5 @@
-import { isAddress } from "viem";
 import dns from "dns";
+import { isAddress } from "viem";
 
 export type InfoCache = Map<string, UserInfo>;
 export type ConverseProfile = {
@@ -41,7 +41,7 @@ export interface EnsData {
 }
 
 class UserInfoCache {
-  private static instance: UserInfoCache;
+  private static instance: UserInfoCache | undefined;
   private cache: InfoCache = new Map();
 
   private constructor() {}
@@ -77,7 +77,7 @@ export const lookup = async (
   key: string | undefined,
   clientAddress?: string,
 ): Promise<UserInfo | undefined> => {
-  let data: UserInfo = {
+  const data: UserInfo = {
     ensDomain: undefined,
     address: undefined,
     converseUsername: undefined,
@@ -95,7 +95,7 @@ export const lookup = async (
   const cachedData = cache.get(key);
   if (cachedData) return cachedData;
 
-  key = key?.toLowerCase();
+  key = key.toLowerCase();
   clientAddress = clientAddress?.toLowerCase();
 
   // Determine user information based on provided key
@@ -144,7 +144,7 @@ export const lookup = async (
         if (process.env.MSG_LOG === "true")
           console.log("- ENS data request failed for", keyToUse);
       } else {
-        const ensData = (await response.json()) as EnsData;
+        const ensData = (await response.json()) as EnsData | undefined;
         if (ensData) {
           data.ensInfo = ensData;
           data.ensDomain = ensData.ens || data.ensDomain;
@@ -153,7 +153,7 @@ export const lookup = async (
           data.avatar = ensData.avatar_url || data.avatar;
         }
       }
-    } catch (error) {
+    } catch {
       console.error(`Failed to fetch ENS data for ${keyToUse}`);
     }
 
@@ -176,7 +176,9 @@ export const lookup = async (
           `Converse profile request failed with status ${response?.status}`,
         );
       }
-      const converseData = (await response?.json()) as ConverseProfile;
+      const converseData = (await response?.json()) as
+        | ConverseProfile
+        | undefined;
       if (converseData) {
         data.converseUsername =
           converseData.formattedName ||
@@ -203,7 +205,9 @@ const fetchWithTimeout = async (
   timeout = 5000,
 ) => {
   const controller = new AbortController();
-  const id = setTimeout(() => controller.abort(), timeout);
+  const id = setTimeout(() => {
+    controller.abort();
+  }, timeout);
   try {
     const response = await fetch(url, {
       ...options,
@@ -211,7 +215,7 @@ const fetchWithTimeout = async (
     });
     clearTimeout(id);
     return response;
-  } catch (error) {
+  } catch {
     clearTimeout(id);
     console.error("fetching");
   }
@@ -222,11 +226,12 @@ export async function getEvmAddressFromDns(
 ): Promise<string | undefined> {
   try {
     try {
-      const records = await new Promise((resolve, reject) => {
+      const records = await new Promise<string[][]>((resolve, reject) => {
         dns.resolveTxt(domain, (err, records) => {
           if (err) {
             console.error("Failed to resolve TXT records:", err);
-            return reject(err);
+            reject(err);
+            return;
           }
           resolve(records);
         });

@@ -1,44 +1,50 @@
 {
   "name": "xmtp-agents",
+  "version": "0.0.0",
   "private": true,
   "type": "module",
   "workspaces": [
-    "templates/*",
     "packages/*",
     "examples/*",
     "shared/*"
   ],
   "scripts": {
-    "build": "yarn build:agent-starter && yarn build:examples",
-    "build:agent-starter": "turbo run build --filter=./packages/agent-starter --force",
-    "build:examples": "turbo run build --filter='./examples/*'",
+    "build": "turbo run build",
     "changeset": " changeset add --type patch",
     "clean": "turbo run clean && yarn cache clean && find examples -name '.data' -type d -exec rm -rf {} +",
     "dev": "cd packages/agent-starter && yarn build:watch",
     "examples": "node scripts/examples.js",
-    "format": "turbo run format",
-    "publish": "changeset publish",
-    "test": "FORCE_COLOR=1 turbo run test --force --concurrency=1",
+    "format": "prettier -w .",
+    "format:check": "prettier -c .",
+    "lint": "yarn build && eslint .",
+    "publish": "yarn build && changeset publish",
+    "test": "FORCE_COLOR=1 turbo run test",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck"
-  },
-  "resolutions": {
-    "viem": "^2.16.3"
   },
   "dependencies": {
     "@changesets/changelog-git": "^0.2.0",
-    "@changesets/cli": "^2.27.5",
+    "@changesets/cli": "^2.27.11",
     "@clack/prompts": "^0.9.1",
     "punycode": "^2.3.1",
     "readline-sync": "^1.4.10"
   },
   "devDependencies": {
-    "prettier": "^3.3.1",
-    "prettier-plugin-packagejson": "^2.5.0",
-    "turbo": "^1.13.4",
-    "typescript": "^5.4.5"
+    "@eslint/compat": "^1.2.5",
+    "@eslint/js": "^9.18.0",
+    "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
+    "@types/eslint__js": "^8.42.3",
+    "eslint": "^9.18.0",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "globals": "^15.14.0",
+    "prettier": "^3.4.2",
+    "prettier-plugin-packagejson": "^2.5.8",
+    "turbo": "^2.3.4",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.21.0"
   },
-  "packageManager": "yarn@4.5.1",
+  "packageManager": "yarn@4.6.0",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   }
 }
