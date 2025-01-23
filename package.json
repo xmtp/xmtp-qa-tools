@@ -3,7 +3,6 @@
   "private": true,
   "type": "module",
   "workspaces": [
-    "templates/*",
     "packages/*",
     "examples/*",
     "shared/*"
@@ -18,7 +17,7 @@
     "examples": "node scripts/examples.js",
     "format": "turbo run format",
     "publish": "changeset publish",
-    "test": "FORCE_COLOR=1 turbo run test --force --concurrency=1",
+    "test": "FORCE_COLOR=1 turbo run test",
     "typecheck": "FORCE_COLOR=1 turbo run typecheck"
   },
   "resolutions": {
