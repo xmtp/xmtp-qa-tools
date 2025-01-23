@@ -10,9 +10,9 @@ describe("Client Private Key Configuration Tests", () => {
   }, 25000); // Added 15 second timeout
 
   test("creates a client with a provided private key", async () => {
-    const encryptionKey = generatePrivateKey();
+    const walletKey = generatePrivateKey();
     const xmtp = new XMTP({
-      encryptionKey,
+      walletKey,
       onMessage: async () => {},
     });
     await xmtp.init();
@@ -41,7 +41,7 @@ describe("Client Private Key Configuration Tests", () => {
 
     try {
       const xmtp = new XMTP({
-        encryptionKey: invalidKey,
+        walletKey: invalidKey,
         onMessage: async () => {},
       });
       await xmtp.init();

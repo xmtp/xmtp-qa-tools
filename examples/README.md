@@ -32,8 +32,8 @@ yarn examples gm
 Use a `.env` file for your environment variables:
 
 ```bash
-ENCRYPTION_KEY= # the private key of the wallet
-FIXED_KEY= # a second encryption key for encryption (can be random)
+WALLET_KEY= # the private key of the wallet
+ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
 ```
 
 ## Contribute

@@ -33,8 +33,8 @@ yarn add @xmtp/agent-starter
 To run your XMTP agent, you need two keys:
 
 ```bash
-ENCRYPTION_KEY= # the private key of the wallet
-FIXED_KEY= # a second encryption key for encryption (can be random)
+WALLET_KEY= # the private key of the wallet
+ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
 ```
 
 > See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter/README.md#encryption-keys) to learn more.
@@ -43,14 +43,14 @@ FIXED_KEY= # a second encryption key for encryption (can be random)
 
 These are the steps to initialize the XMTP listener and send messages.
 
-- `ENCRYPTION_KEY`: The private key of the wallet that will be used to send or receive messages.
+- `WALLET_KEY`: The private key of the wallet that will be used to send or receive messages.
 
 ```tsx
 import { xmtpClient } from "@xmtp/agent-starter";
 
 async function main() {
   const agent = await xmtpClient({
-    encryptionKey: process.env.ENCRYPTION_KEY as string,
+    walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
         console.log(`Decoded message: ${message.content.text}`);
         console.log(`from ${message.sender.address}`)
@@ -213,7 +213,7 @@ console.log(info);
   preferredName: 'vitalik.eth',
   converseUsername: '',
   avatar: 'https://...',
-  converseEndpoint: 'https://converse.xyz/...'
+  converseDeeplink: 'https://converse.xyz/...'
 }
 */
 ```
@@ -240,6 +240,6 @@ yarn examples gm
 Use a `.env` file for your environment variables:
 
 ```bash
-ENCRYPTION_KEY= # the private key of the wallet
-FIXED_KEY= # a second encryption key for encryption (can be random)
+WALLET_KEY= # the private key of the wallet
+ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
 ```

@@ -1,6 +1,5 @@
 import { isAddress } from "viem";
 import dns from "dns";
-export const converseEndpointURL = "https://converse.xyz/profile/";
 
 export type InfoCache = Map<string, UserInfo>;
 export type ConverseProfile = {
@@ -19,7 +18,7 @@ export type UserInfo = {
   ensInfo?: EnsData | undefined;
   avatar?: string | undefined;
   inboxId?: string | undefined;
-  converseEndpoint?: string | undefined;
+  converseDeeplink?: string | undefined;
 };
 
 export interface EnsData {
@@ -84,7 +83,7 @@ export const lookup = async (
     converseUsername: undefined,
     ensInfo: undefined,
     avatar: undefined,
-    converseEndpoint: undefined,
+    converseDeeplink: undefined,
     inboxId: undefined,
     preferredName: undefined,
   };
@@ -159,9 +158,9 @@ export const lookup = async (
     }
 
     try {
-      const converseEndpoint = `${converseEndpointURL}${data.converseUsername}`;
+      const converseDeeplink = `${"https://converse.xyz/dm/"}${data.converseUsername}`;
       const response = await fetchWithTimeout(
-        converseEndpoint,
+        converseDeeplink,
         {
           method: "POST",
           headers: {
@@ -186,7 +185,7 @@ export const lookup = async (
         data.address =
           converseData.address?.toLowerCase() || data.address?.toLowerCase();
         data.avatar = converseData.avatar || data.avatar;
-        data.converseEndpoint = converseEndpoint;
+        data.converseDeeplink = converseDeeplink;
       }
     } catch (error) {
       console.error("Failed to fetch Converse profile:", error);

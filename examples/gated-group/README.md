@@ -6,8 +6,8 @@ To create a gated group chat using XMTP, you will need an admin bot within the g
 
 ```bash
 ALCHEMY_API_KEY= #alchemy api to check NFT ownership
-ENCRYPTION_KEY= # the private key of admin bot
-FIXED_KEY= # a second encryption key for encryption (can be random)
+WALLET_KEY= # the private key of admin bot
+ENCRYPTION_KEY= # a second encryption key for encryption (can be random)
 ```
 
 ## Start the XMTP agent

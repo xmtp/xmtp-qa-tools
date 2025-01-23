@@ -17,8 +17,8 @@ These are the steps to initialize an agent that listens and sends messages over 
 ```tsx
 async function main() {
   const client = await xmtpClient({
-    encryptionKey: process.env.ENCRYPTION_KEY as string,
-    fixedKey: // optional
+    walletKey: process.env.WALLET_KEY as string,
+    encryptionKey: // optional
     onMessage: async (message: Message) => {
       console.log(
         `Decoded message: ${message.content.text} by ${message.sender.address}`,
@@ -79,23 +79,23 @@ await group.addMembers([walletAddress]);
 
 ## Encryption keys
 
-- `ENCRYPTION_KEY`: XMTP encryption keys can be managed in several ways. Here are the most common methods:
+- `WALLET_KEY`: XMTP encryption keys can be managed in several ways. Here are the most common methods:
 
   1. Use an environment variable to provide the private key:
 
      - Store your private key in a `.env` file:
-       `ENCRYPTION_KEY=0xYOUR_PRIVATE_KEY`
+       `WALLET_KEY=0xYOUR_PRIVATE_KEY`
 
      ```tsx
      const agent = await xmtpClient({
-       encryptionKey: process.env.ENCRYPTION_KEY,
+       walletKey: process.env.WALLET_KEY,
      });
      ```
 
 2. Generate the private key at runtime:
 
    - If no private key is provided, the agent can automatically generate a new one upon startup:
-     `ENCRYPTION_KEY=random_key`
+     `WALLET_KEY=random_key`
    - If exists in the .env file it will **not** generated a new key.
    - This method will save the key in the `.env` file for future use.
 
@@ -106,7 +106,7 @@ await group.addMembers([walletAddress]);
 3. Assign a name (alias) to the randomly generated key:
 
    - Providing a "name" gives your key a meaningful identifier, aiding in organization and persistence.
-     `ENCRYPTION_KEY_agentA=0xYOUR_PRIVATE_KEY`
+     `WALLET_KEY_agentA=0xYOUR_PRIVATE_KEY`
    - This method will also save the key in the `.env` file for future use.
 
      ```tsx
@@ -115,7 +115,7 @@ await group.addMembers([walletAddress]);
      });
      ```
 
-- `FIXED_KEY`: The fixed key is an additional security measure. It is not linked to the public address and can be randomly generated or shared across different agents. It will also be generated and saved in the `.env` file using the methods described above.
+- `ENCRYPTION_KEY`: The fixed key is an additional security measure. It is not linked to the public address and can be randomly generated or shared across different agents. It will also be generated and saved in the `.env` file using the methods described above.
 
 ## Receive messages
 

@@ -9,7 +9,7 @@ const settings = {
 
 async function main() {
   const agent = await xmtpClient({
-    encryptionKey: process.env.ENCRYPTION_KEY as string,
+    walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
       if (message.typeId !== "text") return;
 

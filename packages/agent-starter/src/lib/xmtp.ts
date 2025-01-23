@@ -62,14 +62,6 @@ export class XMTP {
 
   async init(): Promise<XMTP> {
     let suffix = this.agent?.name ? "_" + this.agent?.name : "";
-    let fixedKey =
-      this.agent?.fixedKey ??
-      process.env["FIXED_KEY" + suffix] ??
-      toHex(getRandomValues(new Uint8Array(32)));
-
-    if (!fixedKey.startsWith("0x")) {
-      fixedKey = "0x" + fixedKey;
-    }
     let encryptionKey =
       this.agent?.encryptionKey ??
       process.env["ENCRYPTION_KEY" + suffix] ??
@@ -78,8 +70,16 @@ export class XMTP {
     if (!encryptionKey.startsWith("0x")) {
       encryptionKey = "0x" + encryptionKey;
     }
+    let walletKey =
+      this.agent?.walletKey ??
+      process.env["WALLET_KEY" + suffix] ??
+      toHex(getRandomValues(new Uint8Array(32)));
 
-    const user = createUser(encryptionKey);
+    if (!walletKey.startsWith("0x")) {
+      walletKey = "0x" + walletKey;
+    }
+
+    const user = createUser(walletKey);
 
     let env = this.agent?.config?.env as XmtpEnv;
     if (!env) env = "production" as XmtpEnv;
@@ -112,7 +112,7 @@ export class XMTP {
 
     const client = await Client.create(
       createSigner(user),
-      new Uint8Array(toBytes(fixedKey as `0x${string}`)),
+      new Uint8Array(toBytes(encryptionKey as `0x${string}`)),
       finalConfig,
     );
 
@@ -120,12 +120,12 @@ export class XMTP {
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     Promise.all([streamMessages(this.onMessage, client, this)]);
-    this.saveKeys(suffix, fixedKey, encryptionKey);
+    this.saveKeys(suffix, encryptionKey, walletKey);
     return this;
   }
-  saveKeys(suffix: string, fixedKey: string, encryptionKey: string) {
+  saveKeys(suffix: string, encryptionKey: string, walletKey: string) {
     const envFilePath = path.resolve(process.cwd(), ".env");
-    const envContent = `\nFIXED_KEY${suffix}=${fixedKey}\nENCRYPTION_KEY${suffix}=${encryptionKey}`;
+    const envContent = `\nENCRYPTION_KEY${suffix}=${encryptionKey}\nWALLET_KEY${suffix}=${walletKey}`;
 
     // Read the existing .env file content
     let existingEnvContent = "";
@@ -135,8 +135,8 @@ export class XMTP {
 
     // Check if the keys already exist
     if (
-      !existingEnvContent.includes(`FIXED_KEY${suffix}=`) &&
-      !existingEnvContent.includes(`ENCRYPTION_KEY${suffix}=`)
+      !existingEnvContent.includes(`ENCRYPTION_KEY${suffix}=`) &&
+      !existingEnvContent.includes(`WALLET_KEY${suffix}=`)
     ) {
       fs.appendFileSync(envFilePath, envContent);
     }
