@@ -1,8 +1,16 @@
 {
   "name": "@xmtp/agent-starter",
   "version": "0.0.5",
+  "homepage": "https://github.com/ephemeraHQ/xmtp-agents",
+  "bugs": {
+    "url": "https://github.com/ephemeraHQ/xmtp-agents/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ephemeraHQ/xmtp-agents.git",
+    "directory": "packages/agent-starter"
+  },
   "license": "MIT",
-  "type": "module",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

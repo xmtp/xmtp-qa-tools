@@ -1,6 +1,15 @@
 {
   "name": "@xmtp/lookup",
   "version": "0.0.4",
+  "homepage": "https://github.com/ephemeraHQ/xmtp-agents",
+  "bugs": {
+    "url": "https://github.com/ephemeraHQ/xmtp-agents/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/ephemeraHQ/xmtp-agents.git",
+    "directory": "packages/lookup"
+  },
   "license": "MIT",
   "type": "module",
   "exports": {
