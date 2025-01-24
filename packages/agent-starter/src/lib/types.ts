@@ -57,7 +57,6 @@ export type Conversation = {
 export type Message = {
   id: string; // Unique identifier for the message
   sent: Date; // Date when the message was sent
-  isDM: boolean; // Whether the message is a direct message
   content: {
     text?: string; // Text content of the message
     reply?: string; // Reply content if the message is a reply

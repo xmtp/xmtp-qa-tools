@@ -35,23 +35,17 @@ export interface UserReturnType {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-export type xmtpConfig = {
-  path?: string;
-  hideInitLogMessage?: boolean;
-} & ClientOptions;
-
-export type Agent = {
+export type xmtpClientType = {
   name?: string;
   walletKey?: string;
   encryptionKey?: string;
   onMessage?: (message: Message) => Promise<void>;
-  config?: xmtpConfig;
+  config?: ClientOptions;
 };
 
 export type Message = {
   id: string; // Unique identifier for the message
   sent: Date; // Date when the message was sent
-  isDM: boolean; // Whether the message is a direct message
   content: {
     text?: string | undefined; // Text content of the message
     reply?: string | undefined; // Reply content if the message is a reply
@@ -90,7 +84,7 @@ export type Message = {
   };
 };
 
-export async function xmtpClient(agent?: Agent): Promise<XMTP> {
+export async function xmtpClient(agent?: xmtpClientType): Promise<XMTP> {
   let xmtp: XMTP | null = null; // Ensure a single instance
   xmtp = new XMTP(agent);
   await xmtp.init();
@@ -102,9 +96,9 @@ export class XMTP {
   address: string | undefined;
   inboxId: string | undefined;
   onMessage: (message: Message) => Promise<void>;
-  agent?: Agent;
+  agent?: xmtpClientType;
 
-  constructor(agent?: Agent) {
+  constructor(agent?: xmtpClientType) {
     this.onMessage = agent?.onMessage ?? (() => Promise.resolve());
     this.agent = agent;
   }
@@ -133,18 +127,18 @@ export class XMTP {
     let env = this.agent?.config?.env;
     if (!env) env = "production";
 
-    const volumePath =
+    const dbPath =
       process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-      this.agent?.config?.path ??
+      this.agent?.config?.dbPath ??
       ".data/xmtp";
 
-    if (!fs.existsSync(volumePath)) {
-      fs.mkdirSync(volumePath, { recursive: true });
+    if (!fs.existsSync(dbPath)) {
+      fs.mkdirSync(dbPath, { recursive: true });
     }
 
     const defaultConfig: ClientOptions = {
       env: env,
-      dbPath: `${volumePath}/${user.account.address.toLowerCase()}-${env}`,
+      dbPath: `${dbPath}/${user.account.address.toLowerCase()}-${env}`,
       codecs: [new TextCodec()],
     };
 
@@ -291,17 +285,14 @@ export function createUser(key: string): UserReturnType {
 }
 
 export async function parseMessage(
-  message: DecodedMessage | undefined | null,
+  message: DecodedMessage,
   conversation: Conversation | undefined,
   client: Client,
 ): Promise<Message | undefined> {
-  if (message === null || message === undefined) return undefined;
-
   const content = {
     text: message.content as string,
   };
 
-  const date = message.sentAt;
   let sender:
     | {
         inboxId: string;
@@ -335,7 +326,7 @@ export async function parseMessage(
       admins: conversation?.admins,
       superAdmins: conversation?.superAdmins,
     },
-    sent: date,
+    sent: message.sentAt,
     content,
     typeId: "text",
     client: {
