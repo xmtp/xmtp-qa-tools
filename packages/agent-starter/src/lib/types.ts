@@ -10,7 +10,7 @@ export type Metadata = {
   [key: string]: any;
 };
 
-export type agentMessage = {
+export type clientMessage = {
   message: string;
   originalMessage?: Message;
   metadata: Metadata;
@@ -38,8 +38,8 @@ export type xmtpConfig = {
 
 export type Agent = {
   name?: string;
+  walletKey?: string;
   encryptionKey?: string;
-  fixedKey?: string;
   onMessage?: (message: Message) => Promise<void>;
   config?: xmtpConfig;
 };
@@ -59,21 +59,12 @@ export type Message = {
   sent: Date; // Date when the message was sent
   isDM: boolean; // Whether the message is a direct message
   content: {
-    text?: string; // Text content of the message
-    reply?: string; // Reply content if the message is a reply
-    previousMsg?: string; // Reference to the previous message
-    attachment?: string; // Attachment content if the message is an attachment
-    react?: string; // Reaction content if the message is a reaction
-    content: any; // Any other content
-    metadata?: any; // Metadata for the message
-    remoteAttachment?: any; // Remote attachment content if the message is a remote attachment
-    readReceipt?: any; // Read receipt content if the message is a read receipt
-    agentMessage?: any; // Agent message content if the message is an agent message
-    reaction?: any; // Reaction content if the message is a reaction
-    params?: any; // Parameters for the message
-    reference?: string; // Reference ID for the message
-    skill?: string; // Skill associated with the message
-    any?: any; // Any other content
+    text?: string | undefined; // Text content of the message
+    reply?: string | undefined; // Reply content if the message is a reply
+    previousMsg?: string | undefined; // Reference to the previous message
+    attachment?: string | undefined; // Attachment content if the message is an attachment
+    reaction?: string | undefined; // Reaction content if the message is a reaction
+    reference?: string | undefined; // Reference ID for the message
   };
   group?: Conversation; // Group the message belongs to
   sender: User; // Sender of the message

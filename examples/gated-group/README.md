@@ -6,8 +6,8 @@ To create a gated group chat using XMTP, you will need an admin bot within the g
 
 ```bash
 ALCHEMY_API_KEY= #alchemy api to check NFT ownership
-ENCRYPTION_KEY= # the private key of admin bot
-FIXED_KEY= # a second encryption key for encryption (can be random)
+WALLET_KEY= # the private key of admin bot
+ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
 ```
 
 ## Start the XMTP agent
@@ -22,12 +22,12 @@ const agent = await xmtpClient({
       //This is a arbitrary trigger but you can embed this logic into any server.
       console.log("Creating group");
       const group = await createGroup(
-        agent?.client,
+        client?.client,
         message?.sender?.address as string,
-        agent?.address as string,
+        client?.address as string,
       );
       console.log("Group created", group?.id);
-      await agent.send({
+      await client.send({
         message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
         originalMessage: message,
       });

@@ -39,7 +39,7 @@ import {
 } from "../content-types/agent-message.js";
 import type {
   Agent,
-  agentMessage,
+  clientMessage,
   Message,
   User,
   UserReturnType,
@@ -68,14 +68,6 @@ export class XMTP {
 
   async init(): Promise<XMTP> {
     const suffix = this.agent?.name ? "_" + this.agent.name : "";
-    let fixedKey =
-      this.agent?.fixedKey ??
-      process.env["FIXED_KEY" + suffix] ??
-      toHex(getRandomValues(new Uint8Array(32)));
-
-    if (!fixedKey.startsWith("0x")) {
-      fixedKey = "0x" + fixedKey;
-    }
     let encryptionKey =
       this.agent?.encryptionKey ??
       process.env["ENCRYPTION_KEY" + suffix] ??
@@ -84,8 +76,16 @@ export class XMTP {
     if (!encryptionKey.startsWith("0x")) {
       encryptionKey = "0x" + encryptionKey;
     }
+    let walletKey =
+      this.agent?.walletKey ??
+      process.env["WALLET_KEY" + suffix] ??
+      toHex(getRandomValues(new Uint8Array(32)));
 
-    const user = createUser(encryptionKey);
+    if (!walletKey.startsWith("0x")) {
+      walletKey = "0x" + walletKey;
+    }
+
+    const user = createUser(walletKey);
 
     let env = this.agent?.config?.env;
     if (!env) env = "production";
@@ -118,7 +118,7 @@ export class XMTP {
 
     const client = await Client.create(
       createSigner(user),
-      new Uint8Array(toBytes(fixedKey as `0x${string}`)),
+      new Uint8Array(toBytes(encryptionKey as `0x${string}`)),
       finalConfig,
     );
 
@@ -126,12 +126,12 @@ export class XMTP {
     this.inboxId = client.inboxId;
     this.address = client.accountAddress;
     void streamMessages(this.onMessage, client, this);
-    this.saveKeys(suffix, fixedKey, encryptionKey);
+    this.saveKeys(suffix, walletKey, encryptionKey);
     return this;
   }
-  saveKeys(suffix: string, fixedKey: string, encryptionKey: string) {
+  saveKeys(suffix: string, walletKey: string, encryptionKey: string) {
     const envFilePath = path.resolve(process.cwd(), ".env");
-    const envContent = `\nFIXED_KEY${suffix}=${fixedKey}\nENCRYPTION_KEY${suffix}=${encryptionKey}`;
+    const envContent = `\nENCRYPTION_KEY${suffix}=${encryptionKey}\nWALLET_KEY${suffix}=${walletKey}`;
 
     // Read the existing .env file content
     let existingEnvContent = "";
@@ -141,8 +141,8 @@ export class XMTP {
 
     // Check if the keys already exist
     if (
-      !existingEnvContent.includes(`FIXED_KEY${suffix}=`) &&
-      !existingEnvContent.includes(`ENCRYPTION_KEY${suffix}=`)
+      !existingEnvContent.includes(`ENCRYPTION_KEY${suffix}=`) &&
+      !existingEnvContent.includes(`WALLET_KEY${suffix}=`)
     ) {
       fs.appendFileSync(envFilePath, envContent);
     }
@@ -217,41 +217,41 @@ export class XMTP {
     }
   }
 
-  async send(agentMessage: agentMessage) {
+  async send(clientMessage: clientMessage) {
     let contentType: typeof ContentTypeReaction = ContentTypeText;
 
     let message: any;
-    if (!agentMessage.typeId || agentMessage.typeId === "text") {
-      message = agentMessage.message;
+    if (!clientMessage.typeId || clientMessage.typeId === "text") {
+      message = clientMessage.message;
       contentType = ContentTypeText;
-    } else if (agentMessage.typeId === "attachment") {
-      message = (await this.getAttachment(agentMessage.message)) as Attachment;
+    } else if (clientMessage.typeId === "attachment") {
+      message = (await this.getAttachment(clientMessage.message)) as Attachment;
       contentType = ContentTypeRemoteAttachment;
-    } else if (agentMessage.typeId === "reaction") {
+    } else if (clientMessage.typeId === "reaction") {
       message = {
-        content: agentMessage.message,
+        content: clientMessage.message,
         action: "added",
-        reference: agentMessage.originalMessage?.id,
+        reference: clientMessage.originalMessage?.id,
         schema: "unicode",
       } as Reaction;
       contentType = ContentTypeReaction;
-    } else if (agentMessage.typeId === "reply") {
+    } else if (clientMessage.typeId === "reply") {
       contentType = ContentTypeReply;
       message = {
-        content: agentMessage.message,
+        content: clientMessage.message,
         contentType: ContentTypeText,
-        reference: agentMessage.originalMessage?.id,
+        reference: clientMessage.originalMessage?.id,
       } as Reply;
-    } else if (agentMessage.typeId === "agent_message") {
-      message = new AgentMessage(agentMessage.message, agentMessage.metadata);
+    } else if (clientMessage.typeId === "agent_message") {
+      message = new AgentMessage(clientMessage.message, clientMessage.metadata);
       contentType = ContentTypeAgentMessage;
     }
-    if (!agentMessage.receivers || agentMessage.receivers.length == 0) {
-      agentMessage.receivers = [
-        agentMessage.originalMessage?.sender.inboxId as string,
+    if (!clientMessage.receivers || clientMessage.receivers.length == 0) {
+      clientMessage.receivers = [
+        clientMessage.originalMessage?.sender.inboxId as string,
       ];
     }
-    for (const receiverAddress of agentMessage.receivers) {
+    for (const receiverAddress of clientMessage.receivers) {
       const inboxId = !isAddress(receiverAddress)
         ? receiverAddress
         : await this.client?.getInboxIdByAddress(receiverAddress);
@@ -365,7 +365,7 @@ export class XMTP {
           "No shared secret found on encrypt, generating new one through a handshake",
         );
         sharedSecret = crypto.randomBytes(32).toString("hex");
-        const agentMessage: agentMessage = {
+        const clientMessage: clientMessage = {
           message: "",
           metadata: {
             sharedSecret,
@@ -375,7 +375,7 @@ export class XMTP {
         };
 
         // Send a handshake message with the new shared secret
-        await this.send(agentMessage);
+        await this.send(clientMessage);
         console.log("Sent handshake message");
       }
 

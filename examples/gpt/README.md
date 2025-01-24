@@ -7,8 +7,8 @@ This example uses the [OpenAI](https://openai.com) API for GPT-based responses a
 Add the following keys to a `.env` file:
 
 ```bash
-ENCRYPTION_KEY=    # Private key for XMTP
-FIXED_KEY=         # Secondary key for local encryption
+WALLET_KEY=    # Private key for XMTP
+ENCRYPTION_KEY=         # Secondary key for local encryption
 OPENAI_API_KEY=    # e.g., sk-xxx...
 ```
 
@@ -23,7 +23,7 @@ const openai = new OpenAI();
 
 async function main() {
   const agent = await xmtpClient({
-    encryptionKey: process.env.ENCRYPTION_KEY as string,
+    walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
       console.log(
         `Decoded message: ${message?.content.text} from ${message.sender.address}`,
@@ -42,7 +42,7 @@ async function main() {
       const gptMessage = completion.choices[0]?.message?.content?.trim();
 
       // Send GPT response back via XMTP
-      await agent.send({
+      await client.send({
         message: gptMessage ?? "",
         originalMessage: message,
       });
@@ -50,8 +50,8 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${agent.address}\n` +
-      `Try sending a message at https://xmtp.chat/dm/${agent.address}`,
+    `XMTP client initialized on ${client.address}\n` +
+      `Try sending a message at https://xmtp.chat/dm/${client.address}`,
   );
 }
 

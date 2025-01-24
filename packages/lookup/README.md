@@ -10,18 +10,19 @@ import { lookup } from "@xmtp/lookup";
 // Because user identifiers come in all shapes and sizes!
 const identifier = "vitalik.eth"; // Could also be "0x123...", "@fabri", or even a website
 const info = await lookup(identifier);
+```
 
-console.log(info);
-/*
+Result:
+
+```json
 {
-  ensDomain: 'vitalik.eth',
-  address: '0x1234...',
-  preferredName: 'vitalik.eth',
-  converseUsername: '',
-  avatar: 'https://...',
-  converseEndpoint: 'https://converse.xyz/...'
+  "ensDomain": "vitalik.eth",
+  "address": "0x1234...",
+  "preferredName": "vitalik.eth",
+  "converseUsername": "",
+  "avatar": "https://...",
+  "converseDeeplink": "https://converse.xyz/dm/..."
 }
-*/
 ```
 
 The lookup always returns a `UserInfo` object with these fields:
@@ -33,7 +34,7 @@ The lookup always returns a `UserInfo` object with these fields:
 | **preferredName**    | Best name to display                       |
 | **converseUsername** | The user’s Converse username (if any)      |
 | **avatar**           | URL of the user’s profile picture (if any) |
-| **converseEndpoint** | Endpoint for the user’s Converse profile   |
+| **converseDeeplink** | Deeplink for the user’s Converse profile   |
 
 ## Supported identifiers
 
@@ -119,5 +120,3 @@ cache.clear();
 // Clear a specific address from the cache:
 cache.clear("0x1234...");
 ```
-
-This makes repeated lookups lightning-fast, so you can focus on building cool stuff instead of waiting on network calls.
