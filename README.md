@@ -84,7 +84,7 @@ const isOnXMTP = await client.canMessage(address);
 Various examples and tutorials to help you get started with creating and deploying your own agents using XMTP.
 
 - [gated-group](/examples/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
-- [gm](/examples/gm/): A simple agent that replies with "GM".
+- [gm](/examples/gm/): A simple agent that replies with `gm`.
 - [gpt](/examples/gpt): A simple agent that interacts with OpenAI APIs.
 - [express](/examples/express/): Communicate with traditional APIs using xmtp e2ee
 
