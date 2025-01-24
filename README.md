@@ -10,7 +10,7 @@
 </div>
 
 [`@xmtp/agent-starter`](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter).
-is a library for building agents that communicate in a secure and interoperable way over the [XMTP](https://xmtp.org/) network.
+is a library for building agents that communicate over the [XMTP](https://xmtp.org/) network.
 
 #### Why XMTP?
 
@@ -34,7 +34,7 @@ To run your XMTP agent, you need two keys:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
+ENCRYPTION_KEY= # a second fixed/random 32 bytes encryptioney for local db
 ```
 
 > See [encryption keys](https://github.com/ephemeraHQ/xmtp-agents/tree/main/packages/agent-starter/README.md#encryption-keys) to learn more.
@@ -230,5 +230,5 @@ Use a `.env` file for your environment variables:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second random 32 bytes encryption key for local db encryptioney for encryption (can be random)
+ENCRYPTION_KEY= # a second fixed/random 32 bytes encryptioney for local db
 ```
