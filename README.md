@@ -14,7 +14,7 @@ is a library for building agents that communicate over the [XMTP](https://xmtp.o
 
 #### Why XMTP?
 
-- **End-to-end & compliant**: The server only sees ciphertext, meeting strict security and regulatory standards.
+- **End-to-end & compliant**: Data is encrypted in transit and at rest, meeting strict security and regulatory standards.
 - **Open-source & trustless**: Built on top of the [MLS](https://messaginglayersecurity.rocks/) protocol, it replaces trust in centralized certificate authorities with cryptographic proofs.
 - **Privacy & metadata protection**: Offers anonymous or pseudonymous usage with no tracking of sender routes, IPs, or device and message timestamps.
 - **Decentralized**: Operates on a peer-to-peer network, eliminating single points of failure.
