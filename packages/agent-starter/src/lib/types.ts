@@ -63,8 +63,7 @@ export type Message = {
     reply?: string | undefined; // Reply content if the message is a reply
     previousMsg?: string | undefined; // Reference to the previous message
     attachment?: string | undefined; // Attachment content if the message is an attachment
-    reaction?: any | undefined; // Reaction content if the message is a reaction
-    params?: any | undefined; // Parameters for the message
+    reaction?: string | undefined; // Reaction content if the message is a reaction
     reference?: string | undefined; // Reference ID for the message
   };
   group?: Conversation; // Group the message belongs to

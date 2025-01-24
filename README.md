@@ -52,8 +52,7 @@ async function main() {
   const client = await xmtpClient({
     walletKey: process.env.WALLET_KEY as string,
     onMessage: async (message: Message) => {
-        console.log(`Decoded message: ${message.content.text}`);
-        console.log(`from ${message.sender.address}`)
+        console.log(`Decoded message: ${message.content.text} from ${message.sender.address}`)
 
         // Your AI model response
         const response = await api("Hi, how are you?");
@@ -93,7 +92,10 @@ Various examples and tutorials to help you get started with creating and deployi
 
 ## Deployment
 
-Learn how to deploy with [Railway](/examples/railway/) or [Replit](/examples/replit/)
+Learn how to deploy with:
+
+- [Railway](/examples/railway/)
+- [Replit](/examples/replit/)
 
 ## Groups
 
@@ -131,21 +133,7 @@ const onMessage = async (message: Message) => {
     `Decoded message: ${message.content.text} from ${message.sender.address}`,
   );
 
-  let typeId = message.typeId;
-
-  if (typeId === "text") {
-    // Do something with the text
-  } else if (typeId === "reaction") {
-    // Do something with the reaction
-  } else if (typeId === "reply") {
-    // Do something with the `reply`
-  } else if (typeId === "attachment") {
-    // Do something with the attachment data url
-  } else if (typeId === "agent_message") {
-    // Do something with the agent message
-  } else if (typeId === "group_updated") {
-    // Do something with the group updated metadata
-  }
+  // Your logic
 };
 ```
 
@@ -199,7 +187,7 @@ Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the officia
 
 This library helps you to lookup identities into EVM addresses compatible with XMTP.
 
-````tsx
+```tsx
 import { lookup } from "@xmtp/lookup";
 
 const identifier = "vitalik.eth";
@@ -210,14 +198,14 @@ Result:
 
 ```json
 {
-  ensDomain: 'vitalik.eth',
-  address: '0x1234...',
-  preferredName: 'vitalik.eth',
-  converseUsername: '',
-  avatar: 'https://...',
-  converseDeeplink: 'https://converse.xyz/dm/...'
+  "ensDomain": "vitalik.eth",
+  "address": "0x1234...",
+  "preferredName": "vitalik.eth",
+  "converseUsername": "",
+  "avatar": "https://...",
+  "converseDeeplink": "https://converse.xyz/dm/..."
 }
-````
+```
 
 > Learn more about [`lookup`](/packages/lookup/) library
 
