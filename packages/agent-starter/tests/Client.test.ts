@@ -1,6 +1,6 @@
-import { createUser, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import { generatePrivateKey } from "viem/accounts";
 import { describe, expect, test } from "vitest";
+import { createUser, XMTP, xmtpClient } from "../src/lib/xmtp";
 
 describe("Client Private Key Configuration Tests", () => {
   test("creates a client with a random generated key", async () => {
@@ -29,7 +29,7 @@ describe("Client Private Key Configuration Tests", () => {
   }, 15000); // Added 15 second timeout
 
   test("Creates a key with a agent name", async () => {
-    const agentName = "bob1";
+    const agentName = "bob3";
     const xmtp = await xmtpClient({
       name: agentName,
     });
