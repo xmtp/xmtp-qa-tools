@@ -37,13 +37,7 @@ import {
   AgentMessageCodec,
   ContentTypeAgentMessage,
 } from "../content-types/agent-message.js";
-import type {
-  Agent,
-  clientMessage,
-  Message,
-  User,
-  UserReturnType,
-} from "./types.js";
+import type { Agent, clientMessage, Message, UserReturnType } from "./types.js";
 
 dotenv.config();
 
@@ -92,7 +86,7 @@ export class XMTP {
 
     const volumePath =
       process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-      this.agent?.config?.path ??
+      this.agent?.config?.dbPath ??
       ".data/xmtp";
 
     if (!fs.existsSync(volumePath)) {
@@ -484,6 +478,7 @@ async function streamMessages(
             ) {
               continue;
             }
+
             const parsedMessage = await parseMessage(
               message,
               conversation,
@@ -587,7 +582,16 @@ export async function parseMessage(
     };
   }
   const date = message.sentAt;
-  let sender: User | undefined = undefined;
+  let sender:
+    | {
+        inboxId: string;
+        address: string;
+        accountAddresses: string[];
+        installationIds: string[];
+        username?: string;
+        ensDomain?: string;
+      }
+    | undefined = undefined;
 
   await conversation?.sync();
   const members = await conversation?.members();
@@ -596,14 +600,26 @@ export async function parseMessage(
     address: member.accountAddresses[0],
     accountAddresses: member.accountAddresses,
     installationIds: member.installationIds,
-  })) as User[];
+  })) as {
+    inboxId: string;
+    address: string;
+    accountAddresses: string[];
+    installationIds: string[];
+  }[];
 
   sender = membersArray.find(
-    (member: User) => member.inboxId === message.senderInboxId,
+    (member: { inboxId: string }) => member.inboxId === message.senderInboxId,
   );
   return {
     id: message.id,
-    sender,
+    sender: {
+      inboxId: sender?.inboxId || "",
+      address: sender?.address || "",
+      accountAddresses: sender?.accountAddresses || [],
+      installationIds: sender?.installationIds || [],
+      username: sender?.username || "",
+      ensDomain: sender?.ensDomain || "",
+    },
     group: {
       id: conversation?.id,
       createdAt: conversation?.createdAt,

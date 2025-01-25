@@ -31,24 +31,26 @@ export interface UserReturnType {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-export type xmtpConfig = {
-  path?: string;
-  hideInitLogMessage?: boolean;
-} & ClientOptions;
-
 export type Agent = {
   name?: string;
   walletKey?: string;
   encryptionKey?: string;
   onMessage?: (message: Message) => Promise<void>;
-  config?: xmtpConfig;
+  config?: ClientOptions;
 };
 
 export type Conversation = {
   id: string;
   createdAt: Date;
   topic?: string;
-  members?: User[];
+  members?: {
+    address: string;
+    inboxId: string;
+    installationIds: string[];
+    accountAddresses: string[];
+    username?: string;
+    ensDomain?: string;
+  }[];
   admins?: string[];
   name?: string;
   superAdmins?: string[];
@@ -57,7 +59,6 @@ export type Conversation = {
 export type Message = {
   id: string; // Unique identifier for the message
   sent: Date; // Date when the message was sent
-  isDM: boolean; // Whether the message is a direct message
   content: {
     text?: string | undefined; // Text content of the message
     reply?: string | undefined; // Reply content if the message is a reply
@@ -67,19 +68,17 @@ export type Message = {
     reference?: string | undefined; // Reference ID for the message
   };
   group?: Conversation; // Group the message belongs to
-  sender: User; // Sender of the message
+  sender: {
+    address: string;
+    inboxId: string;
+    installationIds: string[];
+    accountAddresses: string[];
+    username?: string;
+    ensDomain?: string;
+  }; // Sender of the message
   typeId: string; // Type identifier for the message
   client: {
     address: string;
     inboxId: string;
   };
 };
-
-export interface User {
-  address: string;
-  inboxId: string;
-  installationIds: string[];
-  accountAddresses: string[];
-  username?: string;
-  ensDomain?: string;
-}

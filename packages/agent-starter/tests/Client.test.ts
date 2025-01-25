@@ -1,6 +1,7 @@
-import { createUser, XMTP, xmtpClient } from "@xmtp/agent-starter";
 import { generatePrivateKey } from "viem/accounts";
 import { describe, expect, test } from "vitest";
+import type { Message } from "../src/lib/types";
+import { createUser, XMTP, xmtpClient } from "../src/lib/xmtp";
 
 describe("Client Private Key Configuration Tests", () => {
   test("creates a client with a random generated key", async () => {
@@ -52,4 +53,46 @@ describe("Client Private Key Configuration Tests", () => {
       expect((error as Error).message).toContain("invalid private key");
     }
   }, 15000); // Added 15 second timeout
+
+  test("Creates a key with a agent name", async () => {
+    const agentName = "bob1";
+    const xmtp = await xmtpClient({
+      name: agentName,
+      onMessage: async (message: Message) => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log(
+          "message received",
+          message.content.text,
+          "from",
+          message.sender.address,
+        );
+      },
+    });
+    const xmtp2 = await xmtpClient({
+      name: "alice1",
+      onMessage: async (message: Message) => {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        console.log(
+          "message received",
+          message.content.text,
+          "from",
+          message.sender.address,
+        );
+      },
+    });
+
+    const message1 = await xmtp.send({
+      message: "Hello, Alice!",
+      receivers: [xmtp2.inboxId || ""],
+      metadata: {},
+    });
+    const message2 = await xmtp2.send({
+      message: "Hello, Bob!",
+      receivers: [xmtp.inboxId || ""],
+      metadata: {},
+    });
+
+    expect(message1).toBeDefined();
+    expect(message2).toBeDefined();
+  }, 15000);
 });
