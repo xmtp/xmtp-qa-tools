@@ -1,5 +1,5 @@
 ---
-"@xmtp/agent-starter": major
+"@xmtp/agent-starter": path
 ---
 
 Added testing. Cleaner types.
