@@ -6,12 +6,6 @@ describe("Client Private Key Configuration Tests", async () => {
   const xmtp = await xmtpClient({
     name: "bob2",
     onMessage: async (message: Message) => {
-      console.log(
-        "Bob received message:",
-        message.content.text,
-        "from",
-        message.sender.address,
-      );
       await new Promise((resolve) => setTimeout(resolve, 1000));
       expect(message.content.text).toBe("Hello, Alice!");
       expect(message.sender.address).toBe(xmtp2.address);
@@ -35,8 +29,6 @@ describe("Client Private Key Configuration Tests", async () => {
   });
 
   test("Send a message to a client", async () => {
-    console.log("Bob's address:", xmtp.address);
-    console.log("Alice's address:", xmtp2.address);
     const message = await xmtp.send({
       message: "Hello, Alice!",
       receivers: [xmtp2.address as string],
@@ -47,7 +39,7 @@ describe("Client Private Key Configuration Tests", async () => {
       receivers: [xmtp.address as string],
       metadata: {},
     });
-    console.log("Message sent:", message);
-    console.log("Message sent:", message2);
+    expect(message).toBeDefined();
+    expect(message2).toBeDefined();
   }, 25000);
 });
