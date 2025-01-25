@@ -2,4 +2,4 @@
 "@xmtp/agent-starter": patch
 ---
 
-Added testing. Cleaner types.
+New tests. Cleaner types.
