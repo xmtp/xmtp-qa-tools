@@ -1,6 +1,6 @@
 {
   "name": "@xmtp/agent-starter",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "homepage": "https://github.com/ephemeraHQ/xmtp-agents",
   "bugs": {
     "url": "https://github.com/ephemeraHQ/xmtp-agents/issues"
