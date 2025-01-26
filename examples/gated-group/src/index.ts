@@ -20,7 +20,6 @@ async function main() {
           message.sender.address,
           client.address as string,
         );
-        console.log("Group created", group?.id);
         await client.send({
           message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://xmtp.chat/conversations/${group?.id}: \n- This url will deeplink to the group created\n- Once in the other group you can share the invite with your friends.`,
           originalMessage: message,
