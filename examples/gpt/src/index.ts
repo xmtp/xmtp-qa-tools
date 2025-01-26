@@ -36,7 +36,7 @@ async function main() {
   });
 
   console.log(
-    `XMTP agent initialized on ${client.address}\nSend a message on http://xmtp.chat/dm/${client.address}?env=production`,
+    `XMTP agent initialized on ${client.address}\nSend a message on http://xmtp.chat/dm/${client.address}`,
   );
 }
 
