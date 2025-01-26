@@ -209,7 +209,7 @@ Result:
 
 > Learn more about [`lookup`](/packages/lookup/) library
 
-## Quickstart
+## Development
 
 ```bash
 # clone the repository
