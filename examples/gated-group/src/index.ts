@@ -22,7 +22,7 @@ async function main() {
         );
         console.log("Group created", group?.id);
         await client.send({
-          message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://converse.xyz/group/${group?.id}: \n- This url will deelink to the group inside Converse\n- Once in the other group you can share the invite with your friends.`,
+          message: `Group created!\n- ID: ${group?.id}\n- Group URL: https://xmtp.chat/conversations/${group?.id}: \n- This url will deeplink to the group created\n- Once in the other group you can share the invite with your friends.`,
           originalMessage: message,
           metadata: {},
         });
