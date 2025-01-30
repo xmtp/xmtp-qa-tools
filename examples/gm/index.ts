@@ -1,14 +1,23 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
-import { Client, type Signer } from "@xmtp/node-sdk";
+import { Client } from "@xmtp/node-sdk";
+import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
 
-const signer: Signer = {
-  getAddress: () => "0x0000000000000000000000000000000000000000",
-  signMessage: () => Promise.resolve(new Uint8Array()),
-};
+const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
+
+if (!WALLET_KEY) {
+  throw new Error("WALLET_KEY must be set");
+}
+
+if (!ENCRYPTION_KEY) {
+  throw new Error("ENCRYPTION_KEY must be set");
+}
+
+const signer = createSigner(WALLET_KEY);
+const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
 async function main() {
-  console.log("Creating client...");
-  const client = await Client.create(signer, new Uint8Array());
+  console.log("Creating client on the 'dev' network...");
+  const client = await Client.create(signer, encryptionKey);
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
@@ -27,6 +36,11 @@ async function main() {
       !ContentTypeText.sameAs(message.contentType)
     ) {
       console.log("Invalid message, skipping", message);
+      continue;
+    }
+
+    // Ignore own messages
+    if (message.senderInboxId === client.inboxId) {
       continue;
     }
 
