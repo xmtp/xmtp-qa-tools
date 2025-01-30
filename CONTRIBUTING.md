@@ -40,4 +40,3 @@ This repository uses the [Yarn package manager](https://yarnpkg.com/). To use it
 - `yarn format:check`: Run prettier format check
 - `yarn lint`: Lint with ESLint
 - `yarn typecheck`: Typecheck with `tsc`
-
