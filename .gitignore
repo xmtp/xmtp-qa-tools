@@ -51,3 +51,6 @@ dist
 
 # typescript
 *.tsbuildinfo
+
+# xmtp
+*.db3*
