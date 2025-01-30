@@ -1,53 +1,43 @@
 # Contributing
 
-We appreciate your contributions! Here’s how to add new templates or examples quickly:
+Thank you for considering contributing to this repo! Community contributions like yours are key to the development and adoption of XMTP. Your questions, feedback, suggestions, and code contributions are welcome!
 
-## Getting started
+## ❔ Questions
 
-```bash
-# clone the repository
-git clone https://github.com/ephemeraHQ/xmtp-agents/
-cd xmtp-agents
+Have a question about how to build with XMTP? Ask your question and learn with the community in the [XMTP Community Forums](https://community.xmtp.org/).
 
-# install dependencies
-yarn install
-# build
-yarn build
+## 🐞 Bugs
 
-# run sample agents from the examples directory
-yarn examples
+Report a bug using [GitHub Issues](https://github.com/ephemeraHQ/xmtp-agent-examples/issues).
 
-# or run a specific example
-yarn examples gm
-```
+## ✨ Feature Requests
 
-> This runs the base agent locally. You can also launch specific examples via `yarn examples`.
+Request a feature using [GitHub Issues](https://github.com/ephemeraHQ/xmtp-agent-examples/issues).
 
-## Repo structure
+## 🔀 Pull Requests
 
-```
-xmtp-agents/
-├── packages/
-│   ├── agent-starter
-│   └── lookup
-└── examples/
-    ├── gated-group
-    └── ... [your new example here]
-```
+PRs are encouraged, but consider starting with a feature request to temperature-check first. If the PR involves a major change to the protocol, the work should be fleshed out as an [XMTP Improvement Proposal](https://community.xmtp.org/t/xip-0-xip-purpose-process-guidelines/475) before work begins.
 
-- **packages**: core libraries (`agent-starter`, `lookup`).
-- **examples**: standalone demos (e.g., `gated-group`).
+After a pull request is submitted, a single approval is required to merge it.
 
-## Adding an example
+## 🔧 Developing
 
-1. Create a new folder under `examples/`.
-2. Include a minimal README.md describing what it does and how to run it.
-3. Validate locally with `yarn examples your-example-name`.
+### Prerequisites
 
-## Submitting a PR
+#### Node
 
-1. Open a PR against `main`.
-2. Briefly describe the purpose of your example or changes.
-3. Wait for reviews/feedback, then merge once approved.
+Please make sure you have a compatible version as specified in `package.json`. We recommend using a Node version manager such as [nvm](https://github.com/nvm-sh/nvm) or [nodenv](https://github.com/nodenv/nodenv).
 
-Thank you for contributing! Feel free to open an issue if you have questions or need help.
+#### Yarn
+
+This repository uses the [Yarn package manager](https://yarnpkg.com/). To use it, enable [Corepack](https://yarnpkg.com/corepack), if it isn't already, by running `corepack enable`.
+
+### Useful commands
+
+- `yarn`: Installs all dependencies
+- `yarn clean`: Remove all `node_modules` folders
+- `yarn format`: Run prettier format and write changes
+- `yarn format:check`: Run prettier format check
+- `yarn lint`: Lint with ESLint
+- `yarn typecheck`: Typecheck with `tsc`
+
