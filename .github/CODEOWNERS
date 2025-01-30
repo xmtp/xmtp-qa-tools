@@ -1,4 +1,1 @@
-# Global rule for xmtp-agents package
-packages/xmtp-agents/* @ephemeraHQ/engineering
-
-# No specific code owners for other files, meaning no approval required
+*   @ephemeraHQ/engineering
