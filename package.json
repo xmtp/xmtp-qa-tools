@@ -1,47 +1,40 @@
 {
-  "name": "xmtp-agents",
+  "name": "xmtp-agent-examples",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "packages/*",
-    "examples/*",
-    "shared/*"
-  ],
   "scripts": {
-    "build": "turbo run build",
-    "changeset": " changeset add --type patch",
-    "clean": "turbo run clean && yarn cache clean && find examples -name '.data' -type d -exec rm -rf {} +",
-    "dev": "cd packages/agent-starter && yarn build:watch",
-    "examples": "node scripts/examples.js",
+    "clean": "rimraf node_modules && yarn clean:dbs",
+    "clean:dbs": "rimraf *.db3* ||:",
+    "examples:gm": "tsx --env-file=.env examples/gm/index.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
-    "lint": "yarn build && eslint .",
-    "publish": "yarn build && changeset publish",
-    "test": "FORCE_COLOR=1 turbo run test",
-    "typecheck": "FORCE_COLOR=1 turbo run typecheck"
+    "gen:keys": "tsx scripts/generateKeys.ts",
+    "lint": "eslint .",
+    "typecheck": "tsc"
   },
   "dependencies": {
-    "@changesets/changelog-git": "^0.2.0",
-    "@changesets/cli": "^2.27.11",
-    "@clack/prompts": "^0.9.1",
-    "punycode": "^2.3.1",
-    "readline-sync": "^1.4.10"
+    "@xmtp/content-type-text": "^2.0.0",
+    "@xmtp/node-sdk": "^0.0.40",
+    "tsx": "^4.19.2",
+    "uint8arrays": "^5.1.0",
+    "viem": "^2.22.17"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.5",
-    "@eslint/js": "^9.18.0",
+    "@eslint/js": "^9.19.0",
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@types/eslint__js": "^8.42.3",
-    "eslint": "^9.18.0",
+    "@types/node": "^22.12.0",
+    "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
     "globals": "^15.14.0",
     "prettier": "^3.4.2",
     "prettier-plugin-packagejson": "^2.5.8",
-    "turbo": "^2.3.4",
+    "rimraf": "^6.0.1",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.21.0"
+    "typescript-eslint": "^8.22.0"
   },
   "packageManager": "yarn@4.6.0",
   "engines": {
