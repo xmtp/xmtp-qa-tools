@@ -14,47 +14,31 @@ This repository contains examples of agents that use the XMTP protocol.
 
 ## Environment variables
 
-To run your XMTP agent, you need two keys:
+To run your XMTP agent, you must create a `.env` file with the following variables:
 
 ```bash
 WALLET_KEY= # the private key of the wallet
-ENCRYPTION_KEY= # a second fixed or random 32 bytes encryption key for the local db
+ENCRYPTION_KEY= # encryption key for the local database
 ```
+
+You can generate random keys with the following command:
+
+```bash
+yarn gen:keys
+```
+
+> [!WARNING]
+> Running the `gen:keys` script will overwrite the existing `.env` file.
 
 ## Examples
 
-Various examples and tutorials to help you get started with creating and deploying your own agents using XMTP.
-
-- [gated-group](/examples/gated-group/): Create a gated group chat that verifies NFT ownership using Alchemy.
-- [gm](/examples/gm/): A simple agent that replies with `gm`.
+- [gm](/examples/gm/): A simple agent that replies to all text messages with "gm".
 
 > See all the available [examples](/examples/).
 
-## Groups
-
-> [!NOTE]
-> You need to add the agent **as a member** to the group.
-
-To create a group from your agent, you can use the following code:
-
-```tsx
-const group = await client?.conversations.newGroup([address1, address2]);
-```
-
-As an admin you can add members to the group.
-
-```tsx
-// get the group
-await group.sync();
-//By address
-await group.addMembers([0xaddresses]);
-```
-
-> To learn more about groups, read the [XMTP documentation](https://docs.xmtp.org).
-
 ## Web inbox
 
-Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat) the official web inbox for developers using the latest version powered by MLS.
+Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat), the official web inbox for developers.
 
 ![](/media/chat.png)
 
