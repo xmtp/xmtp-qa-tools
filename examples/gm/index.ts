@@ -1,5 +1,5 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
-import { Client } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
 
 const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
@@ -15,15 +15,17 @@ if (!ENCRYPTION_KEY) {
 const signer = createSigner(WALLET_KEY);
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
+const env: XmtpEnv = "dev";
+
 async function main() {
-  console.log("Creating client on the 'dev' network...");
-  const client = await Client.create(signer, encryptionKey);
+  console.log(`Creating client on the '${env}' network...`);
+  const client = await Client.create(signer, encryptionKey, { env });
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
   console.log(
-    `XMTP agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}`,
+    `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}`,
   );
 
   console.log("Waiting for messages...");
@@ -59,7 +61,8 @@ async function main() {
 
     console.log(`Sending "gm" response...`);
     await conversation.send("gm");
-    console.log("Done");
+
+    console.log("Waiting for messages...");
   }
 }
 
