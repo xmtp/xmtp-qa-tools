@@ -875,23 +875,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:^0.0.35":
-  version: 0.0.35
-  resolution: "@xmtp/node-bindings@npm:0.0.35"
-  checksum: 10/c6946dd2e99ef5e3056f73590846a0f9b9be0ef3d61101ea547793801232362fa79495c2ebd97d61ee2a21e350779fe21f4ef810f590688051817beb90b0a8cb
+"@xmtp/node-bindings@npm:^0.0.34":
+  version: 0.0.34
+  resolution: "@xmtp/node-bindings@npm:0.0.34"
+  checksum: 10/4f5314d40dc1f07e303e52a4be1d4517f1199089b4ac1677fabb11f64a6b4f57a989b25849b31036d6d228e9de494a8326d2b53386067146ee47e28691bba999
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:^0.0.41":
-  version: 0.0.41
-  resolution: "@xmtp/node-sdk@npm:0.0.41"
+"@xmtp/node-sdk@npm:0.0.40":
+  version: 0.0.40
+  resolution: "@xmtp/node-sdk@npm:0.0.40"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.35"
+    "@xmtp/node-bindings": "npm:^0.0.34"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/655393ccbe7b322c90f03b7f1b464bf73a99cd25577285b4965e7b5b6e699948264dee2962c0d0f5c0a544d84fa2882c4f16179f6daf377827d4a17fef4e7eb2
+  checksum: 10/eeed6072513dbf1c5ed7f0cfb9d5876c086d648b3fe93d757f0fefa87d03312a8aa5b3f3256b27339b37bbddf75c604eade1480a643909e04dc3865903915b2f
   languageName: node
   linkType: hard
 
@@ -3090,7 +3090,7 @@ __metadata:
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^22.13.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-sdk": "npm:^0.0.41"
+    "@xmtp/node-sdk": "npm:0.0.40"
     eslint: "npm:^9.19.0"
     eslint-config-prettier: "npm:^10.0.1"
     eslint-plugin-prettier: "npm:^5.2.3"
