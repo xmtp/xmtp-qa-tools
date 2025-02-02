@@ -40,7 +40,7 @@ yarn gen:keys
 
 ## Web inbox
 
-Interact with the XMTP protocol using [xmtp.chat](https://xmtp.chat), the official web inbox for developers.
+Interact with the XMTP network using [xmtp.chat](https://xmtp.chat), the official web inbox for developers.
 
 ![](/media/chat.png)
 
