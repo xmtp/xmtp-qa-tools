@@ -4,7 +4,6 @@
 node_modules
 .yarn/
 .vscode/
-.github/
 .env
 # testing
 coverage
