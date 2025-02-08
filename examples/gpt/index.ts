@@ -1,7 +1,7 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
+import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
 const { WALLET_KEY, ENCRYPTION_KEY, OPENAI_API_KEY } = process.env;
 

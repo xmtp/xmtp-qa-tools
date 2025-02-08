@@ -2,7 +2,7 @@ import { writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { generatePrivateKey } from "viem/accounts";
-import { generateEncryptionKeyHex } from "@/helpers";
+import { generateEncryptionKeyHex } from "../helpers/client";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 

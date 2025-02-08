@@ -1,7 +1,7 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { Alchemy, Network } from "alchemy-sdk";
-import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
+import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key

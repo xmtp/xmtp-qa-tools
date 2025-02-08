@@ -17,9 +17,9 @@
     "strict": true,
     "esModuleInterop": true,
     "target": "ESNext",
-    "types": ["node"],
+    "types": ["node", "vitest"],
     "paths": {
-      "@/helpers": ["./helpers/index.ts"]
+      "@helpers/*": ["./helpers/*"]
     }
   },
   "include": ["**/*.ts"]

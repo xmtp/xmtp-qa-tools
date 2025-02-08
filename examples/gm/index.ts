@@ -1,6 +1,6 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
-import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
+import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
 const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
 
