@@ -29,20 +29,15 @@ describe("Centralized test for multiple agents", () => {
 
       const aliceAddress = alice.client.accountAddress as string;
 
+      let wasReplied = false;
+      let wasSent = false;
       await Promise.all([
-        alice.waitForReply("Hello, Alice!"),
-        bob.sendMessage(aliceAddress, "Hello, Alice!"),
+        (wasReplied = await alice.waitForReply("Hello, Alice!")),
+        (wasSent = await bob.sendMessage(aliceAddress, "Hello, Alice!")),
       ]);
-      //const bobReceivedGM = await bob.waitForReply("gm");
 
-      // console.log("message", message);
-      // console.log("aliceReplied", aliceReplied);
-
-      // const bobReceivedGM = await bob.waitForReply("gm");
-      // console.log("bobReceivedGM", bobReceivedGM);
-
-      // expect(aliceReplied).toBe(true);
-      // expect(bobReceivedGM).toBe(true);
+      expect(wasReplied).toBe(true);
+      expect(wasSent).toBe(true);
     },
     TIMEOUT,
   );

@@ -54,12 +54,12 @@ export class AgentManager {
     this.installationId = config.installationId;
   }
 
-  async sendMessage(to: string, message: string): Promise<string> {
+  async sendMessage(to: string, message: string): Promise<boolean> {
     try {
       const conversation = await this.client.conversations.newDm(to);
       await conversation.send(message);
       console.log("message sent");
-      return message;
+      return true;
     } catch (error) {
       console.error("Error sending message:", error);
       throw error;
