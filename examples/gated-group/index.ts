@@ -1,6 +1,6 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { Alchemy, Network } from "alchemy-sdk";
+import { Client, type XmtpEnv } from "node-sdk-42";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
 const settings = {
@@ -40,17 +40,11 @@ async function main() {
   const stream = client.conversations.streamAllMessages();
 
   for await (const message of await stream) {
+    /* Ignore messages from the same agent or non-text messages */
     if (
-      !message ||
-      !message.contentType ||
-      !ContentTypeText.sameAs(message.contentType)
+      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
+      message?.contentType?.typeId !== "text"
     ) {
-      console.log("Invalid message, skipping", message?.contentType?.typeId);
-      continue;
-    }
-
-    // Ignore own messages
-    if (message.senderInboxId === client.inboxId) {
       continue;
     }
 

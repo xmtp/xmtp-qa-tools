@@ -1,9 +1,8 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "node-sdk-42";
-import OpenAI from "openai";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
-const { WALLET_KEY, ENCRYPTION_KEY, OPENAI_API_KEY } = process.env;
+const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
 
 if (!WALLET_KEY) {
   throw new Error("WALLET_KEY must be set");
@@ -13,27 +12,20 @@ if (!ENCRYPTION_KEY) {
   throw new Error("ENCRYPTION_KEY must be set");
 }
 
-if (!OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY must be set");
-}
-
 const signer = createSigner(WALLET_KEY);
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
-const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const env: XmtpEnv = "dev";
 
 async function main() {
   console.log(`Creating client on the '${env}' network...`);
-  const client = await Client.create(signer, encryptionKey, {
-    env,
-  });
+  const client = await Client.create(signer, encryptionKey, { env });
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
   console.log(
-    `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}`,
+    `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
   );
 
   console.log("Waiting for messages...");
@@ -47,6 +39,7 @@ async function main() {
     ) {
       continue;
     }
+
     console.log(
       `Received message: ${message.content as string} by ${message.senderInboxId}`,
     );
@@ -60,22 +53,32 @@ async function main() {
       continue;
     }
 
-    try {
-      const completion = await openai.chat.completions.create({
-        messages: [{ role: "user", content: message.content as string }],
-        model: "gpt-3.5-turbo",
+    if (message.content === "/gm") {
+      console.log(`Sending "gm" response...`);
+      await conversation.send("gm");
+    } else if (message.content === "/group") {
+      console.log("Creating group...");
+      const groupName = `gm-${new Date().toISOString().split("T")[0]}`;
+      const group = await client.conversations.newGroup([], {
+        groupName: groupName,
+        groupDescription: groupName,
       });
+      console.log("Group created", group.id);
 
-      const response =
-        completion.choices[0]?.message?.content ||
-        "I'm not sure how to respond to that.";
-      console.log(`Sending AI response: ${response}`);
-      await conversation.send(response);
-    } catch (error) {
-      console.error("Error getting AI response:", error);
-      await conversation.send(
-        "Sorry, I encountered an error processing your message.",
+      await group.addMembersByInboxId([message.senderInboxId]);
+      await group.addSuperAdmin(message.senderInboxId);
+      console.log(
+        "Sender is superAdmin",
+        group.isSuperAdmin(message.senderInboxId),
       );
+
+      await group.send("gm");
+
+      await conversation.send(
+        `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Name: ${groupName}\n- Description: ${groupName}`,
+      );
+    } else {
+      console.log("Unknown command, skipping");
     }
 
     console.log("Waiting for messages...");

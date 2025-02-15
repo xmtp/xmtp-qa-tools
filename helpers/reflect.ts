@@ -3,6 +3,12 @@ interface RunSendingGmTestResult {
   // Add other properties if needed
 }
 
+interface ExecutionStatus {
+  tests: Array<{
+    status: string;
+  }>;
+}
+
 export class ReflectTestSuite {
   /**
    * Run the "Sending a GM" test with specific local storage settings.
@@ -39,15 +45,15 @@ export class ReflectTestSuite {
 
     const result = await response.json();
     console.log("Sending GM Test executed successfully", result);
-    return result;
+    return result as RunSendingGmTestResult;
   }
 
   /**
    * Get the execution status of a test.
    * @param {number} executionId - The ID of the execution to check.
-   * @returns {Promise<Object>} The execution status and test results.
+   * @returns {Promise<ExecutionStatus>} The execution status and test results.
    */
-  async getExecutionStatus(executionId: number): Promise<object> {
+  async getExecutionStatus(executionId: number): Promise<ExecutionStatus> {
     console.log("Getting execution status for", executionId);
     const response = await fetch(
       `https://api.reflect.run/v1/executions/${executionId}`,
@@ -66,7 +72,7 @@ export class ReflectTestSuite {
 
     const result = await response.json();
     //console.log("Execution status retrieved successfully", result);
-    return result;
+    return result as ExecutionStatus;
   }
 
   /**
@@ -80,9 +86,12 @@ export class ReflectTestSuite {
     while (!allTestsCompleted) {
       const status = await reflectTestSuite.getExecutionStatus(executionId);
 
-      allTestsCompleted = status.tests.every(
-        (test: any) => test.status === "succeeded" || test.status === "failed",
-      );
+      allTestsCompleted = status.tests.every((test) => {
+        return (
+          typeof test.status === "string" &&
+          (test.status === "succeeded" || test.status === "failed")
+        );
+      });
 
       if (!allTestsCompleted) {
         console.log("Waiting for tests to complete...");

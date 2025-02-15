@@ -66,20 +66,13 @@ async function main() {
   const stream = client.conversations.streamAllMessages();
 
   for await (const message of await stream) {
+    /* Ignore messages from the same agent or non-text messages */
     if (
-      !message ||
-      !message.contentType ||
-      !ContentTypeText.sameAs(message.contentType)
+      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
+      message?.contentType?.typeId !== "text"
     ) {
-      console.log("Invalid message, skipping", message);
       continue;
     }
-
-    // Ignore own messages
-    if (message.senderInboxId === client.inboxId) {
-      continue;
-    }
-
     console.log(
       `Received message: ${message.content as string} by ${message.senderInboxId}`,
     );

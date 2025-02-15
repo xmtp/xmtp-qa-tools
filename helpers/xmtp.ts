@@ -1,5 +1,4 @@
-import { type Client } from "@xmtp/node-sdk";
-
+import { type Client } from "node-sdk-42";
 
 /**
  * Listen to messages and respond with "gm".
