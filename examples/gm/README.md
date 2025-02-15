@@ -4,8 +4,6 @@ This agent replies `gm`
 
 > Try XMTP using [xmtp.chat](https://xmtp.chat)
 
-![](/media/gm.png)
-
 ## Basic usage
 
 ```tsx
