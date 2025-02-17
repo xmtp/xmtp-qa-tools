@@ -1,6 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import { Client as Client38 } from "node-sdk-38";
 import { Client as Client39 } from "node-sdk-39";
 import { Client as Client40 } from "node-sdk-40";
@@ -8,14 +5,14 @@ import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
 
-export interface AgentConfig {
+export interface ClientConfig {
   version: string;
   env: XmtpEnv;
   name: string;
   installationId: string;
 }
 
-export class AgentManager {
+export class ClientManager {
   public client!: Client38 | Client39 | Client40 | Client41 | Client42;
   private clientType!:
     | typeof Client38
@@ -29,7 +26,7 @@ export class AgentManager {
   private name: string;
   private installationId: string;
 
-  constructor(config: AgentConfig) {
+  constructor(config: ClientConfig) {
     if (config.version === "38") {
       this.clientType = Client38;
     } else if (config.version === "39") {
@@ -56,6 +53,7 @@ export class AgentManager {
 
   async sendMessage(to: string, message: string): Promise<boolean> {
     try {
+      await this.client.conversations.sync();
       const conversation = await this.client.conversations.newDm(to);
       await conversation.send(message);
       console.log("message sent");
@@ -68,7 +66,9 @@ export class AgentManager {
 
   async waitForReply(expectedMessage: string): Promise<boolean> {
     try {
+      await this.client.conversations.sync();
       const stream = await this.client.conversations.streamAllMessages();
+
       for await (const message of stream) {
         if (
           message?.senderInboxId.toLowerCase() ===
@@ -90,7 +90,6 @@ export class AgentManager {
   }
   async initialize(): Promise<void> {
     const env = this.env;
-    console.log(this.clientType);
     this.client = await this.clientType.create(
       this.signer,
       this.encryptionKey,
