@@ -5,6 +5,8 @@ import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
 
+export type { XmtpEnv };
+
 export interface ClientConfig {
   version: string;
   env: XmtpEnv;
@@ -22,6 +24,7 @@ export class ClientManager {
     | typeof Client42;
   private encryptionKey: Uint8Array;
   private signer: Signer;
+  public version: string;
   private env: XmtpEnv;
   private name: string;
   private installationId: string;
@@ -39,6 +42,7 @@ export class ClientManager {
       this.clientType = Client42;
     }
 
+    this.version = config.version;
     this.signer = createSigner(
       process.env[`WALLET_KEY_${config.name.toUpperCase()}`] as `0x${string}`,
     );
@@ -63,7 +67,24 @@ export class ClientManager {
       throw error;
     }
   }
+  static async sendMessageAndVerify(
+    sender: ClientManager,
+    receiver: ClientManager,
+  ): Promise<boolean> {
+    const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
+    const receiverAddress = receiver.client.accountAddress;
+    let receivedMessage = false;
+
+    await Promise.all([
+      receiver
+        .waitForReply(message)
+        .then((result) => (receivedMessage = result)),
+      sender.sendMessage(receiverAddress, message),
+    ]);
+
+    return receivedMessage;
+  }
   async waitForReply(expectedMessage: string): Promise<boolean> {
     try {
       await this.client.conversations.sync();

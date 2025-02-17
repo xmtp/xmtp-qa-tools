@@ -1,51 +1,41 @@
 import fs from "fs";
 import dotenv from "dotenv";
 import { beforeAll, describe, expect, it } from "vitest";
-import { ClientManager } from "../helpers/manager";
+import { ClientManager, type XmtpEnv } from "../helpers/manager";
 
 dotenv.config();
 
 const TIMEOUT = 20000;
-const environments = ["dev"];
+const environments: XmtpEnv[] = ["dev"];
 const versions = ["40", "41", "42"];
 const installationIds = ["a", "b"];
 
 // Configuration object to specify which tests or describe blocks to skip
 const config = {
-  skipTests: [
-    {
-      bobVersion: "40",
-      aliceVersion: "41",
-      bobInstallationId: "a",
-      aliceInstallationId: "b",
-    },
-    // Add more test combinations to skip as needed
+  skipVersions: [
+    { origin: "40", destiny: "41" },
+    { origin: "40", destiny: "42" },
+    // Add more version pairs to skip as needed
   ],
-  skipDescribeBlocks: [
-    "Test for all version combinations in DMs using a new installation",
-    // Add more describe block titles to skip as needed
+
+  dontSkipDescribeBlocks: [
+    //"Test for all version combinations in DMs using the same installation",
+    //"Test for all version combinations in DMs using a new installation",
+    "Test version updates on the same installation",
   ],
 };
 
-// Function to check if a test should be skipped
-function shouldSkipTest(
-  bobVersion,
-  aliceVersion,
-  bobInstallationId,
-  aliceInstallationId,
-) {
-  return config.skipTests.some(
-    (test) =>
-      test.bobVersion === bobVersion &&
-      test.aliceVersion === aliceVersion &&
-      test.bobInstallationId === bobInstallationId &&
-      test.aliceInstallationId === aliceInstallationId,
+// Function to check if a test should be skipped based on version flow
+function shouldSkipVersionFlow(bobVersion: string, aliceVersion: string) {
+  return config.skipVersions.some(
+    (versionPair) =>
+      versionPair.origin === bobVersion && versionPair.destiny === aliceVersion,
   );
 }
 
 // Function to check if a describe block should be skipped
-function shouldSkipDescribe(title) {
-  return config.skipDescribeBlocks.includes(title);
+function shouldSkipDescribe(title: string) {
+  return !config.dontSkipDescribeBlocks.includes(title);
 }
 
 if (
@@ -69,62 +59,40 @@ if (
                 if (
                   (bobVersion !== aliceVersion ||
                     bobInstallationId !== aliceInstallationId) &&
-                  !shouldSkipTest(
-                    bobVersion,
-                    aliceVersion,
-                    bobInstallationId,
-                    aliceInstallationId,
-                  )
+                  !shouldSkipVersionFlow(bobVersion, aliceVersion)
                 ) {
+                  const testName = `Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`;
                   it(
-                    `bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`,
+                    testName,
                     async () => {
-                      const bob = new ClientManager({
-                        env,
-                        version: bobVersion,
-                        name: "Bob",
-                        installationId: bobInstallationId,
-                      });
+                      try {
+                        const bob = new ClientManager({
+                          env,
+                          version: bobVersion,
+                          name: "Bob",
+                          installationId: bobInstallationId,
+                        });
 
-                      const alice = new ClientManager({
-                        env,
-                        version: aliceVersion,
-                        name: "Alice",
-                        installationId: aliceInstallationId,
-                      });
+                        const alice = new ClientManager({
+                          env,
+                          version: aliceVersion,
+                          name: "Alice",
+                          installationId: aliceInstallationId,
+                        });
 
-                      await bob.initialize();
-                      await alice.initialize();
+                        await bob.initialize();
+                        await alice.initialize();
 
-                      const gm =
-                        "gm-" + Math.random().toString(36).substring(2, 15);
-
-                      let receivedMessage = false;
-                      if (
-                        (bobInstallIndex + bobVersion.charCodeAt(0)) % 2 ===
-                        0
-                      ) {
                         // Bob sends, Alice receives
-                        const aliceAddress = alice.client.accountAddress;
-
-                        await Promise.all([
-                          alice
-                            .waitForReply(gm)
-                            .then((result) => (receivedMessage = result)),
-                          bob.sendMessage(aliceAddress, gm),
-                        ]);
-                      } else {
-                        // Alice sends, Bob receives
-                        const bobAddress = bob.client.accountAddress;
-
-                        await Promise.all([
-                          bob
-                            .waitForReply(gm)
-                            .then((result) => (receivedMessage = result)),
-                          alice.sendMessage(bobAddress, gm),
-                        ]);
+                        const success =
+                          await ClientManager.sendMessageAndVerify(bob, alice);
+                        expect(success).toBe(true);
+                      } catch (error) {
+                        console.error(
+                          `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
+                          error,
+                        );
                       }
-                      expect(receivedMessage).toBe(true);
                     },
                     TIMEOUT,
                   );
@@ -143,7 +111,10 @@ if (
   )
 ) {
   describe("Test for all version combinations in DMs using a new installation", () => {
-    beforeAll(() => {});
+    beforeAll(() => {
+      //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
+      fs.rmSync(".data", { recursive: true, force: true });
+    });
 
     environments.forEach((env) => {
       installationIds.forEach((bobInstallationId, bobInstallIndex) => {
@@ -155,64 +126,41 @@ if (
                 if (
                   (bobVersion !== aliceVersion ||
                     bobInstallationId !== aliceInstallationId) &&
-                  !shouldSkipTest(
-                    bobVersion,
-                    aliceVersion,
-                    bobInstallationId,
-                    aliceInstallationId,
-                  )
+                  !shouldSkipVersionFlow(bobVersion, aliceVersion)
                 ) {
-                  //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
-                  fs.rmSync(".data", { recursive: true, force: true });
+                  const testName = `Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`;
+
                   it(
-                    `bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`,
+                    testName,
                     async () => {
-                      const bob = new ClientManager({
-                        env,
-                        version: bobVersion,
-                        name: "Bob",
-                        installationId: bobInstallationId,
-                      });
+                      try {
+                        const bob = new ClientManager({
+                          env,
+                          version: bobVersion,
+                          name: "Bob",
+                          installationId: bobInstallationId,
+                        });
 
-                      const alice = new ClientManager({
-                        env,
-                        version: aliceVersion,
-                        name: "Alice",
-                        installationId: aliceInstallationId,
-                      });
+                        const alice = new ClientManager({
+                          env,
+                          version: aliceVersion,
+                          name: "Alice",
+                          installationId: aliceInstallationId,
+                        });
 
-                      await bob.initialize();
-                      await alice.initialize();
+                        await bob.initialize();
+                        await alice.initialize();
 
-                      const gm =
-                        "gm-" + Math.random().toString(36).substring(2, 15);
+                        const success =
+                          await ClientManager.sendMessageAndVerify(bob, alice);
 
-                      let receivedMessage = false;
-                      if (
-                        (bobInstallIndex + bobVersion.charCodeAt(0)) % 2 ===
-                        0
-                      ) {
-                        // Bob sends, Alice receives
-                        const aliceAddress = alice.client.accountAddress;
-
-                        await Promise.all([
-                          alice
-                            .waitForReply(gm)
-                            .then((result) => (receivedMessage = result)),
-                          bob.sendMessage(aliceAddress, gm),
-                        ]);
-                      } else {
-                        // Alice sends, Bob receives
-                        const bobAddress = bob.client.accountAddress;
-
-                        await Promise.all([
-                          bob
-                            .waitForReply(gm)
-                            .then((result) => (receivedMessage = result)),
-                          alice.sendMessage(bobAddress, gm),
-                        ]);
+                        expect(success).toBe(true);
+                      } catch (error) {
+                        console.error(
+                          `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
+                          error,
+                        );
                       }
-                      expect(receivedMessage).toBe(true);
                     },
                     TIMEOUT,
                   );
@@ -220,6 +168,73 @@ if (
               });
             });
           });
+      });
+    });
+  });
+}
+
+if (!shouldSkipDescribe("Test version updates on the same installation")) {
+  describe("Test version updates on the same installation", () => {
+    beforeAll(() => {
+      // Ensure the data folder is clean before running tests
+      fs.rmSync(".data", { recursive: true, force: true });
+    });
+
+    environments.forEach((env) => {
+      installationIds.forEach((installationId) => {
+        versions.forEach((initialVersion, index) => {
+          versions.slice(index + 1).forEach((updatedVersion) => {
+            if (
+              (initialVersion !== updatedVersion ||
+                installationId !== installationId) &&
+              !shouldSkipVersionFlow(initialVersion, updatedVersion)
+            ) {
+              it(
+                `updates from version: ${initialVersion} to version: ${updatedVersion} on installationId: ${installationId} with env: ${env}`,
+                async () => {
+                  try {
+                    const bob = new ClientManager({
+                      env,
+                      version: initialVersion,
+                      name: "Bob",
+                      installationId,
+                    });
+
+                    const alice = new ClientManager({
+                      env,
+                      version: updatedVersion,
+                      name: "Alice",
+                      installationId,
+                    });
+
+                    await bob.initialize();
+                    await alice.initialize();
+                    const success = await ClientManager.sendMessageAndVerify(
+                      bob,
+                      alice,
+                    );
+
+                    // Simulate version update
+                    bob.version = updatedVersion;
+                    await bob.initialize();
+
+                    const successUpdated =
+                      await ClientManager.sendMessageAndVerify(bob, alice);
+
+                    expect(success).toBe(true);
+                    expect(successUpdated).toBe(true);
+                  } catch (error) {
+                    console.error(
+                      `Error in test case for Bob (version: ${initialVersion}, installationId: ${installationId}) -> Alice (version: ${updatedVersion}, installationId: ${installationId}):`,
+                      error,
+                    );
+                  }
+                },
+                TIMEOUT * 2,
+              );
+            }
+          });
+        });
       });
     });
   });
