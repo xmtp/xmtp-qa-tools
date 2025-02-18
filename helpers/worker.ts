@@ -1,10 +1,23 @@
 /* eslint-disable */
-import { Worker, type WorkerOptions } from "node:worker_threads";
-import { parentPort } from "worker_threads";
-import dotenv from "dotenv";
+
+import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
 import { ClientManager } from "./manager";
 
-const worker = /* JavaScript */ `
+// Types
+export type WorkerMessage = {
+  type: string;
+  [key: string]: any;
+};
+
+export type WorkerConfig = {
+  name: string;
+  env?: string;
+  version?: string;
+  installationId?: string;
+};
+
+// Worker bootstrap code
+const workerBootstrap = /* JavaScript */ `
   import { createRequire } from "node:module";
   import { workerData } from "node:worker_threads";
 
@@ -14,22 +27,15 @@ const worker = /* JavaScript */ `
   
   tsImport(workerData.__ts_worker_filename, filename);
 `;
-export function createWorkerPair(workerPath: string | URL): {
-  aliceWorker: TsWorker;
-  bobWorker: TsWorker;
-} {
-  const aliceWorker = TsWorker.createWorker("Alice", workerPath);
-  const bobWorker = TsWorker.createWorker("Bob", workerPath);
 
-  return { aliceWorker, bobWorker };
-}
-export class TsWorker extends Worker {
+// Main Worker Client class
+export class WorkerClient extends Worker {
   name: string;
 
   constructor(filename: string | URL, options: WorkerOptions = {}) {
     options.workerData ??= {};
     options.workerData.__ts_worker_filename = filename.toString();
-    super(new URL(`data:text/javascript,${worker}`), options);
+    super(new URL(`data:text/javascript,${workerBootstrap}`), options);
   }
 
   setupLogging(name: string) {
@@ -47,44 +53,40 @@ export class TsWorker extends Worker {
     return this;
   }
 
-  static createWorker(name: string, workerPath: string | URL): TsWorker {
-    const worker = new TsWorker(workerPath, {
-      stderr: true,
-      stdout: true,
-    });
-    return worker.setupLogging(name);
+  async initialize(config: WorkerConfig): Promise<string> {
+    this.postMessage({ type: "initialize", ...config });
+    const response = await this.waitForMessage<{ clientAddress: string }>(
+      "clientInitialized",
+    );
+    return response.clientAddress;
   }
-  async initialize(config: {
-    name: string;
-    env?: string;
-    version?: string;
-    installationId?: string;
-  }): Promise<string> {
-    return new Promise((resolve, reject) => {
-      this.postMessage({
-        type: "initialize",
-        ...config,
-      });
 
-      this.on("message", (msg: WorkerMessage) => {
-        if (msg.type === "clientInitialized") {
-          console.log(
-            `${this.name} initialized successfully with address:`,
-            msg.clientAddress,
-          );
-          resolve(msg.clientAddress);
-        } else if (msg.type === "error") {
-          reject(new Error(msg.error));
-        }
-      });
-    });
+  async sendMessage(recipientAddress: string, message: string): Promise<void> {
+    this.postMessage({ type: "sendMessage", recipientAddress, message });
+    await this.waitForMessage("messageSent");
   }
-  async waitForMessage<T = any>(messageType: string): Promise<T> {
+
+  async receiveMessage(
+    senderAddress: string,
+    expectedMessage: string,
+  ): Promise<string> {
+    this.postMessage({
+      type: "receiveMessage",
+      senderAddress,
+      expectedMessage,
+    });
+    const response = await this.waitForMessage<{ message: string }>(
+      "messageReceived",
+    );
+    return response.message;
+  }
+
+  private async waitForMessage<T = any>(messageType: string): Promise<T> {
     return new Promise((resolve, reject) => {
-      const handler = (msg: any) => {
+      const handler = (msg: WorkerMessage) => {
         if (msg.type === messageType) {
           this.removeListener("message", handler);
-          resolve(msg);
+          resolve(msg as T);
         } else if (msg.type === "error") {
           this.removeListener("message", handler);
           reject(new Error(msg.error));
@@ -93,97 +95,68 @@ export class TsWorker extends Worker {
       this.on("message", handler);
     });
   }
+
+  static createWorker(name: string, workerPath: string | URL): WorkerClient {
+    const worker = new WorkerClient(workerPath, { stderr: true, stdout: true });
+    return worker.setupLogging(name);
+  }
 }
 
-dotenv.config();
-
-if (!parentPort) {
-  throw new Error("This file should be run as a worker.");
+// Helper function to create worker pairs
+export function createWorkerPair(workerPath: string | URL) {
+  const aliceWorker = WorkerClient.createWorker("Alice", workerPath);
+  const bobWorker = WorkerClient.createWorker("Bob", workerPath);
+  return { aliceWorker, bobWorker };
 }
 
-(async () => {
-  try {
-    let client: ClientManager | undefined;
+// Worker implementation (runs in worker thread)
+if (parentPort) {
+  let client: ClientManager | undefined;
 
-    // Listen for messages
-    parentPort.on("message", async (data: any) => {
-      // Initialize client when name is received
-      if (data.type === "initialize" && data.name) {
-        try {
+  parentPort.on("message", async (data: WorkerMessage) => {
+    try {
+      switch (data.type) {
+        case "initialize": {
           client = new ClientManager({
             env: data.env || "dev",
             version: data.version || "42",
             name: data.name,
             installationId: data.installationId || "a",
           });
-
           await client.initialize();
-
           parentPort.postMessage({
             type: "clientInitialized",
             clientAddress: client.client.accountAddress,
             clientName: data.name,
           });
-        } catch (error: any) {
-          parentPort.postMessage({
-            type: "error",
-            error: error.message || String(error),
-          });
+          break;
         }
-      } else if (
-        data.type === "sendMessage" &&
-        data.recipientAddress &&
-        data.message
-      ) {
-        try {
-          if (!client) {
-            throw new Error("Client not initialized");
-          }
-          console.log(
-            `${client.name} sending message to`,
-            data.recipientAddress,
-          );
+
+        case "sendMessage": {
+          if (!client) throw new Error("Client not initialized");
           await client.sendMessage(data.recipientAddress, data.message);
           parentPort.postMessage({
             type: "messageSent",
             message: data.message,
           });
-        } catch (error: any) {
-          parentPort.postMessage({
-            type: "error",
-            error: error.message || String(error),
-          });
+          break;
         }
-      } else if (
-        data.type === "receiveMessage" &&
-        data.senderAddress &&
-        data.expectedMessage
-      ) {
-        console.log(
-          `${client?.name} receiving message from`,
-          data.senderAddress,
-        );
-        try {
-          if (!client) {
-            throw new Error("Client not initialized");
-          }
+
+        case "receiveMessage": {
+          if (!client) throw new Error("Client not initialized");
           const message = await client.receiveMessage(data.expectedMessage);
           parentPort.postMessage({
             type: "messageReceived",
             message: message,
           });
-        } catch (error: any) {
-          parentPort.postMessage({
-            type: "error",
-            error: error.message || String(error),
-          });
+          break;
         }
       }
-    });
-  } catch (error: any) {
-    parentPort.postMessage({
-      type: "error",
-      error: error.message || String(error),
-    });
-  }
-})();
+    } catch (error: any) {
+      parentPort.postMessage({
+        type: "error",
+        error: error.message || String(error),
+      });
+    }
+  });
+}
