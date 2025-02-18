@@ -1,48 +1,48 @@
-import { Worker } from "worker_threads";
 import dotenv from "dotenv";
 import { describe, it } from "vitest";
+import { TsWorker } from "../helpers/worker";
 
 dotenv.config();
 
-const TIMEOUT = 80000;
+const TIMEOUT = 20000;
 
 describe("Parallel DM flows using worker threads", () => {
   it(
     "should deliver all messages concurrently",
     async () => {
-      console.log("Starting test with timeout of", TIMEOUT, "ms");
+      console.log("Starting test with timeout of", TIMEOUT / 1000, "seconds");
 
-      // Create both workers using the same worker file
-      console.log("Creating workers...");
-      const workerPath = new URL(
-        "../helpers/js/client_worker.js",
-        import.meta.url,
+      // Replace Worker instantiation with TsWorker
+      const aliceWorker = new TsWorker(
+        new URL("../helpers/worker.ts", import.meta.url),
+        {
+          stderr: true,
+          stdout: true,
+        },
       );
 
-      const aliceWorker = new Worker(workerPath, {
-        stderr: true,
-        stdout: true,
-      });
+      const bobWorker = new TsWorker(
+        new URL("../helpers/worker.ts", import.meta.url),
+        {
+          stderr: true,
+          stdout: true,
+        },
+      );
+      // // Add stdout and stderr logging for Alice
+      // aliceWorker.stdout.on("data", (data) => {
+      //   console.log("Alice stdout:", data.toString());
+      // });
+      // aliceWorker.stderr.on("data", (data) => {
+      //   console.error("Alice stderr:", data.toString());
+      // });
 
-      const bobWorker = new Worker(workerPath, {
-        stderr: true,
-        stdout: true,
-      });
-      // Add stdout and stderr logging for Alice
-      aliceWorker.stdout.on("data", (data) => {
-        console.log("Alice stdout:", data.toString());
-      });
-      aliceWorker.stderr.on("data", (data) => {
-        console.error("Alice stderr:", data.toString());
-      });
-
-      // Add stdout and stderr logging for Bob
-      bobWorker.stdout.on("data", (data) => {
-        console.log("Bob stdout:", data.toString());
-      });
-      bobWorker.stderr.on("data", (data) => {
-        console.error("Bob stderr:", data.toString());
-      });
+      // // Add stdout and stderr logging for Bob
+      // bobWorker.stdout.on("data", (data) => {
+      //   console.log("Bob stdout:", data.toString());
+      // });
+      // bobWorker.stderr.on("data", (data) => {
+      //   console.error("Bob stderr:", data.toString());
+      // });
 
       // Initialize both workers with different names
       aliceWorker.postMessage({ type: "initialize", name: "Alice" });
@@ -75,7 +75,6 @@ describe("Parallel DM flows using worker threads", () => {
           let messageReceived = false;
 
           aliceWorker.on("message", (msg: any) => {
-            console.log("Alice worker message:", msg);
             if (msg.type === "messageReceived") {
               messageReceived = true;
               if (messageSent) {
@@ -87,7 +86,6 @@ describe("Parallel DM flows using worker threads", () => {
           });
 
           bobWorker.on("message", (msg: any) => {
-            console.log("Bob worker message:", msg);
             if (msg.type === "messageSent") {
               messageSent = true;
               if (messageReceived) {
@@ -113,10 +111,13 @@ describe("Parallel DM flows using worker threads", () => {
         );
         console.log("Bob initialized successfully with address:", bobAddress);
 
+        const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
         // Start Alice listening before Bob sends
         aliceWorker.postMessage({
           type: "receiveMessage",
           senderAddress: bobAddress,
+          expectedMessage: gmMessage,
         });
 
         // Add a small delay to ensure the stream is ready
@@ -126,6 +127,7 @@ describe("Parallel DM flows using worker threads", () => {
         bobWorker.postMessage({
           type: "sendMessage",
           recipientAddress: aliceAddress,
+          message: gmMessage,
         });
 
         // Wait for both operations to complete

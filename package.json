@@ -13,8 +13,8 @@
     "lint": "eslint .",
     "pretest": "yarn workers",
     "test": "vitest",
-    "typecheck": "tsc",
-    "workers": "tsx tests/workers/*.ts"
+    "testts": "node --loader ts-node/esm tests/tstest.test.ts",
+    "typecheck": "tsc"
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",

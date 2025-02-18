@@ -89,6 +89,30 @@ export class ClientManager {
 
     return receivedMessage;
   }
+
+  async receiveMessage(expectedMessage) {
+    try {
+      await this.client.conversations.sync();
+      const stream = await this.client.conversations.streamAllMessages();
+      for await (const message of stream) {
+        if (
+          message?.senderInboxId.toLowerCase() ===
+            this.client.inboxId.toLowerCase() ||
+          message?.contentType?.typeId !== "text"
+        ) {
+          continue;
+        }
+        if (message.content === expectedMessage) {
+          console.log("message received", expectedMessage);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error("Error waiting for reply:", error);
+      throw error;
+    }
+  }
   async waitForReply(expectedMessage: string): Promise<boolean> {
     try {
       await this.client.conversations.sync();
