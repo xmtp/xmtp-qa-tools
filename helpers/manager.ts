@@ -30,19 +30,8 @@ export class ClientManager {
   private installationId: string;
 
   constructor(config: ClientConfig) {
-    if (config.version === "38") {
-      this.clientType = Client38;
-    } else if (config.version === "39") {
-      this.clientType = Client39;
-    } else if (config.version === "40") {
-      this.clientType = Client40;
-    } else if (config.version === "41") {
-      this.clientType = Client41;
-    } else if (config.version === "42") {
-      this.clientType = Client42;
-    }
-
     this.version = config.version;
+    this.updateVersion(config.version);
     this.signer = createSigner(
       process.env[`WALLET_KEY_${config.name.toUpperCase()}`] as `0x${string}`,
     );
@@ -54,13 +43,28 @@ export class ClientManager {
     this.name = config.name;
     this.installationId = config.installationId;
   }
-
+  updateVersion(version: string) {
+    this.version = version;
+    if (version === "38") {
+      this.clientType = Client38;
+    } else if (version === "39") {
+      this.clientType = Client39;
+    } else if (version === "40") {
+      this.clientType = Client40;
+    } else if (version === "41") {
+      this.clientType = Client41;
+    } else if (version === "42") {
+      this.clientType = Client42;
+    }
+  }
   async sendMessage(to: string, message: string): Promise<boolean> {
     try {
       await this.client.conversations.sync();
       const conversation = await this.client.conversations.newDm(to);
       await conversation.send(message);
-      console.log("message sent");
+      console.log(
+        "message sent: " + message + " to " + to + " version " + this.version,
+      );
       return true;
     } catch (error) {
       console.error("Error sending message:", error);
@@ -91,6 +95,7 @@ export class ClientManager {
       const stream = await this.client.conversations.streamAllMessages();
 
       for await (const message of stream) {
+        console.log("message received", message);
         if (
           message?.senderInboxId.toLowerCase() ===
             this.client.inboxId.toLowerCase() ||

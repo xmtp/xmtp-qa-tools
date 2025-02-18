@@ -1,4 +1,3 @@
-import fs from "fs";
 import dotenv from "dotenv";
 import { beforeAll, describe, expect, it } from "vitest";
 import { ClientManager, type XmtpEnv } from "../helpers/manager";
@@ -15,12 +14,13 @@ const config = {
   skipVersions: [
     { origin: "40", destiny: "41" },
     { origin: "40", destiny: "42" },
+    { origin: "41", destiny: "41" },
     // Add more version pairs to skip as needed
   ],
 
   dontSkipDescribeBlocks: [
-    //"Test for all version combinations in DMs using the same installation",
-    //"Test for all version combinations in DMs using a new installation",
+    "Test for all version combinations in DMs using the same installation",
+    "Test for all version combinations in DMs using a new installation",
     "Test version updates on the same installation",
   ],
 };
@@ -44,10 +44,7 @@ if (
   )
 ) {
   describe("Test for all version combinations in DMs using the same installation", () => {
-    beforeAll(() => {
-      //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
-      fs.rmSync(".data", { recursive: true, force: true });
-    });
+    beforeAll(() => {});
 
     environments.forEach((env) => {
       installationIds.forEach((bobInstallationId, bobInstallIndex) => {
@@ -92,6 +89,7 @@ if (
                           `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
                           error,
                         );
+                        throw error; // Rethrow the error to ensure the test fails
                       }
                     },
                     TIMEOUT,
@@ -113,7 +111,7 @@ if (
   describe("Test for all version combinations in DMs using a new installation", () => {
     beforeAll(() => {
       //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
-      fs.rmSync(".data", { recursive: true, force: true });
+      //fs.rmSync(".data", { recursive: true, force: true });
     });
 
     environments.forEach((env) => {
@@ -160,6 +158,7 @@ if (
                           `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
                           error,
                         );
+                        throw error; // Rethrow the error to ensure the test fails
                       }
                     },
                     TIMEOUT,
@@ -177,7 +176,7 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
   describe("Test version updates on the same installation", () => {
     beforeAll(() => {
       // Ensure the data folder is clean before running tests
-      fs.rmSync(".data", { recursive: true, force: true });
+      //fs.rmSync(".data", { recursive: true, force: true });
     });
 
     environments.forEach((env) => {
@@ -215,11 +214,18 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
                     );
 
                     // Simulate version update
-                    bob.version = updatedVersion;
-                    await bob.initialize();
-
+                    const bobUpdated = new ClientManager({
+                      env,
+                      version: updatedVersion,
+                      name: "Bob",
+                      installationId,
+                    });
+                    await bobUpdated.initialize();
                     const successUpdated =
-                      await ClientManager.sendMessageAndVerify(bob, alice);
+                      await ClientManager.sendMessageAndVerify(
+                        bobUpdated,
+                        alice,
+                      );
 
                     expect(success).toBe(true);
                     expect(successUpdated).toBe(true);
@@ -228,6 +234,7 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
                       `Error in test case for Bob (version: ${initialVersion}, installationId: ${installationId}) -> Alice (version: ${updatedVersion}, installationId: ${installationId}):`,
                       error,
                     );
+                    throw error; // Rethrow the error to ensure the test fails
                   }
                 },
                 TIMEOUT * 2,
