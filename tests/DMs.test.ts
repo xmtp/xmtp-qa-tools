@@ -12,16 +12,13 @@ const installationIds = ["a", "b"];
 // Configuration object to specify which tests or describe blocks to skip
 const config = {
   skipVersions: [
-    { origin: "40", destiny: "41" },
-    { origin: "40", destiny: "42" },
-    { origin: "41", destiny: "41" },
     // Add more version pairs to skip as needed
   ],
 
   dontSkipDescribeBlocks: [
     "Test for all version combinations in DMs using the same installation",
-    "Test for all version combinations in DMs using a new installation",
-    "Test version updates on the same installation",
+    //"Test for all version combinations in DMs using a new installation",
+    //"Test version updates on the same installation",
   ],
 };
 

@@ -11,8 +11,10 @@
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",
     "lint": "eslint .",
+    "pretest": "yarn workers",
     "test": "vitest",
-    "typecheck": "tsc"
+    "typecheck": "tsc",
+    "workers": "tsx tests/workers/*.ts"
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
@@ -43,6 +45,8 @@
     "prettier": "^3.4.2",
     "prettier-plugin-packagejson": "^2.5.8",
     "rimraf": "^6.0.1",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.22.0",
     "vitest": "^1.4.0"

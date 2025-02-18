@@ -1,4 +1,3 @@
-import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "node-sdk-42";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
@@ -72,10 +71,10 @@ async function main() {
         group.isSuperAdmin(message.senderInboxId),
       );
 
-      await group.send("gm");
+      await group.send(groupName);
 
       await conversation.send(
-        `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Name: ${groupName}\n- Description: ${groupName}`,
+        `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\n- Description: ${groupName}`,
       );
     } else {
       console.log("Unknown command, skipping");
