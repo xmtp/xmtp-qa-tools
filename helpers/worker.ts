@@ -41,10 +41,10 @@ if (!parentPort) {
       if (data.type === "initialize" && data.name) {
         try {
           client = new ClientManager({
-            env: "dev",
-            version: "42",
+            env: data.env || "dev",
+            version: data.version || "42",
             name: data.name,
-            installationId: "a",
+            installationId: data.installationId || "a",
           });
 
           await client.initialize();

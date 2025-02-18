@@ -44,9 +44,22 @@ describe("Parallel DM flows using worker threads", () => {
       //   console.error("Bob stderr:", data.toString());
       // });
 
-      // Initialize both workers with different names
-      aliceWorker.postMessage({ type: "initialize", name: "Alice" });
-      bobWorker.postMessage({ type: "initialize", name: "Bob" });
+      // Initialize both workers with different names and parameters
+      aliceWorker.postMessage({
+        type: "initialize",
+        name: "Alice",
+        env: "dev", // or any environment you want
+        version: "42", // or any version you want
+        installationId: "a",
+      });
+
+      bobWorker.postMessage({
+        type: "initialize",
+        name: "Bob",
+        env: "dev",
+        version: "42",
+        installationId: "a",
+      });
 
       const aliceInitialized = new Promise<string>((resolve, reject) => {
         aliceWorker.on("message", (msg: any) => {
