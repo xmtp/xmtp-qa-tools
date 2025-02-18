@@ -12,37 +12,9 @@ describe("Parallel DM flows using worker threads", () => {
     async () => {
       console.log("Starting test with timeout of", TIMEOUT / 1000, "seconds");
 
-      // Replace Worker instantiation with TsWorker
-      const aliceWorker = new TsWorker(
+      const { aliceWorker, bobWorker } = createWorkerPair(
         new URL("../helpers/worker.ts", import.meta.url),
-        {
-          stderr: true,
-          stdout: true,
-        },
       );
-
-      const bobWorker = new TsWorker(
-        new URL("../helpers/worker.ts", import.meta.url),
-        {
-          stderr: true,
-          stdout: true,
-        },
-      );
-      // // Add stdout and stderr logging for Alice
-      // aliceWorker.stdout.on("data", (data) => {
-      //   console.log("Alice stdout:", data.toString());
-      // });
-      // aliceWorker.stderr.on("data", (data) => {
-      //   console.error("Alice stderr:", data.toString());
-      // });
-
-      // // Add stdout and stderr logging for Bob
-      // bobWorker.stdout.on("data", (data) => {
-      //   console.log("Bob stdout:", data.toString());
-      // });
-      // bobWorker.stderr.on("data", (data) => {
-      //   console.error("Bob stderr:", data.toString());
-      // });
 
       // Initialize both workers with different names and parameters
       aliceWorker.postMessage({

@@ -14,12 +14,45 @@ const worker = /* JavaScript */ `
   
   tsImport(workerData.__ts_worker_filename, filename);
 `;
+export function createWorkerPair(workerPath: string | URL): {
+  aliceWorker: TsWorker;
+  bobWorker: TsWorker;
+} {
+  const aliceWorker = TsWorker.createWorker("Alice", workerPath);
+  const bobWorker = TsWorker.createWorker("Bob", workerPath);
 
+  return { aliceWorker, bobWorker };
+}
 export class TsWorker extends Worker {
+  name: string;
+
   constructor(filename: string | URL, options: WorkerOptions = {}) {
     options.workerData ??= {};
     options.workerData.__ts_worker_filename = filename.toString();
     super(new URL(`data:text/javascript,${worker}`), options);
+  }
+
+  setupLogging(name: string) {
+    this.name = name;
+    if (this.stdout) {
+      this.stdout.on("data", (data) => {
+        console.log(`${name} stdout:`, data.toString());
+      });
+    }
+    if (this.stderr) {
+      this.stderr.on("data", (data) => {
+        console.error(`${name} stderr:`, data.toString());
+      });
+    }
+    return this;
+  }
+
+  static createWorker(name: string, workerPath: string | URL): TsWorker {
+    const worker = new TsWorker(workerPath, {
+      stderr: true,
+      stdout: true,
+    });
+    return worker.setupLogging(name);
   }
 }
 
