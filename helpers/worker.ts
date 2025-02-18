@@ -54,6 +54,45 @@ export class TsWorker extends Worker {
     });
     return worker.setupLogging(name);
   }
+  async initialize(config: {
+    name: string;
+    env?: string;
+    version?: string;
+    installationId?: string;
+  }): Promise<string> {
+    return new Promise((resolve, reject) => {
+      this.postMessage({
+        type: "initialize",
+        ...config,
+      });
+
+      this.on("message", (msg: WorkerMessage) => {
+        if (msg.type === "clientInitialized") {
+          console.log(
+            `${this.name} initialized successfully with address:`,
+            msg.clientAddress,
+          );
+          resolve(msg.clientAddress);
+        } else if (msg.type === "error") {
+          reject(new Error(msg.error));
+        }
+      });
+    });
+  }
+  async waitForMessage<T = any>(messageType: string): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const handler = (msg: any) => {
+        if (msg.type === messageType) {
+          this.removeListener("message", handler);
+          resolve(msg);
+        } else if (msg.type === "error") {
+          this.removeListener("message", handler);
+          reject(new Error(msg.error));
+        }
+      };
+      this.on("message", handler);
+    });
+  }
 }
 
 dotenv.config();
@@ -68,8 +107,6 @@ if (!parentPort) {
 
     // Listen for messages
     parentPort.on("message", async (data: any) => {
-      console.log("worker received message", data);
-
       // Initialize client when name is received
       if (data.type === "initialize" && data.name) {
         try {
@@ -81,10 +118,6 @@ if (!parentPort) {
           });
 
           await client.initialize();
-          console.log(
-            `[${data.name.toUpperCase()} WORKER] Initialized with address:`,
-            client.client.accountAddress,
-          );
 
           parentPort.postMessage({
             type: "clientInitialized",

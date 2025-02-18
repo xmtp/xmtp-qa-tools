@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { describe, it } from "vitest";
-import { TsWorker } from "../helpers/worker";
+import { createWorkerPair } from "../helpers/worker";
 
 dotenv.config();
 
@@ -15,43 +15,6 @@ describe("Parallel DM flows using worker threads", () => {
       const { aliceWorker, bobWorker } = createWorkerPair(
         new URL("../helpers/worker.ts", import.meta.url),
       );
-
-      // Initialize both workers with different names and parameters
-      aliceWorker.postMessage({
-        type: "initialize",
-        name: "Alice",
-        env: "dev", // or any environment you want
-        version: "42", // or any version you want
-        installationId: "a",
-      });
-
-      bobWorker.postMessage({
-        type: "initialize",
-        name: "Bob",
-        env: "dev",
-        version: "42",
-        installationId: "a",
-      });
-
-      const aliceInitialized = new Promise<string>((resolve, reject) => {
-        aliceWorker.on("message", (msg: any) => {
-          if (msg.type === "clientInitialized") {
-            resolve(msg.clientAddress);
-          } else if (msg.type === "error") {
-            reject(new Error(msg.error));
-          }
-        });
-      });
-
-      const bobInitialized = new Promise<string>((resolve, reject) => {
-        bobWorker.on("message", (msg: any) => {
-          if (msg.type === "clientInitialized") {
-            resolve(msg.clientAddress);
-          } else if (msg.type === "error") {
-            reject(new Error(msg.error));
-          }
-        });
-      });
 
       // Set up message listeners before sending
       const messageHandler = new Promise<{ sent?: string; received?: string }>(
@@ -85,16 +48,21 @@ describe("Parallel DM flows using worker threads", () => {
 
       try {
         console.log("Waiting for workers to initialize...");
-        const [aliceAddress, bobAddress] = await Promise.all([
-          aliceInitialized,
-          bobInitialized,
-        ]);
 
-        console.log(
-          "Alice initialized successfully with address:",
-          aliceAddress,
-        );
-        console.log("Bob initialized successfully with address:", bobAddress);
+        const [aliceAddress, bobAddress] = await Promise.all([
+          aliceWorker.initialize({
+            name: "Alice",
+            env: "dev",
+            version: "42",
+            installationId: "a",
+          }),
+          bobWorker.initialize({
+            name: "Bob",
+            env: "dev",
+            version: "42",
+            installationId: "a",
+          }),
+        ]);
 
         const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
