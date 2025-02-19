@@ -1,10 +1,10 @@
 /* eslint-disable */
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
+import { TestLogger } from "./logger";
 import { ClientManager } from "./manager";
 
 const defaultVersion = "42";
 const defaultInstallationId = "a";
-const defaultEnv = "dev";
 
 // Types
 export type WorkerMessage = {
@@ -17,6 +17,7 @@ export type WorkerConfig = {
   env?: string;
   version?: string;
   installationId?: string;
+  logger: TestLogger;
 };
 
 // Worker bootstrap code
@@ -33,7 +34,8 @@ const workerBootstrap = /* JavaScript */ `
 
 // Main Worker Client class
 export class WorkerClient extends Worker {
-  name: string;
+  public name: string;
+  private logger: TestLogger;
 
   constructor(filename: string | URL, options: WorkerOptions = {}) {
     options.workerData ??= {};
@@ -41,36 +43,45 @@ export class WorkerClient extends Worker {
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
   }
 
-  setupLogging(name: string) {
-    this.name = name;
+  setupLogging() {
     if (this.stdout) {
       this.stdout.on("data", (data) => {
-        console.log(`${name} stdout:`, data.toString());
+        this.logger.log(`[${this.name}] ${data.toString().trim()}`);
       });
     }
     if (this.stderr) {
       this.stderr.on("data", (data) => {
-        console.error(`${name} stderr:`, data.toString());
+        this.logger.log(`[${this.name}] ${data.toString().trim()}`);
       });
     }
     return this;
   }
 
   async initialize(config: WorkerConfig): Promise<string> {
-    this.postMessage({ type: "initialize", ...config });
+    this.postMessage({
+      type: "initialize",
+      ...config,
+    });
+    this.logger = config.logger;
+
     const response = await this.waitForMessage<{ clientAddress: string }>(
       "clientInitialized",
     );
-    console.log(`Created client for ${this.name}`, {
-      env: config.env,
-      version: config.version || defaultVersion,
-      installationId: config.installationId || defaultInstallationId,
-      clientAddress: response.clientAddress,
-    });
+
+    this.logger.log(
+      `[${this.name}] initialized with: ${JSON.stringify({
+        env: config.env,
+        version: config.version || defaultVersion,
+        installationId: config.installationId || defaultInstallationId,
+      })}`,
+    );
     return response.clientAddress;
   }
 
   async sendMessage(recipientAddress: string, message: string): Promise<void> {
+    this.logger.log(
+      `[${this.name}] Sending message to ${recipientAddress}: ${message}`,
+    );
     this.postMessage({ type: "sendMessage", recipientAddress, message });
     await this.waitForMessage("messageSent");
   }
@@ -79,6 +90,7 @@ export class WorkerClient extends Worker {
     senderAddress: string,
     expectedMessage: string,
   ): Promise<string> {
+    this.logger.log(`[${this.name}] Waiting for message from ${senderAddress}`);
     this.postMessage({
       type: "receiveMessage",
       senderAddress,
@@ -87,6 +99,7 @@ export class WorkerClient extends Worker {
     const response = await this.waitForMessage<{ message: string }>(
       "messageReceived",
     );
+    this.logger.log(`[${this.name}] Received message: ${expectedMessage}`);
     return response.message;
   }
 
@@ -98,6 +111,7 @@ export class WorkerClient extends Worker {
           resolve(msg as T);
         } else if (msg.type === "error") {
           this.removeListener("message", handler);
+          this.logger.log(`[${this.name}] Error: ${msg.error}`);
           reject(new Error(msg.error));
         }
       };
@@ -107,7 +121,8 @@ export class WorkerClient extends Worker {
 
   static createWorker(name: string, workerPath: string | URL): WorkerClient {
     const worker = new WorkerClient(workerPath, { stderr: true, stdout: true });
-    return worker.setupLogging(name);
+    worker.name = name;
+    return worker.setupLogging();
   }
 }
 
@@ -121,19 +136,27 @@ export function createWorkerPair(workerPath: string | URL) {
 // Worker implementation (runs in worker thread)
 if (parentPort) {
   let client: ClientManager | undefined;
+  let workerLogger: TestLogger | undefined;
 
   parentPort.on("message", async (data: WorkerMessage) => {
     try {
       switch (data.type) {
         case "initialize": {
+          workerLogger?.log(`[${data.name}:Thread] Initializing client`);
+
           client = new ClientManager({
-            env: data.env || defaultEnv,
-            version: data.version || defaultVersion,
+            env: data.env || "dev",
+            version: data.version || "42",
             name: data.name,
-            installationId: data.installationId || defaultInstallationId,
+            installationId: data.installationId || "a",
+            logger: workerLogger,
           });
           await client.initialize();
-          parentPort.postMessage({
+
+          workerLogger?.log(
+            `[${data.name}:Thread] Client initialized with address: ${client.client.accountAddress}`,
+          );
+          parentPort?.postMessage({
             type: "clientInitialized",
             clientAddress: client.client.accountAddress,
             clientName: data.name,
@@ -143,8 +166,14 @@ if (parentPort) {
 
         case "sendMessage": {
           if (!client) throw new Error("Client not initialized");
+          workerLogger?.log(
+            `[${client.name}:Thread] Sending message to ${data.recipientAddress}`,
+          );
           await client.sendMessage(data.recipientAddress, data.message);
-          parentPort.postMessage({
+          workerLogger?.log(
+            `[${client.name}:Thread] Message sent successfully`,
+          );
+          parentPort?.postMessage({
             type: "messageSent",
             message: data.message,
           });
@@ -153,8 +182,12 @@ if (parentPort) {
 
         case "receiveMessage": {
           if (!client) throw new Error("Client not initialized");
+          workerLogger?.log(`[${client.name}:Thread] Waiting for message`);
           const message = await client.receiveMessage(data.expectedMessage);
-          parentPort.postMessage({
+          workerLogger?.log(
+            `[${client.name}:Thread] Message received: ${message}`,
+          );
+          parentPort?.postMessage({
             type: "messageReceived",
             message: message,
           });
@@ -162,7 +195,13 @@ if (parentPort) {
         }
       }
     } catch (error: any) {
-      parentPort.postMessage({
+      if (workerLogger) {
+        const workerName = client?.config?.name || data?.name || "Unknown";
+        workerLogger.log(
+          `[${workerName}:Thread] Error: ${error.message || String(error)}`,
+        );
+      }
+      parentPort?.postMessage({
         type: "error",
         error: error.message || String(error),
       });

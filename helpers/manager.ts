@@ -62,16 +62,14 @@ export class ClientManager {
       await this.client.conversations.sync();
       const conversation = await this.client.conversations.newDm(to);
       await conversation.send(message);
-      console.log(
-        "message sent: " + message + " to " + to + " version " + this.version,
-      );
+
       return true;
     } catch (error) {
       console.error("Error sending message:", error);
       throw error;
     }
   }
-  async receiveMessage(expectedMessage) {
+  async receiveMessage(expectedMessage: string) {
     try {
       await this.client.conversations.sync();
       const stream = await this.client.conversations.streamAllMessages();
@@ -84,7 +82,6 @@ export class ClientManager {
           continue;
         }
         if (message.content === expectedMessage) {
-          console.log("message received", expectedMessage);
           return true;
         }
       }

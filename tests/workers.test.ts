@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import { describe, it } from "vitest";
-import { createWorkerPair } from "../helpers/worker";
+import { createWorkerPair } from "../../helpers/worker";
 
 dotenv.config();
 

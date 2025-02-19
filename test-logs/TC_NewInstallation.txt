@@ -1,0 +1,12 @@
+[2025-02-19T02:42:40.331Z] [TEST] Initializing workers
+[2025-02-19T02:42:43.169Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T02:42:43.804Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"b"}
+[2025-02-19T02:42:43.804Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
+[2025-02-19T02:42:45.806Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-0agsusori70v
+[2025-02-19T02:42:47.138Z] [Alice] Received message: gm-0agsusori70v
+[2025-02-19T02:42:47.458Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
+[2025-02-19T02:42:49.460Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-1n8tz66xdit
+[2025-02-19T02:42:50.650Z] [Alice] Received message: gm-1n8tz66xdit
+[2025-02-19T02:42:50.724Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
+[2025-02-19T02:42:52.726Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-23klzzj0nsqa
+[2025-02-19T02:42:54.102Z] [Alice] Received message: gm-23klzzj0nsqa
