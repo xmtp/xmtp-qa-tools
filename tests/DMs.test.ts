@@ -1,22 +1,20 @@
 import { beforeAll, describe, it } from "vitest";
 import { testLogger } from "../helpers/logger";
-import type { TestCase, XmtpEnv } from "../helpers/manager";
-import { generateTestCombinations, type Persona } from "../helpers/personas";
-
-const defaultAmount = 5;
-const defaultEnvironments = ["dev"] as XmtpEnv[];
-const defaultVersions = ["42"];
-const defaultInstallationIds = ["a", "b"];
-const defaultTimeout = 40000;
+import type { TestCase } from "../helpers/manager";
+import {
+  defaultValues,
+  generateTestCombinations,
+  type Persona,
+} from "../helpers/personas";
 
 export const testsCases: TestCase[] = [
   {
     name: "TC_NewInstallation",
-    timeout: defaultTimeout,
-    environments: defaultEnvironments,
-    versions: defaultVersions,
-    amount: defaultAmount,
-    installationIds: defaultInstallationIds,
+    timeout: defaultValues.timeout,
+    environments: [defaultValues.env],
+    versions: [defaultValues.versions],
+    amount: defaultValues.amount,
+    installationIds: [defaultValues.installationId],
     describe:
       "Test for all version combinations in DMs using a new installation",
     skipVersions: [],
@@ -24,11 +22,11 @@ export const testsCases: TestCase[] = [
   },
   {
     name: "TC_GroupMessaging",
-    timeout: defaultTimeout,
-    environments: defaultEnvironments,
-    versions: defaultVersions,
-    amount: defaultAmount,
-    installationIds: defaultInstallationIds,
+    timeout: defaultValues.timeout,
+    environments: [defaultValues.env],
+    versions: [defaultValues.versions],
+    amount: defaultValues.amount,
+    installationIds: [defaultValues.installationId],
     describe: "Test for group messaging with different version combinations",
     skipVersions: [],
     skipEnvironments: [],

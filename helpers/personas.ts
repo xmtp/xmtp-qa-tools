@@ -1,7 +1,18 @@
+import { generatePrivateKey } from "viem/accounts";
+import { generateEncryptionKeyHex, getEncryptionKeyFromHex } from "./client";
 import { type TestLogger } from "./logger";
-import type { TestCase } from "./manager";
+import { ClientManager, type TestCase, type XmtpEnv } from "./manager";
 import { WorkerClient } from "./worker";
 
+export const defaultValues = {
+  amount: 5,
+  timeout: 40000,
+  versions: "42",
+  binding: "37",
+  installationId: "a",
+  env: "dev" as XmtpEnv,
+  names: ["Bob", "Alice", "Joe"],
+};
 export interface Persona {
   name: string;
   env: string;
@@ -32,7 +43,18 @@ export function generateDefaultPersonas(
     };
   });
 }
-
+export async function getNewRandomPersona() {
+  const client = new ClientManager({
+    name: "random" + Math.random().toString(36).substring(2, 15),
+    env: defaultValues.env,
+    installationId: defaultValues.installationId,
+    version: defaultValues.versions,
+    walletKey: generatePrivateKey(),
+    encryptionKey: generateEncryptionKeyHex(),
+  });
+  await client.initialize();
+  return client.client.accountAddress;
+}
 /**
  * Generate test combinations using different environments, versions, and installation IDs.
  */
@@ -48,22 +70,46 @@ export function generateTestCombinations(
         const personas = generateDefaultPersonas(
           [
             {
-              name: "Bob",
+              name: "bob",
               env,
               installationId,
               version,
             },
             {
-              name: "Alice",
+              name: "alice",
               env,
               installationId,
               version,
             },
             {
-              name: "Joe",
+              name: "joe",
               env,
               installationId,
               version,
+            },
+            {
+              name: "alice",
+              env,
+              installationId: "b",
+              version: "41",
+            },
+            {
+              name: "bob",
+              env,
+              installationId: "b",
+              version: "41",
+            },
+            {
+              name: "carol",
+              env,
+              installationId: "a",
+              version: "42",
+            },
+            {
+              name: "carol",
+              env,
+              installationId: "b",
+              version: "41",
             },
           ],
           logger,

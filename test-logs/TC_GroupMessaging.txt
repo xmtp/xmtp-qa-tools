@@ -1,1 +1,0 @@
-[2025-02-19T15:10:27.838Z] [MAIN] Testing DMs with version: {42-b-dev} and Alice {42-b-dev} as well as Joe {42-b-dev}

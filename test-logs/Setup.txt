@@ -1,6 +1,4 @@
-[2025-02-19T15:08:54.541Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-19T15:08:54.556Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-19T15:08:54.637Z] [Joe] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-19T15:08:54.935Z] [Bob] DM created: 5fad3254c23ed478462bc68eaec761e4
-[2025-02-19T15:08:56.937Z] [Alice] Sending group message to [5fad3254c23ed478462bc68eaec761e4]: gm-wp322msboll
-[2025-02-19T15:08:57.947Z] [Bob] Received message: gm-wp322msboll
+[2025-02-19T18:27:29.371Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T18:27:29.887Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T18:27:30.272Z] [Joe] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T18:27:30.439Z] [Bob] DM created: 5fad3254c23ed478462bc68eaec761e4

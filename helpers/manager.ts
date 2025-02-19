@@ -1,7 +1,4 @@
 import dotenv from "dotenv";
-import { Client as Client38 } from "node-sdk-38";
-import { Client as Client39 } from "node-sdk-39";
-import { Client as Client40 } from "node-sdk-40";
 import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
@@ -18,44 +15,48 @@ export interface TestCase {
   amount: number;
   installationIds: string[];
   describe: string;
-  skipVersions: string[];
-  skipEnvironments: string[];
-  active?: boolean;
 }
 export interface ClientConfig {
   version: string;
   env: XmtpEnv;
   name: string;
   installationId: string;
+  walletKey?: string;
+  encryptionKey?: string;
 }
 
 export class ClientManager {
-  public client!: Client38 | Client39 | Client40 | Client41 | Client42;
-  private clientType!:
-    | typeof Client38
-    | typeof Client39
-    | typeof Client40
-    | typeof Client41
-    | typeof Client42;
-  private encryptionKey: Uint8Array;
+  public client!: Client41 | Client42;
+  private clientType!: typeof Client41 | typeof Client42;
   private signer: Signer;
   public version: string;
   public env: XmtpEnv;
   public name: string;
   public installationId: string;
+  public walletKey!: string;
+  private encryptionKey!: Uint8Array;
 
   constructor(config: ClientConfig) {
     this.version = config.version;
     this.updateVersion(config.version);
-    this.signer = createSigner(
-      process.env[`WALLET_KEY_${config.name.toUpperCase()}`] as `0x${string}`,
-    );
+    /* Wallet key*/
+    const walletKey =
+      config.walletKey ??
+      (process.env[`WALLET_KEY_${config.name.toUpperCase()}`] as `0x${string}`);
 
-    this.encryptionKey = getEncryptionKeyFromHex(
-      process.env[`ENCRYPTION_KEY_${config.name.toUpperCase()}`] as string,
-    );
+    this.walletKey = walletKey;
+    this.signer = createSigner(walletKey as `0x${string}`);
+    /* Encryption key*/
+    const encryptionKey =
+      config.encryptionKey ??
+      process.env[`ENCRYPTION_KEY_${config.name.toUpperCase()}`];
+
+    this.encryptionKey = getEncryptionKeyFromHex(encryptionKey as string);
+    /* Environment*/
     this.env = config.env;
+    /* Name*/
     this.name = config.name;
+    /* Installation ID*/
     this.installationId = config.installationId;
   }
 
@@ -88,13 +89,7 @@ export class ClientManager {
 
   updateVersion(version: string) {
     this.version = version;
-    if (version === "38") {
-      this.clientType = Client38;
-    } else if (version === "39") {
-      this.clientType = Client39;
-    } else if (version === "40") {
-      this.clientType = Client40;
-    } else if (version === "41") {
+    if (version === "41") {
       this.clientType = Client41;
     } else if (version === "42") {
       this.clientType = Client42;
@@ -139,13 +134,12 @@ export class ClientManager {
     }
   }
   async initialize(): Promise<void> {
-    const env = this.env;
     this.client = await this.clientType.create(
       this.signer,
       this.encryptionKey,
       {
-        env,
-        dbPath: dbPath(this.name, this.installationId, env),
+        env: this.env,
+        dbPath: dbPath(this.name, this.installationId, this.env),
       },
     );
 

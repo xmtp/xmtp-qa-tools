@@ -1,6 +1,10 @@
 import { beforeAll, describe, it } from "vitest";
 import { testLogger } from "../helpers/logger";
-import { generateDefaultPersonas, type Persona } from "../helpers/personas";
+import {
+  defaultValues,
+  generateDefaultPersonas,
+  type Persona,
+} from "../helpers/personas";
 
 const TIMEOUT = 30000;
 
@@ -14,22 +18,22 @@ describe("Test for different DM flows", () => {
     [bob, alice, joe] = generateDefaultPersonas(
       [
         {
-          name: "Bob",
-          env: "dev",
-          installationId: "a",
-          version: "42",
+          name: defaultValues.names[0],
+          env: defaultValues.env,
+          installationId: defaultValues.installationId,
+          version: defaultValues.versions,
         },
         {
-          name: "Alice",
-          env: "dev",
-          installationId: "a",
-          version: "42",
+          name: defaultValues.names[1],
+          env: defaultValues.env,
+          installationId: defaultValues.installationId,
+          version: defaultValues.versions,
         },
         {
-          name: "Joe",
-          env: "dev",
-          installationId: "a",
-          version: "42",
+          name: defaultValues.names[2],
+          env: defaultValues.env,
+          installationId: defaultValues.installationId,
+          version: defaultValues.versions,
         },
       ],
       logger,

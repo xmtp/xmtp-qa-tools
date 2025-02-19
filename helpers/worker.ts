@@ -96,7 +96,6 @@ export class WorkerClient extends Worker {
     this.postMessage({ type: "sendMessage", groupId, message });
     await this.waitForMessage("messageSent");
   }
-
   async createDM(senderAddresses: string): Promise<string> {
     this.postMessage({ type: "createDM", senderAddresses });
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");

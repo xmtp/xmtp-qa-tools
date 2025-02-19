@@ -1,5 +1,0 @@
-[2025-02-19T13:09:13.112Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-19T13:09:13.657Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"b"}
-[2025-02-19T13:09:13.658Z] [Bob] Waiting for message from Alice-a
-[2025-02-19T13:09:15.662Z] [Alice] Sending message to Bob-b: gm-0-am9qkgp2d78
-[2025-02-19T13:09:16.936Z] [Bob] Received message: gm-0-am9qkgp2d78

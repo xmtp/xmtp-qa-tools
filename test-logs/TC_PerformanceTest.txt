@@ -1,0 +1,15 @@
+[2025-02-19T19:34:14.361Z] [bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T19:34:15.087Z] [joe] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T19:34:15.175Z] [bob] initialized with: {"env":"dev","version":"41","installationId":"b"}
+[2025-02-19T19:34:15.200Z] [alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T19:34:15.228Z] [alice] initialized with: {"env":"dev","version":"41","installationId":"b"}
+[2025-02-19T19:34:15.897Z] [carol] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T19:34:16.131Z] [carol] initialized with: {"env":"dev","version":"41","installationId":"b"}
+[2025-02-19T19:34:26.580Z] [bob] DM created: 05bdfa23c571088d0c34e2f3fa0796ad
+[2025-02-19T19:34:28.582Z] [bob] Sending group message to [05bdfa23c571088d0c34e2f3fa0796ad]: gm-rbiigv7wium
+[2025-02-19T19:34:31.824Z] [bob] Sending group message to [05bdfa23c571088d0c34e2f3fa0796ad]: gm-5cgprc8v10f
+[2025-02-19T19:34:50.567Z] [bob] Group created: 011c1fc947d032640abb15399e177368
+[2025-02-19T19:34:52.569Z] [bob] Sending group message to [011c1fc947d032640abb15399e177368]: gm-w1hcnz0nse
+[2025-02-19T19:34:55.823Z] [bob] Sending group message to [011c1fc947d032640abb15399e177368]: gm-79sh24rd3vj
+[2025-02-19T19:34:56.984Z] [joe] Received message: gm-79sh24rd3vj
+[2025-02-19T19:34:57.451Z] [alice] Received message: gm-79sh24rd3vj

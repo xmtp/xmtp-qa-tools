@@ -1,1 +1,2 @@
-[2025-02-19T15:08:58.208Z] Testing groups with version: 42, installationId: a | env: dev
+[2025-02-19T18:25:11.022Z] Testing groups with version: 42, installationId: a | env: dev
+[2025-02-19T18:25:55.306Z] Waiting for message from Alice

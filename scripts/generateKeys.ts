@@ -1,23 +1,31 @@
 import { writeFile } from "node:fs/promises";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
-import { generatePrivateKey } from "viem/accounts";
+import { join } from "node:path";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../helpers/client";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 console.log("Generating keys...");
 
+const person = process.argv[2];
+if (!person) {
+  console.error("Please provide a name: yarn gen:keys <name>");
+  process.exit(1);
+}
+
 const walletKey = generatePrivateKey();
+const account = privateKeyToAccount(walletKey);
+const publicKey = account.address;
 const encryptionKeyHex = generateEncryptionKeyHex();
 
-const envFilePath = join(__dirname, "../.env");
+const filePath = join(process.cwd(), ".env");
 
 await writeFile(
-  envFilePath,
-  `WALLET_KEY=${walletKey}
-ENCRYPTION_KEY=${encryptionKeyHex}
+  filePath,
+  `# ${person.toLowerCase()}
+WALLET_KEY_${person.toUpperCase()}=${walletKey}
+ENCRYPTION_KEY_${person.toUpperCase()}=${encryptionKeyHex}
+# public key is ${publicKey}
 `,
+  { flag: "a" },
 );
 
-console.log(`Keys written to ${envFilePath}`);
+console.log(`Keys for ${person} written to ${filePath}`);
