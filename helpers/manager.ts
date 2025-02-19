@@ -71,14 +71,10 @@ export class ClientManager {
   }
   async createGroup(senderAddresses: string[]): Promise<string> {
     try {
-      const group = await this.client.conversations.newGroup([]);
+      const group = await this.client.conversations.newGroup(senderAddresses);
       await group.updateName(
         "Test Group" + Math.random().toString(36).substring(2, 15),
       );
-      // First add the sender to the group
-      for (const sender of senderAddresses) {
-        await group.addMembers([sender]);
-      }
       await group.addSuperAdmin(senderAddresses[0]);
       return group.id;
     } catch (error) {

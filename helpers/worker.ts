@@ -1,7 +1,7 @@
 /* eslint-disable */
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
 import { testLogger, TestLogger } from "./logger";
-import { ClientManager } from "./manager";
+import { ClientManager, type XmtpEnv } from "./manager";
 import { Persona } from "./personas";
 
 const defaultVersion = "42";
@@ -30,11 +30,12 @@ export class WorkerClient extends Worker {
   public name: string;
   private logger: TestLogger;
   private installationId!: string;
-  private env!: string;
+  private env!: XmtpEnv;
   private version!: string;
 
   constructor(
     persona: Persona,
+    env: XmtpEnv,
     logger: TestLogger,
     options: WorkerOptions = {},
   ) {
@@ -42,9 +43,9 @@ export class WorkerClient extends Worker {
     options.workerData.__ts_worker_filename = "../helpers/worker.ts".toString();
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
     this.name = persona.name;
-    this.env = persona.env;
     this.installationId = persona.installationId;
     this.version = persona.version;
+    this.env = env;
     this.logger = logger;
     this.setupLogging();
     return this;

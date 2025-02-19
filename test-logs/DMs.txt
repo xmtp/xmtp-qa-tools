@@ -1,1 +1,3 @@
-[2025-02-19T18:27:30.274Z] Testing DMs with version: 42, installationId: a | env: dev
+[2025-02-19T20:28:25.819Z] Testing DMs with version: 42, installationId: a | env: dev
+[2025-02-19T20:28:25.819Z] Creating DM with alice at 0x8553750b8e4945036dF0B96Bf830525dA60bca29
+[2025-02-19T20:28:29.487Z] Waiting for message from bob

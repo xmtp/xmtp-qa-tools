@@ -1,0 +1,9 @@
+[2025-02-19T23:29:03.183Z] [bob] initialized with: {"version":"42","installationId":"a"}
+[2025-02-19T23:29:03.379Z] [alice] initialized with: {"version":"42","installationId":"a"}
+[2025-02-19T23:29:03.459Z] [joe] initialized with: {"version":"42","installationId":"a"}
+[2025-02-19T23:29:03.489Z] [bob] initialized with: {"version":"41","installationId":"B"}
+[2025-02-19T23:29:14.173Z] [bob] DM created: f45374509285b014458079723e02e8d8
+[2025-02-19T23:29:16.174Z] [bob] Sending group message to [f45374509285b014458079723e02e8d8]: gm-38nj2foto63
+[2025-02-19T23:29:28.967Z] [bob] Group created: c5d9f568ee9e799c2d3a486cf751e84d
+[2025-02-19T23:29:30.970Z] [bob] Sending group message to [c5d9f568ee9e799c2d3a486cf751e84d]: gm-nwagho635f9
+[2025-02-19T23:29:33.666Z] [bob] Sending group message to [c5d9f568ee9e799c2d3a486cf751e84d]: gm-r4z5wm8xpt

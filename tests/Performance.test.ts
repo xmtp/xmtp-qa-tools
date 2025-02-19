@@ -1,146 +1,115 @@
-import fs from "fs";
+import type { XmtpEnv } from "node-sdk-42";
 import { beforeAll, describe, it } from "vitest";
 import { testLogger } from "../helpers/logger";
-import type { TestCase } from "../helpers/manager";
 import {
   defaultValues,
-  generateTestCombinations,
   getNewRandomPersona,
+  getPersonas,
   type Persona,
 } from "../helpers/personas";
 
-export const performanceTestCases: TestCase[] = [
-  {
-    name: "TC_PerformanceTest",
-    timeout: defaultValues.timeout,
-    environments: [defaultValues.env],
-    versions: [defaultValues.versions],
-    amount: defaultValues.amount,
-    installationIds: [defaultValues.installationId],
-    describe:
-      "Performance test for sending gm, creating group, and sending gm in group",
-  },
-];
+const env: XmtpEnv = "dev";
+const logger = testLogger.createTest("Performance test " + env);
 
-const logger = testLogger.createTest(performanceTestCases[0].name);
+describe("Performance test for sending gm, creating group, and sending gm in group", () => {
+  let bob: Persona,
+    alice: Persona,
+    joe: Persona,
+    bobB41: Persona,
+    dmId: string,
+    groupId: string,
+    randomPersona: string;
 
-describe(performanceTestCases[0].describe, () => {
-  generateTestCombinations(performanceTestCases[0], logger, ({ personas }) => {
-    let bob: Persona;
-    let alice: Persona;
-    let joe: Persona;
-    let bob41: Persona;
-    let alice41: Persona;
-    let carol: Persona;
-    let carol41: Persona;
-    let bobAddress: string;
-    let randomAddress: string;
-    let aliceAddress: string;
-    let joeAddress: string;
-    let groupId: string;
-    let dmId: string;
-    beforeAll(async () => {
-      bob = personas.find((p) => p.name === "bob" && p.installationId === "a")!;
-      alice = personas.find(
-        (p) => p.name === "alice" && p.installationId === "a",
-      )!;
-      joe = personas.find((p) => p.name === "joe" && p.installationId === "a")!;
-      bob41 = personas.find(
-        (p) => p.name === "bob" && p.installationId === "b",
-      )!;
-      alice41 = personas.find(
-        (p) => p.name === "alice" && p.installationId === "b",
-      )!;
+  beforeAll(async () => {
+    [bob, alice, joe, bobB41] = await getPersonas(
+      ["bob", "alice", "joe", "bobB41"],
+      env,
+      logger,
+    );
+    randomPersona = await getNewRandomPersona(env);
+  }, defaultValues.timeout);
 
-      [bobAddress, aliceAddress, joeAddress] = await Promise.all([
-        bob.worker!.initialize(),
-        alice.worker!.initialize(),
-        joe.worker!.initialize(),
-        bob41.worker!.initialize(),
-        alice41.worker!.initialize(),
+  it(
+    "should measure creating a DM",
+    async () => {
+      console.time("createDMTime");
+      dmId = await bob.worker!.createDM(randomPersona);
+      console.timeEnd("createDMTime");
+    },
+    defaultValues.timeout,
+  );
+
+  it(
+    "should measure sending a gm",
+    async () => {
+      const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+      console.time("sendGmTime");
+      await bob.worker!.sendMessage(dmId!, gmMessage);
+      console.timeEnd("sendGmTime");
+    },
+    defaultValues.timeout,
+  );
+
+  it(
+    "should measure creating a group",
+    async () => {
+      console.time("createGroupTime");
+      groupId = await bob.worker!.createGroup([
+        joe.address!,
+        bob.address!,
+        alice.address!,
       ]);
-      randomAddress = await getNewRandomPersona();
-      console.log("randomAddress", randomAddress);
-    }, defaultValues.timeout);
+      console.timeEnd("createGroupTime");
+    },
+    defaultValues.timeout,
+  );
 
-    it(
-      "should measure creating a DM",
-      async () => {
-        console.time("createDMTime");
-        dmId = await bob.worker!.createDM(randomAddress);
-        console.timeEnd("createDMTime");
-      },
-      defaultValues.timeout,
-    );
+  it(
+    "should measure sending a gm in a group",
+    async () => {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-    it(
-      "should measure sending a gm",
-      async () => {
-        const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+      console.time("sendGmInGroupTime");
+      await bob.worker!.sendMessage(groupId!, groupMessage);
+      console.timeEnd("sendGmInGroupTime");
+    },
+    defaultValues.timeout,
+  );
 
-        console.time("sendGmTime");
-        await bob.worker!.sendMessage(dmId!, gmMessage);
-        console.timeEnd("sendGmTime");
-      },
-      defaultValues.timeout,
-    );
+  it(
+    "should measure stream catch time",
+    async () => {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-    it(
-      "should measure sending a gm from SDK 42 to 41",
-      async () => {
-        const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-        console.time("sendGmTime");
-        await bob41.worker!.sendMessage(dmId!, gmMessage);
-        console.timeEnd("sendGmTime");
-      },
-      defaultValues.timeout,
-    );
+      const alicePromise = alice.worker!.receiveMessage(groupId!, groupMessage);
+      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
 
-    it(
-      "should measure creating a group",
-      async () => {
-        console.time("createGroupTime");
-        groupId = await bob.worker!.createGroup([
-          joeAddress,
-          bobAddress,
-          aliceAddress,
-        ]);
-        console.timeEnd("createGroupTime");
-      },
-      defaultValues.timeout,
-    );
+      console.time("streamCatchTime");
+      await bob.worker!.sendMessage(groupId!, groupMessage);
+      await Promise.all([alicePromise, joePromise]);
+      console.timeEnd("streamCatchTime");
+    },
+    defaultValues.timeout,
+  );
 
-    it(
-      "should measure sending a gm in a group",
-      async () => {
-        const groupMessage =
-          "gm-" + Math.random().toString(36).substring(2, 15);
+  /* Returns a bug in the SDK, so we're disabling it for now*/
+  it(
+    "should measure sending a gm from SDK 42 to 41",
+    async () => {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-        console.time("sendGmInGroupTime");
-        await bob.worker!.sendMessage(groupId!, groupMessage);
-        console.timeEnd("sendGmInGroupTime");
-      },
-      defaultValues.timeout,
-    );
+      const bob41Promise = bobB41.worker!.receiveMessage(
+        groupId!,
+        groupMessage,
+      );
+      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
 
-    it(
-      "should measure stream catch time",
-      async () => {
-        const groupMessage =
-          "gm-" + Math.random().toString(36).substring(2, 15);
-
-        const alicePromise = alice.worker!.receiveMessage(
-          groupId!,
-          groupMessage,
-        );
-        const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
-
-        console.time("streamCatchTime");
-        await bob.worker?.sendMessage(groupId!, groupMessage);
-        await Promise.all([alicePromise, joePromise]);
-        console.timeEnd("streamCatchTime");
-      },
-      defaultValues.timeout,
-    );
-  });
+      console.time("streamCatchTime");
+      await alice.worker!.sendMessage(groupId!, groupMessage);
+      await Promise.all([bob41Promise, joePromise]);
+      console.timeEnd("streamCatchTime");
+    },
+    defaultValues.timeout,
+  );
 });
