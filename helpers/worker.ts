@@ -1,7 +1,10 @@
 /* eslint-disable */
-
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
 import { ClientManager } from "./manager";
+
+const defaultVersion = "42";
+const defaultInstallationId = "a";
+const defaultEnv = "dev";
 
 // Types
 export type WorkerMessage = {
@@ -60,8 +63,8 @@ export class WorkerClient extends Worker {
     );
     console.log(`Created client for ${this.name}`, {
       env: config.env,
-      version: config.version,
-      installationId: config.installationId,
+      version: config.version || defaultVersion,
+      installationId: config.installationId || defaultInstallationId,
       clientAddress: response.clientAddress,
     });
     return response.clientAddress;
@@ -124,10 +127,10 @@ if (parentPort) {
       switch (data.type) {
         case "initialize": {
           client = new ClientManager({
-            env: data.env || "dev",
-            version: data.version || "42",
+            env: data.env || defaultEnv,
+            version: data.version || defaultVersion,
             name: data.name,
-            installationId: data.installationId || "a",
+            installationId: data.installationId || defaultInstallationId,
           });
           await client.initialize();
           parentPort.postMessage({

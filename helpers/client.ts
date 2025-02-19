@@ -20,7 +20,7 @@ export const createSigner = (privateKey: `0x${string}`): Signer => {
 export const dbPath = (name: string, installationName: string, env: string) => {
   const volumePath =
     process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-    `.data/${name.toLowerCase()}/${name.toLowerCase()}-${installationName}`;
+    `${process.cwd()}/.data/${name.toLowerCase()}/${name.toLowerCase()}-${installationName}`;
 
   if (!fs.existsSync(volumePath)) {
     fs.mkdirSync(volumePath, { recursive: true });

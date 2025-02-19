@@ -71,54 +71,11 @@ export class ClientManager {
       throw error;
     }
   }
-  static async sendMessageAndVerify(
-    sender: ClientManager,
-    receiver: ClientManager,
-  ): Promise<boolean> {
-    const message = "gm-" + Math.random().toString(36).substring(2, 15);
-
-    const receiverAddress = receiver.client.accountAddress;
-    let receivedMessage = false;
-
-    await Promise.all([
-      receiver
-        .waitForReply(message)
-        .then((result) => (receivedMessage = result)),
-      sender.sendMessage(receiverAddress, message),
-    ]);
-
-    return receivedMessage;
-  }
-
   async receiveMessage(expectedMessage) {
     try {
       await this.client.conversations.sync();
       const stream = await this.client.conversations.streamAllMessages();
       for await (const message of stream) {
-        if (
-          message?.senderInboxId.toLowerCase() ===
-            this.client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text"
-        ) {
-          continue;
-        }
-        if (message.content === expectedMessage) {
-          console.log("message received", expectedMessage);
-          return true;
-        }
-      }
-      return false;
-    } catch (error) {
-      console.error("Error waiting for reply:", error);
-      throw error;
-    }
-  }
-  async waitForReply(expectedMessage: string): Promise<boolean> {
-    try {
-      await this.client.conversations.sync();
-      const stream = await this.client.conversations.streamAllMessages();
-      for await (const message of stream) {
-        console.log("message received", message);
         if (
           message?.senderInboxId.toLowerCase() ===
             this.client.inboxId.toLowerCase() ||
