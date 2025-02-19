@@ -1,5 +1,3 @@
-import { version } from "os";
-import { env } from "process";
 import { beforeAll, describe, it } from "vitest";
 import { testLogger } from "../helpers/logger";
 import { generateDefaultPersonas, type Persona } from "../helpers/personas";
@@ -83,11 +81,13 @@ describe("Test for different DM flows", () => {
           `Testing groups with version: ${bob.version}, installationId: ${bob.installationId} | env: ${bob.env}`,
         );
         // Create group and send message
+        console.time("groupCreationTime");
         const groupId = await bob.worker?.createGroup([
           joeAddress,
           bobAddress,
           aliceAddress,
         ]);
+        console.timeEnd("groupCreationTime");
 
         const groupMessage =
           "hello group " + Math.random().toString(36).substring(2, 15);

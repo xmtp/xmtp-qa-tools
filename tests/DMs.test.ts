@@ -3,7 +3,7 @@ import { testLogger } from "../helpers/logger";
 import type { TestCase, XmtpEnv } from "../helpers/manager";
 import { generateTestCombinations, type Persona } from "../helpers/personas";
 
-const defaultAmount = 1;
+const defaultAmount = 5;
 const defaultEnvironments = ["dev"] as XmtpEnv[];
 const defaultVersions = ["42"];
 const defaultInstallationIds = ["a", "b"];
@@ -111,11 +111,14 @@ describe(testsCases[1].describe, () => {
           logger.log(
             `[MAIN] Testing DMs with version: {${bob.version}-${bob.installationId}-${bob.env}} and Alice {${alice.version}-${alice.installationId}-${alice.env}} as well as Joe {${joe.version}-${joe.installationId}-${joe.env}}`,
           );
+
+          console.time("groupCreationTime");
           const groupId = await bob.worker?.createGroup([
-            aliceAddress,
             joeAddress,
             bobAddress,
+            aliceAddress,
           ]);
+          console.timeEnd("groupCreationTime");
 
           for (let i = 0; i < testsCases[1].amount; i++) {
             const groupMessage =
