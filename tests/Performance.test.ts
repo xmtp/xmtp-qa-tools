@@ -39,11 +39,7 @@ describe(performanceTestCases[0].describe, () => {
     let joeAddress: string;
     let groupId: string;
     let dmId: string;
-    beforeAll(() => {});
     beforeAll(async () => {
-      // Ensure the data folder is clean before running tests
-      fs.rmSync(".data/carol", { recursive: true, force: true });
-
       bob = personas.find((p) => p.name === "bob" && p.installationId === "a")!;
       alice = personas.find(
         (p) => p.name === "alice" && p.installationId === "a",
@@ -55,12 +51,6 @@ describe(performanceTestCases[0].describe, () => {
       alice41 = personas.find(
         (p) => p.name === "alice" && p.installationId === "b",
       )!;
-      carol = personas.find(
-        (p) => p.name === "carol" && p.installationId === "a",
-      )!;
-      carol41 = personas.find(
-        (p) => p.name === "carol" && p.installationId === "b",
-      )!;
 
       [bobAddress, aliceAddress, joeAddress] = await Promise.all([
         bob.worker!.initialize(),
@@ -68,8 +58,6 @@ describe(performanceTestCases[0].describe, () => {
         joe.worker!.initialize(),
         bob41.worker!.initialize(),
         alice41.worker!.initialize(),
-        carol.worker!.initialize(),
-        carol41.worker!.initialize(),
       ]);
       randomAddress = await getNewRandomPersona();
       console.log("randomAddress", randomAddress);
