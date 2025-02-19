@@ -1,0 +1,7 @@
+[2025-02-19T13:55:41.725Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:55:41.726Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:55:42.710Z] [Joe] initialized with: {"env":"dev","version":"42","installationId":"b"}
+[2025-02-19T13:55:59.093Z] [Bob] Group created: 3d41f77f379d9f1f9c718db8476e6f48
+[2025-02-19T13:56:01.093Z] [Bob] Sending group message to [3d41f77f379d9f1f9c718db8476e6f48]: hello group zv5wf8b3dq
+[2025-02-19T13:56:02.455Z] [Joe] Received message: hello group zv5wf8b3dq
+[2025-02-19T13:56:02.533Z] [Alice] Received message: hello group zv5wf8b3dq

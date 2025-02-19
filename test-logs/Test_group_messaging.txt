@@ -1,0 +1,3 @@
+[2025-02-19T13:26:27.097Z] [Joe] initialized with: {"env":"dev","version":"42","installationId":"b"}
+[2025-02-19T13:26:27.271Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:26:27.404Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}

@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import { Client as Client38 } from "node-sdk-38";
 import { Client as Client39 } from "node-sdk-39";
 import { Client as Client40 } from "node-sdk-40";
@@ -5,8 +6,22 @@ import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
 
+dotenv.config();
+
 export type { XmtpEnv };
 
+export interface TestCase {
+  name: string;
+  timeout: number;
+  environments: XmtpEnv[];
+  versions: string[];
+  amount: number;
+  installationIds: string[];
+  describe: string;
+  skipVersions: string[];
+  skipEnvironments: string[];
+  active?: boolean;
+}
 export interface ClientConfig {
   version: string;
   env: XmtpEnv;
@@ -25,9 +40,9 @@ export class ClientManager {
   private encryptionKey: Uint8Array;
   private signer: Signer;
   public version: string;
-  private env: XmtpEnv;
-  private name: string;
-  private installationId: string;
+  public env: XmtpEnv;
+  public name: string;
+  public installationId: string;
 
   constructor(config: ClientConfig) {
     this.version = config.version;
@@ -43,6 +58,34 @@ export class ClientManager {
     this.name = config.name;
     this.installationId = config.installationId;
   }
+
+  async createDM(senderAddresses: string): Promise<string> {
+    try {
+      const dm = await this.client.conversations.newDm(senderAddresses);
+      return dm.id;
+    } catch (error) {
+      console.error("Error creating DM:", error);
+      throw error;
+    }
+  }
+  async createGroup(senderAddresses: string[]): Promise<string> {
+    try {
+      const group = await this.client.conversations.newGroup([]);
+      await group.updateName(
+        "Test Group" + Math.random().toString(36).substring(2, 15),
+      );
+      // First add the sender to the group
+      for (const sender of senderAddresses) {
+        await group.addMembers([sender]);
+      }
+      await group.addSuperAdmin(senderAddresses[0]);
+      return group.id;
+    } catch (error) {
+      console.error("Error creating group:", error);
+      throw error;
+    }
+  }
+
   updateVersion(version: string) {
     this.version = version;
     if (version === "38") {
@@ -57,10 +100,14 @@ export class ClientManager {
       this.clientType = Client42;
     }
   }
-  async sendMessage(to: string, message: string): Promise<boolean> {
+  async sendMessage(groupId: string, message: string): Promise<boolean> {
     try {
       await this.client.conversations.sync();
-      const conversation = await this.client.conversations.newDm(to);
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
       await conversation.send(message);
 
       return true;

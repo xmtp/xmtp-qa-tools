@@ -1,0 +1,4 @@
+[2025-02-19T13:46:42.061Z] [bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:46:44.503Z] [alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:46:44.686Z] [bob] DM created: 5fad3254c23ed478462bc68eaec761e4
+[2025-02-19T13:46:44.686Z] [bob] Waiting for message from alice-a

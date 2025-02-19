@@ -1,0 +1,10 @@
+[2025-02-19T14:47:07.679Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T14:47:07.879Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T14:47:07.926Z] [Joe] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T14:47:08.095Z] [Bob] DM created: 5fad3254c23ed478462bc68eaec761e4
+[2025-02-19T14:47:10.097Z] [Alice] Sending group message to [5fad3254c23ed478462bc68eaec761e4]: gm-dmkf5hlx44d
+[2025-02-19T14:47:11.299Z] [Bob] Received message: gm-dmkf5hlx44d
+[2025-02-19T14:47:29.625Z] [Bob] Group created: 4158d8faa16b204bdff9df6c8ce2a0fc
+[2025-02-19T14:47:31.628Z] [Bob] Sending group message to [4158d8faa16b204bdff9df6c8ce2a0fc]: hello group nhb6nemp3gr
+[2025-02-19T14:47:33.184Z] [Alice] Received message: hello group nhb6nemp3gr
+[2025-02-19T14:47:34.233Z] [Joe] Received message: hello group nhb6nemp3gr

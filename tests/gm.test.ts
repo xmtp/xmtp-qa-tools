@@ -1,47 +1,114 @@
-import dotenv from "dotenv";
-import { describe, it } from "vitest";
-import { createWorkerPair } from "../helpers/worker";
+import { version } from "os";
+import { env } from "process";
+import { beforeAll, describe, it } from "vitest";
+import { testLogger } from "../helpers/logger";
+import { generateDefaultPersonas, type Persona } from "../helpers/personas";
 
-dotenv.config();
-
-const TIMEOUT = 20000;
+const TIMEOUT = 30000;
 
 describe("Test for different DM flows", () => {
+  // Add beforeAll to initialize personas
+  let bob: Persona, alice: Persona, joe: Persona;
+  let bobAddress: string, aliceAddress: string, joeAddress: string;
+
+  beforeAll(async () => {
+    const logger = testLogger.createTest("Setup");
+    [bob, alice, joe] = generateDefaultPersonas(
+      [
+        {
+          name: "Bob",
+          env: "dev",
+          installationId: "a",
+          version: "42",
+        },
+        {
+          name: "Alice",
+          env: "dev",
+          installationId: "a",
+          version: "42",
+        },
+        {
+          name: "Joe",
+          env: "dev",
+          installationId: "a",
+          version: "42",
+        },
+      ],
+      logger,
+    );
+
+    // Initialize all workers at once
+    [bobAddress, aliceAddress, joeAddress] = await Promise.all([
+      bob.worker!.initialize(),
+      alice.worker!.initialize(),
+      joe.worker!.initialize(),
+    ]);
+  }, TIMEOUT);
+
   it(
-    "should initialize bob and alice and send a message using workers",
+    "should send a direct message using workers",
     async () => {
       try {
-        const { aliceWorker, bobWorker } = createWorkerPair(
-          new URL("../helpers/worker.ts", import.meta.url),
+        const testName = "DMs";
+        const logger = testLogger.createTest(testName);
+        logger.log(
+          `Testing DMs with version: ${bob.version}, installationId: ${bob.installationId} | env: ${bob.env}`,
         );
-        // Initialize workers
-        const [aliceAddress, bobAddress] = await Promise.all([
-          aliceWorker.initialize({ name: "Alice", env: "dev" }),
-          bobWorker.initialize({ name: "Bob", env: "dev" }),
-        ]);
+        // Create DM and send message
+        const dmId = await bob.worker!.createDM(aliceAddress);
 
         const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
         // Set up receive before send
-        const receivePromise = aliceWorker.receiveMessage(
-          bobAddress,
-          gmMessage,
-        );
-        await new Promise((resolve) => setTimeout(resolve, 2000));
+        const receivePromise = bob.worker?.receiveMessage(dmId, gmMessage);
+        await alice.worker?.sendMessage(dmId, gmMessage);
 
-        // Send and wait for completion
-        await bobWorker.sendMessage(aliceAddress, gmMessage);
-        const receivedMessage = await receivePromise;
-
-        console.log("Message exchange complete:", {
-          sent: gmMessage,
-          received: receivedMessage,
-        });
+        logger.log(`Waiting for message from ${bob.name}`);
+        await receivePromise;
       } catch (error) {
         console.error("Failed during message exchange:", error);
         throw error;
       }
     },
     TIMEOUT,
+  );
+
+  it(
+    "should send a group message using workers",
+    async () => {
+      try {
+        const testName = "Groups";
+        const logger = testLogger.createTest(testName);
+        logger.log(
+          `Testing groups with version: ${bob.version}, installationId: ${bob.installationId} | env: ${bob.env}`,
+        );
+        // Create group and send message
+        const groupId = await bob.worker?.createGroup([
+          joeAddress,
+          bobAddress,
+          aliceAddress,
+        ]);
+
+        const groupMessage =
+          "hello group " + Math.random().toString(36).substring(2, 15);
+
+        // Set up both Alice and Joe to listen for the group message from Bob
+        const alicePromise = alice.worker?.receiveMessage(
+          groupId!,
+          groupMessage,
+        );
+        const joePromise = joe.worker?.receiveMessage(groupId!, groupMessage);
+
+        // Bob sends the group message
+        await bob.worker?.sendMessage(groupId!, groupMessage);
+
+        logger.log(`Waiting for message from ${alice.name}`);
+        await Promise.all([alicePromise, joePromise]);
+      } catch (error) {
+        console.error("Failed during group messaging test:", error);
+        throw error;
+      }
+    },
+    TIMEOUT * 2,
   );
 });

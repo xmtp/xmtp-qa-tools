@@ -1,11 +1,5 @@
-[2025-02-19T02:42:56.793Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-19T02:42:57.648Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"b"}
-[2025-02-19T02:42:57.648Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
-[2025-02-19T02:42:59.649Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-0t00nluq8que
-[2025-02-19T02:43:00.974Z] [Alice] Received message: gm-0t00nluq8que
-[2025-02-19T02:43:01.094Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
-[2025-02-19T02:43:03.097Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-1ukcwpposfhi
-[2025-02-19T02:43:04.249Z] [Alice] Received message: gm-1ukcwpposfhi
-[2025-02-19T02:43:04.387Z] [Alice] Waiting for message from 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
-[2025-02-19T02:43:06.389Z] [Bob] Sending message to 0x8553750b8e4945036dF0B96Bf830525dA60bca29: gm-2819ya2kajq3
-[2025-02-19T02:43:07.692Z] [Alice] Received message: gm-2819ya2kajq3
+[2025-02-19T13:09:13.112Z] [Alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
+[2025-02-19T13:09:13.657Z] [Bob] initialized with: {"env":"dev","version":"42","installationId":"b"}
+[2025-02-19T13:09:13.658Z] [Bob] Waiting for message from Alice-a
+[2025-02-19T13:09:15.662Z] [Alice] Sending message to Bob-b: gm-0-am9qkgp2d78
+[2025-02-19T13:09:16.936Z] [Bob] Received message: gm-0-am9qkgp2d78

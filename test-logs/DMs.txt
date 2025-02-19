@@ -1,0 +1,2 @@
+[2025-02-19T14:47:07.927Z] Testing DMs with version: 42, installationId: a | env: dev
+[2025-02-19T14:47:11.397Z] Waiting for message from Bob
