@@ -100,6 +100,7 @@ export class WorkerClient extends Worker {
       "messageReceived",
     );
     this.logger.log(`[${this.name}] Received message: ${expectedMessage}`);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
     return response.message;
   }
 

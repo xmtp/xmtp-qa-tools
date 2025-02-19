@@ -132,8 +132,6 @@ if (
                   bobAddress,
                   gmMessage,
                 );
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-
                 // Send and wait for completion
                 await bobWorker.sendMessage(aliceAddress, gmMessage);
                 await receivePromise;
@@ -199,7 +197,6 @@ if (
                   bobAddress,
                   gmMessage,
                 );
-                await new Promise((resolve) => setTimeout(resolve, 2000));
 
                 // Send and wait for completion
                 await bobWorker.sendMessage(aliceAddress, gmMessage);
@@ -260,7 +257,6 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
                       bobAddress,
                       gmMessage,
                     );
-                    await new Promise((resolve) => setTimeout(resolve, 2000));
 
                     // Send and wait for completion
                     await bobWorker.sendMessage(aliceAddress, gmMessage);
@@ -294,8 +290,6 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
                       bobAddressUpdated,
                       gmMessage,
                     );
-                    await new Promise((resolve) => setTimeout(resolve, 2000));
-
                     // Send and wait for completion
                     await bobWorker.sendMessage(aliceAddressUpdated, gmMessage);
                     const receivedMessageUpdated = await receivePromiseUpdated;
