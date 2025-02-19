@@ -58,6 +58,12 @@ export class WorkerClient extends Worker {
     const response = await this.waitForMessage<{ clientAddress: string }>(
       "clientInitialized",
     );
+    console.log(`Created client for ${this.name}`, {
+      env: config.env,
+      version: config.version,
+      installationId: config.installationId,
+      clientAddress: response.clientAddress,
+    });
     return response.clientAddress;
   }
 

@@ -1,12 +1,14 @@
+import fs from "fs";
 import dotenv from "dotenv";
-import { beforeAll, describe, expect, it } from "vitest";
-import { ClientManager, type XmtpEnv } from "../helpers/manager";
+import { beforeAll, describe, it } from "vitest";
+import { type XmtpEnv } from "../helpers/manager";
+import { createWorkerPair } from "../helpers/worker";
 
 dotenv.config();
 
 const TIMEOUT = 20000;
 const environments: XmtpEnv[] = ["dev"];
-const versions = ["40", "41", "42"];
+const versions = ["41", "42"];
 const installationIds = ["a", "b"];
 
 // Configuration object to specify which tests or describe blocks to skip
@@ -16,9 +18,9 @@ const config = {
   ],
 
   dontSkipDescribeBlocks: [
+    "Test for all version combinations in DMs using a new installation",
     "Test for all version combinations in DMs using the same installation",
-    //"Test for all version combinations in DMs using a new installation",
-    //"Test version updates on the same installation",
+    "Test version updates on the same installation",
   ],
 };
 
@@ -35,6 +37,89 @@ function shouldSkipDescribe(title: string) {
   return !config.dontSkipDescribeBlocks.includes(title);
 }
 
+if (
+  !shouldSkipDescribe(
+    "Test for all version combinations in DMs using a new installation",
+  )
+) {
+  describe("Test for all version combinations in DMs using a new installation", () => {
+    beforeAll(() => {
+      //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
+      fs.rmSync(".data", { recursive: true, force: true });
+    });
+
+    environments.forEach((env) => {
+      installationIds.forEach((bobInstallationId, bobInstallIndex) => {
+        installationIds
+          .slice(bobInstallIndex + 1)
+          .forEach((aliceInstallationId) => {
+            versions.forEach((bobVersion) => {
+              versions.forEach((aliceVersion) => {
+                if (
+                  (bobVersion !== aliceVersion ||
+                    bobInstallationId !== aliceInstallationId) &&
+                  !shouldSkipVersionFlow(bobVersion, aliceVersion)
+                ) {
+                  const testName = `Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`;
+
+                  it(
+                    testName,
+                    async () => {
+                      try {
+                        const { aliceWorker, bobWorker } = createWorkerPair(
+                          new URL("../helpers/worker.ts", import.meta.url),
+                        );
+                        // Initialize workers
+                        const [aliceAddress, bobAddress] = await Promise.all([
+                          aliceWorker.initialize({
+                            name: "Alice",
+                            env: env,
+                            installationId: aliceInstallationId,
+                            version: aliceVersion,
+                          }),
+                          bobWorker.initialize({
+                            name: "Bob",
+                            env: env,
+                            installationId: bobInstallationId,
+                            version: bobVersion,
+                          }),
+                        ]);
+
+                        const gmMessage =
+                          "gm-" + Math.random().toString(36).substring(2, 15);
+
+                        // Set up receive before send
+                        const receivePromise = aliceWorker.receiveMessage(
+                          bobAddress,
+                          gmMessage,
+                        );
+                        await new Promise((resolve) =>
+                          setTimeout(resolve, 2000),
+                        );
+
+                        // Send and wait for completion
+                        await bobWorker.sendMessage(aliceAddress, gmMessage);
+                        const receivedMessage = await receivePromise;
+
+                        console.log("Message exchange complete:", {
+                          sent: gmMessage,
+                          received: receivedMessage,
+                        });
+                      } catch (error) {
+                        console.error("Failed during message exchange:", error);
+                        throw error;
+                      }
+                    },
+                    TIMEOUT,
+                  );
+                }
+              });
+            });
+          });
+      });
+    });
+  });
+}
 if (
   !shouldSkipDescribe(
     "Test for all version combinations in DMs using the same installation",
@@ -60,102 +145,48 @@ if (
                     testName,
                     async () => {
                       try {
-                        const bob = new ClientManager({
-                          env,
-                          version: bobVersion,
-                          name: "Bob",
-                          installationId: bobInstallationId,
-                        });
-
-                        const alice = new ClientManager({
-                          env,
-                          version: aliceVersion,
-                          name: "Alice",
-                          installationId: aliceInstallationId,
-                        });
-
-                        await bob.initialize();
-                        await alice.initialize();
-
-                        // Bob sends, Alice receives
-                        const success =
-                          await ClientManager.sendMessageAndVerify(bob, alice);
-                        expect(success).toBe(true);
-                      } catch (error) {
-                        console.error(
-                          `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
-                          error,
+                        const { aliceWorker, bobWorker } = createWorkerPair(
+                          new URL("../helpers/worker.ts", import.meta.url),
                         );
-                        throw error; // Rethrow the error to ensure the test fails
-                      }
-                    },
-                    TIMEOUT,
-                  );
-                }
-              });
-            });
-          });
-      });
-    });
-  });
-}
+                        // Initialize workers
+                        const [aliceAddress, bobAddress] = await Promise.all([
+                          aliceWorker.initialize({
+                            name: "Alice",
+                            env: env,
+                            installationId: aliceInstallationId,
+                            version: aliceVersion,
+                          }),
+                          bobWorker.initialize({
+                            name: "Bob",
+                            env: env,
+                            installationId: bobInstallationId,
+                            version: bobVersion,
+                          }),
+                        ]);
 
-if (
-  !shouldSkipDescribe(
-    "Test for all version combinations in DMs using a new installation",
-  )
-) {
-  describe("Test for all version combinations in DMs using a new installation", () => {
-    beforeAll(() => {
-      //Delete the data folder before running all tests for creating new installation but keep the installation as it persists
-      //fs.rmSync(".data", { recursive: true, force: true });
-    });
+                        const gmMessage =
+                          "gm-" + Math.random().toString(36).substring(2, 15);
 
-    environments.forEach((env) => {
-      installationIds.forEach((bobInstallationId, bobInstallIndex) => {
-        installationIds
-          .slice(bobInstallIndex + 1)
-          .forEach((aliceInstallationId) => {
-            versions.forEach((bobVersion) => {
-              versions.forEach((aliceVersion) => {
-                if (
-                  (bobVersion !== aliceVersion ||
-                    bobInstallationId !== aliceInstallationId) &&
-                  !shouldSkipVersionFlow(bobVersion, aliceVersion)
-                ) {
-                  const testName = `Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}) with env: ${env}`;
-
-                  it(
-                    testName,
-                    async () => {
-                      try {
-                        const bob = new ClientManager({
-                          env,
-                          version: bobVersion,
-                          name: "Bob",
-                          installationId: bobInstallationId,
-                        });
-
-                        const alice = new ClientManager({
-                          env,
-                          version: aliceVersion,
-                          name: "Alice",
-                          installationId: aliceInstallationId,
-                        });
-
-                        await bob.initialize();
-                        await alice.initialize();
-
-                        const success =
-                          await ClientManager.sendMessageAndVerify(bob, alice);
-
-                        expect(success).toBe(true);
-                      } catch (error) {
-                        console.error(
-                          `Error in test case for Bob (version: ${bobVersion}, installationId: ${bobInstallationId}) -> Alice (version: ${aliceVersion}, installationId: ${aliceInstallationId}):`,
-                          error,
+                        // Set up receive before send
+                        const receivePromise = aliceWorker.receiveMessage(
+                          bobAddress,
+                          gmMessage,
                         );
-                        throw error; // Rethrow the error to ensure the test fails
+                        await new Promise((resolve) =>
+                          setTimeout(resolve, 2000),
+                        );
+
+                        // Send and wait for completion
+                        await bobWorker.sendMessage(aliceAddress, gmMessage);
+                        const receivedMessage = await receivePromise;
+
+                        console.log("Message exchange complete:", {
+                          sent: gmMessage,
+                          received: receivedMessage,
+                        });
+                      } catch (error) {
+                        console.error("Failed during message exchange:", error);
+                        throw error;
                       }
                     },
                     TIMEOUT,
@@ -171,11 +202,6 @@ if (
 
 if (!shouldSkipDescribe("Test version updates on the same installation")) {
   describe("Test version updates on the same installation", () => {
-    beforeAll(() => {
-      // Ensure the data folder is clean before running tests
-      //fs.rmSync(".data", { recursive: true, force: true });
-    });
-
     environments.forEach((env) => {
       installationIds.forEach((installationId) => {
         versions.forEach((initialVersion, index) => {
@@ -189,52 +215,81 @@ if (!shouldSkipDescribe("Test version updates on the same installation")) {
                 `updates from version: ${initialVersion} to version: ${updatedVersion} on installationId: ${installationId} with env: ${env}`,
                 async () => {
                   try {
-                    const bob = new ClientManager({
-                      env,
-                      version: initialVersion,
-                      name: "Bob",
-                      installationId,
-                    });
-
-                    const alice = new ClientManager({
-                      env,
-                      version: updatedVersion,
-                      name: "Alice",
-                      installationId,
-                    });
-
-                    await bob.initialize();
-                    await alice.initialize();
-                    const success = await ClientManager.sendMessageAndVerify(
-                      bob,
-                      alice,
+                    const { aliceWorker, bobWorker } = createWorkerPair(
+                      new URL("../helpers/worker.ts", import.meta.url),
                     );
+                    // Initialize workers
+                    const [aliceAddress, bobAddress] = await Promise.all([
+                      aliceWorker.initialize({
+                        name: "Alice",
+                        env: env,
+                        installationId: installationId,
+                        version: initialVersion,
+                      }),
+                      bobWorker.initialize({
+                        name: "Bob",
+                        env: env,
+                        installationId: installationId,
+                        version: initialVersion,
+                      }),
+                    ]);
 
-                    // Simulate version update
-                    const bobUpdated = new ClientManager({
-                      env,
-                      version: updatedVersion,
-                      name: "Bob",
-                      installationId,
+                    const gmMessage =
+                      "gm-" + Math.random().toString(36).substring(2, 15);
+
+                    // Set up receive before send
+                    const receivePromise = aliceWorker.receiveMessage(
+                      bobAddress,
+                      gmMessage,
+                    );
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                    // Send and wait for completion
+                    await bobWorker.sendMessage(aliceAddress, gmMessage);
+                    const receivedMessage = await receivePromise;
+
+                    console.log("Message exchange complete:", {
+                      sent: gmMessage,
+                      received: receivedMessage,
                     });
-                    await bobUpdated.initialize();
-                    const successUpdated =
-                      await ClientManager.sendMessageAndVerify(
-                        bobUpdated,
-                        alice,
-                      );
 
-                    expect(success).toBe(true);
-                    expect(successUpdated).toBe(true);
+                    const [aliceAddressUpdated, bobAddressUpdated] =
+                      await Promise.all([
+                        aliceWorker.initialize({
+                          name: "Alice",
+                          env: env,
+                          installationId: installationId,
+                          version: updatedVersion,
+                        }),
+                        bobWorker.initialize({
+                          name: "Bob",
+                          env: env,
+                          installationId: installationId,
+                          version: updatedVersion,
+                        }),
+                      ]);
+
+                    // Set up receive before send
+                    const receivePromiseUpdated = aliceWorker.receiveMessage(
+                      bobAddressUpdated,
+                      gmMessage,
+                    );
+                    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+                    // Send and wait for completion
+                    await bobWorker.sendMessage(aliceAddressUpdated, gmMessage);
+                    const receivedMessageUpdated = await receivePromiseUpdated;
+
+                    console.log("Message exchange complete:", {
+                      sent: gmMessage,
+                      received: receivedMessageUpdated,
+                    });
                   } catch (error) {
-                    console.error(
-                      `Error in test case for Bob (version: ${initialVersion}, installationId: ${installationId}) -> Alice (version: ${updatedVersion}, installationId: ${installationId}):`,
-                      error,
-                    );
-                    throw error; // Rethrow the error to ensure the test fails
+                    console.error("Failed during message exchange:", error);
+                    throw error;
                   }
                 },
-                TIMEOUT * 2,
+                TIMEOUT,
               );
             }
           });

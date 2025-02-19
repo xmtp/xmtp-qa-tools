@@ -117,7 +117,6 @@ export class ClientManager {
     try {
       await this.client.conversations.sync();
       const stream = await this.client.conversations.streamAllMessages();
-      console.log("stream started", stream);
       for await (const message of stream) {
         console.log("message received", message);
         if (
@@ -150,9 +149,5 @@ export class ClientManager {
     );
 
     await this.client.conversations.sync();
-
-    console.log(
-      `Created client for ${this.name} on the '${this.env}' network...`,
-    );
   }
 }
