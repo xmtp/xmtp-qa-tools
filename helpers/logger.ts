@@ -1,58 +1,100 @@
 import fs from "fs";
 import path from "path";
+import winston from "winston";
 
-export class TestLogger {
-  private logDir: string;
-  private activeTests: Map<string, { filePath: string; testName: string }>;
-  private currentTestName: string | null;
+// Singleton logger instance
+let sharedLogger: winston.Logger | null = null;
 
-  constructor(private instanceName?: string) {
-    this.logDir = path.join(process.cwd(), "test-logs");
-    this.ensureLogDirectory();
-    this.activeTests = new Map();
-    this.currentTestName = null;
-  }
-
-  private ensureLogDirectory() {
-    if (!fs.existsSync(this.logDir)) {
-      fs.mkdirSync(this.logDir, { recursive: true });
+export const createLogger = (testName: string) => {
+  if (!sharedLogger) {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
+    // Create filename from test name
+    const logFilePath = path.join("logs", `${sanitizedName}.log`);
+    if (fs.existsSync(logFilePath)) {
+      fs.unlinkSync(logFilePath);
     }
+    // NEW: Added console transport
+    const consoleTransport = new winston.transports.Console({
+      format: winston.format.combine(
+        winston.format.colorize(),
+        winston.format.printf(({ timestamp, level, message }) => {
+          return `[${timestamp}] [${level}] ${message}`;
+        }),
+      ),
+    });
+    const sharedTransport = new winston.transports.File({
+      filename: path.join("logs", `${sanitizedName}.log`),
+      maxsize: 10485760,
+      tailable: true,
+      options: { flags: "a" }, // Change to 'a' for append mode instead of 'w'
+    });
+
+    const colorizeSlowOps = winston.format((info) => {
+      if (typeof info.message === "string" && info.message.includes("XMTP:")) {
+        return false;
+      }
+
+      return info;
+    });
+
+    sharedLogger = winston.createLogger({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        colorizeSlowOps(),
+        winston.format.printf(({ timestamp, level, message }) => {
+          return `[${timestamp}] [${level}] ${message}`;
+        }),
+      ),
+      transports: [sharedTransport, consoleTransport],
+    });
   }
 
-  private getFilePath(testName: string): string {
-    const sanitizedName = testName.replace(/[^a-z0-9]/gi, "_");
-    return path.join(this.logDir, `${sanitizedName}.txt`);
-  }
+  return sharedLogger;
+};
 
-  log(message: string) {
-    if (!this.currentTestName) {
-      throw new Error("No active test found");
+// Helper to override console for any module
+export const overrideConsole = (logger: winston.Logger) => {
+  console.log = (...args: any[]) => {
+    if (
+      args.length > 0 &&
+      typeof args[0] === "string" &&
+      args[0].includes("%s: %s")
+    ) {
+      filterTime(args, logger);
+    } else if (Array.isArray(args)) {
+      logger.info(args.join(" "));
+    } else {
+      logger.info(args);
     }
+  };
+  console.error = (...args: any[]) => logger.error(args.join(" "));
+  console.warn = (...args: any[]) => logger.warn(args.join(" "));
+  console.info = (...args: any[]) => logger.info(args.join(" "));
+};
 
-    const currentTest = this.activeTests.get(this.currentTestName);
-    if (!currentTest) {
-      throw new Error(`Test ${this.currentTestName} not found in active tests`);
-    }
-
-    const timestamp = new Date().toISOString();
-    const logEntry = `[${timestamp}] ${message}\n`;
-    fs.appendFileSync(currentTest.filePath, logEntry);
-    console.log(`${currentTest.testName}: ${message}`);
-  }
-
-  createTest(testName: string) {
-    if (!testName) {
-      throw new Error("Test name cannot be empty");
-    }
-
-    // Create a new logger instance for this test
-    const newLogger = new TestLogger(testName);
-    const filePath = newLogger.getFilePath(testName);
-    fs.writeFileSync(filePath, "");
-    newLogger.activeTests.set(testName, { filePath, testName });
-    newLogger.currentTestName = testName;
-    return newLogger;
-  }
+// Ensure logs directory exists
+if (!fs.existsSync("logs")) {
+  fs.mkdirSync("logs");
 }
+function filterTime(args: any[], logger: winston.Logger) {
+  const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
+  const timeMatch = args.find((arg: any) =>
+    timePattern.test(String(arg)),
+  ) as string;
 
-export const testLogger = new TestLogger();
+  if (timeMatch) {
+    const timeValue = parseFloat(timeMatch.replace(/[ms|s]/g, ""));
+    // Convert seconds to milliseconds if needed
+    const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
+
+    // Log if over 300ms
+    if (timeInMs > 300) {
+      logger.info(
+        `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`,
+      );
+    }
+    return true;
+  }
+
+  return false;
+}

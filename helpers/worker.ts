@@ -1,11 +1,8 @@
 /* eslint-disable */
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
-import { testLogger, TestLogger } from "./logger";
+import { createLogger, overrideConsole } from "./logger";
 import { ClientManager, type XmtpEnv } from "./manager";
 import { Persona } from "./personas";
-
-const defaultVersion = "42";
-const defaultInstallationId = "a";
 
 // Types
 export type WorkerMessage = {
@@ -28,17 +25,11 @@ const workerBootstrap = /* JavaScript */ `
 // Main Worker Client class
 export class WorkerClient extends Worker {
   public name: string;
-  private logger: TestLogger;
   private installationId!: string;
   private env!: XmtpEnv;
   private version!: string;
 
-  constructor(
-    persona: Persona,
-    env: XmtpEnv,
-    logger: TestLogger,
-    options: WorkerOptions = {},
-  ) {
+  constructor(persona: Persona, env: XmtpEnv, options: WorkerOptions = {}) {
     options.workerData ??= {};
     options.workerData.__ts_worker_filename = "../helpers/worker.ts".toString();
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
@@ -46,86 +37,82 @@ export class WorkerClient extends Worker {
     this.installationId = persona.installationId;
     this.version = persona.version;
     this.env = env;
-    this.logger = logger;
-    this.setupLogging();
     return this;
   }
 
-  setupLogging() {
-    if (this.stdout) {
-      this.stdout.on("data", (data) => {
-        this.logger?.log(`[${this.name}] ${data.toString().trim()}`);
-      });
-    }
-    if (this.stderr) {
-      this.stderr.on("data", (data) => {
-        this.logger?.log(`[${this.name}] ${data.toString().trim()}`);
-      });
-    }
-    return this;
-  }
-
-  async initialize(): Promise<string> {
+  async initialize(
+    testName: string,
+  ): Promise<{ address: string; inboxId: string }> {
     this.postMessage({
       type: "initialize",
       name: this.name,
       env: this.env,
       version: this.version,
       installationId: this.installationId,
+      testName: testName,
     });
-    const response = await this.waitForMessage<{ clientAddress: string }>(
-      "clientInitialized",
-    );
-
-    this.logger?.log(
+    const response = await this.waitForMessage<{
+      address: string;
+      inboxId: string;
+    }>("clientInitialized");
+    console.log(
       `[${this.name}] initialized with: ${JSON.stringify({
         env: this.env,
         version: this.version,
         installationId: this.installationId,
       })}`,
     );
-    return response.clientAddress;
+    return {
+      address: response.address,
+      inboxId: response.inboxId,
+    };
   }
 
   // New method for sending group messages
   async sendMessage(groupId: string, message: string): Promise<void> {
     // Simulate delay before sending
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    this.logger?.log(
+    console.log(
       `[${this.name}] Sending group message to [${groupId}]: ${message}`,
     );
+    console.time(`[${this.name}] sendMessage`);
     this.postMessage({ type: "sendMessage", groupId, message });
-    await this.waitForMessage("messageSent");
+    console.timeEnd(`[${this.name}] sendMessage`);
+    const returnValue = await this.waitForMessage("messageSent");
+    return returnValue;
   }
   async createDM(senderAddresses: string): Promise<string> {
     this.postMessage({ type: "createDM", senderAddresses });
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
-    this.logger?.log(`[${this.name}] DM created: ${response.dmId}`);
+    console.log(`[${this.name}] DM created: ${response.dmId}`);
     return response.dmId;
   }
 
   async createGroup(senderAddresses: string[]): Promise<string> {
+    console.time(`[${this.name}] createGroup`);
     this.postMessage({ type: "createGroup", senderAddresses });
     const response = await this.waitForMessage<{ groupId: string }>(
       "groupCreated",
     );
-    this.logger?.log(`[${this.name}] Group created: ${response.groupId}`);
+    console.log(`[${this.name}] Group created: ${response.groupId}`);
+    console.timeEnd(`[${this.name}] createGroup`);
     return response.groupId;
   }
 
   async receiveMessage(
-    senderAddress: string,
+    groupId: string,
     expectedMessage: string,
   ): Promise<string> {
     this.postMessage({
       type: "receiveMessage",
-      senderAddress,
+      groupId,
       expectedMessage,
+      name: this.name,
+      installationId: this.installationId,
     });
     const response = await this.waitForMessage<{ message: string }>(
       "messageReceived",
     );
-    this.logger?.log(`[${this.name}] Received message: ${expectedMessage}`);
+    console.log(`[${this.name}] Received message: ${expectedMessage}`);
     return response.message;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
@@ -136,7 +123,7 @@ export class WorkerClient extends Worker {
           resolve(msg as T);
         } else if (msg.type === "error") {
           this.removeListener("message", handler);
-          this.logger?.log(`[${this.name}] Error: ${msg.error}`);
+          console.log(`[${this.name}] Error: ${msg.error}`);
           reject(new Error(msg.error));
         }
       };
@@ -147,13 +134,17 @@ export class WorkerClient extends Worker {
 
 // Worker implementation (runs in worker thread)
 if (parentPort) {
-  let client: ClientManager | undefined;
-  let workerLogger: TestLogger | undefined;
+  let client: ClientManager;
 
   parentPort.on("message", async (data: WorkerMessage) => {
     try {
       switch (data.type) {
         case "initialize": {
+          // Use the same logger instance with the test name
+          console.time(`[${data.name}] initialize`);
+          const logger = createLogger(data.testName);
+          overrideConsole(logger);
+
           client = new ClientManager({
             env: data.env || "dev",
             version: data.version || "42",
@@ -161,23 +152,24 @@ if (parentPort) {
             installationId: data.installationId || "a",
           });
           await client.initialize();
-
+          console.timeEnd(`[${data.name}] initialize`);
           parentPort?.postMessage({
             type: "clientInitialized",
-            clientAddress: client.client.accountAddress,
-            clientName: data.name,
+            name: data.name,
+            address: client.client.accountAddress,
+            inboxId: client.client.inboxId,
           });
           break;
         }
         case "sendMessage": {
           if (!client) throw new Error("Client not initialized");
-          workerLogger?.log(
-            `[${client?.name}:Thread] Sending group message to ${data.groupId}`,
+          console.log(
+            `[${client?.name}] Sending group message to ${data.groupId}`,
           );
+          console.time(`[${client?.name}] sendMessage`);
           await client.sendMessage(data.groupId, data.message);
-          workerLogger?.log(
-            `[${client?.name}:Thread] Group message sent successfully`,
-          );
+          console.timeEnd(`[${client?.name}] sendMessage`);
+          console.log(`[${client?.name}] Group message sent successfully`);
           parentPort?.postMessage({
             type: "messageSent",
             message: data.message,
@@ -186,14 +178,18 @@ if (parentPort) {
         }
 
         case "receiveMessage": {
+          console.log(JSON.stringify(data));
           if (!client) throw new Error("Client not initialized");
-          workerLogger?.log(
-            `[${client.name}:Thread] Waiting for message from ${data.name}-${data.installationId}`,
+          console.time(`[${client?.name}] receiveMessage`);
+          console.log(
+            `[${client.name}] Waiting for message from group ${data.groupId}`,
           );
-          const message = await client.receiveMessage(data.expectedMessage);
-          workerLogger?.log(
-            `[${client.name}:Thread] Message received: ${message}`,
+          const message = await client.receiveMessage(
+            data.groupId,
+            data.expectedMessage,
           );
+          console.timeEnd(`[${client?.name}] receiveMessage`);
+          console.log(`[${client.name}] Message received: ${message}`);
           parentPort?.postMessage({
             type: "messageReceived",
             message: message,
@@ -202,8 +198,10 @@ if (parentPort) {
         }
         case "createDM": {
           if (!client) throw new Error("Client not initialized");
-          workerLogger?.log("Creating DM");
+          console.time(`[${client?.name}] createDM`);
           const dmId = await client.createDM(data.senderAddresses);
+          console.timeEnd(`[${client?.name}] createDM`);
+          console.log(`[${client?.name}] DM created`);
           parentPort?.postMessage({
             type: "dmCreated",
             dmId: dmId,
@@ -212,8 +210,10 @@ if (parentPort) {
         }
         case "createGroup": {
           if (!client) throw new Error("Client not initialized");
-          workerLogger?.log("Creating group");
+          console.time(`[${client?.name}] createGroup`);
+
           const groupId = await client.createGroup(data.senderAddresses);
+          console.timeEnd(`[${client?.name}] createGroup`);
           parentPort?.postMessage({
             type: "groupCreated",
             groupId: groupId,
@@ -222,15 +222,13 @@ if (parentPort) {
         }
       }
     } catch (error: any) {
-      if (workerLogger) {
-        const workerName = client?.name || data?.name || "Unknown";
-        workerLogger?.log(
-          `[${workerName}:Thread] Error: ${error.message || String(error)}`,
-        );
-      }
+      console.time(`[${client?.name}] error`);
+      const workerName = client?.name || data?.name || "Unknown";
+      console.log(`[${workerName}] Error: ${error.message || String(error)}`);
+      console.timeEnd(`[${client?.name}] error`);
       parentPort?.postMessage({
         type: "error",
-        error: error.message || String(error),
+        error: error.message,
       });
     }
   });

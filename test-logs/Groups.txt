@@ -1,5 +1,0 @@
-[2025-02-19T20:28:29.488Z] Testing groups with version: 42, installationId: a | env: dev
-[2025-02-19T20:28:29.488Z] Creating group with joe at 0xa9bFE9aDA6D816E4A7A1e03d19043C521423655C
-[2025-02-19T20:28:29.488Z] Creating group with bob at 0x9853f1f54716AD6f6979F18c814d7307eC1437E8
-[2025-02-19T20:28:29.488Z] Creating group with alice at 0x8553750b8e4945036dF0B96Bf830525dA60bca29
-[2025-02-19T20:28:51.168Z] Waiting for group message acknowledgments
