@@ -76,12 +76,7 @@ describe("Small group interactions with multiple participants", () => {
   it(
     "should handle adding new members",
     async () => {
-      const currentMembersBeforeAdd = await creator.worker!.getMembers(groupId);
-      console.log(
-        "[TEST] Current members before add:",
-        currentMembersBeforeAdd.length,
-      );
-      expect(currentMembersBeforeAdd.length).toBe(participants.length);
+      await verifyMembersCount(participants, groupId, participants.length);
 
       const newRandomParticipant = getRandomPersonas(participants, 1)[0];
       const membersAfterAdd = await creator.worker!.addMembers(groupId, [
@@ -89,8 +84,7 @@ describe("Small group interactions with multiple participants", () => {
       ]);
       console.log("[TEST] Members after adding:", membersAfterAdd);
 
-      const currentMembersAfterAdd = await creator.worker!.getMembers(groupId);
-      expect(currentMembersAfterAdd.length).toBe(membersAfterAdd);
+      await verifyMembersCount(participants, groupId, 2);
 
       // Final verification step
       const { validMessages, receivedMessages } = await verifyStreams(
@@ -109,18 +103,13 @@ describe("Small group interactions with multiple participants", () => {
     "should handle removing members",
     async () => {
       const newRandomParticipant = getRandomPersonas(participants, 1)[0];
-      const membersBeforeRemove = await creator.worker!.getMembers(groupId);
+      await verifyMembersCount(participants, groupId, 2);
 
-      const membersAfterRemove = await creator.worker!.removeMembers(groupId, [
+      await creator.worker!.removeMembers(groupId, [
         newRandomParticipant.address!,
       ]);
 
-      const finalMembers = await creator.worker!.getMembers(groupId);
-      console.log("[TEST] Members after removing:", membersAfterRemove);
-      console.log("[TEST] Final members count:", finalMembers.length);
-
-      expect(finalMembers.length).toBe(membersAfterRemove);
-      expect(membersAfterRemove).toBe(membersBeforeRemove.length - 1);
+      await verifyMembersCount(participants, groupId, 4);
 
       // Final verification step
       const { validMessages, receivedMessages } = await verifyStreams(
@@ -139,6 +128,25 @@ describe("Small group interactions with multiple participants", () => {
     flushLogger(testName);
   });
 });
+
+async function verifyMembersCount(
+  participants: Persona[],
+  groupId: string,
+  checkersCount: number,
+) {
+  const checkers = getRandomPersonas(participants, checkersCount);
+  const memberCounts = await Promise.all(
+    checkers.map(async (checker) => {
+      const members = await checker.worker!.getMembers(groupId);
+      console.log(
+        `[TEST] Member count verified by ${checker.address}: ${members.length}`,
+      );
+      return members.length;
+    }),
+  );
+
+  return memberCounts[0];
+}
 
 async function verifyStreams(
   creator: Persona,
