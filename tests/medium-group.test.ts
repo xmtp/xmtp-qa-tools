@@ -110,16 +110,30 @@ describe("Complex group interactions with multiple participants", () => {
       const newGroupName =
         "name-" + Math.random().toString(36).substring(2, 15);
 
+      //for 3 random participants receivemetadata
+      const randomParticipants = participants
+        .slice(1)
+        .sort(() => Math.random() - 0.5)
+        .slice(0, 3);
+      const metadataPromises = randomParticipants.map((p) =>
+        p.worker!.receiveMetadata(groupId, newGroupName),
+      );
       //Update group name randomly by one participant
       const randomParticipant =
         participants[Math.floor(Math.random() * participants.length)];
       await randomParticipant.worker!.updateGroupName(groupId, newGroupName);
 
+      const metadataReceived = await Promise.all(metadataPromises);
+
       // Add debug logs
+      console.log("[TEST] Metadata received:", metadataReceived);
       console.log("[TEST] Actual received messages:", receivedMessages.length);
       console.log("[TEST] Expected messages length:", recipients.length);
       console.log("[TEST] Expected me ssage:", message);
       console.log("[TEST] Expected group name:", newGroupName);
+
+      // expect(metadataReceived.length).toBe(randomParticipants.length);
+      // expect(metadataReceived).toContain(newGroupName);
     },
     defaultValues.timeout,
   ); // Double timeout for complex test
