@@ -11,11 +11,11 @@ import {
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
-const testName = "TC_Small_Groups_" + env + ":";
+const testName = "TS_Small_Groups_" + env + ":";
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Small group interactions with multiple participants", () => {
+describe(testName, () => {
   let participants: Persona[] = [];
   let groupId: string;
   let creator: Persona;

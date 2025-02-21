@@ -20,7 +20,6 @@ class MemoryTransport extends Transport {
   }
   flush(filePath: string) {
     // Write all logs at once
-    console.log("Flushing logs to file", filePath);
     fs.writeFileSync(filePath, this.logs.join("\n"), { flag: "w" });
   }
 }
@@ -86,35 +85,29 @@ export const createLogger = (testName: string) => {
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      if (
-        args.length > 0 &&
-        typeof args[0] === "string" &&
-        args[0].includes("[TEST]")
-      ) {
-        logger.info(args.join(" "));
-      } else if (
-        args.length > 0 &&
-        typeof args[0] === "string" &&
-        args[0].includes("%s: %s")
-      ) {
-        filterTime(args, logger);
-      } else {
-        const message = args
-          .map((arg) =>
-            typeof arg === "object" ? JSON.stringify(arg) : String(arg),
-          )
-          .join(" ");
-        logger.info(message);
-      }
+      filerlog(args, logger);
     };
-    console.error = (...args: any[]) => logger.error(args.join(" "));
-    console.warn = (...args: any[]) => logger.warn(args.join(" "));
-    console.info = (...args: any[]) => logger.info(args.join(" "));
+    console.error = (...args: any[]) => {
+      filerlog(args, logger);
+    };
+    console.warn = (...args: any[]) => {
+      filerlog(args, logger);
+    };
+    console.info = (...args: any[]) => {
+      filerlog(args, logger);
+    };
   } catch (error) {
     console.error("Error overriding console", error);
   }
 };
-
+function filerlog(args: any[], logger: winston.Logger) {
+  const message = args.join(" ");
+  if (message.includes("%s: %s")) {
+    filterTime(args, logger);
+  } else {
+    logger.info(message);
+  }
+}
 if (!fs.existsSync("logs")) {
   fs.mkdirSync("logs");
 }

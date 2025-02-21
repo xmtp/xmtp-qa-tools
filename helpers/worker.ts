@@ -44,6 +44,7 @@ export class WorkerClient extends Worker {
   async initialize(
     testName: string,
   ): Promise<{ address: string; inboxId: string }> {
+    console.time(`[${this.name}-${this.installationId}] initialize`);
     this.postMessage({
       type: "initialize",
       name: this.name,
@@ -56,6 +57,7 @@ export class WorkerClient extends Worker {
       address: string;
       inboxId: string;
     }>("clientInitialized");
+    console.timeEnd(`[${this.name}-${this.installationId}] initialize`);
     console.log(
       `[${this.name}] initialized with: ${this.env}:${this.version}:${this.installationId}`,
     );
@@ -78,8 +80,10 @@ export class WorkerClient extends Worker {
     return returnValue;
   }
   async createDM(senderAddresses: string): Promise<string> {
+    console.time(`[${this.name}] createDM`);
     this.postMessage({ type: "createDM", senderAddresses });
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
+    console.timeEnd(`[${this.name}] createDM`);
     return response.dmId;
   }
   async removeMembers(
@@ -180,7 +184,8 @@ export class WorkerClient extends Worker {
     return response.groupName;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
-    return new Promise((resolve, reject) => {
+    console.time(`[${this.name}] waitForMessage`);
+    const promise = new Promise((resolve, reject) => {
       const handler = (msg: WorkerMessage) => {
         if (msg.type === messageType) {
           this.removeListener("message", handler);
@@ -193,10 +198,11 @@ export class WorkerClient extends Worker {
       };
       this.on("message", handler);
     });
+    console.timeEnd(`[${this.name}] waitForMessage`);
+    return promise as Promise<T>;
   }
 }
 
-// Worker implementation (runs in worker thread)
 if (parentPort) {
   let client: ClientManager;
 
@@ -204,8 +210,6 @@ if (parentPort) {
     try {
       switch (data.type) {
         case "initialize": {
-          // Use the same logger instance with the test name
-          console.time(`[${data.name}] initialize`);
           const logger = createLogger(data.testName);
           overrideConsole(logger);
 
@@ -216,7 +220,6 @@ if (parentPort) {
             installationId: data.installationId || "a",
           });
           await client.initialize();
-          console.timeEnd(`[${data.name}] initialize`);
           parentPort?.postMessage({
             type: "clientInitialized",
             name: data.name,
@@ -227,9 +230,7 @@ if (parentPort) {
         }
         case "getMembers": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] getMembers`);
           const members = await client.getMembers(data.groupId);
-          console.timeEnd(`[${client?.name}] getMembers`);
           parentPort?.postMessage({
             type: "membersReceived",
             members: members,
@@ -238,12 +239,10 @@ if (parentPort) {
         }
         case "removeMembers": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] removeMembers`);
           const count = await client.removeMembers(
             data.groupId,
             data.memberAddresses,
           );
-          console.timeEnd(`[${client?.name}] removeMembers`);
           parentPort?.postMessage({
             type: "membersRemoved",
             count: count,
@@ -252,12 +251,10 @@ if (parentPort) {
         }
         case "addMembers": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] addMembers`);
           const count = await client.addMembers(
             data.groupId,
             data.memberAddresses,
           );
-          console.timeEnd(`[${client?.name}] addMembers`);
           parentPort?.postMessage({
             type: "membersAdded",
             count: count,
@@ -266,12 +263,10 @@ if (parentPort) {
         }
         case "metadataReceived": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] metadataReceived`);
           const metadata = await client.receiveMetadata(
             data.groupId,
             data.expectedMetadata,
           );
-          console.timeEnd(`[${client?.name}] metadataReceived`);
           parentPort?.postMessage({
             type: "metadataReceived",
             metadata: metadata,
@@ -280,13 +275,10 @@ if (parentPort) {
         }
         case "updateGroupName": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] updateGroupName`);
           const groupName = await client.updateName(
             data.groupId,
             data.newGroupName,
           );
-          console.log(`[${client?.name}] Group name updated: ${groupName}`);
-          console.timeEnd(`[${client?.name}] updateGroupName`);
           parentPort?.postMessage({
             type: "groupNameUpdated",
             groupName: groupName,
@@ -294,15 +286,8 @@ if (parentPort) {
         }
         case "sendMessage": {
           if (!client) throw new Error("Client not initialized");
-          console.log(
-            `[${client?.name}] Sending group message to ${data.groupId}`,
-          );
-          console.time(`[${client?.name}] sendMessage`);
+
           await client.send(data.groupId, data.message);
-          console.timeEnd(`[${client?.name}] sendMessage`);
-          console.log(
-            `[${client?.name}] Group message ${data.message} successfully`,
-          );
           parentPort?.postMessage({
             type: "messageSent",
             message: data.message,
@@ -311,16 +296,11 @@ if (parentPort) {
         }
         case "receiveMetadata": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] receiveMetadata`);
-          console.log(
-            `[${client.name}] Waiting for metadata from group ${data.groupId}`,
-          );
+
           const metadata = await client.receiveMetadata(
             data.groupId,
             data.expectedMetadata,
           );
-          console.log(`[${client?.name}] Metadata received: ${metadata}`);
-          console.timeEnd(`[${client?.name}] receiveMetadata`);
           parentPort?.postMessage({
             type: "metadataReceived",
             metadata: metadata,
@@ -328,17 +308,10 @@ if (parentPort) {
           break;
         }
         case "receiveMessage": {
-          if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] receiveMessage`);
-          console.log(
-            `[${client.name}] Started stream for group ${data.groupId}`,
-          );
           const message = await client.receiveMessage(
             data.groupId,
             data.expectedMessage,
           );
-          console.timeEnd(`[${client?.name}] receiveMessage`);
-          console.log(`[${client.name}] Message received: ${message}`);
           parentPort?.postMessage({
             type: "messageReceived",
             message: message,
@@ -347,9 +320,7 @@ if (parentPort) {
         }
         case "createDM": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] createDM`);
           const dmId = await client.newDM(data.senderAddresses);
-          console.timeEnd(`[${client?.name}] createDM`);
           parentPort?.postMessage({
             type: "dmCreated",
             dmId: dmId,
@@ -358,10 +329,8 @@ if (parentPort) {
         }
         case "createGroup": {
           if (!client) throw new Error("Client not initialized");
-          console.time(`[${client?.name}] createGroup`);
 
           const groupId = await client.newGroup(data.senderAddresses);
-          console.timeEnd(`[${client?.name}] createGroup`);
           parentPort?.postMessage({
             type: "groupCreated",
             groupId: groupId,
@@ -369,15 +338,10 @@ if (parentPort) {
           break;
         }
         default: {
-          console.log(`[${client?.name}] Unknown message type: ${data.type}`);
-          break;
+          throw new Error(`Unknown message type: ${data.type}`);
         }
       }
     } catch (error: any) {
-      console.time(`[${client?.name}] error`);
-      const workerName = client?.name || data?.name || "Unknown";
-      console.log(`[${workerName}] Error: ${error.message || String(error)}`);
-      console.timeEnd(`[${client?.name}] error`);
       parentPort?.postMessage({
         type: "error",
         error: error.message,

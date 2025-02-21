@@ -3497,6 +3497,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"hook-std@npm:^3.0.0":
+  version: 3.0.0
+  resolution: "hook-std@npm:3.0.0"
+  checksum: 10/f1f0ca88bbbca2306b9c2c342f45fbecb318ad5496bcbde1fcfc2a64dab0feabd50278a613f683edf07225c4b8b75b3c64ad3f1fca090dd0cae426fdec374a56
+  languageName: node
+  linkType: hard
+
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -4719,6 +4726,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.0.1"
     eslint-plugin-prettier: "npm:^5.2.3"
     globals: "npm:^15.14.0"
+    hook-std: "npm:^3.0.0"
     node-sdk-41: "npm:@xmtp/node-sdk@0.0.41"
     node-sdk-42: "npm:@xmtp/node-sdk@0.0.42"
     openai: "npm:latest"

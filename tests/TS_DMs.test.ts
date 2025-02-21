@@ -9,11 +9,11 @@ import {
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
-const testName = "TC_Performance_" + env + ":";
+const testName = "TS_DMs_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Performance test for sending gm, creating group, and sending gm in group", () => {
+describe(testName, () => {
   let bob: Persona,
     alice: Persona,
     joe: Persona,
@@ -39,7 +39,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     "TC_CreateDM: should measure creating a DM",
     async () => {
       dmId = await bob.worker!.createDM(randomAddress);
-      console.log("[TEST] DM ID", dmId);
+      console.log("[TEST] dmId", dmId);
       expect(dmId).toBeDefined();
     },
     defaultValues.timeout,
@@ -70,7 +70,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     },
     defaultValues.timeout,
   );
-  afterAll(() => {
+  afterAll(async () => {
     flushLogger(testName);
   });
 });

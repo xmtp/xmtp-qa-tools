@@ -9,11 +9,11 @@ import {
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
-const testName = "TC_Performance_" + env + ":";
+const testName = "TS_Groups_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Performance test for sending gm, creating group, and sending gm in group", () => {
+describe(testName, () => {
   let bob: Persona,
     alice: Persona,
     joe: Persona,

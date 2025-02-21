@@ -138,7 +138,6 @@ export class ClientManager {
   }
   async getMembers(groupId: string) {
     try {
-      console.time(`[${this.name}] getMembersFromConversation`);
       await this.client.conversations.sync();
       const conversation =
         this.client.conversations.getConversationById(groupId);
@@ -150,7 +149,6 @@ export class ClientManager {
       for (const member of await conversation.members()) {
         members.push(member.accountAddresses);
       }
-      console.timeEnd(`[${this.name}] getMembersFromConversation`);
       return members;
     } catch (error) {
       console.error(

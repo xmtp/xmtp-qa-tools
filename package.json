@@ -21,6 +21,7 @@
     "@xmtp/content-type-text": "^2.0.0",
     "alchemy-sdk": "^3.0.0",
     "dotenv": "^16.4.7",
+    "hook-std": "^3.0.0",
     "node-sdk-41": "npm:@xmtp/node-sdk@0.0.41",
     "node-sdk-42": "npm:@xmtp/node-sdk@0.0.42",
     "openai": "latest",

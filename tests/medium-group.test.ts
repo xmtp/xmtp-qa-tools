@@ -10,11 +10,11 @@ import {
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
-const testName = "TC_Medium_Groups_" + env + ":";
+const testName = "TS_Medium_Groups_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Medium group interactions with multiple participants", () => {
+describe(testName, () => {
   let participants: Persona[] = [];
   let groupId: string;
 
