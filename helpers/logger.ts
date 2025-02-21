@@ -1,81 +1,127 @@
 import fs from "fs";
 import path from "path";
 import winston from "winston";
+import Transport from "winston-transport";
 
-// Singleton logger instance
+// Custom transport that buffers logs in memory
+class MemoryTransport extends Transport {
+  logs: string[] = [];
+  constructor(opts?: any) {
+    super(opts);
+  }
+  log(info: any, callback: () => void) {
+    // Ensure the formatted message is available
+    const formattedMessage =
+      info[Symbol.for("message")] ||
+      `[${info.timestamp}] [${info.level}] ${info.message}`;
+    this.logs.push(formattedMessage);
+    setImmediate(() => this.emit("logged", info));
+    callback();
+  }
+  flush(filePath: string) {
+    // Write all logs at once
+    console.log("Flushing logs to file", filePath);
+    fs.writeFileSync(filePath, this.logs.join("\n"), { flag: "w" });
+  }
+}
+
 let sharedLogger: winston.Logger | null = null;
+let memoryTransport: MemoryTransport | null = null;
+// Export a flush function to flush the memory transport logs
+export const flushLogger = (testName: string) => {
+  if (memoryTransport) {
+    const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
+    const logFilePath = path.join("logs", `${sanitizedName}.log`);
+    memoryTransport.flush(logFilePath);
+  }
+};
 
 export const createLogger = (testName: string) => {
   if (!sharedLogger) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    // Create filename from test name
     const logFilePath = path.join("logs", `${sanitizedName}.log`);
     if (fs.existsSync(logFilePath)) {
       fs.unlinkSync(logFilePath);
     }
-    // NEW: Added console transport
+
+    // Shared format for console and memory transport
+    const sharedFormat = winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.printf(({ timestamp, level, message }) => {
+        return `[${timestamp}] [${level}] ${message}`;
+      }),
+    );
+
     const consoleTransport = new winston.transports.Console({
-      format: winston.format.combine(
-        winston.format.colorize(),
-        winston.format.printf(({ timestamp, level, message }) => {
-          return `[${timestamp}] [${level}] ${message}`;
-        }),
-      ),
-    });
-    const sharedTransport = new winston.transports.File({
-      filename: path.join("logs", `${sanitizedName}.log`),
-      maxsize: 10485760,
-      tailable: true,
-      options: { flags: "a" }, // Change to 'a' for append mode instead of 'w'
+      format: winston.format.combine(winston.format.colorize(), sharedFormat),
     });
 
-    const colorizeSlowOps = winston.format((info) => {
-      if (typeof info.message === "string" && info.message.includes("XMTP:")) {
-        return false;
-      }
-
-      return info;
+    // Initialize our custom memory transport
+    memoryTransport = new MemoryTransport({
+      format: sharedFormat,
     });
 
     sharedLogger = winston.createLogger({
-      format: winston.format.combine(
-        winston.format.timestamp(),
-        colorizeSlowOps(),
-        winston.format.printf(({ timestamp, level, message }) => {
-          return `[${timestamp}] [${level}] ${message}`;
-        }),
-      ),
-      transports: [sharedTransport, consoleTransport],
+      transports: [consoleTransport, memoryTransport],
     });
+
+    // Flush the buffered logs to file when the process exits normally
+    process.on("exit", () => {
+      if (memoryTransport) {
+        memoryTransport.flush(logFilePath);
+      }
+    });
+
+    // Optionally, catch termination signals to flush logs before exit
+    const flushAndExit = () => {
+      if (memoryTransport) {
+        memoryTransport.flush(logFilePath);
+      }
+      process.exit();
+    };
+    process.on("SIGINT", flushAndExit);
+    process.on("SIGTERM", flushAndExit);
   }
 
   return sharedLogger;
 };
 
-// Helper to override console for any module
 export const overrideConsole = (logger: winston.Logger) => {
-  console.log = (...args: any[]) => {
-    if (
-      args.length > 0 &&
-      typeof args[0] === "string" &&
-      args[0].includes("%s: %s")
-    ) {
-      filterTime(args, logger);
-    } else if (Array.isArray(args)) {
-      logger.info(args.join(" "));
-    } else {
-      logger.info(args);
-    }
-  };
-  console.error = (...args: any[]) => logger.error(args.join(" "));
-  console.warn = (...args: any[]) => logger.warn(args.join(" "));
-  console.info = (...args: any[]) => logger.info(args.join(" "));
+  try {
+    console.log = (...args: any[]) => {
+      if (
+        args.length > 0 &&
+        typeof args[0] === "string" &&
+        args[0].includes("[TEST]")
+      ) {
+        logger.info(args.join(" "));
+      } else if (
+        args.length > 0 &&
+        typeof args[0] === "string" &&
+        args[0].includes("%s: %s")
+      ) {
+        filterTime(args, logger);
+      } else {
+        const message = args
+          .map((arg) =>
+            typeof arg === "object" ? JSON.stringify(arg) : String(arg),
+          )
+          .join(" ");
+        logger.info(message);
+      }
+    };
+    console.error = (...args: any[]) => logger.error(args.join(" "));
+    console.warn = (...args: any[]) => logger.warn(args.join(" "));
+    console.info = (...args: any[]) => logger.info(args.join(" "));
+  } catch (error) {
+    console.error("Error overriding console", error);
+  }
 };
 
-// Ensure logs directory exists
 if (!fs.existsSync("logs")) {
   fs.mkdirSync("logs");
 }
+
 function filterTime(args: any[], logger: winston.Logger) {
   const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
   const timeMatch = args.find((arg: any) =>
@@ -84,10 +130,8 @@ function filterTime(args: any[], logger: winston.Logger) {
 
   if (timeMatch) {
     const timeValue = parseFloat(timeMatch.replace(/[ms|s]/g, ""));
-    // Convert seconds to milliseconds if needed
     const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
 
-    // Log if over 300ms
     if (timeInMs > 300) {
       logger.info(
         `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`,
@@ -95,6 +139,5 @@ function filterTime(args: any[], logger: winston.Logger) {
     }
     return true;
   }
-
   return false;
 }

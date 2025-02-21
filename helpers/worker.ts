@@ -75,9 +75,9 @@ export class WorkerClient extends Worker {
     console.log(
       `[${this.name}] Sending group message to [${groupId}]: ${message}`,
     );
-    console.time(`[${this.name}] sendMessage`);
+    console.time(`[${this.name}] send`);
     this.postMessage({ type: "sendMessage", groupId, message });
-    console.timeEnd(`[${this.name}] sendMessage`);
+    console.timeEnd(`[${this.name}] send`);
     const returnValue = await this.waitForMessage("messageSent");
     return returnValue;
   }
@@ -192,7 +192,7 @@ if (parentPort) {
         case "updateGroupName": {
           if (!client) throw new Error("Client not initialized");
           console.time(`[${client?.name}] updateGroupName`);
-          const groupName = await client.updateGroupName(
+          const groupName = await client.updateName(
             data.groupId,
             data.newGroupName,
           );
@@ -209,7 +209,7 @@ if (parentPort) {
             `[${client?.name}] Sending group message to ${data.groupId}`,
           );
           console.time(`[${client?.name}] sendMessage`);
-          await client.sendMessage(data.groupId, data.message);
+          await client.send(data.groupId, data.message);
           console.timeEnd(`[${client?.name}] sendMessage`);
           console.log(
             `[${client?.name}] Group message ${data.message} successfully`,
@@ -226,7 +226,10 @@ if (parentPort) {
           console.log(
             `[${client.name}] Waiting for metadata from group ${data.groupId}`,
           );
-          const metadata = await client.receiveMetadata(data.groupId);
+          const metadata = await client.receiveMetadata(
+            data.groupId,
+            data.expectedMetadata,
+          );
           console.log(`[${client?.name}] Metadata received: ${metadata}`);
           console.timeEnd(`[${client?.name}] receiveMetadata`);
           parentPort?.postMessage({
@@ -256,7 +259,7 @@ if (parentPort) {
         case "createDM": {
           if (!client) throw new Error("Client not initialized");
           console.time(`[${client?.name}] createDM`);
-          const dmId = await client.createDM(data.senderAddresses);
+          const dmId = await client.newDM(data.senderAddresses);
           console.timeEnd(`[${client?.name}] createDM`);
           parentPort?.postMessage({
             type: "dmCreated",
@@ -268,7 +271,7 @@ if (parentPort) {
           if (!client) throw new Error("Client not initialized");
           console.time(`[${client?.name}] createGroup`);
 
-          const groupId = await client.createGroup(data.senderAddresses);
+          const groupId = await client.newGroup(data.senderAddresses);
           console.timeEnd(`[${client?.name}] createGroup`);
           parentPort?.postMessage({
             type: "groupCreated",
@@ -288,4 +291,17 @@ if (parentPort) {
       });
     }
   });
+}
+
+// Consider adding a pool size limit
+const MAX_WORKERS = 50;
+const CONCURRENT_INIT = 10; // Initialize in batches
+
+// Example batch initialization
+async function initializeWorkerBatch(workers: WorkerClient[]) {
+  // ... existing code ...
+  const results = await Promise.all(
+    workers.map((worker) => worker.initialize(testName)),
+  );
+  // ... existing code ...
 }

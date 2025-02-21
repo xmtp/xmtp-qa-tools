@@ -1,6 +1,6 @@
 import type { XmtpEnv } from "node-sdk-42";
-import { beforeAll, describe, expect, it } from "vitest";
-import { createLogger, overrideConsole } from "../helpers/logger";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
@@ -70,11 +70,11 @@ describe("Complex group interactions with multiple participants", () => {
       const joeReceived = await joePromise;
 
       // Add debug logs
-      console.log("Expected messages length:", recipients.length);
-      console.log("Actual received messages:", receivedMessages);
-      console.log("Expected message:", message);
-      console.log("Expected group name:", newGroupName);
-      console.log("Actual received group name:", joeReceived);
+      console.log("[TEST] Expected messages length:", recipients.length);
+      console.log("[TEST] Actual received messages:", receivedMessages);
+      console.log("[TEST] Expected message:", message);
+      console.log("[TEST] Expected group name:", newGroupName);
+      console.log("[TEST] Actual received group name:", joeReceived);
 
       expect(receivedMessages.length).toBe(recipients.length);
       expect(receivedMessages).toContain(message);
@@ -82,4 +82,8 @@ describe("Complex group interactions with multiple participants", () => {
     },
     defaultValues.timeout * 2,
   ); // Double timeout for complex test
+
+  afterAll(() => {
+    flushLogger(testName);
+  });
 });

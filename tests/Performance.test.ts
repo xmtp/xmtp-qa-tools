@@ -1,6 +1,6 @@
 import type { XmtpEnv } from "node-sdk-42";
-import { beforeAll, describe, expect, it } from "vitest";
-import { createLogger, overrideConsole } from "../helpers/logger";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
   getNewRandomPersona,
@@ -20,8 +20,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     bobB41: Persona,
     dmId: string,
     groupId: string,
-    randomAddress: string,
-    randomInboxId: string;
+    randomAddress: string;
 
   beforeAll(async () => {
     [bob, alice, joe, bobB41] = await getPersonas(
@@ -29,15 +28,16 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
       env,
       testName,
     );
-    const { address, inboxId } = await getNewRandomPersona(env);
+    const { address } = await getNewRandomPersona(env);
     randomAddress = address;
-    randomInboxId = inboxId;
   }, defaultValues.timeout);
 
   it(
     "should measure creating a DM",
     async () => {
       dmId = await bob.worker!.createDM(randomAddress);
+      console.log("[TEST] DM ID", dmId);
+      expect(dmId).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -47,6 +47,8 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     async () => {
       const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
       await bob.worker!.sendMessage(dmId!, gmMessage);
+      console.log("[TEST] GM Message sent", gmMessage);
+      expect(gmMessage).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -64,6 +66,8 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
       const joePromise = joe.worker!.receiveMetadata(groupId!, newGroupName);
       await bob.worker!.updateGroupName(groupId, newGroupName);
       const joeReceived = await joePromise;
+
+      console.log("[TEST] Joe received group name", joeReceived);
       expect(joeReceived).toBe(newGroupName);
     },
     defaultValues.timeout,
@@ -76,6 +80,8 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
         bob.address!,
         alice.address!,
       ]);
+      console.log("[TEST] Group created", groupId);
+      expect(groupId).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -86,6 +92,8 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await bob.worker!.sendMessage(groupId!, groupMessage);
+      console.log("[TEST] GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -97,7 +105,10 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
       const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
-      await Promise.all([joePromise]);
+      const received = await joePromise;
+
+      console.log("[TEST] GM Message received in group", groupMessage);
+      expect(received).toBe(groupMessage);
     },
     defaultValues.timeout,
   );
@@ -119,6 +130,9 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
         alicePromise,
         joePromise,
       ]);
+      console.log("[TEST] GM Message received in group", groupMessage);
+      console.log("[TEST] Alice received", aliceReceived);
+      console.log("[TEST] Joe received", joeReceived);
       expect(aliceReceived).toBe(groupMessage);
       expect(joeReceived).toBe(groupMessage);
     },
@@ -141,9 +155,16 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
         joePromise,
         bob41Promise,
       ]);
+      console.log("[TEST] GM Message received in group", groupMessage);
+      console.log("[TEST] Joe received", joeReceived);
+      console.log("[TEST] Bob 41 received", bob41Received);
       expect(joeReceived).toBe(groupMessage);
       expect(bob41Received).toBe(groupMessage);
     },
     defaultValues.timeout,
   );
+
+  afterAll(() => {
+    flushLogger(testName);
+  });
 });

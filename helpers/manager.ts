@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
-import { sleep } from "openai/core.mjs";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
 
+/* We dont use logs here, everything is measure in worker file
+This way i can measure the time it takes to do the action and not the time it takes to log
+And leave this file clean and simple */
 dotenv.config();
 
 export type { XmtpEnv };
@@ -53,11 +55,9 @@ export class ClientManager {
       process.env[`ENCRYPTION_KEY_${config.name.toUpperCase()}`];
 
     this.encryptionKey = getEncryptionKeyFromHex(encryptionKey as string);
-    /* Environment*/
+
     this.env = config.env;
-    /* Name*/
     this.name = config.name;
-    /* Installation ID*/
     this.installationId = config.installationId;
   }
 
@@ -69,103 +69,88 @@ export class ClientManager {
       this.clientType = Client42;
     }
   }
-  async createDM(senderAddresses: string): Promise<string> {
+  async newDM(senderAddresses: string): Promise<string> {
     try {
-      //console.time("Manager:createDM");
       const dm = await this.client.conversations.newDm(senderAddresses);
-      //console.timeEnd("Manager:createDM");
       return dm.id;
     } catch (error) {
       console.error(
-        "createDM",
+        "error:newDM()",
         error instanceof Error ? error.message : String(error),
       );
       return "";
     }
   }
-  async createGroup(senderAddresses: string[]): Promise<string> {
+  async newGroup(senderAddresses: string[]): Promise<string> {
     try {
-      //console.time("Manager:createGroup");
       const group = await this.client.conversations.newGroup(senderAddresses);
-      //console.timeEnd("Manager:createGroup");
-      //console.time("Manager:updateName");
       await group.updateName(
         "Test Group" + Math.random().toString(36).substring(2, 15),
       );
-      //console.timeEnd("Manager:UpdateName");
-      //console.time("Manager:AddSuperAdmin");
       await group.addSuperAdmin(senderAddresses[0]);
-      //console.timeEnd("Manager:AddSuperAdmin");
       return group.id;
     } catch (error) {
       console.error(
-        "createGroup",
+        "error:newGroup()",
         error instanceof Error ? error.message : String(error),
       );
       return "";
     }
   }
 
-  async sendMessage(groupId: string, message: string): Promise<boolean> {
+  async send(groupId: string, message: string): Promise<boolean> {
     try {
-      console.time("syncForSending");
       await this.client.conversations.sync();
-      console.timeEnd("syncForSending");
-      console.time("sendMessage in manager");
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
       await conversation.send(message);
-      console.timeEnd("sendMessage in manager");
       return true;
     } catch (error) {
       console.error(
-        "sendMessage",
+        "error:send()",
         error instanceof Error ? error.message : String(error),
       );
       return false;
     }
   }
 
-  async updateGroupName(groupId: string, newGroupName: string) {
+  async updateName(groupId: string, newGroupName: string) {
     try {
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
-      console.time("Manager:updateGroupName");
       await conversation.updateName(newGroupName);
-      console.timeEnd("Manager:updateGroupName");
       return conversation.name;
     } catch (error) {
       console.error(
-        "updateGroupName",
+        "error:updateName()",
         error instanceof Error ? error.message : String(error),
       );
       return false;
     }
   }
 
-  async receiveMetadata(groupId: string) {
+  async receiveMetadata(groupId: string, expectedMetadata: string) {
     try {
-      console.time("Stream sync");
       await this.client.conversations.sync();
-      console.timeEnd("Stream sync");
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
-      console.time("Stream sync");
       await conversation.sync();
-      console.timeEnd("Stream sync");
-      return conversation.name;
+      if (conversation.name === expectedMetadata) {
+        return conversation.name;
+      }
+      return false;
     } catch (error) {
       console.error(
-        "receiveMetadata",
+        "error:receiveMetadata()",
         error instanceof Error ? error.message : String(error),
       );
       return false;
@@ -173,9 +158,7 @@ export class ClientManager {
   }
   async receiveMessage(groupId: string, expectedMessage: string) {
     try {
-      console.time("Stream sync");
       await this.client.conversations.sync();
-      console.timeEnd("Stream sync");
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
@@ -198,7 +181,7 @@ export class ClientManager {
       return false;
     } catch (error) {
       console.error(
-        "receiveMessage",
+        "error:receiveMessage()",
         error instanceof Error ? error.message : String(error),
       );
       return false;
@@ -217,7 +200,7 @@ export class ClientManager {
       return;
     } catch (error) {
       console.error(
-        "initialize",
+        "error:initialize()",
         error instanceof Error ? error.message : String(error),
       );
       return;
