@@ -40,9 +40,6 @@ export const createLogger = (testName: string) => {
   if (!sharedLogger) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
     const logFilePath = path.join("logs", `${sanitizedName}.log`);
-    if (fs.existsSync(logFilePath)) {
-      fs.unlinkSync(logFilePath);
-    }
 
     // Shared format for console and memory transport
     const sharedFormat = winston.format.combine(

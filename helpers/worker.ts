@@ -143,8 +143,11 @@ export class WorkerClient extends Worker {
         this.waitForMessage<{ message: string }>("messageReceived"),
         new Promise((_, reject) =>
           setTimeout(
-            () => reject(new Error("Message receive timeout after 3 seconds")),
-            3000,
+            () =>
+              reject(
+                new Error(`[${this.name}] receive timeout after 4 seconds`),
+              ),
+            4000,
           ),
         ),
       ]);
@@ -152,7 +155,7 @@ export class WorkerClient extends Worker {
       console.timeEnd(`[${this.name}] receiveMessage`);
       return (response as any).message;
     } catch (error) {
-      console.log(`[${this.name}] Message receive timeout`);
+      console.log(`[${this.name}] Message receive timeout after 4 seconds`);
       console.timeEnd(`[${this.name}] receiveMessage`);
       return null;
     }

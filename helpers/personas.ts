@@ -114,7 +114,10 @@ export async function getPersonas(
     count++;
   }
 
-  const personas = descriptors.map((desc) => ({
+  // Limit the descriptors array to maxPersonas before mapping
+  const limitedDescriptors = descriptors.slice(0, maxPersonas);
+
+  const personas = limitedDescriptors.map((desc) => ({
     ...parsePersonaDescriptor(desc),
     worker: new WorkerClient(parsePersonaDescriptor(desc), env),
   }));

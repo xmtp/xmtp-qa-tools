@@ -145,6 +145,7 @@ export class ClientManager {
       if (!conversation) {
         throw new Error("Conversation not found");
       }
+      await conversation.sync();
       const members = [];
       for (const member of await conversation.members()) {
         members.push(member.accountAddresses);
@@ -168,6 +169,7 @@ export class ClientManager {
         throw new Error("Conversation not found");
       }
       await conversation.removeMembers(memberAddresses);
+      await conversation.sync();
       return (await conversation.members()).length;
     } catch (error) {
       console.error(
@@ -186,6 +188,7 @@ export class ClientManager {
         throw new Error("Conversation not found");
       }
       await conversation.addMembers(memberAddresses);
+      await conversation.sync();
       return (await conversation.members()).length;
     } catch (error) {
       console.error(
