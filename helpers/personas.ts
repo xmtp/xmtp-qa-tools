@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
+import { config } from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex } from "./client";
 import { ClientManager, type XmtpEnv } from "./manager";
@@ -72,8 +73,8 @@ export function parsePersonaDescriptor(
   const [, name, installationId, version] = match;
 
   return {
-    name,
-    installationId: installationId || defaults.installationId,
+    name: name.toLowerCase(),
+    installationId: (installationId || defaults.installationId).toLowerCase(),
     version: version || defaults.version,
   };
 }
@@ -85,8 +86,10 @@ export async function getPersonas(
   descriptors: string[],
   env: XmtpEnv,
   testName: string,
+  maxPersonas: number,
 ): Promise<Persona[]> {
   // First check and generate any missing keys
+  let count = 0;
   for (const desc of descriptors) {
     const persona = parsePersonaDescriptor(desc);
     const walletKeyEnv = `WALLET_KEY_${persona.name.toUpperCase()}`;
@@ -97,13 +100,18 @@ export async function getPersonas(
       try {
         await execAsync(`yarn gen:keys ${persona.name.toLowerCase()}`);
         // Reload environment variables after generating keys
-        require("dotenv").config();
+        config();
       } catch (error) {
         throw new Error(
-          `Failed to generate keys for ${persona.name}: ${error}`,
+          `Failed to generate keys for ${persona.name}: ${error instanceof Error ? error.message : String(error)}`,
         );
       }
     }
+
+    if (count >= maxPersonas) {
+      break;
+    }
+    count++;
   }
 
   const personas = descriptors.map((desc) => ({
@@ -126,3 +134,84 @@ export async function getPersonas(
 
   return personas;
 }
+
+/**
+ * Returns a random selection of personas from the given array
+ * @param personas Array of personas to select from
+ * @param count Number of personas to return (defaults to 1)
+ * @returns Array of randomly selected personas
+ */
+export function getRandomPersonas(
+  personas: Persona[],
+  count: number = 1,
+): Persona[] {
+  if (count > personas.length) {
+    throw new Error(
+      `Cannot select ${count} personas from a list of ${personas.length}`,
+    );
+  }
+
+  // Create a copy of the array to avoid modifying the original
+  const shuffled = [...personas];
+
+  // Fisher-Yates shuffle algorithm
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  return shuffled.slice(0, count);
+}
+
+export const participantNames = [
+  "alice",
+  "bob",
+  "charlie",
+  "dave",
+  "eve",
+  "frank",
+  "grace",
+  "henry",
+  "ivy",
+  "jack",
+  "karen",
+  "larry",
+  "mary",
+  "nancy",
+  "oscar",
+  "paul",
+  "quinn",
+  "rachel",
+  "steve",
+  "tom",
+  "ursula",
+  "victor",
+  "wendy",
+  "xavier",
+  "yolanda",
+  "zack",
+  "adam",
+  "bella",
+  "carl",
+  "diana",
+  "eric",
+  "fiona",
+  "george",
+  "hannah",
+  "ian",
+  "julia",
+  "keith",
+  "lisa",
+  "mike",
+  "nina",
+  "oliver",
+  "penny",
+  "quentin",
+  "rosa",
+  "sam",
+  "tina",
+  "uma",
+  "vince",
+  "walt",
+  "xena",
+];

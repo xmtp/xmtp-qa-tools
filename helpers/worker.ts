@@ -57,11 +57,7 @@ export class WorkerClient extends Worker {
       inboxId: string;
     }>("clientInitialized");
     console.log(
-      `[${this.name}] initialized with: ${JSON.stringify({
-        env: this.env,
-        version: this.version,
-        installationId: this.installationId,
-      })}`,
+      `[${this.name}] initialized with: ${this.env}:${this.version}:${this.installationId}`,
     );
     return {
       address: response.address,
@@ -86,7 +82,39 @@ export class WorkerClient extends Worker {
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
     return response.dmId;
   }
-
+  async removeMembers(
+    groupId: string,
+    memberAddresses: string[],
+  ): Promise<number> {
+    console.time(`[${this.name}] removeMembers`);
+    this.postMessage({ type: "removeMembers", groupId, memberAddresses });
+    const response = await this.waitForMessage<{ count: number }>(
+      "membersRemoved",
+    );
+    console.timeEnd(`[${this.name}] removeMembers`);
+    return response.count;
+  }
+  async getMembers(groupId: string): Promise<string[]> {
+    console.time(`[${this.name}] getMembers`);
+    this.postMessage({ type: "getMembers", groupId });
+    const response = await this.waitForMessage<{ members: string[] }>(
+      "membersReceived",
+    );
+    console.timeEnd(`[${this.name}] getMembers`);
+    return response.members;
+  }
+  async addMembers(
+    groupId: string,
+    memberAddresses: string[],
+  ): Promise<number> {
+    console.time(`[${this.name}] addMembers`);
+    this.postMessage({ type: "addMembers", groupId, memberAddresses });
+    const response = await this.waitForMessage<{ count: number }>(
+      "membersAdded",
+    );
+    console.timeEnd(`[${this.name}] addMembers`);
+    return response.count;
+  }
   async createGroup(senderAddresses: string[]): Promise<string> {
     console.time(`[${this.name}] createGroup`);
     this.postMessage({ type: "createGroup", senderAddresses });
@@ -101,7 +129,7 @@ export class WorkerClient extends Worker {
   async receiveMessage(
     groupId: string,
     expectedMessage: string,
-  ): Promise<string> {
+  ): Promise<string | null> {
     this.postMessage({
       type: "receiveMessage",
       groupId,
@@ -109,24 +137,43 @@ export class WorkerClient extends Worker {
       name: this.name,
       installationId: this.installationId,
     });
-    const response = await this.waitForMessage<{ message: string }>(
-      "messageReceived",
-    );
-    console.log(`[${this.name}] Received message: ${expectedMessage}`);
-    return response.message;
+    console.time(`[${this.name}] receiveMessage`);
+    try {
+      const response = await Promise.race([
+        this.waitForMessage<{ message: string }>("messageReceived"),
+        new Promise((_, reject) =>
+          setTimeout(
+            () => reject(new Error("Message receive timeout after 3 seconds")),
+            3000,
+          ),
+        ),
+      ]);
+      console.log(`[${this.name}] Received message: ${expectedMessage}`);
+      console.timeEnd(`[${this.name}] receiveMessage`);
+      return (response as any).message;
+    } catch (error) {
+      console.log(`[${this.name}] Message receive timeout`);
+      console.timeEnd(`[${this.name}] receiveMessage`);
+      return null;
+    }
   }
   async receiveMetadata(groupId: string, expectedMetadata: string) {
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.time(`[${this.name}] receiveMetadata`);
     this.postMessage({ type: "receiveMetadata", groupId, expectedMetadata });
     const response = await this.waitForMessage<{ metadata: string }>(
       "metadataReceived",
     );
+    console.timeEnd(`[${this.name}] receiveMetadata`);
     return response.metadata;
   }
   async updateGroupName(groupId: string, newGroupName: string) {
+    console.time(`[${this.name}] updateGroupName`);
     this.postMessage({ type: "updateGroupName", groupId, newGroupName });
     const response = await this.waitForMessage<{ groupName: string }>(
       "groupNameUpdated",
     );
+    console.timeEnd(`[${this.name}] updateGroupName`);
     return response.groupName;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
@@ -172,6 +219,45 @@ if (parentPort) {
             name: data.name,
             address: client.client.accountAddress,
             inboxId: client.client.inboxId,
+          });
+          break;
+        }
+        case "getMembers": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] getMembers`);
+          const members = await client.getMembers(data.groupId);
+          console.timeEnd(`[${client?.name}] getMembers`);
+          parentPort?.postMessage({
+            type: "membersReceived",
+            members: members,
+          });
+          break;
+        }
+        case "removeMembers": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] removeMembers`);
+          const count = await client.removeMembers(
+            data.groupId,
+            data.memberAddresses,
+          );
+          console.timeEnd(`[${client?.name}] removeMembers`);
+          parentPort?.postMessage({
+            type: "membersRemoved",
+            count: count,
+          });
+          break;
+        }
+        case "addMembers": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] addMembers`);
+          const count = await client.addMembers(
+            data.groupId,
+            data.memberAddresses,
+          );
+          console.timeEnd(`[${client?.name}] addMembers`);
+          parentPort?.postMessage({
+            type: "membersAdded",
+            count: count,
           });
           break;
         }
@@ -279,6 +365,10 @@ if (parentPort) {
           });
           break;
         }
+        default: {
+          console.log(`[${client?.name}] Unknown message type: ${data.type}`);
+          break;
+        }
       }
     } catch (error: any) {
       console.time(`[${client?.name}] error`);
@@ -291,17 +381,4 @@ if (parentPort) {
       });
     }
   });
-}
-
-// Consider adding a pool size limit
-const MAX_WORKERS = 50;
-const CONCURRENT_INIT = 10; // Initialize in batches
-
-// Example batch initialization
-async function initializeWorkerBatch(workers: WorkerClient[]) {
-  // ... existing code ...
-  const results = await Promise.all(
-    workers.map((worker) => worker.initialize(testName)),
-  );
-  // ... existing code ...
 }

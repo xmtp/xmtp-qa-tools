@@ -119,11 +119,13 @@ export class ClientManager {
 
   async updateName(groupId: string, newGroupName: string) {
     try {
+      await this.client.conversations.sync();
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
+      await conversation.sync();
       await conversation.updateName(newGroupName);
       return conversation.name;
     } catch (error) {
@@ -134,12 +136,76 @@ export class ClientManager {
       return false;
     }
   }
-
-  async receiveMetadata(groupId: string, expectedMetadata: string) {
+  async getMembers(groupId: string) {
+    try {
+      console.time(`[${this.name}] getMembersFromConversation`);
+      await this.client.conversations.sync();
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      const members = [];
+      for (const member of await conversation.members()) {
+        members.push(member.accountAddresses);
+      }
+      console.timeEnd(`[${this.name}] getMembersFromConversation`);
+      return members;
+    } catch (error) {
+      console.error(
+        "error:getMembers()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+  async removeMembers(groupId: string, memberAddresses: string[]) {
     try {
       await this.client.conversations.sync();
       const conversation =
         this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      await conversation.removeMembers(memberAddresses);
+      return (await conversation.members()).length;
+    } catch (error) {
+      console.error(
+        "error:removeMembers()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+  async addMembers(groupId: string, memberAddresses: string[]) {
+    try {
+      await this.client.conversations.sync();
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      await conversation.addMembers(memberAddresses);
+      return (await conversation.members()).length;
+    } catch (error) {
+      console.error(
+        "error:addMembers()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+  async receiveMetadata(groupId: string, expectedMetadata: string) {
+    try {
+      console.log(
+        "[TEST] Receiving metadata for group:",
+        groupId,
+        expectedMetadata,
+      );
+      await this.client.conversations.sync();
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+
       if (!conversation) {
         throw new Error("Conversation not found");
       }

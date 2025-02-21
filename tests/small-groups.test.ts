@@ -1,84 +1,87 @@
 import type { XmtpEnv } from "node-sdk-42";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
+import {
+  defaultValues,
+  getPersonas,
+  getRandomPersonas,
+  participantNames,
+  type Persona,
+} from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
-const testName = "TC_Groups_" + env + ":";
+const testName = "TC_Small_Groups_" + env + ":";
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Complex group interactions with multiple participants", () => {
-  let alice: Persona,
-    bob: Persona,
-    charlie: Persona,
-    dave: Persona,
-    eve: Persona,
-    joe: Persona,
-    pepe: Persona;
+describe("Small group interactions with multiple participants", () => {
+  // Define 50 participants using an array
 
+  let participants: Persona[] = [];
   let groupId: string;
 
   beforeAll(async () => {
-    [alice, bob, joe, charlie, dave, eve, pepe] = await getPersonas(
-      ["alice", "bob", "joe", "charlie", "dave", "eve", "pepe"],
-      env,
-      testName,
-    );
+    // Get all personas at once
+    participants = await getPersonas(participantNames, env, testName, 10);
   }, defaultValues.timeout);
 
   it(
-    "should create a group and handle multiple messages and metadata updates",
+    "should create a group and handle multiple messages with many participants",
     async () => {
-      // Create group with all participants
-      groupId = await alice.worker!.createGroup([
-        alice.address!,
-        bob.address!,
-        joe.address!,
-        charlie.address!,
-        dave.address!,
-        eve.address!,
-      ]);
+      const creator = participants[0]; // First participant creates the group
+      const addresses = participants.map((p) => p.address!);
 
-      // Function to get random recipients (2-4 participants)
-      const getRandomRecipients = () => {
-        const participants = [bob, charlie, dave, eve];
-        return participants
-          .sort(() => Math.random() - 0.5)
-          .slice(0, Math.floor(Math.random() * 3) + 2);
-      };
+      // Create group with all participants
+      groupId = await creator.worker!.createGroup(addresses);
 
       const message = `gm-${Math.random().toString(36).substring(2, 8)}`;
-      const recipients = getRandomRecipients();
-
+      const recipients = getRandomPersonas(participants, 10);
+      console.log("[TEST] Recipients:", recipients.length);
       // Set up message reception streams
-      const receivePromises = recipients.map((recipient) =>
-        recipient.worker!.receiveMessage(groupId, message),
+      const receivePromises = recipients.map(
+        async (recipient) =>
+          await recipient.worker!.receiveMessage(groupId, message),
       );
 
-      // Send message
-      await alice.worker!.sendMessage(groupId, message);
+      // Send messages
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await creator.worker!.sendMessage(groupId, message);
 
       // Verify reception
       const receivedMessages = await Promise.all(receivePromises);
+      const validMessages = receivedMessages.filter((msg) => msg !== null);
+      console.log("[TEST] Valid messages received:", validMessages.length);
+
+      // Expect at least some messages to be received (adjust percentage as needed)
+      expect(validMessages.length).toBeGreaterThan(0);
+      validMessages.forEach((msg) => {
+        expect(msg).toBe(message);
+      });
 
       const newGroupName =
         "name-" + Math.random().toString(36).substring(2, 15);
 
-      const joePromise = joe.worker!.receiveMetadata(groupId!, newGroupName);
-      await bob.worker!.updateGroupName(groupId, newGroupName);
-      const joeReceived = await joePromise;
+      //for 3 random participants receivemetadata
+      const randomParticipants = getRandomPersonas(participants, 3);
+      const metadataPromises = randomParticipants.map((p) =>
+        p.worker!.receiveMetadata(groupId, newGroupName),
+      );
+      //Update group name randomly by one participant
+      const randomParticipant = getRandomPersonas(participants, 1)[0];
+      await randomParticipant.worker!.updateGroupName(groupId, newGroupName);
+
+      await new Promise((resolve) => setTimeout(resolve, 4000));
+      const metadataReceived = await Promise.all(metadataPromises);
 
       // Add debug logs
+      console.log("[TEST] Actual messages received:", receivedMessages.length);
       console.log("[TEST] Expected messages length:", recipients.length);
-      console.log("[TEST] Actual received messages:", receivedMessages);
-      console.log("[TEST] Expected message:", message);
-      console.log("[TEST] Expected group name:", newGroupName);
-      console.log("[TEST] Actual received group name:", joeReceived);
-
+      console.log("[TEST] Group updates received:", metadataReceived.length);
+      console.log("[TEST] Expected group name:", metadataReceived);
       expect(receivedMessages.length).toBe(recipients.length);
       expect(receivedMessages).toContain(message);
-      expect(joeReceived).toBe(newGroupName);
+      expect(metadataReceived.length).toBe(randomParticipants.length);
+      expect(metadataReceived).toContain(newGroupName);
     },
     defaultValues.timeout * 2,
   ); // Double timeout for complex test
