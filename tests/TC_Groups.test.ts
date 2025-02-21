@@ -18,44 +18,24 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     alice: Persona,
     joe: Persona,
     bobB41: Persona,
-    dmId: string,
     groupId: string,
     randomAddress: string,
     sam: Persona;
 
   beforeAll(async () => {
+    const personas = ["bob", "alice", "joe", "bobB41", "sam"];
     [bob, alice, joe, bobB41, sam] = await getPersonas(
-      ["bob", "alice", "joe", "bobB41", "sam"],
+      personas,
       env,
       testName,
-      4,
+      personas.length,
     );
     const { address } = await getNewRandomPersona(env);
     randomAddress = address;
   }, defaultValues.timeout);
 
   it(
-    "should measure creating a DM",
-    async () => {
-      dmId = await bob.worker!.createDM(randomAddress);
-      console.log("[TEST] DM ID", dmId);
-      expect(dmId).toBeDefined();
-    },
-    defaultValues.timeout,
-  );
-
-  it(
-    "should measure sending a gm",
-    async () => {
-      const gmMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-      await bob.worker!.sendMessage(dmId!, gmMessage);
-      console.log("[TEST] GM Message sent", gmMessage);
-      expect(gmMessage).toBeDefined();
-    },
-    defaultValues.timeout,
-  );
-  it(
-    "should measure creating a group",
+    "TC_CreateGroup: should measure creating a group",
     async () => {
       groupId = await bob.worker!.createGroup([
         joe.address!,
@@ -69,7 +49,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
   );
 
   it(
-    "should create a group and update group name",
+    "TC_UpdateGroupName: should create a group and update group name",
     async () => {
       const newGroupName =
         "name-" + Math.random().toString(36).substring(2, 15);
@@ -85,20 +65,19 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
   );
 
   it(
-    `should measure adding a participant to a group`,
+    "TC_AddMembers: should measure adding a participant to a group",
     async () => {
-      console.time("[TEST] testing adding a participant to a group");
       const membersCount = await bob.worker!.addMembers(groupId!, [
-        sam.address!,
+        randomAddress!,
       ]);
-      console.timeEnd("[TEST] testing adding a participant to a group");
       console.log("[TEST] Members added", membersCount);
       expect(membersCount).toBe(4);
     },
     defaultValues.timeout,
   );
+
   it(
-    `should get members count of a group`,
+    "TC_GetMembersCount: should get members count of a group",
     async () => {
       const members = await bob.worker!.getMembers(groupId!);
       console.log("[TEST] Members count", members.length);
@@ -108,10 +87,10 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
   );
 
   it(
-    "should remove a participant from a group",
+    "TC_RemoveMembers: should remove a participant from a group",
     async () => {
       const membersCount = await bob.worker!.removeMembers(groupId!, [
-        sam.address!,
+        joe.address!,
       ]);
       console.log("[TEST] Members removed", membersCount);
       expect(membersCount).toBe(3);
@@ -119,7 +98,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
     defaultValues.timeout,
   );
   it(
-    "should measure sending a gm in a group",
+    "TC_SendGroupMessage: should measure sending a gm in a group",
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -131,22 +110,23 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
   );
 
   it(
-    "should measure 1 stream catching up a message in a group",
+    "TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group",
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
+      const bobPromise = bob.worker!.receiveMessage(groupId!, groupMessage);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
-      const received = await joePromise;
+      const received = await bobPromise;
 
       console.log("[TEST] GM Message received in group", groupMessage);
       expect(received).toBe(groupMessage);
     },
     defaultValues.timeout,
   );
+
   it(
-    "should create a group and measure 2 streams catching up a message in a group",
+    "TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group",
     async () => {
       groupId = await bob.worker!.createGroup([
         joe.address!,
@@ -173,7 +153,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
   );
 
   it(
-    "should measure sending a gm from SDK 42 to 41",
+    "TC_ReceiveGroupMessageFrom42To41: should measure sending a gm from SDK 42 to 41",
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -184,6 +164,7 @@ describe("Performance test for sending gm, creating group, and sending gm in gro
       const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
+      await new Promise((resolve) => setTimeout(resolve, 2000));
       const [joeReceived, bob41Received] = await Promise.all([
         joePromise,
         bob41Promise,
