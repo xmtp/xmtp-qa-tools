@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import { Client as Client41 } from "node-sdk-41";
 import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
+import { sleep } from "openai/core.mjs";
 import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client";
 
 dotenv.config();
@@ -26,8 +27,8 @@ export interface ClientConfig {
 }
 
 export class ClientManager {
-  public client!: Client41 | Client42;
-  private clientType!: typeof Client41 | typeof Client42;
+  public client!: Client42 | Client41;
+  private clientType!: typeof Client42 | typeof Client41;
   private signer: Signer;
   public version: string;
   public env: XmtpEnv;
@@ -60,6 +61,14 @@ export class ClientManager {
     this.installationId = config.installationId;
   }
 
+  updateVersion(version: string) {
+    this.version = version;
+    if (version === "41") {
+      this.clientType = Client41;
+    } else if (version === "42") {
+      this.clientType = Client42;
+    }
+  }
   async createDM(senderAddresses: string): Promise<string> {
     try {
       //console.time("Manager:createDM");
@@ -67,7 +76,10 @@ export class ClientManager {
       //console.timeEnd("Manager:createDM");
       return dm.id;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(
+        "createDM",
+        error instanceof Error ? error.message : String(error),
+      );
       return "";
     }
   }
@@ -86,72 +98,114 @@ export class ClientManager {
       //console.timeEnd("Manager:AddSuperAdmin");
       return group.id;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(
+        "createGroup",
+        error instanceof Error ? error.message : String(error),
+      );
       return "";
     }
   }
 
-  updateVersion(version: string) {
-    this.version = version;
-    if (version === "41") {
-      this.clientType = Client41;
-    } else if (version === "42") {
-      this.clientType = Client42;
-    }
-  }
   async sendMessage(groupId: string, message: string): Promise<boolean> {
     try {
-      //console.time("Manager:sync");
+      console.time("syncForSending");
       await this.client.conversations.sync();
-      //console.timeEnd("Manager:sync");
-      //console.time("Manager:sendMessage");
+      console.timeEnd("syncForSending");
+      console.time("sendMessage in manager");
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
       await conversation.send(message);
-      //console.timeEnd("Manager:sendMessage");
+      console.timeEnd("sendMessage in manager");
       return true;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(
+        "sendMessage",
+        error instanceof Error ? error.message : String(error),
+      );
       return false;
     }
   }
-  async receiveMessage(groupId: string, expectedMessage: string) {
+
+  async updateGroupName(groupId: string, newGroupName: string) {
     try {
-      //console.time("Manager:sync");
-      await this.client.conversations.sync();
-      //console.timeEnd("Manager:sync");
-      //console.time("Manager:streamAllMessages");
       const conversation =
         this.client.conversations.getConversationById(groupId);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
-      const stream = await conversation.streamAllMessages();
+      console.time("Manager:updateGroupName");
+      await conversation.updateName(newGroupName);
+      console.timeEnd("Manager:updateGroupName");
+      return conversation.name;
+    } catch (error) {
+      console.error(
+        "updateGroupName",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+
+  async receiveMetadata(groupId: string) {
+    try {
+      console.time("Stream sync");
+      await this.client.conversations.sync();
+      console.timeEnd("Stream sync");
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      console.time("Stream sync");
+      await conversation.sync();
+      console.timeEnd("Stream sync");
+      return conversation.name;
+    } catch (error) {
+      console.error(
+        "receiveMetadata",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+  async receiveMessage(groupId: string, expectedMessage: string) {
+    try {
+      console.time("Stream sync");
+      await this.client.conversations.sync();
+      console.timeEnd("Stream sync");
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      // Start the stream before sending the message to ensure delivery
+      const stream = conversation.stream();
       for await (const message of stream) {
         if (
-          message?.senderInboxId?.toLowerCase() ===
+          message?.senderInboxId.toLowerCase() ===
             this.client.inboxId.toLowerCase() ||
           message?.contentType?.typeId !== "text"
         ) {
           continue;
         }
         if (message.content === expectedMessage) {
-          return true;
+          return expectedMessage;
         }
       }
-      //console.timeEnd("Manager:streamAllMessages");
       return false;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(
+        "receiveMessage",
+        error instanceof Error ? error.message : String(error),
+      );
       return false;
     }
   }
   async initialize(): Promise<void> {
     try {
-      //console.time("Manager:initialize");
       this.client = await this.clientType.create(
         this.signer,
         this.encryptionKey,
@@ -160,10 +214,12 @@ export class ClientManager {
           dbPath: dbPath(this.name, this.installationId, this.env),
         },
       );
-      //console.timeEnd("Manager:initialize");
       return;
     } catch (error) {
-      console.error(error instanceof Error ? error.message : String(error));
+      console.error(
+        "initialize",
+        error instanceof Error ? error.message : String(error),
+      );
       return;
     }
   }

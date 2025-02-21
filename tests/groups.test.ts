@@ -1,57 +1,85 @@
 import type { XmtpEnv } from "node-sdk-42";
-import { timeout } from "puppeteer-core";
-import { beforeAll, describe, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { createLogger, overrideConsole } from "../helpers/logger";
-import {
-  defaultValues,
-  getNewRandomPersona,
-  getPersonas,
-  type Persona,
-} from "../helpers/personas";
+import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
 const testName = "TC_Groups_" + env + ":";
 const logger = createLogger(testName);
 overrideConsole(logger);
 
-describe("Performance test for sending gm, creating group, and sending gm in group", () => {
-  let bob: Persona,
-    alice: Persona,
+describe("Complex group interactions with multiple participants", () => {
+  let alice: Persona,
+    bob: Persona,
+    charlie: Persona,
+    dave: Persona,
+    eve: Persona,
     joe: Persona,
-    bobB41: Persona,
-    dmId: string,
-    groupId: string,
-    randomAddress: string,
-    randomInboxId: string;
+    pepe: Persona;
+
+  let groupId: string;
 
   beforeAll(async () => {
-    [bob, alice, joe, bobB41] = await getPersonas(
-      ["bob", "alice", "joe", "bobB41"],
+    [alice, bob, joe, charlie, dave, eve, pepe] = await getPersonas(
+      ["alice", "bob", "joe", "charlie", "dave", "eve", "pepe"],
       env,
       testName,
     );
   }, defaultValues.timeout);
 
   it(
-    "should measure creating a group and sending a gm in it catched up by 2 streams",
+    "should create a group and handle multiple messages and metadata updates",
     async () => {
-      groupId = await bob.worker!.createGroup([
-        joe.address!,
-        bob.address!,
+      // Create group with all participants
+      groupId = await alice.worker!.createGroup([
         alice.address!,
+        bob.address!,
+        joe.address!,
+        charlie.address!,
+        dave.address!,
+        eve.address!,
       ]);
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const alicePromise = alice.worker!.receiveMessage(groupId!, groupMessage);
-      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
+      // Function to get random recipients (2-4 participants)
+      const getRandomRecipients = () => {
+        const participants = [bob, charlie, dave, eve];
+        return participants
+          .sort(() => Math.random() - 0.5)
+          .slice(0, Math.floor(Math.random() * 3) + 2);
+      };
 
-      await bob.worker!.sendMessage(
-        "65ca5432d914386f662f1f76d73159ff",
-        groupMessage,
+      const message = `gm-${Math.random().toString(36).substring(2, 8)}`;
+      const recipients = getRandomRecipients();
+
+      // Set up message reception streams
+      const receivePromises = recipients.map((recipient) =>
+        recipient.worker!.receiveMessage(groupId, message),
       );
-      await Promise.all([joePromise, alicePromise]);
-    },
-    defaultValues.timeout,
-  );
 
+      // Send message
+      await alice.worker!.sendMessage(groupId, message);
+
+      // Verify reception
+      const receivedMessages = await Promise.all(receivePromises);
+
+      const newGroupName =
+        "name-" + Math.random().toString(36).substring(2, 15);
+
+      const joePromise = joe.worker!.receiveMetadata(groupId!, newGroupName);
+      await bob.worker!.updateGroupName(groupId, newGroupName);
+      const joeReceived = await joePromise;
+
+      // Add debug logs
+      console.log("Expected messages length:", recipients.length);
+      console.log("Actual received messages:", receivedMessages);
+      console.log("Expected message:", message);
+      console.log("Expected group name:", newGroupName);
+      console.log("Actual received group name:", joeReceived);
+
+      expect(receivedMessages.length).toBe(recipients.length);
+      expect(receivedMessages).toContain(message);
+      expect(joeReceived).toBe(newGroupName);
+    },
+    defaultValues.timeout * 2,
+  ); // Double timeout for complex test
 });

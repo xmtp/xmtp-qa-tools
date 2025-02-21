@@ -1,7 +1,11 @@
+import { exec } from "child_process";
+import { promisify } from "util";
 import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex } from "./client";
 import { ClientManager, type XmtpEnv } from "./manager";
 import { WorkerClient } from "./worker";
+
+const execAsync = promisify(exec);
 
 // Constants
 export const defaultValues = {
@@ -82,6 +86,26 @@ export async function getPersonas(
   env: XmtpEnv,
   testName: string,
 ): Promise<Persona[]> {
+  // First check and generate any missing keys
+  for (const desc of descriptors) {
+    const persona = parsePersonaDescriptor(desc);
+    const walletKeyEnv = `WALLET_KEY_${persona.name.toUpperCase()}`;
+    const encryptionKeyEnv = `ENCRYPTION_KEY_${persona.name.toUpperCase()}`;
+
+    if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
+      console.log(`Generating keys for ${persona.name}...`);
+      try {
+        await execAsync(`yarn gen:keys ${persona.name.toLowerCase()}`);
+        // Reload environment variables after generating keys
+        require("dotenv").config();
+      } catch (error) {
+        throw new Error(
+          `Failed to generate keys for ${persona.name}: ${error}`,
+        );
+      }
+    }
+  }
+
   const personas = descriptors.map((desc) => ({
     ...parsePersonaDescriptor(desc),
     worker: new WorkerClient(parsePersonaDescriptor(desc), env),

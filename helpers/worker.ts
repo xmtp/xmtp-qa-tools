@@ -1,5 +1,6 @@
 /* eslint-disable */
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
+import { sleep } from "openai/core.mjs";
 import { createLogger, overrideConsole } from "./logger";
 import { ClientManager, type XmtpEnv } from "./manager";
 import { Persona } from "./personas";
@@ -83,7 +84,6 @@ export class WorkerClient extends Worker {
   async createDM(senderAddresses: string): Promise<string> {
     this.postMessage({ type: "createDM", senderAddresses });
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
-    console.log(`[${this.name}] DM created: ${response.dmId}`);
     return response.dmId;
   }
 
@@ -114,6 +114,20 @@ export class WorkerClient extends Worker {
     );
     console.log(`[${this.name}] Received message: ${expectedMessage}`);
     return response.message;
+  }
+  async receiveMetadata(groupId: string, expectedMetadata: string) {
+    this.postMessage({ type: "receiveMetadata", groupId, expectedMetadata });
+    const response = await this.waitForMessage<{ metadata: string }>(
+      "metadataReceived",
+    );
+    return response.metadata;
+  }
+  async updateGroupName(groupId: string, newGroupName: string) {
+    this.postMessage({ type: "updateGroupName", groupId, newGroupName });
+    const response = await this.waitForMessage<{ groupName: string }>(
+      "groupNameUpdated",
+    );
+    return response.groupName;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
     return new Promise((resolve, reject) => {
@@ -161,6 +175,34 @@ if (parentPort) {
           });
           break;
         }
+        case "metadataReceived": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] metadataReceived`);
+          const metadata = await client.receiveMetadata(
+            data.groupId,
+            data.expectedMetadata,
+          );
+          console.timeEnd(`[${client?.name}] metadataReceived`);
+          parentPort?.postMessage({
+            type: "metadataReceived",
+            metadata: metadata,
+          });
+          break;
+        }
+        case "updateGroupName": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] updateGroupName`);
+          const groupName = await client.updateGroupName(
+            data.groupId,
+            data.newGroupName,
+          );
+          console.log(`[${client?.name}] Group name updated: ${groupName}`);
+          console.timeEnd(`[${client?.name}] updateGroupName`);
+          parentPort?.postMessage({
+            type: "groupNameUpdated",
+            groupName: groupName,
+          });
+        }
         case "sendMessage": {
           if (!client) throw new Error("Client not initialized");
           console.log(
@@ -169,20 +211,35 @@ if (parentPort) {
           console.time(`[${client?.name}] sendMessage`);
           await client.sendMessage(data.groupId, data.message);
           console.timeEnd(`[${client?.name}] sendMessage`);
-          console.log(`[${client?.name}] Group message sent successfully`);
+          console.log(
+            `[${client?.name}] Group message ${data.message} successfully`,
+          );
           parentPort?.postMessage({
             type: "messageSent",
             message: data.message,
           });
           break;
         }
-
+        case "receiveMetadata": {
+          if (!client) throw new Error("Client not initialized");
+          console.time(`[${client?.name}] receiveMetadata`);
+          console.log(
+            `[${client.name}] Waiting for metadata from group ${data.groupId}`,
+          );
+          const metadata = await client.receiveMetadata(data.groupId);
+          console.log(`[${client?.name}] Metadata received: ${metadata}`);
+          console.timeEnd(`[${client?.name}] receiveMetadata`);
+          parentPort?.postMessage({
+            type: "metadataReceived",
+            metadata: metadata,
+          });
+          break;
+        }
         case "receiveMessage": {
-          console.log(JSON.stringify(data));
           if (!client) throw new Error("Client not initialized");
           console.time(`[${client?.name}] receiveMessage`);
           console.log(
-            `[${client.name}] Waiting for message from group ${data.groupId}`,
+            `[${client.name}] Started stream for group ${data.groupId}`,
           );
           const message = await client.receiveMessage(
             data.groupId,
@@ -201,7 +258,6 @@ if (parentPort) {
           console.time(`[${client?.name}] createDM`);
           const dmId = await client.createDM(data.senderAddresses);
           console.timeEnd(`[${client?.name}] createDM`);
-          console.log(`[${client?.name}] DM created`);
           parentPort?.postMessage({
             type: "dmCreated",
             dmId: dmId,
