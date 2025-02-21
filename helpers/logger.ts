@@ -4,16 +4,21 @@ import winston from "winston";
 import Transport from "winston-transport";
 
 // Custom transport that buffers logs in memory
+interface LogInfo {
+  timestamp: string;
+  level: string;
+  message: string;
+  [key: symbol]: string | undefined;
+}
+
 class MemoryTransport extends Transport {
   logs: string[] = [];
-  constructor(opts?: any) {
-    super(opts);
-  }
-  log(info: any, callback: () => void) {
+  log(info: LogInfo, callback: () => void) {
     // Ensure the formatted message is available
-    const formattedMessage =
+    const formattedMessage = String(
       info[Symbol.for("message")] ||
-      `[${info.timestamp}] [${info.level}] ${info.message}`;
+        `[${info.timestamp}] [${info.level}] ${info.message}`,
+    );
     this.logs.push(formattedMessage);
     setImmediate(() => this.emit("logged", info));
     callback();
@@ -102,8 +107,14 @@ export const overrideConsole = (logger: winston.Logger) => {
 };
 function filerlog(args: any[], logger: winston.Logger) {
   const message = args.join(" ");
-  if (message.includes("%s: %s")) {
-    filterTime(args, logger);
+  if (typeof args === "object") {
+    if (message.includes("%s: %s")) {
+      filterTime(args, logger);
+    } else if (Array.isArray(args)) {
+      logger.info(args.join(" "));
+    } else {
+      logger.info(message);
+    }
   } else {
     logger.info(message);
   }

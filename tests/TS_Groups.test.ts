@@ -19,12 +19,11 @@ describe(testName, () => {
     joe: Persona,
     bobB41: Persona,
     groupId: string,
-    randomAddress: string,
-    sam: Persona;
+    randomAddress: string;
 
   beforeAll(async () => {
-    const personas = ["bob", "alice", "joe", "bobB41", "sam"];
-    [bob, alice, joe, bobB41, sam] = await getPersonas(
+    const personas = ["bob", "alice", "joe", "bobB41"];
+    [bob, alice, joe, bobB41] = await getPersonas(
       personas,
       env,
       testName,
@@ -114,7 +113,7 @@ describe(testName, () => {
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const bobPromise = bob.worker!.receiveMessage(groupId!, groupMessage);
+      const bobPromise = bob.worker!.receiveMessage(groupId!, [groupMessage]);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
       const received = await bobPromise;
@@ -135,8 +134,10 @@ describe(testName, () => {
       ]);
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const alicePromise = alice.worker!.receiveMessage(groupId!, groupMessage);
-      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
+      const alicePromise = alice.worker!.receiveMessage(groupId!, [
+        groupMessage,
+      ]);
+      const joePromise = joe.worker!.receiveMessage(groupId!, [groupMessage]);
 
       await bob.worker!.sendMessage(groupId!, groupMessage);
       const [aliceReceived, joeReceived] = await Promise.all([
@@ -157,11 +158,15 @@ describe(testName, () => {
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const bob41Promise = bobB41.worker!.receiveMessage(
-        groupId!,
+      await bob.worker!.addMembers(groupId!, [bobB41.address!]);
+      const isMember = await bob.worker!.isMember(groupId!, bobB41.address!);
+      console.log("[TEST] Bob 41 is member", isMember);
+      expect(isMember).toBe(true);
+
+      const bob41Promise = bobB41.worker!.receiveMessage(groupId!, [
         groupMessage,
-      );
-      const joePromise = joe.worker!.receiveMessage(groupId!, groupMessage);
+      ]);
+      const joePromise = joe.worker!.receiveMessage(groupId!, [groupMessage]);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
       await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -175,7 +180,7 @@ describe(testName, () => {
       expect(joeReceived).toBe(groupMessage);
       expect(bob41Received).toBe(groupMessage);
     },
-    defaultValues.timeout,
+    defaultValues.timeout * 2,
   );
 
   afterAll(() => {

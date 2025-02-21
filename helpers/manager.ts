@@ -136,6 +136,54 @@ export class ClientManager {
       return false;
     }
   }
+  async isMember(groupId: string, memberAddress: string) {
+    try {
+      await this.client.conversations.sync();
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      await conversation.sync();
+      const members = await conversation.members();
+      return members.some((member) =>
+        member.accountAddresses.some(
+          (address) => address.toLowerCase() === memberAddress.toLowerCase(),
+        ),
+      );
+    } catch (error) {
+      console.error(
+        "error:isMember()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return false;
+    }
+  }
+  async messages(groupId: string): Promise<string[]> {
+    try {
+      await this.client.conversations.sync();
+      const conversation =
+        this.client.conversations.getConversationById(groupId);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      await conversation.sync();
+      const returnedMessages: string[] = [];
+      const messages = await conversation.messages();
+      for (const message of messages) {
+        if (message.contentType?.typeId === "text") {
+          returnedMessages.push(message.content as string);
+        }
+      }
+      return returnedMessages;
+    } catch (error) {
+      console.error(
+        "error:messages()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return [];
+    }
+  }
   async getMembers(groupId: string) {
     try {
       await this.client.conversations.sync();
@@ -223,7 +271,7 @@ export class ClientManager {
       return false;
     }
   }
-  async receiveMessage(groupId: string, expectedMessage: string) {
+  async receiveMessage(groupId: string, expectedMessage: string[]) {
     try {
       await this.client.conversations.sync();
       const conversation =
@@ -233,6 +281,7 @@ export class ClientManager {
       }
       // Start the stream before sending the message to ensure delivery
       const stream = conversation.stream();
+      const receivedMessages: string[] = [];
       for await (const message of stream) {
         if (
           message?.senderInboxId.toLowerCase() ===
@@ -241,11 +290,17 @@ export class ClientManager {
         ) {
           continue;
         }
-        if (message.content === expectedMessage) {
-          return expectedMessage;
+        const content = message.content as string;
+        if (expectedMessage.includes(content)) {
+          receivedMessages.push(content);
+        }
+
+        // Break the stream if we've received all expected messages
+        if (receivedMessages.length === expectedMessage.length) {
+          break;
         }
       }
-      return false;
+      return receivedMessages;
     } catch (error) {
       console.error(
         "error:receiveMessage()",
@@ -262,6 +317,9 @@ export class ClientManager {
         {
           env: this.env,
           dbPath: dbPath(this.name, this.installationId, this.env),
+          /* eslint-disable */
+          loggingLevel: "error" as any,
+          /* eslint-enable */
         },
       );
       return;

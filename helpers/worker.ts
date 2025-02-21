@@ -1,9 +1,7 @@
-/* eslint-disable */
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
-import { sleep } from "openai/core.mjs";
 import { createLogger, overrideConsole } from "./logger";
 import { ClientManager, type XmtpEnv } from "./manager";
-import { Persona } from "./personas";
+import type { Persona } from "./personas";
 
 // Types
 export type WorkerMessage = {
@@ -29,22 +27,27 @@ export class WorkerClient extends Worker {
   private installationId!: string;
   private env!: XmtpEnv;
   private version!: string;
+  private nameId!: string;
 
   constructor(persona: Persona, env: XmtpEnv, options: WorkerOptions = {}) {
-    options.workerData ??= {};
-    options.workerData.__ts_worker_filename = "../helpers/worker.ts".toString();
+    options.workerData = {
+      __ts_worker_filename: "../helpers/worker.ts",
+      ...(options.workerData as Record<string, unknown>),
+    };
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
-    this.name = persona.name;
+
     this.installationId = persona.installationId;
+    this.name = persona.name;
     this.version = persona.version;
     this.env = env;
+    this.nameId = `${this.name}-${this.installationId}`;
     return this;
   }
 
   async initialize(
     testName: string,
   ): Promise<{ address: string; inboxId: string }> {
-    console.time(`[${this.name}-${this.installationId}] initialize`);
+    console.time(`[${this.nameId}] initialize`);
     this.postMessage({
       type: "initialize",
       name: this.name,
@@ -57,9 +60,9 @@ export class WorkerClient extends Worker {
       address: string;
       inboxId: string;
     }>("clientInitialized");
-    console.timeEnd(`[${this.name}-${this.installationId}] initialize`);
+    console.timeEnd(`[${this.nameId}] initialize`);
     console.log(
-      `[${this.name}] initialized with: ${this.env}:${this.version}:${this.installationId}`,
+      `[${this.nameId}] initialized with: ${this.env}:${this.version}:${this.installationId}`,
     );
     return {
       address: response.address,
@@ -71,69 +74,87 @@ export class WorkerClient extends Worker {
   async sendMessage(groupId: string, message: string): Promise<void> {
     // Simulate delay before sending
     console.log(
-      `[${this.name}] Sending group message to [${groupId}]: ${message}`,
+      `[${this.nameId}] Sending group message to [${groupId}]: ${message}`,
     );
-    console.time(`[${this.name}] send`);
+    console.time(`[${this.nameId}] send`);
     this.postMessage({ type: "sendMessage", groupId, message });
-    console.timeEnd(`[${this.name}] send`);
-    const returnValue = await this.waitForMessage("messageSent");
-    return returnValue;
+    console.timeEnd(`[${this.nameId}] send`);
+    await this.waitForMessage("messageSent");
   }
   async createDM(senderAddresses: string): Promise<string> {
-    console.time(`[${this.name}] createDM`);
+    console.time(`[${this.nameId}] createDM`);
     this.postMessage({ type: "createDM", senderAddresses });
     const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
-    console.timeEnd(`[${this.name}] createDM`);
+    console.timeEnd(`[${this.nameId}] createDM`);
     return response.dmId;
   }
   async removeMembers(
     groupId: string,
     memberAddresses: string[],
   ): Promise<number> {
-    console.time(`[${this.name}] removeMembers`);
+    console.time(`[${this.nameId}] removeMembers`);
     this.postMessage({ type: "removeMembers", groupId, memberAddresses });
     const response = await this.waitForMessage<{ count: number }>(
       "membersRemoved",
     );
-    console.timeEnd(`[${this.name}] removeMembers`);
+    console.timeEnd(`[${this.nameId}] removeMembers`);
     return response.count;
   }
   async getMembers(groupId: string): Promise<string[]> {
-    console.time(`[${this.name}] getMembers`);
+    console.time(`[${this.nameId}] getMembers`);
     this.postMessage({ type: "getMembers", groupId });
     const response = await this.waitForMessage<{ members: string[] }>(
       "membersReceived",
     );
-    console.timeEnd(`[${this.name}] getMembers`);
+    console.timeEnd(`[${this.nameId}] getMembers`);
     return response.members;
   }
   async addMembers(
     groupId: string,
     memberAddresses: string[],
   ): Promise<number> {
-    console.time(`[${this.name}] addMembers`);
+    console.time(`[${this.nameId}] addMembers`);
     this.postMessage({ type: "addMembers", groupId, memberAddresses });
     const response = await this.waitForMessage<{ count: number }>(
       "membersAdded",
     );
-    console.timeEnd(`[${this.name}] addMembers`);
+    console.timeEnd(`[${this.nameId}] addMembers`);
     return response.count;
   }
   async createGroup(senderAddresses: string[]): Promise<string> {
-    console.time(`[${this.name}] createGroup`);
+    console.time(`[${this.nameId}] createGroup`);
     this.postMessage({ type: "createGroup", senderAddresses });
     const response = await this.waitForMessage<{ groupId: string }>(
       "groupCreated",
     );
-    console.log(`[${this.name}] Group created: ${response.groupId}`);
-    console.timeEnd(`[${this.name}] createGroup`);
+    console.log(`[${this.nameId}] Group created: ${response.groupId}`);
+    console.timeEnd(`[${this.nameId}] createGroup`);
     return response.groupId;
+  }
+  async isMember(groupId: string, memberAddress: string): Promise<boolean> {
+    console.time(`[${this.nameId}] isMember`);
+    this.postMessage({ type: "isMember", groupId, memberAddress });
+    const response = await this.waitForMessage<{ isMember: boolean }>(
+      "isMember",
+    );
+    console.timeEnd(`[${this.nameId}] isMember`);
+    return response.isMember;
+  }
+
+  async pullMessages(groupId: string): Promise<string[]> {
+    console.time(`[${this.nameId}] pullMessages`);
+    this.postMessage({ type: "pullMessages", groupId });
+    const response = await this.waitForMessage<{ messages: string[] }>(
+      "messagesPulled",
+    );
+    console.timeEnd(`[${this.nameId}] pullMessages`);
+    return response.messages;
   }
 
   async receiveMessage(
     groupId: string,
-    expectedMessage: string,
-  ): Promise<string | null> {
+    expectedMessage: string[],
+  ): Promise<string[]> {
     this.postMessage({
       type: "receiveMessage",
       groupId,
@@ -141,50 +162,43 @@ export class WorkerClient extends Worker {
       name: this.name,
       installationId: this.installationId,
     });
-    console.time(`[${this.name}] receiveMessage`);
+    console.time(`[${this.nameId}] receiveMessage`);
     try {
-      const response = await Promise.race([
-        this.waitForMessage<{ message: string }>("messageReceived"),
-        new Promise((_, reject) =>
-          setTimeout(
-            () =>
-              reject(
-                new Error(`[${this.name}] receive timeout after 4 seconds`),
-              ),
-            4000,
-          ),
-        ),
-      ]);
-      console.log(`[${this.name}] Received message: ${expectedMessage}`);
-      console.timeEnd(`[${this.name}] receiveMessage`);
-      return (response as any).message;
-    } catch (error) {
-      console.log(`[${this.name}] Message receive timeout after 4 seconds`);
-      console.timeEnd(`[${this.name}] receiveMessage`);
-      return null;
+      const response = (await Promise.race([
+        this.waitForMessage<{ message: string[] }>("messageReceived"),
+      ])) as { message: string[] };
+      console.log(`[${this.nameId}] Received messages:`, response);
+      console.timeEnd(`[${this.nameId}] receiveMessage`);
+      return response.message;
+    } catch (error: unknown) {
+      console.log(
+        `[${this.nameId}] Message receive timeout after 4 seconds`,
+        error,
+      );
+      return [];
     }
   }
   async receiveMetadata(groupId: string, expectedMetadata: string) {
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.time(`[${this.name}] receiveMetadata`);
+    console.time(`[${this.nameId}] receiveMetadata`);
     this.postMessage({ type: "receiveMetadata", groupId, expectedMetadata });
     const response = await this.waitForMessage<{ metadata: string }>(
       "metadataReceived",
     );
-    console.timeEnd(`[${this.name}] receiveMetadata`);
+    console.timeEnd(`[${this.nameId}] receiveMetadata`);
     return response.metadata;
   }
   async updateGroupName(groupId: string, newGroupName: string) {
-    console.time(`[${this.name}] updateGroupName`);
+    console.time(`[${this.nameId}] updateGroupName`);
     this.postMessage({ type: "updateGroupName", groupId, newGroupName });
     const response = await this.waitForMessage<{ groupName: string }>(
       "groupNameUpdated",
     );
-    console.timeEnd(`[${this.name}] updateGroupName`);
+    console.timeEnd(`[${this.nameId}] updateGroupName`);
     return response.groupName;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
-    console.time(`[${this.name}] waitForMessage`);
+    console.time(`[${this.nameId}] waitForMessage`);
     const promise = new Promise((resolve, reject) => {
       const handler = (msg: WorkerMessage) => {
         if (msg.type === messageType) {
@@ -192,20 +206,20 @@ export class WorkerClient extends Worker {
           resolve(msg as T);
         } else if (msg.type === "error") {
           this.removeListener("message", handler);
-          console.log(`[${this.name}] Error: ${msg.error}`);
-          reject(new Error(msg.error));
+          console.log(`[${this.nameId}] Error: ${msg.error}`);
+          reject(new Error(msg.error as string));
         }
       };
       this.on("message", handler);
     });
-    console.timeEnd(`[${this.name}] waitForMessage`);
+    console.timeEnd(`[${this.nameId}] waitForMessage`);
     return promise as Promise<T>;
   }
 }
 
 if (parentPort) {
   let client: ClientManager;
-
+  /* eslint-disable */
   parentPort.on("message", async (data: WorkerMessage) => {
     try {
       switch (data.type) {
@@ -228,6 +242,15 @@ if (parentPort) {
           });
           break;
         }
+        case "pullMessages": {
+          if (!client) throw new Error("Client not initialized");
+          const messages = await client.messages(data.groupId);
+          parentPort?.postMessage({
+            type: "messagesPulled",
+            messages: messages,
+          });
+          break;
+        }
         case "getMembers": {
           if (!client) throw new Error("Client not initialized");
           const members = await client.getMembers(data.groupId);
@@ -236,6 +259,13 @@ if (parentPort) {
             members: members,
           });
           break;
+        }
+        case "isMember": {
+          if (!client) throw new Error("Client not initialized");
+          const isMember = await client.isMember(
+            data.groupId,
+            data.memberAddress,
+          );
         }
         case "removeMembers": {
           if (!client) throw new Error("Client not initialized");

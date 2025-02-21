@@ -19,7 +19,6 @@ describe(testName, () => {
     joe: Persona,
     bobB41: Persona,
     dmId: string,
-    groupId: string,
     randomAddress: string,
     sam: Persona;
 

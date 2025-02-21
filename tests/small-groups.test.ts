@@ -1,11 +1,16 @@
 import type { XmtpEnv } from "node-sdk-42";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  verifyAddRandomMembers,
+  verifyGroupNameChange,
+  verifyMembersCount,
+  verifyRemoveRandomMembers,
+  verifyStreams,
+} from "../helpers/groups";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
-  getNewRandomPersona,
   getPersonas,
-  getRandomPersonas,
   participantNames,
   type Persona,
 } from "../helpers/personas";
@@ -48,15 +53,15 @@ describe(testName, () => {
 
       // Final verification step
       const steeamstoVerify = 3;
-      const { validMessages, receivedMessages } = await verifyStreams(
+      const { validMessages, successPercentage } = await verifyStreams(
         creator,
         participants,
         groupId,
         steeamstoVerify,
       );
+
       expect(validMessages.length).toBe(steeamstoVerify);
-      expect(receivedMessages).toBeDefined();
-      expect(receivedMessages.every((msg) => msg !== undefined)).toBe(true);
+      expect(successPercentage).toBeGreaterThanOrEqual(currentMemberCount);
     },
     defaultValues.timeout,
   );
@@ -73,6 +78,7 @@ describe(testName, () => {
         participants,
         groupId,
         currentMemberCount,
+        env,
       );
 
       // High-level expectations about member count
@@ -85,15 +91,15 @@ describe(testName, () => {
 
       // Final verification step
       const steeamstoVerify = 5;
-      const { validMessages, receivedMessages } = await verifyStreams(
+      const { successPercentage, validMessages } = await verifyStreams(
         creator,
         participants,
         groupId,
         steeamstoVerify,
       );
+
+      expect(successPercentage).toBeGreaterThanOrEqual(currentMemberCount);
       expect(validMessages.length).toBe(steeamstoVerify);
-      expect(receivedMessages).toBeDefined();
-      expect(receivedMessages.filter(Boolean).length).toBe(steeamstoVerify);
     },
     defaultValues.timeout,
   );
@@ -110,6 +116,7 @@ describe(testName, () => {
         participants,
         groupId,
         currentMemberCount,
+        env,
       );
 
       // High-level expectations about member count
@@ -123,15 +130,49 @@ describe(testName, () => {
       await verifyGroupNameChange(participants, groupId);
 
       // Final verification step
-      const { validMessages, receivedMessages } = await verifyStreams(
+      const { successPercentage, validMessages } = await verifyStreams(
         creator,
         participants,
         groupId,
-        5,
+        currentMemberCount,
       );
-      expect(validMessages.length).toBe(5);
-      expect(receivedMessages).toBeDefined();
-      expect(receivedMessages.some(Boolean)).toBe(true); // At least some messages received
+
+      expect(successPercentage).toBeGreaterThanOrEqual(currentMemberCount);
+      expect(validMessages.length).toBe(currentMemberCount);
+    },
+    defaultValues.timeout,
+  );
+
+  it(
+    "should handle streams",
+    async () => {
+      // Final verification step
+      const {
+        successPercentage: successPercentage1,
+        validMessages: validMessages1,
+      } = await verifyStreams(
+        creator,
+        participants,
+        groupId,
+        currentMemberCount,
+      );
+
+      expect(successPercentage1).toBeGreaterThanOrEqual(currentMemberCount);
+      expect(validMessages1.length).toBe(currentMemberCount);
+
+      // Final verification step
+      const {
+        successPercentage: successPercentage2,
+        validMessages: validMessages2,
+      } = await verifyStreams(
+        creator,
+        participants,
+        groupId,
+        currentMemberCount,
+      );
+
+      expect(successPercentage2).toBeGreaterThanOrEqual(currentMemberCount);
+      expect(validMessages2.length).toBe(currentMemberCount);
     },
     defaultValues.timeout,
   );
@@ -140,145 +181,3 @@ describe(testName, () => {
     flushLogger(testName);
   });
 });
-
-async function verifyRemoveRandomMembers(
-  creator: Persona,
-  participants: Persona[],
-  groupId: string,
-  currentMemberCount: number,
-): Promise<number> {
-  try {
-    const newRandomParticipant = getRandomPersonas(participants, 1)[0];
-    expect(newRandomParticipant).toBeDefined();
-    expect(newRandomParticipant.address).toBeDefined();
-
-    const membersAfterRemove = await creator.worker!.removeMembers(groupId, [
-      newRandomParticipant.address!,
-    ]);
-    expect(membersAfterRemove).toBe(currentMemberCount - 1);
-    return membersAfterRemove;
-  } catch (error) {
-    console.error(`[TEST] Error verifying remove random members: ${error}`);
-    throw error;
-  }
-}
-
-async function verifyAddRandomMembers(
-  creator: Persona,
-  participants: Persona[],
-  groupId: string,
-  currentMemberCount: number,
-): Promise<number> {
-  try {
-    const newRandomParticipant = await getNewRandomPersona(env);
-    expect(newRandomParticipant).toBeDefined();
-    expect(newRandomParticipant.address).toBeDefined();
-
-    const membersAfterAdd = await creator.worker!.addMembers(groupId, [
-      newRandomParticipant.address,
-    ]);
-    expect(membersAfterAdd).toBe(currentMemberCount + 1);
-    return membersAfterAdd;
-  } catch (error) {
-    console.error(`[TEST] Error verifying add random members: ${error}`);
-    throw error;
-  }
-}
-
-async function verifyMembersCount(
-  participants: Persona[],
-  groupId: string,
-): Promise<number> {
-  try {
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    const checkersCount =
-      Math.floor(Math.random() * (participants.length - 1)) + 1;
-    const checkers = getRandomPersonas(participants, checkersCount);
-    const memberCounts = await Promise.all(
-      checkers.map(async (checker) => {
-        const members = await checker.worker!.getMembers(groupId);
-        return members.length;
-      }),
-    );
-
-    // Find the most common count
-    const countMap = memberCounts.reduce<Record<number, number>>(
-      (acc, count) => {
-        acc[count] = (acc[count] || 0) + 1;
-        return acc;
-      },
-      {},
-    );
-
-    // Get the count that appears most frequently
-    const [mostCommonCount] = Object.entries(countMap).sort(
-      ([, a], [, b]) => b - a,
-    )[0];
-
-    console.log(
-      `[TEST] Member count verified by ${checkers[0].address}: ${mostCommonCount}`,
-    );
-    return parseInt(mostCommonCount);
-  } catch (error) {
-    console.error(`[TEST] Error verifying members count: ${error}`);
-    throw error;
-  }
-}
-
-async function verifyGroupNameChange(participants: Persona[], groupId: string) {
-  try {
-    const newGroupName = "name-" + Math.random().toString(36).substring(2, 15);
-    const randomParticipants = getRandomPersonas(participants, 3);
-    const metadataPromises = randomParticipants.map((p) =>
-      p.worker!.receiveMetadata(groupId, newGroupName),
-    );
-
-    const newRandomParticipant = getRandomPersonas(participants, 1)[0];
-    await newRandomParticipant.worker!.updateGroupName(groupId, newGroupName);
-
-    const metadataReceived = await Promise.all(metadataPromises);
-    expect(metadataReceived.length).toBe(randomParticipants.length);
-    expect(metadataReceived).toContain(newGroupName);
-  } catch (error) {
-    console.error(`[TEST] Error verifying group name: ${error}`);
-    throw error;
-  }
-}
-
-async function verifyStreams(
-  creator: Persona,
-  allParticipants: Persona[],
-  groupId: string,
-  listenerCount: number,
-) {
-  try {
-    const message = `gm-${Math.random().toString(36).substring(2, 8)}`;
-
-    const recipients = getRandomPersonas(allParticipants, listenerCount);
-    // Set up message reception streams
-    const receivePromises = recipients.map(async (recipient) => {
-      if (recipient.address !== creator.address) {
-        return recipient.worker!.receiveMessage(groupId, message);
-      }
-    });
-
-    // Send messages
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    await creator.worker!.sendMessage(groupId, message);
-
-    // Verify reception
-    const receivedMessages = await Promise.all(receivePromises);
-    const validMessages = receivedMessages.filter((msg) => msg !== null);
-
-    return {
-      receivedMessages,
-      validMessages,
-    };
-  } catch (error) {
-    console.error(`[TEST] Error verifying streams: ${error}`);
-    return {
-      receivedMessages: [],
-      validMessages: [],
-    };
-  }
-}
