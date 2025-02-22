@@ -13,8 +13,8 @@ if (!person) {
 
 const walletKey = generatePrivateKey();
 const account = privateKeyToAccount(walletKey);
-const publicKey = account.address;
 const encryptionKeyHex = generateEncryptionKeyHex();
+const publicKey = account.address;
 
 const filePath = join(process.cwd(), ".env");
 

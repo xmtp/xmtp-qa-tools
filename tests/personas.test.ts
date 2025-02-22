@@ -1,17 +1,17 @@
-import fs from "fs";
 import type { XmtpEnv } from "node-sdk-42";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
+  DefaultPersonas,
   defaultValues,
-  getNewRandomPersona,
-  getPersonas,
+  PersonaFactory,
   type Persona,
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Personas_" + env;
 const logger = createLogger(testName);
+const personaFactory = new PersonaFactory(env, testName);
 overrideConsole(logger);
 
 /* 
@@ -25,10 +25,6 @@ Topics:
 */
 
 describe(testName, () => {
-  let bob: Persona, alice: Persona, joe: Persona, bobB41: Persona;
-  let randomAddress: string;
-  let randomAddress2: string;
-
   beforeAll(async () => {
     // Ensure the data folder is clean before running tests
     //fs.rmSync(".data", { recursive: true, force: true });
@@ -37,33 +33,64 @@ describe(testName, () => {
   it(
     "should create a persona",
     async () => {
-      const personas = ["bob", "alice"];
-      [bob, alice] = await getPersonas(
-        personas,
-        env,
-        testName,
-        personas.length,
-      );
-      expect(bob.dbPath).toBeDefined();
-      expect(alice.dbPath).toBeDefined();
+      // Get Bob's persona using the enum value.
+      const [bob] = await personaFactory.getPersonas([DefaultPersonas.BOB]);
+
+      expect(bob.address).toBeDefined();
     },
     defaultValues.timeout,
   );
 
   it(
-    "should create 2 random personas",
+    "should create a random persona",
     async () => {
-      const { address } = await getNewRandomPersona(env);
-      randomAddress = address;
-      const { address: address2 } = await getNewRandomPersona(env);
-      randomAddress2 = address2;
-
-      expect(randomAddress).toBeDefined();
-      expect(randomAddress2).toBeDefined();
+      const [randomPersona] = await personaFactory.getPersonas(["random"]);
+      expect(randomPersona.address).toBeDefined();
     },
     defaultValues.timeout,
   );
 
+  it(
+    "should create multiple personas",
+    async () => {
+      const personas = await personaFactory.getPersonas([
+        DefaultPersonas.BOB,
+        DefaultPersonas.ALICE,
+        "randompep",
+        "randombob",
+      ]);
+      const [bob, alice, random, randomBob] = personas;
+      expect(bob.address).toBeDefined();
+      expect(alice.address).toBeDefined();
+      expect(random.address).toBeDefined();
+      expect(randomBob.address).toBeDefined();
+    },
+    defaultValues.timeout * 2,
+  );
+
+  // it(
+  //   "should create 10 personas",
+  //   async () => {
+  //     const selectedPersonas = [
+  //       DefaultPersonas.BOB,
+  //       DefaultPersonas.ALICE,
+  //       DefaultPersonas.ADAM,
+  //       DefaultPersonas.BELLA,
+  //       DefaultPersonas.CARL,
+  //       DefaultPersonas.DIANA,
+  //       DefaultPersonas.ERIC,
+  //       DefaultPersonas.FIONA,
+  //       DefaultPersonas.GEORGE,
+  //       DefaultPersonas.HANNAH,
+  //     ];
+  //     const personas = await personaFactory.getPersonas(selectedPersonas);
+
+  //     for (const persona of personas) {
+  //       expect(persona.address).toBeDefined();
+  //     }
+  //   },
+  //   defaultValues.timeout * 4,
+  // );
   afterAll(() => {
     flushLogger(testName);
   });

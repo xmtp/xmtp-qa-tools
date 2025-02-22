@@ -1,6 +1,8 @@
 import dotenv from "dotenv";
-import { Client as Client42, type Signer, type XmtpEnv } from "node-sdk-42";
+import { Client as Client41 } from "node-sdk-41";
+import { Client as Client42, type XmtpEnv } from "node-sdk-42";
 import { createSigner, getEncryptionKeyFromHex } from "./client";
+import type { Persona } from "./personas";
 
 /* We dont use logs here, everything is measure in worker file
 This way i can measure the time it takes to do the action and not the time it takes to log
@@ -18,58 +20,59 @@ export interface TestCase {
   installationIds: string[];
   describe: string;
 }
-export interface ClientConfig {
-  version: string;
-  env: XmtpEnv;
-  name: string;
-  installationId: string;
-  walletKey?: string;
-  encryptionKey?: string;
-  dbPath: string;
-}
 
 export class ClientManager {
-  public client!: Client42;
-  private clientType!: typeof Client42;
-  private signer: Signer;
+  public client!: Client42 | Client41;
+  private clientType!: typeof Client42 | typeof Client41;
   public version: string;
   public env: XmtpEnv;
   public name: string;
   public installationId: string;
-  public walletKey!: string;
-  private encryptionKey!: Uint8Array;
-  private nameId!: string;
+  public walletKey: string;
+  private encryptionKey: string;
+  private nameId: string;
   public dbPath: string;
 
-  constructor(config: ClientConfig) {
+  constructor(config: Persona) {
     this.version = config.version;
     this.nameId = `manager:${config.name}-${config.installationId}`;
     this.updateVersion(config.version);
-    /* Wallet key*/
-    const walletKey =
-      config.walletKey ??
-      (process.env[`WALLET_KEY_${config.name.toUpperCase()}`] as `0x${string}`);
-    this.clientType = Client42;
-    this.walletKey = walletKey;
-    this.signer = createSigner(walletKey as `0x${string}`);
-    /* Encryption key*/
-    const encryptionKey =
-      config.encryptionKey ??
-      process.env[`ENCRYPTION_KEY_${config.name.toUpperCase()}`];
-
-    this.encryptionKey = getEncryptionKeyFromHex(encryptionKey as string);
-
+    this.walletKey = config.walletKey;
+    this.encryptionKey = config.encryptionKey;
     this.env = config.env;
     this.name = config.name;
     this.installationId = config.installationId;
     this.dbPath = config.dbPath;
-    console.log("dbPath", this.dbPath);
   }
 
+  async initialize(): Promise<void> {
+    try {
+      console.time(`[${this.nameId}] - initialize`);
+      const signer = createSigner(this.walletKey as `0x${string}`);
+      const encryptionKey = getEncryptionKeyFromHex(this.encryptionKey);
+
+      this.client = await this.clientType.create(signer, encryptionKey, {
+        env: this.env,
+        dbPath: this.dbPath,
+      });
+      console.timeEnd(`[${this.nameId}] - initialize`);
+      return;
+    } catch (error) {
+      console.error(
+        "error:initialize()",
+        error instanceof Error ? error.message : String(error),
+      );
+      return;
+    }
+  }
   updateVersion(version: string) {
     this.version = version;
     if (version === "42") {
       this.clientType = Client42;
+    } else if (version === "41") {
+      this.clientType = Client41;
+    } else {
+      throw new Error("Invalid version");
     }
   }
   async receiveMessage(groupId: string, expectedMessages: string[]) {
@@ -403,30 +406,6 @@ export class ClientManager {
         error instanceof Error ? error.message : String(error),
       );
       return false;
-    }
-  }
-  async initialize(): Promise<void> {
-    try {
-      console.log(`[${this.nameId}] - initializing`);
-      console.time(`[${this.nameId}] - initialize`);
-      console.log("dbPath", this.dbPath);
-      this.client = await this.clientType.create(
-        this.signer,
-        this.encryptionKey,
-        {
-          env: this.env,
-          dbPath: this.dbPath,
-        },
-      );
-      console.timeEnd(`[${this.nameId}] - initialize`);
-      console.log(`[${this.nameId}] - initialized`);
-      return;
-    } catch (error) {
-      console.error(
-        "error:initialize()",
-        error instanceof Error ? error.message : String(error),
-      );
-      return;
     }
   }
 }

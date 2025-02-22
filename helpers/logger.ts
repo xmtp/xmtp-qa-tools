@@ -49,7 +49,7 @@ export const createLogger = (testName: string) => {
     const sharedFormat = winston.format.combine(
       winston.format.timestamp(),
       winston.format.printf(({ timestamp, level, message }) => {
-        return `[${timestamp}] [${level}] ${message}`;
+        return `[${timestamp as string}] [${level}] ${message as string}`;
       }),
     );
 
@@ -87,26 +87,49 @@ export const createLogger = (testName: string) => {
   return sharedLogger;
 };
 
+function filterLog(args: any[]): string {
+  return args
+    .map((arg) => {
+      if (arg === null) return "null";
+      if (arg === undefined) return "undefined";
+      if (typeof arg === "object") {
+        try {
+          return JSON.stringify(arg);
+        } catch (e: unknown) {
+          if (e instanceof Error) {
+            return e.message;
+          }
+          return "[Circular Object]";
+        }
+      } else if (args.join(" ").includes("%s")) {
+        return filterTime(args);
+      } else {
+        return String(arg);
+      }
+    })
+    .join(" ");
+}
+
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      logger.log("info", args, logger);
+      logger.log("info", filterLog(args));
     };
     console.error = (...args: any[]) => {
-      logger.log("error", args, logger);
+      logger.log("error", filterLog(args));
     };
     console.warn = (...args: any[]) => {
-      logger.log("warn", args, logger);
+      logger.log("warn", filterLog(args));
     };
     console.info = (...args: any[]) => {
-      logger.log("info", args, logger);
+      logger.log("info", filterLog(args));
     };
   } catch (error) {
     console.error("Error overriding console", error);
   }
 };
 
-function filterTime(args: any[], logger: winston.Logger): boolean {
+function filterTime(args: any[]): string {
   const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
   const timeMatch = args.find((arg: any) =>
     timePattern.test(String(arg)),
@@ -117,13 +140,11 @@ function filterTime(args: any[], logger: winston.Logger): boolean {
     const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
 
     if (timeInMs > 300) {
-      logger.warn(
-        `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`,
-      );
+      return `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`;
     }
-    return true;
+    return "";
   }
-  return false;
+  return "";
 }
 
 if (!fs.existsSync("logs")) {

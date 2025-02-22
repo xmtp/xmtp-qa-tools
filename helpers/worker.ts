@@ -1,5 +1,4 @@
 import { parentPort, Worker, type WorkerOptions } from "node:worker_threads";
-import { createLogger, overrideConsole } from "./logger";
 import { ClientManager, type XmtpEnv } from "./manager";
 import type { Persona } from "./personas";
 
@@ -29,40 +28,33 @@ export class WorkerClient extends Worker {
   private version!: string;
   private dbPath!: string;
   nameId!: string;
+  testName!: string;
 
-  constructor(
-    persona: Persona,
-    env: XmtpEnv,
-    dbPath: string,
-    options: WorkerOptions = {},
-  ) {
-    options.workerData = {
-      __ts_worker_filename: "../helpers/worker.ts",
-      ...(options.workerData as Record<string, unknown>),
+  constructor(persona: Persona) {
+    const options: WorkerOptions = {
+      workerData: {
+        __ts_worker_filename: "../helpers/worker.ts",
+      },
     };
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
-    this.dbPath = dbPath;
+    this.dbPath = persona.dbPath;
     this.installationId = persona.installationId;
     this.name = persona.name;
     this.version = persona.version;
-    this.env = env;
+    this.env = persona.env;
+    this.testName = persona.testName;
     this.nameId = `worker:${this.name}-${this.installationId}`;
     return this;
   }
 
   async initialize(
-    testName: string,
+    persona: Persona,
   ): Promise<{ address: string; inboxId: string }> {
     try {
       console.time(`[${this.nameId}] initialize`);
       this.postMessage({
         type: "initialize",
-        name: this.name,
-        env: this.env,
-        version: this.version,
-        installationId: this.installationId,
-        testName: testName,
-        dbPath: this.dbPath,
+        persona,
       });
       const response = await this.waitForMessage<{
         address: string;
@@ -294,16 +286,7 @@ if (parentPort) {
         switch (data.type) {
           case "initialize": {
             try {
-              const logger = createLogger(data.testName as string);
-              overrideConsole(logger);
-
-              client = new ClientManager({
-                env: data.env as XmtpEnv,
-                version: data.version as string,
-                name: data.name as string,
-                installationId: data.installationId as string,
-                dbPath: data.dbPath as string,
-              });
+              client = new ClientManager(data.persona as Persona);
               await client.initialize();
               parentPort?.postMessage({
                 type: "clientInitialized",
@@ -312,7 +295,7 @@ if (parentPort) {
                 inboxId: client.client.inboxId,
               });
             } catch (error: unknown) {
-              console.error(`[initialize] Initialize error  `, error);
+              console.error(`[initialize] error`, error);
             }
             break;
           }
