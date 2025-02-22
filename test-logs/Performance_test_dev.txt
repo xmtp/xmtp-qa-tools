@@ -1,6 +1,0 @@
-[2025-02-20T00:52:42.530Z] [bob] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-20T00:52:42.807Z] [joe] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-20T00:52:42.929Z] [bob] initialized with: {"env":"dev","version":"41","installationId":"B"}
-[2025-02-20T00:52:42.960Z] [alice] initialized with: {"env":"dev","version":"42","installationId":"a"}
-[2025-02-20T00:52:48.511Z] [bob] DM created: 82b8e972c0a080c03a00849c264c2318
-[2025-02-20T00:52:50.512Z] [bob] Sending group message to [82b8e972c0a080c03a00849c264c2318]: gm-2t5dm4ui24l

@@ -125,7 +125,7 @@ export class WorkerClient extends Worker {
     const response = await this.waitForMessage<{ message: string }>(
       "messageReceived",
     );
-    this.logger?.log(`[${this.name}] Received message: ${expectedMessage}`);
+    this.logger?.log(`[${this.name}] Received message: ${response.message}`);
     return response.message;
   }
   private async waitForMessage<T = any>(messageType: string): Promise<T> {
