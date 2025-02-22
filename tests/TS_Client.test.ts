@@ -8,6 +8,11 @@ const testName = "TS_Client_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
+/* 
+Topics:
+- Takes 3 seconds to create a client, is this expected?
+*/
+
 describe(testName, () => {
   it(
     "TC_CreateClient: Initialize the client",

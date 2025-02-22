@@ -11,7 +11,6 @@ export async function verifyRemoveRandomMembers(
   participants: Persona[],
   groupId: string,
   currentMemberCount: number,
-  env: XmtpEnv,
 ): Promise<number> {
   try {
     const newRandomParticipant = getRandomPersonas(participants, 1)[0];
@@ -33,7 +32,6 @@ export async function verifyRemoveRandomMembers(
 
 export async function verifyAddRandomMembers(
   creator: Persona,
-  participants: Persona[],
   groupId: string,
   currentMemberCount: number,
   env: XmtpEnv,
@@ -136,7 +134,7 @@ export async function verifyStreams(
     // Set up message reception streams
     const receivePromises = recipients.map(async (recipient) => {
       if (recipient.address !== creator.address) {
-        return recipient.worker?.receiveMessage(groupId, message);
+        return recipient.worker?.receiveMessage(groupId, [message]);
       }
     });
 
@@ -147,7 +145,9 @@ export async function verifyStreams(
 
     // Verify reception
     const receivedMessages = await Promise.all(receivePromises);
-    const validMessages = receivedMessages.filter((msg) => msg === message);
+    const validMessages = receivedMessages.filter((msg) =>
+      msg?.includes(message),
+    );
     const percentageMissed =
       (receivedMessages.length - validMessages.length) /
       receivedMessages.length;

@@ -1,4 +1,3 @@
-import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import { type Signer } from "node-sdk-42";
 import { fromString, toString } from "uint8arrays";
@@ -16,17 +15,6 @@ export const createSigner = (privateKey: `0x${string}`): Signer => {
       return toBytes(signature);
     },
   };
-};
-export const dbPath = (name: string, installationName: string, env: string) => {
-  const volumePath =
-    process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-    `${process.cwd()}/.data/${name.toLowerCase()}/${name.toLowerCase()}-${installationName}`;
-
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  const dbPath = `${volumePath}/${name.toLowerCase()}-${installationName}-${env}`;
-  return dbPath;
 };
 export const generateEncryptionKeyHex = () => {
   const uint8Array = getRandomValues(new Uint8Array(32));

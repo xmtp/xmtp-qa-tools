@@ -13,6 +13,16 @@ const testName = "TS_Groups_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
+/* 
+Topics:
+- Inconsistent test results (~20%).
+- Performance issues (>1000ms) for operations
+- Old sdk to new sdk breaks (node 41 to 42)
+- agent stream failures
+- 20% missed streams
+
+*/
+
 describe(testName, () => {
   let bob: Persona,
     alice: Persona,
@@ -119,7 +129,7 @@ describe(testName, () => {
       const received = await bobPromise;
 
       console.log("[TEST] GM Message received in group", groupMessage);
-      expect(received).toBe(groupMessage);
+      expect(received).toContain(groupMessage);
     },
     defaultValues.timeout,
   );
@@ -147,8 +157,8 @@ describe(testName, () => {
       console.log("[TEST] GM Message received in group", groupMessage);
       console.log("[TEST] Alice received", aliceReceived);
       console.log("[TEST] Joe received", joeReceived);
-      expect(aliceReceived).toBe(groupMessage);
-      expect(joeReceived).toBe(groupMessage);
+      expect(aliceReceived).toContain(groupMessage);
+      expect(joeReceived).toContain(groupMessage);
     },
     defaultValues.timeout,
   );
@@ -177,8 +187,8 @@ describe(testName, () => {
       console.log("[TEST] GM Message received in group", groupMessage);
       console.log("[TEST] Joe received", joeReceived);
       console.log("[TEST] Bob 41 received", bob41Received);
-      expect(joeReceived).toBe(groupMessage);
-      expect(bob41Received).toBe(groupMessage);
+      expect(joeReceived).toContain(groupMessage);
+      expect(bob41Received).toContain(groupMessage);
     },
     defaultValues.timeout * 2,
   );

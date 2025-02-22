@@ -13,7 +13,6 @@ describe(
     it("should return true", async () => {
       const reflectTestSuite = new ReflectTestSuite();
 
-      console.log("Syncing conversations...");
       const bobClient = await getXmtpClient("bob", "dev");
 
       console.log(

@@ -90,40 +90,23 @@ export const createLogger = (testName: string) => {
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      filerlog(args, logger);
+      logger.log("info", args, logger);
     };
     console.error = (...args: any[]) => {
-      filerlog(args, logger);
+      logger.log("error", args, logger);
     };
     console.warn = (...args: any[]) => {
-      filerlog(args, logger);
+      logger.log("warn", args, logger);
     };
     console.info = (...args: any[]) => {
-      filerlog(args, logger);
+      logger.log("info", args, logger);
     };
   } catch (error) {
     console.error("Error overriding console", error);
   }
 };
-function filerlog(args: any[], logger: winston.Logger) {
-  const message = args.join(" ");
-  if (typeof args === "object") {
-    if (message.includes("%s: %s")) {
-      filterTime(args, logger);
-    } else if (Array.isArray(args)) {
-      logger.info(args.join(" "));
-    } else {
-      logger.info(message);
-    }
-  } else {
-    logger.info(message);
-  }
-}
-if (!fs.existsSync("logs")) {
-  fs.mkdirSync("logs");
-}
 
-function filterTime(args: any[], logger: winston.Logger) {
+function filterTime(args: any[], logger: winston.Logger): boolean {
   const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
   const timeMatch = args.find((arg: any) =>
     timePattern.test(String(arg)),
@@ -134,11 +117,15 @@ function filterTime(args: any[], logger: winston.Logger) {
     const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
 
     if (timeInMs > 300) {
-      logger.info(
+      logger.warn(
         `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`,
       );
     }
     return true;
   }
   return false;
+}
+
+if (!fs.existsSync("logs")) {
+  fs.mkdirSync("logs");
 }

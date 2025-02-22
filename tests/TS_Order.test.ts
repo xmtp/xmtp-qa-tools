@@ -9,6 +9,12 @@ const testName = "TS_Order_" + env;
 const logger = createLogger(testName);
 overrideConsole(logger);
 
+/* 
+Topics:
+- If if dont do the await, the messages are not in order, is this expected for guaranteeing order?
+- If i do the await, the messages are in order both in streams and pull, what would be a real-world way to test this?
+*/
+
 describe(testName, () => {
   let bob: Persona, alice: Persona, joe: Persona, groupId: string, sam: Persona;
 

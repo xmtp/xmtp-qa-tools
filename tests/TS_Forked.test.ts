@@ -20,6 +20,11 @@ const testName = "TS_Small_Groups_" + env + ":";
 const logger = createLogger(testName);
 overrideConsole(logger);
 
+/* 
+TODO
+- Stress groups (200 users.installations, who sends, who was added last)
+*/
+
 describe(testName, () => {
   let participants: Persona[] = [];
   let groupId: string;
@@ -67,7 +72,7 @@ describe(testName, () => {
   );
 
   it(
-    "should handle adding new members",
+    "should handle adding new and removing members",
     async () => {
       // Verify current count before adding
       const count = await verifyMembersCount(participants, groupId);
@@ -75,7 +80,6 @@ describe(testName, () => {
 
       const newMemberCount = await verifyAddRandomMembers(
         creator,
-        participants,
         groupId,
         currentMemberCount,
         env,
@@ -91,37 +95,28 @@ describe(testName, () => {
 
       // Final verification step
       const steeamstoVerify = 5;
-      const { successPercentage, validMessages } = await verifyStreams(
-        creator,
-        participants,
-        groupId,
-        steeamstoVerify,
-      );
+      const {
+        successPercentage: successPercentage1,
+        validMessages: validMessages1,
+      } = await verifyStreams(creator, participants, groupId, steeamstoVerify);
 
-      expect(successPercentage).toBeGreaterThanOrEqual(currentMemberCount);
-      expect(validMessages.length).toBe(steeamstoVerify);
-    },
-    defaultValues.timeout,
-  );
+      expect(successPercentage1).toBeGreaterThanOrEqual(currentMemberCount);
+      expect(validMessages1.length).toBe(steeamstoVerify);
 
-  it(
-    "should handle removing members",
-    async () => {
       // Verify current count before removing
       const count2 = await verifyMembersCount(participants, groupId);
       expect(count2).toBe(currentMemberCount);
 
-      const newMemberCount = await verifyRemoveRandomMembers(
+      const newMemberCount2 = await verifyRemoveRandomMembers(
         creator,
         participants,
         groupId,
         currentMemberCount,
-        env,
       );
 
       // High-level expectations about member count
-      expect(newMemberCount).toBe(currentMemberCount - 1);
-      currentMemberCount = newMemberCount;
+      expect(newMemberCount2).toBe(currentMemberCount - 1);
+      currentMemberCount = newMemberCount2;
 
       // Verify the member count decreased
       const count3 = await verifyMembersCount(participants, groupId);
@@ -130,15 +125,18 @@ describe(testName, () => {
       await verifyGroupNameChange(participants, groupId);
 
       // Final verification step
-      const { successPercentage, validMessages } = await verifyStreams(
+      const {
+        successPercentage: successPercentage2,
+        validMessages: validMessages2,
+      } = await verifyStreams(
         creator,
         participants,
         groupId,
         currentMemberCount,
       );
 
-      expect(successPercentage).toBeGreaterThanOrEqual(currentMemberCount);
-      expect(validMessages.length).toBe(currentMemberCount);
+      expect(successPercentage2).toBeGreaterThanOrEqual(80);
+      expect(validMessages2.length).toBe(currentMemberCount);
     },
     defaultValues.timeout,
   );
