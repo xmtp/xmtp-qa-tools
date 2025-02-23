@@ -1,6 +1,6 @@
 import { afterAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getPersonas } from "../helpers/personas";
+import { defaultValues, getWorkers } from "../helpers/personas";
 import type { XmtpEnv } from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
@@ -17,7 +17,7 @@ describe(testName, () => {
     async () => {
       const logger = createLogger(testName);
       overrideConsole(logger);
-      const [alice, randompep] = await getPersonas(
+      const [alice, randompep] = await getWorkers(
         ["alice", "randompep"],
         env,
         testName,

@@ -3,7 +3,7 @@ import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   DefaultPersonas,
   defaultValues,
-  getPersonas,
+  getWorkers,
 } from "../helpers/personas";
 
 const env = "dev";
@@ -31,7 +31,7 @@ describe(testName, () => {
     "should create a persona",
     async () => {
       // Get Bob's persona using the enum value.
-      const [bob] = await getPersonas([DefaultPersonas.BOB], env, testName);
+      const [bob] = await getWorkers([DefaultPersonas.BOB], env, testName);
 
       expect(bob.client?.accountAddress).toBeDefined();
     },
@@ -41,7 +41,7 @@ describe(testName, () => {
   it(
     "should create a random persona",
     async () => {
-      const [randomPersona] = await getPersonas(["random"], env, testName);
+      const [randomPersona] = await getWorkers(["random"], env, testName);
       expect(randomPersona.client?.accountAddress).toBeDefined();
     },
     defaultValues.timeout,
@@ -50,7 +50,7 @@ describe(testName, () => {
   it(
     "should create multiple personas",
     async () => {
-      const personas = await getPersonas(
+      const personas = await getWorkers(
         [DefaultPersonas.BOB, DefaultPersonas.ALICE, "randompep", "randombob"],
         env,
         testName,
@@ -79,7 +79,7 @@ describe(testName, () => {
   //       DefaultPersonas.GEORGE,
   //       DefaultPersonas.HANNAH,
   //     ];
-  //     const personas = await personaFactory.getPersonas(selectedPersonas);
+  //     const personas = await personaFactory.getWorkers(selectedPersonas);
 
   //     for (const persona of personas) {
   //       expect(persona.address).toBeDefined();

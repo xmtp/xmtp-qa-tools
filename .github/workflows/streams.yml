@@ -1,9 +1,11 @@
-name: Validate code quality
+name: Scheduled test
 
-on: [pull_request]
+on:
+  schedule:
+    - cron: "0 */2 * * *" # This cron expression means every 2 hours
 
 jobs:
-  check:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -15,6 +17,4 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - run: yarn format
-      - run: yarn typecheck
-      - run: yarn lint
+      - run: yarn test streams

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
+import { defaultValues, getWorkers, type Persona } from "../helpers/personas";
 import { verifyMetadataUpdates, type Conversation } from "../helpers/xmtp";
 
 const env = "dev";
@@ -20,7 +20,7 @@ describe(testName, () => {
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
-    personas = await getPersonas(
+    personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
       "dev",
       testName,

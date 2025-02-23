@@ -12,8 +12,8 @@
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",
     "lint": "eslint .",
-    "start": "vitest --ui --standalone --watch",
-    "test": "vitest",
+    "start": "vitest --ui --standalone --watch ",
+    "test": "vitest --coverage=v8",
     "typecheck": "tsc"
   },
   "dependencies": {
@@ -36,6 +36,7 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.13.0",
+    "@vitest/coverage-v8": "3.0.6",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",

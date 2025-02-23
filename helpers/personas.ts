@@ -165,10 +165,10 @@ export class PersonaFactory {
     return result;
   }
 
-  public async getPersonas(
+  public async getWorkers(
     descriptors: (string | DefaultPersonas)[],
   ): Promise<Persona[]> {
-    console.time(`getPersonas - ${descriptors.join(",")}`);
+    console.time(`getWorkers - ${descriptors.join(",")}`);
     try {
       const personas: Persona[] = [];
 
@@ -243,21 +243,21 @@ export class PersonaFactory {
         persona.client = clients[index];
       });
 
-      console.timeEnd(`getPersonas - ${descriptors.join(",")}`);
+      console.timeEnd(`getWorkers - ${descriptors.join(",")}`);
       return personas;
     } catch (error) {
-      console.timeEnd(`getPersonas - ${descriptors.join(",")}`);
+      console.timeEnd(`getWorkers - ${descriptors.join(",")}`);
       console.error("Error getting personas:", error);
       throw error;
     }
   }
 }
 
-export async function getPersonas(
+export async function getWorkers(
   descriptors: (string | DefaultPersonas)[],
   env: XmtpEnv,
   testName: string,
 ): Promise<Persona[]> {
   const personaFactory = new PersonaFactory(env, testName);
-  return personaFactory.getPersonas(descriptors);
+  return personaFactory.getWorkers(descriptors);
 }

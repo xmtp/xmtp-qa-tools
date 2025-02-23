@@ -1,6 +1,6 @@
 // import { afterAll, beforeAll, describe, expect, it } from "vitest";
 // import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-// import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
+// import { defaultValues, getWorkers, type Persona } from "../helpers/personas";
 // import {
 //   verifyAddRandomMembers,
 //   verifyGroupNameChange,
@@ -27,7 +27,7 @@
 
 //   beforeAll(async () => {
 //     // Get all personas at once
-//     participants = await getPersonas(participantNames, env, testName);
+//     participants = await getWorkers(participantNames, env, testName);
 //     creator = participants[0];
 //     currentMemberCount = participants.length;
 

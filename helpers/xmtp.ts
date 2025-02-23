@@ -50,10 +50,10 @@ export async function verifyDM(
       .flat()
       .filter((msg): msg is DecodedMessage => msg.content !== undefined);
 
-    console.log(`Received ${parsedMessageContent.length} messages:`);
     const messageContent = parsedMessageContent.map(
       (msg) => msg.content as string,
     );
+    console.log(`Received ${messageContent.join(", ")}`);
     return messageContent;
   } catch (error) {
     console.error(
