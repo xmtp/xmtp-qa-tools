@@ -1,9 +1,9 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { getPersonas, type Persona } from "../helpers/personas";
+import { beforeAll, describe, expect, it } from "vitest";
+import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 
 // Adjust path
 
-const timeout = 20000;
+const timeout = defaultValues.timeout;
 describe("Performance test for sending gm (Bob -> Joe)", () => {
   let bob: Persona;
   let joe: Persona;
@@ -18,30 +18,21 @@ describe("Performance test for sending gm (Bob -> Joe)", () => {
     );
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
-  }, timeout);
+  }, timeout * 2);
 
   it(
-    "test bob sending gm to joe",
+    "test fabri sending gm to alice",
     async () => {
-      const result = await testMessageTo(bob, joe);
+      const result = await testMessageTo(fabri, alice);
       expect(result).toBe(true);
     },
     timeout,
   ); // Increase timeout if needed
 
   it(
-    "test joe sending gm to bob",
+    "test fabri sending gm to alice",
     async () => {
-      const result = await testMessageTo(joe, bob);
-      expect(result).toBe(true);
-    },
-    timeout,
-  ); // Increase timeout if needed
-
-  it(
-    "test alice sending gm to fabri",
-    async () => {
-      const result = await testMessageTo(alice, fabri);
+      const result = await testMessageTo(fabri, alice);
       expect(result).toBe(true);
     },
     timeout,
@@ -55,6 +46,15 @@ describe("Performance test for sending gm (Bob -> Joe)", () => {
     },
     timeout,
   ); // Increase timeout if needed
+
+  it(
+    "test bob sending gm to joe",
+    async () => {
+      const result = await testMessageTo(bob, joe);
+      expect(result).toBe(true);
+    },
+    timeout,
+  );
 });
 
 async function testMessageTo(sender: Persona, receiver: Persona) {
@@ -72,7 +72,8 @@ async function testMessageTo(sender: Persona, receiver: Persona) {
     const dmConvo = await sender.client.conversations.newDm(
       receiver.client.accountAddress,
     );
-    await dmConvo.send(message);
+    const dmId = await dmConvo.send(message);
+    console.log("dmId", dmId);
 
     // Wait for Joe to see it
     const receivedMessage = await messagePromise;

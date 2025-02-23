@@ -1,8 +1,9 @@
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { createSigner, dbPath, getEncryptionKeyFromHex } from "./client"; // Adapt these imports
-import type { Persona } from "./personas";
+import { createSigner, getDbPath, getEncryptionKeyFromHex } from "./client";
+// Adapt these imports
+import type { PersonaBase } from "./personas";
 
 dotenv.config();
 
@@ -39,7 +40,7 @@ export class WorkerClient extends Worker {
 
   public client!: Client; // Expose the XMTP client if you need direct DM send
 
-  constructor(persona: Persona, env: XmtpEnv, options: WorkerOptions = {}) {
+  constructor(persona: PersonaBase, env: XmtpEnv, options: WorkerOptions = {}) {
     options.workerData = {
       __ts_worker_filename: new URL("../helpers/worker.ts", import.meta.url)
         .pathname,
@@ -53,6 +54,11 @@ export class WorkerClient extends Worker {
     this.installationId = persona.installationId;
     this.version = persona.version;
     this.env = env;
+
+    // Add general message handler
+    this.on("message", (message) => {
+      console.log(`[${this.name}] Worker message:`, message);
+    });
 
     // Handle worker errors
     this.on("error", (error) => {
@@ -74,7 +80,18 @@ export class WorkerClient extends Worker {
    * Returns the XMTP Client object for convenience.
    */
   async initialize(): Promise<Client> {
+    // Send initialization message to worker
+    this.postMessage({
+      type: "initialize",
+      data: {
+        name: this.name,
+        installationId: this.installationId,
+        version: this.version,
+      },
+    });
+
     // Read keys from process.env
+
     const walletKey = process.env[
       `WALLET_KEY_${this.name.toUpperCase()}`
     ] as `0x${string}`;
@@ -85,19 +102,21 @@ export class WorkerClient extends Worker {
     this.signer = createSigner(walletKey);
     this.encryptionKey = getEncryptionKeyFromHex(encryptionKey);
 
-    // Create the XMTP client
+    const dbPath = getDbPath(
+      this.name,
+      this.installationId,
+      this.version,
+      this.env,
+    );
+
     this.client = await Client.create(this.signer, this.encryptionKey, {
       env: this.env,
-      dbPath: dbPath(this.name, this.installationId, this.env),
+      dbPath,
     });
-
-    // Wait for sync
-    await this.client.conversations.sync();
-    console.log(`[${this.name}] Sync completed`);
 
     // Start streaming in the background
     await this.startStream();
-
+    await this.client.conversations.sync();
     return this.client;
   }
 
