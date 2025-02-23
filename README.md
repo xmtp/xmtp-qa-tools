@@ -97,8 +97,6 @@ yarn gen:keys [name]
 
 Replace `[name]` with the desired identifier.
 
-Here's a concise section about the GitHub workflows for your README:
-
 ## GitHub Workflows
 
 The monorepo includes automated workflows using GitHub Actions to ensure continuous integration and testing:
