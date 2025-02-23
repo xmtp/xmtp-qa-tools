@@ -1,12 +1,5 @@
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import {
-  verifyAddRandomMembers,
-  verifyGroupNameChange,
-  verifyMembersCount,
-  verifyRemoveRandomMembers,
-  verifyStreams,
-} from "../helpers/groups";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
@@ -14,6 +7,13 @@ import {
   PersonaFactory,
   type Persona,
 } from "../helpers/personas";
+import {
+  verifyAddRandomMembers,
+  verifyGroupNameChange,
+  verifyMembersCount,
+  verifyRemoveRandomMembers,
+  verifyStreams,
+} from "../helpers/testing";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Small_Groups_" + env + ":";

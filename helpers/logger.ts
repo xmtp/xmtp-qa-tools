@@ -88,66 +88,88 @@ export const createLogger = (testName: string) => {
 };
 
 function filterLog(args: any[], logger: winston.Logger): string {
-  return args
-    .map((arg) => {
-      if (arg === null) return "null";
-      if (arg === undefined) return "undefined";
-      if (typeof arg === "object") {
-        try {
-          return JSON.stringify(arg);
-        } catch (e: unknown) {
-          if (e instanceof Error) {
-            return e.message;
-          }
-          return "[Circular Object]";
-        }
-      } else if (args.join(" ").includes("%s")) {
-        const time = filterTime(args);
-        if (time) {
-          logger.warn(time);
-        }
-      } else {
-        return String(arg);
+  // Check for the console.time/timeEnd pattern: where args[0] is "%s: %s"
+  if (args.length >= 2 && args[0] === "%s: %s") {
+    // Join the remaining parts into one message
+    const message = args.slice(1).join(" ");
+    const timePattern = /(\d+(\.\d+)?)(ms|s)\b/;
+    const match = message.match(timePattern);
+    if (match) {
+      const timeValue = parseFloat(match[1]);
+      const unit = match[3];
+      const timeInMs = unit === "ms" ? timeValue : timeValue * 1000;
+      // Skip logs for durations less than or equal to 300ms
+      if (timeInMs <= 300) {
+        return "";
       }
-    })
-    .join(" ");
+    }
+    // Remove any "%s" placeholders from the message.
+    return message.replace(/%s/g, "").trim();
+  }
+
+  return (
+    args
+      .map((arg) => {
+        if (arg === null) return "null";
+        if (arg === undefined) return "undefined";
+        if (typeof arg === "object") {
+          try {
+            return JSON.stringify(arg);
+          } catch (e: unknown) {
+            if (e instanceof Error) {
+              return e.message;
+            }
+            return "[Circular Object]";
+          }
+        }
+        return String(arg);
+      })
+      .filter(Boolean)
+      .join(" ")
+      .trim() || ""
+  );
 }
 
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      logger.log("info", filterLog(args, logger));
-    };
-    console.error = (...args: any[]) => {
-      logger.log("error", filterLog(args, logger));
-    };
-    console.warn = (...args: any[]) => {
-      logger.log("warn", filterLog(args, logger));
+      const message = filterLog(args, logger);
+      if (message) {
+        // If this is a console.time/end log, always use warn if duration > 300ms.
+        if (args.length >= 2 && args[0] === "%s: %s") {
+          logger.log("warn", message);
+        } else {
+          logger.log("info", message);
+        }
+      }
     };
     console.info = (...args: any[]) => {
-      logger.log("info", filterLog(args, logger));
+      const message = filterLog(args, logger);
+      if (message) {
+        // Also promote timing logs from console.info to warn.
+        if (args.length >= 2 && args[0] === "%s: %s") {
+          logger.log("warn", message);
+        } else {
+          logger.log("info", message);
+        }
+      }
+    };
+    console.warn = (...args: any[]) => {
+      const message = filterLog(args, logger);
+      if (message) {
+        logger.log("warn", message);
+      }
+    };
+    console.error = (...args: any[]) => {
+      const message = filterLog(args, logger);
+      if (message) {
+        logger.log("error", message);
+      }
     };
   } catch (error) {
     console.error("Error overriding console", error);
   }
 };
-
-function filterTime(args: any[]): string | null {
-  const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
-  const timeMatch = args.find((arg: any) =>
-    timePattern.test(String(arg)),
-  ) as string;
-
-  if (timeMatch) {
-    const timeValue = parseFloat(timeMatch.replace(/[ms|s]/g, ""));
-    const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
-
-    if (timeInMs > 300) {
-      return `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}\n`;
-    }
-  }
-  return null;
-}
 
 if (!fs.existsSync("logs")) {
   fs.mkdirSync("logs");

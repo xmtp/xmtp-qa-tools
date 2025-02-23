@@ -1,11 +1,12 @@
 import { exec } from "child_process";
+import fs from "fs";
 import { promisify } from "util";
-import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import type { Client, XmtpEnv } from "@xmtp/node-sdk";
 import { config } from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
-import { generateEncryptionKeyHex, getDbPath } from "./client";
-import { WorkerClient } from "./WorkerClient";
-import "./worker";
+import { generateEncryptionKeyHex, getDbPath } from "../helpers/client";
+import type { WorkerClient } from "../helpers/WorkerClient";
+import "../helpers/worker";
 
 const execAsync = promisify(exec);
 
@@ -84,20 +85,6 @@ export enum DefaultPersonas {
   XENA = "xena",
 }
 
-export interface PersonaBase {
-  name: string;
-  installationId: string;
-  version: string;
-  dbPath: string;
-  walletKey: string;
-  encryptionKey: string;
-}
-
-export interface Persona extends PersonaBase {
-  worker: WorkerClient | null;
-  client: Client | null;
-}
-
 export class PersonaFactory {
   private env: XmtpEnv;
   private testName: string;
@@ -114,7 +101,6 @@ export class PersonaFactory {
     console.time(`[${name}] - ensureKeys`);
     const walletKeyEnv = `WALLET_KEY_${name.toUpperCase()}`;
     const encryptionKeyEnv = `ENCRYPTION_KEY_${name.toUpperCase()}`;
-
     if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
       console.log(`Generating keys for ${name}...`);
       try {
@@ -143,27 +129,25 @@ export class PersonaFactory {
     return result;
   }
 
-  public parsePersonaDescriptor(
-    descriptor: string,
-    defaults: { installationId: string; version: string } = {
-      installationId: defaultValues.installationId,
-      version: defaultValues.version,
-    },
-  ): { name: string; installationId: string; version: string } {
-    console.time(`parsePersonaDescriptor:${descriptor}`);
-    const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
-    const match = descriptor.match(regex);
+  public parsePersonaDescriptor(descriptor: string): {
+    name: string;
+    installationId: string;
+    version: string;
+  } {
+    console.time(`parsePersonaDescriptor - ${descriptor}`);
+    const normalized = descriptor.toLowerCase();
+    const regex = /^([a-z]+)([a-z])?(\d+)?$/;
+    const match = normalized.match(regex);
     if (!match) {
+      console.timeEnd(`parsePersonaDescriptor - ${descriptor}`);
       throw new Error(`Invalid persona descriptor: ${descriptor}`);
     }
-    const [, baseName, inst, ver] = match;
-    const result = {
-      name: baseName,
-      installationId: inst || defaults.installationId,
-      version: ver || defaults.version,
-    };
-    console.timeEnd(`parsePersonaDescriptor:${descriptor}`);
-    return result;
+    const [, name, installationIdRaw, versionRaw] = match;
+    const installationId = installationIdRaw || defaultValues.installationId;
+    const version = versionRaw || defaultValues.version;
+    const persona = { name, installationId, version };
+    console.timeEnd(`parsePersonaDescriptor - ${descriptor}`);
+    return persona;
   }
 
   public async getPersonas(
@@ -172,76 +156,81 @@ export class PersonaFactory {
     console.time(`getPersonas - ${descriptors.join(",")}`);
     try {
       const personas: Persona[] = [];
-
+      let personasDescriptors: {
+        name: string;
+        installationId: string;
+        version: string;
+        walletKey: string;
+        encryptionKey: string;
+      };
       for (const desc of descriptors) {
         console.time(`[${desc}] - processing persona`);
-        let personaData: PersonaBase;
-
+        let name = desc.toString();
         if (desc.toString().includes("random")) {
           const randomId = Math.random().toString(36).slice(2, 15);
-          const name = `${desc}_${randomId}`;
+          name = `${desc}_${randomId}`;
+
           const walletKey = generatePrivateKey();
           const encryptionKeyHex = generateEncryptionKeyHex();
-
-          personaData = {
+          personasDescriptors = {
             name,
             installationId: defaultValues.installationId,
             version: defaultValues.version,
             walletKey,
             encryptionKey: encryptionKeyHex,
-            dbPath: getDbPath(
-              name,
-              defaultValues.installationId,
-              defaultValues.version,
-              this.env,
-            ),
           };
-          console.log(personaData);
         } else {
-          const { name, installationId, version } = this.parsePersonaDescriptor(
-            desc.toString(),
-          );
+          const { name, installationId, version } =
+            this.parsePersonaDescriptor(desc);
           const { walletKey, encryptionKey } = await this.ensureKeys(name);
-          const dbPath = getDbPath(name, installationId, version, this.env);
-
-          if (!dbPath) {
-            throw new Error("DB path is required");
-          }
-
-          personaData = {
+          personasDescriptors = {
             name,
             installationId,
             version,
-            dbPath,
             walletKey,
             encryptionKey,
           };
         }
-
-        const persona: Persona = {
-          ...personaData,
+        const dbPath = getDbPath(
+          personasDescriptors.name,
+          personasDescriptors.installationId,
+          personasDescriptors.version,
+        );
+        if (!dbPath) {
+          throw new Error("DB path is required");
+        }
+        const personaData: Persona = {
+          ...personasDescriptors,
+          dbPath,
           worker: null,
           client: null,
         };
 
-        personas.push(persona);
+        personas.push(personaData);
         console.timeEnd(`[${desc}] - processing persona`);
       }
 
-      // Create all workers in parallel
+      // Now working
       const workers = await Promise.all(
-        personas.map((persona) => new WorkerClient(persona, this.env)),
+        personas.map((persona) => {
+          const workerClient = new WorkerClient(persona, this.env);
+          return workerClient;
+        }),
       );
 
-      // Initialize all clients in parallel
+      //Initialize all workers
       const clients = await Promise.all(
-        workers.map((worker) => worker.initialize()),
+        personas.map((persona) => {
+          return persona.worker?.initialize();
+        }),
       );
-
-      // Assign workers and clients to personas
+      // Assign workers to personas
       personas.forEach((persona, index) => {
         persona.worker = workers[index];
-        persona.client = clients[index];
+      });
+      // Assign clients to personas
+      personas.forEach((persona, index) => {
+        persona.client = clients[index] ?? null;
       });
 
       console.timeEnd(`getPersonas - ${descriptors.join(",")}`);

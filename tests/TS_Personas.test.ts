@@ -4,13 +4,12 @@ import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   DefaultPersonas,
   defaultValues,
-  PersonaFactory,
+  getPersonas,
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Personas_" + env;
 const logger = createLogger(testName);
-const personaFactory = new PersonaFactory(env, testName);
 overrideConsole(logger);
 
 /* 
@@ -33,9 +32,9 @@ describe(testName, () => {
     "should create a persona",
     async () => {
       // Get Bob's persona using the enum value.
-      const [bob] = await personaFactory.getPersonas([DefaultPersonas.BOB]);
+      const [bob] = await getPersonas([DefaultPersonas.BOB], env, testName);
 
-      expect(bob.address).toBeDefined();
+      expect(bob.client?.accountAddress).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -43,8 +42,8 @@ describe(testName, () => {
   it(
     "should create a random persona",
     async () => {
-      const [randomPersona] = await personaFactory.getPersonas(["random"]);
-      expect(randomPersona.address).toBeDefined();
+      const [randomPersona] = await getPersonas(["random"], env, testName);
+      expect(randomPersona.client?.accountAddress).toBeDefined();
     },
     defaultValues.timeout,
   );
@@ -52,17 +51,16 @@ describe(testName, () => {
   it(
     "should create multiple personas",
     async () => {
-      const personas = await personaFactory.getPersonas([
-        DefaultPersonas.BOB,
-        DefaultPersonas.ALICE,
-        "randompep",
-        "randombob",
-      ]);
+      const personas = await getPersonas(
+        [DefaultPersonas.BOB, DefaultPersonas.ALICE, "randompep", "randombob"],
+        env,
+        testName,
+      );
       const [bob, alice, random, randomBob] = personas;
-      expect(bob.address).toBeDefined();
-      expect(alice.address).toBeDefined();
-      expect(random.address).toBeDefined();
-      expect(randomBob.address).toBeDefined();
+      expect(bob.client?.accountAddress).toBeDefined();
+      expect(alice.client?.accountAddress).toBeDefined();
+      expect(random.client?.accountAddress).toBeDefined();
+      expect(randomBob.client?.accountAddress).toBeDefined();
     },
     defaultValues.timeout * 2,
   );

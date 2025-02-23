@@ -1,119 +1,86 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, overrideConsole } from "../helpers/logger";
-import { PersonaFactory, type Persona } from "../helpers/personas";
+import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
+import { sendMessageTo } from "../helpers/testing";
 
-const timeout = 10000;
-const testName = "gm";
-const env = "production";
+/* 
+  TODO:
+- Streams
+    - Ensure streams recover correctly.
+    - Handling repeated dual streams.
+    - Stream metadata.
+    - Test different type of streams for users.
+    - Timeout?
+    - Parallel streams.
+    - Installations
+      - Multiple installations.
+      - Multiple clients from the same installation.
+*/
+
+const env = "dev";
+const timeout = defaultValues.timeout;
+const testName = "TS_Streams_" + env;
 const logger = createLogger(testName);
-const personaFactory = new PersonaFactory(env, testName);
 overrideConsole(logger);
-describe("Test for different GM flows", () => {
+
+describe(testName, () => {
   let bob: Persona;
   let joe: Persona;
+  let elon: Persona;
   let alice: Persona;
   let fabri: Persona;
-  let elon: Persona;
+
   beforeAll(async () => {
-    [bob, joe, alice, fabri, elon] = await personaFactory.getPersonas([
-      "bob",
-      "joe",
-      "alice",
-      "fabri",
-      "elon",
-    ]);
-    console.log("bob.worker", bob.worker?.name);
-    console.log("joe.worker", joe.worker?.name);
-    console.log("alice.worker", alice.worker?.name);
-    console.log("fabri.worker", fabri.worker?.name);
-    console.log("elon.worker", elon.worker?.name);
-  }, timeout * 3);
+    [bob, joe, elon, fabri, alice] = await getPersonas(
+      ["bob", "joe", "elon", "fabri", "alice"],
+      "dev",
+      testName,
+    );
+    // Add delay to ensure streams are properly initialized
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+  }, timeout * 2);
+
+  afterAll(async () => {
+    await Promise.all(
+      [bob, joe, elon, fabri, alice].map((persona) =>
+        persona.worker?.terminate(),
+      ),
+    );
+  });
+
   it(
-    "should joe to bob",
+    "test fabri sending gm to alice",
     async () => {
-      const result = await testMessageFromTo(joe, bob);
+      const result = await sendMessageTo(fabri, alice);
+      expect(result).toBe(true);
+    },
+    timeout,
+  ); // Increase timeout if needed
+
+  it(
+    "test fabri sending gm to alice",
+    async () => {
+      const result = await sendMessageTo(fabri, alice);
+      expect(result).toBe(true);
+    },
+    timeout,
+  ); // Increase timeout if needed
+
+  it(
+    "test elon sending gm to fabri",
+    async () => {
+      const result = await sendMessageTo(elon, fabri);
+      expect(result).toBe(true);
+    },
+    timeout,
+  ); // Increase timeout if needed
+
+  it(
+    "test bob sending gm to joe",
+    async () => {
+      const result = await sendMessageTo(bob, joe);
       expect(result).toBe(true);
     },
     timeout,
   );
-  it(
-    "should bob to joe",
-    async () => {
-      const result = await testMessageFromTo(bob, joe);
-      expect(result).toBe(true);
-    },
-    timeout,
-  );
-
-  // it(
-  //   "should alice to fabri",
-  //   async () => {
-  //     const result = await testMessageFromTo(alice, fabri);
-  //     expect(result).toBe(true);
-  //   },
-  //   timeout,
-  // );
-  // it(
-  //   "should elon to bob",
-  //   async () => {
-  //     const result = await testMessageFromTo(elon, bob);
-  //     expect(result).toBe(true);
-  //   },
-  //   timeout,
-  // );
-  // it(
-  //   "should elon to alice",
-  //   async () => {
-  //     const result = await testMessageFromTo(elon, alice);
-  //     expect(result).toBe(true);
-  //   },
-  //   timeout,
-  // );
-  // it(
-  //   "should elon to fabri",
-  //   async () => {
-  //     const result = await testMessageFromTo(elon, fabri);
-  //     expect(result).toBe(true);
-  //   },
-  //   timeout,
-  // );
-  // it(
-  //   "should alice to joe",
-  //   async () => {
-  //     const result = await testMessageFromTo(alice, joe);
-  //     expect(result).toBe(true);
-  //   },
-  //   timeout,
-  // );
-  // it(
-  //   "should measure creating a group",
-  //   async () => {
-  //     const [fabri, elon] = personas;
-  //     const groupId = await fabri.worker!.createGroup([
-  //       elon.address,
-  //       fabri.address,
-  //     ]);
-  //     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-  //     const elonPromise = elon.worker!.receiveMessage(groupId, groupMessage);
-
-  //     await fabri.worker!.sendMessage(groupId, groupMessage);
-
-  //     await elonPromise;
-  //   },
-  //   defaultValues.timeout,
-  // );
 });
-
-async function testMessageFromTo(sender: Persona, receiver: Persona) {
-  const groupId = await sender.worker!.createDM(receiver.address);
-  console.log("groupId", groupId);
-
-  const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-  const receiverPromise = receiver.worker!.receiveMessage(groupMessage);
-
-  await sender.worker!.sendMessage(groupId, groupMessage);
-  const message = await receiverPromise;
-  return message === groupMessage;
-}

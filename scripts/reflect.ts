@@ -1,7 +1,7 @@
 import { type XmtpEnv } from "@xmtp/node-sdk";
 import { getXmtpClient } from "../helpers/client";
 import { ReflectTestSuite } from "../helpers/reflect";
-import { streamMessages } from "../helpers/xmtp";
+import { streamMessages } from "../helpers/testing";
 
 const reflectTestSuite = new ReflectTestSuite();
 
