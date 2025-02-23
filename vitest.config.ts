@@ -7,9 +7,9 @@ export default defineConfig({
     reporters: "verbose",
     watch: false, // Disable automatic test runs on file changes
     // Add server configuration
-    server: {
+    api: {
       host: "0.0.0.0", // Bind to all interfaces
-      port: process.env.PORT || 51204, // Use Railway's assigned port or default
+      port: 51204, // Use Railway's assigned port or default
     },
   },
 });
