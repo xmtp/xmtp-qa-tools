@@ -73,14 +73,18 @@ Run bots using these commands:
 
 - **GM Bot:**
 
+  A bot that replies gm
+
   ```bash
   yarn bot gm
   ```
 
-- **GPT Bot:**
+- **Test Bot:**
+
+  A bot that generates some groups for you
 
   ```bash
-  yarn bot gpt
+  yarn bot test
   ```
 
 ## Custom Key Generation
