@@ -1,10 +1,16 @@
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 
-// Adjust path
+// Adjust pathconst
 
+const env = "dev";
 const timeout = defaultValues.timeout;
-describe("Performance test for sending gm (Bob -> Joe)", () => {
+const testName = "TS_Streams_" + env;
+const logger = createLogger(testName);
+overrideConsole(logger);
+
+describe(testName, () => {
   let bob: Persona;
   let joe: Persona;
   let elon: Persona;
@@ -15,10 +21,19 @@ describe("Performance test for sending gm (Bob -> Joe)", () => {
     [bob, joe, elon, fabri, alice] = await getPersonas(
       ["bob", "joe", "elon", "fabri", "alice"],
       "dev",
+      testName,
     );
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }, timeout * 2);
+
+  afterAll(async () => {
+    await Promise.all(
+      [bob, joe, elon, fabri, alice].map((persona) =>
+        persona.worker?.terminate(),
+      ),
+    );
+  });
 
   it(
     "test fabri sending gm to alice",
@@ -63,24 +78,24 @@ async function testMessageTo(sender: Persona, receiver: Persona) {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     // Joe sets up a promise to wait for that exact message
-    const messagePromise = receiver.worker.receiveMessage(message);
+    const messagePromise = receiver.worker?.receiveMessage(message);
 
     console.log(
-      `[${sender.name}] Creating DM with ${receiver.name} at ${receiver.client.accountAddress}`,
+      `[${sender.name}] Creating DM with ${receiver.name} at ${receiver.client?.accountAddress}`,
     );
 
-    const dmConvo = await sender.client.conversations.newDm(
-      receiver.client.accountAddress,
+    const dmConvo = await sender.client?.conversations.newDm(
+      receiver.client?.accountAddress as `0x${string}`,
     );
-    const dmId = await dmConvo.send(message);
+    const dmId = await dmConvo?.send(message);
     console.log("dmId", dmId);
 
     // Wait for Joe to see it
     const receivedMessage = await messagePromise;
-    expect(receivedMessage.data.content).toBe(message);
+    expect(receivedMessage?.data.content).toBe(message);
     console.log(
       `[${receiver.name}] Message received:`,
-      receivedMessage.data.content,
+      receivedMessage?.data.content,
     );
 
     return true;

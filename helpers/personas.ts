@@ -1,9 +1,11 @@
-// personas.ts
+import { exec } from "child_process";
+import { promisify } from "util";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { config } from "dotenv";
+import { generatePrivateKey } from "viem/accounts";
+import { generateEncryptionKeyHex, getDbPath } from "./client";
 import { WorkerClient } from "./WorkerClient";
 import "./worker";
-import { exec } from "node:child_process";
-import { promisify } from "node:util";
 
 const execAsync = promisify(exec);
 
@@ -86,73 +88,175 @@ export interface PersonaBase {
   name: string;
   installationId: string;
   version: string;
+  dbPath: string;
+  walletKey?: string;
+  encryptionKey?: string;
 }
 
 export interface Persona extends PersonaBase {
-  worker: WorkerClient;
-  client: Client;
+  worker: WorkerClient | null;
+  client: Client | null;
 }
 
-/**
- * Parses a descriptor string like "bobA41" into a Persona.
- */
-export function parsePersonaDescriptor(
-  descriptor: string,
-  defaults: { installationId: string; version: string } = {
-    installationId: defaultValues.installationId,
-    version: defaultValues.versions,
-  },
-): { name: string; installationId: string; version: string } {
-  console.time(`parsePersonaDescriptor:${descriptor}`);
-  // Matches: lowercase letters for name, optional uppercase letter, optional digits.
-  const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
-  const match = descriptor.match(regex);
-  if (!match) {
-    throw new Error(`Invalid persona descriptor: ${descriptor}`);
+export class PersonaFactory {
+  private env: XmtpEnv;
+  private testName: string;
+
+  constructor(env: XmtpEnv, testName: string) {
+    this.env = env;
+    this.testName = testName;
   }
-  const [, baseName, inst, ver] = match;
-  const result = {
-    name: baseName,
-    installationId: inst || defaults.installationId,
-    version: ver || defaults.version,
-  };
-  console.timeEnd(`parsePersonaDescriptor:${descriptor}`);
-  return result;
+
+  private async ensureKeys(name: string): Promise<{
+    walletKey: string;
+    encryptionKey: string;
+  }> {
+    console.time(`[${name}] - ensureKeys`);
+    const walletKeyEnv = `WALLET_KEY_${name.toUpperCase()}`;
+    const encryptionKeyEnv = `ENCRYPTION_KEY_${name.toUpperCase()}`;
+
+    if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
+      console.log(`Generating keys for ${name}...`);
+      try {
+        await execAsync(`yarn gen:keys ${name.toLowerCase()}`);
+        config();
+        const result = {
+          walletKey: process.env[walletKeyEnv] as string,
+          encryptionKey: process.env[encryptionKeyEnv] as string,
+        };
+        console.timeEnd(`[${name}] - ensureKeys`);
+        return result;
+      } catch (error) {
+        console.timeEnd(`[${name}] - ensureKeys`);
+        throw new Error(
+          `Failed to generate keys for ${name}: ${
+            error instanceof Error ? error.message : String(error)
+          }`,
+        );
+      }
+    }
+    const result = {
+      walletKey: process.env[walletKeyEnv],
+      encryptionKey: process.env[encryptionKeyEnv],
+    };
+    console.timeEnd(`[${name}] - ensureKeys`);
+    return result;
+  }
+
+  public parsePersonaDescriptor(
+    descriptor: string,
+    defaults: { installationId: string; version: string } = {
+      installationId: defaultValues.installationId,
+      version: defaultValues.version,
+    },
+  ): { name: string; installationId: string; version: string } {
+    console.time(`parsePersonaDescriptor:${descriptor}`);
+    const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
+    const match = descriptor.match(regex);
+    if (!match) {
+      throw new Error(`Invalid persona descriptor: ${descriptor}`);
+    }
+    const [, baseName, inst, ver] = match;
+    const result = {
+      name: baseName,
+      installationId: inst || defaults.installationId,
+      version: ver || defaults.version,
+    };
+    console.timeEnd(`parsePersonaDescriptor:${descriptor}`);
+    return result;
+  }
+
+  public async getPersonas(
+    descriptors: (string | DefaultPersonas)[],
+  ): Promise<Persona[]> {
+    console.time(`getPersonas - ${descriptors.join(",")}`);
+    try {
+      const personas: Persona[] = [];
+
+      for (const desc of descriptors) {
+        console.time(`[${desc}] - processing persona`);
+        let personaData: PersonaBase;
+
+        if (desc.toString().includes("random")) {
+          const randomId = Math.random().toString(36).slice(2, 15);
+          const name = `${desc}_${randomId}`;
+          const walletKey = generatePrivateKey();
+          const encryptionKeyHex = generateEncryptionKeyHex();
+
+          personaData = {
+            name,
+            installationId: defaultValues.installationId,
+            version: defaultValues.version,
+            dbPath: getDbPath(
+              name,
+              defaultValues.installationId,
+              defaultValues.version,
+            ),
+            walletKey,
+            encryptionKey: encryptionKeyHex,
+          };
+        } else {
+          const { name, installationId, version } = this.parsePersonaDescriptor(
+            desc.toString(),
+          );
+          const { walletKey, encryptionKey } = await this.ensureKeys(name);
+          const dbPath = getDbPath(name, installationId, version);
+
+          if (!dbPath) {
+            throw new Error("DB path is required");
+          }
+
+          personaData = {
+            name,
+            installationId,
+            version,
+            dbPath,
+            walletKey,
+            encryptionKey,
+          };
+        }
+
+        const persona: Persona = {
+          ...personaData,
+          worker: null,
+          client: null,
+        };
+
+        personas.push(persona);
+        console.timeEnd(`[${desc}] - processing persona`);
+      }
+
+      // Create all workers in parallel
+      const workers = await Promise.all(
+        personas.map((persona) => new WorkerClient(persona, this.env)),
+      );
+
+      // Initialize all clients in parallel
+      const clients = await Promise.all(
+        workers.map((worker) => worker.initialize()),
+      );
+
+      // Assign workers and clients to personas
+      personas.forEach((persona, index) => {
+        persona.worker = workers[index];
+        persona.client = clients[index];
+      });
+
+      console.timeEnd(`getPersonas - ${descriptors.join(",")}`);
+      return personas;
+    } catch (error) {
+      console.timeEnd(`getPersonas - ${descriptors.join(",")}`);
+      console.error("Error getting personas:", error);
+      throw error;
+    }
+  }
 }
 
-/**
- * Given an array of descriptor strings and an environment,
- * initialize a worker for each persona.
- */
 export async function getPersonas(
-  descriptors: string[],
+  descriptors: (string | DefaultPersonas)[],
   env: XmtpEnv,
+  testName: string,
 ): Promise<Persona[]> {
-  console.time("getPersonas:total");
-
-  // Create all worker instances in parallel first
-  const personas = await Promise.all(
-    descriptors.map((desc) => {
-      const { name, installationId, version } = parsePersonaDescriptor(desc);
-      // Create a base persona object without the worker
-      const basePersona = { name, installationId, version };
-      // Create the worker with just the base info
-      const worker = new WorkerClient(basePersona, env);
-      // Create the full persona object
-      const persona = { ...basePersona, worker } as Persona;
-      return persona;
-    }),
-  );
-
-  // Then initialize all clients in parallel
-  await Promise.all(
-    personas.map(async (p) => {
-      console.time(`getPersonas:initialize:${p.name}`);
-      p.client = await p.worker.initialize();
-      console.timeEnd(`getPersonas:initialize:${p.name}`);
-    }),
-  );
-
-  console.timeEnd("getPersonas:total");
-  return personas;
+  const personaFactory = new PersonaFactory(env, testName);
+  return personaFactory.getPersonas(descriptors);
 }
