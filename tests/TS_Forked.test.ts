@@ -10,8 +10,8 @@ import {
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
-  getPersonas,
   participantNames,
+  PersonaFactory,
   type Persona,
 } from "../helpers/personas";
 
@@ -19,6 +19,7 @@ const env: XmtpEnv = "dev";
 const testName = "TS_Small_Groups_" + env + ":";
 const logger = createLogger(testName);
 overrideConsole(logger);
+const personaFactory = new PersonaFactory(env, testName);
 
 /* 
 TODO
@@ -33,13 +34,13 @@ describe(testName, () => {
 
   beforeAll(async () => {
     // Get all personas at once
-    participants = await getPersonas(participantNames, env, testName, 10);
+    participants = await personaFactory.getPersonas(participantNames, 10);
     creator = participants[0];
     currentMemberCount = participants.length;
 
     // Create the group that will be used across all tests
     console.log("[TEST] Creating group with participants:", currentMemberCount);
-    const addresses = participants.map((p) => p.address!);
+    const addresses = participants.map((p) => p.address);
     groupId = await creator.worker!.createGroup(addresses);
 
     // Verify initial member count

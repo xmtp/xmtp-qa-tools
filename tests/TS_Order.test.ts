@@ -1,7 +1,12 @@
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
+import {
+  defaultValues,
+  getPersonas,
+  PersonaFactory,
+  type Persona,
+} from "../helpers/personas";
 
 const env: XmtpEnv = "dev";
 const amount = 20;
@@ -19,23 +24,23 @@ describe(testName, () => {
   let bob: Persona, alice: Persona, joe: Persona, groupId: string, sam: Persona;
 
   beforeAll(async () => {
-    const personas = ["bob", "alice", "joe", "sam"];
-    [bob, alice, joe, sam] = await getPersonas(
-      personas,
-      env,
-      testName,
-      personas.length,
-    );
+    const personaFactory = new PersonaFactory(env, testName);
+    [bob, alice, joe, sam] = await personaFactory.getPersonas([
+      "bob",
+      "alice",
+      "joe",
+      "sam",
+    ]);
   }, defaultValues.timeout);
 
   it(
     "TC_StreamOrder: should verify message order when receiving via streams",
     async () => {
       groupId = await bob.worker!.createGroup([
-        joe.address!,
-        bob.address!,
-        alice.address!,
-        sam.address!,
+        joe.address,
+        bob.address,
+        alice.address,
+        sam.address,
       ]);
       console.log("[TEST] Group created", groupId);
       expect(groupId).toBeDefined();
@@ -83,10 +88,10 @@ describe(testName, () => {
     "TC_PullOrder: should verify message order when receiving via pull",
     async () => {
       groupId = await bob.worker!.createGroup([
-        joe.address!,
-        bob.address!,
-        alice.address!,
-        sam.address!,
+        joe.address,
+        bob.address,
+        alice.address,
+        sam.address,
       ]);
       console.log("[TEST] Group created", groupId);
       expect(groupId).toBeDefined();

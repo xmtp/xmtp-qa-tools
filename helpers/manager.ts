@@ -51,6 +51,8 @@ export class ClientManager {
       this.client = await Client.create(signer, encryptionKey, {
         env: this.env as XmtpEnv,
         dbPath: this.dbPath,
+        // eslint-disable-next-line
+        loggingLevel: "error" as any,
       });
       console.timeEnd(`[${this.nameId}] - initialize`);
     } catch (error) {

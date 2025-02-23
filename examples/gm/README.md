@@ -7,7 +7,6 @@ This agent replies `gm`
 ## Basic usage
 
 ```tsx
-import { ContentTypeText } from "@xmtp/content-type-text";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
 

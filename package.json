@@ -19,6 +19,7 @@
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
     "@xmtp/content-type-text": "^2.0.0",
+    "@xmtp/node-sdk": "0.0.42",
     "alchemy-sdk": "^3.0.0",
     "dotenv": "^16.4.7",
     "openai": "latest",
@@ -34,7 +35,6 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.13.0",
-    "@xmtp/node-sdk": "0.0.42",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",

@@ -3,8 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
-  getNewRandomPersona,
-  getPersonas,
+  PersonaFactory,
   type Persona,
 } from "../helpers/personas";
 
@@ -29,27 +28,30 @@ describe(testName, () => {
     joe: Persona,
     bobB41: Persona,
     groupId: string,
-    randomAddress: string;
+    randompep: Persona;
 
   beforeAll(async () => {
-    const personas = ["bob", "alice", "joe", "bobB41"];
-    [bob, alice, joe, bobB41] = await getPersonas(
-      personas,
-      env,
-      testName,
-      personas.length,
-    );
-    const { address } = await getNewRandomPersona(env);
-    randomAddress = address;
+    const personaFactory = new PersonaFactory(env, testName);
+    [bob, alice, joe, bobB41, randompep] = await personaFactory.getPersonas([
+      "bob",
+      "alice",
+      "joe",
+      "bobB41",
+      "randompep",
+    ]);
+    expect(bob).toBeDefined();
+    expect(alice).toBeDefined();
+    expect(joe).toBeDefined();
+    expect(bobB41).toBeDefined();
   }, defaultValues.timeout);
 
   it(
     "TC_CreateGroup: should measure creating a group",
     async () => {
       groupId = await bob.worker!.createGroup([
-        joe.address!,
-        bob.address!,
-        alice.address!,
+        joe.address,
+        bob.address,
+        alice.address,
       ]);
       console.log("[TEST] Group created", groupId);
       expect(groupId).toBeDefined();
@@ -77,7 +79,7 @@ describe(testName, () => {
     "TC_AddMembers: should measure adding a participant to a group",
     async () => {
       const membersCount = await bob.worker!.addMembers(groupId!, [
-        randomAddress!,
+        randompep.address,
       ]);
       console.log("[TEST] Members added", membersCount);
       expect(membersCount).toBe(4);
@@ -99,7 +101,7 @@ describe(testName, () => {
     "TC_RemoveMembers: should remove a participant from a group",
     async () => {
       const membersCount = await bob.worker!.removeMembers(groupId!, [
-        joe.address!,
+        joe.address,
       ]);
       console.log("[TEST] Members removed", membersCount);
       expect(membersCount).toBe(3);
@@ -123,7 +125,7 @@ describe(testName, () => {
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const bobPromise = bob.worker!.receiveMessage(groupId!, [groupMessage]);
+      const bobPromise = bob.worker!.receiveMessage(groupMessage);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
       const received = await bobPromise;
@@ -138,16 +140,14 @@ describe(testName, () => {
     "TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group",
     async () => {
       groupId = await bob.worker!.createGroup([
-        joe.address!,
-        bob.address!,
-        alice.address!,
+        joe.address,
+        bob.address,
+        alice.address,
       ]);
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const alicePromise = alice.worker!.receiveMessage(groupId!, [
-        groupMessage,
-      ]);
-      const joePromise = joe.worker!.receiveMessage(groupId!, [groupMessage]);
+      const alicePromise = alice.worker!.receiveMessage(groupMessage);
+      const joePromise = joe.worker!.receiveMessage(groupMessage);
 
       await bob.worker!.sendMessage(groupId!, groupMessage);
       const [aliceReceived, joeReceived] = await Promise.all([
@@ -168,15 +168,13 @@ describe(testName, () => {
     async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      await bob.worker!.addMembers(groupId!, [bobB41.address!]);
-      const isMember = await bob.worker!.isMember(groupId!, bobB41.address!);
+      await bob.worker!.addMembers(groupId!, [bobB41.address]);
+      const isMember = await bob.worker!.isMember(groupId!, bobB41.address);
       console.log("[TEST] Bob 41 is member", isMember);
       expect(isMember).toBe(true);
 
-      const bob41Promise = bobB41.worker!.receiveMessage(groupId!, [
-        groupMessage,
-      ]);
-      const joePromise = joe.worker!.receiveMessage(groupId!, [groupMessage]);
+      const bob41Promise = bobB41.worker!.receiveMessage(groupMessage);
+      const joePromise = joe.worker!.receiveMessage(groupMessage);
 
       await alice.worker!.sendMessage(groupId!, groupMessage);
       await new Promise((resolve) => setTimeout(resolve, 2000));
