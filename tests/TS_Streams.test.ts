@@ -28,16 +28,17 @@ describe(testName, () => {
   let elon: Persona;
   let alice: Persona;
   let fabri: Persona;
+  let randompep: Persona;
   let personas: Persona[];
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
     personas = await getPersonas(
-      ["bob", "joe", "elon", "fabri", "alice"],
+      ["bob", "joe", "elon", "fabri", "alice", "randompep"],
       "dev",
       testName,
     );
-    [bob, joe, elon, fabri, alice] = personas;
+    [bob, joe, elon, fabri, alice, randompep] = personas;
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }, timeout * 2);
@@ -124,6 +125,28 @@ describe(testName, () => {
     timeout,
   );
 
+  it(
+    "should receive a group message in all streams",
+    async () => {
+      const newGroup = await bob.client!.conversations.newGroup([
+        alice.client?.accountAddress as `0x${string}`,
+        joe.client?.accountAddress as `0x${string}`,
+        randompep.client?.accountAddress as `0x${string}`,
+        elon.client?.accountAddress as `0x${string}`,
+      ]);
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+      // Wait for Joe to see it
+      const parsedMessages = await verifyDM(
+        () => newGroup.send(groupMessage),
+        [joe, alice, randompep, elon],
+      );
+      parsedMessages.forEach((msg) => {
+        expect(msg).toBe(groupMessage);
+      });
+    },
+    defaultValues.timeout * 2,
+  );
   afterAll(async () => {
     flushLogger(testName);
   });

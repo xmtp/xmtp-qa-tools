@@ -1,10 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import {
-  defaultValues,
-  PersonaFactory,
-  type Persona,
-} from "../helpers/personas";
+import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 import { verifyDM, type Conversation, type XmtpEnv } from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
@@ -27,13 +23,11 @@ describe(testName, () => {
     sam: Persona;
 
   beforeAll(async () => {
-    const personaFactory = new PersonaFactory(env, testName);
-    [bob, alice, joe, sam] = await personaFactory.getPersonas([
-      "bob",
-      "alice",
-      "joe",
-      "sam",
-    ]);
+    [bob, alice, joe, sam] = await getPersonas(
+      ["bob", "alice", "joe", "sam"],
+      env,
+      testName,
+    );
   }, defaultValues.timeout);
 
   it(
@@ -56,12 +50,16 @@ describe(testName, () => {
 
       // Wait for Joe to see it
       const receivers = [joe, alice, sam];
-      const parsedMessages = await verifyDM(async () => {
-        // Send messages sequentially to maintain order
-        for (const msg of messages) {
-          await group.send(msg);
-        }
-      }, receivers);
+      const parsedMessages = await verifyDM(
+        async () => {
+          // Send messages sequentially to maintain order
+          for (const msg of messages) {
+            await group.send(msg);
+          }
+        },
+        receivers,
+        amount,
+      );
 
       // Group messages by receiver - each receiver should have all messages in order
       for (let i = 0; i < receivers.length; i++) {
@@ -78,7 +76,7 @@ describe(testName, () => {
         console.log(`${receivers[i].name} did not receive messages in order`);
       }
     },
-    defaultValues.timeout * 4,
+    defaultValues.timeout * 2,
   );
 
   it(

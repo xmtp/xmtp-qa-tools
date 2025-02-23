@@ -12,6 +12,7 @@ export { Client };
 export async function verifyDM(
   action: () => Promise<any>,
   receivers: Persona[],
+  amount: number = 1,
 ) {
   try {
     // Set up message collectors for each receiver
@@ -27,7 +28,7 @@ export async function verifyDM(
 
       // Create an async function to collect messages
       const collectMessages = async () => {
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < amount; i++) {
           // Collect up to 5 messages
           const msg = await stream;
           messages.push(msg.message);
@@ -85,7 +86,7 @@ export async function verifyMetadataUpdates(
       c.metadataFieldChanges.find((change) => change.fieldName === fieldName),
     );
 
-    const messageContent = nameChange.map((c) => c?.newValue);
+    const messageContent = nameChange.map((c) => c?.newValue == newValue);
     return messageContent;
   } catch (error) {
     console.error(
