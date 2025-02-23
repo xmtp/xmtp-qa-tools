@@ -87,7 +87,7 @@ export const createLogger = (testName: string) => {
   return sharedLogger;
 };
 
-function filterLog(args: any[]): string {
+function filterLog(args: any[], logger: winston.Logger): string {
   return args
     .map((arg) => {
       if (arg === null) return "null";
@@ -102,7 +102,10 @@ function filterLog(args: any[]): string {
           return "[Circular Object]";
         }
       } else if (args.join(" ").includes("%s")) {
-        return filterTime(args);
+        const time = filterTime(args);
+        if (time) {
+          logger.warn(time);
+        }
       } else {
         return String(arg);
       }
@@ -113,23 +116,23 @@ function filterLog(args: any[]): string {
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      logger.log("info", filterLog(args));
+      logger.log("info", filterLog(args, logger));
     };
     console.error = (...args: any[]) => {
-      logger.log("error", filterLog(args));
+      logger.log("error", filterLog(args, logger));
     };
     console.warn = (...args: any[]) => {
-      logger.log("warn", filterLog(args));
+      logger.log("warn", filterLog(args, logger));
     };
     console.info = (...args: any[]) => {
-      logger.log("info", filterLog(args));
+      logger.log("info", filterLog(args, logger));
     };
   } catch (error) {
     console.error("Error overriding console", error);
   }
 };
 
-function filterTime(args: any[]): string {
+function filterTime(args: any[]): string | null {
   const timePattern = /\d+(\.\d+)?ms|\d+(\.\d+)?s/;
   const timeMatch = args.find((arg: any) =>
     timePattern.test(String(arg)),
@@ -140,11 +143,10 @@ function filterTime(args: any[]): string {
     const timeInMs = timeMatch.includes("s") ? timeValue * 1000 : timeValue;
 
     if (timeInMs > 300) {
-      return `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}`;
+      return `${args[1]} took ${timeValue}${timeMatch.includes("s") ? "s" : "ms"}\n`;
     }
-    return "";
   }
-  return "";
+  return null;
 }
 
 if (!fs.existsSync("logs")) {

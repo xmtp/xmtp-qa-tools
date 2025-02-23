@@ -1,5 +1,5 @@
 import { ContentTypeText } from "@xmtp/content-type-text";
-import { Client, type XmtpEnv } from "node-sdk-42";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import OpenAI from "openai";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 

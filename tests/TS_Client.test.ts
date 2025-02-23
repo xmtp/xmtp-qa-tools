@@ -1,4 +1,4 @@
-import type { XmtpEnv } from "node-sdk-42";
+import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getNewRandomPersona } from "../helpers/personas";

@@ -1,11 +1,10 @@
-import type { XmtpEnv } from "node-sdk-42";
+import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   DefaultPersonas,
   defaultValues,
   PersonaFactory,
-  type Persona,
 } from "../helpers/personas";
 
 const env: XmtpEnv = "dev";

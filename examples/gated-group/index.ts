@@ -1,6 +1,5 @@
-import { ContentTypeText } from "@xmtp/content-type-text";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { Alchemy, Network } from "alchemy-sdk";
-import { Client, type XmtpEnv } from "node-sdk-42";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
 const settings = {

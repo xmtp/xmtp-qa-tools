@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import fs from "fs";
 import { promisify } from "util";
 import { config } from "dotenv";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
+import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex } from "./client";
 import type { XmtpEnv } from "./manager";
 import { WorkerClient } from "./worker";
@@ -33,8 +33,11 @@ export interface Persona {
 
 // Default personas as an enum
 export enum DefaultPersonas {
+  FABRI = "fabri",
+  ELON = "elon",
   ALICE = "alice",
   BOB = "bob",
+  JOE = "joe",
   CHARLIE = "charlie",
   DAVE = "dave",
   ROSALIE = "rosalie",
@@ -214,7 +217,7 @@ export class PersonaFactory {
           dbPath,
           testName: this.testName,
           inboxId: "",
-          address: personasDescriptors.address,
+          address: "",
           worker: null,
         };
         const worker = new WorkerClient(personaData);
@@ -235,4 +238,43 @@ export class PersonaFactory {
       throw error;
     }
   }
+}
+
+const personas: Record<string, Persona> = {};
+let initialized = false;
+
+export async function initializeGlobalPersonas(
+  env: string,
+  testName: string,
+  personaNames: string[],
+) {
+  if (!personaNames.length) {
+    throw new Error("Provide at least one persona name");
+  }
+
+  const personaFactory = new PersonaFactory(env as XmtpEnv, testName);
+  const initializedPersonas = await personaFactory.getPersonas(personaNames);
+
+  personaNames.forEach((name, index) => {
+    personas[name] = initializedPersonas[index];
+  });
+
+  initialized = true;
+  return personas;
+}
+
+export function getGlobalPersonas(...requestedPersonas: DefaultPersonas[]) {
+  if (!initialized) {
+    throw new Error(
+      "Global personas not initialized. Call initializeGlobalPersonas() first",
+    );
+  }
+
+  return requestedPersonas.reduce<Record<string, Persona>>((acc, name) => {
+    if ((personas && !personas[name]) || !personas[name].worker) {
+      throw new Error(`Persona ${name} not initialized`);
+    }
+    acc[name] = personas[name];
+    return acc;
+  }, {});
 }

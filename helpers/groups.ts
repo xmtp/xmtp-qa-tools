@@ -1,4 +1,4 @@
-import type { XmtpEnv } from "node-sdk-42";
+import type { XmtpEnv } from "@xmtp/node-sdk";
 import { expect } from "vitest";
 import {
   getNewRandomPersona,

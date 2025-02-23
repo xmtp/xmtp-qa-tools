@@ -81,20 +81,17 @@ export class WorkerClient extends Worker {
   async sendMessage(groupId: string, message: string): Promise<void> {
     // Simulate delay before sending
     try {
-      console.log(
-        `[${this.nameId}] Sending group message to [${groupId}]: ${message}`,
-      );
       console.time(`[${this.nameId}] send`);
       this.postMessage({ type: "sendMessage", groupId, message });
       console.timeEnd(`[${this.nameId}] send`);
       await this.waitForMessage("messageSent");
+      console.log(`[${this.nameId}] Message sent to [${groupId}]: ${message}`);
     } catch (error: unknown) {
       console.error(`[${this.nameId}] Send message error  `, error);
     }
   }
   async createDM(senderAddresses: string): Promise<string> {
     try {
-      console.log(`[${this.nameId}] Creating DM with: ${senderAddresses}`);
       console.time(`[${this.nameId}] createDM`);
       this.postMessage({ type: "createDM", senderAddresses });
       const response = await this.waitForMessage<{ dmId: string }>("dmCreated");
@@ -199,32 +196,16 @@ export class WorkerClient extends Worker {
     }
   }
 
-  async receiveMessage(
-    groupId: string,
-    expectedMessages: string[],
-  ): Promise<string[]> {
-    try {
-      console.time(`[${this.nameId}] receiveMessage`);
-      //sdd
-      console.log(
-        `[${this.nameId}] Started stream for: ${expectedMessages.join(", ")}`,
-      );
-      this.postMessage({
-        type: "receiveMessage",
-        groupId,
-        expectedMessages,
-        name: this.name,
-        installationId: this.installationId,
-      });
-      const response = (await Promise.race([
-        this.waitForMessage<{ message: string[] }>("messageReceived"),
-      ])) as { message: string[] };
-      console.timeEnd(`[${this.nameId}] receiveMessage`);
-      return Array.isArray(response.message) ? response.message : [];
-    } catch (error: unknown) {
-      console.error(`[${this.nameId}] Message receive error  `, error);
-      return [];
-    }
+  async receiveMessage(expectedMessage: string): Promise<string> {
+    this.postMessage({
+      type: "receiveMessage",
+      expectedMessage,
+    });
+    const response = await this.waitForMessage<{ message: string }>(
+      "messageReceived",
+    );
+    console.log(`[${this.nameId}] Received message: ${response.message}`);
+    return response.message;
   }
   async receiveMetadata(groupId: string, expectedMetadata: string) {
     try {
@@ -290,7 +271,6 @@ if (parentPort) {
               await client.initialize();
               parentPort?.postMessage({
                 type: "clientInitialized",
-                name: data.name as string,
                 address: client.client.accountAddress,
                 inboxId: client.client.inboxId,
               });
@@ -434,27 +414,23 @@ if (parentPort) {
             }
             break;
           }
+
           case "receiveMessage": {
-            try {
-              const message = await client.receiveMessage(
-                data.groupId as string,
-                data.expectedMessages as string[],
-              );
-              if (!message) {
-                throw new Error("Message not received");
-              }
-              parentPort?.postMessage({
-                type: "messageReceived",
-                message: message,
-              });
-            } catch (error: unknown) {
-              console.error(`[receiveMessage] Message receive error  `, error);
-            }
+            console.log(
+              `[${client.name}:Thread] Waiting for message from ${data.name}-${data.installationId}`,
+            );
+            const message = await client.receiveMessage(
+              data.expectedMessage as string,
+            );
+            console.log(`[${client.name}:Thread] Message received: ${message}`);
+            parentPort?.postMessage({
+              type: "messageReceived",
+              message: message,
+            });
             break;
           }
           case "createDM": {
             try {
-              console.log(`Creating DM with: ${data.senderAddresses}`);
               const dmId = await client.newDM(data.senderAddresses as string);
               if (!dmId) {
                 throw new Error("DM not created");

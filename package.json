@@ -12,7 +12,7 @@
     "gen:keys": "tsx scripts/generateKeys.ts",
     "lint": "eslint .",
     "pretest": "yarn workers",
-    "test": "vitest run",
+    "test": "vitest",
     "testts": "node --loader ts-node/esm tests/tstest.test.ts",
     "typecheck": "tsc"
   },
@@ -21,9 +21,6 @@
     "@xmtp/content-type-text": "^2.0.0",
     "alchemy-sdk": "^3.0.0",
     "dotenv": "^16.4.7",
-    "hook-std": "^3.0.0",
-    "node-sdk-41": "npm:@xmtp/node-sdk@0.0.41",
-    "node-sdk-42": "npm:@xmtp/node-sdk@0.0.42",
     "openai": "latest",
     "puppeteer-core": "^24.2.0",
     "tsx": "^4.19.2",
@@ -37,6 +34,7 @@
     "@ianvs/prettier-plugin-sort-imports": "^4.4.1",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.13.0",
+    "@xmtp/node-sdk": "0.0.42",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.0.1",
     "eslint-plugin-prettier": "^5.2.3",
@@ -53,13 +51,5 @@
   "packageManager": "yarn@4.6.0",
   "engines": {
     "node": ">=20"
-  },
-  "overrides": {
-    "node-sdk-41": {
-      "@xmtp/node-bindings": "npm:@xmtp/node-bindings@0.0.37"
-    },
-    "node-sdk-42": {
-      "@xmtp/node-bindings": "npm:@xmtp/node-bindings@0.0.37"
-    }
   }
 }

@@ -1735,17 +1735,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:^0.0.35":
-  version: 0.0.35
-  resolution: "@xmtp/node-bindings@npm:0.0.35"
-  checksum: 10/c6946dd2e99ef5e3056f73590846a0f9b9be0ef3d61101ea547793801232362fa79495c2ebd97d61ee2a21e350779fe21f4ef810f590688051817beb90b0a8cb
-  languageName: node
-  linkType: hard
-
 "@xmtp/node-bindings@npm:^0.0.37":
   version: 0.0.37
   resolution: "@xmtp/node-bindings@npm:0.0.37"
   checksum: 10/06d12ee27f306a2ad767b75eedf3ceb0457cab3f574a545f44e487cbb39d07a3866c81277954a4937dc1f048a75c10b34b5ffa5de4fc43eaf9b1310a1c4dce8a
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk@npm:0.0.42":
+  version: 0.0.42
+  resolution: "@xmtp/node-sdk@npm:0.0.42"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.0"
+    "@xmtp/content-type-primitives": "npm:^2.0.0"
+    "@xmtp/content-type-text": "npm:^2.0.0"
+    "@xmtp/node-bindings": "npm:^0.0.37"
+    "@xmtp/proto": "npm:^3.72.3"
+  checksum: 10/6163ede6d9cd7bc36b3a237d9a63a8be0041a11a1eefc6f56fefbf7cb8b8cc02c817c4696996a29a4f296d7545fd3172d8ebf8f85e1aeb23dcff917719dfcd10
   languageName: node
   linkType: hard
 
@@ -3497,13 +3503,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hook-std@npm:^3.0.0":
-  version: 3.0.0
-  resolution: "hook-std@npm:3.0.0"
-  checksum: 10/f1f0ca88bbbca2306b9c2c342f45fbecb318ad5496bcbde1fcfc2a64dab0feabd50278a613f683edf07225c4b8b75b3c64ad3f1fca090dd0cae426fdec374a56
-  languageName: node
-  linkType: hard
-
 "http-cache-semantics@npm:^4.1.1":
   version: 4.1.1
   resolution: "http-cache-semantics@npm:4.1.1"
@@ -4240,32 +4239,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-sdk-41@npm:@xmtp/node-sdk@0.0.41":
-  version: 0.0.41
-  resolution: "@xmtp/node-sdk@npm:0.0.41"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.0"
-    "@xmtp/content-type-primitives": "npm:^2.0.0"
-    "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.35"
-    "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/655393ccbe7b322c90f03b7f1b464bf73a99cd25577285b4965e7b5b6e699948264dee2962c0d0f5c0a544d84fa2882c4f16179f6daf377827d4a17fef4e7eb2
-  languageName: node
-  linkType: hard
-
-"node-sdk-42@npm:@xmtp/node-sdk@0.0.42":
-  version: 0.0.42
-  resolution: "@xmtp/node-sdk@npm:0.0.42"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.0"
-    "@xmtp/content-type-primitives": "npm:^2.0.0"
-    "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.37"
-    "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/6163ede6d9cd7bc36b3a237d9a63a8be0041a11a1eefc6f56fefbf7cb8b8cc02c817c4696996a29a4f296d7545fd3172d8ebf8f85e1aeb23dcff917719dfcd10
-  languageName: node
-  linkType: hard
-
 "nopt@npm:^8.0.0":
   version: 8.1.0
   resolution: "nopt@npm:8.1.0"
@@ -4720,15 +4693,13 @@ __metadata:
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^22.13.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
+    "@xmtp/node-sdk": "npm:0.0.42"
     alchemy-sdk: "npm:^3.0.0"
     dotenv: "npm:^16.4.7"
     eslint: "npm:^9.19.0"
     eslint-config-prettier: "npm:^10.0.1"
     eslint-plugin-prettier: "npm:^5.2.3"
     globals: "npm:^15.14.0"
-    hook-std: "npm:^3.0.0"
-    node-sdk-41: "npm:@xmtp/node-sdk@0.0.41"
-    node-sdk-42: "npm:@xmtp/node-sdk@0.0.42"
     openai: "npm:latest"
     prettier: "npm:^3.4.2"
     prettier-plugin-packagejson: "npm:^2.5.8"

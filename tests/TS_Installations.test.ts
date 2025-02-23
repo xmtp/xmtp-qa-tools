@@ -1,4 +1,4 @@
-import type { XmtpEnv } from "node-sdk-42";
+import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import {
   verifyGroupNameChange,

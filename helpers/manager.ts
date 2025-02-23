@@ -1,6 +1,5 @@
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { Client as Client41 } from "node-sdk-41";
-import { Client as Client42, type XmtpEnv } from "node-sdk-42";
 import { createSigner, getEncryptionKeyFromHex } from "./client";
 import type { Persona } from "./personas";
 
@@ -22,10 +21,9 @@ export interface TestCase {
 }
 
 export class ClientManager {
-  public client!: Client42 | Client41;
-  private clientType!: typeof Client42 | typeof Client41;
+  public client!: Client;
   public version: string;
-  public env: XmtpEnv;
+  public env: string;
   public name: string;
   public installationId: string;
   public walletKey: string;
@@ -36,7 +34,6 @@ export class ClientManager {
   constructor(config: Persona) {
     this.version = config.version;
     this.nameId = `manager:${config.name}-${config.installationId}`;
-    this.updateVersion(config.version);
     this.walletKey = config.walletKey;
     this.encryptionKey = config.encryptionKey;
     this.env = config.env;
@@ -51,52 +48,27 @@ export class ClientManager {
       const signer = createSigner(this.walletKey as `0x${string}`);
       const encryptionKey = getEncryptionKeyFromHex(this.encryptionKey);
 
-      this.client = await this.clientType.create(signer, encryptionKey, {
-        env: this.env,
+      this.client = await Client.create(signer, encryptionKey, {
+        env: this.env as XmtpEnv,
         dbPath: this.dbPath,
       });
       console.timeEnd(`[${this.nameId}] - initialize`);
-      return;
     } catch (error) {
       console.error(
         "error:initialize()",
         error instanceof Error ? error.message : String(error),
       );
-      return;
+      throw new Error(
+        error instanceof Error ? error.message : "Client initialization failed",
+      );
     }
   }
-  updateVersion(version: string) {
-    this.version = version;
-    if (version === "42") {
-      this.clientType = Client42;
-    } else if (version === "41") {
-      this.clientType = Client41;
-    } else {
-      throw new Error("Invalid version");
-    }
-  }
-  async receiveMessage(groupId: string, expectedMessages: string[]) {
+
+  async receiveMessage(expectedMessage: string) {
     try {
-      console.log(`[${this.nameId}] - started stream`);
-      console.time(`[${this.nameId}] - sync`);
-      await this.client.conversations.syncAll();
-      console.timeEnd(`[${this.nameId}] - sync`);
-      console.log(`[${this.nameId}] - synced`);
-      const conversation =
-        this.client.conversations.getConversationById(groupId);
-      if (!conversation) {
-        throw new Error("Conversation not found");
-      }
-      console.log(`[${this.nameId}] - syncing conversation`);
-      console.time(`[${this.nameId}] - sync conversation`);
-      await conversation.sync();
-      console.timeEnd(`[${this.nameId}] - sync`);
-      console.log(`[${this.nameId}] - synced`);
-      const stream = conversation.stream();
-      const receivedMessages: string[] = [];
-      console.log(`[${this.nameId}] - receiving messages`);
+      await this.client.conversations.sync();
+      const stream = await this.client.conversations.streamAllMessages();
       for await (const message of stream) {
-        console.info(`[${this.nameId}] - received message`);
         if (
           message?.senderInboxId.toLowerCase() ===
             this.client.inboxId.toLowerCase() ||
@@ -104,35 +76,21 @@ export class ClientManager {
         ) {
           continue;
         }
-        const content = message.content as string;
-        if (expectedMessages.includes(content)) {
-          if (!receivedMessages.includes(content)) {
-            receivedMessages.push(content);
-          }
-        }
-        console.log(
-          `[${this.nameId}] - received ${receivedMessages.length} messages`,
-        );
-        if (receivedMessages.length === expectedMessages.length) {
-          break;
+        if (message.content === expectedMessage) {
+          return message.content as string;
         }
       }
-      return receivedMessages;
-    } catch (error) {
-      console.error(
-        "error:receiveMessage()",
-        error instanceof Error ? error.message : String(error),
-      );
       return false;
+    } catch (error) {
+      console.error("Error waiting for reply:", error);
+      throw error;
     }
   }
   async newDM(senderAddresses: string): Promise<string> {
     try {
-      console.log(`[${this.nameId}] - creating DM`);
       console.time(`[${this.nameId}] - create DM`);
       const dm = await this.client.conversations.newDm(senderAddresses);
       console.timeEnd(`[${this.nameId}] - create DM`);
-      console.log(`[${this.nameId}] - DM created`);
       return dm.id;
     } catch (error) {
       console.error(
