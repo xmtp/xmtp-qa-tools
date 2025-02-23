@@ -1,4 +1,3 @@
-import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
@@ -13,7 +12,8 @@ import {
   verifyMembersCount,
   verifyRemoveRandomMembers,
   verifyStreams,
-} from "../helpers/testing";
+  type XmtpEnv,
+} from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Small_Groups_" + env + ":";

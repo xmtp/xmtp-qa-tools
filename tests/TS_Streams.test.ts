@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
-import { sendMessageTo } from "../helpers/testing";
+import { verifyDM } from "../helpers/xmtp";
 
 /* 
   TODO:
@@ -51,7 +51,7 @@ describe(testName, () => {
   it(
     "test fabri sending gm to alice",
     async () => {
-      const result = await sendMessageTo(fabri, alice);
+      const result = await verifyDM(fabri, alice);
       expect(result).toBe(true);
     },
     timeout,
@@ -60,7 +60,7 @@ describe(testName, () => {
   it(
     "test fabri sending gm to alice",
     async () => {
-      const result = await sendMessageTo(fabri, alice);
+      const result = await verifyDM(fabri, alice);
       expect(result).toBe(true);
     },
     timeout,
@@ -69,7 +69,7 @@ describe(testName, () => {
   it(
     "test elon sending gm to fabri",
     async () => {
-      const result = await sendMessageTo(elon, fabri);
+      const result = await verifyDM(elon, fabri);
       expect(result).toBe(true);
     },
     timeout,
@@ -78,7 +78,7 @@ describe(testName, () => {
   it(
     "test bob sending gm to joe",
     async () => {
-      const result = await sendMessageTo(bob, joe);
+      const result = await verifyDM(bob, joe);
       expect(result).toBe(true);
     },
     timeout,

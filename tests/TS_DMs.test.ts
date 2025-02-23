@@ -1,8 +1,7 @@
-import type { XmtpEnv } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
-import { sendMessageTo } from "../helpers/testing";
+import { sendMessageTo, type XmtpEnv } from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_DMs_" + env;
