@@ -4,7 +4,7 @@ import {
   DefaultPersonas,
   defaultValues,
   getWorkers,
-} from "../helpers/personas";
+} from "../helpers/workers/creator";
 
 const env = "dev";
 const testName = "TS_Personas_" + env;

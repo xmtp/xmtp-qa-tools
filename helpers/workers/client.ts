@@ -2,8 +2,8 @@ import { type } from "node:os";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { Client, type DecodedMessage, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { createSigner, getDbPath, getEncryptionKeyFromHex } from "./client";
-import type { PersonaBase } from "./personas";
+import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
+import type { PersonaBase } from "./creator";
 
 dotenv.config();
 

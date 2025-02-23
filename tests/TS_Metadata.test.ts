@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getWorkers, type Persona } from "../helpers/personas";
-import { verifyMetadataUpdates, type Conversation } from "../helpers/xmtp";
+import { verifyMetadataUpdates, type Conversation } from "../helpers/verify";
+import {
+  defaultValues,
+  getWorkers,
+  type Persona,
+} from "../helpers/workers/creator";
 
 const env = "dev";
 const timeout = defaultValues.timeout;

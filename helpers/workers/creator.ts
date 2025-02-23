@@ -3,8 +3,8 @@ import { promisify } from "util";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { config } from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
-import { generateEncryptionKeyHex, getDbPath } from "./client";
-import { WorkerClient } from "./WorkerClient";
+import { generateEncryptionKeyHex, getDbPath } from "../client";
+import { WorkerClient } from "./client";
 
 const execAsync = promisify(exec);
 

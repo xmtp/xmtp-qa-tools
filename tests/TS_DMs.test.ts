@@ -1,7 +1,11 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { defaultValues, getWorkers, type Persona } from "../helpers/personas";
-import { verifyDM, type XmtpEnv } from "../helpers/xmtp";
+import { verifyDM, type XmtpEnv } from "../helpers/verify";
+import {
+  defaultValues,
+  getWorkers,
+  type Persona,
+} from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_DMs_" + env;

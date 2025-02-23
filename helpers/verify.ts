@@ -4,7 +4,7 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import { type Persona } from "./personas";
+import { type Persona } from "./workers/creator";
 
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };
