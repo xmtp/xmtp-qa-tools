@@ -93,6 +93,16 @@ yarn gen:keys [name]
 
 Replace `[name]` with the desired identifier.
 
+Here's a concise section about the GitHub workflows for your README:
+
+## GitHub Workflows
+
+The monorepo includes automated workflows using GitHub Actions to ensure continuous integration and testing:
+
+- **Scheduled Test Workflow**: Defined in `streams.yml`, this workflow runs tests for the streams module every two hours and can also be triggered manually.
+
+This brief mention provides an overview without going into detailed steps, keeping the README succinct.
+
 ## Environment Configuration
 
 A `.env` file manages environment variables. Use the `.env.example` file as a template. Key variables include:
