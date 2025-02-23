@@ -22,5 +22,5 @@
       "@helpers/*": ["./helpers/*"]
     }
   },
-  "include": ["**/*.ts"]
+  "include": ["**/*.ts", "vitest.config.ts", "vite.config.js"]
 }
