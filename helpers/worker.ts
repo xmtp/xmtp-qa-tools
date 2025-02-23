@@ -16,7 +16,7 @@ if (!parentPort) {
 parentPort.on("message", (message: { type: string; data: any }) => {
   if (message.type === "initialize") {
     // Handle initialization
-    console.log("Worker initializing with data:", message.data);
+    console.log("Worker initializing with data:", message);
   }
 });
 

@@ -1,11 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 import {
-  defaultValues,
-  PersonaFactory,
-  type Persona,
-} from "../helpers/personas";
-import {
+  verifyDM,
   verifyMetadataUpdates,
   type Conversation,
   type XmtpEnv,
@@ -13,11 +10,9 @@ import {
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Groups_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
 
 /* 
-Topics:
+TODO:
 - Verify group creation with different participants for incosisten stream results
 
 
@@ -30,21 +25,31 @@ describe(testName, () => {
     bobsGroup: Conversation,
     randompep: Persona,
     elon: Persona;
+  let personas: Persona[];
 
   beforeAll(async () => {
-    const personaFactory = new PersonaFactory(env, testName);
-    [bob, alice, joe, randompep, elon] = await personaFactory.getPersonas([
-      "bob",
-      "alice",
-      "joe",
-      "randompep",
-      "elon",
-    ]);
+    const logger = createLogger(testName);
+    overrideConsole(logger);
+    personas = await getPersonas(
+      ["bob", "alice", "joe", "randompep", "elon"],
+      env,
+      testName,
+    );
+    [bob, alice, joe, randompep, elon] = personas;
     expect(bob).toBeDefined();
     expect(alice).toBeDefined();
     expect(joe).toBeDefined();
     expect(randompep).toBeDefined();
   }, defaultValues.timeout);
+
+  afterAll(async () => {
+    flushLogger(testName);
+    await Promise.all(
+      personas.map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
+    );
+  });
 
   it(
     "TC_CreateGroup: should measure creating a group",
@@ -53,9 +58,10 @@ describe(testName, () => {
       bobsGroup = await bob.client!.conversations.newGroup([
         bob.client?.accountAddress as `0x${string}`,
         joe.client?.accountAddress as `0x${string}`,
+        alice.client?.accountAddress as `0x${string}`,
         elon.client?.accountAddress as `0x${string}`,
       ]);
-      console.log("[TEST] Bob's group", bobsGroup.id);
+      console.log("Bob's group", bobsGroup.id);
       console.timeEnd("create group");
       expect(bobsGroup.id).toBeDefined();
     },
@@ -70,13 +76,11 @@ describe(testName, () => {
         "New Group Name" + Math.random().toString(36).substring(2, 15);
 
       const result = await verifyMetadataUpdates(
-        bobsGroup.id,
-        bob,
-        joe,
-        "group_name",
-        newGroupName,
+        () => bobsGroup.updateName(newGroupName),
+        [elon],
+        { fieldName: "group_name", newValue: newGroupName },
       );
-      expect(result).toBe(true);
+      expect(result).toEqual([newGroupName]);
       console.timeEnd("update group name");
     },
     defaultValues.timeout,
@@ -86,24 +90,13 @@ describe(testName, () => {
     "TC_AddMembers: should measure adding a participant to a group",
     async () => {
       console.time("add members");
+      const previousMembers = await bobsGroup.members();
       await bobsGroup.addMembers([
         randompep.client?.accountAddress as `0x${string}`,
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const members = await bobsGroup.members();
       console.timeEnd("add members");
-      expect(members.length).toBe(4);
-    },
-    defaultValues.timeout,
-  );
-
-  it(
-    "TC_GetMembersCount: should get members count of a group",
-    async () => {
-      console.time("get members count");
-      const members = await bobsGroup.members();
-      console.timeEnd("get members count");
-      expect(members.length).toBe(4);
+      expect(members.length).toBe(previousMembers.length + 1);
     },
     defaultValues.timeout,
   );
@@ -112,71 +105,75 @@ describe(testName, () => {
     "TC_RemoveMembers: should remove a participant from a group",
     async () => {
       console.time("remove members");
+      const previousMembers = await bobsGroup.members();
       await bobsGroup.removeMembers([
         joe.client?.accountAddress as `0x${string}`,
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const members = await bobsGroup.members();
       console.timeEnd("remove members");
-      expect(members.length).toBe(3);
+      expect(members.length).toBe(previousMembers.length - 1);
     },
     defaultValues.timeout,
   );
 
-  // it(
-  //   "TC_SendGroupMessage: should measure sending a gm in a group",
-  //   async () => {
-  //     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+  it(
+    "TC_SendGroupMessage: should measure sending a gm in a group",
+    async () => {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-  //     await bob.client!.conversations.sendMessage(groupId!, groupMessage);
-  //     console.log("[TEST] GM Message sent in group", groupMessage);
-  //     expect(groupMessage).toBeDefined();
-  //   },
-  //   defaultValues.timeout,
-  // );
+      await bobsGroup.send(groupMessage);
+      console.log("GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
+    },
+    defaultValues.timeout,
+  );
 
-  // it(
-  //   "TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group",
-  //   async () => {
-  //     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+  it(
+    "TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group",
+    async () => {
+      try {
+        const groupMessage =
+          "gm-" + Math.random().toString(36).substring(2, 15);
 
-  //     const bobPromise = bob.worker!.receiveMessage(groupMessage);
+        // Wait for participants to see it with increased timeout
+        const parsedMessages = await verifyDM(
+          () => bobsGroup.send(groupMessage),
+          [elon],
+        );
 
-  //     await alice.worker!.sendMessage(groupId!, groupMessage);
-  //     const received = await bobPromise;
+        parsedMessages.forEach((msg) => {
+          expect(msg).toBe(groupMessage);
+        });
+      } catch (error) {
+        console.error("Failed to receive group message:", error);
+        throw error; // Re-throw to fail the test
+      }
+    },
+    defaultValues.timeout * 2,
+  );
 
-  //     console.log("[TEST] GM Message received in group", groupMessage);
-  //     expect(received).toContain(groupMessage);
-  //   },
-  //   defaultValues.timeout,
-  // );
+  it(
+    "TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group",
+    async () => {
+      const newGroup = await bob.client!.conversations.newGroup([
+        alice.client?.accountAddress as `0x${string}`,
+        joe.client?.accountAddress as `0x${string}`,
+        randompep.client?.accountAddress as `0x${string}`,
+        elon.client?.accountAddress as `0x${string}`,
+      ]);
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-  // it(
-  //   "TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group",
-  //   async () => {
-  //     groupId = await bob.worker!.createGroup([
-  //       joe.address,
-  //       bob.address,
-  //       alice.address,
-  //     ]);
-  //     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-  //     const alicePromise = alice.worker!.receiveMessage(groupMessage);
-  //     const joePromise = joe.worker!.receiveMessage(groupMessage);
-
-  //     await bob.worker!.sendMessage(groupId!, groupMessage);
-  //     const [aliceReceived, joeReceived] = await Promise.all([
-  //       alicePromise,
-  //       joePromise,
-  //     ]);
-  //     console.log("[TEST] GM Message received in group", groupMessage);
-  //     console.log("[TEST] Alice received", aliceReceived);
-  //     console.log("[TEST] Joe received", joeReceived);
-  //     expect(aliceReceived).toContain(groupMessage);
-  //     expect(joeReceived).toContain(groupMessage);
-  //   },
-  //   defaultValues.timeout,
-  // );
+      // Wait for Joe to see it
+      const parsedMessages = await verifyDM(
+        () => newGroup.send(groupMessage),
+        [joe, alice, randompep, elon],
+      );
+      parsedMessages.forEach((msg) => {
+        expect(msg).toBe(groupMessage);
+      });
+    },
+    defaultValues.timeout * 2,
+  );
 
   // it(
   //   "TC_ReceiveGroupMessageFrom42To41: should measure sending a gm from SDK 42 to 41",
@@ -185,7 +182,7 @@ describe(testName, () => {
 
   //     await bob.worker!.addMembers(groupId!, [bobB41.address]);
   //     const isMember = await bob.worker!.isMember(groupId!, bobB41.address);
-  //     console.log("[TEST] Bob 41 is member", isMember);
+  //     console.log("Bob 41 is member", isMember);
   //     expect(isMember).toBe(true);
 
   //     const bob41Promise = bobB41.worker!.receiveMessage(groupMessage);
@@ -197,11 +194,11 @@ describe(testName, () => {
   //       joePromise,
   //       bob41Promise,
   //     ]);
-  //     console.log("[TEST] GM Message received in group", groupMessage);
-  //     console.log("[TEST] Joe received", joeReceived);
-  //     console.log("[TEST] Bob 41 received", bob41Received);
-  //     expect(joeReceived).toContain(groupMessage);
-  //     expect(bob41Received).toContain(groupMessage);
+  //     console.log("GM Message received in group", groupMessage);
+  //     console.log("Joe received", joeReceived);
+  //     console.log("Bob 41 received", bob41Received);
+  //     expect(joeReceived).toBe(groupMessage);
+  //     expect(bob41Received).toBe(groupMessage);
   //   },
   //   defaultValues.timeout * 2,
   // );

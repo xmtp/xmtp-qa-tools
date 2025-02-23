@@ -5,15 +5,12 @@ import {
   defaultValues,
   getPersonas,
 } from "../helpers/personas";
-import type { XmtpEnv } from "../helpers/xmtp";
 
-const env: XmtpEnv = "dev";
+const env = "dev";
 const testName = "TS_Personas_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
 
 /* 
-Topics:
+TODO:
 - Inconsistent test results (~20%).
 - Performance issues (>1000ms) for operations
 - Old sdk to new sdk breaks (node 41 to 42)
@@ -24,6 +21,8 @@ Topics:
 
 describe(testName, () => {
   beforeAll(async () => {
+    const logger = createLogger(testName);
+    overrideConsole(logger);
     // Ensure the data folder is clean before running tests
     //fs.rmSync(".data", { recursive: true, force: true });
   }, defaultValues.timeout);

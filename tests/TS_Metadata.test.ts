@@ -1,14 +1,14 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createLogger, overrideConsole } from "../helpers/logger";
+import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
 import { verifyMetadataUpdates, type Conversation } from "../helpers/xmtp";
 
 const env = "dev";
 const timeout = defaultValues.timeout;
 const testName = "TS_Metadata_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
-
+/* TODO:
+time streams without timeouts
+*/
 describe(testName, () => {
   let bob: Persona;
   let joe: Persona;
@@ -16,13 +16,16 @@ describe(testName, () => {
   let elon: Persona;
   let alice: Persona;
   let fabri: Persona;
-
+  let personas: Persona[];
   beforeAll(async () => {
-    [bob, joe, elon, fabri, alice] = await getPersonas(
+    const logger = createLogger(testName);
+    overrideConsole(logger);
+    personas = await getPersonas(
       ["bob", "joe", "elon", "fabri", "alice"],
       "dev",
       testName,
     );
+    [bob, joe, elon, fabri, alice] = personas;
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -32,15 +35,16 @@ describe(testName, () => {
       joe.client?.accountAddress as `0x${string}`,
       elon.client?.accountAddress as `0x${string}`,
     ]);
-    console.log("[TEST] Bob's group", bobsGroup.id);
+    console.log("Bob's group", bobsGroup.id);
     console.timeEnd("create group");
   }, timeout * 2);
 
   afterAll(async () => {
+    flushLogger(testName);
     await Promise.all(
-      [bob, joe, elon, fabri, alice].map((persona) =>
-        persona.worker?.terminate(),
-      ),
+      personas.map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
     );
   });
 
@@ -51,13 +55,11 @@ describe(testName, () => {
       const newGroupName =
         "New Group Name" + Math.random().toString(36).substring(2, 15);
       const result = await verifyMetadataUpdates(
-        bobsGroup.id,
-        bob,
-        joe,
-        "group_name",
-        newGroupName,
+        () => bobsGroup.updateName(newGroupName),
+        [joe],
+        { fieldName: "group_name", newValue: newGroupName },
       );
-      expect(result).toBe(true);
+      expect(result).toEqual([newGroupName]);
       console.timeEnd("update group name");
     },
     defaultValues.timeout * 2,

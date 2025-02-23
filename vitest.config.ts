@@ -5,5 +5,6 @@ export default defineConfig({
     globals: true,
     environment: "node", // Use a more verbose reporter to log detailed output
     reporters: "verbose",
+    watch: false, // Disable automatic test runs on file changes
   },
 });

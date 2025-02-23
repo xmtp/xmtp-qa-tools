@@ -5,7 +5,6 @@ import { config } from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex, getDbPath } from "./client";
 import { WorkerClient } from "./WorkerClient";
-import "./worker";
 
 const execAsync = promisify(exec);
 

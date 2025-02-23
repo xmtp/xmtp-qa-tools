@@ -13,7 +13,6 @@
     "lint": "eslint .",
     "pretest": "yarn workers",
     "test": "vitest",
-    "testts": "node --loader ts-node/esm tests/tstest.test.ts",
     "typecheck": "tsc"
   },
   "dependencies": {

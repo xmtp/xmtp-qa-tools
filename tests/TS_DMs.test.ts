@@ -1,24 +1,37 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { defaultValues, getPersonas, type Persona } from "../helpers/personas";
-import { sendMessageTo, type XmtpEnv } from "../helpers/xmtp";
+import { verifyDM, type XmtpEnv } from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_DMs_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
 
 describe(testName, () => {
-  let bob: Persona, joe: Persona, sam: Persona;
+  let bob: Persona;
+  let joe: Persona;
+  let sam: Persona;
+  let personas: Persona[];
 
   beforeAll(async () => {
-    [bob, joe, sam] = await getPersonas(["bob", "joe", "sam"], env, testName);
+    const logger = createLogger(testName);
+    overrideConsole(logger);
+    personas = await getPersonas(["bob", "joe", "sam"], env, testName);
+    [bob, joe, sam] = personas;
     console.log("bob", bob.client?.accountAddress);
     console.log("joe", joe.client?.accountAddress);
     console.log("sam", sam.client?.accountAddress);
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
   }, defaultValues.timeout);
+
+  afterAll(async () => {
+    flushLogger(testName);
+    await Promise.all(
+      personas.map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
+    );
+  });
 
   it(
     "TC_CreateDM: should measure creating a DM",
@@ -52,14 +65,18 @@ describe(testName, () => {
     defaultValues.timeout,
   );
 
-  /* 
-  TODO:
-    - Why here the stream doest work? */
   it(
     "TC_ReceiveGM: should measure receiving a gm",
     async () => {
-      const result = await sendMessageTo(bob, sam);
-      expect(result).toBe(true);
+      const dmConvo = await bob.client?.conversations.newDm(
+        sam.client?.accountAddress as `0x${string}`,
+      );
+      if (!dmConvo) {
+        throw new Error("DM conversation not found");
+      }
+      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+      const result = await verifyDM(() => dmConvo.send(message), [sam]);
+      expect(result).toEqual([message]);
     },
     defaultValues.timeout,
   ); // Increase timeout if needed

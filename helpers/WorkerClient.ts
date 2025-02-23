@@ -1,19 +1,15 @@
+import { type } from "node:os";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type DecodedMessage, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { createSigner, getDbPath, getEncryptionKeyFromHex } from "./client";
-// Adapt these imports
 import type { PersonaBase } from "./personas";
 
 dotenv.config();
 
 export type WorkerMessage = {
   type: string;
-  data: {
-    content: string;
-    conversationId?: string;
-    senderAddress?: string;
-  };
+  message: DecodedMessage;
 };
 
 // This snippet is used as the "inline" JS for your Worker to import your worker code:
@@ -124,15 +120,9 @@ export class WorkerClient extends Worker {
     void (async () => {
       try {
         for await (const message of stream) {
-          if (!message?.content) continue;
-
           const workerMessage: WorkerMessage = {
             type: "stream_message",
-            data: {
-              content: message.content as string,
-              conversationId: message.conversationId,
-              senderAddress: message.senderInboxId,
-            },
+            message: message as DecodedMessage,
           };
 
           // Only emit messages we're waiting for
@@ -152,15 +142,13 @@ export class WorkerClient extends Worker {
    * in the parent. This sets up a one-off listener on this Worker
    * to resolve once the specified message text arrives.
    */
-  receiveMessage(expectedContent: string): Promise<WorkerMessage> {
-    console.log(`[${this.name}] Waiting for message: ${expectedContent}`);
+  stream(typeId: string): Promise<WorkerMessage> {
+    console.log(`[${this.name}] Waiting for message: ${typeId}`);
 
     return new Promise<WorkerMessage>((resolve, reject) => {
       const timeout = setTimeout(() => {
         this.removeListener("message", messageHandler);
-        reject(
-          new Error(`Timeout: Did not receive '${expectedContent}' in time`),
-        );
+        reject(new Error(`Timeout: Did not receive '${typeId}' in time`));
       }, 10000);
 
       const messageHandler = (msg: WorkerMessage) => {
@@ -168,14 +156,14 @@ export class WorkerClient extends Worker {
         if (msg.type === "error") {
           clearTimeout(timeout);
           this.removeListener("message", messageHandler);
-          reject(new Error(msg.data.content));
+          reject(new Error(msg.message.content as string));
           return;
         }
 
         // If it's a matching stream message, resolve
         if (
           msg.type === "stream_message" &&
-          msg.data.content === expectedContent
+          msg.message.contentType?.typeId === typeId
         ) {
           clearTimeout(timeout);
           this.removeListener("message", messageHandler);

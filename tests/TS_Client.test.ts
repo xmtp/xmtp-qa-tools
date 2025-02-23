@@ -5,11 +5,9 @@ import type { XmtpEnv } from "../helpers/xmtp";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Client_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
 
 /* 
-Topics:
+TODO:
 - Takes 3 seconds to create a client, is this expected?
 */
 
@@ -17,6 +15,8 @@ describe(testName, () => {
   it(
     "TC_CreateClient: Initialize the client",
     async () => {
+      const logger = createLogger(testName);
+      overrideConsole(logger);
       const [alice, randompep] = await getPersonas(
         ["alice", "randompep"],
         env,
