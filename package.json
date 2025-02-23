@@ -4,10 +4,10 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "bot": "tsx scripts/run.ts bots",
     "build": "tsc",
     "clean": "rimraf node_modules && yarn clean:dbs",
     "clean:dbs": "rimraf *.db3* ||:",
-    "dev": "tsx scripts/run.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",

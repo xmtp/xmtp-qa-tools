@@ -10,14 +10,14 @@ if (!type || !name) {
   process.exit(1);
 }
 
-if (type !== "examples" && type !== "scripts") {
-  console.error('Type must be either "examples" or "scripts"');
+if (type !== "bots" && type !== "scripts") {
+  console.error('Type must be either "bots" or "scripts"');
   process.exit(1);
 }
 
 const filePath =
-  type === "examples"
-    ? path.join("examples", name, "index.ts")
+  type === "bots"
+    ? path.join("bots", name, "index.ts")
     : path.join("scripts", `${name}.ts`);
 
 try {

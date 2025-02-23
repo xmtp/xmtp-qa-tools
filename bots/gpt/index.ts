@@ -2,22 +2,22 @@ import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import OpenAI from "openai";
 import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
 
-const { WALLET_KEY, ENCRYPTION_KEY, OPENAI_API_KEY } = process.env;
+const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, OPENAI_API_KEY } = process.env;
 
-if (!WALLET_KEY) {
-  throw new Error("WALLET_KEY must be set");
+if (!WALLET_KEY_BOT) {
+  throw new Error("WALLET_KEY_BOT must be set");
 }
 
-if (!ENCRYPTION_KEY) {
-  throw new Error("ENCRYPTION_KEY must be set");
+if (!ENCRYPTION_KEY_BOT) {
+  throw new Error("ENCRYPTION_KEY_BOT must be set");
 }
 
 if (!OPENAI_API_KEY) {
   throw new Error("OPENAI_API_KEY must be set");
 }
 
-const signer = createSigner(WALLET_KEY);
-const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+const signer = createSigner(WALLET_KEY_BOT as `0x${string}`);
+const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY_BOT);
 const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 
 const env: XmtpEnv = "dev";
