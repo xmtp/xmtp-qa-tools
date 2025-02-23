@@ -2,7 +2,7 @@ name: Scheduled test
 
 on:
   schedule:
-    - cron: "*/5 * * * *" # This cron expression means every 5 minutes
+    - cron: "0 */2 * * *" # This cron expression means every 2 hours
   workflow_dispatch:
 
 jobs:
