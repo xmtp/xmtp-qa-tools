@@ -1,6 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { DefaultPersonas, getWorkers } from "../helpers/workers/creator";
+import { WorkerNames } from "../helpers/types";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env = "dev";
 const testName = "TS_Personas_" + env;
@@ -24,12 +25,12 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
   });
 
   it("should create a persona", async () => {
     // Get Bob's persona using the enum value.
-    const [bob] = await getWorkers([DefaultPersonas.BOB], env, testName);
+    const [bob] = await getWorkers([WorkerNames.BOB], env, testName);
 
     expect(bob.client?.accountAddress).toBeDefined();
   });
@@ -41,7 +42,7 @@ describe(testName, () => {
 
   it("should create multiple personas", async () => {
     const personas = await getWorkers(
-      [DefaultPersonas.BOB, DefaultPersonas.ALICE, "randompep", "randombob"],
+      [WorkerNames.BOB, WorkerNames.ALICE, "randompep", "randombob"],
       env,
       testName,
     );

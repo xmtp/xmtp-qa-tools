@@ -1,26 +1,15 @@
-import {
-  Client,
-  type Conversation,
-  type DecodedMessage,
-  type XmtpEnv,
-} from "@xmtp/node-sdk";
 import { getNetworkStats } from "./logger";
-import { type Persona } from "./workers/creator";
+import { type Conversation, type DecodedMessage, type Persona } from "./types";
 
-export type { Conversation, DecodedMessage, XmtpEnv };
-export { Client };
-
-export async function verifyNotForked(
-  group: Conversation,
-  participants: Persona[],
-) {
+export async function verifyDMs(group: Conversation, participants: Persona[]) {
   try {
-    const message = "Hello" + Math.random().toString(36).substring(2, 15);
+    const message = "gm-" + Math.random().toString(36).substring(2, 15);
     // Exclude Bella from the receivers
     const creatorInboxId = (await group.metadata()).creatorInboxId;
     const filteredReceivers = participants.filter(
       (p) => p.client?.inboxId !== creatorInboxId,
     );
+    console.log("filteredReceivers", filteredReceivers.length);
 
     // Set up message collectors for each receiver except Bella
     const messageCollectors = filteredReceivers.map(async (r) => {
@@ -43,7 +32,7 @@ export async function verifyNotForked(
     console.time("helpers/verify.ts: Collect all messages");
     console.log("messageCollectors", messageCollectors.length);
     const receivedMessages = await Promise.all(messageCollectors);
-    await getNetworkStats();
+    //await getNetworkStats();
     console.timeEnd("helpers/verify.ts: Collect all messages");
 
     console.log("receivedMessages", receivedMessages.length);
@@ -52,17 +41,17 @@ export async function verifyNotForked(
       .filter((m) => m.content === message)
       .map((m) => m.content as string);
     console.log("onlyMessages", onlyMessageContent);
-    return onlyMessageContent.length == participants.length - 1;
+    return onlyMessageContent.length == filteredReceivers.length;
   } catch (error) {
     console.error(
-      "verifyDM error:",
+      "verifyDMs error:",
       error instanceof Error ? error.message : error,
     );
     throw error;
   }
 }
 
-export async function verifyDM(
+export async function verifyMultipleDMs(
   action: () => Promise<any>,
   receivers: Persona[],
   amount: number = 1,
@@ -106,7 +95,7 @@ export async function verifyDM(
     console.time("helpers/verify.ts: Collect all messages");
     const receivedMessages = await Promise.all(messageCollectors);
     console.timeEnd("helpers/verify.ts: Collect all messages");
-    await getNetworkStats();
+    //await getNetworkStats();
 
     // Flatten and filter out any undefined messages
     const parsedMessageContent = receivedMessages
@@ -120,7 +109,7 @@ export async function verifyDM(
     return messageContent;
   } catch (error) {
     console.error(
-      "verifyDM error:",
+      "verifyMultipleDMs error:",
       error instanceof Error ? error.message : error,
     );
     throw error;
@@ -159,7 +148,7 @@ export async function verifyMetadataUpdates(
       `helpers/verify.ts: Collect metadata messages + ${fieldName}, ${newValue}`,
     );
     const receivedMessages = await Promise.all(messagePromises);
-    await getNetworkStats();
+    //await getNetworkStats();
     console.timeEnd(
       `helpers/verify.ts: Collect metadata messages + ${fieldName}, ${newValue}`,
     );

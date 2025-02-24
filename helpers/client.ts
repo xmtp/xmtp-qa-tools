@@ -15,7 +15,7 @@ export const createSigner = (privateKey: `0x${string}`): Signer => {
       });
       return toBytes(signature);
     },
-  };
+  } as Signer;
 };
 export const getDbPath = (
   name: string,

@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
-  verifyDM,
-  verifyMetadataUpdates,
   type Conversation,
+  type Persona,
   type XmtpEnv,
-} from "../helpers/verify";
-import { getWorkers, type Persona } from "../helpers/workers/creator";
+} from "../helpers/types";
+import { verifyDMs, verifyMetadataUpdates } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Groups_" + env;
@@ -43,7 +43,7 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
       personas.map(async (persona) => {
         await persona.worker?.terminate();
@@ -109,41 +109,22 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
-    try {
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+    // Wait for participants to see it with increased timeout
+    const result = await verifyDMs(bobsGroup, [elon]);
 
-      // Wait for participants to see it with increased timeout
-      const parsedMessages = await verifyDM(
-        () => bobsGroup.send(groupMessage),
-        [elon],
-      );
-
-      parsedMessages.forEach((msg) => {
-        expect(msg).toBe(groupMessage);
-      });
-    } catch (error) {
-      console.error("Failed to receive group message:", error);
-      throw error; // Re-throw to fail the test
-    }
+    expect(result).toBe(true);
   });
 
-  it("TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group", async () => {
+  it("TC_ReceiveGroupMessage: should create a group and measure all streams", async () => {
     const newGroup = await bob.client!.conversations.newGroup([
       alice.client?.accountAddress as `0x${string}`,
       joe.client?.accountAddress as `0x${string}`,
       randompep.client?.accountAddress as `0x${string}`,
       elon.client?.accountAddress as `0x${string}`,
     ]);
-    const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+    const result = await verifyDMs(newGroup, [joe, alice, randompep, elon]);
 
-    // Wait for Joe to see it
-    const parsedMessages = await verifyDM(
-      () => newGroup.send(groupMessage),
-      [joe, alice, randompep, elon],
-    );
-    parsedMessages.forEach((msg) => {
-      expect(msg).toBe(groupMessage);
-    });
+    expect(result).toBe(true);
   });
 
   // it(

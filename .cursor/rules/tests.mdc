@@ -7,7 +7,7 @@ alwaysApply: false
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
-  verifyDM,
+  verifyMultipleDMs,
   verifyMetadataUpdates,
   type Conversation,
   type XmtpEnv,
@@ -81,7 +81,7 @@ describe(testName, () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
-    const result = await verifyDM(() => dmConvo.send(message), [sam]);
+    const result = await verifyMultipleDMs(() => dmConvo.send(message), [sam]);
     expect(result).toEqual([message]);
   });
 
@@ -147,7 +147,7 @@ describe(testName, () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       // Wait for participants to see it with increased timeout
-      const parsedMessages = await verifyDM(
+      const parsedMessages = await verifyMultipleDMs(
         () => bobsGroup.send(groupMessage),
         [elon],
       );
@@ -171,7 +171,7 @@ describe(testName, () => {
     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
     // Wait for Joe to see it
-    const parsedMessages = await verifyDM(
+    const parsedMessages = await verifyMultipleDMs(
       () => newGroup.send(groupMessage),
       [joe, alice, randompep, elon],
     );

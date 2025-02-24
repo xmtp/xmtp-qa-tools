@@ -1,15 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import {
-  verifyMetadataUpdates,
-  verifyNotForked,
-  type Conversation,
-} from "../helpers/verify";
-import {
-  getWorkers,
-  WorkerNames,
-  type Persona,
-} from "../helpers/workers/creator";
+import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
+import { verifyDMs, verifyMetadataUpdates } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env = "dev";
 const testName = "TS_Forked_" + env;
@@ -85,7 +78,7 @@ describe(testName, () => {
   });
 
   it("should message a gm", async () => {
-    expect(await verifyNotForked(group, participants)).toBe(true);
+    expect(await verifyDMs(group, participants)).toBe(true);
   });
 
   it("should handle group name updates", async () => {
@@ -99,7 +92,7 @@ describe(testName, () => {
     );
     console.timeEnd("updateName");
 
-    expect(await verifyNotForked(group, participants)).toBe(true);
+    expect(await verifyDMs(group, participants)).toBe(true);
   });
 
   it("should handle adding new  members", async () => {
@@ -109,7 +102,7 @@ describe(testName, () => {
 
     participants.push(random);
 
-    expect(await verifyNotForked(group, participants)).toBe(true);
+    expect(await verifyDMs(group, participants)).toBe(true);
   });
 
   it("should handle removing members", async () => {
@@ -129,6 +122,6 @@ describe(testName, () => {
     );
     console.timeEnd("verifyMetadataUpdates");
 
-    expect(await verifyNotForked(group, participants)).toBe(true);
+    expect(await verifyDMs(group, participants)).toBe(true);
   });
 });

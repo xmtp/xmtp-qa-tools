@@ -1,7 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { verifyDM, type Conversation, type XmtpEnv } from "../helpers/verify";
-import { getWorkers, type Persona } from "../helpers/workers/creator";
+import {
+  type Conversation,
+  type Persona,
+  type XmtpEnv,
+} from "../helpers/types";
+import { verifyMultipleDMs } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const amount = 5;
@@ -33,7 +38,7 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
       personas.map(async (persona) => {
         await persona.worker?.terminate();
@@ -59,7 +64,7 @@ describe(testName, () => {
 
     // Wait for Joe to see it
     const receivers = [joe, alice, sam];
-    const parsedMessages = await verifyDM(
+    const parsedMessages = await verifyMultipleDMs(
       async () => {
         // Send messages sequentially to maintain order
         for (const msg of messages) {

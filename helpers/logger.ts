@@ -4,16 +4,9 @@ import path from "path";
 import { promisify } from "util";
 import winston from "winston";
 import Transport from "winston-transport";
+import type { LogInfo } from "./types";
 
 const execAsync = promisify(exec);
-
-// Custom transport that buffers logs in memory
-interface LogInfo {
-  timestamp: string;
-  level: string;
-  message: string;
-  [key: symbol]: string | undefined;
-}
 
 class MemoryTransport extends Transport {
   logs: string[] = [];
@@ -163,7 +156,7 @@ function filterLog(args: any[]): string {
 export const overrideConsole = (logger: winston.Logger) => {
   try {
     console.log = (...args: any[]) => {
-      const message = filterLog(args, logger);
+      const message = filterLog(args);
       if (message) {
         // If this is a console.time/end log, always use warn if duration > 300ms.
         if (args.length >= 2 && args[0] === "%s: %s") {
@@ -174,7 +167,7 @@ export const overrideConsole = (logger: winston.Logger) => {
       }
     };
     console.info = (...args: any[]) => {
-      const message = filterLog(args, logger);
+      const message = filterLog(args);
       if (message) {
         // Also promote timing logs from console.info to warn.
         if (args.length >= 2 && args[0] === "%s: %s") {
@@ -185,13 +178,13 @@ export const overrideConsole = (logger: winston.Logger) => {
       }
     };
     console.warn = (...args: any[]) => {
-      const message = filterLog(args, logger);
+      const message = filterLog(args);
       if (message) {
         logger.log("warn", message);
       }
     };
     console.error = (...args: any[]) => {
-      const message = filterLog(args, logger);
+      const message = filterLog(args);
       if (message) {
         logger.log("error", message);
       }

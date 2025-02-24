@@ -1,12 +1,12 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
-  verifyDM,
-  verifyMetadataUpdates,
   type Conversation,
+  type Persona,
   type XmtpEnv,
-} from "../helpers/verify";
-import { getWorkers, type Persona } from "../helpers/workers/creator";
+} from "../helpers/types";
+import { verifyDMs, verifyMetadataUpdates } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
@@ -16,6 +16,7 @@ describe(testName, () => {
   let joe: Persona;
   let sam: Persona;
   let alice: Persona;
+  let random: Persona;
   let randompep: Persona;
   let elon: Persona;
   let bobsGroup: Conversation;
@@ -26,15 +27,15 @@ describe(testName, () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
-      ["bob", "joe", "sam", "alice", "randompep", "elon"],
+      ["bob", "joe", "sam", "alice", "randompep", "elon", "random"],
       env,
       testName,
     );
-    [bob, joe, sam, alice, randompep, elon] = personas;
+    [bob, joe, sam, alice, randompep, elon, random] = personas;
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
       personas.map(async (persona) => {
         await persona.worker?.terminate();
@@ -43,7 +44,9 @@ describe(testName, () => {
   });
 
   it("TC_CreateDM: should measure creating a DM", async () => {
-    dmConvo = await bob.client!.conversations.newDm(sam.client!.accountAddress);
+    dmConvo = await bob.client!.conversations.newDm(
+      random.client!.accountAddress,
+    );
     expect(dmConvo).toBeDefined();
     expect(dmConvo.id).toBeDefined();
   });
@@ -70,9 +73,9 @@ describe(testName, () => {
     }
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const message = "gm-" + Math.random().toString(36).substring(2, 15);
-    const result = await verifyDM(() => dmConvo.send(message), [sam]);
-    expect(result).toEqual([message]);
+
+    const result = await verifyDMs(dmConvo, [sam]);
+    expect(result).toBe(true);
   });
 
   it("TC_CreateGroup: should measure creating a group", async () => {
@@ -133,22 +136,8 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
-    try {
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-      // Wait for participants to see it with increased timeout
-      const parsedMessages = await verifyDM(
-        () => bobsGroup.send(groupMessage),
-        [elon],
-      );
-
-      parsedMessages.forEach((msg) => {
-        expect(msg).toBe(groupMessage);
-      });
-    } catch (error) {
-      console.error("Failed to receive group message:", error);
-      throw error; // Re-throw to fail the test
-    }
+    const result = await verifyDMs(bobsGroup, [elon]);
+    expect(result).toBe(true);
   });
 
   it("TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group", async () => {
@@ -158,15 +147,8 @@ describe(testName, () => {
       randompep.client?.accountAddress as `0x${string}`,
       elon.client?.accountAddress as `0x${string}`,
     ]);
-    const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-    // Wait for Joe to see it
-    const parsedMessages = await verifyDM(
-      () => newGroup.send(groupMessage),
-      [joe, alice, randompep, elon],
-    );
-    parsedMessages.forEach((msg) => {
-      expect(msg).toBe(groupMessage);
-    });
+    const result = await verifyDMs(newGroup, [joe, alice, randompep, elon]);
+    expect(result).toBe(true);
   });
 });

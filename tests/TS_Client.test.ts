@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import type { XmtpEnv } from "../helpers/verify";
+import type { XmtpEnv } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";

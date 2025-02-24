@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { verifyMetadataUpdates, type Conversation } from "../helpers/verify";
-import { getWorkers, type Persona } from "../helpers/workers/creator";
+import { type Conversation, type Persona } from "../helpers/types";
+import { verifyMetadataUpdates } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/creator";
 
 const env = "dev";
 const testName = "TS_Metadata_" + env;
@@ -37,7 +38,7 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
       personas.map(async (persona) => {
         await persona.worker?.terminate();
