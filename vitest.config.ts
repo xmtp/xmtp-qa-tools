@@ -1,6 +1,7 @@
 import { defineConfig } from "vitest/config";
 
 export default defineConfig({
+  base: "/__vitest__/#/",
   test: {
     globals: true,
     reporters: ["html", "default"],
