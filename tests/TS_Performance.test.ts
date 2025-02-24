@@ -13,37 +13,27 @@ import {
 } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
-const testName = "TS_Groups_" + env;
-
-/* 
-TODO:
-- Verify group creation with different participants for incosisten stream results
-
-
-*/
+const testName = "TS_Performance_" + env;
 
 describe(testName, () => {
-  let bob: Persona,
-    alice: Persona,
-    joe: Persona,
-    bobsGroup: Conversation,
-    randompep: Persona,
-    elon: Persona;
+  let bob: Persona;
+  let joe: Persona;
+  let sam: Persona;
+  let alice: Persona;
+  let randompep: Persona;
+  let elon: Persona;
+  let bobsGroup: Conversation;
   let personas: Persona[];
 
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
-      ["bob", "alice", "joe", "randompep", "elon"],
+      ["bob", "joe", "sam", "alice", "randompep", "elon"],
       env,
       testName,
     );
-    [bob, alice, joe, randompep, elon] = personas;
-    expect(bob).toBeDefined();
-    expect(alice).toBeDefined();
-    expect(joe).toBeDefined();
-    expect(randompep).toBeDefined();
+    [bob, joe, sam, alice, randompep, elon] = personas;
   }, defaultValues.timeout);
 
   afterAll(async () => {
@@ -54,6 +44,54 @@ describe(testName, () => {
       }),
     );
   });
+
+  it(
+    "TC_CreateDM: should measure creating a DM",
+    async () => {
+      const conversation = await bob.client!.conversations.newDm(
+        sam.client!.accountAddress,
+      );
+      expect(conversation).toBeDefined();
+      expect(conversation.id).toBeDefined();
+    },
+    defaultValues.timeout,
+  );
+
+  it(
+    "TC_SendGM: should measure sending a gm",
+    async () => {
+      // We'll expect this random message to appear in Joe's stream
+      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+
+      console.log(
+        `[${bob.name}] Creating DM with ${sam.name} at ${sam.client?.accountAddress}`,
+      );
+
+      const dmConvo = await bob.client?.conversations.newDm(
+        sam.client?.accountAddress as `0x${string}`,
+      );
+      const dmId = await dmConvo?.send(message);
+
+      expect(dmId).toBeDefined();
+    },
+    defaultValues.timeout,
+  );
+
+  it(
+    "TC_ReceiveGM: should measure receiving a gm",
+    async () => {
+      const dmConvo = await bob.client?.conversations.newDm(
+        sam.client?.accountAddress as `0x${string}`,
+      );
+      if (!dmConvo) {
+        throw new Error("DM conversation not found");
+      }
+      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+      const result = await verifyDM(() => dmConvo.send(message), [sam]);
+      expect(result).toEqual([message]);
+    },
+    defaultValues.timeout,
+  ); // Increase timeout if needed
 
   it(
     "TC_CreateGroup: should measure creating a group",
@@ -179,35 +217,7 @@ describe(testName, () => {
     defaultValues.timeout * 2,
   );
 
-  // it(
-  //   "TC_ReceiveGroupMessageFrom42To41: should measure sending a gm from SDK 42 to 41",
-  //   async () => {
-  //     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-  //     await bob.worker!.addMembers(groupId!, [bobB41.address]);
-  //     const isMember = await bob.worker!.isMember(groupId!, bobB41.address);
-  //     console.log("Bob 41 is member", isMember);
-  //     expect(isMember).toBe(true);
-
-  //     const bob41Promise = bobB41.worker!.receiveMessage(groupMessage);
-  //     const joePromise = joe.worker!.receiveMessage(groupMessage);
-
-  //     await alice.worker!.sendMessage(groupId!, groupMessage);
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
-  //     const [joeReceived, bob41Received] = await Promise.all([
-  //       joePromise,
-  //       bob41Promise,
-  //     ]);
-  //     console.log("GM Message received in group", groupMessage);
-  //     console.log("Joe received", joeReceived);
-  //     console.log("Bob 41 received", bob41Received);
-  //     expect(joeReceived).toBe(groupMessage);
-  //     expect(bob41Received).toBe(groupMessage);
-  //   },
-  //   defaultValues.timeout * 2,
-  // );
-
-  afterAll(() => {
+  afterAll(async () => {
     flushLogger(testName);
   });
 });

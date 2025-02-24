@@ -83,10 +83,13 @@ export async function verifyMetadataUpdates(
     );
 
     const nameChange = metadataContent.map((c) =>
-      c.metadataFieldChanges.find((change) => change.fieldName === fieldName),
+      c.metadataFieldChanges.find(
+        (change) =>
+          change.fieldName === fieldName && change.newValue === newValue,
+      ),
     );
 
-    const messageContent = nameChange.map((c) => c?.newValue == newValue);
+    const messageContent = nameChange.map((c) => c?.newValue);
     return messageContent;
   } catch (error) {
     console.error(

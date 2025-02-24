@@ -30,8 +30,6 @@ describe(testName, () => {
       testName,
     );
     [bob, joe, elon, fabri, alice] = personas;
-    // Add delay to ensure streams are properly initialized
-    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     console.time("create group");
     bobsGroup = await bob.client!.conversations.newGroup([
@@ -76,7 +74,6 @@ describe(testName, () => {
       await bobsGroup.addMembers([
         fabri.client?.accountAddress as `0x${string}`,
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const members = await bobsGroup.members();
       console.timeEnd("add members");
       expect(members.length).toBe(4);
@@ -91,7 +88,6 @@ describe(testName, () => {
       await bobsGroup.removeMembers([
         fabri.client?.accountAddress as `0x${string}`,
       ]);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
       const members = await bobsGroup.members();
       console.timeEnd("remove members");
       expect(members.length).toBe(3);
