@@ -1,6 +1,10 @@
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { Alchemy, Network } from "alchemy-sdk";
-import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
+import {
+  createSigner,
+  getDbPath,
+  getEncryptionKeyFromHex,
+} from "../../helpers/client";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key
@@ -23,9 +27,12 @@ const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY_BOT);
 const env: XmtpEnv = "dev";
 
 async function main() {
+  const dbPath = getDbPath("bot", "gated-group", "42", env);
+
   console.log(`Creating client on the '${env}' network...`);
   const client = await Client.create(signer, encryptionKey, {
     env,
+    dbPath,
   });
 
   console.log("Syncing conversations...");

@@ -1,5 +1,9 @@
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
-import { createSigner, getEncryptionKeyFromHex } from "../../helpers/client";
+import {
+  createSigner,
+  getDbPath,
+  getEncryptionKeyFromHex,
+} from "../../helpers/client";
 
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT } = process.env;
 
@@ -17,8 +21,12 @@ const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY_BOT);
 const env: XmtpEnv = "dev";
 
 async function main() {
+  const dbPath = getDbPath("bot", "gm", "42", env);
   console.log(`Creating client on the '${env}' network...`);
-  const client = await Client.create(signer, encryptionKey, { env });
+  const client = await Client.create(signer, encryptionKey, {
+    env,
+    dbPath,
+  });
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
