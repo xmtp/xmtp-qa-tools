@@ -3,7 +3,7 @@ import { getWorkers } from "@helpers/workers/creator";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { type Persona } from "../../helpers/types";
 
-const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT } = process.env;
+const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, XMTP_ENV } = process.env;
 
 if (!WALLET_KEY_BOT) {
   throw new Error("WALLET_KEY_BOT must be set");
@@ -13,7 +13,7 @@ if (!ENCRYPTION_KEY_BOT) {
   throw new Error("ENCRYPTION_KEY_BOT must be set");
 }
 
-const env: XmtpEnv = "dev";
+const env: XmtpEnv = XMTP_ENV as XmtpEnv;
 let bob: Persona;
 let alice: Persona;
 let joe: Persona;
