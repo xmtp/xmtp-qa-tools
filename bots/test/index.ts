@@ -1,7 +1,10 @@
 import { createLogger, overrideConsole } from "@helpers/logger";
 import { getWorkers } from "@helpers/workers/creator";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import dotenv from "dotenv";
 import { type Persona } from "../../helpers/types";
+
+dotenv.config();
 
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, XMTP_ENV } = process.env;
 
