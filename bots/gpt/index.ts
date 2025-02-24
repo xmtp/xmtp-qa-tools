@@ -28,7 +28,9 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const env: XmtpEnv = "dev";
 
 async function main() {
-  const dbPath = getDbPath("bot", "gpt", defaultValues.version, env);
+  const clientAddress = await signer.getAddress();
+  const dbPath = getDbPath("gpt", clientAddress, env);
+
   console.log(`Creating client on the '${env}' network...`);
   const client = await Client.create(signer, encryptionKey, {
     env,
@@ -38,9 +40,11 @@ async function main() {
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
-  console.log(
-    `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}`,
-  );
+  console.log(`Agent initialized on`, {
+    inboxId: client.inboxId,
+    accountAddress: client.accountAddress,
+    deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
+  });
 
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();

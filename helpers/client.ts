@@ -4,6 +4,7 @@ import { type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
+import { defaultValues } from "./types";
 
 export const createSigner = (privateKey: `0x${string}`): Signer => {
   const account = privateKeyToAccount(privateKey);
@@ -19,20 +20,34 @@ export const createSigner = (privateKey: `0x${string}`): Signer => {
 };
 export const getDbPath = (
   name: string,
-  installationId: string,
-  version: string,
+  accountAddress: string,
   env: string,
+  installationId?: string,
+  sdkVersion?: string,
+  libxmtpVersion?: string,
 ): string => {
   console.time(`[${name}] - getDbPath`);
-  const folder = name.includes("random") ? "random" : name.toLowerCase();
-  const basePath =
-    process.env.RAILWAY_VOLUME_MOUNT_PATH ??
-    `${process.cwd()}/.data/${folder}/${name.toLowerCase()}-${installationId}-${version}`;
+  const namePath = name.toLowerCase().includes("random")
+    ? "random/" + name.toLowerCase()
+    : name.toLowerCase();
+
+  const nameSet = name.toLowerCase();
+  const installationIdSet =
+    installationId?.toLowerCase() ?? defaultValues.installationId;
+  const sdkVersionSet = sdkVersion?.toLowerCase() ?? defaultValues.sdkVersion;
+  const libxmtpVersionSet =
+    libxmtpVersion?.toLowerCase() ?? defaultValues.libxmtpVersion;
+  const identifier = `${nameSet}-${accountAddress}-${installationIdSet}-${sdkVersionSet}-${libxmtpVersionSet}-${env}`;
+  const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
+  const basePath = `${preBasePath}/.data/${namePath}`;
+  const result = `${basePath}/${identifier}`;
+  console.time(`[${nameSet}] - create basePath`);
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
+    console.warn("Creating directory", basePath);
   }
-  const result = `${basePath}/${name.toLowerCase()}-${installationId}-${version}-${env}`;
-  console.timeEnd(`[${name}] - getDbPath`);
+  console.timeEnd(`[${nameSet}] - create basePath`);
+  console.timeEnd(`[${nameSet}] - getDbPath`);
   return result;
 };
 

@@ -7,9 +7,11 @@ async function main() {
   // const client = await Client.create(signer, encryptionKey, {
   //   env,
   // });
-  // console.log(
-  //   `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
-  // );
+  //  console.log(`Agent initialized on`, {
+      inboxId: client.inboxId,
+      accountAddress: client.accountAddress,
+      deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
+    });
   // // Start the message listener in the background.
   // streamMessages(client).catch(console.error);
   // // Run the GM test and wait for its execution ID.

@@ -14,9 +14,11 @@
 
 //       const bobClient = await getXmtpClient("bob", "dev");
 
-//       console.log(
-//         `Agent initialized on ${bobClient.accountAddress}\nSend a message on http://xmtp.chat/dm/${bobClient.accountAddress}`,
-//       );
+//        console.log(`Agent initialized on`, {
+//   inboxId: client.inboxId,
+//   accountAddress: client.accountAddress,
+//   deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
+// });
 
 //       // Start the message listener in the background.
 //       streamMessages(bobClient).catch(console.error);

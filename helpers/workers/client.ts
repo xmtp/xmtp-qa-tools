@@ -96,6 +96,7 @@ export class WorkerClient extends Worker {
       this.installationId,
       this.version,
       this.env,
+      await signer.getAddress(),
     );
 
     console.time(`[${this.name}] Create XMTP client`);

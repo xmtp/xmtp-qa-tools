@@ -102,32 +102,22 @@ export class PersonaFactory {
           personaData = {
             name,
             installationId: defaultValues.installationId,
-            version: defaultValues.version,
+            sdkVersion: defaultValues.sdkVersion,
+            libxmtpVersion: defaultValues.libxmtpVersion,
             walletKey,
             encryptionKey: encryptionKeyHex,
-            dbPath: getDbPath(
-              name,
-              defaultValues.installationId,
-              defaultValues.version,
-              this.env,
-            ),
           };
         } else {
-          const { name, installationId, version } = this.parsePersonaDescriptor(
+          const { name, installationId } = this.parsePersonaDescriptor(
             desc.toString(),
           );
           const { walletKey, encryptionKey } = await this.ensureKeys(name);
-          const dbPath = getDbPath(name, installationId, version, this.env);
-
-          if (!dbPath) {
-            throw new Error("DB path is required");
-          }
 
           personaData = {
             name,
             installationId,
-            version,
-            dbPath,
+            sdkVersion: defaultValues.sdkVersion,
+            libxmtpVersion: defaultValues.libxmtpVersion,
             walletKey,
             encryptionKey,
           };
@@ -137,6 +127,8 @@ export class PersonaFactory {
           ...personaData,
           worker: null,
           client: null,
+          dbPath: "",
+          address: "",
         };
 
         personas.push(persona);
@@ -157,6 +149,13 @@ export class PersonaFactory {
       personas.forEach((persona, index) => {
         persona.worker = workers[index];
         persona.client = clients[index];
+        persona.dbPath = getDbPath(
+          persona.name,
+          persona.installationId,
+          persona.version,
+          this.env,
+          persona.client.accountAddress,
+        );
       });
 
       console.timeEnd(`getWorkers - ${descriptors.join(",")}`);

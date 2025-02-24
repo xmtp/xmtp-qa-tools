@@ -57,9 +57,11 @@ async function main() {
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
-  console.log(
-    `Agent initialized on ${client.accountAddress}\nSend a message on http://xmtp.chat/dm/${client.accountAddress}`,
-  );
+  console.log(`Agent initialized on`, {
+    inboxId: client.inboxId,
+    accountAddress: client.accountAddress,
+    deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
+  });
 
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();

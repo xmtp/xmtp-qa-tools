@@ -21,25 +21,26 @@ let bob: Persona;
 let alice: Persona;
 let joe: Persona;
 let sam: Persona;
-
+let bot: Persona;
 async function main() {
   const logger = createLogger("test-bot");
   overrideConsole(logger);
-  [bob, alice, joe, sam] = await getWorkers(
-    ["bob", "alice", "joe", "sam"],
+  [bob, bot, alice, joe, sam] = await getWorkers(
+    ["bob", "bot", "alice", "joe", "sam"],
     env,
     "test-bot",
   );
 
-  const client = bob.client as Client;
+  const client = bot.client as Client;
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
-  console.log(`Agent initialized on ${client.accountAddress}`);
-  console.log(
-    `Send a message on http://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
-  );
+  console.log(`Agent initialized on`, {
+    inboxId: client.inboxId,
+    accountAddress: client.accountAddress,
+    deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
+  });
 
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();

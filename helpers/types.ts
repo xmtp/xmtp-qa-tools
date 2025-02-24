@@ -12,8 +12,8 @@ export { Client };
 export const defaultValues = {
   amount: 5,
   timeout: 40000,
-  version: "42",
-  binding: "37",
+  sdkVersion: "44",
+  libxmtpVersion: "39",
   installationId: "a",
 };
 
@@ -94,13 +94,15 @@ export interface LogInfo {
 export interface PersonaBase {
   name: string;
   installationId: string;
-  version: string;
-  dbPath: string;
+  sdkVersion: string;
+  libxmtpVersion: string;
   walletKey: string;
   encryptionKey: string;
 }
 
 export interface Persona extends PersonaBase {
   worker: WorkerClient | null;
+  dbPath: string;
   client: Client | null;
+  address: string;
 }
