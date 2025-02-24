@@ -103,6 +103,8 @@ export class WorkerClient extends Worker {
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
       dbPath,
+      // @ts-expect-error: loggingLevel is not typed
+      loggingLevel: process.env.LOGGING_LEVEL,
     });
     console.timeEnd(`[${this.name}] Create XMTP client`);
 

@@ -1848,16 +1848,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:0.0.42":
-  version: 0.0.42
-  resolution: "@xmtp/node-sdk@npm:0.0.42"
+"@xmtp/node-sdk@npm:0.0.43":
+  version: 0.0.43
+  resolution: "@xmtp/node-sdk@npm:0.0.43"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
     "@xmtp/node-bindings": "npm:^0.0.37"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/6163ede6d9cd7bc36b3a237d9a63a8be0041a11a1eefc6f56fefbf7cb8b8cc02c817c4696996a29a4f296d7545fd3172d8ebf8f85e1aeb23dcff917719dfcd10
+  checksum: 10/f77915d61d2428d8ffd4773a468ec2812335460a047e80d3b37e2e31f9d74e14d2aa183b6236f58743007dc4f42e0405f78268be587bd891c541311ca352788d
   languageName: node
   linkType: hard
 
@@ -4723,7 +4723,7 @@ __metadata:
     "@types/node": "npm:^22.13.0"
     "@vitest/coverage-v8": "npm:3.0.6"
     "@vitest/ui": "npm:^3.0.6"
-    "@xmtp/node-sdk": "npm:0.0.42"
+    "@xmtp/node-sdk": "npm:0.0.43"
     alchemy-sdk: "npm:^3.0.0"
     dotenv: "npm:^16.4.7"
     eslint: "npm:^9.19.0"

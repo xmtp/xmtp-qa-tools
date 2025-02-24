@@ -7,6 +7,8 @@ export default defineConfig({
     reporters: ["html", "default"],
     environment: "node",
     watch: false,
+    testTimeout: 100000,
+    hookTimeout: 100000,
     api: {
       host: "0.0.0.0",
       port: 51204,

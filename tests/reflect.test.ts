@@ -6,7 +6,6 @@
 
 // dotenv.config();
 
-// const timeout = 200000; // 20 seconds
 // describe(
 //   "Basic test",
 //   () => {
@@ -36,5 +35,4 @@
 //       expect(true).toBeTruthy();
 //     });
 //   },
-//   timeout,
 // );

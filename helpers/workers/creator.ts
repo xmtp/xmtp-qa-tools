@@ -26,7 +26,7 @@ export interface Persona {
 }
 
 // Default personas as an enum
-export enum DefaultPersonas {
+export enum WorkerNames {
   FABRI = "fabri",
   ELON = "elon",
   ALICE = "alice",

@@ -5,6 +5,7 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../../helpers/client";
+import { defaultValues } from "../../helpers/workers/creator";
 
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, OPENAI_API_KEY } = process.env;
 
@@ -27,7 +28,7 @@ const openai = new OpenAI({ apiKey: OPENAI_API_KEY });
 const env: XmtpEnv = "dev";
 
 async function main() {
-  const dbPath = getDbPath("bot", "gpt", "42", env);
+  const dbPath = getDbPath("bot", "gpt", defaultValues.version, env);
   console.log(`Creating client on the '${env}' network...`);
   const client = await Client.create(signer, encryptionKey, {
     env,
