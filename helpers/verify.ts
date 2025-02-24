@@ -30,7 +30,9 @@ export async function verifyDM(
       const collectMessages = async () => {
         for (let i = 0; i < amount; i++) {
           // Collect up to 5 messages
+          console.time(`[${r.client?.accountAddress}] Collect message`);
           const msg = await stream;
+          console.timeEnd(`[${r.client?.accountAddress}] Collect message`);
           messages.push(msg.message);
         }
         return messages;
@@ -40,10 +42,17 @@ export async function verifyDM(
     });
 
     // Wait a bit before sending messages
+    console.time("helpers/verify.ts: Waited 1 second");
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    await action();
+    console.timeEnd("helpers/verify.ts: Waited 1 second");
 
+    console.time("helpers/verify.ts: Send the dms");
+    await action();
+    console.timeEnd("helpers/verify.ts: Send the dms");
+
+    console.time("helpers/verify.ts: Collect all messages");
     const receivedMessages = await Promise.all(messageCollectors);
+    console.timeEnd("helpers/verify.ts: Collect all messages");
 
     // Flatten and filter out any undefined messages
     const parsedMessageContent = receivedMessages
@@ -70,13 +79,23 @@ export async function verifyMetadataUpdates(
   { fieldName, newValue }: { fieldName: string; newValue: string },
 ) {
   try {
+    console.time("helpers/verify.ts: Setup message promises");
     const messagePromises = receivers.map((r) =>
       r.worker?.stream("group_updated"),
     );
+    console.timeEnd("helpers/verify.ts: Setup message promises");
 
+    console.time("helpers/verify.ts: Waited 2 seconds");
     await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.timeEnd("helpers/verify.ts: Waited 2 seconds");
+
+    console.time("helpers/verify.ts: Sent the group update");
     await action();
+    console.timeEnd("helpers/verify.ts: Sent the group update");
+
+    console.time("helpers/verify.ts: Collect metadata messages");
     const receivedMessages = await Promise.all(messagePromises);
+    console.timeEnd("helpers/verify.ts: Collect metadata messages");
 
     const metadataContent = receivedMessages.map(
       (r) => r?.message.content as GroupMetadataContent,

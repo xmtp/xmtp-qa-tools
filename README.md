@@ -65,7 +65,7 @@ beforeAll(async () => {
 });
 ```
 
-? If a persona does not exist, its keys are created. Personas prefixed with "random" have keys that are stored only in memory.
+> If a persona does not exist, its keys are created. Personas prefixed with "random" have keys that are stored only in memory.
 
 ## Bot Setup
 
@@ -96,6 +96,19 @@ yarn gen:keys [name]
 ```
 
 Replace `[name]` with the desired identifier.
+
+Example:
+
+```bash
+# alice
+WALLET_KEY_ALICE=0x...
+ENCRYPTION_KEY_ALICE=
+# public key is 0x7788b23377c368B571D6ce4DA9B54670409A96d0
+# joe
+WALLET_KEY_JOE=
+ENCRYPTION_KEY_JOE=
+# public key is 0x54469Ef3f6a4e511DA71795D90E7BbC9A4845EE9
+```
 
 ## GitHub Workflows
 

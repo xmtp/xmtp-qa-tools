@@ -78,6 +78,7 @@ export class WorkerClient extends Worker {
    * Returns the XMTP Client object for convenience.
    */
   async initialize(): Promise<Client> {
+    console.time(`[${this.name}] Initialize XMTP client`);
     // Send initialization message to worker
     this.postMessage({
       type: "initialize",
@@ -98,14 +99,23 @@ export class WorkerClient extends Worker {
       this.env,
     );
 
+    console.time(`[${this.name}] Create XMTP client`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
       dbPath,
     });
+    console.timeEnd(`[${this.name}] Create XMTP client`);
 
     // Start streaming in the background
+    console.time(`[${this.name}] Start stream`);
     await this.startStream();
+    console.timeEnd(`[${this.name}] Start stream`);
+
+    console.time(`[${this.name}] Sync conversations`);
     await this.client.conversations.sync();
+    console.timeEnd(`[${this.name}] Sync conversations`);
+
+    console.timeEnd(`[${this.name}] Initialize XMTP client`);
     return this.client;
   }
 
@@ -114,12 +124,15 @@ export class WorkerClient extends Worker {
    * to the parent thread as { type: 'stream_message' } events.
    */
   private async startStream() {
+    console.time(`[${this.name}] Start message stream`);
     const stream = await this.client.conversations.streamAllMessages();
+    console.timeEnd(`[${this.name}] Start message stream`);
     console.log(`[${this.name}] Message stream started`);
 
     void (async () => {
       try {
         for await (const message of stream) {
+          console.time(`[${this.name}] Process message`);
           const workerMessage: WorkerMessage = {
             type: "stream_message",
             message: message as DecodedMessage,
@@ -129,6 +142,7 @@ export class WorkerClient extends Worker {
           if (this.listenerCount("message") > 0) {
             this.emit("message", workerMessage);
           }
+          console.timeEnd(`[${this.name}] Process message`);
         }
       } catch (error) {
         console.error(`[${this.name}] Stream error:`, error);
@@ -143,12 +157,12 @@ export class WorkerClient extends Worker {
    * to resolve once the specified message text arrives.
    */
   stream(typeId: string): Promise<WorkerMessage> {
-    console.log(`[${this.name}] Waiting for message: ${typeId}`);
+    console.log(`[${this.name}] Waiting for message typeId: ${typeId}`);
 
     return new Promise<WorkerMessage>((resolve, reject) => {
       const timeout = setTimeout(() => {
         this.removeListener("message", messageHandler);
-        reject(new Error(`Timeout: Did not receive '${typeId}' in time`));
+        reject(new Error(`[${this.name}] Did not receive '${typeId}' in time`));
       }, 10000);
 
       const messageHandler = (msg: WorkerMessage) => {
@@ -156,7 +170,7 @@ export class WorkerClient extends Worker {
         if (msg.type === "error") {
           clearTimeout(timeout);
           this.removeListener("message", messageHandler);
-          reject(new Error(msg.message.content as string));
+          reject(new Error(`[${this.name}] Error: ${msg.message.content}`));
           return;
         }
 

@@ -195,7 +195,6 @@ export class PersonaFactory {
               this.env,
             ),
           };
-          console.log(personaData);
         } else {
           const { name, installationId, version } = this.parsePersonaDescriptor(
             desc.toString(),

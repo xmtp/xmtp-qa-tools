@@ -86,6 +86,8 @@ describe(testName, () => {
       if (!dmConvo) {
         throw new Error("DM conversation not found");
       }
+
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
       const result = await verifyDM(() => dmConvo.send(message), [sam]);
       expect(result).toEqual([message]);
