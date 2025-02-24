@@ -4,6 +4,7 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
+import { getNetworkStats } from "./logger";
 import { type Persona } from "./workers/creator";
 
 export type { Conversation, DecodedMessage, XmtpEnv };
@@ -42,6 +43,7 @@ export async function verifyNotForked(
     console.time("helpers/verify.ts: Collect all messages");
     console.log("messageCollectors", messageCollectors.length);
     const receivedMessages = await Promise.all(messageCollectors);
+    await getNetworkStats();
     console.timeEnd("helpers/verify.ts: Collect all messages");
 
     console.log("receivedMessages", receivedMessages.length);
@@ -104,6 +106,7 @@ export async function verifyDM(
     console.time("helpers/verify.ts: Collect all messages");
     const receivedMessages = await Promise.all(messageCollectors);
     console.timeEnd("helpers/verify.ts: Collect all messages");
+    await getNetworkStats();
 
     // Flatten and filter out any undefined messages
     const parsedMessageContent = receivedMessages
@@ -156,6 +159,7 @@ export async function verifyMetadataUpdates(
       `helpers/verify.ts: Collect metadata messages + ${fieldName}, ${newValue}`,
     );
     const receivedMessages = await Promise.all(messagePromises);
+    await getNetworkStats();
     console.timeEnd(
       `helpers/verify.ts: Collect metadata messages + ${fieldName}, ${newValue}`,
     );

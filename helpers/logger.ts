@@ -1,7 +1,11 @@
+import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
+import { promisify } from "util";
 import winston from "winston";
 import Transport from "winston-transport";
+
+const execAsync = promisify(exec);
 
 // Custom transport that buffers logs in memory
 interface LogInfo {
@@ -32,13 +36,39 @@ class MemoryTransport extends Transport {
 let sharedLogger: winston.Logger | null = null;
 let memoryTransport: MemoryTransport | null = null;
 // Export a flush function to flush the memory transport logs
-export const flushLogger = (testName: string) => {
+export const flushLogger = async (testName: string) => {
+  await getNetworkStats();
   if (memoryTransport) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
     const logFilePath = path.join("logs", `${sanitizedName}.log`);
     memoryTransport.flush(logFilePath);
   }
 };
+
+export async function getNetworkStats() {
+  const { stdout } = await execAsync(`yarn monitor:network`);
+  const json = JSON.parse(stdout) as {
+    "DNS Lookup": number;
+    "TCP Connection": number;
+    "TLS Handshake": number;
+    "Server Processing": number;
+    "Content Transfer": number;
+  };
+  console.log(json);
+  const tlsTimeinMS = json["TLS Handshake"] * 1000;
+  const totalTimeinMS = json["Content Transfer"] * 1000;
+  const onlyContentTransferTimeinMS = totalTimeinMS - tlsTimeinMS;
+  if (
+    onlyContentTransferTimeinMS > 300 ||
+    tlsTimeinMS > 300 ||
+    totalTimeinMS > 300
+  ) {
+    console.warn(
+      `total: ${totalTimeinMS}ms, tls: ${tlsTimeinMS}ms, processing: ${onlyContentTransferTimeinMS}ms`,
+    );
+  }
+  return json;
+}
 
 export const createLogger = (testName: string) => {
   if (!sharedLogger) {
@@ -87,7 +117,7 @@ export const createLogger = (testName: string) => {
   return sharedLogger;
 };
 
-function filterLog(args: any[], logger: winston.Logger): string {
+function filterLog(args: any[]): string {
   // Check for the console.time/timeEnd pattern: where args[0] is "%s: %s"
   if (args.length >= 2 && args[0] === "%s: %s") {
     // Join the remaining parts into one message

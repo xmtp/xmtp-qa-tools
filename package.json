@@ -12,6 +12,9 @@
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",
     "lint": "eslint .",
+    "monitor:dev": "httpstat  https://grpc.dev.xmtp.network:443",
+    "monitor:live": "bash scripts/monitor.sh",
+    "monitor:network": "bash scripts/network.sh",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest",
     "typecheck": "tsc"

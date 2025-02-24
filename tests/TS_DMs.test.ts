@@ -1,5 +1,10 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import {
+  createLogger,
+  flushLogger,
+  getNetworkStats,
+  overrideConsole,
+} from "../helpers/logger";
 import { verifyDM, type Conversation, type XmtpEnv } from "../helpers/verify";
 import { getWorkers, type Persona } from "../helpers/workers/creator";
 
@@ -16,6 +21,7 @@ describe(testName, () => {
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
+    await getNetworkStats();
     personas = await getWorkers(["bob", "joe", "sam"], env, testName);
     [bob, joe, sam] = personas;
     console.log("bob", bob.client?.accountAddress);
@@ -24,7 +30,7 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
       personas.map(async (persona) => {
         await persona.worker?.terminate();
