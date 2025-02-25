@@ -25,7 +25,6 @@ yarn-error.log*
 
 # logs
 
-*.log
 
 # editor directories and files
 .vscode/*

@@ -1,0 +1,68 @@
+[2025-02-25T14:03:25.314Z] [warn] [dave] Create XMTP client 1.954s
+[2025-02-25T14:03:25.314Z] [info] [dave] Client.version: 436360a
+[2025-02-25T14:03:25.377Z] [warn] [elon] Create XMTP client 2.018s
+[2025-02-25T14:03:25.377Z] [info] [elon] Client.version: 436360a
+[2025-02-25T14:03:25.501Z] [warn] [bella] Create XMTP client 2.143s
+[2025-02-25T14:03:25.502Z] [info] [bella] Client.version: 436360a
+[2025-02-25T14:03:25.612Z] [warn] [diana] Create XMTP client 2.254s
+[2025-02-25T14:03:25.612Z] [info] [diana] Client.version: 436360a
+[2025-02-25T14:03:25.678Z] [warn] [dave] Start message stream 363.525ms
+[2025-02-25T14:03:25.678Z] [info] [dave] Message stream started
+[2025-02-25T14:03:25.678Z] [warn] [dave] Start stream 364.073ms
+[2025-02-25T14:03:25.741Z] [warn] [elon] Start message stream 363.453ms
+[2025-02-25T14:03:25.741Z] [info] [elon] Message stream started
+[2025-02-25T14:03:25.741Z] [warn] [elon] Start stream 364.016ms
+[2025-02-25T14:03:25.876Z] [warn] [bella] Start message stream 374.256ms
+[2025-02-25T14:03:25.877Z] [info] [bella] Message stream started
+[2025-02-25T14:03:25.877Z] [warn] [bella] Start stream 374.779ms
+[2025-02-25T14:03:25.979Z] [warn] [diana] Start message stream 366.125ms
+[2025-02-25T14:03:25.979Z] [info] [diana] Message stream started
+[2025-02-25T14:03:25.979Z] [warn] [diana] Start stream 366.588ms
+[2025-02-25T14:03:26.037Z] [warn] [dave] Sync conversations 357.782ms
+[2025-02-25T14:03:26.037Z] [warn] [dave] Initialize XMTP client 2.682s
+[2025-02-25T14:03:26.106Z] [warn] [elon] Sync conversations 364.895ms
+[2025-02-25T14:03:26.107Z] [warn] [elon] Initialize XMTP client 2.751s
+[2025-02-25T14:03:26.255Z] [warn] [bella] Sync conversations 378.125ms
+[2025-02-25T14:03:26.255Z] [warn] [bella] Initialize XMTP client 2.922s
+[2025-02-25T14:03:26.347Z] [warn] [diana] Sync conversations 367.476ms
+[2025-02-25T14:03:26.347Z] [warn] [diana] Initialize XMTP client 2.990s
+[2025-02-25T14:03:26.869Z] [warn] [random] Create XMTP client 3.510s
+[2025-02-25T14:03:26.869Z] [info] [random] Client.version: 436360a
+[2025-02-25T14:03:27.247Z] [warn] [random] Start message stream 377.87ms
+[2025-02-25T14:03:27.247Z] [info] [random] Message stream started
+[2025-02-25T14:03:27.248Z] [warn] [random] Start stream 378.758ms
+[2025-02-25T14:03:27.611Z] [warn] [random] Sync conversations 362.342ms
+[2025-02-25T14:03:27.611Z] [warn] [random] Initialize XMTP client 4.253s
+[2025-02-25T14:03:27.612Z] [warn] createPersonas - bella,dave,elon,diana,random 4.283s
+[2025-02-25T14:03:27.613Z] [warn] getWorkers 4.283s
+[2025-02-25T14:03:31.371Z] [warn] newGroup 3.756s
+[2025-02-25T14:03:31.372Z] [info] [elon] Collecting 1 messages of type text
+[2025-02-25T14:03:32.374Z] [info] Sending payload: gm-1-w08vkfzao9k
+[2025-02-25T14:03:32.934Z] [info] [elon] Collected message: gm-1-w08vkfzao9k
+[2025-02-25T14:03:33.313Z] [info] All participants received the expected number of messages.
+[2025-02-25T14:03:33.316Z] [info] [elon] Collecting 1 messages of type group_updated
+[2025-02-25T14:03:34.318Z] [info] Sending payload: New name-1-url4ttn9txl
+[2025-02-25T14:03:34.707Z] [info] [elon] Collected message: [object Object]
+[2025-02-25T14:03:35.055Z] [info] All participants received the expected number of messages.
+[2025-02-25T14:03:35.056Z] [warn] updateName 1.741s
+[2025-02-25T14:03:35.057Z] [info] [elon] Collecting 1 messages of type text
+[2025-02-25T14:03:36.059Z] [info] Sending payload: gm-1-fpkpx6t9plv
+[2025-02-25T14:03:36.244Z] [info] [elon] Collected message: gm-1-fpkpx6t9plv
+[2025-02-25T14:03:36.612Z] [info] All participants received the expected number of messages.
+[2025-02-25T14:03:37.364Z] [warn] addMembers 750.794ms
+[2025-02-25T14:03:37.367Z] [info] [elon] Collecting 1 messages of type text
+[2025-02-25T14:03:38.370Z] [info] Sending payload: gm-1-ok4e90al0u
+[2025-02-25T14:03:38.950Z] [info] [elon] Collected message: gm-1-ok4e90al0u
+[2025-02-25T14:03:39.319Z] [info] All participants received the expected number of messages.
+[2025-02-25T14:03:40.904Z] [warn] removeMembers 1.583s
+[2025-02-25T14:03:40.906Z] [info] [dave] Collecting 1 messages of type text
+[2025-02-25T14:03:40.906Z] [info] [elon] Collecting 1 messages of type text
+[2025-02-25T14:03:40.906Z] [info] [diana] Collecting 1 messages of type text
+[2025-02-25T14:03:41.908Z] [info] Sending payload: gm-1-brhjojy0gok
+[2025-02-25T14:03:42.100Z] [info] [elon] Collected message: gm-1-brhjojy0gok
+[2025-02-25T14:03:42.103Z] [info] [dave] Collected message: gm-1-brhjojy0gok
+[2025-02-25T14:03:42.103Z] [info] [diana] Collected message: gm-1-brhjojy0gok
+[2025-02-25T14:03:42.474Z] [info] All participants received the expected number of messages.
+[2025-02-25T14:03:42.474Z] [warn] verifyStream 1.570s
+[2025-02-25T14:03:43.757Z] [info] {"DNS Lookup":0.00177,"TCP Connection":0.001949,"TLS Handshake":0.517371,"Server Processing":0.844076,"Content Transfer":0.84422}
+[2025-02-25T14:03:43.757Z] [warn] total: 844.22ms, tls: 517.371ms, processing: 326.84900000000005ms
