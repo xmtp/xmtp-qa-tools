@@ -5,27 +5,28 @@ on:
   schedule:
     - cron: "0 */5 * * *" # This cron expression means every 5 minutes
   workflow_dispatch:
-    jobs:
-      test:
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v4
-          - uses: actions/setup-node@v4
-            with:
-              node-version-file: ".node-version"
-              cache: "yarn"
-            env:
-              SKIP_YARN_COREPACK_CHECK: "1"
-          - run: corepack enable
-          - run: yarn
-          - name: Run tests with retry
-          - run: |
-              for i in {1..3}; do
-                echo "Attempt $i..."
-                yarn test TS_Performance && break
-                if [ $i -eq 3 ]; then
-                  echo "Test failed after 3 attempts."
-                  exit 1
-                fi
-                sleep 10
-              done
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - run: corepack enable
+      - run: yarn
+      - name: Run tests with retry
+      - run: |
+          for i in {1..3}; do
+            echo "Attempt $i..."
+            yarn test TS_Performance && break
+            if [ $i -eq 3 ]; then
+              echo "Test failed after 3 attempts."
+              exit 1
+            fi
+            sleep 10
+          done
