@@ -12,18 +12,15 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 ## Steps to reproduce
 
-1. Run the test TS_Create_Installations.test.ts.
+1. Check out the logs [libxmtp](./libxmtp.logs)
+2. Env file to reproduce
 2. Observe the panic during the creation of installations.
 3. Review the logs in libxmtp.logs and TS_Group_installations_dev.log for further details.
 
-## Expected behavior
+## Running test
 
-The installation process should complete without triggering a panic and handle errors gracefully.
-
-## Additional logs
-
-Refer to the log files in this directory for more context on the error occurrence.
-
-## Notes
-
-This bug is tracked under the code @bug_panic_creating.
+```bash
+yarn
+yarn build
+yarn test bug_panic_creating_dev
+```
