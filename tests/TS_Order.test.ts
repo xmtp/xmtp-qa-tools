@@ -1,18 +1,19 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
+  defaultValues,
   WorkerNames,
   type Conversation,
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
+import { verifyStream } from "../helpers/workers/stream";
 
 const amount = 30; // Number of messages to collect per receiver
 const testName = "TS_Order";
 const env: XmtpEnv = "dev";
-const timeoutMax = 100000;
+const timeoutMax = amount * defaultValues.perMessageTimeout;
 describe(
   "TC_StreamOrder: should verify message order when receiving via streams",
   () => {

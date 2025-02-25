@@ -4,14 +4,20 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import type { WorkerClient } from "./workers/streams";
+import type { WorkerClient } from "./workers/stream";
 
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };
+// Define the expected return type of verifyStream
+export type VerifyStreamResult = {
+  allReceived: boolean;
+  messages: string[][];
+};
 
 export const defaultValues = {
   amount: 5,
   timeout: 40000,
+  perMessageTimeout: 1000,
   sdkVersion: "44",
   libxmtpVersion: "39",
   installationId: "a",
@@ -94,6 +100,9 @@ export enum WorkerNames {
   VINCE = "vince",
   WALT = "walt",
   XENA = "xena",
+  YARA = "yara",
+  ZARA = "zara",
+  GUADA = "guada",
 }
 
 // Custom transport that buffers logs in memory

@@ -5,8 +5,8 @@ import {
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
+import { verifyStream } from "../helpers/workers/stream";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_DMs_" + env;

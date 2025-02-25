@@ -2,12 +2,15 @@ name: Scheduled test
 
 on:
   schedule:
-    - cron: "0 */2 * * *" # This cron expression means every 2 hours
+    - cron: "0 */5 * * *" # This cron expression means every 5 minutes
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      max_attempts: 3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -18,4 +21,4 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - run: yarn test streams
+      - run: yarn test TS_Stream_Loss
