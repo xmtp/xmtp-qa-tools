@@ -1,28 +1,29 @@
-[2025-02-25T18:26:57.826Z] [info] [PersonaFactory] Creating personas: bob, joe, sam
-[2025-02-25T18:26:59.727Z] [warn] [sam] Create XMTP client v:436360a 1.864s
-[2025-02-25T18:26:59.816Z] [warn] [bob] Create XMTP client v:436360a 1.953s
-[2025-02-25T18:26:59.890Z] [warn] [joe] Create XMTP client v:436360a 2.026s
-[2025-02-25T18:27:00.119Z] [warn] [sam] Start message stream 391.332ms
-[2025-02-25T18:27:00.119Z] [info] [sam] Message stream started
-[2025-02-25T18:27:00.120Z] [warn] [sam] Start stream 393.203ms
-[2025-02-25T18:27:00.204Z] [warn] [bob] Start message stream 387.63ms
-[2025-02-25T18:27:00.205Z] [info] [bob] Message stream started
-[2025-02-25T18:27:00.206Z] [warn] [bob] Start stream 389.401ms
-[2025-02-25T18:27:00.265Z] [warn] [joe] Start message stream 373.95ms
-[2025-02-25T18:27:00.265Z] [info] [joe] Message stream started
-[2025-02-25T18:27:00.265Z] [warn] [joe] Start stream 374.634ms
-[2025-02-25T18:27:00.463Z] [warn] [sam] Sync conversations 341.083ms
-[2025-02-25T18:27:00.463Z] [warn] [sam] Initialize XMTP client 2.602s
-[2025-02-25T18:27:00.581Z] [warn] [bob] Sync conversations 374.077ms
-[2025-02-25T18:27:00.581Z] [warn] [bob] Initialize XMTP client 2.751s
-[2025-02-25T18:27:00.621Z] [warn] [joe] Sync conversations 354.98ms
-[2025-02-25T18:27:00.622Z] [warn] [joe] Initialize XMTP client 2.761s
-[2025-02-25T18:27:00.623Z] [info] bob 0x5f276F28D44eaBEe2B53a593e7C803BcFe349508
-[2025-02-25T18:27:00.624Z] [info] joe 0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399
-[2025-02-25T18:27:00.624Z] [info] sam 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
-[2025-02-25T18:27:02.832Z] [info] [bob] Creating DM with sam at 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
-[2025-02-25T18:27:04.975Z] [info] [sam] Collecting 1 'text' messages containing 'mn3i5ybb5b8' from convo 'f78bfbdcc5c979554bc41e8ab8492b0e'
-[2025-02-25T18:27:04.976Z] [info] Sending message #1: gm-1-mn3i5ybb5b8
-[2025-02-25T18:27:05.537Z] [info] All participants received the expected number of messages.
-[2025-02-25T18:27:06.652Z] [info] {"DNS Lookup":0.001776,"TCP Connection":0.001973,"TLS Handshake":0.542417,"Server Processing":0.865266,"Content Transfer":0.865314}
-[2025-02-25T18:27:06.653Z] [warn] total: 865.3140000000001ms, tls: 542.417ms, processing: 322.89700000000005ms
+[2025-02-25T21:36:25.587Z] [info] [PersonaFactory] Creating personas: bob, joe, sam for TS_DMs_dev
+[2025-02-25T21:36:25.614Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-undefined-dev
+[2025-02-25T21:36:25.615Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-undefined-dev
+[2025-02-25T21:36:25.615Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/sam/sam-0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834-a-44-undefined-dev
+[2025-02-25T21:36:27.539Z] [warn] [sam] Create XMTP client v:436360a 1.924s
+[2025-02-25T21:36:27.639Z] [warn] [bob] Create XMTP client v:436360a 2.024s
+[2025-02-25T21:36:27.684Z] [warn] [joe] Create XMTP client v:436360a 2.070s
+[2025-02-25T21:36:27.905Z] [warn] [sam] Start message stream 365.909ms
+[2025-02-25T21:36:27.905Z] [info] [sam] Message stream started
+[2025-02-25T21:36:27.906Z] [warn] [sam] Start stream 366.536ms
+[2025-02-25T21:36:28.008Z] [warn] [bob] Start message stream 369.098ms
+[2025-02-25T21:36:28.008Z] [info] [bob] Message stream started
+[2025-02-25T21:36:28.008Z] [warn] [bob] Start stream 369.512ms
+[2025-02-25T21:36:28.050Z] [warn] [joe] Start message stream 365.546ms
+[2025-02-25T21:36:28.050Z] [info] [joe] Message stream started
+[2025-02-25T21:36:28.051Z] [warn] [joe] Start stream 366.006ms
+[2025-02-25T21:36:28.269Z] [warn] [sam] Sync conversations 363.651ms
+[2025-02-25T21:36:28.270Z] [warn] [sam] Initialize XMTP client 2.656s
+[2025-02-25T21:36:28.381Z] [warn] [bob] Sync conversations 372.466ms
+[2025-02-25T21:36:28.381Z] [warn] [bob] Initialize XMTP client 2.792s
+[2025-02-25T21:36:28.420Z] [warn] [joe] Sync conversations 368.696ms
+[2025-02-25T21:36:28.420Z] [warn] [joe] Initialize XMTP client 2.807s
+[2025-02-25T21:36:28.420Z] [info] bob 0x5f276F28D44eaBEe2B53a593e7C803BcFe349508
+[2025-02-25T21:36:28.420Z] [info] joe 0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399
+[2025-02-25T21:36:28.420Z] [info] sam 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
+[2025-02-25T21:36:28.751Z] [info] [bob] Creating DM with sam at 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
+[2025-02-25T21:36:30.865Z] [info] [sam] Collecting 1 'text' messages containing 'ynssynxz09' from convo '0cbd74e900e4008f8eae0230fd00c036'
+[2025-02-25T21:36:30.865Z] [info] Sending message #1: gm-1-ynssynxz09
+[2025-02-25T21:36:31.412Z] [info] All participants received the expected number of messages.

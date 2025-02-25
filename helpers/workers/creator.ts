@@ -3,7 +3,7 @@ import { promisify } from "util";
 import { type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
-import { generateEncryptionKeyHex, getDbPath } from "../client";
+import { generateEncryptionKeyHex } from "../client";
 import {
   defaultValues,
   WorkerNames,
@@ -22,7 +22,7 @@ const execAsync = promisify(exec);
  */
 export class PersonaFactory {
   private env: XmtpEnv;
-  private testName: string; // Not currently used, but preserved for potential future logic
+  private testName: string;
 
   constructor(env: XmtpEnv, testName: string) {
     this.env = env;
@@ -73,17 +73,14 @@ export class PersonaFactory {
     defaults: {
       installationId: string;
       sdkVersion: string;
-      libxmtpVersion: string;
     } = {
       installationId: defaultValues.installationId,
       sdkVersion: defaultValues.sdkVersion,
-      libxmtpVersion: defaultValues.libxmtpVersion,
     },
   ): {
     name: string;
     installationId: string;
     sdkVersion: string;
-    libxmtpVersion: string;
   } {
     const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
     const match = descriptor.match(regex);
@@ -99,7 +96,6 @@ export class PersonaFactory {
       name: baseName,
       installationId: inst || defaults.installationId,
       sdkVersion: ver || defaults.sdkVersion,
-      libxmtpVersion: ver || defaults.libxmtpVersion,
     };
   }
 
@@ -112,7 +108,7 @@ export class PersonaFactory {
    */
   public async createPersonas(descriptors: string[]): Promise<Persona[]> {
     console.log(
-      `[PersonaFactory] Creating personas: ${descriptors.join(", ")}`,
+      `[PersonaFactory] Creating personas: ${descriptors.join(", ")} for ${this.testName}`,
     );
     const personas: Persona[] = [];
 
@@ -127,23 +123,23 @@ export class PersonaFactory {
 
         personaData = {
           name: desc,
+          testName: this.testName,
           installationId: defaultValues.installationId,
           sdkVersion: defaultValues.sdkVersion,
-          libxmtpVersion: defaultValues.libxmtpVersion,
           walletKey,
           encryptionKey: encryptionKeyHex,
         };
       } else {
         // Use or generate keys from environment
-        const { name, installationId, sdkVersion, libxmtpVersion } =
+        const { name, installationId, sdkVersion } =
           this.parsePersonaDescriptor(desc);
         const { walletKey, encryptionKey } = await this.ensureKeys(name);
 
         personaData = {
           name,
+          testName: this.testName,
           installationId,
           sdkVersion,
-          libxmtpVersion,
           walletKey,
           encryptionKey,
         };
@@ -166,19 +162,12 @@ export class PersonaFactory {
 
     // Initialize each worker's XMTP client in parallel
     const clients = await Promise.all(workers.map((w) => w.initialize()));
-
     // Attach worker, client, dbPath, etc. to each persona
     personas.forEach((p, index) => {
       p.worker = workers[index];
-      p.client = clients[index];
-      p.dbPath = getDbPath(
-        p.name,
-        p.client.accountAddress || "unknown",
-        this.env,
-        p.installationId,
-        p.sdkVersion,
-        p.libxmtpVersion,
-      );
+      p.client = clients[index].client;
+      p.dbPath = clients[index].dbPath;
+      p.version = clients[index].version;
     });
 
     return personas;

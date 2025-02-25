@@ -19,7 +19,6 @@ export const defaultValues = {
   timeout: 40000,
   perMessageTimeout: 2000,
   sdkVersion: "44",
-  libxmtpVersion: "39",
   installationId: "a",
 };
 export type WorkerMessage = {
@@ -117,9 +116,9 @@ export interface PersonaBase {
   name: string;
   installationId: string;
   sdkVersion: string;
-  libxmtpVersion: string;
   walletKey: string;
   encryptionKey: string;
+  testName: string;
 }
 
 export interface Persona extends PersonaBase {

@@ -22,7 +22,7 @@ const env: XmtpEnv = "dev";
 
 async function main() {
   const clientAddress = await signer.getAddress();
-  const dbPath = getDbPath("  group", clientAddress, env);
+  const dbPath = getDbPath("gated-group", clientAddress, env);
 
   console.log(`Creating client on the '${env}' network...`);
   const client = await Client.create(signer, encryptionKey, {

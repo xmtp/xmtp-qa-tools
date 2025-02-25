@@ -31,7 +31,7 @@ export class WorkerClient extends Worker {
   private installationId: string;
   private env: XmtpEnv;
   private sdkVersion: string;
-  private libxmtpVersion: string;
+  private testName: string;
 
   private walletKey: string;
   private encryptionKeyHex: string;
@@ -51,8 +51,8 @@ export class WorkerClient extends Worker {
     this.name = persona.name;
     this.installationId = persona.installationId;
     this.sdkVersion = persona.sdkVersion;
-    this.libxmtpVersion = persona.libxmtpVersion;
     this.env = env;
+    this.testName = persona.testName;
     this.walletKey = persona.walletKey;
     this.encryptionKeyHex = persona.encryptionKey;
 
@@ -80,7 +80,11 @@ export class WorkerClient extends Worker {
    * Initializes the underlying XMTP client in the Worker.
    * Returns the XMTP Client object for convenience.
    */
-  async initialize(): Promise<Client> {
+  async initialize(): Promise<{
+    client: Client;
+    dbPath: string;
+    version: string;
+  }> {
     console.time(`[${this.name}] Initialize XMTP client`);
 
     // Tell the Worker to do any internal initialization
@@ -90,23 +94,26 @@ export class WorkerClient extends Worker {
         name: this.name,
         installationId: this.installationId,
         sdkVersion: this.sdkVersion,
-        libxmtpVersion: this.libxmtpVersion,
       },
     });
 
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-
+    const version = Client.version.match(/ci@([a-f0-9]+)/)?.[1];
     const dbPath = getDbPath(
       this.name,
       await signer.getAddress(),
       this.env,
-      this.installationId,
-      this.sdkVersion,
-      this.libxmtpVersion,
+      {
+        installationId: this.installationId,
+        sdkVersion: this.sdkVersion,
+        version: version,
+      },
+      {
+        testName: this.testName,
+      },
     );
-
-    const version = Client.version.match(/ci@([a-f0-9]+)/)?.[1];
+    console.log("dbPath", dbPath);
     console.time(`[${this.name}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
@@ -127,7 +134,7 @@ export class WorkerClient extends Worker {
     console.timeEnd(`[${this.name}] Sync conversations`);
 
     console.timeEnd(`[${this.name}] Initialize XMTP client`);
-    return this.client;
+    return { client: this.client, dbPath, version: Client.version };
   }
 
   /**

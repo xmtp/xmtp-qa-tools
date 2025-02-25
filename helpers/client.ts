@@ -22,9 +22,14 @@ export const getDbPath = (
   name: string,
   accountAddress: string,
   env: string,
-  installationId?: string,
-  sdkVersion?: string,
-  libxmtpVersion?: string,
+  instance?: {
+    installationId?: string;
+    sdkVersion?: string;
+    libxmtpVersion?: string;
+  },
+  tests?: {
+    testName: string;
+  },
 ): string => {
   console.time(`[${name}] - getDbPath`);
   // const namePath = name.toLowerCase().includes("random")
@@ -32,15 +37,16 @@ export const getDbPath = (
   //   : name.toLowerCase();
   const nameSet = name.toLowerCase();
   const installationIdSet =
-    installationId?.toLowerCase() ?? defaultValues.installationId;
-  const sdkVersionSet = sdkVersion?.toLowerCase() ?? defaultValues.sdkVersion;
-  const libxmtpVersionSet =
-    libxmtpVersion?.toLowerCase() ?? defaultValues.libxmtpVersion;
+    instance?.installationId?.toLowerCase() ?? defaultValues.installationId;
+  const sdkVersionSet =
+    instance?.sdkVersion?.toLowerCase() ?? defaultValues.sdkVersion;
+  const libxmtpVersionSet = instance?.libxmtpVersion?.toLowerCase();
   const identifier = `${nameSet}-${accountAddress}-${installationIdSet}-${sdkVersionSet}-${libxmtpVersionSet}-${env}`;
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
-  const basePath = `${preBasePath}/.data/${nameSet}`;
-  const result = `${basePath}/${identifier}`;
-
+  let basePath = `${preBasePath}/.data/${nameSet}`;
+  if (tests && tests.testName && tests.testName.includes("bug")) {
+    basePath = `${preBasePath}/bugs/${tests.testName}/.data/${nameSet}`;
+  }
   console.time(`[${nameSet}] - create basePath`);
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
@@ -48,7 +54,7 @@ export const getDbPath = (
   }
   console.timeEnd(`[${nameSet}] - create basePath`);
   console.timeEnd(`[${nameSet}] - getDbPath`);
-  return result;
+  return `${basePath}/${identifier}`;
 };
 
 export const generateEncryptionKeyHex = () => {
