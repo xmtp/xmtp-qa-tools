@@ -10,6 +10,8 @@ coverage
 .data/
 !bugs/**/.data/
 !bugs/**/.data/.env
+!bugs/**/.data/**/.env
+
 # misc
 .DS_Store
 *.pem
@@ -18,8 +20,6 @@ coverage
 yarn-debug.log*
 yarn-error.log*
 
-# local env files
-.env*
 !.env.example
 
 # turbo
