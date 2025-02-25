@@ -4,30 +4,45 @@
  * This file is loaded by the Worker's inline `tsImport(...)`.
  * You can do any required initialization for your worker environment here.
  */
+
 import { parentPort, workerData } from "node:worker_threads";
 import type { Client } from "@xmtp/node-sdk";
 
-// Ensure we have parentPort
+// The Worker must be run in a worker thread, so confirm `parentPort` is defined
 if (!parentPort) {
   throw new Error("This module must be run as a worker thread");
 }
 
-// Set up message handling from parent
+// Optional logs to see what's being passed into the worker.
+console.log("[Worker] Started with workerData:", workerData);
+
+// Listen for messages from the parent
 parentPort.on("message", (message: { type: string; data: any }) => {
-  if (message.type === "initialize") {
-    // Handle initialization
-    console.log("Worker initializing with data:", message);
+  switch (message.type) {
+    case "initialize":
+      // You can add logs or do any one-time setup here.
+      console.log("[Worker] Received 'initialize' message:", message.data);
+      break;
+
+    default:
+      console.log(`[Worker] Received unknown message type: ${message.type}`);
+      break;
   }
 });
 
-// Export for type checking
+// If you need to keep the worker alive, do so here. In many setups,
+// simply running an async stream or event loop is enough.
+// The actual XMTP logic runs in the parent (WorkerClient), so usually
+// there is nothing else you must do here aside from listening for parent messages.
+
+// Optional error handling for unhandled exceptions in the worker
+process.on("unhandledRejection", (reason) => {
+  console.error("[Worker] Unhandled Rejection:", reason);
+});
+
+process.on("uncaughtException", (error) => {
+  console.error("[Worker] Uncaught Exception:", error);
+});
+
+// Re-export anything needed in the worker environment (if necessary)
 export type { Client };
-
-// Optional: If you need a top-level await or additional logging, do it here.
-// In many setups, you might not need anything special.
-// The actual logic is mostly inside WorkerClient.
-
-console.log("Worker started with workerData:", workerData);
-
-// If you need to keep the worker alive explicitly, do so here.
-// Otherwise, once the parent thread ends, the worker will close as well.
