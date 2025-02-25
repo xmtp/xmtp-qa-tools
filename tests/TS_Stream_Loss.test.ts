@@ -13,7 +13,7 @@ const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
 
 const amountofMessages = 2; // Number of messages to collect per receiver
-const receivers = 2;
+const receivers = 10;
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax =
   amountofMessages * receivers * defaultValues.perMessageTimeout;
