@@ -277,7 +277,6 @@ export async function verifyStream<T>(
   // Wait for collectors
   const collectedMessages = await Promise.all(collectPromises);
   const allReceived = collectedMessages.every((msgs) => msgs?.length === count);
-  console.log(collectedMessages);
   if (!allReceived) {
     console.error(
       "Not all participants received the expected number of messages.",
