@@ -1,5 +1,5 @@
-name: Scheduled test
-
+name: TS_Stream_Loss
+description: "should verify message loss when receiving via 200 streams"
 on:
   schedule:
     - cron: "0 */5 * * *" # This cron expression means every 5 minutes

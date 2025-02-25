@@ -1,4 +1,5 @@
-name: Scheduled test
+name: TS_Performance
+description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
