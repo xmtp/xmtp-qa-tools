@@ -42,8 +42,8 @@ describe(testName, () => {
 
   beforeAll(async () => {
     // Simple generator and sender for "gm" messages.
-    gmMessageGenerator = async (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
+    gmMessageGenerator = (i: number, suffix: string) => {
+      return Promise.resolve(`gm-${i + 1}-${suffix}`);
     };
     gmSender = async (convo: Conversation, message: string) => {
       await convo.send(message);
@@ -164,8 +164,8 @@ describe(testName, () => {
     const start = performance.now();
     console.time("update group name");
 
-    const nameUpdateGenerator = async (i: number, suffix: string) => {
-      return `New name-${i + 1}-${suffix}`;
+    const nameUpdateGenerator = (i: number, suffix: string) => {
+      return Promise.resolve(`New name-${i + 1}-${suffix}`);
     };
 
     const nameUpdater = async (group: Conversation, newName: string) => {
