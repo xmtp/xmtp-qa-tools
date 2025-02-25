@@ -24,7 +24,7 @@ yarn-error.log*
 .turbo
 
 # logs
-logs
+
 *.log
 
 # editor directories and files
