@@ -23,11 +23,10 @@ import { verifyStream } from "../helpers/workers/stream";
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
 
-// 4-second limit per test
-const MAX_TEST_DURATION_MS = 4000;
+const MAX_TEST_DURATION_MS = process.env.GITHUB_ACTIONS ? 1000 : 4000;
 
 // If some of the actions are especially large or complex, you may need to raise the limit.
-function expectUnder4Seconds(duration: number) {
+function expectUnderSeconds(duration: number) {
   // If your environment is slow, increase or remove as needed
   expect(duration).toBeLessThan(MAX_TEST_DURATION_MS);
   console.log(`Test took ${duration}ms`);
@@ -83,7 +82,7 @@ describe(testName, () => {
 
     expect(dmConvo).toBeDefined();
     expect(dmConvo.id).toBeDefined();
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_SendGM: should measure sending a gm", async () => {
@@ -105,7 +104,7 @@ describe(testName, () => {
     console.log("TC_SendGM duration:", duration, "ms");
 
     expect(dmId).toBeDefined();
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_ReceiveGM: should measure receiving a gm", async () => {
@@ -136,7 +135,7 @@ describe(testName, () => {
     console.log("TC_ReceiveGM duration:", duration, "ms");
 
     expect(verifyResult.allReceived).toBe(true);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_CreateGroup: should measure creating a group", async () => {
@@ -157,7 +156,7 @@ describe(testName, () => {
     console.log("TC_CreateGroup duration:", duration, "ms");
 
     expect(bobsGroup.id).toBeDefined();
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_UpdateGroupName: should create a group and update group name", async () => {
@@ -187,7 +186,7 @@ describe(testName, () => {
     console.log("TC_UpdateGroupName duration:", duration, "ms");
     console.log(result);
     expect(result.allReceived).toBe(true);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
@@ -207,7 +206,7 @@ describe(testName, () => {
     console.log("TC_AddMembers duration:", duration, "ms");
 
     expect(members.length).toBe(previousMembers.length + 1);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
@@ -227,7 +226,7 @@ describe(testName, () => {
     console.log("TC_RemoveMembers duration:", duration, "ms");
 
     expect(members.length).toBe(previousMembers.length - 1);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_SendGroupMessage: should measure sending a gm in a group", async () => {
@@ -242,7 +241,7 @@ describe(testName, () => {
     console.log("TC_SendGroupMessage duration:", duration, "ms");
 
     expect(groupMessage).toBeDefined();
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
@@ -260,7 +259,7 @@ describe(testName, () => {
     console.log("TC_ReceiveGroupMessage (1 stream) duration:", duration, "ms");
 
     expect(verifyResult.allReceived).toBe(true);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 
   it("TC_ReceiveGroupMessage: should create a group and measure multiple streams catching a message", async () => {
@@ -291,6 +290,6 @@ describe(testName, () => {
     );
 
     expect(verifyResult.allReceived).toBe(true);
-    expectUnder4Seconds(duration);
+    expectUnderSeconds(duration);
   });
 });

@@ -1,16 +1,14 @@
 name: TS_Stream_Loss
 description: "should verify message loss when receiving via 200 streams"
+
 on:
   schedule:
-    - cron: "0 */5 * * *" # This cron expression means every 5 minutes
+    - cron: "0 */2 * * *" # This cron expression means every 2 hours
   workflow_dispatch:
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      max_attempts: 3
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -21,4 +19,14 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - run: yarn test TS_Stream_Loss
+      - name: Run tests with retry
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i..."
+            yarn test TS_Stream_Loss && break
+            if [ $i -eq 3 ]; then
+              echo "Test failed after 3 attempts."
+              exit 1
+            fi
+            sleep 10
+          done
