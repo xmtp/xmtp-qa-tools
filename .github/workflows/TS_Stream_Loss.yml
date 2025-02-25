@@ -27,7 +27,7 @@ jobs:
           path: |
             .data
             .env
-          key: ${{ runner.os }}-data-env-${{ hashFiles('.data/**', '.env') }}
+          key: ${{ runner.os }}-data-env-${{ hashFiles('.data/**', '.env') }}-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-data-env-
           enableCrossOsArchive: false
