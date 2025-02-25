@@ -1841,23 +1841,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:^0.0.37":
-  version: 0.0.37
-  resolution: "@xmtp/node-bindings@npm:0.0.37"
-  checksum: 10/06d12ee27f306a2ad767b75eedf3ceb0457cab3f574a545f44e487cbb39d07a3866c81277954a4937dc1f048a75c10b34b5ffa5de4fc43eaf9b1310a1c4dce8a
+"@xmtp/node-bindings@npm:^0.0.38":
+  version: 0.0.38
+  resolution: "@xmtp/node-bindings@npm:0.0.38"
+  checksum: 10/a9452a913cdda5cd050b91ed34358b8975524d1c5e6434db51b1d60f13a29069b531ee566811ab4ed339713ad0e041e83f24fc916684c968c322ba63f21319f3
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:0.0.44":
-  version: 0.0.44
-  resolution: "@xmtp/node-sdk@npm:0.0.44"
+"@xmtp/node-sdk@npm:0.0.45":
+  version: 0.0.45
+  resolution: "@xmtp/node-sdk@npm:0.0.45"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.37"
+    "@xmtp/node-bindings": "npm:^0.0.38"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/7f22849b085ab547d8d4c687ab74f4e1bf23aa5893eb2ac630facc28230aab828a176b5365fc80486ed6517ccd7c4d0dc229887d677b45c22ec566f22b10b891
+  checksum: 10/70eb659105a585e651f9c9a538b98014476212a1023308b88012317a5c64e58b4a2d920891c131e763d449823cb8d1e126a4041ff73a803b5593702f43c08e8c
   languageName: node
   linkType: hard
 
@@ -4723,7 +4723,7 @@ __metadata:
     "@types/node": "npm:^22.13.0"
     "@vitest/coverage-v8": "npm:3.0.6"
     "@vitest/ui": "npm:^3.0.6"
-    "@xmtp/node-sdk": "npm:0.0.44"
+    "@xmtp/node-sdk": "npm:0.0.45"
     alchemy-sdk: "npm:^3.0.0"
     dotenv: "npm:^16.4.7"
     eslint: "npm:^9.19.0"
