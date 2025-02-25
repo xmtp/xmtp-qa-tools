@@ -10,12 +10,6 @@ thread 'tokio-runtime-worker' panicked at /Users/runner/work/libxmtp/libxmtp/xmt
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
-## Reproduce
-
-### Test
-
-- Test [code](./test.test.ts)
-
 ### Logs
 
 - [libxmtp](./libxmtp.log) log
@@ -23,6 +17,7 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 
 ### Environment
 
+- Test [code](./test.test.ts)
 - [./data](./.data) folder
 - [env](./env.example) file
 
