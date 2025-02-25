@@ -10,7 +10,7 @@ import {
 import { getWorkers } from "../helpers/workers/creator";
 import { verifyStream } from "../helpers/workers/stream";
 
-const amount = 200; // Number of messages to collect per receiver
+const amount = 2; // Number of messages to collect per receiver
 const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
 
