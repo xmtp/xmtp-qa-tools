@@ -30,7 +30,7 @@ describe(
 
     // 1. Setup
     beforeAll(async () => {
-      const logger = createLogger(testName);
+      const logger = await createLogger(testName);
       overrideConsole(logger);
 
       // Use getWorkers to spin up many personas. This is resource-intensive.

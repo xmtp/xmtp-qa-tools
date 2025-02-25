@@ -42,6 +42,7 @@ export class PersonaFactory {
     // If not already in .env, generate them.
     if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
       console.log(`[PersonaFactory] Generating keys for persona: "${name}"`);
+      getNete
       try {
         await execAsync(`yarn gen:keys ${name.toLowerCase()}`);
         dotenv.config();

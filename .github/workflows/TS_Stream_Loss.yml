@@ -19,6 +19,8 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - name: Ensure data folder exists
         run: mkdir -p .data
+      - name: List data folder contents before caching
+        run: ls -la .data
       - name: Cache data folder
         uses: actions/cache@v3
         with:
@@ -28,6 +30,8 @@ jobs:
             ${{ runner.os }}-data-
           enableCrossOsArchive: false
           fail-on-cache-miss: false
+      - name: List data folder contents after cache restore
+        run: ls -la .data
       - run: corepack enable
       - run: yarn
       - name: Run tests with retry

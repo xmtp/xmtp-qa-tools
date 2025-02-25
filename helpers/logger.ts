@@ -63,7 +63,7 @@ export async function getNetworkStats() {
   return json;
 }
 
-export const createLogger = (testName: string) => {
+export const createLogger = async (testName: string) => {
   if (!sharedLogger) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
     const logFilePath = path.join("logs", `${sanitizedName}.log`);
@@ -107,6 +107,7 @@ export const createLogger = (testName: string) => {
     process.on("SIGTERM", flushAndExit);
   }
 
+  await getNetworkStats();
   return sharedLogger;
 };
 
