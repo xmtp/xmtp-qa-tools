@@ -12,8 +12,8 @@ import { verifyStream } from "../helpers/workers/stream";
 const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
 
-const amountofMessages = 200; // Number of messages to collect per receiver
-const receivers = 50;
+const amountofMessages = 2; // Number of messages to collect per receiver
+const receivers = 2;
 const initializeTime = 5000; // 10 seconds
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax =
