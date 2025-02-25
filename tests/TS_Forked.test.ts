@@ -80,7 +80,7 @@ describe(testName, () => {
   it("should message a gm", async () => {
     const result = await verifyStream(
       group,
-      [personas[WorkerNames.ELON]],
+      [personas["elon"]],
       gmMessageGenerator,
       gmSender,
     );

@@ -29,10 +29,8 @@ const MAX_TEST_DURATION_MS = 4000;
 // If some of the actions are especially large or complex, you may need to raise the limit.
 function expectUnder4Seconds(duration: number) {
   // If your environment is slow, increase or remove as needed
-  expect(duration).toBeLessThan(
-    MAX_TEST_DURATION_MS,
-    `Test took longer than ${MAX_TEST_DURATION_MS}ms`,
-  );
+  expect(duration).toBeLessThan(MAX_TEST_DURATION_MS);
+  console.log(`Test took ${duration}ms`);
 }
 
 describe(testName, () => {

@@ -106,7 +106,7 @@ export class WorkerClient extends Worker {
       this.libxmtpVersion,
     );
 
-    const version = (Client.version as string).match(/ci@([a-f0-9]+)/)?.[1];
+    const version = Client.version.match(/ci@([a-f0-9]+)/)?.[1];
     console.time(`[${this.name}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
@@ -289,6 +289,6 @@ export async function verifyStream<T>(
 
   return {
     allReceived,
-    messages: collectedMessages.map((m) => m ?? []),
+    messages: collectedMessages.map((m) => m ?? []) as string[][],
   };
 }
