@@ -1,3 +1,4 @@
+import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { Client, type DecodedMessage, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
@@ -8,10 +9,23 @@ import {
   type Persona,
   type PersonaBase,
   type VerifyStreamResult,
-  type WorkerMessage,
 } from "../types";
 
+// Load the root .env file
 dotenv.config();
+
+// Load the .env file from .data directory if it exists
+dotenv.config({ path: path.resolve(process.cwd(), ".data", ".env") });
+
+export type MessageStreamWorker = {
+  type: string;
+  message: DecodedMessage;
+};
+
+export type ConversationStreamWorker = {
+  type: string;
+  conversation: Conversation;
+};
 
 // Snippet used as "inline" JS for Worker to import your worker code
 const workerBootstrap = /* JavaScript */ `
@@ -124,7 +138,8 @@ export class WorkerClient extends Worker {
 
     // Start streaming in the background
     console.time(`[${this.name}] Start stream`);
-    await this.startStream();
+    await this.startStreamMessages();
+    //this.startStreamConversations();
     console.timeEnd(`[${this.name}] Start stream`);
 
     // Sync conversations
@@ -140,7 +155,7 @@ export class WorkerClient extends Worker {
    * Internal helper to stream all messages from the client,
    * then emit them as 'stream_message' events on this Worker.
    */
-  private async startStream() {
+  private async startStreamMessages() {
     console.time(`[${this.name}] Start message stream`);
     const stream = await this.client.conversations.streamAllMessages();
     console.timeEnd(`[${this.name}] Start message stream`);
@@ -151,7 +166,7 @@ export class WorkerClient extends Worker {
       try {
         for await (const message of stream) {
           console.time(`[${this.name}] Process message`);
-          const workerMessage: WorkerMessage = {
+          const workerMessage: MessageStreamWorker = {
             type: "stream_message",
             message: message as DecodedMessage,
           };
@@ -168,6 +183,37 @@ export class WorkerClient extends Worker {
     })();
   }
 
+  /**
+   * Internal helper to stream all conversations from the client,
+   * then emit them as 'stream_conversation' events on this Worker.
+   */
+  private startStreamConversations() {
+    console.time(`[${this.name}] Start conversation stream`);
+    const stream = this.client.conversations.stream();
+    console.timeEnd(`[${this.name}] Start conversation stream`);
+    console.log(`[${this.name}] Conversation stream started`);
+
+    // Process conversations asynchronously
+    void (async () => {
+      try {
+        for await (const conversation of stream) {
+          console.time(`[${this.name}] Process conversation`);
+          const workerMessage: ConversationStreamWorker = {
+            type: "stream_conversation",
+            conversation: conversation as Conversation,
+          };
+          // Emit if any listeners are attached
+          if (this.listenerCount("message") > 0) {
+            this.emit("message", workerMessage);
+          }
+          console.timeEnd(`[${this.name}] Process conversation`);
+        }
+      } catch (error) {
+        console.error(`[${this.name}] Stream error:`, error);
+        this.emit("error", error);
+      }
+    })();
+  }
   /**
    * Collects a fixed number of messages matching:
    * - a specific conversation (topic or peer address),
@@ -188,13 +234,13 @@ export class WorkerClient extends Worker {
     suffix: string,
     count: number,
     timeoutMs = count * defaultValues.perMessageTimeout,
-  ): Promise<WorkerMessage[]> {
+  ): Promise<MessageStreamWorker[]> {
     console.log(
       `[${this.name}] Collecting ${count} '${typeId}' messages containing '${suffix}' from convo '${groupId}'`,
     );
 
     return new Promise((resolve, reject) => {
-      const messages: WorkerMessage[] = [];
+      const messages: MessageStreamWorker[] = [];
       const timer = setTimeout(() => {
         this.off("message", onMessage);
         console.warn(
@@ -203,7 +249,7 @@ export class WorkerClient extends Worker {
         resolve(messages); // partial or empty
       }, timeoutMs);
 
-      const onMessage = (msg: WorkerMessage) => {
+      const onMessage = (msg: MessageStreamWorker) => {
         if (msg.type === "error") {
           clearTimeout(timer);
           this.off("message", onMessage);
@@ -271,7 +317,9 @@ export async function verifyStream<T extends string>(
   const collectPromises = receivers.map((r) =>
     r.worker
       ?.collectMessages(conversationId, collectorType, randomSuffix, count)
-      .then((msgs: WorkerMessage[]) => msgs.map((m) => m.message.content as T)),
+      .then((msgs: MessageStreamWorker[]) =>
+        msgs.map((m) => m.message.content as T),
+      ),
   );
   // Send the messages
   for (let i = 0; i < count; i++) {

@@ -29,7 +29,6 @@ describe(testName, () => {
     await flushLogger(testName);
     await Promise.all(
       Object.values(personas).map(async (persona) => {
-        console.log("terminating", persona);
         await persona.worker?.terminate();
       }),
     );

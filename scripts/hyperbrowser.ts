@@ -1,8 +1,5 @@
 import { Hyperbrowser } from "@hyperbrowser/sdk";
-import { config } from "dotenv";
 import { connect } from "puppeteer-core";
-
-config();
 
 const client = new Hyperbrowser({
   apiKey: process.env.HYPERBROWSER_API_KEY as string,

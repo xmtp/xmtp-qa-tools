@@ -21,10 +21,7 @@ export const defaultValues = {
   sdkVersion: "44",
   installationId: "a",
 };
-export type WorkerMessage = {
-  type: string;
-  message: DecodedMessage;
-};
+
 export interface Persona {
   name: string;
   installationId: string;

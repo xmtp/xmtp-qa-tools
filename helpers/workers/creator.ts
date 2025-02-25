@@ -1,8 +1,10 @@
 import { exec } from "child_process";
+import { appendFile } from "fs/promises";
+import path from "path";
 import { promisify } from "util";
 import { type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { generatePrivateKey } from "viem/accounts";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
 import {
   defaultValues,
@@ -12,7 +14,8 @@ import {
 } from "../types";
 import { WorkerClient } from "./stream";
 
-dotenv.config();
+dotenv.config(); // Load the .env file from .data directory if it exists
+dotenv.config({ path: path.resolve(process.cwd(), ".data", ".env") });
 
 const execAsync = promisify(exec);
 
@@ -41,22 +44,24 @@ export class PersonaFactory {
 
     // If not already in .env, generate them.
     if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
-      console.log(`[PersonaFactory] Generating keys for persona: "${name}"`);
-      try {
-        await execAsync(`yarn gen:keys ${name.toLowerCase()}`);
-        dotenv.config();
-      } catch (error) {
-        throw new Error(
-          `Failed to generate keys for ${name}: ${
-            error instanceof Error ? error.message : String(error)
-          }`,
-        );
-      }
+      const walletKey = generatePrivateKey();
+      const account = privateKeyToAccount(walletKey);
+      const encryptionKeyHex = generateEncryptionKeyHex();
+      const publicKey = account.address;
+      // Append a new environment variable to the .data/.env file
+      await appendFile(
+        path.resolve(process.cwd(), ".data", ".env"),
+        `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKeyHex}\n# public key is ${publicKey}\n`,
+      );
+      return {
+        walletKey,
+        encryptionKey: encryptionKeyHex,
+      };
     }
 
     return {
-      walletKey: process.env[walletKeyEnv] as string,
-      encryptionKey: process.env[encryptionKeyEnv] as string,
+      walletKey: process.env[walletKeyEnv],
+      encryptionKey: process.env[encryptionKeyEnv],
     };
   }
 

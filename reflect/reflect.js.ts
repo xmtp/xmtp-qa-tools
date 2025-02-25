@@ -1,10 +1,7 @@
-// import dotenv from "dotenv";
 // import { describe, expect, it } from "vitest";
 // import { getXmtpClient } from "../helpers/client";
 // import ReflectTestSuite from "../helpers/reflect";
 // import { streamMessages } from "../helpers/xmtp";
-
-// dotenv.config();
 
 // describe(
 //   "Basic test",

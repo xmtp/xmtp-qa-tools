@@ -1,69 +1,51 @@
-[2025-02-25T14:49:26.377Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice
-[2025-02-25T14:49:28.323Z] [warn] [elon] Create XMTP client v:436360a 1.917s
-[2025-02-25T14:49:28.422Z] [warn] [bob] Create XMTP client v:436360a 2.016s
-[2025-02-25T14:49:28.517Z] [warn] [joe] Create XMTP client v:436360a 2.111s
-[2025-02-25T14:49:28.523Z] [warn] [fabri] Create XMTP client v:436360a 2.117s
-[2025-02-25T14:49:28.637Z] [warn] [alice] Create XMTP client v:436360a 2.231s
-[2025-02-25T14:49:28.685Z] [warn] [elon] Start message stream 361.993ms
-[2025-02-25T14:49:28.685Z] [info] [elon] Message stream started
-[2025-02-25T14:49:28.686Z] [warn] [elon] Start stream 362.452ms
-[2025-02-25T14:49:28.789Z] [warn] [bob] Start message stream 366.207ms
-[2025-02-25T14:49:28.789Z] [info] [bob] Message stream started
-[2025-02-25T14:49:28.789Z] [warn] [bob] Start stream 367.038ms
-[2025-02-25T14:49:28.886Z] [warn] [fabri] Start message stream 363.084ms
-[2025-02-25T14:49:28.887Z] [info] [fabri] Message stream started
-[2025-02-25T14:49:28.887Z] [warn] [fabri] Start stream 364.316ms
-[2025-02-25T14:49:28.889Z] [warn] [joe] Start message stream 371.878ms
-[2025-02-25T14:49:28.889Z] [info] [joe] Message stream started
-[2025-02-25T14:49:28.889Z] [warn] [joe] Start stream 372.231ms
-[2025-02-25T14:49:29.009Z] [warn] [alice] Start message stream 371.207ms
-[2025-02-25T14:49:29.009Z] [info] [alice] Message stream started
-[2025-02-25T14:49:29.009Z] [warn] [alice] Start stream 371.707ms
-[2025-02-25T14:49:29.052Z] [warn] [elon] Sync conversations 366.256ms
-[2025-02-25T14:49:29.052Z] [warn] [elon] Initialize XMTP client 2.649s
-[2025-02-25T14:49:29.153Z] [warn] [bob] Sync conversations 363.882ms
-[2025-02-25T14:49:29.153Z] [warn] [bob] Initialize XMTP client 2.774s
-[2025-02-25T14:49:29.255Z] [warn] [fabri] Sync conversations 366.883ms
-[2025-02-25T14:49:29.255Z] [warn] [fabri] Initialize XMTP client 2.851s
-[2025-02-25T14:49:29.257Z] [warn] [joe] Sync conversations 367.542ms
-[2025-02-25T14:49:29.257Z] [warn] [joe] Initialize XMTP client 2.855s
-[2025-02-25T14:49:29.381Z] [warn] [alice] Sync conversations 371.627ms
-[2025-02-25T14:49:29.381Z] [warn] [alice] Initialize XMTP client 2.977s
-[2025-02-25T14:49:32.561Z] [info] [alice] Collecting 1 'text' messages containing 'r5s7z3heuk9' from convo 'e6524ddcf4dee6602c1dd69b97ac10de'
-[2025-02-25T14:49:32.561Z] [info] collectPromises [{}]
-[2025-02-25T14:49:32.561Z] [info] Sending message #1: gm-1-r5s7z3heuk9
-[2025-02-25T14:49:33.112Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-r5s7z3heuk9","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"e6524ddcf4dee6602c1dd69b97ac10de","deliveryStatus":"published","id":"c3e50e43fc2f9f666b09cef84e8a10675e5008ed599f37199db4e38aed9bb007","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"db33fef8907b1289661a573aa809c99d302d292c1a9b73437687984cd7696c10","sentAt":"2025-02-25T14:49:33.183Z","sentAtNs":1740494973183233000}}
-[2025-02-25T14:49:33.460Z] [info] [["gm-1-r5s7z3heuk9"]]
-[2025-02-25T14:49:33.460Z] [info] All participants received the expected number of messages.
-[2025-02-25T14:49:34.833Z] [info] [alice] Collecting 1 'text' messages containing 'ouakisp67os' from convo 'e6524ddcf4dee6602c1dd69b97ac10de'
-[2025-02-25T14:49:34.833Z] [info] collectPromises [{}]
-[2025-02-25T14:49:34.833Z] [info] Sending message #1: gm-1-ouakisp67os
-[2025-02-25T14:49:35.008Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-ouakisp67os","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"e6524ddcf4dee6602c1dd69b97ac10de","deliveryStatus":"published","id":"a7a274ea1638b8f0292661e0cfd4bdd993b936643f33cee1998febbd422a8a73","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"db33fef8907b1289661a573aa809c99d302d292c1a9b73437687984cd7696c10","sentAt":"2025-02-25T14:49:35.082Z","sentAtNs":1740494975082580000}}
-[2025-02-25T14:49:35.368Z] [info] [["gm-1-ouakisp67os"]]
-[2025-02-25T14:49:35.369Z] [info] All participants received the expected number of messages.
-[2025-02-25T14:49:36.538Z] [info] [fabri] Collecting 1 'text' messages containing 'szfa7ytlnts' from convo '18595e35d3f802a050d61d859ad41853'
-[2025-02-25T14:49:36.538Z] [info] collectPromises [{}]
-[2025-02-25T14:49:36.539Z] [info] Sending message #1: gm-1-szfa7ytlnts
-[2025-02-25T14:49:37.075Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-szfa7ytlnts","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"18595e35d3f802a050d61d859ad41853","deliveryStatus":"published","id":"8c84b63e4a984aee67daf66e29592bea0e9684bddc17c9e7882b6d0ace0ead70","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"7a1720d3650785a9951fcc8f17177cce69205d60e7083628ea993fc7cd2adae9","sentAt":"2025-02-25T14:49:37.149Z","sentAtNs":1740494977149103000}}
-[2025-02-25T14:49:37.432Z] [info] [["gm-1-szfa7ytlnts"]]
-[2025-02-25T14:49:37.432Z] [info] All participants received the expected number of messages.
-[2025-02-25T14:49:38.601Z] [info] [joe] Collecting 1 'text' messages containing 'hs3ml3grmno' from convo 'ead2e67e0677dec3b65c3b3c0db879d7'
-[2025-02-25T14:49:38.601Z] [info] collectPromises [{}]
-[2025-02-25T14:49:38.601Z] [info] Sending message #1: gm-1-hs3ml3grmno
-[2025-02-25T14:49:39.148Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-hs3ml3grmno","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"ead2e67e0677dec3b65c3b3c0db879d7","deliveryStatus":"published","id":"2598557f7499dc1d3a646240a64477af53549e396829b89ecaf5c1331cc654b9","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"f3878789d4621ce3093970889d0476a373751a2e5de91cad64b100dc91001ce6","sentAt":"2025-02-25T14:49:39.215Z","sentAtNs":1740494979215896000}}
-[2025-02-25T14:49:39.518Z] [info] [["gm-1-hs3ml3grmno"]]
-[2025-02-25T14:49:39.518Z] [info] All participants received the expected number of messages.
-[2025-02-25T14:49:49.033Z] [info] [joe] Collecting 1 'text' messages containing 'zksuqzxe4x9' from convo '2778be4423858edd956f4ad0771a23e8'
-[2025-02-25T14:49:49.034Z] [info] [elon] Collecting 1 'text' messages containing 'zksuqzxe4x9' from convo '2778be4423858edd956f4ad0771a23e8'
-[2025-02-25T14:49:49.034Z] [info] [fabri] Collecting 1 'text' messages containing 'zksuqzxe4x9' from convo '2778be4423858edd956f4ad0771a23e8'
-[2025-02-25T14:49:49.034Z] [info] [alice] Collecting 1 'text' messages containing 'zksuqzxe4x9' from convo '2778be4423858edd956f4ad0771a23e8'
-[2025-02-25T14:49:49.034Z] [info] collectPromises [{},{},{},{}]
-[2025-02-25T14:49:49.034Z] [info] Sending message #1: gm-1-zksuqzxe4x9
-[2025-02-25T14:49:49.582Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-zksuqzxe4x9","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"2778be4423858edd956f4ad0771a23e8","deliveryStatus":"published","id":"142114cdbba85b26e0692fbab1c2d7d3c63da3dae830439a2fbc48fdd78c6e3b","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"f3878789d4621ce3093970889d0476a373751a2e5de91cad64b100dc91001ce6","sentAt":"2025-02-25T14:49:49.651Z","sentAtNs":1740494989651681000}}
-[2025-02-25T14:49:49.588Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-zksuqzxe4x9","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"2778be4423858edd956f4ad0771a23e8","deliveryStatus":"published","id":"142114cdbba85b26e0692fbab1c2d7d3c63da3dae830439a2fbc48fdd78c6e3b","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"f3878789d4621ce3093970889d0476a373751a2e5de91cad64b100dc91001ce6","sentAt":"2025-02-25T14:49:49.651Z","sentAtNs":1740494989651681000}}
-[2025-02-25T14:49:49.588Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-zksuqzxe4x9","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"2778be4423858edd956f4ad0771a23e8","deliveryStatus":"published","id":"142114cdbba85b26e0692fbab1c2d7d3c63da3dae830439a2fbc48fdd78c6e3b","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"f3878789d4621ce3093970889d0476a373751a2e5de91cad64b100dc91001ce6","sentAt":"2025-02-25T14:49:49.651Z","sentAtNs":1740494989651681000}}
-[2025-02-25T14:49:49.588Z] [info] onMessage {"type":"stream_message","message":{"content":"gm-1-zksuqzxe4x9","contentType":{"authorityId":"xmtp.org","typeId":"text","versionMajor":1,"versionMinor":0},"conversationId":"2778be4423858edd956f4ad0771a23e8","deliveryStatus":"published","id":"142114cdbba85b26e0692fbab1c2d7d3c63da3dae830439a2fbc48fdd78c6e3b","kind":"application","parameters":{"encoding":"UTF-8"},"senderInboxId":"f3878789d4621ce3093970889d0476a373751a2e5de91cad64b100dc91001ce6","sentAt":"2025-02-25T14:49:49.651Z","sentAtNs":1740494989651681000}}
-[2025-02-25T14:49:49.944Z] [info] [["gm-1-zksuqzxe4x9"],["gm-1-zksuqzxe4x9"],["gm-1-zksuqzxe4x9"],["gm-1-zksuqzxe4x9"]]
-[2025-02-25T14:49:49.944Z] [info] All participants received the expected number of messages.
-[2025-02-25T14:49:51.227Z] [info] {"DNS Lookup":0.001754,"TCP Connection":0.001941,"TLS Handshake":0.559528,"Server Processing":0.894707,"Content Transfer":0.894775}
-[2025-02-25T14:49:51.227Z] [warn] total: 894.775ms, tls: 559.528ms, processing: 335.24699999999996ms
+[2025-02-25T22:49:22.320Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_Streams_dev
+[2025-02-25T22:49:24.557Z] [warn] [bob] Create XMTP client v:436360a 2.205s
+[2025-02-25T22:49:24.606Z] [warn] [joe] Create XMTP client v:436360a 2.255s
+[2025-02-25T22:49:24.931Z] [warn] [bob] Start message stream 373.657ms
+[2025-02-25T22:49:24.931Z] [info] [bob] Message stream started
+[2025-02-25T22:49:24.931Z] [warn] [bob] Start stream 374.238ms
+[2025-02-25T22:49:24.974Z] [warn] [joe] Start message stream 367.87ms
+[2025-02-25T22:49:24.974Z] [info] [joe] Message stream started
+[2025-02-25T22:49:24.974Z] [warn] [joe] Start stream 368.327ms
+[2025-02-25T22:49:25.296Z] [warn] [bob] Sync conversations 364.534ms
+[2025-02-25T22:49:25.296Z] [warn] [bob] Initialize XMTP client 2.947s
+[2025-02-25T22:49:25.341Z] [warn] [joe] Sync conversations 366.307ms
+[2025-02-25T22:49:25.341Z] [warn] [joe] Initialize XMTP client 2.992s
+[2025-02-25T22:49:25.731Z] [warn] [elon] Create XMTP client v:436360a 3.379s
+[2025-02-25T22:49:25.963Z] [warn] [fabri] Create XMTP client v:436360a 3.612s
+[2025-02-25T22:49:26.112Z] [warn] [elon] Start message stream 381.04ms
+[2025-02-25T22:49:26.112Z] [info] [elon] Message stream started
+[2025-02-25T22:49:26.112Z] [warn] [elon] Start stream 381.508ms
+[2025-02-25T22:49:26.180Z] [warn] [alice] Create XMTP client v:436360a 3.828s
+[2025-02-25T22:49:26.337Z] [warn] [fabri] Start message stream 373.495ms
+[2025-02-25T22:49:26.337Z] [info] [fabri] Message stream started
+[2025-02-25T22:49:26.337Z] [warn] [fabri] Start stream 373.974ms
+[2025-02-25T22:49:26.474Z] [warn] [elon] Sync conversations 361.393ms
+[2025-02-25T22:49:26.474Z] [warn] [elon] Initialize XMTP client 4.124s
+[2025-02-25T22:49:26.553Z] [warn] [alice] Start message stream 373.358ms
+[2025-02-25T22:49:26.553Z] [info] [alice] Message stream started
+[2025-02-25T22:49:26.553Z] [warn] [alice] Start stream 373.679ms
+[2025-02-25T22:49:26.712Z] [warn] [fabri] Sync conversations 374.312ms
+[2025-02-25T22:49:26.712Z] [warn] [fabri] Initialize XMTP client 4.361s
+[2025-02-25T22:49:26.926Z] [warn] [alice] Sync conversations 372.672ms
+[2025-02-25T22:49:26.926Z] [warn] [alice] Initialize XMTP client 4.576s
+[2025-02-25T22:49:32.049Z] [info] [alice] Collecting 1 'text' messages containing 'dxak2mdzhsa' from convo 'f5ad91abed9d1ffa6d936016ee153f5b'
+[2025-02-25T22:49:32.049Z] [info] Sending message #1: gm-1-dxak2mdzhsa
+[2025-02-25T22:49:32.964Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:49:34.328Z] [info] [alice] Collecting 1 'text' messages containing 'brvbkjrb63l' from convo 'f5ad91abed9d1ffa6d936016ee153f5b'
+[2025-02-25T22:49:34.328Z] [info] Sending message #1: gm-1-brvbkjrb63l
+[2025-02-25T22:49:34.871Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:49:37.842Z] [info] [fabri] Collecting 1 'text' messages containing 'dmwm23zxa7' from convo '6dd2f53483a3db63c30f46beff9e16b0'
+[2025-02-25T22:49:37.842Z] [info] Sending message #1: gm-1-dmwm23zxa7
+[2025-02-25T22:49:38.738Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:49:41.706Z] [info] [joe] Collecting 1 'text' messages containing '4339dmdbwqu' from convo 'dafefd3bf77b635824a9da4a52dd62c4'
+[2025-02-25T22:49:41.706Z] [info] Sending message #1: gm-1-4339dmdbwqu
+[2025-02-25T22:49:42.620Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:49:45.824Z] [info] [joe] Collecting 1 'text' messages containing 'rpk80yycond' from convo 'dd0d69e58dda87c4591da52b03e8a3ab'
+[2025-02-25T22:49:45.824Z] [info] [elon] Collecting 1 'text' messages containing 'rpk80yycond' from convo 'dd0d69e58dda87c4591da52b03e8a3ab'
+[2025-02-25T22:49:45.824Z] [info] [fabri] Collecting 1 'text' messages containing 'rpk80yycond' from convo 'dd0d69e58dda87c4591da52b03e8a3ab'
+[2025-02-25T22:49:45.824Z] [info] [alice] Collecting 1 'text' messages containing 'rpk80yycond' from convo 'dd0d69e58dda87c4591da52b03e8a3ab'
+[2025-02-25T22:49:45.824Z] [info] Sending message #1: gm-1-rpk80yycond
+[2025-02-25T22:49:46.725Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:49:47.677Z] [info] {"DNS Lookup":0.002616,"TCP Connection":0.002778,"TLS Handshake":0.521031,"Server Processing":0.680325,"Content Transfer":0.680346}
+[2025-02-25T22:49:47.677Z] [warn] total: 680.346ms, tls: 521.0310000000001ms, processing: 159.31499999999994ms
