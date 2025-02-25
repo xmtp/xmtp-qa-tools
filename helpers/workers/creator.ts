@@ -1,9 +1,6 @@
-import { exec } from "child_process";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { promisify } from "util";
 import { type XmtpEnv } from "@xmtp/node-sdk";
-import dotenv from "dotenv";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
 import {
@@ -13,11 +10,6 @@ import {
   type PersonaBase,
 } from "../types";
 import { WorkerClient } from "./stream";
-
-dotenv.config(); // Load the .env file from .data directory if it exists
-dotenv.config({ path: path.resolve(process.cwd(), ".data", ".env") });
-
-const execAsync = promisify(exec);
 
 /**
  * The PersonaFactory is responsible for creating Persona objects

@@ -1,3 +1,5 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
@@ -9,6 +11,11 @@ import {
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
 import { verifyStream } from "../helpers/workers/stream";
+
+dotenv.config();
+dotenv.config({
+  path: path.resolve(process.cwd(), `.data/.env`),
+});
 
 const amount = 30; // Number of messages to collect per receiver
 const testName = "TS_Order";

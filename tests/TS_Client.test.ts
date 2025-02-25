@@ -1,7 +1,14 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import type { Persona, XmtpEnv } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
+
+dotenv.config();
+dotenv.config({
+  path: path.resolve(process.cwd(), `.data/.env`),
+});
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Client_" + env;

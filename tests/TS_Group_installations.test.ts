@@ -1,5 +1,6 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { aM } from "vitest/dist/chunks/reporters.DTtkbAtP.js";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   type Conversation,
@@ -9,6 +10,15 @@ import {
 import { getWorkers } from "../helpers/workers/creator";
 import { verifyStream } from "../helpers/workers/stream";
 
+dotenv.config();
+dotenv.config({
+  path: path.resolve(process.cwd(), `.data/.env`),
+});
+
+/**
+ * TODO
+ * - Test multiple groups with multiple participants with multiple installations
+ */
 const env: XmtpEnv = "dev";
 const testName = "TS_Group_installations_" + env;
 

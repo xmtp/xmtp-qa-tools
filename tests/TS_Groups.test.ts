@@ -1,3 +1,5 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
@@ -11,12 +13,10 @@ import { verifyStream } from "../helpers/workers/stream";
 const env: XmtpEnv = "dev";
 const testName = "TS_Groups_" + env;
 
-/* 
-TODO:
-- Verify group creation with different participants for incosisten stream results
-
-
-*/
+dotenv.config();
+dotenv.config({
+  path: path.resolve(process.cwd(), `.data/.env`),
+});
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

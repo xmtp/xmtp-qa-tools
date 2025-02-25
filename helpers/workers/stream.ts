@@ -1,7 +1,5 @@
-import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { Client, type DecodedMessage, type XmtpEnv } from "@xmtp/node-sdk";
-import dotenv from "dotenv";
 import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
 import {
   defaultValues,
@@ -10,12 +8,6 @@ import {
   type PersonaBase,
   type VerifyStreamResult,
 } from "../types";
-
-// Load the root .env file
-dotenv.config();
-
-// Load the .env file from .data directory if it exists
-dotenv.config({ path: path.resolve(process.cwd(), ".data", ".env") });
 
 export type MessageStreamWorker = {
   type: string;

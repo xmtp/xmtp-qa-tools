@@ -1,3 +1,5 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
@@ -7,17 +9,10 @@ import { verifyStream } from "../helpers/workers/stream";
 const env = "dev";
 const testName = "TS_Forked_" + env;
 
-/*
-TODO
-- Stress groups (200 users.installations, who sends, who was added last)
-- Addying my self to a group? stream doesnt work
-- After running a couple of times
-
-thread 'tokio-runtime-worker' panicked at /Users/runner/work/libxmtp/libxmtp/xmtp_mls/src/subscriptions/stream_conversations.rs:333:78:
-`async fn` resumed after completion
-note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-
-*/
+dotenv.config();
+dotenv.config({
+  path: path.resolve(process.cwd(), `.data/.env`),
+});
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

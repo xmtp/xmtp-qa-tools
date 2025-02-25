@@ -1,9 +1,12 @@
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import dotenv from "dotenv";
 import {
   createSigner,
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../../helpers/client";
+
+dotenv.config();
 
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT } = process.env;
 

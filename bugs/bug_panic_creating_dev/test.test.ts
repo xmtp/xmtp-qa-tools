@@ -1,3 +1,5 @@
+import path from "path";
+import dotenv from "dotenv";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   createLogger,
@@ -9,6 +11,10 @@ import { getWorkers } from "../../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "bug_panic_creating_" + env;
+
+dotenv.config({
+  path: path.resolve(process.cwd(), `bugs/${testName}/.data/.env`),
+});
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

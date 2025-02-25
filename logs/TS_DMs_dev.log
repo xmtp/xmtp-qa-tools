@@ -1,28 +1,28 @@
-[2025-02-25T22:49:05.493Z] [info] [PersonaFactory] Creating personas: bob, joe, sam for TS_DMs_dev
-[2025-02-25T22:49:09.023Z] [warn] [sam] Create XMTP client v:436360a 3.501s
-[2025-02-25T22:49:09.056Z] [warn] [joe] Create XMTP client v:436360a 3.534s
-[2025-02-25T22:49:09.141Z] [warn] [bob] Create XMTP client v:436360a 3.619s
-[2025-02-25T22:49:09.409Z] [warn] [sam] Start message stream 385.081ms
-[2025-02-25T22:49:09.409Z] [info] [sam] Message stream started
-[2025-02-25T22:49:09.409Z] [warn] [sam] Start stream 385.832ms
-[2025-02-25T22:49:09.424Z] [warn] [joe] Start message stream 367.195ms
-[2025-02-25T22:49:09.424Z] [info] [joe] Message stream started
-[2025-02-25T22:49:09.424Z] [warn] [joe] Start stream 367.674ms
-[2025-02-25T22:49:09.512Z] [warn] [bob] Start message stream 371.325ms
-[2025-02-25T22:49:09.513Z] [info] [bob] Message stream started
-[2025-02-25T22:49:09.513Z] [warn] [bob] Start stream 371.706ms
-[2025-02-25T22:49:09.776Z] [warn] [sam] Sync conversations 366.358ms
-[2025-02-25T22:49:09.776Z] [warn] [sam] Initialize XMTP client 4.255s
-[2025-02-25T22:49:09.798Z] [warn] [joe] Sync conversations 373.741ms
-[2025-02-25T22:49:09.798Z] [warn] [joe] Initialize XMTP client 4.277s
-[2025-02-25T22:49:09.881Z] [warn] [bob] Sync conversations 368.083ms
-[2025-02-25T22:49:09.881Z] [warn] [bob] Initialize XMTP client 4.361s
-[2025-02-25T22:49:09.881Z] [info] bob 0xc6879BA310943F114fee782f1636d337cB977EC2
-[2025-02-25T22:49:09.882Z] [info] joe 0xf344D1e0Dc0F2adBF1AA2046f91Bbf4a6fDEaFa1
-[2025-02-25T22:49:09.882Z] [info] sam 0xB287B3932d9F6cA7604F6C42EcC0821dCDD4b182
-[2025-02-25T22:49:11.576Z] [info] [bob] Creating DM with sam at 0xB287B3932d9F6cA7604F6C42EcC0821dCDD4b182
-[2025-02-25T22:49:13.558Z] [info] [sam] Collecting 1 'text' messages containing 'g5ewgt8qxbq' from convo '9c2bfd4fe262fff76086b947528e4fbf'
-[2025-02-25T22:49:13.558Z] [info] Sending message #1: gm-1-g5ewgt8qxbq
-[2025-02-25T22:49:14.188Z] [info] All participants received the expected number of messages.
-[2025-02-25T22:49:15.109Z] [info] {"DNS Lookup":0.002072,"TCP Connection":0.002261,"TLS Handshake":0.516128,"Server Processing":0.679352,"Content Transfer":0.679374}
-[2025-02-25T22:49:15.109Z] [warn] total: 679.374ms, tls: 516.128ms, processing: 163.24599999999998ms
+[2025-02-25T23:22:04.333Z] [info] [PersonaFactory] Creating personas: bob, joe, sam for TS_DMs_dev
+[2025-02-25T23:22:06.439Z] [warn] [bob] Create XMTP client v:436360a 2.078s
+[2025-02-25T23:22:06.502Z] [warn] [joe] Create XMTP client v:436360a 2.140s
+[2025-02-25T23:22:06.807Z] [warn] [bob] Start message stream 368.103ms
+[2025-02-25T23:22:06.807Z] [info] [bob] Message stream started
+[2025-02-25T23:22:06.808Z] [warn] [bob] Start stream 368.695ms
+[2025-02-25T23:22:06.874Z] [warn] [joe] Start message stream 372.361ms
+[2025-02-25T23:22:06.874Z] [info] [joe] Message stream started
+[2025-02-25T23:22:06.875Z] [warn] [joe] Start stream 372.888ms
+[2025-02-25T23:22:07.179Z] [warn] [bob] Sync conversations 371.287ms
+[2025-02-25T23:22:07.179Z] [warn] [bob] Initialize XMTP client 2.821s
+[2025-02-25T23:22:07.250Z] [warn] [joe] Sync conversations 375.565ms
+[2025-02-25T23:22:07.250Z] [warn] [joe] Initialize XMTP client 2.891s
+[2025-02-25T23:22:07.633Z] [warn] [sam] Create XMTP client v:436360a 3.271s
+[2025-02-25T23:22:07.998Z] [warn] [sam] Start message stream 365.251ms
+[2025-02-25T23:22:07.998Z] [info] [sam] Message stream started
+[2025-02-25T23:22:07.998Z] [warn] [sam] Start stream 365.66ms
+[2025-02-25T23:22:08.356Z] [warn] [sam] Sync conversations 357.396ms
+[2025-02-25T23:22:08.356Z] [warn] [sam] Initialize XMTP client 3.996s
+[2025-02-25T23:22:08.356Z] [info] bob 0x1B5ECD41Ef528b5A24df68C30c8DCA32b2Acb8C6
+[2025-02-25T23:22:08.356Z] [info] joe 0x0407201572e5F68AA4B1b7AA2D38834aA0861988
+[2025-02-25T23:22:08.356Z] [info] sam 0x6Ed11d170A752d4E1d7B8E29aDad333A6eE622B7
+[2025-02-25T23:22:10.308Z] [info] [bob] Creating DM with sam at 0x6Ed11d170A752d4E1d7B8E29aDad333A6eE622B7
+[2025-02-25T23:22:12.419Z] [info] [sam] Collecting 1 'text' messages containing 'r6uupvgu7a' from convo '43461115fd7c5aaee4a95f9ab291f744'
+[2025-02-25T23:22:12.420Z] [info] Sending message #1: gm-1-r6uupvgu7a
+[2025-02-25T23:22:12.962Z] [info] All participants received the expected number of messages.
+[2025-02-25T23:22:13.864Z] [info] {"DNS Lookup":0.001712,"TCP Connection":0.001903,"TLS Handshake":0.518872,"Server Processing":0.681949,"Content Transfer":0.681964}
+[2025-02-25T23:22:13.864Z] [warn] total: 681.964ms, tls: 518.872ms, processing: 163.0920000000001ms

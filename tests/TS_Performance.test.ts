@@ -9,16 +9,6 @@ import {
 import { getWorkers } from "../helpers/workers/creator";
 import { verifyStream } from "../helpers/workers/stream";
 
-/**
- * This test suite measures XMTP performance of common actions:
- * - DM creation
- * - Sending / receiving messages
- * - Creating / updating groups
- * - Adding / removing participants
- *
- * Each test includes a performance assertion, verifying that it completes
- * in under 4 seconds (4000ms).
- */
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;

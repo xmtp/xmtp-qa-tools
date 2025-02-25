@@ -1,4 +1,5 @@
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import dotenv from "dotenv";
 import OpenAI from "openai";
 import {
   createSigner,
@@ -6,6 +7,7 @@ import {
   getEncryptionKeyFromHex,
 } from "../../helpers/client";
 
+dotenv.config();
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, OPENAI_API_KEY } = process.env;
 
 if (!WALLET_KEY_BOT) {
