@@ -1,6 +1,7 @@
-[![TS_Stream_Loss](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml)
-
 # Overview
+
+[![TS_Stream_Loss](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml)
+[![TS_Stream_Loss](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Stream_Loss.yml)
 
 This monorepo contains multiple projects and tools for development and testing. The following sections provide straightforward instructions to set up, test, and configure the components.
 
@@ -124,6 +125,8 @@ This brief mention provides an overview without going into detailed steps, keepi
 
 A `.env` file manages environment variables. Use the `.env.example` file as a template. Key variables include:
 
+- **LOGGING_LEVEL**: Sets the logging level for the application. Possible values include "error", "warn", "info", "debug". Default is "error".
+- **XMTP_ENV**: Specifies the environment for XMTP. `XMTP_ENV` Possible values are "dev", "production". Default is "dev".
 - **API Keys:**
 
   - ALCHEMY_API_KEY: For the gated group bot

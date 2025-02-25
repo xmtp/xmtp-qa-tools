@@ -17,7 +17,7 @@ export type VerifyStreamResult = {
 export const defaultValues = {
   amount: 5,
   timeout: 40000,
-  perMessageTimeout: 1000,
+  perMessageTimeout: 2000,
   sdkVersion: "44",
   libxmtpVersion: "39",
   installationId: "a",
@@ -103,6 +103,7 @@ export enum WorkerNames {
   YARA = "yara",
   ZARA = "zara",
   GUADA = "guada",
+  //max 61
 }
 
 // Custom transport that buffers logs in memory

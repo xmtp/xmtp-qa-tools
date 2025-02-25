@@ -4,7 +4,12 @@ import { type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex, getDbPath } from "../client";
-import { defaultValues, type Persona, type PersonaBase } from "../types";
+import {
+  defaultValues,
+  WorkerNames,
+  type Persona,
+  type PersonaBase,
+} from "../types";
 import { WorkerClient } from "./stream";
 
 dotenv.config();
@@ -190,10 +195,19 @@ export class PersonaFactory {
  * @param testName    Not currently used, but can be used for labeling or logging
  */
 export async function getWorkers(
-  descriptors: string[],
+  descriptorsOrAmount: string[] | number,
   env: XmtpEnv,
   testName: string,
 ): Promise<Record<string, Persona>> {
+  let descriptors: string[];
+  if (typeof descriptorsOrAmount === "number") {
+    const workerNames = Object.values(WorkerNames);
+    const orderedNames = workerNames.slice(0, descriptorsOrAmount);
+    descriptors = orderedNames;
+  } else {
+    descriptors = descriptorsOrAmount;
+  }
+
   const personaFactory = new PersonaFactory(env, testName);
   const personas = await personaFactory.createPersonas(descriptors);
 

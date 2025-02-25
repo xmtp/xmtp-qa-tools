@@ -267,7 +267,6 @@ export async function verifyStream<T>(
       ?.collectMessages(conversationId, collectorType, randomSuffix, count)
       .then((msgs: WorkerMessage[]) => msgs.map((m) => m.message.content as T)),
   );
-  console.log("collectPromises", collectPromises);
   // Send the messages
   for (let i = 0; i < count; i++) {
     const payload = await messageGenerator(i, randomSuffix);
@@ -289,6 +288,6 @@ export async function verifyStream<T>(
 
   return {
     allReceived,
-    messages: collectedMessages.map((m) => m ?? []) as string[][],
+    messages: collectedMessages.map((m) => m ?? []),
   };
 }

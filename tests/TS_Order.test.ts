@@ -13,6 +13,7 @@ import { verifyStream } from "../helpers/workers/stream";
 const amount = 30; // Number of messages to collect per receiver
 const testName = "TS_Order";
 const env: XmtpEnv = "dev";
+// 2 seconds per message, multiplied by the total number of participants
 const timeoutMax = amount * defaultValues.perMessageTimeout;
 describe(
   "TC_StreamOrder: should verify message order when receiving via streams",
