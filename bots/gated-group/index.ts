@@ -28,7 +28,6 @@ const env: XmtpEnv = "dev";
 
 async function main() {
   const clientAddress = await signer.getAddress();
-  console.log(clientAddress);
   const dbPath = getDbPath("gated-group", clientAddress, env);
 
   console.log(`Creating client on the '${env}' network...`);

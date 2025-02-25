@@ -147,7 +147,7 @@ export class PersonaFactory {
       );
 
       const clients = await Promise.all(
-        workers.map((worker, index) => {
+        workers.map((worker) => {
           return worker.initialize();
         }),
       );
@@ -156,7 +156,6 @@ export class PersonaFactory {
       Object.values(personas).forEach((persona, index) => {
         persona.worker = workers[index];
         persona.client = clients[index];
-
         persona.dbPath = getDbPath(
           persona.name,
           persona.client.accountAddress || "unknown",

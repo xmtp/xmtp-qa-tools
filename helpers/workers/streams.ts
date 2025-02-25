@@ -97,7 +97,6 @@ export class WorkerClient extends Worker {
       this.sdkVersion,
       this.libxmtpVersion,
     );
-
     console.time(`[${this.name}] Create XMTP client`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
@@ -106,6 +105,9 @@ export class WorkerClient extends Worker {
       loggingLevel: process.env.LOGGING_LEVEL,
     });
     console.timeEnd(`[${this.name}] Create XMTP client`);
+
+    const version = (Client.version as string).match(/ci@([a-f0-9]+)/)?.[1];
+    console.log(`[${this.name}] Client.version: ${version}`);
 
     // Start streaming in the background
     console.time(`[${this.name}] Start stream`);
