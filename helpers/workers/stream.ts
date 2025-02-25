@@ -206,15 +206,11 @@ export class WorkerClient extends Worker {
         }
 
         if (msg.type === "stream_message") {
-          const { conversationId, contentType, content } = msg.message;
-
+          const { conversationId, contentType } = msg.message;
           const correctConversation = groupId === conversationId;
-
           const correctType = contentType?.typeId === typeId;
-          const containsSuffix =
-            typeof content === "string" && content.includes(suffix);
 
-          if (correctConversation && correctType && containsSuffix) {
+          if (correctConversation && correctType) {
             messages.push(msg);
             if (messages.length >= count) {
               clearTimeout(timer);
@@ -271,7 +267,7 @@ export async function verifyStream<T>(
       ?.collectMessages(conversationId, collectorType, randomSuffix, count)
       .then((msgs: WorkerMessage[]) => msgs.map((m) => m.message.content as T)),
   );
-
+  console.log("collectPromises", collectPromises);
   // Send the messages
   for (let i = 0; i < count; i++) {
     const payload = await messageGenerator(i, randomSuffix);
@@ -282,7 +278,7 @@ export async function verifyStream<T>(
   // Wait for collectors
   const collectedMessages = await Promise.all(collectPromises);
   const allReceived = collectedMessages.every((msgs) => msgs?.length === count);
-
+  console.log(collectedMessages);
   if (!allReceived) {
     console.error(
       "Not all participants received the expected number of messages.",
@@ -293,6 +289,6 @@ export async function verifyStream<T>(
 
   return {
     allReceived,
-    messages: collectedMessages.map((m) => m ?? []) as string[][],
+    messages: collectedMessages.map((m) => m ?? []),
   };
 }

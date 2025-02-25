@@ -13,19 +13,26 @@ import { verifyStream } from "../helpers/workers/stream";
 const amount = 200; // Number of messages to collect per receiver
 const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
-let timeoutMax = amount * defaultValues.perMessageTimeout; // 2 seconds per message
+
+// 2 seconds per message, multiplied by the total number of participants
+let timeoutMax = amount * defaultValues.perMessageTimeout;
+
 describe("TC_StreamLoss: should verify message loss when receiving via streams", () => {
   let personas: Record<string, Persona>;
 
+  // We'll define these so they're accessible in the test
   let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
   let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
+  // 1. Setup
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
 
+    // Use getWorkers to spin up many personas. This is resource-intensive.
     personas = await getWorkers(
       [
+        // Large list of user descriptors. Each will become one Worker.
         WorkerNames.BOB,
         WorkerNames.ALICE,
         WorkerNames.JOE,
@@ -77,11 +84,16 @@ describe("TC_StreamLoss: should verify message loss when receiving via streams",
       env,
       testName,
     );
+
+    // Increase timeout based on how many personas we have
     timeoutMax = timeoutMax * Object.keys(personas).length;
   });
 
+  // 2. Teardown
   afterAll(async () => {
     await flushLogger(testName);
+
+    // Terminate each worker thread
     await Promise.all(
       Object.values(personas).map(async (persona) => {
         await persona.worker?.terminate();
@@ -92,16 +104,16 @@ describe("TC_StreamLoss: should verify message loss when receiving via streams",
   it(
     "TC_StreamOrder: should verify message order when receiving via streams",
     async () => {
-      // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
+      // Create a new group conversation with Bob (creator) and all others.
       const group = await personas["bob"].client!.conversations.newGroup(
         Object.values(personas).map(
           (p) => p.client?.accountAddress as `0x${string}`,
         ),
       );
-      console.log("Group created", group.id);
+      console.log("[Test] Created group:", group.id);
       expect(group.id).toBeDefined();
 
-      // Define receivers (excluding Bob, the creator).
+      // We exclude Bob from receiving; Bob is the group creator.
       const receivers = Object.values(personas).filter(
         (p) =>
           p.client?.accountAddress !==
@@ -111,12 +123,12 @@ describe("TC_StreamLoss: should verify message loss when receiving via streams",
       gmMessageGenerator = async (i: number, suffix: string) => {
         return `gm-${i + 1}-${suffix}`;
       };
+
       gmSender = async (convo: Conversation, message: string) => {
         await convo.send(message);
       };
 
-      // Collect messages by setting up listeners before sending and then sending known messages.
-      // Use type assertion when calling verifyStream
+      // Verify that each receiver collects `amount` messages of type "text".
       const collectedMessages = await verifyStream(
         group,
         receivers,
@@ -126,15 +138,16 @@ describe("TC_StreamLoss: should verify message loss when receiving via streams",
         amount,
       );
 
+      // Evaluate how many messages were received in total
       const totalMessages = amount * receivers.length;
       const receivedMessagesCount = collectedMessages.messages.flat().length;
       const percentageReceived = (receivedMessagesCount / totalMessages) * 100;
 
       console.log(
-        "Percentage of messages received:" +
-          percentageReceived.toString() +
-          "%",
+        `[Test] Percentage of messages received: ${percentageReceived}%`,
       );
+
+      // We expect at least 99% to pass
       expect(percentageReceived).toBeGreaterThanOrEqual(99);
     },
     timeoutMax,

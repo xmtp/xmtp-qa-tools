@@ -53,11 +53,12 @@ describe(testName, () => {
     };
 
     const nameUpdater = async (group: Conversation, newName: string) => {
+      console.log("Updating group name to", newName, "for group", group.id);
       await group.updateName(newName);
     };
     const verifyResult = await verifyStream(
       bobsGroup,
-      [personas[WorkerNames.JOE]],
+      [personas["joe"]],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
