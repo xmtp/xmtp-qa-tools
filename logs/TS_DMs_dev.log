@@ -1,34 +1,31 @@
-[2025-02-25T21:47:09.282Z] [info] [PersonaFactory] Creating personas: bob, joe, sam for TS_DMs_dev
-[2025-02-25T21:47:09.311Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-436360a-dev
-[2025-02-25T21:47:09.311Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-436360a-dev
-[2025-02-25T21:47:09.311Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/.data/sam/sam-0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834-a-44-436360a-dev
-[2025-02-25T21:47:12.780Z] [warn] [bob] Create XMTP client v:436360a 3.469s
-[2025-02-25T21:47:12.790Z] [warn] [joe] Create XMTP client v:436360a 3.479s
-[2025-02-25T21:47:12.955Z] [warn] [sam] Create XMTP client v:436360a 3.644s
-[2025-02-25T21:47:13.138Z] [warn] [bob] Start message stream 358.046ms
-[2025-02-25T21:47:13.138Z] [info] [bob] Message stream started
-[2025-02-25T21:47:13.139Z] [warn] [bob] Start stream 358.684ms
-[2025-02-25T21:47:13.158Z] [warn] [joe] Start message stream 367.713ms
-[2025-02-25T21:47:13.158Z] [info] [joe] Message stream started
-[2025-02-25T21:47:13.159Z] [warn] [joe] Start stream 368.088ms
-[2025-02-25T21:47:13.334Z] [warn] [sam] Start message stream 378.718ms
-[2025-02-25T21:47:13.334Z] [info] [sam] Message stream started
-[2025-02-25T21:47:13.334Z] [warn] [sam] Start stream 379.177ms
-[2025-02-25T21:47:13.495Z] [warn] [bob] Sync conversations 356.226ms
-[2025-02-25T21:47:13.495Z] [warn] [bob] Initialize XMTP client 4.210s
-[2025-02-25T21:47:13.521Z] [warn] [joe] Sync conversations 362.313ms
-[2025-02-25T21:47:13.521Z] [warn] [joe] Initialize XMTP client 4.213s
-[2025-02-25T21:47:13.706Z] [warn] [sam] Sync conversations 371.446ms
-[2025-02-25T21:47:13.706Z] [warn] [sam] Initialize XMTP client 4.397s
-[2025-02-25T21:47:13.706Z] [info] bob 0x5f276F28D44eaBEe2B53a593e7C803BcFe349508
-[2025-02-25T21:47:13.706Z] [info] joe 0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399
-[2025-02-25T21:47:13.706Z] [info] sam 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
-[2025-02-25T21:47:15.691Z] [info] [bob] Creating DM with sam at 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
-[2025-02-25T21:47:17.639Z] [info] [sam] Collecting 1 'text' messages containing '43600c9xhg7' from convo '412cee271b8df4df54e58a09ec8e0a5c'
-[2025-02-25T21:47:17.639Z] [info] Sending message #1: gm-1-43600c9xhg7
-[2025-02-25T21:47:18.230Z] [info] All participants received the expected number of messages.
-[2025-02-25T21:47:19.149Z] [info] {"DNS Lookup":0.001829,"TCP Connection":0.002038,"TLS Handshake":0.52415,"Server Processing":0.68835,"Content Transfer":0.688365}
-[2025-02-25T21:47:19.149Z] [warn] total: 688.365ms, tls: 524.15ms, processing: 164.21500000000003ms
-[2025-02-25T21:47:19.150Z] [info] terminating {"name":"bob","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x5183d538d976705055028d153651804da7ae12b2b8738a917d764b8c6b9c33aa","encryptionKey":"fb1989b3bd9162836a52064c3827e470fdc527c661b5a8f449c4adea51a63e29","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"bob","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x5183d538d976705055028d153651804da7ae12b2b8738a917d764b8c6b9c33aa","encryptionKeyHex":"fb1989b3bd9162836a52064c3827e470fdc527c661b5a8f449c4adea51a63e29","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
-[2025-02-25T21:47:19.150Z] [info] terminating {"name":"joe","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x8c254f2054ac5a0df1de98d0984528d3010a335bbfd79f58c733bd7b49eaa93f","encryptionKey":"09d451ca2393485e40ad3b4598c595a5210b88e633f197b3a31544c56d525a5d","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"joe","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x8c254f2054ac5a0df1de98d0984528d3010a335bbfd79f58c733bd7b49eaa93f","encryptionKeyHex":"09d451ca2393485e40ad3b4598c595a5210b88e633f197b3a31544c56d525a5d","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
-[2025-02-25T21:47:19.150Z] [info] terminating {"name":"sam","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x3acf7a5146a00a594246603a543ad3d83e3878c0bfaa628bac82f0e2bc491c94","encryptionKey":"7a4cdc41d8415d35991b9c91f6b847f81954d27ac003ba406a88616b6fa08cb3","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"sam","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x3acf7a5146a00a594246603a543ad3d83e3878c0bfaa628bac82f0e2bc491c94","encryptionKeyHex":"7a4cdc41d8415d35991b9c91f6b847f81954d27ac003ba406a88616b6fa08cb3","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/sam/sam-0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
+[2025-02-25T22:01:49.899Z] [info] [PersonaFactory] Creating personas: bob, joe, sam for TS_DMs_dev
+[2025-02-25T22:01:51.813Z] [warn] [bob] Create XMTP client v:436360a 1.888s
+[2025-02-25T22:01:51.961Z] [warn] [joe] Create XMTP client v:436360a 2.035s
+[2025-02-25T22:01:52.018Z] [warn] [sam] Create XMTP client v:436360a 2.093s
+[2025-02-25T22:01:52.186Z] [warn] [bob] Start message stream 371.488ms
+[2025-02-25T22:01:52.186Z] [info] [bob] Message stream started
+[2025-02-25T22:01:52.187Z] [warn] [bob] Start stream 373.756ms
+[2025-02-25T22:01:52.327Z] [warn] [joe] Start message stream 366.281ms
+[2025-02-25T22:01:52.328Z] [info] [joe] Message stream started
+[2025-02-25T22:01:52.328Z] [warn] [joe] Start stream 367.291ms
+[2025-02-25T22:01:52.385Z] [warn] [sam] Start message stream 366.854ms
+[2025-02-25T22:01:52.385Z] [info] [sam] Message stream started
+[2025-02-25T22:01:52.386Z] [warn] [sam] Start stream 367.643ms
+[2025-02-25T22:01:52.556Z] [warn] [bob] Sync conversations 368.195ms
+[2025-02-25T22:01:52.556Z] [warn] [bob] Initialize XMTP client 2.654s
+[2025-02-25T22:01:52.694Z] [warn] [joe] Sync conversations 365.868ms
+[2025-02-25T22:01:52.695Z] [warn] [joe] Initialize XMTP client 2.772s
+[2025-02-25T22:01:52.751Z] [warn] [sam] Sync conversations 364.296ms
+[2025-02-25T22:01:52.751Z] [warn] [sam] Initialize XMTP client 2.827s
+[2025-02-25T22:01:52.751Z] [info] bob 0x5f276F28D44eaBEe2B53a593e7C803BcFe349508
+[2025-02-25T22:01:52.751Z] [info] joe 0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399
+[2025-02-25T22:01:52.751Z] [info] sam 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
+[2025-02-25T22:01:52.930Z] [info] [bob] Creating DM with sam at 0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834
+[2025-02-25T22:01:54.971Z] [info] [sam] Collecting 1 'text' messages containing 'fohygofpbyh' from convo '412cee271b8df4df54e58a09ec8e0a5c'
+[2025-02-25T22:01:54.971Z] [info] Sending message #1: gm-1-fohygofpbyh
+[2025-02-25T22:01:55.523Z] [info] All participants received the expected number of messages.
+[2025-02-25T22:01:56.466Z] [info] {"DNS Lookup":0.00171,"TCP Connection":0.001905,"TLS Handshake":0.524829,"Server Processing":0.692155,"Content Transfer":0.692212}
+[2025-02-25T22:01:56.466Z] [warn] total: 692.2120000000001ms, tls: 524.829ms, processing: 167.38300000000015ms
+[2025-02-25T22:01:56.468Z] [info] terminating {"name":"bob","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x5183d538d976705055028d153651804da7ae12b2b8738a917d764b8c6b9c33aa","encryptionKey":"fb1989b3bd9162836a52064c3827e470fdc527c661b5a8f449c4adea51a63e29","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"bob","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x5183d538d976705055028d153651804da7ae12b2b8738a917d764b8c6b9c33aa","encryptionKeyHex":"fb1989b3bd9162836a52064c3827e470fdc527c661b5a8f449c4adea51a63e29","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
+[2025-02-25T22:01:56.468Z] [info] terminating {"name":"joe","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x8c254f2054ac5a0df1de98d0984528d3010a335bbfd79f58c733bd7b49eaa93f","encryptionKey":"09d451ca2393485e40ad3b4598c595a5210b88e633f197b3a31544c56d525a5d","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"joe","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x8c254f2054ac5a0df1de98d0984528d3010a335bbfd79f58c733bd7b49eaa93f","encryptionKeyHex":"09d451ca2393485e40ad3b4598c595a5210b88e633f197b3a31544c56d525a5d","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
+[2025-02-25T22:01:56.468Z] [info] terminating {"name":"sam","testName":"TS_DMs_dev","installationId":"a","sdkVersion":"44","walletKey":"0x3acf7a5146a00a594246603a543ad3d83e3878c0bfaa628bac82f0e2bc491c94","encryptionKey":"7a4cdc41d8415d35991b9c91f6b847f81954d27ac003ba406a88616b6fa08cb3","worker":{"_events":{},"_eventsCount":0,"performance":{},"name":"sam","installationId":"a","env":"dev","sdkVersion":"44","testName":"TS_DMs_dev","walletKey":"0x3acf7a5146a00a594246603a543ad3d83e3878c0bfaa628bac82f0e2bc491c94","encryptionKeyHex":"7a4cdc41d8415d35991b9c91f6b847f81954d27ac003ba406a88616b6fa08cb3","client":{}},"client":{},"dbPath":"/Users/fabrizioguespe/DevRel/qa-testing/.data/sam/sam-0xac7b70c295507Efd310BD0DE7a1f2c4B0F186834-a-44-436360a-dev","address":"","version":"rygine/fix-node-release-ci@436360a (2025-02-24 17:14:11 +0000)"}
