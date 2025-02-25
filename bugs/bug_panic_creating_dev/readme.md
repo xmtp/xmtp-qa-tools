@@ -83,8 +83,8 @@ it("Measure group creation time for 15 participants", async () => {
 
 ### Environment
 
-- [./data](./.data/.env) folder
-- [env](./env.example) file
+- [./data](./.data/) folder
+- [./data](.env) folder
 
 ## Running test
 
