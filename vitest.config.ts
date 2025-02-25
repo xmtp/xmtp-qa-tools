@@ -4,7 +4,7 @@ export default defineConfig({
   base: "/__vitest__/#/",
   test: {
     globals: true,
-    reporters: ["html", "default"],
+    reporters: ["default"],
     environment: "node",
     watch: false,
     testTimeout: 100000,
