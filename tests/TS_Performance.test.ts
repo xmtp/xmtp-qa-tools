@@ -48,7 +48,7 @@ describe(testName, () => {
       await convo.send(message);
     };
 
-    const logger = createLogger(testName);
+    const logger = await createLogger(testName);
     overrideConsole(logger);
 
     // Spin up workers for the listed personas.

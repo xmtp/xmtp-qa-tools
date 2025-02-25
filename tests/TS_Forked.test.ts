@@ -33,7 +33,7 @@ describe(testName, () => {
       await convo.send(message);
     };
     console.time("createLogger");
-    const logger = createLogger(testName);
+    const logger = await createLogger(testName);
     console.timeEnd("createLogger");
 
     console.time("overrideConsole");

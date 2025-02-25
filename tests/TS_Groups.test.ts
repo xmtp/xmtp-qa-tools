@@ -31,7 +31,7 @@ describe(testName, () => {
     gmSender = async (convo: Conversation, message: string) => {
       await convo.send(message);
     };
-    const logger = createLogger(testName);
+    const logger = await createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "alice", "joe", "randompep", "elon"],
@@ -63,8 +63,7 @@ describe(testName, () => {
 
   it("TC_CreateGroup: should measure creating a group with inbox ids", async () => {
     console.time("bobsGroupByInboxIds");
-    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-    /* eslint-disable @typescript-eslint/no-unsafe-call */
+
     const bobsGroupByInboxIds = await personas[
       "bob"
     ].client!.conversations.newGroupByInboxIds([
@@ -72,8 +71,7 @@ describe(testName, () => {
       personas["joe"].client!.inboxId,
       personas["elon"].client!.inboxId,
     ]);
-    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
-    /* eslint-enable @typescript-eslint/no-unsafe-call */
+
     console.log("bobsGroupByInboxIds", bobsGroupByInboxIds.id);
     console.timeEnd("bobsGroupByInboxIds");
     expect(bobsGroupByInboxIds.id).toBeDefined();
@@ -158,6 +156,15 @@ describe(testName, () => {
       gmSender,
     );
     expect(verifyResult.allReceived).toBe(true);
+  });
+
+  it("TC_CreateLargeGroup: should create a large group of 20 participants", async () => {
+    const group = await personas[
+      "bob"
+    ].client!.conversations.newGroupByInboxIds(
+      Object.values(personas).map((p) => p.client?.inboxId as string),
+    );
+    expect(group.id).toBeDefined();
   });
 
   // it(

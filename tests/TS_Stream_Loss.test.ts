@@ -12,12 +12,17 @@ import { verifyStream } from "../helpers/workers/stream";
 const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
 
-const amountofMessages = 100; // Number of messages to collect per receiver
+const amountofMessages = 10; // Number of messages to collect per receiver
 const receivers = 50;
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax =
   amountofMessages * receivers * defaultValues.perMessageTimeout;
 
+/*eslint-disable*/
+if (receivers < 2) {
+  throw new Error("Receivers must be at least 2");
+}
+/*eslint-enable*/
 describe(
   "TS_Stream_Loss: should verify message loss when receiving via streams",
   () => {

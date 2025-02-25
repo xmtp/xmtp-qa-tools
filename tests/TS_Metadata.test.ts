@@ -13,7 +13,7 @@ describe(testName, () => {
   let bobsGroup: Conversation;
   let personas: Record<string, Persona>;
   beforeAll(async () => {
-    const logger = createLogger(testName);
+    const logger = await createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
       [

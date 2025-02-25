@@ -24,7 +24,7 @@ describe(
     let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
     beforeAll(async () => {
-      const logger = createLogger(testName);
+      const logger = await createLogger(testName);
       overrideConsole(logger);
       personas = await getWorkers(
         [

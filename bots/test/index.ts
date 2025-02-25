@@ -19,7 +19,7 @@ if (!ENCRYPTION_KEY_BOT) {
 let personas: Record<string, Persona> = {};
 const env: XmtpEnv = XMTP_ENV as XmtpEnv;
 async function main() {
-  const logger = createLogger("test-bot");
+  const logger = await createLogger("test-bot");
   overrideConsole(logger);
   personas = await getWorkers(
     [

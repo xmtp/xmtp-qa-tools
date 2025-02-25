@@ -237,7 +237,7 @@ export class WorkerClient extends Worker {
  * @param collectorType The contentType ID to match in collecting
  * @param count Number of messages to send
  */
-export async function verifyStream<T>(
+export async function verifyStream<T extends string>(
   group: Conversation,
   participants: Persona[],
   messageGenerator: (index: number, suffix: string) => Promise<T>,

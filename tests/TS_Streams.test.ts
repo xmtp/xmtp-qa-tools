@@ -31,7 +31,7 @@ describe(testName, () => {
     gmSender = async (convo: Conversation, message: string) => {
       await convo.send(message);
     };
-    const logger = createLogger(testName);
+    const logger = await createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
