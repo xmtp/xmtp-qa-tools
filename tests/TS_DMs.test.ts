@@ -5,41 +5,39 @@ import {
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { verifyDMs } from "../helpers/verify";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_DMs_" + env;
 
 describe(testName, () => {
-  let bob: Persona;
-  let joe: Persona;
-  let sam: Persona;
   let convo: Conversation;
-  let personas: Persona[];
+  let personas: Record<string, Persona>;
 
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
 
     personas = await getWorkers(["bob", "joe", "sam"], env, testName);
-    [bob, joe, sam] = personas;
-    console.log("bob", bob.client?.accountAddress);
-    console.log("joe", joe.client?.accountAddress);
-    console.log("sam", sam.client?.accountAddress);
+    console.log("bob", personas["bob"].client?.accountAddress);
+    console.log("joe", personas["joe"].client?.accountAddress);
+    console.log("sam", personas["sam"].client?.accountAddress);
   });
 
   afterAll(async () => {
     await flushLogger(testName);
     await Promise.all(
-      personas.map(async (persona) => {
+      Object.values(personas).map(async (persona) => {
         await persona.worker?.terminate();
       }),
     );
   });
 
   it("TC_CreateDM: should measure creating a DM", async () => {
-    convo = await bob.client!.conversations.newDm(sam.client!.accountAddress);
+    convo = await personas["bob"].client!.conversations.newDm(
+      personas["sam"].client!.accountAddress,
+    );
     expect(convo).toBeDefined();
     expect(convo.id).toBeDefined();
   });
@@ -49,7 +47,7 @@ describe(testName, () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${bob.name}] Creating DM with ${sam.name} at ${sam.client?.accountAddress}`,
+      `[${personas["bob"].name}] Creating DM with ${personas["sam"].name} at ${personas["sam"].client?.accountAddress}`,
     );
 
     const dmId = await convo.send(message);
@@ -58,8 +56,21 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGM: should measure receiving a gm", async () => {
-    const result = await verifyDMs(convo, [sam]);
+    const gmMessageGenerator = async (i: number, suffix: string) => {
+      return `gm-${i + 1}-${suffix}`;
+    };
 
-    expect(result).toBe(true);
+    const gmSender = async (convo: Conversation, message: string) => {
+      await convo.send(message);
+    };
+
+    const verifyResult = await verifyStream(
+      convo,
+      [personas["sam"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(verifyResult.messages.length).toEqual(1);
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

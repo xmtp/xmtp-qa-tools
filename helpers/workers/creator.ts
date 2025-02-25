@@ -4,13 +4,8 @@ import { type XmtpEnv } from "@xmtp/node-sdk";
 import { config } from "dotenv";
 import { generatePrivateKey } from "viem/accounts";
 import { generateEncryptionKeyHex, getDbPath } from "../client";
-import {
-  defaultValues,
-  type Persona,
-  type PersonaBase,
-  type WorkerNames,
-} from "../types";
-import { WorkerClient } from "./client";
+import { defaultValues, type Persona, type PersonaBase } from "../types";
+import { WorkerClient } from "./streams";
 
 const execAsync = promisify(exec);
 
@@ -61,11 +56,21 @@ export class PersonaFactory {
 
   public parsePersonaDescriptor(
     descriptor: string,
-    defaults: { installationId: string; version: string } = {
+    defaults: {
+      installationId: string;
+      sdkVersion: string;
+      libxmtpVersion: string;
+    } = {
       installationId: defaultValues.installationId,
-      version: defaultValues.version,
+      sdkVersion: defaultValues.sdkVersion,
+      libxmtpVersion: defaultValues.libxmtpVersion,
     },
-  ): { name: string; installationId: string; version: string } {
+  ): {
+    name: string;
+    installationId: string;
+    sdkVersion: string;
+    libxmtpVersion: string;
+  } {
     console.time(`parsePersonaDescriptor:${descriptor}`);
     const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
     const match = descriptor.match(regex);
@@ -76,16 +81,15 @@ export class PersonaFactory {
     const result = {
       name: baseName,
       installationId: inst || defaults.installationId,
-      version: ver || defaults.version,
+      sdkVersion: ver || defaults.sdkVersion,
+      libxmtpVersion: ver || defaults.libxmtpVersion,
     };
     console.timeEnd(`parsePersonaDescriptor:${descriptor}`);
     return result;
   }
 
-  public async getWorkers(
-    descriptors: (string | WorkerNames)[],
-  ): Promise<Persona[]> {
-    console.time(`getWorkers - ${descriptors.join(",")}`);
+  public async createPersonas(descriptors: string[]): Promise<Persona[]> {
+    console.time(`createPersonas - ${descriptors.join(",")}`);
     try {
       const personas: Persona[] = [];
 
@@ -94,8 +98,7 @@ export class PersonaFactory {
         let personaData: PersonaBase;
 
         if (desc.toString().includes("random")) {
-          const randomId = Math.random().toString(36).slice(2, 15);
-          const name = `${desc}_${randomId}`;
+          const name = desc;
           const walletKey = generatePrivateKey();
           const encryptionKeyHex = generateEncryptionKeyHex();
 
@@ -129,6 +132,7 @@ export class PersonaFactory {
           client: null,
           dbPath: "",
           address: "",
+          version: "",
         };
 
         personas.push(persona);
@@ -137,42 +141,52 @@ export class PersonaFactory {
 
       // Create all workers in parallel
       const workers = await Promise.all(
-        personas.map((persona) => new WorkerClient(persona, this.env)),
+        Object.values(personas).map((persona) => {
+          return new WorkerClient(persona, this.env);
+        }),
       );
 
-      // Initialize all clients in parallel
       const clients = await Promise.all(
-        workers.map((worker) => worker.initialize()),
+        workers.map((worker, index) => {
+          return worker.initialize();
+        }),
       );
 
       // Assign workers and clients to personas
-      personas.forEach((persona, index) => {
+      Object.values(personas).forEach((persona, index) => {
         persona.worker = workers[index];
         persona.client = clients[index];
+
         persona.dbPath = getDbPath(
           persona.name,
-          persona.installationId,
-          persona.version,
+          persona.client.accountAddress || "unknown",
           this.env,
-          persona.client.accountAddress,
+          persona.installationId,
+          persona.sdkVersion,
+          persona.libxmtpVersion,
         );
       });
 
-      console.timeEnd(`getWorkers - ${descriptors.join(",")}`);
+      console.timeEnd(`createPersonas - ${descriptors.join(",")}`);
       return personas;
     } catch (error) {
-      console.timeEnd(`getWorkers - ${descriptors.join(",")}`);
-      console.error("Error getting personas:", error);
+      console.timeEnd(`createPersonas - ${descriptors.join(",")}`);
+      console.error("Error creating personas:", error);
       throw error;
     }
   }
 }
 
 export async function getWorkers(
-  descriptors: (string | WorkerNames)[],
+  descriptors: string[],
   env: XmtpEnv,
   testName: string,
-): Promise<Persona[]> {
+): Promise<Record<string, Persona>> {
   const personaFactory = new PersonaFactory(env, testName);
-  return personaFactory.getWorkers(descriptors);
+  const personas = await personaFactory.createPersonas(descriptors);
+
+  return personas.reduce<Record<string, Persona>>((acc, p) => {
+    acc[p.name] = p;
+    return acc;
+  }, {});
 }

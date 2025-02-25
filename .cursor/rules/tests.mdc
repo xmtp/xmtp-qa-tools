@@ -7,8 +7,8 @@ alwaysApply: false
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
-  verifyMultipleDMs,
-  verifyMetadataUpdates,
+  verifyStream,
+  verifyMeta,
   type Conversation,
   type XmtpEnv,
 } from "../helpers/verify";
@@ -81,7 +81,7 @@ describe(testName, () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
-    const result = await verifyMultipleDMs(() => dmConvo.send(message), [sam]);
+    const result = await verifyStream(() => dmConvo.send(message), [sam]);
     expect(result).toEqual([message]);
   });
 
@@ -103,7 +103,7 @@ describe(testName, () => {
     const newGroupName =
       "New Group Name" + Math.random().toString(36).substring(2, 15);
 
-    const result = await verifyMetadataUpdates(
+    const result = await verifyMeta(
       () => bobsGroup.updateName(newGroupName),
       [elon],
       { fieldName: "group_name", newValue: newGroupName },
@@ -147,7 +147,7 @@ describe(testName, () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       // Wait for participants to see it with increased timeout
-      const parsedMessages = await verifyMultipleDMs(
+      const parsedMessages = await verifyStream(
         () => bobsGroup.send(groupMessage),
         [elon],
       );
@@ -171,7 +171,7 @@ describe(testName, () => {
     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
     // Wait for Joe to see it
-    const parsedMessages = await verifyMultipleDMs(
+    const parsedMessages = await verifyStream(
       () => newGroup.send(groupMessage),
       [joe, alice, randompep, elon],
     );

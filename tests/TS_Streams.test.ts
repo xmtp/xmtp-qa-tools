@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { type Persona } from "../helpers/types";
-import { verifyDMs } from "../helpers/verify";
+import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
 
 /* 
@@ -20,22 +20,24 @@ const env = "dev";
 const testName = "TS_Streams_" + env;
 
 describe(testName, () => {
-  let bob: Persona;
-  let joe: Persona;
-  let elon: Persona;
-  let alice: Persona;
-  let fabri: Persona;
-  let randompep: Persona;
-  let personas: Persona[];
+  let personas: Record<string, Persona>;
+  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmSender: (convo: Conversation, message: string) => Promise<void>;
+
   beforeAll(async () => {
+    gmMessageGenerator = async (i: number, suffix: string) => {
+      return `gm-${i + 1}-${suffix}`;
+    };
+    gmSender = async (convo: Conversation, message: string) => {
+      await convo.send(message);
+    };
     const logger = createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
-      ["bob", "joe", "elon", "fabri", "alice", "randompep"],
+      ["bob", "joe", "elon", "fabri", "alice"],
       "dev",
       testName,
     );
-    [bob, joe, elon, fabri, alice, randompep] = personas;
     // Add delay to ensure streams are properly initialized
     await new Promise((resolve) => setTimeout(resolve, 2000));
   });
@@ -43,64 +45,90 @@ describe(testName, () => {
   afterAll(async () => {
     await flushLogger(testName);
     await Promise.all(
-      personas.map(async (persona) => {
+      Object.values(personas).map(async (persona) => {
         await persona.worker?.terminate();
       }),
     );
   });
 
   it("test fabri sending gm to alice", async () => {
-    const dmConvo = await fabri.client?.conversations.newDm(
-      alice.client?.accountAddress as `0x${string}`,
+    const dmConvo = await personas[
+      WorkerNames.FABRI
+    ].client?.conversations.newDm(
+      personas[WorkerNames.ALICE].client?.accountAddress as `0x${string}`,
     );
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyDMs(dmConvo, [alice]);
-    expect(result).toBe(true);
+    const result = await verifyStream(
+      dmConvo,
+      [personas[WorkerNames.ALICE]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
   it("test fabri sending gm to alice", async () => {
-    const dmConvo = await fabri.client?.conversations.newDm(
-      alice.client?.accountAddress as `0x${string}`,
+    const dmConvo = await personas["fabri"].client?.conversations.newDm(
+      personas["alice"].client?.accountAddress as `0x${string}`,
     );
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyDMs(dmConvo, [alice]);
-    expect(result).toBe(true);
+    const result = await verifyStream(
+      dmConvo,
+      [personas["alice"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
   it("test elon sending gm to fabri", async () => {
-    const dmConvo = await elon.client?.conversations.newDm(
-      fabri.client?.accountAddress as `0x${string}`,
+    const dmConvo = await personas["elon"].client?.conversations.newDm(
+      personas["fabri"].client?.accountAddress as `0x${string}`,
     );
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyDMs(dmConvo, [fabri]);
-    expect(result).toBe(true);
+    const result = await verifyStream(
+      dmConvo,
+      [personas["fabri"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
   it("test bob sending gm to joe", async () => {
-    const dmConvo = await bob.client?.conversations.newDm(
-      joe.client?.accountAddress as `0x${string}`,
+    const dmConvo = await personas["bob"].client?.conversations.newDm(
+      personas["joe"].client?.accountAddress as `0x${string}`,
     );
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyDMs(dmConvo, [joe]);
-    expect(result).toBe(true);
+    const result = await verifyStream(
+      dmConvo,
+      [personas["joe"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   });
 
   it("should receive a group message in all streams", async () => {
-    const newGroup = await bob.client!.conversations.newGroup([
-      alice.client?.accountAddress as `0x${string}`,
-      joe.client?.accountAddress as `0x${string}`,
-      randompep.client?.accountAddress as `0x${string}`,
-      elon.client?.accountAddress as `0x${string}`,
-    ]);
-    const result = await verifyDMs(newGroup, [joe, alice, randompep, elon]);
-    expect(result).toBe(true);
+    const newGroup = await personas["bob"].client!.conversations.newGroup(
+      Object.values(personas).map(
+        (p) => p.client?.accountAddress as `0x${string}`,
+      ),
+    );
+    const result = await verifyStream(
+      newGroup,
+      Object.values(personas).map((p) => p),
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   });
 });

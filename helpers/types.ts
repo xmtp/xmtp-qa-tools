@@ -4,7 +4,7 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import type { WorkerClient } from "./workers/client";
+import type { WorkerClient } from "./workers/streams";
 
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };
@@ -16,7 +16,10 @@ export const defaultValues = {
   libxmtpVersion: "39",
   installationId: "a",
 };
-
+export type WorkerMessage = {
+  type: string;
+  message: DecodedMessage;
+};
 export interface Persona {
   name: string;
   installationId: string;
@@ -26,9 +29,18 @@ export interface Persona {
   client: Client | null;
 }
 
+export type GroupMetadataContent = {
+  metadataFieldChanges: Array<{
+    fieldName: string;
+    newValue: string;
+    oldValue: string;
+  }>;
+};
+
 // Default personas as an enum
 export enum WorkerNames {
   FABRI = "fabri",
+  BOT = "bot",
   ELON = "elon",
   ALICE = "alice",
   BOB = "bob",

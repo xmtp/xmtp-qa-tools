@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import type { XmtpEnv } from "../helpers/types";
+import type { Persona, XmtpEnv } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
@@ -12,21 +12,24 @@ TODO:
 */
 
 describe(testName, () => {
+  let personas: Record<string, Persona>;
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
+    personas = await getWorkers(["alice", "randompep"], env, testName);
   });
+
   afterAll(async () => {
-    flushLogger(testName);
+    await flushLogger(testName);
+    await Promise.all(
+      Object.values(personas).map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
+    );
   });
 
   it("TC_CreateClient: Initialize the client", async () => {
-    const [alice, randompep] = await getWorkers(
-      ["alice", "randompep"],
-      env,
-      testName,
-    );
-    expect(alice.client?.accountAddress).toBeDefined();
-    expect(randompep.client?.accountAddress).toBeDefined();
+    expect(personas["alice"].client?.accountAddress).toBeDefined();
+    expect(personas["randompep"].client?.accountAddress).toBeDefined();
   });
 });

@@ -2,14 +2,9 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { Client, type DecodedMessage, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
-import type { PersonaBase } from "../types";
+import type { PersonaBase, WorkerMessage } from "../types";
 
 dotenv.config();
-
-export type WorkerMessage = {
-  type: string;
-  message: DecodedMessage;
-};
 
 // This snippet is used as the "inline" JS for your Worker to import your worker code:
 const workerBootstrap = /* JavaScript */ `
@@ -28,7 +23,8 @@ export class WorkerClient extends Worker {
   public name: string;
   private installationId: string;
   private env: XmtpEnv;
-  private version: string;
+  private sdkVersion: string;
+  private libxmtpVersion: string;
 
   private walletKey!: string;
   private encryptionKeyHex!: string;
@@ -47,7 +43,8 @@ export class WorkerClient extends Worker {
 
     this.name = persona.name;
     this.installationId = persona.installationId;
-    this.version = persona.version;
+    this.sdkVersion = persona.sdkVersion;
+    this.libxmtpVersion = persona.libxmtpVersion;
     this.env = env;
     this.walletKey = persona.walletKey;
     this.encryptionKeyHex = persona.encryptionKey;
@@ -84,7 +81,8 @@ export class WorkerClient extends Worker {
       data: {
         name: this.name,
         installationId: this.installationId,
-        version: this.version,
+        sdkVersion: this.sdkVersion,
+        libxmtpVersion: this.libxmtpVersion,
       },
     });
 
@@ -93,10 +91,11 @@ export class WorkerClient extends Worker {
 
     const dbPath = getDbPath(
       this.name,
-      this.installationId,
-      this.version,
-      this.env,
       await signer.getAddress(),
+      this.env,
+      this.installationId,
+      this.sdkVersion,
+      this.libxmtpVersion,
     );
 
     console.time(`[${this.name}] Create XMTP client`);
@@ -188,6 +187,62 @@ export class WorkerClient extends Worker {
       };
 
       this.on("message", messageHandler);
+    });
+  } /**
+   * Collects multiple messages (of a specific type) from this worker.
+   * Unlike stream(), this method attaches a persistent listener that collects
+   * messages until the specified count is reached.
+   *
+   * @param typeId The content type to listen for.
+   * @param count The number of messages to collect.
+   * @param timeoutMs Optional timeout in milliseconds (default: 10,000 ms).
+   * @returns A promise that resolves with an array of WorkerMessages.
+   */
+  collectMessages(
+    typeId: string,
+    count: number,
+    timeoutMs: number = count * 1000, // 2 seconds per expected message
+  ): Promise<WorkerMessage[]> {
+    console.log(
+      `[${this.name}] Collecting ${count} messages of type ${typeId}`,
+    );
+    return new Promise((resolve, reject) => {
+      const messages: WorkerMessage[] = [];
+      const timeout = setTimeout(() => {
+        this.off("message", handler);
+        console.warn(
+          `[${this.name}] Timeout reached. Collected ${messages.length} messages out of ${count}.`,
+        );
+        // Instead of rejecting, resolve with the messages collected so far.
+        resolve(messages);
+      }, timeoutMs);
+
+      const handler = (msg: WorkerMessage) => {
+        // If it's an error event, reject immediately.
+        if (msg.type === "error") {
+          clearTimeout(timeout);
+          this.off("message", handler);
+          reject(new Error(`[${this.name}] Error: ${msg.message.content}`));
+          return;
+        }
+        // Accumulate stream messages that match the type.
+        if (
+          msg.type === "stream_message" &&
+          msg.message.contentType?.typeId === typeId
+        ) {
+          console.log(
+            `[${this.name}] Collected message: ${msg.message.content}`,
+          );
+          messages.push(msg);
+          if (messages.length === count) {
+            clearTimeout(timeout);
+            this.off("message", handler);
+            resolve(messages);
+          }
+        }
+      };
+
+      this.on("message", handler);
     });
   }
 }

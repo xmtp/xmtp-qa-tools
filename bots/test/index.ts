@@ -2,7 +2,7 @@ import { createLogger, overrideConsole } from "@helpers/logger";
 import { getWorkers } from "@helpers/workers/creator";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { type Persona } from "../../helpers/types";
+import { WorkerNames, type Persona } from "../../helpers/types";
 
 dotenv.config();
 
@@ -16,22 +16,24 @@ if (!ENCRYPTION_KEY_BOT) {
   throw new Error("ENCRYPTION_KEY_BOT must be set");
 }
 
+let personas: Record<string, Persona> = {};
 const env: XmtpEnv = XMTP_ENV as XmtpEnv;
-let bob: Persona;
-let alice: Persona;
-let joe: Persona;
-let sam: Persona;
-let bot: Persona;
 async function main() {
   const logger = createLogger("test-bot");
   overrideConsole(logger);
-  [bob, bot, alice, joe, sam] = await getWorkers(
-    ["bob", "bot", "alice", "joe", "sam"],
+  personas = await getWorkers(
+    [
+      WorkerNames.BOB,
+      WorkerNames.BOT,
+      WorkerNames.ALICE,
+      WorkerNames.JOE,
+      WorkerNames.SAM,
+    ],
     env,
     "test-bot",
   );
 
-  const client = bot.client as Client;
+  const client = personas[WorkerNames.BOT].client as Client;
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
@@ -73,9 +75,9 @@ async function main() {
       const groupName = `group-${new Date().toISOString().split("T")[0]}`;
       const group = await client.conversations.newGroup(
         [
-          alice.client?.accountAddress as `0x${string}`,
-          joe.client?.accountAddress as `0x${string}`,
-          sam.client?.accountAddress as `0x${string}`,
+          personas[WorkerNames.ALICE].client?.accountAddress as `0x${string}`,
+          personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
+          personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
         ],
         {
           groupName: groupName,

@@ -5,7 +5,6 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../../helpers/client";
-import { defaultValues } from "../../helpers/types";
 
 const settings = {
   apiKey: process.env.ALCHEMY_API_KEY, // Replace with your Alchemy API key

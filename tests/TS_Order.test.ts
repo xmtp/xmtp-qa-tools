@@ -1,152 +1,172 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
+  WorkerNames,
   type Conversation,
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { verifyMultipleDMs } from "../helpers/verify";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
 
+const amount = 30; // Number of messages to collect per receiver
+const testName = "TS_Order";
 const env: XmtpEnv = "dev";
-const amount = 5;
-const testName = "TS_Order_" + env;
-const logger = createLogger(testName);
-overrideConsole(logger);
+const timeoutMax = 100000;
+describe(
+  "TC_StreamOrder: should verify message order when receiving via streams",
+  () => {
+    let personas: Record<string, Persona>;
 
-/*
-TODO:
-- If if dont do the await, the messages are not in order, is this expected for guaranteeing order?
-- If i do the await, the messages are in order both in streams and pull, what would be a real-world way to test this?
-*/
+    let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+    let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
-describe(testName, () => {
-  let bob: Persona,
-    alice: Persona,
-    joe: Persona,
-    group: Conversation,
-    sam: Persona;
-  let personas: Persona[];
-
-  beforeAll(async () => {
-    [bob, alice, joe, sam] = await getWorkers(
-      ["bob", "alice", "joe", "sam"],
-      env,
-      testName,
-    );
-    personas = [bob, alice, joe, sam];
-  });
-
-  afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      personas.map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
-  });
-
-  it("TC_StreamOrder: should verify message order when receiving via streams", async () => {
-    group = await bob.client!.conversations.newGroup([
-      joe.client?.accountAddress as `0x${string}`,
-      bob.client?.accountAddress as `0x${string}`,
-      alice.client?.accountAddress as `0x${string}`,
-      sam.client?.accountAddress as `0x${string}`,
-    ]);
-    console.log("Group created", group.id);
-    expect(group.id).toBeDefined();
-
-    const randomMessage = Math.random().toString(36).substring(2, 15);
-    const messages: string[] = [];
-    for (let i = 0; i < amount; i++) {
-      messages.push("message-" + (i + 1).toString() + "-" + randomMessage);
-    }
-
-    // Wait for Joe to see it
-    const receivers = [joe, alice, sam];
-    const parsedMessages = await verifyMultipleDMs(
-      async () => {
-        // Send messages sequentially to maintain order
-        for (const msg of messages) {
-          await group.send(msg);
-        }
-      },
-      receivers,
-      amount,
-    );
-
-    // Group messages by receiver - each receiver should have all messages in order
-    for (let i = 0; i < receivers.length; i++) {
-      console.log(`Verifying messages for ${receivers[i].name}`);
-      const receiverMessages = parsedMessages.slice(
-        i * amount,
-        (i + 1) * amount,
+    beforeAll(async () => {
+      const logger = createLogger(testName);
+      overrideConsole(logger);
+      personas = await getWorkers(
+        [
+          WorkerNames.BOB,
+          WorkerNames.ALICE,
+          WorkerNames.JOE,
+          WorkerNames.SAM,
+          WorkerNames.CHARLIE,
+          WorkerNames.DAVE,
+          WorkerNames.EVE,
+          WorkerNames.FRANK,
+          WorkerNames.GRACE,
+          WorkerNames.HENRY,
+          WorkerNames.IVY,
+          WorkerNames.JACK,
+          WorkerNames.KAREN,
+          WorkerNames.LARRY,
+        ],
+        env,
+        testName,
       );
-      console.log("Expected:", messages);
-      console.log("Received:", receiverMessages);
-      // Assert that the messages are not in order
-      expect(receiverMessages.length).toBe(amount);
-      expect(receiverMessages).not.toEqual(messages);
-      console.log(`${receivers[i].name} did not receive messages in order`);
-    }
-  });
+    });
 
-  it("TC_PullOrder: should verify message order when receiving via pull", async () => {
-    console.time("createGroup");
-    group = await bob.client!.conversations.newGroup([
-      joe.client?.accountAddress as `0x${string}`,
-      bob.client?.accountAddress as `0x${string}`,
-      alice.client?.accountAddress as `0x${string}`,
-      sam.client?.accountAddress as `0x${string}`,
-    ]);
-    console.log("Group created", group.id);
-    expect(group.id).toBeDefined();
-    console.timeEnd("createGroup");
+    afterAll(async () => {
+      await flushLogger(testName);
+      await Promise.all(
+        Object.values(personas).map(async (persona) => {
+          await persona.worker?.terminate();
+        }),
+      );
+    });
 
-    console.time("sendMessages");
-    const randomMessage = Math.random().toString(36).substring(2, 15);
-    const messages: string[] = [];
-    for (let i = 0; i < amount; i++) {
-      messages.push("message-" + (i + 1).toString() + "-" + randomMessage);
-    }
+    it("TC_StreamOrder: should verify message order when receiving via streams", async () => {
+      // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
+      const group = await personas["bob"].client!.conversations.newGroup(
+        Object.values(personas).map(
+          (p) => p.client?.accountAddress as `0x${string}`,
+        ),
+      );
+      console.log("Group created", group.id);
+      expect(group.id).toBeDefined();
 
-    // Send messages sequentially to maintain order
-    for (const msg of messages) {
-      await group.send(msg);
-    }
-    console.timeEnd("sendMessages");
+      // Define receivers (excluding Bob, the creator).
+      const receivers = Object.values(personas).filter(
+        (p) =>
+          p.client?.accountAddress !==
+          personas[WorkerNames.BOB].client?.accountAddress,
+      );
 
-    console.time("pullMessages");
-    // Pull messages for both recipients
-    const conversation = alice.client!.conversations.getConversationById(
-      group.id,
-    );
-    const aliceMessages = await conversation!.messages();
-    const parsedAliceMessages = aliceMessages.map(
-      (msg) => msg.content as string,
-    );
-    const joeConversation = joe.client!.conversations.getConversationById(
-      group.id,
-    );
-    const joeMessages = await joeConversation!.messages();
-    const parsedJoeMessages = joeMessages.map((msg) => msg.content as string);
+      gmMessageGenerator = async (i: number, suffix: string) => {
+        return `gm-${i + 1}-${suffix}`;
+      };
+      gmSender = async (convo: Conversation, message: string) => {
+        await convo.send(message);
+      };
 
-    const samConversation = sam.client!.conversations.getConversationById(
-      group.id,
-    );
-    const samMessages = await samConversation!.messages();
-    const parsedSamMessages = samMessages.map((msg) => msg.content as string);
-    console.timeEnd("pullMessages");
-    // Verify the order of messages received by Alice
-    expect(parsedAliceMessages).toEqual(messages);
-    console.log("Alice received messages in order");
+      // Collect messages by setting up listeners before sending and then sending known messages.
+      const collectedMessages = await verifyStream(
+        group,
+        receivers,
+        gmMessageGenerator,
+        gmSender,
+        "text",
+        10,
+      );
 
-    // Verify the order of messages received by Joe
-    expect(parsedJoeMessages).toEqual(messages);
-    console.log("Joe received messages in order");
+      console.log("allReceived", collectedMessages.allReceived);
+      expect(collectedMessages.allReceived).toBe(true);
 
-    // Verify the order of messages received by Sam
-    expect(parsedSamMessages).toEqual(messages);
-    console.log("Sam received messages in order");
-  });
-});
+      // Verify the order of received messages
+      const receivedMessages = collectedMessages.messages.flat();
+      const expectedMessages = Array.from(
+        { length: 10 },
+        (_, i) => `gm-${i + 1}-${receivedMessages[0].split("-")[2]}`,
+      );
+
+      const inOrder = receivedMessages.every(
+        (msg, index) => msg === expectedMessages[index],
+      );
+
+      console.log("Messages received in order:", inOrder);
+      expect(inOrder).toBe(false);
+    });
+
+    it("TC_PullOrder: should verify message order when receiving via pull", async () => {
+      console.time("createGroup");
+      const group = await personas[
+        WorkerNames.BOB
+      ].client!.conversations.newGroup([
+        personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
+        personas[WorkerNames.BOB].client?.accountAddress as `0x${string}`,
+        personas[WorkerNames.ALICE].client?.accountAddress as `0x${string}`,
+        personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
+      ]);
+      console.log("Group created", group.id);
+      expect(group.id).toBeDefined();
+      console.timeEnd("createGroup");
+
+      console.time("sendMessages");
+      const randomMessage = Math.random().toString(36).substring(2, 15);
+      const messages: string[] = [];
+      for (let i = 0; i < amount; i++) {
+        messages.push("message-" + (i + 1).toString() + "-" + randomMessage);
+      }
+
+      // Send messages sequentially to maintain order
+      for (const msg of messages) {
+        await group.send(msg);
+      }
+      console.timeEnd("sendMessages");
+
+      console.time("pullMessages");
+      // Pull messages for both recipients
+      const conversation = personas[
+        WorkerNames.ALICE
+      ].client!.conversations.getConversationById(group.id);
+      const aliceMessages = await conversation!.messages();
+      const parsedAliceMessages = aliceMessages.map(
+        (msg) => msg.content as string,
+      );
+      const joeConversation = personas[
+        WorkerNames.JOE
+      ].client!.conversations.getConversationById(group.id);
+      const joeMessages = await joeConversation!.messages();
+      const parsedJoeMessages = joeMessages.map((msg) => msg.content as string);
+
+      const samConversation = personas[
+        WorkerNames.SAM
+      ].client!.conversations.getConversationById(group.id);
+      const samMessages = await samConversation!.messages();
+      const parsedSamMessages = samMessages.map((msg) => msg.content as string);
+      console.timeEnd("pullMessages");
+      // Verify the order of messages received by Alice
+      expect(parsedAliceMessages).toEqual(messages);
+      console.log("Alice received messages in order");
+
+      // Verify the order of messages received by Joe
+      expect(parsedJoeMessages).toEqual(messages);
+      console.log("Joe received messages in order");
+
+      // Verify the order of messages received by Sam
+      expect(parsedSamMessages).toEqual(messages);
+      console.log("Sam received messages in order");
+    });
+  },
+  timeoutMax, // 100 seconds
+);

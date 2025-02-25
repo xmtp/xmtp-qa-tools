@@ -1,7 +1,7 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
-import { verifyDMs, verifyMetadataUpdates } from "../helpers/verify";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env = "dev";
@@ -20,15 +20,18 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 */
 
 describe(testName, () => {
-  let participants: Persona[] = [];
-  let random: Persona;
-  let bella: Persona;
-  let dave: Persona;
-  let elon: Persona;
-  let diana: Persona;
+  let personas: Record<string, Persona>;
   let group: Conversation;
+  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
   beforeAll(async () => {
+    gmMessageGenerator = async (i: number, suffix: string) => {
+      return `gm-${i + 1}-${suffix}`;
+    };
+    gmSender = async (convo: Conversation, message: string) => {
+      await convo.send(message);
+    };
     console.time("createLogger");
     const logger = createLogger(testName);
     console.timeEnd("createLogger");
@@ -38,7 +41,7 @@ describe(testName, () => {
     console.timeEnd("overrideConsole");
 
     console.time("getWorkers");
-    participants = await getWorkers(
+    personas = await getWorkers(
       [
         WorkerNames.BELLA,
         WorkerNames.DAVE,
@@ -49,15 +52,13 @@ describe(testName, () => {
       env,
       testName,
     );
-    [bella, dave, elon, diana, random] = participants;
     console.timeEnd("getWorkers");
   });
 
   afterAll(async () => {
-    console.time("afterAll");
-    flushLogger(testName);
+    await flushLogger(testName);
     await Promise.all(
-      participants.map(async (p) => {
+      Object.values(personas).map(async (p) => {
         await p.worker?.terminate();
       }),
     );
@@ -66,11 +67,10 @@ describe(testName, () => {
 
   it("should create a group", async () => {
     console.time("newGroup");
-    group = await bella.client!.conversations.newGroup([
-      dave.client!.accountAddress,
-      elon.client!.accountAddress,
-      diana.client!.accountAddress,
-      random.client!.accountAddress,
+    group = await personas[WorkerNames.BELLA].client!.conversations.newGroup([
+      ...Object.values(personas).map(
+        (p) => p.client?.accountAddress as `0x${string}`,
+      ),
     ]);
     expect(group).toBeDefined();
     expect(group.id).toBeDefined();
@@ -78,50 +78,75 @@ describe(testName, () => {
   });
 
   it("should message a gm", async () => {
-    expect(await verifyDMs(group, participants)).toBe(true);
+    const result = await verifyStream(
+      group,
+      [personas[WorkerNames.ELON]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   });
 
   it("should handle group name updates", async () => {
     console.time("updateName");
-    const groupName =
-      "New Group Name" + Math.random().toString(36).substring(2, 15);
-    await verifyMetadataUpdates(
-      () => group.updateName(groupName),
-      participants,
-      { fieldName: "group_name", newValue: groupName },
+    const nameUpdateGenerator = async (i: number, suffix: string) => {
+      return `New name-${i + 1}-${suffix}`;
+    };
+
+    const nameUpdater = async (group: Conversation, newName: string) => {
+      await group.updateName(newName);
+    };
+
+    const result = await verifyStream(
+      group,
+      [personas["elon"]],
+      nameUpdateGenerator,
+      nameUpdater,
+      "group_updated",
     );
+    expect(result.allReceived).toBe(true);
     console.timeEnd("updateName");
 
-    expect(await verifyDMs(group, participants)).toBe(true);
+    const resultDm = await verifyStream(
+      group,
+      [personas["elon"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(resultDm.allReceived).toBe(true);
   });
 
   it("should handle adding new  members", async () => {
     console.time("addMembers");
-    await group.addMembers([random.client?.accountAddress as `0x${string}`]);
+    await group.addMembers([
+      personas["random"].client?.accountAddress as `0x${string}`,
+    ]);
     console.timeEnd("addMembers");
 
-    participants.push(random);
-
-    expect(await verifyDMs(group, participants)).toBe(true);
+    const result = await verifyStream(
+      group,
+      [personas["elon"]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(result.allReceived).toBe(true);
   });
 
   it("should handle removing members", async () => {
     console.time("removeMembers");
-    await group.removeMembers([random.client?.accountAddress as `0x${string}`]);
+    await group.removeMembers([
+      personas["random"].client?.accountAddress as `0x${string}`,
+    ]);
     console.timeEnd("removeMembers");
 
-    participants = participants.filter((p) => p !== random);
-
-    console.time("verifyMetadataUpdates");
-    const groupName =
-      "New Group Name" + Math.random().toString(36).substring(2, 15);
-    await verifyMetadataUpdates(
-      () => group.updateName(groupName),
-      participants,
-      { fieldName: "group_name", newValue: groupName },
+    console.time("verifyStream");
+    const result = await verifyStream(
+      group,
+      Object.values(personas).filter((p) => p !== personas["random"]),
+      gmMessageGenerator,
+      gmSender,
     );
-    console.timeEnd("verifyMetadataUpdates");
-
-    expect(await verifyDMs(group, participants)).toBe(true);
+    console.timeEnd("verifyStream");
+    expect(result.allReceived).toBe(true);
   });
 });

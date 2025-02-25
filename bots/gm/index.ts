@@ -4,7 +4,6 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "../../helpers/client";
-import { defaultValues } from "../../helpers/types";
 
 const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT } = process.env;
 

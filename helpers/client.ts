@@ -27,10 +27,9 @@ export const getDbPath = (
   libxmtpVersion?: string,
 ): string => {
   console.time(`[${name}] - getDbPath`);
-  const namePath = name.toLowerCase().includes("random")
-    ? "random/" + name.toLowerCase()
-    : name.toLowerCase();
-
+  // const namePath = name.toLowerCase().includes("random")
+  //   ? "random/" + name.toLowerCase()
+  //   : name.toLowerCase();
   const nameSet = name.toLowerCase();
   const installationIdSet =
     installationId?.toLowerCase() ?? defaultValues.installationId;
@@ -39,8 +38,9 @@ export const getDbPath = (
     libxmtpVersion?.toLowerCase() ?? defaultValues.libxmtpVersion;
   const identifier = `${nameSet}-${accountAddress}-${installationIdSet}-${sdkVersionSet}-${libxmtpVersionSet}-${env}`;
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
-  const basePath = `${preBasePath}/.data/${namePath}`;
+  const basePath = `${preBasePath}/.data/${nameSet}`;
   const result = `${basePath}/${identifier}`;
+
   console.time(`[${nameSet}] - create basePath`);
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });

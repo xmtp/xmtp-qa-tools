@@ -1,29 +1,31 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
+  WorkerNames,
   type Conversation,
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { verifyDMs, verifyMetadataUpdates } from "../helpers/verify";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
 
 describe(testName, () => {
-  let bob: Persona;
-  let joe: Persona;
-  let sam: Persona;
-  let alice: Persona;
-  let random: Persona;
-  let randompep: Persona;
-  let elon: Persona;
   let bobsGroup: Conversation;
   let dmConvo: Conversation;
-  let personas: Persona[];
+  let personas: Record<string, Persona>;
+  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
   beforeAll(async () => {
+    gmMessageGenerator = async (i: number, suffix: string) => {
+      return `gm-${i + 1}-${suffix}`;
+    };
+    gmSender = async (convo: Conversation, message: string) => {
+      await convo.send(message);
+    };
     const logger = createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
@@ -31,21 +33,20 @@ describe(testName, () => {
       env,
       testName,
     );
-    [bob, joe, sam, alice, randompep, elon, random] = personas;
   });
 
   afterAll(async () => {
     await flushLogger(testName);
     await Promise.all(
-      personas.map(async (persona) => {
+      Object.values(personas).map(async (persona) => {
         await persona.worker?.terminate();
       }),
     );
   });
 
   it("TC_CreateDM: should measure creating a DM", async () => {
-    dmConvo = await bob.client!.conversations.newDm(
-      random.client!.accountAddress,
+    dmConvo = await personas[WorkerNames.BOB].client!.conversations.newDm(
+      personas["random"].client!.accountAddress,
     );
     expect(dmConvo).toBeDefined();
     expect(dmConvo.id).toBeDefined();
@@ -56,7 +57,7 @@ describe(testName, () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${bob.name}] Creating DM with ${sam.name} at ${sam.client?.accountAddress}`,
+      `[${personas[WorkerNames.BOB].name}] Creating DM with ${personas[WorkerNames.SAM].name} at ${personas[WorkerNames.SAM].client?.accountAddress}`,
     );
 
     const dmId = await dmConvo.send(message);
@@ -65,8 +66,8 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGM: should measure receiving a gm", async () => {
-    const dmConvo = await bob.client?.conversations.newDm(
-      sam.client?.accountAddress as `0x${string}`,
+    const dmConvo = await personas[WorkerNames.BOB].client?.conversations.newDm(
+      personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
     );
     if (!dmConvo) {
       throw new Error("DM conversation not found");
@@ -74,18 +75,22 @@ describe(testName, () => {
 
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    const result = await verifyDMs(dmConvo, [sam]);
-    expect(result).toBe(true);
+    const verifyResult = await verifyStream(
+      dmConvo,
+      [personas[WorkerNames.SAM]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("TC_CreateGroup: should measure creating a group", async () => {
     console.time("create group");
-    bobsGroup = await bob.client!.conversations.newGroup([
-      bob.client?.accountAddress as `0x${string}`,
-      joe.client?.accountAddress as `0x${string}`,
-      alice.client?.accountAddress as `0x${string}`,
-      elon.client?.accountAddress as `0x${string}`,
-    ]);
+    bobsGroup = await personas[WorkerNames.BOB].client!.conversations.newGroup(
+      Object.values(personas)
+        .filter((p) => p.name !== "randompep")
+        .map((p) => p.client?.accountAddress as `0x${string}`),
+    );
     console.log("Bob's group", bobsGroup.id);
     console.timeEnd("create group");
     expect(bobsGroup.id).toBeDefined();
@@ -93,15 +98,22 @@ describe(testName, () => {
 
   it("TC_UpdateGroupName: should create a group and update group name", async () => {
     console.time("update group name");
-    const newGroupName =
-      "New Group Name" + Math.random().toString(36).substring(2, 15);
 
-    const result = await verifyMetadataUpdates(
-      () => bobsGroup.updateName(newGroupName),
-      [elon],
-      { fieldName: "group_name", newValue: newGroupName },
+    const nameUpdateGenerator = async (i: number, suffix: string) => {
+      return `New name-${i + 1}-${suffix}`;
+    };
+
+    const nameUpdater = async (group: Conversation, newName: string) => {
+      await group.updateName(newName);
+    };
+    const result = await verifyStream(
+      bobsGroup,
+      [personas["elon"]],
+      nameUpdateGenerator,
+      nameUpdater,
+      "group_updated",
     );
-    expect(result).toEqual([newGroupName]);
+    expect(result.allReceived).toBe(true);
     console.timeEnd("update group name");
   });
 
@@ -109,7 +121,7 @@ describe(testName, () => {
     console.time("add members");
     const previousMembers = await bobsGroup.members();
     await bobsGroup.addMembers([
-      randompep.client?.accountAddress as `0x${string}`,
+      personas["randompep"].client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
     console.timeEnd("add members");
@@ -120,7 +132,7 @@ describe(testName, () => {
     console.time("remove members");
     const previousMembers = await bobsGroup.members();
     await bobsGroup.removeMembers([
-      joe.client?.accountAddress as `0x${string}`,
+      personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
     console.timeEnd("remove members");
@@ -136,19 +148,30 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
-    const result = await verifyDMs(bobsGroup, [elon]);
-    expect(result).toBe(true);
+    const verifyResult = await verifyStream(
+      bobsGroup,
+      [personas[WorkerNames.ELON]],
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("TC_ReceiveGroupMessage: should create a group and measure 2 streams catching up a message in a group", async () => {
-    const newGroup = await bob.client!.conversations.newGroup([
-      alice.client?.accountAddress as `0x${string}`,
-      joe.client?.accountAddress as `0x${string}`,
-      randompep.client?.accountAddress as `0x${string}`,
-      elon.client?.accountAddress as `0x${string}`,
-    ]);
+    const newGroup = await personas[
+      WorkerNames.BOB
+    ].client!.conversations.newGroup(
+      Object.values(personas).map(
+        (p) => p.client?.accountAddress as `0x${string}`,
+      ),
+    );
 
-    const result = await verifyDMs(newGroup, [joe, alice, randompep, elon]);
-    expect(result).toBe(true);
+    const verifyResult = await verifyStream(
+      newGroup,
+      Object.values(personas).map((p) => p),
+      gmMessageGenerator,
+      gmSender,
+    );
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

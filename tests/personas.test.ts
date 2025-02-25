@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { WorkerNames } from "../helpers/types";
+import { WorkerNames, type Persona } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
 
 const env = "dev";
@@ -17,6 +17,8 @@ TODO:
 */
 
 describe(testName, () => {
+  let personas: Record<string, Persona>;
+
   beforeAll(async () => {
     const logger = createLogger(testName);
     overrideConsole(logger);
@@ -26,30 +28,38 @@ describe(testName, () => {
 
   afterAll(async () => {
     await flushLogger(testName);
+    await Promise.all(
+      Object.values(personas).map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
+    );
+  });
+  it("create random personas", async () => {
+    personas = await getWorkers(["random"], env, testName);
+    expect(personas["random"].client?.accountAddress).toBeDefined();
   });
 
   it("should create a persona", async () => {
     // Get Bob's persona using the enum value.
-    const [bob] = await getWorkers([WorkerNames.BOB], env, testName);
+    personas = await getWorkers([WorkerNames.BOB, "random"], env, testName);
 
-    expect(bob.client?.accountAddress).toBeDefined();
+    expect(personas[WorkerNames.BOB].client?.accountAddress).toBeDefined();
   });
 
   it("should create a random persona", async () => {
-    const [randomPersona] = await getWorkers(["random"], env, testName);
-    expect(randomPersona.client?.accountAddress).toBeDefined();
+    personas = await getWorkers(["random"], env, testName);
+    expect(personas["random"].client?.accountAddress).toBeDefined();
   });
 
   it("should create multiple personas", async () => {
-    const personas = await getWorkers(
+    personas = await getWorkers(
       [WorkerNames.BOB, WorkerNames.ALICE, "randompep", "randombob"],
       env,
       testName,
     );
-    const [bob, alice, random, randomBob] = personas;
-    expect(bob.client?.accountAddress).toBeDefined();
-    expect(alice.client?.accountAddress).toBeDefined();
-    expect(random.client?.accountAddress).toBeDefined();
-    expect(randomBob.client?.accountAddress).toBeDefined();
+    expect(personas[WorkerNames.BOB].client?.accountAddress).toBeDefined();
+    expect(personas[WorkerNames.ALICE].client?.accountAddress).toBeDefined();
+    expect(personas["randompep"].client?.accountAddress).toBeDefined();
+    expect(personas["randombob"].client?.accountAddress).toBeDefined();
   });
 });
