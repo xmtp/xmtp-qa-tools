@@ -5,7 +5,7 @@ node_modules
 .yarn/
 .vscode/
 .env
-!bugs/**/.env/
+!bugs/**/.env
 # testing
 coverage
 .data/
