@@ -17,13 +17,10 @@ const receivers = 50;
 const initializeTime = 5000; // 10 seconds
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax =
-  amountofMessages *
-  receivers *
-  initializeTime *
-  defaultValues.perMessageTimeout;
+  amountofMessages * receivers * defaultValues.perMessageTimeout;
 
 describe(
-  "TC_StreamLoss: should verify message loss when receiving via streams",
+  "TS_Stream_Loss: should verify message loss when receiving via streams",
   () => {
     let personas: Record<string, Persona>;
 
@@ -52,7 +49,7 @@ describe(
       );
     });
 
-    it("TC_StreamOrder: should verify message order when receiving via streams", async () => {
+    it("TS_Stream_Loss: should verify message order when receiving via streams", async () => {
       // Create a new group conversation with Bob (creator) and all others.
       const firstPersona = Object.values(personas)[0];
       console.log(
