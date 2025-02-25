@@ -61,6 +61,24 @@ describe(testName, () => {
     expect(bobsGroup.id).toBeDefined();
   });
 
+  it("TC_CreateGroup: should measure creating a group with inbox ids", async () => {
+    console.time("bobsGroupByInboxIds");
+    /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-disable @typescript-eslint/no-unsafe-call */
+    const bobsGroupByInboxIds = await personas[
+      "bob"
+    ].client!.conversations.newGroupByInboxIds([
+      personas["alice"].client!.inboxId,
+      personas["joe"].client!.inboxId,
+      personas["elon"].client!.inboxId,
+    ]);
+    /* eslint-enable @typescript-eslint/no-unsafe-assignment */
+    /* eslint-enable @typescript-eslint/no-unsafe-call */
+    console.log("bobsGroupByInboxIds", bobsGroupByInboxIds.id);
+    console.timeEnd("bobsGroupByInboxIds");
+    expect(bobsGroupByInboxIds.id).toBeDefined();
+  });
+
   it("TC_UpdateGroupName: should create a group and update group name", async () => {
     console.time("update group name");
 
