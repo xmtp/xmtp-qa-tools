@@ -107,13 +107,12 @@ export class WorkerClient extends Worker {
       {
         installationId: this.installationId,
         sdkVersion: this.sdkVersion,
-        version: version,
+        libxmtpVersion: version,
       },
       {
         testName: this.testName,
       },
     );
-    console.log("dbPath", dbPath);
     console.time(`[${this.name}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,

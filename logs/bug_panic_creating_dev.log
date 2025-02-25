@@ -1,18 +1,11 @@
-[2025-02-25T21:32:05.158Z] [info] [PersonaFactory] Creating personas: bob, alice, joe, randompep, elon for bug_panic_creating_dev
-[2025-02-25T21:32:05.184Z] [info] testName bug_panic_creating_dev
-[2025-02-25T21:32:05.185Z] [info] testName bug_panic_creating_dev
-[2025-02-25T21:32:05.186Z] [info] testName bug_panic_creating_dev
-[2025-02-25T21:32:05.187Z] [info] testName bug_panic_creating_dev
-[2025-02-25T21:32:05.188Z] [info] testName bug_panic_creating_dev
-[2025-02-25T21:32:05.188Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/
-[2025-02-25T21:32:05.188Z] [info] dbpath: /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-436360a-dev
-[2025-02-25T21:32:05.189Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/
-[2025-02-25T21:32:05.189Z] [info] dbpath: /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/alice/alice-0x620BCD903c72064F2d1914de60Ea4797C3D366C2-a-44-436360a-dev
-[2025-02-25T21:32:05.189Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/
-[2025-02-25T21:32:05.189Z] [info] dbpath: /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-436360a-dev
-[2025-02-25T21:32:05.189Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/
-[2025-02-25T21:32:05.189Z] [info] dbpath: /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/randompep/randompep-0xC012658C10bd459060D1222Ac960625aD713Cbd4-a-44-436360a-dev
-[2025-02-25T21:32:05.189Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/
-[2025-02-25T21:32:05.190Z] [info] dbpath: /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/elon/elon-0xdb5882EAe65d00A95334aF78caD22dAd4B3eA618-a-44-436360a-dev
-[2025-02-25T21:32:07.799Z] [info] {"DNS Lookup":0.003675,"TCP Connection":0.003891,"TLS Handshake":0.500261,"Server Processing":0.658131,"Content Transfer":0.65815}
-[2025-02-25T21:32:07.799Z] [warn] total: 658.15ms, tls: 500.26099999999997ms, processing: 157.889ms
+[2025-02-25T21:45:38.005Z] [info] [PersonaFactory] Creating personas: bob, alice, joe, randompep, elon for bug_panic_creating_dev
+[2025-02-25T21:45:38.042Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/bob
+[2025-02-25T21:45:38.043Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/bob/bob-0x5f276F28D44eaBEe2B53a593e7C803BcFe349508-a-44-undefined-dev
+[2025-02-25T21:45:38.043Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/alice
+[2025-02-25T21:45:38.043Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/alice/alice-0x620BCD903c72064F2d1914de60Ea4797C3D366C2-a-44-undefined-dev
+[2025-02-25T21:45:38.043Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/joe
+[2025-02-25T21:45:38.043Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/joe/joe-0xC7F034DC0C60e34AAD5d13bcBd125c19856dE399-a-44-undefined-dev
+[2025-02-25T21:45:38.043Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/randompep
+[2025-02-25T21:45:38.043Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/randompep/randompep-0xF08A40C452e94F0a800E47afb2441c3889282823-a-44-undefined-dev
+[2025-02-25T21:45:38.044Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/elon
+[2025-02-25T21:45:38.044Z] [info] dbPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_panic_creating_dev/.data/elon/elon-0xdb5882EAe65d00A95334aF78caD22dAd4B3eA618-a-44-undefined-dev

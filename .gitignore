@@ -5,11 +5,9 @@ node_modules
 .yarn/
 .vscode/
 .env
-!bugs/**/.env
 # testing
 coverage
 .data/
-!bugs/**/.data/
 # misc
 .DS_Store
 *.pem
