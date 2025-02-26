@@ -1,0 +1,34 @@
+[2025-02-26T10:45:48.753Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_ConvoStreams_dev
+[2025-02-26T10:45:50.685Z] [warn] [elon] Create XMTP client v:436360a 1.896s
+[2025-02-26T10:45:50.701Z] [warn] [bob] Create XMTP client v:436360a 1.912s
+[2025-02-26T10:45:50.935Z] [warn] [joe] Create XMTP client v:436360a 2.146s
+[2025-02-26T10:45:50.977Z] [warn] [fabri] Create XMTP client v:436360a 2.187s
+[2025-02-26T10:45:51.034Z] [warn] [alice] Create XMTP client v:436360a 2.244s
+[2025-02-26T10:45:51.049Z] [warn] [elon] Start message stream 363.198ms
+[2025-02-26T10:45:51.049Z] [info] [elon] Message stream started
+[2025-02-26T10:45:51.050Z] [warn] [elon] Start stream 364.012ms
+[2025-02-26T10:45:51.068Z] [warn] [bob] Start message stream 365.787ms
+[2025-02-26T10:45:51.068Z] [info] [bob] Message stream started
+[2025-02-26T10:45:51.069Z] [warn] [bob] Start stream 367.154ms
+[2025-02-26T10:45:51.308Z] [warn] [joe] Start message stream 371.573ms
+[2025-02-26T10:45:51.309Z] [info] [joe] Message stream started
+[2025-02-26T10:45:51.309Z] [warn] [joe] Start stream 373.809ms
+[2025-02-26T10:45:51.362Z] [warn] [fabri] Start message stream 383.206ms
+[2025-02-26T10:45:51.363Z] [info] [fabri] Message stream started
+[2025-02-26T10:45:51.363Z] [warn] [fabri] Start stream 385.023ms
+[2025-02-26T10:45:51.396Z] [warn] [alice] Start message stream 361.013ms
+[2025-02-26T10:45:51.396Z] [info] [alice] Message stream started
+[2025-02-26T10:45:51.398Z] [warn] [alice] Start stream 363.899ms
+[2025-02-26T10:45:51.416Z] [warn] [elon] Sync conversations 365.828ms
+[2025-02-26T10:45:51.416Z] [warn] [elon] Initialize XMTP client 2.630s
+[2025-02-26T10:45:51.443Z] [warn] [bob] Sync conversations 373.628ms
+[2025-02-26T10:45:51.444Z] [warn] [bob] Initialize XMTP client 2.686s
+[2025-02-26T10:45:51.677Z] [warn] [joe] Sync conversations 366.475ms
+[2025-02-26T10:45:51.677Z] [warn] [joe] Initialize XMTP client 2.892s
+[2025-02-26T10:45:51.742Z] [warn] [fabri] Sync conversations 378.546ms
+[2025-02-26T10:45:51.743Z] [warn] [fabri] Initialize XMTP client 2.956s
+[2025-02-26T10:45:51.767Z] [warn] [alice] Sync conversations 367.598ms
+[2025-02-26T10:45:51.767Z] [warn] [alice] Initialize XMTP client 2.979s
+[2025-02-26T10:45:51.771Z] [info] [fabri] Starting conversation stream verification test
+[2025-02-26T10:45:52.730Z] [info] {"DNS Lookup":0.001815,"TCP Connection":0.002007,"TLS Handshake":0.541799,"Server Processing":0.708621,"Content Transfer":0.708701}
+[2025-02-26T10:45:52.730Z] [warn] total: 708.701ms, tls: 541.799ms, processing: 166.90200000000004ms

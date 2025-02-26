@@ -18,10 +18,15 @@ import { WorkerClient } from "./main";
 export class PersonaFactory {
   private env: XmtpEnv;
   private testName: string;
-
-  constructor(env: XmtpEnv, testName: string) {
+  private typeofStream: "message" | "conversation";
+  constructor(
+    env: XmtpEnv,
+    testName: string,
+    typeofStream: "message" | "conversation",
+  ) {
     this.env = env;
     this.testName = testName;
+    this.typeofStream = typeofStream;
   }
 
   /**
@@ -154,7 +159,7 @@ export class PersonaFactory {
 
     // Spin up Workers in parallel
     const messageWorkers = await Promise.all(
-      personas.map((p) => new WorkerClient(p, this.env)),
+      personas.map((p) => new WorkerClient(p, this.env, this.typeofStream)),
     );
 
     // Initialize each worker's XMTP client in parallel
@@ -186,6 +191,7 @@ export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   env: XmtpEnv,
   testName: string,
+  typeofStream: "message" | "conversation" = "message",
 ): Promise<Record<string, Persona>> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
@@ -196,7 +202,7 @@ export async function getWorkers(
     descriptors = descriptorsOrAmount;
   }
 
-  const personaFactory = new PersonaFactory(env, testName);
+  const personaFactory = new PersonaFactory(env, testName, typeofStream);
   const personas = await personaFactory.createPersonas(descriptors);
 
   return personas.reduce<Record<string, Persona>>((acc, p) => {

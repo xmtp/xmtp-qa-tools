@@ -43,7 +43,7 @@ export async function verifyStream<T extends string>(
   // Start collectors
   const collectPromises = receivers.map((r) =>
     r.worker
-      ?.collectMessages(conversationId, collectorType, randomSuffix, count)
+      ?.collectMessages(conversationId, collectorType, count)
       .then((msgs: MessageStreamWorker[]) =>
         msgs.map((m) => m.message.content as T),
       ),
