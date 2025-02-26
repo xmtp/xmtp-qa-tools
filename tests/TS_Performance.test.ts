@@ -1,3 +1,4 @@
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
@@ -6,9 +7,10 @@ import {
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/messages";
 
+dotenv.config();
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
 

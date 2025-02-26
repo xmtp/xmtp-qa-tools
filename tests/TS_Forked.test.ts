@@ -1,18 +1,14 @@
-import path from "path";
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/messages";
 
 const env = "dev";
 const testName = "TS_Forked_" + env;
 
 dotenv.config();
-dotenv.config({
-  path: path.resolve(process.cwd(), `.data/.env`),
-});
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

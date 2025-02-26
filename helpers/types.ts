@@ -6,6 +6,11 @@ import {
 } from "@xmtp/node-sdk";
 import type { WorkerClient } from "./workers/messages";
 
+export type WorkerStreamMessage = {
+  type: "stream_message";
+  message: DecodedMessage;
+};
+
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };
 // Define the expected return type of verifyStream

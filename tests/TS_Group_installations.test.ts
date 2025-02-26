@@ -1,4 +1,3 @@
-import path from "path";
 import dotenv from "dotenv";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
@@ -8,12 +7,8 @@ import {
   type XmtpEnv,
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/messages";
 
 dotenv.config();
-dotenv.config({
-  path: path.resolve(process.cwd(), `.data/.env`),
-});
 
 /**
  * TODO

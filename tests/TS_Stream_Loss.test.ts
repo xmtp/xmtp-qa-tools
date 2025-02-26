@@ -8,13 +8,10 @@ import {
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
+import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/messages";
 
 dotenv.config();
-dotenv.config({
-  path: path.resolve(process.cwd(), `.data/.env`),
-});
 
 const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";

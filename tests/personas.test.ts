@@ -1,4 +1,3 @@
-import path from "path";
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
@@ -6,9 +5,6 @@ import { WorkerNames, type Persona } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
 
 dotenv.config();
-dotenv.config({
-  path: path.resolve(process.cwd(), `.data/.env`),
-});
 
 const env = "dev";
 const testName = "TS_Personas_" + env;
