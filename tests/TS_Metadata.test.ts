@@ -17,22 +17,16 @@ describe(testName, () => {
     const logger = await createLogger(testName);
     overrideConsole(logger);
     personas = await getWorkers(
-      [
-        WorkerNames.BOB,
-        WorkerNames.JOE,
-        WorkerNames.ELON,
-        WorkerNames.FABRI,
-        WorkerNames.ALICE,
-      ],
+      ["bob", "joe", "elon", "fabri", "alice"],
       "dev",
       testName,
     );
 
     console.time("create group");
-    bobsGroup = await personas[WorkerNames.BOB].client!.conversations.newGroup([
-      personas[WorkerNames.BOB].client?.accountAddress as `0x${string}`,
-      personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
-      personas[WorkerNames.ELON].client?.accountAddress as `0x${string}`,
+    bobsGroup = await personas.bob.client!.conversations.newGroup([
+      personas.bob.client?.accountAddress as `0x${string}`,
+      personas.joe.client?.accountAddress as `0x${string}`,
+      personas.elon.client?.accountAddress as `0x${string}`,
     ]);
     console.log("Bob's group", bobsGroup.id);
     console.timeEnd("create group");
@@ -59,7 +53,7 @@ describe(testName, () => {
     };
     const verifyResult = await verifyStream(
       bobsGroup,
-      [personas["joe"]],
+      [personas.joe],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -71,7 +65,7 @@ describe(testName, () => {
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
     await bobsGroup.addMembers([
-      personas[WorkerNames.FABRI].client?.accountAddress as `0x${string}`,
+      personas.fabri.client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
     console.timeEnd("add members");
@@ -81,7 +75,7 @@ describe(testName, () => {
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
     console.time("remove members");
     await bobsGroup.removeMembers([
-      personas[WorkerNames.FABRI].client?.accountAddress as `0x${string}`,
+      personas.fabri.client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
     console.timeEnd("remove members");

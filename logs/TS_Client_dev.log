@@ -1,26 +1,13 @@
-[2025-02-25T11:52:58.263Z] [info] [{"name":"alice","installationId":"a","sdkVersion":"44","libxmtpVersion":"39","walletKey":"0x255bb289911b7ea11f43ad41d959d7357346590c881de5d866d44b4e625f7cfe","encryptionKey":"e35a9042367ab3e6c86d67a0b863ca539fbfb0ad3d9ccc4c001a20fb1312993a","worker":null,"client":null,"dbPath":"","address":"","version":""},{"name":"randompep","installationId":"a","sdkVersion":"44","libxmtpVersion":"39","walletKey":"0x93888a22ad2d5798f8c4c9761ac9f02727c13fadecf76e1e27ea63c09c57ba57","encryptionKey":"3546ac2cbb5fbb18a8e2675e04a90844da7caea9fde51927502d49447d5be5aa","worker":null,"client":null,"dbPath":"","address":"","version":""}]
-[2025-02-25T11:52:58.263Z] [info] Creating WorkerClient for persona: alice
-[2025-02-25T11:52:58.264Z] [info] Creating WorkerClient for persona: randompep
-[2025-02-25T11:52:58.265Z] [info] Initializing client for worker: alice
-[2025-02-25T11:52:58.287Z] [info] Initializing client for worker: randompep
-[2025-02-25T11:52:58.288Z] [info] Generated DB path for alice: /Users/fabrizioguespe/DevRel/qa-testing/.data/alice/alice-0x7788b23377c368B571D6ce4DA9B54670409A96d0-a-44-39-dev
-[2025-02-25T11:52:58.289Z] [info] Generated DB path for randompep: /Users/fabrizioguespe/DevRel/qa-testing/.data/randompep/randompep-0x35E547B39e9f2eDaEc685796C82CF1Ed54878cC7-a-44-39-dev
-[2025-02-25T11:53:00.394Z] [warn] [alice] Create XMTP client 2.105s
-[2025-02-25T11:53:00.760Z] [warn] [alice] Start message stream 364.659ms
-[2025-02-25T11:53:00.761Z] [info] [alice] Message stream started
-[2025-02-25T11:53:00.761Z] [warn] [alice] Start stream 365.886ms
-[2025-02-25T11:53:01.131Z] [warn] [alice] Sync conversations 369.97ms
-[2025-02-25T11:53:01.131Z] [warn] [alice] Initialize XMTP client 2.866s
-[2025-02-25T11:53:01.926Z] [warn] [randompep] Create XMTP client 3.637s
-[2025-02-25T11:53:02.305Z] [warn] [randompep] Start message stream 377.965ms
-[2025-02-25T11:53:02.305Z] [info] [randompep] Message stream started
-[2025-02-25T11:53:02.306Z] [warn] [randompep] Start stream 379.673ms
-[2025-02-25T11:53:02.686Z] [warn] [randompep] Sync conversations 379.724ms
-[2025-02-25T11:53:02.686Z] [warn] [randompep] Initialize XMTP client 4.399s
-[2025-02-25T11:53:02.686Z] [info] Assigning worker and client to persona: alice
-[2025-02-25T11:53:02.687Z] [info] Generated DB path for alice: /Users/fabrizioguespe/DevRel/qa-testing/.data/alice/alice-0x7788b23377c368B571D6ce4DA9B54670409A96d0-a-44-39-dev
-[2025-02-25T11:53:02.687Z] [info] Assigning worker and client to persona: randompep
-[2025-02-25T11:53:02.687Z] [info] Generated DB path for randompep: /Users/fabrizioguespe/DevRel/qa-testing/.data/randompep/randompep-0x35E547B39e9f2eDaEc685796C82CF1Ed54878cC7-a-44-39-dev
-[2025-02-25T11:53:02.687Z] [warn] getWorkers - alice,randompep 4.426s
-[2025-02-25T11:53:03.968Z] [info] {"DNS Lookup":0.00183,"TCP Connection":0.001979,"TLS Handshake":0.558833,"Server Processing":0.899149,"Content Transfer":0.899193}
-[2025-02-25T11:53:03.968Z] [warn] total: 899.193ms, tls: 558.833ms, processing: 340.36ms
+[2025-02-26T11:45:31.712Z] [info] [PersonaFactory] Creating personas: alice, randompep for TS_Client_dev
+[2025-02-26T11:45:33.618Z] [warn] [alice] Create XMTP client v:436360a 1.874s
+[2025-02-26T11:45:33.988Z] [warn] [alice] Start message stream 369.283ms
+[2025-02-26T11:45:33.988Z] [info] [alice] Message stream started
+[2025-02-26T11:45:33.990Z] [warn] [alice] Start stream 371.011ms
+[2025-02-26T11:45:33.990Z] [warn] [alice] Initialize XMTP client 2.274s
+[2025-02-26T11:45:35.304Z] [warn] [randompep] Create XMTP client v:436360a 3.560s
+[2025-02-26T11:45:35.681Z] [warn] [randompep] Start message stream 376.811ms
+[2025-02-26T11:45:35.682Z] [info] [randompep] Message stream started
+[2025-02-26T11:45:35.682Z] [warn] [randompep] Start stream 378.24ms
+[2025-02-26T11:45:35.683Z] [warn] [randompep] Initialize XMTP client 3.940s
+[2025-02-26T11:45:36.613Z] [info] {"DNS Lookup":0.001698,"TCP Connection":0.001879,"TLS Handshake":0.545403,"Server Processing":0.708437,"Content Transfer":0.708468}
+[2025-02-26T11:45:36.613Z] [warn] total: 708.468ms, tls: 545.403ms, processing: 163.06499999999994ms

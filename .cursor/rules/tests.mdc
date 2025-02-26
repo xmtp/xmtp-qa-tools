@@ -3,6 +3,7 @@ description: General guidance for testing script
 globs: 
 alwaysApply: false
 ---
+import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
@@ -11,20 +12,10 @@ import {
   type Persona,
   type XmtpEnv,
 } from "../helpers/types";
-import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/stream";
+import { verifyStream } from "../helpers/verify";
+import { getWorkers } from "../helpers/workers/factory";
 
-/**
- * This test suite measures XMTP performance of common actions:
- * - DM creation
- * - Sending / receiving messages
- * - Creating / updating groups
- * - Adding / removing participants
- *
- * Each test includes a performance assertion, verifying that it completes
- * in under 4 seconds (4000ms).
- */
-
+dotenv.config();
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
 
@@ -77,8 +68,8 @@ describe(testName, () => {
   it("TC_CreateDM: should measure creating a DM", async () => {
     const start = performance.now();
 
-    dmConvo = await personas[WorkerNames.BOB].client!.conversations.newDm(
-      personas["random"].client!.accountAddress,
+    dmConvo = await personas.bob.client!.conversations.newDm(
+      personas.random.client!.accountAddress,
     );
 
     const end = performance.now();
@@ -178,7 +169,7 @@ describe(testName, () => {
 
     const result = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -200,7 +191,7 @@ describe(testName, () => {
 
     const previousMembers = await bobsGroup.members();
     await bobsGroup.addMembers([
-      personas["randompep"].client?.accountAddress as `0x${string}`,
+      personas.randompep.client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
 
@@ -254,7 +245,7 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );

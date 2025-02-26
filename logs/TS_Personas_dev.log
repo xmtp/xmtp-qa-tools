@@ -1,58 +1,47 @@
-[2025-02-25T17:53:24.639Z] [info] [PersonaFactory] Creating personas: random
-[2025-02-25T17:53:24.668Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random
-[2025-02-25T17:53:28.221Z] [warn] [random] Create XMTP client v:436360a 3.553s
-[2025-02-25T17:53:28.587Z] [warn] [random] Start message stream 364.967ms
-[2025-02-25T17:53:28.587Z] [info] [random] Message stream started
-[2025-02-25T17:53:28.588Z] [warn] [random] Start stream 366.499ms
-[2025-02-25T17:53:28.952Z] [warn] [random] Sync conversations 363.007ms
-[2025-02-25T17:53:28.952Z] [warn] [random] Initialize XMTP client 4.310s
-[2025-02-25T17:53:28.956Z] [info] [PersonaFactory] Creating personas: bob, random
-[2025-02-25T17:53:28.959Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
-[2025-02-25T17:53:32.324Z] [warn] [random] Create XMTP client v:436360a 3.365s
-[2025-02-25T17:53:32.439Z] [warn] [bob] Create XMTP client v:436360a 3.479s
-[2025-02-25T17:53:32.697Z] [warn] [random] Start message stream 371.486ms
-[2025-02-25T17:53:32.697Z] [info] [random] Message stream started
-[2025-02-25T17:53:32.698Z] [warn] [random] Start stream 372.937ms
-[2025-02-25T17:53:32.802Z] [warn] [bob] Start message stream 362.065ms
-[2025-02-25T17:53:32.802Z] [info] [bob] Message stream started
-[2025-02-25T17:53:32.803Z] [warn] [bob] Start stream 363.23ms
-[2025-02-25T17:53:33.062Z] [warn] [random] Sync conversations 362.688ms
-[2025-02-25T17:53:33.062Z] [warn] [random] Initialize XMTP client 4.103s
-[2025-02-25T17:53:33.175Z] [warn] [bob] Sync conversations 370.935ms
-[2025-02-25T17:53:33.175Z] [warn] [bob] Initialize XMTP client 4.217s
-[2025-02-25T17:53:33.176Z] [info] [PersonaFactory] Creating personas: random
-[2025-02-25T17:53:36.573Z] [warn] [random] Create XMTP client v:436360a 3.393s
-[2025-02-25T17:53:36.933Z] [warn] [random] Start message stream 360.087ms
-[2025-02-25T17:53:36.933Z] [info] [random] Message stream started
-[2025-02-25T17:53:36.934Z] [warn] [random] Start stream 360.891ms
-[2025-02-25T17:53:37.292Z] [warn] [random] Sync conversations 357.136ms
-[2025-02-25T17:53:37.294Z] [warn] [random] Initialize XMTP client 4.114s
-[2025-02-25T17:53:37.297Z] [info] [PersonaFactory] Creating personas: bob, alice, randompep, randombob
-[2025-02-25T17:53:37.306Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randompep
-[2025-02-25T17:53:37.307Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randombob
-[2025-02-25T17:53:39.106Z] [warn] [bob] Create XMTP client v:436360a 1.800s
-[2025-02-25T17:53:39.195Z] [warn] [alice] Create XMTP client v:436360a 1.889s
-[2025-02-25T17:53:39.472Z] [warn] [bob] Start message stream 365.411ms
-[2025-02-25T17:53:39.473Z] [info] [bob] Message stream started
-[2025-02-25T17:53:39.473Z] [warn] [bob] Start stream 367.089ms
-[2025-02-25T17:53:39.559Z] [warn] [alice] Start message stream 363.641ms
-[2025-02-25T17:53:39.559Z] [info] [alice] Message stream started
-[2025-02-25T17:53:39.559Z] [warn] [alice] Start stream 364.491ms
-[2025-02-25T17:53:39.836Z] [warn] [bob] Sync conversations 362.657ms
-[2025-02-25T17:53:39.836Z] [warn] [bob] Initialize XMTP client 2.535s
-[2025-02-25T17:53:39.925Z] [warn] [alice] Sync conversations 365.306ms
-[2025-02-25T17:53:39.925Z] [warn] [alice] Initialize XMTP client 2.622s
-[2025-02-25T17:53:40.730Z] [warn] [randombob] Create XMTP client v:436360a 3.423s
-[2025-02-25T17:53:40.876Z] [warn] [randompep] Create XMTP client v:436360a 3.569s
-[2025-02-25T17:53:41.098Z] [warn] [randombob] Start message stream 367.382ms
-[2025-02-25T17:53:41.098Z] [info] [randombob] Message stream started
-[2025-02-25T17:53:41.098Z] [warn] [randombob] Start stream 368.096ms
-[2025-02-25T17:53:41.242Z] [warn] [randompep] Start message stream 365.587ms
-[2025-02-25T17:53:41.242Z] [info] [randompep] Message stream started
-[2025-02-25T17:53:41.242Z] [warn] [randompep] Start stream 366.269ms
-[2025-02-25T17:53:41.469Z] [warn] [randombob] Sync conversations 370.426ms
-[2025-02-25T17:53:41.469Z] [warn] [randombob] Initialize XMTP client 4.165s
-[2025-02-25T17:53:41.604Z] [warn] [randompep] Sync conversations 362.147ms
-[2025-02-25T17:53:41.604Z] [warn] [randompep] Initialize XMTP client 4.301s
-[2025-02-25T17:53:42.701Z] [info] {"DNS Lookup":0.001715,"TCP Connection":0.001903,"TLS Handshake":0.525907,"Server Processing":0.849511,"Content Transfer":0.849607}
-[2025-02-25T17:53:42.702Z] [warn] total: 849.607ms, tls: 525.907ms, processing: 323.69999999999993ms
+[2025-02-26T11:42:30.318Z] [info] [PersonaFactory] Creating personas: random for TS_Personas_dev
+[2025-02-26T11:42:33.723Z] [warn] [random] Create XMTP client v:436360a 3.374s
+[2025-02-26T11:42:34.115Z] [warn] [random] Start message stream 390.542ms
+[2025-02-26T11:42:34.115Z] [info] [random] Message stream started
+[2025-02-26T11:42:34.115Z] [warn] [random] Start stream 391.386ms
+[2025-02-26T11:42:34.115Z] [warn] [random] Initialize XMTP client 3.793s
+[2025-02-26T11:42:34.116Z] [info] [PersonaFactory] Creating personas: bob, random for TS_Personas_dev
+[2025-02-26T11:42:36.080Z] [warn] [bob] Create XMTP client v:436360a 1.960s
+[2025-02-26T11:42:36.442Z] [warn] [bob] Start message stream 360.355ms
+[2025-02-26T11:42:36.442Z] [info] [bob] Message stream started
+[2025-02-26T11:42:36.442Z] [warn] [bob] Start stream 361.554ms
+[2025-02-26T11:42:36.442Z] [warn] [bob] Initialize XMTP client 2.325s
+[2025-02-26T11:42:37.521Z] [warn] [random] Create XMTP client v:436360a 3.400s
+[2025-02-26T11:42:37.889Z] [warn] [random] Start message stream 366.901ms
+[2025-02-26T11:42:37.889Z] [info] [random] Message stream started
+[2025-02-26T11:42:37.889Z] [warn] [random] Start stream 368.417ms
+[2025-02-26T11:42:37.890Z] [warn] [random] Initialize XMTP client 3.771s
+[2025-02-26T11:42:37.891Z] [info] [PersonaFactory] Creating personas: random for TS_Personas_dev
+[2025-02-26T11:42:41.315Z] [warn] [random] Create XMTP client v:436360a 3.422s
+[2025-02-26T11:42:41.677Z] [warn] [random] Start message stream 361.07ms
+[2025-02-26T11:42:41.677Z] [info] [random] Message stream started
+[2025-02-26T11:42:41.678Z] [warn] [random] Start stream 362.235ms
+[2025-02-26T11:42:41.678Z] [warn] [random] Initialize XMTP client 3.786s
+[2025-02-26T11:42:41.679Z] [info] [PersonaFactory] Creating personas: bob, alice, randompep, randombob for TS_Personas_dev
+[2025-02-26T11:42:41.687Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randombob
+[2025-02-26T11:42:43.669Z] [warn] [bob] Create XMTP client v:436360a 1.983s
+[2025-02-26T11:42:43.790Z] [warn] [alice] Create XMTP client v:436360a 2.102s
+[2025-02-26T11:42:44.032Z] [warn] [bob] Start message stream 361.825ms
+[2025-02-26T11:42:44.032Z] [info] [bob] Message stream started
+[2025-02-26T11:42:44.032Z] [warn] [bob] Start stream 362.497ms
+[2025-02-26T11:42:44.032Z] [warn] [bob] Initialize XMTP client 2.350s
+[2025-02-26T11:42:44.154Z] [warn] [alice] Start message stream 364.217ms
+[2025-02-26T11:42:44.154Z] [info] [alice] Message stream started
+[2025-02-26T11:42:44.155Z] [warn] [alice] Start stream 364.788ms
+[2025-02-26T11:42:44.155Z] [warn] [alice] Initialize XMTP client 2.471s
+[2025-02-26T11:42:45.128Z] [warn] [randombob] Create XMTP client v:436360a 3.441s
+[2025-02-26T11:42:45.319Z] [warn] [randompep] Create XMTP client v:436360a 3.633s
+[2025-02-26T11:42:45.498Z] [warn] [randombob] Start message stream 369.58ms
+[2025-02-26T11:42:45.498Z] [info] [randombob] Message stream started
+[2025-02-26T11:42:45.498Z] [warn] [randombob] Start stream 370.323ms
+[2025-02-26T11:42:45.498Z] [warn] [randombob] Initialize XMTP client 3.813s
+[2025-02-26T11:42:45.686Z] [warn] [randompep] Start message stream 365.856ms
+[2025-02-26T11:42:45.686Z] [info] [randompep] Message stream started
+[2025-02-26T11:42:45.686Z] [warn] [randompep] Start stream 366.253ms
+[2025-02-26T11:42:45.686Z] [warn] [randompep] Initialize XMTP client 4.001s
+[2025-02-26T11:42:46.771Z] [info] {"DNS Lookup":0.001703,"TCP Connection":0.001889,"TLS Handshake":0.531408,"Server Processing":0.855805,"Content Transfer":0.856178}
+[2025-02-26T11:42:46.772Z] [warn] total: 856.178ms, tls: 531.408ms, processing: 324.77ms

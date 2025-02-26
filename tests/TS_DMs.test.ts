@@ -23,9 +23,9 @@ describe(testName, () => {
     overrideConsole(logger);
 
     personas = await getWorkers(["bob", "joe", "sam"], env, testName);
-    console.log("bob", personas["bob"].client?.accountAddress);
-    console.log("joe", personas["joe"].client?.accountAddress);
-    console.log("sam", personas["sam"].client?.accountAddress);
+    console.log("bob", personas.bob.client?.accountAddress);
+    console.log("joe", personas.joe.client?.accountAddress);
+    console.log("sam", personas.sam.client?.accountAddress);
   });
 
   afterAll(async () => {
@@ -38,8 +38,8 @@ describe(testName, () => {
   });
 
   it("TC_CreateDM: should measure creating a DM", async () => {
-    convo = await personas["bob"].client!.conversations.newDm(
-      personas["sam"].client!.accountAddress,
+    convo = await personas.bob.client!.conversations.newDm(
+      personas.sam.client!.accountAddress,
     );
     expect(convo).toBeDefined();
     expect(convo.id).toBeDefined();
@@ -50,7 +50,7 @@ describe(testName, () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${personas["bob"].name}] Creating DM with ${personas["sam"].name} at ${personas["sam"].client?.accountAddress}`,
+      `[${personas.bob.name}] Creating DM with ${personas.sam.name} at ${personas.sam.client?.accountAddress}`,
     );
 
     const dmId = await convo.send(message);
@@ -69,7 +69,7 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       convo,
-      [personas["sam"]],
+      [personas.sam],
       gmMessageGenerator,
       gmSender,
     );

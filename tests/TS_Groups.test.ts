@@ -47,10 +47,10 @@ describe(testName, () => {
 
   it("TC_CreateGroup: should measure creating a group", async () => {
     console.time("create group");
-    bobsGroup = await personas["bob"].client!.conversations.newGroup([
-      personas["alice"].client?.accountAddress as `0x${string}`,
-      personas["joe"].client?.accountAddress as `0x${string}`,
-      personas["elon"].client?.accountAddress as `0x${string}`,
+    bobsGroup = await personas.bob.client!.conversations.newGroup([
+      personas.alice.client!.accountAddress as `0x${string}`,
+      personas.joe.client!.accountAddress as `0x${string}`,
+      personas.elon.client!.accountAddress as `0x${string}`,
     ]);
     console.log("Bob's group", bobsGroup.id);
     console.timeEnd("create group");
@@ -60,13 +60,12 @@ describe(testName, () => {
   it("TC_CreateGroup: should measure creating a group with inbox ids", async () => {
     console.time("bobsGroupByInboxIds");
 
-    const bobsGroupByInboxIds = await personas[
-      "bob"
-    ].client!.conversations.newGroupByInboxIds([
-      personas["alice"].client!.inboxId,
-      personas["joe"].client!.inboxId,
-      personas["elon"].client!.inboxId,
-    ]);
+    const bobsGroupByInboxIds =
+      await personas.bob.client!.conversations.newGroupByInboxIds([
+        personas.alice.client!.inboxId,
+        personas.joe.client!.inboxId,
+        personas.elon.client!.inboxId,
+      ]);
 
     console.log("bobsGroupByInboxIds", bobsGroupByInboxIds.id);
     console.timeEnd("bobsGroupByInboxIds");
@@ -86,7 +85,7 @@ describe(testName, () => {
 
     const result = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -99,7 +98,7 @@ describe(testName, () => {
     console.time("add members");
     const previousMembers = await bobsGroup.members();
     await bobsGroup.addMembers([
-      personas["randompep"].client?.accountAddress as `0x${string}`,
+      personas.randompep.client!.accountAddress as `0x${string}`,
     ]);
     console.time("sync");
     await bobsGroup.sync();
@@ -113,7 +112,7 @@ describe(testName, () => {
     console.time("remove members");
     const previousMembers = await bobsGroup.members();
     await bobsGroup.removeMembers([
-      personas["joe"].client?.accountAddress as `0x${string}`,
+      personas.joe.client!.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
     console.timeEnd("remove members");
@@ -132,7 +131,7 @@ describe(testName, () => {
     // Wait for participants to see it with increased timeout
     const verifyResult = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );
@@ -140,7 +139,7 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGroupMessage: should create a group and measure all streams", async () => {
-    const newGroup = await personas["bob"].client!.conversations.newGroup(
+    const newGroup = await personas.bob.client!.conversations.newGroup(
       Object.values(personas).map(
         (p) => p.client?.accountAddress as `0x${string}`,
       ),

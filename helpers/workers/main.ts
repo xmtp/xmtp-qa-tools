@@ -296,7 +296,6 @@ export class WorkerClient extends Worker {
    *
    * @param conversationId - Usually `group.topic` or similar
    * @param typeId - Content type to filter (e.g. "text")
-   * @param suffix - Unique substring used in messages
    * @param count - Number of messages to gather
    * @param timeoutMs - Optional max time in milliseconds
    *

@@ -1,59 +1,51 @@
-[2025-02-25T23:02:07.909Z] [info] [PersonaFactory] Creating personas: bella, dave, elon, diana, random for TS_Forked_dev
-[2025-02-25T23:02:07.949Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bella
-[2025-02-25T23:02:07.949Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/dave
-[2025-02-25T23:02:07.950Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/diana
-[2025-02-25T23:02:07.950Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random
-[2025-02-25T23:02:11.407Z] [warn] [dave] Create XMTP client v:436360a 3.457s
-[2025-02-25T23:02:11.501Z] [warn] [bella] Create XMTP client v:436360a 3.551s
-[2025-02-25T23:02:11.527Z] [warn] [elon] Create XMTP client v:436360a 3.577s
-[2025-02-25T23:02:11.594Z] [warn] [diana] Create XMTP client v:436360a 3.644s
-[2025-02-25T23:02:11.607Z] [warn] [random] Create XMTP client v:436360a 3.657s
-[2025-02-25T23:02:11.775Z] [warn] [dave] Start message stream 367.586ms
-[2025-02-25T23:02:11.775Z] [info] [dave] Message stream started
-[2025-02-25T23:02:11.776Z] [warn] [dave] Start stream 368.777ms
-[2025-02-25T23:02:11.875Z] [warn] [bella] Start message stream 373.673ms
-[2025-02-25T23:02:11.875Z] [info] [bella] Message stream started
-[2025-02-25T23:02:11.876Z] [warn] [bella] Start stream 374.844ms
-[2025-02-25T23:02:11.891Z] [warn] [elon] Start message stream 363.274ms
-[2025-02-25T23:02:11.891Z] [info] [elon] Message stream started
-[2025-02-25T23:02:11.891Z] [warn] [elon] Start stream 363.852ms
-[2025-02-25T23:02:11.955Z] [warn] [diana] Start message stream 359.933ms
-[2025-02-25T23:02:11.955Z] [info] [diana] Message stream started
-[2025-02-25T23:02:11.955Z] [warn] [diana] Start stream 360.799ms
-[2025-02-25T23:02:11.972Z] [warn] [random] Start message stream 364.124ms
-[2025-02-25T23:02:11.972Z] [info] [random] Message stream started
-[2025-02-25T23:02:11.972Z] [warn] [random] Start stream 364.428ms
-[2025-02-25T23:02:12.063Z] [warn] [elon] Initialize XMTP client 4.115s
-[2025-02-25T23:02:12.136Z] [warn] [dave] Sync conversations 359.385ms
-[2025-02-25T23:02:12.136Z] [warn] [dave] Initialize XMTP client 4.189s
-[2025-02-25T23:02:12.208Z] [warn] [bella] Sync conversations 332.011ms
-[2025-02-25T23:02:12.208Z] [warn] [bella] Initialize XMTP client 4.262s
-[2025-02-25T23:02:12.313Z] [warn] [diana] Sync conversations 357.478ms
-[2025-02-25T23:02:12.313Z] [warn] [diana] Initialize XMTP client 4.365s
-[2025-02-25T23:02:12.343Z] [warn] [random] Sync conversations 371.022ms
-[2025-02-25T23:02:12.343Z] [warn] [random] Initialize XMTP client 4.395s
-[2025-02-25T23:02:12.344Z] [warn] getWorkers 4.436s
-[2025-02-25T23:02:14.288Z] [warn] newGroup 1.942s
-[2025-02-25T23:02:15.291Z] [info] [elon] Collecting 1 'text' messages containing '9cjfojx4uzn' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:15.292Z] [info] Sending message #1: gm-1-9cjfojx4uzn
-[2025-02-25T23:02:16.308Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:17.312Z] [info] [elon] Collecting 1 'group_updated' messages containing '3kttz6oz0c2' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:17.312Z] [info] Sending message #1: New name-1-3kttz6oz0c2
-[2025-02-25T23:02:17.860Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:17.861Z] [warn] updateName 1.552s
-[2025-02-25T23:02:18.863Z] [info] [elon] Collecting 1 'text' messages containing 'yexzbgys29m' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:18.863Z] [info] Sending message #1: gm-1-yexzbgys29m
-[2025-02-25T23:02:19.397Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:20.133Z] [warn] addMembers 734.463ms
-[2025-02-25T23:02:21.135Z] [info] [elon] Collecting 1 'text' messages containing '9mfdjmbzywv' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:21.135Z] [info] Sending message #1: gm-1-9mfdjmbzywv
-[2025-02-25T23:02:22.050Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:23.333Z] [warn] removeMembers 1.282s
-[2025-02-25T23:02:24.335Z] [info] [dave] Collecting 1 'text' messages containing 'klo732toe7' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:24.335Z] [info] [elon] Collecting 1 'text' messages containing 'klo732toe7' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:24.336Z] [info] [diana] Collecting 1 'text' messages containing 'klo732toe7' from convo '6eb384979a2e1c31f25e514485ef4c1a'
-[2025-02-25T23:02:24.336Z] [info] Sending message #1: gm-1-klo732toe7
-[2025-02-25T23:02:24.876Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:24.876Z] [warn] verifyStream 1.543s
-[2025-02-25T23:02:25.943Z] [info] {"DNS Lookup":0.001657,"TCP Connection":0.001843,"TLS Handshake":0.551798,"Server Processing":0.723708,"Content Transfer":0.723804}
-[2025-02-25T23:02:25.943Z] [warn] total: 723.804ms, tls: 551.798ms, processing: 172.00599999999997ms
+[2025-02-26T11:46:12.259Z] [info] [PersonaFactory] Creating personas: bella, dave, elon, diana, random for TS_Forked_dev
+[2025-02-26T11:46:14.256Z] [warn] [diana] Create XMTP client v:436360a 1.959s
+[2025-02-26T11:46:14.344Z] [warn] [bella] Create XMTP client v:436360a 2.046s
+[2025-02-26T11:46:14.395Z] [warn] [dave] Create XMTP client v:436360a 2.098s
+[2025-02-26T11:46:14.454Z] [warn] [elon] Create XMTP client v:436360a 2.157s
+[2025-02-26T11:46:14.629Z] [warn] [diana] Start message stream 372.099ms
+[2025-02-26T11:46:14.630Z] [info] [diana] Message stream started
+[2025-02-26T11:46:14.630Z] [warn] [diana] Start stream 373.653ms
+[2025-02-26T11:46:14.631Z] [warn] [diana] Initialize XMTP client 2.336s
+[2025-02-26T11:46:14.711Z] [warn] [bella] Start message stream 366.639ms
+[2025-02-26T11:46:14.712Z] [info] [bella] Message stream started
+[2025-02-26T11:46:14.713Z] [warn] [bella] Start stream 369.329ms
+[2025-02-26T11:46:14.714Z] [warn] [bella] Initialize XMTP client 2.449s
+[2025-02-26T11:46:14.769Z] [warn] [dave] Start message stream 372.148ms
+[2025-02-26T11:46:14.769Z] [info] [dave] Message stream started
+[2025-02-26T11:46:14.771Z] [warn] [dave] Start stream 375.385ms
+[2025-02-26T11:46:14.772Z] [warn] [dave] Initialize XMTP client 2.478s
+[2025-02-26T11:46:14.825Z] [warn] [elon] Start message stream 370.427ms
+[2025-02-26T11:46:14.825Z] [info] [elon] Message stream started
+[2025-02-26T11:46:14.826Z] [warn] [elon] Start stream 371.114ms
+[2025-02-26T11:46:14.826Z] [warn] [elon] Initialize XMTP client 2.532s
+[2025-02-26T11:46:16.033Z] [warn] [random] Create XMTP client v:436360a 3.736s
+[2025-02-26T11:46:16.411Z] [warn] [random] Start message stream 376.895ms
+[2025-02-26T11:46:16.412Z] [info] [random] Message stream started
+[2025-02-26T11:46:16.413Z] [warn] [random] Start stream 378.74ms
+[2025-02-26T11:46:16.413Z] [warn] [random] Initialize XMTP client 4.117s
+[2025-02-26T11:46:16.414Z] [warn] getWorkers 4.157s
+[2025-02-26T11:46:18.502Z] [warn] newGroup 2.085s
+[2025-02-26T11:46:19.508Z] [info] [elon] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:19.509Z] [info] Sending message #1: gm-1-3twfvmmhq69
+[2025-02-26T11:46:20.226Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:21.230Z] [info] [elon] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:21.232Z] [info] Sending message #1: New name-1-b4078kcp6u6
+[2025-02-26T11:46:21.784Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:21.785Z] [warn] updateName 1.557s
+[2025-02-26T11:46:22.787Z] [info] [elon] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:22.787Z] [info] Sending message #1: gm-1-hstx5ngqn4l
+[2025-02-26T11:46:23.334Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:24.067Z] [warn] addMembers 731.782ms
+[2025-02-26T11:46:25.069Z] [info] [elon] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:25.069Z] [info] Sending message #1: gm-1-njx3o4sj0sb
+[2025-02-26T11:46:25.984Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:27.258Z] [warn] removeMembers 1.272s
+[2025-02-26T11:46:28.261Z] [info] [dave] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:28.262Z] [info] [elon] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:28.263Z] [info] [diana] Collecting 1 messages from convo:16c93de4f9c1ae3e6c8c98a0a7299d30
+[2025-02-26T11:46:28.264Z] [info] Sending message #1: gm-1-7vgelcv8xta
+[2025-02-26T11:46:28.813Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:28.813Z] [warn] verifyStream 1.555s
+[2025-02-26T11:46:30.064Z] [info] {"DNS Lookup":0.142701,"TCP Connection":0.14316,"TLS Handshake":0.675641,"Server Processing":1.001702,"Content Transfer":1.001859}
+[2025-02-26T11:46:30.064Z] [warn] total: 1001.859ms, tls: 675.6410000000001ms, processing: 326.21799999999996ms

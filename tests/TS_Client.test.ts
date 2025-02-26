@@ -32,7 +32,7 @@ describe(testName, () => {
   });
 
   it("TC_CreateClient: Initialize the client", async () => {
-    expect(personas["alice"].client?.accountAddress).toBeDefined();
-    expect(personas["randompep"].client?.accountAddress).toBeDefined();
+    expect(personas.alice.client?.accountAddress).toBeDefined();
+    expect(personas.randompep.client?.accountAddress).toBeDefined();
   });
 });

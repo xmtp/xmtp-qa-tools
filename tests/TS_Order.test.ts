@@ -31,20 +31,20 @@ describe(
       overrideConsole(logger);
       personas = await getWorkers(
         [
-          WorkerNames.BOB,
-          WorkerNames.ALICE,
-          WorkerNames.JOE,
-          WorkerNames.SAM,
-          WorkerNames.CHARLIE,
-          WorkerNames.DAVE,
-          WorkerNames.EVE,
-          WorkerNames.FRANK,
-          WorkerNames.GRACE,
-          WorkerNames.HENRY,
-          WorkerNames.IVY,
-          WorkerNames.JACK,
-          WorkerNames.KAREN,
-          WorkerNames.LARRY,
+          "bob",
+          "alice",
+          "joe",
+          "sam",
+          "charlie",
+          "dave",
+          "eve",
+          "frank",
+          "grace",
+          "henry",
+          "ivy",
+          "jack",
+          "karen",
+          "larry",
         ],
         env,
         testName,
@@ -62,7 +62,7 @@ describe(
 
     it("TC_StreamOrder: should verify message order when receiving via streams", async () => {
       // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-      const group = await personas["bob"].client!.conversations.newGroup(
+      const group = await personas.bob.client!.conversations.newGroup(
         Object.values(personas).map(
           (p) => p.client?.accountAddress as `0x${string}`,
         ),
@@ -72,9 +72,7 @@ describe(
 
       // Define receivers (excluding Bob, the creator).
       const receivers = Object.values(personas).filter(
-        (p) =>
-          p.client?.accountAddress !==
-          personas[WorkerNames.BOB].client?.accountAddress,
+        (p) => p.client?.accountAddress !== personas.bob.client?.accountAddress,
       );
 
       gmMessageGenerator = async (i: number, suffix: string) => {
@@ -114,13 +112,11 @@ describe(
 
     it("TC_PullOrder: should verify message order when receiving via pull", async () => {
       console.time("createGroup");
-      const group = await personas[
-        WorkerNames.BOB
-      ].client!.conversations.newGroup([
-        personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
-        personas[WorkerNames.BOB].client?.accountAddress as `0x${string}`,
-        personas[WorkerNames.ALICE].client?.accountAddress as `0x${string}`,
-        personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
+      const group = await personas.bob.client!.conversations.newGroup([
+        personas.joe.client?.accountAddress as `0x${string}`,
+        personas.bob.client?.accountAddress as `0x${string}`,
+        personas.alice.client?.accountAddress as `0x${string}`,
+        personas.sam.client?.accountAddress as `0x${string}`,
       ]);
       console.log("Group created", group.id);
       expect(group.id).toBeDefined();
@@ -141,22 +137,19 @@ describe(
 
       console.time("pullMessages");
       // Pull messages for both recipients
-      const conversation = personas[
-        WorkerNames.ALICE
-      ].client!.conversations.getConversationById(group.id);
+      const conversation =
+        personas.alice.client!.conversations.getConversationById(group.id);
       const aliceMessages = await conversation!.messages();
       const parsedAliceMessages = aliceMessages.map(
         (msg) => msg.content as string,
       );
-      const joeConversation = personas[
-        WorkerNames.JOE
-      ].client!.conversations.getConversationById(group.id);
+      const joeConversation =
+        personas.joe.client!.conversations.getConversationById(group.id);
       const joeMessages = await joeConversation!.messages();
       const parsedJoeMessages = joeMessages.map((msg) => msg.content as string);
 
-      const samConversation = personas[
-        WorkerNames.SAM
-      ].client!.conversations.getConversationById(group.id);
+      const samConversation =
+        personas.sam.client!.conversations.getConversationById(group.id);
       const samMessages = await samConversation!.messages();
       const parsedSamMessages = samMessages.map((msg) => msg.content as string);
       console.timeEnd("pullMessages");

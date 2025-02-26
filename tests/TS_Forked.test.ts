@@ -33,13 +33,7 @@ describe(testName, () => {
 
     console.time("getWorkers");
     personas = await getWorkers(
-      [
-        WorkerNames.BELLA,
-        WorkerNames.DAVE,
-        WorkerNames.ELON,
-        WorkerNames.DIANA,
-        "random",
-      ],
+      ["bella", "dave", "elon", "diana", "random"],
       env,
       testName,
     );
@@ -58,7 +52,7 @@ describe(testName, () => {
 
   it("should create a group", async () => {
     console.time("newGroup");
-    group = await personas[WorkerNames.BELLA].client!.conversations.newGroup([
+    group = await personas.bella.client!.conversations.newGroup([
       ...Object.values(personas).map(
         (p) => p.client?.accountAddress as `0x${string}`,
       ),
@@ -71,7 +65,7 @@ describe(testName, () => {
   it("should message a gm", async () => {
     const result = await verifyStream(
       group,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );
@@ -90,7 +84,7 @@ describe(testName, () => {
 
     const result = await verifyStream(
       group,
-      [personas["elon"]],
+      [personas.elon],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -100,7 +94,7 @@ describe(testName, () => {
 
     const resultDm = await verifyStream(
       group,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );
@@ -110,13 +104,13 @@ describe(testName, () => {
   it("should handle adding new  members", async () => {
     console.time("addMembers");
     await group.addMembers([
-      personas["random"].client?.accountAddress as `0x${string}`,
+      personas.random.client?.accountAddress as `0x${string}`,
     ]);
     console.timeEnd("addMembers");
 
     const result = await verifyStream(
       group,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );
@@ -126,14 +120,14 @@ describe(testName, () => {
   it("should handle removing members", async () => {
     console.time("removeMembers");
     await group.removeMembers([
-      personas["random"].client?.accountAddress as `0x${string}`,
+      personas.random.client?.accountAddress as `0x${string}`,
     ]);
     console.timeEnd("removeMembers");
 
     console.time("verifyStream");
     const result = await verifyStream(
       group,
-      Object.values(personas).filter((p) => p !== personas["random"]),
+      Object.values(personas).filter((p) => p !== personas.random),
       gmMessageGenerator,
       gmSender,
     );

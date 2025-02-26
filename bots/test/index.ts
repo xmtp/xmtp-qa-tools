@@ -22,18 +22,12 @@ async function main() {
   const logger = await createLogger("test-bot");
   overrideConsole(logger);
   personas = await getWorkers(
-    [
-      WorkerNames.BOB,
-      WorkerNames.BOT,
-      WorkerNames.ALICE,
-      WorkerNames.JOE,
-      WorkerNames.SAM,
-    ],
+    ["bob", "bot", "alice", "joe", "sam"],
     env,
     "test-bot",
   );
 
-  const client = personas[WorkerNames.BOT].client as Client;
+  const client = personas.bot.client as Client;
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
@@ -75,9 +69,9 @@ async function main() {
       const groupName = `group-${new Date().toISOString().split("T")[0]}`;
       const group = await client.conversations.newGroup(
         [
-          personas[WorkerNames.ALICE].client?.accountAddress as `0x${string}`,
-          personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
-          personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
+          personas.alice.client?.accountAddress as `0x${string}`,
+          personas.joe.client?.accountAddress as `0x${string}`,
+          personas.sam.client?.accountAddress as `0x${string}`,
         ],
         {
           groupName: groupName,

@@ -1,42 +1,37 @@
-[2025-02-25T23:02:27.426Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_Metadata_dev
-[2025-02-25T23:02:31.003Z] [warn] [bob] Create XMTP client v:436360a 3.538s
-[2025-02-25T23:02:31.115Z] [warn] [joe] Create XMTP client v:436360a 3.650s
-[2025-02-25T23:02:31.208Z] [warn] [alice] Create XMTP client v:436360a 3.742s
-[2025-02-25T23:02:31.295Z] [warn] [elon] Create XMTP client v:436360a 3.830s
-[2025-02-25T23:02:31.368Z] [warn] [bob] Start message stream 365.09ms
-[2025-02-25T23:02:31.369Z] [info] [bob] Message stream started
-[2025-02-25T23:02:31.369Z] [warn] [bob] Start stream 365.864ms
-[2025-02-25T23:02:31.395Z] [warn] [fabri] Create XMTP client v:436360a 3.930s
-[2025-02-25T23:02:31.479Z] [warn] [joe] Start message stream 363.129ms
-[2025-02-25T23:02:31.479Z] [info] [joe] Message stream started
-[2025-02-25T23:02:31.479Z] [warn] [joe] Start stream 363.516ms
-[2025-02-25T23:02:31.574Z] [warn] [alice] Start message stream 365.859ms
-[2025-02-25T23:02:31.575Z] [info] [alice] Message stream started
-[2025-02-25T23:02:31.575Z] [warn] [alice] Start stream 366.803ms
-[2025-02-25T23:02:31.659Z] [warn] [elon] Start message stream 362.984ms
-[2025-02-25T23:02:31.660Z] [info] [elon] Message stream started
-[2025-02-25T23:02:31.660Z] [warn] [elon] Start stream 363.903ms
-[2025-02-25T23:02:31.736Z] [warn] [bob] Sync conversations 365.784ms
-[2025-02-25T23:02:31.736Z] [warn] [bob] Initialize XMTP client 4.273s
-[2025-02-25T23:02:31.769Z] [warn] [fabri] Start message stream 372.808ms
-[2025-02-25T23:02:31.769Z] [info] [fabri] Message stream started
-[2025-02-25T23:02:31.769Z] [warn] [fabri] Start stream 373.508ms
-[2025-02-25T23:02:31.849Z] [warn] [joe] Sync conversations 369.073ms
-[2025-02-25T23:02:31.849Z] [warn] [joe] Initialize XMTP client 4.386s
-[2025-02-25T23:02:31.941Z] [warn] [alice] Sync conversations 365.892ms
-[2025-02-25T23:02:31.942Z] [warn] [alice] Initialize XMTP client 4.477s
-[2025-02-25T23:02:32.033Z] [warn] [elon] Sync conversations 372.227ms
-[2025-02-25T23:02:32.033Z] [warn] [elon] Initialize XMTP client 4.569s
-[2025-02-25T23:02:32.137Z] [warn] [fabri] Sync conversations 367.042ms
-[2025-02-25T23:02:32.137Z] [warn] [fabri] Initialize XMTP client 4.672s
-[2025-02-25T23:02:33.763Z] [info] Bob's group 181fc59fdff8ed9dd5b53f76efe71d8f
-[2025-02-25T23:02:33.763Z] [warn] create group 1.625s
-[2025-02-25T23:02:34.771Z] [info] [joe] Collecting 1 'group_updated' messages containing '1cp5n6ac3bm' from convo '181fc59fdff8ed9dd5b53f76efe71d8f'
-[2025-02-25T23:02:34.772Z] [info] Sending message #1: New name-1-1cp5n6ac3bm
-[2025-02-25T23:02:34.773Z] [info] Updating group name to New name-1-1cp5n6ac3bm for group 181fc59fdff8ed9dd5b53f76efe71d8f
-[2025-02-25T23:02:35.265Z] [info] All participants received the expected number of messages.
-[2025-02-25T23:02:35.266Z] [warn] update group name 1.499s
-[2025-02-25T23:02:37.155Z] [warn] add members 1.887s
-[2025-02-25T23:02:38.414Z] [warn] remove members 1.258s
-[2025-02-25T23:02:39.577Z] [info] {"DNS Lookup":0.001667,"TCP Connection":0.001855,"TLS Handshake":0.52756,"Server Processing":0.846392,"Content Transfer":0.84647}
-[2025-02-25T23:02:39.577Z] [warn] total: 846.4699999999999ms, tls: 527.5600000000001ms, processing: 318.90999999999985ms
+[2025-02-26T11:46:36.234Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_Metadata_dev
+[2025-02-26T11:46:38.323Z] [warn] [fabri] Create XMTP client v:436360a 2.052s
+[2025-02-26T11:46:38.376Z] [warn] [elon] Create XMTP client v:436360a 2.104s
+[2025-02-26T11:46:38.379Z] [warn] [alice] Create XMTP client v:436360a 2.107s
+[2025-02-26T11:46:38.438Z] [warn] [bob] Create XMTP client v:436360a 2.167s
+[2025-02-26T11:46:38.515Z] [warn] [joe] Create XMTP client v:436360a 2.244s
+[2025-02-26T11:46:38.691Z] [warn] [fabri] Start message stream 367.511ms
+[2025-02-26T11:46:38.691Z] [info] [fabri] Message stream started
+[2025-02-26T11:46:38.692Z] [warn] [fabri] Start stream 369.012ms
+[2025-02-26T11:46:38.693Z] [warn] [fabri] Initialize XMTP client 2.424s
+[2025-02-26T11:46:38.742Z] [warn] [elon] Start message stream 364.763ms
+[2025-02-26T11:46:38.742Z] [info] [elon] Message stream started
+[2025-02-26T11:46:38.743Z] [warn] [elon] Start stream 366.466ms
+[2025-02-26T11:46:38.743Z] [warn] [elon] Initialize XMTP client 2.475s
+[2025-02-26T11:46:38.746Z] [warn] [alice] Start message stream 366.658ms
+[2025-02-26T11:46:38.747Z] [info] [alice] Message stream started
+[2025-02-26T11:46:38.747Z] [warn] [alice] Start stream 367.812ms
+[2025-02-26T11:46:38.748Z] [warn] [alice] Initialize XMTP client 2.478s
+[2025-02-26T11:46:38.802Z] [warn] [bob] Start message stream 362.473ms
+[2025-02-26T11:46:38.803Z] [info] [bob] Message stream started
+[2025-02-26T11:46:38.803Z] [warn] [bob] Start stream 364.097ms
+[2025-02-26T11:46:38.804Z] [warn] [bob] Initialize XMTP client 2.565s
+[2025-02-26T11:46:38.882Z] [warn] [joe] Start message stream 365.654ms
+[2025-02-26T11:46:38.882Z] [info] [joe] Message stream started
+[2025-02-26T11:46:38.882Z] [warn] [joe] Start stream 366.027ms
+[2025-02-26T11:46:38.882Z] [warn] [joe] Initialize XMTP client 2.616s
+[2025-02-26T11:46:40.957Z] [info] Bob's group 6699b209fddaff4358f34ac1150bc36d
+[2025-02-26T11:46:40.957Z] [warn] create group 2.075s
+[2025-02-26T11:46:41.964Z] [info] [joe] Collecting 1 messages from convo:6699b209fddaff4358f34ac1150bc36d
+[2025-02-26T11:46:41.965Z] [info] Sending message #1: New name-1-cc6fcmhiyol
+[2025-02-26T11:46:41.966Z] [info] Updating group name to New name-1-cc6fcmhiyol for group 6699b209fddaff4358f34ac1150bc36d
+[2025-02-26T11:46:42.532Z] [info] All participants received the expected number of messages.
+[2025-02-26T11:46:42.533Z] [warn] update group name 1.574s
+[2025-02-26T11:46:44.727Z] [warn] add members 2.192s
+[2025-02-26T11:46:45.809Z] [warn] remove members 1.081s
+[2025-02-26T11:46:46.907Z] [info] {"DNS Lookup":0.001662,"TCP Connection":0.001867,"TLS Handshake":0.529575,"Server Processing":0.852792,"Content Transfer":0.852837}
+[2025-02-26T11:46:46.907Z] [warn] total: 852.837ms, tls: 529.575ms, processing: 323.26199999999994ms

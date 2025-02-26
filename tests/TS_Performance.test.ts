@@ -63,8 +63,8 @@ describe(testName, () => {
   it("TC_CreateDM: should measure creating a DM", async () => {
     const start = performance.now();
 
-    dmConvo = await personas[WorkerNames.BOB].client!.conversations.newDm(
-      personas["random"].client!.accountAddress,
+    dmConvo = await personas.bob.client!.conversations.newDm(
+      personas.random.client!.accountAddress,
     );
 
     const end = performance.now();
@@ -83,9 +83,9 @@ describe(testName, () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${personas[WorkerNames.BOB].name}] Creating DM with ${
-        personas[WorkerNames.SAM].name
-      } at ${personas[WorkerNames.SAM].client?.accountAddress}`,
+      `[${personas.bob.name}] Creating DM with ${
+        personas.sam.name
+      } at ${personas.sam.client?.accountAddress}`,
     );
 
     const dmId = await dmConvo.send(message);
@@ -103,20 +103,16 @@ describe(testName, () => {
 
     // Create or fetch the DM conversation with Sam.
     const dmConvoLocal =
-      (await personas[WorkerNames.BOB].client?.conversations.newDm(
-        personas[WorkerNames.SAM].client?.accountAddress as `0x${string}`,
+      (await personas.bob.client?.conversations.newDm(
+        personas.sam.client?.accountAddress as `0x${string}`,
       )) || dmConvo;
-
-    if (!dmConvoLocal) {
-      throw new Error("DM conversation not found");
-    }
 
     // Wait a bit to let Sam attach stream listeners.
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const verifyResult = await verifyStream(
       dmConvoLocal,
-      [personas[WorkerNames.SAM]],
+      [personas.sam],
       gmMessageGenerator,
       gmSender,
     );
@@ -133,7 +129,7 @@ describe(testName, () => {
     console.time("create group");
     const start = performance.now();
 
-    bobsGroup = await personas[WorkerNames.BOB].client!.conversations.newGroup(
+    bobsGroup = await personas.bob.client!.conversations.newGroup(
       Object.values(personas)
         .filter((p) => p.name !== "randompep")
         .map((p) => p.client?.accountAddress as `0x${string}`),
@@ -164,7 +160,7 @@ describe(testName, () => {
 
     const result = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -186,7 +182,7 @@ describe(testName, () => {
 
     const previousMembers = await bobsGroup.members();
     await bobsGroup.addMembers([
-      personas["randompep"].client?.accountAddress as `0x${string}`,
+      personas.randompep.client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
 
@@ -206,7 +202,7 @@ describe(testName, () => {
 
     const previousMembers = await bobsGroup.members();
     await bobsGroup.removeMembers([
-      personas[WorkerNames.JOE].client?.accountAddress as `0x${string}`,
+      personas.joe.client?.accountAddress as `0x${string}`,
     ]);
     const members = await bobsGroup.members();
 
@@ -240,7 +236,7 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       bobsGroup,
-      [personas["elon"]],
+      [personas.elon],
       gmMessageGenerator,
       gmSender,
     );
@@ -257,9 +253,7 @@ describe(testName, () => {
     const start = performance.now();
 
     // Create a new group for all personas
-    const newGroup = await personas[
-      WorkerNames.BOB
-    ].client!.conversations.newGroup(
+    const newGroup = await personas.bob.client!.conversations.newGroup(
       Object.values(personas).map(
         (p) => p.client?.accountAddress as `0x${string}`,
       ),

@@ -39,30 +39,30 @@ describe(testName, () => {
   });
   it("create random personas", async () => {
     personas = await getWorkers(["random"], env, testName);
-    expect(personas["random"].client?.accountAddress).toBeDefined();
+    expect(personas.random.client?.accountAddress).toBeDefined();
   });
 
   it("should create a persona", async () => {
     // Get Bob's persona using the enum value.
-    personas = await getWorkers([WorkerNames.BOB, "random"], env, testName);
+    personas = await getWorkers(["bob", "random"], env, testName);
 
-    expect(personas[WorkerNames.BOB].client?.accountAddress).toBeDefined();
+    expect(personas.bob.client?.accountAddress).toBeDefined();
   });
 
   it("should create a random persona", async () => {
     personas = await getWorkers(["random"], env, testName);
-    expect(personas["random"].client?.accountAddress).toBeDefined();
+    expect(personas.random.client?.accountAddress).toBeDefined();
   });
 
   it("should create multiple personas", async () => {
     personas = await getWorkers(
-      [WorkerNames.BOB, WorkerNames.ALICE, "randompep", "randombob"],
+      ["bob", "alice", "randompep", "randombob"],
       env,
       testName,
     );
-    expect(personas[WorkerNames.BOB].client?.accountAddress).toBeDefined();
-    expect(personas[WorkerNames.ALICE].client?.accountAddress).toBeDefined();
-    expect(personas["randompep"].client?.accountAddress).toBeDefined();
-    expect(personas["randombob"].client?.accountAddress).toBeDefined();
+    expect(personas.bob.client?.accountAddress).toBeDefined();
+    expect(personas.alice.client?.accountAddress).toBeDefined();
+    expect(personas.randompep.client?.accountAddress).toBeDefined();
+    expect(personas.randombob.client?.accountAddress).toBeDefined();
   });
 });
