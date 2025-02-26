@@ -1,67 +1,56 @@
-[2025-02-26T11:40:09.227Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_GroupConversationStreams_dev
-[2025-02-26T11:40:11.145Z] [warn] [fabri] Create XMTP client v:436360a 1.882s
-[2025-02-26T11:40:11.145Z] [info] [fabri] Start conversation stream
-[2025-02-26T11:40:11.149Z] [info] [fabri] Initial conversations count: 19
-[2025-02-26T11:40:11.149Z] [info] [fabri] Conversation stream started
-[2025-02-26T11:40:11.150Z] [warn] [fabri] Initialize XMTP client 1.889s
-[2025-02-26T11:40:11.155Z] [warn] [bob] Create XMTP client v:436360a 1.892s
-[2025-02-26T11:40:11.155Z] [info] [bob] Start conversation stream
-[2025-02-26T11:40:11.157Z] [info] [bob] Initial conversations count: 21
-[2025-02-26T11:40:11.157Z] [info] [bob] Conversation stream started
-[2025-02-26T11:40:11.157Z] [warn] [bob] Initialize XMTP client 1.925s
-[2025-02-26T11:40:11.210Z] [warn] [alice] Create XMTP client v:436360a 1.947s
-[2025-02-26T11:40:11.211Z] [info] [alice] Start conversation stream
-[2025-02-26T11:40:11.214Z] [info] [alice] Initial conversations count: 25
-[2025-02-26T11:40:11.214Z] [info] [alice] Conversation stream started
-[2025-02-26T11:40:11.215Z] [warn] [alice] Initialize XMTP client 1.953s
-[2025-02-26T11:40:11.307Z] [warn] [joe] Create XMTP client v:436360a 2.043s
-[2025-02-26T11:40:11.308Z] [info] [joe] Start conversation stream
-[2025-02-26T11:40:11.310Z] [info] [joe] Initial conversations count: 19
-[2025-02-26T11:40:11.311Z] [info] [joe] Conversation stream started
-[2025-02-26T11:40:11.311Z] [warn] [joe] Initialize XMTP client 2.052s
-[2025-02-26T11:40:11.438Z] [warn] [elon] Create XMTP client v:436360a 2.175s
-[2025-02-26T11:40:11.439Z] [info] [elon] Start conversation stream
-[2025-02-26T11:40:11.441Z] [info] [elon] Initial conversations count: 19
-[2025-02-26T11:40:11.441Z] [info] [elon] Conversation stream started
-[2025-02-26T11:40:11.442Z] [warn] [elon] Initialize XMTP client 2.182s
-[2025-02-26T11:40:11.444Z] [info] [alice] Starting group conversation stream verification test with 2 participants
-[2025-02-26T11:40:11.445Z] [info] [bob] Collecting 1 conversations from peer: 462c7a0842001ade7317133774475d5981e73b4b918365b7ec9d4dacd5b9467a
-[2025-02-26T11:40:11.445Z] [info] [joe] Collecting 1 conversations from peer: 462c7a0842001ade7317133774475d5981e73b4b918365b7ec9d4dacd5b9467a
-[2025-02-26T11:40:11.445Z] [info] [alice] Creating new group conversation with 2 participants
-[2025-02-26T11:40:11.583Z] [info] [alice] New conversation in stream: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.571Z] [info] [alice] Created group conversation with ID: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.579Z] [info] [bob] New conversation in stream: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.579Z] [info] [bob] Received conversation event, id: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.584Z] [info] [joe] New conversation in stream: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.584Z] [info] [joe] Received conversation event, id: 3e5aa93e30769c87fb51adafa803222a
-[2025-02-26T11:40:13.584Z] [info] [alice] Received 2 group conversation notifications
-[2025-02-26T11:40:13.585Z] [info] [fabri] Starting group conversation stream verification test with 4 participants
-[2025-02-26T11:40:13.585Z] [info] [alice] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
-[2025-02-26T11:40:13.585Z] [info] [bob] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
-[2025-02-26T11:40:13.585Z] [info] [joe] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
-[2025-02-26T11:40:13.585Z] [info] [elon] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
-[2025-02-26T11:40:13.586Z] [info] [fabri] Creating new group conversation with 4 participants
-[2025-02-26T11:40:13.591Z] [info] [fabri] New conversation in stream: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.508Z] [info] [joe] New conversation in stream: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.509Z] [info] [joe] Received conversation event, id: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.510Z] [info] [fabri] Created group conversation with ID: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.514Z] [info] [bob] New conversation in stream: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.514Z] [info] [bob] Received conversation event, id: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.515Z] [info] [alice] New conversation in stream: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.515Z] [info] [alice] Received conversation event, id: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.515Z] [info] [elon] New conversation in stream: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.515Z] [info] [elon] Received conversation event, id: a86c090912c960921a04f4c48a6289f2
-[2025-02-26T11:40:15.515Z] [info] [fabri] Received 4 group conversation notifications
-[2025-02-26T11:40:15.516Z] [info] [elon] Starting group conversation stream verification test with 2 participants
-[2025-02-26T11:40:15.516Z] [info] [alice] Collecting 1 conversations from peer: 8c3145763070f8887b4d8fa76d06f0c7230b66b7fb0ea286c1a3679afcea6b4e
-[2025-02-26T11:40:15.516Z] [info] [bob] Collecting 1 conversations from peer: 8c3145763070f8887b4d8fa76d06f0c7230b66b7fb0ea286c1a3679afcea6b4e
-[2025-02-26T11:40:15.516Z] [info] [elon] Creating new group conversation with 2 participants
-[2025-02-26T11:40:15.520Z] [info] [elon] New conversation in stream: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.426Z] [info] [alice] New conversation in stream: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.426Z] [info] [alice] Received conversation event, id: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.426Z] [info] [elon] Created group conversation with ID: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.430Z] [info] [bob] New conversation in stream: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.430Z] [info] [bob] Received conversation event, id: adad4845061300d54a253ab6d3f5e2cd
-[2025-02-26T11:40:17.430Z] [info] [elon] Received 2 group conversation notifications
-[2025-02-26T11:40:18.373Z] [info] {"DNS Lookup":0.002013,"TCP Connection":0.00223,"TLS Handshake":0.529707,"Server Processing":0.696339,"Content Transfer":0.69644}
-[2025-02-26T11:40:18.373Z] [warn] total: 696.4399999999999ms, tls: 529.707ms, processing: 166.73299999999995ms
+[2025-02-26T12:06:44.392Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_GroupConversationStreams_dev
+[2025-02-26T12:06:46.493Z] [warn] [bob] Create XMTP client v:436360a 2.066s
+[2025-02-26T12:06:46.494Z] [info] [bob] Start conversation stream
+[2025-02-26T12:06:46.498Z] [info] [bob] Initial conversations count: 50
+[2025-02-26T12:06:46.498Z] [info] [bob] Conversation stream started
+[2025-02-26T12:06:46.498Z] [warn] [bob] Initialize XMTP client 2.102s
+[2025-02-26T12:06:46.532Z] [warn] [elon] Create XMTP client v:436360a 2.104s
+[2025-02-26T12:06:46.532Z] [info] [elon] Start conversation stream
+[2025-02-26T12:06:46.535Z] [info] [elon] Initial conversations count: 35
+[2025-02-26T12:06:46.536Z] [info] [elon] Conversation stream started
+[2025-02-26T12:06:46.536Z] [warn] [elon] Initialize XMTP client 2.112s
+[2025-02-26T12:06:46.579Z] [warn] [joe] Create XMTP client v:436360a 2.151s
+[2025-02-26T12:06:46.579Z] [info] [joe] Start conversation stream
+[2025-02-26T12:06:46.584Z] [info] [joe] Initial conversations count: 44
+[2025-02-26T12:06:46.584Z] [info] [joe] Conversation stream started
+[2025-02-26T12:06:46.584Z] [warn] [joe] Initialize XMTP client 2.161s
+[2025-02-26T12:06:46.652Z] [warn] [fabri] Create XMTP client v:436360a 2.224s
+[2025-02-26T12:06:46.653Z] [info] [fabri] Start conversation stream
+[2025-02-26T12:06:46.656Z] [info] [fabri] Initial conversations count: 26
+[2025-02-26T12:06:46.656Z] [info] [fabri] Conversation stream started
+[2025-02-26T12:06:46.657Z] [warn] [fabri] Initialize XMTP client 2.232s
+[2025-02-26T12:06:46.685Z] [warn] [alice] Create XMTP client v:436360a 2.257s
+[2025-02-26T12:06:46.685Z] [info] [alice] Start conversation stream
+[2025-02-26T12:06:46.690Z] [info] [alice] Initial conversations count: 51
+[2025-02-26T12:06:46.690Z] [info] [alice] Conversation stream started
+[2025-02-26T12:06:46.690Z] [warn] [alice] Initialize XMTP client 2.264s
+[2025-02-26T12:06:46.692Z] [info] [alice] Starting group conversation stream verification test with 2 participants
+[2025-02-26T12:06:46.692Z] [info] [bob] Collecting 1 conversations from peer: 462c7a0842001ade7317133774475d5981e73b4b918365b7ec9d4dacd5b9467a
+[2025-02-26T12:06:46.692Z] [info] [joe] Collecting 1 conversations from peer: 462c7a0842001ade7317133774475d5981e73b4b918365b7ec9d4dacd5b9467a
+[2025-02-26T12:06:46.693Z] [info] [alice] Creating new group conversation with 2 participants
+[2025-02-26T12:06:47.064Z] [info] [alice] New conversation in stream: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.942Z] [info] [bob] New conversation in stream: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.942Z] [info] [bob] Received conversation event, id: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.943Z] [info] [alice] Created group conversation with ID: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.951Z] [info] [joe] New conversation in stream: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.951Z] [info] [joe] Received conversation event, id: d842ea042be8970cb398411bf4e30324
+[2025-02-26T12:06:48.952Z] [info] [alice] Received 2 group conversation notifications
+[2025-02-26T12:06:48.952Z] [info] [fabri] Starting group conversation stream verification test with 4 participants
+[2025-02-26T12:06:48.952Z] [info] [alice] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
+[2025-02-26T12:06:48.953Z] [info] [bob] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
+[2025-02-26T12:06:48.953Z] [info] [joe] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
+[2025-02-26T12:06:48.953Z] [info] [elon] Collecting 1 conversations from peer: ca6656aedb78696f5f905535e9e05239e8d493060b7614785fae704a3125b215
+[2025-02-26T12:06:48.953Z] [info] [fabri] Creating new group conversation with 4 participants
+[2025-02-26T12:06:48.958Z] [info] [fabri] New conversation in stream: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.433Z] [info] [joe] New conversation in stream: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.433Z] [info] [joe] Received conversation event, id: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.436Z] [info] [bob] New conversation in stream: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.436Z] [info] [bob] Received conversation event, id: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.436Z] [info] [fabri] Created group conversation with ID: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.439Z] [info] [alice] New conversation in stream: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.439Z] [info] [alice] Received conversation event, id: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.439Z] [info] [elon] New conversation in stream: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.439Z] [info] [elon] Received conversation event, id: 98e8415e51ec7055ccc2ed166a1b1f7f
+[2025-02-26T12:06:51.439Z] [info] [fabri] Received 4 group conversation notifications
+[2025-02-26T12:06:52.374Z] [info] {"DNS Lookup":0.001708,"TCP Connection":0.001903,"TLS Handshake":0.531597,"Server Processing":0.697131,"Content Transfer":0.69721}
+[2025-02-26T12:06:52.374Z] [warn] total: 697.21ms, tls: 531.597ms, processing: 165.61300000000006ms

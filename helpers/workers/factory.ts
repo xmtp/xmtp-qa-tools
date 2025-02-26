@@ -1,5 +1,6 @@
 import { appendFile } from "fs/promises";
 import path from "path";
+import type { Worker } from "worker_threads";
 import { type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
@@ -18,11 +19,13 @@ import { WorkerClient } from "./main";
 export class PersonaFactory {
   private env: XmtpEnv;
   private testName: string;
-  private typeofStream: "message" | "conversation";
+  private activeWorkers: WorkerClient[] = []; // Add this to track workers
+
+  private typeofStream: "message" | "conversation" | "consent";
   constructor(
     env: XmtpEnv,
     testName: string,
-    typeofStream: "message" | "conversation",
+    typeofStream: "message" | "conversation" | "consent",
   ) {
     this.env = env;
     this.testName = testName;
@@ -101,6 +104,11 @@ export class PersonaFactory {
     };
   }
 
+  public async flushWorkers(): Promise<void> {
+    await Promise.all(this.activeWorkers.map((worker) => worker.terminate()));
+    this.activeWorkers = [];
+  }
+
   /**
    * Creates an array of Persona objects from the given descriptors.
    * Each persona either has pre-existing keys (if the descriptor is "alice", etc.)
@@ -109,6 +117,7 @@ export class PersonaFactory {
    * and returns the complete Persona array.
    */
   public async createPersonas(descriptors: string[]): Promise<Persona[]> {
+    await this.flushWorkers();
     console.log(
       `[PersonaFactory] Creating personas: ${descriptors.join(", ")} for ${this.testName}`,
     );
@@ -174,6 +183,9 @@ export class PersonaFactory {
       p.worker = messageWorkers[index];
     });
 
+    // Store the workers for potential cleanup later
+    this.activeWorkers = messageWorkers;
+
     return personas;
   }
 }
@@ -191,7 +203,7 @@ export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   env: XmtpEnv,
   testName: string,
-  typeofStream: "message" | "conversation" = "message",
+  typeofStream: "message" | "conversation" | "consent" = "message",
 ): Promise<Record<string, Persona>> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
@@ -203,6 +215,7 @@ export async function getWorkers(
   }
 
   const personaFactory = new PersonaFactory(env, testName, typeofStream);
+
   const personas = await personaFactory.createPersonas(descriptors);
 
   return personas.reduce<Record<string, Persona>>((acc, p) => {

@@ -1,0 +1,38 @@
+[2025-02-26T20:24:09.430Z] [info] [PersonaFactory] Creating personas: bob, joe, elon, fabri, alice for TS_StreamsConversations_dev
+[2025-02-26T20:24:11.439Z] [warn] [fabri] Create XMTP client v:436360a 1.972s
+[2025-02-26T20:24:11.466Z] [warn] [bob] Create XMTP client v:436360a 1.999s
+[2025-02-26T20:24:11.548Z] [warn] [joe] Create XMTP client v:436360a 2.081s
+[2025-02-26T20:24:11.632Z] [warn] [elon] Create XMTP client v:436360a 2.166s
+[2025-02-26T20:24:11.802Z] [warn] [alice] Create XMTP client v:436360a 2.335s
+[2025-02-26T20:24:11.830Z] [warn] [fabri] Start message stream 390.508ms
+[2025-02-26T20:24:11.830Z] [info] [fabri] Message stream started
+[2025-02-26T20:24:11.831Z] [warn] [fabri] Start stream 391.538ms
+[2025-02-26T20:24:11.831Z] [warn] [fabri] Initialize XMTP client 2.367s
+[2025-02-26T20:24:11.871Z] [warn] [bob] Start message stream 404.985ms
+[2025-02-26T20:24:11.871Z] [info] [bob] Message stream started
+[2025-02-26T20:24:11.871Z] [warn] [bob] Start stream 405.63ms
+[2025-02-26T20:24:11.872Z] [warn] [bob] Initialize XMTP client 2.436s
+[2025-02-26T20:24:11.901Z] [warn] [joe] Start message stream 352.156ms
+[2025-02-26T20:24:11.901Z] [info] [joe] Message stream started
+[2025-02-26T20:24:11.901Z] [warn] [joe] Start stream 352.733ms
+[2025-02-26T20:24:11.901Z] [warn] [joe] Initialize XMTP client 2.438s
+[2025-02-26T20:24:12.038Z] [warn] [elon] Start message stream 405.381ms
+[2025-02-26T20:24:12.039Z] [info] [elon] Message stream started
+[2025-02-26T20:24:12.039Z] [warn] [elon] Start stream 406.264ms
+[2025-02-26T20:24:12.039Z] [warn] [elon] Initialize XMTP client 2.575s
+[2025-02-26T20:24:12.159Z] [warn] [alice] Start message stream 356.427ms
+[2025-02-26T20:24:12.159Z] [info] [alice] Message stream started
+[2025-02-26T20:24:12.160Z] [warn] [alice] Start stream 357.286ms
+[2025-02-26T20:24:12.160Z] [warn] [alice] Initialize XMTP client 2.695s
+[2025-02-26T20:24:13.410Z] [info] [alice] Collecting 1 messages from convo:93d0f43282ce04eaf3ad4d0a2986b0f2
+[2025-02-26T20:24:13.410Z] [info] Sending message #1: gm-1-ii4tw3vx9aj
+[2025-02-26T20:24:14.543Z] [info] All participants received the expected number of messages.
+[2025-02-26T20:24:15.939Z] [info] [alice] Collecting 1 messages from convo:93d0f43282ce04eaf3ad4d0a2986b0f2
+[2025-02-26T20:24:15.940Z] [info] Sending message #1: gm-1-y0ykjzx7q5r
+[2025-02-26T20:24:16.313Z] [info] All participants received the expected number of messages.
+[2025-02-26T20:24:17.498Z] [info] [fabri] Collecting 1 messages from convo:b2aab2a2a24b364ffa803ea576db89d9
+[2025-02-26T20:24:17.499Z] [info] Sending message #1: gm-1-irf6rowbsoe
+[2025-02-26T20:24:18.487Z] [info] All participants received the expected number of messages.
+[2025-02-26T20:24:19.669Z] [info] [joe] Collecting 1 messages from convo:f1d0b04ecd93754b7302af4934da0cdc
+[2025-02-26T20:24:19.669Z] [info] Sending message #1: gm-1-br16dsbhof
+[2025-02-26T20:24:20.596Z] [info] All participants received the expected number of messages.

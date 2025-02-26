@@ -1,6 +1,7 @@
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   Client,
+  type Consent,
   type Conversation,
   type DecodedMessage,
   type XmtpEnv,
@@ -16,6 +17,12 @@ export type MessageStreamWorker = {
 export type ConversationStreamWorker = {
   type: string;
   conversation: Conversation;
+};
+
+// Add this new type for consent stream events
+export type ConsentStreamWorker = {
+  type: string;
+  consentUpdate: Consent[] | undefined;
 };
 
 // Snippet used as "inline" JS for Worker to import your worker code
@@ -40,14 +47,14 @@ export class WorkerClient extends Worker {
 
   private walletKey: string;
   private encryptionKeyHex: string;
-  private typeofStream: "message" | "conversation";
+  private typeofStream: "message" | "conversation" | "consent";
 
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
     persona: PersonaBase,
     env: XmtpEnv,
-    typeofStream: "message" | "conversation",
+    typeofStream: "message" | "conversation" | "consent",
     options: WorkerOptions = {},
   ) {
     options.workerData = {
@@ -139,10 +146,14 @@ export class WorkerClient extends Worker {
       console.time(`[${this.name}] Start stream`);
       await this.startStream();
       console.timeEnd(`[${this.name}] Start stream`);
-    } else {
+    } else if (this.typeofStream === "conversation") {
       // Start conversation streaming
       console.log(`[${this.name}] Start conversation stream`);
       this.startConversationStream();
+    } else if (this.typeofStream === "consent") {
+      // Start consent streaming
+      console.log(`[${this.name}] Start consent stream`);
+      this.startConsentStream();
     }
 
     // // Start conversation streaming
@@ -244,6 +255,42 @@ export class WorkerClient extends Worker {
     console.timeEnd(`[${this.name}] Start conversation stream`);
     console.log(`[${this.name}] Conversation stream started`);
   }
+
+  /**
+   * Internal helper to stream consent updates from the client,
+   * then emit them as 'stream_consent' events on this Worker.
+   */
+  private startConsentStream() {
+    console.time(`[${this.name}] Start consent stream`);
+
+    // Use the stream method to listen for consent updates
+    const consentStream = this.client.conversations.streamConsent();
+
+    // Process consent updates asynchronously
+    void (async () => {
+      try {
+        for await (const consentUpdate of consentStream) {
+          // Create and emit the worker message
+          const workerMessage: ConsentStreamWorker = {
+            type: "stream_consent",
+            consentUpdate: consentUpdate,
+          };
+
+          // Emit if any listeners are attached
+          if (this.listenerCount("message") > 0) {
+            this.emit("message", workerMessage);
+          }
+        }
+      } catch (error) {
+        console.error(`[${this.name}] Consent stream error:`, error);
+        this.emit("error", error);
+      }
+    })();
+
+    console.timeEnd(`[${this.name}] Start consent stream`);
+    console.log(`[${this.name}] Consent stream started`);
+  }
+
   // Add this to allow collecting conversation events:
   collectConversations(
     fromPeerAddress: string,
@@ -341,6 +388,56 @@ export class WorkerClient extends Worker {
               this.off("message", onMessage);
               resolve(messages);
             }
+          }
+        }
+      };
+
+      this.on("message", onMessage);
+    });
+  }
+
+  /**
+   * Collects a fixed number of consent updates.
+   *
+   * @param count - Number of consent updates to gather
+   * @param timeoutMs - Optional max time in milliseconds
+   *
+   * @returns Promise resolving with an array of ConsentStreamWorker
+   */
+  collectConsentUpdates(
+    count: number = 1,
+    timeoutMs = count * defaultValues.timeout,
+  ): Promise<ConsentStreamWorker[]> {
+    console.log(`[${this.name}] Collecting ${count} consent updates`);
+
+    return new Promise((resolve) => {
+      const consentUpdates: ConsentStreamWorker[] = [];
+      const timer = setTimeout(() => {
+        this.off("message", onMessage);
+        console.warn(
+          `[${this.name}] Timeout. Got ${consentUpdates.length} / ${count} consent updates.`,
+        );
+        resolve(consentUpdates); // partial or empty
+      }, timeoutMs);
+
+      const onMessage = (
+        msg:
+          | MessageStreamWorker
+          | ConversationStreamWorker
+          | ConsentStreamWorker,
+      ) => {
+        if (msg.type === "stream_consent") {
+          const consentMsg = msg as ConsentStreamWorker;
+
+          console.log(
+            `[${this.name}] Received consent update: ${JSON.stringify(consentMsg.consentUpdate)}`,
+          );
+
+          consentUpdates.push(consentMsg);
+          if (consentUpdates.length >= count) {
+            clearTimeout(timer);
+            this.off("message", onMessage);
+            resolve(consentUpdates);
           }
         }
       };

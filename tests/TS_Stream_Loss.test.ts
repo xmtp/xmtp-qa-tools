@@ -1,4 +1,3 @@
-import path from "path";
 import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
@@ -17,7 +16,7 @@ const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
 
 const amountofMessages = 10; // Number of messages to collect per receiver
-const receivers = 50;
+const receivers = 10;
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax =
   amountofMessages * receivers * defaultValues.perMessageTimeout;

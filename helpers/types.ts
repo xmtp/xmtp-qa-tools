@@ -1,3 +1,4 @@
+import { ConsentEntityType, ConsentState } from "@xmtp/node-bindings"; // Update this import
 import {
   Client,
   type Conversation,
@@ -10,7 +11,7 @@ export type WorkerStreamMessage = {
   type: "stream_message";
   message: DecodedMessage;
 };
-
+export { ConsentEntityType, ConsentState };
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };
 // Define the expected return type of verifyStream
