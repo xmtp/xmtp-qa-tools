@@ -8,7 +8,7 @@ import {
   type XmtpEnv,
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/stream";
+import { verifyStream } from "../helpers/workers/messages";
 
 const env: XmtpEnv = "dev";
 const testName = "TS_Groups_" + env;

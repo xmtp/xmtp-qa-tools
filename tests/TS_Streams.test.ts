@@ -1,15 +1,8 @@
-import path from "path";
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/stream";
-
-dotenv.config();
-dotenv.config({
-  path: path.resolve(process.cwd(), `.data/.env`),
-});
+import { verifyStream } from "../helpers/workers/messages";
 
 /* 
 TODO:
@@ -45,10 +38,7 @@ describe(testName, () => {
       "dev",
       testName,
     );
-    // Add delay to ensure streams are properly initialized
-    await new Promise((resolve) => setTimeout(resolve, 2000));
   });
-
   afterAll(async () => {
     await flushLogger(testName);
     await Promise.all(
@@ -57,7 +47,6 @@ describe(testName, () => {
       }),
     );
   });
-
   it("test fabri sending gm to alice", async () => {
     const dmConvo = await personas[
       WorkerNames.FABRI
@@ -130,9 +119,21 @@ describe(testName, () => {
         (p) => p.client?.accountAddress as `0x${string}`,
       ),
     );
+    const members = await newGroup.members();
+    for (const member of members) {
+      const worker = Object.values(personas).find(
+        (w) => w.client!.inboxId === member.inboxId,
+      );
+      console.log(
+        "name:",
+        worker?.name,
+        "installations:",
+        member.installationIds.length,
+      );
+    }
     const result = await verifyStream(
       newGroup,
-      Object.values(personas).map((p) => p),
+      [personas["bob"], personas["joe"], personas["elon"], personas["fabri"]],
       gmMessageGenerator,
       gmSender,
     );

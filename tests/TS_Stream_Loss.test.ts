@@ -9,7 +9,7 @@ import {
   type XmtpEnv,
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/stream";
+import { verifyStream } from "../helpers/workers/messages";
 
 dotenv.config();
 dotenv.config({

@@ -9,7 +9,7 @@ import {
   type Persona,
   type PersonaBase,
 } from "../types";
-import { WorkerClient } from "./stream";
+import { WorkerClient } from "./messages";
 
 /**
  * The PersonaFactory is responsible for creating Persona objects
@@ -42,7 +42,7 @@ export class PersonaFactory {
       const publicKey = account.address;
       // Append a new environment variable to the .data/.env file
       await appendFile(
-        path.resolve(process.cwd(), ".data", ".env"),
+        path.resolve(process.cwd(), ".env"),
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKeyHex}\n# public key is ${publicKey}\n`,
       );
       return {
@@ -153,18 +153,20 @@ export class PersonaFactory {
     }
 
     // Spin up Workers in parallel
-    const workers = await Promise.all(
+    const messageWorkers = await Promise.all(
       personas.map((p) => new WorkerClient(p, this.env)),
     );
 
     // Initialize each worker's XMTP client in parallel
-    const clients = await Promise.all(workers.map((w) => w.initialize()));
-    // Attach worker, client, dbPath, etc. to each persona
+    const workers = await Promise.all([
+      ...messageWorkers.map((w) => w.initialize()),
+    ]);
+
     personas.forEach((p, index) => {
-      p.worker = workers[index];
-      p.client = clients[index].client;
-      p.dbPath = clients[index].dbPath;
-      p.version = clients[index].version;
+      p.client = workers[index].client;
+      p.dbPath = workers[index].dbPath;
+      p.version = workers[index].version;
+      p.worker = messageWorkers[index];
     });
 
     return personas;

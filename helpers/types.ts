@@ -4,7 +4,7 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import type { WorkerClient } from "./workers/stream";
+import type { WorkerClient } from "./workers/messages";
 
 export type { Conversation, DecodedMessage, XmtpEnv };
 export { Client };

@@ -16,7 +16,7 @@ const account = privateKeyToAccount(walletKey);
 const encryptionKeyHex = generateEncryptionKeyHex();
 const publicKey = account.address;
 
-const filePath = join(process.cwd(), ".data", ".env");
+const filePath = join(process.cwd(), ".env");
 
 await writeFile(
   filePath,

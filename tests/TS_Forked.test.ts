@@ -4,7 +4,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/creator";
-import { verifyStream } from "../helpers/workers/stream";
+import { verifyStream } from "../helpers/workers/messages";
 
 const env = "dev";
 const testName = "TS_Forked_" + env;

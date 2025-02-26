@@ -14,11 +14,6 @@ export type MessageStreamWorker = {
   message: DecodedMessage;
 };
 
-export type ConversationStreamWorker = {
-  type: string;
-  conversation: Conversation;
-};
-
 // Snippet used as "inline" JS for Worker to import your worker code
 const workerBootstrap = /* JavaScript */ `
   import { createRequire } from "node:module";
@@ -130,8 +125,7 @@ export class WorkerClient extends Worker {
 
     // Start streaming in the background
     console.time(`[${this.name}] Start stream`);
-    await this.startStreamMessages();
-    //this.startStreamConversations();
+    await this.startStream();
     console.timeEnd(`[${this.name}] Start stream`);
 
     // Sync conversations
@@ -147,7 +141,7 @@ export class WorkerClient extends Worker {
    * Internal helper to stream all messages from the client,
    * then emit them as 'stream_message' events on this Worker.
    */
-  private async startStreamMessages() {
+  private async startStream() {
     console.time(`[${this.name}] Start message stream`);
     const stream = await this.client.conversations.streamAllMessages();
     console.timeEnd(`[${this.name}] Start message stream`);
@@ -176,37 +170,6 @@ export class WorkerClient extends Worker {
   }
 
   /**
-   * Internal helper to stream all conversations from the client,
-   * then emit them as 'stream_conversation' events on this Worker.
-   */
-  private startStreamConversations() {
-    console.time(`[${this.name}] Start conversation stream`);
-    const stream = this.client.conversations.stream();
-    console.timeEnd(`[${this.name}] Start conversation stream`);
-    console.log(`[${this.name}] Conversation stream started`);
-
-    // Process conversations asynchronously
-    void (async () => {
-      try {
-        for await (const conversation of stream) {
-          console.time(`[${this.name}] Process conversation`);
-          const workerMessage: ConversationStreamWorker = {
-            type: "stream_conversation",
-            conversation: conversation as Conversation,
-          };
-          // Emit if any listeners are attached
-          if (this.listenerCount("message") > 0) {
-            this.emit("message", workerMessage);
-          }
-          console.timeEnd(`[${this.name}] Process conversation`);
-        }
-      } catch (error) {
-        console.error(`[${this.name}] Stream error:`, error);
-        this.emit("error", error);
-      }
-    })();
-  }
-  /**
    * Collects a fixed number of messages matching:
    * - a specific conversation (topic or peer address),
    * - a specific contentType ID,
@@ -228,7 +191,7 @@ export class WorkerClient extends Worker {
     timeoutMs = count * defaultValues.perMessageTimeout,
   ): Promise<MessageStreamWorker[]> {
     console.log(
-      `[${this.name}] Collecting ${count} '${typeId}' messages containing '${suffix}' from convo '${groupId}'`,
+      `[${this.name}] Collecting ${count} '${typeId}' messages from convo:${groupId}`,
     );
 
     return new Promise((resolve, reject) => {
