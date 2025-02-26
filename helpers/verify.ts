@@ -3,7 +3,7 @@ import {
   type Persona,
   type VerifyStreamResult,
 } from "./types";
-import type { MessageStreamWorker } from "./workers/messages";
+import type { MessageStreamWorker } from "./workers/main";
 
 /**
  * Simplified `verifyStream` that sends messages to a conversation,

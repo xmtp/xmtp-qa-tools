@@ -9,7 +9,7 @@ import {
   type Persona,
   type PersonaBase,
 } from "../types";
-import { WorkerClient } from "./messages";
+import { WorkerClient } from "./main";
 
 /**
  * The PersonaFactory is responsible for creating Persona objects

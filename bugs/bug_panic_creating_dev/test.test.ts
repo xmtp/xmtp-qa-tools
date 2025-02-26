@@ -7,7 +7,7 @@ import {
   overrideConsole,
 } from "../../helpers/logger";
 import { type Persona, type XmtpEnv } from "../../helpers/types";
-import { getWorkers } from "../../helpers/workers/creator";
+import { getWorkers } from "../../helpers/workers/factory";
 
 const env: XmtpEnv = "dev";
 const testName = "bug_panic_creating_" + env;

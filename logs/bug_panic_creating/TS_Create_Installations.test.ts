@@ -1,19 +1,16 @@
-import dotenv from "dotenv";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import {
+  createLogger,
+  flushLogger,
+  overrideConsole,
+} from "../../helpers/logger";
 import {
   type Conversation,
   type Persona,
   type XmtpEnv,
-} from "../helpers/types";
-import { getWorkers } from "../helpers/workers/factory";
+} from "../../helpers/types";
+import { getWorkers } from "../../helpers/workers/factory";
 
-dotenv.config();
-
-/**
- * TODO
- * - Test multiple groups with multiple participants with multiple installations
- */
 const env: XmtpEnv = "dev";
 const testName = "TS_Group_installations_" + env;
 

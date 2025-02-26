@@ -3,7 +3,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { WorkerNames, type Conversation, type Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
-import { getWorkers } from "../helpers/workers/creator";
+import { getWorkers } from "../helpers/workers/factory";
 
 dotenv.config();
 /* 

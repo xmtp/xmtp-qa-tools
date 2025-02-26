@@ -1,5 +1,5 @@
 import { createLogger, overrideConsole } from "@helpers/logger";
-import { getWorkers } from "@helpers/workers/creator";
+import { getWorkers } from "@helpers/workers/factory";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { WorkerNames, type Persona } from "../../helpers/types";
