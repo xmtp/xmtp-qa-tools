@@ -19,30 +19,30 @@ dotenv.config({
 describe(testName, () => {
   let personas: Record<string, Persona>;
 
-  beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
-    personas = await getWorkers(
-      ["bob", "alice", "joe", "randompep", "elon"],
-      env,
-      testName,
-    );
-  });
-  afterEach(async () => {
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
-  });
-  afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
-  });
+  // beforeAll(async () => {
+  //   const logger = await createLogger(testName);
+  //   overrideConsole(logger);
+  //   personas = await getWorkers(
+  //     ["bob", "alice", "joe", "randompep", "elon"],
+  //     env,
+  //     testName,
+  //   );
+  // });
+  // afterEach(async () => {
+  //   await Promise.all(
+  //     Object.values(personas).map(async (persona) => {
+  //       await persona.worker?.terminate();
+  //     }),
+  //   );
+  // });
+  // afterAll(async () => {
+  //   await flushLogger(testName);
+  //   await Promise.all(
+  //     Object.values(personas).map(async (persona) => {
+  //       await persona.worker?.terminate();
+  //     }),
+  //   );
+  // });
 
   it("Measure group creation time for 5 participants", async () => {
     const amount = 5;
@@ -67,6 +67,37 @@ describe(testName, () => {
       );
     }
     expect(group.id).toBeDefined();
+    for (const worker of workerArray) {
+      await worker.worker?.terminate();
+    }
+  });
+
+  it("Measure group creation time for 5 participants, again", async () => {
+    const amount = 5;
+    const allWorkers = await getWorkers(amount, env, testName);
+    const workerArray = Object.values(allWorkers);
+
+    console.time(`create group ${amount}`);
+    const inboxIds = workerArray.slice(0, amount).map((p) => p.client!.inboxId);
+    const group =
+      await workerArray[0].client!.conversations.newGroupByInboxIds(inboxIds);
+    console.timeEnd(`create group ${amount}`);
+    const members = await group.members();
+    for (const member of members) {
+      const worker = workerArray.find(
+        (w) => w.client!.inboxId === member.inboxId,
+      );
+      console.log(
+        "name:",
+        worker?.name,
+        "installations:",
+        member.installationIds.length,
+      );
+    }
+    expect(group.id).toBeDefined();
+    for (const worker of workerArray) {
+      await worker.worker?.terminate();
+    }
   });
 
   it("Measure group creation time for 15 participants", async () => {
@@ -87,6 +118,9 @@ describe(testName, () => {
       console.log(worker?.name, member.inboxId, member.installationIds.length);
     }
     expect(group.id).toBeDefined();
+    for (const worker of workerArray) {
+      await worker.worker?.terminate();
+    }
   });
 
   it("Measure group creation time for 25 participants", async () => {
@@ -107,5 +141,8 @@ describe(testName, () => {
       console.log(worker?.name, member.inboxId, member.installationIds.length);
     }
     expect(group.id).toBeDefined();
+    for (const worker of workerArray) {
+      await worker.worker?.terminate();
+    }
   });
 });

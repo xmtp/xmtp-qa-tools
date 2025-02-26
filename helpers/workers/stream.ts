@@ -39,6 +39,9 @@ export class WorkerClient extends Worker {
   private sdkVersion: string;
   private testName: string;
 
+  private messageStream?: any;
+  private isTerminated = false;
+
   private walletKey: string;
   private encryptionKeyHex: string;
 
@@ -149,30 +152,46 @@ export class WorkerClient extends Worker {
    */
   private async startStreamMessages() {
     console.time(`[${this.name}] Start message stream`);
-    const stream = await this.client.conversations.streamAllMessages();
+    this.messageStream = await this.client.conversations.streamAllMessages();
     console.timeEnd(`[${this.name}] Start message stream`);
     console.log(`[${this.name}] Message stream started`);
 
-    // Process messages asynchronously
     void (async () => {
       try {
-        for await (const message of stream) {
+        if (!this.messageStream) return;
+
+        for await (const message of this.messageStream) {
+          if (this.isTerminated) break;
+
           console.time(`[${this.name}] Process message`);
           const workerMessage: MessageStreamWorker = {
             type: "stream_message",
             message: message as DecodedMessage,
           };
-          // Emit if any listeners are attached
           if (this.listenerCount("message") > 0) {
             this.emit("message", workerMessage);
           }
           console.timeEnd(`[${this.name}] Process message`);
         }
       } catch (error) {
-        console.error(`[${this.name}] Stream error:`, error);
-        this.emit("error", error);
+        if (!this.isTerminated) {
+          console.error(`[${this.name}] Stream error:`, error);
+          this.emit("error", error);
+        }
       }
     })();
+  }
+
+  async terminate() {
+    this.isTerminated = true;
+
+    // Close streams if they exist
+    if (this.messageStream && "return" in this.messageStream) {
+      await this.messageStream.return?.();
+    }
+
+    // Call parent terminate
+    return super.terminate();
   }
 
   /**
