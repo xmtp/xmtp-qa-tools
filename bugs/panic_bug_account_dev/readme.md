@@ -17,20 +17,10 @@ thread 'tokio-runtime-worker' panicked at /Users/runner/work/libxmtp/libxmtp/xmt
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ```
 
-## Test
+## Test code
 
-This test file measures how long it takes to create message groups with different numbers of people. It tests three group sizes:
-
-1. Create a group with 5 people
-2. Create a group with 15 people
-3. Create a group with 25 people
-
-For each test, the code:
-
-1. Creates worker clients to represent different users
-2. Records the time needed to create a group
-3. Shows information about each group member
-4. Checks that the group was created correctly
+1. Create a gm with buggy account
+2. Check for its conversations
 
 ```tsx
 it("TC_CreateDM: should measure creating a DM and sending a gm to bug", async () => {

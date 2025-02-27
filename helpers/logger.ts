@@ -68,7 +68,7 @@ export const createLogger = async (testName: string) => {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
     let logFilePath = path.join("logs", `${sanitizedName}.log`);
     if (testName.includes("bug")) {
-      logFilePath = path.join("bugs", testName, `${sanitizedName}.log`);
+      logFilePath = path.join("bugs", testName, `test.log`);
     }
     // Shared format for console and memory transport
     const sharedFormat = winston.format.combine(
