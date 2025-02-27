@@ -1,6 +1,6 @@
 import fs from "fs";
-import dotenv from "dotenv";
 import { beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, overrideConsole } from "../helpers/logger";
 import { type Persona } from "../helpers/types";
 import {
@@ -9,11 +9,9 @@ import {
   getWorkers,
 } from "../helpers/workers/factory";
 
-dotenv.config();
-
 const env = "dev";
-const testName = "clients" + env;
-
+const testName = "clients_" + env;
+loadEnv(testName);
 /* 
 TODO:
 - Inconsistent test results (~20%).
@@ -74,19 +72,21 @@ describe(testName, () => {
 
   it("should create multiple installations for the same persona", async () => {
     // Create a base persona and multiple installations
-    const baseName = "fabritest";
+
+    personas = await getWorkers(["fabritest"], env, testName, "none");
+
     const suffixes = ["a", "b", "c"];
     folderCount++;
 
     const installations = await createMultipleInstallations(
-      baseName,
+      personas.fabritest,
       suffixes,
       env,
       testName,
     );
 
     // Log the installation details
-    for (const [id, persona] of Object.entries(installations)) {
+    for (const [_id, persona] of Object.entries(installations)) {
       console.log(
         `Name: ${persona.name}, Installation ID: ${persona.installationId}, DB Path: ${persona.dbPath}`,
       );

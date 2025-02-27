@@ -1,14 +1,17 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import { type Conversation, type Persona } from "../helpers/types";
+import {
+  type Conversation,
+  type Persona,
+  type XmtpEnv,
+} from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
-
-const env = "dev";
-const testName = "metadata" + env;
+const env: XmtpEnv = "dev";
+const testName = "metadata_" + env;
+loadEnv(testName);
 
 describe(testName, () => {
   let bobsGroup: Conversation;

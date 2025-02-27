@@ -1,13 +1,11 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { type Persona, type XmtpEnv } from "../helpers/types";
 import {
   createMultipleInstallations,
   getWorkers,
 } from "../helpers/workers/factory";
-
-dotenv.config();
 
 /**
  * TODO
@@ -16,7 +14,8 @@ dotenv.config();
 */
 
 const env: XmtpEnv = "dev";
-const testName = "installations" + env;
+const testName = "installations_" + env;
+loadEnv(testName);
 
 describe(
   testName,
@@ -29,7 +28,8 @@ describe(
     afterAll(async () => {
       await flushLogger(testName);
     });
-    const users = 2;
+    const baseNames = ["bob", "alice", "sam"];
+    const users = baseNames.length;
     const installationsPerUser = 5;
     const suffixes = Array.from({ length: installationsPerUser }, (_, i) =>
       String.fromCharCode(97 + i),
@@ -40,10 +40,9 @@ describe(
       // Create a base persona and multiple installations
 
       console.time("personas creation");
-      personas = await getWorkers(users, env, testName);
+      personas = await getWorkers(baseNames, env, testName);
       console.timeEnd("personas creation");
       const creator = Object.values(personas)[0];
-      console.timeEnd("installation creation");
 
       const convo = await creator.client?.conversations.newGroupByInboxIds(
         Object.values(personas).map((p) => p.client?.inboxId ?? ""),
@@ -56,7 +55,7 @@ describe(
       for (const persona of Object.values(personas)) {
         console.time("installation creation");
         const installations = await createMultipleInstallations(
-          persona.name,
+          persona,
           suffixes,
           env,
           testName,

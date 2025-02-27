@@ -1,0 +1,91 @@
+[2025-02-27T21:47:41.541Z] [info] [PersonaFactory] Using env keys for fabri: 0xde84...
+[2025-02-27T21:47:41.542Z] [info] [PersonaFactory] Generating new keys for bot
+[2025-02-27T21:47:41.562Z] [info] [PersonaFactory] Using env keys for elon: 0x7d69...
+[2025-02-27T21:47:41.562Z] [info] [PersonaFactory] Using env keys for alice: 0x4cac...
+[2025-02-27T21:47:41.562Z] [info] [PersonaFactory] Using env keys for bob: 0x1426...
+[2025-02-27T21:47:41.563Z] [info] [PersonaFactory] Using env keys for joe: 0xa2d8...
+[2025-02-27T21:47:41.563Z] [info] [PersonaFactory] Using env keys for charlie: 0x1a71...
+[2025-02-27T21:47:41.563Z] [info] [PersonaFactory] Using env keys for dave: 0x3dee...
+[2025-02-27T21:47:41.563Z] [info] [PersonaFactory] Generating new keys for rosalie
+[2025-02-27T21:47:41.564Z] [info] [PersonaFactory] Using env keys for eve: 0x44aa...
+[2025-02-27T21:47:41.575Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bot
+[2025-02-27T21:47:41.577Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/rosalie
+[2025-02-27T21:47:43.700Z] [warn] [bob-a] Create XMTP client v:436360a 2.124s
+[2025-02-27T21:47:43.708Z] [warn] [fabri-a] Create XMTP client v:436360a 2.133s
+[2025-02-27T21:47:43.827Z] [warn] [elon-a] Create XMTP client v:436360a 2.251s
+[2025-02-27T21:47:43.924Z] [warn] [joe-a] Create XMTP client v:436360a 2.347s
+[2025-02-27T21:47:43.947Z] [warn] [alice-a] Create XMTP client v:436360a 2.371s
+[2025-02-27T21:47:44.069Z] [warn] [bob-a] Start message stream 368.912ms
+[2025-02-27T21:47:44.069Z] [warn] [bob-a] Start stream 369.406ms
+[2025-02-27T21:47:44.070Z] [warn] [bob-a] Initialize XMTP client 2.499s
+[2025-02-27T21:47:44.114Z] [warn] [dave-a] Create XMTP client v:436360a 2.538s
+[2025-02-27T21:47:44.132Z] [warn] [fabri-a] Start message stream 423.777ms
+[2025-02-27T21:47:44.132Z] [warn] [fabri-a] Start stream 423.925ms
+[2025-02-27T21:47:44.132Z] [warn] [fabri-a] Initialize XMTP client 2.564s
+[2025-02-27T21:47:44.165Z] [warn] [eve-a] Create XMTP client v:436360a 2.588s
+[2025-02-27T21:47:44.236Z] [warn] [elon-a] Start message stream 408.63ms
+[2025-02-27T21:47:44.236Z] [warn] [elon-a] Start stream 408.935ms
+[2025-02-27T21:47:44.236Z] [warn] [elon-a] Initialize XMTP client 2.666s
+[2025-02-27T21:47:44.319Z] [warn] [joe-a] Start message stream 395.091ms
+[2025-02-27T21:47:44.319Z] [warn] [joe-a] Start stream 395.313ms
+[2025-02-27T21:47:44.319Z] [warn] [joe-a] Initialize XMTP client 2.748s
+[2025-02-27T21:47:44.324Z] [warn] [alice-a] Start message stream 376.922ms
+[2025-02-27T21:47:44.324Z] [warn] [alice-a] Start stream 377.017ms
+[2025-02-27T21:47:44.324Z] [warn] [alice-a] Initialize XMTP client 2.754s
+[2025-02-27T21:47:44.340Z] [warn] [charlie-a] Create XMTP client v:436360a 2.764s
+[2025-02-27T21:47:44.509Z] [warn] [dave-a] Start message stream 394.258ms
+[2025-02-27T21:47:44.509Z] [warn] [dave-a] Start stream 394.577ms
+[2025-02-27T21:47:44.509Z] [warn] [dave-a] Initialize XMTP client 2.937s
+[2025-02-27T21:47:44.576Z] [warn] [eve-a] Start message stream 410.42ms
+[2025-02-27T21:47:44.576Z] [warn] [eve-a] Start stream 410.638ms
+[2025-02-27T21:47:44.576Z] [warn] [eve-a] Initialize XMTP client 3.002s
+[2025-02-27T21:47:44.736Z] [warn] [charlie-a] Start message stream 395.397ms
+[2025-02-27T21:47:44.736Z] [warn] [charlie-a] Start stream 395.73ms
+[2025-02-27T21:47:44.736Z] [warn] [charlie-a] Initialize XMTP client 3.164s
+[2025-02-27T21:47:45.388Z] [warn] [bot-a] Create XMTP client v:436360a 3.812s
+[2025-02-27T21:47:45.794Z] [warn] [bot-a] Start message stream 406.357ms
+[2025-02-27T21:47:45.794Z] [warn] [bot-a] Start stream 406.702ms
+[2025-02-27T21:47:45.794Z] [warn] [bot-a] Initialize XMTP client 4.225s
+[2025-02-27T21:47:45.874Z] [warn] [rosalie-a] Create XMTP client v:436360a 4.297s
+[2025-02-27T21:47:46.290Z] [warn] [rosalie-a] Start message stream 415.743ms
+[2025-02-27T21:47:46.290Z] [warn] [rosalie-a] Start stream 416.003ms
+[2025-02-27T21:47:46.290Z] [warn] [rosalie-a] Initialize XMTP client 4.717s
+[2025-02-27T21:47:46.291Z] [info] [Test] Creating group with 10 participants
+[2025-02-27T21:47:50.554Z] [warn] [Test] Group creation time 4.263s
+[2025-02-27T21:47:50.554Z] [info] [Test] Created group with ID: 6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:50.554Z] [info] [Test] Starting message verification
+[2025-02-27T21:47:51.557Z] [info] [bot-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [elon-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [alice-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [bob-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [joe-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [charlie-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [dave-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [rosalie-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.558Z] [info] [eve-a] Collecting 10 messages from convo:6342837620640ac3b5505fb137fedc95
+[2025-02-27T21:47:51.559Z] [info] Sending message #1: gm-1-4v7zdeyjts
+[2025-02-27T21:47:52.612Z] [warn] [Test] Message send time 1.053s
+[2025-02-27T21:47:52.613Z] [info] Sending message #2: gm-2-4v7zdeyjts
+[2025-02-27T21:47:53.609Z] [warn] [Test] Message send time 996.177ms
+[2025-02-27T21:47:53.609Z] [info] Sending message #3: gm-3-4v7zdeyjts
+[2025-02-27T21:47:54.334Z] [warn] [Test] Message send time 724.85ms
+[2025-02-27T21:47:54.334Z] [info] Sending message #4: gm-4-4v7zdeyjts
+[2025-02-27T21:47:55.154Z] [warn] [Test] Message send time 818.839ms
+[2025-02-27T21:47:55.154Z] [info] Sending message #5: gm-5-4v7zdeyjts
+[2025-02-27T21:47:56.011Z] [warn] [Test] Message send time 856.791ms
+[2025-02-27T21:47:56.011Z] [info] Sending message #6: gm-6-4v7zdeyjts
+[2025-02-27T21:47:56.668Z] [warn] [Test] Message send time 656.402ms
+[2025-02-27T21:47:56.668Z] [info] Sending message #7: gm-7-4v7zdeyjts
+[2025-02-27T21:47:57.708Z] [warn] [Test] Message send time 1.039s
+[2025-02-27T21:47:57.708Z] [info] Sending message #8: gm-8-4v7zdeyjts
+[2025-02-27T21:47:59.124Z] [warn] [Test] Message send time 1.416s
+[2025-02-27T21:47:59.124Z] [info] Sending message #9: gm-9-4v7zdeyjts
+[2025-02-27T21:48:00.329Z] [warn] [Test] Message send time 1.205s
+[2025-02-27T21:48:00.329Z] [info] Sending message #10: gm-10-4v7zdeyjts
+[2025-02-27T21:48:01.603Z] [warn] [Test] Message send time 1.273s
+[2025-02-27T21:48:01.604Z] [info] All participants received the expected number of messages.
+[2025-02-27T21:48:01.604Z] [warn] [Test] Verification time 11.050s
+[2025-02-27T21:48:01.604Z] [info] [Test] Total messages expected: 90, received: 90
+[2025-02-27T21:48:01.604Z] [info] [Test] Percentage of messages received: 100%
+[2025-02-27T21:48:02.821Z] [info] {"DNS Lookup":0.002044,"TCP Connection":0.002295,"TLS Handshake":0.622963,"Server Processing":0.991991,"Content Transfer":0.992006}
+[2025-02-27T21:48:02.821Z] [warn] total: 992.0060000000001ms, tls: 622.9630000000001ms, processing: 369.043ms

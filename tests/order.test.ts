@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
@@ -10,11 +10,11 @@ import {
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
+const env: XmtpEnv = "dev";
+const testName = "order_" + env;
+loadEnv(testName);
 
 const amount = 30; // Number of messages to collect per receiver
-const testName = "order";
-const env: XmtpEnv = "dev";
 // 2 seconds per message, multiplied by the total number of participants
 const timeoutMax = amount * defaultValues.perMessageTimeout;
 describe(

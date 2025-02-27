@@ -1,14 +1,13 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { type Conversation, type Persona } from "../helpers/types";
 import { verifyGroupConversationStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
-
 const env = "dev";
 const testName = "conversations" + env;
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

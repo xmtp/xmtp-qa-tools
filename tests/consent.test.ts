@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   ConsentEntityType,
@@ -9,10 +9,9 @@ import {
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
-
 const env: XmtpEnv = "dev";
 const testName = "consent" + env;
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

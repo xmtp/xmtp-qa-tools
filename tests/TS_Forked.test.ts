@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import { type Conversation, type Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
@@ -7,8 +7,7 @@ import { getWorkers } from "../helpers/workers/factory";
 
 const env = "dev";
 const testName = "TS_Forked_" + env;
-
-dotenv.config();
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

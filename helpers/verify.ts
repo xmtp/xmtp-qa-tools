@@ -35,9 +35,6 @@ export async function verifyStream<T extends string>(
   // Modify as needed depending on how you store the ID
   const conversationId = group.id;
 
-  // Wait to ensure they are listening
-  await new Promise((res) => setTimeout(res, 1000));
-
   // Unique random suffix to avoid counting old messages
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 

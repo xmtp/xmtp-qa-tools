@@ -175,7 +175,6 @@ export class WorkerClient extends Worker {
     console.time(`[${this.nameId}] Start message stream`);
     const stream = await this.client.conversations.streamAllMessages();
     console.timeEnd(`[${this.nameId}] Start message stream`);
-    console.log(`[${this.nameId}] Message stream started`);
 
     // Process messages asynchronously
     void (async () => {

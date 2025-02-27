@@ -1,6 +1,0 @@
-[2025-02-27T19:06:55.196Z] [info] [PersonaFactory] Creating personas: bob, alice, joe, randompep, elon for TS_Group_installations_dev
-[2025-02-27T19:06:55.196Z] [info] [PersonaFactory] Generating new keys for bob
-[2025-02-27T19:06:55.219Z] [info] [PersonaFactory] Generating new keys for alice
-[2025-02-27T19:06:55.220Z] [info] [PersonaFactory] Generating new keys for joe
-[2025-02-27T19:06:55.220Z] [info] [PersonaFactory] Generating new keys for randompep
-[2025-02-27T19:06:55.221Z] [info] [PersonaFactory] Generating new keys for elon

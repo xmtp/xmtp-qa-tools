@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   type Conversation,
@@ -9,9 +9,10 @@ import {
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
 const env: XmtpEnv = "dev";
 const testName = "TS_Performance_" + env;
+
+loadEnv(testName);
 
 const MAX_TEST_DURATION_MS = process.env.GITHUB_ACTIONS ? 1000 : 4000;
 
@@ -105,9 +106,6 @@ describe(testName, () => {
       (await personas.bob.client?.conversations.newDm(
         personas.sam.client?.accountAddress as `0x${string}`,
       )) || dmConvo;
-
-    // Wait a bit to let Sam attach stream listeners.
-    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const verifyResult = await verifyStream(
       dmConvoLocal,

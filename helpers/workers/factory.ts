@@ -44,11 +44,7 @@ export class PersonaFactory {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
-    if (
-      this.keysCache &&
-      this.keysCache[baseName] &&
-      this.keysCache[baseName].walletKey
-    ) {
+    if (this.keysCache[baseName] && this.keysCache[baseName].walletKey) {
       console.log(`[PersonaFactory] Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
@@ -94,7 +90,7 @@ export class PersonaFactory {
     if (!name.includes("random")) {
       // Append to .env file for persistence across runs
       void appendFile(
-        path.resolve(process.cwd(), ".env"),
+        process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env"),
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
       );
     }
@@ -262,39 +258,26 @@ export function getDataSubFolderCount() {
 }
 
 export async function createMultipleInstallations(
-  baseName: string,
+  persona: Persona,
   suffixes: string[],
   env: string,
   testName: string,
 ): Promise<Record<string, Persona>> {
-  // Create a base persona first
-  const basePersona = await getWorkers(
-    [baseName],
-    env as XmtpEnv,
-    testName,
-    "none",
-  );
-  const baseAddress = basePersona[baseName].client?.accountAddress;
-
-  console.log(`Created base persona: ${baseName}`);
-  console.log(`Wallet address: ${baseAddress}`);
-
   // Create installations with different IDs for the same persona
   const installations: Record<string, Persona> = {};
 
   for (const suffix of suffixes) {
-    const installId = `${baseName}-${suffix}`;
+    const installId = `${persona.name}-${suffix}`;
 
     // Create worker with the installation ID
-    const installation = await getWorkers(
+    const installations = await getWorkers(
       [installId],
       env as XmtpEnv,
       testName,
       "none",
     );
-    const persona = Object.values(installation)[0];
 
-    installations[installId] = persona;
+    installations[installId] = Object.values(installations)[0];
   }
 
   return installations;

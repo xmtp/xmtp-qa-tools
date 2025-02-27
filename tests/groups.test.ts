@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   type Conversation,
@@ -10,9 +10,8 @@ import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const env: XmtpEnv = "dev";
-const testName = "groups" + env;
-
-dotenv.config();
+const testName = "groups_" + env;
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
@@ -176,7 +175,6 @@ describe(testName, () => {
   //     const joePromise = joe.worker!.receiveMessage(groupMessage);
 
   //     await alice.worker!.sendMessage(groupId!, groupMessage);
-  //     await new Promise((resolve) => setTimeout(resolve, 2000));
   //     const [joeReceived, bob41Received] = await Promise.all([
   //       joePromise,
   //       bob41Promise,

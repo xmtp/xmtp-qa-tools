@@ -21,5 +21,10 @@
       "@helpers/*": ["./helpers/*"]
     }
   },
-  "include": ["**/*.ts", "vitest.config.ts", "vite.config.js"]
+  "include": [
+    "**/*.ts",
+    "vitest.config.ts",
+    "vite.config.js",
+    "bugs/panic_bug_account_dev/panic_bug_account.test.ts"
+  ]
 }

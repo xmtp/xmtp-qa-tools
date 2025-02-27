@@ -1,0 +1,34 @@
+[2025-02-27T21:44:26.126Z] [info] [PersonaFactory] Using env keys for bob: 0x1426...
+[2025-02-27T21:44:26.126Z] [info] [PersonaFactory] Using env keys for joe: 0xa2d8...
+[2025-02-27T21:44:26.126Z] [info] [PersonaFactory] Using env keys for elon: 0x7d69...
+[2025-02-27T21:44:26.126Z] [info] [PersonaFactory] Generating new keys for fabri
+[2025-02-27T21:44:26.147Z] [info] [PersonaFactory] Using env keys for alice: 0x4cac...
+[2025-02-27T21:44:29.224Z] [warn] [joe-a] Create XMTP client v:436360a 3.069s
+[2025-02-27T21:44:29.232Z] [warn] [bob-a] Create XMTP client v:436360a 3.076s
+[2025-02-27T21:44:29.436Z] [warn] [elon-a] Create XMTP client v:436360a 3.280s
+[2025-02-27T21:44:29.942Z] [warn] [bob-a] Start message stream 709.72ms
+[2025-02-27T21:44:29.942Z] [warn] [bob-a] Start stream 710.078ms
+[2025-02-27T21:44:29.942Z] [warn] [bob-a] Initialize XMTP client 3.792s
+[2025-02-27T21:44:29.942Z] [warn] [alice-a] Create XMTP client v:436360a 3.787s
+[2025-02-27T21:44:29.948Z] [warn] [joe-a] Start message stream 723.252ms
+[2025-02-27T21:44:29.948Z] [warn] [joe-a] Start stream 723.695ms
+[2025-02-27T21:44:29.948Z] [warn] [joe-a] Initialize XMTP client 3.796s
+[2025-02-27T21:44:30.140Z] [warn] [alice-a] Initialize XMTP client 3.986s
+[2025-02-27T21:44:30.175Z] [warn] [elon-a] Start message stream 738.537ms
+[2025-02-27T21:44:30.175Z] [warn] [elon-a] Start stream 738.833ms
+[2025-02-27T21:44:30.175Z] [warn] [elon-a] Initialize XMTP client 4.022s
+[2025-02-27T21:44:31.385Z] [warn] [fabri-a] Create XMTP client v:436360a 5.229s
+[2025-02-27T21:44:31.804Z] [warn] [fabri-a] Start message stream 418.617ms
+[2025-02-27T21:44:31.804Z] [warn] [fabri-a] Start stream 418.966ms
+[2025-02-27T21:44:31.804Z] [warn] [fabri-a] Initialize XMTP client 5.650s
+[2025-02-27T21:44:35.109Z] [info] Bob's group c1fe24b0b9c9599eaeee1e7b3f07db53
+[2025-02-27T21:44:35.109Z] [warn] create group 3.305s
+[2025-02-27T21:44:36.111Z] [info] [joe-a] Collecting 1 messages from convo:c1fe24b0b9c9599eaeee1e7b3f07db53
+[2025-02-27T21:44:36.111Z] [info] Sending message #1: New name-1-w3v2mwq652a
+[2025-02-27T21:44:36.111Z] [info] Updating group name to New name-1-w3v2mwq652a for group c1fe24b0b9c9599eaeee1e7b3f07db53
+[2025-02-27T21:44:36.809Z] [info] All participants received the expected number of messages.
+[2025-02-27T21:44:36.809Z] [warn] update group name 1.700s
+[2025-02-27T21:44:39.567Z] [warn] add members 2.757s
+[2025-02-27T21:44:41.293Z] [warn] remove members 1.726s
+[2025-02-27T21:44:42.595Z] [info] {"DNS Lookup":0.056126,"TCP Connection":0.056349,"TLS Handshake":0.844704,"Server Processing":1.031805,"Content Transfer":1.03182}
+[2025-02-27T21:44:42.595Z] [warn] total: 1031.82ms, tls: 844.7040000000001ms, processing: 187.11599999999987ms

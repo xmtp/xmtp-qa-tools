@@ -1,16 +1,19 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   ConsentEntityType,
   ConsentState,
   type Conversation,
   type Persona,
+  type XmtpEnv,
 } from "../helpers/types";
 import { verifyGroupConversationStream, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
+const env: XmtpEnv = "dev";
+let testName = "TS_Streams_" + env;
+loadEnv(testName);
 /* 
 TODO:
   - Percentge of missed?
@@ -22,9 +25,6 @@ TODO:
   - Multiple installations.
   - Multiple clients from the same installation.
 */
-
-const env = "dev";
-let testName = "TS_Streams_" + env;
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

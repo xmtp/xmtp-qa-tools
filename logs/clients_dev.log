@@ -1,0 +1,54 @@
+[2025-02-27T21:29:59.449Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-27T21:29:59.475Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random
+[2025-02-27T21:30:05.402Z] [warn] [random-a] Create XMTP client v:436360a 5.927s
+[2025-02-27T21:30:05.402Z] [info] [random-a] No stream started
+[2025-02-27T21:30:05.403Z] [warn] [random-a] Initialize XMTP client 5.929s
+[2025-02-27T21:30:05.404Z] [info] [PersonaFactory] Generating new keys for bob
+[2025-02-27T21:30:05.405Z] [info] [PersonaFactory] Using env keys for random: 0xf8f6...
+[2025-02-27T21:30:05.407Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
+[2025-02-27T21:30:07.835Z] [warn] [random-a] Create XMTP client v:436360a 2.428s
+[2025-02-27T21:30:07.836Z] [info] [random-a] No stream started
+[2025-02-27T21:30:07.836Z] [warn] [random-a] Initialize XMTP client 2.429s
+[2025-02-27T21:30:10.397Z] [warn] [bob-a] Create XMTP client v:436360a 4.990s
+[2025-02-27T21:30:10.398Z] [info] [bob-a] No stream started
+[2025-02-27T21:30:10.398Z] [warn] [bob-a] Initialize XMTP client 4.991s
+[2025-02-27T21:30:10.399Z] [info] [PersonaFactory] Using env keys for random: 0xf8f6...
+[2025-02-27T21:30:12.584Z] [warn] [random-a] Create XMTP client v:436360a 2.184s
+[2025-02-27T21:30:12.584Z] [info] [random-a] No stream started
+[2025-02-27T21:30:12.585Z] [warn] [random-a] Initialize XMTP client 2.185s
+[2025-02-27T21:30:12.585Z] [info] [PersonaFactory] Using env keys for bob: 0x2963...
+[2025-02-27T21:30:12.585Z] [info] [PersonaFactory] Generating new keys for alice
+[2025-02-27T21:30:12.586Z] [info] [PersonaFactory] Generating new keys for randompep
+[2025-02-27T21:30:12.587Z] [info] [PersonaFactory] Generating new keys for randombob
+[2025-02-27T21:30:12.592Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/alice
+[2025-02-27T21:30:12.592Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randompep
+[2025-02-27T21:30:12.592Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randombob
+[2025-02-27T21:30:15.074Z] [warn] [bob-a] Create XMTP client v:436360a 2.482s
+[2025-02-27T21:30:15.074Z] [info] [bob-a] No stream started
+[2025-02-27T21:30:15.074Z] [warn] [bob-a] Initialize XMTP client 2.485s
+[2025-02-27T21:30:16.915Z] [warn] [alice-a] Create XMTP client v:436360a 4.323s
+[2025-02-27T21:30:16.915Z] [info] [alice-a] No stream started
+[2025-02-27T21:30:16.915Z] [warn] [alice-a] Initialize XMTP client 4.326s
+[2025-02-27T21:30:16.930Z] [warn] [randompep-a] Create XMTP client v:436360a 4.338s
+[2025-02-27T21:30:16.930Z] [info] [randompep-a] No stream started
+[2025-02-27T21:30:16.930Z] [warn] [randompep-a] Initialize XMTP client 4.340s
+[2025-02-27T21:30:17.179Z] [warn] [randombob-a] Create XMTP client v:436360a 4.587s
+[2025-02-27T21:30:17.179Z] [info] [randombob-a] No stream started
+[2025-02-27T21:30:17.179Z] [warn] [randombob-a] Initialize XMTP client 4.588s
+[2025-02-27T21:30:17.180Z] [info] [PersonaFactory] Generating new keys for fabritest
+[2025-02-27T21:30:17.181Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/fabritest
+[2025-02-27T21:30:22.039Z] [warn] [fabritest-a] Create XMTP client v:436360a 4.858s
+[2025-02-27T21:30:22.039Z] [info] [fabritest-a] No stream started
+[2025-02-27T21:30:22.039Z] [warn] [fabritest-a] Initialize XMTP client 4.859s
+[2025-02-27T21:30:22.040Z] [info] [PersonaFactory] Using env keys for fabritest: 0x0a4a...
+[2025-02-27T21:30:24.553Z] [warn] [fabritest-a-a] Create XMTP client v:436360a 2.512s
+[2025-02-27T21:30:24.553Z] [info] [fabritest-a-a] No stream started
+[2025-02-27T21:30:24.553Z] [warn] [fabritest-a-a] Initialize XMTP client 2.513s
+[2025-02-27T21:30:24.553Z] [info] [PersonaFactory] Using env keys for fabritest: 0x0a4a...
+[2025-02-27T21:30:29.133Z] [warn] [fabritest-b-b] Create XMTP client v:436360a 4.579s
+[2025-02-27T21:30:29.133Z] [info] [fabritest-b-b] No stream started
+[2025-02-27T21:30:29.133Z] [warn] [fabritest-b-b] Initialize XMTP client 4.580s
+[2025-02-27T21:30:29.134Z] [info] [PersonaFactory] Using env keys for fabritest: 0x0a4a...
+[2025-02-27T21:30:34.158Z] [warn] [fabritest-c-c] Create XMTP client v:436360a 5.023s
+[2025-02-27T21:30:34.158Z] [info] [fabritest-c-c] No stream started
+[2025-02-27T21:30:34.158Z] [warn] [fabritest-c-c] Initialize XMTP client 5.024s

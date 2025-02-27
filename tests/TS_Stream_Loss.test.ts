@@ -1,5 +1,5 @@
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { loadEnv } from "../helpers/client";
 import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
   defaultValues,
@@ -10,10 +10,9 @@ import {
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-dotenv.config();
-
-const testName = "TS_Stream_Loss";
 const env: XmtpEnv = "dev";
+const testName = "TS_Stream_Loss_" + env;
+loadEnv(testName);
 
 const amountofMessages = 10; // Number of messages to collect per receiver
 const receivers = 10;
