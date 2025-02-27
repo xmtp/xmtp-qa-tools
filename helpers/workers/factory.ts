@@ -44,7 +44,11 @@ export class PersonaFactory {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
-    if (this.keysCache[baseName]) {
+    if (
+      this.keysCache &&
+      this.keysCache[baseName] &&
+      this.keysCache[baseName].walletKey
+    ) {
       console.log(`[PersonaFactory] Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
@@ -53,7 +57,10 @@ export class PersonaFactory {
     const encryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
 
     // Check if keys exist in environment variables
-    if (process.env[walletKeyEnv] && process.env[encryptionKeyEnv]) {
+    if (
+      process.env[walletKeyEnv] !== undefined &&
+      process.env[encryptionKeyEnv] !== undefined
+    ) {
       console.log(
         `[PersonaFactory] Using env keys for ${baseName}: ${process.env[walletKeyEnv].substring(0, 6)}...`,
       );
@@ -142,9 +149,7 @@ export class PersonaFactory {
    */
   public async createPersonas(descriptors: string[]): Promise<Persona[]> {
     await this.flushWorkers();
-    console.log(
-      `[PersonaFactory] Creating personas: ${descriptors.join(", ")} for ${this.testName}`,
-    );
+
     const personas: Persona[] = [];
 
     for (const desc of descriptors) {
@@ -261,9 +266,7 @@ export async function createMultipleInstallations(
   suffixes: string[],
   env: string,
   testName: string,
-): Promise<
-  Record<string, { name: string; installationId: string; dbPath: string }>
-> {
+): Promise<Record<string, Persona>> {
   // Create a base persona first
   const basePersona = await getWorkers(
     [baseName],
@@ -277,14 +280,10 @@ export async function createMultipleInstallations(
   console.log(`Wallet address: ${baseAddress}`);
 
   // Create installations with different IDs for the same persona
-  const installations: Record<
-    string,
-    { name: string; installationId: string; dbPath: string }
-  > = {};
+  const installations: Record<string, Persona> = {};
 
   for (const suffix of suffixes) {
     const installId = `${baseName}-${suffix}`;
-    console.log(`Creating installation: ${installId}`);
 
     // Create worker with the installation ID
     const installation = await getWorkers(
@@ -295,11 +294,7 @@ export async function createMultipleInstallations(
     );
     const persona = Object.values(installation)[0];
 
-    installations[installId] = {
-      name: persona.name,
-      installationId: persona.installationId,
-      dbPath: persona.dbPath,
-    };
+    installations[installId] = persona;
   }
 
   return installations;

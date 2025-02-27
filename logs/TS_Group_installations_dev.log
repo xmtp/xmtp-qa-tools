@@ -1,55 +1,6 @@
-[2025-02-27T12:53:05.009Z] [info] Creating group with 2 participants and 4 installations
-[2025-02-27T12:53:05.009Z] [info] [PersonaFactory] Creating personas: random1-a, random1-b, random2-a, random2-b for TS_Group_installations_dev
-[2025-02-27T12:53:05.037Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random1
-[2025-02-27T12:53:05.037Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random2
-[2025-02-27T12:53:08.582Z] [warn] [random1-b] Create XMTP client v:436360a 3.544s
-[2025-02-27T12:53:08.582Z] [info] [random1-b] No stream started
-[2025-02-27T12:53:08.582Z] [warn] [random1-b] Initialize XMTP client 3.548s
-[2025-02-27T12:53:08.588Z] [warn] [random2-a] Create XMTP client v:436360a 3.551s
-[2025-02-27T12:53:08.588Z] [info] [random2-a] No stream started
-[2025-02-27T12:53:08.588Z] [warn] [random2-a] Initialize XMTP client 3.553s
-[2025-02-27T12:53:08.648Z] [warn] [random2-b] Create XMTP client v:436360a 3.611s
-[2025-02-27T12:53:08.649Z] [info] [random2-b] No stream started
-[2025-02-27T12:53:08.649Z] [warn] [random2-b] Initialize XMTP client 3.613s
-[2025-02-27T12:53:08.801Z] [warn] [random1-a] Create XMTP client v:436360a 3.764s
-[2025-02-27T12:53:08.801Z] [info] [random1-a] No stream started
-[2025-02-27T12:53:08.801Z] [warn] [random1-a] Initialize XMTP client 3.789s
-[2025-02-27T12:53:08.802Z] [info] random1 is going to create the group
-[2025-02-27T12:53:10.610Z] [info] Group created with id dabd2fa3610ee6aa05a54eac95039901
-[2025-02-27T12:53:11.319Z] [error] Error creating group with 2 users: {}
-[2025-02-27T12:53:11.319Z] [warn] Create group with 2 users (4 installations) 2.517s
-[2025-02-27T12:53:11.319Z] [info] Creating group with 4 participants and 8 installations
-[2025-02-27T12:53:11.319Z] [info] [PersonaFactory] Creating personas: random1-a, random1-b, random2-a, random2-b, random3-a, random3-b, random4-a, random4-b for TS_Group_installations_dev
-[2025-02-27T12:53:11.326Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random3
-[2025-02-27T12:53:11.326Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random4
-[2025-02-27T12:53:14.877Z] [warn] [random1-a] Create XMTP client v:436360a 3.552s
-[2025-02-27T12:53:14.877Z] [info] [random1-a] No stream started
-[2025-02-27T12:53:14.877Z] [warn] [random1-a] Initialize XMTP client 3.555s
-[2025-02-27T12:53:14.954Z] [warn] [random3-a] Create XMTP client v:436360a 3.628s
-[2025-02-27T12:53:14.954Z] [info] [random3-a] No stream started
-[2025-02-27T12:53:14.954Z] [warn] [random3-a] Initialize XMTP client 3.630s
-[2025-02-27T12:53:14.966Z] [warn] [random2-b] Create XMTP client v:436360a 3.641s
-[2025-02-27T12:53:14.966Z] [info] [random2-b] No stream started
-[2025-02-27T12:53:14.966Z] [warn] [random2-b] Initialize XMTP client 3.643s
-[2025-02-27T12:53:14.998Z] [warn] [random2-a] Create XMTP client v:436360a 3.672s
-[2025-02-27T12:53:14.998Z] [info] [random2-a] No stream started
-[2025-02-27T12:53:14.998Z] [warn] [random2-a] Initialize XMTP client 3.674s
-[2025-02-27T12:53:15.130Z] [warn] [random1-b] Create XMTP client v:436360a 3.804s
-[2025-02-27T12:53:15.130Z] [info] [random1-b] No stream started
-[2025-02-27T12:53:15.130Z] [warn] [random1-b] Initialize XMTP client 3.807s
-[2025-02-27T12:53:15.175Z] [warn] [random4-a] Create XMTP client v:436360a 3.849s
-[2025-02-27T12:53:15.175Z] [info] [random4-a] No stream started
-[2025-02-27T12:53:15.175Z] [warn] [random4-a] Initialize XMTP client 3.850s
-[2025-02-27T12:53:15.176Z] [warn] [random3-b] Create XMTP client v:436360a 3.850s
-[2025-02-27T12:53:15.176Z] [info] [random3-b] No stream started
-[2025-02-27T12:53:15.176Z] [warn] [random3-b] Initialize XMTP client 3.851s
-[2025-02-27T12:53:15.247Z] [warn] [random4-b] Create XMTP client v:436360a 3.921s
-[2025-02-27T12:53:15.247Z] [info] [random4-b] No stream started
-[2025-02-27T12:53:15.247Z] [warn] [random4-b] Initialize XMTP client 3.922s
-[2025-02-27T12:53:15.247Z] [info] random1 is going to create the group
-[2025-02-27T12:53:17.066Z] [info] Group created with id 6349fbf0579e5910c70d89b7894ee28c
-[2025-02-27T12:53:17.770Z] [error] Error creating group with 4 users: {}
-[2025-02-27T12:53:17.770Z] [warn] Create group with 4 users (8 installations) 2.523s
-[2025-02-27T12:53:18.760Z] [info] {"DNS Lookup":0.002529,"TCP Connection":0.002729,"TLS Handshake":0.588948,"Server Processing":0.773076,"Content Transfer":0.773091}
-[2025-02-27T12:53:18.760Z] [warn] total: 773.091ms, tls: 588.948ms, processing: 184.14300000000003ms
-[2025-02-27T12:53:18.761Z] [info] Cleaning up .data/random* folders
+[2025-02-27T19:06:55.196Z] [info] [PersonaFactory] Creating personas: bob, alice, joe, randompep, elon for TS_Group_installations_dev
+[2025-02-27T19:06:55.196Z] [info] [PersonaFactory] Generating new keys for bob
+[2025-02-27T19:06:55.219Z] [info] [PersonaFactory] Generating new keys for alice
+[2025-02-27T19:06:55.220Z] [info] [PersonaFactory] Generating new keys for joe
+[2025-02-27T19:06:55.220Z] [info] [PersonaFactory] Generating new keys for randompep
+[2025-02-27T19:06:55.221Z] [info] [PersonaFactory] Generating new keys for elon

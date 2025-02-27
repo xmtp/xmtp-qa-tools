@@ -1,119 +1,115 @@
-// import dotenv from "dotenv";
-// import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
-// import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-// import { defaultValues, type Persona, type XmtpEnv } from "../helpers/types";
-// import { getWorkers } from "../helpers/workers/factory";
+import dotenv from "dotenv";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { type Persona, type XmtpEnv } from "../helpers/types";
+import {
+  createMultipleInstallations,
+  getWorkers,
+} from "../helpers/workers/factory";
 
-// dotenv.config();
+dotenv.config();
 
-// /**
-//  * TODO
-//  * - Test multiple groups with multiple participants with multiple installations
-//   - Verify group creation with different participants for incosisten stream results
-// */
+/**
+ * TODO
+ * - Test multiple groups with multiple participants with multiple installations
+  - Verify group creation with different participants for incosisten stream results
+*/
 
-// const env: XmtpEnv = "dev";
-// const testName = "TS_Group_installations_" + env;
+const env: XmtpEnv = "dev";
+const testName = "installations" + env;
 
-// describe(testName, () => {
-//   beforeAll(async () => {
-//     const logger = await createLogger(testName);
-//     overrideConsole(logger);
-//   });
+describe(
+  testName,
+  () => {
+    beforeAll(async () => {
+      const logger = await createLogger(testName);
+      overrideConsole(logger);
+    });
 
-//   afterAll(async () => {
-//     await flushLogger(testName);
-//     // Clean up .data/random* folders after tests
-//     const { execSync } = require("child_process");
-//     try {
-//       console.log("Cleaning up .data/random* folders");
-//       execSync("rm -rf ./.data/random*");
-//     } catch (error) {
-//       console.error("Error cleaning up .data folders:", error);
-//     }
-//   });
+    afterAll(async () => {
+      await flushLogger(testName);
+    });
+    const users = 2;
+    const installationsPerUser = 5;
+    const suffixes = Array.from({ length: installationsPerUser }, (_, i) =>
+      String.fromCharCode(97 + i),
+    );
+    let personas: Record<string, Persona> = {};
 
-//   const users = 2;
-//   let batchSize = 2;
-//   const installationsPerUser = 2;
+    it(`Measure group creation time up to ${users * installationsPerUser} participants`, async () => {
+      // Create a base persona and multiple installations
 
-//   it(`Measure group creation time up to ${users * installationsPerUser} participants`, async () => {
-//     while (batchSize <= users * installationsPerUser) {
-//       console.log(
-//         `Creating group with ${batchSize} participants and ${batchSize * installationsPerUser} installations`,
-//       );
-//       // Use the helper function to create and time the group creation
-//       await createGroupWithUsers(batchSize, installationsPerUser);
+      console.time("personas creation");
+      personas = await getWorkers(users, env, testName);
+      console.timeEnd("personas creation");
+      const creator = Object.values(personas)[0];
+      console.timeEnd("installation creation");
 
-//       batchSize += 2;
-//     }
-//   });
-// });
+      const convo = await creator.client?.conversations.newGroupByInboxIds(
+        Object.values(personas).map((p) => p.client?.inboxId ?? ""),
+      );
+      console.time("syncing");
+      await convo?.sync();
+      expect(convo?.id).toBeDefined();
+      console.timeEnd("syncing");
 
-// /**
-//  * Creates a group with a specified number of users and installations per user
-//  * @param creator - The persona that will create the group
-//  * @param allPersonas - Record of all available personas
-//  * @param numUsers - Number of users to include in the group
-//  * @param installsPerUser - Number of installations per user
-//  * @returns The created group
-//  */
-// async function createGroupWithUsers(numUsers: number, installsPerUser: number) {
-//   const fullNames = [];
-//   for (let i = 1; i <= numUsers; i++) {
-//     for (let j = 0; j < installsPerUser; j++) {
-//       fullNames.push(
-//         "random" + i.toString() + "-" + String.fromCharCode(97 + j),
-//       );
-//     }
-//   }
-//   const personas = await getWorkers(fullNames, env, testName, "none");
+      for (const persona of Object.values(personas)) {
+        console.time("installation creation");
+        const installations = await createMultipleInstallations(
+          persona.name,
+          suffixes,
+          env,
+          testName,
+        );
+        console.timeEnd("installation creation");
+        // Log the installation details
+        for (const [_id, persona] of Object.entries(installations)) {
+          console.log(
+            `Name: ${persona.name}, Installation ID: ${persona.installationId}, DB Path: ${persona.dbPath}`,
+          );
+        }
 
-//   console.time(
-//     `Create group with ${numUsers} users (${numUsers * installsPerUser} installations)`,
-//   );
+        console.time("syncing");
+        await convo?.sync();
+        console.timeEnd("syncing");
 
-//   try {
-//     // Create the group using the inbox IDs
-//     // Create an empty group first
-//     const creator = personas[Object.keys(personas)[0]]; // Use the first persona as creator
-//     console.log(`${creator.name} is going to create the group`);
-//     const group = await creator.client?.conversations.newGroupByInboxIds(
-//       Object.values(personas).map(
-//         (persona) => persona.client?.inboxId as string,
-//       ),
-//     );
+        console.time("adding members");
+        for (const installation of Object.values(installations)) {
+          await convo?.addMembersByInboxId([
+            installation.client?.inboxId ?? "",
+          ]);
+        }
+        console.timeEnd("adding members");
 
-//     console.log(`Group created with id ${group?.id}`);
-//     if (!group) {
-//       throw new Error("Failed to create group");
-//     }
-//     // Log group membership details
-//     await group.sync();
-//     const members = await group.members();
-//     let totalInstallations = 0;
-//     for (const member of members ?? []) {
-//       console.log(
-//         personas.find((p: Persona) => p.client?.inboxId === member.inboxId)
-//           ?.name,
-//         member.installationIds.length,
-//       );
-//       totalInstallations += member.installationIds.length;
-//     }
-//     console.log(`Total members: ${members.length}`);
-//     console.log(`Total installations: ${totalInstallations}`);
+        console.time("syncing");
+        await convo?.sync();
+        console.timeEnd("syncing");
 
-//     console.timeEnd(
-//       `Create group with ${numUsers} users (${numUsers * installsPerUser} installations)`,
-//     );
+        console.time("members fetching");
+        const members = await convo?.members();
+        expect(members?.length).toBe(users);
+        console.timeEnd("members fetching");
 
-//     return group;
-//   } catch (error) {
-//     console.error(`Error creating group with ${numUsers} users:`, error);
-//     console.timeEnd(
-//       `Create group with ${numUsers} users (${numUsers * installsPerUser} installations)`,
-//     );
+        let totalInstallations = 0;
+        for (const member of members ?? []) {
+          totalInstallations += member.installationIds.length;
+        }
+        console.log(`Total installations: ${totalInstallations}`);
 
-//     return null;
-//   }
-// }
+        console.time("message sending");
+        await convo?.send("Hello");
+        console.timeEnd("message sending");
+
+        console.time("message receiving");
+        const messages = await convo?.messages();
+        expect(messages?.length).toBeGreaterThan(1);
+        console.timeEnd("message receiving");
+
+        console.time("syncing");
+        await convo?.sync();
+        console.timeEnd("syncing");
+      }
+    });
+  },
+  { timeout: 1000000 },
+);
