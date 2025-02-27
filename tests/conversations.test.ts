@@ -8,7 +8,7 @@ import { getWorkers } from "../helpers/workers/factory";
 dotenv.config();
 
 const env = "dev";
-const testName = "TS_GroupConversationStreams_" + env;
+const testName = "conversations" + env;
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

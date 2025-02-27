@@ -1,47 +1,13 @@
-[2025-02-26T11:42:30.318Z] [info] [PersonaFactory] Creating personas: random for TS_Personas_dev
-[2025-02-26T11:42:33.723Z] [warn] [random] Create XMTP client v:436360a 3.374s
-[2025-02-26T11:42:34.115Z] [warn] [random] Start message stream 390.542ms
-[2025-02-26T11:42:34.115Z] [info] [random] Message stream started
-[2025-02-26T11:42:34.115Z] [warn] [random] Start stream 391.386ms
-[2025-02-26T11:42:34.115Z] [warn] [random] Initialize XMTP client 3.793s
-[2025-02-26T11:42:34.116Z] [info] [PersonaFactory] Creating personas: bob, random for TS_Personas_dev
-[2025-02-26T11:42:36.080Z] [warn] [bob] Create XMTP client v:436360a 1.960s
-[2025-02-26T11:42:36.442Z] [warn] [bob] Start message stream 360.355ms
-[2025-02-26T11:42:36.442Z] [info] [bob] Message stream started
-[2025-02-26T11:42:36.442Z] [warn] [bob] Start stream 361.554ms
-[2025-02-26T11:42:36.442Z] [warn] [bob] Initialize XMTP client 2.325s
-[2025-02-26T11:42:37.521Z] [warn] [random] Create XMTP client v:436360a 3.400s
-[2025-02-26T11:42:37.889Z] [warn] [random] Start message stream 366.901ms
-[2025-02-26T11:42:37.889Z] [info] [random] Message stream started
-[2025-02-26T11:42:37.889Z] [warn] [random] Start stream 368.417ms
-[2025-02-26T11:42:37.890Z] [warn] [random] Initialize XMTP client 3.771s
-[2025-02-26T11:42:37.891Z] [info] [PersonaFactory] Creating personas: random for TS_Personas_dev
-[2025-02-26T11:42:41.315Z] [warn] [random] Create XMTP client v:436360a 3.422s
-[2025-02-26T11:42:41.677Z] [warn] [random] Start message stream 361.07ms
-[2025-02-26T11:42:41.677Z] [info] [random] Message stream started
-[2025-02-26T11:42:41.678Z] [warn] [random] Start stream 362.235ms
-[2025-02-26T11:42:41.678Z] [warn] [random] Initialize XMTP client 3.786s
-[2025-02-26T11:42:41.679Z] [info] [PersonaFactory] Creating personas: bob, alice, randompep, randombob for TS_Personas_dev
-[2025-02-26T11:42:41.687Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randombob
-[2025-02-26T11:42:43.669Z] [warn] [bob] Create XMTP client v:436360a 1.983s
-[2025-02-26T11:42:43.790Z] [warn] [alice] Create XMTP client v:436360a 2.102s
-[2025-02-26T11:42:44.032Z] [warn] [bob] Start message stream 361.825ms
-[2025-02-26T11:42:44.032Z] [info] [bob] Message stream started
-[2025-02-26T11:42:44.032Z] [warn] [bob] Start stream 362.497ms
-[2025-02-26T11:42:44.032Z] [warn] [bob] Initialize XMTP client 2.350s
-[2025-02-26T11:42:44.154Z] [warn] [alice] Start message stream 364.217ms
-[2025-02-26T11:42:44.154Z] [info] [alice] Message stream started
-[2025-02-26T11:42:44.155Z] [warn] [alice] Start stream 364.788ms
-[2025-02-26T11:42:44.155Z] [warn] [alice] Initialize XMTP client 2.471s
-[2025-02-26T11:42:45.128Z] [warn] [randombob] Create XMTP client v:436360a 3.441s
-[2025-02-26T11:42:45.319Z] [warn] [randompep] Create XMTP client v:436360a 3.633s
-[2025-02-26T11:42:45.498Z] [warn] [randombob] Start message stream 369.58ms
-[2025-02-26T11:42:45.498Z] [info] [randombob] Message stream started
-[2025-02-26T11:42:45.498Z] [warn] [randombob] Start stream 370.323ms
-[2025-02-26T11:42:45.498Z] [warn] [randombob] Initialize XMTP client 3.813s
-[2025-02-26T11:42:45.686Z] [warn] [randompep] Start message stream 365.856ms
-[2025-02-26T11:42:45.686Z] [info] [randompep] Message stream started
-[2025-02-26T11:42:45.686Z] [warn] [randompep] Start stream 366.253ms
-[2025-02-26T11:42:45.686Z] [warn] [randompep] Initialize XMTP client 4.001s
-[2025-02-26T11:42:46.771Z] [info] {"DNS Lookup":0.001703,"TCP Connection":0.001889,"TLS Handshake":0.531408,"Server Processing":0.855805,"Content Transfer":0.856178}
-[2025-02-26T11:42:46.772Z] [warn] total: 856.178ms, tls: 531.408ms, processing: 324.77ms
+[2025-02-27T13:05:21.531Z] [info] [PersonaFactory] Creating personas: fabritest for TS_Personas_dev
+[2025-02-27T13:05:23.840Z] [warn] [fabritest-a] Create XMTP client v:436360a 2.287s
+[2025-02-27T13:05:23.840Z] [info] [fabritest-a] No stream started
+[2025-02-27T13:05:23.840Z] [warn] [fabritest-a] Initialize XMTP client 2.308s
+[2025-02-27T13:05:23.841Z] [info] Created base persona: fabritest
+[2025-02-27T13:05:23.841Z] [info] Wallet address: 0x0d4e64d8bE91d04D5E26be74079A793d68Ce45AB
+[2025-02-27T13:05:23.841Z] [info] Creating installation 1: fabritest-a
+[2025-02-27T13:05:23.841Z] [info] [PersonaFactory] Creating personas: fabritest-a for TS_Personas_dev
+[2025-02-27T13:05:26.095Z] [warn] [fabritest-a] Create XMTP client v:436360a 2.252s
+[2025-02-27T13:05:26.095Z] [info] [fabritest-a] No stream started
+[2025-02-27T13:05:26.095Z] [warn] [fabritest-a] Initialize XMTP client 2.253s
+[2025-02-27T13:05:27.089Z] [info] {"DNS Lookup":0.001908,"TCP Connection":0.002101,"TLS Handshake":0.589066,"Server Processing":0.776869,"Content Transfer":0.776884}
+[2025-02-27T13:05:27.090Z] [warn] total: 776.884ms, tls: 589.066ms, processing: 187.81799999999998ms

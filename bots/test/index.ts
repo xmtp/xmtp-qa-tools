@@ -2,7 +2,7 @@ import { createLogger, overrideConsole } from "@helpers/logger";
 import { getWorkers } from "@helpers/workers/factory";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { WorkerNames, type Persona } from "../../helpers/types";
+import { type Persona } from "../../helpers/types";
 
 dotenv.config();
 

@@ -1,14 +1,14 @@
+import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import type { Worker } from "worker_threads";
 import { type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
 import {
   defaultValues,
-  WorkerNames,
   type Persona,
   type PersonaBase,
+  type typeofStream,
 } from "../types";
 import { WorkerClient } from "./main";
 
@@ -21,12 +21,8 @@ export class PersonaFactory {
   private testName: string;
   private activeWorkers: WorkerClient[] = []; // Add this to track workers
 
-  private typeofStream: "message" | "conversation" | "consent";
-  constructor(
-    env: XmtpEnv,
-    testName: string,
-    typeofStream: "message" | "conversation" | "consent",
-  ) {
+  private typeofStream: typeofStream;
+  constructor(env: XmtpEnv, testName: string, typeofStream: typeofStream) {
     this.env = env;
     this.testName = testName;
     this.typeofStream = typeofStream;
@@ -36,33 +32,67 @@ export class PersonaFactory {
    * Ensure a particular persona (by name) has a wallet key and encryption key.
    * If these are not found in the environment variables, generate them via a yarn script.
    */
-  private async ensureKeys(
-    name: string,
-  ): Promise<{ walletKey: string; encryptionKey: string }> {
-    const walletKeyEnv = `WALLET_KEY_${name.toUpperCase()}`;
-    const encryptionKeyEnv = `ENCRYPTION_KEY_${name.toUpperCase()}`;
+  // keep a cache of keys
+  private keysCache: Record<
+    string,
+    { walletKey: string; encryptionKey: string }
+  > = {};
+  private ensureKeys(name: string): {
+    walletKey: string;
+    encryptionKey: string;
+  } {
+    // Extract the base name without installation ID for key lookup
+    const baseName = name.split("-")[0];
 
-    // If not already in .env, generate them.
-    if (!process.env[walletKeyEnv] || !process.env[encryptionKeyEnv]) {
-      const walletKey = generatePrivateKey();
-      const account = privateKeyToAccount(walletKey);
-      const encryptionKeyHex = generateEncryptionKeyHex();
-      const publicKey = account.address;
-      // Append a new environment variable to the .data/.env file
-      await appendFile(
-        path.resolve(process.cwd(), ".env"),
-        `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKeyHex}\n# public key is ${publicKey}\n`,
-      );
-      return {
-        walletKey,
-        encryptionKey: encryptionKeyHex,
-      };
+    if (this.keysCache[baseName]) {
+      console.log(`[PersonaFactory] Using cached keys for ${baseName}`);
+      return this.keysCache[baseName];
     }
 
-    return {
-      walletKey: process.env[walletKeyEnv],
-      encryptionKey: process.env[encryptionKeyEnv],
+    const walletKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}`;
+    const encryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
+
+    // Check if keys exist in environment variables
+    if (process.env[walletKeyEnv] && process.env[encryptionKeyEnv]) {
+      console.log(
+        `[PersonaFactory] Using env keys for ${baseName}: ${process.env[walletKeyEnv].substring(0, 6)}...`,
+      );
+
+      // Keys exist in env, use them
+      this.keysCache[baseName] = {
+        walletKey: process.env[walletKeyEnv],
+        encryptionKey: process.env[encryptionKeyEnv],
+      };
+
+      return this.keysCache[baseName];
+    }
+
+    // Keys don't exist, generate new ones
+    console.log(`[PersonaFactory] Generating new keys for ${baseName}`);
+    const walletKey = generatePrivateKey();
+    const account = privateKeyToAccount(walletKey);
+    const encryptionKey = generateEncryptionKeyHex();
+    const publicKey = account.address;
+
+    // Store in cache
+    this.keysCache[baseName] = {
+      walletKey,
+      encryptionKey,
     };
+
+    // Update process.env directly so subsequent calls in the same process will find the keys
+    process.env[walletKeyEnv] = walletKey;
+    process.env[encryptionKeyEnv] = encryptionKey;
+
+    if (!name.includes("random")) {
+      // Append to .env file for persistence across runs
+      void appendFile(
+        path.resolve(process.cwd(), ".env"),
+        `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
+      );
+    }
+
+    return this.keysCache[baseName];
   }
 
   /**
@@ -87,20 +117,14 @@ export class PersonaFactory {
     installationId: string;
     sdkVersion: string;
   } {
-    const regex = /^([a-z]+)([A-Z])?(\d+)?$/;
-    const match = descriptor.match(regex);
+    const baseName = descriptor.split("-")[0];
+    const installationId = descriptor.split("-")[1];
+    const sdkVersion = descriptor.split("-")[2];
 
-    if (!match) {
-      throw new Error(
-        `[PersonaFactory] Invalid persona descriptor: ${descriptor}`,
-      );
-    }
-
-    const [, baseName, inst, ver] = match;
     return {
       name: baseName,
-      installationId: inst || defaults.installationId,
-      sdkVersion: ver || defaults.sdkVersion,
+      installationId: installationId || defaults.installationId,
+      sdkVersion: sdkVersion || defaults.sdkVersion,
     };
   }
 
@@ -124,30 +148,32 @@ export class PersonaFactory {
     const personas: Persona[] = [];
 
     for (const desc of descriptors) {
-      const isRandom = desc.includes("random");
       let personaData: PersonaBase;
 
-      if (isRandom) {
+      if (desc.includes("random")) {
         // Generate ephemeral keys
-        const walletKey = generatePrivateKey();
-        const encryptionKeyHex = generateEncryptionKeyHex();
+        const { name, installationId, sdkVersion } =
+          this.parsePersonaDescriptor(desc);
+
+        const { walletKey, encryptionKey } = this.ensureKeys(name);
 
         personaData = {
           name: desc,
           testName: this.testName,
-          installationId: defaultValues.installationId,
-          sdkVersion: defaultValues.sdkVersion,
+          installationId,
+          sdkVersion,
           walletKey,
-          encryptionKey: encryptionKeyHex,
+          encryptionKey,
         };
       } else {
         // Use or generate keys from environment
         const { name, installationId, sdkVersion } =
           this.parsePersonaDescriptor(desc);
-        const { walletKey, encryptionKey } = await this.ensureKeys(name);
+
+        const { walletKey, encryptionKey } = this.ensureKeys(name);
 
         personaData = {
-          name,
+          name: desc, // Use full descriptor as name to preserve installation ID
           testName: this.testName,
           installationId,
           sdkVersion,
@@ -203,11 +229,11 @@ export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   env: XmtpEnv,
   testName: string,
-  typeofStream: "message" | "conversation" | "consent" = "message",
+  typeofStream: typeofStream = "message",
 ): Promise<Record<string, Persona>> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
-    const workerNames = Object.values(WorkerNames);
+    const workerNames = defaultValues.defaultNames;
     const orderedNames = workerNames.slice(0, descriptorsOrAmount);
     descriptors = orderedNames;
   } else {
@@ -219,7 +245,62 @@ export async function getWorkers(
   const personas = await personaFactory.createPersonas(descriptors);
 
   return personas.reduce<Record<string, Persona>>((acc, p) => {
+    // Use the full descriptor as the key in the returned object
     acc[p.name] = p;
     return acc;
   }, {});
+}
+
+export function getDataSubFolderCount() {
+  const preBasePath = process.cwd();
+  return fs.readdirSync(`${preBasePath}/.data`).length;
+}
+
+export async function createMultipleInstallations(
+  baseName: string,
+  suffixes: string[],
+  env: string,
+  testName: string,
+): Promise<
+  Record<string, { name: string; installationId: string; dbPath: string }>
+> {
+  // Create a base persona first
+  const basePersona = await getWorkers(
+    [baseName],
+    env as XmtpEnv,
+    testName,
+    "none",
+  );
+  const baseAddress = basePersona[baseName].client?.accountAddress;
+
+  console.log(`Created base persona: ${baseName}`);
+  console.log(`Wallet address: ${baseAddress}`);
+
+  // Create installations with different IDs for the same persona
+  const installations: Record<
+    string,
+    { name: string; installationId: string; dbPath: string }
+  > = {};
+
+  for (const suffix of suffixes) {
+    const installId = `${baseName}-${suffix}`;
+    console.log(`Creating installation: ${installId}`);
+
+    // Create worker with the installation ID
+    const installation = await getWorkers(
+      [installId],
+      env as XmtpEnv,
+      testName,
+      "none",
+    );
+    const persona = Object.values(installation)[0];
+
+    installations[installId] = {
+      name: persona.name,
+      installationId: persona.installationId,
+      dbPath: persona.dbPath,
+    };
+  }
+
+  return installations;
 }

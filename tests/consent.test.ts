@@ -12,7 +12,7 @@ import { getWorkers } from "../helpers/workers/factory";
 dotenv.config();
 
 const env: XmtpEnv = "dev";
-const testName = "TS_Consent_" + env;
+const testName = "consent" + env;
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

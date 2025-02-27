@@ -10,7 +10,7 @@ import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const env: XmtpEnv = "dev";
-const testName = "TS_Groups_" + env;
+const testName = "groups" + env;
 
 dotenv.config();
 

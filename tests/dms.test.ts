@@ -12,7 +12,7 @@ import { getWorkers } from "../helpers/workers/factory";
 dotenv.config();
 
 const env: XmtpEnv = "dev";
-const testName = "TS_DMs_" + env;
+const testName = "dms" + env;
 
 describe(testName, () => {
   let convo: Conversation;

@@ -1,83 +1,89 @@
-[2025-02-26T11:44:58.039Z] [info] [PersonaFactory] Creating personas: bob, joe, sam, alice, randompep, elon, random for TS_Performance_dev
-[2025-02-26T11:44:59.949Z] [warn] [joe] Create XMTP client v:436360a 1.868s
-[2025-02-26T11:45:00.042Z] [warn] [alice] Create XMTP client v:436360a 1.962s
-[2025-02-26T11:45:00.141Z] [warn] [elon] Create XMTP client v:436360a 2.061s
-[2025-02-26T11:45:00.205Z] [warn] [bob] Create XMTP client v:436360a 2.125s
-[2025-02-26T11:45:00.253Z] [warn] [sam] Create XMTP client v:436360a 2.172s
-[2025-02-26T11:45:00.312Z] [warn] [joe] Start message stream 363.246ms
-[2025-02-26T11:45:00.312Z] [info] [joe] Message stream started
-[2025-02-26T11:45:00.313Z] [warn] [joe] Start stream 364.135ms
-[2025-02-26T11:45:00.313Z] [warn] [joe] Initialize XMTP client 2.239s
-[2025-02-26T11:45:00.413Z] [warn] [alice] Start message stream 369.61ms
-[2025-02-26T11:45:00.413Z] [info] [alice] Message stream started
-[2025-02-26T11:45:00.413Z] [warn] [alice] Start stream 370.581ms
-[2025-02-26T11:45:00.414Z] [warn] [alice] Initialize XMTP client 2.337s
-[2025-02-26T11:45:00.507Z] [warn] [elon] Start message stream 366.08ms
-[2025-02-26T11:45:00.508Z] [info] [elon] Message stream started
-[2025-02-26T11:45:00.508Z] [warn] [elon] Start stream 367.495ms
-[2025-02-26T11:45:00.509Z] [warn] [elon] Initialize XMTP client 2.430s
-[2025-02-26T11:45:00.582Z] [warn] [bob] Start message stream 376.296ms
-[2025-02-26T11:45:00.582Z] [info] [bob] Message stream started
-[2025-02-26T11:45:00.583Z] [warn] [bob] Start stream 377.025ms
-[2025-02-26T11:45:00.583Z] [warn] [bob] Initialize XMTP client 2.537s
-[2025-02-26T11:45:00.620Z] [warn] [sam] Start message stream 366.788ms
-[2025-02-26T11:45:00.620Z] [info] [sam] Message stream started
-[2025-02-26T11:45:00.620Z] [warn] [sam] Start stream 366.984ms
-[2025-02-26T11:45:00.620Z] [warn] [sam] Initialize XMTP client 2.545s
-[2025-02-26T11:45:01.662Z] [warn] [randompep] Create XMTP client v:436360a 3.582s
-[2025-02-26T11:45:01.777Z] [warn] [random] Create XMTP client v:436360a 3.697s
-[2025-02-26T11:45:02.037Z] [warn] [randompep] Start message stream 374.538ms
-[2025-02-26T11:45:02.037Z] [info] [randompep] Message stream started
-[2025-02-26T11:45:02.038Z] [warn] [randompep] Start stream 376.28ms
-[2025-02-26T11:45:02.038Z] [warn] [randompep] Initialize XMTP client 3.961s
-[2025-02-26T11:45:02.133Z] [warn] [random] Start message stream 356.485ms
-[2025-02-26T11:45:02.134Z] [info] [random] Message stream started
-[2025-02-26T11:45:02.134Z] [warn] [random] Start stream 357.415ms
-[2025-02-26T11:45:02.134Z] [warn] [random] Initialize XMTP client 4.055s
-[2025-02-26T11:45:04.111Z] [info] TC_CreateDM duration: 1975.4646250000005 ms
-[2025-02-26T11:45:04.112Z] [info] Test took 1975.4646250000005ms
-[2025-02-26T11:45:04.113Z] [info] [bob] Creating DM with sam at 0x9ae162A3E95ffb3784EE3Fd66c6bBD020c25c477
-[2025-02-26T11:45:05.223Z] [info] TC_SendGM duration: 1108.8968330000007 ms
-[2025-02-26T11:45:05.224Z] [info] Test took 1108.8968330000007ms
-[2025-02-26T11:45:07.604Z] [info] [sam] Collecting 1 messages from convo:db1d9f8de33038f6b6202151c0860727
-[2025-02-26T11:45:07.605Z] [info] Sending message #1: gm-1-v4f673v82d9
-[2025-02-26T11:45:08.523Z] [info] All participants received the expected number of messages.
-[2025-02-26T11:45:08.524Z] [info] TC_ReceiveGM duration: 3298.335583 ms
-[2025-02-26T11:45:08.524Z] [info] Test took 3298.335583ms
-[2025-02-26T11:45:10.514Z] [warn] create group 1.989s
-[2025-02-26T11:45:10.514Z] [info] Bob's group: e60e758858232949cf92e542dff6f8c1
-[2025-02-26T11:45:10.514Z] [info] TC_CreateGroup duration: 1989.2637080000004 ms
-[2025-02-26T11:45:10.515Z] [info] Test took 1989.2637080000004ms
-[2025-02-26T11:45:11.519Z] [info] [elon] Collecting 1 messages from convo:e60e758858232949cf92e542dff6f8c1
-[2025-02-26T11:45:11.520Z] [info] Sending message #1: New name-1-omqyol4do6f
-[2025-02-26T11:45:12.080Z] [info] All participants received the expected number of messages.
-[2025-02-26T11:45:12.080Z] [warn] update group name 1.564s
-[2025-02-26T11:45:12.080Z] [info] TC_UpdateGroupName duration: 1564.227334000001 ms
-[2025-02-26T11:45:12.080Z] [info] {"allReceived":true,"messages":[[{"initiatedByInboxId":"16f5c843e28d79ce15ccbc7f8aec41ae090edea91010a704a00688c9697a8608","addedInboxes":[],"removedInboxes":[],"metadataFieldChanges":[{"fieldName":"group_name","oldValue":"","newValue":"New name-1-omqyol4do6f"}]}]]}
-[2025-02-26T11:45:12.081Z] [info] Test took 1564.227334000001ms
-[2025-02-26T11:45:14.297Z] [warn] add members 2.215s
-[2025-02-26T11:45:14.297Z] [info] TC_AddMembers duration: 2215.6882499999974 ms
-[2025-02-26T11:45:14.297Z] [info] Test took 2215.6882499999974ms
-[2025-02-26T11:45:15.598Z] [warn] remove members 1.300s
-[2025-02-26T11:45:15.598Z] [info] TC_RemoveMembers duration: 1300.7019579999978 ms
-[2025-02-26T11:45:15.599Z] [info] Test took 1300.7019579999978ms
-[2025-02-26T11:45:16.719Z] [info] GM Message sent in group: gm-k7gr0qrbaz8
-[2025-02-26T11:45:16.720Z] [info] TC_SendGroupMessage duration: 1120.2131249999984 ms
-[2025-02-26T11:45:16.720Z] [info] Test took 1120.2131249999984ms
-[2025-02-26T11:45:17.723Z] [info] [elon] Collecting 1 messages from convo:e60e758858232949cf92e542dff6f8c1
-[2025-02-26T11:45:17.724Z] [info] Sending message #1: gm-1-tct2swlr8k
-[2025-02-26T11:45:18.280Z] [info] All participants received the expected number of messages.
-[2025-02-26T11:45:18.280Z] [info] TC_ReceiveGroupMessage (1 stream) duration: 1559.0802079999994 ms
-[2025-02-26T11:45:18.280Z] [info] Test took 1559.0802079999994ms
-[2025-02-26T11:45:21.351Z] [info] [joe] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] [sam] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] [alice] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] [randompep] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] [elon] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] [random] Collecting 1 messages from convo:3da3c89fdac3ca2751b54d96377c7794
-[2025-02-26T11:45:21.351Z] [info] Sending message #1: gm-1-alo26qgq555
-[2025-02-26T11:45:22.263Z] [info] All participants received the expected number of messages.
-[2025-02-26T11:45:22.264Z] [info] TC_ReceiveGroupMessage (multiple streams) duration: 3982.6397499999985 ms
-[2025-02-26T11:45:22.264Z] [info] Test took 3982.6397499999985ms
-[2025-02-26T11:45:23.370Z] [info] {"DNS Lookup":0.001783,"TCP Connection":0.001999,"TLS Handshake":0.547713,"Server Processing":0.872711,"Content Transfer":0.872732}
-[2025-02-26T11:45:23.370Z] [warn] total: 872.732ms, tls: 547.713ms, processing: 325.019ms
+[2025-02-27T14:23:37.532Z] [info] [PersonaFactory] Creating personas: bob, joe, sam, alice, randompep, elon, random for TS_Performance_dev
+[2025-02-27T14:23:37.532Z] [info] [PersonaFactory] Using env keys for bob: 0xf758...
+[2025-02-27T14:23:37.532Z] [info] [PersonaFactory] Using env keys for joe: 0x0fbf...
+[2025-02-27T14:23:37.532Z] [info] [PersonaFactory] Generating new keys for sam
+[2025-02-27T14:23:37.552Z] [info] [PersonaFactory] Using env keys for alice: 0xff14...
+[2025-02-27T14:23:37.553Z] [info] [PersonaFactory] Generating new keys for randompep
+[2025-02-27T14:23:37.554Z] [info] [PersonaFactory] Using env keys for elon: 0x6cae...
+[2025-02-27T14:23:37.554Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-27T14:23:37.561Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/sam
+[2025-02-27T14:23:39.649Z] [warn] [bob-a] Create XMTP client v:436360a 2.089s
+[2025-02-27T14:23:39.764Z] [warn] [joe-a] Create XMTP client v:436360a 2.203s
+[2025-02-27T14:23:39.800Z] [warn] [elon-a] Create XMTP client v:436360a 2.239s
+[2025-02-27T14:23:39.914Z] [warn] [alice-a] Create XMTP client v:436360a 2.352s
+[2025-02-27T14:23:40.027Z] [warn] [bob-a] Start message stream 376.857ms
+[2025-02-27T14:23:40.027Z] [info] [bob-a] Message stream started
+[2025-02-27T14:23:40.027Z] [warn] [bob-a] Start stream 377.533ms
+[2025-02-27T14:23:40.027Z] [warn] [bob-a] Initialize XMTP client 2.470s
+[2025-02-27T14:23:40.155Z] [warn] [joe-a] Start message stream 390.903ms
+[2025-02-27T14:23:40.155Z] [info] [joe-a] Message stream started
+[2025-02-27T14:23:40.155Z] [warn] [joe-a] Start stream 391.281ms
+[2025-02-27T14:23:40.155Z] [warn] [joe-a] Initialize XMTP client 2.597s
+[2025-02-27T14:23:40.211Z] [warn] [elon-a] Start message stream 410.54ms
+[2025-02-27T14:23:40.211Z] [info] [elon-a] Message stream started
+[2025-02-27T14:23:40.211Z] [warn] [elon-a] Start stream 410.939ms
+[2025-02-27T14:23:40.211Z] [warn] [elon-a] Initialize XMTP client 2.652s
+[2025-02-27T14:23:40.312Z] [warn] [alice-a] Start message stream 398.67ms
+[2025-02-27T14:23:40.312Z] [info] [alice-a] Message stream started
+[2025-02-27T14:23:40.312Z] [warn] [alice-a] Start stream 398.926ms
+[2025-02-27T14:23:40.312Z] [warn] [alice-a] Initialize XMTP client 2.754s
+[2025-02-27T14:23:41.316Z] [warn] [sam-a] Create XMTP client v:436360a 3.755s
+[2025-02-27T14:23:41.444Z] [warn] [random-a] Create XMTP client v:436360a 3.883s
+[2025-02-27T14:23:41.505Z] [warn] [randompep-a] Create XMTP client v:436360a 3.944s
+[2025-02-27T14:23:41.721Z] [warn] [sam-a] Start message stream 404.617ms
+[2025-02-27T14:23:41.721Z] [info] [sam-a] Message stream started
+[2025-02-27T14:23:41.721Z] [warn] [sam-a] Start stream 404.881ms
+[2025-02-27T14:23:41.721Z] [warn] [sam-a] Initialize XMTP client 4.163s
+[2025-02-27T14:23:41.848Z] [warn] [random-a] Start message stream 404.387ms
+[2025-02-27T14:23:41.848Z] [info] [random-a] Message stream started
+[2025-02-27T14:23:41.848Z] [warn] [random-a] Start stream 404.476ms
+[2025-02-27T14:23:41.848Z] [warn] [random-a] Initialize XMTP client 4.288s
+[2025-02-27T14:23:41.892Z] [warn] [randompep-a] Start message stream 386.831ms
+[2025-02-27T14:23:41.892Z] [info] [randompep-a] Message stream started
+[2025-02-27T14:23:41.893Z] [warn] [randompep-a] Start stream 387.105ms
+[2025-02-27T14:23:41.893Z] [warn] [randompep-a] Initialize XMTP client 4.334s
+[2025-02-27T14:23:44.071Z] [info] TC_CreateDM duration: 2177.751125 ms
+[2025-02-27T14:23:44.072Z] [info] Test took 2177.751125ms
+[2025-02-27T14:23:44.072Z] [info] [bob] Creating DM with sam at 0xd8BDfCD92A29752db05229b94c81B1d159352413
+[2025-02-27T14:23:45.126Z] [info] TC_SendGM duration: 1260.4597909999993 ms
+[2025-02-27T14:23:45.126Z] [info] Test took 1260.4597909999993ms
+[2025-02-27T14:23:49.249Z] [info] [sam-a] Collecting 1 messages from convo:0aa2d1f4c86cc8e40aee63674d437ca4
+[2025-02-27T14:23:49.250Z] [info] Sending message #1: gm-1-5458mhsadn9
+[2025-02-27T14:23:50.473Z] [info] All participants received the expected number of messages.
+[2025-02-27T14:23:50.473Z] [info] TC_ReceiveGM duration: 5346.191124999999 ms
+[2025-02-27T14:23:53.125Z] [warn] create group 2.649s
+[2025-02-27T14:23:53.125Z] [info] Bob's group: c0b9044041552e2a606c97ca22aa0659
+[2025-02-27T14:23:53.125Z] [info] TC_CreateGroup duration: 2649.006458 ms
+[2025-02-27T14:23:53.125Z] [info] Test took 2649.006458ms
+[2025-02-27T14:23:54.127Z] [info] [elon-a] Collecting 1 messages from convo:c0b9044041552e2a606c97ca22aa0659
+[2025-02-27T14:23:54.127Z] [info] Sending message #1: New name-1-0pzzjwz88eok
+[2025-02-27T14:23:54.531Z] [info] All participants received the expected number of messages.
+[2025-02-27T14:23:54.531Z] [warn] update group name 1.406s
+[2025-02-27T14:23:54.531Z] [info] TC_UpdateGroupName duration: 1406.133708999998 ms
+[2025-02-27T14:23:54.532Z] [info] {"allReceived":true,"messages":[[{"initiatedByInboxId":"265abbcf27dddc4c1390bac2781b6c93fca63dbad1d19aac0a05949bc24d2ad1","addedInboxes":[],"removedInboxes":[],"metadataFieldChanges":[{"fieldName":"group_name","oldValue":"","newValue":"New name-1-0pzzjwz88eok"}]}]]}
+[2025-02-27T14:23:54.532Z] [info] Test took 1406.133708999998ms
+[2025-02-27T14:23:56.881Z] [warn] add members 2.349s
+[2025-02-27T14:23:56.881Z] [info] TC_AddMembers duration: 2349.454167 ms
+[2025-02-27T14:23:56.881Z] [info] Test took 2349.454167ms
+[2025-02-27T14:23:58.213Z] [warn] remove members 1.332s
+[2025-02-27T14:23:58.213Z] [info] TC_RemoveMembers duration: 1331.8010419999991 ms
+[2025-02-27T14:23:58.214Z] [info] Test took 1331.8010419999991ms
+[2025-02-27T14:23:59.232Z] [info] GM Message sent in group: gm-ldkjd6mgnid
+[2025-02-27T14:23:59.232Z] [info] TC_SendGroupMessage duration: 1018.0298329999969 ms
+[2025-02-27T14:23:59.232Z] [info] Test took 1018.0298329999969ms
+[2025-02-27T14:24:00.233Z] [info] [elon-a] Collecting 1 messages from convo:c0b9044041552e2a606c97ca22aa0659
+[2025-02-27T14:24:00.233Z] [info] Sending message #1: gm-1-ap7zc3rtegj
+[2025-02-27T14:24:00.846Z] [info] All participants received the expected number of messages.
+[2025-02-27T14:24:00.846Z] [info] TC_ReceiveGroupMessage (1 stream) duration: 1613.3370410000025 ms
+[2025-02-27T14:24:00.846Z] [info] Test took 1613.3370410000025ms
+[2025-02-27T14:24:04.363Z] [info] [joe-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.363Z] [info] [sam-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.363Z] [info] [alice-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.363Z] [info] [randompep-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.363Z] [info] [elon-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.363Z] [info] [random-a] Collecting 1 messages from convo:68b81cef000d56930e2163ed822989ff
+[2025-02-27T14:24:04.364Z] [info] Sending message #1: gm-1-ai65bqkdvu
+[2025-02-27T14:24:05.412Z] [info] All participants received the expected number of messages.
+[2025-02-27T14:24:05.413Z] [info] TC_ReceiveGroupMessage (multiple streams) duration: 4566.617167 ms
+[2025-02-27T14:24:06.391Z] [info] {"DNS Lookup":0.001904,"TCP Connection":0.002097,"TLS Handshake":0.571869,"Server Processing":0.760818,"Content Transfer":0.760853}
+[2025-02-27T14:24:06.391Z] [warn] total: 760.853ms, tls: 571.8689999999999ms, processing: 188.98400000000004ms

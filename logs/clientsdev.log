@@ -1,0 +1,70 @@
+[2025-02-27T14:17:36.548Z] [info] [PersonaFactory] Creating personas: random for clientsdev
+[2025-02-27T14:17:36.548Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-27T14:17:36.572Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random
+[2025-02-27T14:17:40.324Z] [warn] [random-a] Create XMTP client v:436360a 3.751s
+[2025-02-27T14:17:40.324Z] [info] [random-a] No stream started
+[2025-02-27T14:17:40.324Z] [warn] [random-a] Initialize XMTP client 3.753s
+[2025-02-27T14:17:40.325Z] [info] [PersonaFactory] Creating personas: bob, random for clientsdev
+[2025-02-27T14:17:40.325Z] [info] [PersonaFactory] Using env keys for bob: 0xf758...
+[2025-02-27T14:17:40.325Z] [info] [PersonaFactory] Using env keys for random: 0xd5c6...
+[2025-02-27T14:17:40.327Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
+[2025-02-27T14:17:42.300Z] [warn] [random-a] Create XMTP client v:436360a 1.972s
+[2025-02-27T14:17:42.300Z] [info] [random-a] No stream started
+[2025-02-27T14:17:42.300Z] [warn] [random-a] Initialize XMTP client 1.973s
+[2025-02-27T14:17:43.735Z] [warn] [bob-a] Create XMTP client v:436360a 3.407s
+[2025-02-27T14:17:43.735Z] [info] [bob-a] No stream started
+[2025-02-27T14:17:43.735Z] [warn] [bob-a] Initialize XMTP client 3.409s
+[2025-02-27T14:17:43.736Z] [info] [PersonaFactory] Creating personas: random for clientsdev
+[2025-02-27T14:17:43.736Z] [info] [PersonaFactory] Using env keys for random: 0xd5c6...
+[2025-02-27T14:17:45.894Z] [warn] [random-a] Create XMTP client v:436360a 2.156s
+[2025-02-27T14:17:45.894Z] [info] [random-a] No stream started
+[2025-02-27T14:17:45.894Z] [warn] [random-a] Initialize XMTP client 2.158s
+[2025-02-27T14:17:45.895Z] [info] [PersonaFactory] Creating personas: bob, alice, randompep, randombob for clientsdev
+[2025-02-27T14:17:45.895Z] [info] [PersonaFactory] Using env keys for bob: 0xf758...
+[2025-02-27T14:17:45.895Z] [info] [PersonaFactory] Using env keys for alice: 0xff14...
+[2025-02-27T14:17:45.895Z] [info] [PersonaFactory] Generating new keys for randompep
+[2025-02-27T14:17:45.896Z] [info] [PersonaFactory] Generating new keys for randombob
+[2025-02-27T14:17:45.900Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/alice
+[2025-02-27T14:17:45.900Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randompep
+[2025-02-27T14:17:45.900Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randombob
+[2025-02-27T14:17:47.851Z] [warn] [bob-a] Create XMTP client v:436360a 1.951s
+[2025-02-27T14:17:47.851Z] [info] [bob-a] No stream started
+[2025-02-27T14:17:47.851Z] [warn] [bob-a] Initialize XMTP client 1.953s
+[2025-02-27T14:17:49.437Z] [warn] [alice-a] Create XMTP client v:436360a 3.537s
+[2025-02-27T14:17:49.437Z] [info] [alice-a] No stream started
+[2025-02-27T14:17:49.437Z] [warn] [alice-a] Initialize XMTP client 3.539s
+[2025-02-27T14:17:49.480Z] [warn] [randombob-a] Create XMTP client v:436360a 3.580s
+[2025-02-27T14:17:49.480Z] [info] [randombob-a] No stream started
+[2025-02-27T14:17:49.480Z] [warn] [randombob-a] Initialize XMTP client 3.581s
+[2025-02-27T14:17:49.656Z] [warn] [randompep-a] Create XMTP client v:436360a 3.756s
+[2025-02-27T14:17:49.656Z] [info] [randompep-a] No stream started
+[2025-02-27T14:17:49.656Z] [warn] [randompep-a] Initialize XMTP client 3.758s
+[2025-02-27T14:17:49.656Z] [info] [PersonaFactory] Creating personas: fabritest for clientsdev
+[2025-02-27T14:17:49.657Z] [info] [PersonaFactory] Using env keys for fabritest: 0x1fee...
+[2025-02-27T14:17:49.657Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/fabritest
+[2025-02-27T14:17:53.382Z] [warn] [fabritest-a] Create XMTP client v:436360a 3.725s
+[2025-02-27T14:17:53.382Z] [info] [fabritest-a] No stream started
+[2025-02-27T14:17:53.382Z] [warn] [fabritest-a] Initialize XMTP client 3.725s
+[2025-02-27T14:17:53.382Z] [info] Created base persona: fabritest
+[2025-02-27T14:17:53.382Z] [info] Wallet address: 0xB23A6DaF212E1459F70B1796a82579b3412957Ac
+[2025-02-27T14:17:53.383Z] [info] Creating installation: fabritest-a
+[2025-02-27T14:17:53.383Z] [info] [PersonaFactory] Creating personas: fabritest-a for clientsdev
+[2025-02-27T14:17:53.383Z] [info] [PersonaFactory] Using env keys for fabritest: 0x1fee...
+[2025-02-27T14:17:55.107Z] [warn] [fabritest-a-a] Create XMTP client v:436360a 1.723s
+[2025-02-27T14:17:55.107Z] [info] [fabritest-a-a] No stream started
+[2025-02-27T14:17:55.107Z] [warn] [fabritest-a-a] Initialize XMTP client 1.724s
+[2025-02-27T14:17:55.107Z] [info] Creating installation: fabritest-b
+[2025-02-27T14:17:55.107Z] [info] [PersonaFactory] Creating personas: fabritest-b for clientsdev
+[2025-02-27T14:17:55.107Z] [info] [PersonaFactory] Using env keys for fabritest: 0x1fee...
+[2025-02-27T14:17:58.804Z] [warn] [fabritest-b-b] Create XMTP client v:436360a 3.696s
+[2025-02-27T14:17:58.804Z] [info] [fabritest-b-b] No stream started
+[2025-02-27T14:17:58.804Z] [warn] [fabritest-b-b] Initialize XMTP client 3.697s
+[2025-02-27T14:17:58.804Z] [info] Creating installation: fabritest-c
+[2025-02-27T14:17:58.805Z] [info] [PersonaFactory] Creating personas: fabritest-c for clientsdev
+[2025-02-27T14:17:58.805Z] [info] [PersonaFactory] Using env keys for fabritest: 0x1fee...
+[2025-02-27T14:18:02.528Z] [warn] [fabritest-c-c] Create XMTP client v:436360a 3.722s
+[2025-02-27T14:18:02.528Z] [info] [fabritest-c-c] No stream started
+[2025-02-27T14:18:02.528Z] [warn] [fabritest-c-c] Initialize XMTP client 3.723s
+[2025-02-27T14:18:02.528Z] [info] Name: fabritest-a, Installation ID: a, DB Path: /Users/fabrizioguespe/DevRel/qa-testing/.data/fabritest/fabritest-a-0xB23A6DaF212E1459F70B1796a82579b3412957Ac-44-436360a-dev
+[2025-02-27T14:18:02.528Z] [info] Name: fabritest-b, Installation ID: b, DB Path: /Users/fabrizioguespe/DevRel/qa-testing/.data/fabritest/fabritest-b-0xB23A6DaF212E1459F70B1796a82579b3412957Ac-44-436360a-dev
+[2025-02-27T14:18:02.528Z] [info] Name: fabritest-c, Installation ID: c, DB Path: /Users/fabrizioguespe/DevRel/qa-testing/.data/fabritest/fabritest-c-0xB23A6DaF212E1459F70B1796a82579b3412957Ac-44-436360a-dev

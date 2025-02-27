@@ -7,7 +7,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
-import { defaultValues, type PersonaBase } from "../types";
+import { defaultValues, type PersonaBase, type typeofStream } from "../types";
 
 export type MessageStreamWorker = {
   type: string;
@@ -44,17 +44,17 @@ export class WorkerClient extends Worker {
   private env: XmtpEnv;
   private sdkVersion: string;
   private testName: string;
-
+  private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
-  private typeofStream: "message" | "conversation" | "consent";
+  private typeofStream: typeofStream;
 
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
     persona: PersonaBase,
     env: XmtpEnv,
-    typeofStream: "message" | "conversation" | "consent",
+    typeofStream: typeofStream,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
@@ -69,6 +69,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = persona.name;
     this.installationId = persona.installationId;
+    this.nameId = `${this.name}-${this.installationId}`;
     this.sdkVersion = persona.sdkVersion;
     this.env = env;
     this.testName = persona.testName;
@@ -77,7 +78,7 @@ export class WorkerClient extends Worker {
 
     // Log messages from the Worker
     this.on("message", (message) => {
-      console.log(`[${this.name}] Worker message:`, message);
+      console.log(`[${this.nameId}] Worker message:`, message);
     });
 
     // Handle Worker errors
@@ -104,7 +105,7 @@ export class WorkerClient extends Worker {
     dbPath: string;
     version: string;
   }> {
-    console.time(`[${this.name}] Initialize XMTP client`);
+    console.time(`[${this.nameId}] Initialize XMTP client`);
 
     // Tell the Worker to do any internal initialization
     this.postMessage({
@@ -132,35 +133,37 @@ export class WorkerClient extends Worker {
         testName: this.testName,
       },
     );
-    console.time(`[${this.name}] Create XMTP client v:${version}`);
+    console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       env: this.env,
       dbPath,
       // @ts-expect-error: loggingLevel is not typed
       loggingLevel: process.env.LOGGING_LEVEL,
     });
-    console.timeEnd(`[${this.name}] Create XMTP client v:${version}`);
+    console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);
 
     if (this.typeofStream === "message") {
       // Start message streaming in the background
-      console.time(`[${this.name}] Start stream`);
+      console.time(`[${this.nameId}] Start stream`);
       await this.startStream();
-      console.timeEnd(`[${this.name}] Start stream`);
+      console.timeEnd(`[${this.nameId}] Start stream`);
     } else if (this.typeofStream === "conversation") {
       // Start conversation streaming
-      console.log(`[${this.name}] Start conversation stream`);
+      console.log(`[${this.nameId}] Start conversation stream`);
       this.startConversationStream();
     } else if (this.typeofStream === "consent") {
       // Start consent streaming
-      console.log(`[${this.name}] Start consent stream`);
+      console.log(`[${this.nameId}] Start consent stream`);
       this.startConsentStream();
+    } else {
+      console.log(`[${this.nameId}] No stream started`);
     }
 
     // // Start conversation streaming
-    // console.log(`[${this.name}] Start conversation stream`);
+    // console.log(`[${this.nameId}] Start conversation stream`);
     // this.startConversationStream();
 
-    console.timeEnd(`[${this.name}] Initialize XMTP client`);
+    console.timeEnd(`[${this.nameId}] Initialize XMTP client`);
     return { client: this.client, dbPath, version: Client.version };
   }
 
@@ -169,16 +172,16 @@ export class WorkerClient extends Worker {
    * then emit them as 'stream_message' events on this Worker.
    */
   private async startStream() {
-    console.time(`[${this.name}] Start message stream`);
+    console.time(`[${this.nameId}] Start message stream`);
     const stream = await this.client.conversations.streamAllMessages();
-    console.timeEnd(`[${this.name}] Start message stream`);
-    console.log(`[${this.name}] Message stream started`);
+    console.timeEnd(`[${this.nameId}] Start message stream`);
+    console.log(`[${this.nameId}] Message stream started`);
 
     // Process messages asynchronously
     void (async () => {
       try {
         for await (const message of stream) {
-          console.time(`[${this.name}] Process message`);
+          console.time(`[${this.nameId}] Process message`);
           const workerMessage: MessageStreamWorker = {
             type: "stream_message",
             message: message as DecodedMessage,
@@ -187,10 +190,10 @@ export class WorkerClient extends Worker {
           if (this.listenerCount("message") > 0) {
             this.emit("message", workerMessage);
           }
-          console.timeEnd(`[${this.name}] Process message`);
+          console.timeEnd(`[${this.nameId}] Process message`);
         }
       } catch (error) {
-        console.error(`[${this.name}] Stream error:`, error);
+        console.error(`[${this.nameId}] Stream error:`, error);
         this.emit("error", error);
       }
     })();
@@ -201,14 +204,14 @@ export class WorkerClient extends Worker {
    * then emit them as 'stream_conversation' events on this Worker.
    */
   private startConversationStream() {
-    console.time(`[${this.name}] Start conversation stream`);
+    console.time(`[${this.nameId}] Start conversation stream`);
 
     // Get initial list of conversations
     const initialConversations = this.client.conversations.list();
     const knownConversations = new Set(initialConversations.map((c) => c.id));
 
     console.log(
-      `[${this.name}] Initial conversations count: ${knownConversations.size}`,
+      `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
     );
 
     // Use the stream method to listen for conversation updates
@@ -221,14 +224,14 @@ export class WorkerClient extends Worker {
           const convoId = conversation?.id;
 
           if (!convoId) {
-            console.error(`[${this.name}] Conversation ID is undefined`);
+            console.error(`[${this.nameId}] Conversation ID is undefined`);
             continue;
           }
 
           // Only emit for new conversations that weren't in our initial set
           if (!knownConversations.has(convoId)) {
             console.log(
-              `[${this.name}] New conversation in stream: ${convoId}`,
+              `[${this.nameId}] New conversation in stream: ${convoId}`,
             );
 
             // Add to known conversations
@@ -247,13 +250,13 @@ export class WorkerClient extends Worker {
           }
         }
       } catch (error) {
-        console.error(`[${this.name}] Conversation stream error:`, error);
+        console.error(`[${this.nameId}] Conversation stream error:`, error);
         this.emit("error", error);
       }
     })();
 
-    console.timeEnd(`[${this.name}] Start conversation stream`);
-    console.log(`[${this.name}] Conversation stream started`);
+    console.timeEnd(`[${this.nameId}] Start conversation stream`);
+    console.log(`[${this.nameId}] Conversation stream started`);
   }
 
   /**
@@ -261,7 +264,7 @@ export class WorkerClient extends Worker {
    * then emit them as 'stream_consent' events on this Worker.
    */
   private startConsentStream() {
-    console.time(`[${this.name}] Start consent stream`);
+    console.time(`[${this.nameId}] Start consent stream`);
 
     // Use the stream method to listen for consent updates
     const consentStream = this.client.conversations.streamConsent();
@@ -282,13 +285,13 @@ export class WorkerClient extends Worker {
           }
         }
       } catch (error) {
-        console.error(`[${this.name}] Consent stream error:`, error);
+        console.error(`[${this.nameId}] Consent stream error:`, error);
         this.emit("error", error);
       }
     })();
 
-    console.timeEnd(`[${this.name}] Start consent stream`);
-    console.log(`[${this.name}] Consent stream started`);
+    console.timeEnd(`[${this.nameId}] Start consent stream`);
+    console.log(`[${this.nameId}] Consent stream started`);
   }
 
   // Add this to allow collecting conversation events:
@@ -298,7 +301,7 @@ export class WorkerClient extends Worker {
     timeoutMs = count * defaultValues.timeout,
   ): Promise<ConversationStreamWorker[]> {
     console.log(
-      `[${this.name}] Collecting ${count} conversations from peer: ${fromPeerAddress}`,
+      `[${this.nameId}] Collecting ${count} conversations from peer: ${fromPeerAddress}`,
     );
 
     return new Promise((resolve) => {
@@ -306,7 +309,7 @@ export class WorkerClient extends Worker {
       const timer = setTimeout(() => {
         this.off("message", onMessage);
         console.warn(
-          `[${this.name}] Timeout. Got ${conversations.length} / ${count} conversations.`,
+          `[${this.nameId}] Timeout. Got ${conversations.length} / ${count} conversations.`,
         );
         resolve(conversations); // partial or empty
       }, timeoutMs);
@@ -319,7 +322,7 @@ export class WorkerClient extends Worker {
           const convoId = convoMsg.conversation.id;
 
           console.log(
-            `[${this.name}] Received conversation event, id: ${convoId}`,
+            `[${this.nameId}] Received conversation event, id: ${convoId}`,
           );
 
           conversations.push(convoMsg);
@@ -355,7 +358,7 @@ export class WorkerClient extends Worker {
     timeoutMs = count * defaultValues.perMessageTimeout,
   ): Promise<MessageStreamWorker[]> {
     console.log(
-      `[${this.name}] Collecting ${count} messages from convo:${groupId}`,
+      `[${this.nameId}] Collecting ${count} messages from convo:${groupId}`,
     );
 
     return new Promise((resolve, reject) => {
@@ -363,7 +366,7 @@ export class WorkerClient extends Worker {
       const timer = setTimeout(() => {
         this.off("message", onMessage);
         console.warn(
-          `[${this.name}] Timeout. Got ${messages.length} / ${count} messages.`,
+          `[${this.nameId}] Timeout. Got ${messages.length} / ${count} messages.`,
         );
         resolve(messages); // partial or empty
       }, timeoutMs);
@@ -372,7 +375,7 @@ export class WorkerClient extends Worker {
         if (msg.type === "error") {
           clearTimeout(timer);
           this.off("message", onMessage);
-          reject(new Error(`[${this.name}] Error: ${msg.message.content}`));
+          reject(new Error(`[${this.nameId}] Error: ${msg.message.content}`));
           return;
         }
 
@@ -408,14 +411,14 @@ export class WorkerClient extends Worker {
     count: number = 1,
     timeoutMs = count * defaultValues.timeout,
   ): Promise<ConsentStreamWorker[]> {
-    console.log(`[${this.name}] Collecting ${count} consent updates`);
+    console.log(`[${this.nameId}] Collecting ${count} consent updates`);
 
     return new Promise((resolve) => {
       const consentUpdates: ConsentStreamWorker[] = [];
       const timer = setTimeout(() => {
         this.off("message", onMessage);
         console.warn(
-          `[${this.name}] Timeout. Got ${consentUpdates.length} / ${count} consent updates.`,
+          `[${this.nameId}] Timeout. Got ${consentUpdates.length} / ${count} consent updates.`,
         );
         resolve(consentUpdates); // partial or empty
       }, timeoutMs);
@@ -430,7 +433,7 @@ export class WorkerClient extends Worker {
           const consentMsg = msg as ConsentStreamWorker;
 
           console.log(
-            `[${this.name}] Received consent update: ${JSON.stringify(consentMsg.consentUpdate)}`,
+            `[${this.nameId}] Received consent update: ${JSON.stringify(consentMsg.consentUpdate)}`,
           );
 
           consentUpdates.push(consentMsg);

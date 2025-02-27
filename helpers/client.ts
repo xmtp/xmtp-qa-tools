@@ -32,28 +32,40 @@ export const getDbPath = (
   },
 ): string => {
   console.time(`[${name}] - getDbPath`);
-  // const namePath = name.toLowerCase().includes("random")
-  //   ? "random/" + name.toLowerCase()
-  //   : name.toLowerCase();
-  const nameSet = name.toLowerCase();
-  const installationIdSet =
-    instance?.installationId?.toLowerCase() ?? defaultValues.installationId;
-  const sdkVersionSet =
-    instance?.sdkVersion?.toLowerCase() ?? defaultValues.sdkVersion;
-  const libxmtpVersionSet = instance?.libxmtpVersion?.toLowerCase();
-  const identifier = `${nameSet}-${accountAddress}-${installationIdSet}-${sdkVersionSet}-${libxmtpVersionSet}-${env}`;
-  const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
-  let basePath = `${preBasePath}/.data/${nameSet}`;
-  if (tests && tests.testName && tests.testName.includes("bug")) {
-    basePath = `${preBasePath}/bugs/${tests.testName}/.data/${nameSet}`;
+
+  // Extract the base name without installation ID for folder structure
+  const baseName = name.toLowerCase().split("-")[0];
+
+  // For the identifier, use either the name as-is (if it already has installation ID)
+  // or construct it with the installation ID from instance
+  let identifier;
+  if (name.includes("-")) {
+    // Name already has installation ID (e.g., "fabritest-a")
+    identifier = `${name.toLowerCase()}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
+  } else {
+    // Name doesn't have installation ID, use the one from instance
+    const installationId =
+      instance?.installationId?.toLowerCase() ?? defaultValues.installationId;
+    identifier = `${name.toLowerCase()}-${installationId}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
   }
-  console.time(`[${nameSet}] - create basePath`);
+
+  const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
+
+  // Use baseName for the parent folder, not the full name
+  let basePath = `${preBasePath}/.data/${baseName}`;
+
+  if (tests && tests.testName && tests.testName.includes("bug")) {
+    basePath = `${preBasePath}/bugs/${tests.testName}/.data/${baseName}`;
+  }
+
+  console.time(`[${name}] - create basePath`);
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
     console.warn("Creating directory", basePath);
   }
-  console.timeEnd(`[${nameSet}] - create basePath`);
-  console.timeEnd(`[${nameSet}] - getDbPath`);
+  console.timeEnd(`[${name}] - create basePath`);
+  console.timeEnd(`[${name}] - getDbPath`);
+
   return `${basePath}/${identifier}`;
 };
 
