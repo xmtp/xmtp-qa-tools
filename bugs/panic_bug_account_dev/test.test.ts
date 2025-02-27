@@ -1,6 +1,4 @@
 import fs from "fs";
-import path from "path";
-import dotenv from "dotenv";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { loadEnv } from "../../helpers/client";
 import {
@@ -78,23 +76,4 @@ describe(testName, () => {
     expect(messagesfrombug).toBeDefined();
     expect(messagesfrombug.length).toBeGreaterThan(0);
   });
-
-  // it("TC_ReceiveGM: should measure receiving a gm", async () => {
-  //   const gmMessageGenerator = async (i: number, suffix: string) => {
-  //     return `gm-${i + 1}-${suffix}`;
-  //   };
-
-  //   const gmSender = async (convo: Conversation, message: string) => {
-  //     await convo.send(message);
-  //   };
-
-  //   const verifyResult = await verifyStream(
-  //     convo,
-  //     [personas.bug],
-  //     gmMessageGenerator,
-  //     gmSender,
-  //   );
-  //   expect(verifyResult.messages.length).toEqual(1);
-  //   expect(verifyResult.allReceived).toBe(true);
-  // });
 });

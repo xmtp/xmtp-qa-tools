@@ -1,6 +1,7 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
+import test from "node:test";
 import { type Signer } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
@@ -85,38 +86,20 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
  */
 export function loadEnv(testName: string): {
   path: string;
-  parsed: dotenv.DotenvParseOutput | undefined;
 } {
-  // Ensure we're pointing to the bugs directory
-  const bugsDir = path.resolve(process.cwd(), "bugs");
-
-  // Create the specific test directory path
-  const testDir = path.join(bugsDir, testName);
-
   // Create the .env file path
-  const envPath = path.join(".env");
+  let envPath = path.join(".env");
 
   if (testName.includes("bug")) {
     // Ensure the directory exists
-    if (!fs.existsSync(testDir)) {
-      fs.mkdirSync(testDir, { recursive: true });
-    }
-
-    // If the .env file doesn't exist, create an empty one
+    // Ensure we're pointing to the bugs directory
+    envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
     if (!fs.existsSync(envPath)) {
-      fs.writeFileSync(envPath, "# Environment variables for test\n");
+      fs.mkdirSync(envPath, { recursive: true });
     }
   }
+  dotenv.config({ path: envPath });
+  process.env.CURRENT_ENV_PATH = envPath;
 
-  // Load the environment variables
-  const result = dotenv.config({ path: envPath });
-
-  // Store the path in process.env so it can be accessed globally
-  if (testName.includes("bug")) {
-    process.env.CURRENT_ENV_PATH = envPath;
-  }
-  return {
-    path: envPath,
-    parsed: result.parsed,
-  };
+  return envPath;
 }

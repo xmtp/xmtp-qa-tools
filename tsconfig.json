@@ -25,6 +25,6 @@
     "**/*.ts",
     "vitest.config.ts",
     "vite.config.js",
-    "bugs/panic_bug_account_dev/panic_bug_account.test.ts"
+    "bugs/panic_bug_account_dev/test.test.ts"
   ]
 }

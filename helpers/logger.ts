@@ -66,8 +66,10 @@ export async function getNetworkStats() {
 export const createLogger = async (testName: string) => {
   if (!sharedLogger) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    const logFilePath = path.join("logs", `${sanitizedName}.log`);
-
+    let logFilePath = path.join("logs", `${sanitizedName}.log`);
+    if (testName.includes("bug")) {
+      logFilePath = path.join("bugs", testName, `${sanitizedName}.log`);
+    }
     // Shared format for console and memory transport
     const sharedFormat = winston.format.combine(
       winston.format.timestamp(),
