@@ -84,9 +84,7 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
 /**
  * Loads environment variables from the specified test's .env file
  */
-export function loadEnv(testName: string): {
-  path: string;
-} {
+export function loadEnv(testName: string) {
   // Create the .env file path
   let envPath = path.join(".env");
 
@@ -100,6 +98,4 @@ export function loadEnv(testName: string): {
   }
   dotenv.config({ path: envPath });
   process.env.CURRENT_ENV_PATH = envPath;
-
-  return envPath;
 }
