@@ -9,6 +9,7 @@ node_modules
 coverage
 .data/
 !bugs/**/.data/
+!bugs/**/.env
 !bugs/**/.data/.env
 !bugs/**/.data/**/.env
 
