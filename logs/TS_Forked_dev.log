@@ -1,78 +1,78 @@
-[2025-02-28T17:07:09.967Z] [info] [PersonaFactory] Using env keys for bella: 0x7018...
-[2025-02-28T17:07:09.968Z] [info] [PersonaFactory] Using env keys for dave: 0x5ebf...
-[2025-02-28T17:07:09.968Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
-[2025-02-28T17:07:09.968Z] [info] [PersonaFactory] Using env keys for diana: 0x961f...
-[2025-02-28T17:07:09.968Z] [info] [PersonaFactory] Generating new keys for random
-[2025-02-28T17:07:09.998Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
-[2025-02-28T17:07:09.998Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
-[2025-02-28T17:07:12.120Z] [warn] [dave-a] Create XMTP client v:436360a 2.112s
-[2025-02-28T17:07:12.230Z] [warn] [alice-a] Create XMTP client v:436360a 2.222s
-[2025-02-28T17:07:12.296Z] [warn] [elon-a] Create XMTP client v:436360a 2.287s
-[2025-02-28T17:07:12.344Z] [warn] [bella-a] Create XMTP client v:436360a 2.333s
-[2025-02-28T17:07:12.395Z] [warn] [diana-a] Create XMTP client v:436360a 2.387s
-[2025-02-28T17:07:12.491Z] [warn] [bob-a] Create XMTP client v:436360a 2.483s
-[2025-02-28T17:07:12.549Z] [warn] [dave-a] Start message stream 426.046ms
-[2025-02-28T17:07:12.550Z] [warn] [dave-a] Start stream 429.8ms
-[2025-02-28T17:07:12.550Z] [warn] [dave-a] Initialize XMTP client 2.548s
-[2025-02-28T17:07:12.619Z] [warn] [alice-a] Start message stream 388.217ms
-[2025-02-28T17:07:12.619Z] [warn] [alice-a] Start stream 389.019ms
-[2025-02-28T17:07:12.620Z] [warn] [alice-a] Initialize XMTP client 2.613s
-[2025-02-28T17:07:12.663Z] [warn] [elon-a] Start message stream 365.964ms
-[2025-02-28T17:07:12.664Z] [warn] [elon-a] Start stream 366.774ms
-[2025-02-28T17:07:12.664Z] [warn] [elon-a] Initialize XMTP client 2.660s
-[2025-02-28T17:07:12.761Z] [warn] [bella-a] Start message stream 416.744ms
-[2025-02-28T17:07:12.761Z] [warn] [bella-a] Start stream 417.468ms
-[2025-02-28T17:07:12.762Z] [warn] [bella-a] Initialize XMTP client 2.762s
-[2025-02-28T17:07:12.780Z] [warn] [diana-a] Start message stream 384.445ms
-[2025-02-28T17:07:12.781Z] [warn] [diana-a] Start stream 385.645ms
-[2025-02-28T17:07:12.781Z] [warn] [diana-a] Initialize XMTP client 2.777s
-[2025-02-28T17:07:12.851Z] [warn] [bob-a] Start message stream 359.835ms
-[2025-02-28T17:07:12.852Z] [warn] [bob-a] Start stream 359.977ms
-[2025-02-28T17:07:12.852Z] [warn] [bob-a] Initialize XMTP client 2.845s
-[2025-02-28T17:07:14.030Z] [warn] [random-a] Create XMTP client v:436360a 4.021s
-[2025-02-28T17:07:14.443Z] [warn] [random-a] Start message stream 412.318ms
-[2025-02-28T17:07:14.443Z] [warn] [random-a] Start stream 413.033ms
-[2025-02-28T17:07:14.443Z] [warn] [random-a] Initialize XMTP client 4.437s
-[2025-02-28T17:07:17.681Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:17.681Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:17.681Z] [info] Sending message #1: gm-1-zt62k9kim0k
-[2025-02-28T17:07:18.496Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:07:18.497Z] [info] Adding members to trigger epoch transition
-[2025-02-28T17:07:21.711Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:21.711Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:21.711Z] [info] [diana-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:21.711Z] [info] [random-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:21.711Z] [info] Sending message #1: gm-1-cqlj243bae7
-[2025-02-28T17:07:22.479Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:07:30.192Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:30.192Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:30.192Z] [info] [diana-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:30.192Z] [info] [alice-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:30.192Z] [info] Sending message #1: gm-1-1dxpev80e9w
-[2025-02-28T17:07:30.577Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:07:38.310Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:38.311Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:38.311Z] [info] [diana-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:38.311Z] [info] [alice-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:38.311Z] [info] [bob-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:38.311Z] [info] Sending message #1: gm-1-ewaffqhglse
-[2025-02-28T17:07:38.894Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:07:38.895Z] [info] Starting rapid consecutive member changes...
-[2025-02-28T17:07:52.563Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] [diana-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] [alice-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] [bob-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] [random-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:52.563Z] [info] Sending message #1: gm-1-72mym5xyg45
-[2025-02-28T17:07:53.154Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:07:53.155Z] [info] Simulating network partition...
-[2025-02-28T17:07:58.150Z] [info] [dave-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:58.150Z] [info] [elon-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:58.150Z] [info] [diana-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:58.150Z] [info] [alice-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:58.150Z] [info] [bob-a] Collecting 1 messages from convo:e316711ff3c2e55fc4126ec99ba6fda8
-[2025-02-28T17:07:58.151Z] [info] Sending message #1: gm-1-yb8zrv3zx3
-[2025-02-28T17:07:59.139Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:08:00.141Z] [info] {"DNS Lookup":0.00194,"TCP Connection":0.002151,"TLS Handshake":0.58392,"Server Processing":0.770277,"Content Transfer":0.770313}
-[2025-02-28T17:08:00.141Z] [warn] total: 770.313ms, tls: 583.92ms, processing: 186.39300000000003ms
+[2025-02-28T18:02:11.934Z] [info] [PersonaFactory] Using env keys for bella: 0x7018...
+[2025-02-28T18:02:11.935Z] [info] [PersonaFactory] Using env keys for dave: 0x5ebf...
+[2025-02-28T18:02:11.935Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
+[2025-02-28T18:02:11.935Z] [info] [PersonaFactory] Using env keys for diana: 0x961f...
+[2025-02-28T18:02:11.935Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-28T18:02:11.961Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T18:02:11.962Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T18:02:13.930Z] [warn] [dave-a] Create XMTP client v:436360a 1.958s
+[2025-02-28T18:02:13.951Z] [warn] [diana-a] Create XMTP client v:436360a 1.979s
+[2025-02-28T18:02:14.043Z] [warn] [bella-a] Create XMTP client v:436360a 2.071s
+[2025-02-28T18:02:14.321Z] [warn] [elon-a] Create XMTP client v:436360a 2.348s
+[2025-02-28T18:02:14.322Z] [warn] [alice-a] Create XMTP client v:436360a 2.350s
+[2025-02-28T18:02:14.342Z] [warn] [diana-a] Start message stream 389.32ms
+[2025-02-28T18:02:14.343Z] [warn] [diana-a] Start stream 391.664ms
+[2025-02-28T18:02:14.343Z] [warn] [diana-a] Initialize XMTP client 2.375s
+[2025-02-28T18:02:14.347Z] [warn] [dave-a] Start message stream 416.234ms
+[2025-02-28T18:02:14.347Z] [warn] [dave-a] Start stream 416.495ms
+[2025-02-28T18:02:14.347Z] [warn] [dave-a] Initialize XMTP client 2.381s
+[2025-02-28T18:02:14.463Z] [warn] [bella-a] Start message stream 417.872ms
+[2025-02-28T18:02:14.463Z] [warn] [bella-a] Start stream 419.823ms
+[2025-02-28T18:02:14.466Z] [warn] [bella-a] Initialize XMTP client 2.500s
+[2025-02-28T18:02:14.467Z] [warn] [bob-a] Create XMTP client v:436360a 2.495s
+[2025-02-28T18:02:14.720Z] [warn] [elon-a] Start message stream 398.776ms
+[2025-02-28T18:02:14.720Z] [warn] [elon-a] Start stream 399.078ms
+[2025-02-28T18:02:14.720Z] [warn] [elon-a] Initialize XMTP client 2.754s
+[2025-02-28T18:02:14.725Z] [warn] [alice-a] Start message stream 402.609ms
+[2025-02-28T18:02:14.725Z] [warn] [alice-a] Start stream 402.742ms
+[2025-02-28T18:02:14.725Z] [warn] [alice-a] Initialize XMTP client 2.755s
+[2025-02-28T18:02:14.872Z] [warn] [bob-a] Start message stream 404.474ms
+[2025-02-28T18:02:14.872Z] [warn] [bob-a] Start stream 404.694ms
+[2025-02-28T18:02:14.872Z] [warn] [bob-a] Initialize XMTP client 2.901s
+[2025-02-28T18:02:15.807Z] [warn] [random-a] Create XMTP client v:436360a 3.835s
+[2025-02-28T18:02:16.213Z] [warn] [random-a] Start message stream 403.415ms
+[2025-02-28T18:02:16.215Z] [warn] [random-a] Start stream 408.199ms
+[2025-02-28T18:02:16.215Z] [warn] [random-a] Initialize XMTP client 4.245s
+[2025-02-28T18:02:19.379Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:19.379Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:19.379Z] [info] Sending message #1: gm-1-3emlqphf7hl
+[2025-02-28T18:02:19.997Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:02:19.998Z] [info] Adding members to trigger epoch transition
+[2025-02-28T18:02:23.084Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:23.084Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:23.084Z] [info] [diana-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:23.084Z] [info] [random-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:23.084Z] [info] Sending message #1: gm-1-b362icdgdze
+[2025-02-28T18:02:23.706Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:02:31.924Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:31.924Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:31.924Z] [info] [diana-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:31.924Z] [info] [alice-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:31.924Z] [info] Sending message #1: gm-1-snhr90ydi9j
+[2025-02-28T18:02:32.325Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:02:40.835Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:40.835Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:40.835Z] [info] [diana-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:40.835Z] [info] [alice-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:40.835Z] [info] [bob-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:40.835Z] [info] Sending message #1: gm-1-hyu8j1pzqna
+[2025-02-28T18:02:41.464Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:02:41.465Z] [info] Starting rapid consecutive member changes...
+[2025-02-28T18:02:55.295Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] [diana-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] [alice-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] [bob-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] [random-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:02:55.295Z] [info] Sending message #1: gm-1-l5lmb6zmu0j
+[2025-02-28T18:02:55.699Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:02:55.699Z] [info] Simulating network partition...
+[2025-02-28T18:03:00.827Z] [info] [dave-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:03:00.827Z] [info] [elon-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:03:00.827Z] [info] [diana-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:03:00.827Z] [info] [alice-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:03:00.827Z] [info] [bob-a] Collecting 1 messages from convo:4e2a992a3cf65cecbf170b53d2b1a4dc
+[2025-02-28T18:03:00.827Z] [info] Sending message #1: gm-1-j67aqv36ocd
+[2025-02-28T18:03:01.677Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:03:02.875Z] [info] {"DNS Lookup":0.001865,"TCP Connection":0.002066,"TLS Handshake":0.612298,"Server Processing":0.973237,"Content Transfer":0.9737}
+[2025-02-28T18:03:02.875Z] [warn] total: 973.7ms, tls: 612.298ms, processing: 361.40200000000004ms
