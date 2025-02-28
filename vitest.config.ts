@@ -9,6 +9,12 @@ export default defineConfig({
     watch: false,
     testTimeout: 100000,
     hookTimeout: 100000,
+    pool: "threads",
+    poolOptions: {
+      threads: {
+        singleThread: true,
+      },
+    },
     api: {
       host: "0.0.0.0",
       port: 51204,

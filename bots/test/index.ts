@@ -6,18 +6,8 @@ import { type Persona } from "../../helpers/types";
 
 dotenv.config();
 
-const { WALLET_KEY_BOT, ENCRYPTION_KEY_BOT, XMTP_ENV } = process.env;
-
-if (!WALLET_KEY_BOT) {
-  throw new Error("WALLET_KEY_BOT must be set");
-}
-
-if (!ENCRYPTION_KEY_BOT) {
-  throw new Error("ENCRYPTION_KEY_BOT must be set");
-}
-
 let personas: Record<string, Persona> = {};
-const env: XmtpEnv = XMTP_ENV as XmtpEnv;
+const env: XmtpEnv = "dev";
 async function main() {
   const logger = await createLogger("test-bot");
   overrideConsole(logger);
@@ -32,11 +22,8 @@ async function main() {
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
-  console.log(`Agent initialized on`, {
-    inboxId: client.inboxId,
-    accountAddress: client.accountAddress,
-    deeplink: `https://xmtp.chat/dm/${client.accountAddress}?env=${env}`,
-  });
+  console.log(`Agent initialized on ${client.accountAddress}`);
+  console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
 
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();
@@ -67,11 +54,12 @@ async function main() {
       console.log("Creating group...");
       await conversation.send("hang tight, creating group...");
       const groupName = `group-${new Date().toISOString().split("T")[0]}`;
-      const group = await client.conversations.newGroup(
+      const group = await client.conversations.newGroupByInboxIds(
         [
-          personas.alice.client?.accountAddress as `0x${string}`,
-          personas.joe.client?.accountAddress as `0x${string}`,
-          personas.sam.client?.accountAddress as `0x${string}`,
+          personas.alice.client?.inboxId as string,
+          personas.joe.client?.inboxId as string,
+          personas.sam.client?.inboxId as string,
+          message.senderInboxId,
         ],
         {
           groupName: groupName,
@@ -81,11 +69,44 @@ async function main() {
       console.log(
         `Group created with name ${groupName} by ${message.senderInboxId}`,
       );
-
+      // Send random messages from each client in the group
       await group.send(groupName);
 
+      const randomMessages = [
+        "Hello everyone!",
+        "Thanks for adding me to this group",
+        "What's everyone working on today?",
+        "Excited to be here!",
+        "gm to the group",
+      ];
+
+      // Send messages from each persona
+      if (personas.alice.client) {
+        const aliceMessage =
+          randomMessages[Math.floor(Math.random() * randomMessages.length)];
+        await group.send(`Alice says: ${aliceMessage}`);
+      }
+
+      if (personas.joe.client) {
+        const joeMessage =
+          randomMessages[Math.floor(Math.random() * randomMessages.length)];
+        await group.send(`Joe says: ${joeMessage}`);
+      }
+
+      if (personas.sam.client) {
+        const samMessage =
+          randomMessages[Math.floor(Math.random() * randomMessages.length)];
+        await group.send(`Sam says: ${samMessage}`);
+      }
+
+      // Send a message as the bot
+      await group.send("Bot says: Group chat initialized. Welcome everyone!");
+
+      // await conversation.send(
+      //   `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\ne}`,
+      // );
       await conversation.send(
-        `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\n- Description: ${groupName}`,
+        `Group created!\n- ID: ${group.id} - Name: ${groupName}`,
       );
       continue;
     }

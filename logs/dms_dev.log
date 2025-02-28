@@ -1,11 +1,18 @@
-[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for bob: 0xd335...
-[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for joe: 0x8b27...
-[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for sam: 0xd9ff...
-[2025-02-28T00:06:38.036Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/joe
-[2025-02-28T00:06:38.036Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/sam
-[2025-02-28T00:06:40.335Z] [warn] [bob-a] Create XMTP client v:436360a 2.298s
-[2025-02-28T00:06:40.757Z] [warn] [bob-a] Start message stream 419.949ms
-[2025-02-28T00:06:40.757Z] [warn] [bob-a] Start stream 422.253ms
-[2025-02-28T00:06:40.757Z] [warn] [bob-a] Initialize XMTP client 2.744s
-[2025-02-28T00:06:41.742Z] [warn] [sam-a] Create XMTP client v:436360a 3.705s
-[2025-02-28T00:06:41.890Z] [warn] [joe-a] Create XMTP client v:436360a 3.853s
+[2025-02-28T00:45:35.567Z] [info] [PersonaFactory] Using env keys for bob: 0xd335...
+[2025-02-28T00:45:35.568Z] [info] [PersonaFactory] Using env keys for joe: 0x8b27...
+[2025-02-28T00:45:35.568Z] [info] [PersonaFactory] Using env keys for sam: 0xd9ff...
+[2025-02-28T00:45:37.561Z] [warn] [bob-a] Create XMTP client v:436360a 1.968s
+[2025-02-28T00:45:37.774Z] [warn] [joe-a] Create XMTP client v:436360a 2.180s
+[2025-02-28T00:45:37.836Z] [warn] [sam-a] Create XMTP client v:436360a 2.243s
+[2025-02-28T00:45:37.965Z] [warn] [bob-a] Start message stream 401.829ms
+[2025-02-28T00:45:37.965Z] [warn] [bob-a] Start stream 403.765ms
+[2025-02-28T00:45:37.965Z] [warn] [bob-a] Initialize XMTP client 2.396s
+[2025-02-28T00:45:38.199Z] [warn] [sam-a] Start message stream 363.294ms
+[2025-02-28T00:45:38.199Z] [warn] [sam-a] Start stream 363.52ms
+[2025-02-28T00:45:38.200Z] [warn] [sam-a] Initialize XMTP client 2.608s
+[2025-02-28T00:45:38.586Z] [warn] [joe-a] Start message stream 810.31ms
+[2025-02-28T00:45:38.587Z] [warn] [joe-a] Start stream 811.942ms
+[2025-02-28T00:45:38.587Z] [warn] [joe-a] Initialize XMTP client 2.997s
+[2025-02-28T00:45:38.588Z] [info] bob 0x7282b3Bb823E3e224078222566AEF9037EC39269
+[2025-02-28T00:45:38.588Z] [info] joe 0x5acea5e580ec2093b5A0Ef4Eb277Dd1716ddA45a
+[2025-02-28T00:45:38.589Z] [info] sam 0x42551088486b4841188f3eCb013e4EB2Ecb03dF4

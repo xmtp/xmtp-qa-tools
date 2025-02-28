@@ -1,52 +1,23 @@
-[2025-02-27T21:46:09.947Z] [info] [PersonaFactory] Generating new keys for bella
-[2025-02-27T21:46:09.970Z] [info] [PersonaFactory] Using env keys for dave: 0x3dee...
-[2025-02-27T21:46:09.970Z] [info] [PersonaFactory] Using env keys for elon: 0x7d69...
-[2025-02-27T21:46:09.970Z] [info] [PersonaFactory] Generating new keys for diana
-[2025-02-27T21:46:09.971Z] [info] [PersonaFactory] Generating new keys for random
-[2025-02-27T21:46:09.977Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bella
-[2025-02-27T21:46:09.978Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/diana
-[2025-02-27T21:46:12.123Z] [warn] [dave-a] Create XMTP client v:436360a 2.146s
-[2025-02-27T21:46:12.333Z] [warn] [elon-a] Create XMTP client v:436360a 2.356s
-[2025-02-27T21:46:12.538Z] [warn] [dave-a] Start message stream 414.211ms
-[2025-02-27T21:46:12.538Z] [warn] [dave-a] Start stream 414.715ms
-[2025-02-27T21:46:12.538Z] [warn] [dave-a] Initialize XMTP client 2.563s
-[2025-02-27T21:46:12.738Z] [warn] [elon-a] Start message stream 404.154ms
-[2025-02-27T21:46:12.738Z] [warn] [elon-a] Start stream 404.533ms
-[2025-02-27T21:46:12.738Z] [warn] [elon-a] Initialize XMTP client 2.762s
-[2025-02-27T21:46:13.932Z] [warn] [bella-a] Create XMTP client v:436360a 3.955s
-[2025-02-27T21:46:14.048Z] [warn] [diana-a] Create XMTP client v:436360a 4.070s
-[2025-02-27T21:46:14.070Z] [warn] [random-a] Create XMTP client v:436360a 4.092s
-[2025-02-27T21:46:14.335Z] [warn] [bella-a] Start message stream 403.229ms
-[2025-02-27T21:46:14.336Z] [warn] [bella-a] Start stream 403.531ms
-[2025-02-27T21:46:14.336Z] [warn] [bella-a] Initialize XMTP client 4.362s
-[2025-02-27T21:46:14.458Z] [warn] [diana-a] Start message stream 409.272ms
-[2025-02-27T21:46:14.458Z] [warn] [diana-a] Start stream 409.532ms
-[2025-02-27T21:46:14.458Z] [warn] [diana-a] Initialize XMTP client 4.482s
-[2025-02-27T21:46:14.484Z] [warn] [random-a] Start message stream 413.657ms
-[2025-02-27T21:46:14.484Z] [warn] [random-a] Start stream 414.301ms
-[2025-02-27T21:46:14.484Z] [warn] [random-a] Initialize XMTP client 4.508s
-[2025-02-27T21:46:14.485Z] [warn] getWorkers 4.539s
-[2025-02-27T21:46:16.668Z] [warn] newGroup 2.181s
-[2025-02-27T21:46:17.670Z] [info] [elon-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:17.672Z] [info] Sending message #1: gm-1-3pvwnkl56w4
-[2025-02-27T21:46:18.912Z] [info] All participants received the expected number of messages.
-[2025-02-27T21:46:19.916Z] [info] [elon-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:19.917Z] [info] Sending message #1: New name-1-eu1l93y0a
-[2025-02-27T21:46:20.559Z] [info] All participants received the expected number of messages.
-[2025-02-27T21:46:20.559Z] [warn] updateName 1.646s
-[2025-02-27T21:46:21.561Z] [info] [elon-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:21.561Z] [info] Sending message #1: gm-1-9qt721o1r0c
-[2025-02-27T21:46:21.953Z] [info] All participants received the expected number of messages.
-[2025-02-27T21:46:22.814Z] [warn] addMembers 860.476ms
-[2025-02-27T21:46:23.816Z] [info] [elon-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:23.817Z] [info] Sending message #1: gm-1-w0otvlvhql
-[2025-02-27T21:46:24.883Z] [info] All participants received the expected number of messages.
-[2025-02-27T21:46:26.320Z] [warn] removeMembers 1.436s
-[2025-02-27T21:46:27.322Z] [info] [dave-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:27.322Z] [info] [elon-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:27.323Z] [info] [diana-a] Collecting 1 messages from convo:19a075007321452f166cee53abdd25e3
-[2025-02-27T21:46:27.323Z] [info] Sending message #1: gm-1-mq6sco143n
-[2025-02-27T21:46:27.709Z] [info] All participants received the expected number of messages.
-[2025-02-27T21:46:27.710Z] [warn] verifyStream 1.390s
-[2025-02-27T21:46:29.462Z] [info] {"DNS Lookup":0.221332,"TCP Connection":0.221572,"TLS Handshake":1.143436,"Server Processing":1.522592,"Content Transfer":1.52264}
-[2025-02-27T21:46:29.462Z] [warn] total: 1522.64ms, tls: 1143.436ms, processing: 379.2040000000002ms
+[2025-02-28T00:45:09.167Z] [info] [PersonaFactory] Generating new keys for bella
+[2025-02-28T00:45:09.220Z] [info] [PersonaFactory] Generating new keys for dave
+[2025-02-28T00:45:09.233Z] [info] [PersonaFactory] Using env keys for elon: 0x33c5...
+[2025-02-28T00:45:09.233Z] [info] [PersonaFactory] Generating new keys for diana
+[2025-02-28T00:45:09.236Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-28T00:45:09.338Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bella
+[2025-02-28T00:45:09.339Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/diana
+[2025-02-28T00:45:13.729Z] [warn] [bella-a] Create XMTP client v:436360a 4.391s
+[2025-02-28T00:45:14.029Z] [warn] [bella-a] Initialize XMTP client 4.693s
+[2025-02-28T00:45:14.328Z] [warn] [dave-a] Create XMTP client v:436360a 4.989s
+[2025-02-28T00:45:14.507Z] [warn] [diana-a] Create XMTP client v:436360a 5.168s
+[2025-02-28T00:45:14.762Z] [warn] [dave-a] Start message stream 433.908ms
+[2025-02-28T00:45:14.763Z] [warn] [dave-a] Start stream 434.276ms
+[2025-02-28T00:45:14.763Z] [warn] [dave-a] Initialize XMTP client 5.427s
+[2025-02-28T00:45:15.017Z] [warn] [diana-a] Start message stream 509.356ms
+[2025-02-28T00:45:15.017Z] [warn] [diana-a] Start stream 509.695ms
+[2025-02-28T00:45:15.017Z] [warn] [diana-a] Initialize XMTP client 5.680s
+[2025-02-28T00:45:15.026Z] [warn] [random-a] Create XMTP client v:436360a 5.687s
+[2025-02-28T00:45:15.460Z] [warn] [random-a] Start message stream 433.528ms
+[2025-02-28T00:45:15.460Z] [warn] [random-a] Start stream 433.83ms
+[2025-02-28T00:45:15.460Z] [warn] [random-a] Initialize XMTP client 6.122s
+[2025-02-28T00:45:15.597Z] [info] {"DNS Lookup":0.018627,"TCP Connection":0.018748,"TLS Handshake":0.844339,"Server Processing":1.070919,"Content Transfer":1.070938}
+[2025-02-28T00:45:15.597Z] [warn] total: 1070.9379999999999ms, tls: 844.3389999999999ms, processing: 226.59899999999993ms

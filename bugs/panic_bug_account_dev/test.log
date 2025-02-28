@@ -1,21 +1,23 @@
-[2025-02-27T22:06:49.292Z] [info] [PersonaFactory] Using env keys for bob: 0xfb19...
-[2025-02-27T22:06:49.292Z] [info] [PersonaFactory] Using env keys for bug: 0xed8a...
-[2025-02-27T22:06:49.292Z] [info] [PersonaFactory] Using env keys for sam: 0xf297...
-[2025-02-27T22:06:51.871Z] [warn] [bug-a] Create XMTP client v:436360a 2.553s
-[2025-02-27T22:06:51.893Z] [warn] [sam-a] Create XMTP client v:436360a 2.575s
-[2025-02-27T22:06:51.994Z] [warn] [bob-a] Create XMTP client v:436360a 2.676s
-[2025-02-27T22:06:52.091Z] [warn] [sam-a] Initialize XMTP client 2.775s
-[2025-02-27T22:06:52.675Z] [warn] [bob-a] Start message stream 680.881ms
-[2025-02-27T22:06:52.677Z] [warn] [bob-a] Start stream 682.061ms
-[2025-02-27T22:06:52.677Z] [warn] [bob-a] Initialize XMTP client 3.382s
-[2025-02-27T22:06:52.937Z] [warn] [bug-a] Start message stream 1.066s
-[2025-02-27T22:06:52.938Z] [warn] [bug-a] Start stream 1.067s
-[2025-02-27T22:06:52.938Z] [warn] [bug-a] Initialize XMTP client 3.622s
-[2025-02-27T22:06:52.939Z] [info] bob 0x2B092ED3bD04D544b67474Ca37f4aC0bB0D9f47c
-[2025-02-27T22:06:52.939Z] [info] bug 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
-[2025-02-27T22:06:52.940Z] [info] sam 0x291BaB7029DA8567896aF3b92D8aC757aEF19dB9
-[2025-02-27T22:06:53.270Z] [info] convo caea9e5232c122b0faf633acb72f4636
-[2025-02-27T22:06:55.378Z] [info] [bob] Creating DM with bug at 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
-[2025-02-27T22:06:56.508Z] [info] conversations 0
-[2025-02-27T22:06:57.792Z] [info] {"DNS Lookup":0.002081,"TCP Connection":0.002281,"TLS Handshake":0.603124,"Server Processing":1.014417,"Content Transfer":1.014433}
-[2025-02-27T22:06:57.792Z] [warn] total: 1014.4329999999999ms, tls: 603.124ms, processing: 411.30899999999986ms
+[2025-02-28T00:45:17.378Z] [info] [PersonaFactory] Using env keys for bob: 0xfb19...
+[2025-02-28T00:45:17.378Z] [info] [PersonaFactory] Using env keys for bug: 0xed8a...
+[2025-02-28T00:45:17.378Z] [info] [PersonaFactory] Using env keys for sam: 0xf297...
+[2025-02-28T00:45:19.503Z] [warn] [bob-a] Create XMTP client v:436360a 2.098s
+[2025-02-28T00:45:19.607Z] [warn] [bug-a] Create XMTP client v:436360a 2.202s
+[2025-02-28T00:45:19.908Z] [warn] [bob-a] Start message stream 404.853ms
+[2025-02-28T00:45:19.908Z] [warn] [bob-a] Start stream 405.341ms
+[2025-02-28T00:45:19.908Z] [warn] [bob-a] Initialize XMTP client 2.528s
+[2025-02-28T00:45:20.016Z] [warn] [sam-a] Create XMTP client v:436360a 2.611s
+[2025-02-28T00:45:20.421Z] [warn] [sam-a] Start message stream 405.296ms
+[2025-02-28T00:45:20.422Z] [warn] [sam-a] Start stream 405.555ms
+[2025-02-28T00:45:20.422Z] [warn] [sam-a] Initialize XMTP client 3.018s
+[2025-02-28T00:45:20.504Z] [warn] [bug-a] Start message stream 896.517ms
+[2025-02-28T00:45:20.504Z] [warn] [bug-a] Start stream 896.94ms
+[2025-02-28T00:45:20.504Z] [warn] [bug-a] Initialize XMTP client 3.101s
+[2025-02-28T00:45:20.504Z] [info] bob 0x2B092ED3bD04D544b67474Ca37f4aC0bB0D9f47c
+[2025-02-28T00:45:20.504Z] [info] bug 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
+[2025-02-28T00:45:20.505Z] [info] sam 0x291BaB7029DA8567896aF3b92D8aC757aEF19dB9
+[2025-02-28T00:45:21.118Z] [info] convo caea9e5232c122b0faf633acb72f4636
+[2025-02-28T00:45:22.479Z] [info] [bob] Creating DM with bug at 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
+[2025-02-28T00:45:23.832Z] [info] conversations 0
+[2025-02-28T00:45:24.830Z] [info] {"DNS Lookup":0.001758,"TCP Connection":0.001947,"TLS Handshake":0.59056,"Server Processing":0.77453,"Content Transfer":0.774544}
+[2025-02-28T00:45:24.830Z] [warn] total: 774.544ms, tls: 590.56ms, processing: 183.98400000000004ms

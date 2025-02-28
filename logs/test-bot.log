@@ -1,0 +1,48 @@
+[2025-02-28T01:00:33.303Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T01:00:33.303Z] [info] [PersonaFactory] Using env keys for bot: 0x7493...
+[2025-02-28T01:00:33.303Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T01:00:33.303Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
+[2025-02-28T01:00:33.303Z] [info] [PersonaFactory] Using env keys for sam: 0xfae4...
+[2025-02-28T01:00:33.333Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
+[2025-02-28T01:00:33.334Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bot
+[2025-02-28T01:00:33.334Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/alice
+[2025-02-28T01:00:33.334Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/joe
+[2025-02-28T01:00:33.334Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/sam
+[2025-02-28T01:00:37.153Z] [warn] [joe-a] Create XMTP client v:436360a 3.819s
+[2025-02-28T01:00:37.216Z] [warn] [bob-a] Create XMTP client v:436360a 3.883s
+[2025-02-28T01:00:37.271Z] [warn] [alice-a] Create XMTP client v:436360a 3.937s
+[2025-02-28T01:00:37.390Z] [warn] [bot-a] Create XMTP client v:436360a 4.056s
+[2025-02-28T01:00:37.450Z] [warn] [sam-a] Create XMTP client v:436360a 4.116s
+[2025-02-28T01:00:37.560Z] [warn] [joe-a] Start message stream 405.94ms
+[2025-02-28T01:00:37.560Z] [warn] [joe-a] Start stream 406.295ms
+[2025-02-28T01:00:37.560Z] [warn] [joe-a] Initialize XMTP client 4.229s
+[2025-02-28T01:00:37.624Z] [warn] [bob-a] Start message stream 407.171ms
+[2025-02-28T01:00:37.624Z] [warn] [bob-a] Start stream 407.35ms
+[2025-02-28T01:00:37.624Z] [warn] [bob-a] Initialize XMTP client 4.319s
+[2025-02-28T01:00:37.675Z] [warn] [alice-a] Start message stream 403.696ms
+[2025-02-28T01:00:37.675Z] [warn] [alice-a] Start stream 403.837ms
+[2025-02-28T01:00:37.675Z] [warn] [alice-a] Initialize XMTP client 4.344s
+[2025-02-28T01:00:37.815Z] [warn] [bot-a] Start message stream 423.126ms
+[2025-02-28T01:00:37.816Z] [warn] [bot-a] Start stream 425.382ms
+[2025-02-28T01:00:37.816Z] [warn] [bot-a] Initialize XMTP client 4.487s
+[2025-02-28T01:00:37.862Z] [warn] [sam-a] Start message stream 411.032ms
+[2025-02-28T01:00:37.862Z] [warn] [sam-a] Start stream 411.807ms
+[2025-02-28T01:00:37.863Z] [warn] [sam-a] Initialize XMTP client 4.531s
+[2025-02-28T01:00:37.863Z] [info] Syncing conversations...
+[2025-02-28T01:00:38.230Z] [info] Agent initialized on 0x9A39e9073512956f825954a759926ab46EA58495
+[2025-02-28T01:00:38.230Z] [info] https://xmtp.chat/dm/0x9A39e9073512956f825954a759926ab46EA58495?env=dev
+[2025-02-28T01:00:38.230Z] [info] Waiting for messages...
+[2025-02-28T01:01:47.359Z] [info] Received message: Hi by 9304aef6f8ab279e3907effd46158318e51974df935221d99ac2477f2b361129
+[2025-02-28T01:01:48.927Z] [info] Waiting for messages...
+[2025-02-28T01:01:50.425Z] [info] Received message: Hi by 9304aef6f8ab279e3907effd46158318e51974df935221d99ac2477f2b361129
+[2025-02-28T01:01:51.323Z] [info] Waiting for messages...
+[2025-02-28T01:01:54.210Z] [info] Received message: /group by 9304aef6f8ab279e3907effd46158318e51974df935221d99ac2477f2b361129
+[2025-02-28T01:01:54.211Z] [info] Creating group...
+[2025-02-28T01:01:57.977Z] [info] Group created with name group-2025-02-28 by 9304aef6f8ab279e3907effd46158318e51974df935221d99ac2477f2b361129
+[2025-02-28T01:06:31.095Z] [info] Received message: Hi by 6e0fb90fb15a189c01b73ddc70e19fc021f266d9698a49e652846a1cf0dce204
+[2025-02-28T01:06:32.766Z] [info] Waiting for messages...
+[2025-02-28T01:06:34.577Z] [info] Received message: Gm by 6e0fb90fb15a189c01b73ddc70e19fc021f266d9698a49e652846a1cf0dce204
+[2025-02-28T01:06:35.209Z] [info] Waiting for messages...
+[2025-02-28T01:06:38.680Z] [info] Received message: /group by 6e0fb90fb15a189c01b73ddc70e19fc021f266d9698a49e652846a1cf0dce204
+[2025-02-28T01:06:38.681Z] [info] Creating group...
+[2025-02-28T01:06:42.056Z] [info] Group created with name group-2025-02-28 by 6e0fb90fb15a189c01b73ddc70e19fc021f266d9698a49e652846a1cf0dce204
