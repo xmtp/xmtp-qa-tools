@@ -1,4 +1,4 @@
-name: TS_Stream_Loss
+name: TS_Streams
 description: "should verify message loss when receiving via 200 streams"
 
 on:
