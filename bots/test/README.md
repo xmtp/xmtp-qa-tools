@@ -19,6 +19,5 @@ This agent performs a series of commands to interact with conversations using th
 git clone https://github.com/ephemeraHQ/qa-testing/
 cd qa-testing
 yarn
-yarn build
 yarn bot test
 ```
