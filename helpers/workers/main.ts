@@ -29,13 +29,18 @@ export type ConsentStreamWorker = {
 const workerBootstrap = /* JavaScript */ `
   import { createRequire } from "node:module";
   import { workerData } from "node:worker_threads";
+  import { fileURLToPath } from "node:url";
+  import { dirname } from "node:path";
 
-  const filename = "${import.meta.url}";
-  const require = createRequire(filename);
-  const { tsImport } = require("tsx/esm/api");
+  const __filename = fileURLToPath("${import.meta.url}");
+  const __dirname = dirname(__filename);
+  const require = createRequire(__filename);
+  
+  // Use dynamic import instead if possible
+  const { tsImport } = await import("tsx/esm/api");
   
   // This loads your worker code.
-  tsImport(workerData.__ts_worker_filename, filename);
+  await tsImport(workerData.__ts_worker_filename, __filename);
 `;
 
 export class WorkerClient extends Worker {

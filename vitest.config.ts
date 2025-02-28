@@ -11,9 +11,7 @@ export default defineConfig({
     hookTimeout: 100000,
     pool: "threads",
     poolOptions: {
-      threads: {
-        singleThread: true,
-      },
+      singleThread: true,
     },
     api: {
       host: "0.0.0.0",

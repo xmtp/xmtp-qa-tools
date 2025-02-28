@@ -1,169 +1,170 @@
-[2025-02-28T17:29:13.420Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
-[2025-02-28T17:29:13.420Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
-[2025-02-28T17:29:13.420Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
-[2025-02-28T17:29:13.420Z] [info] [PersonaFactory] Using env keys for fabri: 0x709e...
-[2025-02-28T17:29:13.420Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
-[2025-02-28T17:29:15.586Z] [warn] [fabri-a] Create XMTP client v:436360a 2.129s
-[2025-02-28T17:29:15.642Z] [warn] [alice-a] Create XMTP client v:436360a 2.184s
-[2025-02-28T17:29:15.683Z] [warn] [bob-a] Create XMTP client v:436360a 2.225s
-[2025-02-28T17:29:15.747Z] [warn] [joe-a] Create XMTP client v:436360a 2.288s
-[2025-02-28T17:29:15.789Z] [warn] [elon-a] Create XMTP client v:436360a 2.331s
-[2025-02-28T17:29:15.988Z] [warn] [fabri-a] Start message stream 400.918ms
-[2025-02-28T17:29:15.989Z] [warn] [fabri-a] Start stream 402.022ms
-[2025-02-28T17:29:15.989Z] [warn] [fabri-a] Initialize XMTP client 2.534s
-[2025-02-28T17:29:16.030Z] [warn] [bob-a] Start message stream 345.999ms
-[2025-02-28T17:29:16.030Z] [warn] [bob-a] Start stream 347.37ms
-[2025-02-28T17:29:16.031Z] [warn] [bob-a] Initialize XMTP client 2.609s
-[2025-02-28T17:29:16.036Z] [warn] [alice-a] Start message stream 394.183ms
-[2025-02-28T17:29:16.036Z] [warn] [alice-a] Start stream 394.653ms
-[2025-02-28T17:29:16.037Z] [warn] [alice-a] Initialize XMTP client 2.581s
-[2025-02-28T17:29:16.151Z] [warn] [joe-a] Start message stream 404.298ms
-[2025-02-28T17:29:16.152Z] [warn] [joe-a] Start stream 404.809ms
-[2025-02-28T17:29:16.152Z] [warn] [joe-a] Initialize XMTP client 2.701s
-[2025-02-28T17:29:16.153Z] [warn] [elon-a] Start message stream 363.712ms
-[2025-02-28T17:29:16.153Z] [warn] [elon-a] Start stream 363.864ms
-[2025-02-28T17:29:16.153Z] [warn] [elon-a] Initialize XMTP client 2.700s
-[2025-02-28T17:29:16.353Z] [info] [alice-a] Collecting 1 messages from convo:9e2213b61d662acd353aa4442db7ce6e
-[2025-02-28T17:29:16.353Z] [info] Sending message #1: gm-1-t7xrn8vc1rr
-[2025-02-28T17:29:17.476Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:29:17.831Z] [info] [alice-a] Collecting 1 messages from convo:9e2213b61d662acd353aa4442db7ce6e
-[2025-02-28T17:29:17.831Z] [info] Sending message #1: gm-1-a0rga5hs55
-[2025-02-28T17:29:18.642Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:29:18.826Z] [info] [fabri-a] Collecting 1 messages from convo:c3b8445109fbab04af00788c1f4094e8
-[2025-02-28T17:29:18.826Z] [info] Sending message #1: gm-1-pyd7mrfmze9
-[2025-02-28T17:29:20.035Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:29:20.222Z] [info] [joe-a] Collecting 1 messages from convo:986ad97f3b975921dfc0a7657af107db
-[2025-02-28T17:29:20.222Z] [info] Sending message #1: gm-1-90leuj1c25v
-[2025-02-28T17:29:21.417Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:29:23.770Z] [info] name: elon installations: 1
-[2025-02-28T17:29:23.770Z] [info] name: bob installations: 2
-[2025-02-28T17:29:23.770Z] [info] name: joe installations: 2
-[2025-02-28T17:29:23.770Z] [info] name: alice installations: 2
-[2025-02-28T17:29:23.770Z] [info] name: fabri installations: 1
-[2025-02-28T17:29:23.770Z] [info] [joe-a] Collecting 1 messages from convo:30c51069c7a7a1d3b1377c4e324870e8
-[2025-02-28T17:29:23.770Z] [info] [elon-a] Collecting 1 messages from convo:30c51069c7a7a1d3b1377c4e324870e8
-[2025-02-28T17:29:23.770Z] [info] [fabri-a] Collecting 1 messages from convo:30c51069c7a7a1d3b1377c4e324870e8
-[2025-02-28T17:29:23.770Z] [info] Sending message #1: gm-1-srmzh7cvzb
-[2025-02-28T17:29:24.882Z] [info] All participants received the expected number of messages.
-[2025-02-28T17:29:26.095Z] [info] {"DNS Lookup":0.023508,"TCP Connection":0.02374,"TLS Handshake":0.605274,"Server Processing":0.974647,"Content Transfer":0.974702}
-[2025-02-28T17:29:26.095Z] [warn] total: 974.702ms, tls: 605.274ms, processing: 369.428ms
-[2025-02-28T17:29:27.141Z] [info] {"DNS Lookup":0.001736,"TCP Connection":0.001909,"TLS Handshake":0.591926,"Server Processing":0.781729,"Content Transfer":0.781748}
-[2025-02-28T17:29:27.141Z] [warn] total: 781.748ms, tls: 591.9259999999999ms, processing: 189.82200000000012ms
-[2025-02-28T17:29:27.141Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
-[2025-02-28T17:29:27.141Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
-[2025-02-28T17:29:27.141Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
-[2025-02-28T17:29:27.141Z] [info] [PersonaFactory] Using env keys for fabri: 0x709e...
-[2025-02-28T17:29:27.141Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
-[2025-02-28T17:29:29.263Z] [warn] [fabri-a] Create XMTP client v:436360a 2.115s
-[2025-02-28T17:29:29.263Z] [info] [fabri-a] Start conversation stream
-[2025-02-28T17:29:29.265Z] [info] [fabri-a] Initial conversations count: 11
-[2025-02-28T17:29:29.265Z] [info] [fabri-a] Conversation stream started
-[2025-02-28T17:29:29.265Z] [warn] [fabri-a] Initialize XMTP client 2.119s
-[2025-02-28T17:29:29.291Z] [warn] [bob-a] Create XMTP client v:436360a 2.143s
-[2025-02-28T17:29:29.291Z] [info] [bob-a] Start conversation stream
-[2025-02-28T17:29:29.294Z] [info] [bob-a] Initial conversations count: 25
-[2025-02-28T17:29:29.294Z] [info] [bob-a] Conversation stream started
-[2025-02-28T17:29:29.294Z] [warn] [bob-a] Initialize XMTP client 2.151s
-[2025-02-28T17:29:29.485Z] [warn] [elon-a] Create XMTP client v:436360a 2.337s
-[2025-02-28T17:29:29.485Z] [info] [elon-a] Start conversation stream
-[2025-02-28T17:29:29.489Z] [info] [elon-a] Initial conversations count: 29
-[2025-02-28T17:29:29.489Z] [info] [elon-a] Conversation stream started
-[2025-02-28T17:29:29.489Z] [warn] [elon-a] Initialize XMTP client 2.345s
-[2025-02-28T17:29:29.497Z] [warn] [joe-a] Create XMTP client v:436360a 2.349s
-[2025-02-28T17:29:29.497Z] [info] [joe-a] Start conversation stream
-[2025-02-28T17:29:29.497Z] [info] [joe-a] Initial conversations count: 17
-[2025-02-28T17:29:29.497Z] [info] [joe-a] Conversation stream started
-[2025-02-28T17:29:29.497Z] [warn] [joe-a] Initialize XMTP client 2.353s
-[2025-02-28T17:29:29.571Z] [warn] [alice-a] Create XMTP client v:436360a 2.423s
-[2025-02-28T17:29:29.571Z] [info] [alice-a] Start conversation stream
-[2025-02-28T17:29:29.576Z] [info] [alice-a] Initial conversations count: 33
-[2025-02-28T17:29:29.576Z] [info] [alice-a] Conversation stream started
-[2025-02-28T17:29:29.576Z] [warn] [alice-a] Initialize XMTP client 2.429s
-[2025-02-28T17:29:29.576Z] [info] [alice] Starting group conversation stream verification test with 2 participants
-[2025-02-28T17:29:29.576Z] [info] [bob-a] Collecting 1 conversations from peer: 93946e68eb4e45762a71eb4d2ec81ce08c40ba65ab0ba8ca2c2ad3f971bf5af8
-[2025-02-28T17:29:29.576Z] [info] [joe-a] Collecting 1 conversations from peer: 93946e68eb4e45762a71eb4d2ec81ce08c40ba65ab0ba8ca2c2ad3f971bf5af8
-[2025-02-28T17:29:29.576Z] [info] [alice] Creating new group conversation with 2 participants
-[2025-02-28T17:29:29.966Z] [info] [alice-a] New conversation in stream: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.121Z] [info] [alice] Created group conversation with ID: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.121Z] [info] [bob-a] New conversation in stream: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.121Z] [info] [bob-a] Received conversation event, id: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.190Z] [info] [joe-a] New conversation in stream: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.190Z] [info] [joe-a] Received conversation event, id: a1ffc0c757f3b3cbd38756db2ef8ff78
-[2025-02-28T17:29:32.190Z] [info] [alice] Received 2 group conversation notifications
-[2025-02-28T17:29:32.190Z] [info] [fabri] Starting group conversation stream verification test with 4 participants
-[2025-02-28T17:29:32.190Z] [info] [alice-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
-[2025-02-28T17:29:32.190Z] [info] [bob-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
-[2025-02-28T17:29:32.190Z] [info] [joe-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
-[2025-02-28T17:29:32.190Z] [info] [elon-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
-[2025-02-28T17:29:32.190Z] [info] [fabri] Creating new group conversation with 4 participants
-[2025-02-28T17:29:32.193Z] [info] [fabri-a] New conversation in stream: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.551Z] [info] [alice-a] New conversation in stream: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.551Z] [info] [alice-a] Received conversation event, id: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.571Z] [info] [joe-a] New conversation in stream: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.571Z] [info] [joe-a] Received conversation event, id: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.574Z] [info] [elon-a] New conversation in stream: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.574Z] [info] [elon-a] Received conversation event, id: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.575Z] [info] [fabri] Created group conversation with ID: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.642Z] [info] [bob-a] New conversation in stream: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.642Z] [info] [bob-a] Received conversation event, id: 7c47ab3c41bbe91fabaa6082d4dbe3fb
-[2025-02-28T17:29:34.643Z] [info] [fabri] Received 4 group conversation notifications
-[2025-02-28T17:29:35.851Z] [info] {"DNS Lookup":0.001828,"TCP Connection":0.002039,"TLS Handshake":0.596744,"Server Processing":0.980439,"Content Transfer":0.980488}
-[2025-02-28T17:29:35.851Z] [warn] total: 980.488ms, tls: 596.744ms, processing: 383.744ms
-[2025-02-28T17:29:36.847Z] [info] {"DNS Lookup":0.00179,"TCP Connection":0.001977,"TLS Handshake":0.58303,"Server Processing":0.771801,"Content Transfer":0.771954}
-[2025-02-28T17:29:36.847Z] [warn] total: 771.9540000000001ms, tls: 583.0300000000001ms, processing: 188.92399999999998ms
-[2025-02-28T17:29:36.847Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
-[2025-02-28T17:29:36.847Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
-[2025-02-28T17:29:36.847Z] [info] [PersonaFactory] Using env keys for charlie: 0x9694...
-[2025-02-28T17:29:36.847Z] [info] [PersonaFactory] Using env keys for dave: 0x5ebf...
-[2025-02-28T17:29:36.848Z] [info] [PersonaFactory] Using env keys for eve: 0x2c2b...
-[2025-02-28T17:29:36.848Z] [info] [PersonaFactory] Generating new keys for random
-[2025-02-28T17:29:39.139Z] [warn] [eve-a] Create XMTP client v:436360a 2.284s
-[2025-02-28T17:29:39.139Z] [info] [eve-a] Start consent stream
-[2025-02-28T17:29:39.139Z] [info] [eve-a] Consent stream started
-[2025-02-28T17:29:39.139Z] [warn] [eve-a] Initialize XMTP client 2.286s
-[2025-02-28T17:29:39.179Z] [warn] [alice-a] Create XMTP client v:436360a 2.325s
-[2025-02-28T17:29:39.179Z] [info] [alice-a] Start consent stream
-[2025-02-28T17:29:39.179Z] [info] [alice-a] Consent stream started
-[2025-02-28T17:29:39.179Z] [warn] [alice-a] Initialize XMTP client 2.329s
-[2025-02-28T17:29:39.234Z] [warn] [bob-a] Create XMTP client v:436360a 2.379s
-[2025-02-28T17:29:39.234Z] [info] [bob-a] Start consent stream
-[2025-02-28T17:29:39.234Z] [info] [bob-a] Consent stream started
-[2025-02-28T17:29:39.234Z] [warn] [bob-a] Initialize XMTP client 2.383s
-[2025-02-28T17:29:39.362Z] [warn] [charlie-a] Create XMTP client v:436360a 2.508s
-[2025-02-28T17:29:39.362Z] [info] [charlie-a] Start consent stream
-[2025-02-28T17:29:39.362Z] [info] [charlie-a] Consent stream started
-[2025-02-28T17:29:39.362Z] [warn] [charlie-a] Initialize XMTP client 2.511s
-[2025-02-28T17:29:39.400Z] [warn] [dave-a] Create XMTP client v:436360a 2.546s
-[2025-02-28T17:29:39.400Z] [info] [dave-a] Start consent stream
-[2025-02-28T17:29:39.401Z] [info] [dave-a] Consent stream started
-[2025-02-28T17:29:39.401Z] [warn] [dave-a] Initialize XMTP client 2.549s
-[2025-02-28T17:29:40.850Z] [warn] [random-a] Create XMTP client v:436360a 3.995s
-[2025-02-28T17:29:40.850Z] [info] [random-a] Start consent stream
-[2025-02-28T17:29:40.850Z] [info] [random-a] Consent stream started
-[2025-02-28T17:29:40.850Z] [warn] [random-a] Initialize XMTP client 3.996s
-[2025-02-28T17:29:40.851Z] [info] Creating DM conversation with address: 0x7cfA43014e16b6be0cb32F9d6EbC7280DE92FFa6
-[2025-02-28T17:29:43.092Z] [info] [alice-a] Collecting 1 consent updates
-[2025-02-28T17:29:43.495Z] [info] Consent state: 0
-[2025-02-28T17:29:43.495Z] [warn] get-initial-consent 402.626ms
-[2025-02-28T17:29:43.496Z] [info] Alice is allowing Bob...
-[2025-02-28T17:29:43.909Z] [info] [alice-a] Received consent update: [{"entityType":1,"state":1,"entity":"af846578f34d94a4b127d8809ba3e4b9d854cc52ec5108780d82f4619a04581d"},{"entityType":2,"state":1,"entity":"0x7cfA43014e16b6be0cb32F9d6EbC7280DE92FFa6"}]
-[2025-02-28T17:29:43.910Z] [warn] set-consent-state 414.175ms
-[2025-02-28T17:29:44.328Z] [warn] get-updated-consent 418.083ms
-[2025-02-28T17:29:44.329Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"af846578f34d94a4b127d8809ba3e4b9d854cc52ec5108780d82f4619a04581d"},{"entityType":2,"state":1,"entity":"0x7cfA43014e16b6be0cb32F9d6EbC7280DE92FFa6"}]}]
-[2025-02-28T17:29:44.331Z] [info] Creating a group conversation...
-[2025-02-28T17:29:46.535Z] [info] [bob-a] New conversation in stream: 0f8501ccea245c884c26a53a4a9e20b4
-[2025-02-28T17:29:46.538Z] [warn] create-group 2.207s
-[2025-02-28T17:29:46.539Z] [info] Group created with 5 members
-[2025-02-28T17:29:46.539Z] [info] [alice-a] Collecting 1 consent updates
-[2025-02-28T17:29:46.539Z] [info] Alice is blocking the group...
-[2025-02-28T17:29:46.539Z] [info] [alice-a] Received consent update: [{"entityType":0,"state":2,"entity":"0f8501ccea245c884c26a53a4a9e20b4"}]
-[2025-02-28T17:29:46.539Z] [info] Alice's consent state for the group: 2
-[2025-02-28T17:29:46.539Z] [info] Testing individual member consent states...
-[2025-02-28T17:29:46.895Z] [warn] block-bob 355.462ms
-[2025-02-28T17:29:47.303Z] [info] Alice's consent state for Bob is : denied
-[2025-02-28T17:29:47.304Z] [warn] get-bob-consent 408.274ms
-[2025-02-28T17:29:47.304Z] [info] All consent updates received: 1
-[2025-02-28T17:29:47.304Z] [info] Unblocking all entities...
-[2025-02-28T17:29:47.496Z] [info] Final group consent state: 1
-[2025-02-28T17:29:48.537Z] [info] {"DNS Lookup":0.001833,"TCP Connection":0.002023,"TLS Handshake":0.606573,"Server Processing":0.794733,"Content Transfer":0.79478}
-[2025-02-28T17:29:48.538Z] [warn] total: 794.7800000000001ms, tls: 606.573ms, processing: 188.2070000000001ms
+[2025-02-28T18:30:07.631Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T18:30:07.631Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
+[2025-02-28T18:30:07.631Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
+[2025-02-28T18:30:07.631Z] [info] [PersonaFactory] Using env keys for fabri: 0x709e...
+[2025-02-28T18:30:07.631Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T18:30:09.773Z] [warn] [elon-a] Create XMTP client v:436360a 2.101s
+[2025-02-28T18:30:09.903Z] [warn] [joe-a] Create XMTP client v:436360a 2.231s
+[2025-02-28T18:30:09.904Z] [warn] [fabri-a] Create XMTP client v:436360a 2.231s
+[2025-02-28T18:30:09.955Z] [warn] [alice-a] Create XMTP client v:436360a 2.282s
+[2025-02-28T18:30:10.039Z] [warn] [bob-a] Create XMTP client v:436360a 2.366s
+[2025-02-28T18:30:10.172Z] [warn] [elon-a] Start message stream 397.311ms
+[2025-02-28T18:30:10.173Z] [warn] [elon-a] Start stream 398.997ms
+[2025-02-28T18:30:10.173Z] [warn] [elon-a] Initialize XMTP client 2.504s
+[2025-02-28T18:30:10.300Z] [warn] [joe-a] Start message stream 395.052ms
+[2025-02-28T18:30:10.300Z] [warn] [joe-a] Start stream 396.877ms
+[2025-02-28T18:30:10.300Z] [warn] [joe-a] Initialize XMTP client 2.634s
+[2025-02-28T18:30:10.302Z] [warn] [fabri-a] Start message stream 398.387ms
+[2025-02-28T18:30:10.303Z] [warn] [fabri-a] Start stream 398.933ms
+[2025-02-28T18:30:10.304Z] [warn] [fabri-a] Initialize XMTP client 2.634s
+[2025-02-28T18:30:10.355Z] [warn] [alice-a] Start message stream 399.554ms
+[2025-02-28T18:30:10.356Z] [warn] [alice-a] Start stream 400.653ms
+[2025-02-28T18:30:10.356Z] [warn] [alice-a] Initialize XMTP client 2.685s
+[2025-02-28T18:30:10.396Z] [warn] [bob-a] Start message stream 355.889ms
+[2025-02-28T18:30:10.396Z] [warn] [bob-a] Start stream 357.118ms
+[2025-02-28T18:30:10.396Z] [warn] [bob-a] Initialize XMTP client 2.763s
+[2025-02-28T18:30:10.712Z] [info] [alice-a] Collecting 1 messages from convo:9e2213b61d662acd353aa4442db7ce6e
+[2025-02-28T18:30:10.712Z] [info] Sending message #1: gm-1-un30ncgsatj
+[2025-02-28T18:30:11.682Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:30:12.078Z] [info] [alice-a] Collecting 1 messages from convo:9e2213b61d662acd353aa4442db7ce6e
+[2025-02-28T18:30:12.078Z] [info] Sending message #1: gm-1-an2k0g137qo
+[2025-02-28T18:30:12.875Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:30:13.061Z] [info] [fabri-a] Collecting 1 messages from convo:c3b8445109fbab04af00788c1f4094e8
+[2025-02-28T18:30:13.061Z] [info] Sending message #1: gm-1-yv39zj7ycye
+[2025-02-28T18:30:14.364Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:30:14.546Z] [info] [joe-a] Collecting 1 messages from convo:986ad97f3b975921dfc0a7657af107db
+[2025-02-28T18:30:14.546Z] [info] Sending message #1: gm-1-bmb6zj1mwp9
+[2025-02-28T18:30:15.795Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:30:18.247Z] [info] name: elon installations: 1
+[2025-02-28T18:30:18.247Z] [info] name: bob installations: 2
+[2025-02-28T18:30:18.247Z] [info] name: joe installations: 2
+[2025-02-28T18:30:18.247Z] [info] name: alice installations: 2
+[2025-02-28T18:30:18.247Z] [info] name: fabri installations: 1
+[2025-02-28T18:30:18.248Z] [info] [joe-a] Collecting 1 messages from convo:e2fe0814d40845dff6f83c7b27080d0f
+[2025-02-28T18:30:18.248Z] [info] [elon-a] Collecting 1 messages from convo:e2fe0814d40845dff6f83c7b27080d0f
+[2025-02-28T18:30:18.248Z] [info] [fabri-a] Collecting 1 messages from convo:e2fe0814d40845dff6f83c7b27080d0f
+[2025-02-28T18:30:18.248Z] [info] Sending message #1: gm-1-iet99308x7
+[2025-02-28T18:30:19.480Z] [info] All participants received the expected number of messages.
+[2025-02-28T18:30:20.652Z] [info] {"DNS Lookup":0.001983,"TCP Connection":0.002172,"TLS Handshake":0.581544,"Server Processing":0.944454,"Content Transfer":0.94447}
+[2025-02-28T18:30:20.652Z] [warn] total: 944.47ms, tls: 581.544ms, processing: 362.92600000000004ms
+[2025-02-28T18:30:21.647Z] [info] {"DNS Lookup":0.001994,"TCP Connection":0.002184,"TLS Handshake":0.573038,"Server Processing":0.769332,"Content Transfer":0.769367}
+[2025-02-28T18:30:21.647Z] [warn] total: 769.3670000000001ms, tls: 573.038ms, processing: 196.32900000000006ms
+[2025-02-28T18:30:21.647Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T18:30:21.647Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
+[2025-02-28T18:30:21.647Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
+[2025-02-28T18:30:21.647Z] [info] [PersonaFactory] Using env keys for fabri: 0x709e...
+[2025-02-28T18:30:21.648Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T18:30:23.719Z] [warn] [bob-a] Create XMTP client v:436360a 2.067s
+[2025-02-28T18:30:23.719Z] [info] [bob-a] Start conversation stream
+[2025-02-28T18:30:23.722Z] [info] [bob-a] Initial conversations count: 42
+[2025-02-28T18:30:23.722Z] [info] [bob-a] Conversation stream started
+[2025-02-28T18:30:23.722Z] [warn] [bob-a] Initialize XMTP client 2.074s
+[2025-02-28T18:30:23.846Z] [warn] [fabri-a] Create XMTP client v:436360a 2.193s
+[2025-02-28T18:30:23.846Z] [info] [fabri-a] Start conversation stream
+[2025-02-28T18:30:23.847Z] [info] [fabri-a] Initial conversations count: 14
+[2025-02-28T18:30:23.847Z] [info] [fabri-a] Conversation stream started
+[2025-02-28T18:30:23.847Z] [warn] [fabri-a] Initialize XMTP client 2.196s
+[2025-02-28T18:30:23.903Z] [warn] [joe-a] Create XMTP client v:436360a 2.251s
+[2025-02-28T18:30:23.903Z] [info] [joe-a] Start conversation stream
+[2025-02-28T18:30:23.905Z] [info] [joe-a] Initial conversations count: 21
+[2025-02-28T18:30:23.905Z] [info] [joe-a] Conversation stream started
+[2025-02-28T18:30:23.905Z] [warn] [joe-a] Initialize XMTP client 2.255s
+[2025-02-28T18:30:23.975Z] [warn] [alice-a] Create XMTP client v:436360a 2.323s
+[2025-02-28T18:30:23.976Z] [info] [alice-a] Start conversation stream
+[2025-02-28T18:30:23.981Z] [info] [alice-a] Initial conversations count: 53
+[2025-02-28T18:30:23.981Z] [info] [alice-a] Conversation stream started
+[2025-02-28T18:30:23.981Z] [warn] [alice-a] Initialize XMTP client 2.330s
+[2025-02-28T18:30:23.983Z] [warn] [elon-a] Create XMTP client v:436360a 2.331s
+[2025-02-28T18:30:23.983Z] [info] [elon-a] Start conversation stream
+[2025-02-28T18:30:23.990Z] [info] [elon-a] Initial conversations count: 49
+[2025-02-28T18:30:23.990Z] [info] [elon-a] Conversation stream started
+[2025-02-28T18:30:23.990Z] [warn] [elon-a] Initialize XMTP client 2.340s
+[2025-02-28T18:30:23.991Z] [info] [alice] Starting group conversation stream verification test with 2 participants
+[2025-02-28T18:30:23.991Z] [info] [bob-a] Collecting 1 conversations from peer: 93946e68eb4e45762a71eb4d2ec81ce08c40ba65ab0ba8ca2c2ad3f971bf5af8
+[2025-02-28T18:30:23.991Z] [info] [joe-a] Collecting 1 conversations from peer: 93946e68eb4e45762a71eb4d2ec81ce08c40ba65ab0ba8ca2c2ad3f971bf5af8
+[2025-02-28T18:30:23.991Z] [info] [alice] Creating new group conversation with 2 participants
+[2025-02-28T18:30:24.374Z] [info] [alice-a] New conversation in stream: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.333Z] [info] [alice] Created group conversation with ID: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.333Z] [info] [joe-a] New conversation in stream: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.333Z] [info] [joe-a] Received conversation event, id: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.395Z] [info] [bob-a] New conversation in stream: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.395Z] [info] [bob-a] Received conversation event, id: 5242a8cf2011d780205257b92a3c3fee
+[2025-02-28T18:30:26.395Z] [info] [alice] Received 2 group conversation notifications
+[2025-02-28T18:30:26.396Z] [info] [fabri] Starting group conversation stream verification test with 4 participants
+[2025-02-28T18:30:26.396Z] [info] [alice-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
+[2025-02-28T18:30:26.396Z] [info] [bob-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
+[2025-02-28T18:30:26.396Z] [info] [joe-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
+[2025-02-28T18:30:26.396Z] [info] [elon-a] Collecting 1 conversations from peer: e928b7a2f78983100ea56e9cea7032c0313f4972bab5781fc4cc93fe3fdf2f5a
+[2025-02-28T18:30:26.396Z] [info] [fabri] Creating new group conversation with 4 participants
+[2025-02-28T18:30:26.399Z] [info] [fabri-a] New conversation in stream: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.615Z] [info] [elon-a] New conversation in stream: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.616Z] [info] [elon-a] Received conversation event, id: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.626Z] [info] [alice-a] New conversation in stream: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.626Z] [info] [alice-a] Received conversation event, id: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.642Z] [info] [fabri] Created group conversation with ID: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.642Z] [info] [joe-a] New conversation in stream: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.642Z] [info] [joe-a] Received conversation event, id: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.698Z] [info] [bob-a] New conversation in stream: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.698Z] [info] [bob-a] Received conversation event, id: 96182be864ae13527a33d05cdd4d6688
+[2025-02-28T18:30:28.698Z] [info] [fabri] Received 4 group conversation notifications
+[2025-02-28T18:30:29.829Z] [info] {"DNS Lookup":0.003125,"TCP Connection":0.003342,"TLS Handshake":0.555568,"Server Processing":0.905401,"Content Transfer":0.905416}
+[2025-02-28T18:30:29.829Z] [warn] total: 905.416ms, tls: 555.568ms, processing: 349.84800000000007ms
+[2025-02-28T18:30:31.009Z] [info] {"DNS Lookup":0.001779,"TCP Connection":0.001981,"TLS Handshake":0.568024,"Server Processing":0.930689,"Content Transfer":0.930729}
+[2025-02-28T18:30:31.009Z] [warn] total: 930.729ms, tls: 568.024ms, processing: 362.70500000000004ms
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Using env keys for charlie: 0x9694...
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Using env keys for dave: 0x5ebf...
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Using env keys for eve: 0x2c2b...
+[2025-02-28T18:30:31.009Z] [info] [PersonaFactory] Generating new keys for random
+[2025-02-28T18:30:32.914Z] [warn] [charlie-a] Create XMTP client v:436360a 1.897s
+[2025-02-28T18:30:32.914Z] [info] [charlie-a] Start consent stream
+[2025-02-28T18:30:32.914Z] [info] [charlie-a] Consent stream started
+[2025-02-28T18:30:32.914Z] [warn] [charlie-a] Initialize XMTP client 1.901s
+[2025-02-28T18:30:33.035Z] [warn] [bob-a] Create XMTP client v:436360a 2.018s
+[2025-02-28T18:30:33.035Z] [info] [bob-a] Start consent stream
+[2025-02-28T18:30:33.035Z] [info] [bob-a] Consent stream started
+[2025-02-28T18:30:33.035Z] [warn] [bob-a] Initialize XMTP client 2.022s
+[2025-02-28T18:30:33.278Z] [warn] [alice-a] Create XMTP client v:436360a 2.261s
+[2025-02-28T18:30:33.278Z] [info] [alice-a] Start consent stream
+[2025-02-28T18:30:33.278Z] [info] [alice-a] Consent stream started
+[2025-02-28T18:30:33.278Z] [warn] [alice-a] Initialize XMTP client 2.266s
+[2025-02-28T18:30:33.391Z] [warn] [dave-a] Create XMTP client v:436360a 2.374s
+[2025-02-28T18:30:33.391Z] [info] [dave-a] Start consent stream
+[2025-02-28T18:30:33.391Z] [info] [dave-a] Consent stream started
+[2025-02-28T18:30:33.391Z] [warn] [dave-a] Initialize XMTP client 2.377s
+[2025-02-28T18:30:33.391Z] [warn] [eve-a] Create XMTP client v:436360a 2.374s
+[2025-02-28T18:30:33.391Z] [info] [eve-a] Start consent stream
+[2025-02-28T18:30:33.391Z] [info] [eve-a] Consent stream started
+[2025-02-28T18:30:33.391Z] [warn] [eve-a] Initialize XMTP client 2.376s
+[2025-02-28T18:30:35.036Z] [warn] [random-a] Create XMTP client v:436360a 4.018s
+[2025-02-28T18:30:35.036Z] [info] [random-a] Start consent stream
+[2025-02-28T18:30:35.036Z] [info] [random-a] Consent stream started
+[2025-02-28T18:30:35.036Z] [warn] [random-a] Initialize XMTP client 4.020s
+[2025-02-28T18:30:35.036Z] [info] Creating DM conversation with address: 0x39d264c0b155A235eeff8c8B18C0B1721526F3ae
+[2025-02-28T18:30:37.019Z] [info] [alice-a] Collecting 1 consent updates
+[2025-02-28T18:30:37.362Z] [info] Consent state: 0
+[2025-02-28T18:30:37.362Z] [warn] get-initial-consent 342.645ms
+[2025-02-28T18:30:37.362Z] [info] Alice is allowing Bob...
+[2025-02-28T18:30:37.763Z] [info] [alice-a] Received consent update: [{"entityType":1,"state":1,"entity":"75cc8985084a7e36f5dbbf0500837a3e65f26284cf61c5c8f876317af6a1a67a"},{"entityType":2,"state":1,"entity":"0x39d264c0b155A235eeff8c8B18C0B1721526F3ae"}]
+[2025-02-28T18:30:37.763Z] [warn] set-consent-state 400.655ms
+[2025-02-28T18:30:38.164Z] [warn] get-updated-consent 400.973ms
+[2025-02-28T18:30:38.164Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"75cc8985084a7e36f5dbbf0500837a3e65f26284cf61c5c8f876317af6a1a67a"},{"entityType":2,"state":1,"entity":"0x39d264c0b155A235eeff8c8B18C0B1721526F3ae"}]}]
+[2025-02-28T18:30:38.165Z] [info] Creating a group conversation...
+[2025-02-28T18:30:40.363Z] [warn] create-group 2.199s
+[2025-02-28T18:30:40.364Z] [info] Group created with 5 members
+[2025-02-28T18:30:40.364Z] [info] [alice-a] Collecting 1 consent updates
+[2025-02-28T18:30:40.364Z] [info] Alice is blocking the group...
+[2025-02-28T18:30:40.365Z] [info] [alice-a] Received consent update: [{"entityType":0,"state":2,"entity":"4f4878d9ea0f80626799892628c2891b"}]
+[2025-02-28T18:30:40.365Z] [info] Alice's consent state for the group: 2
+[2025-02-28T18:30:40.365Z] [info] Testing individual member consent states...
+[2025-02-28T18:30:40.406Z] [info] [bob-a] New conversation in stream: 4f4878d9ea0f80626799892628c2891b
+[2025-02-28T18:30:40.771Z] [warn] block-bob 404.969ms
+[2025-02-28T18:30:41.172Z] [info] Alice's consent state for Bob is : denied
+[2025-02-28T18:30:41.172Z] [warn] get-bob-consent 401.121ms
+[2025-02-28T18:30:41.172Z] [info] All consent updates received: 1
+[2025-02-28T18:30:41.172Z] [info] Unblocking all entities...
+[2025-02-28T18:30:41.545Z] [warn] unblock-all 372.528ms
+[2025-02-28T18:30:41.546Z] [info] Final group consent state: 1
+[2025-02-28T18:30:42.745Z] [info] {"DNS Lookup":0.00183,"TCP Connection":0.002034,"TLS Handshake":0.565003,"Server Processing":0.919457,"Content Transfer":0.919506}
+[2025-02-28T18:30:42.745Z] [warn] total: 919.5060000000001ms, tls: 565.003ms, processing: 354.50300000000004ms
