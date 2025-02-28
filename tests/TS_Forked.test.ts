@@ -27,7 +27,7 @@ describe(testName, () => {
     overrideConsole(logger);
 
     personas = await getWorkers(
-      ["bella", "dave", "elon", "diana", "random", "alice", "bob"],
+      ["bella", "dave", "elon", "diana", "diana-b", "random", "alice", "bob"],
       env,
       testName,
     );
@@ -191,6 +191,96 @@ describe(testName, () => {
     expect(aliceMessages?.length).toBe(4);
   });
 
+  it("should remove a member and re-add them from a different device without forking", async () => {
+    // First, remove Diana from the group
+    console.log("Removing Diana from the group");
+    // await group.removeMembers([
+    //   personas.diana.client?.accountAddress as `0x${string}`,
+    // ]);
+
+    // Send a message after removal
+    await group.send("Message after Diana was removed");
+
+    // Allow time for synchronization
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Create a new installation for Diana (simulating a different device)
+    console.log("Creating a new installation for Diana");
+
+    const dianaNewDevice = personas["diana-b"];
+    expect(dianaNewDevice).toBeDefined();
+    expect(dianaNewDevice.client).toBeDefined();
+    expect(dianaNewDevice.installationId).not.toBe(
+      personas.diana.installationId,
+    );
+
+    console.log(
+      `Diana's original installation ID: ${personas.diana.installationId}`,
+    );
+    console.log(
+      `Diana's new installation ID: ${dianaNewDevice.installationId}`,
+    );
+
+    // Re-add Diana using her new installation's inbox ID
+    console.log("Re-adding Diana from her new device");
+    await group.addMembersByInboxId([dianaNewDevice.client?.inboxId ?? ""]);
+
+    // Send messages from different members
+    await group.send("Message from Bella after Diana was re-added");
+    await personas.elon.client?.conversations
+      .getConversationById(group.id)
+      ?.send("Message from Elon after Diana was re-added");
+
+    // Allow time for synchronization
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Get Diana's group from her new installation
+    const dianaNewGroup =
+      dianaNewDevice.client?.conversations.getConversationById(group.id);
+
+    expect(dianaNewGroup).toBeDefined();
+
+    // Diana sends a message from her new device
+    await dianaNewGroup?.send("Message from Diana's new device");
+
+    // Allow time for synchronization
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+
+    // Verify all members can communicate
+    const result = await verifyStream(
+      group,
+      [personas.bella, dianaNewDevice],
+      gmMessageGenerator,
+      gmSender,
+    );
+
+    expect(result.allReceived).toBe(true);
+
+    // Verify group consistency across different members
+    await group.sync();
+    const bellaMessages = await group.messages();
+
+    const elonGroup = personas.elon.client?.conversations.getConversationById(
+      group.id,
+    );
+    await elonGroup?.sync();
+
+    await dianaNewGroup?.sync();
+    const dianaNewMessages = await dianaNewGroup?.messages();
+
+    // Diana's new device should have fewer messages since she was re-added later
+    expect(dianaNewMessages?.length).toBeGreaterThan(0);
+    expect(dianaNewMessages?.length).toBeLessThan(bellaMessages.length);
+
+    // Verify the group name is consistent across all members
+    const bellaGroupName = group.name;
+    const elonGroupName = elonGroup?.name;
+    const dianaNewGroupName = dianaNewGroup?.name;
+
+    expect(elonGroupName).toBe(bellaGroupName);
+    expect(dianaNewGroupName).toBe(bellaGroupName);
+  });
+
   it("should simulate a network partition by adding members from different clients", async () => {
     // Get references to the group for different members
     const bellaGroup = group;
@@ -280,15 +370,7 @@ describe(testName, () => {
     // Verify all members can still communicate
     const result = await verifyStream(
       group,
-      [
-        personas.bella,
-        personas.dave,
-        personas.elon,
-        personas.diana,
-        personas.alice,
-        personas.bob,
-        personas.random,
-      ],
+      await getPersonasFromGroup(group, personas),
       gmMessageGenerator,
       gmSender,
     );
@@ -347,3 +429,26 @@ describe(testName, () => {
     expect(result.allReceived).toBe(true);
   });
 });
+
+async function getPersonasFromGroup(
+  group: Conversation,
+  personas: Record<string, Persona>,
+): Promise<Persona[]> {
+  await group.sync();
+  const members = await group.members();
+  const memberInboxIds = members.map((member) => {
+    return {
+      inboxId: member.inboxId,
+    };
+  });
+  const personasFromGroup = memberInboxIds.map((m) => {
+    return Object.keys(personas).find(
+      (name) => personas[name].client?.inboxId === m.inboxId,
+    );
+  });
+  // Convert persona names to actual Persona objects and filter out undefined values
+  const personaObjects = personasFromGroup
+    .filter((name): name is string => name !== undefined)
+    .map((name) => personas[name]);
+  return personaObjects;
+}

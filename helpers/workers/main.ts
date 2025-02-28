@@ -74,7 +74,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = persona.name;
     this.installationId = persona.installationId;
-    this.nameId = `${this.name}-${this.installationId}`;
+    this.nameId = `${this.name.replaceAll("-" + this.installationId, "")}-${this.installationId}`;
     this.sdkVersion = persona.sdkVersion;
     this.env = env;
     this.testName = persona.testName;
