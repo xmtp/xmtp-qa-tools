@@ -10,8 +10,8 @@ This agent performs a series of commands to interact with conversations using th
 
 - Creates a group and sends a message with the group details.
 - Names the group with the format `group-YYYY-MM-DD`.
-- Adds a description with the same format as the group name.
-- Sends a message with the group ID, group URL, and other details.
+- Adds members to the group by inbox id
+- Sends random messages from each member
 
 ## Running bot
 
