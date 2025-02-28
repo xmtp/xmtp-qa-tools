@@ -1,40 +1,36 @@
-[2025-02-28T01:25:30.268Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
-[2025-02-28T01:25:30.268Z] [info] [PersonaFactory] Using env keys for bot: 0x7493...
-[2025-02-28T01:25:30.268Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
-[2025-02-28T01:25:30.268Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
-[2025-02-28T01:25:30.268Z] [info] [PersonaFactory] Using env keys for sam: 0xfae4...
-[2025-02-28T01:25:32.352Z] [warn] [bob-a] Create XMTP client v:436360a 2.050s
-[2025-02-28T01:25:32.362Z] [warn] [bot-a] Create XMTP client v:436360a 2.060s
-[2025-02-28T01:25:32.468Z] [warn] [alice-a] Create XMTP client v:436360a 2.166s
-[2025-02-28T01:25:32.514Z] [warn] [joe-a] Create XMTP client v:436360a 2.211s
-[2025-02-28T01:25:32.701Z] [warn] [sam-a] Create XMTP client v:436360a 2.398s
-[2025-02-28T01:25:32.747Z] [warn] [bob-a] Start message stream 394.853ms
-[2025-02-28T01:25:32.748Z] [warn] [bob-a] Start stream 395.131ms
-[2025-02-28T01:25:32.748Z] [warn] [bob-a] Initialize XMTP client 2.478s
-[2025-02-28T01:25:32.761Z] [warn] [bot-a] Start message stream 398.925ms
-[2025-02-28T01:25:32.761Z] [warn] [bot-a] Start stream 399.204ms
-[2025-02-28T01:25:32.761Z] [warn] [bot-a] Initialize XMTP client 2.463s
-[2025-02-28T01:25:32.848Z] [warn] [alice-a] Start message stream 380.107ms
-[2025-02-28T01:25:32.848Z] [warn] [alice-a] Start stream 380.274ms
-[2025-02-28T01:25:32.848Z] [warn] [alice-a] Initialize XMTP client 2.549s
-[2025-02-28T01:25:32.939Z] [warn] [joe-a] Start message stream 424.436ms
-[2025-02-28T01:25:32.939Z] [warn] [joe-a] Start stream 424.621ms
-[2025-02-28T01:25:32.939Z] [warn] [joe-a] Initialize XMTP client 2.639s
-[2025-02-28T01:25:33.115Z] [warn] [sam-a] Start message stream 413.857ms
-[2025-02-28T01:25:33.115Z] [warn] [sam-a] Start stream 414.314ms
-[2025-02-28T01:25:33.115Z] [warn] [sam-a] Initialize XMTP client 2.815s
-[2025-02-28T01:25:33.116Z] [info] Syncing conversations...
-[2025-02-28T01:25:33.343Z] [info] Agent initialized on 0x9A39e9073512956f825954a759926ab46EA58495
-[2025-02-28T01:25:33.344Z] [info] https://xmtp.chat/dm/0x9A39e9073512956f825954a759926ab46EA58495?env=dev
-[2025-02-28T01:25:33.344Z] [info] Waiting for messages...
-[2025-02-28T01:26:02.395Z] [info] Received message: gm by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
-[2025-02-28T01:26:03.881Z] [info] Waiting for messages...
-[2025-02-28T01:26:06.061Z] [info] Received message: /group by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
-[2025-02-28T01:26:06.061Z] [info] Creating group...
-[2025-02-28T01:26:08.803Z] [info] Group created with name group-2025-02-28 by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
-[2025-02-28T01:26:16.066Z] [info] Received message: Alice says: Excited to be here! by 93946e68eb4e45762a71eb4d2ec81ce08c40ba65ab0ba8ca2c2ad3f971bf5af8
-[2025-02-28T01:26:16.997Z] [info] Waiting for messages...
-[2025-02-28T01:26:16.997Z] [info] Received message: Joe says: Thanks for adding me to this group by 5a4a7485352a6d3424b9e402624bdfa458fe6d0401fa5a5c0abf72326e2ab2c0
-[2025-02-28T01:26:17.760Z] [info] Waiting for messages...
-[2025-02-28T01:26:17.760Z] [info] Received message: Sam says: Excited to be here! by 1abd84b0cb625182d44c74dd0e3220c153453a823c4d1c9b27e66d123afa78f9
-[2025-02-28T01:26:18.307Z] [info] Waiting for messages...
+[2025-02-28T16:43:22.586Z] [info] [PersonaFactory] Using env keys for bob: 0xacea...
+[2025-02-28T16:43:22.586Z] [info] [PersonaFactory] Using env keys for bot: 0x7493...
+[2025-02-28T16:43:22.586Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T16:43:22.586Z] [info] [PersonaFactory] Using env keys for joe: 0x5116...
+[2025-02-28T16:43:22.587Z] [info] [PersonaFactory] Using env keys for sam: 0xfae4...
+[2025-02-28T16:43:24.799Z] [warn] [alice-a] Create XMTP client v:436360a 2.175s
+[2025-02-28T16:43:24.860Z] [warn] [sam-a] Create XMTP client v:436360a 2.236s
+[2025-02-28T16:43:24.942Z] [warn] [bot-a] Create XMTP client v:436360a 2.317s
+[2025-02-28T16:43:24.991Z] [warn] [bob-a] Create XMTP client v:436360a 2.367s
+[2025-02-28T16:43:25.014Z] [warn] [joe-a] Create XMTP client v:436360a 2.389s
+[2025-02-28T16:43:25.215Z] [warn] [alice-a] Start message stream 414.593ms
+[2025-02-28T16:43:25.216Z] [warn] [alice-a] Start stream 415.778ms
+[2025-02-28T16:43:25.216Z] [warn] [alice-a] Initialize XMTP client 2.596s
+[2025-02-28T16:43:25.277Z] [warn] [sam-a] Start message stream 413.823ms
+[2025-02-28T16:43:25.278Z] [warn] [sam-a] Start stream 416.873ms
+[2025-02-28T16:43:25.278Z] [warn] [sam-a] Initialize XMTP client 2.655s
+[2025-02-28T16:43:25.344Z] [warn] [bot-a] Start message stream 402.37ms
+[2025-02-28T16:43:25.344Z] [warn] [bot-a] Start stream 402.54ms
+[2025-02-28T16:43:25.344Z] [warn] [bot-a] Initialize XMTP client 2.727s
+[2025-02-28T16:43:25.356Z] [warn] [bob-a] Start message stream 364.787ms
+[2025-02-28T16:43:25.356Z] [warn] [bob-a] Start stream 364.926ms
+[2025-02-28T16:43:25.356Z] [warn] [bob-a] Initialize XMTP client 2.767s
+[2025-02-28T16:43:25.423Z] [warn] [joe-a] Start message stream 408.206ms
+[2025-02-28T16:43:25.424Z] [warn] [joe-a] Start stream 409.159ms
+[2025-02-28T16:43:25.424Z] [warn] [joe-a] Initialize XMTP client 2.803s
+[2025-02-28T16:43:25.424Z] [info] Syncing conversations...
+[2025-02-28T16:43:25.758Z] [info] Agent initialized on address 0x9A39e9073512956f825954a759926ab46EA58495
+[2025-02-28T16:43:25.758Z] [info] Agent initialized on inbox 3c2cc5f181cb8c899a6779d1adffbb6ef1d4dca36281041be027409846b046f2
+[2025-02-28T16:43:25.758Z] [info] https://xmtp.chat/dm/0x9A39e9073512956f825954a759926ab46EA58495?env=production
+[2025-02-28T16:43:25.758Z] [info] Waiting for messages...
+[2025-02-28T16:43:54.473Z] [info] Received message: hi by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
+[2025-02-28T16:43:56.138Z] [info] Waiting for messages...
+[2025-02-28T16:43:58.157Z] [info] Received message: hey by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
+[2025-02-28T16:43:58.787Z] [info] Waiting for messages...
+[2025-02-28T16:44:51.715Z] [info] Received message: g, by cc19e573d62e1daa0e48987a7f0146023aead7d165ca20926bee14af26b79d32
+[2025-02-28T16:44:52.689Z] [info] Waiting for messages...

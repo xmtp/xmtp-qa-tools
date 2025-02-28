@@ -7,7 +7,7 @@ import { type Persona } from "../../helpers/types";
 dotenv.config();
 
 let personas: Record<string, Persona> = {};
-const env: XmtpEnv = "dev";
+const env: XmtpEnv = "production";
 async function main() {
   const logger = await createLogger("test-bot");
   overrideConsole(logger);
@@ -22,7 +22,8 @@ async function main() {
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
-  console.log(`Agent initialized on ${client.accountAddress}`);
+  console.log(`Agent initialized on address ${client.accountAddress}`);
+  console.log(`Agent initialized on inbox ${client.inboxId}`);
   console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
 
   console.log("Waiting for messages...");
@@ -79,6 +80,14 @@ async function main() {
         "Excited to be here!",
         "gm to the group",
       ];
+      // await conversation.send(
+      //   `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\ne}`,
+      // );
+      await conversation.send(
+        `Group created!\n- ID: ${group.id} - Name: ${groupName}`,
+      );
+      // Send a message as the bot
+      await group.send("Bot says: Group chat initialized. Welcome everyone!");
 
       // Send messages from each persona
       if (personas.alice.client) {
@@ -107,15 +116,6 @@ async function main() {
         await samGroup?.send(`Sam says: ${samMessage}`);
       }
 
-      // Send a message as the bot
-      await group.send("Bot says: Group chat initialized. Welcome everyone!");
-
-      // await conversation.send(
-      //   `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\ne}`,
-      // );
-      await conversation.send(
-        `Group created!\n- ID: ${group.id} - Name: ${groupName}`,
-      );
       continue;
     }
 

@@ -1,0 +1,26 @@
+[2025-02-28T17:12:49.818Z] [info] [PersonaFactory] Using env keys for bella: 0x7018...
+[2025-02-28T17:12:49.818Z] [info] [PersonaFactory] Using env keys for dave: 0x5ebf...
+[2025-02-28T17:12:49.818Z] [info] [PersonaFactory] Using env keys for elon: 0x1bbe...
+[2025-02-28T17:12:49.818Z] [info] [PersonaFactory] Using env keys for alice: 0x7dec...
+[2025-02-28T17:12:51.916Z] [warn] [alice-a] Create XMTP client v:436360a 2.058s
+[2025-02-28T17:12:51.978Z] [warn] [elon-a] Create XMTP client v:436360a 2.119s
+[2025-02-28T17:12:52.073Z] [warn] [bella-a] Create XMTP client v:436360a 2.214s
+[2025-02-28T17:12:52.208Z] [warn] [dave-a] Create XMTP client v:436360a 2.350s
+[2025-02-28T17:12:52.335Z] [warn] [alice-a] Start message stream 416.188ms
+[2025-02-28T17:12:52.336Z] [warn] [alice-a] Start stream 418.595ms
+[2025-02-28T17:12:52.336Z] [warn] [alice-a] Initialize XMTP client 2.480s
+[2025-02-28T17:12:52.396Z] [warn] [elon-a] Start message stream 417.57ms
+[2025-02-28T17:12:52.397Z] [warn] [elon-a] Start stream 418.13ms
+[2025-02-28T17:12:52.397Z] [warn] [elon-a] Initialize XMTP client 2.543s
+[2025-02-28T17:12:52.487Z] [warn] [bella-a] Start message stream 413.332ms
+[2025-02-28T17:12:52.487Z] [warn] [bella-a] Start stream 414.026ms
+[2025-02-28T17:12:52.488Z] [warn] [bella-a] Initialize XMTP client 2.668s
+[2025-02-28T17:12:52.630Z] [warn] [dave-a] Start message stream 421.541ms
+[2025-02-28T17:12:52.631Z] [warn] [dave-a] Start stream 422.788ms
+[2025-02-28T17:12:52.632Z] [warn] [dave-a] Initialize XMTP client 2.779s
+[2025-02-28T17:12:57.312Z] [info] {"initiatedByInboxId":"b0066ebf1e7ab06fe55e67fde8856ec34b4578480f1e6070d998b8022d58ba98","addedInboxes":[{"inboxId":"92629b59ca84d15946f131f452f9974fe9edf938c6913249d470fea9e63da990"},{"inboxId":"05b2182917ad2fd17fe12e3fa7d41d3e0771c3c9bc2283dd190995c8824cf880"}],"removedInboxes":[],"metadataFieldChanges":[]}
+[2025-02-28T17:12:57.313Z] [info] Initial message 1
+[2025-02-28T17:12:57.313Z] [info] Initial message 2
+[2025-02-28T17:12:58.515Z] [info] Baseline message counts: {"bella":3,"dave":2,"elon":2}
+[2025-02-28T17:12:59.711Z] [info] {"DNS Lookup":0.00183,"TCP Connection":0.002027,"TLS Handshake":0.601235,"Server Processing":0.967946,"Content Transfer":0.968052}
+[2025-02-28T17:12:59.711Z] [warn] total: 968.052ms, tls: 601.235ms, processing: 366.817ms
