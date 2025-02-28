@@ -16,11 +16,11 @@ loadEnv(testName);
 describe(testName, () => {
   let personas: Record<string, Persona>;
   let bobsGroup: Conversation;
-  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmMessageGenerator: (i: number, suffix: string) => string;
   let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
   beforeAll(async () => {
-    gmMessageGenerator = async (i: number, suffix: string) => {
+    gmMessageGenerator = (i: number, suffix: string) => {
       return `gm-${i + 1}-${suffix}`;
     };
     gmSender = async (convo: Conversation, message: string) => {
@@ -74,7 +74,7 @@ describe(testName, () => {
   it("TC_UpdateGroupName: should create a group and update group name", async () => {
     console.time("update group name");
 
-    const nameUpdateGenerator = async (i: number, suffix: string) => {
+    const nameUpdateGenerator = (i: number, suffix: string) => {
       return `New name-${i + 1}-${suffix}`;
     };
 

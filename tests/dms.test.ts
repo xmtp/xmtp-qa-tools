@@ -58,7 +58,7 @@ describe(testName, () => {
   });
 
   it("TC_ReceiveGM: should measure receiving a gm", async () => {
-    const gmMessageGenerator = async (i: number, suffix: string) => {
+    const gmMessageGenerator = (i: number, suffix: string) => {
       return `gm-${i + 1}-${suffix}`;
     };
 

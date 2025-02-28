@@ -12,11 +12,11 @@ loadEnv(testName);
 describe(testName, () => {
   let personas: Record<string, Persona>;
   let group: Conversation;
-  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmMessageGenerator: (i: number, suffix: string) => string;
   let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
   beforeAll(async () => {
-    gmMessageGenerator = async (i: number, suffix: string) => {
+    gmMessageGenerator = (i: number, suffix: string) => {
       return `gm-${i + 1}-${suffix}`;
     };
     gmSender = async (convo: Conversation, message: string) => {
@@ -73,12 +73,12 @@ describe(testName, () => {
 
   it("should handle group name updates", async () => {
     console.time("updateName");
-    const nameUpdateGenerator = async (i: number, suffix: string) => {
+    const nameUpdateGenerator = (i: number, suffix: string) => {
       return `New name-${i + 1}-${suffix}`;
     };
 
-    const nameUpdater = async (group: Conversation, newName: string) => {
-      await group.updateName(newName);
+    const nameUpdater = (group: Conversation, newName: string) => {
+      return group.updateName(newName);
     };
 
     const result = await verifyStream(

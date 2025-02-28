@@ -1,7 +1,6 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import test from "node:test";
 import { type Signer } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";

@@ -27,7 +27,7 @@ describe(testName, () => {
   let bobsGroup: Conversation;
   let dmConvo: Conversation;
   let personas: Record<string, Persona>;
-  let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+  let gmMessageGenerator: (i: number, suffix: string) => string;
   let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
   beforeAll(async () => {

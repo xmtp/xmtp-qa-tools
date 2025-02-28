@@ -31,7 +31,7 @@ describe(
     let personas: Record<string, Persona>;
 
     // We'll define these so they're accessible in the test
-    let gmMessageGenerator: (i: number, suffix: string) => Promise<string>;
+    let gmMessageGenerator: (i: number, suffix: string) => string;
     let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
     // 1. Setup
@@ -73,7 +73,7 @@ describe(
       console.log("[Test] Created group with ID:", group.id);
       expect(group.id).toBeDefined();
 
-      gmMessageGenerator = async (i: number, suffix: string) => {
+      gmMessageGenerator = (i: number, suffix: string) => {
         return `gm-${i + 1}-${suffix}`;
       };
 

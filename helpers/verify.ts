@@ -20,7 +20,7 @@ import type { MessageStreamWorker } from "./workers/main";
 export async function verifyStream<T extends string>(
   group: Conversation,
   participants: Persona[],
-  messageGenerator: (index: number, suffix: string) => Promise<T>,
+  messageGenerator: (index: number, suffix: string) => T,
   sender: (group: Conversation, payload: T) => Promise<void>,
   collectorType = "text",
   count = 1,
@@ -48,7 +48,7 @@ export async function verifyStream<T extends string>(
   );
   // Send the messages
   for (let i = 0; i < count; i++) {
-    const payload = await messageGenerator(i, randomSuffix);
+    const payload = messageGenerator(i, randomSuffix);
     console.log(`Sending message #${i + 1}:`, payload);
     await sender(group, payload);
   }
