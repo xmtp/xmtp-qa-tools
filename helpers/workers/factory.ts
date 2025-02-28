@@ -44,7 +44,7 @@ export class PersonaFactory {
     // Extract the base name without installation ID for key lookup
     const baseName = name.split("-")[0];
 
-    if (this.keysCache[baseName].walletKey) {
+    if (baseName in this.keysCache) {
       console.log(`[PersonaFactory] Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }

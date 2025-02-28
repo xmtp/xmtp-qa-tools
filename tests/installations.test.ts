@@ -110,5 +110,5 @@ describe(
       }
     });
   },
-  { timeout: 1000000 },
+  { timeout: 1000000 }, // 10 minutes
 );

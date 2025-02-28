@@ -1,27 +1,11 @@
-[2025-02-27T22:04:43.705Z] [info] [PersonaFactory] Generating new keys for bob
-[2025-02-27T22:04:43.726Z] [info] [PersonaFactory] Generating new keys for joe
-[2025-02-27T22:04:43.727Z] [info] [PersonaFactory] Generating new keys for sam
-[2025-02-27T22:04:43.732Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
-[2025-02-27T22:04:43.733Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/joe
-[2025-02-27T22:04:43.733Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/sam
-[2025-02-27T22:04:48.287Z] [warn] [joe-a] Create XMTP client v:436360a 4.553s
-[2025-02-27T22:04:48.381Z] [warn] [bob-a] Create XMTP client v:436360a 4.648s
-[2025-02-27T22:04:48.663Z] [warn] [sam-a] Create XMTP client v:436360a 4.930s
-[2025-02-27T22:04:48.692Z] [warn] [joe-a] Start message stream 404.934ms
-[2025-02-27T22:04:48.692Z] [warn] [joe-a] Start stream 405.451ms
-[2025-02-27T22:04:48.692Z] [warn] [joe-a] Initialize XMTP client 4.961s
-[2025-02-27T22:04:48.798Z] [warn] [bob-a] Start message stream 416.114ms
-[2025-02-27T22:04:48.798Z] [warn] [bob-a] Start stream 416.493ms
-[2025-02-27T22:04:48.798Z] [warn] [bob-a] Initialize XMTP client 5.068s
-[2025-02-27T22:04:49.091Z] [warn] [sam-a] Start message stream 427.759ms
-[2025-02-27T22:04:49.091Z] [warn] [sam-a] Start stream 428.328ms
-[2025-02-27T22:04:49.091Z] [warn] [sam-a] Initialize XMTP client 5.360s
-[2025-02-27T22:04:49.092Z] [info] bob 0x7282b3Bb823E3e224078222566AEF9037EC39269
-[2025-02-27T22:04:49.092Z] [info] joe 0x5acea5e580ec2093b5A0Ef4Eb277Dd1716ddA45a
-[2025-02-27T22:04:49.092Z] [info] sam 0x42551088486b4841188f3eCb013e4EB2Ecb03dF4
-[2025-02-27T22:04:52.001Z] [info] [bob] Creating DM with sam at 0x42551088486b4841188f3eCb013e4EB2Ecb03dF4
-[2025-02-27T22:04:52.971Z] [info] [sam-a] Collecting 1 messages from convo:3d1b5a8869f0adcb8e4fc798acd004ab
-[2025-02-27T22:04:52.971Z] [info] Sending message #1: gm-1-5osziewirz
-[2025-02-27T22:04:54.386Z] [info] All participants received the expected number of messages.
-[2025-02-27T22:04:55.791Z] [info] {"DNS Lookup":0.002312,"TCP Connection":0.002532,"TLS Handshake":0.931724,"Server Processing":1.125183,"Content Transfer":1.125205}
-[2025-02-27T22:04:55.791Z] [warn] total: 1125.205ms, tls: 931.724ms, processing: 193.48099999999988ms
+[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for bob: 0xd335...
+[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for joe: 0x8b27...
+[2025-02-28T00:06:38.011Z] [info] [PersonaFactory] Using env keys for sam: 0xd9ff...
+[2025-02-28T00:06:38.036Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/joe
+[2025-02-28T00:06:38.036Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/sam
+[2025-02-28T00:06:40.335Z] [warn] [bob-a] Create XMTP client v:436360a 2.298s
+[2025-02-28T00:06:40.757Z] [warn] [bob-a] Start message stream 419.949ms
+[2025-02-28T00:06:40.757Z] [warn] [bob-a] Start stream 422.253ms
+[2025-02-28T00:06:40.757Z] [warn] [bob-a] Initialize XMTP client 2.744s
+[2025-02-28T00:06:41.742Z] [warn] [sam-a] Create XMTP client v:436360a 3.705s
+[2025-02-28T00:06:41.890Z] [warn] [joe-a] Create XMTP client v:436360a 3.853s
