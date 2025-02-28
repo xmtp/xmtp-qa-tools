@@ -84,19 +84,27 @@ async function main() {
       if (personas.alice.client) {
         const aliceMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        await group.send(`Alice says: ${aliceMessage}`);
+        const aliceGroup =
+          personas.alice.client.conversations.getConversationById(group.id);
+        await aliceGroup?.send(`Alice says: ${aliceMessage}`);
       }
 
       if (personas.joe.client) {
         const joeMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        await group.send(`Joe says: ${joeMessage}`);
+        const joeGroup = personas.joe.client.conversations.getConversationById(
+          group.id,
+        );
+        await joeGroup?.send(`Joe says: ${joeMessage}`);
       }
 
       if (personas.sam.client) {
         const samMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        await group.send(`Sam says: ${samMessage}`);
+        const samGroup = personas.sam.client.conversations.getConversationById(
+          group.id,
+        );
+        await samGroup?.send(`Sam says: ${samMessage}`);
       }
 
       // Send a message as the bot
