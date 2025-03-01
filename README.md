@@ -65,7 +65,7 @@ let joe: Persona;
 let sam: Persona;
 
 beforeAll(async () => {
-  [bob, joe, sam] = await getWorkers(["bob", "joe", "sam"], env, testName);
+  [bob, joe, sam] = await getWorkers(["bob", "joe", "sam"], testName);
 });
 ```
 

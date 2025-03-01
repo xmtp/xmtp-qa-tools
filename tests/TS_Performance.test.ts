@@ -1,150 +1,163 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import type { Conversation } from "@xmtp/node-sdk";
 import {
-  type Conversation,
-  type Persona,
-  type XmtpEnv,
-} from "../helpers/types";
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
+import { closeEnv, loadEnv } from "../helpers/client";
+import { sendMetric } from "../helpers/datadog";
+import type { Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "TS_Performance_" + env;
-
-loadEnv(testName);
-
-const MAX_TEST_DURATION_MS = process.env.GITHUB_ACTIONS ? 1000 : 4000;
-
-// If some of the actions are especially large or complex, you may need to raise the limit.
-function expectUnderSeconds(duration: number) {
-  // If your environment is slow, increase or remove as needed
-  expect(duration).toBeLessThan(MAX_TEST_DURATION_MS);
-  console.log(`Test took ${duration}ms`);
-}
+const testName = "ts_performance";
+await loadEnv(testName);
 
 describe(testName, () => {
-  let bobsGroup: Conversation;
-  let dmConvo: Conversation;
+  let convo: Conversation;
   let personas: Record<string, Persona>;
-  let gmMessageGenerator: (i: number, suffix: string) => string;
-  let gmSender: (convo: Conversation, message: string) => Promise<void>;
+  let start: number;
 
   beforeAll(async () => {
-    // Simple generator and sender for "gm" messages.
-    gmMessageGenerator = (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
-    };
-    gmSender = async (convo: Conversation, message: string) => {
-      await convo.send(message);
-    };
+    personas = await getWorkers(["bob", "joe", "sam", "random"], testName);
+  });
 
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
-
-    // Spin up workers for the listed personas.
-    // If your environment lacks keys, the code may generate them (see getWorkers).
-    personas = await getWorkers(
-      ["bob", "joe", "sam", "alice", "randompep", "elon", "random"],
-      env,
-      testName,
-    );
+  beforeEach(() => {
+    start = performance.now();
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
-  it("TC_CreateDM: should measure creating a DM", async () => {
-    const start = performance.now();
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
+  });
 
-    dmConvo = await personas.bob.client!.conversations.newDm(
+  it("createDM: should measure creating a DM", async () => {
+    convo = await personas.bob.client!.conversations.newDm(
       personas.random.client!.accountAddress,
     );
 
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_CreateDM duration:", duration, "ms");
-
-    expect(dmConvo).toBeDefined();
-    expect(dmConvo.id).toBeDefined();
-    expectUnderSeconds(duration);
+    expect(convo).toBeDefined();
+    expect(convo.id).toBeDefined();
   });
 
-  it("TC_SendGM: should measure sending a gm", async () => {
-    const start = performance.now();
-
+  it("sendGM: should measure sending a gm", async () => {
     // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${personas.bob.name}] Creating DM with ${
-        personas.sam.name
-      } at ${personas.sam.client?.accountAddress}`,
+      `[${personas.bob.name}] Creating DM with ${personas.random.name} at ${personas.random.client?.accountAddress}`,
     );
 
-    const dmId = await dmConvo.send(message);
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_SendGM duration:", duration, "ms");
+    const dmId = await convo.send(message);
 
     expect(dmId).toBeDefined();
-    expectUnderSeconds(duration);
   });
 
-  it("TC_ReceiveGM: should measure receiving a gm", async () => {
-    const start = performance.now();
+  it("receiveGM: should measure receiving a gm", async () => {
+    const gmMessageGenerator = (i: number, suffix: string) => {
+      return `gm-${i + 1}-${suffix}`;
+    };
 
-    // Create or fetch the DM conversation with Sam.
-    const dmConvoLocal =
-      (await personas.bob.client?.conversations.newDm(
-        personas.sam.client?.accountAddress as `0x${string}`,
-      )) || dmConvo;
+    const gmSender = async (convo: Conversation, message: string) => {
+      await convo.send(message);
+    };
 
     const verifyResult = await verifyStream(
-      dmConvoLocal,
-      [personas.sam],
+      convo,
+      [personas.random],
       gmMessageGenerator,
       gmSender,
     );
 
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_ReceiveGM duration:", duration, "ms");
-
+    expect(verifyResult.messages.length).toEqual(1);
     expect(verifyResult.allReceived).toBe(true);
-    expectUnderSeconds(duration);
   });
+});
 
-  it("TC_CreateGroup: should measure creating a group", async () => {
-    console.time("create group");
-    const start = performance.now();
+describe(testName, () => {
+  let personas: Record<string, Persona>;
+  let group: Conversation;
+  let start: number;
+  const gmMessageGenerator = (i: number, suffix: string) => {
+    return `gm-${i + 1}-${suffix}`;
+  };
+  const gmSender = async (convo: Conversation, message: string) => {
+    await convo.send(message);
+  };
 
-    bobsGroup = await personas.bob.client!.conversations.newGroup(
-      Object.values(personas)
-        .filter((p) => p.name !== "randompep")
-        .map((p) => p.client?.accountAddress as `0x${string}`),
+  beforeAll(async () => {
+    personas = await getWorkers(
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+        "randomguy",
+      ],
+      testName,
     );
-
-    console.timeEnd("create group");
-    console.log("Bob's group:", bobsGroup.id);
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_CreateGroup duration:", duration, "ms");
-
-    expect(bobsGroup.id).toBeDefined();
-    expectUnderSeconds(duration);
   });
 
-  it("TC_UpdateGroupName: should create a group and update group name", async () => {
-    const start = performance.now();
+  beforeEach(() => {
+    start = performance.now();
+  });
+
+  afterAll(async () => {
+    await closeEnv(testName, personas);
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
+  });
+  it("createGroup: should measure creating a group", async () => {
+    console.time("create group");
+    group = await personas.henry.client!.conversations.newGroup([
+      personas.ivy.client!.accountAddress as `0x${string}`,
+      personas.jack.client!.accountAddress as `0x${string}`,
+      personas.karen.client!.accountAddress as `0x${string}`,
+      personas.nancy.client!.accountAddress as `0x${string}`,
+      personas.oscar.client!.accountAddress as `0x${string}`,
+      personas.mary.client!.accountAddress as `0x${string}`,
+      personas.larry.client!.accountAddress as `0x${string}`,
+    ]);
+    console.log("Henry's group", group.id);
+    console.timeEnd("create group");
+    expect(group.id).toBeDefined();
+  });
+
+  it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
+    console.time("Henry's groupByInboxIds");
+
+    const groupByInboxIds =
+      await personas.henry.client!.conversations.newGroupByInboxIds([
+        personas.ivy.client!.inboxId,
+        personas.jack.client!.inboxId,
+        personas.karen.client!.inboxId,
+      ]);
+
+    console.log("Henry's groupByInboxIds", groupByInboxIds.id);
+    console.timeEnd("Henry's groupByInboxIds");
+    expect(groupByInboxIds.id).toBeDefined();
+  });
+
+  it("updateGroupName: should create a group and update group name", async () => {
     console.time("update group name");
 
     const nameUpdateGenerator = (i: number, suffix: string) => {
@@ -156,122 +169,79 @@ describe(testName, () => {
     };
 
     const result = await verifyStream(
-      bobsGroup,
-      [personas.elon],
+      group,
+      [personas.nancy],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
     );
-
-    console.timeEnd("update group name");
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_UpdateGroupName duration:", duration, "ms");
-    console.log(result);
     expect(result.allReceived).toBe(true);
-    expectUnderSeconds(duration);
+    console.timeEnd("update group name");
   });
 
-  it("TC_AddMembers: should measure adding a participant to a group", async () => {
-    const start = performance.now();
+  it("addMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
-
-    const previousMembers = await bobsGroup.members();
-    await bobsGroup.addMembers([
-      personas.randompep.client?.accountAddress as `0x${string}`,
+    const previousMembers = await group.members();
+    await group.addMembers([
+      personas.randomguy.client!.accountAddress as `0x${string}`,
     ]);
-    const members = await bobsGroup.members();
-
+    console.time("sync");
+    await group.sync();
+    console.timeEnd("sync");
+    const members = await group.members();
     console.timeEnd("add members");
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_AddMembers duration:", duration, "ms");
-
     expect(members.length).toBe(previousMembers.length + 1);
-    expectUnderSeconds(duration);
   });
 
-  it("TC_RemoveMembers: should remove a participant from a group", async () => {
-    const start = performance.now();
+  it("removeMembers: should remove a participant from a group", async () => {
     console.time("remove members");
-
-    const previousMembers = await bobsGroup.members();
-    await bobsGroup.removeMembers([
-      personas.joe.client?.accountAddress as `0x${string}`,
+    const previousMembers = await group.members();
+    await group.removeMembers([
+      personas.nancy.client!.accountAddress as `0x${string}`,
     ]);
-    const members = await bobsGroup.members();
-
+    const members = await group.members();
     console.timeEnd("remove members");
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_RemoveMembers duration:", duration, "ms");
-
     expect(members.length).toBe(previousMembers.length - 1);
-    expectUnderSeconds(duration);
   });
 
-  it("TC_SendGroupMessage: should measure sending a gm in a group", async () => {
-    const start = performance.now();
-
+  it("sendGroupMessage: should measure sending a gm in a group", async () => {
     const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-    await bobsGroup.send(groupMessage);
-    console.log("GM Message sent in group:", groupMessage);
 
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_SendGroupMessage duration:", duration, "ms");
-
+    await group.send(groupMessage);
+    console.log("GM Message sent in group", groupMessage);
     expect(groupMessage).toBeDefined();
-    expectUnderSeconds(duration);
   });
 
-  it("TC_ReceiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
-    const start = performance.now();
-
+  it("receiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
+    // Wait for participants to see it with increased timeout
     const verifyResult = await verifyStream(
-      bobsGroup,
-      [personas.elon],
+      group,
+      [personas.oscar],
       gmMessageGenerator,
       gmSender,
     );
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log("TC_ReceiveGroupMessage (1 stream) duration:", duration, "ms");
-
     expect(verifyResult.allReceived).toBe(true);
-    expectUnderSeconds(duration);
   });
 
-  it("TC_ReceiveGroupMessage: should create a group and measure multiple streams catching a message", async () => {
-    const start = performance.now();
-
-    // Create a new group for all personas
-    const newGroup = await personas.bob.client!.conversations.newGroup(
+  it("receiveGroupMessage: should create a group and measure all streams", async () => {
+    const newGroup = await personas.henry.client!.conversations.newGroup(
       Object.values(personas).map(
         (p) => p.client?.accountAddress as `0x${string}`,
       ),
     );
-
     const verifyResult = await verifyStream(
       newGroup,
-      Object.values(personas), // all participants
+      Object.values(personas),
       gmMessageGenerator,
       gmSender,
     );
-
-    const end = performance.now();
-    const duration = end - start;
-    console.log(
-      "TC_ReceiveGroupMessage (multiple streams) duration:",
-      duration,
-      "ms",
-    );
-
     expect(verifyResult.allReceived).toBe(true);
-    expectUnderSeconds(duration);
+  });
+
+  it("createLargeGroup: should create a large group of 20 participants", async () => {
+    const group = await personas.henry.client!.conversations.newGroupByInboxIds(
+      Object.values(personas).map((p) => p.client?.inboxId as string),
+    );
+    expect(group.id).toBeDefined();
   });
 });

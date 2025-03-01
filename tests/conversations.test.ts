@@ -1,13 +1,11 @@
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { closeEnv, loadEnv } from "../helpers/client";
 import { type Conversation, type Persona } from "../helpers/types";
 import { verifyGroupConversationStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env = "dev";
-const testName = "conversations" + env;
-loadEnv(testName);
+const testName = "conversations";
+await loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
@@ -26,23 +24,15 @@ describe(testName, () => {
       }
       return initiator.client.conversations.newGroup(participantAddresses);
     };
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
-      "dev",
       testName,
       "conversation",
     );
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
   it("detects new group conversation creation with three participants", async () => {

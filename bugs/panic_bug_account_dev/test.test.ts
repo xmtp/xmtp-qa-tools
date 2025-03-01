@@ -1,44 +1,27 @@
 import fs from "fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../../helpers/client";
-import {
-  createLogger,
-  flushLogger,
-  overrideConsole,
-} from "../../helpers/logger";
-import {
-  type Conversation,
-  type Persona,
-  type XmtpEnv,
-} from "../../helpers/types";
+import { closeEnv, loadEnv } from "../../helpers/client";
+import { type Conversation, type Persona } from "../../helpers/types";
 import { getWorkers } from "../../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "panic_bug_account_" + env;
-loadEnv(testName);
+const testName = "panic_bug_account";
+await loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
 
   beforeAll(async () => {
-    fs.rmSync(".data", { recursive: true, force: true }); // TODO: remove this
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
+    fs.rmSync(".data", { recursive: true, force: true });
 
-    personas = await getWorkers(["bob", "bug", "sam"], env, testName);
+    personas = await getWorkers(["bob", "bug", "sam"], testName);
     console.log("bob", personas.bob.client?.accountAddress);
     console.log("bug", personas.bug.client?.accountAddress);
     console.log("sam", personas.sam.client?.accountAddress);
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
   it("TC_CreateDM: should measure creating a DM and sending a gm to bug", async () => {

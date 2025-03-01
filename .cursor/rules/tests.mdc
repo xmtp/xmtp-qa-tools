@@ -1,5 +1,6 @@
 ---
-description: General guidance for testing script
+description: Testing format
 globs: 
 alwaysApply: false
 ---
+[dms.test.ts](mdc:tests/dms.test.ts)

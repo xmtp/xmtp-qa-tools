@@ -1,39 +1,28 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { closeEnv, loadEnv } from "../helpers/client";
 import {
   ConsentEntityType,
   ConsentState,
   type Persona,
-  type XmtpEnv,
 } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "consent" + env;
-loadEnv(testName);
+const testName = "consent";
+await loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
 
   beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["alice", "bob", "charlie", "dave", "eve", "random"],
-      env,
       testName,
       "consent",
     );
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
   it("should stream consent updates when a user is blocked", async () => {

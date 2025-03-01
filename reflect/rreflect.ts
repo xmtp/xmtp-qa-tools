@@ -1,6 +1,6 @@
 // import { type XmtpEnv } from "@xmtp/node-sdk";
 
-// const env: XmtpEnv = "dev";
+// 
 
 // async function main() {
 //   // console.log("Syncing conversations...");

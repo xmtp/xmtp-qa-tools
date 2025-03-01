@@ -1,59 +1,56 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
+import { closeEnv, loadEnv } from "../helpers/client";
+import { sendMetric } from "../helpers/datadog";
 import {
   ConsentEntityType,
   ConsentState,
   type Conversation,
   type Persona,
-  type XmtpEnv,
 } from "../helpers/types";
 import { verifyGroupConversationStream, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-let testName = "TS_Streams_" + env;
-loadEnv(testName);
-/* 
-TODO:
-  - Percentge of missed?
-  - Ensure streams recover correctly.
-  - Handling repeated paralell dual streams.
-  - Test different type of streams for users.
-  - Timeout?
-  - Installations
-  - Multiple installations.
-  - Multiple clients from the same installation.
-*/
-
+const testName = "TS_Streams";
+await loadEnv(testName);
+let personas: Record<string, Persona>;
+let start: number;
+const gmMessageGenerator = (i: number, suffix: string) => {
+  return `gm-${i + 1}-${suffix}`;
+};
+const gmSender = async (convo: Conversation, message: string) => {
+  await convo.send(message);
+};
 describe(testName, () => {
-  let personas: Record<string, Persona>;
-  let gmMessageGenerator: (i: number, suffix: string) => string;
-  let gmSender: (convo: Conversation, message: string) => Promise<void>;
-
   beforeAll(async () => {
-    gmMessageGenerator = (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
-    };
-    gmSender = async (convo: Conversation, message: string) => {
-      await convo.send(message);
-    };
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
-      "dev",
       testName,
     );
   });
+
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
+
+  beforeEach(() => {
+    start = performance.now();
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
+  });
+
   it("test fabri sending gm to alice", async () => {
     const dmConvo = await personas.fabri.client?.conversations.newDm(
       personas.alice.client?.accountAddress as `0x${string}`,
@@ -146,10 +143,7 @@ describe(testName, () => {
   });
 });
 
-testName = "TS_StreamsConversations_" + env;
-
 describe(testName, () => {
-  let personas: Record<string, Persona>;
   let groupCreator: (
     initiator: Persona,
     participantAddresses: string[],
@@ -165,23 +159,26 @@ describe(testName, () => {
       }
       return initiator.client.conversations.newGroup(participantAddresses);
     };
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
-      "dev",
       testName,
       "conversation",
     );
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
+  });
+
+  beforeEach(() => {
+    start = performance.now();
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
   });
 
   it("detects new group conversation creation with three participants", async () => {
@@ -204,28 +201,27 @@ describe(testName, () => {
   });
 });
 
-testName = "TS_StreamsConsent_" + env;
 describe(testName, () => {
-  let personas: Record<string, Persona>;
-
   beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["alice", "bob", "charlie", "dave", "eve", "random"],
-      env,
       testName,
       "consent",
     );
   });
-
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
+  });
+
+  beforeEach(() => {
+    start = performance.now();
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
   });
 
   it("should stream consent updates when a user is blocked", async () => {

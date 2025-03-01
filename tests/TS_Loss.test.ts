@@ -1,18 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { closeEnv, loadEnv } from "../helpers/client";
 import {
   defaultValues,
   type Conversation,
   type Persona,
-  type XmtpEnv,
 } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "TS_Stream_Loss_" + env;
-loadEnv(testName);
+const testName = "TS_Loss";
+await loadEnv(testName);
 
 const amountofMessages = 10; // Number of messages to collect per receiver
 const receivers = 10;
@@ -36,23 +33,13 @@ describe(
 
     // 1. Setup
     beforeAll(async () => {
-      const logger = await createLogger(testName);
-      overrideConsole(logger);
-
       // Use getWorkers to spin up many personas. This is resource-intensive.
-      personas = await getWorkers(receivers, env, testName);
+      personas = await getWorkers(receivers, testName);
     });
 
     // 2. Teardown
     afterAll(async () => {
-      await flushLogger(testName);
-
-      // Terminate each worker thread
-      await Promise.all(
-        Object.values(personas).map(async (persona) => {
-          await persona.worker?.terminate();
-        }),
-      );
+      await closeEnv(testName, personas);
     });
 
     it("TS_Stream_Loss: should verify message order when receiving via streams", async () => {

@@ -1,18 +1,15 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import { closeEnv, loadEnv } from "../helpers/client";
 import {
   defaultValues,
   type Conversation,
   type Persona,
-  type XmtpEnv,
 } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "order_" + env;
-loadEnv(testName);
+const testName = "order";
+await loadEnv(testName);
 
 const amount = 30; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
@@ -26,8 +23,6 @@ describe(
     let gmSender: (convo: Conversation, message: string) => Promise<void>;
 
     beforeAll(async () => {
-      const logger = await createLogger(testName);
-      overrideConsole(logger);
       personas = await getWorkers(
         [
           "bob",
@@ -45,18 +40,12 @@ describe(
           "karen",
           "larry",
         ],
-        env,
         testName,
       );
     });
 
     afterAll(async () => {
-      await flushLogger(testName);
-      await Promise.all(
-        Object.values(personas).map(async (persona) => {
-          await persona.worker?.terminate();
-        }),
-      );
+      await closeEnv(testName, personas);
     });
 
     it("TC_StreamOrder: should verify message order when receiving via streams", async () => {

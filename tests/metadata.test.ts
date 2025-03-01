@@ -1,27 +1,18 @@
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
-import {
-  type Conversation,
-  type Persona,
-  type XmtpEnv,
-} from "../helpers/types";
+import { closeEnv, loadEnv } from "../helpers/client";
+import { type Conversation, type Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "metadata_" + env;
-loadEnv(testName);
+const testName = "metadata";
+await loadEnv(testName);
 
 describe(testName, () => {
   let bobsGroup: Conversation;
   let personas: Record<string, Persona>;
   beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
-      "dev",
       testName,
     );
 
@@ -36,12 +27,7 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
   it("TC_ReceiveMetadata: should update group name", async () => {

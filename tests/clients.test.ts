@@ -1,7 +1,6 @@
 import fs from "fs";
-import { beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, overrideConsole } from "../helpers/logger";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { closeEnv, loadEnv } from "../helpers/client";
 import { type Persona } from "../helpers/types";
 import {
   createMultipleInstallations,
@@ -9,30 +8,23 @@ import {
   getWorkers,
 } from "../helpers/workers/factory";
 
-const env = "dev";
-const testName = "clients_" + env;
-loadEnv(testName);
-/* 
-TODO:
-- Inconsistent test results (~20%).
-- Performance issues (>1000ms) for operations
-- Old sdk to new sdk breaks (node 41 to 42)
-- agent stream failures
-- 20% missed streams
+const testName = "clients";
+await loadEnv(testName);
 
-*/
 describe(testName, () => {
   let personas: Record<string, Persona>;
 
   let folderCount: number = 0;
-  beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
-    fs.rmSync(".data", { recursive: true, force: true }); // TODO: remove this
+  beforeAll(() => {
+    fs.rmSync(".data", { recursive: true, force: true });
+  });
+
+  afterAll(async () => {
+    await closeEnv(testName, personas);
   });
 
   it("create random personas", async () => {
-    personas = await getWorkers(["random"], env, testName, "none");
+    personas = await getWorkers(["random"], testName, "none");
     folderCount++;
     expect(personas.random.client?.accountAddress).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
@@ -40,14 +32,14 @@ describe(testName, () => {
 
   it("should create a persona", async () => {
     // Get Bob's persona using the enum value.
-    personas = await getWorkers(["bob", "random"], env, testName, "none");
+    personas = await getWorkers(["bob", "random"], testName, "none");
     folderCount++;
     expect(personas.bob.client?.accountAddress).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create a random persona", async () => {
-    personas = await getWorkers(["random"], env, testName, "none");
+    personas = await getWorkers(["random"], testName, "none");
 
     expect(personas.random.client?.accountAddress).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
@@ -56,7 +48,6 @@ describe(testName, () => {
   it("should create multiple personas", async () => {
     personas = await getWorkers(
       ["bob", "alice", "randompep", "randombob"],
-      env,
       testName,
       "none",
     );
@@ -73,7 +64,7 @@ describe(testName, () => {
   it("should create multiple installations for the same persona", async () => {
     // Create a base persona and multiple installations
 
-    personas = await getWorkers(["fabritest"], env, testName, "none");
+    personas = await getWorkers(["fabritest"], testName, "none");
 
     const suffixes = ["a", "b", "c"];
     folderCount++;
@@ -81,7 +72,6 @@ describe(testName, () => {
     const installations = await createMultipleInstallations(
       personas.fabritest,
       suffixes,
-      env,
       testName,
     );
 

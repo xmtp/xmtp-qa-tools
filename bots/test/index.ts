@@ -1,19 +1,14 @@
-import { createLogger, overrideConsole } from "@helpers/logger";
 import { getWorkers } from "@helpers/workers/factory";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
-import dotenv from "dotenv";
+import { loadEnv } from "../../helpers/client";
 import { type Persona } from "../../helpers/types";
 
-dotenv.config();
+await loadEnv("test-bot");
 
 let personas: Record<string, Persona> = {};
-const env: XmtpEnv = "production";
 async function main() {
-  const logger = await createLogger("test-bot");
-  overrideConsole(logger);
   personas = await getWorkers(
     ["bob", "bot", "alice", "joe", "sam"],
-    env,
     "test-bot",
   );
 
@@ -21,7 +16,7 @@ async function main() {
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
-
+  const env = process.env.XMTP_ENV as XmtpEnv;
   console.log(`Agent initialized on address ${client.accountAddress}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);
   console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);

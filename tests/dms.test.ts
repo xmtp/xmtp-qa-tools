@@ -1,55 +1,60 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
 import {
-  type Conversation,
-  type Persona,
-  type XmtpEnv,
-} from "../helpers/types";
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
+import { closeEnv, loadEnv } from "../helpers/client";
+import { sendMetric } from "../helpers/datadog";
+import { type Conversation, type Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env: XmtpEnv = "dev";
-const testName = "dms_" + env;
-loadEnv(testName);
+const testName = "dms";
+await loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
+  let start: number;
 
   beforeAll(async () => {
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
+    personas = await getWorkers(["bob", "joe", "sam", "random"], testName);
+  });
 
-    personas = await getWorkers(["bob", "joe", "sam"], env, testName);
-    console.log("bob", personas.bob.client?.accountAddress);
-    console.log("joe", personas.joe.client?.accountAddress);
-    console.log("sam", personas.sam.client?.accountAddress);
+  beforeEach(() => {
+    start = performance.now();
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
   });
 
-  it("TC_CreateDM: should measure creating a DM", async () => {
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
+  });
+
+  it("createDM: should measure creating a DM", async () => {
     convo = await personas.bob.client!.conversations.newDm(
-      personas.sam.client!.accountAddress,
+      personas.random.client!.accountAddress,
     );
+
     expect(convo).toBeDefined();
     expect(convo.id).toBeDefined();
   });
 
-  it("TC_SendGM: should measure sending a gm", async () => {
+  it("sendGM: should measure sending a gm", async () => {
     // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${personas.bob.name}] Creating DM with ${personas.sam.name} at ${personas.sam.client?.accountAddress}`,
+      `[${personas.bob.name}] Creating DM with ${personas.random.name} at ${personas.random.client?.accountAddress}`,
     );
 
     const dmId = await convo.send(message);
@@ -57,7 +62,7 @@ describe(testName, () => {
     expect(dmId).toBeDefined();
   });
 
-  it("TC_ReceiveGM: should measure receiving a gm", async () => {
+  it("receiveGM: should measure receiving a gm", async () => {
     const gmMessageGenerator = (i: number, suffix: string) => {
       return `gm-${i + 1}-${suffix}`;
     };
@@ -68,10 +73,11 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       convo,
-      [personas.sam],
+      [personas.random],
       gmMessageGenerator,
       gmSender,
     );
+
     expect(verifyResult.messages.length).toEqual(1);
     expect(verifyResult.allReceived).toBe(true);
   });

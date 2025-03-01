@@ -4,7 +4,6 @@ import {
   type Consent,
   type Conversation,
   type DecodedMessage,
-  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
 import { defaultValues, type PersonaBase, type typeofStream } from "../types";
@@ -46,7 +45,6 @@ const workerBootstrap = /* JavaScript */ `
 export class WorkerClient extends Worker {
   public name: string;
   private installationId: string;
-  private env: XmtpEnv;
   private sdkVersion: string;
   private testName: string;
   private nameId: string;
@@ -58,7 +56,6 @@ export class WorkerClient extends Worker {
 
   constructor(
     persona: PersonaBase,
-    env: XmtpEnv,
     typeofStream: typeofStream,
     options: WorkerOptions = {},
   ) {
@@ -66,7 +63,6 @@ export class WorkerClient extends Worker {
       __ts_worker_filename: new URL("../workers/thread.ts", import.meta.url)
         .pathname,
       persona,
-      env,
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
@@ -76,7 +72,6 @@ export class WorkerClient extends Worker {
     this.installationId = persona.installationId;
     this.nameId = `${this.name.replaceAll("-" + this.installationId, "")}-${this.installationId}`;
     this.sdkVersion = persona.sdkVersion;
-    this.env = env;
     this.testName = persona.testName;
     this.walletKey = persona.walletKey;
     this.encryptionKeyHex = persona.encryptionKey;
@@ -128,7 +123,6 @@ export class WorkerClient extends Worker {
     const dbPath = getDbPath(
       this.name,
       await signer.getAddress(),
-      this.env,
       {
         installationId: this.installationId,
         sdkVersion: this.sdkVersion,
@@ -140,7 +134,6 @@ export class WorkerClient extends Worker {
     );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
-      env: this.env,
       dbPath,
       // @ts-expect-error: loggingLevel is not typed
       loggingLevel: process.env.LOGGING_LEVEL,

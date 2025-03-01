@@ -1,7 +1,7 @@
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { type XmtpEnv } from "@xmtp/node-sdk";
+import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
 import {
@@ -17,13 +17,11 @@ import { WorkerClient } from "./main";
  * and ensuring they each have a WorkerClient + XMTP Client.
  */
 export class PersonaFactory {
-  private env: XmtpEnv;
   private testName: string;
   private activeWorkers: WorkerClient[] = []; // Add this to track workers
 
   private typeofStream: typeofStream;
-  constructor(env: XmtpEnv, testName: string, typeofStream: typeofStream) {
-    this.env = env;
+  constructor(testName: string, typeofStream: typeofStream) {
     this.testName = testName;
     this.typeofStream = typeofStream;
   }
@@ -61,7 +59,6 @@ export class PersonaFactory {
         `[PersonaFactory] Using env keys for ${baseName}: ${process.env[walletKeyEnv].substring(0, 6)}...`,
       );
 
-      // Keys exist in env, use them
       this.keysCache[baseName] = {
         walletKey: process.env[walletKeyEnv],
         encryptionKey: process.env[encryptionKeyEnv],
@@ -195,7 +192,7 @@ export class PersonaFactory {
 
     // Spin up Workers in parallel
     const messageWorkers = await Promise.all(
-      personas.map((p) => new WorkerClient(p, this.env, this.typeofStream)),
+      personas.map((p) => new WorkerClient(p, this.typeofStream)),
     );
 
     // Initialize each worker's XMTP client in parallel
@@ -223,12 +220,10 @@ export class PersonaFactory {
  *   { alice: Persona, bob: Persona }
  *
  * @param descriptors e.g. ["aliceA12", "bob", "random1"]
- * @param env         The XMTP environment to use
  * @param testName    Not currently used, but can be used for labeling or logging
  */
 export async function getWorkers(
   descriptorsOrAmount: string[] | number,
-  env: XmtpEnv,
   testName: string,
   typeofStream: typeofStream = "message",
 ): Promise<Record<string, Persona>> {
@@ -241,10 +236,12 @@ export async function getWorkers(
     descriptors = descriptorsOrAmount;
   }
 
-  const personaFactory = new PersonaFactory(env, testName, typeofStream);
+  const personaFactory = new PersonaFactory(testName, typeofStream);
 
   const personas = await personaFactory.createPersonas(descriptors);
-
+  Object.values(personas).forEach((persona) => {
+    console.log(persona.name, persona.client?.accountAddress);
+  });
   return personas.reduce<Record<string, Persona>>((acc, p) => {
     // Use the full descriptor as the key in the returned object
     acc[p.name] = p;
@@ -260,7 +257,6 @@ export function getDataSubFolderCount() {
 export async function createMultipleInstallations(
   persona: Persona,
   suffixes: string[],
-  env: string,
   testName: string,
 ): Promise<Record<string, Persona>> {
   // Create installations with different IDs for the same persona
@@ -270,15 +266,28 @@ export async function createMultipleInstallations(
     const installId = `${persona.name}-${suffix}`;
 
     // Create worker with the installation ID
-    const installations = await getWorkers(
-      [installId],
-      env as XmtpEnv,
-      testName,
-      "none",
-    );
+    const installations = await getWorkers([installId], testName, "none");
 
     installations[installId] = Object.values(installations)[0];
   }
 
   return installations;
+}
+
+export async function getInstallations(client: Client) {
+  await client.conversations.syncAll();
+  const conversations = client.conversations.list();
+  const uniqueInstallationIds = new Set<string>();
+
+  for (const conversation of conversations) {
+    await conversation.sync();
+    const members = await conversation.members();
+    for (const member of members) {
+      if (member.inboxId === client.inboxId) {
+        member.installationIds.forEach((id) => uniqueInstallationIds.add(id));
+      }
+    }
+  }
+
+  return uniqueInstallationIds;
 }

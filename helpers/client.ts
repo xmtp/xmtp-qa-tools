@@ -4,26 +4,49 @@ import path from "node:path";
 import { type Signer } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
-import { toBytes } from "viem";
+import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
-import { defaultValues } from "./types";
+import { sepolia } from "viem/chains";
+import { flushMetrics, initDataDog } from "./datadog";
+import { createLogger, flushLogger, overrideConsole } from "./logger";
+import { defaultValues, type Persona, type XmtpEnv } from "./types";
 
-export const createSigner = (privateKey: `0x${string}`): Signer => {
-  const account = privateKeyToAccount(privateKey);
+interface User {
+  key: string;
+  account: ReturnType<typeof privateKeyToAccount>;
+  wallet: ReturnType<typeof createWalletClient>;
+}
+
+export const createUser = (key: string): User => {
+  const account = privateKeyToAccount(key as `0x${string}`);
   return {
-    getAddress: () => account.address,
+    key,
+    account,
+    wallet: createWalletClient({
+      account,
+      chain: sepolia,
+      transport: http(),
+    }),
+  };
+};
+
+export const createSigner = (key: string): Signer => {
+  const user = createUser(key);
+  return {
+    walletType: "EOA",
+    getAddress: () => user.account.address,
     signMessage: async (message: string) => {
-      const signature = await account.signMessage({
+      const signature = await user.wallet.signMessage({
         message,
+        account: user.account,
       });
       return toBytes(signature);
     },
-  } as Signer;
+  };
 };
 export const getDbPath = (
   name: string,
   accountAddress: string,
-  env: string,
   instance?: {
     installationId?: string;
     sdkVersion?: string;
@@ -41,6 +64,7 @@ export const getDbPath = (
   // For the identifier, use either the name as-is (if it already has installation ID)
   // or construct it with the installation ID from instance
   let identifier;
+  const env = process.env.XMTP_ENV as XmtpEnv;
   if (name.includes("-")) {
     // Name already has installation ID (e.g., "fabritest-a")
     identifier = `${name.toLowerCase()}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
@@ -60,12 +84,10 @@ export const getDbPath = (
     basePath = `${preBasePath}/bugs/${tests.testName}/.data/${baseName}`;
   }
 
-  console.time(`[${name}] - create basePath`);
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
     console.warn("Creating directory", basePath);
   }
-  console.timeEnd(`[${name}] - create basePath`);
   console.timeEnd(`[${name}] - getDbPath`);
 
   return `${basePath}/${identifier}`;
@@ -83,8 +105,12 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
 /**
  * Loads environment variables from the specified test's .env file
  */
-export function loadEnv(testName: string) {
+export async function loadEnv(testName: string) {
   // Create the .env file path
+  const logger = await createLogger(testName);
+  overrideConsole(logger);
+  initDataDog(testName);
+
   let envPath = path.join(".env");
 
   if (testName.includes("bug")) {
@@ -97,4 +123,17 @@ export function loadEnv(testName: string) {
   }
   dotenv.config({ path: envPath });
   process.env.CURRENT_ENV_PATH = envPath;
+}
+export async function closeEnv(
+  testName: string,
+  personas: Record<string, Persona>,
+) {
+  flushLogger(testName);
+
+  await flushMetrics();
+  await Promise.all(
+    Object.values(personas).map(async (persona) => {
+      await persona.worker?.terminate();
+    }),
+  );
 }

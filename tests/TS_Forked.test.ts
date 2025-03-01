@@ -1,45 +1,52 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { loadEnv } from "../helpers/client";
-import { createLogger, flushLogger, overrideConsole } from "../helpers/logger";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
+import { closeEnv, loadEnv } from "../helpers/client";
+import { sendMetric } from "../helpers/datadog";
 import { type Conversation, type Persona } from "../helpers/types";
 import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const env = "dev";
-const testName = "TS_Forked_" + env;
-loadEnv(testName);
+const testName = "TS_Forked";
+await loadEnv(testName);
 
 describe(testName, () => {
+  let start: number;
   let personas: Record<string, Persona>;
   let group: Conversation;
-  let gmMessageGenerator: (i: number, suffix: string) => string;
-  let gmSender: (convo: Conversation, message: string) => Promise<void>;
+  const gmMessageGenerator = (i: number, suffix: string) => {
+    return `gm-${i + 1}-${suffix}`;
+  };
+  const gmSender = async (convo: Conversation, message: string) => {
+    await convo.send(message);
+  };
 
   beforeAll(async () => {
-    gmMessageGenerator = (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
-    };
-    gmSender = async (convo: Conversation, message: string) => {
-      await convo.send(message);
-    };
-
-    const logger = await createLogger(testName);
-    overrideConsole(logger);
-
     personas = await getWorkers(
       ["bella", "dave", "elon", "diana", "diana-b", "random", "alice", "bob"],
-      env,
       testName,
     );
   });
 
   afterAll(async () => {
-    await flushLogger(testName);
-    await Promise.all(
-      Object.values(personas).map(async (p) => {
-        await p.worker?.terminate();
-      }),
-    );
+    await closeEnv(testName, personas);
+  });
+
+  beforeEach(() => {
+    start = performance.now();
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    if (testName) {
+      sendMetric(performance.now() - start, testName);
+    }
   });
 
   it("should create a group and establish baseline communication", async () => {
