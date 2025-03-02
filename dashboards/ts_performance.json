@@ -3,8 +3,9 @@
   "description": "Metrics for XMTP SDK operations (DNS, TLS, Server Processing)",
   "widgets": [
     {
+      "id": 8186190636625556,
       "definition": {
-        "title": "Operation Duration (ms)",
+        "title": "Server Processing Average (ms)",
         "type": "query_value",
         "requests": [
           {
@@ -13,31 +14,19 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation} by {operation}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_processing,$env,$geo,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
+            "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
               {
                 "comparator": "<=",
                 "value": 300,
                 "palette": "white_on_yellow"
               },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
             ]
           }
         ],
@@ -47,6 +36,7 @@
       "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
     },
     {
+      "id": 7062709793280578,
       "definition": {
         "title": "TLS Handshake Average (ms)",
         "type": "query_value",
@@ -57,31 +47,19 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$geo,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
+            "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
               {
                 "comparator": "<=",
                 "value": 300,
                 "palette": "white_on_yellow"
               },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
             ]
           }
         ],
@@ -90,31 +68,140 @@
       },
       "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
     },
-
     {
+      "id": 8268482323253859,
       "definition": {
-        "title": "SDK Operations Performance",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "type": "timeseries",
+        "title": "Content Transfer Average (ms)",
+        "type": "query_value",
         "requests": [
           {
-            "formulas": [{ "formula": "query1" }],
+            "response_format": "scalar",
             "queries": [
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:content_transfer,$env,$geo,$libxmtp}",
+                "aggregator": "avg"
               }
             ],
-            "response_format": "timeseries",
-            "display_type": "line"
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ]
           }
-        ]
+        ],
+        "autoscale": true,
+        "precision": 2
       },
-      "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
     },
     {
+      "id": 3707182648216683,
+      "definition": {
+        "title": "Top operation by duration (ms)",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 2
+      },
+      "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 2793414807712549,
+      "definition": {
+        "title": "Group Creation Average (ms)",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$libxmtp}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 2
+      },
+      "layout": { "x": 8, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 132554502285611,
+      "definition": {
+        "title": "Message Reception Average (ms)",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:receivegroupmessage,$env,$geo,$libxmtp}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 2
+      },
+      "layout": { "x": 10, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 7792773130762525,
       "definition": {
         "title": "Network Performance",
         "show_legend": true,
@@ -127,7 +214,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network} by {network_phase}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$libxmtp} by {network_phase}"
               }
             ],
             "response_format": "timeseries",
@@ -135,9 +222,34 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
+      "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
     },
     {
+      "id": 4980151126779186,
+      "definition": {
+        "title": "SDK Operations Performance",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp} by {operation}"
+              }
+            ],
+            "response_format": "timeseries",
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 6, "y": 2, "width": 6, "height": 4 }
+    },
+    {
+      "id": 2220493386247805,
       "definition": {
         "title": "SDK Operations Performance (Ordered by Duration)",
         "type": "query_table",
@@ -147,7 +259,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp} by {operation}"
               }
             ],
             "response_format": "scalar",
@@ -155,75 +267,57 @@
             "limit": 100,
             "sort": {
               "count": 500,
-              "order_by": [
-                {
-                  "type": "formula",
-                  "index": 0,
-                  "order": "desc"
-                }
-              ]
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
             },
-            "formulas": [
-              {
-                "alias": "Duration (ms)",
-                "formula": "query1"
-              }
-            ]
+            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
           }
         ],
         "has_search_bar": "auto"
       },
-      "layout": {
-        "x": 0,
-        "y": 6,
-        "width": 6,
-        "height": 4
-      }
+      "layout": { "x": 6, "y": 6, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
     {
       "name": "env",
       "prefix": "env",
+      "available_values": [],
       "default": "dev"
     },
-    {
-      "name": "geo",
-      "prefix": "geo",
-      "default": "*"
-    },
+    { "name": "geo", "prefix": "geo", "available_values": [], "default": "*" },
     {
       "name": "test",
       "prefix": "test",
+      "available_values": [],
       "default": "*"
     },
     {
       "name": "libxmtp",
       "prefix": "libxmtp",
+      "available_values": [],
       "default": "*"
     },
     {
       "name": "operation",
       "prefix": "operation",
+      "available_values": [],
       "default": "*"
     },
     {
       "name": "metric_type",
       "prefix": "metric_type",
+      "available_values": [],
       "default": "*"
     }
   ],
   "layout_type": "ordered",
+  "notify_list": [],
   "template_variable_presets": [
-    {
-      "name": "us",
-      "template_variables": [{ "name": "geo", "value": "us" }]
-    },
     {
       "name": "outside-us",
       "template_variables": [{ "name": "geo", "value": "south-america" }]
-    }
+    },
+    { "name": "us", "template_variables": [{ "name": "geo", "value": "us" }] }
   ],
-  "notify_list": [],
   "reflow_type": "fixed"
 }
