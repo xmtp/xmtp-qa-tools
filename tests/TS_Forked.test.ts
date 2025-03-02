@@ -10,7 +10,7 @@ import {
 import { closeEnv, loadEnv } from "../helpers/client";
 import { sendMetric } from "../helpers/datadog";
 import { type Conversation, type Persona } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
+import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "TS_Forked";
@@ -20,12 +20,6 @@ describe(testName, () => {
   let start: number;
   let personas: Record<string, Persona>;
   let group: Conversation;
-  const gmMessageGenerator = (i: number, suffix: string) => {
-    return `gm-${i + 1}-${suffix}`;
-  };
-  const gmSender = async (convo: Conversation, message: string) => {
-    await convo.send(message);
-  };
 
   beforeAll(async () => {
     personas = await getWorkers(
@@ -45,7 +39,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      sendMetric(performance.now() - start, testName, personas);
     }
   });
 
@@ -63,12 +57,7 @@ describe(testName, () => {
     // Send initial messages to establish that communication works
     await group.send("Initial message in epoch 0");
 
-    const result = await verifyStream(
-      group,
-      [personas.elon, personas.dave],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [personas.elon, personas.dave]);
     expect(result.allReceived).toBe(true);
   });
 
@@ -84,12 +73,12 @@ describe(testName, () => {
     await group.send("Message after first epoch transition");
 
     // Verify all members including new ones can receive messages
-    const result = await verifyStream(
-      group,
-      [personas.elon, personas.dave, personas.diana, personas.random],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [
+      personas.elon,
+      personas.dave,
+      personas.diana,
+      personas.random,
+    ]);
     expect(result.allReceived).toBe(true);
   });
 
@@ -141,18 +130,13 @@ describe(testName, () => {
     await elonGroup.send("Message from Elon after concurrent operations");
 
     // Verify messages can be received by all remaining members
-    const result = await verifyStream(
-      group,
-      [
-        personas.bella,
-        personas.dave,
-        personas.elon,
-        personas.diana,
-        personas.alice,
-      ],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [
+      personas.bella,
+      personas.dave,
+      personas.elon,
+      personas.diana,
+      personas.alice,
+    ]);
 
     expect(result.allReceived).toBe(true);
   });
@@ -254,12 +238,7 @@ describe(testName, () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Verify all members can communicate
-    const result = await verifyStream(
-      group,
-      [personas.bella, dianaNewDevice],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [personas.bella, dianaNewDevice]);
 
     expect(result.allReceived).toBe(true);
 
@@ -317,19 +296,14 @@ describe(testName, () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Verify all members are in sync and can receive messages
-    const result = await verifyStream(
-      group,
-      [
-        personas.bella,
-        personas.dave,
-        personas.elon,
-        personas.diana,
-        personas.alice,
-        personas.bob,
-      ],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [
+      personas.bella,
+      personas.dave,
+      personas.elon,
+      personas.diana,
+      personas.alice,
+      personas.bob,
+    ]);
 
     expect(result.allReceived).toBe(true);
   });
@@ -378,8 +352,6 @@ describe(testName, () => {
     const result = await verifyStream(
       group,
       await getPersonasFromGroup(group, personas),
-      gmMessageGenerator,
-      gmSender,
     );
 
     expect(result.allReceived).toBe(true);
@@ -419,43 +391,15 @@ describe(testName, () => {
     expect(daveMetadata?.name).toBe(bellaMetadata?.name);
 
     // Verify messages can be sent and received
-    const result = await verifyStream(
-      group,
-      [
-        personas.bella,
-        personas.dave,
-        personas.elon,
-        personas.diana,
-        personas.alice,
-        personas.bob,
-      ],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(group, [
+      personas.bella,
+      personas.dave,
+      personas.elon,
+      personas.diana,
+      personas.alice,
+      personas.bob,
+    ]);
 
     expect(result.allReceived).toBe(true);
   });
 });
-
-async function getPersonasFromGroup(
-  group: Conversation,
-  personas: Record<string, Persona>,
-): Promise<Persona[]> {
-  await group.sync();
-  const members = await group.members();
-  const memberInboxIds = members.map((member) => {
-    return {
-      inboxId: member.inboxId,
-    };
-  });
-  const personasFromGroup = memberInboxIds.map((m) => {
-    return Object.keys(personas).find(
-      (name) => personas[name].client?.inboxId === m.inboxId,
-    );
-  });
-  // Convert persona names to actual Persona objects and filter out undefined values
-  const personaObjects = personasFromGroup
-    .filter((name): name is string => name !== undefined)
-    .map((name) => personas[name]);
-  return personaObjects;
-}

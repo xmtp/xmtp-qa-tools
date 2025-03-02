@@ -27,10 +27,6 @@ describe(
   () => {
     let personas: Record<string, Persona>;
 
-    // We'll define these so they're accessible in the test
-    let gmMessageGenerator: (i: number, suffix: string) => string;
-    let gmSender: (convo: Conversation, message: string) => Promise<void>;
-
     // 1. Setup
     beforeAll(async () => {
       // Use getWorkers to spin up many personas. This is resource-intensive.
@@ -60,24 +56,12 @@ describe(
       console.log("[Test] Created group with ID:", group.id);
       expect(group.id).toBeDefined();
 
-      gmMessageGenerator = (i: number, suffix: string) => {
-        return `gm-${i + 1}-${suffix}`;
-      };
-
-      gmSender = async (convo: Conversation, message: string) => {
-        console.time("[Test] Message send time");
-        await convo.send(message);
-        console.timeEnd("[Test] Message send time");
-      };
-
       // Verify that each receiver collects `amount` messages of type "text".
       console.log("[Test] Starting message verification");
       console.time("[Test] Verification time");
       const collectedMessages = await verifyStream(
         group,
         Object.values(personas),
-        gmMessageGenerator,
-        gmSender,
         "text",
         amountofMessages,
       );

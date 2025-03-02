@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import dotenv from "dotenv";
+import type { Persona } from "./types";
 
 dotenv.config();
 
@@ -44,11 +45,12 @@ export function initDataDog(testName: string): boolean {
   }
 }
 
-export function sendMetric(
+export async function sendMetric(
   value: number,
   key: string,
+  personas: Record<string, Persona>,
   skipNetworkStats: boolean = false,
-): void {
+): Promise<void> {
   if (!isInitialized) {
     console.warn(
       `⚠️ DataDog not initialized. Metric '${key}' will not be sent.`,
@@ -57,6 +59,7 @@ export function sendMetric(
   }
 
   try {
+    const firstPersona = Object.values(personas)[0];
     let metricName = (key.match(/^([^:]+):/) || [null, key])[1].replaceAll(
       " > ",
       ".",
@@ -68,11 +71,34 @@ export function sendMetric(
       );
       metricName = metricName.replaceAll(".dms.", ".");
     }
-    // console.log(`metricName: ${metricName} and value: ${value}`);
-    metrics.gauge(metricName, value);
-    // Only report network stats if not already reporting network stats
+
+    // Extract operation name for tagging - ensure consistent naming
+    const operationParts = metricName.split(".");
+    const operationName =
+      operationParts[operationParts.length - 1] || "unknown";
+
+    // Ensure consistent metric naming format
+    if (!metricName.startsWith("xmtp.sdk.ts_performance.")) {
+      metricName = `xmtp.sdk.ts_performance.${operationName}`;
+    }
+
+    // console.log(
+    //   `Sending metric: ${metricName} with value: ${value} and operation: ${operationName}`,
+    // );
+
+    metrics.gauge(metricName, value, [
+      `qa_libxmtp:${firstPersona.version}`,
+      `qa_operation:${operationName}`,
+    ]);
+
     if (!skipNetworkStats && !metricName.includes(".network.")) {
-      void reportNetworkStats(metricName);
+      const networkStats = await reportNetworkStats(metricName);
+      Object.entries(networkStats).forEach(([stat, value]) => {
+        metrics.gauge(stat, value, [
+          `qa_libxmtp:${firstPersona.version}`,
+          `qa_operation:${operationName}`, // Use same normalized name for network stats
+        ]);
+      });
     }
   } catch (error) {
     console.error(`❌ Error sending metric '${key}':`, error);
@@ -138,9 +164,9 @@ export async function getNetworkStats(
       tlsTimeInMs > 300 ||
       totalTransferTimeInMs > 300
     ) {
-      console.warn(
-        `Slow connection detected - total: ${totalTransferTimeInMs.toFixed(2)}ms, TLS: ${tlsTimeInMs.toFixed(2)}ms, processing: ${processingTimeInMs.toFixed(2)}ms`,
-      );
+      // console.warn(
+      //   `Slow connection detected - total: ${totalTransferTimeInMs.toFixed(2)}ms, TLS: ${tlsTimeInMs.toFixed(2)}ms, processing: ${processingTimeInMs.toFixed(2)}ms`,
+      // );
     }
 
     return stats;
@@ -167,17 +193,13 @@ export async function getNetworkStats(
 export async function reportNetworkStats(
   operation: string,
   endpoint?: string,
-): Promise<void> {
-  try {
-    const networkStats = await getNetworkStats(endpoint);
-
-    for (const [key, value] of Object.entries(networkStats)) {
-      // Convert to milliseconds and format the key for metrics
-      const metricValue = value * 1000;
-      const metricKey = `${operation}.network.${key.toLowerCase().replace(/\s+/g, "_")}`;
-      sendMetric(metricValue, metricKey, true);
-    }
-  } catch (error) {
-    console.error(`Failed to report network stats for ${operation}:`, error);
+): Promise<Record<string, number>> {
+  const returnValue: Record<string, number> = {};
+  const networkStats = await getNetworkStats(endpoint);
+  for (const [key, value] of Object.entries(networkStats)) {
+    const metricValue = value * 1000;
+    const metricKey = `${operation}.network.${key.toLowerCase().replace(/\s+/g, "_")}`;
+    returnValue[metricKey] = metricValue;
   }
+  return returnValue;
 }

@@ -162,7 +162,7 @@ export class WorkerClient extends Worker {
     // this.startConversationStream();
 
     console.timeEnd(`[${this.nameId}] Initialize XMTP client`);
-    return { client: this.client, dbPath, version: Client.version };
+    return { client: this.client, dbPath, version: version ?? "" };
   }
 
   /**

@@ -36,7 +36,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      void sendMetric(performance.now() - start, testName, personas);
     }
   });
 
@@ -63,20 +63,7 @@ describe(testName, () => {
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    const gmMessageGenerator = (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
-    };
-
-    const gmSender = async (convo: Conversation, message: string) => {
-      await convo.send(message);
-    };
-
-    const verifyResult = await verifyStream(
-      convo,
-      [personas.random],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const verifyResult = await verifyStream(convo, [personas.random]);
 
     expect(verifyResult.messages.length).toEqual(1);
     expect(verifyResult.allReceived).toBe(true);

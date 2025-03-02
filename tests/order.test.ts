@@ -19,9 +19,6 @@ describe(
   () => {
     let personas: Record<string, Persona>;
 
-    let gmMessageGenerator: (i: number, suffix: string) => string;
-    let gmSender: (convo: Conversation, message: string) => Promise<void>;
-
     beforeAll(async () => {
       personas = await getWorkers(
         [
@@ -63,19 +60,10 @@ describe(
         (p) => p.client?.accountAddress !== personas.bob.client?.accountAddress,
       );
 
-      gmMessageGenerator = (i: number, suffix: string) => {
-        return `gm-${i + 1}-${suffix}`;
-      };
-      gmSender = async (convo: Conversation, message: string) => {
-        await convo.send(message);
-      };
-
       // Collect messages by setting up listeners before sending and then sending known messages.
       const collectedMessages = await verifyStream(
         group,
         receivers,
-        gmMessageGenerator,
-        gmSender,
         "text",
         10,
       );

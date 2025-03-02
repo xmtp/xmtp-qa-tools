@@ -3,6 +3,7 @@
   "description": "Metrics for XMTP SDK operations (DNS, TLS, Server Processing)",
   "widgets": [
     {
+      "id": 1035665042386260,
       "definition": {
         "title": "Create DM Average (ms)",
         "type": "query_value",
@@ -17,27 +18,15 @@
                 "aggregator": "avg"
               }
             ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
+            "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
               {
                 "comparator": "<=",
                 "value": 300,
                 "palette": "white_on_yellow"
               },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
             ]
           }
         ],
@@ -47,6 +36,7 @@
       "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
     },
     {
+      "id": 1070356135122934,
       "definition": {
         "title": "TLS Handshake Average (ms)",
         "type": "query_value",
@@ -61,27 +51,15 @@
                 "aggregator": "avg"
               }
             ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
+            "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
               {
                 "comparator": "<=",
                 "value": 300,
                 "palette": "white_on_yellow"
               },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
             ]
           }
         ],
@@ -91,6 +69,7 @@
       "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
     },
     {
+      "id": 2086792500299912,
       "definition": {
         "title": "Content Transfer Average (ms)",
         "type": "query_value",
@@ -105,27 +84,15 @@
                 "aggregator": "avg"
               }
             ],
-            "formulas": [
-              {
-                "formula": "query1"
-              }
-            ],
+            "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
               {
                 "comparator": "<=",
                 "value": 300,
                 "palette": "white_on_yellow"
               },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
             ]
           }
         ],
@@ -135,6 +102,82 @@
       "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
     },
     {
+      "id": 4572751823816670,
+      "definition": {
+        "title": "Top SDK Operations by Average Time (ms)",
+        "type": "toplist",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.ts_performance.createDM{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query2",
+                "query": "avg:xmtp.sdk.ts_performance.sendGM{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query3",
+                "query": "avg:xmtp.sdk.ts_performance.receiveGM{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query4",
+                "query": "avg:xmtp.sdk.ts_performance.createGroup{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query5",
+                "query": "avg:xmtp.sdk.ts_performance.createGroupByInboxIds{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query6",
+                "query": "avg:xmtp.sdk.ts_performance.updateGroupName{*}",
+                "aggregator": "avg"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query7",
+                "query": "avg:xmtp.sdk.ts_performance.addMembers{*}",
+                "aggregator": "avg"
+              }
+            ],
+            "response_format": "scalar",
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ],
+            "formulas": [
+              { "formula": "query1", "alias": "Create DM" },
+              { "formula": "query2", "alias": "Send GM" },
+              { "formula": "query3", "alias": "Receive GM" },
+              { "formula": "query4", "alias": "Create Group" },
+              { "formula": "query5", "alias": "Create Group By Inbox Ids" },
+              { "formula": "query6", "alias": "Update Group Name" },
+              { "formula": "query7", "alias": "Add Members" }
+            ]
+          }
+        ]
+      },
+      "layout": { "x": 6, "y": 0, "width": 4, "height": 2 }
+    },
+    {
+      "id": 8656283950468599,
       "definition": {
         "title": "SDK Operations Performance",
         "show_legend": true,
@@ -232,6 +275,7 @@
       "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
     },
     {
+      "id": 332458450576053,
       "definition": {
         "title": "Network Performance",
         "show_legend": true,
@@ -261,114 +305,37 @@
         ]
       },
       "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
-    },
-    {
-      "definition": {
-        "title": "Top SDK Operations by Average Time (ms)",
-        "type": "toplist",
-        "requests": [
-          {
-            "formulas": [
-              { "formula": "query1", "alias": "Create DM" },
-              { "formula": "query2", "alias": "Send GM" },
-              { "formula": "query3", "alias": "Receive GM" },
-              { "formula": "query4", "alias": "Create Group" },
-              { "formula": "query5", "alias": "Create Group By Inbox Ids" },
-              { "formula": "query6", "alias": "Update Group Name" },
-              { "formula": "query7", "alias": "Add Members" }
-            ],
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.ts_performance.createDM{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query2",
-                "query": "avg:xmtp.sdk.ts_performance.sendGM{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query3",
-                "query": "avg:xmtp.sdk.ts_performance.receiveGM{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query4",
-                "query": "avg:xmtp.sdk.ts_performance.createGroup{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query5",
-                "query": "avg:xmtp.sdk.ts_performance.createGroupByInboxIds{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query6",
-                "query": "avg:xmtp.sdk.ts_performance.updateGroupName{*}",
-                "aggregator": "avg"
-              },
-              {
-                "data_source": "metrics",
-                "name": "query7",
-                "query": "avg:xmtp.sdk.ts_performance.addMembers{*}",
-                "aggregator": "avg"
-              }
-            ],
-            "response_format": "scalar",
-            "conditional_formats": [
-              {
-                "comparator": "<=",
-                "value": 100,
-                "palette": "white_on_green"
-              },
-              {
-                "comparator": "<=",
-                "value": 300,
-                "palette": "white_on_yellow"
-              },
-              {
-                "comparator": ">",
-                "value": 300,
-                "palette": "white_on_red"
-              }
-            ]
-          }
-        ]
-      },
-      "layout": { "x": 6, "y": 0, "width": 4, "height": 2 }
     }
   ],
   "template_variables": [
     {
       "name": "qa_env",
       "prefix": "qa_env",
+      "available_values": [],
       "default": "dev"
     },
     {
       "name": "qa_geo",
       "prefix": "qa_geo",
+      "available_values": [],
       "default": "us"
     },
     {
       "name": "qa_test",
       "prefix": "qa_test",
+      "available_values": [],
       "default": "ts_performance"
     },
     {
       "name": "qa_libxmtp",
       "prefix": "qa_libxmtp",
+      "available_values": [],
       "default": "*"
     },
     {
       "name": "qa_operation",
       "prefix": "qa_operation",
+      "available_values": [],
       "default": "*"
     }
   ],
@@ -376,3 +343,4 @@
   "notify_list": [],
   "reflow_type": "fixed"
 }
+f

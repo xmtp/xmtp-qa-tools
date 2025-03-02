@@ -11,7 +11,7 @@ import {
 import { closeEnv, loadEnv } from "../helpers/client";
 import { sendMetric } from "../helpers/datadog";
 import type { Persona } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
+import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "ts_performance";
@@ -37,7 +37,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      void sendMetric(performance.now() - start, testName, personas);
     }
   });
 
@@ -64,39 +64,17 @@ describe(testName, () => {
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    const gmMessageGenerator = (i: number, suffix: string) => {
-      return `gm-${i + 1}-${suffix}`;
-    };
-
-    const gmSender = async (convo: Conversation, message: string) => {
-      await convo.send(message);
-    };
-
-    const verifyResult = await verifyStream(
-      convo,
-      [personas.random],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const verifyResult = await verifyStream(convo, [personas.random]);
 
     expect(verifyResult.messages.length).toEqual(1);
     expect(verifyResult.allReceived).toBe(true);
   });
-});
 
-describe(testName, () => {
-  let personas: Record<string, Persona>;
+  let groupPersonas: Record<string, Persona>;
   let group: Conversation;
-  let start: number;
-  const gmMessageGenerator = (i: number, suffix: string) => {
-    return `gm-${i + 1}-${suffix}`;
-  };
-  const gmSender = async (convo: Conversation, message: string) => {
-    await convo.send(message);
-  };
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    groupPersonas = await getWorkers(
       [
         "henry",
         "ivy",
@@ -107,6 +85,34 @@ describe(testName, () => {
         "nancy",
         "oscar",
         "randomguy",
+        "zack",
+        "adam",
+        "bella",
+        "carl",
+        "diana",
+        "eric",
+        "fiona",
+        "george",
+        "hannah",
+        "ian",
+        "julia",
+        "keith",
+        "lisa",
+        "mike",
+        "nina",
+        "oliver",
+        "penny",
+        "quentin",
+        "rosa",
+        "sam",
+        "tina",
+        "uma",
+        "vince",
+        "walt",
+        "xena",
+        "yara",
+        "zara",
+        "guada",
       ],
       testName,
     );
@@ -117,25 +123,25 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, groupPersonas);
   });
 
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      void sendMetric(performance.now() - start, testName, groupPersonas);
     }
   });
   it("createGroup: should measure creating a group", async () => {
     console.time("create group");
-    group = await personas.henry.client!.conversations.newGroup([
-      personas.ivy.client!.accountAddress as `0x${string}`,
-      personas.jack.client!.accountAddress as `0x${string}`,
-      personas.karen.client!.accountAddress as `0x${string}`,
-      personas.nancy.client!.accountAddress as `0x${string}`,
-      personas.oscar.client!.accountAddress as `0x${string}`,
-      personas.mary.client!.accountAddress as `0x${string}`,
-      personas.larry.client!.accountAddress as `0x${string}`,
+    group = await groupPersonas.henry.client!.conversations.newGroup([
+      groupPersonas.ivy.client!.accountAddress as `0x${string}`,
+      groupPersonas.jack.client!.accountAddress as `0x${string}`,
+      groupPersonas.karen.client!.accountAddress as `0x${string}`,
+      groupPersonas.nancy.client!.accountAddress as `0x${string}`,
+      groupPersonas.oscar.client!.accountAddress as `0x${string}`,
+      groupPersonas.mary.client!.accountAddress as `0x${string}`,
+      groupPersonas.larry.client!.accountAddress as `0x${string}`,
     ]);
     console.log("Henry's group", group.id);
     console.timeEnd("create group");
@@ -146,10 +152,10 @@ describe(testName, () => {
     console.time("Henry's groupByInboxIds");
 
     const groupByInboxIds =
-      await personas.henry.client!.conversations.newGroupByInboxIds([
-        personas.ivy.client!.inboxId,
-        personas.jack.client!.inboxId,
-        personas.karen.client!.inboxId,
+      await groupPersonas.henry.client!.conversations.newGroupByInboxIds([
+        groupPersonas.ivy.client!.inboxId,
+        groupPersonas.jack.client!.inboxId,
+        groupPersonas.karen.client!.inboxId,
       ]);
 
     console.log("Henry's groupByInboxIds", groupByInboxIds.id);
@@ -170,7 +176,7 @@ describe(testName, () => {
 
     const result = await verifyStream(
       group,
-      [personas.nancy],
+      [groupPersonas.nancy],
       nameUpdateGenerator,
       nameUpdater,
       "group_updated",
@@ -183,7 +189,7 @@ describe(testName, () => {
     console.time("add members");
     const previousMembers = await group.members();
     await group.addMembers([
-      personas.randomguy.client!.accountAddress as `0x${string}`,
+      groupPersonas.randomguy.client!.accountAddress as `0x${string}`,
     ]);
     console.time("sync");
     await group.sync();
@@ -197,7 +203,7 @@ describe(testName, () => {
     console.time("remove members");
     const previousMembers = await group.members();
     await group.removeMembers([
-      personas.nancy.client!.accountAddress as `0x${string}`,
+      groupPersonas.nancy.client!.accountAddress as `0x${string}`,
     ]);
     const members = await group.members();
     console.timeEnd("remove members");
@@ -212,36 +218,30 @@ describe(testName, () => {
     expect(groupMessage).toBeDefined();
   });
 
-  it("receiveGroupMessage: should measure 1 stream catching up a message in a group", async () => {
-    // Wait for participants to see it with increased timeout
-    const verifyResult = await verifyStream(
-      group,
-      [personas.oscar],
-      gmMessageGenerator,
-      gmSender,
-    );
-    expect(verifyResult.allReceived).toBe(true);
-  });
-
   it("receiveGroupMessage: should create a group and measure all streams", async () => {
-    const newGroup = await personas.henry.client!.conversations.newGroup(
-      Object.values(personas).map(
-        (p) => p.client?.accountAddress as `0x${string}`,
-      ),
-    );
-    const verifyResult = await verifyStream(
-      newGroup,
-      Object.values(personas),
-      gmMessageGenerator,
-      gmSender,
-    );
+    const personasToVerify = await getPersonasFromGroup(group, groupPersonas);
+    const verifyResult = await verifyStream(group, personasToVerify);
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("createLargeGroup: should create a large group of 20 participants", async () => {
-    const group = await personas.henry.client!.conversations.newGroupByInboxIds(
-      Object.values(personas).map((p) => p.client?.inboxId as string),
+  it("createGroup20: should create a large group of 20 participants", async () => {
+    group = await groupPersonas.henry.client!.conversations.newGroupByInboxIds(
+      Object.values(groupPersonas).map((p) => p.client?.inboxId as string),
     );
     expect(group.id).toBeDefined();
+  });
+
+  it("sendGroupMessage20: should measure sending a gm in a group", async () => {
+    const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+    await group.send(groupMessage);
+    console.log("GM Message sent in group", groupMessage);
+    expect(groupMessage).toBeDefined();
+  });
+
+  it("receiveGroupMessage20: should create a group and measure all streams", async () => {
+    const personasToVerify = await getPersonasFromGroup(group, groupPersonas);
+    const verifyResult = await verifyStream(group, personasToVerify);
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

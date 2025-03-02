@@ -6,6 +6,29 @@ import {
 } from "./types";
 import type { MessageStreamWorker } from "./workers/main";
 
+export async function getPersonasFromGroup(
+  group: Conversation,
+  personas: Record<string, Persona>,
+): Promise<Persona[]> {
+  await group.sync();
+  const members = await group.members();
+  const memberInboxIds = members.map((member) => {
+    return {
+      inboxId: member.inboxId,
+    };
+  });
+  const personasFromGroup = memberInboxIds.map((m) => {
+    return Object.keys(personas).find(
+      (name) => personas[name].client?.inboxId === m.inboxId,
+    );
+  });
+  // Convert persona names to actual Persona objects and filter out undefined values
+  const personaObjects = personasFromGroup
+    .filter((name): name is string => name !== undefined)
+    .map((name) => personas[name]);
+  return personaObjects;
+}
+
 /**
  * Simplified `verifyStream` that sends messages to a conversation,
  * and ensures each participant collects exactly `count` messages.
@@ -17,11 +40,20 @@ import type { MessageStreamWorker } from "./workers/main";
  * @param collectorType The contentType ID to match in collecting
  * @param count Number of messages to send
  */
-export async function verifyStream<T extends string>(
+
+export async function verifyStream<T extends string = string>(
   group: Conversation,
   participants: Persona[],
-  messageGenerator: (index: number, suffix: string) => T,
-  sender: (group: Conversation, payload: T) => Promise<void>,
+  messageGenerator: (index: number, suffix: string) => T = (
+    i: number,
+    suffix: string,
+  ): T => `gm-${i + 1}-${suffix}` as T,
+  sender: (group: Conversation, payload: T) => Promise<void> = async (
+    convo: Conversation,
+    message: T,
+  ) => {
+    await convo.send(message);
+  },
   collectorType = "text",
   count = 1,
 ): Promise<VerifyStreamResult> {

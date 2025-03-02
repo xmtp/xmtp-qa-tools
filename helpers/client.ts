@@ -136,4 +136,8 @@ export async function closeEnv(
       await persona.worker?.terminate();
     }),
   );
+
+  // Import and call clearWorkerCache to ensure global cache is cleaned up
+  const { clearWorkerCache } = await import("./workers/factory");
+  await clearWorkerCache();
 }

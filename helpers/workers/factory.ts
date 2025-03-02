@@ -1,7 +1,7 @@
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { type Client } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { generateEncryptionKeyHex } from "../client";
 import {
@@ -11,6 +11,9 @@ import {
   type typeofStream,
 } from "../types";
 import { WorkerClient } from "./main";
+
+// Global cache to store workers across multiple getWorkers calls
+const globalWorkerCache: Record<string, Persona> = {};
 
 /**
  * The PersonaFactory is responsible for creating Persona objects
@@ -144,71 +147,95 @@ export class PersonaFactory {
     await this.flushWorkers();
 
     const personas: Persona[] = [];
+    const newDescriptors: string[] = [];
+    const newPersonas: Persona[] = [];
 
+    // First, check which personas already exist in the global cache
     for (const desc of descriptors) {
-      let personaData: PersonaBase;
-
-      if (desc.includes("random")) {
-        // Generate ephemeral keys
-        const { name, installationId, sdkVersion } =
-          this.parsePersonaDescriptor(desc);
-
-        const { walletKey, encryptionKey } = this.ensureKeys(name);
-
-        personaData = {
-          name: desc,
-          testName: this.testName,
-          installationId,
-          sdkVersion,
-          walletKey,
-          encryptionKey,
-        };
+      if (desc in globalWorkerCache && globalWorkerCache[desc].client) {
+        console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
+        personas.push(globalWorkerCache[desc]);
+      } else if (desc.includes("random")) {
+        // Always create new random personas
+        newDescriptors.push(desc);
       } else {
-        // Use or generate keys from environment
-        const { name, installationId, sdkVersion } =
-          this.parsePersonaDescriptor(desc);
-
-        const { walletKey, encryptionKey } = this.ensureKeys(name);
-
-        personaData = {
-          name: desc, // Use full descriptor as name to preserve installation ID
-          testName: this.testName,
-          installationId,
-          sdkVersion,
-          walletKey,
-          encryptionKey,
-        };
+        newDescriptors.push(desc);
       }
-
-      personas.push({
-        ...personaData,
-        worker: null,
-        client: null,
-        dbPath: "",
-        address: "",
-        version: "",
-      });
     }
 
-    // Spin up Workers in parallel
-    const messageWorkers = await Promise.all(
-      personas.map((p) => new WorkerClient(p, this.typeofStream)),
-    );
+    // Only create new personas for descriptors not in the cache
+    if (newDescriptors.length > 0) {
+      for (const desc of newDescriptors) {
+        let personaData: PersonaBase;
 
-    // Initialize each worker's XMTP client in parallel
-    const workers = await Promise.all([
-      ...messageWorkers.map((w) => w.initialize()),
-    ]);
+        if (desc.includes("random")) {
+          // Generate ephemeral keys
+          const { name, installationId, sdkVersion } =
+            this.parsePersonaDescriptor(desc);
 
-    personas.forEach((p, index) => {
-      p.client = workers[index].client;
-      p.dbPath = workers[index].dbPath;
-      p.version = workers[index].version;
-      p.worker = messageWorkers[index];
-    });
+          const { walletKey, encryptionKey } = this.ensureKeys(name);
 
-    // Store the workers for potential cleanup later
-    this.activeWorkers = messageWorkers;
+          personaData = {
+            name: desc,
+            testName: this.testName,
+            installationId,
+            sdkVersion,
+            walletKey,
+            encryptionKey,
+          };
+        } else {
+          // Use or generate keys from environment
+          const { name, installationId, sdkVersion } =
+            this.parsePersonaDescriptor(desc);
+
+          const { walletKey, encryptionKey } = this.ensureKeys(name);
+
+          personaData = {
+            name: desc, // Use full descriptor as name to preserve installation ID
+            testName: this.testName,
+            installationId,
+            sdkVersion,
+            walletKey,
+            encryptionKey,
+          };
+        }
+
+        newPersonas.push({
+          ...personaData,
+          worker: null,
+          client: null,
+          dbPath: "",
+          address: "",
+          version: "",
+        });
+      }
+
+      // Spin up Workers in parallel only for new personas
+      const messageWorkers = await Promise.all(
+        newPersonas.map((p) => new WorkerClient(p, this.typeofStream)),
+      );
+
+      // Initialize each worker's XMTP client in parallel
+      const workers = await Promise.all([
+        ...messageWorkers.map((w) => w.initialize()),
+      ]);
+
+      newPersonas.forEach((p, index) => {
+        p.client = workers[index].client;
+        p.dbPath = workers[index].dbPath;
+        p.version = workers[index].version;
+        p.worker = messageWorkers[index];
+
+        // Add to global cache for future reuse
+        globalWorkerCache[p.name] = p;
+      });
+
+      // Store the new workers for potential cleanup later
+      this.activeWorkers = [...this.activeWorkers, ...messageWorkers];
+
+      // Combine existing and new personas
+      personas.push(...newPersonas);
+    }
 
     return personas;
   }
@@ -247,6 +274,21 @@ export async function getWorkers(
     acc[p.name] = p;
     return acc;
   }, {});
+}
+
+// Function to clear the global worker cache if needed
+export async function clearWorkerCache(): Promise<void> {
+  for (const key in globalWorkerCache) {
+    if (globalWorkerCache[key] && globalWorkerCache[key].worker) {
+      await globalWorkerCache[key].worker.terminate();
+    }
+  }
+  // Fix: Don't use delete on dynamically computed property keys
+  // Instead, create a new empty object
+  for (const key in globalWorkerCache) {
+    // @ts-expect-error: We're intentionally clearing the cache
+    globalWorkerCache[key] = undefined;
+  }
 }
 
 export function getDataSubFolderCount() {

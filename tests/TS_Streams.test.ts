@@ -22,12 +22,7 @@ const testName = "TS_Streams";
 await loadEnv(testName);
 let personas: Record<string, Persona>;
 let start: number;
-const gmMessageGenerator = (i: number, suffix: string) => {
-  return `gm-${i + 1}-${suffix}`;
-};
-const gmSender = async (convo: Conversation, message: string) => {
-  await convo.send(message);
-};
+
 describe(testName, () => {
   beforeAll(async () => {
     personas = await getWorkers(
@@ -47,7 +42,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      sendMetric(performance.now() - start, testName, personas);
     }
   });
 
@@ -58,12 +53,7 @@ describe(testName, () => {
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyStream(
-      dmConvo,
-      [personas.alice],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(dmConvo, [personas.alice]);
     expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
@@ -74,12 +64,7 @@ describe(testName, () => {
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyStream(
-      dmConvo,
-      [personas.alice],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(dmConvo, [personas.alice]);
     expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
@@ -90,12 +75,7 @@ describe(testName, () => {
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyStream(
-      dmConvo,
-      [personas.fabri],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(dmConvo, [personas.fabri]);
     expect(result.allReceived).toBe(true);
   }); // Increase timeout if needed
 
@@ -106,12 +86,7 @@ describe(testName, () => {
     if (!dmConvo) {
       throw new Error("DM conversation not found");
     }
-    const result = await verifyStream(
-      dmConvo,
-      [personas.joe],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(dmConvo, [personas.joe]);
     expect(result.allReceived).toBe(true);
   });
 
@@ -133,12 +108,12 @@ describe(testName, () => {
         member.installationIds.length,
       );
     }
-    const result = await verifyStream(
-      newGroup,
-      [personas.bob, personas.joe, personas.elon, personas.fabri],
-      gmMessageGenerator,
-      gmSender,
-    );
+    const result = await verifyStream(newGroup, [
+      personas.bob,
+      personas.joe,
+      personas.elon,
+      personas.fabri,
+    ]);
     expect(result.allReceived).toBe(true);
   });
 });
@@ -177,7 +152,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      void sendMetric(performance.now() - start, testName, personas);
     }
   });
 
@@ -220,7 +195,7 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      sendMetric(performance.now() - start, testName);
+      void sendMetric(performance.now() - start, testName, personas);
     }
   });
 
