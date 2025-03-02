@@ -127,8 +127,8 @@ interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
   "TLS Handshake": number;
-  "Server Processing": number;
-  "Content Transfer": number;
+  "Server Call": number;
+  Processing: number;
 }
 
 /**
@@ -141,7 +141,7 @@ export async function getNetworkStats(
 ): Promise<NetworkStats> {
   try {
     // Construct the curl command with timing parameters
-    const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Processing\\": %{time_starttransfer}, \\"Content Transfer\\": %{time_total}}\\n" -o /dev/null ${endpoint}`;
+    const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}}" -o /dev/null ${endpoint}`;
 
     // Execute the curl command
     const { stdout } = await execAsync(curlCommand);
@@ -150,18 +150,16 @@ export async function getNetworkStats(
     const stats = JSON.parse(stdout.trim()) as NetworkStats;
 
     // Optional: Log warnings for slow connections
-    const tlsTimeInMs = stats["TLS Handshake"] * 1000;
-    const totalTransferTimeInMs = stats["Content Transfer"] * 1000;
-    const processingTimeInMs = totalTransferTimeInMs - tlsTimeInMs;
+    stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
 
     if (
-      processingTimeInMs > 300 ||
-      tlsTimeInMs > 300 ||
-      totalTransferTimeInMs > 300
+      stats["Processing"] * 1000 > 300 ||
+      stats["TLS Handshake"] * 1000 > 300 ||
+      stats["Server Call"] * 1000 > 300
     ) {
-      // console.warn(
-      //   `Slow connection detected - total: ${totalTransferTimeInMs.toFixed(2)}ms, TLS: ${tlsTimeInMs.toFixed(2)}ms, processing: ${processingTimeInMs.toFixed(2)}ms`,
-      // );
+      console.warn(
+        `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
+      );
     }
 
     return stats;
@@ -172,8 +170,8 @@ export async function getNetworkStats(
       "DNS Lookup": 0,
       "TCP Connection": 0,
       "TLS Handshake": 0,
-      "Server Processing": 0,
-      "Content Transfer": 0,
+      "Server Call": 0,
+      Processing: 0,
     };
   }
 }

@@ -5,7 +5,7 @@
     {
       "id": 8186190636625556,
       "definition": {
-        "title": "Server Processing Average (ms)",
+        "title": "Server Call Average (ms)",
         "type": "query_value",
         "requests": [
           {
@@ -14,7 +14,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_processing,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call,$env,$geo,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -71,7 +71,7 @@
     {
       "id": 8268482323253859,
       "definition": {
-        "title": "Content Transfer Average (ms)",
+        "title": "Processing Average (ms)",
         "type": "query_value",
         "requests": [
           {
@@ -80,7 +80,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:content_transfer,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$geo,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
