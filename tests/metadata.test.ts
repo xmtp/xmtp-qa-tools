@@ -32,19 +32,10 @@ describe(testName, () => {
 
   it("TC_ReceiveMetadata: should update group name", async () => {
     console.time("update group name");
-    const nameUpdateGenerator = (i: number, suffix: string) => {
-      return `New name-${i + 1}-${suffix}`;
-    };
 
-    const nameUpdater = (group: Conversation, newName: string) => {
-      console.log("Updating group name to", newName, "for group", group.id);
-      return group.updateName(newName);
-    };
     const verifyResult = await verifyStream(
       bobsGroup,
       [personas.joe],
-      nameUpdateGenerator,
-      nameUpdater,
       "group_updated",
     );
     expect(verifyResult.allReceived).toBe(true);

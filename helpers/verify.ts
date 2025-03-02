@@ -41,22 +41,34 @@ export async function getPersonasFromGroup(
  * @param count Number of messages to send
  */
 
+const nameUpdateGenerator = (i: number, suffix: string) => {
+  return `New name-${i + 1}-${suffix}`;
+};
+
+const nameUpdater = async (group: Conversation, payload: string) => {
+  await group.updateName(payload);
+};
+
 export async function verifyStream<T extends string = string>(
   group: Conversation,
   participants: Persona[],
-  messageGenerator: (index: number, suffix: string) => T = (
+  collectorType = "text",
+  count = 1,
+  generator: (index: number, suffix: string) => T = (
     i: number,
     suffix: string,
   ): T => `gm-${i + 1}-${suffix}` as T,
   sender: (group: Conversation, payload: T) => Promise<void> = async (
-    convo: Conversation,
-    message: T,
+    group: Conversation,
+    payload: T,
   ) => {
-    await convo.send(message);
+    await group.send(payload);
   },
-  collectorType = "text",
-  count = 1,
 ): Promise<VerifyStreamResult> {
+  if (collectorType === "group_updated") {
+    generator = nameUpdateGenerator as (index: number, suffix: string) => T;
+    sender = nameUpdater as (group: Conversation, payload: T) => Promise<void>;
+  }
   // Exclude the group creator from receiving
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   const receivers = participants.filter(
@@ -80,7 +92,7 @@ export async function verifyStream<T extends string = string>(
   );
   // Send the messages
   for (let i = 0; i < count; i++) {
-    const payload = messageGenerator(i, randomSuffix);
+    const payload = generator(i, randomSuffix);
     console.log(`Sending message #${i + 1}:`, payload);
     await sender(group, payload);
   }

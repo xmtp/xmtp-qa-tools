@@ -126,16 +126,20 @@ export async function loadEnv(testName: string) {
 }
 export async function closeEnv(
   testName: string,
-  personas: Record<string, Persona>,
+  personas: Record<string, Persona> | undefined | null,
 ) {
   flushLogger(testName);
 
   await flushMetrics();
-  await Promise.all(
-    Object.values(personas).map(async (persona) => {
-      await persona.worker?.terminate();
-    }),
-  );
+
+  // Check if personas exists before trying to terminate workers
+  if (personas) {
+    await Promise.all(
+      Object.values(personas).map(async (persona) => {
+        await persona.worker?.terminate();
+      }),
+    );
+  }
 
   // Import and call clearWorkerCache to ensure global cache is cleaned up
   const { clearWorkerCache } = await import("./workers/factory");

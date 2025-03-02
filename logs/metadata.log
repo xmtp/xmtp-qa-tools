@@ -1,41 +1,40 @@
-[2025-03-01T23:38:46.075Z] [info] initConfig: {"prefix":"xmtp.sdk.","apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["qa_env:dev","qa_test:metadata","qa_geo:south-america"]}
-[2025-03-01T23:38:46.076Z] [info] ✅ DataDog metrics initialized successfully
-[2025-03-01T23:38:46.078Z] [info] [PersonaFactory] Using env keys for bob: 0x24c8...
-[2025-03-01T23:38:46.078Z] [info] [PersonaFactory] Using env keys for joe: 0x44ef...
-[2025-03-01T23:38:46.078Z] [info] [PersonaFactory] Using env keys for elon: 0x3775...
-[2025-03-01T23:38:46.078Z] [info] [PersonaFactory] Using env keys for fabri: 0x7567...
-[2025-03-01T23:38:46.078Z] [info] [PersonaFactory] Using env keys for alice: 0xdec7...
-[2025-03-01T23:38:48.346Z] [warn] [elon-a] Create XMTP client v:436360a 2.228s
-[2025-03-01T23:38:48.361Z] [warn] [fabri-a] Create XMTP client v:436360a 2.244s
-[2025-03-01T23:38:48.448Z] [warn] [joe-a] Create XMTP client v:436360a 2.331s
-[2025-03-01T23:38:48.475Z] [warn] [bob-a] Create XMTP client v:436360a 2.358s
-[2025-03-01T23:38:48.518Z] [warn] [alice-a] Create XMTP client v:436360a 2.400s
-[2025-03-01T23:38:48.751Z] [warn] [elon-a] Start message stream 404.186ms
-[2025-03-01T23:38:48.753Z] [warn] [elon-a] Start stream 405.375ms
-[2025-03-01T23:38:48.753Z] [warn] [elon-a] Initialize XMTP client 2.639s
-[2025-03-01T23:38:48.754Z] [warn] [fabri-a] Start message stream 392.187ms
-[2025-03-01T23:38:48.754Z] [warn] [fabri-a] Start stream 392.511ms
-[2025-03-01T23:38:48.754Z] [warn] [fabri-a] Initialize XMTP client 2.640s
-[2025-03-01T23:38:48.851Z] [warn] [joe-a] Start message stream 401.684ms
-[2025-03-01T23:38:48.852Z] [warn] [joe-a] Start stream 402.879ms
-[2025-03-01T23:38:48.852Z] [warn] [joe-a] Initialize XMTP client 2.740s
-[2025-03-01T23:38:48.931Z] [warn] [alice-a] Start message stream 412.587ms
-[2025-03-01T23:38:48.931Z] [warn] [alice-a] Start stream 412.94ms
-[2025-03-01T23:38:48.931Z] [warn] [alice-a] Initialize XMTP client 2.815s
-[2025-03-01T23:38:49.662Z] [warn] [bob-a] Start message stream 1.187s
-[2025-03-01T23:38:49.662Z] [warn] [bob-a] Start stream 1.187s
-[2025-03-01T23:38:49.662Z] [warn] [bob-a] Initialize XMTP client 3.582s
-[2025-03-01T23:38:49.662Z] [info] bob 0xB5a13FeFBa5C7a4189f5d60df4D7e609Aead8Fdf
-[2025-03-01T23:38:49.663Z] [info] joe 0x5dA5E499FCffC83833FB487CE2fB909f86Eb867c
-[2025-03-01T23:38:49.663Z] [info] elon 0xBFB0E777EDf6966833730e400A4DC153Ee61d960
-[2025-03-01T23:38:49.663Z] [info] fabri 0x01A1440227279907F2225cd6DC7B1462359EC08c
-[2025-03-01T23:38:49.663Z] [info] alice 0x1A76D7792698bd87fF787E3dDf516032e7169f5C
-[2025-03-01T23:38:52.208Z] [info] Bob's group 0fbde1862c86742a6f928894cf3e4691
-[2025-03-01T23:38:52.208Z] [warn] create group 2.545s
-[2025-03-01T23:38:52.209Z] [info] [joe-a] Collecting 1 messages from convo:0fbde1862c86742a6f928894cf3e4691
-[2025-03-01T23:38:52.209Z] [info] Sending message #1: New name-1-xa87f6mpzaf
-[2025-03-01T23:38:52.209Z] [info] Updating group name to New name-1-xa87f6mpzaf for group 0fbde1862c86742a6f928894cf3e4691
-[2025-03-01T23:38:52.794Z] [info] All participants received the expected number of messages.
-[2025-03-01T23:38:52.794Z] [warn] update group name 585.763ms
-[2025-03-01T23:38:55.167Z] [warn] add members 2.372s
-[2025-03-01T23:38:57.119Z] [warn] remove members 1.951s
+[2025-03-02T19:56:39.956Z] [info] initConfig: {"prefix":"xmtp.sdk.","apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["qa_env:dev","qa_test:metadata","qa_geo:south-america"]}
+[2025-03-02T19:56:39.957Z] [info] ✅ DataDog metrics initialized successfully
+[2025-03-02T19:56:39.960Z] [info] [PersonaFactory] Using env keys for bob: 0x2305...
+[2025-03-02T19:56:39.960Z] [info] [PersonaFactory] Using env keys for joe: 0xb735...
+[2025-03-02T19:56:39.960Z] [info] [PersonaFactory] Generating new keys for elon
+[2025-03-02T19:56:39.987Z] [info] [PersonaFactory] Generating new keys for fabri
+[2025-03-02T19:56:39.989Z] [info] [PersonaFactory] Generating new keys for alice
+[2025-03-02T19:56:42.078Z] [warn] [joe-a] Create XMTP client v:436360a 2.082s
+[2025-03-02T19:56:42.233Z] [warn] [bob-a] Create XMTP client v:436360a 2.237s
+[2025-03-02T19:56:42.452Z] [warn] [joe-a] Start message stream 371.549ms
+[2025-03-02T19:56:42.452Z] [warn] [joe-a] Start stream 373.384ms
+[2025-03-02T19:56:42.452Z] [warn] [joe-a] Initialize XMTP client 2.459s
+[2025-03-02T19:56:42.657Z] [warn] [bob-a] Start message stream 423.669ms
+[2025-03-02T19:56:42.657Z] [warn] [bob-a] Start stream 423.821ms
+[2025-03-02T19:56:42.657Z] [warn] [bob-a] Initialize XMTP client 2.665s
+[2025-03-02T19:56:43.809Z] [warn] [elon-a] Create XMTP client v:436360a 3.813s
+[2025-03-02T19:56:43.809Z] [warn] [alice-a] Create XMTP client v:436360a 3.813s
+[2025-03-02T19:56:43.892Z] [warn] [fabri-a] Create XMTP client v:436360a 3.896s
+[2025-03-02T19:56:44.206Z] [warn] [alice-a] Start message stream 395.958ms
+[2025-03-02T19:56:44.206Z] [warn] [alice-a] Start stream 396.26ms
+[2025-03-02T19:56:44.206Z] [warn] [alice-a] Initialize XMTP client 4.211s
+[2025-03-02T19:56:44.228Z] [warn] [elon-a] Start message stream 418.576ms
+[2025-03-02T19:56:44.228Z] [warn] [elon-a] Start stream 418.784ms
+[2025-03-02T19:56:44.228Z] [warn] [elon-a] Initialize XMTP client 4.234s
+[2025-03-02T19:56:44.252Z] [warn] [fabri-a] Start message stream 359.437ms
+[2025-03-02T19:56:44.252Z] [warn] [fabri-a] Start stream 359.81ms
+[2025-03-02T19:56:44.253Z] [warn] [fabri-a] Initialize XMTP client 4.258s
+[2025-03-02T19:56:44.253Z] [info] bob 0xC7E0839CEb5A576b60570a40f984822f8EdB6D50
+[2025-03-02T19:56:44.253Z] [info] joe 0xB9f8390f9b6108EE9F4cE764944d08Ca84568A71
+[2025-03-02T19:56:44.253Z] [info] elon 0x2BDcaf4E66dE71a6AD42Efc6Cb99A2b8BA70F174
+[2025-03-02T19:56:44.253Z] [info] fabri 0xa5AC8f2418417b2B1Bc1FbC0F0c6573Bd46DCa0e
+[2025-03-02T19:56:44.254Z] [info] alice 0xbe5d5417D43B91BC48EAebc439C6a34241150Eba
+[2025-03-02T19:56:46.435Z] [info] Bob's group 9c80e2012ae34384fec1d83f25a0301b
+[2025-03-02T19:56:46.435Z] [warn] create group 2.181s
+[2025-03-02T19:56:46.436Z] [info] [joe-a] Collecting 1 messages from convo:9c80e2012ae34384fec1d83f25a0301b
+[2025-03-02T19:56:46.436Z] [info] Sending message #1: New name-1-bi7etrse4jp
+[2025-03-02T19:56:47.382Z] [info] All participants received the expected number of messages.
+[2025-03-02T19:56:47.382Z] [warn] update group name 946.573ms
+[2025-03-02T19:56:49.634Z] [warn] add members 2.251s
+[2025-03-02T19:56:50.855Z] [warn] remove members 1.220s

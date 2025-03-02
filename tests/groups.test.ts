@@ -114,19 +114,9 @@ describe(testName, () => {
   it("updateGroupName: should create a group and update group name", async () => {
     console.time("update group name");
 
-    const nameUpdateGenerator = (i: number, suffix: string) => {
-      return `New name-${i + 1}-${suffix}`;
-    };
-
-    const nameUpdater = async (group: Conversation, newName: string) => {
-      await group.updateName(newName);
-    };
-
     const result = await verifyStream(
       group,
       [groupPersonas.nancy],
-      nameUpdateGenerator,
-      nameUpdater,
       "group_updated",
     );
     expect(result.allReceived).toBe(true);

@@ -1,35 +1,30 @@
-[2025-03-02T19:30:25.052Z] [info] initConfig: {"prefix":"xmtp.sdk.","apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["qa_env:dev","qa_test:dms","qa_geo:south-america"]}
-[2025-03-02T19:30:25.053Z] [info] ✅ DataDog metrics initialized successfully
-[2025-03-02T19:30:25.056Z] [info] [PersonaFactory] Using env keys for bob: 0x2305...
-[2025-03-02T19:30:25.056Z] [info] [PersonaFactory] Using env keys for joe: 0xb735...
-[2025-03-02T19:30:25.056Z] [info] [PersonaFactory] Using env keys for sam: 0x9c47...
-[2025-03-02T19:30:25.056Z] [info] [PersonaFactory] Generating new keys for random
-[2025-03-02T19:30:27.237Z] [warn] [bob-a] Create XMTP client v:436360a 2.146s
-[2025-03-02T19:30:27.361Z] [warn] [sam-a] Create XMTP client v:436360a 2.271s
-[2025-03-02T19:30:27.462Z] [warn] [joe-a] Create XMTP client v:436360a 2.372s
-[2025-03-02T19:30:27.650Z] [warn] [bob-a] Start message stream 411.628ms
-[2025-03-02T19:30:27.651Z] [warn] [bob-a] Start stream 414.15ms
-[2025-03-02T19:30:27.652Z] [warn] [bob-a] Initialize XMTP client 2.568s
-[2025-03-02T19:30:27.764Z] [warn] [sam-a] Start message stream 401.802ms
-[2025-03-02T19:30:27.765Z] [warn] [sam-a] Start stream 403.256ms
-[2025-03-02T19:30:27.766Z] [warn] [sam-a] Initialize XMTP client 2.678s
-[2025-03-02T19:30:27.864Z] [warn] [joe-a] Start message stream 401.884ms
-[2025-03-02T19:30:27.865Z] [warn] [joe-a] Start stream 402.151ms
-[2025-03-02T19:30:27.865Z] [warn] [joe-a] Initialize XMTP client 2.779s
-[2025-03-02T19:30:28.988Z] [warn] [random-a] Create XMTP client v:436360a 3.898s
-[2025-03-02T19:30:29.391Z] [warn] [random-a] Start message stream 402.749ms
-[2025-03-02T19:30:29.391Z] [warn] [random-a] Start stream 403.067ms
-[2025-03-02T19:30:29.391Z] [warn] [random-a] Initialize XMTP client 4.302s
-[2025-03-02T19:30:29.391Z] [info] bob 0xC7E0839CEb5A576b60570a40f984822f8EdB6D50
-[2025-03-02T19:30:29.392Z] [info] joe 0xB9f8390f9b6108EE9F4cE764944d08Ca84568A71
-[2025-03-02T19:30:29.392Z] [info] sam 0x508851a5383366248fdb8291F630a12Cb2a417b1
-[2025-03-02T19:30:29.392Z] [info] random 0x5F0fA2b69FA823CB83711A6c0E82d1Aea839F171
-[2025-03-02T19:30:31.786Z] [info] Sending metric: xmtp.sdk.ts_performance.createDM with value: 2393.7749999999996 and operation: createDM
-[2025-03-02T19:30:31.788Z] [info] [bob] Creating DM with random at 0x5F0fA2b69FA823CB83711A6c0E82d1Aea839F171
-[2025-03-02T19:30:32.587Z] [warn] Slow connection detected - total: 787.66ms, TLS: 591.80ms, processing: 195.86ms
-[2025-03-02T19:30:33.033Z] [info] Sending metric: xmtp.sdk.ts_performance.sendGM with value: 1244.064625000001 and operation: sendGM
-[2025-03-02T19:30:33.038Z] [info] [random-a] Collecting 1 messages from convo:3cc177270116e9ea696c56a607f95363
-[2025-03-02T19:30:33.038Z] [info] Sending message #1: gm-1-mrqf2s8qad
-[2025-03-02T19:30:33.835Z] [warn] Slow connection detected - total: 780.41ms, TLS: 587.00ms, processing: 193.41ms
-[2025-03-02T19:30:33.867Z] [info] All participants received the expected number of messages.
-[2025-03-02T19:30:33.868Z] [info] Sending metric: xmtp.sdk.ts_performance.receiveGM with value: 831.2314999999999 and operation: receiveGM
+[2025-03-02T19:49:49.445Z] [info] initConfig: {"prefix":"xmtp.sdk.","apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["qa_env:dev","qa_test:dms","qa_geo:south-america"]}
+[2025-03-02T19:49:49.445Z] [info] ✅ DataDog metrics initialized successfully
+[2025-03-02T19:49:49.448Z] [info] [PersonaFactory] Using env keys for bob: 0x2305...
+[2025-03-02T19:49:49.448Z] [info] [PersonaFactory] Using env keys for joe: 0xb735...
+[2025-03-02T19:49:49.448Z] [info] [PersonaFactory] Using env keys for sam: 0x9c47...
+[2025-03-02T19:49:49.448Z] [info] [PersonaFactory] Generating new keys for random
+[2025-03-02T19:49:51.518Z] [warn] [bob-a] Create XMTP client v:436360a 2.035s
+[2025-03-02T19:49:51.756Z] [warn] [joe-a] Create XMTP client v:436360a 2.273s
+[2025-03-02T19:49:51.818Z] [warn] [sam-a] Create XMTP client v:436360a 2.335s
+[2025-03-02T19:49:51.904Z] [warn] [bob-a] Start message stream 383.311ms
+[2025-03-02T19:49:51.905Z] [warn] [bob-a] Start stream 385.953ms
+[2025-03-02T19:49:51.905Z] [warn] [bob-a] Initialize XMTP client 2.429s
+[2025-03-02T19:49:52.170Z] [warn] [joe-a] Start message stream 412.417ms
+[2025-03-02T19:49:52.171Z] [warn] [joe-a] Start stream 414.353ms
+[2025-03-02T19:49:52.171Z] [warn] [joe-a] Initialize XMTP client 2.692s
+[2025-03-02T19:49:52.236Z] [warn] [sam-a] Start message stream 417.839ms
+[2025-03-02T19:49:52.236Z] [warn] [sam-a] Start stream 418.115ms
+[2025-03-02T19:49:52.236Z] [warn] [sam-a] Initialize XMTP client 2.756s
+[2025-03-02T19:49:53.383Z] [warn] [random-a] Create XMTP client v:436360a 3.900s
+[2025-03-02T19:49:53.749Z] [warn] [random-a] Start message stream 365.012ms
+[2025-03-02T19:49:53.750Z] [warn] [random-a] Start stream 366.904ms
+[2025-03-02T19:49:53.751Z] [warn] [random-a] Initialize XMTP client 4.268s
+[2025-03-02T19:49:53.751Z] [info] bob 0xC7E0839CEb5A576b60570a40f984822f8EdB6D50
+[2025-03-02T19:49:53.752Z] [info] joe 0xB9f8390f9b6108EE9F4cE764944d08Ca84568A71
+[2025-03-02T19:49:53.752Z] [info] sam 0x508851a5383366248fdb8291F630a12Cb2a417b1
+[2025-03-02T19:49:53.752Z] [info] random 0xd2964185A65D9b27109e19788690cfb95cf417aA
+[2025-03-02T19:49:55.845Z] [info] [bob] Creating DM with random at 0xd2964185A65D9b27109e19788690cfb95cf417aA
+[2025-03-02T19:49:56.812Z] [info] [random-a] Collecting 1 messages from convo:70636b34bb94628b36aad363f1720d5e
+[2025-03-02T19:49:56.812Z] [info] Sending message #1: gm-1-liyk58fkres
+[2025-03-02T19:49:57.577Z] [info] All participants received the expected number of messages.

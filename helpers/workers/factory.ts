@@ -155,10 +155,9 @@ export class PersonaFactory {
       if (desc in globalWorkerCache && globalWorkerCache[desc].client) {
         console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
         personas.push(globalWorkerCache[desc]);
-      } else if (desc.includes("random")) {
-        // Always create new random personas
-        newDescriptors.push(desc);
+        continue;
       } else {
+        // Add all other descriptors to the list of new ones to create
         newDescriptors.push(desc);
       }
     }
@@ -278,17 +277,35 @@ export async function getWorkers(
 
 // Function to clear the global worker cache if needed
 export async function clearWorkerCache(): Promise<void> {
+  // First terminate all workers
   for (const key in globalWorkerCache) {
-    if (globalWorkerCache[key] && globalWorkerCache[key].worker) {
-      await globalWorkerCache[key].worker.terminate();
+    try {
+      // Check if the key exists and has a worker property before trying to terminate
+      if (globalWorkerCache[key].worker) {
+        await globalWorkerCache[key].worker.terminate();
+      }
+    } catch (error) {
+      console.warn(`Error terminating worker for ${key}:`, error);
     }
   }
-  // Fix: Don't use delete on dynamically computed property keys
-  // Instead, create a new empty object
+
+  // Clear the cache by setting all entries to undefined
   for (const key in globalWorkerCache) {
+    try {
+      // @ts-expect-error: We're intentionally clearing the cache
+      globalWorkerCache[key] = undefined;
+    } catch (error) {
+      console.warn(`Error clearing cache for ${key}:`, error);
+    }
+  }
+
+  // Create a new empty object with the same reference
+  // This is a workaround to avoid using delete on dynamically computed property keys
+  const keys = Object.keys(globalWorkerCache);
+  keys.forEach((key) => {
     // @ts-expect-error: We're intentionally clearing the cache
     globalWorkerCache[key] = undefined;
-  }
+  });
 }
 
 export function getDataSubFolderCount() {
