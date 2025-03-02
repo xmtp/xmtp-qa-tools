@@ -267,12 +267,12 @@
     {
       "name": "qa_geo",
       "prefix": "qa_geo",
-      "default": "south-america"
+      "default": "us"
     },
     {
       "name": "qa_test",
       "prefix": "qa_test",
-      "default": "dms"
+      "default": "ts_performance"
     }
   ],
   "layout_type": "ordered",
