@@ -1,14 +1,5 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeEnv, loadEnv } from "../helpers/client";
-import { sendMetric } from "../helpers/datadog";
 import {
   ConsentEntityType,
   ConsentState,
@@ -21,7 +12,6 @@ import { getWorkers } from "../helpers/workers/factory";
 const testName = "TS_Streams";
 await loadEnv(testName);
 let personas: Record<string, Persona>;
-let start: number;
 
 describe(testName, () => {
   beforeAll(async () => {
@@ -33,17 +23,6 @@ describe(testName, () => {
 
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  beforeEach(() => {
-    start = performance.now();
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      sendMetric(performance.now() - start, testName, personas);
-    }
   });
 
   it("test fabri sending gm to alice", async () => {
@@ -144,18 +123,6 @@ describe(testName, () => {
   afterAll(async () => {
     await closeEnv(testName, personas);
   });
-
-  beforeEach(() => {
-    start = performance.now();
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
-    }
-  });
-
   it("detects new group conversation creation with three participants", async () => {
     const initiator = personas.alice;
     const participants = [personas.bob, personas.joe];
@@ -186,17 +153,6 @@ describe(testName, () => {
   });
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  beforeEach(() => {
-    start = performance.now();
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
-    }
   });
 
   it("should stream consent updates when a user is blocked", async () => {

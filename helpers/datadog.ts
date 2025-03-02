@@ -25,12 +25,11 @@ export function initDataDog(testName: string): boolean {
     const envValue = process.env.XMTP_ENV;
     const geolocation = process.env.GEOLOCATION;
     const initConfig = {
-      prefix: `xmtp.sdk.`,
       apiKey: process.env.DATADOG_API_KEY,
       defaultTags: [
-        `qa_env:${envValue}`,
-        `qa_test:${testName}`,
-        `qa_geo:${geolocation}`,
+        `env:${envValue}`,
+        `test:${testName}`,
+        `geo:${geolocation}`,
       ],
     };
     console.log(`initConfig: ${JSON.stringify(initConfig)}`);
@@ -44,7 +43,6 @@ export function initDataDog(testName: string): boolean {
     return false;
   }
 }
-
 export async function sendMetric(
   value: number,
   key: string,
@@ -60,45 +58,42 @@ export async function sendMetric(
 
   try {
     const firstPersona = Object.values(personas)[0];
-    let metricName = (key.match(/^([^:]+):/) || [null, key])[1].replaceAll(
+    const metricName = (key.match(/^([^:]+):/) || [null, key])[1].replaceAll(
       " > ",
       ".",
     );
-    if (metricName.includes("ts_")) {
-      metricName = metricName.replace(
-        "ts_performance.ts_performance.",
-        "ts_performance.",
-      );
-      metricName = metricName.replaceAll(".dms.", ".");
-    }
 
-    // Extract operation name for tagging - ensure consistent naming
+    // Extract operation name for tagging
     const operationParts = metricName.split(".");
-    const operationName =
-      operationParts[operationParts.length - 1] || "unknown";
+    const operationName = operationParts[1];
+    const testName = operationParts[0];
+    const durationMetricName = `xmtp.sdk.duration`;
+    console.log(`Operation name: ${operationName}`);
+    console.log(`Test name: ${testName}`);
+    console.log(`Duration metric name: ${durationMetricName}`);
 
-    // Ensure consistent metric naming format
-    if (!metricName.startsWith("xmtp.sdk.ts_performance.")) {
-      metricName = `xmtp.sdk.ts_performance.${operationName}`;
-    }
-
-    // console.log(
-    //   `Sending metric: ${metricName} with value: ${value} and operation: ${operationName}`,
-    // );
-
-    metrics.gauge(metricName, value, [
-      `qa_libxmtp:${firstPersona.version}`,
-      `qa_operation:${operationName}`,
+    // Send main operation metric
+    metrics.gauge(durationMetricName, value, [
+      `libxmtp:${firstPersona.version}`,
+      `operation:${operationName}`,
+      `test:${testName}`,
+      `metric_type:operation`,
     ]);
 
-    if (!skipNetworkStats && !metricName.includes(".network.")) {
-      const networkStats = await reportNetworkStats(metricName);
-      Object.entries(networkStats).forEach(([stat, value]) => {
-        metrics.gauge(stat, value, [
-          `qa_libxmtp:${firstPersona.version}`,
-          `qa_operation:${operationName}`, // Use same normalized name for network stats
+    // Handle network stats if needed
+    if (!skipNetworkStats) {
+      const networkStats = await getNetworkStats();
+
+      for (const [statName, statValue] of Object.entries(networkStats)) {
+        const metricValue = statValue * 1000; // Convert to milliseconds
+        metrics.gauge(durationMetricName, metricValue, [
+          `libxmtp:${firstPersona.version}`,
+          `operation:${operationName}`,
+          `test:${testName}`,
+          `metric_type:network`,
+          `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
         ]);
-      });
+      }
     }
   } catch (error) {
     console.error(`❌ Error sending metric '${key}':`, error);
@@ -181,25 +176,4 @@ export async function getNetworkStats(
       "Content Transfer": 0,
     };
   }
-}
-
-/**
- * Get network stats and send them as metrics
- * @param operation Operation name for the metrics
- * @param endpoint Optional endpoint to monitor
- * @param env Optional environment override for this specific metric
- * @param geolocation Optional geolocation for this specific metric
- */
-export async function reportNetworkStats(
-  operation: string,
-  endpoint?: string,
-): Promise<Record<string, number>> {
-  const returnValue: Record<string, number> = {};
-  const networkStats = await getNetworkStats(endpoint);
-  for (const [key, value] of Object.entries(networkStats)) {
-    const metricValue = value * 1000;
-    const metricKey = `${operation}.network.${key.toLowerCase().replace(/\s+/g, "_")}`;
-    returnValue[metricKey] = metricValue;
-  }
-  return returnValue;
 }

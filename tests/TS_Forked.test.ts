@@ -1,14 +1,5 @@
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeEnv, loadEnv } from "../helpers/client";
-import { sendMetric } from "../helpers/datadog";
 import { type Conversation, type Persona } from "../helpers/types";
 import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
@@ -17,7 +8,6 @@ const testName = "TS_Forked";
 await loadEnv(testName);
 
 describe(testName, () => {
-  let start: number;
   let personas: Record<string, Persona>;
   let group: Conversation;
 
@@ -30,17 +20,6 @@ describe(testName, () => {
 
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  beforeEach(() => {
-    start = performance.now();
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      sendMetric(performance.now() - start, testName, personas);
-    }
   });
 
   it("should create a group and establish baseline communication", async () => {

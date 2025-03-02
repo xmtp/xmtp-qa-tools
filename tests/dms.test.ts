@@ -26,7 +26,9 @@ describe(testName, () => {
   });
 
   beforeEach(() => {
+    const testName = expect.getState().currentTestName;
     start = performance.now();
+    console.time(testName);
   });
 
   afterAll(async () => {
@@ -35,6 +37,7 @@ describe(testName, () => {
 
   afterEach(function () {
     const testName = expect.getState().currentTestName;
+    console.timeEnd(testName);
     if (testName) {
       void sendMetric(performance.now() - start, testName, personas);
     }
