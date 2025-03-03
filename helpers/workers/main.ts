@@ -136,6 +136,7 @@ export class WorkerClient extends Worker {
       // @ts-expect-error: loggingLevel is not typed
       loggingLevel: process.env.LOGGING_LEVEL,
     });
+
     console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);
 
     if (this.typeofStream === "message") {
