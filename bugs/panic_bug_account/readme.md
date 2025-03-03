@@ -35,13 +35,10 @@ This issue creates these problems:
 
 ```bash
 git clone https://github.com/ephemeraHQ/qa-testing/
-cd qa-testing && yarn
+cd qa-testing
+yarn
 yarn test panic_bug_account
 ```
-
-## More information
-
-- All test code and logs are here: https://github.com/ephemeraHQ/qa-testing/tree/main/bugs/panic_bug_account
 
 ## Test code
 
@@ -57,12 +54,6 @@ yarn test panic_bug_account
 - [./data](https://github.com/ephemeraHQ/qa-testing/tree/main/bugs/panic_bug_account/.data/) folder
 - [.env](https://github.com/ephemeraHQ/qa-testing/tree/main/bugs/panic_bug_account/.env) file
 
-## Running test
+## More information
 
-```bash
-git clone https://github.com/ephemeraHQ/qa-testing/
-cd qa-testing
-yarn
-yarn build
-yarn test panic_bug_account
-```
+- All test code and logs are here: https://github.com/ephemeraHQ/qa-testing/tree/main/bugs/panic_bug_account
