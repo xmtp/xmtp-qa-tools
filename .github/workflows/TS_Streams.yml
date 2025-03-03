@@ -33,7 +33,7 @@ jobs:
           path: |
             .data
             .env
-          key: ${{ runner.os }}-TS_Streams-${{ github.run_id }}
+          key: ${{ runner.os }}-TS_Streams-cache
           restore-keys: |
             ${{ runner.os }}-TS_Streams-
           enableCrossOsArchive: false
@@ -42,8 +42,8 @@ jobs:
         run: ls -la .data
       - name: Count specific folders in .data directory
         run: |
-          COUNT=$(find .data -type d -name "${{ runner.os }}-${{ github.run_id }}-testname-*" | wc -l)
-          echo "Found $COUNT folders matching pattern: ${{ runner.os }}-${{ github.run_id }}-testname-*"
+          COUNT=$(find .data -type d | wc -l)
+          echo "Found $COUNT folders in .data directory"
       - run: corepack enable
       - run: yarn
       - name: Run tests with retry
