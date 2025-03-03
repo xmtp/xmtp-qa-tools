@@ -9,7 +9,7 @@ This monorepo contains multiple projects and tools for development and testing. 
 
 ## Prerequisites
 
-- Install [Yarn](https://yarnpkg.com/).
+- Yarn 4.6.0
 - Clone the repository and change to its root directory.
 
 ## Installation
@@ -24,16 +24,22 @@ yarn install
 
 Run tests for specific modules using these commands:
 
-- **Direct Messages (DMs):**
+- **Direct Messages (DMs):**: Sending dms
 
   ```bash
   yarn test dms
   ```
 
-- **Streams:**
+- **Streams:**: 3 different kind of streams
 
   ```bash
   yarn test streams
+  ```
+
+- **Groups:**: Up to 500 groups
+
+  ```bash
+  yarn test groups
   ```
 
 - **Groups:**
@@ -70,19 +76,19 @@ beforeAll(async () => {
 });
 ```
 
-> If a persona does not exist, its keys are created. Personas prefixed with "random" have keys that are stored only in memory.
+Considerations
+
+- If a persona does not exist, its keys are created.
+- If persona exists uses the existing env file keys and .data folder
+- If the data folder doesnt exist, it creates one
+- Personas prefixed with "random" have keys that are stored only in memory.
+
+> [!TIP]
+> Repository of 600 dummy wallets with inboxIds [see file](./helpers/generated-inboxes.json)
 
 ## Bot Setup
 
 Run bots using these commands:
-
-- **GM Bot:**
-
-  A bot that replies gm
-
-  ```bash
-  yarn bot gm
-  ```
 
 - **Test Bot:**
 
@@ -92,47 +98,20 @@ Run bots using these commands:
   yarn bot test
   ```
 
-## Custom Key Generation
+## Datadog dashboard
 
-Generate custom keys with:
+![](/media/datadog.png)
 
-```bash
-yarn gen:keys [name]
-```
+See more in the dashboards [section](./dashboards/
 
-Replace `[name]` with the desired identifier.
+## Github workflows
 
-Example:
+See more in the worflows [section](/)
 
-```bash
-# alice
-WALLET_KEY_ALICE=0x...
-ENCRYPTION_KEY_ALICE=
-# public key is 0x7788b23377c368B571D6ce4DA9B54670409A96d0
-# joe
-WALLET_KEY_JOE=
-ENCRYPTION_KEY_JOE=
-# public key is 0x54469Ef3f6a4e511DA71795D90E7BbC9A4845EE9
-```
+## Helpers
 
-## GitHub Workflows
+See more helpers in the helpers [section](./helpers/)
 
-The monorepo includes automated workflows using GitHub Actions to ensure continuous integration and testing:
+## Scripts
 
-- **Scheduled Test Workflow**: Defined in `streams.yml`, this workflow runs tests for the streams module every two hours and can also be triggered manually.
-
-This brief mention provides an overview without going into detailed steps, keeping the README succinct.
-
-## Environment Configuration
-
-A `.env` file manages environment variables. Use the `.env.example` file as a template. Key variables include:
-
-- **LOGGING_LEVEL**: Sets the logging level for the application. Possible values include "error", "warn", "info", "debug". Default is "error".
-- **XMTP_ENV**: Specifies the environment for XMTP. `XMTP_ENV` Possible values are "dev", "production". Default is "dev".
-- **API Keys:**
-
-  - ALCHEMY_API_KEY: For the gated group bot
-  - OPENAI_API_KEY: For the gpt bot
-
-- **Wallet and Encryption Keys:**  
-  For identities such as Bob, Alice, Joe, Fabri, Elon, Sam, and Bot (e.g., `WALLET_KEY_[NAME]` and `ENCRYPTION_KEY_[NAME]`).
+See more scripts in the scripts [section](./scripts/)
