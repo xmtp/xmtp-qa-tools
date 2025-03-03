@@ -167,15 +167,23 @@ export class WorkerClient extends Worker {
    * Internal helper to stream all messages from the client,
    * then emit them as 'stream_message' events on this Worker.
    */
+
+  private messageStream?: AsyncIterable<any> & {
+    return: (value?: any) => Promise<any>;
+  };
+  private isTerminated = false;
+
   private async startStream() {
     console.time(`[${this.nameId}] Start message stream`);
-    const stream = await this.client.conversations.streamAllMessages();
+    this.messageStream = await this.client.conversations.streamAllMessages();
     console.timeEnd(`[${this.nameId}] Start message stream`);
 
     // Process messages asynchronously
     void (async () => {
       try {
-        for await (const message of stream) {
+        if (!this.messageStream) return;
+        for await (const message of this.messageStream) {
+          if (this.isTerminated) break;
           console.time(`[${this.nameId}] Process message`);
           const workerMessage: MessageStreamWorker = {
             type: "stream_message",
@@ -188,12 +196,27 @@ export class WorkerClient extends Worker {
           console.timeEnd(`[${this.nameId}] Process message`);
         }
       } catch (error) {
-        console.error(`[${this.nameId}] Stream error:`, error);
-        this.emit("error", error);
+        if (!this.isTerminated) {
+          console.error(`[${this.name}] Stream error:`, error);
+          this.emit("error", error);
+        }
+      } finally {
+        this.isTerminated = true;
       }
     })();
   }
 
+  async terminate() {
+    this.isTerminated = true;
+
+    // Close streams if they exist
+    if (this.messageStream && typeof this.messageStream.return === "function") {
+      await this.messageStream.return();
+    }
+
+    // Call parent terminate
+    return super.terminate();
+  }
   /**
    * Internal helper to stream conversations from the client,
    * then emit them as 'stream_conversation' events on this Worker.
