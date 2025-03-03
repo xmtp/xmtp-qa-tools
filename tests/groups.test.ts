@@ -118,7 +118,7 @@ describe(testName, () => {
     const verifyResult = await verifyStream(convo, personasToVerify);
     expect(verifyResult.allReceived).toBe(true);
   });
-  for (let i = 50; i <= 200; i += 50) {
+  for (let i = 50; i <= 500; i += 50) {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = generatedInboxes.slice(0, i);
       convo = await personas.henry.client!.conversations.newGroupByInboxIds(

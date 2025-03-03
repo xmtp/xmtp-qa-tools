@@ -61,11 +61,10 @@ export async function sendMetric(
 
   try {
     const firstPersona = Object.values(personas)[0];
-    const metricName = (key.match(/^([^:]+):/) || [null, key])[1].replaceAll(
-      " > ",
-      ".",
-    );
-
+    const metricNameParts = key.split(":")[0];
+    const metricName = metricNameParts.replaceAll(" > ", ".");
+    const metricDescription = key.split(":")[1];
+    console.log("metricName", metricName, metricDescription);
     // Extract operation name for tagging
     const operationParts = metricName.split(".");
     const operationName = operationParts[1];
@@ -79,6 +78,7 @@ export async function sendMetric(
       `operation:${operationName}`,
       `test:${testName}`,
       `metric_type:operation`,
+      `description:${metricDescription}`,
       `members:${members}`,
     ]);
 
