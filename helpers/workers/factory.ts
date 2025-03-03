@@ -155,7 +155,11 @@ export class PersonaFactory {
 
     // First, check which personas already exist in the global cache
     for (const desc of descriptors) {
-      if (desc in globalWorkerCache && globalWorkerCache[desc].client) {
+      if (
+        desc in globalWorkerCache &&
+        globalWorkerCache[desc] &&
+        globalWorkerCache[desc].client
+      ) {
         console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
         personas.push(globalWorkerCache[desc]);
         continue;

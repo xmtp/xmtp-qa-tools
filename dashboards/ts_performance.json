@@ -14,7 +14,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -47,7 +47,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -80,7 +80,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -113,7 +113,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp}",
+                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -146,7 +146,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -179,7 +179,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:receivegroupmessage,$env,$geo,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:receivegroupmessage,$env,$geo,$test,$libxmtp}",
                 "aggregator": "avg"
               }
             ],
@@ -214,7 +214,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$libxmtp} by {network_phase}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp} by {network_phase}"
               }
             ],
             "response_format": "timeseries",
@@ -238,7 +238,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp} by {operation}"
               }
             ],
             "response_format": "timeseries",
@@ -259,7 +259,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$libxmtp} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp} by {operation}"
               }
             ],
             "response_format": "scalar",
@@ -289,7 +289,7 @@
       "name": "test",
       "prefix": "test",
       "available_values": [],
-      "default": "*"
+      "default": "ts_performance"
     },
     {
       "name": "libxmtp",
@@ -315,9 +315,18 @@
   "template_variable_presets": [
     {
       "name": "outside-us",
-      "template_variables": [{ "name": "geo", "value": "south-america" }]
+      "template_variables": [
+        { "name": "geo", "value": "south-america" },
+        { "name": "test", "value": "ts_performance" }
+      ]
     },
-    { "name": "us", "template_variables": [{ "name": "geo", "value": "us" }] }
+    {
+      "name": "us",
+      "template_variables": [
+        { "name": "geo", "value": "us" },
+        { "name": "test", "value": "ts_performance" }
+      ]
+    }
   ],
   "reflow_type": "fixed"
 }

@@ -1,5 +1,14 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 import { closeEnv, loadEnv } from "../helpers/client";
+import { sendMetric } from "../helpers/datadog";
 import {
   ConsentEntityType,
   ConsentState,
@@ -9,11 +18,12 @@ import {
 import { verifyGroupConversationStream, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const testName = "TS_Streams";
+const testName = "ts_streams";
 loadEnv(testName);
-let personas: Record<string, Persona>;
 
 describe(testName, () => {
+  let personas: Record<string, Persona>;
+  let start: number;
   beforeAll(async () => {
     personas = await getWorkers(
       ["bob", "joe", "elon", "fabri", "alice"],
@@ -21,8 +31,22 @@ describe(testName, () => {
     );
   });
 
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName;
+    start = performance.now();
+    console.time(testName);
+  });
+
   afterAll(async () => {
     await closeEnv(testName, personas);
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    console.timeEnd(testName);
+    if (testName) {
+      void sendMetric(performance.now() - start, testName, personas);
+    }
   });
 
   it("test fabri sending gm to alice", async () => {
@@ -98,6 +122,8 @@ describe(testName, () => {
 });
 
 describe(testName, () => {
+  let personas: Record<string, Persona>;
+  let start: number;
   let groupCreator: (
     initiator: Persona,
     participantAddresses: string[],
@@ -120,9 +146,24 @@ describe(testName, () => {
     );
   });
 
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName;
+    start = performance.now();
+    console.time(testName);
+  });
+
   afterAll(async () => {
     await closeEnv(testName, personas);
   });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    console.timeEnd(testName);
+    if (testName) {
+      void sendMetric(performance.now() - start, testName, personas);
+    }
+  });
+
   it("detects new group conversation creation with three participants", async () => {
     const initiator = personas.alice;
     const participants = [personas.bob, personas.joe];
@@ -144,6 +185,8 @@ describe(testName, () => {
 });
 
 describe(testName, () => {
+  let personas: Record<string, Persona>;
+  let start: number;
   beforeAll(async () => {
     personas = await getWorkers(
       ["alice", "bob", "charlie", "dave", "eve", "random"],
@@ -151,8 +194,23 @@ describe(testName, () => {
       "consent",
     );
   });
+
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName;
+    start = performance.now();
+    console.time(testName);
+  });
+
   afterAll(async () => {
     await closeEnv(testName, personas);
+  });
+
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    console.timeEnd(testName);
+    if (testName) {
+      void sendMetric(performance.now() - start, testName, personas);
+    }
   });
 
   it("should stream consent updates when a user is blocked", async () => {
