@@ -43,7 +43,7 @@ describe(testName, () => {
     }
   });
 
-  it("createDM: should measure creating a DM", async () => {
+  it("gm-bot: should measure sending a gm", async () => {
     convo = await personas.bob.client!.conversations.newDm(gmBotAddress);
     await convo.sync();
     const messages = await convo.messages();

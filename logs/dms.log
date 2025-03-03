@@ -1,11 +1,11 @@
-[2025-03-03T18:09:38.390Z] [info] initConfig: {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:dms","geo:south-america"]}
-[2025-03-03T18:09:38.391Z] [info] ✅ DataDog metrics initialized successfully
-[2025-03-03T18:09:38.393Z] [info] [PersonaFactory] Using env keys for bob: 0x6915...
-[2025-03-03T18:09:40.410Z] [warn] [bob-a] Create XMTP client v:436360a 1.987s
-[2025-03-03T18:09:40.818Z] [warn] [bob-a] Start message stream 407.556ms
-[2025-03-03T18:09:40.818Z] [warn] [bob-a] Start stream 408.014ms
-[2025-03-03T18:09:40.818Z] [warn] [bob-a] Initialize XMTP client 2.424s
-[2025-03-03T18:09:40.818Z] [info] bob 0x081a6DaE7d02ee8Dc24831912E52dBC7F87fF51f
-[2025-03-03T18:09:41.579Z] [info] Messages before sending 9
-[2025-03-03T18:09:44.703Z] [info] Messages after sending 11
-[2025-03-03T18:09:44.704Z] [warn] dms > createDM: should measure creating a DM 3.884s
+[2025-03-03T18:15:05.863Z] [info] initConfig: {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:dms","geo:south-america"]}
+[2025-03-03T18:15:05.863Z] [info] ✅ DataDog metrics initialized successfully
+[2025-03-03T18:15:05.866Z] [info] [PersonaFactory] Using env keys for bob: 0x6915...
+[2025-03-03T18:15:07.704Z] [warn] [bob-a] Create XMTP client v:436360a 1.809s
+[2025-03-03T18:15:08.108Z] [warn] [bob-a] Start message stream 399.026ms
+[2025-03-03T18:15:08.109Z] [warn] [bob-a] Start stream 404.676ms
+[2025-03-03T18:15:08.109Z] [warn] [bob-a] Initialize XMTP client 2.242s
+[2025-03-03T18:15:08.109Z] [info] bob 0x081a6DaE7d02ee8Dc24831912E52dBC7F87fF51f
+[2025-03-03T18:15:08.851Z] [info] Messages before sending 11
+[2025-03-03T18:15:11.987Z] [info] Messages after sending 13
+[2025-03-03T18:15:11.987Z] [warn] dms > gm-bot: should measure sending a gm 3.876s
