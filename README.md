@@ -57,16 +57,17 @@ Run tests for specific modules using these commands:
 
 Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
 
-```typescript
-import { getWorkers, type Persona } from "../helpers/workers/creator";
-
-let bob: Persona;
-let joe: Persona;
-let sam: Persona;
+```tsx
+let personas: Record<string, Persona>;
 
 beforeAll(async () => {
-  [bob, joe, sam] = await getWorkers(["bob", "joe", "sam"], testName);
+  personas = await getWorkers(["alice", "bob", "randomguy"], testName);
 });
+
+// Use them directly
+convo = await personas.henry.client!.conversations.newDm(
+  personas.randomguy.client!.accountAddress,
+);
 ```
 
 Considerations
