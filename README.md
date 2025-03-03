@@ -79,9 +79,9 @@ Considerations
 > [!TIP]
 > Repository of 600 dummy wallets with inboxIds [see file](./helpers/generated-inboxes.json)
 
-## Test Bot:
+## Test bot
 
-A bot that generates some groups for you
+A bot that tests different interactions for manual testing
 
 ```bash
 yarn bot test
