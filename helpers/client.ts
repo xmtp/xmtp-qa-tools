@@ -17,7 +17,7 @@ interface User {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-export const createUser = (key: string): User => {
+const createUser = (key: string): User => {
   const account = privateKeyToAccount(key as `0x${string}`);
   return {
     key,
