@@ -33,9 +33,9 @@ jobs:
           path: |
             .data
             .env
-          key: ${{ runner.os }}-data-env-${{ hashFiles('.data/**', '.env') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-TS_Loss-cache
           restore-keys: |
-            ${{ runner.os }}-data-env-
+            ${{ runner.os }}-TS_Loss-
           enableCrossOsArchive: false
           fail-on-cache-miss: false
       - name: List data folder contents after cache restore
