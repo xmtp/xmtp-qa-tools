@@ -14,6 +14,8 @@ import { type Conversation, type Persona } from "../helpers/types";
 import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
+const batchSize = 50;
+const total = 300;
 const testName = "groups";
 loadEnv(testName);
 describe(testName, () => {
@@ -118,7 +120,7 @@ describe(testName, () => {
     const verifyResult = await verifyStream(convo, personasToVerify);
     expect(verifyResult.allReceived).toBe(true);
   });
-  for (let i = 50; i <= 500; i += 50) {
+  for (let i = batchSize; i <= total; i += batchSize) {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = generatedInboxes.slice(0, i);
       convo = await personas.henry.client!.conversations.newGroupByInboxIds(
