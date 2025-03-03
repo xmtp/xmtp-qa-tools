@@ -1,71 +1,72 @@
-[2025-03-03T18:19:34.553Z] [info] [PersonaFactory] Using env keys for alice: 0xeca6...
-[2025-03-03T18:19:34.553Z] [info] [PersonaFactory] Using env keys for bob: 0x6915...
-[2025-03-03T18:19:34.553Z] [info] [PersonaFactory] Generating new keys for charlie
-[2025-03-03T18:19:34.554Z] [info] filePath .env
-[2025-03-03T18:19:34.555Z] [info] [PersonaFactory] Generating new keys for dave
-[2025-03-03T18:19:34.555Z] [info] filePath .env
-[2025-03-03T18:19:34.555Z] [info] [PersonaFactory] Generating new keys for eve
-[2025-03-03T18:19:34.556Z] [info] filePath .env
-[2025-03-03T18:19:34.556Z] [info] [PersonaFactory] Generating new keys for random
-[2025-03-03T18:19:34.562Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/charlie
-[2025-03-03T18:19:34.562Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/dave
-[2025-03-03T18:19:34.562Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/eve
-[2025-03-03T18:19:35.193Z] [warn] Slow connection detected - total: 805.693ms, TLS: 614.092ms, processing: 191.60100000000003ms
-[2025-03-03T18:19:36.626Z] [warn] [alice-a] Create XMTP client v:436360a 2.065s
-[2025-03-03T18:19:36.626Z] [info] [alice-a] Start consent stream
-[2025-03-03T18:19:36.626Z] [info] [alice-a] Consent stream started
-[2025-03-03T18:19:36.626Z] [warn] [alice-a] Initialize XMTP client 2.068s
-[2025-03-03T18:19:36.688Z] [warn] [bob-a] Create XMTP client v:436360a 2.127s
-[2025-03-03T18:19:36.688Z] [info] [bob-a] Start consent stream
-[2025-03-03T18:19:36.688Z] [info] [bob-a] Consent stream started
-[2025-03-03T18:19:36.688Z] [warn] [bob-a] Initialize XMTP client 2.130s
-[2025-03-03T18:19:38.272Z] [warn] [dave-a] Create XMTP client v:436360a 3.711s
-[2025-03-03T18:19:38.273Z] [info] [dave-a] Start consent stream
-[2025-03-03T18:19:38.273Z] [info] [dave-a] Consent stream started
-[2025-03-03T18:19:38.273Z] [warn] [dave-a] Initialize XMTP client 3.713s
-[2025-03-03T18:19:38.292Z] [warn] [eve-a] Create XMTP client v:436360a 3.730s
-[2025-03-03T18:19:38.292Z] [info] [eve-a] Start consent stream
-[2025-03-03T18:19:38.292Z] [info] [eve-a] Consent stream started
-[2025-03-03T18:19:38.292Z] [warn] [eve-a] Initialize XMTP client 3.732s
-[2025-03-03T18:19:38.406Z] [warn] [charlie-a] Create XMTP client v:436360a 3.844s
-[2025-03-03T18:19:38.406Z] [info] [charlie-a] Start consent stream
-[2025-03-03T18:19:38.406Z] [info] [charlie-a] Consent stream started
-[2025-03-03T18:19:38.406Z] [warn] [charlie-a] Initialize XMTP client 3.847s
-[2025-03-03T18:19:38.532Z] [warn] [random-a] Create XMTP client v:436360a 3.970s
-[2025-03-03T18:19:38.532Z] [info] [random-a] Start consent stream
-[2025-03-03T18:19:38.533Z] [info] [random-a] Consent stream started
-[2025-03-03T18:19:38.533Z] [warn] [random-a] Initialize XMTP client 3.972s
-[2025-03-03T18:19:38.533Z] [info] alice 0x721e4fF6492f0d6aAf48AF2767085c23F4aa8119
-[2025-03-03T18:19:38.533Z] [info] bob 0x081a6DaE7d02ee8Dc24831912E52dBC7F87fF51f
-[2025-03-03T18:19:38.533Z] [info] charlie 0x7bA2cD8080DcA7ba64F5283BcC85C4D354983d67
-[2025-03-03T18:19:38.533Z] [info] dave 0xd67198A9d765511F4C1635b00B26D4B2Bda207fe
-[2025-03-03T18:19:38.533Z] [info] eve 0x8eCC73Da90AFB3cbC4d358C189907F40A1df1190
-[2025-03-03T18:19:38.533Z] [info] random 0x70f7EBD16a6e026aD21830B729f520EacaeD4e7a
-[2025-03-03T18:19:38.533Z] [info] Creating DM conversation with address: 0x70f7EBD16a6e026aD21830B729f520EacaeD4e7a
-[2025-03-03T18:19:40.569Z] [info] [alice-a] Collecting 1 consent updates
-[2025-03-03T18:19:40.965Z] [info] Consent state: 0
-[2025-03-03T18:19:40.965Z] [warn] get-initial-consent 395.65ms
-[2025-03-03T18:19:40.965Z] [info] Alice is allowing Bob...
-[2025-03-03T18:19:41.379Z] [info] [alice-a] Received consent update: [{"entityType":1,"state":1,"entity":"10596f0f2d6c7cb1bd0458857073971f306727500ba1f38d75105e3085ed4524"},{"entityType":2,"state":1,"entity":"0x70f7EBD16a6e026aD21830B729f520EacaeD4e7a"}]
-[2025-03-03T18:19:41.379Z] [warn] set-consent-state 413.525ms
-[2025-03-03T18:19:41.788Z] [warn] get-updated-consent 407.013ms
-[2025-03-03T18:19:41.788Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"10596f0f2d6c7cb1bd0458857073971f306727500ba1f38d75105e3085ed4524"},{"entityType":2,"state":1,"entity":"0x70f7EBD16a6e026aD21830B729f520EacaeD4e7a"}]}]
-[2025-03-03T18:19:41.790Z] [warn] TS_Streams > should stream consent updates when a user is blocked 3.257s
-[2025-03-03T18:19:41.794Z] [info] Creating a group conversation...
-[2025-03-03T18:19:42.610Z] [warn] Slow connection detected - total: 805.775ms, TLS: 614.911ms, processing: 190.86400000000003ms
-[2025-03-03T18:19:44.095Z] [warn] create-group 2.301s
-[2025-03-03T18:19:44.096Z] [info] Group created with 5 members
-[2025-03-03T18:19:44.096Z] [info] [alice-a] Collecting 1 consent updates
-[2025-03-03T18:19:44.096Z] [info] Alice is blocking the group...
-[2025-03-03T18:19:44.096Z] [info] [alice-a] Received consent update: [{"entityType":0,"state":2,"entity":"4a0e22deaa0b4896bbc1b0f9fba33fce"}]
-[2025-03-03T18:19:44.096Z] [info] Alice's consent state for the group: 2
-[2025-03-03T18:19:44.096Z] [info] Testing individual member consent states...
-[2025-03-03T18:19:44.296Z] [info] [bob-a] New conversation in stream: 4a0e22deaa0b4896bbc1b0f9fba33fce
-[2025-03-03T18:19:44.481Z] [warn] block-bob 385.267ms
-[2025-03-03T18:19:44.918Z] [info] Alice's consent state for Bob is : denied
-[2025-03-03T18:19:44.918Z] [warn] get-bob-consent 436.11ms
-[2025-03-03T18:19:44.918Z] [info] All consent updates received: 1
-[2025-03-03T18:19:44.918Z] [info] Unblocking all entities...
-[2025-03-03T18:19:45.294Z] [warn] unblock-all 375.592ms
-[2025-03-03T18:19:45.294Z] [info] Final group consent state: 1
-[2025-03-03T18:19:45.295Z] [warn] TS_Streams > should manage consent for all members in a group 3.501s
+[2025-03-03T18:39:37.121Z] [info] [PersonaFactory] Using env keys for alice: 0x433b...
+[2025-03-03T18:39:37.121Z] [info] [PersonaFactory] Using env keys for bob: 0x57b9...
+[2025-03-03T18:39:37.121Z] [info] [PersonaFactory] Generating new keys for charlie
+[2025-03-03T18:39:37.123Z] [info] filePath .env
+[2025-03-03T18:39:37.123Z] [info] [PersonaFactory] Generating new keys for dave
+[2025-03-03T18:39:37.124Z] [info] filePath .env
+[2025-03-03T18:39:37.124Z] [info] [PersonaFactory] Generating new keys for eve
+[2025-03-03T18:39:37.125Z] [info] filePath .env
+[2025-03-03T18:39:37.125Z] [info] [PersonaFactory] Generating new keys for random
+[2025-03-03T18:39:37.131Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/charlie
+[2025-03-03T18:39:37.131Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/dave
+[2025-03-03T18:39:37.131Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/eve
+[2025-03-03T18:39:37.131Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/random
+[2025-03-03T18:39:37.174Z] [warn] Slow connection detected - total: 774.67ms, TLS: 589.544ms, processing: 185.126ms
+[2025-03-03T18:39:39.132Z] [warn] [alice-a] Create XMTP client v:436360a 2.001s
+[2025-03-03T18:39:39.132Z] [info] [alice-a] Start consent stream
+[2025-03-03T18:39:39.132Z] [info] [alice-a] Consent stream started
+[2025-03-03T18:39:39.132Z] [warn] [alice-a] Initialize XMTP client 2.005s
+[2025-03-03T18:39:39.198Z] [warn] [bob-a] Create XMTP client v:436360a 2.067s
+[2025-03-03T18:39:39.198Z] [info] [bob-a] Start consent stream
+[2025-03-03T18:39:39.198Z] [info] [bob-a] Consent stream started
+[2025-03-03T18:39:39.198Z] [warn] [bob-a] Initialize XMTP client 2.070s
+[2025-03-03T18:39:40.780Z] [warn] [charlie-a] Create XMTP client v:436360a 3.649s
+[2025-03-03T18:39:40.781Z] [info] [charlie-a] Start consent stream
+[2025-03-03T18:39:40.781Z] [info] [charlie-a] Consent stream started
+[2025-03-03T18:39:40.781Z] [warn] [charlie-a] Initialize XMTP client 3.652s
+[2025-03-03T18:39:40.885Z] [warn] [dave-a] Create XMTP client v:436360a 3.754s
+[2025-03-03T18:39:40.885Z] [info] [dave-a] Start consent stream
+[2025-03-03T18:39:40.885Z] [info] [dave-a] Consent stream started
+[2025-03-03T18:39:40.885Z] [warn] [dave-a] Initialize XMTP client 3.756s
+[2025-03-03T18:39:40.966Z] [warn] [random-a] Create XMTP client v:436360a 3.835s
+[2025-03-03T18:39:40.966Z] [info] [random-a] Start consent stream
+[2025-03-03T18:39:40.966Z] [info] [random-a] Consent stream started
+[2025-03-03T18:39:40.966Z] [warn] [random-a] Initialize XMTP client 3.836s
+[2025-03-03T18:39:41.028Z] [warn] [eve-a] Create XMTP client v:436360a 3.897s
+[2025-03-03T18:39:41.028Z] [info] [eve-a] Start consent stream
+[2025-03-03T18:39:41.028Z] [info] [eve-a] Consent stream started
+[2025-03-03T18:39:41.028Z] [warn] [eve-a] Initialize XMTP client 3.898s
+[2025-03-03T18:39:41.028Z] [info] alice 0xd39874692047984395dBA2818e0304d17BFb6711
+[2025-03-03T18:39:41.028Z] [info] bob 0xfe74339Ebea36722De360fC8a3268aEaeB7657B8
+[2025-03-03T18:39:41.028Z] [info] charlie 0xE6EaFE26d5d07fA309535199Bc569b3798BdCC62
+[2025-03-03T18:39:41.028Z] [info] dave 0x83E37b1d4446bB41093123B8d5F3F98591661854
+[2025-03-03T18:39:41.028Z] [info] eve 0x134deD5BCA5A60bDbE66BB8773396633c54487E4
+[2025-03-03T18:39:41.028Z] [info] random 0xAADAE7EFfc20Fc2898efAf7649Ae0BE0CF5C1ed2
+[2025-03-03T18:39:41.029Z] [info] Creating DM conversation with address: 0xAADAE7EFfc20Fc2898efAf7649Ae0BE0CF5C1ed2
+[2025-03-03T18:39:43.014Z] [info] [alice-a] Collecting 1 consent updates
+[2025-03-03T18:39:43.414Z] [info] Consent state: 0
+[2025-03-03T18:39:43.414Z] [warn] get-initial-consent 399.638ms
+[2025-03-03T18:39:43.414Z] [info] Alice is allowing Bob...
+[2025-03-03T18:39:43.773Z] [info] [alice-a] Received consent update: [{"entityType":1,"state":1,"entity":"3294ef0e418d42416de57d6070f5f762f34de2a180a50bdc7707b4d6a70875a3"},{"entityType":2,"state":1,"entity":"0xAADAE7EFfc20Fc2898efAf7649Ae0BE0CF5C1ed2"}]
+[2025-03-03T18:39:43.773Z] [warn] set-consent-state 359.28ms
+[2025-03-03T18:39:44.183Z] [warn] get-updated-consent 409.788ms
+[2025-03-03T18:39:44.183Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"3294ef0e418d42416de57d6070f5f762f34de2a180a50bdc7707b4d6a70875a3"},{"entityType":2,"state":1,"entity":"0xAADAE7EFfc20Fc2898efAf7649Ae0BE0CF5C1ed2"}]}]
+[2025-03-03T18:39:44.184Z] [warn] ts_streams > should stream consent updates when a user is blocked 3.155s
+[2025-03-03T18:39:44.185Z] [info] Creating a group conversation...
+[2025-03-03T18:39:44.971Z] [warn] Slow connection detected - total: 774.408ms, TLS: 592.761ms, processing: 181.647ms
+[2025-03-03T18:39:46.487Z] [warn] create-group 2.302s
+[2025-03-03T18:39:46.487Z] [info] Group created with 5 members
+[2025-03-03T18:39:46.488Z] [info] [alice-a] Collecting 1 consent updates
+[2025-03-03T18:39:46.488Z] [info] Alice is blocking the group...
+[2025-03-03T18:39:46.488Z] [info] [alice-a] Received consent update: [{"entityType":0,"state":2,"entity":"6c16434179724a16be7bb7a6473ac186"}]
+[2025-03-03T18:39:46.488Z] [info] Alice's consent state for the group: 2
+[2025-03-03T18:39:46.488Z] [info] Testing individual member consent states...
+[2025-03-03T18:39:46.681Z] [info] [bob-a] New conversation in stream: 6c16434179724a16be7bb7a6473ac186
+[2025-03-03T18:39:46.884Z] [warn] block-bob 395.892ms
+[2025-03-03T18:39:47.287Z] [info] Alice's consent state for Bob is : denied
+[2025-03-03T18:39:47.288Z] [warn] get-bob-consent 403.028ms
+[2025-03-03T18:39:47.288Z] [info] All consent updates received: 1
+[2025-03-03T18:39:47.288Z] [info] Unblocking all entities...
+[2025-03-03T18:39:47.694Z] [warn] unblock-all 405.76ms
+[2025-03-03T18:39:47.694Z] [info] Final group consent state: 1
+[2025-03-03T18:39:47.694Z] [warn] ts_streams > should manage consent for all members in a group 3.509s

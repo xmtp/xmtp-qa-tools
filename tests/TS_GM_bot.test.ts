@@ -13,7 +13,7 @@ import { type Conversation, type Persona } from "../helpers/types";
 import { getWorkers } from "../helpers/workers/factory";
 
 const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
-const testName = "dms";
+const testName = "ts_gm_bot";
 loadEnv(testName);
 
 describe(testName, () => {

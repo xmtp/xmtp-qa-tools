@@ -1,3 +1,4 @@
+import { error } from "console";
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
@@ -91,7 +92,6 @@ export class PersonaFactory {
       // Append to .env file for persistence across runs
       const filePath =
         process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
-      console.log("filePath", filePath);
       void appendFile(
         filePath,
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
