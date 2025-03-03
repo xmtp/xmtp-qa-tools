@@ -28,12 +28,7 @@ let memoryTransport: MemoryTransport | null = null;
 // Export a flush function to flush the memory transport logs
 export const flushLogger = (testName: string): string => {
   if (memoryTransport) {
-    let testFilePath = "logs";
-    if (testName.includes("bug")) {
-      testFilePath = "bugs/" + testName;
-    }
-    const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    const logFilePath = path.join(testFilePath, `${sanitizedName}.log`);
+    const logFilePath = getLogFilePath(testName);
     memoryTransport.flush(logFilePath);
     return logFilePath;
   }
@@ -42,11 +37,7 @@ export const flushLogger = (testName: string): string => {
 
 export const createLogger = (testName: string) => {
   if (!sharedLogger) {
-    const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    let logFilePath = path.join("logs", `${sanitizedName}.log`);
-    if (testName.includes("bug")) {
-      logFilePath = path.join("bugs", testName, `test.log`);
-    }
+    const logFilePath = getLogFilePath(testName);
     // Shared format for console and memory transport
     const sharedFormat = winston.format.combine(
       winston.format.timestamp(),
@@ -68,13 +59,6 @@ export const createLogger = (testName: string) => {
       transports: [consoleTransport, memoryTransport],
     });
 
-    // Flush the buffered logs to file when the process exits normally
-    process.on("exit", () => {
-      if (memoryTransport) {
-        memoryTransport.flush(logFilePath);
-      }
-    });
-
     // Optionally, catch termination signals to flush logs before exit
     const flushAndExit = () => {
       if (memoryTransport) {
@@ -82,6 +66,7 @@ export const createLogger = (testName: string) => {
       }
       process.exit();
     };
+    process.on("exit", flushAndExit);
     process.on("SIGINT", flushAndExit);
     process.on("SIGTERM", flushAndExit);
   }
@@ -131,6 +116,14 @@ function filterLog(args: any[]): string {
       .trim() || ""
   );
 }
+const getLogFilePath = (testName: string): string => {
+  const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
+  const fileName = `${sanitizedName}.log`;
+
+  return testName.includes("bug")
+    ? path.join("bugs", testName, "test.log")
+    : path.join("logs", fileName);
+};
 
 export const overrideConsole = (logger: winston.Logger) => {
   try {

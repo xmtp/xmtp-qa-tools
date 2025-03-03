@@ -1,0 +1,29 @@
+(node:25811) ExperimentalWarning: Importing JSON modules is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:02.701Z] [info] [PersonaFactory] Using env keys for bug: 0xed8a...
+[2025-03-03T14:15:02.702Z] [info] [PersonaFactory] Using env keys for bob: 0x31c7...
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:04.780Z] [warn] [bug-a] Create XMTP client v:436360a 2.047s
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.025Z] [warn] [bob-a] Create XMTP client v:436360a 2.293s
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.639Z] [warn] [bug-a] Start message stream 858.354ms
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.640Z] [warn] [bug-a] Start stream 859.325ms
+[2025-03-03T14:15:05.640Z] [warn] [bug-a] Initialize XMTP client 2.937s
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.874Z] [warn] [bob-a] Start message stream 848.719ms
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.874Z] [warn] [bob-a] Start stream 849.038ms
+[2025-03-03T14:15:05.874Z] [warn] [bob-a] Initialize XMTP client 3.144s
+
+stdout | bugs/panic_bug_account/test.test.ts > panic_bug_account
+[2025-03-03T14:15:05.875Z] [info] bug 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
+[2025-03-03T14:15:05.875Z] [info] bob 0x96e34774c524aa159d0c910d0bB37fe702A4dA61

@@ -123,13 +123,11 @@ export class WorkerClient extends Worker {
     const dbPath = getDbPath(
       this.name,
       await signer.getAddress(),
+      this.testName,
       {
         installationId: this.installationId,
         sdkVersion: this.sdkVersion,
         libxmtpVersion: version,
-      },
-      {
-        testName: this.testName,
       },
     );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);

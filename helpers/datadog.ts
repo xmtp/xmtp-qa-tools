@@ -70,9 +70,6 @@ export async function sendMetric(
     const operationName = operationParts[1];
     const testName = operationParts[0];
     const durationMetricName = `xmtp.sdk.duration`;
-    console.log(`Operation name: ${operationName}`);
-    console.log(`Test name: ${testName}`);
-    console.log(`Duration metric name: ${durationMetricName}`);
 
     // Send main operation metric
     metrics.gauge(durationMetricName, value, [

@@ -1,3 +1,4 @@
+import fs from "fs";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { closeEnv, loadEnv } from "../../helpers/client";
 import {
@@ -12,13 +13,15 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
+  let findBugConvo: Conversation;
+  let group: Conversation;
   let personas: Record<string, Persona>;
 
   beforeAll(async () => {
     // const testFilePath = __filename.split("/").slice(0, -1).join("/") + "/";
-    //    fs.rmSync(testFilePath + ".data", { recursive: true, force: true });
+    // fs.rmSync(testFilePath + ".data", { recursive: true, force: true });
 
-    personas = await getWorkers(["bug2", "bug", "bob"], testName);
+    personas = await getWorkers(["bug", "bob"], testName);
   });
 
   afterAll(async () => {
@@ -33,42 +36,61 @@ describe(testName, () => {
     }
   });
 
-  // it("new dm with bug", async () => {
-  //   const convoWithBug = await personas.bob.client!.conversations.newDm(
-  //     personas.bug.client!.accountAddress,
-  //   );
-  //   expect(convoWithBug.id).toBeDefined();
-  //   console.log("convoWithBug", convoWithBug.id);
-  //   await personas.bug.client?.conversations.syncAll();
-  //   const findBugConvo = personas.bug.client?.conversations.getConversationById(
-  //     convoWithBug.id,
-  //   );
-
-  //   expect(findBugConvo?.id).toBeUndefined();
-  //   console.log("Conversation not found");
-  // });
-
-  it("new dm with bug2", async () => {
-    const convoWithBug2 = await personas.bob.client!.conversations.newDm(
-      personas.bug2.client!.accountAddress,
+  it("new dm with bug", async () => {
+    convo = await personas.bob.client!.conversations.newDm(
+      personas.bug.client!.accountAddress,
     );
-    expect(convoWithBug2.id).toBeDefined();
-    console.log("convoWithBug2", convoWithBug2.id);
-    await personas.bug2.client?.conversations.syncAll();
-    const findBugConvo2 =
-      personas.bug2.client?.conversations.getConversationById(convoWithBug2.id);
-
-    expect(findBugConvo2?.id).toBe(convoWithBug2.id);
-    console.log("Conversation found");
-
-    const messagesfrombug2 = await convoWithBug2.messages();
-    console.log("messagesfrombug2", messagesfrombug2.length);
-    expect(messagesfrombug2.length).toBeGreaterThan(0);
-
-    await convoWithBug2.send("gm");
-    await findBugConvo2?.sync();
-    const messagesfrombug22 = await findBugConvo2?.messages();
-    console.log("messagesfrombug22", messagesfrombug22?.length);
-    expect(messagesfrombug22?.length).toBe(messagesfrombug2.length);
+    expect(convo.id).toBeDefined();
+    console.log("convo", convo.id);
+  });
+  it("sync all", async () => {
+    await personas.bug.client?.conversations.syncAll();
+    findBugConvo = personas.bug.client?.conversations.getConversationById(
+      convo.id,
+    ) as Conversation;
+    console.log("findBugConvo", findBugConvo.id);
+    expect(findBugConvo.id).toBeDefined();
+  });
+  it("send message", async () => {
+    await convo.send("Hello");
+    await findBugConvo.send("Hello");
+  });
+  it("sync all", async () => {
+    await personas.bug.client?.conversations.syncAll();
+    await personas.bob.client?.conversations.syncAll();
+  });
+  it("fetch  messages", async () => {
+    await convo.sync();
+    const messages = await convo.messages();
+    for (const message of messages) {
+      console.log("message", message.content);
+    }
+    await findBugConvo.sync();
+    const messages2 = await findBugConvo.messages();
+    for (const message of messages2) {
+      console.log("message", message.content);
+    }
+    expect(messages.length - 1).toBe(messages2.length);
+  });
+  it("crete new group", async () => {
+    group = await personas.bug.client!.conversations.newGroup([
+      personas.bob.client!.accountAddress,
+    ]);
+    expect(group.id).toBeDefined();
+    console.log("group", group.id);
+  });
+  it("send message in group", async () => {
+    await group.send("Hello");
+  });
+  it("sync all", async () => {
+    await personas.bug.client?.conversations.syncAll();
+    await personas.bob.client?.conversations.syncAll();
+  });
+  it("fetch  messages", async () => {
+    await group.sync();
+    const messages = await group.messages();
+    for (const message of messages) {
+      console.log("message", message.content);
+    }
   });
 });

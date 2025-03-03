@@ -44,22 +44,31 @@ export const createSigner = (key: string): Signer => {
     },
   };
 };
+function loadDataPath(name: string, testName: string): string {
+  // Extract the base name without installation ID for folder structure
+  const baseName = name.toLowerCase().split("-")[0];
+  const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
+
+  // Use baseName for the parent folder, not the full name
+  let basePath = `${preBasePath}/.data/${baseName}`;
+
+  //Load data for bugs
+  if (testName.includes("bug")) {
+    basePath = `${preBasePath}/bugs/${testName}/.data/${baseName}`;
+  }
+  return basePath;
+}
 export const getDbPath = (
   name: string,
   accountAddress: string,
+  testName: string,
   instance?: {
     installationId?: string;
     sdkVersion?: string;
     libxmtpVersion?: string;
   },
-  tests?: {
-    testName: string;
-  },
 ): string => {
   console.time(`[${name}] - getDbPath`);
-
-  // Extract the base name without installation ID for folder structure
-  const baseName = name.toLowerCase().split("-")[0];
 
   // For the identifier, use either the name as-is (if it already has installation ID)
   // or construct it with the installation ID from instance
@@ -74,15 +83,7 @@ export const getDbPath = (
       instance?.installationId?.toLowerCase() ?? defaultValues.installationId;
     identifier = `${name.toLowerCase()}-${installationId}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
   }
-
-  const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
-
-  // Use baseName for the parent folder, not the full name
-  let basePath = `${preBasePath}/.data/${baseName}`;
-
-  if (tests && tests.testName && tests.testName.includes("bug")) {
-    basePath = `${preBasePath}/bugs/${tests.testName}/.data/${baseName}`;
-  }
+  const basePath = loadDataPath(name, testName);
 
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
@@ -102,6 +103,17 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   return fromString(hex, "hex");
 };
 
+function getEnvPath(testName: string): string {
+  let envPath = path.join(".env");
+  if (testName.includes("bug")) {
+    envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
+    if (!fs.existsSync(envPath)) {
+      fs.mkdirSync(envPath, { recursive: true });
+    }
+  }
+  process.env.CURRENT_ENV_PATH = envPath;
+  return envPath;
+}
 /**
  * Loads environment variables from the specified test's .env file
  */
@@ -109,24 +121,13 @@ export function loadEnv(testName: string) {
   // Create the .env file path
   const logger = createLogger(testName);
   overrideConsole(logger);
-  let envPath = path.join(".env");
-  if (testName.includes("bug")) {
-    // Ensure the directory exists
-    // Ensure we're pointing to the bugs directory
-    envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
-    if (!fs.existsSync(envPath)) {
-      fs.mkdirSync(envPath, { recursive: true });
-    }
-    console.log("envPath", envPath);
-  }
-  dotenv.config({ path: envPath });
+  dotenv.config({ path: getEnvPath(testName) });
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",
     process.env.GEOLOCATION ?? "",
     process.env.DATADOG_API_KEY ?? "",
   );
-  process.env.CURRENT_ENV_PATH = envPath;
 }
 export async function closeEnv(
   testName: string,
