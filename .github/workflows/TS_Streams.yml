@@ -33,13 +33,17 @@ jobs:
           path: |
             .data
             .env
-          key: ${{ runner.os }}-data-env-${{ hashFiles('.data/**', '.env') }}-${{ github.run_id }}
+          key: ${{ runner.os }}-TS_Streams-${{ github.run_id }}
           restore-keys: |
-            ${{ runner.os }}-data-env-
+            ${{ runner.os }}-TS_Streams-
           enableCrossOsArchive: false
           fail-on-cache-miss: false
       - name: List data folder contents after cache restore
         run: ls -la .data
+      - name: Count specific folders in .data directory
+        run: |
+          COUNT=$(find .data -type d -name "${{ runner.os }}-${{ github.run_id }}-testname-*" | wc -l)
+          echo "Found $COUNT folders matching pattern: ${{ runner.os }}-${{ github.run_id }}-testname-*"
       - run: corepack enable
       - run: yarn
       - name: Run tests with retry
