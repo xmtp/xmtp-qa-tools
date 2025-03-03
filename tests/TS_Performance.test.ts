@@ -15,7 +15,7 @@ import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "ts_performance";
-await loadEnv(testName);
+loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;

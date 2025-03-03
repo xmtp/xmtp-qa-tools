@@ -8,7 +8,7 @@ import {
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "consent";
-await loadEnv(testName);
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

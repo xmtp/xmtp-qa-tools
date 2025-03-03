@@ -3,7 +3,7 @@ import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { loadEnv } from "../../helpers/client";
 import { type Persona } from "../../helpers/types";
 
-await loadEnv("test-bot");
+loadEnv("test-bot");
 
 let personas: Record<string, Persona> = {};
 async function main() {

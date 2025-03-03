@@ -14,7 +14,7 @@ import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "groups";
-await loadEnv(testName);
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

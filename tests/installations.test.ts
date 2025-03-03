@@ -5,7 +5,7 @@ import { type Client, type Persona } from "../helpers/types";
 import { getInstallations, getWorkers } from "../helpers/workers/factory";
 
 const testName = "installations";
-await loadEnv(testName);
+loadEnv(testName);
 
 describe(
   testName,

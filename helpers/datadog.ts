@@ -1,31 +1,33 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import dotenv from "dotenv";
 import type { Persona } from "./types";
-
-dotenv.config();
 
 let isInitialized = false;
 
-export function initDataDog(testName: string): boolean {
+export function initDataDog(
+  testName: string,
+  envValue: string,
+  geolocation: string,
+  apiKey: string,
+): boolean {
   // Check if already initialized
   if (isInitialized) {
     return true;
   }
+  if (testName.includes("bug")) {
+    return true;
+  }
 
   // Verify API key is available
-  if (!process.env.DATADOG_API_KEY) {
+  if (!apiKey) {
     console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
-    console.warn("→ Create a .env file with your DATADOG_API_KEY=xxx");
     return false;
   }
 
   try {
-    const envValue = process.env.XMTP_ENV;
-    const geolocation = process.env.GEOLOCATION;
     const initConfig = {
-      apiKey: process.env.DATADOG_API_KEY,
+      apiKey: apiKey,
       defaultTags: [
         `env:${envValue}`,
         `test:${testName}`,

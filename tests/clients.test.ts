@@ -9,7 +9,7 @@ import {
 } from "../helpers/workers/factory";
 
 const testName = "clients";
-await loadEnv(testName);
+loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;

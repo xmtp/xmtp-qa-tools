@@ -9,7 +9,7 @@ import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "TS_Loss";
-await loadEnv(testName);
+loadEnv(testName);
 
 const amountofMessages = 10; // Number of messages to collect per receiver
 const receivers = 10;

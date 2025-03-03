@@ -284,7 +284,7 @@
       "available_values": [],
       "default": "dev"
     },
-    { "name": "geo", "prefix": "geo", "available_values": [], "default": "*" },
+    { "name": "geo", "prefix": "geo", "available_values": [], "default": "us" },
     {
       "name": "test",
       "prefix": "test",

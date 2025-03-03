@@ -10,7 +10,7 @@ import { verifyGroupConversationStream, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "TS_Streams";
-await loadEnv(testName);
+loadEnv(testName);
 let personas: Record<string, Persona>;
 
 describe(testName, () => {

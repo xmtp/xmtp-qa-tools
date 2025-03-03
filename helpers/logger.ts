@@ -1,12 +1,8 @@
-import { exec } from "child_process";
 import fs from "fs";
 import path from "path";
-import { promisify } from "util";
 import winston from "winston";
 import Transport from "winston-transport";
 import type { LogInfo } from "./types";
-
-const execAsync = promisify(exec);
 
 class MemoryTransport extends Transport {
   logs: string[] = [];
@@ -23,6 +19,7 @@ class MemoryTransport extends Transport {
   flush(filePath: string) {
     // Write all logs at once
     fs.writeFileSync(filePath, this.logs.join("\n"), { flag: "w" });
+    this.logs = [];
   }
 }
 
@@ -31,15 +28,19 @@ let memoryTransport: MemoryTransport | null = null;
 // Export a flush function to flush the memory transport logs
 export const flushLogger = (testName: string): string => {
   if (memoryTransport) {
+    let testFilePath = "logs";
+    if (testName.includes("bug")) {
+      testFilePath = "bugs/" + testName;
+    }
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
-    const logFilePath = path.join("logs", `${sanitizedName}.log`);
+    const logFilePath = path.join(testFilePath, `${sanitizedName}.log`);
     memoryTransport.flush(logFilePath);
     return logFilePath;
   }
   return "";
 };
 
-export const createLogger = async (testName: string) => {
+export const createLogger = (testName: string) => {
   if (!sharedLogger) {
     const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
     let logFilePath = path.join("logs", `${sanitizedName}.log`);

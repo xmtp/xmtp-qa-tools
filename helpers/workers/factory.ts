@@ -89,8 +89,11 @@ export class PersonaFactory {
 
     if (!name.includes("random")) {
       // Append to .env file for persistence across runs
+      const filePath =
+        process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
+      console.log("filePath", filePath);
       void appendFile(
-        process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env"),
+        filePath,
         `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
       );
     }

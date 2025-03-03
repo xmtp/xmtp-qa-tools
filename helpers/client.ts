@@ -105,14 +105,11 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
 /**
  * Loads environment variables from the specified test's .env file
  */
-export async function loadEnv(testName: string) {
+export function loadEnv(testName: string) {
   // Create the .env file path
-  const logger = await createLogger(testName);
+  const logger = createLogger(testName);
   overrideConsole(logger);
-  initDataDog(testName);
-
   let envPath = path.join(".env");
-
   if (testName.includes("bug")) {
     // Ensure the directory exists
     // Ensure we're pointing to the bugs directory
@@ -120,8 +117,15 @@ export async function loadEnv(testName: string) {
     if (!fs.existsSync(envPath)) {
       fs.mkdirSync(envPath, { recursive: true });
     }
+    console.log("envPath", envPath);
   }
   dotenv.config({ path: envPath });
+  initDataDog(
+    testName,
+    process.env.XMTP_ENV ?? "",
+    process.env.GEOLOCATION ?? "",
+    process.env.DATADOG_API_KEY ?? "",
+  );
   process.env.CURRENT_ENV_PATH = envPath;
 }
 export async function closeEnv(

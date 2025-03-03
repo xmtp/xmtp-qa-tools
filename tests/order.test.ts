@@ -9,7 +9,7 @@ import { verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "order";
-await loadEnv(testName);
+loadEnv(testName);
 
 const amount = 30; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
