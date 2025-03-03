@@ -56,6 +56,10 @@ describe(testName, () => {
       testName,
     );
   });
+  it("inboxState: should measure inboxState of henry", async () => {
+    const inboxState = await personas.henry.client?.inboxState(true);
+    console.log(inboxState?.installations.length);
+  });
   it("createDM: should measure creating a DM", async () => {
     convo = await personas.henry.client!.conversations.newDm(
       personas.randomguy.client!.accountAddress,
