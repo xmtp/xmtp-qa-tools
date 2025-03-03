@@ -65,7 +65,7 @@ beforeAll(async () => {
 });
 
 // Use them directly
-convo = await personas.henry.client!.conversations.newDm(
+convo = await personas.alice.client!.conversations.newDm(
   personas.randomguy.client!.accountAddress,
 );
 ```
