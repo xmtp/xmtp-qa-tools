@@ -86,27 +86,25 @@ Considerations
 > [!TIP]
 > Repository of 600 dummy wallets with inboxIds [see file](./helpers/generated-inboxes.json)
 
-## Bot Setup
+## Test Bot:
 
-Run bots using these commands:
+A bot that generates some groups for you
 
-- **Test Bot:**
+```bash
+yarn bot test
+```
 
-  A bot that generates some groups for you
-
-  ```bash
-  yarn bot test
-  ```
+See more in the test bot [section](./bots/test/)
 
 ## Datadog dashboard
 
 ![](/media/datadog.png)
 
-See more in the dashboards [section](./dashboards/
+See more in the dashboards [section](./dashboards/)
 
 ## Github workflows
 
-See more in the worflows [section](/)
+See more in the worflows [section](/.github/workflows)
 
 ## Helpers
 
