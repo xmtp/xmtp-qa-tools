@@ -21,7 +21,7 @@ This monorepo contains multiple projects and tools for development and testing. 
 
 Run tests for specific modules using these commands:
 
-- **TS_Performance:**: Measures operations by miliseconds and aggregates them in datadog dashboard
+- **TS_Performance**: Measures operations by miliseconds and aggregates them in datadog dashboard
 
   ```bash
   yarn test ts_performance
@@ -29,7 +29,7 @@ Run tests for specific modules using these commands:
 
   Link to [test](./tests/TS_Performance.test.ts)
 
-- **Streams:**: Test 3 different kind of streams (consent,conversations,messages)
+- **TS_Streams**: Test 3 different kind of streams (consent,conversations,messages)
 
   ```bash
   yarn test ts_streams
@@ -37,7 +37,7 @@ Run tests for specific modules using these commands:
 
   Link to [test](./tests/TS_Streams.test.ts)
 
-- **TS_Loss:**: Test multiple concurrent streams to see if there are message losses
+- **TS_Loss**: Test multiple concurrent streams to see if there are message losses
 
   ```bash
   yarn test ts_loss
@@ -45,7 +45,7 @@ Run tests for specific modules using these commands:
 
   Link to [test](./tests/TS_Loss.test.ts)
 
-- **TS_Forked:**: Stress tests group operations to find if they are forked
+- **TS_Forked**: Stress tests group operations to find if they are forked
 
   ```bash
   yarn test ts_forked
