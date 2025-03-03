@@ -259,6 +259,11 @@
                 "data_source": "metrics",
                 "name": "query1",
                 "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp,$members} by {operation}"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query2",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp,$members} by {operation}"
               }
             ],
             "response_format": "scalar",
@@ -268,7 +273,10 @@
               "count": 500,
               "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
             },
-            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
+            "formulas": [
+              { "alias": "Duration (ms)", "formula": "query1" },
+              { "alias": "Members", "formula": "query2" }
+            ]
           }
         ],
         "has_search_bar": "auto"
