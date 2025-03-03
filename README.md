@@ -11,56 +11,49 @@ This monorepo contains multiple projects and tools for development and testing. 
 
 - Yarn 4.6.0
 - Clone the repository and change to its root directory.
+- Run this command to install all dependencies:
 
-## Installation
+  ```bash
+  yarn install
+  ```
 
-Run this command to install all dependencies:
-
-```bash
-yarn install
-```
-
-## Testing
+## Test suites
 
 Run tests for specific modules using these commands:
 
-- **Direct Messages (DMs):**: Sending dms
+- **TS_Performance:**: Measures operations by miliseconds and aggregates them in datadog dashboard
 
   ```bash
-  yarn test dms
+  yarn test ts_performance
   ```
 
-- **Streams:**: 3 different kind of streams
+  Link to [test](./tests/TS_Performance.test.ts)
+
+- **Streams:**: Test 3 different kind of streams (consent,conversations,messages)
 
   ```bash
-  yarn test streams
+  yarn test ts_streams
   ```
 
-- **Groups:**: Up to 500 groups
+  Link to [test](./tests/TS_Streams.test.ts)
+
+- **TS_Loss:**: Test multiple concurrent streams to see if there are message losses
 
   ```bash
-  yarn test groups
+  yarn test ts_loss
   ```
 
-- **Groups:**
+  Link to [test](./tests/TS_Loss.test.ts)
+
+- **TS_Forked:**: Stress tests group operations to find if they are forked
 
   ```bash
-  yarn test groups
+  yarn test ts_forked
   ```
 
-#### Vitest UI Setup
+  Link to [test](./tests/TS_Forked.test.ts)
 
-Vitest is used for running tests and provides a UI for better visualization.
-
-```bash
-yarn start
-```
-
-## Worker Setup
-
-The repository uses a worker system to manage test personas.
-
-### Known Workers
+## Workers
 
 Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
 
@@ -113,3 +106,13 @@ See more helpers in the helpers [section](./helpers/)
 ## Scripts
 
 See more scripts in the scripts [section](./scripts/)
+
+## Vitest UI
+
+Vitest is used for running tests and provides a UI for better visualization.
+
+```bash
+yarn start
+```
+
+See live link deployed in [railway](https://ephemera-test.up.railway.app/__vitest__/#/)
