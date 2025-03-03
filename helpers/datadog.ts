@@ -70,6 +70,7 @@ export async function sendMetric(
     const operationParts = metricName.split(".");
     const operationName = operationParts[1];
     const testName = operationParts[0];
+    const members = testName.split("-")[1] || "";
     const durationMetricName = `xmtp.sdk.duration`;
 
     // Send main operation metric
@@ -78,6 +79,7 @@ export async function sendMetric(
       `operation:${operationName}`,
       `test:${testName}`,
       `metric_type:operation`,
+      `members:${members}`,
     ]);
 
     // Handle network stats if needed

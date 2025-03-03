@@ -14,7 +14,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call,$env,$geo,$test,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -47,7 +47,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$geo,$test,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -80,7 +80,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$geo,$test,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -113,7 +113,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp}",
+                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -146,7 +146,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$test,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -179,7 +179,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:receivegroupmessage,$env,$geo,$test,$libxmtp}",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:receivegroupmessage,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -214,7 +214,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp} by {network_phase}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp,$members} by {network_phase}"
               }
             ],
             "response_format": "timeseries",
@@ -238,7 +238,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp,$members} by {operation}"
               }
             ],
             "response_format": "timeseries",
@@ -249,9 +249,8 @@
       "layout": { "x": 6, "y": 2, "width": 6, "height": 4 }
     },
     {
-      "id": 2220493386247805,
       "definition": {
-        "title": "SDK Operations Performance (Ordered by Duration)",
+        "title": "Sdk operations performance (ordered by duration)",
         "type": "query_table",
         "requests": [
           {
@@ -259,7 +258,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$geo,$test,$libxmtp,$members} by {operation}"
               }
             ],
             "response_format": "scalar",
@@ -306,6 +305,12 @@
     {
       "name": "metric_type",
       "prefix": "metric_type",
+      "available_values": [],
+      "default": "*"
+    },
+    {
+      "name": "members",
+      "prefix": "members",
       "available_values": [],
       "default": "*"
     }
