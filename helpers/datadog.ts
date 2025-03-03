@@ -34,10 +34,11 @@ export function initDataDog(
         `geo:${geolocation}`,
       ],
     };
-    console.log(`initConfig: ${JSON.stringify(initConfig)}`);
     metrics.init(initConfig);
 
-    console.log("✅ DataDog metrics initialized successfully");
+    console.log(
+      `✅ DataDog metrics initialized successfully ${JSON.stringify(initConfig)}`,
+    );
     isInitialized = true;
     return true;
   } catch (error) {
@@ -135,6 +136,7 @@ interface NetworkStats {
  * @param endpoint The endpoint to monitor (defaults to XMTP gRPC endpoint)
  * @returns Object containing timing information in seconds
  */
+let firstLogShared = false;
 export async function getNetworkStats(
   endpoint = "https://grpc.dev.xmtp.network:443",
 ): Promise<NetworkStats> {
@@ -156,9 +158,12 @@ export async function getNetworkStats(
       stats["TLS Handshake"] * 1000 > 300 ||
       stats["Server Call"] * 1000 > 300
     ) {
-      console.warn(
-        `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
-      );
+      if (!firstLogShared) {
+        firstLogShared = true;
+        console.warn(
+          `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
+        );
+      }
     }
 
     return stats;

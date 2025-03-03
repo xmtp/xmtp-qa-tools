@@ -22,7 +22,20 @@ describe(testName, () => {
   let start: number;
 
   beforeAll(async () => {
-    personas = await getWorkers(["bob", "joe", "sam", "random"], testName);
+    personas = await getWorkers(
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "randomguy",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+      ],
+      testName,
+    );
   });
 
   beforeEach(() => {
@@ -44,8 +57,8 @@ describe(testName, () => {
   });
 
   it("createDM: should measure creating a DM", async () => {
-    convo = await personas.bob.client!.conversations.newDm(
-      personas.random.client!.accountAddress,
+    convo = await personas.henry.client!.conversations.newDm(
+      personas.randomguy.client!.accountAddress,
     );
 
     expect(convo).toBeDefined();
@@ -57,7 +70,7 @@ describe(testName, () => {
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(
-      `[${personas.bob.name}] Creating DM with ${personas.random.name} at ${personas.random.client?.accountAddress}`,
+      `[${personas.henry.name}] Creating DM with ${personas.randomguy.name} at ${personas.randomguy.client?.accountAddress}`,
     );
 
     const dmId = await convo.send(message);
@@ -66,7 +79,7 @@ describe(testName, () => {
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    const verifyResult = await verifyStream(convo, [personas.random]);
+    const verifyResult = await verifyStream(convo, [personas.randomguy]);
 
     expect(verifyResult.messages.length).toEqual(1);
     expect(verifyResult.allReceived).toBe(true);
