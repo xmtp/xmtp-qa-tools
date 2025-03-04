@@ -27,6 +27,17 @@ jobs:
         run: mkdir -p .data
       - name: List data folder contents before caching
         run: ls -la .data
+      - name: Cache data folder and .env file
+        uses: actions/cache@v3
+        with:
+          path: |
+            .data
+            .env
+          key: ${{ runner.os }}-TS_Loss-cache
+          restore-keys: |
+            ${{ runner.os }}-TS_Loss-
+          enableCrossOsArchive: false
+          fail-on-cache-miss: false
       - name: List data folder contents after cache restore
         run: ls -la .data
       - run: corepack enable

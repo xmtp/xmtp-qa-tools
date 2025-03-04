@@ -1,3 +1,4 @@
+import fs from "fs";
 import {
   afterAll,
   afterEach,
@@ -22,6 +23,7 @@ describe(testName, () => {
   let start: number;
 
   beforeAll(async () => {
+    fs.rmSync(".data", { recursive: true, force: true });
     personas = await getWorkers(["bob"], testName);
   });
 
