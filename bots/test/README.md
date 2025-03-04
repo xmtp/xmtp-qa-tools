@@ -60,6 +60,30 @@ LOGGING_LEVEL="off" # off, error, warn, info, debug, trace
 XMTP_ENV="dev" # dev, production
 ```
 
+## Workers
+
+Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
+
+```tsx
+let personas: Record<string, Persona>;
+
+beforeAll(async () => {
+  personas = await getWorkers(["alice", "bob", "randomguy"], testName);
+});
+
+// Use them directly
+convo = await personas.alice.client!.conversations.newDm(
+  personas.randomguy.client!.accountAddress,
+);
+```
+
+Considerations
+
+- If a persona does not exist, its keys are created.
+- If persona exists uses the existing env file keys and .data folder
+- If the data folder doesnt exist, it creates one
+- Personas prefixed with "random" have keys that are stored only in memory.
+
 ## Coming Soon
 
 - [ ] Metadata for groups
