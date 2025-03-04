@@ -1,4 +1,8 @@
 import fs from "fs";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendMetric } from "@helpers/datadog";
+import { type Conversation, type Persona } from "@helpers/types";
+import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
   afterEach,
@@ -8,10 +12,6 @@ import {
   expect,
   it,
 } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { sendMetric } from "../helpers/datadog";
-import { type Conversation, type Persona } from "../helpers/types";
-import { getWorkers } from "../helpers/workers/factory";
 
 const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
 const testName = "ts_gm_bot";

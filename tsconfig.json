@@ -8,6 +8,7 @@
     "forceConsistentCasingInFileNames": true,
     "lib": ["ESNext"],
     "module": "ESNext",
+    "baseUrl": ".",
     "moduleResolution": "Bundler",
     "noEmit": true,
     "resolveJsonModule": true,

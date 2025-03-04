@@ -1,11 +1,7 @@
+import { closeEnv, loadEnv } from "@helpers/client";
+import { ConsentEntityType, ConsentState, type Persona } from "@helpers/types";
+import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import {
-  ConsentEntityType,
-  ConsentState,
-  type Persona,
-} from "../helpers/types";
-import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "consent";
 loadEnv(testName);

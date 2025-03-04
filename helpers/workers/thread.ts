@@ -1,12 +1,5 @@
-/**
- * worker.ts
- *
- * This file is loaded by the Worker's inline `tsImport(...)`.
- * You can do any required initialization for your worker environment here.
- */
-
 import { parentPort, workerData } from "node:worker_threads";
-import type { Client } from "@xmtp/node-sdk";
+import type { Client } from "@helpers/types";
 
 // The Worker must be run in a worker thread, so confirm `parentPort` is defined
 if (!parentPort) {

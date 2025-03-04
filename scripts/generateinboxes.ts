@@ -3,8 +3,8 @@ import {
   createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
-} from "../helpers/client";
-import { Client } from "../helpers/types";
+} from "@helpers/client";
+import { Client } from "@helpers/types";
 
 async function main() {
   // Number of accounts to generate

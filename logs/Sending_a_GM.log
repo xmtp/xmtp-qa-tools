@@ -1,0 +1,11 @@
+[2025-03-04T13:56:06.908Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:Sending a GM","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-04T13:56:06.923Z] [info] [PersonaFactory] Using env keys for larry: 0x05e9...
+[2025-03-04T13:56:06.952Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/larry
+[2025-03-04T13:56:10.886Z] [warn] [larry-a] Create XMTP client v:436360a 3.934s
+[2025-03-04T13:56:11.298Z] [warn] [larry-a] Start message stream 411.769ms
+[2025-03-04T13:56:11.299Z] [warn] [larry-a] Start stream 412.588ms
+[2025-03-04T13:56:11.299Z] [warn] [larry-a] Initialize XMTP client 4.375s
+[2025-03-04T13:56:11.300Z] [info] larry 0x51144C5b4a207658843599c299F11A9E240248B6
+[2025-03-04T13:56:11.301Z] [info] Running Sending GM Test with ID 196428
+[2025-03-04T13:56:13.121Z] [warn] Basic test > should return true 1.821s
+[2025-03-04T13:56:13.122Z] [info] metricName Basic test.should return true undefined

@@ -1,12 +1,18 @@
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
+  createSigner,
+  getDbPath,
+  getEncryptionKeyFromHex,
+} from "@helpers/client";
+import {
   Client,
+  defaultValues,
   type Consent,
   type Conversation,
   type DecodedMessage,
-} from "@xmtp/node-sdk";
-import { createSigner, getDbPath, getEncryptionKeyFromHex } from "../client";
-import { defaultValues, type PersonaBase, type typeofStream } from "../types";
+  type PersonaBase,
+  type typeofStream,
+} from "@helpers/types";
 
 export type MessageStreamWorker = {
   type: string;

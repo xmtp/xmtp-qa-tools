@@ -1,4 +1,9 @@
 import fs from "fs";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendMetric } from "@helpers/datadog";
+import { defaultValues, type Persona } from "@helpers/types";
+import { verifyStream } from "@helpers/verify";
+import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
   afterEach,
@@ -8,11 +13,6 @@ import {
   expect,
   it,
 } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { sendMetric } from "../helpers/datadog";
-import { defaultValues, type Persona } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
-import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "ts_loss";
 loadEnv(testName);

@@ -1,12 +1,12 @@
 import fs from "fs";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { type Persona } from "../helpers/types";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { type Persona } from "@helpers/types";
 import {
   createMultipleInstallations,
   getDataSubFolderCount,
   getWorkers,
-} from "../helpers/workers/factory";
+} from "@helpers/workers/factory";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);

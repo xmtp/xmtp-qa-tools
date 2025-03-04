@@ -1,8 +1,11 @@
-import type { Installation } from "@xmtp/node-sdk";
+import { closeEnv, loadEnv } from "@helpers/client";
+import {
+  type Conversation,
+  type Installation,
+  type Persona,
+} from "@helpers/types";
+import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { closeEnv, loadEnv } from "../../helpers/client";
-import { type Conversation, type Persona } from "../../helpers/types";
-import { getWorkers } from "../../helpers/workers/factory";
 
 const testName = "panic_bug_account";
 loadEnv(testName);
@@ -10,7 +13,6 @@ loadEnv(testName);
 describe(testName, () => {
   let convo: Conversation | null;
   let findBugConvo: Conversation | null;
-  let group: Conversation | null;
   let installations: Installation[] = [];
   let personas: Record<string, Persona>;
 

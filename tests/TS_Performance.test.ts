@@ -1,4 +1,9 @@
-import type { Conversation } from "@xmtp/node-sdk";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendMetric } from "@helpers/datadog";
+import generatedInboxes from "@helpers/generated-inboxes.json";
+import type { Conversation, Persona } from "@helpers/types";
+import { getPersonasFromGroup, verifyStream } from "@helpers/verify";
+import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
   afterEach,
@@ -8,12 +13,6 @@ import {
   expect,
   it,
 } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { sendMetric } from "../helpers/datadog";
-import generatedInboxes from "../helpers/generated-inboxes.json";
-import type { Persona } from "../helpers/types";
-import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
-import { getWorkers } from "../helpers/workers/factory";
 
 const batchSize = 50;
 const total = 300;

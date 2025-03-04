@@ -1,8 +1,8 @@
+import { closeEnv, loadEnv } from "@helpers/client";
+import { type Conversation, type Persona } from "@helpers/types";
+import { verifyStream } from "@helpers/verify";
+import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { type Conversation, type Persona } from "../helpers/types";
-import { verifyStream } from "../helpers/verify";
-import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "metadata";
 loadEnv(testName);

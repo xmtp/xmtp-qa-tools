@@ -1,7 +1,7 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type Signer } from "@xmtp/node-sdk";
+import { type Signer } from "@helpers/types";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";

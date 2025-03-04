@@ -1,7 +1,6 @@
+import { loadEnv } from "@helpers/client";
+import { type Client, type Persona, type XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
-import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
-import { loadEnv } from "../../helpers/client";
-import { type Persona } from "../../helpers/types";
 
 const testName = "test-bot";
 loadEnv(testName);

@@ -1,16 +1,15 @@
-import { error } from "console";
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { type Client } from "@xmtp/node-sdk";
-import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { generateEncryptionKeyHex } from "../client";
+import { generateEncryptionKeyHex } from "@helpers/client";
 import {
   defaultValues,
+  type Client,
   type Persona,
   type PersonaBase,
   type typeofStream,
-} from "../types";
+} from "@helpers/types";
+import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
 // Global cache to store workers across multiple getWorkers calls
@@ -153,7 +152,6 @@ export class PersonaFactory {
     const newDescriptors: string[] = [];
     const newPersonas: Persona[] = [];
 
-    
     // First, check which personas already exist in the global cache
     for (const desc of descriptors) {
       if (

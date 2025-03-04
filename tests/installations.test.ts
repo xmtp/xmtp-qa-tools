@@ -1,10 +1,8 @@
 import fs from "fs";
-import type { Installation } from "@xmtp/node-sdk";
-import { nonceManager } from "viem";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { type Installation, type Persona } from "@helpers/types";
+import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, it } from "vitest";
-import { closeEnv, loadEnv } from "../helpers/client";
-import { type Persona } from "../helpers/types";
-import { getWorkers } from "../helpers/workers/factory";
 
 const testName = "installations";
 loadEnv(testName);

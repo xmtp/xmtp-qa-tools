@@ -1,7 +1,7 @@
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { generateEncryptionKeyHex } from "@helpers/client";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { generateEncryptionKeyHex } from "../helpers/client";
 
 console.log("Generating keys...");
 
