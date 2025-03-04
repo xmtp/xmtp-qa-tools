@@ -6,9 +6,8 @@ A lightweight toolkit for React Native developers to test messaging functionalit
 
 ### Prerequisites
 
-- Node.js (v16+)
-- Yarn or npm
-- Git
+- Node.js (20.18.0)
+- Yarn
 
 ### Installation
 
