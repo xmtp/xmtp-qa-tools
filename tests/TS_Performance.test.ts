@@ -25,6 +25,22 @@ describe(testName, () => {
   let personas: Record<string, Persona>;
   let start: number;
 
+  beforeAll(async () => {
+    personas = await getWorkers(
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "randomguy",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+      ],
+      testName,
+    );
+  });
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
     start = performance.now();
@@ -42,22 +58,6 @@ describe(testName, () => {
     await closeEnv(testName, personas);
   });
 
-  beforeAll(async () => {
-    personas = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
-  });
   it("inboxState: should measure inboxState of henry", async () => {
     const inboxState = await personas.henry.client?.inboxState(true);
     console.log(inboxState?.installations.length);

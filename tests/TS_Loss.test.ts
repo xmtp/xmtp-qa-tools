@@ -1,3 +1,4 @@
+import fs from "fs";
 import {
   afterAll,
   afterEach,
@@ -27,8 +28,9 @@ describe(
   () => {
     let personas: Record<string, Persona>;
     let start: number;
-    // 1. Setup
+
     beforeAll(async () => {
+      fs.rmSync(".data", { recursive: true, force: true });
       // Use getWorkers to spin up many personas. This is resource-intensive.
       personas = await getWorkers(receivers, testName);
     });
