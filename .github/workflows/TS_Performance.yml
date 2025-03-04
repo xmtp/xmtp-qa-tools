@@ -44,11 +44,11 @@ jobs:
             const { repo, owner } = context.repo;
             const workflow_run_url = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
 
-            await github.rest.issues.create({
+            await github.rest.issues.createComment({
               owner: owner,
               repo: repo,
-              title: `❌ TS_Performance Dev Network Test Failed`,
-              body: `## Automated Dev Network Performance Test Failed\n\n` +
+              issue_number: 25, // Reference to the existing issue #25
+              body: `## ❌ TS_Performance Dev Network Test Failed\n\n` +
                     `The scheduled Dev network performance verification workflow has failed after 3 retry attempts.\n\n` +
                     `### Details:\n` +
                     `- **Workflow:** [TS_Performance](${workflow_run_url})\n` +
@@ -56,6 +56,5 @@ jobs:
                     `- **Run ID:** ${context.runId}\n` +
                     `- **Commit:** ${context.sha}\n` +
                     `- **Triggered by:** ${context.actor || 'Scheduled run'}\n` +
-                    `- **Timestamp:** ${new Date().toISOString()}\n\n` +
-                    `Please investigate this failure as it may indicate performance issues in the development network.`
+                    `- **Timestamp:** ${new Date().toISOString()}\n\n`
             });
