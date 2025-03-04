@@ -15,7 +15,6 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ vars.XMTP_ENV }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      PLAYWRIGHT_HEADLESS: "true"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -26,34 +25,19 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-
-      # Install Playwright browsers
+        # Install Playwright browsers
       - name: Install Playwright
         run: |
           yarn add --dev playwright-chromium
           yarn playwright install --with-deps chromium
 
-      # Run the existing tests with retry
-      - name: Run existing tests with retry
+      - name: Run tests with retry
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
             yarn test TS_GM_bot && break
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
-              exit 1
-            fi
-            sleep 10
-          done
-
-      # Run Playwright E2E test with retry
-      - name: Run Playwright E2E test with retry
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i for Playwright test..."
-            yarn vitest run gm-bot.test.ts && break
-            if [ $i -eq 3 ]; then
-              echo "Playwright test failed after 3 attempts."
               exit 1
             fi
             sleep 10
