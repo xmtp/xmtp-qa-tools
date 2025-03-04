@@ -15,8 +15,8 @@ import type { Persona } from "../helpers/types";
 import { getPersonasFromGroup, verifyStream } from "../helpers/verify";
 import { getWorkers } from "../helpers/workers/factory";
 
-const batchSize = 50;
-const total = 300;
+const batchSize = 100;
+const total = 550;
 const testName = "ts_performance";
 loadEnv(testName);
 
