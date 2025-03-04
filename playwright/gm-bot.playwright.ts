@@ -7,10 +7,12 @@ import {
 
 let browser: Browser | null = null;
 
+// Determine if we should run in headless mode (default to true in CI)
+const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
 export async function testGmBot(gmBotAddress: string): Promise<boolean> {
   try {
     // Launch the browser
-    browser = await chromium.launch({ headless: true });
+    browser = await chromium.launch({ headless: isHeadless });
     const context: BrowserContext = await browser.newContext();
     const page: Page = await context.newPage();
     console.log("Starting test");
@@ -40,7 +42,7 @@ export async function testGmBot(gmBotAddress: string): Promise<boolean> {
     console.log(`Sent message: ${message}`);
 
     // Wait a couple seconds for the bot's response to appear
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 4000));
     await page.waitForSelector(
       '[data-testid="virtuoso-item-list"] div:has-text("gm")',
     );
@@ -59,7 +61,7 @@ export async function testGmBot(gmBotAddress: string): Promise<boolean> {
 
     console.log(`Received response: ${response}`);
 
-    return response == "gm";
+    return response === "gm";
   } catch (error) {
     console.error("Test failed:", error);
     return false;
