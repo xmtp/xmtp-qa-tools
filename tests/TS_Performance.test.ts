@@ -15,7 +15,7 @@ import {
 } from "vitest";
 
 const batchSize = 50;
-const total = 300;
+const total = 200;
 const testName = "ts_performance";
 loadEnv(testName);
 

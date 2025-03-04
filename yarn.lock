@@ -1224,6 +1224,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@playwright/test@npm:^1.50.1":
+  version: 1.50.1
+  resolution: "@playwright/test@npm:1.50.1"
+  dependencies:
+    playwright: "npm:1.50.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/0d8d2291d6554c492cb163b4d463e1e9cc6d3ae50680d790473f693f36a243c16c3620406849dd40115046c47a6ad5cc36a24511caec6d054dc1a1d9fffb4138
+  languageName: node
+  linkType: hard
+
 "@polka/url@npm:^1.0.0-next.24":
   version: 1.0.0-next.28
   resolution: "@polka/url@npm:1.0.0-next.28"
@@ -3398,12 +3409,31 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fsevents@npm:2.3.2":
+  version: 2.3.2
+  resolution: "fsevents@npm:2.3.2"
+  dependencies:
+    node-gyp: "npm:latest"
+  checksum: 10/6b5b6f5692372446ff81cf9501c76e3e0459a4852b3b5f1fc72c103198c125a6b8c72f5f166bdd76ffb2fca261e7f6ee5565daf80dca6e571e55bcc589cc1256
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
 "fsevents@npm:~2.3.2, fsevents@npm:~2.3.3":
   version: 2.3.3
   resolution: "fsevents@npm:2.3.3"
   dependencies:
     node-gyp: "npm:latest"
   checksum: 10/4c1ade961ded57cdbfbb5cac5106ec17bc8bccd62e16343c569a0ceeca83b9dfef87550b4dc5cbb89642da412b20c5071f304c8c464b80415446e8e155a038c0
+  conditions: os=darwin
+  languageName: node
+  linkType: hard
+
+"fsevents@patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>":
+  version: 2.3.2
+  resolution: "fsevents@patch:fsevents@npm%3A2.3.2#optional!builtin<compat/fsevents>::version=2.3.2&hash=df0bf1"
+  dependencies:
+    node-gyp: "npm:latest"
   conditions: os=darwin
   languageName: node
   linkType: hard
@@ -4642,6 +4672,41 @@ __metadata:
   languageName: node
   linkType: hard
 
+"playwright-chromium@npm:^1.50.1":
+  version: 1.50.1
+  resolution: "playwright-chromium@npm:1.50.1"
+  dependencies:
+    playwright-core: "npm:1.50.1"
+  bin:
+    playwright: cli.js
+  checksum: 10/1444cc7b9ce9883c319753176accf8520cae0bf3068f318547f9a7f711848ca3b71032d9ed67d58888269834e8951ce90c2448133a77b0b1ff055b6bce6c4d83
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:1.50.1":
+  version: 1.50.1
+  resolution: "playwright-core@npm:1.50.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 10/9a310b8a66bf7fd926e620c1c8e27be29bdbdce91640e5f975b2fd4dc706d0307faec2bb0456cc8e7dedb1e71c0b5eb35c6a58acd5cedc7d8fd849a9067e637b
+  languageName: node
+  linkType: hard
+
+"playwright@npm:1.50.1":
+  version: 1.50.1
+  resolution: "playwright@npm:1.50.1"
+  dependencies:
+    fsevents: "npm:2.3.2"
+    playwright-core: "npm:1.50.1"
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  bin:
+    playwright: cli.js
+  checksum: 10/a3687614ac3238a81cbe3018e4f4a2ae92c71f3f65110cc6087068c020f6134f0628308da33177b9b08102644706e835d4053f6890beeb4a935f433bc4ac107a
+  languageName: node
+  linkType: hard
+
 "postcss@npm:^8.5.2":
   version: 8.5.3
   resolution: "postcss@npm:8.5.3"
@@ -4799,6 +4864,7 @@ __metadata:
     "@eslint/js": "npm:^9.19.0"
     "@hyperbrowser/sdk": "npm:^0.29.0"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
+    "@playwright/test": "npm:^1.50.1"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^22.13.0"
     "@vitest/coverage-v8": "npm:3.0.6"
@@ -4812,6 +4878,7 @@ __metadata:
     eslint-plugin-prettier: "npm:^5.2.3"
     globals: "npm:^15.14.0"
     openai: "npm:latest"
+    playwright-chromium: "npm:^1.50.1"
     prettier: "npm:^3.4.2"
     prettier-plugin-packagejson: "npm:^2.5.8"
     puppeteer-core: "npm:^24.2.0"
