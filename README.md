@@ -111,3 +111,17 @@ Vitest is used for running tests and provides a UI for better visualization.
 ```bash
 yarn start
 ```
+
+## Playwright
+
+Using playwright to write web automations.
+
+Try it out:
+
+```tsx
+yarn test xmtp
+```
+
+https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
+
+See the example xmtp.chat [script](./playwright/gm-bot.playwright.ts)
