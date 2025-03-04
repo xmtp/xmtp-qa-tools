@@ -118,14 +118,14 @@ function getEnvPath(testName: string): string {
  * Loads environment variables from the specified test's .env file
  */
 export function loadEnv(testName: string) {
-  // Create the .env file path
-  const env = process.env.XMTP_ENV as XmtpEnv | undefined;
-  if (env !== "dev" && env !== "production" && env !== "local") {
-    throw new Error("XMTP_ENV is not set in .env file or its not valid");
-  }
   const logger = createLogger(testName);
   overrideConsole(logger);
   dotenv.config({ path: getEnvPath(testName) });
+  // Create the .env file path
+  const env = process.env.XMTP_ENV;
+  if (env !== "dev" && env !== "production" && env !== "local") {
+    throw new Error("XMTP_ENV is not set in .env file or its not valid");
+  }
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",
