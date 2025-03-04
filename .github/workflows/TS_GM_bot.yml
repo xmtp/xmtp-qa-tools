@@ -25,11 +25,6 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-        # Install Playwright browsers
-      - name: Install Playwright
-        run: |
-          yarn add --dev playwright-chromium
-          yarn playwright install --with-deps chromium
 
       - name: Run tests with retry
         run: |
