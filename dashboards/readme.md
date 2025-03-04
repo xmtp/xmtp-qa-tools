@@ -15,39 +15,8 @@ The XMTP SDK performance dashboard tracks key metrics related to the performance
 The dashboard tracks several important performance indicators:
 
 - Message delivery times
-- Client initialization performance
-- Message listing performance
+- Group creation performance
 - Network request latency
-- Error rates
-- Resource utilization
-
-## Using the dashboard
-
-```bash
-# Access the dashboard directly via the URL
-open https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance
-```
-
-**Expected result:** You'll see a comprehensive view of SDK performance metrics that can be filtered by:
-
-- Geographic region
-- Time range
-- Environment (production, dev)
-- SDK version
-
-## Filtering options
-
-The dashboard supports various filtering options to narrow down the data:
-
-```
-# Example URL parameters
-?tpl_var_geo[0]=us       # Filter by US region
-&from_ts=1740956007001   # Start timestamp
-&to_ts=1740956307001     # End timestamp
-&live=true               # Enable live updates
-```
-
-**Expected result:** The dashboard will display filtered data based on your selected parameters.
 
 ## Dashboard configuration
 
@@ -65,8 +34,7 @@ The dashboard configuration is stored in `dashboards/ts_performance.json`. This 
 The dashboard helps identify:
 
 - Performance bottlenecks
+- Expected benchmarks
 - Unusual latency spikes
 - Error patterns
-- Regional performance differences
-
-**Expected result:** You can use these insights to optimize SDK performance and troubleshoot issues affecting message delivery and client operations.
+- Regional differences
