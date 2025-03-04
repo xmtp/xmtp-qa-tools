@@ -7,8 +7,7 @@ import {
 
 let browser: Browser | null = null;
 
-const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
-export async function testGmBot(): Promise<boolean> {
+export async function testGmBot(gmBotAddress: string): Promise<boolean> {
   try {
     // Launch the browser
     browser = await chromium.launch({ headless: true });

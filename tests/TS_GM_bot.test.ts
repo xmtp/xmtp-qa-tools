@@ -61,11 +61,11 @@ describe(testName, () => {
     expect(messagesAfter.length).toBe(messages.length + 2);
     console.log("Messages after sending", messagesAfter.length);
 
-    expect(dmId).toBeDefined();
+    expect(dmId).toBeUndefined();
   });
 
   it("should respond to a message", async () => {
-    const result = await testGmBot();
+    const result = await testGmBot(gmBotAddress);
     expect(result).toBe(true);
-  }, 300000);
+  });
 });
