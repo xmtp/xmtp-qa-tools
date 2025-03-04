@@ -102,10 +102,12 @@ See more scripts in the scripts [section](./scripts/)
 
 Vitest is used for running tests and provides a UI for better visualization.
 
+> See live link deployed in [railway](https://ephemera-test.up.railway.app/__vitest__/#/)
+
 ![](/media/vitest.jpeg)
+
+### How to run
 
 ```bash
 yarn start
 ```
-
-See live link deployed in [railway](https://ephemera-test.up.railway.app/__vitest__/#/)
