@@ -61,7 +61,7 @@ describe(testName, () => {
     expect(messagesAfter.length).toBe(messages.length + 2);
     console.log("Messages after sending", messagesAfter.length);
 
-    expect(dmId).toBeUndefined();
+    expect(dmId).toBeDefined();
   });
 
   it("should respond to a message", async () => {
