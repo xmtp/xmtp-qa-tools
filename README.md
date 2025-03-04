@@ -106,7 +106,7 @@ Vitest is used for running tests and provides a UI for better visualization.
 
 ![](/media/vitest.jpeg)
 
-### How to run
+#### How to run vitest ui
 
 ```bash
 yarn start
