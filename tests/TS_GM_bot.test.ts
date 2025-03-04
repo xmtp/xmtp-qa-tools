@@ -12,6 +12,7 @@ import {
   expect,
   it,
 } from "vitest";
+import { testGmBot } from "../playwright/gm-bot.playwright";
 
 const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
 const testName = "ts_gm_bot";
@@ -62,4 +63,9 @@ describe(testName, () => {
 
     expect(dmId).toBeDefined();
   });
+
+  it("should respond to a message", async () => {
+    const result = await testGmBot();
+    expect(result).toBe(true);
+  }, 300000);
 });
