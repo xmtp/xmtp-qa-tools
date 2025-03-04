@@ -3,14 +3,12 @@ import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { loadEnv } from "../../helpers/client";
 import { type Persona } from "../../helpers/types";
 
-loadEnv("test-bot");
+const testName = "test-bot";
+loadEnv(testName);
 
 let personas: Record<string, Persona> = {};
 async function main() {
-  personas = await getWorkers(
-    ["bob", "bot", "alice", "joe", "sam"],
-    "test-bot",
-  );
+  personas = await getWorkers(["bob", "bot", "alice", "joe", "sam"], testName);
 
   const client = personas.bot.client as Client;
 
@@ -46,9 +44,9 @@ async function main() {
       continue;
     }
 
-    if (message.content === "gm") {
+    if ((message.content as string).toLowerCase() === "gm") {
       await conversation.send("gm");
-    } else if (message.content === "/group") {
+    } else if ((message.content as string).toLowerCase() === "/group") {
       console.log("Creating group...");
       await conversation.send("hang tight, creating group...");
       const groupName = `group-${new Date().toISOString().split("T")[0]}`;
