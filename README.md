@@ -102,6 +102,8 @@ See more scripts in the scripts [section](./scripts/)
 
 Vitest is used for running tests and provides a UI for better visualization.
 
+![](/media/vitest.jpeg)
+
 ```bash
 yarn start
 ```
