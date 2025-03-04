@@ -36,3 +36,27 @@ jobs:
             fi
             sleep 10
           done
+
+      - name: Create issue on workflow failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const { repo, owner } = context.repo;
+            const workflow_run_url = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
+
+            await github.rest.issues.create({
+              owner: owner,
+              repo: repo,
+              title: `❌ TS_GM_bot Dev Network Test Failed`,
+              body: `## Automated Dev Network Performance Test Failed\n\n` +
+                    `The scheduled Dev network performance verification workflow has failed after 3 retry attempts.\n\n` +
+                    `### Details:\n` +
+                    `- **Workflow:** [TS_GM_bot](${workflow_run_url})\n` +
+                    `- **Environment:** Dev\n` +
+                    `- **Run ID:** ${context.runId}\n` +
+                    `- **Commit:** ${context.sha}\n` +
+                    `- **Triggered by:** ${context.actor || 'Scheduled run'}\n` +
+                    `- **Timestamp:** ${new Date().toISOString()}\n\n` +
+                    `Please investigate this failure as it may indicate performance issues in the development network.`
+            });
