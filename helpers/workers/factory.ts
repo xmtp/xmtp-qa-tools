@@ -153,6 +153,7 @@ export class PersonaFactory {
     const newDescriptors: string[] = [];
     const newPersonas: Persona[] = [];
 
+    
     // First, check which personas already exist in the global cache
     for (const desc of descriptors) {
       if (
