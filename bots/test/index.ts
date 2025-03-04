@@ -46,7 +46,9 @@ async function main() {
       continue;
     }
 
-    if (message.content === "/group") {
+    if (message.content === "gm") {
+      await conversation.send("gm");
+    } else if (message.content === "/group") {
       console.log("Creating group...");
       await conversation.send("hang tight, creating group...");
       const groupName = `group-${new Date().toISOString().split("T")[0]}`;
@@ -113,8 +115,6 @@ async function main() {
 
       continue;
     }
-
-    await conversation.send("gm");
 
     console.log("Waiting for messages...");
   }
