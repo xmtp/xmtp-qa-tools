@@ -49,6 +49,13 @@ const nameUpdater = async (group: Conversation, payload: string) => {
   await group.updateName(payload);
 };
 
+export async function verifyStreamAll(
+  group: Conversation,
+  participants: Record<string, Persona>,
+) {
+  const allPersonas = await getPersonasFromGroup(group, participants);
+  return verifyStream(group, allPersonas);
+}
 export async function verifyStream<T extends string = string>(
   group: Conversation,
   participants: Persona[],
@@ -124,15 +131,21 @@ export async function verifyStream<T extends string = string>(
  * @param timeoutMs - How long to wait for the conversation event
  * @returns Promise resolving with results of the verification
  */
-export async function verifyGroupConversationStream(
+export async function verifyConversationStream(
   initiator: Persona,
   participants: Persona[],
-  groupCreator: (
-    initiator: Persona,
-    participantAddresses: string[],
-  ) => Promise<Conversation>,
   timeoutMs = defaultValues.timeout,
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
+  const groupCreator = async (
+    initiator: Persona,
+    participantAddresses: string[],
+  ) => {
+    if (!initiator.client) {
+      throw new Error("Initiator has no client");
+    }
+    return initiator.client.conversations.newGroup(participantAddresses);
+  };
+
   console.log(
     `[${initiator.name}] Starting group conversation stream verification test with ${participants.length} participants`,
   );

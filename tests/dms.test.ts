@@ -66,7 +66,6 @@ describe(testName, () => {
   });
 
   it("sendGM: should measure sending a gm", async () => {
-    // We'll expect this random message to appear in Joe's stream
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
     console.log(

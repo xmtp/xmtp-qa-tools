@@ -1,161 +1,97 @@
-[2025-03-04T14:07:13.172Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_performance","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-04T14:07:13.175Z] [info] [PersonaFactory] Using env keys for henry: 0xe914...
-[2025-03-04T14:07:13.175Z] [info] [PersonaFactory] Using env keys for ivy: 0xcb02...
-[2025-03-04T14:07:13.175Z] [info] [PersonaFactory] Using env keys for jack: 0xca0d...
-[2025-03-04T14:07:13.175Z] [info] [PersonaFactory] Using env keys for karen: 0x606f...
-[2025-03-04T14:07:13.175Z] [info] [PersonaFactory] Generating new keys for randomguy
-[2025-03-04T14:07:13.203Z] [info] [PersonaFactory] Using env keys for larry: 0x05e9...
-[2025-03-04T14:07:13.203Z] [info] [PersonaFactory] Using env keys for mary: 0x24fe...
-[2025-03-04T14:07:13.203Z] [info] [PersonaFactory] Using env keys for nancy: 0x2705...
-[2025-03-04T14:07:13.203Z] [info] [PersonaFactory] Using env keys for oscar: 0x680e...
-[2025-03-04T14:07:13.218Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/henry
-[2025-03-04T14:07:13.218Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/ivy
-[2025-03-04T14:07:13.219Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/jack
-[2025-03-04T14:07:13.219Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/karen
-[2025-03-04T14:07:13.219Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/randomguy
-[2025-03-04T14:07:13.219Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/mary
-[2025-03-04T14:07:13.219Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/nancy
-[2025-03-04T14:07:13.220Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/oscar
-[2025-03-04T14:07:15.593Z] [warn] [larry-a] Create XMTP client v:436360a 2.374s
-[2025-03-04T14:07:15.992Z] [warn] [larry-a] Start message stream 397.896ms
-[2025-03-04T14:07:15.992Z] [warn] [larry-a] Start stream 398.302ms
-[2025-03-04T14:07:15.992Z] [warn] [larry-a] Initialize XMTP client 2.777s
-[2025-03-04T14:07:17.023Z] [warn] [randomguy-a] Create XMTP client v:436360a 3.804s
-[2025-03-04T14:07:17.054Z] [warn] [henry-a] Create XMTP client v:436360a 3.836s
-[2025-03-04T14:07:17.167Z] [warn] [karen-a] Create XMTP client v:436360a 3.948s
-[2025-03-04T14:07:17.201Z] [warn] [mary-a] Create XMTP client v:436360a 3.982s
-[2025-03-04T14:07:17.279Z] [warn] [jack-a] Create XMTP client v:436360a 4.060s
-[2025-03-04T14:07:17.286Z] [warn] [nancy-a] Create XMTP client v:436360a 4.066s
-[2025-03-04T14:07:17.346Z] [warn] [oscar-a] Create XMTP client v:436360a 4.126s
-[2025-03-04T14:07:17.428Z] [warn] [randomguy-a] Start message stream 404.529ms
-[2025-03-04T14:07:17.428Z] [warn] [randomguy-a] Start stream 404.626ms
-[2025-03-04T14:07:17.428Z] [warn] [randomguy-a] Initialize XMTP client 4.214s
-[2025-03-04T14:07:17.436Z] [warn] [ivy-a] Create XMTP client v:436360a 4.217s
-[2025-03-04T14:07:17.466Z] [warn] [henry-a] Start message stream 411.589ms
-[2025-03-04T14:07:17.466Z] [warn] [henry-a] Start stream 411.675ms
-[2025-03-04T14:07:17.466Z] [warn] [henry-a] Initialize XMTP client 4.260s
-[2025-03-04T14:07:17.566Z] [warn] [mary-a] Start message stream 365.197ms
-[2025-03-04T14:07:17.567Z] [warn] [mary-a] Start stream 365.296ms
-[2025-03-04T14:07:17.567Z] [warn] [mary-a] Initialize XMTP client 4.351s
-[2025-03-04T14:07:17.575Z] [warn] [karen-a] Start message stream 407.783ms
-[2025-03-04T14:07:17.575Z] [warn] [karen-a] Start stream 407.922ms
-[2025-03-04T14:07:17.575Z] [warn] [karen-a] Initialize XMTP client 4.362s
-[2025-03-04T14:07:17.692Z] [warn] [nancy-a] Start message stream 405.746ms
-[2025-03-04T14:07:17.693Z] [warn] [nancy-a] Start stream 406.446ms
-[2025-03-04T14:07:17.693Z] [warn] [nancy-a] Initialize XMTP client 4.476s
-[2025-03-04T14:07:17.710Z] [warn] [jack-a] Start message stream 431.082ms
-[2025-03-04T14:07:17.711Z] [warn] [jack-a] Start stream 431.857ms
-[2025-03-04T14:07:17.711Z] [warn] [jack-a] Initialize XMTP client 4.500s
-[2025-03-04T14:07:17.716Z] [warn] [oscar-a] Start message stream 369.947ms
-[2025-03-04T14:07:17.716Z] [warn] [oscar-a] Start stream 370.062ms
-[2025-03-04T14:07:17.716Z] [warn] [oscar-a] Initialize XMTP client 4.499s
-[2025-03-04T14:07:17.842Z] [warn] [ivy-a] Start message stream 405.771ms
-[2025-03-04T14:07:17.842Z] [warn] [ivy-a] Start stream 405.947ms
-[2025-03-04T14:07:17.842Z] [warn] [ivy-a] Initialize XMTP client 4.632s
-[2025-03-04T14:07:17.842Z] [info] henry 0x1556528772E9D1aCaE53436110954aF49ce4EC35
-[2025-03-04T14:07:17.842Z] [info] ivy 0x1b2c9833574DcD573921E09de28B4E660d9801B2
-[2025-03-04T14:07:17.842Z] [info] jack 0x6c880931242F1470a7c5aCe83C5cA225745C75b4
-[2025-03-04T14:07:17.842Z] [info] karen 0x4F1bd0B57D53c64A8d448f307b44D9255B2392be
-[2025-03-04T14:07:17.842Z] [info] randomguy 0x9c1760FB4667c998A7853543C61A64f70FD2cEe4
-[2025-03-04T14:07:17.842Z] [info] larry 0x51144C5b4a207658843599c299F11A9E240248B6
-[2025-03-04T14:07:17.843Z] [info] mary 0xeD8EecdE3834BC1e76E5B1dF0d2B214936c6632B
-[2025-03-04T14:07:17.843Z] [info] nancy 0x894e32B8F197dcE280e55d1746262d601359FeA5
-[2025-03-04T14:07:17.843Z] [info] oscar 0x29A79FE3eE7e753A4630718CD6aFC384855c3a37
-[2025-03-04T14:07:18.077Z] [info] 4
-[2025-03-04T14:07:18.078Z] [info] metricName ts_performance.inboxState  should measure inboxState of henry
-[2025-03-04T14:07:18.869Z] [warn] Slow connection detected - total: 769.138ms, TLS: 589.394ms, processing: 179.74400000000003ms
-[2025-03-04T14:07:19.921Z] [info] metricName ts_performance.createDM  should measure creating a DM
-[2025-03-04T14:07:19.922Z] [warn] ts_performance > createDM: should measure creating a DM 1.840s
-[2025-03-04T14:07:19.923Z] [info] [henry] Creating DM with randomguy at 0x9c1760FB4667c998A7853543C61A64f70FD2cEe4
-[2025-03-04T14:07:21.007Z] [info] metricName ts_performance.sendGM  should measure sending a gm
-[2025-03-04T14:07:21.008Z] [warn] ts_performance > sendGM: should measure sending a gm 1.085s
-[2025-03-04T14:07:21.008Z] [info] [randomguy-a] Collecting 1 messages from convo:e44e018281b479d13b8097d8b60068a0
-[2025-03-04T14:07:21.009Z] [info] Sending message #1: gm-1-v86vedofv4
-[2025-03-04T14:07:21.727Z] [info] All participants received the expected number of messages.
-[2025-03-04T14:07:21.728Z] [info] metricName ts_performance.receiveGM  should measure receiving a gm
-[2025-03-04T14:07:21.729Z] [warn] ts_performance > receiveGM: should measure receiving a gm 721.201ms
-[2025-03-04T14:07:25.373Z] [info] Henry's group 1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:25.373Z] [info] metricName ts_performance.createGroup  should measure creating a group
-[2025-03-04T14:07:25.375Z] [warn] ts_performance > createGroup: should measure creating a group 3.645s
-[2025-03-04T14:07:26.946Z] [info] Henry's groupByInboxIds 6e67380e824e7289be96f41e3e631db5
-[2025-03-04T14:07:26.946Z] [info] metricName ts_performance.createGroupByInboxIds  should measure creating a group with inbox ids
-[2025-03-04T14:07:26.947Z] [warn] ts_performance > createGroupByInboxIds: should measure creating a group with inbox ids 1.572s
-[2025-03-04T14:07:26.947Z] [info] [nancy-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:26.948Z] [info] Sending message #1: New name-1-6ddhw87mf9
-[2025-03-04T14:07:27.518Z] [info] All participants received the expected number of messages.
-[2025-03-04T14:07:27.518Z] [info] metricName ts_performance.updateGroupName  should create a group and update group name
-[2025-03-04T14:07:27.519Z] [warn] ts_performance > updateGroupName: should create a group and update group name 571.814ms
-[2025-03-04T14:07:29.510Z] [info] metricName ts_performance.addMembers  should measure adding a participant to a group
-[2025-03-04T14:07:29.512Z] [warn] ts_performance > addMembers: should measure adding a participant to a group 1.993s
-[2025-03-04T14:07:30.307Z] [info] metricName ts_performance.syncGroup  should measure syncing a group
-[2025-03-04T14:07:30.309Z] [warn] ts_performance > syncGroup: should measure syncing a group 796.816ms
-[2025-03-04T14:07:31.516Z] [info] metricName ts_performance.removeMembers  should remove a participant from a group
-[2025-03-04T14:07:31.517Z] [warn] ts_performance > removeMembers: should remove a participant from a group 1.207s
-[2025-03-04T14:07:32.323Z] [info] GM Message sent in group gm-eu31upfsqhn
-[2025-03-04T14:07:32.323Z] [info] metricName ts_performance.sendGroupMessage  should measure sending a gm in a group
-[2025-03-04T14:07:32.324Z] [warn] ts_performance > sendGroupMessage: should measure sending a gm in a group 806.979ms
-[2025-03-04T14:07:32.684Z] [info] [oscar-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [ivy-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [larry-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [karen-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [mary-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [randomguy-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] [jack-a] Collecting 1 messages from convo:1cd4e70094a5729e9cc754356f9b1922
-[2025-03-04T14:07:32.684Z] [info] Sending message #1: gm-1-irucggr89vh
-[2025-03-04T14:07:33.488Z] [info] All participants received the expected number of messages.
-[2025-03-04T14:07:33.489Z] [info] metricName ts_performance.receiveGroupMessage  should create a group and measure all streams
-[2025-03-04T14:07:33.490Z] [warn] ts_performance > receiveGroupMessage: should create a group and measure all streams 1.165s
-[2025-03-04T14:07:36.593Z] [info] metricName ts_performance.createGroup-50  should create a large group of 50 participants 50
-[2025-03-04T14:07:36.597Z] [warn] ts_performance > createGroup-50: should create a large group of 50 participants 50 3.107s
-[2025-03-04T14:07:37.200Z] [info] metricName ts_performance.syncGroup-50  should sync a large group of 50 participants 50
-[2025-03-04T14:07:37.201Z] [warn] ts_performance > syncGroup-50: should sync a large group of 50 participants 50 602.974ms
-[2025-03-04T14:07:37.983Z] [info] metricName ts_performance.updateGroupName-50  should update the group name
-[2025-03-04T14:07:37.984Z] [warn] ts_performance > updateGroupName-50: should update the group name 782.703ms
-[2025-03-04T14:07:38.614Z] [info] GM Message sent in group gm-xmkm5cj70n
-[2025-03-04T14:07:38.614Z] [info] metricName ts_performance.sendGroupMessage-50  should measure sending a gm in a group of 50 participants
-[2025-03-04T14:07:38.616Z] [warn] ts_performance > sendGroupMessage-50: should measure sending a gm in a group of 50 participants 631.393ms
-[2025-03-04T14:07:44.920Z] [info] metricName ts_performance.createGroup-100  should create a large group of 100 participants 100
-[2025-03-04T14:07:44.921Z] [warn] ts_performance > createGroup-100: should create a large group of 100 participants 100 6.305s
-[2025-03-04T14:07:45.520Z] [info] metricName ts_performance.syncGroup-100  should sync a large group of 100 participants 100
-[2025-03-04T14:07:45.520Z] [warn] ts_performance > syncGroup-100: should sync a large group of 100 participants 100 598.878ms
-[2025-03-04T14:07:45.937Z] [info] metricName ts_performance.updateGroupName-100  should update the group name
-[2025-03-04T14:07:45.938Z] [warn] ts_performance > updateGroupName-100: should update the group name 417.479ms
-[2025-03-04T14:07:46.704Z] [info] GM Message sent in group gm-4ohivvwsktj
-[2025-03-04T14:07:46.705Z] [info] metricName ts_performance.sendGroupMessage-100  should measure sending a gm in a group of 100 participants
-[2025-03-04T14:07:46.705Z] [warn] ts_performance > sendGroupMessage-100: should measure sending a gm in a group of 100 participants 767.038ms
-[2025-03-04T14:08:07.731Z] [info] metricName ts_performance.createGroup-150  should create a large group of 150 participants 150
-[2025-03-04T14:08:07.732Z] [warn] ts_performance > createGroup-150: should create a large group of 150 participants 150 21.027s
-[2025-03-04T14:08:08.289Z] [info] metricName ts_performance.syncGroup-150  should sync a large group of 150 participants 150
-[2025-03-04T14:08:08.289Z] [warn] ts_performance > syncGroup-150: should sync a large group of 150 participants 150 557.142ms
-[2025-03-04T14:08:09.086Z] [info] metricName ts_performance.updateGroupName-150  should update the group name
-[2025-03-04T14:08:09.087Z] [warn] ts_performance > updateGroupName-150: should update the group name 797.114ms
-[2025-03-04T14:08:09.713Z] [info] GM Message sent in group gm-4zu7u4xtayy
-[2025-03-04T14:08:09.713Z] [info] metricName ts_performance.sendGroupMessage-150  should measure sending a gm in a group of 150 participants
-[2025-03-04T14:08:09.715Z] [warn] ts_performance > sendGroupMessage-150: should measure sending a gm in a group of 150 participants 627.903ms
-[2025-03-04T14:08:21.868Z] [info] metricName ts_performance.createGroup-200  should create a large group of 200 participants 200
-[2025-03-04T14:08:21.869Z] [warn] ts_performance > createGroup-200: should create a large group of 200 participants 200 12.154s
-[2025-03-04T14:08:22.496Z] [info] metricName ts_performance.syncGroup-200  should sync a large group of 200 participants 200
-[2025-03-04T14:08:22.497Z] [warn] ts_performance > syncGroup-200: should sync a large group of 200 participants 200 627.906ms
-[2025-03-04T14:08:23.095Z] [info] metricName ts_performance.updateGroupName-200  should update the group name
-[2025-03-04T14:08:23.097Z] [warn] ts_performance > updateGroupName-200: should update the group name 598.82ms
-[2025-03-04T14:08:23.860Z] [info] GM Message sent in group gm-ontt46m4w3
-[2025-03-04T14:08:23.860Z] [info] metricName ts_performance.sendGroupMessage-200  should measure sending a gm in a group of 200 participants
-[2025-03-04T14:08:23.862Z] [warn] ts_performance > sendGroupMessage-200: should measure sending a gm in a group of 200 participants 764.768ms
-[2025-03-04T14:08:42.306Z] [info] metricName ts_performance.createGroup-250  should create a large group of 250 participants 250
-[2025-03-04T14:08:42.308Z] [warn] ts_performance > createGroup-250: should create a large group of 250 participants 250 18.446s
-[2025-03-04T14:08:42.916Z] [info] metricName ts_performance.syncGroup-250  should sync a large group of 250 participants 250
-[2025-03-04T14:08:42.918Z] [warn] ts_performance > syncGroup-250: should sync a large group of 250 participants 250 610.063ms
-[2025-03-04T14:08:43.439Z] [info] metricName ts_performance.updateGroupName-250  should update the group name
-[2025-03-04T14:08:43.440Z] [warn] ts_performance > updateGroupName-250: should update the group name 521.959ms
-[2025-03-04T14:08:44.190Z] [info] GM Message sent in group gm-sv542t9i9xm
-[2025-03-04T14:08:44.190Z] [info] metricName ts_performance.sendGroupMessage-250  should measure sending a gm in a group of 250 participants
-[2025-03-04T14:08:44.192Z] [warn] ts_performance > sendGroupMessage-250: should measure sending a gm in a group of 250 participants 751.434ms
-[2025-03-04T14:09:09.048Z] [info] metricName ts_performance.createGroup-300  should create a large group of 300 participants 300
-[2025-03-04T14:09:09.049Z] [warn] ts_performance > createGroup-300: should create a large group of 300 participants 300 24.857s
-[2025-03-04T14:09:09.677Z] [info] metricName ts_performance.syncGroup-300  should sync a large group of 300 participants 300
-[2025-03-04T14:09:09.678Z] [warn] ts_performance > syncGroup-300: should sync a large group of 300 participants 300 628.87ms
-[2025-03-04T14:09:10.674Z] [info] metricName ts_performance.updateGroupName-300  should update the group name
-[2025-03-04T14:09:10.675Z] [warn] ts_performance > updateGroupName-300: should update the group name 996.477ms
-[2025-03-04T14:09:11.374Z] [info] GM Message sent in group gm-zdguci1g2f
-[2025-03-04T14:09:11.374Z] [info] metricName ts_performance.sendGroupMessage-300  should measure sending a gm in a group of 300 participants
-[2025-03-04T14:09:11.376Z] [warn] ts_performance > sendGroupMessage-300: should measure sending a gm in a group of 300 participants 700.625ms
+[2025-03-04T19:43:47.631Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_performance","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-04T19:43:47.634Z] [info] [PersonaFactory] Using env keys for henry: 0xe914...
+[2025-03-04T19:43:47.634Z] [info] [PersonaFactory] Using env keys for ivy: 0xcb02...
+[2025-03-04T19:43:47.634Z] [info] [PersonaFactory] Using env keys for jack: 0xca0d...
+[2025-03-04T19:43:47.634Z] [info] [PersonaFactory] Using env keys for karen: 0x606f...
+[2025-03-04T19:43:47.634Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-04T19:43:47.661Z] [info] [PersonaFactory] Using env keys for larry: 0x05e9...
+[2025-03-04T19:43:47.661Z] [info] [PersonaFactory] Using env keys for mary: 0x24fe...
+[2025-03-04T19:43:47.661Z] [info] [PersonaFactory] Using env keys for nancy: 0x2705...
+[2025-03-04T19:43:47.661Z] [info] [PersonaFactory] Using env keys for oscar: 0x680e...
+[2025-03-04T19:43:50.880Z] [warn] [mary-a] Create XMTP client v:436360a 3.203s
+[2025-03-04T19:43:50.906Z] [warn] [nancy-a] Create XMTP client v:436360a 3.229s
+[2025-03-04T19:43:50.946Z] [warn] [henry-a] Create XMTP client v:436360a 3.270s
+[2025-03-04T19:43:50.959Z] [warn] [jack-a] Create XMTP client v:436360a 3.281s
+[2025-03-04T19:43:51.027Z] [warn] [ivy-a] Create XMTP client v:436360a 3.350s
+[2025-03-04T19:43:51.055Z] [warn] [karen-a] Create XMTP client v:436360a 3.379s
+[2025-03-04T19:43:51.196Z] [warn] [oscar-a] Create XMTP client v:436360a 3.519s
+[2025-03-04T19:43:51.200Z] [warn] [larry-a] Create XMTP client v:436360a 3.523s
+[2025-03-04T19:43:51.320Z] [warn] [mary-a] Start message stream 438.588ms
+[2025-03-04T19:43:51.321Z] [warn] [mary-a] Start stream 440.213ms
+[2025-03-04T19:43:51.321Z] [warn] [mary-a] Initialize XMTP client 3.647s
+[2025-03-04T19:43:51.341Z] [warn] [nancy-a] Start message stream 435.352ms
+[2025-03-04T19:43:51.341Z] [warn] [nancy-a] Start stream 435.604ms
+[2025-03-04T19:43:51.341Z] [warn] [nancy-a] Initialize XMTP client 3.667s
+[2025-03-04T19:43:51.379Z] [warn] [henry-a] Start message stream 432.714ms
+[2025-03-04T19:43:51.379Z] [warn] [henry-a] Start stream 432.856ms
+[2025-03-04T19:43:51.380Z] [warn] [henry-a] Initialize XMTP client 3.714s
+[2025-03-04T19:43:51.432Z] [warn] [larry-a] Initialize XMTP client 3.759s
+[2025-03-04T19:43:51.445Z] [warn] [jack-a] Start message stream 486.221ms
+[2025-03-04T19:43:51.445Z] [warn] [jack-a] Start stream 486.346ms
+[2025-03-04T19:43:51.445Z] [warn] [jack-a] Initialize XMTP client 3.776s
+[2025-03-04T19:43:51.466Z] [warn] [ivy-a] Start message stream 438.77ms
+[2025-03-04T19:43:51.466Z] [warn] [ivy-a] Start stream 438.843ms
+[2025-03-04T19:43:51.466Z] [warn] [ivy-a] Initialize XMTP client 3.798s
+[2025-03-04T19:43:51.497Z] [warn] [karen-a] Start message stream 442.018ms
+[2025-03-04T19:43:51.498Z] [warn] [karen-a] Start stream 442.091ms
+[2025-03-04T19:43:51.498Z] [warn] [karen-a] Initialize XMTP client 3.827s
+[2025-03-04T19:43:51.672Z] [warn] [oscar-a] Start message stream 476.27ms
+[2025-03-04T19:43:51.672Z] [warn] [oscar-a] Start stream 476.425ms
+[2025-03-04T19:43:51.672Z] [warn] [oscar-a] Initialize XMTP client 3.997s
+[2025-03-04T19:43:52.785Z] [warn] [randomguy-a] Create XMTP client v:436360a 5.108s
+[2025-03-04T19:43:53.291Z] [warn] [randomguy-a] Start message stream 504.909ms
+[2025-03-04T19:43:53.292Z] [warn] [randomguy-a] Start stream 507.044ms
+[2025-03-04T19:43:53.292Z] [warn] [randomguy-a] Initialize XMTP client 5.621s
+[2025-03-04T19:43:53.293Z] [info] henry 0x1556528772E9D1aCaE53436110954aF49ce4EC35
+[2025-03-04T19:43:53.293Z] [info] ivy 0x1b2c9833574DcD573921E09de28B4E660d9801B2
+[2025-03-04T19:43:53.293Z] [info] jack 0x6c880931242F1470a7c5aCe83C5cA225745C75b4
+[2025-03-04T19:43:53.293Z] [info] karen 0x4F1bd0B57D53c64A8d448f307b44D9255B2392be
+[2025-03-04T19:43:53.293Z] [info] randomguy 0xE25463b0220CDf07e3c2Bf7aCd7cCC98436d25de
+[2025-03-04T19:43:53.293Z] [info] larry 0x51144C5b4a207658843599c299F11A9E240248B6
+[2025-03-04T19:43:53.293Z] [info] mary 0xeD8EecdE3834BC1e76E5B1dF0d2B214936c6632B
+[2025-03-04T19:43:53.293Z] [info] nancy 0x894e32B8F197dcE280e55d1746262d601359FeA5
+[2025-03-04T19:43:53.293Z] [info] oscar 0x29A79FE3eE7e753A4630718CD6aFC384855c3a37
+[2025-03-04T19:43:53.534Z] [info] 5
+[2025-03-04T19:43:53.535Z] [info] metricName ts_performance.inboxState  should measure inboxState of henry
+[2025-03-04T19:43:54.623Z] [warn] Slow connection detected - total: 1068.526ms, TLS: 628.2410000000001ms, processing: 440.285ms
+[2025-03-04T19:43:56.351Z] [info] metricName ts_performance.createDM  should measure creating a DM
+[2025-03-04T19:43:56.352Z] [warn] ts_performance > createDM: should measure creating a DM 2.814s
+[2025-03-04T19:43:56.352Z] [info] [henry] Creating DM with randomguy at 0xE25463b0220CDf07e3c2Bf7aCd7cCC98436d25de
+[2025-03-04T19:43:57.746Z] [info] metricName ts_performance.sendGM  should measure sending a gm
+[2025-03-04T19:43:57.749Z] [warn] ts_performance > sendGM: should measure sending a gm 1.396s
+[2025-03-04T19:43:57.750Z] [info] [randomguy-a] Collecting 1 messages from convo:1c79b386ca200b85fce6eb6da1c4a176
+[2025-03-04T19:43:57.750Z] [info] Sending message #1: gm-1-4uttkapxnan
+[2025-03-04T19:43:58.620Z] [info] All participants received the expected number of messages.
+[2025-03-04T19:43:58.622Z] [info] metricName ts_performance.receiveGM  should measure receiving a gm
+[2025-03-04T19:43:58.623Z] [warn] ts_performance > receiveGM: should measure receiving a gm 874.406ms
+[2025-03-04T19:44:08.522Z] [info] Henry's group a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:08.523Z] [info] metricName ts_performance.createGroup  should measure creating a group
+[2025-03-04T19:44:08.524Z] [warn] ts_performance > createGroup: should measure creating a group 9.900s
+[2025-03-04T19:44:10.547Z] [info] Henry's groupByInboxIds 80171a9b38bbde1fd2ab38760bd92ca1
+[2025-03-04T19:44:10.547Z] [info] metricName ts_performance.createGroupByInboxIds  should measure creating a group with inbox ids
+[2025-03-04T19:44:10.548Z] [warn] ts_performance > createGroupByInboxIds: should measure creating a group with inbox ids 2.024s
+[2025-03-04T19:44:10.549Z] [info] [nancy-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:10.549Z] [info] Sending message #1: New name-1-cllar3qjz7b
+[2025-03-04T19:44:11.301Z] [info] All participants received the expected number of messages.
+[2025-03-04T19:44:11.301Z] [info] metricName ts_performance.updateGroupName  should create a group and update group name
+[2025-03-04T19:44:11.302Z] [warn] ts_performance > updateGroupName: should create a group and update group name 753.919ms
+[2025-03-04T19:44:15.061Z] [info] metricName ts_performance.addMembers  should measure adding a participant to a group
+[2025-03-04T19:44:15.062Z] [warn] ts_performance > addMembers: should measure adding a participant to a group 3.760s
+[2025-03-04T19:44:15.867Z] [info] metricName ts_performance.syncGroup  should measure syncing a group
+[2025-03-04T19:44:15.868Z] [warn] ts_performance > syncGroup: should measure syncing a group 805.907ms
+[2025-03-04T19:44:17.248Z] [info] metricName ts_performance.removeMembers  should remove a participant from a group
+[2025-03-04T19:44:17.249Z] [warn] ts_performance > removeMembers: should remove a participant from a group 1.380s
+[2025-03-04T19:44:18.117Z] [info] GM Message sent in group gm-hpqxstvz6rv
+[2025-03-04T19:44:18.118Z] [info] metricName ts_performance.sendGroupMessage  should measure sending a gm in a group
+[2025-03-04T19:44:18.119Z] [warn] ts_performance > sendGroupMessage: should measure sending a gm in a group 870.093ms
+[2025-03-04T19:44:18.559Z] [info] [randomguy-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [oscar-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [ivy-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [larry-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [karen-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [mary-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] [jack-a] Collecting 1 messages from convo:a905c68de146736480c3c5d09151b1b7
+[2025-03-04T19:44:18.559Z] [info] Sending message #1: gm-1-wriyvryqrts
+[2025-03-04T19:44:19.485Z] [info] All participants received the expected number of messages.
+[2025-03-04T19:44:19.486Z] [info] metricName ts_performance.receiveGroupMessage  should create a group and measure all streams
+[2025-03-04T19:44:19.487Z] [warn] ts_performance > receiveGroupMessage: should create a group and measure all streams 1.368s

@@ -31,7 +31,6 @@ describe(testName, () => {
   });
 
   it("should create a persona", async () => {
-    // Get Bob's persona using the enum value.
     personas = await getWorkers(["bob", "random"], testName, "none");
     folderCount++;
     expect(personas.bob.client?.accountAddress).toBeDefined();
@@ -64,7 +63,7 @@ describe(testName, () => {
   it("should create multiple installations for the same persona", async () => {
     // Create a base persona and multiple installations
 
-    personas = await getWorkers(["fabritest"], testName, "none");
+    personas = await getWorkers(["fabri"], testName, "none");
 
     const suffixes = ["a", "b", "c"];
     folderCount++;

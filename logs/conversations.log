@@ -1,0 +1,97 @@
+[2025-03-04T19:28:39.600Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:conversations","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-04T19:28:39.602Z] [info] [PersonaFactory] Using env keys for henry: 0xe914...
+[2025-03-04T19:28:39.602Z] [info] [PersonaFactory] Using env keys for ivy: 0xcb02...
+[2025-03-04T19:28:39.602Z] [info] [PersonaFactory] Using env keys for jack: 0xca0d...
+[2025-03-04T19:28:39.602Z] [info] [PersonaFactory] Using env keys for karen: 0x606f...
+[2025-03-04T19:28:39.602Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-04T19:28:39.630Z] [info] [PersonaFactory] Using env keys for larry: 0x05e9...
+[2025-03-04T19:28:39.630Z] [info] [PersonaFactory] Using env keys for mary: 0x24fe...
+[2025-03-04T19:28:39.630Z] [info] [PersonaFactory] Using env keys for nancy: 0x2705...
+[2025-03-04T19:28:39.630Z] [info] [PersonaFactory] Using env keys for oscar: 0x680e...
+[2025-03-04T19:28:42.966Z] [warn] [karen-a] Create XMTP client v:436360a 3.322s
+[2025-03-04T19:28:42.966Z] [info] [karen-a] Start conversation stream
+[2025-03-04T19:28:42.968Z] [info] [karen-a] Initial conversations count: 5
+[2025-03-04T19:28:42.968Z] [info] [karen-a] Conversation stream started
+[2025-03-04T19:28:42.968Z] [warn] [karen-a] Initialize XMTP client 3.327s
+[2025-03-04T19:28:43.028Z] [warn] [nancy-a] Create XMTP client v:436360a 3.384s
+[2025-03-04T19:28:43.028Z] [info] [nancy-a] Start conversation stream
+[2025-03-04T19:28:43.029Z] [info] [nancy-a] Initial conversations count: 13
+[2025-03-04T19:28:43.029Z] [info] [nancy-a] Conversation stream started
+[2025-03-04T19:28:43.029Z] [warn] [nancy-a] Initialize XMTP client 3.386s
+[2025-03-04T19:28:43.029Z] [warn] [larry-a] Create XMTP client v:436360a 3.385s
+[2025-03-04T19:28:43.029Z] [info] [larry-a] Start conversation stream
+[2025-03-04T19:28:43.029Z] [info] [larry-a] Initial conversations count: 0
+[2025-03-04T19:28:43.030Z] [info] [larry-a] Conversation stream started
+[2025-03-04T19:28:43.030Z] [warn] [larry-a] Initialize XMTP client 3.388s
+[2025-03-04T19:28:43.113Z] [warn] [jack-a] Create XMTP client v:436360a 3.467s
+[2025-03-04T19:28:43.114Z] [info] [jack-a] Start conversation stream
+[2025-03-04T19:28:43.116Z] [info] [jack-a] Initial conversations count: 11
+[2025-03-04T19:28:43.116Z] [info] [jack-a] Conversation stream started
+[2025-03-04T19:28:43.116Z] [warn] [jack-a] Initialize XMTP client 3.476s
+[2025-03-04T19:28:43.165Z] [warn] [mary-a] Create XMTP client v:436360a 3.520s
+[2025-03-04T19:28:43.165Z] [info] [mary-a] Start conversation stream
+[2025-03-04T19:28:43.166Z] [info] [mary-a] Initial conversations count: 0
+[2025-03-04T19:28:43.166Z] [info] [mary-a] Conversation stream started
+[2025-03-04T19:28:43.166Z] [warn] [mary-a] Initialize XMTP client 3.524s
+[2025-03-04T19:28:43.272Z] [warn] [henry-a] Create XMTP client v:436360a 3.627s
+[2025-03-04T19:28:43.272Z] [info] [henry-a] Start conversation stream
+[2025-03-04T19:28:43.276Z] [info] [henry-a] Initial conversations count: 27
+[2025-03-04T19:28:43.276Z] [info] [henry-a] Conversation stream started
+[2025-03-04T19:28:43.276Z] [warn] [henry-a] Initialize XMTP client 3.642s
+[2025-03-04T19:28:43.375Z] [warn] [oscar-a] Create XMTP client v:436360a 3.730s
+[2025-03-04T19:28:43.375Z] [info] [oscar-a] Start conversation stream
+[2025-03-04T19:28:43.377Z] [info] [oscar-a] Initial conversations count: 13
+[2025-03-04T19:28:43.377Z] [info] [oscar-a] Conversation stream started
+[2025-03-04T19:28:43.377Z] [warn] [oscar-a] Initialize XMTP client 3.733s
+[2025-03-04T19:28:43.387Z] [warn] [ivy-a] Create XMTP client v:436360a 3.742s
+[2025-03-04T19:28:43.387Z] [info] [ivy-a] Start conversation stream
+[2025-03-04T19:28:43.387Z] [info] [ivy-a] Initial conversations count: 1
+[2025-03-04T19:28:43.387Z] [info] [ivy-a] Conversation stream started
+[2025-03-04T19:28:43.387Z] [warn] [ivy-a] Initialize XMTP client 3.750s
+[2025-03-04T19:28:45.245Z] [warn] [randomguy-a] Create XMTP client v:436360a 5.600s
+[2025-03-04T19:28:45.245Z] [info] [randomguy-a] Start conversation stream
+[2025-03-04T19:28:45.245Z] [info] [randomguy-a] Initial conversations count: 0
+[2025-03-04T19:28:45.245Z] [info] [randomguy-a] Conversation stream started
+[2025-03-04T19:28:45.246Z] [warn] [randomguy-a] Initialize XMTP client 5.604s
+[2025-03-04T19:28:45.246Z] [info] henry 0x1556528772E9D1aCaE53436110954aF49ce4EC35
+[2025-03-04T19:28:45.246Z] [info] ivy 0x1b2c9833574DcD573921E09de28B4E660d9801B2
+[2025-03-04T19:28:45.246Z] [info] jack 0x6c880931242F1470a7c5aCe83C5cA225745C75b4
+[2025-03-04T19:28:45.246Z] [info] karen 0x4F1bd0B57D53c64A8d448f307b44D9255B2392be
+[2025-03-04T19:28:45.246Z] [info] randomguy 0x0cbE3A7B894Dc7f5227ABb13553ec04E969bF38b
+[2025-03-04T19:28:45.246Z] [info] larry 0x51144C5b4a207658843599c299F11A9E240248B6
+[2025-03-04T19:28:45.246Z] [info] mary 0xeD8EecdE3834BC1e76E5B1dF0d2B214936c6632B
+[2025-03-04T19:28:45.246Z] [info] nancy 0x894e32B8F197dcE280e55d1746262d601359FeA5
+[2025-03-04T19:28:45.246Z] [info] oscar 0x29A79FE3eE7e753A4630718CD6aFC384855c3a37
+[2025-03-04T19:28:45.247Z] [info] [henry] Starting group conversation stream verification test with 2 participants
+[2025-03-04T19:28:45.247Z] [info] [nancy-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:45.247Z] [info] [oscar-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:45.247Z] [info] [henry] Creating new group conversation with 2 participants
+[2025-03-04T19:28:45.249Z] [info] [henry-a] New conversation in stream: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.384Z] [info] [oscar-a] New conversation in stream: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.384Z] [info] [oscar-a] Received conversation event, id: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.425Z] [info] [nancy-a] New conversation in stream: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.425Z] [info] [nancy-a] Received conversation event, id: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.425Z] [info] [henry] Created group conversation with ID: 047fc20eb978369507a5ec32a8562b58
+[2025-03-04T19:28:48.425Z] [info] [henry] Received 2 group conversation notifications
+[2025-03-04T19:28:48.426Z] [warn] conversations > detects new group conversation creation with three participants 3.179s
+[2025-03-04T19:28:48.426Z] [info] metricName conversations.detects new group conversation creation with three participants undefined
+[2025-03-04T19:28:48.429Z] [info] [henry] Starting group conversation stream verification test with 4 participants
+[2025-03-04T19:28:48.429Z] [info] [nancy-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:48.429Z] [info] [oscar-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:48.429Z] [info] [jack-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:48.429Z] [info] [ivy-a] Collecting 1 conversations from peer: 6a76cbc1b69ab9a5b2f76241702a9bf74f76c1ecf901752ab16134b4d1f6546d
+[2025-03-04T19:28:48.429Z] [info] [henry] Creating new group conversation with 4 participants
+[2025-03-04T19:28:48.432Z] [info] [henry-a] New conversation in stream: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:49.519Z] [warn] Slow connection detected - total: 1072.507ms, TLS: 673.804ms, processing: 398.70300000000015ms
+[2025-03-04T19:28:51.855Z] [info] [henry] Created group conversation with ID: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:51.963Z] [info] [jack-a] New conversation in stream: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:51.963Z] [info] [jack-a] Received conversation event, id: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:51.995Z] [info] [nancy-a] New conversation in stream: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:51.995Z] [info] [nancy-a] Received conversation event, id: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:52.002Z] [info] [oscar-a] New conversation in stream: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:52.002Z] [info] [oscar-a] Received conversation event, id: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:52.032Z] [info] [ivy-a] New conversation in stream: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:52.032Z] [info] [ivy-a] Received conversation event, id: 73cbae7b83118f873fe0cc6868b3b689
+[2025-03-04T19:28:52.032Z] [info] [henry] Received 4 group conversation notifications
+[2025-03-04T19:28:52.032Z] [warn] conversations > detects new group conversation with all available personas 3.604s
+[2025-03-04T19:28:52.033Z] [info] metricName conversations.detects new group conversation with all available personas undefined

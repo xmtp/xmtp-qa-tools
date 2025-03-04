@@ -8,21 +8,31 @@ const testName = "metadata";
 loadEnv(testName);
 
 describe(testName, () => {
-  let bobsGroup: Conversation;
+  let group: Conversation;
   let personas: Record<string, Persona>;
   beforeAll(async () => {
     personas = await getWorkers(
-      ["bob", "joe", "elon", "fabri", "alice"],
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "randomguy",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+      ],
       testName,
     );
 
     console.time("create group");
-    bobsGroup = await personas.bob.client!.conversations.newGroup([
-      personas.bob.client?.accountAddress as `0x${string}`,
-      personas.joe.client?.accountAddress as `0x${string}`,
-      personas.elon.client?.accountAddress as `0x${string}`,
+    group = await personas.henry.client!.conversations.newGroupByInboxIds([
+      personas.nancy.client?.inboxId ?? "",
+      personas.oscar.client?.inboxId ?? "",
+      personas.jack.client?.inboxId ?? "",
     ]);
-    console.log("Bob's group", bobsGroup.id);
+    console.log("group", group.id);
     console.timeEnd("create group");
   });
 
@@ -34,8 +44,8 @@ describe(testName, () => {
     console.time("update group name");
 
     const verifyResult = await verifyStream(
-      bobsGroup,
-      [personas.joe],
+      group,
+      [personas.oscar],
       "group_updated",
     );
     expect(verifyResult.allReceived).toBe(true);
@@ -44,21 +54,21 @@ describe(testName, () => {
 
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
-    await bobsGroup.addMembers([
-      personas.fabri.client?.accountAddress as `0x${string}`,
+    await group.addMembers([
+      personas.randomguy.client?.accountAddress as `0x${string}`,
     ]);
-    const members = await bobsGroup.members();
+    const members = await group.members();
     console.timeEnd("add members");
-    expect(members.length).toBe(4);
+    expect(members.length).toBe(5);
   });
 
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
     console.time("remove members");
-    await bobsGroup.removeMembers([
-      personas.fabri.client?.accountAddress as `0x${string}`,
+    await group.removeMembers([
+      personas.randomguy.client?.accountAddress as `0x${string}`,
     ]);
-    const members = await bobsGroup.members();
+    const members = await group.members();
     console.timeEnd("remove members");
-    expect(members.length).toBe(3);
+    expect(members.length).toBe(4);
   });
 });

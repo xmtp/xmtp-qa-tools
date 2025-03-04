@@ -2,7 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import type { Conversation, Persona } from "@helpers/types";
-import { getPersonasFromGroup, verifyStream } from "@helpers/verify";
+import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
@@ -14,8 +14,6 @@ import {
   it,
 } from "vitest";
 
-const batchSize = 50;
-const total = 200;
 const testName = "ts_performance";
 loadEnv(testName);
 
@@ -23,6 +21,8 @@ describe(testName, () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
   let start: number;
+  const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
+  const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
   beforeAll(async () => {
     personas = await getWorkers(
@@ -149,8 +149,7 @@ describe(testName, () => {
   });
 
   it("receiveGroupMessage: should create a group and measure all streams", async () => {
-    const personasToVerify = await getPersonasFromGroup(convo, personas);
-    const verifyResult = await verifyStream(convo, personasToVerify);
+    const verifyResult = await verifyStreamAll(convo, personas);
     expect(verifyResult.allReceived).toBe(true);
   });
   for (let i = batchSize; i <= total; i += batchSize) {

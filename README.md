@@ -1,4 +1,3 @@
-[![TS_Streams](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Streams.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Streams.yml)
 [![TS_Performance](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml)
 [![TS_Loss](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Loss.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Loss.yml)
 [![TS_GM_bot](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml)
@@ -18,14 +17,6 @@ Run tests for specific modules using these commands:
   ```
 
   Link to [test](./tests/TS_Performance.test.ts)
-
-- **TS_Streams**: Test 3 different kind of streams (consent,conversations,messages)
-
-  ```bash
-  yarn test ts_streams
-  ```
-
-  Link to [test](./tests/TS_Streams.test.ts)
 
 - **TS_Loss**: Test multiple concurrent streams to see if there are message losses
 
@@ -114,9 +105,7 @@ yarn start
 
 ## Playwright
 
-Using playwright to write web automations.
-
-Try it out:
+Using playwright to write web automations. Try it out:
 
 ```tsx
 yarn test xmtpchat

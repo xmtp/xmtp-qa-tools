@@ -34,14 +34,3 @@ The `TS_Performance.yml` workflow measures and reports on XMTP network performan
 ```
 
 **Expected result:** The workflow will run performance tests and generate metrics on message delivery times, throughput, and other performance indicators.
-
-## TS_Streams workflow
-
-The `TS_Streams.yml` workflow tests the XMTP streams functionality.
-
-```bash
-# Manually trigger the workflow from GitHub Actions UI
-# Navigate to: Actions > TS_Streams > Run workflow
-```
-
-**Expected result:** The workflow will verify that message streams are working correctly, testing subscription, real-time updates, and stream reliability.

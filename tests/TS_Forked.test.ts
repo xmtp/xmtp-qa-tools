@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { type Conversation, type Persona } from "@helpers/types";
-import { getPersonasFromGroup, verifyStream } from "@helpers/verify";
+import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -328,11 +328,7 @@ describe(testName, () => {
       ?.send("Message from Random after rapid member changes");
 
     // Verify all members can still communicate
-    const result = await verifyStream(
-      group,
-      await getPersonasFromGroup(group, personas),
-    );
-
+    const result = await verifyStreamAll(group, personas);
     expect(result.allReceived).toBe(true);
   });
   it("should recover from simulated network partition", async () => {

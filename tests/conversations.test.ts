@@ -1,56 +1,76 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Conversation, type Persona } from "@helpers/types";
-import { verifyGroupConversationStream } from "@helpers/verify";
+import { sendMetric } from "@helpers/datadog";
+import { type Persona } from "@helpers/types";
+import { verifyConversationStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
-import { afterAll, beforeAll, describe, it } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 
 const testName = "conversations";
 loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
-  let groupCreator: (
-    initiator: Persona,
-    participantAddresses: string[],
-  ) => Promise<Conversation>;
+  let start: number;
 
   beforeAll(async () => {
-    groupCreator = async (
-      initiator: Persona,
-      participantAddresses: string[],
-    ) => {
-      if (!initiator.client) {
-        throw new Error("Initiator has no client");
-      }
-      return initiator.client.conversations.newGroup(participantAddresses);
-    };
     personas = await getWorkers(
-      ["bob", "joe", "elon", "fabri", "alice"],
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "randomguy",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+      ],
       testName,
       "conversation",
     );
+  });
+
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName;
+    start = performance.now();
+    console.time(testName);
   });
 
   afterAll(async () => {
     await closeEnv(testName, personas);
   });
 
+  afterEach(function () {
+    const testName = expect.getState().currentTestName;
+    console.timeEnd(testName);
+    if (testName) {
+      void sendMetric(performance.now() - start, testName, personas);
+    }
+  });
   it("detects new group conversation creation with three participants", async () => {
-    const initiator = personas.alice;
-    const participants = [personas.bob, personas.joe];
+    const sender = personas.henry;
+    const participants = [personas.nancy, personas.oscar];
 
-    await verifyGroupConversationStream(initiator, participants, groupCreator);
+    await verifyConversationStream(sender, participants);
   });
 
   it("detects new group conversation with all available personas", async () => {
-    const initiator = personas.fabri;
+    const sender = personas.henry;
     const participants = [
-      personas.alice,
-      personas.bob,
-      personas.joe,
-      personas.elon,
+      personas.nancy,
+      personas.oscar,
+      personas.jack,
+      personas.ivy,
     ];
 
-    await verifyGroupConversationStream(initiator, participants, groupCreator);
+    await verifyConversationStream(sender, participants);
   });
 });

@@ -334,7 +334,7 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
-    timeoutMs = count * defaultValues.timeout,
+    timeoutMs = count * defaultValues.perMessageTimeout,
   ): Promise<ConversationStreamWorker[]> {
     console.log(
       `[${this.nameId}] Collecting ${count} conversations from peer: ${fromPeerAddress}`,
