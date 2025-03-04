@@ -119,7 +119,7 @@ Using playwright to write web automations.
 Try it out:
 
 ```tsx
-yarn test xmtp
+yarn test xmtpchat
 ```
 
 https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
