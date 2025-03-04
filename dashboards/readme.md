@@ -61,6 +61,8 @@ if (!skipNetworkStats) {
 // ... existing code ...
 ```
 
+> See the network stats [function](/helpers/datadog.ts)
+
 ## Network phases measured
 
 The following network phases are measured and reported:
