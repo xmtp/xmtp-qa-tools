@@ -15,9 +15,6 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ vars.XMTP_ENV }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      RUST_BACKTRACE: 1
-      TOKIO_WORKER_THREADS: 4
-      MAX_CONCURRENT_STREAMS: 50
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -53,8 +50,6 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
-            # Add a memory limit to the test process
-            ulimit -v 4194304  # Set virtual memory limit to 4GB
             yarn test TS_Streams && break
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
