@@ -3,7 +3,7 @@ description: "should verify message loss when receiving via 200 streams"
 
 on:
   schedule:
-    - cron: "0 */3 * * *" # every 3 hours
+    - cron: "0 */2 * * *" # every 3 hours
   workflow_dispatch:
 
 jobs:
