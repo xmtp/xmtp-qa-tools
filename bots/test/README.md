@@ -1,4 +1,4 @@
-# XMTP Agent Testing for React Native
+# XMTP bot testing for react native and browser
 
 A lightweight toolkit for React Native developers to test messaging functionality against XMTP agents.
 
