@@ -22,7 +22,7 @@ yarn install
 If you need to run the test bot locally:
 
 ```bash
-yarn bot test
+yarn bot
 ```
 
 This will return the address of the bot

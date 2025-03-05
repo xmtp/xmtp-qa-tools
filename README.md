@@ -66,7 +66,7 @@ Considerations
 A bot that tests different interactions for manual testing
 
 ```bash
-yarn bot test
+yarn bot
 ```
 
 See more in the test bot [section](./bots/test/)

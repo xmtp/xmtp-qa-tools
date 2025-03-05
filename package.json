@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bot": "tsx scripts/run.ts bots",
+    "bot": "tsx  bots/test/index.ts",
     "build": "tsc",
     "clean": "rimraf node_modules && yarn clean:dbs",
     "clean:dbs": "rimraf *.db3* ||:",

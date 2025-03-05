@@ -15,8 +15,8 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ vars.XMTP_ENV }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
-      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

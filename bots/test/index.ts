@@ -4,9 +4,8 @@ import { getWorkers } from "@helpers/workers/factory";
 
 const testName = "test-bot";
 loadEnv(testName);
-
-let personas: Record<string, Persona> = {};
 async function main() {
+  let personas: Record<string, Persona> = {};
   personas = await getWorkers(["bob", "bot", "alice", "joe", "sam"], testName);
 
   const client = personas.bot.client as Client;
