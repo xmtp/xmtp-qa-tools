@@ -1,0 +1,28 @@
+[2025-03-05T18:02:12.837Z] [info] [PersonaFactory] Using env keys for henry: 0xd5f3...
+[2025-03-05T18:02:12.837Z] [info] [PersonaFactory] Using env keys for ivy: 0x3b78...
+[2025-03-05T18:02:12.837Z] [info] [PersonaFactory] Using env keys for bug: 0x9b3b...
+[2025-03-05T18:02:12.837Z] [info] [PersonaFactory] Using cached keys for bug
+[2025-03-05T18:02:14.734Z] [warn] [henry-a] Create XMTP client v:436360a 1.863s
+[2025-03-05T18:02:14.939Z] [warn] [ivy-a] Create XMTP client v:436360a 2.068s
+[2025-03-05T18:02:15.132Z] [warn] [henry-a] Start message stream 397.224ms
+[2025-03-05T18:02:15.132Z] [warn] [henry-a] Start stream 397.616ms
+[2025-03-05T18:02:15.132Z] [warn] [henry-a] Initialize XMTP client 2.294s
+[2025-03-05T18:02:15.132Z] [warn] [bug-b] Create XMTP client v:436360a 2.262s
+[2025-03-05T18:02:15.157Z] [warn] [bug-a] Create XMTP client v:436360a 2.286s
+[2025-03-05T18:02:15.334Z] [warn] [ivy-a] Start message stream 392.823ms
+[2025-03-05T18:02:15.335Z] [warn] [ivy-a] Start stream 395.206ms
+[2025-03-05T18:02:15.335Z] [warn] [ivy-a] Initialize XMTP client 2.468s
+[2025-03-05T18:02:15.542Z] [warn] [bug-b] Start message stream 407.986ms
+[2025-03-05T18:02:15.543Z] [warn] [bug-b] Start stream 409.915ms
+[2025-03-05T18:02:15.543Z] [warn] [bug-b] Initialize XMTP client 2.673s
+[2025-03-05T18:02:15.559Z] [warn] [bug-a] Start message stream 401.534ms
+[2025-03-05T18:02:15.560Z] [warn] [bug-a] Start stream 402.251ms
+[2025-03-05T18:02:15.560Z] [warn] [bug-a] Initialize XMTP client 2.692s
+[2025-03-05T18:02:15.562Z] [info] henry 0x1EE7642cBAb5Faa04c8ec359899EA007c70f85Ec
+[2025-03-05T18:02:15.562Z] [info] ivy 0x873594Edf60e79a44EA858B18d8e498750Cc1376
+[2025-03-05T18:02:15.563Z] [info] bug-a 0xeF65ca647140b1Ca19fBABe6e166eF0f430B64eb
+[2025-03-05T18:02:15.563Z] [info] bug-b 0xeF65ca647140b1Ca19fBABe6e166eF0f430B64eb
+[2025-03-05T18:02:15.565Z] [info] Installations 1
+[2025-03-05T18:02:15.565Z] [info] Installations 1
+[2025-03-05T18:02:17.066Z] [info] convo b76fabc7c229d7564ed8f4bcc2e459f0
+[2025-03-05T18:02:17.247Z] [info] 0

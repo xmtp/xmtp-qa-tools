@@ -1,6 +1,6 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendMessageDeliveryMetric, sendMetric } from "@helpers/datadog";
 import { defaultValues, type Persona } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
@@ -14,7 +14,7 @@ import {
   it,
 } from "vitest";
 
-const testName = "ts_loss";
+const testName = "ts_delivery";
 loadEnv(testName);
 
 const amountofMessages = 10; // Number of messages to collect per receiver
@@ -52,7 +52,7 @@ describe(
         void sendMetric(performance.now() - start, testName, personas);
       }
     });
-    it("TS_Stream_Loss: should verify message order when receiving via streams", async () => {
+    it("streamLoss: should verify message order when receiving via streams", async () => {
       // Create a new group conversation with Bob (creator) and all others.
       const firstPersona = Object.values(personas)[0];
       console.log(
@@ -85,12 +85,21 @@ describe(
       const totalMessages = amountofMessages * (receivers - 1);
       const receivedMessagesCount = collectedMessages.messages.flat().length;
       const percentageReceived = (receivedMessagesCount / totalMessages) * 100;
+      const lossRate = 100 - percentageReceived;
 
       console.log(
         `[Test] Total messages expected: ${totalMessages}, received: ${receivedMessagesCount}`,
       );
       console.log(
         `[Test] Percentage of messages received: ${percentageReceived}%`,
+      );
+
+      // Send message delivery metrics to DataDog
+      sendMessageDeliveryMetric(
+        percentageReceived,
+        lossRate,
+        testName,
+        personas,
       );
 
       // We expect at least 99% to pass

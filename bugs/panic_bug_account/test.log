@@ -1,15 +1,31 @@
-[2025-03-03T23:28:26.626Z] [info] [PersonaFactory] Using env keys for bug: 0xed8a...
-[2025-03-03T23:28:26.626Z] [info] [PersonaFactory] Generating new keys for bob
-[2025-03-03T23:28:29.136Z] [warn] [bug-a] Create XMTP client v:436360a 2.478s
-[2025-03-03T23:28:29.582Z] [warn] [bug-a] Start message stream 445.321ms
-[2025-03-03T23:28:29.583Z] [warn] [bug-a] Start stream 446.317ms
-[2025-03-03T23:28:29.583Z] [warn] [bug-a] Initialize XMTP client 2.929s
-[2025-03-03T23:28:31.091Z] [warn] [bob-a] Create XMTP client v:436360a 4.434s
-[2025-03-03T23:28:31.543Z] [warn] [bob-a] Start message stream 450.355ms
-[2025-03-03T23:28:31.544Z] [warn] [bob-a] Start stream 451.838ms
-[2025-03-03T23:28:31.544Z] [warn] [bob-a] Initialize XMTP client 4.888s
-[2025-03-03T23:28:31.545Z] [info] bug 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
-[2025-03-03T23:28:31.545Z] [info] bob 0x602BBc3FBFe0d1700DB1421eda05DbB6ee06e7fE
-[2025-03-03T23:28:31.780Z] [info] 0
-[2025-03-03T23:28:32.439Z] [info] 0
-[2025-03-03T23:28:36.678Z] [info] convo 934a9304dd25d5322556a8a849ea1472
+[2025-03-05T17:53:15.251Z] [info] [PersonaFactory] Using env keys for henry: 0xccb0...
+[2025-03-05T17:53:15.251Z] [info] [PersonaFactory] Using env keys for ivy: 0x43d4...
+[2025-03-05T17:53:15.251Z] [info] [PersonaFactory] Using env keys for bug: 0xed8a...
+[2025-03-05T17:53:15.251Z] [info] [PersonaFactory] Using cached keys for bug
+[2025-03-05T17:53:17.482Z] [warn] [bug-a] Create XMTP client v:436360a 2.196s
+[2025-03-05T17:53:17.554Z] [warn] [henry-a] Create XMTP client v:436360a 2.267s
+[2025-03-05T17:53:17.592Z] [warn] [bug-b] Create XMTP client v:436360a 2.307s
+[2025-03-05T17:53:17.626Z] [warn] [ivy-a] Create XMTP client v:436360a 2.340s
+[2025-03-05T17:53:17.892Z] [warn] [bug-a] Start message stream 408.862ms
+[2025-03-05T17:53:17.892Z] [warn] [bug-a] Start stream 409.614ms
+[2025-03-05T17:53:17.892Z] [warn] [bug-a] Initialize XMTP client 2.609s
+[2025-03-05T17:53:17.970Z] [warn] [henry-a] Start message stream 415.034ms
+[2025-03-05T17:53:17.970Z] [warn] [henry-a] Start stream 415.748ms
+[2025-03-05T17:53:17.970Z] [warn] [henry-a] Initialize XMTP client 2.718s
+[2025-03-05T17:53:17.999Z] [warn] [bug-b] Start message stream 405.909ms
+[2025-03-05T17:53:17.999Z] [warn] [bug-b] Start stream 406.302ms
+[2025-03-05T17:53:17.999Z] [warn] [bug-b] Initialize XMTP client 2.715s
+[2025-03-05T17:53:18.031Z] [warn] [ivy-a] Start message stream 405.131ms
+[2025-03-05T17:53:18.031Z] [warn] [ivy-a] Start stream 405.232ms
+[2025-03-05T17:53:18.031Z] [warn] [ivy-a] Initialize XMTP client 2.750s
+[2025-03-05T17:53:18.032Z] [info] henry 0xC0661B83cddA56326732ec46Ff23bD6C92dF4DD6
+[2025-03-05T17:53:18.032Z] [info] ivy 0xB1851d805582993d063190f8774200DAd3f5e505
+[2025-03-05T17:53:18.032Z] [info] bug 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
+[2025-03-05T17:53:18.032Z] [info] bug-b 0xc9925662D36DE3e1bF0fD64e779B2e5F0Aead964
+[2025-03-05T17:53:18.257Z] [info] Installations 8
+[2025-03-05T17:53:18.555Z] [info] Installations 8
+[2025-03-05T17:53:18.756Z] [info] convo 0e62f5ce2aea764f9fe58dd1e951582f
+[2025-03-05T17:53:20.161Z] [info] 1
+[2025-03-05T17:53:20.997Z] [info] 1
+[2025-03-05T17:53:21.603Z] [info] 1
+[2025-03-05T17:53:22.309Z] [info] 1

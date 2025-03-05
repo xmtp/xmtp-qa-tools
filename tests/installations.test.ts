@@ -1,15 +1,15 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Installation, type Persona } from "@helpers/types";
+import { type Conversation, type Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
-import { afterAll, beforeAll, describe, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "installations";
 loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
-  let installations: Installation[] = [];
+  let convo: Conversation | null;
   beforeAll(async () => {
     fs.rmSync(".data", { recursive: true, force: true });
     personas = await getWorkers(
@@ -23,10 +23,41 @@ describe(testName, () => {
     await closeEnv(testName, personas);
   });
 
+  afterAll(async () => {
+    await closeEnv(testName, personas);
+  });
   it("inboxState", async () => {
-    const inboxState = await personas["bob-a"].client?.inboxState(true);
-    installations = inboxState?.installations ?? [];
-    console.log(installations.length);
+    const inboxState = await personas["bob-a"].client!.inboxState();
+    console.log("Installations", inboxState.installations.length);
+    const inboxState2 = await personas["bob-b"].client!.inboxState();
+    console.log("Installations", inboxState2.installations.length);
+  });
+
+  it("inboxState", async () => {
+    const inboxState = await personas["bob-a"].client!.inboxState();
+    console.log("Installations", inboxState.installations.length);
+    const inboxState2 = await personas["bob-b"].client!.inboxState();
+    console.log("Installations", inboxState2.installations.length);
+  });
+
+  it("new dm with bug", async () => {
+    convo = await personas.henry.client!.conversations.newDm(
+      personas["bob-a"].client!.accountAddress,
+    );
+    expect(convo.id).toBeDefined();
+    await convo.send("hello");
+    console.log("convo", convo.id);
+  });
+
+  it("should count conversations", async () => {
+    await personas["bob-a"].client?.conversations.sync();
+    const listConversations = personas["bob-a"].client?.conversations.list();
+    console.log(listConversations?.length);
+    expect(listConversations?.length).toBe(1);
+    await personas["bob-b"].client?.conversations.sync();
+    const listConversations2 = personas["bob-b"].client?.conversations.list();
+    console.log(listConversations2?.length);
+    expect(listConversations2?.length).toBe(1);
   });
 });
 

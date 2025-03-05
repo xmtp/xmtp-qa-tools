@@ -1,5 +1,6 @@
 import {
   defaultValues,
+  type Client,
   type Conversation,
   type Persona,
   type VerifyStreamResult,

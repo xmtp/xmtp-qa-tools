@@ -1,5 +1,5 @@
 [![TS_Performance](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml)
-[![TS_Loss](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Loss.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Loss.yml)
+[![TS_Delivery](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml)
 [![TS_GM_bot](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml)
 
 # Overview
@@ -18,13 +18,13 @@ Run tests for specific modules using these commands:
 
   Link to [test](./tests/TS_Performance.test.ts)
 
-- **TS_Loss**: Test multiple concurrent streams to see if there are message losses
+- **TS_Delivery**: Test multiple concurrent streams to see if there are message losses
 
   ```bash
-  yarn test ts_loss
+  yarn test ts_delivery
   ```
 
-  Link to [test](./tests/TS_Loss.test.ts)
+  Link to [test](./tests/TS_Delivery.test.ts)
 
 - **TS_Forked**: Stress tests group operations to find if they are forked
 
@@ -107,10 +107,10 @@ yarn start
 
 Using playwright to write web automations. Try it out:
 
+> See the example xmtp.chat [script](./playwright/gm-bot.playwright.ts)
+
 ```tsx
 yarn test xmtpchat
 ```
 
 https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
-
-See the example xmtp.chat [script](./playwright/gm-bot.playwright.ts)

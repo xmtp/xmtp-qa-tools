@@ -15,7 +15,7 @@ export function initDataDog(
   if (isInitialized) {
     return true;
   }
-  if (testName.includes("bug")) {
+  if (!testName.includes("ts_")) {
     return true;
   }
 
@@ -46,6 +46,37 @@ export function initDataDog(
     return false;
   }
 }
+
+// Add this new function to send message delivery metrics
+export function sendMessageDeliveryMetric(
+  deliveryRate: number,
+  lossRate: number,
+  testName: string,
+  personas: Record<string, Persona>,
+): void {
+  if (!isInitialized) {
+    console.warn(
+      `⚠️ DataDog not initialized. Message delivery metrics will not be sent.`,
+    );
+    return;
+  }
+
+  try {
+    const firstPersona = Object.values(personas)[0];
+    const members = testName.split("-")[1] || "";
+
+    // Send delivery rate metric
+    metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
+      `libxmtp:${firstPersona.version}`,
+      `test:${testName}`,
+      `metric_type:reliability`,
+      `members:${members}`,
+    ]);
+  } catch (error) {
+    console.error("❌ Error sending message delivery metrics:", error);
+  }
+}
+
 export async function sendMetric(
   value: number,
   key: string,
@@ -109,7 +140,6 @@ export async function sendMetric(
 export function flushMetrics(): Promise<void> {
   return new Promise<void>((resolve) => {
     if (!isInitialized) {
-      console.warn("⚠️ DataDog not initialized. No metrics to flush.");
       resolve();
       return;
     }

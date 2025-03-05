@@ -13,13 +13,13 @@ The `TS_GM_bot.yml` workflow automates testing of the GM bot functionality.
 
 **Expected result:** The workflow will run tests against the GM bot functionality, verifying message sending and receiving capabilities.
 
-## TS_Loss workflow
+## TS_Delivery workflow
 
-The `TS_Loss.yml` workflow tests message delivery reliability and identifies potential message loss.
+The `TS_Delivery.yml` workflow tests message delivery reliability and identifies potential message loss.
 
 ```bash
 # Manually trigger the workflow from GitHub Actions UI
-# Navigate to: Actions > TS_Loss > Run workflow
+# Navigate to: Actions > TS_Delivery > Run workflow
 ```
 
 **Expected result:** The workflow will generate test messages and verify their delivery, reporting any message loss detected.

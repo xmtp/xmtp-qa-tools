@@ -1,4 +1,4 @@
-name: TS_Loss
+name: TS_Delivery
 description: "should verify message loss when receiving via 200 streams"
 
 on:
@@ -35,9 +35,9 @@ jobs:
           path: |
             .data
             .env
-          key: ${{ runner.os }}-TS_Loss-cache
+          key: ${{ runner.os }}-TS_Delivery-cache
           restore-keys: |
-            ${{ runner.os }}-TS_Loss-
+            ${{ runner.os }}-TS_Delivery-
           enableCrossOsArchive: false
           fail-on-cache-miss: false
       - name: List data folder contents after cache restore
@@ -48,7 +48,7 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
-            yarn test TS_Loss && break
+            yarn test TS_Delivery && break
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
               exit 1
@@ -67,10 +67,10 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: 25, // Reference to the existing issue #25
-              body: `## ❌ TS_Loss Dev Network Test Failed\n\n` +
-                    `The scheduled Dev network loss verification workflow has failed after 3 retry attempts.\n\n` +
+              body: `## ❌ TS_Delivery Dev Network Test Failed\n\n` +
+                    `The scheduled Dev network delivery verification workflow has failed after 3 retry attempts.\n\n` +
                     `### Details:\n` +
-                    `- **Workflow:** [TS_Loss](${workflow_run_url})\n` +
+                    `- **Workflow:** [TS_Delivery](${workflow_run_url})\n` +
                     `- **Environment:** Dev\n` +
                     `- **Run ID:** ${context.runId}\n` +
                     `- **Commit:** ${context.sha}\n` +
