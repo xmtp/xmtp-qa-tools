@@ -114,3 +114,7 @@ yarn test xmtpchat
 ```
 
 https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
+
+## Bugs
+
+Documenting bugs in this [folder](./bugs/) for easy replicatio.
