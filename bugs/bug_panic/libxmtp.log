@@ -900,3 +900,1006 @@ thread 'tokio-runtime-worker' panicked at /Users/runner/.cargo/registry/src/inde
 Threadsafe Function release failed InvalidArg
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 fabrizioguespe@fabrizios-MacBook-Pro qa-testing % 
+
+
+2025-03-05T19:33:26.112551Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81) }
+2025-03-05T19:33:26.112576Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81) }
+2025-03-05T19:33:26.112579Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(79), flags: (0x1: END_STREAM) }
+
+ ❯ bugs/bug_panic/test.test.ts 0/1
+
+ Test Files 0 passed (1)
+      Tests 0 passed (1)
+   Start at 16:33:18
+   Duration 7.97s
+2025-03-05T19:33:26.284212Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 65565 }
+2025-03-05T19:33:26.284289Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81) }
+2025-03-05T19:33:26.284369Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81) }
+2025-03-05T19:33:26.284419Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81) }
+2025-03-05T19:33:26.284487Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(81), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.299990Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 68806 }
+2025-03-05T19:33:26.300608Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.300809Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="376ac4e05838b7b0da34b6732de6b2a19a933f8634ce93e091adaa9e770b5d9e" welcome_id=988875
+2025-03-05T19:33:26.300985Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.301016Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.305024Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.305138Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.305387Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.305430Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.305466Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.305501Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.305515Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.305539Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.305556Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.305579Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.305604Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.305640Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.305654Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.305668Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.305683Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.305695Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.305709Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.305723Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.305735Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.305747Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.305759Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.305771Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.305783Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.305795Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.305818Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.305833Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.305845Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.305889Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.305902Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.305905Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.308610Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.308648Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.309593Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.310016Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.310022Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca" installation_id=376ac4e05838b7b0da34b6732de6b2a19a933f8634ce93e091adaa9e770b5d9e group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.310244Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca"
+2025-03-05T19:33:26.310280Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.310344Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.310365Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.310412Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.313942Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 163898 }
+2025-03-05T19:33:26.313951Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Settings { flags: (0x0), initial_window_size: 425922 }
+2025-03-05T19:33:26.313954Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Settings { flags: (0x1: ACK) }
+2025-03-05T19:33:26.313957Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 78590 }
+2025-03-05T19:33:26.313961Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-05T19:33:26.313977Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-05T19:33:26.315345Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.315378Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="c4de2512d047384afb02b9bd63fd950aa3f82cc88a179d0c700e1a780411a173" welcome_id=988877
+2025-03-05T19:33:26.315395Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.315400Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.317854Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.317881Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.318025Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.318051Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.318073Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.318085Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.318097Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.318108Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.318138Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.318167Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.318180Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.318208Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.318230Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.318252Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.318263Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.318283Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.318296Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.318307Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.318318Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.318329Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.318340Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.318351Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.318371Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.318382Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.318393Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.318404Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.318414Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.318447Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.318453Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.318455Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.321114Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.321184Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.321840Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.322220Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.322226Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af" installation_id=c4de2512d047384afb02b9bd63fd950aa3f82cc88a179d0c700e1a780411a173 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.322402Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af"
+2025-03-05T19:33:26.322422Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.322451Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(63), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.322462Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63) }
+2025-03-05T19:33:26.322473Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.322480Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.322493Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="21602770cf5c4923e61af14defaa44f0ca08e7388bbc0a69cd8eb03558e6b3ba" welcome_id=988876
+2025-03-05T19:33:26.322506Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.322509Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.324232Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.324250Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="e6964ffac4984668f3a5097555721c5d8c34b8b8521e575803aec57c28de5c12" welcome_id=988878
+2025-03-05T19:33:26.324263Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.324267Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.324891Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.324911Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.325041Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.325075Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.325096Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.325116Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.325144Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.325172Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.325200Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.325211Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.325222Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.325233Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.325244Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.325255Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.325265Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.325284Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.325295Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.325314Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.325327Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.325337Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.325348Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.325359Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.325369Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.325387Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.325398Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.325409Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.325419Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.325451Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.325456Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.325458Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.326683Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.326709Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.326861Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.326893Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.326925Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.326950Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.326963Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.326984Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.327007Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.327022Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.327051Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.327074Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.327086Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.327098Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.327117Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.327137Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.327265Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.327282Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.327294Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.327305Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.327328Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.327341Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.327363Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.327374Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.327386Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.327405Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.327417Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.327453Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.327460Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.327463Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.328129Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.328155Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.328546Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.328891Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.328895Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994" installation_id=21602770cf5c4923e61af14defaa44f0ca08e7388bbc0a69cd8eb03558e6b3ba group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.329037Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994"
+2025-03-05T19:33:26.329051Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.329079Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.329095Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.329117Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.330089Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.330120Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.330506Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.330804Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.330807Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470" installation_id=e6964ffac4984668f3a5097555721c5d8c34b8b8521e575803aec57c28de5c12 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.330909Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470"
+2025-03-05T19:33:26.330916Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.330932Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(57), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.330939Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(57) }
+2025-03-05T19:33:26.330950Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(57), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.333368Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.333390Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="1170153f030c03ec3ce6e0450ed0e324f9bce52e6ed749199d50b06133fd83e1" welcome_id=988879
+2025-03-05T19:33:26.333404Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.333407Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.335803Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.335838Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.335992Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.336027Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.336058Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.336081Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.336103Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.336132Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.336145Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.336156Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.336176Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.336197Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.336208Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.336228Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.336249Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.336260Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.336272Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.336283Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.336294Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.336305Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.336316Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.336327Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.336338Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.336349Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.336360Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.336370Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.336381Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.336419Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.336427Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.336430Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.339018Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.339041Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.339436Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.339810Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.339815Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6" installation_id=1170153f030c03ec3ce6e0450ed0e324f9bce52e6ed749199d50b06133fd83e1 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.339975Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6"
+2025-03-05T19:33:26.339992Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.340023Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.340032Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.340047Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.340048Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.340066Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.340072Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="eab96e4e4d6c87632d2fdef6a73a0a7347d21349a4acacfa8a1a3aecd2e86c28" welcome_id=988880
+2025-03-05T19:33:26.340094Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.340098Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.340104Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="3441badaf03eb23bfa3b908064969c89419578945444d23303565866ff18ee67" welcome_id=988881
+2025-03-05T19:33:26.340123Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.340127Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.342519Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.342530Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.342545Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.342555Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.342679Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.342712Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.342720Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.342746Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.342753Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.342783Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.342791Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.342812Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.342817Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.342836Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.342860Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.342870Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.342882Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.342896Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.342903Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.342910Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.342915Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.342927Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.342931Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.342938Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.342944Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.342949Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.342955Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.342968Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.342971Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.342992Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.342997Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.343003Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.343014Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.343019Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.343025Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.343030Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.343042Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.343045Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.343053Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.343057Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.343065Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.343069Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.343077Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.343080Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.343088Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.343092Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.343099Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.343103Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.343110Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.343115Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.343121Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.343126Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.343133Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.343144Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.343162Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.343167Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.343170Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.343180Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.343187Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.343190Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.345803Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.345828Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.345833Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.345854Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.346246Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.346247Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.346588Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.346593Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c" installation_id=3441badaf03eb23bfa3b908064969c89419578945444d23303565866ff18ee67 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.346595Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.346599Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3" installation_id=eab96e4e4d6c87632d2fdef6a73a0a7347d21349a4acacfa8a1a3aecd2e86c28 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.346767Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3"
+2025-03-05T19:33:26.346767Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c"
+2025-03-05T19:33:26.346782Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.346782Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.346809Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.346818Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.346835Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.346839Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.346846Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.346867Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.350085Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.350107Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="9c1bd28ced1279fc7b0d12857dbdac86af5b6157b4ab902bfe2f3e6297d067f9" welcome_id=988882
+2025-03-05T19:33:26.350121Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.350124Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.352580Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.352613Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.352761Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.352793Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.352823Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.352844Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.352865Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.352876Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.352903Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.352915Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.352926Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.352937Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.352957Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.352970Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.352990Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.353003Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.353014Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.353024Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.353035Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.353046Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.353066Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.353078Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.353089Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.353100Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.353111Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.353122Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.353133Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.353166Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.353173Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.353176Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.356017Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.356044Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.356468Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.356825Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.356831Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077" installation_id=9c1bd28ced1279fc7b0d12857dbdac86af5b6157b4ab902bfe2f3e6297d067f9 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.356994Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077"
+2025-03-05T19:33:26.357014Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.357043Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(59), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.357052Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(59) }
+2025-03-05T19:33:26.357068Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(59), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.357073Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.357073Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.357095Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="f414067b48e7b8de6b8694dea21cdc7666063fc8aca199d0238a69512f252ef9" welcome_id=988883
+2025-03-05T19:33:26.357095Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="1a1f3c0a4245ffdf8b633f5f3d713313a18ff7a03ad94a51cea6e7e6ff6d3dfe" welcome_id=988885
+2025-03-05T19:33:26.357103Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.357114Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.357118Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.357118Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.357128Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="04a5bf1b9d0942db4d4f1877ade56f4cd90dadf7e39b9bbf1dbaaef80889b146" welcome_id=988884
+2025-03-05T19:33:26.357134Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.357153Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.357158Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.359482Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.359503Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.359517Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.359543Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.359579Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.359607Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.359663Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.359702Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.359712Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.359724Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.359741Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.359753Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.359768Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.359771Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.359801Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.359811Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.359826Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.359841Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.359842Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.359860Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.359874Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.359875Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.359892Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.359896Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.359905Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.359908Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.359918Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.359932Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.359936Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.359946Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.359958Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.359959Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.359961Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.359981Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.359985Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.359982Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.359999Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.360002Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.360013Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.360015Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.360018Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.360028Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.360034Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.360043Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.360055Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.360056Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.360056Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.360071Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.360079Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.360082Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.360084Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.360091Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.360095Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.360300Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.360103Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.360330Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.360337Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.360341Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.360346Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.360362Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.360365Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.360376Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.360381Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.360394Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.360396Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.360413Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.360424Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.360435Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.360446Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.360457Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.360463Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.360468Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.360471Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.360476Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.360488Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.360491Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.360497Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.360490Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.360517Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.360524Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.360529Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.360538Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.360550Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.360564Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.360578Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.360583Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.360587Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.360598Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.360605Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.360607Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.363053Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.363076Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.363532Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.363651Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.363703Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.363712Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.363734Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.363959Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.363966Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b" installation_id=f414067b48e7b8de6b8694dea21cdc7666063fc8aca199d0238a69512f252ef9 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.364106Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b"
+2025-03-05T19:33:26.364122Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.364150Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.364170Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23) }
+2025-03-05T19:33:26.364175Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.364267Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.364272Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.364704Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.364711Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef" installation_id=1a1f3c0a4245ffdf8b633f5f3d713313a18ff7a03ad94a51cea6e7e6ff6d3dfe group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.364706Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.364721Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c" installation_id=04a5bf1b9d0942db4d4f1877ade56f4cd90dadf7e39b9bbf1dbaaef80889b146 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.364834Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef"
+2025-03-05T19:33:26.364838Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c"
+2025-03-05T19:33:26.364844Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.364848Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.364866Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(83), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.364871Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(73), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.364874Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(83) }
+2025-03-05T19:33:26.364881Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(73) }
+2025-03-05T19:33:26.364891Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(83), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.364895Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(73), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.368642Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.368663Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="497600a19801014360841e3780fd2e4a4719ef1f260857c9edba1389767dfbfe" welcome_id=988887
+2025-03-05T19:33:26.368676Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.368679Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.371149Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.371204Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.371348Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.371372Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.371400Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.371429Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.371452Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.371465Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.371476Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.371505Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.371517Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.371536Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.371548Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.371560Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.371581Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.371596Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.371607Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.371627Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.371639Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.371651Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.371663Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.371682Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.371696Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.371716Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.371731Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.371743Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.371763Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.371796Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.371804Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.371807Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.374366Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.374387Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.374792Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.375150Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.375155Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef" installation_id=497600a19801014360841e3780fd2e4a4719ef1f260857c9edba1389767dfbfe group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.375300Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef"
+2025-03-05T19:33:26.375314Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.375344Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(63), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.375352Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63) }
+2025-03-05T19:33:26.375367Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.375369Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.375391Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="61222cf5b57178898aeea9eb66158f0564071ed0c2ab439a6444b359a02e4f4f" welcome_id=988888
+2025-03-05T19:33:26.375406Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.375410Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.377863Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.377892Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.378083Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.378118Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.378148Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.378170Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.378198Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.378210Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.378222Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.378452Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.378567Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.378609Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.378622Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.378649Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.378661Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.378673Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.378684Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.378704Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.378715Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.378725Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.378736Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.378897Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.378913Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.378929Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.378943Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.378969Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.379027Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.379080Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.379088Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.379091Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.382291Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.382328Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.382823Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.383464Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.383472Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0" installation_id=61222cf5b57178898aeea9eb66158f0564071ed0c2ab439a6444b359a02e4f4f group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.383668Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0"
+2025-03-05T19:33:26.383692Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.383733Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(63), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.383744Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63) }
+2025-03-05T19:33:26.383780Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.385803Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.385899Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="d110e95800195fdf120a115a778f3da9b642ef4863bddd1b2690f65c412989ff" welcome_id=988890
+2025-03-05T19:33:26.385923Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.385928Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.388451Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.388492Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.388665Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.388703Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.388724Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.388753Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.388776Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.388807Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.388830Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.388844Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.388859Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.388873Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.388895Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.388908Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.388938Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.388951Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.388972Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.388984Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.389007Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.389035Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.389056Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.389068Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.389088Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.389100Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.389111Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.389122Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.389134Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.389168Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.389174Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.389178Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.391857Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.391890Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.392467Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.392895Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.392900Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e" installation_id=d110e95800195fdf120a115a778f3da9b642ef4863bddd1b2690f65c412989ff group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.393062Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e"
+2025-03-05T19:33:26.393086Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.393126Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(143), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.393137Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(143) }
+2025-03-05T19:33:26.393145Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.393156Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(143), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.393168Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="d91ec2639c279bdf8c170c22fb0e43679b6f454d2504cafed7ed061beb195dd9" welcome_id=988889
+2025-03-05T19:33:26.393260Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.393263Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.395686Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.395707Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.395842Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.395866Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.395894Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.395915Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.395942Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.395955Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.395966Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.395993Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.396014Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.396033Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.396044Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.396063Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.396083Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.396094Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.396105Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.396116Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.396126Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.396137Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.396147Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.396158Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.396168Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.396179Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.396189Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.396200Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.396210Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.396243Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.396248Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.396251Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.398796Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.398824Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.399209Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.399531Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.399539Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069" installation_id=d91ec2639c279bdf8c170c22fb0e43679b6f454d2504cafed7ed061beb195dd9 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.399662Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069"
+2025-03-05T19:33:26.399680Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.399706Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.399715Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23) }
+2025-03-05T19:33:26.399718Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.401934Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.401958Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="cee2b8160ac01009312344523afec6d9af1d4775dfd72b8b40ced2b1167a8586" welcome_id=988892
+2025-03-05T19:33:26.401972Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.401976Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.404477Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.404503Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.404646Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.404738Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.404777Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.404804Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.404837Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.404861Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.404875Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.404886Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.404898Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.404927Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.404950Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.404974Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.404997Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.405009Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.405021Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.405032Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.405044Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.405056Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.405067Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.405079Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.405090Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.405101Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.405111Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.405121Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.405196Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.405250Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.405258Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.405263Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.407812Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.407843Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.408251Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.408574Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.408579Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96" installation_id=cee2b8160ac01009312344523afec6d9af1d4775dfd72b8b40ced2b1167a8586 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.408698Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96"
+2025-03-05T19:33:26.408712Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.408738Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.408748Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23) }
+2025-03-05T19:33:26.408750Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.408768Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.408781Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.408792Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="9eac5ec20c4e455b6c0f97199cf286efaf544bb41e98bcf3c27465be22961858" welcome_id=988891
+2025-03-05T19:33:26.408806Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.408808Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.408808Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="412500da3c243cd846edf84f1b46dce05cc73efd20184f80851cd7bbe0e3d70c" welcome_id=988893
+2025-03-05T19:33:26.408831Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.408834Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.410800Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.410821Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="df0e528cbeb909b3c1f16a85914b6c5d8023f3248dccc8bf0c3058eb53e7068b" welcome_id=988895
+2025-03-05T19:33:26.410837Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.410840Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.411247Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.411257Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.411270Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.411283Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.411387Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.411410Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.411439Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.411443Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.411473Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.411504Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.411524Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.411538Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.411556Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.411575Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.411590Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.411593Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.411609Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.411615Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.411623Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.411639Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.411649Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.411654Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.411669Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.411676Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.411685Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.411701Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.411720Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.411726Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.411741Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.411745Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.411762Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.411769Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.411776Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.411783Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.411790Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.411806Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.411809Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.411822Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.411826Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.411840Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.411842Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.411868Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.411891Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.411901Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.411909Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.411919Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.411923Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.411936Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.411936Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.411950Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.411964Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.411968Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.411977Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.411989Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.412014Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.412020Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.412022Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.412024Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.412032Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.412035Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.413272Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being rolled back
+2025-03-05T19:33:26.413294Z  INFO process:create_from_welcome: xmtp_mls::groups: Validating initial group membership
+2025-03-05T19:33:26.413732Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.413870Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.413952Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.413974Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.413994Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.414007Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.414035Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.414062Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.414073Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.414084Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.414231Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.414283Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.414305Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.414316Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.414326Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.414337Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+2025-03-05T19:33:26.414348Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.414358Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.414368Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.414379Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.414399Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.414448Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.414462Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.414473Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: c7c7c2278441de4c455a159f225d18fb30c36ab90a6f11ed2d336acd74a80077 58464
+2025-03-05T19:33:26.414485Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.414517Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.414522Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.414525Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.414703Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.414715Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.414761Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.414781Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.415451Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.415477Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.415826Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.415830Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705" installation_id=9eac5ec20c4e455b6c0f97199cf286efaf544bb41e98bcf3c27465be22961858 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.415934Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.415938Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657" installation_id=412500da3c243cd846edf84f1b46dce05cc73efd20184f80851cd7bbe0e3d70c group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.415973Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705"
+2025-03-05T19:33:26.415993Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.416033Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(59), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.416044Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(59) }
+2025-03-05T19:33:26.416054Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657"
+2025-03-05T19:33:26.416061Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.416077Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(55), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.416083Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55) }
+2025-03-05T19:33:26.416082Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(59), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.416097Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(55), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.417191Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.417220Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.417646Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.417995Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.417999Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f" installation_id=df0e528cbeb909b3c1f16a85914b6c5d8023f3248dccc8bf0c3058eb53e7068b group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.418141Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f"
+2025-03-05T19:33:26.418153Z DEBUG tower::buffer::worker: service.ready=true processing request
+2025-03-05T19:33:26.418178Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(63), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.418186Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63) }
+2025-03-05T19:33:26.418199Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(63), flags: (0x1: END_STREAM) }
+2025-03-05T19:33:26.436092Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(79), flags: (0x4: END_HEADERS) }
+2025-03-05T19:33:26.436110Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(79) }
+2025-03-05T19:33:26.436115Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(79), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-05T19:33:26.436769Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-05T19:33:26.436798Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="81fdf3eb63ff8e2e710d5ec40665f12ba08ae6b6bab61d48e868da92f3095341" welcome_id=988897
+2025-03-05T19:33:26.436818Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.436822Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.438192Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438206Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(53), error_code: CANCEL }
+2025-03-05T19:33:26.438209Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(55), error_code: CANCEL }
+2025-03-05T19:33:26.438217Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438224Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(61), error_code: CANCEL }
+2025-03-05T19:33:26.438261Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(63), error_code: CANCEL }
+2025-03-05T19:33:26.438276Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438281Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438285Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(61), error_code: CANCEL }
+2025-03-05T19:33:26.438283Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(57), error_code: CANCEL }
+2025-03-05T19:33:26.438327Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(59), error_code: CANCEL }
+2025-03-05T19:33:26.438194Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438344Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(53), error_code: CANCEL }
+2025-03-05T19:33:26.438351Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(55), error_code: CANCEL }
+2025-03-05T19:33:26.438365Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438426Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(7), error_code: CANCEL }
+2025-03-05T19:33:26.438437Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(69), error_code: CANCEL }
+2025-03-05T19:33:26.438443Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(81), error_code: CANCEL }
+2025-03-05T19:33:26.438246Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438249Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438312Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438288Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(63), error_code: CANCEL }
+2025-03-05T19:33:26.438473Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(53), error_code: CANCEL }
+2025-03-05T19:33:26.438475Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438509Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(71), error_code: CANCEL }
+2025-03-05T19:33:26.438517Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(73), error_code: CANCEL }
+2025-03-05T19:33:26.438312Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438528Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(57), error_code: CANCEL }
+2025-03-05T19:33:26.438482Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(55), error_code: CANCEL }
+2025-03-05T19:33:26.438558Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438565Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(55), error_code: CANCEL }
+2025-03-05T19:33:26.438386Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438610Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(75), error_code: CANCEL }
+2025-03-05T19:33:26.438613Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(57), error_code: CANCEL }
+2025-03-05T19:33:26.438465Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(57), error_code: CANCEL }
+2025-03-05T19:33:26.438638Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438664Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(21), error_code: CANCEL }
+2025-03-05T19:33:26.438427Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(141), error_code: CANCEL }
+2025-03-05T19:33:26.438683Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(143), error_code: CANCEL }
+2025-03-05T19:33:26.438691Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438698Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(21), error_code: CANCEL }
+2025-03-05T19:33:26.438700Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438704Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(23), error_code: CANCEL }
+2025-03-05T19:33:26.438707Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(61), error_code: CANCEL }
+2025-03-05T19:33:26.438497Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438738Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(63), error_code: CANCEL }
+2025-03-05T19:33:26.438742Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(59), error_code: CANCEL }
+2025-03-05T19:33:26.438645Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438758Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438785Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(81), error_code: CANCEL }
+2025-03-05T19:33:26.438793Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(83), error_code: CANCEL }
+2025-03-05T19:33:26.438586Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438804Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(61), error_code: CANCEL }
+2025-03-05T19:33:26.438418Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438808Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(63), error_code: CANCEL }
+2025-03-05T19:33:26.438461Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(53), error_code: CANCEL }
+2025-03-05T19:33:26.438811Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(53), error_code: CANCEL }
+2025-03-05T19:33:26.438833Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(55), error_code: CANCEL }
+2025-03-05T19:33:26.438751Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(21), error_code: CANCEL }
+2025-03-05T19:33:26.438838Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(23), error_code: CANCEL }
+2025-03-05T19:33:26.438647Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(9), error_code: CANCEL }
+2025-03-05T19:33:26.438859Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(21), error_code: CANCEL }
+2025-03-05T19:33:26.438866Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(23), error_code: CANCEL }
+2025-03-05T19:33:26.438559Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Reset { stream_id: StreamId(59), error_code: CANCEL }
+2025-03-05T19:33:26.439848Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9050066f82f733b9eca0ded9c247e2b80920206e506be797a742fb75b0b48a6b 58497
+ ✓ bugs/bug_panic/test.test.ts (1 test) 7465ms
+   ✓ bug_panic > createGroupByInboxIds: should measure creating a group with inbox ids 2554ms
+
+ ❯ bugs/bug_panic/test.test.ts 1/1
+
+ Test Files 0 passed (1)
+      Tests 1 passed (1)
+   Start at 16:33:18
+   Duration 8.17s
+2025-03-05T19:33:26.439870Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1c2d9c5e52e7e523ef8b9189e327e59c8db7a04de3882c3b0c9fd81392f2fc50 58411
+2025-03-05T19:33:26.439898Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bae4d29efcb50659fe125abc163abd1d948659d3c838db48c54c4be59c535994 58505
+2025-03-05T19:33:26.439911Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 5be79912e0853a1695cd1e66d179a07d5d6031b565a77ebddb9b467abb3511ef 58403
+2025-03-05T19:33:26.439938Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 101f52efa9a5946eb0b57851f63429c5a2dfa690a87c21a7c54bdcfa36e17ac4 58397
+2025-03-05T19:33:26.439961Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 245ca04bf8050ccbf23eee87ddd69b5d23fa95ee0f9e2fd01783334d1d85668c 58511
+2025-03-05T19:33:26.439972Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 51fe85913749e9b4c129b7bcde3e084c43c0a2f22151444b43c34dca4fbc3df0 58404
+2025-03-05T19:33:26.439983Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 42dfe836e2191b38353d97d5ffdad54d38a419e259f049ba14c3128bbad4d470 58400
+2025-03-05T19:33:26.439994Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: b6cec599aa98999f3df9a8edef0f30028bc2cf9d76160586a21fb9259d61c68e 58398
+2025-03-05T19:33:26.440005Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 0733b1e778cac40cc86d4dd4a91e62b5537b93bb0325ff924aee3b88a750318f 58412
+2025-03-05T19:33:26.440016Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 7bebae1c643672a62cfcfdad526663bf27d298652b25e2eeb67e53a58b616d2c 58399
+2025-03-05T19:33:26.440037Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 96cd3637e0e730c8c224e4d43b96ea4fafbc8acccc546e8e195e3fc56c71b2af 58413
+2025-03-05T19:33:26.440049Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9509d53ee4d210e5c3dce6e74b82de342aeb18c5cf8e14b48bb9002e321a22ca 58463
+2025-03-05T19:33:26.440061Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576 58508
+2025-03-05T19:33:26.440073Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: bd8218fb7a9732c3e28efd0a217c2aa41807810d73a3d26688487fed641c33a0 58402
+2025-03-05T19:33:26.440094Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 099b812fc4b7f98c405ef08a3f809d5d7a36f93bd447bf8b267672f6690414ef 58401
+2025-03-05T19:33:26.440116Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 1ea60cf6c5a9d26e8ea33b81165157235ba294a4366614afd74c02eec171f443 58493
+2025-03-05T19:33:26.440127Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 31265c4492bd3abe0ed96542d4474b9fbe794f1292a6fd0f87b77e4d67980069 58524
+2025-03-05T19:33:26.440138Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 9a5327a21f3ee7f57d1fb0f96bd7ffce532218945ceb4b2b047306d7a5226ee6 58510
+2025-03-05T19:33:26.440149Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: d3d01ed085b559ab155bd0afc2c0c3206576cff3bc00159c5ef0b3d30abc4705 58460
+2025-03-05T19:33:26.440159Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 75d56f530ce4f0c90995a2f983e91dbebe7e224596d61addff9c42cd316649c3 58517
+2025-03-05T19:33:26.440170Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 50e20f03ec2e0880521490d350cf1328690bd547acfa7556c8cc4804e3ddd657 58462
+2025-03-05T19:33:26.440181Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 85e90719ddef5a6689983adf45224badf50e2e852a30149022888fff76890d7f 58465
+2025-03-05T19:33:26.440193Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 39c134e546d206455c5ca787d760864dda493e0076811538a9be3e5087011f96 58519
+2025-03-05T19:33:26.440225Z  INFO process:create_from_welcome: xmtp_mls::groups: Group membership validated
+2025-03-05T19:33:26.440233Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-05T19:33:26.440237Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+2025-03-05T19:33:26.442328Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442355Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442380Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442396Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442426Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442499Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442510Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442564Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442334Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442601Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442641Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442673Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442685Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442700Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442646Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442742Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442795Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442837Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442686Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442915Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442921Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442925Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.442964Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.443041Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.443054Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+2025-03-05T19:33:26.443159Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Trying to insert group
+2025-03-05T19:33:26.443364Z  INFO process:create_from_welcome: xmtp_mls::storage::encrypted_store::group: Group is inserted
+2025-03-05T19:33:26.443973Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-05T19:33:26.444324Z DEBUG xmtp_mls::subscriptions::stream_conversations: finished processing with group 8648c89e2d32e2bf70f0e0fa05da3996 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.444328Z DEBUG xmtp_mls::subscriptions::stream_messages: begin establishing new message stream to include group_id=8648c89e2d32e2bf70f0e0fa05da3996 inbox_id="6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576" installation_id=81fdf3eb63ff8e2e710d5ec40665f12ba08ae6b6bab61d48e868da92f3095341 group_id="8648c89e2d32e2bf70f0e0fa05da3996"
+2025-03-05T19:33:26.444478Z DEBUG xmtp_api::mls: subscribing to group messages inbox_id="6c33260c83bab9645bb99ae8ba816f7f081cd853f25f5332cab589725192b576"
+
+thread 'tokio-runtime-worker' panicked at /Users/runner/work/libxmtp/libxmtp/xmtp_mls/src/subscriptions/stream_messages.rs:211:73:
+`async fn` resumed after completion
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+fabrizioguespe@fabrizios-MacBook-Pro qa-testing % 
