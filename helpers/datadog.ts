@@ -50,7 +50,6 @@ export function initDataDog(
 // Add this new function to send message delivery metrics
 export function sendMessageDeliveryMetric(
   deliveryRate: number,
-  lossRate: number,
   testName: string,
   personas: Record<string, Persona>,
 ): void {
@@ -89,7 +88,6 @@ export async function sendMetric(
     const metricNameParts = key.split(":")[0];
     const metricName = metricNameParts.replaceAll(" > ", ".");
     const metricDescription = key.split(":")[1];
-    console.log("metricName", metricName, metricDescription);
     // Extract operation name for tagging
     const operationParts = metricName.split(".");
     const operationName = operationParts[1];

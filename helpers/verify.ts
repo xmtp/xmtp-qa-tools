@@ -53,9 +53,10 @@ const nameUpdater = async (group: Conversation, payload: string) => {
 export async function verifyStreamAll(
   group: Conversation,
   participants: Record<string, Persona>,
+  count = 1,
 ) {
   const allPersonas = await getPersonasFromGroup(group, participants);
-  return verifyStream(group, allPersonas);
+  return verifyStream(group, allPersonas, "text", count);
 }
 export async function verifyStream<T extends string = string>(
   group: Conversation,
@@ -129,13 +130,11 @@ export async function verifyStream<T extends string = string>(
  * @param initiator - The persona creating the group conversation
  * @param participants - Array of personas that should be added to the group and receive the event
  * @param groupCreator - Function to create a new group conversation
- * @param timeoutMs - How long to wait for the conversation event
  * @returns Promise resolving with results of the verification
  */
 export async function verifyConversationStream(
   initiator: Persona,
   participants: Persona[],
-  timeoutMs = defaultValues.timeout,
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
   const groupCreator = async (
     initiator: Persona,
@@ -170,7 +169,6 @@ export async function verifyConversationStream(
     return participant.worker.collectConversations(
       initiator.client.inboxId,
       1, // We expect just one conversation
-      timeoutMs, // Use the provided timeout
     );
   });
 
@@ -192,7 +190,7 @@ export async function verifyConversationStream(
     `[${initiator.name}] Created group conversation with ID: ${createdGroupId}`,
   );
 
-  // Wait for all participant promises to resolve (or timeout)
+  // Wait for all participant promises to resolve ()
   const results = await Promise.all(participantPromises);
   console.log(
     `[${initiator.name}] Received ${results.length} group conversation notifications`,

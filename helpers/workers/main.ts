@@ -404,7 +404,7 @@ export class WorkerClient extends Worker {
         console.warn(
           `[${this.nameId}] Timeout. Got ${messages.length} / ${count} messages.`,
         );
-        resolve(messages); // partial or empty
+        resolve(messages);
       }, timeoutMs);
 
       const onMessage = (msg: MessageStreamWorker) => {
@@ -421,6 +421,9 @@ export class WorkerClient extends Worker {
           const correctType = contentType?.typeId === typeId;
 
           if (correctConversation && correctType) {
+            // console.log(
+            //   `[${this.nameId}] Received message: ${msg.message.content}`,
+            // );
             messages.push(msg);
             if (messages.length >= count) {
               clearTimeout(timer);

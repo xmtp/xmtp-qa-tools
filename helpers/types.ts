@@ -8,8 +8,8 @@ import {
   type Conversation,
   type DecodedMessage,
   type Installation,
-  type XmtpEnv,
   type Signer,
+  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import type { WorkerClient } from "./workers/main";
 
@@ -17,7 +17,8 @@ export type WorkerStreamMessage = {
   type: "stream_message";
   message: DecodedMessage;
 };
-export { ConsentEntityType, ConsentState, Consent };
+export type { Consent };
+export { ConsentEntityType, ConsentState };
 export type { Conversation, DecodedMessage, Installation, Signer, XmtpEnv };
 export { Client };
 // Define the expected return type of verifyStream
@@ -109,7 +110,7 @@ export type typeofStream = "message" | "conversation" | "consent" | "none";
 export const defaultValues = {
   amount: 5,
   timeout: 40000,
-  perMessageTimeout: 2000,
+  perMessageTimeout: 3000,
   sdkVersion: "44",
   installationId: "a",
   defaultNames,
