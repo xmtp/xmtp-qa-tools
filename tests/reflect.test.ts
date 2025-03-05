@@ -1,6 +1,5 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceMetric } from "@helpers/datadog";
 import ReflectTestSuite from "@helpers/reflect";
 import type { Conversation, Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
@@ -20,7 +19,6 @@ loadEnv(testName);
 describe("Basic test", () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
-  let start: number;
   const reflectTestSuite = new ReflectTestSuite();
 
   beforeAll(async () => {
@@ -28,26 +26,8 @@ describe("Basic test", () => {
     personas = await getWorkers(["larry"], testName);
   });
 
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
-
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    console.timeEnd(testName);
-    if (testName) {
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
-    }
   });
 
   it("should return true", async () => {

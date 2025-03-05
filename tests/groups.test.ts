@@ -1,5 +1,4 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceMetric } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { type Conversation, type Persona } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
@@ -19,7 +18,6 @@ loadEnv(testName);
 describe(testName, () => {
   let personas: Record<string, Persona>;
   let convo: Conversation;
-  let start: number;
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
@@ -39,26 +37,9 @@ describe(testName, () => {
       testName,
     );
   });
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
 
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
-      console.timeEnd(testName);
-    }
   });
 
   it("createGroup: should measure creating a group", async () => {

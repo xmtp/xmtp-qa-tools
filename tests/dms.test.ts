@@ -1,17 +1,8 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceMetric } from "@helpers/datadog";
 import { type Conversation, type Persona } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "dms";
 loadEnv(testName);
@@ -19,7 +10,6 @@ loadEnv(testName);
 describe(testName, () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
-  let start: number;
 
   beforeAll(async () => {
     personas = await getWorkers(
@@ -38,26 +28,8 @@ describe(testName, () => {
     );
   });
 
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
-
   afterAll(async () => {
     await closeEnv(testName, personas);
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    console.timeEnd(testName);
-    if (testName) {
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
-    }
   });
 
   it("createDM: should measure creating a DM", async () => {

@@ -28,6 +28,9 @@ import { logEvent, sendPerformanceMetric } from "@helpers/datadog";
 // Send a metric to Datadog
 await sendPerformanceMetric("test.metric", 1, ["tag:value"]);
 
+// Send delivery metric
+await ...
+
 // Log an event to Datadog
 await logEvent("Test event", "Event description", ["tag:value"]);
 ```

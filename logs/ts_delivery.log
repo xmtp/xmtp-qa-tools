@@ -1,51 +1,54 @@
-[2025-03-05T23:24:34.405Z] [info] envPath .env
-[2025-03-05T23:24:34.407Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_delivery","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-05T23:24:34.409Z] [info] [PersonaFactory] Using env keys for fabri: 0x100f...
-[2025-03-05T23:24:34.409Z] [info] [PersonaFactory] Using env keys for bot: 0x1697...
-[2025-03-05T23:24:34.409Z] [info] [PersonaFactory] Using env keys for elon: 0x9b53...
-[2025-03-05T23:24:34.409Z] [info] [PersonaFactory] Using env keys for alice: 0x0bf1...
-[2025-03-05T23:24:36.624Z] [warn] [bot-a] Create XMTP client v:436360a 2.180s
-[2025-03-05T23:24:36.692Z] [warn] [elon-a] Create XMTP client v:436360a 2.247s
-[2025-03-05T23:24:36.804Z] [warn] [alice-a] Create XMTP client v:436360a 2.360s
-[2025-03-05T23:24:37.051Z] [warn] [bot-a] Start message stream 425.708ms
-[2025-03-05T23:24:37.053Z] [warn] [bot-a] Start stream 427.953ms
-[2025-03-05T23:24:37.054Z] [warn] [bot-a] Initialize XMTP client 2.614s
-[2025-03-05T23:24:37.110Z] [warn] [elon-a] Start message stream 417.721ms
-[2025-03-05T23:24:37.111Z] [warn] [elon-a] Start stream 418.75ms
-[2025-03-05T23:24:37.112Z] [warn] [elon-a] Initialize XMTP client 2.670s
-[2025-03-05T23:24:37.216Z] [warn] [alice-a] Start message stream 409.98ms
-[2025-03-05T23:24:37.217Z] [warn] [alice-a] Start stream 412.342ms
-[2025-03-05T23:24:37.217Z] [warn] [alice-a] Initialize XMTP client 2.775s
-[2025-03-05T23:24:37.692Z] [warn] [fabri-a] Create XMTP client v:436360a 3.248s
-[2025-03-05T23:24:38.108Z] [warn] [fabri-a] Start message stream 413.104ms
-[2025-03-05T23:24:38.111Z] [warn] [fabri-a] Start stream 417.052ms
-[2025-03-05T23:24:38.112Z] [warn] [fabri-a] Initialize XMTP client 3.700s
-[2025-03-05T23:24:38.112Z] [info] fabri 0xaA7Eb9Ea44d138E84ad34d6F6849DdA7Fa270A07
-[2025-03-05T23:24:38.112Z] [info] bot 0xc5f9802bD454aA20089AA564a63651dae73eB048
-[2025-03-05T23:24:38.112Z] [info] elon 0xb6a44A8a6AFffFA9E33937cc822f66bD85C57074
-[2025-03-05T23:24:38.113Z] [info] alice 0x0439115ce936C580e5055e40A29eD21D168a67c8
-[2025-03-05T23:24:38.528Z] [info] 4
-[2025-03-05T23:24:38.528Z] [info] [Test] Using existing group with ID: 5579a448e98def76489ef22751e8a3f7
-[2025-03-05T23:24:38.528Z] [warn] [Test] Group creation time 415.058ms
-[2025-03-05T23:24:38.529Z] [warn] ts_delivery > should create a group with the correct number of participants 416.148ms
-[2025-03-05T23:24:38.533Z] [info] [Test] Starting message verification
-[2025-03-05T23:24:38.533Z] [info] [bot-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
-[2025-03-05T23:24:38.533Z] [info] [elon-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
-[2025-03-05T23:24:38.533Z] [info] [alice-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
-[2025-03-05T23:24:38.533Z] [info] Sending message #1: gm-1-x2h326oo6ss
-[2025-03-05T23:24:39.408Z] [warn] Slow connection detected - total: 856.204ms, TLS: 637.6270000000001ms, processing: 218.5769999999999ms
-[2025-03-05T23:24:39.673Z] [info] Sending message #2: gm-2-x2h326oo6ss
-[2025-03-05T23:24:40.493Z] [info] Sending message #3: gm-3-x2h326oo6ss
-[2025-03-05T23:24:41.336Z] [info] Sending message #4: gm-4-x2h326oo6ss
-[2025-03-05T23:24:42.143Z] [info] Sending message #5: gm-5-x2h326oo6ss
-[2025-03-05T23:24:42.757Z] [info] Sending message #6: gm-6-x2h326oo6ss
-[2025-03-05T23:24:43.618Z] [info] Sending message #7: gm-7-x2h326oo6ss
-[2025-03-05T23:24:44.240Z] [info] Sending message #8: gm-8-x2h326oo6ss
-[2025-03-05T23:24:45.439Z] [info] Sending message #9: gm-9-x2h326oo6ss
-[2025-03-05T23:24:46.219Z] [info] Sending message #10: gm-10-x2h326oo6ss
-[2025-03-05T23:24:47.068Z] [info] All participants received the expected number of messages.
-[2025-03-05T23:24:47.068Z] [info] [Test] Percentage of messages received: 100.00%
-[2025-03-05T23:24:47.069Z] [warn] ts_delivery > messageDelivery: should verify message order when receiving via streams 8.536s
-[2025-03-05T23:24:47.070Z] [info] [Test] Starting conversation message count verification
-[2025-03-05T23:24:48.082Z] [info] [Test] Percentage of messages received: 100.00% (40 of 40 expected messages)
-[2025-03-05T23:24:48.082Z] [warn] ts_delivery > should verify all participants receive the same number of messages in their conversations 1.012s
+[2025-03-05T23:31:34.529Z] [info] envPath .env
+[2025-03-05T23:31:34.530Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_delivery","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-05T23:31:34.533Z] [info] [PersonaFactory] Using env keys for fabri: 0x100f...
+[2025-03-05T23:31:34.533Z] [info] [PersonaFactory] Using env keys for bot: 0x1697...
+[2025-03-05T23:31:34.533Z] [info] [PersonaFactory] Using env keys for elon: 0x9b53...
+[2025-03-05T23:31:34.533Z] [info] [PersonaFactory] Using env keys for alice: 0x0bf1...
+[2025-03-05T23:31:36.826Z] [warn] [elon-a] Create XMTP client v:436360a 2.220s
+[2025-03-05T23:31:37.078Z] [warn] [alice-a] Create XMTP client v:436360a 2.471s
+[2025-03-05T23:31:37.083Z] [warn] [fabri-a] Create XMTP client v:436360a 2.477s
+[2025-03-05T23:31:37.144Z] [warn] [bot-a] Create XMTP client v:436360a 2.537s
+[2025-03-05T23:31:37.252Z] [warn] [elon-a] Start message stream 424.763ms
+[2025-03-05T23:31:37.252Z] [warn] [elon-a] Start stream 425.492ms
+[2025-03-05T23:31:37.252Z] [warn] [elon-a] Initialize XMTP client 2.649s
+[2025-03-05T23:31:37.471Z] [warn] [alice-a] Start message stream 388.703ms
+[2025-03-05T23:31:37.472Z] [warn] [alice-a] Start stream 393.395ms
+[2025-03-05T23:31:37.473Z] [warn] [alice-a] Initialize XMTP client 2.868s
+[2025-03-05T23:31:37.520Z] [warn] [fabri-a] Start message stream 436.155ms
+[2025-03-05T23:31:37.522Z] [warn] [fabri-a] Start stream 438.303ms
+[2025-03-05T23:31:37.522Z] [warn] [fabri-a] Initialize XMTP client 2.988s
+[2025-03-05T23:31:37.591Z] [warn] [bot-a] Start message stream 445.604ms
+[2025-03-05T23:31:37.592Z] [warn] [bot-a] Start stream 447.012ms
+[2025-03-05T23:31:37.592Z] [warn] [bot-a] Initialize XMTP client 2.991s
+[2025-03-05T23:31:37.593Z] [info] fabri 0xaA7Eb9Ea44d138E84ad34d6F6849DdA7Fa270A07
+[2025-03-05T23:31:37.593Z] [info] bot 0xc5f9802bD454aA20089AA564a63651dae73eB048
+[2025-03-05T23:31:37.593Z] [info] elon 0xb6a44A8a6AFffFA9E33937cc822f66bD85C57074
+[2025-03-05T23:31:37.593Z] [info] alice 0x0439115ce936C580e5055e40A29eD21D168a67c8
+[2025-03-05T23:31:37.976Z] [info] 4
+[2025-03-05T23:31:37.976Z] [info] [Test] Using existing group with ID: 5579a448e98def76489ef22751e8a3f7
+[2025-03-05T23:31:37.976Z] [warn] [Test] Group creation time 381.191ms
+[2025-03-05T23:31:37.977Z] [warn] ts_delivery > should create a group with the correct number of participants 382.677ms
+[2025-03-05T23:31:37.981Z] [info] [Test] Starting message verification
+[2025-03-05T23:31:37.982Z] [info] [bot-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
+[2025-03-05T23:31:37.982Z] [info] [elon-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
+[2025-03-05T23:31:37.982Z] [info] [alice-a] Collecting 10 messages from convo:5579a448e98def76489ef22751e8a3f7
+[2025-03-05T23:31:37.982Z] [info] Sending message #1: gm-1-dgy6ivxk7t
+[2025-03-05T23:31:38.979Z] [warn] Slow connection detected - total: 980.668ms, TLS: 601.56ms, processing: 379.108ms
+[2025-03-05T23:31:39.119Z] [info] Sending message #2: gm-2-dgy6ivxk7t
+[2025-03-05T23:31:39.986Z] [info] Sending message #3: gm-3-dgy6ivxk7t
+[2025-03-05T23:31:40.626Z] [info] Sending message #4: gm-4-dgy6ivxk7t
+[2025-03-05T23:31:41.510Z] [info] Sending message #5: gm-5-dgy6ivxk7t
+[2025-03-05T23:31:42.362Z] [info] Sending message #6: gm-6-dgy6ivxk7t
+[2025-03-05T23:31:43.176Z] [info] Sending message #7: gm-7-dgy6ivxk7t
+[2025-03-05T23:31:44.042Z] [info] Sending message #8: gm-8-dgy6ivxk7t
+[2025-03-05T23:31:45.330Z] [info] Sending message #9: gm-9-dgy6ivxk7t
+[2025-03-05T23:31:45.971Z] [info] Sending message #10: gm-10-dgy6ivxk7t
+[2025-03-05T23:32:07.984Z] [warn] [bot-a] Timeout. Got 9 / 10 messages.
+[2025-03-05T23:32:07.984Z] [error] Not all participants received the expected number of messages.
+[2025-03-05T23:32:07.985Z] [info] [Test] Percentage of messages received: 96.67%
+[2025-03-05T23:32:07.985Z] [warn] ts_delivery > messageDelivery: should verify message order when receiving via streams 30.004s
+[2025-03-05T23:32:07.988Z] [info] [Test] Starting conversation message count verification
+[2025-03-05T23:32:10.098Z] [info] [Test] Percentage of messages received: 97.50% (39 of 40 expected messages)
+[2025-03-05T23:32:10.098Z] [info] [Test] Message count discrepancies:
+[2025-03-05T23:32:10.098Z] [info] [Test] bot: 9 (expected 10)
+[2025-03-05T23:32:10.099Z] [warn] ts_delivery > should verify all participants receive the same number of messages in their conversations 2.111s
