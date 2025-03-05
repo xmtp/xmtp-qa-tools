@@ -55,9 +55,6 @@ export function sendMessageDeliveryMetric(
   personas: Record<string, Persona>,
 ): void {
   if (!isInitialized) {
-    console.warn(
-      `⚠️ DataDog not initialized. Message delivery metrics will not be sent.`,
-    );
     return;
   }
 
@@ -84,9 +81,6 @@ export async function sendMetric(
   skipNetworkStats: boolean = false,
 ): Promise<void> {
   if (!isInitialized) {
-    console.warn(
-      `⚠️ DataDog not initialized. Metric '${key}' will not be sent.`,
-    );
     return;
   }
 

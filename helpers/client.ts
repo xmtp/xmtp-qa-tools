@@ -108,7 +108,16 @@ function getEnvPath(testName: string): string {
   if (testName.includes("bug")) {
     envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
     if (!fs.existsSync(envPath)) {
-      fs.mkdirSync(envPath, { recursive: true });
+      // Create the directory structure for the env file
+      fs.mkdirSync(path.dirname(envPath), { recursive: true });
+      // Create the .env file if it doesn't exist
+      if (!fs.existsSync(envPath)) {
+        fs.writeFileSync(
+          envPath,
+          `#XMTP\nLOGGING_LEVEL="off"\nXMTP_ENV="dev"\n`,
+        );
+        console.log(`Created default .env file at ${envPath}`);
+      }
     }
   }
   process.env.CURRENT_ENV_PATH = envPath;
