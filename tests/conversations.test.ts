@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendPerformanceMetric } from "@helpers/datadog";
 import { type Persona } from "@helpers/types";
 import { verifyConversationStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
@@ -52,7 +52,11 @@ describe(testName, () => {
     const testName = expect.getState().currentTestName;
     console.timeEnd(testName);
     if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
+      void sendPerformanceMetric(
+        performance.now() - start,
+        testName,
+        Object.values(personas)[0].version,
+      );
     }
   });
   it("detects new group conversation creation with three participants", async () => {

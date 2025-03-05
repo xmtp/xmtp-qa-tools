@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
-import { type Conversation, type Persona } from "@helpers/types";
+import { sendDeliveryMetric, sendPerformanceMetric } from "@helpers/datadog";
+import { defaultValues, type Conversation, type Persona } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
@@ -18,6 +18,10 @@ loadEnv(testName);
 
 const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
 const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
+// 2 seconds per message, multiplied by the total number of participants
+// valiable for github actions
+const timeoutMax =
+  amountofMessages * receiverAmount * defaultValues.perMessageTimeout;
 
 describe(
   testName,
@@ -48,7 +52,11 @@ describe(
       const testName = expect.getState().currentTestName;
       console.timeEnd(testName);
       if (testName) {
-        void sendMetric(performance.now() - start, testName, personas);
+        void sendPerformanceMetric(
+          performance.now() - start,
+          testName,
+          Object.values(personas)[0].version,
+        );
       }
     });
 
@@ -113,7 +121,11 @@ describe(
       );
       expect(percentageReceived).toBeGreaterThanOrEqual(95);
       // Send message delivery metrics to DataDog
-      //sendMessageDeliveryMetric(percentageReceived, testName, personas);
+      sendDeliveryMetric(
+        percentageReceived,
+        Object.values(personas)[0].version,
+        testName,
+      );
     });
 
     it("should verify all participants receive the same number of messages in their conversations", async () => {
@@ -148,10 +160,6 @@ describe(
         messageCounts.push(messageCount);
       }
 
-      // The sum of all message counts is causing the percentage to exceed 100%
-      // We need to calculate the percentage based on how many messages were actually received
-      // compared to how many should have been received
-
       // Calculate expected total messages across all participants
       const expectedTotalMessages = amountofMessages * personaArray.length;
 
@@ -182,6 +190,13 @@ describe(
         });
       }
       expect(percentageReceived).toBeGreaterThanOrEqual(95);
+      sendDeliveryMetric(
+        percentageReceived,
+        Object.values(personas)[0].version,
+        testName,
+        "poll",
+      );
     });
   },
+  timeoutMax,
 );

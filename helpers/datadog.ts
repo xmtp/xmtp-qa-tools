@@ -1,7 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import type { Persona } from "./types";
 
 let isInitialized = false;
 
@@ -48,24 +47,24 @@ export function initDataDog(
 }
 
 // Add this new function to send message delivery metrics
-export function sendMessageDeliveryMetric(
-  deliveryRate: number,
+export function sendDeliveryMetric(
+  metricValue: number,
   testName: string,
-  personas: Record<string, Persona>,
+  libxmtpVersion: string,
+  metricType: string = "stream",
 ): void {
   if (!isInitialized) {
     return;
   }
 
   try {
-    const firstPersona = Object.values(personas)[0];
     const members = testName.split("-")[1] || "";
 
     // Send delivery rate metric
-    metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
-      `libxmtp:${firstPersona.version}`,
+    metrics.gauge("xmtp.sdk.delivery_rate", metricValue, [
+      `libxmtp:${libxmtpVersion}`,
       `test:${testName}`,
-      `metric_type:reliability`,
+      `metric_type:${metricType}`,
       `members:${members}`,
     ]);
   } catch (error) {
@@ -73,10 +72,10 @@ export function sendMessageDeliveryMetric(
   }
 }
 
-export async function sendMetric(
-  value: number,
-  key: string,
-  personas: Record<string, Persona>,
+export async function sendPerformanceMetric(
+  metricValue: number,
+  testName: string,
+  libxmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
   if (!isInitialized) {
@@ -84,22 +83,21 @@ export async function sendMetric(
   }
 
   try {
-    const firstPersona = Object.values(personas)[0];
-    const metricNameParts = key.split(":")[0];
+    const metricNameParts = testName.split(":")[0];
     const metricName = metricNameParts.replaceAll(" > ", ".");
-    const metricDescription = key.split(":")[1];
+    const metricDescription = testName.split(":")[1];
     // Extract operation name for tagging
     const operationParts = metricName.split(".");
     const operationName = operationParts[1];
-    const testName = operationParts[0];
-    const members = testName.split("-")[1] || "";
+    const testNameExtracted = operationParts[0];
+    const members = testNameExtracted.split("-")[1] || "";
     const durationMetricName = `xmtp.sdk.duration`;
 
     // Send main operation metric
-    metrics.gauge(durationMetricName, value, [
-      `libxmtp:${firstPersona.version}`,
+    metrics.gauge(durationMetricName, metricValue, [
+      `libxmtp:${libxmtpVersion}`,
       `operation:${operationName}`,
-      `test:${testName}`,
+      `test:${testNameExtracted}`,
       `metric_type:operation`,
       `description:${metricDescription}`,
       `members:${members}`,
@@ -112,7 +110,7 @@ export async function sendMetric(
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const metricValue = statValue * 1000; // Convert to milliseconds
         metrics.gauge(durationMetricName, metricValue, [
-          `libxmtp:${firstPersona.version}`,
+          `libxmtp:${libxmtpVersion}`,
           `operation:${operationName}`,
           `test:${testName}`,
           `metric_type:network`,
@@ -121,7 +119,7 @@ export async function sendMetric(
       }
     }
   } catch (error) {
-    console.error(`❌ Error sending metric '${key}':`, error);
+    console.error(`❌ Error sending metric '${testName}':`, error);
   }
 }
 

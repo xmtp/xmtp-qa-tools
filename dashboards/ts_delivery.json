@@ -17,7 +17,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery_rate{metric_type:reliability,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery_rate{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -54,7 +54,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery_rate{metric_type:reliability,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery_rate{metric_type:stream,$env,$geo,$test,$libxmtp,$members}"
               }
             ],
             "response_format": "timeseries",
@@ -94,8 +94,8 @@
     {
       "name": "metric_type",
       "prefix": "metric_type",
-      "available_values": [],
-      "default": "*"
+      "available_values": ["stream", "poll"],
+      "default": "stream"
     },
     {
       "name": "members",

@@ -23,10 +23,10 @@ const randomClient = await createRandomClient();
 The `datadog.ts` module provides utilities for sending metrics and logs to Datadog.
 
 ```typescript
-import { logEvent, sendMetric } from "@helpers/datadog";
+import { logEvent, sendPerformanceMetric } from "@helpers/datadog";
 
 // Send a metric to Datadog
-await sendMetric("test.metric", 1, ["tag:value"]);
+await sendPerformanceMetric("test.metric", 1, ["tag:value"]);
 
 // Log an event to Datadog
 await logEvent("Test event", "Event description", ["tag:value"]);

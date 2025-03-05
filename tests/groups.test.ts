@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendPerformanceMetric } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { type Conversation, type Persona } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
@@ -52,7 +52,11 @@ describe(testName, () => {
   afterEach(function () {
     const testName = expect.getState().currentTestName;
     if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
+      void sendPerformanceMetric(
+        performance.now() - start,
+        testName,
+        Object.values(personas)[0].version,
+      );
       console.timeEnd(testName);
     }
   });

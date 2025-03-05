@@ -1,6 +1,6 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendPerformanceMetric } from "@helpers/datadog";
 import ReflectTestSuite from "@helpers/reflect";
 import type { Conversation, Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
@@ -42,7 +42,11 @@ describe("Basic test", () => {
     const testName = expect.getState().currentTestName;
     console.timeEnd(testName);
     if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
+      void sendPerformanceMetric(
+        performance.now() - start,
+        testName,
+        Object.values(personas)[0].version,
+      );
     }
   });
 

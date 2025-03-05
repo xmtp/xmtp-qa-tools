@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { sendPerformanceMetric } from "@helpers/datadog";
 import { ConsentEntityType, ConsentState, type Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import {
@@ -37,7 +37,6 @@ describe(testName, () => {
     );
   });
 
-
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
     start = performance.now();
@@ -52,7 +51,11 @@ describe(testName, () => {
     const testName = expect.getState().currentTestName;
     console.timeEnd(testName);
     if (testName) {
-      void sendMetric(performance.now() - start, testName, personas);
+      void sendPerformanceMetric(
+        performance.now() - start,
+        testName,
+        Object.values(personas)[0].version,
+      );
     }
   });
 
