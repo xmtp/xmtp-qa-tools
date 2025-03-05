@@ -34,5 +34,5 @@ yarn test bug_panic
 
 ### Environment
 
-- [./data](/.data/) folder
-- [.env](/.env) file
+- [./data](.data/) folder
+- [.env](.env) file
