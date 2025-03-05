@@ -21,7 +21,9 @@ describe(testName, () => {
       await personas.bob.client!.conversations.newGroupByInboxIds(
         Object.values(personas).map((persona) => persona.client!.inboxId),
       );
-
+    // for (const worker of workerArray) {
+    //   await worker.worker?.terminate();
+    // }
     expect(groupByInboxIds.id).toBeDefined();
   });
 });
