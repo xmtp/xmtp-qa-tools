@@ -125,5 +125,3 @@ Preset views are available for:
 
 - US region
 - Outside US (South America)
-
-> See the full delivery metrics implementation in [helpers/datadog.ts](/helpers/datadog.ts)
