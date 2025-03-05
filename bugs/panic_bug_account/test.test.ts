@@ -1,11 +1,9 @@
-import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
 import {
   type Conversation,
   type Installation,
   type Persona,
 } from "@helpers/types";
-import { countInstallations } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -14,7 +12,6 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation | null;
-  const installations: Installation[] = [];
   let personas: Record<string, Persona>;
 
   beforeAll(async () => {
@@ -59,13 +56,13 @@ describe(testName, () => {
     await convo?.send("hello");
     await personas.bug.client?.conversations.sync();
     const listConversations =
-      personas.bug.client?.conversations.getConversationById(convo?.id);
+      personas.bug.client?.conversations.getConversationById(convo?.id ?? "");
     console.log(listConversations?.messages.length);
     expect(listConversations?.messages.length).toBe(1);
     await convo?.send("hello");
     const listConversations2 = personas[
       "bug-b"
-    ].client?.conversations.getConversationById(convo?.id);
+    ].client?.conversations.getConversationById(convo?.id ?? "");
     console.log(listConversations2?.messages.length);
     expect(listConversations2?.messages.length).toBe(1);
   });
