@@ -52,6 +52,7 @@ export function sendDeliveryMetric(
   testName: string,
   libxmtpVersion: string,
   metricType: string = "stream",
+  metricName: string = "delivery",
 ): void {
   if (!isInitialized) {
     return;
@@ -61,7 +62,10 @@ export function sendDeliveryMetric(
     const members = testName.split("-")[1] || "";
 
     // Send delivery rate metric
-    metrics.gauge("xmtp.sdk.delivery_rate", metricValue, [
+    console.log(
+      `Sending metric: xmtp.sdk.${metricName} with value ${metricValue}`,
+    );
+    metrics.gauge(`xmtp.sdk.${metricName}`, metricValue, [
       `libxmtp:${libxmtpVersion}`,
       `test:${testName}`,
       `metric_type:${metricType}`,

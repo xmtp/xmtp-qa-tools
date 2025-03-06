@@ -93,12 +93,14 @@ describe(
         Object.values(personas)[0].version,
         testName,
         "stream",
+        "delivery",
       );
       sendDeliveryMetric(
         stats.orderPercentage,
         Object.values(personas)[0].version,
         testName,
         "stream",
+        "order",
       );
     });
 
@@ -141,12 +143,14 @@ describe(
         Object.values(personas)[0].version,
         testName,
         "poll",
+        "delivery",
       );
       sendDeliveryMetric(
         stats.orderPercentage,
         Object.values(personas)[0].version,
         testName,
         "poll",
+        "order",
       );
     });
   },

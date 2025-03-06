@@ -170,7 +170,7 @@
     {
       "id": 132554502285611,
       "definition": {
-        "title": "Message Reception Average (ms)",
+        "title": "Message Delivery Average (ms)",
         "type": "query_value",
         "requests": [
           {
