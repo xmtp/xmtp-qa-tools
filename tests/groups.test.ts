@@ -115,10 +115,8 @@ describe(testName, () => {
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       const previousMembers = await group.members();
-      const randomMember =
-        previousMembers[Math.floor(Math.random() * previousMembers.length)];
       await (group as Group).removeMembers([
-        randomMember.accountAddresses[0] as `0x${string}`,
+        previousMembers[1].accountAddresses[1] as `0x${string}`,
       ]);
 
       const members = await group.members();

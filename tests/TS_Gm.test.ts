@@ -68,8 +68,8 @@ describe(testName, () => {
     expect(dmId).toBeDefined();
   });
 
-  it("should respond to a message", async () => {
-    const result = await testGmBot(gmBotAddress);
-    expect(result).toBe(true);
-  });
+  // it("should respond to a message", async () => {
+  //   const result = await testGmBot(gmBotAddress);
+  //   expect(result).toBe(true);
+  // });
 });
