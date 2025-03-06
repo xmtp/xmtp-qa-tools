@@ -37,6 +37,13 @@ jobs:
             fi
             sleep 10
           done
+      - name: Disable scheduled workflow
+        if: failure() && steps.run_tests.outputs.test_failed == 'true'
+        run: |
+          echo "Disabling scheduled workflow due to test failures"
+          gh workflow disable TS_GM_bot.yml
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create issue on workflow failure
         if: failure()

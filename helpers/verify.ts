@@ -1,6 +1,4 @@
 import {
-  defaultValues,
-  type Client,
   type Conversation,
   type Persona,
   type VerifyStreamResult,
@@ -214,5 +212,157 @@ export async function verifyConversationStream(
   return {
     allReceived,
     receivedCount,
+  };
+}
+
+/**
+ * Verifies the order of messages received in a stream or pulled from a conversation
+ *
+ * @param receivedMessages - Array of received messages to check
+ * @param expectedPrefix - The expected prefix for messages (e.g., 'gm-' or 'message-')
+ * @param randomSuffix - The random suffix used to identify messages in this test run
+ * @param expectedCount - The expected number of messages
+ * @returns Object containing whether messages are in order and the expected messages
+ */
+
+// Helper function to calculate message reception and order percentages
+export function calculateMessageStats(
+  messagesByPersona: string[][],
+  prefix: string,
+  amount: number,
+  suffix: string,
+) {
+  const verifyMessageOrder = (
+    receivedMessages: string[],
+    expectedPrefix: string = "gm-",
+    expectedCount?: number,
+  ): { inOrder: boolean; expectedMessages: string[] } => {
+    // If no messages received, return early
+    if (receivedMessages.length === 0) {
+      return { inOrder: false, expectedMessages: [] };
+    }
+
+    // Extract the random suffix from the first message
+    const parts = receivedMessages[0].split("-");
+    const randomSuffix = parts.length >= 3 ? parts[2] : suffix;
+
+    // Determine the count of expected messages
+    const count = expectedCount || receivedMessages.length;
+
+    // Generate the expected messages in order
+    const expectedMessages = Array.from(
+      { length: count },
+      (_, i) => `${expectedPrefix}${i + 1}-${randomSuffix}`,
+    );
+
+    // Check if received messages are in the expected order
+    const inOrder =
+      receivedMessages.length === expectedMessages.length &&
+      receivedMessages.every((msg, index) => msg === expectedMessages[index]);
+
+    return {
+      inOrder,
+      expectedMessages,
+    };
+  };
+  const showDiscrepancies = (personasInOrder: number, personaCount: number) => {
+    // Log any discrepancies in message order
+    if (personasInOrder < personaCount) {
+      console.log("Message order discrepancies detected:");
+
+      messagesByPersona.forEach((messages, index) => {
+        const { inOrder, expectedMessages } = verifyMessageOrder(
+          messages,
+          prefix,
+          amount,
+        );
+
+        if (!inOrder) {
+          console.log(
+            `Persona ${index + 1} received messages out of order or missing messages:`,
+          );
+
+          // Check for missing messages
+          if (messages.length !== expectedMessages.length) {
+            console.log(
+              `  Expected ${expectedMessages.length} messages, received ${messages.length}`,
+            );
+          }
+
+          // Find specific discrepancies
+          const discrepancies = [];
+
+          // Check for messages in wrong order or missing
+          for (
+            let i = 0;
+            i < Math.max(messages.length, expectedMessages.length);
+            i++
+          ) {
+            if (i >= messages.length) {
+              discrepancies.push(`Missing: ${expectedMessages[i]}`);
+            } else if (i >= expectedMessages.length) {
+              discrepancies.push(`Unexpected: ${messages[i]}`);
+            } else if (messages[i] !== expectedMessages[i]) {
+              discrepancies.push(
+                `Expected: ${expectedMessages[i]}, Got: ${messages[i]}`,
+              );
+            }
+          }
+
+          if (discrepancies.length > 0) {
+            console.log(`Discrepancies:`);
+            discrepancies.forEach((d) => {
+              console.log(d);
+            });
+          }
+        }
+      });
+    }
+  };
+  const showComparativeTable = (messagesByPersona: string[][]) => {
+    console.log("Comparative Table:");
+    messagesByPersona.forEach((messages, index) => {
+      console.log(`Persona ${index + 1}: ${messages.join(", ")}`);
+    });
+  };
+  // Check message reception
+  let totalExpectedMessages = 0;
+  let totalReceivedMessages = 0;
+
+  // Check message order
+  let personasInOrder = 0;
+  const personaCount = messagesByPersona.length;
+
+  for (const personaMessages of messagesByPersona) {
+    totalExpectedMessages += amount;
+    totalReceivedMessages += personaMessages.length;
+
+    const { inOrder } = verifyMessageOrder(personaMessages, prefix, amount);
+
+    if (inOrder) {
+      personasInOrder++;
+    }
+  }
+
+  const receptionPercentage =
+    (totalReceivedMessages / totalExpectedMessages) * 100;
+  const orderPercentage = (personasInOrder / personaCount) * 100;
+
+  console.log("Expected messages pattern:", `${prefix}[1-${amount}]-${suffix}`);
+  console.log(
+    `Reception percentage: ${receptionPercentage.toFixed(2)}% (${totalReceivedMessages}/${totalExpectedMessages} messages)`,
+  );
+  console.log(
+    `Order percentage: ${orderPercentage.toFixed(2)}% (${personasInOrder}/${personaCount} personas)`,
+  );
+  showDiscrepancies(personasInOrder, personaCount);
+  showComparativeTable(messagesByPersona);
+  return {
+    receptionPercentage,
+    orderPercentage,
+    personasInOrder,
+    personaCount,
+    totalReceivedMessages,
+    totalExpectedMessages,
   };
 }

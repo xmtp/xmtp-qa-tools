@@ -315,8 +315,6 @@
       "default": "*"
     }
   ],
-  "layout_type": "ordered",
-  "notify_list": [],
   "template_variable_presets": [
     {
       "name": "outside-us",
@@ -333,5 +331,7 @@
       ]
     }
   ],
+  "layout_type": "ordered",
+  "notify_list": [],
   "reflow_type": "fixed"
 }

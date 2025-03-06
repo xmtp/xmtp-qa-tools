@@ -3,12 +3,11 @@
   "description": "Metrics for XMTP SDK delivery",
   "widgets": [
     {
-      "id": 3314307979823284,
+      "id": 504026830671482,
       "definition": {
-        "title": "Message Delivery Rate (%)",
+        "title": "Stream Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
-        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -37,24 +36,62 @@
       "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
     },
     {
-      "id": 8340329776064214,
+      "id": 5725909012596498,
       "definition": {
-        "title": "Message Delivery Metrics Over Time",
+        "title": "Poll Delivery Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery_rate{metric_type:poll,$env,$geo,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ]
+      },
+      "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 3827551407888457,
+      "definition": {
+        "title": "Stream Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
         "legend_layout": "auto",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
-            "formulas": [{ "formula": "query1" }],
+            "formulas": [{ "formula": "query1" }, { "formula": "query2" }],
+
             "queries": [
               {
                 "name": "query1",
                 "data_source": "metrics",
                 "query": "avg:xmtp.sdk.delivery_rate{metric_type:stream,$env,$geo,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery_rate{metric_type:poll,$env,$geo,$test,$libxmtp,$members}"
               }
             ],
             "response_format": "timeseries",
@@ -67,10 +104,9 @@
           }
         ]
       },
-      "layout": { "x": 2, "y": 0, "width": 4, "height": 2 }
+      "layout": { "x": 0, "y": 2, "width": 3, "height": 2 }
     }
   ],
-
   "template_variables": [
     {
       "name": "env",
@@ -86,16 +122,16 @@
       "default": "ts_delivery"
     },
     {
-      "name": "libxmtp",
-      "prefix": "libxmtp",
-      "available_values": [],
-      "default": "*"
-    },
-    {
       "name": "metric_type",
       "prefix": "metric_type",
       "available_values": ["stream", "poll"],
       "default": "stream"
+    },
+    {
+      "name": "libxmtp",
+      "prefix": "libxmtp",
+      "available_values": [],
+      "default": "*"
     },
     {
       "name": "members",
@@ -104,6 +140,8 @@
       "default": "*"
     }
   ],
+  "layout_type": "ordered",
+  "notify_list": [],
   "template_variable_presets": [
     {
       "name": "outside-us",
@@ -120,7 +158,5 @@
       ]
     }
   ],
-  "layout_type": "ordered",
-  "notify_list": [],
   "reflow_type": "fixed"
 }

@@ -1,115 +1,106 @@
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for bob: 0xd566...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for alice: 0xbd34...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for joe: 0x356b...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for sam: 0xbc32...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for charlie: 0x314d...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for dave: 0x7e91...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for eve: 0xa2cf...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for frank: 0x5caf...
-[2025-03-05T19:10:21.031Z] [info] [PersonaFactory] Using env keys for grace: 0x98c5...
-[2025-03-05T19:10:21.032Z] [info] [PersonaFactory] Using env keys for henry: 0xd5f3...
-[2025-03-05T19:10:21.032Z] [info] [PersonaFactory] Using env keys for ivy: 0x3b78...
-[2025-03-05T19:10:21.032Z] [info] [PersonaFactory] Using env keys for jack: 0x9940...
-[2025-03-05T19:10:21.032Z] [info] [PersonaFactory] Using env keys for karen: 0xd1bd...
-[2025-03-05T19:10:21.032Z] [info] [PersonaFactory] Using env keys for larry: 0x5524...
-[2025-03-05T19:10:23.329Z] [warn] [bob-a] Create XMTP client v:436360a 2.240s
-[2025-03-05T19:10:23.353Z] [warn] [frank-a] Create XMTP client v:436360a 2.264s
-[2025-03-05T19:10:23.427Z] [warn] [alice-a] Create XMTP client v:436360a 2.338s
-[2025-03-05T19:10:23.476Z] [warn] [charlie-a] Create XMTP client v:436360a 2.387s
-[2025-03-05T19:10:23.581Z] [warn] [eve-a] Create XMTP client v:436360a 2.492s
-[2025-03-05T19:10:23.627Z] [warn] [henry-a] Create XMTP client v:436360a 2.538s
-[2025-03-05T19:10:23.686Z] [warn] [jack-a] Create XMTP client v:436360a 2.596s
-[2025-03-05T19:10:23.732Z] [warn] [bob-a] Start message stream 402.785ms
-[2025-03-05T19:10:23.732Z] [warn] [bob-a] Start stream 403.257ms
-[2025-03-05T19:10:23.733Z] [warn] [bob-a] Initialize XMTP client 2.695s
-[2025-03-05T19:10:23.753Z] [warn] [grace-a] Create XMTP client v:436360a 2.664s
-[2025-03-05T19:10:23.758Z] [warn] [frank-a] Start message stream 404.695ms
-[2025-03-05T19:10:23.758Z] [warn] [frank-a] Start stream 405.289ms
-[2025-03-05T19:10:23.758Z] [warn] [frank-a] Initialize XMTP client 2.679s
-[2025-03-05T19:10:23.803Z] [warn] [sam-a] Create XMTP client v:436360a 2.714s
-[2025-03-05T19:10:23.842Z] [warn] [alice-a] Start message stream 414.197ms
-[2025-03-05T19:10:23.842Z] [warn] [alice-a] Start stream 414.848ms
-[2025-03-05T19:10:23.842Z] [warn] [alice-a] Initialize XMTP client 2.771s
-[2025-03-05T19:10:23.850Z] [warn] [joe-a] Create XMTP client v:436360a 2.761s
-[2025-03-05T19:10:23.858Z] [warn] [ivy-a] Create XMTP client v:436360a 2.769s
-[2025-03-05T19:10:23.864Z] [warn] [charlie-a] Start message stream 387.961ms
-[2025-03-05T19:10:23.865Z] [warn] [charlie-a] Start stream 388.484ms
-[2025-03-05T19:10:23.865Z] [warn] [charlie-a] Initialize XMTP client 2.790s
-[2025-03-05T19:10:23.924Z] [warn] [dave-a] Create XMTP client v:436360a 2.835s
-[2025-03-05T19:10:23.997Z] [warn] [sam-a] Initialize XMTP client 2.922s
-[2025-03-05T19:10:24.008Z] [warn] [eve-a] Start message stream 426.081ms
-[2025-03-05T19:10:24.008Z] [warn] [eve-a] Start stream 426.666ms
-[2025-03-05T19:10:24.008Z] [warn] [eve-a] Initialize XMTP client 2.930s
-[2025-03-05T19:10:24.009Z] [warn] [larry-a] Create XMTP client v:436360a 2.920s
-[2025-03-05T19:10:24.045Z] [warn] [henry-a] Start message stream 417.518ms
-[2025-03-05T19:10:24.045Z] [warn] [henry-a] Start stream 418.292ms
-[2025-03-05T19:10:24.045Z] [warn] [henry-a] Initialize XMTP client 2.962s
-[2025-03-05T19:10:24.064Z] [warn] [karen-a] Create XMTP client v:436360a 2.974s
-[2025-03-05T19:10:24.098Z] [warn] [jack-a] Start message stream 411.393ms
-[2025-03-05T19:10:24.098Z] [warn] [jack-a] Start stream 412.113ms
-[2025-03-05T19:10:24.098Z] [warn] [jack-a] Initialize XMTP client 3.012s
-[2025-03-05T19:10:24.185Z] [warn] [grace-a] Start message stream 431.107ms
-[2025-03-05T19:10:24.185Z] [warn] [grace-a] Start stream 431.613ms
-[2025-03-05T19:10:24.185Z] [warn] [grace-a] Initialize XMTP client 3.104s
-[2025-03-05T19:10:24.256Z] [warn] [ivy-a] Start message stream 397.245ms
-[2025-03-05T19:10:24.256Z] [warn] [ivy-a] Start stream 397.507ms
-[2025-03-05T19:10:24.256Z] [warn] [ivy-a] Initialize XMTP client 3.172s
-[2025-03-05T19:10:24.276Z] [warn] [joe-a] Start message stream 425.746ms
-[2025-03-05T19:10:24.276Z] [warn] [joe-a] Start stream 426.016ms
-[2025-03-05T19:10:24.276Z] [warn] [joe-a] Initialize XMTP client 3.204s
-[2025-03-05T19:10:24.298Z] [warn] [dave-a] Start message stream 372.977ms
-[2025-03-05T19:10:24.298Z] [warn] [dave-a] Start stream 373.46ms
-[2025-03-05T19:10:24.298Z] [warn] [dave-a] Initialize XMTP client 3.222s
-[2025-03-05T19:10:24.437Z] [warn] [larry-a] Start message stream 426.642ms
-[2025-03-05T19:10:24.437Z] [warn] [larry-a] Start stream 427.763ms
-[2025-03-05T19:10:24.438Z] [warn] [larry-a] Initialize XMTP client 3.350s
-[2025-03-05T19:10:24.482Z] [warn] [karen-a] Start message stream 417.455ms
-[2025-03-05T19:10:24.482Z] [warn] [karen-a] Start stream 418.226ms
-[2025-03-05T19:10:24.483Z] [warn] [karen-a] Initialize XMTP client 3.395s
-[2025-03-05T19:10:24.484Z] [info] bob 0x2b0B4798063e8aB4F34f6457E514F82C84F5baFD
-[2025-03-05T19:10:24.484Z] [info] alice 0x205696dE39844F30928C4aAcfd549F65Ba2Fa675
-[2025-03-05T19:10:24.485Z] [info] joe 0x78CC94220C775094D0c08B490FbBb3821B681f91
-[2025-03-05T19:10:24.485Z] [info] sam 0x26eEB30d8Db28E328aCcD4991Ab2bA3125c9B16c
-[2025-03-05T19:10:24.485Z] [info] charlie 0x68b57ec195F2a3b2bE9633F6F1199a99085c037E
-[2025-03-05T19:10:24.485Z] [info] dave 0x7790E3368e01b12f42369731a62bc3aB82e3c4eD
-[2025-03-05T19:10:24.485Z] [info] eve 0xCA0a3Fd2d65a2551804dD53be88AFBaDFE33346f
-[2025-03-05T19:10:24.485Z] [info] frank 0xDc493D7273cbDCE8eaA170692F4b615ab8146fD7
-[2025-03-05T19:10:24.485Z] [info] grace 0x897B1A76Ef2b91479fDF711c9792203b13CD7A07
-[2025-03-05T19:10:24.485Z] [info] henry 0x1EE7642cBAb5Faa04c8ec359899EA007c70f85Ec
-[2025-03-05T19:10:24.485Z] [info] ivy 0x873594Edf60e79a44EA858B18d8e498750Cc1376
-[2025-03-05T19:10:24.485Z] [info] jack 0x2B081d338Cf83c8849E1B7e134c99503A3d54083
-[2025-03-05T19:10:24.485Z] [info] karen 0xb4400555da7f7E32798D2EB7f70E9860B238ffd8
-[2025-03-05T19:10:24.485Z] [info] larry 0x12bb498577729f97f3017eBa85b3C7E346B4601a
-[2025-03-05T19:10:28.958Z] [info] Group created 9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [alice-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [joe-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [sam-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [charlie-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [dave-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [eve-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [frank-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [grace-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [henry-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [ivy-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [jack-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [karen-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] [larry-a] Collecting 10 messages from convo:9a04cf17ceb1715a1bd2fb02deb934ee
-[2025-03-05T19:10:28.959Z] [info] Sending message #1: gm-1-svoxns5szd
-[2025-03-05T19:10:29.909Z] [info] Sending message #2: gm-2-svoxns5szd
-[2025-03-05T19:10:30.727Z] [info] Sending message #3: gm-3-svoxns5szd
-[2025-03-05T19:10:31.280Z] [info] Sending message #4: gm-4-svoxns5szd
-[2025-03-05T19:10:32.036Z] [info] Sending message #5: gm-5-svoxns5szd
-[2025-03-05T19:10:32.831Z] [info] Sending message #6: gm-6-svoxns5szd
-[2025-03-05T19:10:33.420Z] [info] Sending message #7: gm-7-svoxns5szd
-[2025-03-05T19:10:34.004Z] [info] Sending message #8: gm-8-svoxns5szd
-[2025-03-05T19:10:34.820Z] [info] Sending message #9: gm-9-svoxns5szd
-[2025-03-05T19:10:35.995Z] [info] Sending message #10: gm-10-svoxns5szd
-[2025-03-05T19:10:36.595Z] [info] All participants received the expected number of messages.
-[2025-03-05T19:10:36.595Z] [info] allReceived true
-[2025-03-05T19:10:36.595Z] [info] Messages received in order: false ["gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd","gm-1-svoxns5szd","gm-2-svoxns5szd","gm-3-svoxns5szd","gm-4-svoxns5szd","gm-5-svoxns5szd","gm-6-svoxns5szd","gm-7-svoxns5szd","gm-8-svoxns5szd","gm-9-svoxns5szd","gm-10-svoxns5szd"]
-[2025-03-05T19:10:38.760Z] [info] Group created af82725c3f775840c860071d47b00501
-[2025-03-05T19:10:38.761Z] [warn] createGroup 2.165s
-[2025-03-05T19:10:59.524Z] [warn] sendMessages 20.763s
-[2025-03-05T19:10:59.528Z] [info] Alice received messages in order
-[2025-03-05T19:10:59.529Z] [info] Joe received messages in order
-[2025-03-05T19:10:59.529Z] [info] Sam received messages in order
+[2025-03-06T17:46:50.098Z] [info] envPath .env
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for alice: 0x756e...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for joe: 0x24d3...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for sam: 0xff32...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for charlie: 0x1711...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for dave: 0x8c23...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for eve: 0x3d13...
+[2025-03-06T17:46:50.101Z] [info] [PersonaFactory] Using env keys for frank: 0x3a88...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for grace: 0x66eb...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for henry: 0xcbfe...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for ivy: 0x5dfb...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for jack: 0x7b92...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for karen: 0xeff4...
+[2025-03-06T17:46:50.102Z] [info] [PersonaFactory] Using env keys for larry: 0x2545...
+[2025-03-06T17:46:52.396Z] [warn] [grace-a] Create XMTP client v:436360a 2.238s
+[2025-03-06T17:46:52.529Z] [warn] [bob-a] Create XMTP client v:436360a 2.372s
+[2025-03-06T17:46:52.583Z] [warn] [grace-a] Initialize XMTP client 2.429s
+[2025-03-06T17:46:52.612Z] [warn] [sam-a] Create XMTP client v:436360a 2.455s
+[2025-03-06T17:46:52.658Z] [warn] [eve-a] Create XMTP client v:436360a 2.501s
+[2025-03-06T17:46:52.770Z] [warn] [frank-a] Create XMTP client v:436360a 2.613s
+[2025-03-06T17:46:52.771Z] [warn] [joe-a] Create XMTP client v:436360a 2.614s
+[2025-03-06T17:46:52.804Z] [warn] [dave-a] Create XMTP client v:436360a 2.647s
+[2025-03-06T17:46:52.901Z] [warn] [henry-a] Create XMTP client v:436360a 2.744s
+[2025-03-06T17:46:52.927Z] [warn] [bob-a] Start message stream 397.098ms
+[2025-03-06T17:46:52.927Z] [warn] [bob-a] Start stream 397.288ms
+[2025-03-06T17:46:52.927Z] [warn] [bob-a] Initialize XMTP client 2.821s
+[2025-03-06T17:46:52.957Z] [warn] [ivy-a] Create XMTP client v:436360a 2.800s
+[2025-03-06T17:46:52.982Z] [warn] [larry-a] Create XMTP client v:436360a 2.825s
+[2025-03-06T17:46:53.028Z] [warn] [sam-a] Start message stream 415.27ms
+[2025-03-06T17:46:53.028Z] [warn] [sam-a] Start stream 415.57ms
+[2025-03-06T17:46:53.028Z] [warn] [sam-a] Initialize XMTP client 2.879s
+[2025-03-06T17:46:53.053Z] [warn] [eve-a] Start message stream 394.517ms
+[2025-03-06T17:46:53.053Z] [warn] [eve-a] Start stream 394.713ms
+[2025-03-06T17:46:53.053Z] [warn] [eve-a] Initialize XMTP client 2.901s
+[2025-03-06T17:46:53.074Z] [warn] [jack-a] Create XMTP client v:436360a 2.916s
+[2025-03-06T17:46:53.074Z] [warn] [karen-a] Create XMTP client v:436360a 2.917s
+[2025-03-06T17:46:53.152Z] [warn] [charlie-a] Create XMTP client v:436360a 2.995s
+[2025-03-06T17:46:53.188Z] [warn] [frank-a] Start message stream 418.085ms
+[2025-03-06T17:46:53.189Z] [warn] [frank-a] Start stream 418.408ms
+[2025-03-06T17:46:53.189Z] [warn] [frank-a] Initialize XMTP client 3.036s
+[2025-03-06T17:46:53.189Z] [warn] [joe-a] Start message stream 418.351ms
+[2025-03-06T17:46:53.189Z] [warn] [joe-a] Start stream 418.699ms
+[2025-03-06T17:46:53.189Z] [warn] [joe-a] Initialize XMTP client 3.041s
+[2025-03-06T17:46:53.190Z] [warn] [alice-a] Create XMTP client v:436360a 3.033s
+[2025-03-06T17:46:53.213Z] [warn] [dave-a] Start message stream 408.543ms
+[2025-03-06T17:46:53.214Z] [warn] [dave-a] Start stream 408.899ms
+[2025-03-06T17:46:53.214Z] [warn] [dave-a] Initialize XMTP client 3.062s
+[2025-03-06T17:46:53.282Z] [warn] [karen-a] Initialize XMTP client 3.126s
+[2025-03-06T17:46:53.299Z] [warn] [henry-a] Start message stream 398.527ms
+[2025-03-06T17:46:53.299Z] [warn] [henry-a] Start stream 398.624ms
+[2025-03-06T17:46:53.299Z] [warn] [henry-a] Initialize XMTP client 3.145s
+[2025-03-06T17:46:53.321Z] [warn] [ivy-a] Start message stream 363.935ms
+[2025-03-06T17:46:53.321Z] [warn] [ivy-a] Start stream 364.071ms
+[2025-03-06T17:46:53.321Z] [warn] [ivy-a] Initialize XMTP client 3.166s
+[2025-03-06T17:46:53.341Z] [warn] [larry-a] Start message stream 359.086ms
+[2025-03-06T17:46:53.341Z] [warn] [larry-a] Start stream 359.216ms
+[2025-03-06T17:46:53.342Z] [warn] [larry-a] Initialize XMTP client 3.185s
+[2025-03-06T17:46:53.371Z] [warn] [alice-a] Initialize XMTP client 3.224s
+[2025-03-06T17:46:53.478Z] [warn] [jack-a] Start message stream 404.633ms
+[2025-03-06T17:46:53.478Z] [warn] [jack-a] Start stream 404.827ms
+[2025-03-06T17:46:53.479Z] [warn] [jack-a] Initialize XMTP client 3.323s
+[2025-03-06T17:46:53.555Z] [warn] [charlie-a] Start message stream 403.388ms
+[2025-03-06T17:46:53.555Z] [warn] [charlie-a] Start stream 403.558ms
+[2025-03-06T17:46:53.555Z] [warn] [charlie-a] Initialize XMTP client 3.404s
+[2025-03-06T17:46:53.555Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T17:46:53.556Z] [info] alice 0x4C01508cB516F2215A3904af3A0226E7b66E7cF0
+[2025-03-06T17:46:53.556Z] [info] joe 0x171D51F297Cfd29619013DaC9BcBcFf5dFCCd6C6
+[2025-03-06T17:46:53.556Z] [info] sam 0xa91Eec43ca2D32C818A92fa304E48809f184AABd
+[2025-03-06T17:46:53.556Z] [info] charlie 0x2785d2586e7c370809F86d3b5ba4f03d7afdbe9d
+[2025-03-06T17:46:53.556Z] [info] dave 0xAA8A35e4fC5f8161C66c3c6837611e63C8788676
+[2025-03-06T17:46:53.556Z] [info] eve 0x7E5e9Cf009B6092aaF09aFe05B4F797B9F1De4e0
+[2025-03-06T17:46:53.556Z] [info] frank 0x882240557Fa94A1742608bAE362403E024b0a099
+[2025-03-06T17:46:53.556Z] [info] grace 0x53909BB3F658b85908E2711fE402b2549ea351bE
+[2025-03-06T17:46:53.556Z] [info] henry 0x568b42a484BEddD52D414D581D883E070210A93f
+[2025-03-06T17:46:53.556Z] [info] ivy 0x450ed7301240C0E65c91419389be28eD40D857C0
+[2025-03-06T17:46:53.556Z] [info] jack 0x8c023F6E2d01BF2A4E111eDD90Ec097Ccb90C91A
+[2025-03-06T17:46:53.556Z] [info] karen 0xb0e70A632Ae8AaFd15F71Bc43c33B59D4F9495E2
+[2025-03-06T17:46:53.556Z] [info] larry 0x421C33A72A279A5ed06417e015d20A27F3987F07
+[2025-03-06T17:46:56.213Z] [info] Group created 378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [alice-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [joe-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [sam-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [charlie-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [dave-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [eve-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [frank-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [grace-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [henry-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [ivy-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [jack-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [karen-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] [larry-a] Collecting 5 messages from convo:378dc28f3655c460697e711aad165b59
+[2025-03-06T17:46:56.214Z] [info] Sending message #1: gm-1-luur1ouncw
+[2025-03-06T17:46:57.127Z] [info] Sending message #2: gm-2-luur1ouncw
+[2025-03-06T17:46:57.927Z] [info] Sending message #3: gm-3-luur1ouncw
+[2025-03-06T17:46:58.730Z] [info] Sending message #4: gm-4-luur1ouncw
+[2025-03-06T17:46:59.540Z] [info] Sending message #5: gm-5-luur1ouncw
+[2025-03-06T17:47:00.327Z] [info] All participants received the expected number of messages.
+[2025-03-06T17:47:00.327Z] [info] allReceived true
+[2025-03-06T17:47:00.330Z] [info] Expected messages pattern: gm-[1-5]-luur1ouncw
+[2025-03-06T17:47:00.330Z] [info] Reception percentage: 100.00% (65/65 messages)
+[2025-03-06T17:47:00.330Z] [info] Order percentage: 100.00% (13/13 personas)
+[2025-03-06T17:47:07.057Z] [info] Expected messages pattern: gm-[1-5]-luur1ouncw
+[2025-03-06T17:47:07.057Z] [info] Reception percentage: 100.00% (20/20 messages)
+[2025-03-06T17:47:07.057Z] [info] Order percentage: 100.00% (4/4 personas)

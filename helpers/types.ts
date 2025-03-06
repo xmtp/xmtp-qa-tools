@@ -46,11 +46,11 @@ export type GroupMetadataContent = {
 
 // Default personas as an enum
 const defaultNames = [
+  "bob",
+  "alice",
   "fabri",
   "bot",
   "elon",
-  "alice",
-  "bob",
   "joe",
   "charlie",
   "dave",
