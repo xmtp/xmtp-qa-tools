@@ -1,10 +1,11 @@
-[2025-03-06T22:00:45.778Z] [info] envPath .env
-[2025-03-06T22:00:45.781Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
-[2025-03-06T22:00:45.810Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
-[2025-03-06T22:00:49.518Z] [warn] [bob-a] Create XMTP client v:undefined 3.708s
-[2025-03-06T22:00:49.878Z] [warn] [bob-a] Start message stream 359.713ms
-[2025-03-06T22:00:49.878Z] [warn] [bob-a] Start stream 360.227ms
-[2025-03-06T22:00:49.879Z] [warn] [bob-a] Initialize XMTP client 4.097s
-[2025-03-06T22:00:49.879Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
-[2025-03-06T22:00:58.024Z] [info] Messages before sending 1
-[2025-03-06T22:01:00.764Z] [warn] TS_Gm > gm-bot: should measure sending a gm 10.884s
+[2025-03-06T22:17:13.149Z] [info] envPath .env
+[2025-03-06T22:17:13.169Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T22:17:13.196Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
+[2025-03-06T22:17:17.132Z] [warn] [bob-a] Create XMTP client v:undefined 3.936s
+[2025-03-06T22:17:17.563Z] [warn] [bob-a] Start message stream 430.44ms
+[2025-03-06T22:17:17.564Z] [warn] [bob-a] Start stream 431.078ms
+[2025-03-06T22:17:17.564Z] [warn] [bob-a] Initialize XMTP client 4.393s
+[2025-03-06T22:17:17.564Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T22:17:23.481Z] [info] Messages before sending 1
+[2025-03-06T22:17:26.215Z] [info] Messages after sending 3
+[2025-03-06T22:17:26.215Z] [warn] TS_Gm > gm-bot: should measure sending a gm 8.650s
