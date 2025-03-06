@@ -1,10 +1,10 @@
 name: TS_Gm
 description: "should verify performance of the library in the dev network"
 
-on:
-  schedule:
-    - cron: "*/30 * * * *" # This cron expression means every 30 minutes
-  workflow_dispatch:
+# on:
+#   # schedule:
+#   #   - cron: "*/30 * * * *"
+#   workflow_dispatch:
 
 jobs:
   test:

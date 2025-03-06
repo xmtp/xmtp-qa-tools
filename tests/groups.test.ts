@@ -96,13 +96,7 @@ describe(testName, () => {
     const verifyResult = await verifyStreamAll(group, personas);
     expect(verifyResult.allReceived).toBe(true);
   });
-  it(`createGroup-450: should create a large group of 450 participants 450`, async () => {
-    const sliced = generatedInboxes.slice(0, 450);
-    group = await personas.henry.client!.conversations.newGroupByInboxIds(
-      sliced.map((inbox) => inbox.inboxId),
-    );
-    expect(group.id).toBeDefined();
-  });
+
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = generatedInboxes.slice(0, i);

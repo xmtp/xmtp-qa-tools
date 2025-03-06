@@ -1,0 +1,51 @@
+[2025-03-06T22:22:37.898Z] [info] envPath .env
+[2025-03-06T22:22:37.900Z] [info] [PersonaFactory] Using env keys for henry: 0xcbfe...
+[2025-03-06T22:22:37.900Z] [info] [PersonaFactory] Using env keys for ivy: 0x5dfb...
+[2025-03-06T22:22:37.900Z] [info] [PersonaFactory] Using env keys for jack: 0x7b92...
+[2025-03-06T22:22:37.901Z] [info] [PersonaFactory] Using env keys for karen: 0xeff4...
+[2025-03-06T22:22:37.901Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-06T22:22:37.924Z] [info] [PersonaFactory] Using env keys for larry: 0x2545...
+[2025-03-06T22:22:37.924Z] [info] [PersonaFactory] Using env keys for mary: 0xbba0...
+[2025-03-06T22:22:37.925Z] [info] [PersonaFactory] Using env keys for nancy: 0x1ceb...
+[2025-03-06T22:22:37.925Z] [info] [PersonaFactory] Using env keys for oscar: 0x0060...
+[2025-03-06T22:22:40.111Z] [warn] [ivy-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.175s
+[2025-03-06T22:22:40.136Z] [warn] [henry-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.200s
+[2025-03-06T22:22:40.254Z] [warn] [mary-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.318s
+[2025-03-06T22:22:40.401Z] [warn] [karen-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.464s
+[2025-03-06T22:22:40.456Z] [warn] [oscar-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.520s
+[2025-03-06T22:22:40.464Z] [warn] [jack-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.528s
+[2025-03-06T22:22:40.511Z] [warn] [larry-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.574s
+[2025-03-06T22:22:40.536Z] [warn] [ivy-a] Start message stream 425.108ms
+[2025-03-06T22:22:40.537Z] [warn] [ivy-a] Start stream 425.942ms
+[2025-03-06T22:22:40.537Z] [warn] [ivy-a] Initialize XMTP client 2.607s
+[2025-03-06T22:22:40.556Z] [warn] [henry-a] Start message stream 419.607ms
+[2025-03-06T22:22:40.556Z] [warn] [henry-a] Start stream 420.345ms
+[2025-03-06T22:22:40.556Z] [warn] [henry-a] Initialize XMTP client 2.629s
+[2025-03-06T22:22:40.615Z] [warn] [nancy-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 2.679s
+[2025-03-06T22:22:40.664Z] [warn] [mary-a] Start message stream 409.942ms
+[2025-03-06T22:22:40.666Z] [warn] [mary-a] Start stream 411.978ms
+[2025-03-06T22:22:40.666Z] [warn] [mary-a] Initialize XMTP client 2.733s
+[2025-03-06T22:22:40.690Z] [warn] [larry-a] Initialize XMTP client 2.757s
+[2025-03-06T22:22:40.853Z] [warn] [karen-a] Start message stream 451.764ms
+[2025-03-06T22:22:40.853Z] [warn] [karen-a] Start stream 451.992ms
+[2025-03-06T22:22:40.853Z] [warn] [karen-a] Initialize XMTP client 2.922s
+[2025-03-06T22:22:40.854Z] [warn] [oscar-a] Start message stream 398.133ms
+[2025-03-06T22:22:40.854Z] [warn] [oscar-a] Start stream 398.255ms
+[2025-03-06T22:22:40.854Z] [warn] [oscar-a] Initialize XMTP client 2.919s
+[2025-03-06T22:22:40.868Z] [warn] [jack-a] Start message stream 403.398ms
+[2025-03-06T22:22:40.868Z] [warn] [jack-a] Start stream 403.484ms
+[2025-03-06T22:22:40.868Z] [warn] [jack-a] Initialize XMTP client 2.937s
+[2025-03-06T22:22:40.871Z] [warn] [nancy-a] Initialize XMTP client 2.936s
+[2025-03-06T22:22:41.957Z] [warn] [randomguy-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 4.021s
+[2025-03-06T22:22:42.356Z] [warn] [randomguy-a] Start message stream 399.001ms
+[2025-03-06T22:22:42.357Z] [warn] [randomguy-a] Start stream 399.375ms
+[2025-03-06T22:22:42.357Z] [warn] [randomguy-a] Initialize XMTP client 4.425s
+[2025-03-06T22:22:42.357Z] [info] henry 0x568b42a484BEddD52D414D581D883E070210A93f
+[2025-03-06T22:22:42.357Z] [info] ivy 0x450ed7301240C0E65c91419389be28eD40D857C0
+[2025-03-06T22:22:42.357Z] [info] jack 0x8c023F6E2d01BF2A4E111eDD90Ec097Ccb90C91A
+[2025-03-06T22:22:42.357Z] [info] karen 0xb0e70A632Ae8AaFd15F71Bc43c33B59D4F9495E2
+[2025-03-06T22:22:42.357Z] [info] randomguy 0x1B668c862ca98B41Cf964DCAfaefAafB52a2DaB9
+[2025-03-06T22:22:42.357Z] [info] larry 0x421C33A72A279A5ed06417e015d20A27F3987F07
+[2025-03-06T22:22:42.357Z] [info] mary 0x5a3060b08d2bCB0CB22c917137a7c231a3817DbE
+[2025-03-06T22:22:42.357Z] [info] nancy 0x7D8c9c4C693be93C87c5169085665201E1141D9C
+[2025-03-06T22:22:42.357Z] [info] oscar 0x6d56c4B96Afc896564e890B0B3938970ab3b8770

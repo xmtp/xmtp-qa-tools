@@ -125,7 +125,7 @@ export class WorkerClient extends Worker {
 
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-    const version = Client.version.match(/ci@([a-f0-9]+)/)?.[1];
+    const version = Client.version;
     const dbPath = getDbPath(
       this.name,
       await signer.getAddress(),
