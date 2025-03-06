@@ -174,6 +174,16 @@ describe(testName, () => {
       await (group as Group).updateName("Large Group");
       expect((group as Group)?.name).toBe("Large Group");
     });
+    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+      const previousMembers = await group.members();
+      const randomMember =
+        previousMembers[Math.floor(Math.random() * previousMembers.length)];
+      await (group as Group).removeMembers([
+        randomMember.accountAddresses[0] as `0x${string}`,
+      ]);
+      const members = await group.members();
+      expect(members.length).toBe(previousMembers.length - 1);
+    });
     it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
