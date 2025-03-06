@@ -172,12 +172,12 @@ describe(testName, () => {
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
       await (group as Group).updateName("Large Group");
-      expect((group as Group)?.name).toBe("Large Group");
+      expect((group as Group).name).toBe("Large Group");
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       const previousMembers = await group.members();
       await (group as Group).removeMembers([
-        previousMembers[1].accountAddresses[1] as `0x${string}`,
+        previousMembers[1].accountAddresses[0] as `0x${string}`,
       ]);
       const members = await group.members();
       expect(members.length).toBe(previousMembers.length - 1);

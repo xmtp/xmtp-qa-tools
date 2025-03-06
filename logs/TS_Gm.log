@@ -1,11 +1,20 @@
-[2025-03-06T22:17:13.149Z] [info] envPath .env
-[2025-03-06T22:17:13.169Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
-[2025-03-06T22:17:13.196Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
-[2025-03-06T22:17:17.132Z] [warn] [bob-a] Create XMTP client v:undefined 3.936s
-[2025-03-06T22:17:17.563Z] [warn] [bob-a] Start message stream 430.44ms
-[2025-03-06T22:17:17.564Z] [warn] [bob-a] Start stream 431.078ms
-[2025-03-06T22:17:17.564Z] [warn] [bob-a] Initialize XMTP client 4.393s
-[2025-03-06T22:17:17.564Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
-[2025-03-06T22:17:23.481Z] [info] Messages before sending 1
-[2025-03-06T22:17:26.215Z] [info] Messages after sending 3
-[2025-03-06T22:17:26.215Z] [warn] TS_Gm > gm-bot: should measure sending a gm 8.650s
+[2025-03-06T23:19:07.699Z] [info] envPath .env
+[2025-03-06T23:19:07.704Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T23:19:07.727Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
+[2025-03-06T23:19:11.578Z] [warn] [bob-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 3.851s
+[2025-03-06T23:19:11.976Z] [warn] [bob-a] Start message stream 397.366ms
+[2025-03-06T23:19:11.977Z] [warn] [bob-a] Start stream 398.488ms
+[2025-03-06T23:19:11.977Z] [warn] [bob-a] Initialize XMTP client 4.272s
+[2025-03-06T23:19:11.978Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T23:19:17.063Z] [info] Messages before sending 1
+[2025-03-06T23:19:19.810Z] [info] Messages after sending 3
+[2025-03-06T23:19:19.810Z] [warn] TS_Gm > gm-bot: should measure sending a gm 7.831s
+[2025-03-06T23:19:22.588Z] [info] Starting test
+[2025-03-06T23:19:23.531Z] [info] Connected
+[2025-03-06T23:19:23.799Z] [info] Navigated to GM bot
+[2025-03-06T23:19:32.806Z] [info] Sending message: gm-9kw5dtv1xxr
+[2025-03-06T23:19:32.852Z] [info] Sent message: gm-9kw5dtv1xxr
+[2025-03-06T23:19:36.860Z] [info] Found response
+[2025-03-06T23:19:36.866Z] [info] Found messages
+[2025-03-06T23:19:36.868Z] [info] Received response: gm
+[2025-03-06T23:19:36.993Z] [warn] TS_Gm > should respond to a message 17.182s
