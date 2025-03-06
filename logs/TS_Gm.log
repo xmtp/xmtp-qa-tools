@@ -1,20 +1,27 @@
-[2025-03-06T23:19:07.699Z] [info] envPath .env
-[2025-03-06T23:19:07.704Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
-[2025-03-06T23:19:07.727Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
-[2025-03-06T23:19:11.578Z] [warn] [bob-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 3.851s
-[2025-03-06T23:19:11.976Z] [warn] [bob-a] Start message stream 397.366ms
-[2025-03-06T23:19:11.977Z] [warn] [bob-a] Start stream 398.488ms
-[2025-03-06T23:19:11.977Z] [warn] [bob-a] Initialize XMTP client 4.272s
-[2025-03-06T23:19:11.978Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
-[2025-03-06T23:19:17.063Z] [info] Messages before sending 1
-[2025-03-06T23:19:19.810Z] [info] Messages after sending 3
-[2025-03-06T23:19:19.810Z] [warn] TS_Gm > gm-bot: should measure sending a gm 7.831s
-[2025-03-06T23:19:22.588Z] [info] Starting test
-[2025-03-06T23:19:23.531Z] [info] Connected
-[2025-03-06T23:19:23.799Z] [info] Navigated to GM bot
-[2025-03-06T23:19:32.806Z] [info] Sending message: gm-9kw5dtv1xxr
-[2025-03-06T23:19:32.852Z] [info] Sent message: gm-9kw5dtv1xxr
-[2025-03-06T23:19:36.860Z] [info] Found response
-[2025-03-06T23:19:36.866Z] [info] Found messages
-[2025-03-06T23:19:36.868Z] [info] Received response: gm
-[2025-03-06T23:19:36.993Z] [warn] TS_Gm > should respond to a message 17.182s
+[2025-03-06T23:36:24.472Z] [info] envPath .env
+[2025-03-06T23:36:24.477Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T23:36:24.505Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
+[2025-03-06T23:36:28.327Z] [warn] [bob-a] Create XMTP client v:main@6bd613d (2025-03-06 14:52:58 +0000) 3.822s
+[2025-03-06T23:36:28.724Z] [warn] [bob-a] Start message stream 396.144ms
+[2025-03-06T23:36:28.725Z] [warn] [bob-a] Start stream 397.615ms
+[2025-03-06T23:36:28.726Z] [warn] [bob-a] Initialize XMTP client 4.248s
+[2025-03-06T23:36:28.726Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T23:36:28.727Z] [warn] beforeAll 4.251s
+[2025-03-06T23:36:33.144Z] [warn] create-conversation 4.415s
+[2025-03-06T23:36:33.790Z] [warn] sync-conversation 645.833ms
+[2025-03-06T23:36:33.791Z] [info] Messages before sending 1
+[2025-03-06T23:36:34.538Z] [warn] send-message 745.856ms
+[2025-03-06T23:36:36.541Z] [warn] wait-for-response 2.001s
+[2025-03-06T23:36:36.548Z] [info] Messages after sending 3
+[2025-03-06T23:36:36.548Z] [warn] gm-bot-test 7.819s
+[2025-03-06T23:36:36.549Z] [warn] TS_Gm > gm-bot: should measure sending a gm 7.820s
+[2025-03-06T23:36:37.276Z] [info] Starting test
+[2025-03-06T23:36:37.971Z] [info] Connected
+[2025-03-06T23:36:38.232Z] [info] Navigated to GM bot
+[2025-03-06T23:36:47.275Z] [info] Sending message: gm-px4lethv6z
+[2025-03-06T23:36:47.308Z] [info] Sent message: gm-px4lethv6z
+[2025-03-06T23:36:51.332Z] [info] Found response
+[2025-03-06T23:36:51.341Z] [info] Found messages
+[2025-03-06T23:36:51.345Z] [info] Received response: gm
+[2025-03-06T23:36:51.454Z] [warn] respond-to-message-test 14.904s
+[2025-03-06T23:36:51.454Z] [warn] TS_Gm > should respond to a message 14.904s
