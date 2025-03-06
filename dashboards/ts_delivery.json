@@ -31,7 +31,8 @@
               { "comparator": "<", "value": 99, "palette": "white_on_red" }
             ]
           }
-        ]
+        ],
+        "autoscale": true
       },
       "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
     },
@@ -64,7 +65,8 @@
               { "comparator": "<", "value": 99, "palette": "white_on_red" }
             ]
           }
-        ]
+        ],
+        "autoscale": true
       },
       "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
     },
@@ -97,7 +99,8 @@
               { "comparator": "<", "value": 99, "palette": "white_on_red" }
             ]
           }
-        ]
+        ],
+        "autoscale": true
       },
       "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
     },
@@ -130,7 +133,8 @@
               { "comparator": "<", "value": 99, "palette": "white_on_red" }
             ]
           }
-        ]
+        ],
+        "autoscale": true
       },
       "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
     },
