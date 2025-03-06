@@ -2,7 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import {
   defaultValues,
-  type Conversation,
+  type Group,
   type Persona,
   type VerifyStreamResult,
 } from "@helpers/types";
@@ -28,7 +28,7 @@ describe(
   testName,
   () => {
     let personas: Record<string, Persona>;
-    let group: Conversation;
+    let group: Group;
     let collectedMessages: VerifyStreamResult;
     const randomSuffix = Math.random().toString(36).substring(2, 15);
 
@@ -68,7 +68,7 @@ describe(
       expect(collectedMessages.allReceived).toBe(true);
     });
 
-    it("tc_stream_order: verify message order when receiving via streams", async () => {
+    it("tc_stream_order: verify message order when receiving via streams", () => {
       // Group messages by persona
       const messagesByPersona: string[][] = [];
 
@@ -109,10 +109,12 @@ describe(
       const messagesByPersona: string[][] = [];
 
       for (const persona of personasFromGroup) {
-        const conversation = persona.client!.conversations.getConversationById(
-          group.id,
-        );
-        const messages = await conversation!.messages();
+        const conversation =
+          await persona.client!.conversations.getConversationById(group.id);
+        if (!conversation) {
+          throw new Error("Conversation not found");
+        }
+        const messages = await conversation.messages();
         const filteredMessages: string[] = [];
 
         for (const message of messages) {

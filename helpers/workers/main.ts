@@ -153,7 +153,7 @@ export class WorkerClient extends Worker {
     } else if (this.typeofStream === "conversation") {
       // Start conversation streaming
       console.log(`[${this.nameId}] Start conversation stream`);
-      this.startConversationStream();
+      await this.startConversationStream();
     } else if (this.typeofStream === "consent") {
       // Start consent streaming
       console.log(`[${this.nameId}] Start consent stream`);
@@ -239,11 +239,10 @@ export class WorkerClient extends Worker {
    * Internal helper to stream conversations from the client,
    * then emit them as 'stream_conversation' events on this Worker.
    */
-  private startConversationStream() {
+  private async startConversationStream() {
     console.time(`[${this.nameId}] Start conversation stream`);
 
-    // Get initial list of conversations
-    const initialConversations = this.client.conversations.list();
+    const initialConversations = await this.client.conversations.list();
     const knownConversations = new Set(initialConversations.map((c) => c.id));
 
     console.log(

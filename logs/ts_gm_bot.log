@@ -1,23 +1,16 @@
-[2025-03-04T16:05:21.588Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_gm_bot","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-04T16:05:21.591Z] [info] [PersonaFactory] Using env keys for bob: 0x57b9...
-[2025-03-04T16:05:21.619Z] [warn] Creating directory /Users/fabrizioguespe/DevRel/qa-testing/.data/bob
-[2025-03-04T16:05:26.281Z] [warn] [bob-a] Create XMTP client v:436360a 4.661s
-[2025-03-04T16:05:26.724Z] [warn] [bob-a] Start message stream 439.11ms
-[2025-03-04T16:05:26.725Z] [warn] [bob-a] Start stream 444.552ms
-[2025-03-04T16:05:26.726Z] [warn] [bob-a] Initialize XMTP client 5.133s
-[2025-03-04T16:05:26.726Z] [info] bob 0xfe74339Ebea36722De360fC8a3268aEaeB7657B8
-[2025-03-04T16:05:35.470Z] [info] Messages before sending 1
-[2025-03-04T16:05:37.930Z] [info] Messages after sending 3
-[2025-03-04T16:05:37.931Z] [warn] ts_gm_bot > gm-bot: should measure sending a gm 11.203s
-[2025-03-04T16:05:37.931Z] [info] metricName ts_gm_bot.gm-bot  should measure sending a gm
-[2025-03-04T16:05:38.953Z] [info] Starting test
-[2025-03-04T16:05:39.074Z] [warn] Slow connection detected - total: 1125.304ms, TLS: 906.4440000000001ms, processing: 218.86000000000004ms
-[2025-03-04T16:05:40.069Z] [info] Connected
-[2025-03-04T16:05:40.559Z] [info] Navigated to GM bot
-[2025-03-04T16:05:52.490Z] [info] Sending message: gm-07e9izixmutk
-[2025-03-04T16:05:52.537Z] [info] Sent message: gm-07e9izixmutk
-[2025-03-04T16:05:55.546Z] [info] Found response
-[2025-03-04T16:05:55.551Z] [info] Found messages
-[2025-03-04T16:05:55.553Z] [info] Received response: gm
-[2025-03-04T16:05:55.691Z] [warn] ts_gm_bot > should respond to a message 17.757s
-[2025-03-04T16:05:55.691Z] [info] metricName ts_gm_bot.should respond to a message undefined
+[2025-03-06T19:41:03.549Z] [info] envPath .env
+[2025-03-06T19:41:03.550Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:TS_Gm","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-06T19:41:03.553Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T19:41:03.582Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
+[2025-03-06T19:41:07.568Z] [warn] [bob-a] Create XMTP client v:undefined 3.985s
+[2025-03-06T19:41:07.986Z] [warn] [bob-a] Start message stream 417.174ms
+[2025-03-06T19:41:07.986Z] [warn] [bob-a] Start stream 417.816ms
+[2025-03-06T19:41:07.987Z] [warn] [bob-a] Initialize XMTP client 4.432s
+[2025-03-06T19:41:07.987Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T19:41:13.578Z] [info] Messages before sending 1
+[2025-03-06T19:41:16.340Z] [info] Messages after sending 3
+[2025-03-06T19:41:16.341Z] [warn] TS_Gm > gm-bot: should measure sending a gm 8.353s
+[2025-03-06T19:41:17.171Z] [warn] Slow connection detected - total: 801.129ms, TLS: 611.212ms, processing: 189.917ms
+[2025-03-06T19:41:19.177Z] [info] Starting test
+[2025-03-06T19:41:19.408Z] [error] Test failed: {"name":"Error"}
+[2025-03-06T19:41:19.554Z] [warn] TS_Gm > should respond to a message 3.209s

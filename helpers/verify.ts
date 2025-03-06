@@ -1,5 +1,6 @@
 import {
   type Conversation,
+  type Group,
   type Persona,
   type VerifyStreamResult,
 } from "./types";
@@ -45,7 +46,7 @@ const nameUpdateGenerator = (i: number, suffix: string) => {
 };
 
 const nameUpdater = async (group: Conversation, payload: string) => {
-  await group.updateName(payload);
+  await (group as Group).updateName(payload);
 };
 
 export async function verifyStreamAll(

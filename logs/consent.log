@@ -1,83 +1,88 @@
-[2025-03-04T19:29:00.369Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:consent","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-04T19:29:00.372Z] [info] [PersonaFactory] Using env keys for henry: 0xe914...
-[2025-03-04T19:29:00.372Z] [info] [PersonaFactory] Using env keys for ivy: 0xcb02...
-[2025-03-04T19:29:00.372Z] [info] [PersonaFactory] Using env keys for jack: 0xca0d...
-[2025-03-04T19:29:00.372Z] [info] [PersonaFactory] Using env keys for karen: 0x606f...
-[2025-03-04T19:29:00.372Z] [info] [PersonaFactory] Generating new keys for randomguy
-[2025-03-04T19:29:00.400Z] [info] [PersonaFactory] Using env keys for larry: 0x05e9...
-[2025-03-04T19:29:00.400Z] [info] [PersonaFactory] Using env keys for mary: 0x24fe...
-[2025-03-04T19:29:00.400Z] [info] [PersonaFactory] Using env keys for nancy: 0x2705...
-[2025-03-04T19:29:00.400Z] [info] [PersonaFactory] Using env keys for oscar: 0x680e...
-[2025-03-04T19:29:02.754Z] [warn] [henry-a] Create XMTP client v:436360a 2.338s
-[2025-03-04T19:29:02.754Z] [info] [henry-a] Start consent stream
-[2025-03-04T19:29:02.755Z] [info] [henry-a] Consent stream started
-[2025-03-04T19:29:02.756Z] [warn] [henry-a] Initialize XMTP client 2.353s
-[2025-03-04T19:29:02.874Z] [warn] [karen-a] Create XMTP client v:436360a 2.459s
-[2025-03-04T19:29:02.874Z] [info] [karen-a] Start consent stream
-[2025-03-04T19:29:02.875Z] [info] [karen-a] Consent stream started
-[2025-03-04T19:29:02.875Z] [warn] [karen-a] Initialize XMTP client 2.467s
-[2025-03-04T19:29:02.953Z] [warn] [jack-a] Create XMTP client v:436360a 2.537s
-[2025-03-04T19:29:02.954Z] [info] [jack-a] Start consent stream
-[2025-03-04T19:29:02.955Z] [info] [jack-a] Consent stream started
-[2025-03-04T19:29:02.955Z] [warn] [jack-a] Initialize XMTP client 2.548s
-[2025-03-04T19:29:03.039Z] [warn] [mary-a] Create XMTP client v:436360a 2.623s
-[2025-03-04T19:29:03.040Z] [info] [mary-a] Start consent stream
-[2025-03-04T19:29:03.041Z] [info] [mary-a] Consent stream started
-[2025-03-04T19:29:03.041Z] [warn] [mary-a] Initialize XMTP client 2.629s
-[2025-03-04T19:29:03.065Z] [warn] [ivy-a] Create XMTP client v:436360a 2.650s
-[2025-03-04T19:29:03.065Z] [info] [ivy-a] Start consent stream
-[2025-03-04T19:29:03.065Z] [info] [ivy-a] Consent stream started
-[2025-03-04T19:29:03.065Z] [warn] [ivy-a] Initialize XMTP client 2.660s
-[2025-03-04T19:29:03.101Z] [warn] [larry-a] Create XMTP client v:436360a 2.685s
-[2025-03-04T19:29:03.101Z] [info] [larry-a] Start consent stream
-[2025-03-04T19:29:03.101Z] [info] [larry-a] Consent stream started
-[2025-03-04T19:29:03.101Z] [warn] [larry-a] Initialize XMTP client 2.690s
-[2025-03-04T19:29:03.167Z] [warn] [oscar-a] Create XMTP client v:436360a 2.751s
-[2025-03-04T19:29:03.167Z] [info] [oscar-a] Start consent stream
-[2025-03-04T19:29:03.167Z] [info] [oscar-a] Consent stream started
-[2025-03-04T19:29:03.167Z] [warn] [oscar-a] Initialize XMTP client 2.753s
-[2025-03-04T19:29:03.224Z] [warn] [nancy-a] Create XMTP client v:436360a 2.809s
-[2025-03-04T19:29:03.224Z] [info] [nancy-a] Start consent stream
-[2025-03-04T19:29:03.225Z] [info] [nancy-a] Consent stream started
-[2025-03-04T19:29:03.225Z] [warn] [nancy-a] Initialize XMTP client 2.812s
-[2025-03-04T19:29:05.453Z] [warn] [randomguy-a] Create XMTP client v:436360a 5.038s
-[2025-03-04T19:29:05.453Z] [info] [randomguy-a] Start consent stream
-[2025-03-04T19:29:05.453Z] [info] [randomguy-a] Consent stream started
-[2025-03-04T19:29:05.454Z] [warn] [randomguy-a] Initialize XMTP client 5.045s
-[2025-03-04T19:29:05.454Z] [info] henry 0x1556528772E9D1aCaE53436110954aF49ce4EC35
-[2025-03-04T19:29:05.454Z] [info] ivy 0x1b2c9833574DcD573921E09de28B4E660d9801B2
-[2025-03-04T19:29:05.454Z] [info] jack 0x6c880931242F1470a7c5aCe83C5cA225745C75b4
-[2025-03-04T19:29:05.454Z] [info] karen 0x4F1bd0B57D53c64A8d448f307b44D9255B2392be
-[2025-03-04T19:29:05.454Z] [info] randomguy 0x215bcd27F6B254F163bA4E9ab26784a57C338D30
-[2025-03-04T19:29:05.454Z] [info] larry 0x51144C5b4a207658843599c299F11A9E240248B6
-[2025-03-04T19:29:05.454Z] [info] mary 0xeD8EecdE3834BC1e76E5B1dF0d2B214936c6632B
-[2025-03-04T19:29:05.454Z] [info] nancy 0x894e32B8F197dcE280e55d1746262d601359FeA5
-[2025-03-04T19:29:05.454Z] [info] oscar 0x29A79FE3eE7e753A4630718CD6aFC384855c3a37
-[2025-03-04T19:29:05.455Z] [info] Creating DM conversation with address: 0x215bcd27F6B254F163bA4E9ab26784a57C338D30
-[2025-03-04T19:29:08.131Z] [info] [henry-a] Collecting 1 consent updates
-[2025-03-04T19:29:08.588Z] [info] Consent state: 0
-[2025-03-04T19:29:08.588Z] [warn] get-initial-consent 456.952ms
-[2025-03-04T19:29:08.589Z] [info] Alice is allowing Bob...
-[2025-03-04T19:29:09.364Z] [info] [henry-a] Received consent update: [{"entityType":1,"state":1,"entity":"3143c862879ba4da5001b7680ca0086973926ccec87f9b7bed2025c5ef384a81"},{"entityType":2,"state":1,"entity":"0x215bcd27F6B254F163bA4E9ab26784a57C338D30"}]
-[2025-03-04T19:29:09.364Z] [warn] set-consent-state 775.354ms
-[2025-03-04T19:29:10.028Z] [warn] get-updated-consent 663.447ms
-[2025-03-04T19:29:10.030Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"3143c862879ba4da5001b7680ca0086973926ccec87f9b7bed2025c5ef384a81"},{"entityType":2,"state":1,"entity":"0x215bcd27F6B254F163bA4E9ab26784a57C338D30"}]}]
-[2025-03-04T19:29:10.032Z] [warn] consent > should stream consent updates when a user is blocked 4.577s
-[2025-03-04T19:29:10.032Z] [info] metricName consent.should stream consent updates when a user is blocked undefined
-[2025-03-04T19:29:10.036Z] [info] Creating a group conversation...
-[2025-03-04T19:29:10.945Z] [warn] Slow connection detected - total: 894.138ms, TLS: 658.452ms, processing: 235.68599999999995ms
-[2025-03-04T19:29:13.652Z] [warn] create-group 3.616s
-[2025-03-04T19:29:13.653Z] [info] Group created with 5 members
-[2025-03-04T19:29:13.653Z] [info] [henry-a] Collecting 1 consent updates
-[2025-03-04T19:29:13.653Z] [info] Alice is blocking the group...
-[2025-03-04T19:29:13.654Z] [info] [henry-a] Received consent update: [{"entityType":0,"state":2,"entity":"00c6a8148a47fec65ca4e9c26f30a12a"}]
-[2025-03-04T19:29:13.654Z] [info] Alice's consent state for the group: 2
-[2025-03-04T19:29:13.654Z] [info] Testing individual member consent states...
-[2025-03-04T19:29:15.160Z] [info] Alice's consent state for Bob is : denied
-[2025-03-04T19:29:15.161Z] [warn] get-bob-consent 1.275s
-[2025-03-04T19:29:15.161Z] [info] All consent updates received: 1
-[2025-03-04T19:29:15.161Z] [info] Unblocking all entities...
-[2025-03-04T19:29:15.682Z] [warn] unblock-all 520.326ms
-[2025-03-04T19:29:15.683Z] [info] Final group consent state: 1
-[2025-03-04T19:29:15.685Z] [warn] consent > should manage consent for all members in a group 5.649s
-[2025-03-04T19:29:15.685Z] [info] metricName consent.should manage consent for all members in a group undefined
+[2025-03-06T19:37:18.109Z] [info] envPath .env
+[2025-03-06T19:37:18.112Z] [info] [PersonaFactory] Using env keys for henry: 0xcbfe...
+[2025-03-06T19:37:18.112Z] [info] [PersonaFactory] Using env keys for ivy: 0x5dfb...
+[2025-03-06T19:37:18.112Z] [info] [PersonaFactory] Using env keys for jack: 0x7b92...
+[2025-03-06T19:37:18.112Z] [info] [PersonaFactory] Using env keys for karen: 0xeff4...
+[2025-03-06T19:37:18.113Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-06T19:37:18.139Z] [info] [PersonaFactory] Using env keys for larry: 0x2545...
+[2025-03-06T19:37:18.139Z] [info] [PersonaFactory] Using env keys for mary: 0xbba0...
+[2025-03-06T19:37:18.139Z] [info] [PersonaFactory] Using env keys for nancy: 0x1ceb...
+[2025-03-06T19:37:18.139Z] [info] [PersonaFactory] Using env keys for oscar: 0x0060...
+[2025-03-06T19:37:18.157Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/henry
+[2025-03-06T19:37:18.157Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/ivy
+[2025-03-06T19:37:18.158Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/jack
+[2025-03-06T19:37:18.158Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/karen
+[2025-03-06T19:37:18.159Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/randomguy
+[2025-03-06T19:37:18.159Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/larry
+[2025-03-06T19:37:18.159Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/mary
+[2025-03-06T19:37:18.159Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/nancy
+[2025-03-06T19:37:18.159Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/oscar
+[2025-03-06T19:37:21.972Z] [warn] [randomguy-a] Create XMTP client v:undefined 3.814s
+[2025-03-06T19:37:21.973Z] [info] [randomguy-a] Start consent stream
+[2025-03-06T19:37:21.973Z] [info] [randomguy-a] Consent stream started
+[2025-03-06T19:37:21.973Z] [warn] [randomguy-a] Initialize XMTP client 3.823s
+[2025-03-06T19:37:22.009Z] [warn] [karen-a] Create XMTP client v:undefined 3.851s
+[2025-03-06T19:37:22.009Z] [info] [karen-a] Start consent stream
+[2025-03-06T19:37:22.009Z] [info] [karen-a] Consent stream started
+[2025-03-06T19:37:22.009Z] [warn] [karen-a] Initialize XMTP client 3.861s
+[2025-03-06T19:37:22.049Z] [warn] [henry-a] Create XMTP client v:undefined 3.892s
+[2025-03-06T19:37:22.049Z] [info] [henry-a] Start consent stream
+[2025-03-06T19:37:22.049Z] [info] [henry-a] Consent stream started
+[2025-03-06T19:37:22.049Z] [warn] [henry-a] Initialize XMTP client 3.907s
+[2025-03-06T19:37:22.161Z] [warn] [ivy-a] Create XMTP client v:undefined 4.004s
+[2025-03-06T19:37:22.161Z] [info] [ivy-a] Start consent stream
+[2025-03-06T19:37:22.161Z] [info] [ivy-a] Consent stream started
+[2025-03-06T19:37:22.161Z] [warn] [ivy-a] Initialize XMTP client 4.016s
+[2025-03-06T19:37:22.162Z] [warn] [jack-a] Create XMTP client v:undefined 4.003s
+[2025-03-06T19:37:22.162Z] [info] [jack-a] Start consent stream
+[2025-03-06T19:37:22.162Z] [info] [jack-a] Consent stream started
+[2025-03-06T19:37:22.162Z] [warn] [jack-a] Initialize XMTP client 4.015s
+[2025-03-06T19:37:22.211Z] [warn] [nancy-a] Create XMTP client v:undefined 4.052s
+[2025-03-06T19:37:22.211Z] [info] [nancy-a] Start consent stream
+[2025-03-06T19:37:22.211Z] [info] [nancy-a] Consent stream started
+[2025-03-06T19:37:22.211Z] [warn] [nancy-a] Initialize XMTP client 4.057s
+[2025-03-06T19:37:22.301Z] [warn] [oscar-a] Create XMTP client v:undefined 4.142s
+[2025-03-06T19:37:22.301Z] [info] [oscar-a] Start consent stream
+[2025-03-06T19:37:22.301Z] [info] [oscar-a] Consent stream started
+[2025-03-06T19:37:22.302Z] [warn] [oscar-a] Initialize XMTP client 4.147s
+[2025-03-06T19:37:22.350Z] [warn] [larry-a] Create XMTP client v:undefined 4.191s
+[2025-03-06T19:37:22.350Z] [info] [larry-a] Start consent stream
+[2025-03-06T19:37:22.350Z] [info] [larry-a] Consent stream started
+[2025-03-06T19:37:22.350Z] [warn] [larry-a] Initialize XMTP client 4.199s
+[2025-03-06T19:37:22.416Z] [warn] [mary-a] Create XMTP client v:undefined 4.257s
+[2025-03-06T19:37:22.416Z] [info] [mary-a] Start consent stream
+[2025-03-06T19:37:22.416Z] [info] [mary-a] Consent stream started
+[2025-03-06T19:37:22.416Z] [warn] [mary-a] Initialize XMTP client 4.264s
+[2025-03-06T19:37:22.417Z] [info] henry 0x568b42a484BEddD52D414D581D883E070210A93f
+[2025-03-06T19:37:22.417Z] [info] ivy 0x450ed7301240C0E65c91419389be28eD40D857C0
+[2025-03-06T19:37:22.417Z] [info] jack 0x8c023F6E2d01BF2A4E111eDD90Ec097Ccb90C91A
+[2025-03-06T19:37:22.417Z] [info] karen 0xb0e70A632Ae8AaFd15F71Bc43c33B59D4F9495E2
+[2025-03-06T19:37:22.417Z] [info] randomguy 0xf020FAFd8AAa50F895363335675D6Db5cdC9436C
+[2025-03-06T19:37:22.417Z] [info] larry 0x421C33A72A279A5ed06417e015d20A27F3987F07
+[2025-03-06T19:37:22.417Z] [info] mary 0x5a3060b08d2bCB0CB22c917137a7c231a3817DbE
+[2025-03-06T19:37:22.417Z] [info] nancy 0x7D8c9c4C693be93C87c5169085665201E1141D9C
+[2025-03-06T19:37:22.417Z] [info] oscar 0x6d56c4B96Afc896564e890B0B3938970ab3b8770
+[2025-03-06T19:37:22.418Z] [info] Creating DM conversation with address: 0xf020FAFd8AAa50F895363335675D6Db5cdC9436C
+[2025-03-06T19:37:24.423Z] [info] [henry-a] Collecting 1 consent updates
+[2025-03-06T19:37:24.737Z] [info] Consent state: 0
+[2025-03-06T19:37:24.737Z] [warn] get-initial-consent 314.001ms
+[2025-03-06T19:37:24.737Z] [info] Alice is allowing Bob...
+[2025-03-06T19:37:25.104Z] [info] [henry-a] Received consent update: [{"entityType":1,"state":1,"entity":"0dacc4cb4fea3f3a68b429ae272de8b5c114bfbbc74620c8abd302e86459b6db"},{"entityType":2,"state":1,"entity":"0xf020FAFd8AAa50F895363335675D6Db5cdC9436C"}]
+[2025-03-06T19:37:25.104Z] [warn] set-consent-state 366.408ms
+[2025-03-06T19:37:25.474Z] [warn] get-updated-consent 370.154ms
+[2025-03-06T19:37:25.474Z] [info] Consent updates: [{"type":"stream_consent","consentUpdate":[{"entityType":1,"state":1,"entity":"0dacc4cb4fea3f3a68b429ae272de8b5c114bfbbc74620c8abd302e86459b6db"},{"entityType":2,"state":1,"entity":"0xf020FAFd8AAa50F895363335675D6Db5cdC9436C"}]}]
+[2025-03-06T19:37:25.475Z] [info] Creating a group conversation...
+[2025-03-06T19:37:28.817Z] [warn] create-group 3.340s
+[2025-03-06T19:37:28.819Z] [info] Group created with 5 members
+[2025-03-06T19:37:28.820Z] [info] [henry-a] Collecting 1 consent updates
+[2025-03-06T19:37:28.820Z] [info] Alice is blocking the group...
+[2025-03-06T19:37:28.821Z] [info] [henry-a] Received consent update: [{"entityType":0,"state":2,"entity":"cf2b953de2b8d8a465c19c632fb0d600"}]
+[2025-03-06T19:37:28.821Z] [info] Alice's consent state for the group: 2
+[2025-03-06T19:37:28.821Z] [info] Testing individual member consent states...
+[2025-03-06T19:37:29.190Z] [warn] block-bob 368.269ms
+[2025-03-06T19:37:29.573Z] [info] Alice's consent state for Bob is : denied
+[2025-03-06T19:37:29.573Z] [warn] get-bob-consent 383.51ms
+[2025-03-06T19:37:29.573Z] [info] All consent updates received: 1
+[2025-03-06T19:37:29.573Z] [info] Unblocking all entities...
+[2025-03-06T19:37:29.945Z] [warn] unblock-all 370.749ms
+[2025-03-06T19:37:29.946Z] [info] Final group consent state: 1

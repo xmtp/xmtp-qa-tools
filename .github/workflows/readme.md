@@ -2,13 +2,13 @@
 
 This document provides practical instructions for using the GitHub workflows in the `/.github/workflows` directory.
 
-## TS_GM_bot workflow
+## TS_Gm workflow
 
-The `TS_GM_bot.yml` workflow automates testing of the GM bot functionality.
+The `TS_Gm.yml` workflow automates testing of the GM bot functionality.
 
 ```bash
 # Manually trigger the workflow from GitHub Actions UI
-# Navigate to: Actions > TS_GM_bot > Run workflow
+# Navigate to: Actions > TS_Gm > Run workflow
 ```
 
 **Expected result:** The workflow will run tests against the GM bot functionality, verifying message sending and receiving capabilities.

@@ -1,4 +1,4 @@
-name: TS_GM_bot
+name: TS_Gm
 description: "should verify performance of the library in the dev network"
 
 on:
@@ -30,7 +30,7 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
-            yarn test TS_GM_bot && break
+            yarn test TS_Gm && break
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
               exit 1
@@ -41,7 +41,7 @@ jobs:
         if: failure() && steps.run_tests.outputs.test_failed == 'true'
         run: |
           echo "Disabling scheduled workflow due to test failures"
-          gh workflow disable TS_GM_bot.yml
+          gh workflow disable TS_Gm.yml
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -57,10 +57,10 @@ jobs:
               owner: owner,
               repo: repo,
               issue_number: 25, // Reference to the existing issue #25
-              body: `## ❌ TS_GM_bot Dev Network Test Failed\n\n` +
+              body: `## ❌ TS_Gm Dev Network Test Failed\n\n` +
                     `The scheduled Dev network GM_bot verification workflow has failed after 3 retry attempts.\n\n` +
                     `### Details:\n` +
-                    `- **Workflow:** [TS_GM_bot](${workflow_run_url})\n` +
+                    `- **Workflow:** [TS_Gm](${workflow_run_url})\n` +
                     `- **Environment:** Dev\n` +
                     `- **Run ID:** ${context.runId}\n` +
                     `- **Commit:** ${context.sha}\n` +

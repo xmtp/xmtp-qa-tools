@@ -7,6 +7,8 @@ import {
   Client,
   type Conversation,
   type DecodedMessage,
+  type Dm,
+  type Group,
   type Installation,
   type Signer,
   type XmtpEnv,
@@ -18,9 +20,18 @@ export type WorkerStreamMessage = {
   message: DecodedMessage;
 };
 export type { Consent };
-export { ConsentEntityType, ConsentState };
-export type { Conversation, DecodedMessage, Installation, Signer, XmtpEnv };
-export { Client };
+export {
+  Client,
+  ConsentEntityType,
+  ConsentState,
+  DecodedMessage,
+  type Conversation,
+  type Dm,
+  type Group,
+  type Installation,
+  type Signer,
+  type XmtpEnv,
+};
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
   allReceived: boolean;

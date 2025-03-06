@@ -1,6 +1,6 @@
 [![TS_Performance](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml)
 [![TS_Delivery](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml)
-[![TS_GM_bot](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_GM_bot.yml)
+[![TS_Gm](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Gm.yml)
 
 # Overview
 

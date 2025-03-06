@@ -1,0 +1,20 @@
+[2025-03-06T19:41:36.440Z] [info] envPath .env
+[2025-03-06T19:41:36.443Z] [info] [PersonaFactory] Using env keys for bob: 0xa66a...
+[2025-03-06T19:41:36.471Z] [warn] Creating directory /Users/fabrizioguespe/qa-testing/.data/bob
+[2025-03-06T19:41:40.402Z] [warn] [bob-a] Create XMTP client v:undefined 3.931s
+[2025-03-06T19:41:40.818Z] [warn] [bob-a] Start message stream 415.447ms
+[2025-03-06T19:41:40.818Z] [warn] [bob-a] Start stream 416.044ms
+[2025-03-06T19:41:40.819Z] [warn] [bob-a] Initialize XMTP client 4.375s
+[2025-03-06T19:41:40.819Z] [info] bob 0xCdfF5c77c15dbe0573BabCB2c83D6856D8B85117
+[2025-03-06T19:41:46.729Z] [info] Messages before sending 1
+[2025-03-06T19:41:49.493Z] [info] Messages after sending 3
+[2025-03-06T19:41:49.493Z] [warn] TS_Gm > gm-bot: should measure sending a gm 8.674s
+[2025-03-06T19:41:50.245Z] [info] Starting test
+[2025-03-06T19:41:51.759Z] [info] Connected
+[2025-03-06T19:41:52.363Z] [info] Navigated to GM bot
+[2025-03-06T19:42:01.817Z] [info] Sending message: gm-p2sagyt5kl
+[2025-03-06T19:42:01.863Z] [info] Sent message: gm-p2sagyt5kl
+[2025-03-06T19:42:20.851Z] [info] Found response
+[2025-03-06T19:42:20.857Z] [info] Found messages
+[2025-03-06T19:42:20.860Z] [info] Received response: gm
+[2025-03-06T19:42:20.997Z] [warn] TS_Gm > should respond to a message 31.503s

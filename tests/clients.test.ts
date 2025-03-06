@@ -1,11 +1,7 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { type Persona } from "@helpers/types";
-import {
-  createMultipleInstallations,
-  getDataSubFolderCount,
-  getWorkers,
-} from "@helpers/workers/factory";
+import { getDataSubFolderCount, getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
@@ -57,30 +53,6 @@ describe(testName, () => {
     expect(personas.alice.client?.accountAddress).toBeDefined();
     expect(personas.randompep.client?.accountAddress).toBeDefined();
     expect(personas.randombob.client?.accountAddress).toBeDefined();
-    expect(getDataSubFolderCount()).toBe(folderCount);
-  });
-
-  it("should create multiple installations for the same persona", async () => {
-    // Create a base persona and multiple installations
-
-    personas = await getWorkers(["fabri"], testName, "none");
-
-    const suffixes = ["a", "b", "c"];
-    folderCount++;
-
-    const installations = await createMultipleInstallations(
-      personas.fabritest,
-      suffixes,
-      testName,
-    );
-
-    // Log the installation details
-    for (const [_id, persona] of Object.entries(installations)) {
-      console.log(
-        `Name: ${persona.name}, Installation ID: ${persona.installationId}, DB Path: ${persona.dbPath}`,
-      );
-    }
-
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 });

@@ -33,7 +33,7 @@ async function main() {
       `Received message: ${message.content as string} by ${message.senderInboxId}`,
     );
 
-    const conversation = client.conversations.getConversationById(
+    const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
 
@@ -87,26 +87,32 @@ async function main() {
         const aliceMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
         const aliceGroup =
-          personas.alice.client.conversations.getConversationById(group.id);
-        await aliceGroup?.send(`Alice says: ${aliceMessage}`);
+          await personas.alice.client.conversations.getConversationById(
+            group.id,
+          );
+        if (aliceGroup) {
+          await aliceGroup.send(`Alice says: ${aliceMessage}`);
+        }
       }
 
       if (personas.joe.client) {
         const joeMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const joeGroup = personas.joe.client.conversations.getConversationById(
-          group.id,
-        );
-        await joeGroup?.send(`Joe says: ${joeMessage}`);
+        const joeGroup =
+          await personas.joe.client.conversations.getConversationById(group.id);
+        if (joeGroup) {
+          await joeGroup.send(`Joe says: ${joeMessage}`);
+        }
       }
 
       if (personas.sam.client) {
         const samMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const samGroup = personas.sam.client.conversations.getConversationById(
-          group.id,
-        );
-        await samGroup?.send(`Sam says: ${samMessage}`);
+        const samGroup =
+          await personas.sam.client.conversations.getConversationById(group.id);
+        if (samGroup) {
+          await samGroup.send(`Sam says: ${samMessage}`);
+        }
       }
 
       continue;

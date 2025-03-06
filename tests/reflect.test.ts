@@ -3,21 +3,12 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import ReflectTestSuite from "@helpers/reflect";
 import type { Conversation, Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "Sending a GM";
 loadEnv(testName);
 
 describe("Basic test", () => {
-  let convo: Conversation;
   let personas: Record<string, Persona>;
   const reflectTestSuite = new ReflectTestSuite();
 

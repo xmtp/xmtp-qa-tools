@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import {
-  type Conversation,
+  type Group,
   type Persona,
   type VerifyStreamResult,
 } from "@helpers/types";
@@ -20,7 +20,7 @@ const amount = 5; // Number of messages to collect per receiver
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
-  let group: Conversation;
+  let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
@@ -117,10 +117,12 @@ describe(testName, () => {
     const messagesByPersona: string[][] = [];
 
     for (const persona of personasFromGroup) {
-      const conversation = persona.client!.conversations.getConversationById(
-        group.id,
-      );
-      const messages = await conversation!.messages();
+      const conversation =
+        await persona.client!.conversations.getConversationById(group.id);
+      if (!conversation) {
+        throw new Error("Conversation not found");
+      }
+      const messages = await conversation.messages();
       const filteredMessages: string[] = [];
 
       for (const message of messages) {

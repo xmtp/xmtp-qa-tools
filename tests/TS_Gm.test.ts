@@ -15,7 +15,7 @@ import {
 import { testGmBot } from "../playwright/gm-bot.playwright";
 
 const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
-const testName = "ts_gm_bot";
+const testName = "TS_Gm";
 loadEnv(testName);
 
 describe(testName, () => {

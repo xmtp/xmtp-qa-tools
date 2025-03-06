@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Conversation, type Persona } from "@helpers/types";
+import { type Group, type Persona } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -8,7 +8,7 @@ const testName = "metadata";
 loadEnv(testName);
 
 describe(testName, () => {
-  let group: Conversation;
+  let group: Group;
   let personas: Record<string, Persona>;
   beforeAll(async () => {
     personas = await getWorkers(

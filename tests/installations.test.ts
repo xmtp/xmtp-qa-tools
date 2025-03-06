@@ -1,6 +1,6 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Conversation, type Persona } from "@helpers/types";
+import type { Conversation, Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -9,18 +9,14 @@ loadEnv(testName);
 
 describe(testName, () => {
   let personas: Record<string, Persona>;
-  let convo: Conversation | null;
+  let convo: Conversation;
   beforeAll(async () => {
     fs.rmSync(".data", { recursive: true, force: true });
     personas = await getWorkers(
-      ["bob-a", "bob-b", "bob-c", "bob-d"],
+      ["henry", "bob-a", "bob-b", "bob-c", "bob-d"],
       testName,
       "none",
     );
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, personas);
   });
 
   afterAll(async () => {
@@ -51,11 +47,13 @@ describe(testName, () => {
 
   it("should count conversations", async () => {
     await personas["bob-a"].client?.conversations.sync();
-    const listConversations = personas["bob-a"].client?.conversations.list();
+    const listConversations =
+      await personas["bob-a"].client?.conversations.list();
     console.log(listConversations?.length);
     expect(listConversations?.length).toBe(1);
     await personas["bob-b"].client?.conversations.sync();
-    const listConversations2 = personas["bob-b"].client?.conversations.list();
+    const listConversations2 =
+      await personas["bob-b"].client?.conversations.list();
     console.log(listConversations2?.length);
     expect(listConversations2?.length).toBe(1);
   });

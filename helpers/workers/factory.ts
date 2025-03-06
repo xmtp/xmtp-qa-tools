@@ -319,29 +319,9 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 
-export async function createMultipleInstallations(
-  persona: Persona,
-  suffixes: string[],
-  testName: string,
-): Promise<Record<string, Persona>> {
-  // Create installations with different IDs for the same persona
-  const installations: Record<string, Persona> = {};
-
-  for (const suffix of suffixes) {
-    const installId = `${persona.name}-${suffix}`;
-
-    // Create worker with the installation ID
-    const installations = await getWorkers([installId], testName, "none");
-
-    installations[installId] = Object.values(installations)[0];
-  }
-
-  return installations;
-}
-
 export async function getInstallations(client: Client) {
   await client.conversations.syncAll();
-  const conversations = client.conversations.list();
+  const conversations = await client.conversations.list();
   const uniqueInstallationIds = new Set<string>();
 
   for (const conversation of conversations) {
