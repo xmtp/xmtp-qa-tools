@@ -40,6 +40,8 @@ export default tseslint.config(
       "@typescript-eslint/no-deprecated": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/await-thenable": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

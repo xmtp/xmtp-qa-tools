@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceMetric } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import type { Dm, Group, Persona } from "@helpers/types";
+import type { Conversation, Dm, Group, Persona } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
@@ -18,8 +18,8 @@ const testName = "ts_performance";
 loadEnv(testName);
 
 describe(testName, () => {
-  let dm: Dm;
-  let group: Group;
+  let dm: Conversation;
+  let group: Conversation;
   let personas: Record<string, Persona>;
   let start: number;
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
@@ -127,7 +127,7 @@ describe(testName, () => {
   });
 
   it("addMembers: should measure adding a participant to a group", async () => {
-    await group.addMembers([
+    await (group as Group).addMembers([
       personas.randomguy.client!.accountAddress as `0x${string}`,
     ]);
   });
@@ -138,7 +138,7 @@ describe(testName, () => {
 
   it("removeMembers: should remove a participant from a group", async () => {
     const previousMembers = await group.members();
-    await group.removeMembers([
+    await (group as Group).removeMembers([
       personas.nancy.client!.accountAddress as `0x${string}`,
     ]);
     const members = await group.members();
@@ -171,8 +171,8 @@ describe(testName, () => {
       expect(members.length).toBe(i + 1);
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
-      await group.updateName("Large Group");
-      expect(group.name).toBe("Large Group");
+      await (group as Group).updateName("Large Group");
+      expect((group as Group)?.name).toBe("Large Group");
     });
     it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
