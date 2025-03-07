@@ -22,6 +22,14 @@ jobs:
   report:
     runs-on: ubuntu-latest
     steps:
+      - name: Debug secret availability
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "Datadog API key is available (value hidden)"
+          else
+            echo "ERROR: Datadog API key is NOT available"
+          fi
+
       - name: Send workflow status to Datadog
         run: |
           STATUS="${{ inputs.status }}"
