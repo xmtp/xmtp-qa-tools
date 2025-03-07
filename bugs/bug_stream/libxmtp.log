@@ -1,0 +1,177 @@
+Agents
+
+
+Bots
+Architecture
+Observability
+Logs
+Settings
+
+Share
+
+
+
+
+
+Activity
+
+
+gm-bot
+Deployments
+Backups
+Variables
+Metrics
+Settings
+Unexposed service
+US West
+1 Replica
+
+
+
+
+History
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+gm-bot
+/
+12357bd
+Mar 6, 2025 7:11 PM
+
+Completed
+
+
+Details
+Build Logs
+Deploy Logs
+
+Filter
+Filter logs using "", (), AND, OR, -
+
+
+
+
+Load More
+
+2025-03-07T06:03:51.623399Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(179), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.623456Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(179) }
+
+2025-03-07T06:03:51.623465Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(179), flags: (0x1: END_STREAM) }
+
+2025-03-07T06:03:51.625605Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(171) }
+
+2025-03-07T06:03:51.625750Z DEBUG process: xmtp_mls::subscriptions::stream_messages: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5]  is about to process streamed envelope for group 0x09d5...2301 cursor_id=[260959] inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" group_id="09d546b6cf1aa416d8de37570c182301" cursor_id=260959
+
+2025-03-07T06:03:51.627298Z DEBUG process: xmtp_mls::subscriptions::stream_messages: epoch=1 for [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] in process_stream_entry() inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" group_id="09d546b6cf1aa416d8de37570c182301" cursor_id=260959 epoch=1
+
+2025-03-07T06:03:51.627437Z  INFO process: xmtp_mls::subscriptions::stream_messages: error is not retryable. ReceiveGroup(EpochIncrementNotAllowed):processing group message in stream: epoch increment not allowed
+
+2025-03-07T06:03:51.627446Z  WARN process: xmtp_mls::subscriptions::stream_messages: error processing streamed message epoch increment not allowed
+
+2025-03-07T06:03:51.627890Z DEBUG process: xmtp_mls::subscriptions::stream_messages: attempting recovery sync for group 0x09d5...2301 in epoch 1 inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" group_id="09d546b6cf1aa416d8de37570c182301" cursor_id=260959 epoch=1
+
+2025-03-07T06:03:51.632651Z DEBUG process:sync_with_conn:publish_intents:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] set stored intent [154] to state `published` inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" installation_id=705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f intent.id=154 intent.kind=SendMessage group_id="09d546b6cf1aa416d8de37570c182301"
+
+2025-03-07T06:03:51.633355Z DEBUG process:sync_with_conn:publish_intents:load_mls_group_with_lock_async:send_group_messages: xmtp_api::mls: sending [1] group messages inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5"
+
+2025-03-07T06:03:51.633442Z DEBUG process:sync_with_conn:publish_intents:load_mls_group_with_lock_async:send_group_messages: tower::buffer::worker: service.ready=true processing request
+
+2025-03-07T06:03:51.633644Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(181), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.633676Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(181) }
+
+2025-03-07T06:03:51.633754Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(181), flags: (0x1: END_STREAM) }
+
+2025-03-07T06:03:51.685899Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 33 }
+
+2025-03-07T06:03:51.685944Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+
+2025-03-07T06:03:51.685954Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+
+2025-03-07T06:03:51.687962Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(179), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.688005Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(179) }
+
+2025-03-07T06:03:51.688019Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(179), flags: (0x5: END_HEADERS | END_STREAM) }
+
+2025-03-07T06:03:51.688673Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: Processing envelope with hash bceda41967f6b636e553e0f4b32d325155e5b0fea440511619375bf7dd681451, id = 260959 inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" installation_id=705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f group_id="09d546b6cf1aa416d8de37570c182301" cursor=260959
+
+2025-03-07T06:03:51.688699Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: client [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] is about to process own envelope [260959] for intent [153] inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" installation_id=705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f group_id="09d546b6cf1aa416d8de37570c182301" cursor=260959 intent_id=153 intent.kind=KeyUpdate
+
+2025-03-07T06:03:51.701092Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(181), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.701132Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(181) }
+
+2025-03-07T06:03:51.701143Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(181), flags: (0x5: END_HEADERS | END_STREAM) }
+
+2025-03-07T06:03:51.701258Z  INFO process:sync_with_conn:publish_intents:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] published intent [154] of type [SendMessage] intent.id=154 intent.kind=SendMessage inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" installation_id=705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f group_id="09d546b6cf1aa416d8de37570c182301"
+
+2025-03-07T06:03:51.701647Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(171) }
+
+2025-03-07T06:03:51.702208Z DEBUG process:sync_with_conn:receive:query_group_messages{id_cursor=Some(260958) group_id="09d546b6cf1aa416d8de37570c182301"}: xmtp_api::mls: query group messages group_id="09d546b6cf1aa416d8de37570c182301" id_cursor=260958 inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5"
+
+2025-03-07T06:03:51.702314Z DEBUG process:sync_with_conn:receive:query_group_messages{id_cursor=Some(260958) group_id="09d546b6cf1aa416d8de37570c182301"}: tower::buffer::worker: service.ready=true processing request
+
+2025-03-07T06:03:51.702431Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(183), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.702463Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(183) }
+
+2025-03-07T06:03:51.702474Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(183), flags: (0x1: END_STREAM) }
+
+2025-03-07T06:03:51.703922Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] Validating commit for intent 153. Message timestamp: 1741327431585192000
+
+2025-03-07T06:03:51.704097Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::identity_updates: Getting installation diff. Old: GroupMembership { members: {"59b1aeec416a9e3d2dfd147f46b7ea5058c5c09811fcbcfd03d1d1634b7697a8": 61657, "89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5": 60892}, failed_installations: [] }. New GroupMembership { members: {"89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5": 60892, "59b1aeec416a9e3d2dfd147f46b7ea5058c5c09811fcbcfd03d1d1634b7697a8": 61657}, failed_installations: [] }
+
+2025-03-07T06:03:51.704795Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::storage::encrypted_store::association_state: Loaded association state from cache: 89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5 60892
+
+2025-03-07T06:03:51.704866Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::storage::encrypted_store: Transaction beginning
+
+2025-03-07T06:03:51.704982Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5]-[09d546b6cf1aa416d8de37570c182301] processing own message for intent 153 / KeyUpdate, message_epoch: 1 inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5" installation_id=705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f group_id="09d546b6cf1aa416d8de37570c182301" cursor=260959 intent.id=153 intent.kind=KeyUpdate
+
+2025-03-07T06:03:51.704998Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5] merging pending commit for intent 153
+
+2025-03-07T06:03:51.709186Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::storage::encrypted_store: Transaction being committed
+
+2025-03-07T06:03:51.709295Z  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Transaction completed successfully: process for group [09d546b6cf1aa416d8de37570c182301] envelope cursor[260959]
+
+2025-03-07T06:03:51.711508Z  WARN send_message:sync_until_last_intent_resolved:sync_until_intent_resolved: xmtp_mls::groups::mls_sync: retrying intent ID 154. intent currently in state Published
+
+2025-03-07T06:03:51.713106Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:query_group_messages{id_cursor=Some(260959) group_id="09d546b6cf1aa416d8de37570c182301"}: xmtp_api::mls: query group messages group_id="09d546b6cf1aa416d8de37570c182301" id_cursor=260959 inbox_id="89e7ed9f4beb1d1224f8bbb9260f56549e1db74478788269e9b3db03eabe11a5"
+
+2025-03-07T06:03:51.713184Z DEBUG send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:query_group_messages{id_cursor=Some(260959) group_id="09d546b6cf1aa416d8de37570c182301"}: tower::buffer::worker: service.ready=true processing request
+
+2025-03-07T06:03:51.713335Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(185), flags: (0x4: END_HEADERS) }
+
+2025-03-07T06:03:51.713370Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(185) }
+
+2025-03-07T06:03:51.713377Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(185), flags: (0x1: END_STREAM) }
+
+2025-03-07T06:03:58.129938Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+
+2025-03-07T06:03:58.190877Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443";}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+
+2025-03-07T06:03:58.191105Z  INFO process: xmtp_mls::subscriptions::stream_conversations: Trying to process streamed welcome installation_id="705b04650ce544257481809990718752d92c09ef67cfba957fefb6aa49b0f05f" welcome_id=1272497
+
+2025-03-07T06:03:58.191554Z DEBUG process:create_from_welcome: xmtp_mls::storage::encrypted_store: Transaction beginning
+
+2025-03-07T06:03:58.191595Z  INFO process:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+
+
+gm-bot | Railway

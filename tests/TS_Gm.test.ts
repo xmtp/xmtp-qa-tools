@@ -14,7 +14,7 @@ import {
 } from "vitest";
 import { testGmBot } from "../playwright/gm-bot.playwright";
 
-const gmBotAddress = "0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA";
+const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 const testName = "TS_Gm";
 loadEnv(testName);
 
