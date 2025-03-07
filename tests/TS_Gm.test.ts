@@ -23,7 +23,6 @@ describe(testName, () => {
   const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
   beforeAll(async () => {
-    
     personas = await getWorkers(["bob"], testName);
   });
 

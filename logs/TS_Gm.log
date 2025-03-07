@@ -1,24 +1,2 @@
-[2025-03-07T13:05:50.615Z] [info] envPath .env
-[2025-03-07T13:05:50.619Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
-[2025-03-07T13:05:52.789Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.142s
-[2025-03-07T13:05:53.191Z] [warn] [bob-a] Start message stream 399.895ms
-[2025-03-07T13:05:53.192Z] [warn] [bob-a] Start stream 402.28ms
-[2025-03-07T13:05:53.193Z] [warn] [bob-a] Initialize XMTP client 2.573s
-[2025-03-07T13:05:53.194Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
-[2025-03-07T13:05:53.195Z] [info] Creating conversation with gmBotAddress 0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA
-[2025-03-07T13:05:53.543Z] [warn] create-conversation 347.675ms
-[2025-03-07T13:05:53.943Z] [warn] sync-conversation 398.69ms
-[2025-03-07T13:05:53.948Z] [info] Messages before sending 5
-[2025-03-07T13:05:55.007Z] [warn] send-message 1.059s
-[2025-03-07T13:05:58.009Z] [warn] wait-for-response 3.001s
-[2025-03-07T13:05:58.012Z] [info] Messages after sending 7
-[2025-03-07T13:05:58.012Z] [warn] gm-bot-test 4.817s
-[2025-03-07T13:05:58.766Z] [info] Starting test
-[2025-03-07T13:05:59.514Z] [info] Connected
-[2025-03-07T13:05:59.753Z] [info] Navigated to GM bot
-[2025-03-07T13:06:08.706Z] [info] Sending message: gm-mwble46zdr
-[2025-03-07T13:06:08.752Z] [info] Sent message: gm-mwble46zdr
-[2025-03-07T13:06:12.762Z] [info] Found response
-[2025-03-07T13:06:12.768Z] [info] Found messages
-[2025-03-07T13:06:12.770Z] [info] Received response: gm
-[2025-03-07T13:06:12.876Z] [warn] respond-to-message-test 14.863s
+[2025-03-07T13:11:01.572Z] [info] envPath .env
+[2025-03-07T13:11:01.576Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...

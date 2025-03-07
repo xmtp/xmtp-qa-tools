@@ -1,75 +1,10 @@
-[2025-03-07T13:02:54.631Z] [info] envPath .env
-[2025-03-07T13:02:54.634Z] [info] [PersonaFactory] Using env keys for henry: 0x4fa0...
-[2025-03-07T13:02:54.634Z] [info] [PersonaFactory] Using env keys for ivy: 0x7c09...
-[2025-03-07T13:02:54.634Z] [info] [PersonaFactory] Using env keys for jack: 0x6cac...
-[2025-03-07T13:02:54.634Z] [info] [PersonaFactory] Using env keys for karen: 0x947b...
-[2025-03-07T13:02:54.634Z] [info] [PersonaFactory] Generating new keys for randomguy
-[2025-03-07T13:02:54.662Z] [info] [PersonaFactory] Using env keys for larry: 0x09be...
-[2025-03-07T13:02:54.662Z] [info] [PersonaFactory] Using env keys for mary: 0xc5de...
-[2025-03-07T13:02:54.662Z] [info] [PersonaFactory] Using env keys for nancy: 0xaf98...
-[2025-03-07T13:02:54.662Z] [info] [PersonaFactory] Using env keys for oscar: 0x3c51...
-[2025-03-07T13:02:54.677Z] [info] version 6bd613d
-[2025-03-07T13:02:54.677Z] [info] address 0x70506001853d9A8b8becEd0c76427c90dC81b678
-[2025-03-07T13:02:54.677Z] [info] version 6bd613d
-[2025-03-07T13:02:54.678Z] [info] address 0x47bC36610Fd0957fA53A3d111890c0CC70AfE469
-[2025-03-07T13:02:54.678Z] [info] version 6bd613d
-[2025-03-07T13:02:54.678Z] [info] address 0x8ffb52B1a133D4cb0589c759F3Fa51C1DfED98Cf
-[2025-03-07T13:02:54.678Z] [info] version 6bd613d
-[2025-03-07T13:02:54.678Z] [info] address 0x8fF29814f639922532D10069b2540c9390f3df8E
-[2025-03-07T13:02:54.678Z] [info] version 6bd613d
-[2025-03-07T13:02:54.678Z] [info] address 0x38EC7B5B7234Db3ca2109d2182D434a9aB0808b9
-[2025-03-07T13:02:54.678Z] [info] version 6bd613d
-[2025-03-07T13:02:54.678Z] [info] address 0x906d27D8eef3baf534E99e2c6ebBF7051Ed022d4
-[2025-03-07T13:02:54.679Z] [info] version 6bd613d
-[2025-03-07T13:02:54.679Z] [info] address 0x5dcD0247231A2b8764868CAB79c9F681826d39D8
-[2025-03-07T13:02:54.679Z] [info] version 6bd613d
-[2025-03-07T13:02:54.679Z] [info] address 0x0975943ed0d942f3673f67683d2c87882A927136
-[2025-03-07T13:02:54.679Z] [info] version 6bd613d
-[2025-03-07T13:02:54.679Z] [info] address 0x9CcB4e5c18193f7EE60Eb9F9E38d5FCCcbe5d81a
-[2025-03-07T13:02:56.732Z] [warn] [karen-a] Create XMTP client v:6bd613d 2.053s
-[2025-03-07T13:02:56.806Z] [warn] [ivy-a] Create XMTP client v:6bd613d 2.128s
-[2025-03-07T13:02:56.861Z] [warn] [jack-a] Create XMTP client v:6bd613d 2.183s
-[2025-03-07T13:02:56.927Z] [warn] [henry-a] Create XMTP client v:6bd613d 2.249s
-[2025-03-07T13:02:56.981Z] [warn] [larry-a] Create XMTP client v:6bd613d 2.302s
-[2025-03-07T13:02:57.042Z] [warn] [jack-a] Initialize XMTP client 2.372s
-[2025-03-07T13:02:57.108Z] [warn] [mary-a] Create XMTP client v:6bd613d 2.429s
-[2025-03-07T13:02:57.125Z] [warn] [karen-a] Start message stream 392.89ms
-[2025-03-07T13:02:57.126Z] [warn] [karen-a] Start stream 393.808ms
-[2025-03-07T13:02:57.126Z] [warn] [karen-a] Initialize XMTP client 2.454s
-[2025-03-07T13:02:57.168Z] [warn] [nancy-a] Create XMTP client v:6bd613d 2.489s
-[2025-03-07T13:02:57.199Z] [warn] [ivy-a] Start message stream 392.897ms
-[2025-03-07T13:02:57.200Z] [warn] [ivy-a] Start stream 393.566ms
-[2025-03-07T13:02:57.200Z] [warn] [ivy-a] Initialize XMTP client 2.531s
-[2025-03-07T13:02:57.272Z] [warn] [oscar-a] Create XMTP client v:6bd613d 2.593s
-[2025-03-07T13:02:57.328Z] [warn] [henry-a] Start message stream 400.717ms
-[2025-03-07T13:02:57.328Z] [warn] [henry-a] Start stream 400.89ms
-[2025-03-07T13:02:57.328Z] [warn] [henry-a] Initialize XMTP client 2.663s
-[2025-03-07T13:02:57.373Z] [warn] [larry-a] Start message stream 392.019ms
-[2025-03-07T13:02:57.373Z] [warn] [larry-a] Start stream 392.16ms
-[2025-03-07T13:02:57.373Z] [warn] [larry-a] Initialize XMTP client 2.698s
-[2025-03-07T13:02:57.460Z] [warn] [mary-a] Start message stream 351.35ms
-[2025-03-07T13:02:57.460Z] [warn] [mary-a] Start stream 351.501ms
-[2025-03-07T13:02:57.460Z] [warn] [mary-a] Initialize XMTP client 2.785s
-[2025-03-07T13:02:57.571Z] [warn] [nancy-a] Start message stream 402.445ms
-[2025-03-07T13:02:57.571Z] [warn] [nancy-a] Start stream 402.7ms
-[2025-03-07T13:02:57.571Z] [warn] [nancy-a] Initialize XMTP client 2.895s
-[2025-03-07T13:02:57.672Z] [warn] [oscar-a] Start message stream 399.671ms
-[2025-03-07T13:02:57.672Z] [warn] [oscar-a] Start stream 399.854ms
-[2025-03-07T13:02:57.672Z] [warn] [oscar-a] Initialize XMTP client 2.996s
-[2025-03-07T13:02:58.410Z] [warn] [randomguy-a] Create XMTP client v:6bd613d 3.731s
-[2025-03-07T13:02:58.811Z] [warn] [randomguy-a] Start message stream 401.086ms
-[2025-03-07T13:02:58.812Z] [warn] [randomguy-a] Start stream 402.159ms
-[2025-03-07T13:02:58.812Z] [warn] [randomguy-a] Initialize XMTP client 4.138s
-[2025-03-07T13:02:58.813Z] [info] henry 0x70506001853d9A8b8becEd0c76427c90dC81b678
-[2025-03-07T13:02:58.813Z] [info] ivy 0x47bC36610Fd0957fA53A3d111890c0CC70AfE469
-[2025-03-07T13:02:58.813Z] [info] jack 0x8ffb52B1a133D4cb0589c759F3Fa51C1DfED98Cf
-[2025-03-07T13:02:58.813Z] [info] karen 0x8fF29814f639922532D10069b2540c9390f3df8E
-[2025-03-07T13:02:58.813Z] [info] randomguy 0x38EC7B5B7234Db3ca2109d2182D434a9aB0808b9
-[2025-03-07T13:02:58.813Z] [info] larry 0x906d27D8eef3baf534E99e2c6ebBF7051Ed022d4
-[2025-03-07T13:02:58.813Z] [info] mary 0x5dcD0247231A2b8764868CAB79c9F681826d39D8
-[2025-03-07T13:02:58.814Z] [info] nancy 0x0975943ed0d942f3673f67683d2c87882A927136
-[2025-03-07T13:02:58.814Z] [info] oscar 0x9CcB4e5c18193f7EE60Eb9F9E38d5FCCcbe5d81a
-[2025-03-07T13:03:00.787Z] [info] [henry] Creating DM with randomguy at 0x38EC7B5B7234Db3ca2109d2182D434a9aB0808b9
-[2025-03-07T13:03:01.942Z] [info] [randomguy-a] Collecting 1 messages from convo:d02adb828033aa3b58b772fb37da4268
-[2025-03-07T13:03:01.942Z] [info] Sending message #1: gm-1-0xpvy1b9kr8a
-[2025-03-07T13:03:02.521Z] [info] All participants received the expected number of messages.
+[2025-03-07T13:11:31.810Z] [info] envPath .env
+[2025-03-07T13:11:31.813Z] [info] [PersonaFactory] Using env keys for henry: 0x4fa0...
+[2025-03-07T13:11:31.813Z] [info] [PersonaFactory] Using env keys for ivy: 0x7c09...
+[2025-03-07T13:11:31.813Z] [info] [PersonaFactory] Using env keys for jack: 0x6cac...
+[2025-03-07T13:11:31.813Z] [info] [PersonaFactory] Using env keys for karen: 0x947b...
+[2025-03-07T13:11:31.813Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-07T13:11:31.841Z] [info] [PersonaFactory] Using env keys for larry: 0x09be...
+[2025-03-07T13:11:31.841Z] [info] [PersonaFactory] Using env keys for mary: 0xc5de...
+[2025-03-07T13:11:31.841Z] [info] [PersonaFactory] Using env keys for nancy: 0xaf98...
+[2025-03-07T13:11:31.841Z] [info] [PersonaFactory] Using env keys for oscar: 0x3c51...
