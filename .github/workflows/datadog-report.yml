@@ -21,6 +21,8 @@ on:
 jobs:
   report:
     runs-on: ubuntu-latest
+    # Uncomment this line:
+    environment: Dev
     steps:
       - name: Debug secret availability
         run: |

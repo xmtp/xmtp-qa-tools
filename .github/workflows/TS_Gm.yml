@@ -57,8 +57,8 @@ jobs:
   report-to-datadog:
     needs: test
     if: always() # Run even if the test job fails
-    # Try without environment specification
-    # environment: Dev
+    # Add this line to specify the environment:
+    environment: Dev
     uses: ./.github/workflows/datadog-report.yml
     with:
       workflow_name: "TS_Gm"
