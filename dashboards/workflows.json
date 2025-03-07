@@ -1,15 +1,53 @@
 {
   "title": "XMTP QA Worflows",
-  "description": null,
+  "description": "[[suggested_dashboards]]",
   "experience_type": "default",
   "widgets": [
+    {
+      "id": 4721725196839204,
+      "definition": {
+        "title": "Workflow Status Over Time",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:github.workflow.status{*} by {workflow, environment}.fill(last, 300)"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ],
+        "yaxis": {
+          "scale": "linear",
+          "label": "Status",
+          "include_zero": true,
+          "min": "0",
+          "max": "1"
+        }
+      },
+      "layout": { "x": 0, "y": 0, "width": 4, "height": 2 }
+    },
     {
       "id": 371068524616494,
       "definition": {
         "title": "Workflow Success Rate (Last 24h)",
         "title_size": "16",
         "title_align": "left",
-        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -32,7 +70,7 @@
         ],
         "precision": 2
       },
-      "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
     },
     {
       "id": 8324523926175026,
@@ -61,23 +99,7 @@
         ],
         "style": { "display": { "type": "stacked", "legend": "automatic" } }
       },
-      "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
-    },
-    {
-      "id": 2801741133912872,
-      "definition": {
-        "type": "note",
-        "content": "## TS_Gm Workflow\nThis dashboard tracks the status of GitHub workflows, with special focus on the TS_Gm workflow that verifies library performance in the dev network.\n\n**Status 1**: Successful execution\n\n**Status 0**: Failed execution\n\nCheck the Event Stream below for detailed information about recent workflow runs.",
-        "background_color": "white",
-        "font_size": "14",
-        "text_align": "left",
-        "vertical_align": "top",
-        "show_tick": false,
-        "tick_pos": "50%",
-        "tick_edge": "left",
-        "has_padding": true
-      },
-      "layout": { "x": 8, "y": 0, "width": 2, "height": 4 }
+      "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
     },
     {
       "id": 4267751638010774,
@@ -112,43 +134,36 @@
       "layout": { "x": 0, "y": 2, "width": 4, "height": 2 }
     },
     {
-      "id": 4721725196839204,
+      "id": 6302807075611760,
       "definition": {
-        "title": "Workflow Status Over Time",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:github.workflow.status{*} by {workflow}.fill(last, 300)"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "yaxis": {
-          "scale": "linear",
-          "label": "Status",
-          "include_zero": true,
-          "min": "0",
-          "max": "1"
-        }
+        "type": "note",
+        "content": "# Performance\n\nhttps://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance\n\n# Reliability\n\nhttps://app.datadoghq.com/dashboard/pm2-3j8-yc5/xmtp-sdk-delivery\n\n# Workflows\n\nhttps://app.datadoghq.com/dashboard/9we-bpa-nzf",
+        "background_color": "white",
+        "font_size": "14",
+        "text_align": "left",
+        "vertical_align": "top",
+        "show_tick": false,
+        "tick_pos": "50%",
+        "tick_edge": "left",
+        "has_padding": true
       },
-      "layout": { "x": 0, "y": 4, "width": 4, "height": 2 }
+      "layout": { "x": 4, "y": 2, "width": 2, "height": 4 }
+    },
+    {
+      "id": 2801741133912872,
+      "definition": {
+        "type": "note",
+        "content": "## TS_Gm Workflow\nThis dashboard tracks the status of GitHub workflows, with special focus on the TS_Gm workflow that verifies library performance in the dev network.\n\n**Status 1**: Successful execution\n\n**Status 0**: Failed execution\n\nCheck the Event Stream below for detailed information about recent workflow runs.",
+        "background_color": "white",
+        "font_size": "14",
+        "text_align": "left",
+        "vertical_align": "top",
+        "show_tick": false,
+        "tick_pos": "50%",
+        "tick_edge": "left",
+        "has_padding": true
+      },
+      "layout": { "x": 6, "y": 2, "width": 2, "height": 4 }
     }
   ],
   "template_variables": [
