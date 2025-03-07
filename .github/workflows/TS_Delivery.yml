@@ -73,7 +73,7 @@ jobs:
       - name: Send workflow status to Datadog
         run: |
           STATUS="${{ needs.test.result }}"
-          WORKFLOW="TS_Performance"
+          WORKFLOW="TS_Delivery"
           ENV="Dev"
           API_KEY="${{ secrets.DATADOG_API_KEY }}"
 
