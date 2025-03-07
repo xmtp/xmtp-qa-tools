@@ -4,7 +4,7 @@
 
 # Overview
 
-This monorepo contains multiple projects and tools for development and testing.
+This monorepo contains multiple tools for testing and monitoring
 
 ## Test suites
 
@@ -25,6 +25,14 @@ Run tests for specific modules using these commands:
   ```
 
   Link to [test](./tests/TS_Delivery.test.ts)
+
+- **TS_Gm**: Gm bot E2E test across browser and node
+
+  ```bash
+  yarn test ts_gm
+  ```
+
+  Link to [test](./tests/TS_Gm.test.ts)
 
 - **TS_Forked**: Stress tests group operations to find if they are forked
 
