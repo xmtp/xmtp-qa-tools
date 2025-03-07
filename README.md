@@ -34,14 +34,6 @@ Run tests for specific modules using these commands:
 
   Link to [test](./tests/TS_Gm.test.ts)
 
-- **TS_Forked**: Stress tests group operations to find if they are forked
-
-  ```bash
-  yarn test ts_forked
-  ```
-
-  Link to [test](./tests/TS_Forked.test.ts)
-
 ## Workers
 
 Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
