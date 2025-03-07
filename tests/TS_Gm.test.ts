@@ -1,20 +1,10 @@
-import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceMetric } from "@helpers/datadog";
 import { type Conversation, type Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testGmBot } from "../playwright/gm-bot.playwright";
 
-const testName = "TS_Gm";
+const testName = "ts_gm";
 loadEnv(testName);
 
 describe(testName, () => {
