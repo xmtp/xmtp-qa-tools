@@ -51,13 +51,20 @@ jobs:
             fi
             sleep 10
           done
-    report-to-datadog:
-      needs: test
-      if: always() # Run even if the test job fails
-      environment: Dev
-      uses: ./.github/workflows/datadog-report.yml
-      secrets: inherit
-      with:
-        workflow_name: "TS_Gm"
-        environment: "Dev"
-        status: ${{ needs.test.result }}
+
+  report-to-datadog:
+    needs: test
+    if: always()
+    runs-on: ubuntu-latest
+    environment: Dev
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Call Datadog Report
+        uses: ./.github/workflows/datadog-report.yml@main
+        with:
+          workflow_name: "TS_Gm"
+          environment: "Dev"
+          status: ${{ needs.test.result }}
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
