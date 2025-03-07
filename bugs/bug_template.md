@@ -17,8 +17,8 @@ note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
 ## How to replicate
 
 ```bash
-git clone https://github.com/ephemeraHQ/qa-testing/
-cd qa-testing
+git clone https://github.com/xmtp/xmtp-qa-testing/
+cd xmtp-qa-testing
 yarn
 yarn test bug_panic
 ```

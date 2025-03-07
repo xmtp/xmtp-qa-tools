@@ -12,8 +12,8 @@ A lightweight toolkit for React Native developers to test messaging functionalit
 ### Installation
 
 ```bash
-git clone https://github.com/your-org/qa-testing
-cd qa-testing
+git clone https://github.com/xmtp/xmtp-qa-testing
+cd xmtp-qa-testing
 yarn install
 ```
 

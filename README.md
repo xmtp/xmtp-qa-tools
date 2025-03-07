@@ -1,6 +1,6 @@
-[![TS_Performance](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Performance.yml)
-[![TS_Delivery](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Delivery.yml)
-[![TS_Gm](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/ephemeraHQ/qa-testing/actions/workflows/TS_Gm.yml)
+[![TS_Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)
+[![TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)
+[![TS_Gm](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)
 
 # Overview
 
