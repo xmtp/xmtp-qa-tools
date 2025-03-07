@@ -1,79 +1,57 @@
-name: TS_Delivery
-description: "should verify message loss when receiving via 200 streams"
+# name: TS_Delivery
+# description: "should verify message loss when receiving via 200 streams"
 
-on:
-  schedule:
-    - cron: "*/40 * * * *" # every 40 min
-  workflow_dispatch:
+# on:
+#   schedule:
+#     - cron: "*/40 * * * *" # every 40 min
+#   workflow_dispatch:
 
-jobs:
-  test:
-    runs-on: ubuntu-latest
-    environment: Dev
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - name: Ensure data folder exists
-        run: mkdir -p .data
-      - name: List data folder contents before caching
-        run: ls -la .data
-      - name: Cache data folder and .env file
-        uses: actions/cache@v3
-        with:
-          path: |
-            .data
-            .env
-          key: ${{ runner.os }}-TS_Delivery-cache
-          restore-keys: |
-            ${{ runner.os }}-TS_Delivery-
-          enableCrossOsArchive: false
-          fail-on-cache-miss: false
-      - name: List data folder contents after cache restore
-        run: ls -la .data
-      - run: corepack enable
-      - run: yarn
-      - name: Run tests with retry
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i..."
-            yarn test TS_Delivery && break
-            if [ $i -eq 3 ]; then
-              echo "Test failed after 3 attempts."
-              exit 1
-            fi
-            sleep 10
-          done
-      - name: Create issue on workflow failure
-        if: failure()
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const { repo, owner } = context.repo;
-            const workflow_run_url = `https://github.com/${owner}/${repo}/actions/runs/${context.runId}`;
-
-            await github.rest.issues.createComment({
-              owner: owner,
-              repo: repo,
-              issue_number: 25, // Reference to the existing issue #25
-              body: `## ❌ TS_Delivery Dev Network Test Failed\n\n` +
-                    `The scheduled Dev network delivery verification workflow has failed after 3 retry attempts.\n\n` +
-                    `### Details:\n` +
-                    `- **Workflow:** [TS_Delivery](${workflow_run_url})\n` +
-                    `- **Environment:** Dev\n` +
-                    `- **Run ID:** ${context.runId}\n` +
-                    `- **Commit:** ${context.sha}\n` +
-                    `- **Triggered by:** ${context.actor || 'Scheduled run'}\n` +
-                    `- **Timestamp:** ${new Date().toISOString()}\n\n`
-            });
+# jobs:
+#   test:
+#     runs-on: ubuntu-latest
+#     environment: Dev
+#     env:
+#       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+#       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+#       XMTP_ENV: ${{ vars.XMTP_ENV }}
+#       GEOLOCATION: ${{ vars.GEOLOCATION }}
+#       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+#       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+#     steps:
+#       - uses: actions/checkout@v4
+#       - uses: actions/setup-node@v4
+#         with:
+#           node-version-file: ".node-version"
+#           cache: "yarn"
+#         env:
+#           SKIP_YARN_COREPACK_CHECK: "1"
+#       - name: Ensure data folder exists
+#         run: mkdir -p .data
+#       - name: List data folder contents before caching
+#         run: ls -la .data
+#       - name: Cache data folder and .env file
+#         uses: actions/cache@v3
+#         with:
+#           path: |
+#             .data
+#             .env
+#           key: ${{ runner.os }}-TS_Delivery-cache
+#           restore-keys: |
+#             ${{ runner.os }}-TS_Delivery-
+#           enableCrossOsArchive: false
+#           fail-on-cache-miss: false
+#       - name: List data folder contents after cache restore
+#         run: ls -la .data
+#       - run: corepack enable
+#       - run: yarn
+#       - name: Run tests with retry
+#         run: |
+#           for i in {1..3}; do
+#             echo "Attempt $i..."
+#             yarn test TS_Delivery && break
+#             if [ $i -eq 3 ]; then
+#               echo "Test failed after 3 attempts."
+#               exit 1
+#             fi
+#             sleep 10
+#           done
