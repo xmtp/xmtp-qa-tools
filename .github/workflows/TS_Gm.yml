@@ -15,6 +15,7 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ vars.XMTP_ENV }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

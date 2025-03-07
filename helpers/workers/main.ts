@@ -122,20 +122,16 @@ export class WorkerClient extends Worker {
         sdkVersion: this.sdkVersion,
       },
     });
-
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-    const version = Client.version;
-    const dbPath = getDbPath(
-      this.name,
-      await signer.getAddress(),
-      this.testName,
-      {
-        installationId: this.installationId,
-        sdkVersion: this.sdkVersion,
-        libxmtpVersion: version,
-      },
-    );
+    const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+    const address = await signer.getAddress();
+    const dbPath = getDbPath(this.name, address, this.testName, {
+      installationId: this.installationId,
+      sdkVersion: this.sdkVersion,
+      libxmtpVersion: version,
+    });
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,

@@ -14,50 +14,28 @@ import {
 } from "vitest";
 import { testGmBot } from "../playwright/gm-bot.playwright";
 
-const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 const testName = "TS_Gm";
 loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
   let personas: Record<string, Persona>;
-  let start: number;
+  const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
   beforeAll(async () => {
-    console.time("beforeAll");
-    fs.rmSync(".data", { recursive: true, force: true });
+    
     personas = await getWorkers(["bob"], testName);
-    console.timeEnd("beforeAll");
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
   });
 
   afterAll(async () => {
-    console.time("afterAll");
     await closeEnv(testName, personas);
-    console.timeEnd("afterAll");
-  });
-
-  afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    console.timeEnd(testName);
-    if (testName) {
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
-    }
   });
 
   it("gm-bot: should measure sending a gm", async () => {
     console.time("gm-bot-test");
 
     console.time("create-conversation");
+    console.log("Creating conversation with gmBotAddress", gmBotAddress);
     convo = await personas.bob.client!.conversations.newDm(gmBotAddress);
     console.timeEnd("create-conversation");
 
@@ -78,7 +56,7 @@ describe(testName, () => {
     console.timeEnd("send-message");
 
     console.time("wait-for-response");
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     console.timeEnd("wait-for-response");
 
     console.time("get-messages-after");
