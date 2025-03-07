@@ -9,7 +9,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment: Dev
+    # Try without environment specification first to test repository-level secrets
+    # environment: Dev
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
@@ -18,6 +19,13 @@ jobs:
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
     steps:
       - uses: actions/checkout@v4
+      - name: Debug API key
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "API key is available in test job"
+          else
+            echo "API key is NOT available in test job"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
@@ -49,6 +57,8 @@ jobs:
   report-to-datadog:
     needs: test
     if: always() # Run even if the test job fails
+    # Try without environment specification
+    # environment: Dev
     uses: ./.github/workflows/datadog-report.yml
     with:
       workflow_name: "TS_Gm"
