@@ -118,3 +118,13 @@ https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
 ## Bugs
 
 Documenting bugs in this [folder](./bugs/) for easy replicatio.
+
+## Repos
+
+- [lixmtp](https://github.com/xmtp/libxmtp)
+- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/browser-sdk)
+- [react-native-sdk](https://github.com/xmtp/xmtp-react-native)
+
+## Tracking
+
+See the [QA Board](https://github.com/orgs/xmtp/projects/30)
