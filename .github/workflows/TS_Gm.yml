@@ -56,8 +56,7 @@ jobs:
   # Call the reusable Datadog reporting workflow
   report-to-datadog:
     needs: test
-    if: always() # Run even if the test job fails
-    # Add this line to specify the environment:
+    if: always()
     environment: Dev
     uses: ./.github/workflows/datadog-report.yml
     with:
