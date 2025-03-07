@@ -45,14 +45,6 @@ jobs:
             sleep 10
           done
 
-      - name: Disable scheduled workflow
-        if: failure() && steps.run_tests.outputs.test_failed == 'true'
-        run: |
-          echo "Disabling scheduled workflow due to test failures"
-          gh workflow disable TS_Gm.yml
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   # Call the reusable Datadog reporting workflow
   report-to-datadog:
     needs: test
