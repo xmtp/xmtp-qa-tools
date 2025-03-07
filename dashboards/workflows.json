@@ -36,7 +36,7 @@
     {
       "id": 8324523926175026,
       "definition": {
-        "title": "Status By Workflow (Last 24h)",
+        "title": "Status by workflow (Last 24h)",
         "title_size": "16",
         "title_align": "left",
         "type": "toplist",
@@ -46,7 +46,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:system.cpu.user{*} by {service}",
+                "query": "avg:github.workflow.status{*} by {workflow}",
                 "aggregator": "avg"
               }
             ],
@@ -89,7 +89,7 @@
     {
       "id": 5940466208194452,
       "definition": {
-        "title": "TS_Gm Workflow Status by Branch",
+        "title": "TS_Gm workflow status by branch",
         "title_size": "16",
         "title_align": "left",
         "type": "toplist",
@@ -99,7 +99,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:system.cpu.user{*} by {service}",
+                "query": "avg:github.workflow.status{workflow:ts_gm} by {branch}",
                 "aggregator": "avg"
               }
             ],
@@ -133,7 +133,7 @@
     {
       "id": 4267751638010774,
       "definition": {
-        "title": "Workflow Runs (Count)",
+        "title": "Workflow runs (Count)",
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
@@ -147,7 +147,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:system.cpu.user{*}"
+                "query": "count:github.workflow.status{*} by {workflow}.as_count()"
               }
             ],
             "style": {
@@ -165,7 +165,7 @@
     {
       "id": 8112325797558986,
       "definition": {
-        "title": "Workflow Status by Environment",
+        "title": "Workflow status by environment",
         "title_size": "16",
         "title_align": "left",
         "show_legend": true,
@@ -179,7 +179,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:system.cpu.user{*}"
+                "query": "avg:github.workflow.status{*} by {environment}"
               }
             ],
             "style": {
