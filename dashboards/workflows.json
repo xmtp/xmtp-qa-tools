@@ -9,6 +9,7 @@
         "title": "Workflow Success Rate (Last 24h)",
         "title_size": "16",
         "title_align": "left",
+        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -23,8 +24,8 @@
             ],
             "formulas": [{ "formula": "query1" }],
             "conditional_formats": [
-              { "comparator": "<", "value": 0.8, "palette": "red" },
-              { "comparator": "<", "value": 0.9, "palette": "yellow" },
+              { "comparator": "<", "value": 0.9, "palette": "white_on_red" },
+              { "comparator": ">=", "value": 0.9, "palette": "white_on_green" },
               { "comparator": ">=", "value": 0.9, "palette": "green" }
             ]
           }
@@ -61,58 +62,6 @@
         "style": { "display": { "type": "stacked", "legend": "automatic" } }
       },
       "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
-    },
-    {
-      "id": 889709772534658,
-      "definition": {
-        "title": "Workflow Status Heatmap (Environment x Workflow)",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": false,
-        "type": "heatmap",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:github.workflow.status{*} by {workflow,environment}"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }]
-          }
-        ]
-      },
-      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
-    },
-    {
-      "id": 5940466208194452,
-      "definition": {
-        "title": "TS_Gm workflow status by branch",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "toplist",
-        "requests": [
-          {
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:github.workflow.status{workflow:ts_gm} by {branch}",
-                "aggregator": "avg"
-              }
-            ],
-            "response_format": "scalar",
-            "formulas": [{ "formula": "query1" }],
-            "sort": {
-              "count": 10,
-              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
-            }
-          }
-        ]
-      },
-      "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
     },
     {
       "id": 2801741133912872,
@@ -163,77 +112,6 @@
       "layout": { "x": 0, "y": 2, "width": 4, "height": 2 }
     },
     {
-      "id": 8112325797558986,
-      "definition": {
-        "title": "Workflow status by environment",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:github.workflow.status{*} by {environment}"
-              }
-            ],
-            "style": {
-              "palette": "dog_classic",
-              "order_by": "values",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ]
-      },
-      "layout": { "x": 4, "y": 2, "width": 4, "height": 2 }
-    },
-    {
-      "id": 5797144126526620,
-      "definition": {
-        "title": "Workflow Status Over Time",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "response_format": "timeseries",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:github.workflow.status{*} by {workflow}.fill(last, 300)"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "yaxis": {
-          "scale": "linear",
-          "label": "Status",
-          "include_zero": true,
-          "min": "0",
-          "max": "1"
-        }
-      },
-      "layout": { "x": 0, "y": 4, "width": 4, "height": 2 }
-    },
-    {
       "id": 4721725196839204,
       "definition": {
         "title": "Workflow Status Over Time",
@@ -270,21 +148,21 @@
           "max": "1"
         }
       },
-      "layout": { "x": 4, "y": 4, "width": 4, "height": 2 }
+      "layout": { "x": 0, "y": 4, "width": 4, "height": 2 }
     }
   ],
   "template_variables": [
     {
       "name": "workflow",
       "prefix": "workflow",
-      "available_values": [],
+      "available_values": ["TS_Gm", "TS_Performance", "TS_Delivery"],
       "default": "*"
     },
     {
       "name": "environment",
       "prefix": "environment",
-      "available_values": [],
-      "default": "*"
+      "available_values": ["Dev", "Production"],
+      "default": "Dev"
     }
   ],
   "layout_type": "ordered",
