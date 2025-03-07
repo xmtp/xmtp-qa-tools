@@ -45,13 +45,14 @@ jobs:
             sleep 10
           done
 
-report-to-datadog:
-  needs: test
-  if: always() # Run even if the test job fails
-  uses: ./.github/workflows/datadog-report.yml
-  with:
-    workflow_name: "TS_Gm"
-    environment: "Dev"
-    status: ${{ needs.test.result }}
-  secrets:
-    DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+  # Call the reusable Datadog reporting workflow
+  report-to-datadog:
+    needs: test
+    if: always() # Run even if the test job fails
+    uses: ./.github/workflows/datadog-report.yml
+    with:
+      workflow_name: "TS_Gm"
+      environment: "Dev"
+      status: ${{ needs.test.result }}
+    secrets:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
