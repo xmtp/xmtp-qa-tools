@@ -27,6 +27,14 @@ jobs:
           STATUS="${{ inputs.status }}"
           WORKFLOW="${{ inputs.workflow_name }}"
           ENV="${{ inputs.environment }}"
+          API_KEY="${{ secrets.DATADOG_API_KEY }}"
+
+          # Debug API key presence (without revealing it)
+          if [ -z "$API_KEY" ]; then
+            echo "WARNING: Datadog API key is empty"
+          else
+            echo "Datadog API key is available (value hidden)"
+          fi
 
           ALERT_TYPE="info"
 
@@ -43,7 +51,7 @@ jobs:
           # Send event
           curl -X POST "https://api.datadoghq.com/api/v1/events" \
           -H "Content-Type: application/json" \
-          -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+          -H "DD-API-KEY: $API_KEY" \
           -d @- << EOF
           {
             "title": "$TITLE",
@@ -67,7 +75,7 @@ jobs:
 
           curl -X POST "https://api.datadoghq.com/api/v1/series" \
           -H "Content-Type: application/json" \
-          -H "DD-API-KEY: ${{ secrets.DATADOG_API_KEY }}" \
+          -H "DD-API-KEY: $API_KEY" \
           -d @- << EOF
           {
             "series": [

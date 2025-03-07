@@ -1,24 +1,21 @@
-[2025-03-07T16:56:14.275Z] [info] envPath .env
-[2025-03-07T16:56:14.278Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
-[2025-03-07T16:56:16.538Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.232s
-[2025-03-07T16:56:16.946Z] [warn] [bob-a] Start message stream 407.017ms
-[2025-03-07T16:56:16.947Z] [warn] [bob-a] Start stream 408.781ms
-[2025-03-07T16:56:16.948Z] [warn] [bob-a] Initialize XMTP client 2.669s
-[2025-03-07T16:56:16.949Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
-[2025-03-07T16:56:16.950Z] [info] Creating conversation with gmBotAddress 0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA
-[2025-03-07T16:56:17.359Z] [warn] create-conversation 408.506ms
-[2025-03-07T16:56:19.907Z] [warn] sync-conversation 2.547s
-[2025-03-07T16:56:19.911Z] [info] Messages before sending 2
-[2025-03-07T16:56:20.499Z] [warn] send-message 586.859ms
-[2025-03-07T16:56:23.501Z] [warn] wait-for-response 3.002s
-[2025-03-07T16:56:23.506Z] [info] Messages after sending 4
-[2025-03-07T16:56:23.506Z] [warn] gm-bot-test 6.556s
-[2025-03-07T16:56:24.576Z] [info] Starting test
-[2025-03-07T16:56:25.321Z] [info] Connected
-[2025-03-07T16:56:25.552Z] [info] Navigated to GM bot
-[2025-03-07T16:56:34.493Z] [info] Sending message: gm-36mr7iivkgu
-[2025-03-07T16:56:34.539Z] [info] Sent message: gm-36mr7iivkgu
-[2025-03-07T16:56:38.551Z] [info] Found response
-[2025-03-07T16:56:38.556Z] [info] Found messages
-[2025-03-07T16:56:38.558Z] [info] Received response: gm
-[2025-03-07T16:56:38.690Z] [warn] respond-to-message-test 15.183s
+[2025-03-07T17:37:18.364Z] [info] envPath .env
+[2025-03-07T17:37:18.368Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
+[2025-03-07T17:37:20.671Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.274s
+[2025-03-07T17:37:21.081Z] [warn] [bob-a] Start message stream 408.23ms
+[2025-03-07T17:37:21.081Z] [warn] [bob-a] Start stream 409.635ms
+[2025-03-07T17:37:21.082Z] [warn] [bob-a] Initialize XMTP client 2.712s
+[2025-03-07T17:37:21.082Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
+[2025-03-07T17:37:21.083Z] [info] Creating conversation with gmBotAddress 0x3237451eb4b3Cd648fdcD9c7818C9B64b60e82fA
+[2025-03-07T17:37:21.447Z] [warn] create-conversation 363.14ms
+[2025-03-07T17:37:22.137Z] [warn] sync-conversation 688.426ms
+[2025-03-07T17:37:22.140Z] [info] Messages before sending 4
+[2025-03-07T17:37:22.898Z] [warn] send-message 756.986ms
+[2025-03-07T17:37:25.899Z] [warn] wait-for-response 3.001s
+[2025-03-07T17:37:26.983Z] [info] Starting test
+[2025-03-07T17:37:27.850Z] [info] Connected
+[2025-03-07T17:37:28.232Z] [info] Navigated to GM bot
+[2025-03-07T17:37:37.150Z] [info] Sending message: gm-8sj4hkbaov4
+[2025-03-07T17:37:37.182Z] [info] Sent message: gm-8sj4hkbaov4
+[2025-03-07T17:37:41.190Z] [info] Found response
+[2025-03-07T17:37:41.195Z] [info] Found messages
+[2025-03-07T17:37:41.197Z] [info] Received response: gm-8sj4hkbaov4
