@@ -9,8 +9,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    # Try without environment specification first to test repository-level secrets
-    # environment: Dev
+    environment: Dev
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
@@ -53,15 +52,13 @@ jobs:
             sleep 10
           done
 
-  # Call the reusable Datadog reporting workflow
   report-to-datadog:
     needs: test
-    if: always()
+    if: always() # Run even if the test job fails
     environment: Dev
     uses: ./.github/workflows/datadog-report.yml
+    secrets: inherit
     with:
       workflow_name: "TS_Gm"
       environment: "Dev"
       status: ${{ needs.test.result }}
-    secrets:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
