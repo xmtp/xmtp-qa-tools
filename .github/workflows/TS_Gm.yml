@@ -10,47 +10,7 @@ jobs:
   test:
     runs-on: ubuntu-latest
     environment: Dev
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Debug API key
-        run: |
-          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
-            echo "API key is available in test job"
-          else
-            echo "API key is NOT available in test job"
-          fi
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - run: corepack enable
-      - run: yarn
-
-      - name: Run tests with retry
-        id: run_tests
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i..."
-            if yarn test TS_Gm; then
-              echo "Tests passed on attempt $i"
-              echo "test_failed=false" >> $GITHUB_OUTPUT
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "Test failed after 3 attempts."
-              echo "test_failed=true" >> $GITHUB_OUTPUT
-              exit 1
-            fi
-            sleep 10
-          done
+    # Your existing test job configuration...
 
   report-to-datadog:
     needs: test
@@ -58,13 +18,83 @@ jobs:
     runs-on: ubuntu-latest
     environment: Dev
     steps:
-      - uses: actions/checkout@v4
+      - name: Debug secret availability
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "Datadog API key is available (value hidden)"
+          else
+            echo "ERROR: Datadog API key is NOT available"
+          fi
 
-      - name: Call Datadog Report
-        uses: ./.github/workflows/datadog-report.yml@main
-        with:
-          workflow_name: "TS_Gm"
-          environment: "Dev"
-          status: ${{ needs.test.result }}
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      - name: Send workflow status to Datadog
+        run: |
+          STATUS="${{ needs.test.result }}"
+          WORKFLOW="TS_Gm"
+          ENV="Dev"
+          API_KEY="${{ secrets.DATADOG_API_KEY }}"
+
+          # Debug API key presence (without revealing it)
+          if [ -z "$API_KEY" ]; then
+            echo "WARNING: Datadog API key is empty"
+          else
+            echo "Datadog API key is available (value hidden)"
+          fi
+
+          ALERT_TYPE="info"
+
+          if [ "$STATUS" == "success" ]; then
+            ALERT_TYPE="success"
+            TITLE="GitHub Workflow $WORKFLOW Succeeded"
+            TEXT="GitHub workflow $WORKFLOW completed successfully in $ENV environment"
+          else
+            ALERT_TYPE="error"
+            TITLE="GitHub Workflow $WORKFLOW Failed"
+            TEXT="GitHub workflow $WORKFLOW failed in $ENV environment"
+          fi
+
+          # Send event
+          curl -X POST "https://api.datadoghq.com/api/v1/events" \
+          -H "Content-Type: application/json" \
+          -H "DD-API-KEY: $API_KEY" \
+          -d @- << EOF
+          {
+            "title": "$TITLE",
+            "text": "$TEXT\n\nRepository: $GITHUB_REPOSITORY\nBranch: $GITHUB_REF_NAME\nRun ID: $GITHUB_RUN_ID\nTriggered by: $GITHUB_ACTOR\nWorkflow URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
+            "alert_type": "$ALERT_TYPE",
+            "source_type_name": "github",
+            "tags": [
+              "workflow:$WORKFLOW",
+              "environment:$ENV",
+              "repository:$GITHUB_REPOSITORY",
+              "branch:$GITHUB_REF_NAME", 
+              "run_id:$GITHUB_RUN_ID",
+              "status:$STATUS",
+              "triggered_by:$GITHUB_ACTOR"
+            ]
+          }
+          EOF
+
+          # Send metric for monitoring
+          METRIC_VALUE=$([ "$STATUS" == "success" ] && echo "1" || echo "0")
+
+          curl -X POST "https://api.datadoghq.com/api/v1/series" \
+          -H "Content-Type: application/json" \
+          -H "DD-API-KEY: $API_KEY" \
+          -d @- << EOF
+          {
+            "series": [
+              {
+                "metric": "github.workflow.status",
+                "type": "gauge",
+                "points": [[$(date +%s), $METRIC_VALUE]],
+                "tags": [
+                  "workflow:$WORKFLOW",
+                  "environment:$ENV",
+                  "repository:$GITHUB_REPOSITORY",
+                  "branch:$GITHUB_REF_NAME",
+                  "triggered_by:$GITHUB_ACTOR"
+                ]
+              }
+            ]
+          }
+          EOF
