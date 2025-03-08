@@ -4,27 +4,26 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-const RAILWAY_PROJECT_TOKEN = process.env.RAILWAY_PROJECT_TOKEN;
+const RAILWAY_TEAM_TOKEN = process.env.RAILWAY_TEAM_TOKEN;
+const RAILWAY_TEAM_ID = process.env.RAILWAY_TEAM_ID;
 const RAILWAY_SERVICE_ID = process.env.RAILWAY_SERVICE_ID;
-console.log(
-  "RAILWAY_PROJECT_TOKEN",
-  RAILWAY_PROJECT_TOKEN ? "is set" : "is not set",
-);
+console.log("RAILWAY_TEAM_TOKEN", RAILWAY_TEAM_TOKEN ? "is set" : "is not set");
+console.log("RAILWAY_TEAM_ID", RAILWAY_TEAM_ID ? "is set" : "is not set");
 console.log("RAILWAY_SERVICE_ID", RAILWAY_SERVICE_ID ? "is set" : "is not set");
 
 // Deploy to Railway using their updated API v2
 async function deployToRailway() {
-  if (!RAILWAY_PROJECT_TOKEN || !RAILWAY_SERVICE_ID) {
+  if (!RAILWAY_TEAM_TOKEN || !RAILWAY_SERVICE_ID) {
     console.error(
-      "Error: RAILWAY_PROJECT_TOKEN and RAILWAY_SERVICE_ID must be set in your environment variables",
+      "Error: RAILWAY_TEAM_TOKEN, RAILWAY_TEAM_ID, and RAILWAY_SERVICE_ID must be set in your environment variables",
     );
     process.exit(1);
   }
 
-  console.log("Starting deployment to Railway...");
+  console.log("Starting deployment to Railway for team Ephemera...");
 
   try {
-    // This matches the current Railway API v2
+    // This matches the current Railway API v2 with team token authentication
     const graphqlQuery = {
       query: `
         mutation {
@@ -44,7 +43,7 @@ async function deployToRailway() {
       {
         headers: {
           "Content-Type": "application/json",
-          "Project-Access-Token": RAILWAY_PROJECT_TOKEN,
+          "Team-Access-Token": RAILWAY_TEAM_TOKEN,
         },
       },
     );
