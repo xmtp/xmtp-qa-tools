@@ -39,6 +39,7 @@ describe(
       group = await personas.bob.client!.conversations.newGroupByInboxIds(
         Object.values(personas).map((p) => p.client?.inboxId as string),
       );
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       expect(group.id).toBeDefined();
     });
 
