@@ -4,16 +4,14 @@ import dotenv from "dotenv";
 // Load environment variables
 dotenv.config();
 
-const RAILWAY_TEAM_TOKEN = process.env.RAILWAY_TEAM_TOKEN;
-const RAILWAY_TEAM_ID = process.env.RAILWAY_TEAM_ID;
+const RAILWAY_TOKEN = process.env.RAILWAY_TOKEN;
 const RAILWAY_SERVICE_ID = process.env.RAILWAY_SERVICE_ID;
-console.log("RAILWAY_TEAM_TOKEN", RAILWAY_TEAM_TOKEN ? "is set" : "is not set");
-console.log("RAILWAY_TEAM_ID", RAILWAY_TEAM_ID ? "is set" : "is not set");
+console.log("RAILWAY_TEAM_TOKEN", RAILWAY_TOKEN ? "is set" : "is not set");
 console.log("RAILWAY_SERVICE_ID", RAILWAY_SERVICE_ID ? "is set" : "is not set");
 
 // Deploy to Railway using their updated API v2
 async function deployToRailway() {
-  if (!RAILWAY_TEAM_TOKEN || !RAILWAY_SERVICE_ID) {
+  if (!RAILWAY_TOKEN || !RAILWAY_SERVICE_ID) {
     console.error(
       "Error: RAILWAY_TEAM_TOKEN, RAILWAY_TEAM_ID, and RAILWAY_SERVICE_ID must be set in your environment variables",
     );
@@ -43,41 +41,24 @@ async function deployToRailway() {
       {
         headers: {
           "Content-Type": "application/json",
-          "Team-Access-Token": RAILWAY_TEAM_TOKEN,
+          "Team-Access-Token": RAILWAY_TOKEN,
         },
       },
     );
 
     console.log("Deployment initiated successfully!");
     console.log("Response:", JSON.stringify(response.data, null, 2));
-    return response.data;
+    return response.data as {
+      data: {
+        serviceDeploymentTrigger: {
+          id: string;
+          status: string;
+        };
+      };
+    };
   } catch (error) {
-    console.error("Deployment failed:");
-    if (error.response) {
-      console.error(
-        "Response data:",
-        JSON.stringify(error.response.data, null, 2),
-      );
-      console.error("Response status:", error.response.status);
-      console.error(
-        "Response headers:",
-        JSON.stringify(error.response.headers, null, 2),
-      );
-    } else if (error.request) {
-      console.error("No response received:", error.request);
-    } else {
-      console.error("Error message:", error.message);
-    }
-    process.exit(1);
+    console.error("Deployment failed:", (error as Error).message);
   }
 }
 
-// Execute the deployment
-deployToRailway()
-  .then(() => {
-    console.log("Deployment process completed");
-  })
-  .catch((err) => {
-    console.error("Unexpected error:", err);
-    process.exit(1);
-  });
+void deployToRailway();
