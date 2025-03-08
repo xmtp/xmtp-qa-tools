@@ -83,7 +83,7 @@ jobs:
             echo "Attempt $i..."
             
             # Run the test with more comprehensive filtering
-            yarn test TS_Delivery 2>&1 | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "Error: Hpke error" | grep -v "Key not found" | grep -v "This error originated in" | grep -v "The latest test that might" | grep -v "If the error occurred after" | grep -v "The error was thrown" | grep -v "sqlcipher_mem_lock" | grep -v "⎯⎯⎯⎯⎯" | grep -v "Error: group with welcome id" | grep -v "thiserror"
+            yarn test TS_Delivery 2>&1 | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "Error: Hpke error" | grep -v "Key not found" | grep -v "This error originated in" | grep -v "The latest test that might" | grep -v "If the error occurred after" | grep -v "The error was thrown" | grep -v "sqlcipher_mem_lock" | grep -v "⎯⎯⎯⎯⎯" | grep -v "group with welcome id" | grep -v "thiserror"
             
             # Check if the test passed based on exit code
             if [ ${PIPESTATUS[0]} -eq 0 ]; then
