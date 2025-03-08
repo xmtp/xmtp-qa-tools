@@ -2,17 +2,23 @@
 
 The XMTP SDK sends performance metrics to Datadog to track various aspects of SDK operations. Here's a breakdown of how metrics are collected and sent:
 
+## Workflow monitors
+
+![](/media/monitors.png)
+
+**Delivery Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
+
 ## Performance
 
-![](/media/datadog.png)
+![](/media/ts_performance.png)
 
-**Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&tpl_var_geo%5B0%5D=us&from_ts=1740956007001&to_ts=1740956307001&live=true)
+**Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
 
 ## Delivery
 
-![](/media/delivery.png)
+![](/media/ts_delivery.png)
 
-**Delivery Dashboard URL:** [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5/xmtp-sdk-delivery?fromUser=false&from_ts=1741196398259&to_ts=1741199998259&live=true)
+**Delivery Dashboard URL:** [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5)
 
 ## Performance duration metric
 

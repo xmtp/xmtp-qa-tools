@@ -73,7 +73,7 @@ See more in the test bot [section](./bots/test/)
 
 ## Datadog dashboard
 
-![](/media/datadog.png)
+![](/media/ts_performance.png)
 
 See more in the dashboards [section](./dashboards/)
 
