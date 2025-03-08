@@ -2,41 +2,41 @@
 [![TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)
 [![TS_Gm](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)
 
-# Overview
+# 🚀 XMTP Testing Suite
 
-This monorepo contains multiple tools for testing and monitoring
+This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
-## Test suites
+## 🧪 Test Suites
 
 Run tests for specific modules using these commands:
 
-- **TS_Performance**: Measures operations by miliseconds and aggregates them in datadog dashboard
+- **TS_Performance**: Measures operations in milliseconds and aggregates results in a Datadog dashboard
 
   ```bash
   yarn test ts_performance
   ```
 
-  Link to [test](./tests/TS_Performance.test.ts)
+  [View test source](./tests/TS_Performance.test.ts)
 
-- **TS_Delivery**: Test multiple concurrent streams to see if there are message losses
+- **TS_Delivery**: Tests multiple concurrent streams to detect any message losses
 
   ```bash
   yarn test ts_delivery
   ```
 
-  Link to [test](./tests/TS_Delivery.test.ts)
+  [View test source](./tests/TS_Delivery.test.ts)
 
-- **TS_Gm**: Gm bot E2E test across browser and node
+- **TS_Gm**: End-to-end testing for the Gm bot across browser and Node.js environments
 
   ```bash
   yarn test ts_gm
   ```
 
-  Link to [test](./tests/TS_Gm.test.ts)
+  [View test source](./tests/TS_Gm.test.ts)
 
-## Workers
+## 👥 Workers
 
-Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
+Predefined personas (Bob, Joe, Sam, etc.) are initialized with the `getWorkers` function:
 
 ```tsx
 let personas: Record<string, Persona>;
@@ -45,93 +45,92 @@ beforeAll(async () => {
   personas = await getWorkers(["alice", "bob", "randomguy"], testName);
 });
 
-// Use them directly
+// Use them directly in your tests
 convo = await personas.alice.client!.conversations.newDm(
   personas.randomguy.client!.accountAddress,
 );
 ```
 
-Considerations
+### Key Considerations:
 
-- If a persona does not exist, its keys are created.
-- If persona exists uses the existing env file keys and .data folder
-- If the data folder doesnt exist, it creates one
-- Personas prefixed with "random" have keys that are stored only in memory.
+- If a persona doesn't exist, its keys are automatically created
+- Existing personas use keys from the env file and .data folder
+- Missing data folders are created automatically
+- Personas with the "random" prefix have keys stored only in memory
 
 > [!TIP]
-> Repository of 600 dummy wallets with inboxIds [see file](./helpers/generated-inboxes.json)
+> Access our repository of 600 dummy wallets with inboxIds in the [generated-inboxes.json](./helpers/generated-inboxes.json) file
 
-## Test bot
+## 🤖 Test Bot
 
-A bot that tests different interactions for manual testing
+A versatile bot for manual interaction testing:
 
 ```bash
 yarn bot
 ```
 
-See more in the test bot [section](./bots/test/)
+Learn more in the [test bot section](./bots/test/)
 
-## Datadog dashboard
+## 📊 Datadog Dashboards
 
 ![](/media/ts_performance.png)
 
-- **Delivery Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
-- **Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
+- **Message Delivery:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
+- **SDK Performance:** [Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
 
-See more in the dashboards [section](./dashboards/)
+Explore more in the [dashboards section](./dashboards/)
 
-## Github workflows
+## 🔄 GitHub Workflows
 
-See more in the worflows [section](/.github/workflows)
+See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
 
-## Helpers
+## 🧰 Tools & Utilities
 
-See more helpers in the helpers [section](./helpers/)
+- **Helpers:** Utility functions in the [helpers section](./helpers/)
+- **Scripts:** Automation scripts in the [scripts section](./scripts/)
 
-## Scripts
+## 🧩 Development Tools
 
-See more scripts in the scripts [section](./scripts/)
+### Vitest UI
 
-## Vitest UI
+We use Vitest for running tests with an interactive UI for better visualization.
 
-Vitest is used for running tests and provides a UI for better visualization.
-
-> See live link deployed in [railway](https://ephemera-test.up.railway.app/__vitest__/#/)
+> Check out our live deployment on [Railway](https://ephemera-test.up.railway.app/__vitest__/#/)
 
 ![](/media/vitest.jpeg)
 
-#### How to run vitest ui
+Run the Vitest UI locally:
 
 ```bash
 yarn start
 ```
 
-## Playwright
+### Playwright
 
-Using playwright to write web automations. Try it out:
+We use Playwright for web automation testing:
 
-> See the example xmtp.chat [script](./playwright/gm-bot.playwright.ts)
+> See our example [xmtp.chat script](./playwright/gm-bot.playwright.ts)
 
-```tsx
+```bash
 yarn test xmtpchat
 ```
 
 https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
 
-## Bugs
+## 🐛 Bug Tracking
 
-Documenting bugs in this [folder](./bugs/) for easy replicatio.
+We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
 
-## Repos
+## 📚 Related Repositories
 
-- [lixmtp](https://github.com/xmtp/libxmtp)
-- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/browser-sdk)
-- [react-native-sdk](https://github.com/xmtp/xmtp-react-native)
+- [libxmtp](https://github.com/xmtp/libxmtp) - Core library implementation
+- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/browser-sdk) - Node.js SDK
+- [react-native-sdk](https://github.com/xmtp/xmtp-react-native) - React Native implementation
 
-## Railway
+## 🚂 Railway Deployment
 
-- xmtp-qa-testing [project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
+- [xmtp-qa-testing project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
 
-## Tracking
+## 📋 Issue Tracking
 
-See the [QA Board](https://github.com/orgs/xmtp/projects/30)
+Follow our progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
