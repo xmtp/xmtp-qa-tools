@@ -2,6 +2,7 @@ import {
   ConsentEntityType,
   ConsentState,
   type Consent,
+  type LogLevel,
 } from "@xmtp/node-bindings";
 import {
   Client,
@@ -30,6 +31,7 @@ export {
   type Group,
   type Installation,
   type Signer,
+  type LogLevel,
   type XmtpEnv,
 };
 // Define the expected return type of verifyStream

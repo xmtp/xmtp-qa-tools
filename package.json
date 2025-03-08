@@ -5,6 +5,7 @@
   "type": "module",
   "scripts": {
     "bot": "tsx  bots/test/index.ts",
+    "bug:stream": "tsx bugs/bug_dead_stream/index.ts",
     "build": "tsc",
     "clean": "rimraf node_modules && yarn clean:dbs",
     "clean:dbs": "rimraf *.db3* ||:",
@@ -13,6 +14,7 @@
     "format:check": "prettier -c .",
     "gen:inboxes": "tsx scripts/generateinboxes.ts",
     "gen:keys": "tsx scripts/generateKeys.ts",
+    "gm": "tsx  bots/gm/index.ts",
     "lint": "eslint .",
     "monitor:dev": "httpstat  https://grpc.dev.xmtp.network:443",
     "monitor:live": "bash scripts/monitor.sh",

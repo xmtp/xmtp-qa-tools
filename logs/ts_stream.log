@@ -1,0 +1,9 @@
+[2025-03-08T22:51:18.877Z] [info] envPath .env
+[2025-03-08T22:51:18.879Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:production","test:ts_stream","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-08T22:51:18.881Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
+[2025-03-08T22:51:21.117Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.207s
+[2025-03-08T22:51:22.608Z] [warn] [bob-a] Start message stream 1.490s
+[2025-03-08T22:51:22.609Z] [warn] [bob-a] Start stream 1.491s
+[2025-03-08T22:51:22.609Z] [warn] [bob-a] Initialize XMTP client 3.727s
+[2025-03-08T22:51:22.609Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
+[2025-03-08T22:51:26.928Z] [info] Messages before: 35 after: 37
