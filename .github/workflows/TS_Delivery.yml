@@ -17,6 +17,8 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+      # Add environment variable to prevent SQLCipher mlock errors
+      SQLCIPHER_NO_MLOCK: 1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -25,6 +27,14 @@ jobs:
           cache: "yarn"
         env:
           SKIP_YARN_COREPACK_CHECK: "1"
+      # Configure system limits for SQLCipher memory locking
+      - name: Configure system resources
+        run: |
+          echo "Setting resource limits for memory locking"
+          sudo sysctl -w vm.max_map_count=262144
+          sudo bash -c 'echo "* soft memlock unlimited" >> /etc/security/limits.conf'
+          sudo bash -c 'echo "* hard memlock unlimited" >> /etc/security/limits.conf'
+          ulimit -l unlimited || echo "ulimit command failed but continuing"
       - name: Ensure data folder exists
         run: mkdir -p .data
       - name: List data folder contents before caching

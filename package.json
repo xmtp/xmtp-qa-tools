@@ -18,15 +18,18 @@
     "monitor:live": "bash scripts/monitor.sh",
     "monitor:network": "bash scripts/network.sh",
     "record": "npx playwright codegen 'https://xmtp.chat/dm/0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F?env=dev'",
+    "redeploy": "tsx scripts/redeploy.ts",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest",
     "typecheck": "tsc"
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
+    "@railway/cli": "^3.22.2",
     "@vitest/ui": "^3.0.6",
     "@xmtp/node-sdk": "0.0.47",
     "alchemy-sdk": "^3.0.0",
+    "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.4.7",
     "openai": "latest",
