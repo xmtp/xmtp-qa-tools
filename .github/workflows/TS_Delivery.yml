@@ -31,10 +31,31 @@ jobs:
       - name: Configure system resources
         run: |
           echo "Setting resource limits for memory locking"
-          sudo sysctl -w vm.max_map_count=262144
+          # Increase max_map_count even higher
+          sudo sysctl -w vm.max_map_count=524288
+
+          # Set higher limits in both limits.conf and limit.d
           sudo bash -c 'echo "* soft memlock unlimited" >> /etc/security/limits.conf'
           sudo bash -c 'echo "* hard memlock unlimited" >> /etc/security/limits.conf'
+
+          # Create a dedicated config file for our process
+          sudo bash -c 'echo "* soft memlock unlimited" > /etc/security/limits.d/99-memlock.conf'
+          sudo bash -c 'echo "* hard memlock unlimited" >> /etc/security/limits.d/99-memlock.conf'
+
+          # Set higher max locked memory for this session
           ulimit -l unlimited || echo "ulimit command failed but continuing"
+
+          # Apply limits immediately for the current session
+          sudo prlimit --pid $ --memlock=unlimited:unlimited || echo "prlimit command failed but continuing"
+
+          # Increase shared memory limits as well
+          sudo sysctl -w kernel.shmmax=17179869184
+          sudo sysctl -w kernel.shmall=4194304
+
+          # Print current limits for debugging
+          echo "Current memlock limits:"
+          ulimit -a | grep "max locked memory"
+          cat /proc/self/limits | grep "Max locked memory"
       - name: Ensure data folder exists
         run: mkdir -p .data
       - name: List data folder contents before caching
