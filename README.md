@@ -75,6 +75,9 @@ See more in the test bot [section](./bots/test/)
 
 ![](/media/ts_performance.png)
 
+- **Delivery Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
+- **Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
+
 See more in the dashboards [section](./dashboards/)
 
 ## Github workflows
@@ -124,6 +127,10 @@ Documenting bugs in this [folder](./bugs/) for easy replicatio.
 - [lixmtp](https://github.com/xmtp/libxmtp)
 - [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/browser-sdk)
 - [react-native-sdk](https://github.com/xmtp/xmtp-react-native)
+
+## Railway
+
+- xmtp-qa-testing [project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
 
 ## Tracking
 
