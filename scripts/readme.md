@@ -4,14 +4,15 @@ This document provides practical instructions for using the scripts in the `/scr
 
 ## Quick Reference
 
-| Script                 | Purpose                       | Key Features                  |
-| ---------------------- | ----------------------------- | ----------------------------- |
-| **generateKeys.ts**    | Creates new XMTP keys         | Single key generation         |
-| **generateinboxes.ts** | Creates multiple test inboxes | Bulk account creation         |
-| **hyperbrowser.ts**    | Browser automation tool       | Headless testing, screenshots |
-| **network.sh**         | Checks XMTP node status       | Network monitoring            |
-| **monitor.sh**         | System monitoring             | Service status tracking       |
-| **run.ts**             | General-purpose task runner   | Configurable operations       |
+| Script                 | Purpose                        | Key Features                   |
+| ---------------------- | ------------------------------ | ------------------------------ |
+| **generateKeys.ts**    | Creates new XMTP keys          | Single key generation          |
+| **generateinboxes.ts** | Creates multiple test inboxes  | Bulk account creation          |
+| **hyperbrowser.ts**    | Browser automation tool        | Headless testing, screenshots  |
+| **network.sh**         | Checks XMTP node status        | Network monitoring             |
+| **monitor.sh**         | System monitoring              | Service status tracking        |
+| **run.ts**             | General-purpose task runner    | Configurable operations        |
+| **redeploy.ts**        | Redeploys a Railway deployment | Redeploys a Railway deployment |
 
 ## 🔑 Generate Keys
 
@@ -141,6 +142,15 @@ import inboxes from "../helpers/generated-inboxes.json";
 // Use a random inbox
 const randomIndex = Math.floor(Math.random() * inboxes.length);
 const testAccount = inboxes[randomIndex];
+```
+
+## 🔄 Redeploy
+
+The `redeploy.ts` script redeploys a Railway deployment.
+
+```bash
+# Run the script
+npx ts-node scripts/redeploy.ts
 ```
 
 ## 📝 Best Practices
