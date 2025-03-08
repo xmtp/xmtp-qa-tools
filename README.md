@@ -134,3 +134,5 @@ We document bugs in the [bugs folder](./bugs/) for easy reproduction and trackin
 ## 📋 Issue Tracking
 
 Follow our progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
+
+- [Issues](https://github.com/xmtp/xmtp-qa-testing/issues)
