@@ -43,18 +43,7 @@ describe(
     });
 
     afterAll(async () => {
-      try {
-        await closeEnv(testName, personas);
-      } catch (error) {
-        // Catch and log any errors during cleanup to prevent them from failing the test
-        console.error(`Error during test cleanup: ${error}`);
-        if (
-          error instanceof Error &&
-          error.message.includes("Hpke error: Key not found")
-        ) {
-          console.log(`Ignoring expected HPKE key cleanup error in afterAll`);
-        }
-      }
+      await closeEnv(testName, personas);
     });
 
     it("tc_stream: send the stream", async () => {
