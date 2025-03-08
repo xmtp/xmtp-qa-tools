@@ -41,6 +41,10 @@ describe(
         Object.values(personas).map((p) => p.client?.inboxId as string),
       );
       await new Promise((resolve) => setTimeout(resolve, 3000));
+      for (const persona of Object.values(personas)) {
+        console.log("syncing", persona.client?.inboxId);
+        await persona.client!.conversations.sync();
+      }
       expect(group.id).toBeDefined();
       console.log("Group created", group.id);
     });
@@ -60,7 +64,6 @@ describe(
         amountofMessages,
         (index) => `gm-${index + 1}-${randomSuffix}`,
       );
-      console.log("allReceived", collectedMessages.allReceived);
       expect(collectedMessages.allReceived).toBe(true);
     });
 
