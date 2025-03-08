@@ -1,8 +1,8 @@
-# XMTP bot testing for react native and browser
+# 🤖 XMTP Bot Testing for React Native and Browser
 
 A lightweight toolkit for React Native developers to test messaging functionality against XMTP bots.
 
-## Getting Started
+## 🚀 Getting Started
 
 ### Prerequisites
 
@@ -17,7 +17,7 @@ cd xmtp-qa-testing
 yarn install
 ```
 
-## Running the bot
+## 🏃‍♂️ Running the Bot
 
 If you need to run the test bot locally:
 
@@ -31,14 +31,14 @@ This will return the address of the bot
 
 In the example the public key is `0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F`
 
-## Available Commands
+## 💬 Available Commands
 
-| Command  | Description                                                                          |
-| -------- | ------------------------------------------------------------------------------------ |
-| `gm`     | Returns gm to your messageCreates a test group with simulated users and conversation |
-| `/group` | Creates a test group with simulated users and conversation                           |
+| Command  | Description                                                |
+| -------- | ---------------------------------------------------------- |
+| `gm`     | Returns gm to your message                                 |
+| `/group` | Creates a test group with simulated users and conversation |
 
-## Users
+## 👥 Users
 
 The test bot is populated with the following virtual users:
 
@@ -49,7 +49,7 @@ The test bot is populated with the following virtual users:
 
 This will start the bot on your local machine, ready to respond to messages.
 
-## Environment Configuration
+## ⚙️ Environment Configuration
 
 Create a `.env` file with the following configuration:
 
@@ -58,7 +58,7 @@ LOGGING_LEVEL="off" # off, error, warn, info, debug, trace
 XMTP_ENV="dev" # dev, production
 ```
 
-## Workers
+## 🧰 Workers
 
 Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
 
@@ -82,7 +82,7 @@ Considerations
 - If the data folder doesnt exist, it creates one
 - Personas prefixed with "random" have keys that are stored only in memory.
 
-## Coming Soon
+## 🔮 Coming Soon
 
 - [ ] Metadata for groups
 - [ ] Consent
