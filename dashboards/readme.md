@@ -2,25 +2,19 @@
 
 The XMTP SDK sends performance metrics to Datadog to track various aspects of SDK operations. Here's a breakdown of how metrics are collected and sent:
 
-## Workflow monitors
+## Dashboards
 
-![](/media/monitors.png)
+### Workflow
 
 **Delivery Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
 
-## Performance
+![](/media/workflows.png)
 
-![](/media/ts_performance.png)
+### Performance
 
 **Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
 
-## Delivery
-
-![](/media/ts_delivery.png)
-
-**Delivery Dashboard URL:** [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5)
-
-## Performance duration metric
+![](/media/ts_performance.png)
 
 The primary metric sent to Datadog is `xmtp.sdk.duration`, which measures the time taken for various SDK operations.
 
@@ -40,7 +34,7 @@ metrics.gauge(durationMetricName, value, [
 // ... existing code ...
 ```
 
-## Tags used for metrics
+#### Tags used for metrics
 
 Each metric is tagged with relevant information to enable filtering and analysis:
 
@@ -51,7 +45,7 @@ Each metric is tagged with relevant information to enable filtering and analysis
 5. `description` - Additional context about what's being measured
 6. `members` - Number of members involved (for group operations)
 
-## Network performance metrics
+#### Network performance metrics
 
 In addition to operation metrics, network performance is also tracked:
 
@@ -77,7 +71,7 @@ if (!skipNetworkStats) {
 
 > See the network stats [function](/helpers/datadog.ts)
 
-## Network phases measured
+#### Network phases measured
 
 The following network phases are measured and reported:
 
@@ -87,7 +81,11 @@ The following network phases are measured and reported:
 4. `server_call` - Time taken for the server to respond
 5. `processing` - Time taken for server processing (calculated as server_call - tls_handshake)
 
-## Message delivery metrics
+### Delivery
+
+**Delivery Dashboard URL:** [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5)
+
+![](/media/ts_delivery.png)
 
 In addition to performance metrics, the SDK also tracks message delivery reliability through the `xmtp.sdk.delivery_rate` metric:
 
@@ -103,7 +101,7 @@ metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
 // ... existing code ...
 ```
 
-### Delivery dashboard
+#### Delivery dashboard
 
 The delivery dashboard visualizes message delivery rates and provides insights into the reliability of message delivery across different environments and regions.
 
