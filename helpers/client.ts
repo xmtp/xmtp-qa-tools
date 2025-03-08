@@ -192,4 +192,7 @@ export async function closeEnv(
       console.error(`[${testName}] Error clearing worker cache:`, error);
     }
   }
+
+  // Add a small delay to allow any pending operations to complete
+  await new Promise((resolve) => setTimeout(resolve, 500));
 }
