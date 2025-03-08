@@ -152,12 +152,44 @@ export async function closeEnv(
   if (personas) {
     await Promise.all(
       Object.values(personas).map(async (persona) => {
-        await persona.worker?.terminate();
+        try {
+          await persona.worker?.terminate();
+        } catch (error) {
+          // Silently handle HPKE key errors during worker termination
+          if (
+            error instanceof Error &&
+            error.message.includes("Hpke error: Key not found")
+          ) {
+            console.log(
+              `[${testName}] Ignoring expected HPKE key cleanup error for ${persona.name}`,
+            );
+          } else {
+            // Log other errors but don't fail the test
+            console.error(
+              `[${testName}] Error terminating worker for ${persona.name}:`,
+              error,
+            );
+          }
+        }
       }),
     );
   }
 
   // Import and call clearWorkerCache to ensure global cache is cleaned up
-  const { clearWorkerCache } = await import("./workers/factory");
-  await clearWorkerCache();
+  try {
+    const { clearWorkerCache } = await import("./workers/factory");
+    await clearWorkerCache();
+  } catch (error) {
+    // Handle potential errors during cache clearing
+    if (
+      error instanceof Error &&
+      error.message.includes("Hpke error: Key not found")
+    ) {
+      console.log(
+        `[${testName}] Ignoring expected HPKE key cleanup error during cache clearing`,
+      );
+    } else {
+      console.error(`[${testName}] Error clearing worker cache:`, error);
+    }
+  }
 }

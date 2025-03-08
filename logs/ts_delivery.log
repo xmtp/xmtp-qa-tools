@@ -1,61 +1,52 @@
-[2025-03-07T19:04:26.447Z] [info] envPath .env
-[2025-03-07T19:04:26.448Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:production","test:ts_delivery","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-07T19:04:26.450Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
-[2025-03-07T19:04:26.450Z] [info] [PersonaFactory] Using env keys for alice: 0xd7c3...
-[2025-03-07T19:04:26.451Z] [info] [PersonaFactory] Using env keys for fabri: 0xf840...
-[2025-03-07T19:04:26.451Z] [info] [PersonaFactory] Using env keys for bot: 0xb2a3...
-[2025-03-07T19:04:28.606Z] [warn] [bot-a] Create XMTP client v:6bd613d 2.100s
-[2025-03-07T19:04:28.728Z] [warn] [alice-a] Create XMTP client v:6bd613d 2.222s
-[2025-03-07T19:04:28.783Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.276s
-[2025-03-07T19:04:29.000Z] [warn] [bot-a] Start message stream 392.651ms
-[2025-03-07T19:04:29.000Z] [warn] [bot-a] Start stream 393.162ms
-[2025-03-07T19:04:29.000Z] [warn] [bot-a] Initialize XMTP client 2.496s
-[2025-03-07T19:04:29.149Z] [warn] [alice-a] Start message stream 420.773ms
-[2025-03-07T19:04:29.150Z] [warn] [alice-a] Start stream 421.078ms
-[2025-03-07T19:04:29.150Z] [warn] [alice-a] Initialize XMTP client 2.649s
-[2025-03-07T19:04:29.197Z] [warn] [bob-a] Start message stream 413.202ms
-[2025-03-07T19:04:29.197Z] [warn] [bob-a] Start stream 413.513ms
-[2025-03-07T19:04:29.197Z] [warn] [bob-a] Initialize XMTP client 2.745s
-[2025-03-07T19:04:30.108Z] [warn] [fabri-a] Create XMTP client v:6bd613d 3.602s
-[2025-03-07T19:04:30.463Z] [warn] [fabri-a] Start message stream 354.11ms
-[2025-03-07T19:04:30.463Z] [warn] [fabri-a] Start stream 355.424ms
-[2025-03-07T19:04:30.464Z] [warn] [fabri-a] Initialize XMTP client 3.961s
-[2025-03-07T19:04:30.464Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
-[2025-03-07T19:04:30.464Z] [info] alice 0x9150271DBCfa01C3EeD1E1cD8530494B809Bb710
-[2025-03-07T19:04:30.465Z] [info] fabri 0xc9cDb8D21edE9ad90f9F222ea39A806fa2b40682
-[2025-03-07T19:04:30.465Z] [info] bot 0x2d6548B4CD58D48E2C5a4C2633a157eb92Dfd54f
-[2025-03-07T19:04:34.693Z] [info] Group created 3cdd0ae00d805b250f9d79db234a6837
-[2025-03-07T19:04:34.693Z] [info] [alice-a] Collecting 10 messages from convo:3cdd0ae00d805b250f9d79db234a6837
-[2025-03-07T19:04:34.694Z] [info] [fabri-a] Collecting 10 messages from convo:3cdd0ae00d805b250f9d79db234a6837
-[2025-03-07T19:04:34.694Z] [info] [bot-a] Collecting 10 messages from convo:3cdd0ae00d805b250f9d79db234a6837
-[2025-03-07T19:04:34.694Z] [info] Sending message #1: gm-1-mnxr9pfsfod
-[2025-03-07T19:04:35.724Z] [info] Sending message #2: gm-2-mnxr9pfsfod
-[2025-03-07T19:04:36.505Z] [info] Sending message #3: gm-3-mnxr9pfsfod
-[2025-03-07T19:04:37.329Z] [info] Sending message #4: gm-4-mnxr9pfsfod
-[2025-03-07T19:04:38.152Z] [info] Sending message #5: gm-5-mnxr9pfsfod
-[2025-03-07T19:04:38.967Z] [info] Sending message #6: gm-6-mnxr9pfsfod
-[2025-03-07T19:04:39.809Z] [info] Sending message #7: gm-7-mnxr9pfsfod
-[2025-03-07T19:04:40.629Z] [info] Sending message #8: gm-8-mnxr9pfsfod
-[2025-03-07T19:04:41.863Z] [info] Sending message #9: gm-9-mnxr9pfsfod
-[2025-03-07T19:04:42.463Z] [info] Sending message #10: gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.019Z] [info] All participants received the expected number of messages.
-[2025-03-07T19:04:43.019Z] [info] allReceived true
-[2025-03-07T19:04:43.020Z] [info] Expected messages pattern: gm-[1-10]-mnxr9pfsfod
-[2025-03-07T19:04:43.020Z] [info] Reception percentage: 100.00% (30/30 messages)
-[2025-03-07T19:04:43.020Z] [info] Order percentage: 100.00% (3/3 personas)
-[2025-03-07T19:04:43.020Z] [info] Comparative Table:
-[2025-03-07T19:04:43.020Z] [info] Persona 1: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.020Z] [info] Persona 2: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.020Z] [info] Persona 3: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.021Z] [info] Sending metric: xmtp.sdk.delivery with value 100
-[2025-03-07T19:04:43.021Z] [info] Sending metric: xmtp.sdk.order with value 100
-[2025-03-07T19:04:43.388Z] [info] Expected messages pattern: gm-[1-10]-mnxr9pfsfod
-[2025-03-07T19:04:43.388Z] [info] Reception percentage: 100.00% (40/40 messages)
-[2025-03-07T19:04:43.388Z] [info] Order percentage: 100.00% (4/4 personas)
-[2025-03-07T19:04:43.388Z] [info] Comparative Table:
-[2025-03-07T19:04:43.388Z] [info] Persona 1: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.388Z] [info] Persona 2: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.388Z] [info] Persona 3: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.388Z] [info] Persona 4: gm-1-mnxr9pfsfod, gm-2-mnxr9pfsfod, gm-3-mnxr9pfsfod, gm-4-mnxr9pfsfod, gm-5-mnxr9pfsfod, gm-6-mnxr9pfsfod, gm-7-mnxr9pfsfod, gm-8-mnxr9pfsfod, gm-9-mnxr9pfsfod, gm-10-mnxr9pfsfod
-[2025-03-07T19:04:43.388Z] [info] Sending metric: xmtp.sdk.delivery with value 100
-[2025-03-07T19:04:43.388Z] [info] Sending metric: xmtp.sdk.order with value 100
+[2025-03-08T14:28:33.351Z] [info] envPath .env
+[2025-03-08T14:28:33.353Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:production","test:ts_delivery","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-08T14:28:33.355Z] [info] [PersonaFactory] Using env keys for bob: 0xe81b...
+[2025-03-08T14:28:33.355Z] [info] [PersonaFactory] Using env keys for alice: 0xd7c3...
+[2025-03-08T14:28:33.355Z] [info] [PersonaFactory] Using env keys for fabri: 0xf840...
+[2025-03-08T14:28:33.356Z] [info] [PersonaFactory] Using env keys for bot: 0xb2a3...
+[2025-03-08T14:28:35.521Z] [warn] [alice-a] Create XMTP client v:6bd613d 2.131s
+[2025-03-08T14:28:35.571Z] [warn] [fabri-a] Create XMTP client v:6bd613d 2.181s
+[2025-03-08T14:28:35.655Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.266s
+[2025-03-08T14:28:35.689Z] [warn] [bot-a] Create XMTP client v:6bd613d 2.299s
+[2025-03-08T14:28:35.938Z] [warn] [alice-a] Start message stream 415.81ms
+[2025-03-08T14:28:35.939Z] [warn] [alice-a] Start stream 417.288ms
+[2025-03-08T14:28:35.939Z] [warn] [alice-a] Initialize XMTP client 2.554s
+[2025-03-08T14:28:35.999Z] [warn] [fabri-a] Start message stream 425.987ms
+[2025-03-08T14:28:35.999Z] [warn] [fabri-a] Start stream 427.986ms
+[2025-03-08T14:28:36.000Z] [warn] [fabri-a] Initialize XMTP client 2.613s
+[2025-03-08T14:28:36.058Z] [warn] [bob-a] Start message stream 402.703ms
+[2025-03-08T14:28:36.059Z] [warn] [bob-a] Start stream 404.139ms
+[2025-03-08T14:28:36.060Z] [warn] [bob-a] Initialize XMTP client 2.703s
+[2025-03-08T14:28:36.075Z] [warn] [bot-a] Start message stream 385.385ms
+[2025-03-08T14:28:36.076Z] [warn] [bot-a] Start stream 386.581ms
+[2025-03-08T14:28:36.077Z] [warn] [bot-a] Initialize XMTP client 2.689s
+[2025-03-08T14:28:36.078Z] [info] bob 0x9a1C0F4b648C6D8783b259db194be44c8310a943
+[2025-03-08T14:28:36.078Z] [info] alice 0x9150271DBCfa01C3EeD1E1cD8530494B809Bb710
+[2025-03-08T14:28:36.078Z] [info] fabri 0xc9cDb8D21edE9ad90f9F222ea39A806fa2b40682
+[2025-03-08T14:28:36.078Z] [info] bot 0x2d6548B4CD58D48E2C5a4C2633a157eb92Dfd54f
+[2025-03-08T14:28:41.532Z] [info] Group created 046ba914db090709dd247ea8780e4cac
+[2025-03-08T14:28:41.533Z] [info] [alice-a] Collecting 10 messages from convo:046ba914db090709dd247ea8780e4cac
+[2025-03-08T14:28:41.533Z] [info] [fabri-a] Collecting 10 messages from convo:046ba914db090709dd247ea8780e4cac
+[2025-03-08T14:28:41.533Z] [info] [bot-a] Collecting 10 messages from convo:046ba914db090709dd247ea8780e4cac
+[2025-03-08T14:28:41.533Z] [info] Sending message #1: gm-1-2miu0ugspyy
+[2025-03-08T14:28:42.538Z] [info] Sending message #2: gm-2-2miu0ugspyy
+[2025-03-08T14:28:43.341Z] [info] Sending message #3: gm-3-2miu0ugspyy
+[2025-03-08T14:28:44.200Z] [info] Sending message #4: gm-4-2miu0ugspyy
+[2025-03-08T14:28:45.072Z] [info] Sending message #5: gm-5-2miu0ugspyy
+[2025-03-08T14:28:45.672Z] [info] Sending message #6: gm-6-2miu0ugspyy
+[2025-03-08T14:28:46.448Z] [info] Sending message #7: gm-7-2miu0ugspyy
+[2025-03-08T14:28:47.250Z] [info] Sending message #8: gm-8-2miu0ugspyy
+[2025-03-08T14:28:48.370Z] [info] Sending message #9: gm-9-2miu0ugspyy
+[2025-03-08T14:28:48.945Z] [info] Sending message #10: gm-10-2miu0ugspyy
+[2025-03-08T14:28:49.771Z] [info] All participants received the expected number of messages.
+[2025-03-08T14:28:49.771Z] [info] allReceived true
+[2025-03-08T14:28:49.773Z] [info] Expected messages pattern: gm-[1-10]-2miu0ugspyy
+[2025-03-08T14:28:49.773Z] [info] Reception percentage: 100.00% (30/30 messages)
+[2025-03-08T14:28:49.773Z] [info] Order percentage: 100.00% (3/3 personas)
+[2025-03-08T14:28:49.773Z] [info] Sending metric: xmtp.sdk.delivery with value 100
+[2025-03-08T14:28:49.774Z] [info] Sending metric: xmtp.sdk.order with value 100
+[2025-03-08T14:28:50.201Z] [info] Expected messages pattern: gm-[1-10]-2miu0ugspyy
+[2025-03-08T14:28:50.201Z] [info] Reception percentage: 100.00% (40/40 messages)
+[2025-03-08T14:28:50.201Z] [info] Order percentage: 100.00% (4/4 personas)
+[2025-03-08T14:28:50.201Z] [info] Sending metric: xmtp.sdk.delivery with value 100
+[2025-03-08T14:28:50.201Z] [info] Sending metric: xmtp.sdk.order with value 100
