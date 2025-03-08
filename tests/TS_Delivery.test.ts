@@ -36,11 +36,13 @@ describe(
       //fs.rmSync(".data", { recursive: true, force: true });
       // Use getWorkers to spin up many personas. This is resource-intensive.
       personas = await getWorkers(receiverAmount, testName);
+      console.log("creating group");
       group = await personas.bob.client!.conversations.newGroupByInboxIds(
         Object.values(personas).map((p) => p.client?.inboxId as string),
       );
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
       expect(group.id).toBeDefined();
+      console.log("Group created", group.id);
     });
 
     afterAll(async () => {
@@ -48,7 +50,6 @@ describe(
     });
 
     it("tc_stream: send the stream", async () => {
-      console.log("Group created", group.id);
       expect(group.id).toBeDefined();
 
       // Collect messages by setting up listeners before sending and then sending known messages.
