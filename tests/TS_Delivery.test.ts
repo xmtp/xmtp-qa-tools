@@ -47,12 +47,6 @@ describe(
     });
 
     it("tc_stream: send the stream", async () => {
-      // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-      group = await personas.bob.client!.conversations.newGroup(
-        Object.values(personas).map(
-          (p) => p.client?.accountAddress as `0x${string}`,
-        ),
-      );
       console.log("Group created", group.id);
       expect(group.id).toBeDefined();
 
