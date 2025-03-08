@@ -1,0 +1,67 @@
+{
+  "id": 166156318,
+  "name": "TS_Performance Workflow Failed in {{environment.name}}",
+  "type": "query alert",
+  "query": "avg(last_1h):avg:github.workflow.status{workflow:ts_performance} by {workflow}.fill(last, 300) < 1",
+  "message": "This alert triggers when the TS_Performance workflow fails\n\nWorkflow status: {{value}} (0=Failed, 1=Success)\n\n[View Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf)\n[View GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)\n\n@slack-notify-eng-testing",
+  "tags": ["*"],
+  "options": {
+    "thresholds": {
+      "critical": 1
+    },
+    "notify_audit": false,
+    "threshold_windows": null,
+    "on_missing_data": "default",
+    "include_tags": false,
+    "new_group_delay": 60,
+    "notify_by": ["*"]
+  },
+  "priority": null
+}
+{
+	"id": 166156250,
+	"name": "TS_Gm Workflow Failed in {{environment.name}}",
+	"type": "query alert",
+	"query": "avg(last_1h):avg:github.workflow.status{workflow:ts_gm} by {workflow}.fill(last, 300) < 1",
+	"message": "This alert triggers when the TS_Gm workflow fails in the Dev environment.\n\nWorkflow status: {{value}} (0=Failed, 1=Success)\n\n[View Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf)\n[View GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)\n[Railway](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/5088c861-3808-40c2-aef5-7ccb9501343d?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)\n\n@slack-notify-eng-testing",
+	"tags": [
+		"*"
+	],
+	"options": {
+		"thresholds": {
+			"critical": 1
+		},
+		"notify_audit": false,
+		"threshold_windows": null,
+		"on_missing_data": "default",
+		"include_tags": false,
+		"new_group_delay": 60,
+		"notify_by": [
+			"*"
+		]
+	},
+	"priority": null
+}{
+	"id": 166156318,
+	"name": "TS_Performance Workflow Failed in {{environment.name}}",
+	"type": "query alert",
+	"query": "avg(last_1h):avg:github.workflow.status{workflow:ts_performance} by {workflow}.fill(last, 300) < 1",
+	"message": "This alert triggers when the TS_Performance workflow fails\n\nWorkflow status: {{value}} (0=Failed, 1=Success)\n\n[View Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf)\n[View GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)\n\n@slack-notify-eng-testing",
+	"tags": [
+		"*"
+	],
+	"options": {
+		"thresholds": {
+			"critical": 1
+		},
+		"notify_audit": false,
+		"threshold_windows": null,
+		"on_missing_data": "default",
+		"include_tags": false,
+		"new_group_delay": 60,
+		"notify_by": [
+			"*"
+		]
+	},
+	"priority": null
+}
