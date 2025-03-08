@@ -109,7 +109,7 @@ yarn start
 
 We use Playwright for web automation testing:
 
-> See our example [xmtp.chat script](./playwright/gm-bot.playwright.ts)
+> See our example [xmtp.chat script](./playwright/)
 
 ```bash
 yarn test xmtpchat
@@ -124,7 +124,7 @@ We document bugs in the [bugs folder](./bugs/) for easy reproduction and trackin
 ## 📚 Related Repositories
 
 - [libxmtp](https://github.com/xmtp/libxmtp) - Core library implementation
-- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/browser-sdk) - Node.js SDK
+- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/node-sdk) - Node.js SDK
 - [react-native-sdk](https://github.com/xmtp/xmtp-react-native) - React Native implementation
 
 ## 🚂 Railway Deployment
