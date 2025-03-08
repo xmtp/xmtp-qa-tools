@@ -79,22 +79,16 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
+            # Run the test but ignore the specific error messages in the output
+            yarn test TS_Delivery 2>&1 | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "Error: Hpke error: Key not found" | grep -v "This error originated in" | grep -v "The latest test that might've caused the error" | grep -v "sqlcipher_mem_lock"
             
-            # Run the test and capture exit code
-            yarn test TS_Delivery > test_output.log 2>&1
-            TEST_EXIT_CODE=$?
-            
-            # Check if the test passed by looking for passing indicators
-            if grep -q "PASS" test_output.log; then
-              echo "Test passed successfully, ignoring post-test errors"
-              # Filter the output for display purposes only
-              cat test_output.log | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "sqlcipher_mem_lock"
+            # Check if the test passed based on exit code
+            # Vitest will return non-zero if tests actually fail, but we need to use pipefail=false
+            # to prevent the grep filters from affecting the exit code
+            if [ ${PIPESTATUS[0]} -eq 0 ]; then
+              echo "Test passed successfully!"
               break
             fi
-            
-            # If we're here, the test didn't pass
-            echo "Test attempt $i failed with exit code $TEST_EXIT_CODE"
-            cat test_output.log
             
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
