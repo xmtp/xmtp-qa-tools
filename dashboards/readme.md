@@ -10,6 +10,8 @@ The XMTP SDK sends performance metrics to Datadog to track various aspects of SD
 
 ![](/media/workflows.png)
 
+Dashboard for tracking the 3 worflows run continously, connected to slack `#notify-eng-testing` channel
+
 ### Performance
 
 **Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
