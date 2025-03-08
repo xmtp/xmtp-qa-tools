@@ -94,10 +94,3 @@ _Note: Haven't been able to produce reports in cross- testing until we have acce
 | Stream Message Loss     | 0.0%                       | 0% (zero tolerance)     | ✅ On Target          |
 | Cross-SDK Compatibility | 80%                        | 100% operation success  | ⏳ WIP                |
 | Non-us performance      | 40%                        | <20% difference         | ❌ Performance Impact |
-
-### Disclaimers
-
-- **Limited Testing Period**: Performance metrics in this report are based on a limited testing period of only a few days. Longer-term testing may reveal different patterns or issues.
-- **Ideal Network Conditions**: All measurements were taken under ideal network conditions with minimal load. Real-world performance may vary significantly when the network is under stress or high load.
-- **Geographic Limitations**: Most testing was conducted from US-based nodes. Performance in other regions may show considerable variation (as noted in the 40% performance difference for non-US regions).
-- **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
