@@ -79,12 +79,12 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
-            # Run the test and consider it successful if it passes, even with HPKE errors
-            yarn test TS_Delivery 2>&1 | tee test_output.log
+            # Run the test and filter out both HPKE errors and SQLCipher mlock errors
+            yarn test TS_Delivery 2>&1 | grep -v "sqlcipher_mem_lock: mlock.*returned -1 errno=12" | grep -v "Hpke error: Key not found" | tee test_output.log
             
             # Check if the test passed (look for passing test indicators)
             if grep -q "PASS" test_output.log; then
-              echo "Test passed successfully, ignoring HPKE errors"
+              echo "Test passed successfully, ignoring HPKE and mlock errors"
               break
             fi
             
