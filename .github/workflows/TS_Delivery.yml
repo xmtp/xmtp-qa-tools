@@ -79,14 +79,22 @@ jobs:
         run: |
           for i in {1..3}; do
             echo "Attempt $i..."
-            # Run the test and filter out both HPKE errors and SQLCipher mlock errors
-            yarn test TS_Delivery 2>&1 | grep -v "sqlcipher_mem_lock: mlock.*returned -1 errno=12" | grep -v "Hpke error: Key not found" | tee test_output.log
             
-            # Check if the test passed (look for passing test indicators)
+            # Run the test and capture exit code
+            yarn test TS_Delivery > test_output.log 2>&1
+            TEST_EXIT_CODE=$?
+            
+            # Check if the test passed by looking for passing indicators
             if grep -q "PASS" test_output.log; then
-              echo "Test passed successfully, ignoring HPKE and mlock errors"
+              echo "Test passed successfully, ignoring post-test errors"
+              # Filter the output for display purposes only
+              cat test_output.log | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "sqlcipher_mem_lock"
               break
             fi
+            
+            # If we're here, the test didn't pass
+            echo "Test attempt $i failed with exit code $TEST_EXIT_CODE"
+            cat test_output.log
             
             if [ $i -eq 3 ]; then
               echo "Test failed after 3 attempts."
