@@ -95,16 +95,6 @@ _Note: Haven't been able to produce reports in cross- testing until we have acce
 | Cross-SDK Compatibility | 80%                        | 100% operation success  | ⏳ WIP                |
 | Non-us performance      | 40%                        | <20% difference         | ❌ Performance Impact |
 
-## 5. Testing Infrastructure and Roadmap
-
-### Current Testing Infrastructure
-
-- Multi-region testing nodes (US and Non-US regions) ⏳ WIP
-- 30-minute automated test execution intervals
-- Real-time performance dashboard monitoring 79 operations
-- Comprehensive data aggregation in datadog
-- Testing directly on top of SDKs for real-world scenarios
-
 ### Disclaimers
 
 - **Limited Testing Period**: Performance metrics in this report are based on a limited testing period of only a few days. Longer-term testing may reveal different patterns or issues.
