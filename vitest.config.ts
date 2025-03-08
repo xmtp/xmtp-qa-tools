@@ -18,6 +18,11 @@ export default defineConfig({
     pool: "threads",
     poolOptions: {
       singleThread: true,
+    }, // Add these options to better handle cleanup errors
+    teardownTimeout: 10000, // Timeout for teardown operations
+    onConsoleLog(log) {
+      // Optional: customize console log handling
+      return log.includes("Ignoring expected HPKE key") ? false : true;
     },
     api: {
       host: "0.0.0.0",
