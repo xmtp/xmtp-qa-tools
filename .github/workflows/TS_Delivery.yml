@@ -77,14 +77,15 @@ jobs:
       - run: yarn
       - name: Run tests with retry
         run: |
+          set +o pipefail  # Ensure pipeline exit code is from the first command
+
           for i in {1..3}; do
             echo "Attempt $i..."
-            # Run the test but ignore the specific error messages in the output
-            yarn test TS_Delivery 2>&1 | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "Error: Hpke error: Key not found" | grep -v "This error originated in" | grep -v "The latest test that might've caused the error" | grep -v "sqlcipher_mem_lock"
+            
+            # Run the test with more comprehensive filtering
+            yarn test TS_Delivery 2>&1 | grep -v "Uncaught Exception" | grep -v "Serialized Error" | grep -v "Error: Hpke error" | grep -v "Key not found" | grep -v "This error originated in" | grep -v "The latest test that might" | grep -v "If the error occurred after" | grep -v "The error was thrown" | grep -v "sqlcipher_mem_lock" | grep -v "⎯⎯⎯⎯⎯"
             
             # Check if the test passed based on exit code
-            # Vitest will return non-zero if tests actually fail, but we need to use pipefail=false
-            # to prevent the grep filters from affecting the exit code
             if [ ${PIPESTATUS[0]} -eq 0 ]; then
               echo "Test passed successfully!"
               break

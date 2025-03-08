@@ -1,0 +1,57 @@
+[2025-03-08T16:22:32.691Z] [info] envPath .env
+[2025-03-08T16:22:32.694Z] [info] [PersonaFactory] Using env keys for henry: 0x4fa0...
+[2025-03-08T16:22:32.694Z] [info] [PersonaFactory] Using env keys for ivy: 0x7c09...
+[2025-03-08T16:22:32.694Z] [info] [PersonaFactory] Using env keys for jack: 0x6cac...
+[2025-03-08T16:22:32.695Z] [info] [PersonaFactory] Using env keys for karen: 0x947b...
+[2025-03-08T16:22:32.695Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-08T16:22:32.720Z] [info] [PersonaFactory] Using env keys for larry: 0x09be...
+[2025-03-08T16:22:32.720Z] [info] [PersonaFactory] Using env keys for mary: 0xc5de...
+[2025-03-08T16:22:32.721Z] [info] [PersonaFactory] Using env keys for nancy: 0xaf98...
+[2025-03-08T16:22:32.721Z] [info] [PersonaFactory] Using env keys for oscar: 0x3c51...
+[2025-03-08T16:22:36.455Z] [warn] [ivy-a] Create XMTP client v:6bd613d 3.719s
+[2025-03-08T16:22:36.562Z] [warn] [henry-a] Create XMTP client v:6bd613d 3.827s
+[2025-03-08T16:22:36.717Z] [warn] [jack-a] Create XMTP client v:6bd613d 3.981s
+[2025-03-08T16:22:36.722Z] [warn] [larry-a] Create XMTP client v:6bd613d 3.986s
+[2025-03-08T16:22:36.734Z] [warn] [randomguy-a] Create XMTP client v:6bd613d 3.997s
+[2025-03-08T16:22:36.750Z] [warn] [henry-a] Initialize XMTP client 4.025s
+[2025-03-08T16:22:36.824Z] [warn] [nancy-a] Create XMTP client v:6bd613d 4.088s
+[2025-03-08T16:22:36.840Z] [warn] [ivy-a] Start message stream 384.812ms
+[2025-03-08T16:22:36.840Z] [warn] [ivy-a] Start stream 385.14ms
+[2025-03-08T16:22:36.840Z] [warn] [ivy-a] Initialize XMTP client 4.114s
+[2025-03-08T16:22:36.850Z] [warn] [karen-a] Create XMTP client v:6bd613d 4.114s
+[2025-03-08T16:22:36.886Z] [warn] [oscar-a] Create XMTP client v:6bd613d 4.150s
+[2025-03-08T16:22:36.987Z] [warn] [mary-a] Create XMTP client v:6bd613d 4.251s
+[2025-03-08T16:22:37.133Z] [warn] [larry-a] Start message stream 410.077ms
+[2025-03-08T16:22:37.133Z] [warn] [larry-a] Start stream 410.283ms
+[2025-03-08T16:22:37.133Z] [warn] [larry-a] Initialize XMTP client 4.403s
+[2025-03-08T16:22:37.133Z] [warn] [jack-a] Start message stream 416.033ms
+[2025-03-08T16:22:37.133Z] [warn] [jack-a] Start stream 416.083ms
+[2025-03-08T16:22:37.133Z] [warn] [jack-a] Initialize XMTP client 4.405s
+[2025-03-08T16:22:37.141Z] [warn] [randomguy-a] Start message stream 406.8ms
+[2025-03-08T16:22:37.141Z] [warn] [randomguy-a] Start stream 407.001ms
+[2025-03-08T16:22:37.141Z] [warn] [randomguy-a] Initialize XMTP client 4.411s
+[2025-03-08T16:22:37.229Z] [warn] [nancy-a] Start message stream 404.464ms
+[2025-03-08T16:22:37.229Z] [warn] [nancy-a] Start stream 405.135ms
+[2025-03-08T16:22:37.229Z] [warn] [nancy-a] Initialize XMTP client 4.495s
+[2025-03-08T16:22:37.261Z] [warn] [karen-a] Start message stream 410.708ms
+[2025-03-08T16:22:37.262Z] [warn] [karen-a] Start stream 411.694ms
+[2025-03-08T16:22:37.262Z] [warn] [karen-a] Initialize XMTP client 4.533s
+[2025-03-08T16:22:37.315Z] [warn] [oscar-a] Start message stream 429.205ms
+[2025-03-08T16:22:37.316Z] [warn] [oscar-a] Start stream 429.868ms
+[2025-03-08T16:22:37.316Z] [warn] [oscar-a] Initialize XMTP client 4.581s
+[2025-03-08T16:22:37.384Z] [warn] [mary-a] Start message stream 396.973ms
+[2025-03-08T16:22:37.384Z] [warn] [mary-a] Start stream 397.652ms
+[2025-03-08T16:22:37.384Z] [warn] [mary-a] Initialize XMTP client 4.653s
+[2025-03-08T16:22:37.385Z] [info] henry 0x70506001853d9A8b8becEd0c76427c90dC81b678
+[2025-03-08T16:22:37.385Z] [info] ivy 0x47bC36610Fd0957fA53A3d111890c0CC70AfE469
+[2025-03-08T16:22:37.385Z] [info] jack 0x8ffb52B1a133D4cb0589c759F3Fa51C1DfED98Cf
+[2025-03-08T16:22:37.385Z] [info] karen 0x8fF29814f639922532D10069b2540c9390f3df8E
+[2025-03-08T16:22:37.385Z] [info] randomguy 0xC609b017535F6Ae97977330A831F9a0CbA36021e
+[2025-03-08T16:22:37.385Z] [info] larry 0x906d27D8eef3baf534E99e2c6ebBF7051Ed022d4
+[2025-03-08T16:22:37.385Z] [info] mary 0x5dcD0247231A2b8764868CAB79c9F681826d39D8
+[2025-03-08T16:22:37.385Z] [info] nancy 0x0975943ed0d942f3673f67683d2c87882A927136
+[2025-03-08T16:22:37.386Z] [info] oscar 0x9CcB4e5c18193f7EE60Eb9F9E38d5FCCcbe5d81a
+[2025-03-08T16:22:39.675Z] [info] [henry] Creating DM with randomguy at 0xC609b017535F6Ae97977330A831F9a0CbA36021e
+[2025-03-08T16:22:40.795Z] [info] [randomguy-a] Collecting 1 messages from convo:02e3c39aa99f294e73348e7b06c9c253
+[2025-03-08T16:22:40.795Z] [info] Sending message #1: gm-1-9dsm7d2jjpe
+[2025-03-08T16:22:41.518Z] [info] All participants received the expected number of messages.

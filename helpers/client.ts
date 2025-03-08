@@ -10,6 +10,7 @@ import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
 import { defaultValues, type Persona, type XmtpEnv } from "./types";
+import { clearWorkerCache } from "./workers/factory";
 
 interface User {
   key: string;
@@ -142,54 +143,15 @@ export function loadEnv(testName: string) {
 }
 export async function closeEnv(
   testName: string,
-  personas: Record<string, Persona> | undefined | null,
+  personas: Record<string, Persona>,
 ) {
   flushLogger(testName);
 
   await flushMetrics();
 
-  // Check if personas exists before trying to terminate workers
-  if (personas) {
-    await Promise.all(
-      Object.values(personas).map(async (persona) => {
-        try {
-          await persona.worker?.terminate();
-        } catch (error) {
-          // Silently handle HPKE key errors during worker termination
-          if (
-            error instanceof Error &&
-            error.message.includes("Hpke error: Key not found")
-          ) {
-            console.log(
-              `[${testName}] Ignoring expected HPKE key cleanup error for ${persona.name}`,
-            );
-          } else {
-            // Log other errors but don't fail the test
-            console.error(
-              `[${testName}] Error terminating worker for ${persona.name}:`,
-              error,
-            );
-          }
-        }
-      }),
-    );
+  for (const persona of Object.values(personas)) {
+    await persona.worker?.terminate();
   }
 
-  // Import and call clearWorkerCache to ensure global cache is cleaned up
-  try {
-    const { clearWorkerCache } = await import("./workers/factory");
-    await clearWorkerCache();
-  } catch (error) {
-    // Handle potential errors during cache clearing
-    if (
-      error instanceof Error &&
-      error.message.includes("Hpke error: Key not found")
-    ) {
-      console.log(
-        `[${testName}] Ignoring expected HPKE key cleanup error during cache clearing`,
-      );
-    } else {
-      console.error(`[${testName}] Error clearing worker cache:`, error);
-    }
-  }
+  await clearWorkerCache();
 }
