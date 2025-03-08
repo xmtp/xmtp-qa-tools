@@ -70,6 +70,7 @@ export async function verifyStream<T extends string = string>(
     group: Conversation,
     payload: T,
   ) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await group.send(payload);
   },
 ): Promise<VerifyStreamResult> {
