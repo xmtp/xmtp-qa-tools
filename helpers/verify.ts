@@ -357,7 +357,7 @@ export function calculateMessageStats(
     `Order percentage: ${orderPercentage.toFixed(2)}% (${personasInOrder}/${personaCount} personas)`,
   );
   showDiscrepancies(personasInOrder, personaCount);
-  showComparativeTable(messagesByPersona);
+  //showComparativeTable(messagesByPersona);
   return {
     receptionPercentage,
     orderPercentage,
