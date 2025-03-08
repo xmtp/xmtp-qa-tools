@@ -70,7 +70,6 @@ export async function verifyStream<T extends string = string>(
     group: Conversation,
     payload: T,
   ) => {
-    await new Promise((resolve) => setTimeout(resolve, 1000));
     await group.send(payload);
   },
 ): Promise<VerifyStreamResult> {
@@ -103,6 +102,7 @@ export async function verifyStream<T extends string = string>(
   for (let i = 0; i < count; i++) {
     const payload = generator(i, randomSuffix);
     console.log(`Sending message #${i + 1}:`, payload);
+    await new Promise((resolve) => setTimeout(resolve, 500));
     await sender(group, payload);
   }
 
