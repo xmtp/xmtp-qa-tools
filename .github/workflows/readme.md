@@ -4,11 +4,12 @@ This document provides practical instructions for using the GitHub workflows in 
 
 ## Workflow Overview
 
-| Workflow           | Schedule     | Purpose                                      | Key Features                   |
-| ------------------ | ------------ | -------------------------------------------- | ------------------------------ |
-| **TS_Gm**          | Every 30 min | Tests GM bot functionality                   | Message exchange validation    |
-| **TS_Delivery**    | Every 40 min | Tests message reliability across 200 streams | High-volume delivery testing   |
-| **TS_Performance** | Every 30 min | Measures XMTP network performance            | Performance metrics collection |
+| Workflow           | Schedule     | Purpose                                                | Key Features                   |
+| ------------------ | ------------ | ------------------------------------------------------ | ------------------------------ |
+| **TS_Gm**          | Every 30 min | Tests GM bot functionality                             | Message exchange validation    |
+| **TS_Delivery**    | Every 40 min | Tests message reliability across 200 streams           | High-volume delivery testing   |
+| **TS_Performance** | Every 30 min | Measures XMTP network performance                      | Performance metrics collection |
+| **TS_Geolocation** | Every 32 min | Measures geolocation of the library in the dev network | Geolocation metrics collection |
 
 ## 🤖 TS_Gm Workflow
 
@@ -67,6 +68,22 @@ The `TS_Performance.yml` workflow measures and reports on XMTP network performan
 - 📊 Reports comprehensive performance metrics to Datadog
 - 👁️ Provides real-time visibility into XMTP network performance
 
+## 📊 TS_Geolocation Workflow
+
+The `TS_Geolocation.yml` workflow measures geolocation of the library in the dev network, providing insights into the library's performance and reliability.
+
+```bash
+# Manually trigger the workflow from GitHub Actions UI
+# Navigate to: Actions > TS_Geolocation > Run workflow
+```
+
+**Expected Result:** The workflow will run geolocation tests and generate metrics on the library's performance and reliability.
+
+### Technical Details:
+
+- ⏱️ Runs every 32 minutes via cron schedule
+- 📊 Reports geolocation metrics to Datadog for monitoring
+
 ## 📊 Monitoring and Observability
 
 All workflows include integrated Datadog reporting that:
@@ -76,25 +93,5 @@ All workflows include integrated Datadog reporting that:
 - 🏷️ Tags data with repository, branch, and trigger information
 - 🔗 Provides links to GitHub workflow runs for easy debugging
 - 🚨 Enables alerting on workflow failures
-
-### Datadog Event Example:
-
-```json
-{
-  "title": "GitHub Workflow $WORKFLOW Succeeded",
-  "text": "GitHub workflow $WORKFLOW completed successfully in $ENV environment\n\nRepository: $GITHUB_REPOSITORY\nBranch: $GITHUB_REF_NAME\nRun ID: $GITHUB_RUN_ID\nTriggered by: $GITHUB_ACTOR\nWorkflow URL: https://github.com/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID",
-  "alert_type": "success",
-  "source_type_name": "github",
-  "tags": [
-    "workflow:$WORKFLOW",
-    "environment:$ENV",
-    "repository:$GITHUB_REPOSITORY",
-    "branch:$GITHUB_REF_NAME",
-    "run_id:$GITHUB_RUN_ID",
-    "status:$STATUS",
-    "triggered_by:$GITHUB_ACTOR"
-  ]
-}
-```
 
 These automated tests form a critical part of XMTP's continuous monitoring system, ensuring network reliability and performance for all developers building on the protocol.

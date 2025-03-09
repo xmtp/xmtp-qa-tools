@@ -1,6 +1,7 @@
 [![TS_Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)
 [![TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)
 [![TS_Gm](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)
+[![TS_Geolocation](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)
 
 # XMTP QA Testing Suite
 
@@ -17,6 +18,14 @@ Run tests for specific modules using these commands:
   ```
 
   [View test source](./tests/TS_Performance.test.ts)
+
+  - **TS_Geolocation**: Measures geolocation of the library in the dev network
+
+    ```bash
+    railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
+    ```
+
+    [View test source](./tests/TS_Geolocation.test.ts)
 
 - **TS_Delivery**: Tests multiple concurrent streams to detect any message losses
 

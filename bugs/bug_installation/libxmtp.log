@@ -1,0 +1,45 @@
+025-03-09T23:04:08.975649Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 16442 }
+2025-03-09T23:04:08.975740Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-09T23:04:08.975754Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-09T23:04:08.975787Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x4: END_HEADERS) }
+2025-03-09T23:04:08.975822Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(21) }
+2025-03-09T23:04:08.976139Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-09T23:04:08.976162Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x4: END_HEADERS) }
+2025-03-09T23:04:08.976191Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(19) }
+2025-03-09T23:04:08.976202Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-09T23:04:08.977017Z  INFO sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: Processing envelope with hash 86fb5f1280cff824d32c3d39a02a29922640125b81c9c0ad82b683949cb81446, id = 322135 inbox_id="626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f" installation_id=1519e4626ceb6ae10a2dbc73fdff3e4b58ff797edfb4436d4905a547416bb4e8 group_id="f0cdbf5975379ef5ac3b918fa3adc656" cursor=322135
+2025-03-09T23:04:08.977050Z  INFO sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: client [626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f] is about to process own envelope [322135] for intent [13] inbox_id="626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f" installation_id=1519e4626ceb6ae10a2dbc73fdff3e4b58ff797edfb4436d4905a547416bb4e8 group_id="f0cdbf5975379ef5ac3b918fa3adc656" cursor=322135 intent_id=13 intent.kind=SendMessage
+2025-03-09T23:04:08.977559Z DEBUG sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-09T23:04:08.978365Z DEBUG sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f]-[f0cdbf5975379ef5ac3b918fa3adc656] processing own message for intent 13 / SendMessage, message_epoch: 1 inbox_id="626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f" installation_id=1519e4626ceb6ae10a2dbc73fdff3e4b58ff797edfb4436d4905a547416bb4e8 group_id="f0cdbf5975379ef5ac3b918fa3adc656" cursor=322135 intent.id=13 intent.kind=SendMessage
+2025-03-09T23:04:08.979456Z DEBUG sync_with_conn:receive:process_message{allow_epoch_increment=true}:load_mls_group_with_lock_async: xmtp_mls::storage::encrypted_store: Transaction being committed
+2025-03-09T23:04:08.979505Z  INFO sync_with_conn:receive: xmtp_mls::groups::mls_sync: Transaction completed successfully: process for group [f0cdbf5975379ef5ac3b918fa3adc656] envelope cursor[322135]
+2025-03-09T23:04:08.980102Z  INFO load_mls_group_with_lock_async: xmtp_mls::identity_updates: Getting installation diff. Old: GroupMembership { members: {"626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f": 0}, failed_installations: [] }. New GroupMembership { members: {"626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f": 65179, "9fd5ca2a522d35fd12ae80e6d38704d4fc832bb2cae82ebf5fb4c5364f1722f5": 64637}, failed_installations: [] }
+2025-03-09T23:04:08.980244Z DEBUG load_mls_group_with_lock_async: xmtp_mls::identity_updates: Computing diff for "9fd5ca2a522d35fd12ae80e6d38704d4fc832bb2cae82ebf5fb4c5364f1722f5" from None to Some(64637)
+2025-03-09T23:04:08.981048Z DEBUG xmtp_mls::groups: No queryable content fields, msg not formatted as encoded content
+2025-03-09T23:04:08.981059Z DEBUG xmtp_mls::storage::encrypted_store: Transaction beginning
+2025-03-09T23:04:08.981160Z DEBUG xmtp_mls::groups::intents: queued intent inbox_id="626d90f905defae022e035cc6e626781452ed1d03ab1c469fc8d1ef26f64772f" intent_kind=SendMessage
+2025-03-09T23:04:08.982250Z DEBUG xmtp_mls::storage::encrypted_store: Transaction being committed
+ ❯ bugs/bug_cointoss/test.test.ts (2 tests | 1 failed) 4640ms
+   ✓ bug_cointoss > should create a group with bob and alice 2023ms
+   × bug_cointoss > should create a group with bob and alice 407ms
+     → ClientError: Installation diff error: Association error: Multiple create operations detected
+
+ ❯ bugs/bug_cointoss/test.test.ts 2/2
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  bugs/bug_cointoss/test.test.ts > bug_cointoss > should create a group with bob and alice
+Error: ClientError: Installation diff error: Association error: Multiple create operations detected
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  20:04:03
+   Duration  5.41s (transform 63ms, setup 0ms, collect 648ms, tests 4.64s, environment 0ms, prepare 34ms)
+
+fabrizioguespe@fabrizios-MacBook-Pro qa-testing % 
+
+
+
