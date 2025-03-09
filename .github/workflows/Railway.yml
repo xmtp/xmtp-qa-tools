@@ -14,6 +14,6 @@ jobs:
         run: npm install -g @railway/cli
 
       - name: Run performance tests on Railway
-        run: railway run --service "xmtp-qa-testing:us-west" yarn performance
+        run: railway run --service "xmtp-qa-testing:us-west" yarn ts_performance
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
