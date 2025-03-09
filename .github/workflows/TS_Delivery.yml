@@ -58,11 +58,7 @@ jobs:
             # Check if the test passed based on exit code
             if [ ${PIPESTATUS[0]} -eq 0 ]; then
               # Also check for unhandled errors in the output
-<<<<<<< HEAD
               if yarn test TS_Delivery --config.dangerouslyIgnoreUnhandledErrors=true --silent 2>&1 | grep -q "unhandled errors"; then
-=======
-              if yarn test TS_Delivery --silent 2>&1 | grep -q "unhandled errors"; then
->>>>>>> 05cc385 (added version)
                 echo "Test passed but with unhandled errors. Treating as failure."
                 if [ $i -eq 3 ]; then
                   echo "Test failed after 3 attempts due to unhandled errors."
