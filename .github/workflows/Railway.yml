@@ -16,6 +16,9 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
+      - name: Install dependencies once
+        run: yarn install
+
       - name: Create logs directory
         run: mkdir -p logs
 
@@ -23,7 +26,6 @@ jobs:
       - name: Run performance test on US West
         run: |
           echo "Running performance test on US West:"
-          railway run -s xmtp-qa-testing:us-west yarn install
           railway run -s xmtp-qa-testing:us-west yarn ts_performance > logs/us-west-performance.log 2>&1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -32,7 +34,6 @@ jobs:
       - name: Run performance test on US East
         run: |
           echo "Running performance test on US East:"
-          railway run -s xmtp-qa-testing:us-east yarn install
           railway run -s xmtp-qa-testing:us-east yarn ts_performance > logs/us-east-performance.log 2>&1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -41,7 +42,6 @@ jobs:
       - name: Run performance test on Europe
         run: |
           echo "Running performance test on Europe:"
-          railway run -s xmtp-qa-testing:europe yarn install
           railway run -s xmtp-qa-testing:europe yarn ts_performance > logs/europe-performance.log 2>&1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -50,7 +50,6 @@ jobs:
       - name: Run performance test on Asia
         run: |
           echo "Running performance test on Asia:"
-          railway run -s xmtp-qa-testing:asia yarn install
           railway run -s xmtp-qa-testing:asia yarn ts_performance > logs/asia-performance.log 2>&1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
