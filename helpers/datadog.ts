@@ -173,6 +173,13 @@ export function flushMetrics(): Promise<void> {
 
 const execAsync = promisify(exec);
 
+/**
+ * Get network performance statistics for a specific endpoint
+ * @param endpoint The endpoint to monitor (defaults to XMTP gRPC endpoint)
+ * @returns Object containing timing information in seconds
+ */
+let firstLogShared = false;
+
 interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
@@ -181,66 +188,54 @@ interface NetworkStats {
   Processing: number;
 }
 
-/**
- * Get network performance statistics for a specific endpoint
- * @param endpoint The endpoint to monitor (defaults to XMTP gRPC endpoint)
- * @returns Object containing timing information in seconds
- */
-let firstLogShared = false;
 export async function getNetworkStats(
   endpoint = "https://grpc.dev.xmtp.network:443",
 ): Promise<NetworkStats> {
-  try {
-    // Construct the curl command with timing parameters
-    const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}}" -o /dev/null ${endpoint}`;
+  const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}, \\"Total Time\\": %{time_total}}" -o /dev/null --max-time 10 ${endpoint}`;
 
-    // Execute the curl command
-    const { stdout } = await execAsync(curlCommand);
+  // Execute the curl command
+  const { stdout } = await execAsync(curlCommand);
 
-    // Parse the JSON response
-    const stats = JSON.parse(stdout.trim()) as NetworkStats;
+  // Parse the JSON response
+  const stats = JSON.parse(stdout.trim()) as NetworkStats & {
+    "Total Time": number;
+  };
 
-    // Check if Server Call time is 0, which indicates a failed request
-    if (stats["Server Call"] === 0) {
-      console.warn(
-        `Network request to ${endpoint} failed with Server Call time of 0`,
-      );
-      // We still have some useful metrics (DNS, TCP, TLS), so let's use those
-      // and just set a reasonable value for Server Call
-      stats["Server Call"] = stats["TLS Handshake"] + 0.1; // Estimate
+  // Handle the case where Server Call time is 0
+  if (stats["Server Call"] === 0) {
+    console.warn(
+      `Network request to ${endpoint} returned Server Call time of 0. Total time: ${stats["Total Time"]}s`,
+    );
+
+    // Use Total Time as a fallback if it's available and non-zero
+    if (stats["Total Time"] && stats["Total Time"] > stats["TLS Handshake"]) {
+      stats["Server Call"] = stats["Total Time"];
+    } else {
+      // Otherwise use a reasonable estimate
+      stats["Server Call"] = stats["TLS Handshake"] + 0.1;
     }
-
-    // Calculate processing time
-    stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
-
-    // Ensure processing time is not negative
-    if (stats["Processing"] < 0) {
-      stats["Processing"] = 0;
-    }
-
-    if (
-      stats["Processing"] * 1000 > 300 ||
-      stats["TLS Handshake"] * 1000 > 300 ||
-      stats["Server Call"] * 1000 > 300
-    ) {
-      if (!firstLogShared) {
-        firstLogShared = true;
-        console.warn(
-          `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
-        );
-      }
-    }
-
-    return stats;
-  } catch (error) {
-    console.error("Failed to get network stats:", error);
-    // Return zeroed stats on error
-    return {
-      "DNS Lookup": 0,
-      "TCP Connection": 0,
-      "TLS Handshake": 0,
-      "Server Call": 0,
-      Processing: 0,
-    };
   }
+
+  // Calculate processing time
+  stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
+
+  // Ensure processing time is not negative
+  if (stats["Processing"] < 0) {
+    stats["Processing"] = 0;
+  }
+
+  if (
+    stats["Processing"] * 1000 > 300 ||
+    stats["TLS Handshake"] * 1000 > 300 ||
+    stats["Server Call"] * 1000 > 300
+  ) {
+    if (!firstLogShared) {
+      firstLogShared = true;
+      console.warn(
+        `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
+      );
+    }
+  }
+
+  return stats as NetworkStats;
 }

@@ -11,10 +11,7 @@ railway --version
 echo "Checking Railway status:"
 railway status
 
-# Run a command that shows environment information
-echo "Running command to check environment:"
-railway run -s xmtp-qa-testing:us-west env
 
 # Run your performance test
 echo "Running performance test on service:"
-railway run -s xmtp-qa-testing:us-west yarn ts_performance
+railway run -s xmtp-qa-testing:us-west yarn test ts_performance

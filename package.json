@@ -19,6 +19,7 @@
     "monitor:dev": "httpstat  https://grpc.dev.xmtp.network:443",
     "monitor:live": "bash scripts/monitor.sh",
     "monitor:network": "bash scripts/network.sh",
+    "railway": "bash scripts/railway.sh",
     "record": "npx playwright codegen 'https://xmtp.chat/dm/0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F?env=dev'",
     "redeploy": "tsx scripts/redeploy.ts",
     "start": "vitest --ui --standalone --watch ",
