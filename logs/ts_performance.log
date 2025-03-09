@@ -1,11 +1,53 @@
-[2025-03-09T18:47:56.308Z] [info] envPath .env
-[2025-03-09T18:47:56.309Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:production","test:ts_performance","geo:south-america"],"flushIntervalSeconds":15}
-[2025-03-09T18:47:56.381Z] [info] [PersonaFactory] Using env keys for henry: 0x722Ea4E4bb67cC8D43276Caf4501c651Eed8Bd8D
-[2025-03-09T18:47:56.383Z] [info] [PersonaFactory] Using env keys for ivy: 0x249B93b31bC61BA4774Fe9BE27eacfF19d701E69
-[2025-03-09T18:47:56.387Z] [info] [PersonaFactory] Using env keys for jack: 0x72f47c7E66eA4E58eB91f7fDD3c3BE958ea56BB1
-[2025-03-09T18:47:56.388Z] [info] [PersonaFactory] Using env keys for karen: 0x9E42486E9C134af6756BB4bA948a2D40d97A9Ac2
-[2025-03-09T18:47:56.388Z] [info] [PersonaFactory] Generating new keys for randomguy
-[2025-03-09T18:47:56.391Z] [info] [PersonaFactory] Using env keys for larry: 0x739aE2cd17278E1B26CbA2a5191850c1De6AE0D2
-[2025-03-09T18:47:56.391Z] [info] [PersonaFactory] Using env keys for mary: 0x984EbebE2b93608AD237FeDC2148c68B64179eD2
-[2025-03-09T18:47:56.392Z] [info] [PersonaFactory] Using env keys for nancy: 0x8dA3429cB27a919bbA16951AD3225c17a06De965
-[2025-03-09T18:47:56.393Z] [info] [PersonaFactory] Using env keys for oscar: 0xeE05b48758eBAFCf0e3091c06D00F2723710DfAC
+[2025-03-09T19:28:02.575Z] [info] envPath .env
+[2025-03-09T19:28:02.576Z] [info] ✅ DataDog metrics initialized successfully {"apiKey":"7ca2b6ba007049aef48b949d36a49c10","defaultTags":["env:dev","test:ts_performance","geo:south-america"],"flushIntervalSeconds":15}
+[2025-03-09T19:28:02.605Z] [info] [PersonaFactory] Using env keys for henry: 0x722Ea4E4bb67cC8D43276Caf4501c651Eed8Bd8D
+[2025-03-09T19:28:02.607Z] [info] [PersonaFactory] Using env keys for ivy: 0x249B93b31bC61BA4774Fe9BE27eacfF19d701E69
+[2025-03-09T19:28:02.608Z] [info] [PersonaFactory] Using env keys for jack: 0x72f47c7E66eA4E58eB91f7fDD3c3BE958ea56BB1
+[2025-03-09T19:28:02.611Z] [info] [PersonaFactory] Using env keys for karen: 0x9E42486E9C134af6756BB4bA948a2D40d97A9Ac2
+[2025-03-09T19:28:02.611Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-09T19:28:02.612Z] [info] [PersonaFactory] Using env keys for larry: 0x739aE2cd17278E1B26CbA2a5191850c1De6AE0D2
+[2025-03-09T19:28:02.613Z] [info] [PersonaFactory] Using env keys for mary: 0x984EbebE2b93608AD237FeDC2148c68B64179eD2
+[2025-03-09T19:28:02.614Z] [info] [PersonaFactory] Using env keys for nancy: 0x8dA3429cB27a919bbA16951AD3225c17a06De965
+[2025-03-09T19:28:02.614Z] [info] [PersonaFactory] Using env keys for oscar: 0xeE05b48758eBAFCf0e3091c06D00F2723710DfAC
+[2025-03-09T19:28:02.623Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.624Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.625Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:02.625Z] [info] preBasePath /Users/fabrizioguespe/DevRel/qa-testing
+[2025-03-09T19:28:04.702Z] [warn] [larry-a] Create XMTP client v:6bd613d 2.077s
+[2025-03-09T19:28:04.815Z] [warn] [henry-a] Create XMTP client v:6bd613d 2.189s
+[2025-03-09T19:28:04.874Z] [warn] [ivy-a] Create XMTP client v:6bd613d 2.250s
+[2025-03-09T19:28:04.923Z] [warn] [mary-a] Create XMTP client v:6bd613d 2.297s
+[2025-03-09T19:28:04.975Z] [warn] [jack-a] Create XMTP client v:6bd613d 2.351s
+[2025-03-09T19:28:05.068Z] [warn] [karen-a] Create XMTP client v:6bd613d 2.443s
+[2025-03-09T19:28:05.110Z] [warn] [larry-a] Start message stream 407.584ms
+[2025-03-09T19:28:05.110Z] [warn] [larry-a] Start stream 408.322ms
+[2025-03-09T19:28:05.111Z] [warn] [larry-a] Initialize XMTP client 2.490s
+[2025-03-09T19:28:05.179Z] [warn] [nancy-a] Create XMTP client v:6bd613d 2.555s
+[2025-03-09T19:28:05.224Z] [warn] [ivy-a] Start message stream 349.277ms
+[2025-03-09T19:28:05.224Z] [warn] [ivy-a] Start stream 349.528ms
+[2025-03-09T19:28:05.224Z] [warn] [ivy-a] Initialize XMTP client 2.605s
+[2025-03-09T19:28:05.240Z] [warn] [oscar-a] Create XMTP client v:6bd613d 2.615s
+[2025-03-09T19:28:05.311Z] [warn] [mary-a] Start message stream 388.145ms
+[2025-03-09T19:28:05.311Z] [warn] [mary-a] Start stream 388.303ms
+[2025-03-09T19:28:05.311Z] [warn] [mary-a] Initialize XMTP client 2.690s
+[2025-03-09T19:28:05.371Z] [warn] [jack-a] Start message stream 396.018ms
+[2025-03-09T19:28:05.371Z] [warn] [jack-a] Start stream 396.187ms
+[2025-03-09T19:28:05.371Z] [warn] [jack-a] Initialize XMTP client 2.752s
+[2025-03-09T19:28:05.458Z] [warn] [karen-a] Start message stream 390.018ms
+[2025-03-09T19:28:05.458Z] [warn] [karen-a] Start stream 390.225ms
+[2025-03-09T19:28:05.458Z] [warn] [karen-a] Initialize XMTP client 2.839s
+[2025-03-09T19:28:05.572Z] [warn] [nancy-a] Start message stream 392.322ms
+[2025-03-09T19:28:05.572Z] [warn] [nancy-a] Start stream 392.516ms
+[2025-03-09T19:28:05.572Z] [warn] [nancy-a] Initialize XMTP client 2.950s
+[2025-03-09T19:28:05.635Z] [warn] [oscar-a] Start message stream 395.102ms
+[2025-03-09T19:28:05.635Z] [warn] [oscar-a] Start stream 395.307ms
+[2025-03-09T19:28:05.635Z] [warn] [oscar-a] Initialize XMTP client 3.013s
+[2025-03-09T19:28:06.326Z] [warn] [randomguy-a] Create XMTP client v:6bd613d 3.702s
+[2025-03-09T19:28:06.736Z] [warn] [randomguy-a] Start message stream 408.707ms
+[2025-03-09T19:28:06.736Z] [warn] [randomguy-a] Start stream 409.921ms
+[2025-03-09T19:28:06.736Z] [warn] [randomguy-a] Initialize XMTP client 4.116s

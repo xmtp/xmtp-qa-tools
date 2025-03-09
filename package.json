@@ -23,7 +23,6 @@
     "redeploy": "tsx scripts/redeploy.ts",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest",
-    "ts_performance": "tsx scripts/railway-test.ts ts_performance",
     "typecheck": "tsc"
   },
   "dependencies": {
