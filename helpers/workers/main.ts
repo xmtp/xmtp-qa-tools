@@ -506,8 +506,8 @@ export class WorkerClient extends Worker {
       void (async () => {
         // Get the base name without installation ID
         const baseName = this.name.split("-")[0].toLowerCase();
-        if (!msg.message.content.includes(baseName)) return;
         if (msg.type !== "stream_message") return;
+        if (!msg.message.content.includes(baseName)) return;
         if (msg.message.content.includes("/")) return;
         // Skip messages sent by this persona
         if (msg.message.senderInboxId === this.client.inboxId) return;
@@ -523,10 +523,9 @@ export class WorkerClient extends Worker {
           msg.message,
           baseName,
         );
-
+        console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
         // Send the response
         await conversation?.send(response);
-        console.log(`[${this.nameId}] GPT Agent: Sent response: "${response}"`);
       })();
     });
 

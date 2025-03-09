@@ -6,21 +6,22 @@ import {
 } from "@helpers/types";
 
 export const // Command help info
-  commandHelp = `
-Available commands:
-/group [number] - Create a new group with [number] random personas (default: 5)
+  commandHelp = `Available commands:
+gm - Get a greeting back from the bot
+hi [name] - Get a response back to [name]
+/create [number] - Create a new group with [number] random personas (default: 5)
 /rename [name] - Rename the current group
-/add [number] - Add [number] random personas to the current group (default: 1)
-/remove [number] - Remove [number] random personas from the current group (default: 1)
+/add [name] - Add [name] to the current group
+/remove [name] - Remove [name] from the current group
 /groups - List all active groups
 /members - List all members in the current group
-/broadcast [message] - Send a message to all participants in the current group
+/admins - List all admins in the current group
+/blast [message] [count] [repeat] - Send a message to all participants in the current group
 /leave - Leave the current group
 /info - Get info about the current group
-/personas - List all available personas
-gm - Get a greeting back
-/help - Show this message
-`;
+/workers - List all available personas
+/help - Show this message`;
+
 export const // Random messages for group interactions
   randomMessages = [
     "Hello everyone!",
@@ -354,11 +355,14 @@ export class CommandHandler {
     try {
       const preGroups = await client.conversations.listGroups();
       const groupsImAdmin = preGroups.filter((group) =>
-        group.isAdmin(client.accountAddress),
+        group.isAdmin(message.senderInboxId),
+      );
+      const groupsHasBot = groupsImAdmin.filter((group) =>
+        group.isAdmin(client.inboxId),
       );
       let groupsList = "Active groups:\n";
-      for (let i = 0; i < groupsImAdmin.length; i++) {
-        const group = groupsImAdmin[i];
+      for (let i = 0; i < groupsHasBot.length; i++) {
+        const group = groupsHasBot[i];
         const memberCount = await group
           .members()
           .then((members) => members.length);

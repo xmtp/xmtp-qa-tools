@@ -1,0 +1,147 @@
+[2025-03-09T14:35:37.198Z] [info] envPath .env
+[2025-03-09T14:35:37.222Z] [info] [PersonaFactory] Using env keys for bob: 0x6D070F93C200Dd79B321E2fa5cdc284845B9E9De
+[2025-03-09T14:35:37.223Z] [info] [PersonaFactory] Using env keys for alice: 0xdE31bfb52dDB661B0Ed88FaeA08D962B365Df8e8
+[2025-03-09T14:35:37.224Z] [info] [PersonaFactory] Using env keys for fabri: 0x4A17016188dDCA89cBfFfd69982737e32a35a24F
+[2025-03-09T14:35:37.225Z] [info] [PersonaFactory] Using env keys for bot: 0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F
+[2025-03-09T14:35:37.226Z] [info] [PersonaFactory] Using env keys for elon: 0x25241b326C4558E8FbeD9F48c339a10e6739cD98
+[2025-03-09T14:35:37.227Z] [info] [PersonaFactory] Using env keys for joe: 0xAEB97d2cD4e8a18f4be0eb27f7319b0Af9deBe5F
+[2025-03-09T14:35:37.228Z] [info] [PersonaFactory] Using env keys for charlie: 0x1013A845f6e8c95b826CE98E27381b6917a003e4
+[2025-03-09T14:35:37.229Z] [info] [PersonaFactory] Using env keys for dave: 0x3B6AdFa9adF439A6eD2AD2Ca1CA26c4aA519b834
+[2025-03-09T14:35:37.229Z] [info] [PersonaFactory] Using env keys for rosalie: 0xFb36d9EA443A68C65F14B6c80480621240e2d588
+[2025-03-09T14:35:37.230Z] [info] [PersonaFactory] Using env keys for eve: 0x2542e3adC19CdF3b769E8dd2Bd656E06a09E8f5f
+[2025-03-09T14:35:37.230Z] [info] [PersonaFactory] Using env keys for frank: 0x5d17b9d0Abb9D4397E211b640ed60709EC00BBfb
+[2025-03-09T14:35:37.231Z] [info] [PersonaFactory] Using env keys for grace: 0x37777FF0c0dAC5F7a1340640414c4E36C5549F6E
+[2025-03-09T14:35:37.231Z] [info] [PersonaFactory] Using env keys for henry: 0x722Ea4E4bb67cC8D43276Caf4501c651Eed8Bd8D
+[2025-03-09T14:35:37.232Z] [info] [PersonaFactory] Using env keys for ivy: 0x249B93b31bC61BA4774Fe9BE27eacfF19d701E69
+[2025-03-09T14:35:37.232Z] [info] [PersonaFactory] Using env keys for jack: 0x72f47c7E66eA4E58eB91f7fDD3c3BE958ea56BB1
+[2025-03-09T14:35:37.232Z] [info] [PersonaFactory] Using env keys for karen: 0x9E42486E9C134af6756BB4bA948a2D40d97A9Ac2
+[2025-03-09T14:35:37.233Z] [info] [PersonaFactory] Using env keys for larry: 0x739aE2cd17278E1B26CbA2a5191850c1De6AE0D2
+[2025-03-09T14:35:37.233Z] [info] [PersonaFactory] Using env keys for mary: 0x984EbebE2b93608AD237FeDC2148c68B64179eD2
+[2025-03-09T14:35:37.233Z] [info] [PersonaFactory] Using env keys for nancy: 0x8dA3429cB27a919bbA16951AD3225c17a06De965
+[2025-03-09T14:35:37.234Z] [info] [PersonaFactory] Using env keys for oscar: 0xeE05b48758eBAFCf0e3091c06D00F2723710DfAC
+[2025-03-09T14:35:40.298Z] [warn] [joe-a] Create XMTP client v:6bd613d 3.034s
+[2025-03-09T14:35:40.342Z] [warn] [rosalie-a] Create XMTP client v:6bd613d 3.080s
+[2025-03-09T14:35:40.440Z] [warn] [bot-a] Create XMTP client v:6bd613d 3.178s
+[2025-03-09T14:35:40.464Z] [warn] [dave-a] Create XMTP client v:6bd613d 3.202s
+[2025-03-09T14:35:40.474Z] [warn] [jack-a] Create XMTP client v:6bd613d 3.211s
+[2025-03-09T14:35:40.488Z] [warn] [grace-a] Create XMTP client v:6bd613d 3.226s
+[2025-03-09T14:35:40.503Z] [warn] [frank-a] Create XMTP client v:6bd613d 3.241s
+[2025-03-09T14:35:40.527Z] [warn] [elon-a] Create XMTP client v:6bd613d 3.265s
+[2025-03-09T14:35:40.631Z] [warn] [henry-a] Create XMTP client v:6bd613d 3.369s
+[2025-03-09T14:35:40.716Z] [warn] [joe-a] Start message stream 417.28ms
+[2025-03-09T14:35:40.716Z] [warn] [joe-a] Start stream 418.154ms
+[2025-03-09T14:35:40.716Z] [info] [joe-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.716Z] [info] [joe-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.716Z] [warn] [joe-a] Initialize XMTP client 3.469s
+[2025-03-09T14:35:40.753Z] [warn] [bob-a] Create XMTP client v:6bd613d 3.491s
+[2025-03-09T14:35:40.753Z] [warn] [alice-a] Create XMTP client v:6bd613d 3.491s
+[2025-03-09T14:35:40.760Z] [warn] [rosalie-a] Start message stream 418.167ms
+[2025-03-09T14:35:40.761Z] [warn] [rosalie-a] Start stream 418.335ms
+[2025-03-09T14:35:40.761Z] [info] [rosalie-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.761Z] [info] [rosalie-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.761Z] [warn] [rosalie-a] Initialize XMTP client 3.512s
+[2025-03-09T14:35:40.767Z] [warn] [charlie-a] Create XMTP client v:6bd613d 3.505s
+[2025-03-09T14:35:40.808Z] [warn] [karen-a] Create XMTP client v:6bd613d 3.546s
+[2025-03-09T14:35:40.840Z] [warn] [jack-a] Start message stream 366.41ms
+[2025-03-09T14:35:40.840Z] [warn] [jack-a] Start stream 366.574ms
+[2025-03-09T14:35:40.840Z] [info] [jack-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.840Z] [info] [jack-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.840Z] [warn] [jack-a] Initialize XMTP client 3.585s
+[2025-03-09T14:35:40.853Z] [warn] [bot-a] Start message stream 412.783ms
+[2025-03-09T14:35:40.853Z] [warn] [bot-a] Start stream 412.933ms
+[2025-03-09T14:35:40.853Z] [info] [bot-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.853Z] [info] [bot-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.853Z] [warn] [bot-a] Initialize XMTP client 3.607s
+[2025-03-09T14:35:40.876Z] [warn] [dave-a] Start message stream 411.959ms
+[2025-03-09T14:35:40.876Z] [warn] [dave-a] Start stream 412.111ms
+[2025-03-09T14:35:40.876Z] [info] [dave-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.876Z] [info] [dave-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.876Z] [warn] [dave-a] Initialize XMTP client 3.628s
+[2025-03-09T14:35:40.907Z] [warn] [elon-a] Start message stream 379.759ms
+[2025-03-09T14:35:40.907Z] [warn] [elon-a] Start stream 379.923ms
+[2025-03-09T14:35:40.907Z] [info] [elon-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.907Z] [info] [elon-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.907Z] [warn] [elon-a] Initialize XMTP client 3.660s
+[2025-03-09T14:35:40.907Z] [warn] [ivy-a] Create XMTP client v:6bd613d 3.645s
+[2025-03-09T14:35:40.914Z] [warn] [grace-a] Start message stream 426.256ms
+[2025-03-09T14:35:40.914Z] [warn] [grace-a] Start stream 426.393ms
+[2025-03-09T14:35:40.914Z] [info] [grace-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.914Z] [info] [grace-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.914Z] [warn] [grace-a] Initialize XMTP client 3.664s
+[2025-03-09T14:35:40.925Z] [warn] [frank-a] Start message stream 422.103ms
+[2025-03-09T14:35:40.925Z] [warn] [frank-a] Start stream 422.253ms
+[2025-03-09T14:35:40.925Z] [info] [frank-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:40.926Z] [info] [frank-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:40.926Z] [warn] [frank-a] Initialize XMTP client 3.676s
+[2025-03-09T14:35:40.955Z] [warn] [eve-a] Create XMTP client v:6bd613d 3.693s
+[2025-03-09T14:35:41.036Z] [warn] [mary-a] Create XMTP client v:6bd613d 3.774s
+[2025-03-09T14:35:41.055Z] [warn] [henry-a] Start message stream 423.149ms
+[2025-03-09T14:35:41.055Z] [warn] [henry-a] Start stream 423.337ms
+[2025-03-09T14:35:41.055Z] [info] [henry-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.055Z] [info] [henry-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.055Z] [warn] [henry-a] Initialize XMTP client 3.804s
+[2025-03-09T14:35:41.101Z] [warn] [larry-a] Create XMTP client v:6bd613d 3.839s
+[2025-03-09T14:35:41.133Z] [warn] [alice-a] Start message stream 379.58ms
+[2025-03-09T14:35:41.134Z] [warn] [alice-a] Start stream 380.164ms
+[2025-03-09T14:35:41.134Z] [info] [alice-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.134Z] [info] [alice-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.134Z] [warn] [alice-a] Initialize XMTP client 3.890s
+[2025-03-09T14:35:41.172Z] [warn] [karen-a] Start message stream 363.095ms
+[2025-03-09T14:35:41.172Z] [warn] [karen-a] Start stream 363.738ms
+[2025-03-09T14:35:41.173Z] [info] [karen-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.173Z] [info] [karen-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.173Z] [warn] [karen-a] Initialize XMTP client 3.917s
+[2025-03-09T14:35:41.188Z] [warn] [charlie-a] Start message stream 420.878ms
+[2025-03-09T14:35:41.188Z] [warn] [charlie-a] Start stream 421.05ms
+[2025-03-09T14:35:41.188Z] [info] [charlie-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.188Z] [info] [charlie-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.188Z] [warn] [charlie-a] Initialize XMTP client 3.941s
+[2025-03-09T14:35:41.189Z] [warn] [bob-a] Start message stream 435.343ms
+[2025-03-09T14:35:41.189Z] [warn] [bob-a] Start stream 435.398ms
+[2025-03-09T14:35:41.189Z] [info] [bob-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.189Z] [info] [bob-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.189Z] [warn] [bob-a] Initialize XMTP client 3.948s
+[2025-03-09T14:35:41.189Z] [warn] [nancy-a] Create XMTP client v:6bd613d 3.926s
+[2025-03-09T14:35:41.189Z] [warn] [fabri-a] Create XMTP client v:6bd613d 3.927s
+[2025-03-09T14:35:41.230Z] [info] [mary-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.230Z] [info] [mary-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.230Z] [warn] [mary-a] Initialize XMTP client 3.970s
+[2025-03-09T14:35:41.285Z] [warn] [oscar-a] Create XMTP client v:6bd613d 4.022s
+[2025-03-09T14:35:41.325Z] [warn] [ivy-a] Start message stream 418.099ms
+[2025-03-09T14:35:41.325Z] [warn] [ivy-a] Start stream 418.253ms
+[2025-03-09T14:35:41.325Z] [info] [ivy-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.325Z] [info] [ivy-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.325Z] [warn] [ivy-a] Initialize XMTP client 4.073s
+[2025-03-09T14:35:41.358Z] [warn] [eve-a] Start message stream 402.142ms
+[2025-03-09T14:35:41.359Z] [warn] [eve-a] Start stream 403.171ms
+[2025-03-09T14:35:41.359Z] [info] [eve-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.359Z] [info] [eve-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.359Z] [warn] [eve-a] Initialize XMTP client 4.109s
+[2025-03-09T14:35:41.476Z] [info] [oscar-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.476Z] [info] [oscar-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.476Z] [warn] [oscar-a] Initialize XMTP client 4.215s
+[2025-03-09T14:35:41.513Z] [warn] [larry-a] Start message stream 411.455ms
+[2025-03-09T14:35:41.513Z] [warn] [larry-a] Start stream 411.981ms
+[2025-03-09T14:35:41.514Z] [info] [larry-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.514Z] [info] [larry-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.514Z] [warn] [larry-a] Initialize XMTP client 4.254s
+[2025-03-09T14:35:41.605Z] [warn] [nancy-a] Start message stream 416.279ms
+[2025-03-09T14:35:41.606Z] [warn] [nancy-a] Start stream 416.814ms
+[2025-03-09T14:35:41.606Z] [info] [nancy-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.606Z] [info] [nancy-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.606Z] [warn] [nancy-a] Initialize XMTP client 4.346s
+[2025-03-09T14:35:41.611Z] [warn] [fabri-a] Start message stream 422.411ms
+[2025-03-09T14:35:41.612Z] [warn] [fabri-a] Start stream 422.771ms
+[2025-03-09T14:35:41.612Z] [info] [fabri-a] Enabling GPT agent with OpenAI
+[2025-03-09T14:35:41.612Z] [info] [fabri-a] GPT agent enabled with OpenAI
+[2025-03-09T14:35:41.612Z] [warn] [fabri-a] Initialize XMTP client 4.366s
+[2025-03-09T14:35:41.613Z] [info] Agent initialized on address 0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F
+[2025-03-09T14:35:41.614Z] [info] Agent initialized on inbox 17b74e4066a2817d7097c949f75362577d1d9c373b30612f98db5729a5ac7788
+[2025-03-09T14:35:41.615Z] [info] https://xmtp.chat/dm/0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F?env=production
+[2025-03-09T14:35:41.615Z] [info] Syncing conversations...
+[2025-03-09T14:35:41.807Z] [info] Waiting for messages...
+[2025-03-09T14:35:45.862Z] [info] Received message: /help by ec9c42c3f5b4e9b70b4439f69e48d07a6c9d5e43ea0bf8349bc423087423f94f
+[2025-03-09T14:35:46.879Z] [info] Waiting for messages...
+[2025-03-09T14:36:32.486Z] [info] Received message: /create 5 by ec9c42c3f5b4e9b70b4439f69e48d07a6c9d5e43ea0bf8349bc423087423f94f
+[2025-03-09T14:36:32.489Z] [info] Creating group with 5 random personas...
+[2025-03-09T14:36:33.669Z] [info] ["0b4d6496469f7d606e76c0062f858b6e55ed2fe8c5049f3465b1e7362140794d","17b74e4066a2817d7097c949f75362577d1d9c373b30612f98db5729a5ac7788","191324ee891983cf3e9a47b98c979d1c5c7ad289faf3a21165a6792bfaa38086","8f836387f5fcc6cd3e5add2c0c619e09523cb2d77b94741d556c2933b99761b3","42dbe9493500c84ed52a093fad84ee094a16f49297fb9bb0fa6cb700b3bbfaf2","ec9c42c3f5b4e9b70b4439f69e48d07a6c9d5e43ea0bf8349bc423087423f94f","17b74e4066a2817d7097c949f75362577d1d9c373b30612f98db5729a5ac7788"]
