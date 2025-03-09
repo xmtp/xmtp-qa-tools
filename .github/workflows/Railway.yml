@@ -16,4 +16,7 @@ jobs:
       - name: Run performance tests on Railway
         run: railway run --service "xmtp-qa-testing:us-west" yarn performance
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
+          # Either use RAILWAY_TOKEN if you have a project token
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          # OR use RAILWAY_API_TOKEN if you have an account/team token
+          # RAILWAY_API_TOKEN: ${{ secrets.RAILWAY_API_TOKEN }}
