@@ -12,6 +12,8 @@ Function: Replies "gm" to any message
 Use case: Quick connectivity verification
 ```
 
+See more in [gm/README.md](/bots/gm/README.md)
+
 ### 🧪 Test Bot
 
 ```bash
@@ -19,6 +21,8 @@ Address: 0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F (dev)
 Function: Multi-persona simulation environment
 Use case: Complex messaging scenario testing
 ```
+
+See more in [test/README.md](/bots/test/README.md)
 
 #### Command Reference
 
