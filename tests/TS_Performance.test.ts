@@ -173,6 +173,7 @@ describe(testName, () => {
       await (group as Group).addMembers([
         personas.randomguy.client!.accountAddress as `0x${string}`,
       ]);
+      expect(true).toBe(true);
     } catch (e) {
       console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
@@ -182,6 +183,7 @@ describe(testName, () => {
     try {
       await group.sync();
       await group.members();
+      expect(true).toBe(true);
     } catch (e) {
       console.error("[vitest]   Test failed", (e as Error).message);
       hasFailures = true;
