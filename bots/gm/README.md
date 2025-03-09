@@ -1,6 +1,6 @@
-## GM agent
+## GM bot
 
-This agent replies `gm` to any message.
+This bot replies `gm` to any message.
 
 > Send a message to `0x9a1C0F4b648C6D8783b259db194be44c8310a943`
 

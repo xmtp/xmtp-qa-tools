@@ -1,6 +1,6 @@
-# 🤖 XMTP Bot Testing for React Native and Browser
+# 🤖 Test bot
 
-A lightweight toolkit for React Native developers to test messaging functionality against XMTP bots.
+A lightweight toolkit for app developers to test messaging functionality against XMTP bots.
 
 > Send a message to `0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F`
 
