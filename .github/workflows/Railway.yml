@@ -18,7 +18,7 @@ jobs:
       - name: Run performance tests on Railway
         run: railway run --service xmtp-qa-testing:us-west yarn ts_performance
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
+          RAILWAY_PROJECT_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
 
       - name: Print completion message
         run: echo "Railway test execution completed"
