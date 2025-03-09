@@ -1,25 +1,35 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type Persona, type XmtpEnv } from "@helpers/types";
+import {
+  type Client,
+  type Conversation,
+  type DecodedMessage,
+  type Persona,
+  type XmtpEnv,
+} from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
+import { CommandHandler } from "./commands";
 
 const testName = "test-bot";
 loadEnv(testName);
+
 async function main() {
+  // Get 20 dynamic workers
   let personas: Record<string, Persona> = {};
-  personas = await getWorkers(["bob", "bot", "alice", "joe", "sam"], testName);
+  personas = await getWorkers(20, testName);
+  const commandHandler = new CommandHandler(personas);
 
   const client = personas.bot.client as Client;
 
-  console.log("Syncing conversations...");
-  await client.conversations.sync();
   const env = process.env.XMTP_ENV as XmtpEnv;
   console.log(`Agent initialized on address ${client.accountAddress}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);
   console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
 
+  console.log("Syncing conversations...");
+  await client.conversations.sync();
+
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();
-
   for await (const message of await stream) {
     /* Ignore messages from the same agent or non-text messages */
     if (
@@ -42,83 +52,79 @@ async function main() {
       continue;
     }
 
-    if ((message.content as string).toLowerCase() === "gm") {
-      await conversation.send("gm");
-    } else if ((message.content as string).toLowerCase() === "/group") {
-      console.log("Creating group...");
-      await conversation.send("hang tight, creating group...");
-      const groupName = `group-${new Date().toISOString().split("T")[0]}`;
-      const group = await client.conversations.newGroupByInboxIds(
-        [
-          personas.alice.client?.inboxId as string,
-          personas.joe.client?.inboxId as string,
-          personas.sam.client?.inboxId as string,
-          message.senderInboxId,
-        ],
-        {
-          groupName: groupName,
-          groupDescription: groupName,
-        },
-      );
-      console.log(
-        `Group created with name ${groupName} by ${message.senderInboxId}`,
-      );
-      // Send random messages from each client in the group
-      await group.send(groupName);
-
-      const randomMessages = [
-        "Hello everyone!",
-        "Thanks for adding me to this group",
-        "What's everyone working on today?",
-        "Excited to be here!",
-        "gm to the group",
-      ];
-      // await conversation.send(
-      //   `Group created!\n- ID: ${group.id}\n- Group URL: https://xmtp.chat/conversations/${group.id}\n- Converse url - https://converse.xyz/group/${group.id}\n- Name: ${groupName}\ne}`,
-      // );
-      await conversation.send(
-        `Group created!\n- ID: ${group.id} - Name: ${groupName}`,
-      );
-      // Send a message as the bot
-      await group.send("Bot says: Group chat initialized. Welcome everyone!");
-
-      // Send messages from each persona
-      if (personas.alice.client) {
-        const aliceMessage =
-          randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const aliceGroup =
-          await personas.alice.client.conversations.getConversationById(
-            group.id,
-          );
-        if (aliceGroup) {
-          await aliceGroup.send(`Alice says: ${aliceMessage}`);
-        }
-      }
-
-      if (personas.joe.client) {
-        const joeMessage =
-          randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const joeGroup =
-          await personas.joe.client.conversations.getConversationById(group.id);
-        if (joeGroup) {
-          await joeGroup.send(`Joe says: ${joeMessage}`);
-        }
-      }
-
-      if (personas.sam.client) {
-        const samMessage =
-          randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        const samGroup =
-          await personas.sam.client.conversations.getConversationById(group.id);
-        if (samGroup) {
-          await samGroup.send(`Sam says: ${samMessage}`);
-        }
-      }
-
-      continue;
-    }
+    // Parse the message content to extract command and arguments
+    await processCommand(message, conversation, client, commandHandler);
 
     console.log("Waiting for messages...");
   }
 }
+
+// Helper function to process incoming commands
+async function processCommand(
+  message: DecodedMessage,
+  conversation: Conversation,
+  client: Client,
+  commandHandler: CommandHandler,
+) {
+  const messageContent = message.content as string;
+  const trimmedContent = messageContent.trim();
+
+  if (trimmedContent.toLowerCase() === "gm") {
+    await commandHandler.gm(message, client);
+    return;
+  }
+  // Check if the message is a command (starts with '/')
+  if (!trimmedContent.startsWith("/")) {
+    return; // Not a command, ignore
+  }
+
+  // Extract command name and arguments
+  const parts = trimmedContent.substring(1).split(" ");
+  const command = parts[0].toLowerCase();
+  const args = parts.slice(1);
+
+  // Execute the appropriate command handler
+  switch (command) {
+    case "help":
+      await commandHandler.help(message, client);
+      break;
+    case "create":
+      await commandHandler.create(message, client, args);
+      break;
+    case "rename":
+      await commandHandler.rename(message, client, args);
+      break;
+    case "listmembers":
+      await commandHandler.listmembers(message, client);
+      break;
+    case "listgroups":
+      await commandHandler.listgroups(message, client);
+      break;
+    case "broadcast":
+      await commandHandler.broadcast(client, args);
+      break;
+    case "info":
+      await commandHandler.info(message, client);
+      break;
+    case "listpersonas":
+      await commandHandler.listpersonas(message, client);
+      break;
+    case "leave":
+      await commandHandler.leave(message, client);
+      break;
+    case "add":
+      await commandHandler.add(message, client, args);
+      break;
+    case "remove":
+      await commandHandler.remove(message, client, args);
+      break;
+    default:
+      await conversation.send(
+        `Unknown command: /${command}\nType /help to see available commands.`,
+      );
+      break;
+  }
+}
+
+// Run the bot
 main().catch(console.error);
