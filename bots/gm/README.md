@@ -1,8 +1,8 @@
 ## GM agent
 
-This agent replies `gm`
+This agent replies `gm` to any message.
 
-> Try XMTP using [xmtp.chat](https://xmtp.chat) and sending a message to `gm.xmtp.eth`
+> Send a message to `0x9a1C0F4b648C6D8783b259db194be44c8310a943`
 
 ![](/media/gm.png)
 
