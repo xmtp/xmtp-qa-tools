@@ -29,13 +29,6 @@ describe(testName, () => {
     console.log("Installations", inboxState2.installations.length);
   });
 
-  it("inboxState", async () => {
-    const inboxState = await personas["bob-a"].client!.inboxState();
-    console.log("Installations", inboxState.installations.length);
-    const inboxState2 = await personas["bob-b"].client!.inboxState();
-    console.log("Installations", inboxState2.installations.length);
-  });
-
   it("new dm with bug", async () => {
     convo = await personas.henry.client!.conversations.newDm(
       personas["bob-a"].client!.accountAddress,
