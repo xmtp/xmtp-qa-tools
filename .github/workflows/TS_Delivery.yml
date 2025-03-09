@@ -9,7 +9,6 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    environment: Dev
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
@@ -113,7 +112,6 @@ jobs:
     needs: test
     if: always()
     runs-on: ubuntu-latest
-    environment: Dev
     steps:
       - name: Debug secret availability
         run: |
