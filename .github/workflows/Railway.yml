@@ -14,11 +14,7 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Login to Railway
-        run: railway login
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-
+      # No need for separate login step - just use the token directly
       - name: Run performance tests on Railway
         run: railway run --service xmtp-qa-testing:us-west yarn performance
         env:
