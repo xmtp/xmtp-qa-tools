@@ -2,7 +2,7 @@
 
 Internal testing toolkit for XMTP protocol development.
 
-## Bot Arsenal
+## All bots
 
 ### 👋 GM Bot
 
