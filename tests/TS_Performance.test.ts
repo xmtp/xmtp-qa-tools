@@ -70,7 +70,7 @@ describe(testName, () => {
       const inboxState = await personas.henry.client?.inboxState(true);
       expect(inboxState?.installations.length).toBeGreaterThan(0);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -83,7 +83,7 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -101,7 +101,7 @@ describe(testName, () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -113,7 +113,7 @@ describe(testName, () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -132,7 +132,7 @@ describe(testName, () => {
       console.log("Henry's group", group.id);
       expect(group.id).toBeDefined();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -149,7 +149,7 @@ describe(testName, () => {
       console.log("Henry's groupByInboxIds", groupByInboxIds.id);
       expect(groupByInboxIds.id).toBeDefined();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -163,7 +163,7 @@ describe(testName, () => {
       );
       expect(result.allReceived).toBe(true);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -174,7 +174,7 @@ describe(testName, () => {
         personas.randomguy.client!.accountAddress as `0x${string}`,
       ]);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -183,7 +183,7 @@ describe(testName, () => {
       await group.sync();
       await group.members();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest]   Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -197,7 +197,7 @@ describe(testName, () => {
       const members = await group.members();
       expect(members.length).toBe(previousMembers.length - 1);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -210,7 +210,7 @@ describe(testName, () => {
       console.log("GM Message sent in group", groupMessage);
       expect(groupMessage).toBeDefined();
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -220,7 +220,7 @@ describe(testName, () => {
       const verifyResult = await verifyStreamAll(group, personas);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      console.error("Test failed", (e as Error).message);
+      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
@@ -233,7 +233,7 @@ describe(testName, () => {
         );
         expect(group.id).toBeDefined();
       } catch (e) {
-        console.error("Test failed", (e as Error).message);
+        console.error("[vitest] Test failed", (e as Error).message);
         hasFailures = true;
       }
     });
@@ -243,7 +243,7 @@ describe(testName, () => {
         const members = await group.members();
         expect(members.length).toBe(i + 1);
       } catch (e) {
-        console.error("Test failed", (e as Error).message);
+        console.error("[vitest] Test failed", (e as Error).message);
         hasFailures = true;
       }
     });
@@ -252,7 +252,7 @@ describe(testName, () => {
         await (group as Group).updateName("Large Group");
         expect((group as Group).name).toBe("Large Group");
       } catch (e) {
-        console.error("Test failed", (e as Error).message);
+        console.error("[vitest] Test failed", (e as Error).message);
         hasFailures = true;
       }
     });
@@ -266,7 +266,7 @@ describe(testName, () => {
         const members = await group.members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
-        console.error("Test failed", (e as Error).message);
+        console.error("[vitest] Test failed", (e as Error).message);
         hasFailures = true;
       }
     });
@@ -279,7 +279,7 @@ describe(testName, () => {
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
-        console.error("Test failed", (e as Error).message);
+        console.error("[vitest] Test failed", (e as Error).message);
         hasFailures = true;
       }
     });
