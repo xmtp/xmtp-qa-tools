@@ -33,28 +33,110 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Verify Railway environment
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      # US West Region Test
+      - name: Verify US West Railway environment
         run: |
-          echo "Checking if we're on Railway:"
+          echo "Checking US West Railway environment:"
           railway run -s xmtp-qa-testing:us-west bash -c 'echo "RAILWAY_SERVICE_ID: $RAILWAY_SERVICE_ID"'
           railway run -s xmtp-qa-testing:us-west bash -c 'echo "RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"'
           railway run -s xmtp-qa-testing:us-west bash -c 'echo "HOSTNAME: $HOSTNAME"'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Install dependencies on Railway
+      - name: Install dependencies on US West
         run: |
-          echo "Installing dependencies on Railway:"
+          echo "Installing dependencies on US West:"
           railway run -s xmtp-qa-testing:us-west yarn install
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Run performance test on Railway
+      - name: Run performance test on US West
         run: |
-          echo "Running performance test on service:"
-          railway run -s xmtp-qa-testing:us-west yarn ts_performance
+          echo "Running performance test on US West:"
+          railway run -s xmtp-qa-testing:us-west yarn ts_performance > logs/us-west-performance.log 2>&1
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
+      # US East Region Test
+      - name: Verify US East Railway environment
+        run: |
+          echo "Checking US East Railway environment:"
+          railway run -s xmtp-qa-testing:us-east bash -c 'echo "RAILWAY_SERVICE_ID: $RAILWAY_SERVICE_ID"'
+          railway run -s xmtp-qa-testing:us-east bash -c 'echo "RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"'
+          railway run -s xmtp-qa-testing:us-east bash -c 'echo "HOSTNAME: $HOSTNAME"'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Install dependencies on US East
+        run: |
+          echo "Installing dependencies on US East:"
+          railway run -s xmtp-qa-testing:us-east yarn install
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Run performance test on US East
+        run: |
+          echo "Running performance test on US East:"
+          railway run -s xmtp-qa-testing:us-east yarn ts_performance > logs/us-east-performance.log 2>&1
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      # Europe Region Test
+      - name: Verify Europe Railway environment
+        run: |
+          echo "Checking Europe Railway environment:"
+          railway run -s xmtp-qa-testing:europe bash -c 'echo "RAILWAY_SERVICE_ID: $RAILWAY_SERVICE_ID"'
+          railway run -s xmtp-qa-testing:europe bash -c 'echo "RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"'
+          railway run -s xmtp-qa-testing:europe bash -c 'echo "HOSTNAME: $HOSTNAME"'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Install dependencies on Europe
+        run: |
+          echo "Installing dependencies on Europe:"
+          railway run -s xmtp-qa-testing:europe yarn install
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Run performance test on Europe
+        run: |
+          echo "Running performance test on Europe:"
+          railway run -s xmtp-qa-testing:europe yarn ts_performance > logs/europe-performance.log 2>&1
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      # Asia Region Test
+      - name: Verify Asia Railway environment
+        run: |
+          echo "Checking Asia Railway environment:"
+          railway run -s xmtp-qa-testing:asia bash -c 'echo "RAILWAY_SERVICE_ID: $RAILWAY_SERVICE_ID"'
+          railway run -s xmtp-qa-testing:asia bash -c 'echo "RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"'
+          railway run -s xmtp-qa-testing:asia bash -c 'echo "HOSTNAME: $HOSTNAME"'
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Install dependencies on Asia
+        run: |
+          echo "Installing dependencies on Asia:"
+          railway run -s xmtp-qa-testing:asia yarn install
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Run performance test on Asia
+        run: |
+          echo "Running performance test on Asia:"
+          railway run -s xmtp-qa-testing:asia yarn ts_performance > logs/asia-performance.log 2>&1
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Upload log files
+        uses: actions/upload-artifact@v3
+        with:
+          name: performance-logs
+          path: logs/
+
       - name: Print completion message
-        run: echo "Railway test execution completed"
+        run: echo "Railway test execution completed for all regions"
