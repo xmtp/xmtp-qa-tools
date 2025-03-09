@@ -97,6 +97,12 @@ async function processCommand(
     case "members":
       await commandHandler.members(message, client);
       break;
+    case "admins":
+      await commandHandler.admins(message, client);
+      break;
+    case "blast":
+      await commandHandler.blast(message, client, args);
+      break;
     case "groups":
       await commandHandler.groups(message, client);
       break;

@@ -1,7 +1,7 @@
 import {
+  Group,
   type Client,
   type DecodedMessage,
-  type Group,
   type Persona,
 } from "@helpers/types";
 
@@ -102,7 +102,6 @@ export class CommandHandler {
     const personaInboxIds = randomPersonas.map(
       (p) => p.client?.inboxId as string,
     );
-    const personaNames = randomPersonas.map((p) => p.name);
 
     // Create the group name
     const groupName = `group-${Math.random().toString(36).substring(2, 15)}`;
@@ -113,7 +112,7 @@ export class CommandHandler {
       message.senderInboxId,
       client.inboxId, // Add the bot itself
     ];
-
+    console.log(memberInboxIds);
     // Create the group
     const group = await client.conversations.newGroupByInboxIds(
       memberInboxIds,
@@ -122,20 +121,21 @@ export class CommandHandler {
         groupDescription: `Test group with ${count} random personas`,
       },
     );
+    await group.addSuperAdmin(message.senderInboxId);
 
     console.log(
       `Group created with name ${groupName} by ${message.senderInboxId}`,
     );
-
-    await this.info(message, client);
-
-    await this.populateGroup(group, randomPersonas, count);
-  }
-  async populateGroup(group: Group, personas: Persona[], count: number) {
+    await conversation?.send(
+      `Group created with name ${groupName} by ${message.senderInboxId}`,
+    );
     // Send a message as the bot
     await group.send(
       `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
     );
+    await this.populateGroup(group, randomPersonas);
+  }
+  async populateGroup(group: Group, personas: Persona[]) {
     for (const persona of personas) {
       const randomMessage =
         randomMessages[Math.floor(Math.random() * randomMessages.length)];
@@ -158,114 +158,130 @@ export class CommandHandler {
 
   // Add personas to the current group
   async add(message: DecodedMessage, client: Client, args: string[] = []) {
-    // Parse the number of personas to add (default: 1)
-    const count =
-      args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 1;
-
     const groupToAddTo = await client.conversations.getConversationById(
       message.conversationId,
     );
+
     try {
-      // Get random personas not already in the group
-      const personasToAdd = this.getRandomPersonas(count);
+      if (!(groupToAddTo instanceof Group)) {
+        await groupToAddTo?.send("Group not found");
+        return;
+      }
+      // Check if a persona name was provided
+      if (args.length === 0) {
+        await groupToAddTo.send("Please specify a persona name to add");
+        return;
+      }
 
-      const personaInboxIds = personasToAdd.map(
-        (p) => p.client?.inboxId as string,
+      const personaName = args[0].trim();
+
+      // Check if the persona exists
+      if (!Object.keys(this.personas).includes(personaName)) {
+        await groupToAddTo.send(`Persona "${personaName}" not found`);
+        return;
+      }
+
+      const personaToAdd = this.personas[personaName];
+
+      // Check if the persona is already in the group
+      const currentMembers = await groupToAddTo.members();
+      const isAlreadyMember = currentMembers.some(
+        (member) => member.inboxId === personaToAdd.client?.inboxId,
       );
-      const personaNames = personasToAdd.map((p) => p.name);
 
-      // Add the personas to the group
-      await (groupToAddTo as Group).addMembers(personaInboxIds);
+      if (isAlreadyMember) {
+        await groupToAddTo.send(
+          `${personaName} is already a member of this group`,
+        );
+        return;
+      }
+
+      // Add the persona to the group
+      await groupToAddTo.addMembersByInboxId([
+        personaToAdd.client?.inboxId as string,
+      ]);
 
       // Announce in the group
-      await groupToAddTo?.send(
-        `Bot :\n Added ${personaNames.join(", ")} to the group.`,
-      );
+      await groupToAddTo.send(`Bot :\n Added ${personaName} to the group.`);
 
-      await groupToAddTo?.send(
-        `Added ${personaNames.join(", ")} to the group.`,
-      );
-
-      // Have each new persona say something
-      for (const persona of personasToAdd) {
-        if (this.personas[persona.name].client) {
-          const welcomeMessage =
-            this.welcomeMessages[
-              Math.floor(Math.random() * this.welcomeMessages.length)
-            ];
-          const personaGroup = await Object.values(this.personas)
-            .find((p) => p.client?.inboxId === persona.client?.inboxId)
-            ?.client?.conversations.getConversationById(
-              groupToAddTo?.id as string,
-            );
-
-          if (personaGroup) {
-            await personaGroup.send(`${persona.name} :\n ${welcomeMessage}`);
-          }
-        }
-      }
+      await this.populateGroup(groupToAddTo, [this.personas[personaName]]);
     } catch (error) {
-      console.error("Error adding members to group:", error);
+      console.error("Error adding member to group:", error);
       await groupToAddTo?.send(
-        `Error adding members: ${(error as Error).message}`,
+        `Error adding member: ${(error as Error).message}`,
       );
     }
   }
 
   // Remove personas from the current group
   async remove(message: DecodedMessage, client: Client, args: string[] = []) {
-    // Parse the number of personas to remove (default: 1)
-    const count =
-      args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 1;
     const groupToRemoveFrom = await client.conversations.getConversationById(
       message.conversationId,
     );
     try {
-      // Get current members
-      const currentMembers = await (groupToRemoveFrom as Group).members();
-
-      // Filter out the sender and the bot itself - don't remove these
-      const eligibleToRemove = currentMembers.filter(
-        (m) =>
-          m.inboxId !== message.senderInboxId && m.inboxId !== client.inboxId,
-      );
-
-      if (eligibleToRemove.length === 0) {
-        await groupToRemoveFrom?.send(
-          "No eligible members to remove from the group.",
+      if (!(groupToRemoveFrom instanceof Group)) {
+        await groupToRemoveFrom?.send("Group not found");
+        return;
+      }
+      // Check if a persona name was provided
+      if (args.length === 0) {
+        await groupToRemoveFrom.send(
+          "Please specify a persona name to remove. Check /workers to see all available personas",
         );
         return;
       }
 
-      // Get random members to remove
-      const membersToRemove = eligibleToRemove
-        .sort(() => 0.5 - Math.random())
-        .slice(0, Math.min(count, eligibleToRemove.length));
+      const personaName = args[0].trim();
 
-      const personaNames = membersToRemove.map((member) => {
-        const persona = Object.values(this.personas).find(
-          (p) => (p.client?.inboxId as string) === member.inboxId,
+      // Check if the persona exists
+      if (!Object.keys(this.personas).includes(personaName)) {
+        await groupToRemoveFrom.send(
+          `Persona "${personaName}" not found. Check /workers to see all available personas`,
         );
-        return persona?.name;
-      });
+        return;
+      }
+
+      const personaToRemove = this.personas[personaName];
+
+      // Get current members
+      const currentMembers = await groupToRemoveFrom.members();
+
+      // Check if the persona is in the group
+      const memberToRemove = currentMembers.find(
+        (member) => member.inboxId === personaToRemove.client?.inboxId,
+      );
+
+      if (!memberToRemove) {
+        await groupToRemoveFrom.send(
+          `${personaName} is not a member of this group`,
+        );
+        return;
+      }
+
+      // Don't allow removing the sender or the bot
+      if (
+        memberToRemove.inboxId === message.senderInboxId ||
+        memberToRemove.inboxId === client.inboxId
+      ) {
+        await groupToRemoveFrom.send(
+          `Cannot remove ${personaName} from the group`,
+        );
+        return;
+      }
 
       // Announce removal before removing
-      await groupToRemoveFrom?.send(
-        `Bot :\n Removing ${personaNames.join(", ")} from the group.`,
+      await groupToRemoveFrom.send(
+        `Bot :\n Removing ${personaName} from the group.`,
       );
 
-      // Remove the members
-      await (groupToRemoveFrom as Group).removeMembers(
-        membersToRemove.map((m) => m.inboxId),
-      );
+      // Remove the member
+      await groupToRemoveFrom.removeMembersByInboxId([memberToRemove.inboxId]);
 
-      await groupToRemoveFrom?.send(
-        `Removed ${personaNames.join(", ")} from the group.`,
-      );
+      await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
     } catch (error) {
-      console.error("Error removing members from group:", error);
+      console.error("Error removing member from group:", error);
       await groupToRemoveFrom?.send(
-        `Error removing members: ${(error as Error).message}`,
+        `Error removing member: ${(error as Error).message}`,
       );
     }
   }
@@ -296,6 +312,39 @@ export class CommandHandler {
       );
     }
   }
+  async admins(message: DecodedMessage, client: Client) {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    if (!(conversation instanceof Group)) {
+      await conversation?.send("Group not found");
+      return;
+    }
+    try {
+      // Get current members
+      await conversation.sync();
+      const admins = await conversation.admins;
+      const superAdmins = await conversation.superAdmins;
+      console.log(admins);
+      console.log(superAdmins);
+      const allAdmins = [...admins, ...superAdmins];
+      const adminDetails = allAdmins.map((admin) => {
+        const persona = Object.values(this.personas).find(
+          (p) => p.client?.inboxId === admin,
+        );
+        return persona?.name || "You";
+      });
+
+      await conversation.send(
+        `Group admins (${allAdmins.length}):\n${adminDetails.join("\n")}`,
+      );
+    } catch (error) {
+      console.error("Error listing admins:", error);
+      await conversation.send(
+        `Error listing admins: ${(error as Error).message}`,
+      );
+    }
+  }
 
   // List all active groups
   async groups(message: DecodedMessage, client: Client) {
@@ -303,11 +352,13 @@ export class CommandHandler {
       message.conversationId,
     );
     try {
-      const groups = await client.conversations.listGroups();
-
+      const preGroups = await client.conversations.listGroups();
+      const groupsImAdmin = preGroups.filter((group) =>
+        group.isAdmin(client.accountAddress),
+      );
       let groupsList = "Active groups:\n";
-      for (let i = 0; i < groups.length; i++) {
-        const group = groups[i];
+      for (let i = 0; i < groupsImAdmin.length; i++) {
+        const group = groupsImAdmin[i];
         const memberCount = await group
           .members()
           .then((members) => members.length);
@@ -322,8 +373,56 @@ export class CommandHandler {
       );
     }
   }
+  async blast(message: DecodedMessage, client: Client, args: string[] = []) {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    // Extract the message and optional count parameters
+    // Format: /blast <message> <count> <repeat>
+    // Example: /blast jaja 5 5 - sends "jaja" to 5 personas, 5 times each
 
-  // Broadcast a message to all participants in the current group
+    // Get the message from all arguments
+    const blastMessage = args.join(" ").trim();
+
+    // Default values
+    let countOfPersonas = 5; // Number of personas to message
+    let repeatCount = 1; // Number of times to send the message
+
+    // Check if the last two arguments are numbers
+    const lastArg = args[args.length - 1];
+    const secondLastArg = args[args.length - 2];
+
+    if (
+      lastArg &&
+      !isNaN(parseInt(lastArg)) &&
+      secondLastArg &&
+      !isNaN(parseInt(secondLastArg))
+    ) {
+      repeatCount = parseInt(lastArg);
+      countOfPersonas = parseInt(secondLastArg);
+      // Remove the numbers from the message
+      const messageWords = blastMessage.split(" ");
+      const messageWithoutCounts = messageWords
+        .slice(0, messageWords.length - 2)
+        .join(" ");
+      if (messageWithoutCounts.trim()) {
+        blastMessage = messageWithoutCounts;
+      }
+    }
+
+    await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
+    for (let i = 0; i < repeatCount; i++) {
+      for (const persona of Object.values(this.personas)) {
+        const personaGroup = await persona.client?.conversations.newDmByInboxId(
+          message.senderInboxId,
+        );
+        await conversation?.send(` ${persona.name} just sent you a message`);
+        await personaGroup?.send(`${persona.name}:\n${blastMessage}`);
+      }
+    }
+  }
+
+  // Broadcast a message to all participants in all groups
   async broadcast(client: Client, args: string[] = []) {
     const allGroups = await client.conversations.listGroups();
 

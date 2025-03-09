@@ -38,8 +38,8 @@ In the example the public key is `0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F`
 | `gm`           | Returns gm to your message                                   |
 | `/group`       | Creates a test group with simulated users and conversation   |
 | `/rename`      | Rename the current group                                     |
-| `/add`         | Add a number of random personas to the group                 |
-| `/remove`      | Remove a number of random personas from the group            |
+| `/add`         | Add the name of a persona to the group                       |
+| `/remove`      | Remove the name of a persona from the group                  |
 | `/listgroups`  | List all active groups                                       |
 | `/listmembers` | List all members in the current group                        |
 | `/broadcast`   | Broadcast a message to all participants in the current group |
