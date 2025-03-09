@@ -42,6 +42,13 @@ jobs:
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
+      - name: Install dependencies on Railway
+        run: |
+          echo "Installing dependencies on Railway:"
+          railway run -s xmtp-qa-testing:us-west yarn install
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
       - name: Run performance test on Railway
         run: |
           echo "Running performance test on service:"
