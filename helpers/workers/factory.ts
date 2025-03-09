@@ -58,8 +58,11 @@ export class PersonaFactory {
       process.env[walletKeyEnv] !== undefined &&
       process.env[encryptionKeyEnv] !== undefined
     ) {
+      const account = privateKeyToAccount(
+        process.env[walletKeyEnv] as `0x${string}`,
+      );
       console.log(
-        `[PersonaFactory] Using env keys for ${baseName}: ${process.env[walletKeyEnv].substring(0, 6)}...`,
+        `[PersonaFactory] Using env keys for ${baseName}: ${account.address}`,
       );
 
       this.keysCache[baseName] = {
@@ -271,9 +274,7 @@ export async function getWorkers(
   const personaFactory = new PersonaFactory(testName, typeofStream);
 
   const personas = await personaFactory.createPersonas(descriptors);
-  Object.values(personas).forEach((persona) => {
-    console.log(persona.name, persona.client?.accountAddress);
-  });
+
   return personas.reduce<Record<string, Persona>>((acc, p) => {
     // Use the full descriptor as the key in the returned object
     acc[p.name] = p;

@@ -13,6 +13,7 @@ import {
   type PersonaBase,
   type typeofStream,
 } from "@helpers/types";
+import OpenAI from "openai";
 
 export type MessageStreamWorker = {
   type: string;
@@ -57,6 +58,7 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
+  private isGptAgentEnabled = false;
 
   public client!: Client; // Expose the XMTP client if you need direct DM
 
@@ -146,6 +148,9 @@ export class WorkerClient extends Worker {
       console.time(`[${this.nameId}] Start stream`);
       await this.startStream();
       console.timeEnd(`[${this.nameId}] Start stream`);
+
+      // Enable GPT agent for message streams
+      this.enableGptAgent();
     } else if (this.typeofStream === "conversation") {
       // Start conversation streaming
       console.log(`[${this.nameId}] Start conversation stream`);
@@ -163,7 +168,7 @@ export class WorkerClient extends Worker {
     // this.startConversationStream();
 
     console.timeEnd(`[${this.nameId}] Initialize XMTP client`);
-    return { client: this.client, dbPath, version: version ?? "" };
+    return { client: this.client, dbPath, version };
   }
 
   /**
@@ -210,6 +215,9 @@ export class WorkerClient extends Worker {
   }
 
   async terminate() {
+    // Disable GPT agent before terminating
+    this.disableGptAgent();
+
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent
     }
@@ -481,5 +489,99 @@ export class WorkerClient extends Worker {
 
       this.on("message", onMessage);
     });
+  }
+
+  /**
+   * Enables a GPT agent that uses OpenAI API to generate responses
+   * when the persona's name is mentioned in a message.
+   */
+  enableGptAgent(): void {
+    if (this.isGptAgentEnabled || !process.env.OPENAI_API_KEY) return;
+
+    console.log(`[${this.nameId}] Enabling GPT agent with OpenAI`);
+    this.isGptAgentEnabled = true;
+
+    // Listen for messages that mention this persona's name
+    this.on("message", (msg: MessageStreamWorker) => {
+      void (async () => {
+        // Get the base name without installation ID
+        const baseName = this.name.split("-")[0].toLowerCase();
+        if (!msg.message.content.includes(baseName)) return;
+        if (msg.type !== "stream_message") return;
+        if (msg.message.content.includes("/")) return;
+        // Skip messages sent by this persona
+        if (msg.message.senderInboxId === this.client.inboxId) return;
+
+        // Get the conversation from the message
+        const conversation =
+          await this.client.conversations.getConversationById(
+            msg.message.conversationId,
+          );
+
+        // Generate a response using OpenAI
+        const response = await this.generateOpenAIResponse(
+          msg.message,
+          baseName,
+        );
+
+        // Send the response
+        await conversation?.send(response);
+        console.log(`[${this.nameId}] GPT Agent: Sent response: "${response}"`);
+      })();
+    });
+
+    console.log(`[${this.nameId}] GPT agent enabled with OpenAI`);
+  }
+
+  /**
+   * Generates a response using OpenAI based on the message content.
+   */
+  private async generateOpenAIResponse(
+    message: DecodedMessage,
+    personaName: string,
+  ): Promise<string> {
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const conversation = await this.client.conversations.getConversationById(
+      message.conversationId,
+    );
+    const messages = await conversation?.messages();
+    /* Get the AI response */
+    console.log(
+      `[${this.nameId}] Generating OpenAI response for message: ${message.content}`,
+    );
+    const completion = await openai.chat.completions.create({
+      messages: [
+        {
+          role: "system",
+          content: `You are ${personaName}, a fake persona in a group chat. 
+                     Keep your responses concise (under 100 words) and friendly. 
+                     Never mention other personas in your responses.Never answer more than 1 question per response.
+                     For context, these were the last 10 messages in the conversation: ${messages
+                       ?.slice(0, 10)
+                       .map((m) => m.content as string)
+                       .join("\n")}`,
+        },
+        { role: "user", content: message.content as string },
+      ],
+      model: "gpt-4o-mini",
+    });
+
+    /* Get the AI response */
+    const response =
+      personaName +
+      ":\n" +
+      (completion.choices[0]?.message?.content ||
+        "I'm not sure how to respond to that.");
+
+    return response;
+  }
+
+  /**
+   * Disables the GPT agent.
+   */
+  disableGptAgent(): void {
+    this.isGptAgentEnabled = false;
+    console.log(`[${this.nameId}] GPT agent disabled`);
   }
 }
