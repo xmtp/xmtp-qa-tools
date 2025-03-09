@@ -283,7 +283,18 @@
       "available_values": [],
       "default": "dev"
     },
-    { "name": "geo", "prefix": "geo", "available_values": [], "default": "us" },
+    {
+      "name": "geo",
+      "prefix": "geo",
+      "available_values": [
+        "south-america",
+        "europe",
+        "asia",
+        "us-east",
+        "us-west"
+      ],
+      "default": "us-east"
+    },
     {
       "name": "test",
       "prefix": "test",
@@ -319,14 +330,28 @@
     {
       "name": "outside-us",
       "template_variables": [
-        { "name": "geo", "value": "south-america" },
+        { "name": "geo", "values": ["south-america", "europe", "asia"] },
         { "name": "test", "value": "ts_performance" }
       ]
     },
     {
       "name": "us",
       "template_variables": [
-        { "name": "geo", "value": "us" },
+        { "name": "geo", "values": ["us-east", "us-west"] },
+        { "name": "test", "value": "ts_performance" }
+      ]
+    },
+    {
+      "name": "us-east",
+      "template_variables": [
+        { "name": "geo", "values": ["us-east"] },
+        { "name": "test", "value": "ts_performance" }
+      ]
+    },
+    {
+      "name": "us-west",
+      "template_variables": [
+        { "name": "geo", "values": ["us-west"] },
         { "name": "test", "value": "ts_performance" }
       ]
     }
