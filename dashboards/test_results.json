@@ -4,6 +4,97 @@
   "experience_type": "default",
   "widgets": [
     {
+      "id": 371068524616494,
+      "definition": {
+        "title": "Workflow Success Rate (Last 24h)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test,geo}.rollup(avg)",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<", "value": 0.9, "palette": "white_on_red" },
+              { "comparator": ">=", "value": 0.9, "palette": "white_on_green" },
+              { "comparator": ">=", "value": 0.9, "palette": "green" }
+            ]
+          }
+        ],
+        "precision": 2
+      },
+      "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 8324523926175026,
+      "definition": {
+        "title": "Status by workflow (Last 24h)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "toplist",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test,geo}.rollup(avg)",
+                "aggregator": "avg"
+              }
+            ],
+            "response_format": "scalar",
+            "formulas": [{ "formula": "query1" }],
+            "sort": {
+              "count": 10,
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
+            }
+          }
+        ],
+        "style": { "display": { "type": "stacked", "legend": "automatic" } }
+      },
+      "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
+    },
+    {
+      "id": 6302807075611760,
+      "definition": {
+        "type": "note",
+        "content": "# Performance\n\nhttps://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance\n\n# Reliability\n\nhttps://app.datadoghq.com/dashboard/pm2-3j8-yc5/xmtp-sdk-delivery\n\n# Workflows\n\nhttps://app.datadoghq.com/dashboard/9we-bpa-nzf",
+        "background_color": "white",
+        "font_size": "14",
+        "text_align": "left",
+        "vertical_align": "top",
+        "show_tick": false,
+        "tick_pos": "50%",
+        "tick_edge": "left",
+        "has_padding": true
+      },
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 4 }
+    },
+    {
+      "id": 2801741133912872,
+      "definition": {
+        "type": "note",
+        "content": "## TS_Gm Workflow\nThis dashboard tracks the status of GitHub workflows, with special focus on the TS_Gm workflow that verifies library performance in the dev network.\n\n**Status 1**: Successful execution\n\n**Status 0**: Failed execution\n",
+        "background_color": "white",
+        "font_size": "14",
+        "text_align": "left",
+        "vertical_align": "top",
+        "show_tick": false,
+        "tick_pos": "50%",
+        "tick_edge": "left",
+        "has_padding": true
+      },
+      "layout": { "x": 6, "y": 0, "width": 2, "height": 4 }
+    },
+    {
       "id": 4721725196839204,
       "definition": {
         "title": "Workflow Status Over Time",
@@ -20,7 +111,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)"
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test,geo}.rollup(avg)"
               }
             ],
             "formulas": [{ "formula": "query1" }],
@@ -40,66 +131,7 @@
           "max": "1"
         }
       },
-      "layout": { "x": 0, "y": 0, "width": 4, "height": 2 }
-    },
-    {
-      "id": 371068524616494,
-      "definition": {
-        "title": "Workflow Success Rate (Last 24h)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              { "comparator": "<", "value": 0.9, "palette": "white_on_red" },
-              { "comparator": ">=", "value": 0.9, "palette": "white_on_green" },
-              { "comparator": ">=", "value": 0.9, "palette": "green" }
-            ]
-          }
-        ],
-        "precision": 2
-      },
-      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
-    },
-    {
-      "id": 8324523926175026,
-      "definition": {
-        "title": "Status by workflow (Last 24h)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "toplist",
-        "requests": [
-          {
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)",
-                "aggregator": "avg"
-              }
-            ],
-            "response_format": "scalar",
-            "formulas": [{ "formula": "query1" }],
-            "sort": {
-              "count": 10,
-              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
-            }
-          }
-        ],
-        "style": { "display": { "type": "stacked", "legend": "automatic" } }
-      },
-      "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
+      "layout": { "x": 0, "y": 2, "width": 4, "height": 2 }
     },
     {
       "id": 4267751638010774,
@@ -118,7 +150,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "count:xmtp.sdk.workflow.status{*} by {test}.as_count()"
+                "query": "count:xmtp.sdk.workflow.status{*} by {test,geo}.as_count()"
               }
             ],
             "style": {
@@ -131,39 +163,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 2, "width": 4, "height": 2 }
-    },
-    {
-      "id": 6302807075611760,
-      "definition": {
-        "type": "note",
-        "content": "# Performance\n\nhttps://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance\n\n# Reliability\n\nhttps://app.datadoghq.com/dashboard/pm2-3j8-yc5/xmtp-sdk-delivery\n\n# Workflows\n\nhttps://app.datadoghq.com/dashboard/9we-bpa-nzf",
-        "background_color": "white",
-        "font_size": "14",
-        "text_align": "left",
-        "vertical_align": "top",
-        "show_tick": false,
-        "tick_pos": "50%",
-        "tick_edge": "left",
-        "has_padding": true
-      },
-      "layout": { "x": 4, "y": 2, "width": 2, "height": 4 }
-    },
-    {
-      "id": 2801741133912872,
-      "definition": {
-        "type": "note",
-        "content": "## TS_Gm Workflow\nThis dashboard tracks the status of GitHub workflows, with special focus on the TS_Gm workflow that verifies library performance in the dev network.\n\n**Status 1**: Successful execution\n\n**Status 0**: Failed execution\n\nCheck the Event Stream below for detailed information about recent workflow runs.",
-        "background_color": "white",
-        "font_size": "14",
-        "text_align": "left",
-        "vertical_align": "top",
-        "show_tick": false,
-        "tick_pos": "50%",
-        "tick_edge": "left",
-        "has_padding": true
-      },
-      "layout": { "x": 6, "y": 2, "width": 2, "height": 4 }
+      "layout": { "x": 0, "y": 4, "width": 4, "height": 2 }
     }
   ],
   "template_variables": [
