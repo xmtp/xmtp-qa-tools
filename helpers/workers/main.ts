@@ -495,9 +495,6 @@ export class WorkerClient extends Worker {
    * when the persona's name is mentioned in a message.
    */
   enableGptAgent(): void {
-    console.log(
-      `[${this.nameId}] Enabling GPT agent with OpenAI ${this.gptEnabled}`,
-    );
     if (!this.gptEnabled || !process.env.OPENAI_API_KEY) return;
     console.log(`[${this.nameId}] Enabling GPT agent with OpenAI`);
     // Listen for messages that mention this persona's name
