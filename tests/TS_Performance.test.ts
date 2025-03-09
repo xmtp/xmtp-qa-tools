@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceMetric } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import type { Conversation, Dm, Group, Persona } from "@helpers/types";
+import type { Conversation, Group, Persona } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {

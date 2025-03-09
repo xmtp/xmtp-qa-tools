@@ -5,9 +5,9 @@ import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "dms";
-loadEnv(testName);
 
 describe(testName, () => {
+  loadEnv(testName);
   let convo: Conversation;
   let personas: Record<string, Persona>;
 

@@ -8,7 +8,12 @@ import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
-import { createLogger, flushLogger, overrideConsole } from "./logger";
+import {
+  captureProcessOutput,
+  createLogger,
+  flushLogger,
+  overrideConsole,
+} from "./logger";
 import { defaultValues, type Persona, type XmtpEnv } from "./types";
 import { clearWorkerCache } from "./workers/factory";
 

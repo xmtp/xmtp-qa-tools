@@ -76,6 +76,72 @@ export function sendDeliveryMetric(
   }
 }
 
+export async function sendRailwayEvent(
+  status: "success" | "failure",
+  testName: string,
+): Promise<void> {
+  const datadog_api_key = process.env.DATADOG_API_KEY;
+
+  if (!datadog_api_key) {
+    console.error("WARNING: Datadog API key is not available");
+    return;
+  }
+
+  const alertType = status === "success" ? "success" : "error";
+  const title = `Railway Test ${testName} ${status === "success" ? "Succeeded" : "Failed"}`;
+  const text = `Railway test ${testName} ${status === "success" ? "completed successfully" : "failed"} in ${process.env.XMTP_ENV || "unknown"} environment`;
+
+  try {
+    // Send event to Datadog
+    await fetch("https://api.datadoghq.com/api/v1/events", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "DD-API-KEY": datadog_api_key,
+      },
+      body: JSON.stringify({
+        title,
+        text: `${text}\n\nTrigger: Railway`,
+        alert_type: alertType,
+        source_type_name: "railway",
+        tags: [
+          `test:${testName}`,
+          `environment:${process.env.XMTP_ENV || "unknown"}`,
+          `status:${status}`,
+        ],
+      }),
+    });
+
+    // Send metric to Datadog
+    const metricValue = status === "success" ? 1 : 0;
+
+    await fetch("https://api.datadoghq.com/api/v1/series", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "DD-API-KEY": datadog_api_key,
+      },
+      body: JSON.stringify({
+        series: [
+          {
+            metric: "railway.test.status",
+            type: "gauge",
+            points: [[Math.floor(Date.now() / 1000), metricValue]],
+            tags: [
+              `test:${testName}`,
+              `environment:${process.env.XMTP_ENV || "unknown"}`,
+            ],
+          },
+        ],
+      }),
+    });
+
+    console.log(`Successfully reported ${status} to Datadog`);
+  } catch (error) {
+    console.error("Error reporting to Datadog:", error);
+  }
+}
+
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,

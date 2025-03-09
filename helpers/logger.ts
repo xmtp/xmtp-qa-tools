@@ -34,7 +34,24 @@ export const flushLogger = (testName: string): string => {
   }
   return "";
 };
+// Add this function to capture external process output
+export const captureProcessOutput = (
+  stdout: string,
+  stderr: string,
+  logger: winston.Logger,
+) => {
+  if (stdout) {
+    stdout.split("\n").forEach((line) => {
+      if (line.trim()) logger.log("info", `[Rust] ${line.trim()}`);
+    });
+  }
 
+  if (stderr) {
+    stderr.split("\n").forEach((line) => {
+      if (line.trim()) logger.log("error", `[Rust] ${line.trim()}`);
+    });
+  }
+};
 export const createLogger = (testName: string) => {
   if (!sharedLogger) {
     const logFilePath = getLogFilePath(testName);
