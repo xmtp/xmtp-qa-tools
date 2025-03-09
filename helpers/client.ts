@@ -8,12 +8,7 @@ import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
-import {
-  captureProcessOutput,
-  createLogger,
-  flushLogger,
-  overrideConsole,
-} from "./logger";
+import { createLogger, flushLogger, overrideConsole } from "./logger";
 import { defaultValues, type Persona, type XmtpEnv } from "./types";
 import { clearWorkerCache } from "./workers/factory";
 
@@ -54,7 +49,6 @@ function loadDataPath(name: string, testName: string): string {
   // Extract the base name without installation ID for folder structure
   const baseName = name.toLowerCase().split("-")[0];
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
-  console.log("preBasePath", preBasePath);
   // Use baseName for the parent folder, not the full name
   let basePath = `${preBasePath}/.data/${baseName}`;
 

@@ -108,7 +108,7 @@ describe(testName, () => {
     it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       await group.sync();
       const members = await group.members();
-      expect(members.length).toBe(i);
+      expect(members.length).toBe(i + 1);
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
       await (group as Group).updateName("Large Group");

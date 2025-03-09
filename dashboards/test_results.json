@@ -20,7 +20,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:github.workflow.status{*} by {workflow, environment}.fill(last, 300)"
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)"
               }
             ],
             "formulas": [{ "formula": "query1" }],
@@ -56,7 +56,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:github.workflow.status{*}.rollup(avg)",
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)",
                 "aggregator": "avg"
               }
             ],
@@ -85,7 +85,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:github.workflow.status{*} by {workflow}",
+                "query": "avg:xmtp.sdk.workflow.status{*} by {test}.rollup(avg)",
                 "aggregator": "avg"
               }
             ],
@@ -118,7 +118,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "count:github.workflow.status{*} by {workflow}.as_count()"
+                "query": "count:xmtp.sdk.workflow.status{*} by {test}.as_count()"
               }
             ],
             "style": {
@@ -168,16 +168,29 @@
   ],
   "template_variables": [
     {
-      "name": "workflow",
-      "prefix": "workflow",
-      "available_values": ["TS_Gm", "TS_Performance", "TS_Delivery"],
-      "default": "*"
+      "name": "env",
+      "prefix": "env",
+      "available_values": [],
+      "default": "dev"
     },
     {
-      "name": "environment",
-      "prefix": "environment",
-      "available_values": ["Dev", "Production"],
-      "default": "Dev"
+      "name": "geo",
+      "prefix": "geo",
+      "available_values": [
+        "south-america",
+        "europe",
+        "asia",
+        "us-east",
+        "us",
+        "us-west"
+      ],
+      "default": "us"
+    },
+    {
+      "name": "test",
+      "prefix": "test",
+      "available_values": [],
+      "default": "ts_performance"
     }
   ],
   "layout_type": "ordered",

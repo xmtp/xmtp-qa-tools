@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { sendRailwayEvent } from "@helpers/datadog";
+import { sendTestResults } from "@helpers/datadog";
 
 type TestResult = "success" | "failure";
 
@@ -42,7 +42,7 @@ async function runTests(): Promise<void> {
   }
 
   // Report results to Datadog
-  await sendRailwayEvent(status, testName);
+  await sendTestResults(status, testName);
 }
 
 // Run tests when this script is executed
