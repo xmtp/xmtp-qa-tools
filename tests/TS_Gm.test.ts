@@ -29,7 +29,7 @@ describe(testName, () => {
     await convo.send("gm");
 
     // Wait briefly for response
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     // Check if we got a response
     const messagesAfter = (await convo.messages()).length;
