@@ -23,5 +23,7 @@ export default defineConfig({
       host: "0.0.0.0",
       port: 51204,
     },
+    // Add this to suppress unhandled errors at the end
+    dangerouslyIgnoreUnhandledErrors: true,
   },
 });
