@@ -79,9 +79,3 @@ Considerations
 - If persona exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
 - Personas prefixed with "random" have keys that are stored only in memory.
-
-## 🔮 Coming Soon
-
-- [ ] Metadata for groups
-- [ ] Consent
-- [ ] Stress tests
