@@ -52,7 +52,7 @@ async function testConnection() {
   );
 
   console.log("Connection successful!");
-  console.log("User info:", response.RAILWAY_PROJECT_TOKEN);
+  console.log("User info:", response.data);
   return true;
 }
 
