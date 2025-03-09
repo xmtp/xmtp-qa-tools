@@ -1,24 +1,18 @@
-# 🐛 Bug Report
+# Bug logs 🐛
 
-## Description
+This repository contains documentation for known bugs and their solutions.
 
-```bash
-git clone https://github.com/xmtp/xmtp-qa-testing/
-cd xmtp-qa-testing
-yarn
-yarn test bug_panic
-```
+## Categories
 
-## Test code
+| Bug Type                                               | Description                            |
+| ------------------------------------------------------ | -------------------------------------- |
+| [📦 Installation issues](./bug_installation/README.md) | Problems during setup and installation |
+| [💥 Panic errors](./bug_panic/README.md)               | Runtime crashes and panic situations   |
 
-- Test [code](./test.test.ts)
+## Contributing
 
-### Logs
+When adding a new bug report, please:
 
-- [libxmtp](./libxmtp.log) log
-- [test logs](./test.log) log
-
-### Environment
-
-- [./data](/.data/) folder
-- [.env](/.env) file
+1. Create a folder with descriptive name (`bug_[type]`)
+2. Include reproduction steps
+3. Document the solution if available with [BUG_TEMPLATE.md](./BUG_TEMPLATE.md)
