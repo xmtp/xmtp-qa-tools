@@ -1,19 +1,33 @@
-name: Test Railway Integration
+name: Railway Integration
 
 on:
   # Manual trigger only for testing
   workflow_dispatch:
 
 jobs:
-  test-railway:
+  railway-integration:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Run performance tests on Railway
-        run: railway run --service "xmtp-qa-testing:us-west" yarn ts_performance
+      - name: Check Railway services
+        run: railway service list
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Execute performance test on Railway
+        run: railway exec --service "xmtp-qa-testing:us-west" -- yarn performance
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Print completion message
+        run: echo "Railway test execution completed"
