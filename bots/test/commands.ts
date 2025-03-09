@@ -12,8 +12,8 @@ Available commands:
 /rename [name] - Rename the current group
 /add [number] - Add [number] random personas to the current group (default: 1)
 /remove [number] - Remove [number] random personas from the current group (default: 1)
-/listgroups - List all active groups
-/listmembers - List all members in the current group
+/groups - List all active groups
+/members - List all members in the current group
 /broadcast [message] - Send a message to all participants in the current group
 /leave - Leave the current group
 /info - Get info about the current group
@@ -39,7 +39,7 @@ export class CommandHandler {
   constructor(personas: Record<string, Persona>) {
     this.personas = personas;
   }
-  async listpersonas(message: DecodedMessage, client: Client) {
+  async workers(message: DecodedMessage, client: Client) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
@@ -271,7 +271,7 @@ export class CommandHandler {
   }
 
   // List all members in the current group
-  async listmembers(message: DecodedMessage, client: Client) {
+  async members(message: DecodedMessage, client: Client) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
@@ -298,7 +298,7 @@ export class CommandHandler {
   }
 
   // List all active groups
-  async listgroups(message: DecodedMessage, client: Client) {
+  async groups(message: DecodedMessage, client: Client) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );

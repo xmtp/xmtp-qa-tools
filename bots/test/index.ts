@@ -94,11 +94,11 @@ async function processCommand(
     case "rename":
       await commandHandler.rename(message, client, args);
       break;
-    case "listmembers":
-      await commandHandler.listmembers(message, client);
+    case "members":
+      await commandHandler.members(message, client);
       break;
-    case "listgroups":
-      await commandHandler.listgroups(message, client);
+    case "groups":
+      await commandHandler.groups(message, client);
       break;
     case "broadcast":
       await commandHandler.broadcast(client, args);
@@ -106,8 +106,8 @@ async function processCommand(
     case "info":
       await commandHandler.info(message, client);
       break;
-    case "listpersonas":
-      await commandHandler.listpersonas(message, client);
+    case "workers":
+      await commandHandler.workers(message, client);
       break;
     case "leave":
       await commandHandler.leave(message, client);

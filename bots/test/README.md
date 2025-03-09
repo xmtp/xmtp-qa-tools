@@ -33,21 +33,19 @@ In the example the public key is `0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F`
 
 ## 💬 Available Commands
 
-| Command  | Description                                                |
-| -------- | ---------------------------------------------------------- |
-| `gm`     | Returns gm to your message                                 |
-| `/group` | Creates a test group with simulated users and conversation |
-
-## 👥 Users
-
-The test bot is populated with the following virtual users:
-
-- **Alice**: Regular user
-- **Joe**: Regular user
-- **Sam**: Regular user
-- **Bob**: Admin user (optional)
-
-This will start the bot on your local machine, ready to respond to messages.
+| Command        | Description                                                  |
+| -------------- | ------------------------------------------------------------ |
+| `gm`           | Returns gm to your message                                   |
+| `/group`       | Creates a test group with simulated users and conversation   |
+| `/rename`      | Rename the current group                                     |
+| `/add`         | Add a number of random personas to the group                 |
+| `/remove`      | Remove a number of random personas from the group            |
+| `/listgroups`  | List all active groups                                       |
+| `/listmembers` | List all members in the current group                        |
+| `/broadcast`   | Broadcast a message to all participants in the current group |
+| `/leave`       | Leave the current group                                      |
+| `/info`        | Get info about the current group                             |
+| `/workers`     | List all available workers                                   |
 
 ## ⚙️ Environment Configuration
 
