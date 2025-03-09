@@ -19,13 +19,33 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Check Railway services
-        run: railway service list
+      - name: Debug Railway CLI
+        run: |
+          echo "Railway CLI version:"
+          railway --version
+
+          echo "Railway help:"
+          railway help
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Execute performance test on Railway
-        run: railway exec --service "xmtp-qa-testing:us-west" -- yarn performance
+      - name: Debug Railway connection
+        run: |
+          echo "Checking Railway project:"
+          railway project
+
+          echo "List Railway environments:"
+          railway environment
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: List Railway services
+        run: railway service
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+
+      - name: Try to run Railway command
+        run: railway run --service xmtp-qa-testing yarn performance
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
