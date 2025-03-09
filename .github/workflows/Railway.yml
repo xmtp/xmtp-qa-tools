@@ -16,9 +16,9 @@ jobs:
 
       # No need for separate login step - just use the token directly
       - name: Run performance tests on Railway
-        run: railway run --service xmtp-qa-testing:us-west yarn performance
+        run: railway run --service xmtp-qa-testing:us-west yarn ts_performance
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_PROJECT_TOKEN }}
 
       - name: Print completion message
         run: echo "Railway test execution completed"
