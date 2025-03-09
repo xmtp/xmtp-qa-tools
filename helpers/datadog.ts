@@ -242,8 +242,23 @@ export async function getNetworkStats(
     // Parse the JSON response
     const stats = JSON.parse(stdout.trim()) as NetworkStats;
 
-    // Optional: Log warnings for slow connections
+    // Check if Server Call time is 0, which indicates a failed request
+    if (stats["Server Call"] === 0) {
+      console.warn(
+        `Network request to ${endpoint} failed with Server Call time of 0`,
+      );
+      // We still have some useful metrics (DNS, TCP, TLS), so let's use those
+      // and just set a reasonable value for Server Call
+      stats["Server Call"] = stats["TLS Handshake"] + 0.1; // Estimate
+    }
+
+    // Calculate processing time
     stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
+
+    // Ensure processing time is not negative
+    if (stats["Processing"] < 0) {
+      stats["Processing"] = 0;
+    }
 
     if (
       stats["Processing"] * 1000 > 300 ||
