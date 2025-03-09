@@ -1,4 +1,4 @@
-name: Railway Integration
+name: Railway integration
 
 on:
   # Manual trigger only for testing
@@ -19,33 +19,33 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Debug Railway CLI
+      - name: Check Railway CLI version
         run: |
           echo "Railway CLI version:"
           railway --version
-
-          echo "Railway help:"
-          railway help
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Debug Railway connection
+      - name: Check Railway connection status
         run: |
-          echo "Checking Railway project:"
-          railway project
-
-          echo "List Railway environments:"
-          railway environment
+          echo "Checking Railway status:"
+          railway status
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: List Railway services
-        run: railway service
+      - name: Verify Railway environment
+        run: |
+          echo "Checking if we're on Railway:"
+          railway run -s xmtp-qa-testing:us-west bash -c 'echo "RAILWAY_SERVICE_ID: $RAILWAY_SERVICE_ID"'
+          railway run -s xmtp-qa-testing:us-west bash -c 'echo "RAILWAY_PROJECT_ID: $RAILWAY_PROJECT_ID"'
+          railway run -s xmtp-qa-testing:us-west bash -c 'echo "HOSTNAME: $HOSTNAME"'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      - name: Try to run Railway command
-        run: railway run --service xmtp-qa-testing yarn performance
+      - name: Run performance test on Railway
+        run: |
+          echo "Running performance test on service:"
+          railway run -s xmtp-qa-testing:us-west yarn ts_performance
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
