@@ -13,6 +13,8 @@ hi [name] - Get a response back to [name]
 /rename [name] - Rename the current group
 /add [name] - Add [name] to the current group
 /remove [name] - Remove [name] from the current group
+/block [name] - Block [name] from the current group
+/unblock [name] - Unblock [name] from the current group 
 /groups - List all active groups
 /members - List all members in the current group
 /admins - List all admins in the current group
@@ -81,7 +83,18 @@ export class CommandHandler {
     );
     await conversation?.send("gm");
   }
-
+  async block(message: DecodedMessage, client: Client, args: string[] = []) {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    await conversation?.send(`blocked ${args.join(" ")}`);
+  }
+  async unblock(message: DecodedMessage, client: Client, args: string[] = []) {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    await conversation?.send(`unblocked ${args.join(" ")}`);
+  }
   // Create a new group
   async create(message: DecodedMessage, client: Client, args: string[] = []) {
     const conversation = await client.conversations.getConversationById(
@@ -386,7 +399,7 @@ export class CommandHandler {
     // Example: /blast jaja 5 5 - sends "jaja" to 5 personas, 5 times each
 
     // Get the message from all arguments
-    const blastMessage = args.join(" ").trim();
+    let blastMessage = args.join(" ").trim();
 
     // Default values
     let countOfPersonas = 5; // Number of personas to message
@@ -406,17 +419,15 @@ export class CommandHandler {
       countOfPersonas = parseInt(secondLastArg);
       // Remove the numbers from the message
       const messageWords = blastMessage.split(" ");
-      const messageWithoutCounts = messageWords
-        .slice(0, messageWords.length - 2)
-        .join(" ");
-      if (messageWithoutCounts.trim()) {
-        blastMessage = messageWithoutCounts;
-      }
+      blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
     }
 
     await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
     for (let i = 0; i < repeatCount; i++) {
-      for (const persona of Object.values(this.personas)) {
+      for (const persona of Object.values(this.personas).slice(
+        0,
+        countOfPersonas,
+      )) {
         const personaGroup = await persona.client?.conversations.newDmByInboxId(
           message.senderInboxId,
         );

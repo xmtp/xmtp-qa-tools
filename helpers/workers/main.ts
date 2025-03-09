@@ -58,13 +58,14 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
-  private isGptAgentEnabled = false;
+  private gptEnabled: boolean;
 
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
     persona: PersonaBase,
     typeofStream: typeofStream,
+    gptEnabled: boolean,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
@@ -75,6 +76,7 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
 
+    this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
     this.name = persona.name;
     this.installationId = persona.installationId;
@@ -215,9 +217,6 @@ export class WorkerClient extends Worker {
   }
 
   async terminate() {
-    // Disable GPT agent before terminating
-    this.disableGptAgent();
-
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent
     }
@@ -496,11 +495,11 @@ export class WorkerClient extends Worker {
    * when the persona's name is mentioned in a message.
    */
   enableGptAgent(): void {
-    if (this.isGptAgentEnabled || !process.env.OPENAI_API_KEY) return;
-
+    console.log(
+      `[${this.nameId}] Enabling GPT agent with OpenAI ${this.gptEnabled}`,
+    );
+    if (!this.gptEnabled || !process.env.OPENAI_API_KEY) return;
     console.log(`[${this.nameId}] Enabling GPT agent with OpenAI`);
-    this.isGptAgentEnabled = true;
-
     // Listen for messages that mention this persona's name
     this.on("message", (msg: MessageStreamWorker) => {
       void (async () => {
@@ -574,13 +573,5 @@ export class WorkerClient extends Worker {
         "I'm not sure how to respond to that.");
 
     return response;
-  }
-
-  /**
-   * Disables the GPT agent.
-   */
-  disableGptAgent(): void {
-    this.isGptAgentEnabled = false;
-    console.log(`[${this.nameId}] GPT agent disabled`);
   }
 }

@@ -22,11 +22,17 @@ const globalWorkerCache: Record<string, Persona> = {};
 export class PersonaFactory {
   private testName: string;
   private activeWorkers: WorkerClient[] = []; // Add this to track workers
+  private gptEnabled: boolean;
 
   private typeofStream: typeofStream;
-  constructor(testName: string, typeofStream: typeofStream) {
+  constructor(
+    testName: string,
+    typeofStream: typeofStream,
+    gptEnabled: boolean,
+  ) {
     this.testName = testName;
     this.typeofStream = typeofStream;
+    this.gptEnabled = gptEnabled;
   }
 
   /**
@@ -158,8 +164,7 @@ export class PersonaFactory {
     // First, check which personas already exist in the global cache
     for (const desc of descriptors) {
       if (
-        desc in globalWorkerCache &&
-        globalWorkerCache[desc] &&
+        Object.values(globalWorkerCache).some((p) => p.name === desc) &&
         globalWorkerCache[desc].client
       ) {
         console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
@@ -220,7 +225,9 @@ export class PersonaFactory {
 
       // Spin up Workers in parallel only for new personas
       const messageWorkers = await Promise.all(
-        newPersonas.map((p) => new WorkerClient(p, this.typeofStream)),
+        newPersonas.map(
+          (p) => new WorkerClient(p, this.typeofStream, this.gptEnabled),
+        ),
       );
 
       // Initialize each worker's XMTP client in parallel
@@ -261,6 +268,7 @@ export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   testName: string,
   typeofStream: typeofStream = "message",
+  gptEnabled: boolean = false,
 ): Promise<Record<string, Persona>> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
@@ -271,7 +279,7 @@ export async function getWorkers(
     descriptors = descriptorsOrAmount;
   }
 
-  const personaFactory = new PersonaFactory(testName, typeofStream);
+  const personaFactory = new PersonaFactory(testName, typeofStream, gptEnabled);
 
   const personas = await personaFactory.createPersonas(descriptors);
 

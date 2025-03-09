@@ -15,7 +15,7 @@ loadEnv(testName);
 async function main() {
   // Get 20 dynamic workers
   let personas: Record<string, Persona> = {};
-  personas = await getWorkers(20, testName);
+  personas = await getWorkers(20, testName, "message", true);
   const commandHandler = new CommandHandler(personas);
 
   const client = personas.bot.client as Client;
@@ -90,6 +90,12 @@ async function processCommand(
       break;
     case "create":
       await commandHandler.create(message, client, args);
+      break;
+    case "block":
+      await commandHandler.block(message, client, args);
+      break;
+    case "unblock":
+      await commandHandler.unblock(message, client, args);
       break;
     case "rename":
       await commandHandler.rename(message, client, args);
