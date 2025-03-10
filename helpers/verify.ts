@@ -243,9 +243,8 @@ export function calculateMessageStats(
       return { inOrder: false, expectedMessages: [] };
     }
 
-    // Extract the random suffix from the first message
-    const parts = receivedMessages[0].split("-");
-    const randomSuffix = parts.length >= 3 ? parts[2] : suffix;
+    // Use the provided suffix parameter directly
+    const randomSuffix = suffix;
 
     // Determine the count of expected messages
     const count = expectedCount || receivedMessages.length;
@@ -266,7 +265,12 @@ export function calculateMessageStats(
       expectedMessages,
     };
   };
-  const showDiscrepancies = (personasInOrder: number, personaCount: number) => {
+  const showDiscrepancies = (
+    personasInOrder: number,
+    personaCount: number,
+    prefix: string,
+    amount: number,
+  ) => {
     // Log any discrepancies in message order
     if (personasInOrder < personaCount) {
       console.log("Message order discrepancies detected:");
@@ -356,7 +360,7 @@ export function calculateMessageStats(
   console.log(
     `Order percentage: ${orderPercentage.toFixed(2)}% (${personasInOrder}/${personaCount} personas)`,
   );
-  showDiscrepancies(personasInOrder, personaCount);
+  showDiscrepancies(personasInOrder, personaCount, prefix, amount);
   //showComparativeTable(messagesByPersona);
   return {
     receptionPercentage,

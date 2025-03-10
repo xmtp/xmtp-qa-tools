@@ -221,20 +221,20 @@ export class WorkerClient extends Worker {
       return super.terminate(); // Already terminated, just call parent
     }
 
-    this.isTerminated = true;
-
+    console.time(`[${this.nameId}] Terminate stream`);
     try {
-      // Close streams if they exist
       if (
         this.messageStream &&
         typeof this.messageStream.return === "function"
       ) {
         await this.messageStream.return();
+        this.isTerminated = true;
+        console.warn(`[${this.nameId}] Terminated stream`);
       }
     } catch (error) {
       console.error(`[${this.nameId}] Error during stream cleanup:`, error);
     }
-
+    console.timeEnd(`[${this.nameId}] Terminate stream`);
     // Call parent terminate
     return super.terminate();
   }

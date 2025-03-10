@@ -104,6 +104,41 @@
       },
       "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
     },
+
+    {
+      "id": 504026830671482,
+      "definition": {
+        "title": "Offline Order Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
+    },
     {
       "id": 5725909012596498,
       "definition": {
@@ -154,7 +189,9 @@
               { "formula": "query1" },
               { "formula": "query2" },
               { "formula": "query3" },
-              { "formula": "query4" }
+              { "formula": "query4" },
+              { "formula": "query5" },
+              { "formula": "query6" }
             ],
 
             "queries": [
@@ -177,6 +214,16 @@
                 "name": "query4",
                 "data_source": "metrics",
                 "query": "avg:xmtp.sdk.order{metric_type:poll,$env,$geo,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query5",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery{metric_type:offline,$env,$geo,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query6",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}"
               }
             ],
             "response_format": "timeseries",
@@ -209,7 +256,7 @@
     {
       "name": "metric_type",
       "prefix": "metric_type",
-      "available_values": ["stream", "poll"],
+      "available_values": ["stream", "poll", "offline"],
       "default": "*"
     },
     {
