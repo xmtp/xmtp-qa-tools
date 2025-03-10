@@ -1,5 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceMetric, sendTestResults } from "@helpers/datadog";
+import { exportTestResults, logError } from "@helpers/tests";
 import { type Conversation, type Persona } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
@@ -38,12 +39,10 @@ describe(testName, () => {
         ],
         testName,
       );
+      expect(personas).toBeDefined();
+      expect(Object.values(personas).length).toBe(9);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -54,14 +53,10 @@ describe(testName, () => {
   });
 
   afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      console.timeEnd(testName);
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
+    try {
+      exportTestResults(expect, personas, start);
+    } catch (e) {
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -70,11 +65,7 @@ describe(testName, () => {
       sendTestResults(hasFailures ? "failure" : "success", testName);
       await closeEnv(testName, personas);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -87,11 +78,7 @@ describe(testName, () => {
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -107,11 +94,7 @@ describe(testName, () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -122,11 +105,7 @@ describe(testName, () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 });

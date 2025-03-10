@@ -1,5 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
+import { logError } from "@helpers/tests";
 import {
   defaultValues,
   type Group,
@@ -47,12 +48,10 @@ describe(
           await persona.client!.conversations.sync();
         }
         console.log("Group created", group.id);
+        expect(personas).toBeDefined();
+        expect(Object.values(personas).length).toBe(receiverAmount);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
 
@@ -61,11 +60,7 @@ describe(
         sendTestResults(hasFailures ? "failure" : "success", testName);
         await closeEnv(testName, personas);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
 
@@ -83,11 +78,7 @@ describe(
         );
         expect(collectedMessages.allReceived).toBe(true);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
 
@@ -127,11 +118,7 @@ describe(
           "order",
         );
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
 
@@ -187,11 +174,7 @@ describe(
           "order",
         );
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
   },

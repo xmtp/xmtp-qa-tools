@@ -1,5 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
+import { logError } from "@helpers/tests";
 import { type Conversation, type Persona } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -17,12 +18,10 @@ describe(testName, () => {
   beforeAll(async () => {
     try {
       personas = await getWorkers(["bob"], testName);
+      expect(personas).toBeDefined();
+      expect(Object.values(personas).length).toBe(1);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -31,11 +30,7 @@ describe(testName, () => {
       sendTestResults(hasFailures ? "failure" : "success", testName);
       await closeEnv(testName, personas);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -58,11 +53,7 @@ describe(testName, () => {
       expect(messagesAfter).toBe(prevMessages + 2);
       console.log("Messages before:", prevMessages, "after:", messagesAfter);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -73,11 +64,7 @@ describe(testName, () => {
       expect(result).toBe(true);
       console.timeEnd("respond-to-message-test");
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 });

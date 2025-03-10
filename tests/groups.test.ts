@@ -1,8 +1,8 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceMetric, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { exportTestResults, logError } from "@helpers/tests";
 import { type Conversation, type Group, type Persona } from "@helpers/types";
-import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
@@ -40,12 +40,10 @@ describe(testName, () => {
         ],
         testName,
       );
+      expect(personas).toBeDefined();
+      expect(Object.values(personas).length).toBe(9);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -56,14 +54,10 @@ describe(testName, () => {
   });
 
   afterEach(function () {
-    const testName = expect.getState().currentTestName;
-    if (testName) {
-      console.timeEnd(testName);
-      void sendPerformanceMetric(
-        performance.now() - start,
-        testName,
-        Object.values(personas)[0].version,
-      );
+    try {
+      exportTestResults(expect, personas, start);
+    } catch (e) {
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -72,11 +66,7 @@ describe(testName, () => {
       sendTestResults(hasFailures ? "failure" : "success", testName);
       await closeEnv(testName, personas);
     } catch (e) {
-      console.error(
-        `[vitest] Test failed in ${expect.getState().currentTestName}`,
-        e,
-      );
-      hasFailures = true;
+      hasFailures = logError(e, expect);
     }
   });
 
@@ -91,11 +81,7 @@ describe(testName, () => {
           );
         expect(newGroup.id).toBeDefined();
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
     it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
@@ -104,11 +90,7 @@ describe(testName, () => {
         const members = await newGroup.members();
         expect(members.length).toBe(i + 1);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
@@ -119,11 +101,7 @@ describe(testName, () => {
         const name = (newGroup as Group).name;
         expect(name).toBe(newName);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
@@ -136,11 +114,7 @@ describe(testName, () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
     it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
@@ -152,11 +126,7 @@ describe(testName, () => {
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
-        console.error(
-          `[vitest] Test failed in ${expect.getState().currentTestName}`,
-          e,
-        );
-        hasFailures = true;
+        hasFailures = logError(e, expect);
       }
     });
   }

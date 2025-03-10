@@ -180,12 +180,8 @@ export const overrideConsole = (logger: winston.Logger) => {
     };
     // Add a new debug method that only logs in non-production environments
     console.debug = (...args: any[]) => {
-      // Only log debug messages in non-production environments
       if (process.env.NODE_ENV !== "production") {
-        const message = filterLog(args);
-        if (message) {
-          logger.log("debug", message);
-        }
+        logger.debug(args[0]);
       }
     };
   } catch (error) {
