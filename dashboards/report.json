@@ -54,13 +54,37 @@
         ]
       },
       "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
+    },
+    {
+      "id": 2075918014507897,
+      "definition": {
+        "title": "Group operations by size",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$test,$libxmtp,$members} by {members}"
+              }
+            ],
+            "response_format": "timeseries",
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
     {
       "name": "env",
       "prefix": "env",
-      "available_values": ["dev", "prod"],
+      "available_values": [],
       "default": "dev"
     },
     {
