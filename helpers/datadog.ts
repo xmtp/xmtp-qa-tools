@@ -158,13 +158,26 @@ export async function sendPerformanceMetric(
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const metricValue = statValue * 1000; // Convert to milliseconds
+        // Send main operation metric
+        console.debug({
+          durationMetricName,
+          metricValue,
+          libxmtpVersion,
+          operationName,
+          testNameExtracted,
+          metric_type: "network",
+          network_phase: statName.toLowerCase().replace(/\s+/g, "_"),
+          countryCode: getCountryCodeFromGeo(currentGeo),
+          members,
+        });
         metrics.gauge(durationMetricName, metricValue, [
           `libxmtp:${libxmtpVersion}`,
           `operation:${operationName}`,
-          `test:${testName}`,
+          `test:${testNameExtracted}`,
           `metric_type:network`,
           `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
           `geo.country_iso_code:${countryCode}`,
+          `members:${members}`,
         ]);
       }
     }
