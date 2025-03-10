@@ -79,22 +79,6 @@
       "layout": { "x": 4, "y": 0, "width": 2, "height": 4 }
     },
     {
-      "id": 2801741133912872,
-      "definition": {
-        "type": "note",
-        "content": "## TS_Gm Workflow\nThis dashboard tracks the status of GitHub workflows, with special focus on the TS_Gm workflow that verifies library performance in the dev network.\n\n**Status 1**: Successful execution\n\n**Status 0**: Failed execution\n",
-        "background_color": "white",
-        "font_size": "14",
-        "text_align": "left",
-        "vertical_align": "top",
-        "show_tick": false,
-        "tick_pos": "50%",
-        "tick_edge": "left",
-        "has_padding": true
-      },
-      "layout": { "x": 6, "y": 0, "width": 2, "height": 4 }
-    },
-    {
       "id": 4721725196839204,
       "definition": {
         "title": "Workflow Status Over Time",
@@ -171,7 +155,7 @@
       "name": "env",
       "prefix": "env",
       "available_values": [],
-      "default": "dev"
+      "default": "*"
     },
     {
       "name": "geo",
@@ -184,13 +168,13 @@
         "us",
         "us-west"
       ],
-      "default": "us"
+      "default": "*"
     },
     {
       "name": "test",
       "prefix": "test",
       "available_values": [],
-      "default": "ts_performance"
+      "default": "*"
     }
   ],
   "layout_type": "ordered",

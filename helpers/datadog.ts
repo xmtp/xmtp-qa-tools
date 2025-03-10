@@ -73,7 +73,7 @@ export function sendDeliveryMetric(
   try {
     const members = testName.split("-")[1] || "";
 
-    metrics.gauge(`xmtp.sdk.${metricName}`, metricValue, [
+    metrics.gauge(`xmtp.sdk.${metricName}`, Math.round(metricValue), [
       `libxmtp:${libxmtpVersion}`,
       `test:${testName}`,
       `metric_type:${metricType}`,
@@ -140,7 +140,7 @@ export async function sendPerformanceMetric(
       geo: currentGeo,
       countryCode: getCountryCodeFromGeo(currentGeo),
     });
-    metrics.gauge(durationMetricName, metricValue, [
+    metrics.gauge(durationMetricName, Math.round(metricValue), [
       `libxmtp:${libxmtpVersion}`,
       `operation:${operationName}`,
       `test:${testNameExtracted}`,
@@ -157,7 +157,7 @@ export async function sendPerformanceMetric(
       const countryCode = getCountryCodeFromGeo(geo);
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
-        const metricValue = statValue * 1000; // Convert to milliseconds
+        const metricValue = Math.round(statValue * 1000); // Convert to milliseconds
         // Send main operation metric
         console.debug({
           durationMetricName,
