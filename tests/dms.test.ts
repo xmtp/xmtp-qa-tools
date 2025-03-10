@@ -23,20 +23,28 @@ describe(testName, () => {
   let start: number;
 
   beforeAll(async () => {
-    personas = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
+    try {
+      personas = await getWorkers(
+        [
+          "henry",
+          "ivy",
+          "jack",
+          "karen",
+          "randomguy",
+          "larry",
+          "mary",
+          "nancy",
+          "oscar",
+        ],
+        testName,
+      );
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
 
   beforeEach(() => {
@@ -58,8 +66,16 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    sendTestResults(hasFailures ? "failure" : "success", testName);
-    await closeEnv(testName, personas);
+    try {
+      sendTestResults(hasFailures ? "failure" : "success", testName);
+      await closeEnv(testName, personas);
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
 
   it("createDM: should measure creating a DM", async () => {

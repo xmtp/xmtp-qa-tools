@@ -33,24 +33,40 @@ describe(
     const randomSuffix = Math.random().toString(36).substring(2, 15);
     let hasFailures = false;
     beforeAll(async () => {
-      //fs.rmSync(".data", { recursive: true, force: true });
-      // Use getWorkers to spin up many personas. This is resource-intensive.
-      personas = await getWorkers(receiverAmount, testName);
-      console.log("creating group");
-      group = await personas.bob.client!.conversations.newGroupByInboxIds(
-        Object.values(personas).map((p) => p.client?.inboxId as string),
-      );
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      for (const persona of Object.values(personas)) {
-        console.log("syncing", persona.client?.inboxId);
-        await persona.client!.conversations.sync();
+      try {
+        //fs.rmSync(".data", { recursive: true, force: true });
+        // Use getWorkers to spin up many personas. This is resource-intensive.
+        personas = await getWorkers(receiverAmount, testName);
+        console.log("creating group");
+        group = await personas.bob.client!.conversations.newGroupByInboxIds(
+          Object.values(personas).map((p) => p.client?.inboxId as string),
+        );
+        await new Promise((resolve) => setTimeout(resolve, 3000));
+        for (const persona of Object.values(personas)) {
+          console.log("syncing", persona.client?.inboxId);
+          await persona.client!.conversations.sync();
+        }
+        console.log("Group created", group.id);
+      } catch (e) {
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
+        hasFailures = true;
       }
-      console.log("Group created", group.id);
     });
 
     afterAll(async () => {
-      sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      try {
+        sendTestResults(hasFailures ? "failure" : "success", testName);
+        await closeEnv(testName, personas);
+      } catch (e) {
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
+        hasFailures = true;
+      }
     });
 
     it("tc_stream: send the stream", async () => {

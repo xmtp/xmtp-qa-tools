@@ -15,12 +15,28 @@ describe(testName, () => {
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
-    personas = await getWorkers(["bob"], testName);
+    try {
+      personas = await getWorkers(["bob"], testName);
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
 
   afterAll(async () => {
-    sendTestResults(hasFailures ? "failure" : "success", testName);
-    await closeEnv(testName, personas);
+    try {
+      sendTestResults(hasFailures ? "failure" : "success", testName);
+      await closeEnv(testName, personas);
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
 
   it("gm-bot: should check if bot is alive", async () => {
