@@ -27,6 +27,7 @@ yarn-error.log*
 .turbo
 
 # logs
+logs/
 logs/*
 
 
