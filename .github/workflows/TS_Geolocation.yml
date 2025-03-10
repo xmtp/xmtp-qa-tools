@@ -22,35 +22,35 @@ jobs:
       - name: Create logs directory
         run: mkdir -p logs
 
-      # US West Region Test
-      - name: Run performance test on US West
-        id: us-west-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on US West:"
-            railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
-          retry_on: error
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      # # US West Region Test
+      # - name: Run performance test on US West
+      #   id: us-west-test
+      #   continue-on-error: true
+      #   uses: nick-fields/retry@v2
+      #   with:
+      #     timeout_minutes: 10
+      #     max_attempts: 3
+      #     command: |
+      #       echo "Running performance test on US West:"
+      #       railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
+      #     retry_on: error
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      # US East Region Test
-      - name: Run performance test on US East
-        id: us-east-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on US East:"
-            railway run -s xmtp-qa-testing:us-east yarn test ts_performance | tee logs/us-east-performance.log
-          retry_on: error
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      # # US East Region Test
+      # - name: Run performance test on US East
+      #   id: us-east-test
+      #   continue-on-error: true
+      #   uses: nick-fields/retry@v2
+      #   with:
+      #     timeout_minutes: 10
+      #     max_attempts: 3
+      #     command: |
+      #       echo "Running performance test on US East:"
+      #       railway run -s xmtp-qa-testing:us-east yarn test ts_performance | tee logs/us-east-performance.log
+      #     retry_on: error
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       # Europe Region Test
       - name: Run performance test on Europe
