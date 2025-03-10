@@ -19,7 +19,6 @@ loadEnv(testName);
 
 describe(testName, () => {
   let dm: Conversation;
-  let group: Conversation;
   let personas: Record<string, Persona>;
   let start: number;
   let hasFailures: boolean = false;
@@ -27,20 +26,28 @@ describe(testName, () => {
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
   beforeAll(async () => {
-    personas = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
+    try {
+      personas = await getWorkers(
+        [
+          "henry",
+          "ivy",
+          "jack",
+          "karen",
+          "randomguy",
+          "larry",
+          "mary",
+          "nancy",
+          "oscar",
+        ],
+        testName,
+      );
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
@@ -61,8 +68,16 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    sendTestResults(hasFailures ? "failure" : "success", testName);
-    await closeEnv(testName, personas);
+    try {
+      sendTestResults(hasFailures ? "failure" : "success", testName);
+      await closeEnv(testName, personas);
+    } catch (e) {
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
+      hasFailures = true;
+    }
   });
 
   it("inboxState: should measure inboxState of henry", async () => {

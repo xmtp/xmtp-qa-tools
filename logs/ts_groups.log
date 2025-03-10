@@ -1,22 +1,61 @@
-[2025-03-10T18:29:46.737Z] [info] envPath .env
-[2025-03-10T18:29:46.767Z] [info] [PersonaFactory] Using env keys for henry: 0x279E073123f6C71B0c9FC0c664B75fEB022aEd19
-[2025-03-10T18:29:46.768Z] [info] [PersonaFactory] Using env keys for ivy: 0x467e7428C97A818d40b2A85DB965DeCAE212E0D1
-[2025-03-10T18:29:46.770Z] [info] [PersonaFactory] Using env keys for jack: 0xF5C6313Bc7785003765819eFd89360c95e473b00
-[2025-03-10T18:29:46.773Z] [info] [PersonaFactory] Using env keys for karen: 0x5B863a8f6A8dDde93a1d3162733B2EA01f00D099
-[2025-03-10T18:29:46.773Z] [info] [PersonaFactory] Generating new keys for randomguy
-[2025-03-10T18:29:46.775Z] [info] [PersonaFactory] Using env keys for larry: 0x590C6De6475011F5F62D80C2438365692ec258d6
-[2025-03-10T18:29:46.776Z] [info] [PersonaFactory] Using env keys for mary: 0x033Be283F43F0CF36D970eF299fB0dB9278b9b9f
-[2025-03-10T18:29:46.776Z] [info] [PersonaFactory] Using env keys for nancy: 0xa18f772b2f105f33C957E1B633eeC451fC7e0E36
-[2025-03-10T18:29:46.777Z] [info] [PersonaFactory] Using env keys for oscar: 0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b
-[2025-03-10T18:29:49.013Z] [warn] [nancy-a] Create XMTP client v:6bd613d 2.227s
-[2025-03-10T18:29:49.064Z] [warn] [oscar-a] Create XMTP client v:6bd613d 2.278s
-[2025-03-10T18:29:49.262Z] [warn] [oscar-a] Initialize XMTP client 2.477s
-[2025-03-10T18:29:49.280Z] [warn] [jack-a] Create XMTP client v:6bd613d 2.494s
-[2025-03-10T18:29:49.413Z] [warn] [nancy-a] Start message stream 399.352ms
-[2025-03-10T18:29:49.413Z] [warn] [nancy-a] Start stream 400.398ms
-[2025-03-10T18:29:49.413Z] [warn] [nancy-a] Initialize XMTP client 2.629s
-[2025-03-10T18:29:49.676Z] [warn] [jack-a] Start message stream 395.949ms
-[2025-03-10T18:29:49.676Z] [warn] [jack-a] Start stream 396.27ms
-[2025-03-10T18:29:49.676Z] [warn] [jack-a] Initialize XMTP client 2.895s
-[2025-03-10T18:29:52.622Z] [info] The tests indicated that the test ts_groups was success
-[2025-03-10T18:29:52.622Z] [info] Successfully reported success to Datadog
+[2025-03-10T18:40:57.030Z] [info] envPath .env
+[2025-03-10T18:40:57.060Z] [info] [PersonaFactory] Using env keys for henry: 0x279E073123f6C71B0c9FC0c664B75fEB022aEd19
+[2025-03-10T18:40:57.062Z] [info] [PersonaFactory] Using env keys for ivy: 0x467e7428C97A818d40b2A85DB965DeCAE212E0D1
+[2025-03-10T18:40:57.063Z] [info] [PersonaFactory] Using env keys for jack: 0xF5C6313Bc7785003765819eFd89360c95e473b00
+[2025-03-10T18:40:57.065Z] [info] [PersonaFactory] Using env keys for karen: 0x5B863a8f6A8dDde93a1d3162733B2EA01f00D099
+[2025-03-10T18:40:57.065Z] [info] [PersonaFactory] Generating new keys for randomguy
+[2025-03-10T18:40:57.068Z] [info] [PersonaFactory] Using env keys for larry: 0x590C6De6475011F5F62D80C2438365692ec258d6
+[2025-03-10T18:40:57.069Z] [info] [PersonaFactory] Using env keys for mary: 0x033Be283F43F0CF36D970eF299fB0dB9278b9b9f
+[2025-03-10T18:40:57.070Z] [info] [PersonaFactory] Using env keys for nancy: 0xa18f772b2f105f33C957E1B633eeC451fC7e0E36
+[2025-03-10T18:40:57.070Z] [info] [PersonaFactory] Using env keys for oscar: 0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b
+[2025-03-10T18:40:59.145Z] [warn] [jack-a] Create XMTP client v:6bd613d 2.065s
+[2025-03-10T18:40:59.152Z] [warn] [ivy-a] Create XMTP client v:6bd613d 2.072s
+[2025-03-10T18:40:59.235Z] [warn] [karen-a] Create XMTP client v:6bd613d 2.155s
+[2025-03-10T18:40:59.303Z] [warn] [larry-a] Create XMTP client v:6bd613d 2.223s
+[2025-03-10T18:40:59.347Z] [warn] [henry-a] Create XMTP client v:6bd613d 2.267s
+[2025-03-10T18:40:59.417Z] [warn] [mary-a] Create XMTP client v:6bd613d 2.337s
+[2025-03-10T18:40:59.549Z] [warn] [jack-a] Start message stream 402.842ms
+[2025-03-10T18:40:59.549Z] [warn] [jack-a] Start stream 404.196ms
+[2025-03-10T18:40:59.550Z] [warn] [jack-a] Initialize XMTP client 2.474s
+[2025-03-10T18:40:59.552Z] [warn] [ivy-a] Start message stream 399.638ms
+[2025-03-10T18:40:59.553Z] [warn] [ivy-a] Start stream 400.149ms
+[2025-03-10T18:40:59.554Z] [warn] [ivy-a] Initialize XMTP client 2.477s
+[2025-03-10T18:40:59.634Z] [warn] [karen-a] Start message stream 398.273ms
+[2025-03-10T18:40:59.635Z] [warn] [karen-a] Start stream 399.367ms
+[2025-03-10T18:40:59.635Z] [warn] [karen-a] Initialize XMTP client 2.558s
+[2025-03-10T18:40:59.636Z] [warn] [nancy-a] Create XMTP client v:6bd613d 2.556s
+[2025-03-10T18:40:59.678Z] [warn] [oscar-a] Create XMTP client v:6bd613d 2.597s
+[2025-03-10T18:40:59.701Z] [warn] [larry-a] Start message stream 397.372ms
+[2025-03-10T18:40:59.701Z] [warn] [larry-a] Start stream 397.673ms
+[2025-03-10T18:40:59.701Z] [warn] [larry-a] Initialize XMTP client 2.624s
+[2025-03-10T18:40:59.701Z] [warn] [henry-a] Start message stream 353.87ms
+[2025-03-10T18:40:59.701Z] [warn] [henry-a] Start stream 353.923ms
+[2025-03-10T18:40:59.701Z] [warn] [henry-a] Initialize XMTP client 2.629s
+[2025-03-10T18:40:59.817Z] [warn] [mary-a] Start message stream 398.027ms
+[2025-03-10T18:40:59.817Z] [warn] [mary-a] Start stream 399.178ms
+[2025-03-10T18:40:59.817Z] [warn] [mary-a] Initialize XMTP client 2.739s
+[2025-03-10T18:41:00.032Z] [warn] [nancy-a] Start message stream 395.582ms
+[2025-03-10T18:41:00.032Z] [warn] [nancy-a] Start stream 395.813ms
+[2025-03-10T18:41:00.032Z] [warn] [nancy-a] Initialize XMTP client 2.954s
+[2025-03-10T18:41:00.033Z] [warn] [oscar-a] Start message stream 354.259ms
+[2025-03-10T18:41:00.033Z] [warn] [oscar-a] Start stream 354.313ms
+[2025-03-10T18:41:00.033Z] [warn] [oscar-a] Initialize XMTP client 2.954s
+[2025-03-10T18:41:00.990Z] [warn] [randomguy-a] Create XMTP client v:6bd613d 3.909s
+[2025-03-10T18:41:01.393Z] [warn] [randomguy-a] Start message stream 402.742ms
+[2025-03-10T18:41:01.394Z] [warn] [randomguy-a] Start stream 403.811ms
+[2025-03-10T18:41:01.394Z] [warn] [randomguy-a] Initialize XMTP client 4.317s
+[2025-03-10T18:41:03.329Z] [warn] ts_groups > createGroup-4: should create a large group of 4 participants 4 1.933s
+[2025-03-10T18:41:03.972Z] [warn] ts_groups > syncGroup-4: should sync a large group of 4 participants 4 640.113ms
+[2025-03-10T18:41:04.120Z] [warn] Slow connection detected - total: 769.128ms, TLS: 585.491ms, processing: 183.63700000000006ms
+[2025-03-10T18:41:04.916Z] [warn] ts_groups > updateGroupName-4: should update the group name 942.135ms
+[2025-03-10T18:41:06.284Z] [warn] ts_groups > removeMembers-4: should remove a participant from a group 1.365s
+[2025-03-10T18:41:07.040Z] [info] GM Message sent in group gm-l8h20zrop7k
+[2025-03-10T18:41:07.041Z] [warn] ts_groups > sendGroupMessage-4: should measure sending a gm in a group of 4 participants 755.516ms
+[2025-03-10T18:41:09.067Z] [warn] ts_groups > createGroup-8: should create a large group of 8 participants 8 2.023s
+[2025-03-10T18:41:09.842Z] [warn] ts_groups > syncGroup-8: should sync a large group of 8 participants 8 772.808ms
+[2025-03-10T18:41:10.799Z] [warn] ts_groups > updateGroupName-8: should update the group name 954.698ms
+[2025-03-10T18:41:12.133Z] [warn] ts_groups > removeMembers-8: should remove a participant from a group 1.332s
+[2025-03-10T18:41:12.735Z] [info] GM Message sent in group gm-ck78gvyxq1i
+[2025-03-10T18:41:12.735Z] [warn] ts_groups > sendGroupMessage-8: should measure sending a gm in a group of 8 participants 600.284ms
+[2025-03-10T18:41:12.737Z] [info] The tests indicated that the test ts_groups was success
+[2025-03-10T18:41:12.737Z] [info] Successfully reported success to Datadog
