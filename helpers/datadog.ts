@@ -3,6 +3,22 @@ import { promisify } from "util";
 import metrics from "datadog-metrics";
 
 let isInitialized = false;
+let currentGeo = "";
+
+// Add this mapping function
+function getCountryCodeFromGeo(geolocation: string): string {
+  // Map your geo regions to ISO country codes
+  const geoToCountryCode: Record<string, string> = {
+    us: "US",
+    "us-east": "US",
+    "us-west": "US",
+    europe: "FR", // Using France as a representative for Europe
+    asia: "JP", // Using Japan as a representative for Asia
+    "south-america": "BR", // Using Brazil as a representative for South America
+  };
+
+  return geoToCountryCode[geolocation] || "US"; // Default to US if not found
+}
 
 export function initDataDog(
   testName: string,
@@ -10,34 +26,30 @@ export function initDataDog(
   geolocation: string,
   apiKey: string,
 ): boolean {
-  // Check if already initialized
   if (isInitialized) {
     return true;
   }
   if (!testName.includes("ts_")) {
     return true;
   }
-
-  // Verify API key is available
   if (!apiKey) {
     console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
     return false;
   }
 
   try {
+    const countryCode = getCountryCodeFromGeo(geolocation);
+    currentGeo = geolocation;
     const initConfig = {
       apiKey: apiKey,
       defaultTags: [
         `env:${envValue}`,
         `test:${testName}`,
         `geo:${geolocation}`,
+        `geo.country_iso_code:${countryCode}`,
       ],
     };
     metrics.init(initConfig);
-
-    console.log(
-      `✅ DataDog metrics initialized successfully ${JSON.stringify(initConfig)}`,
-    );
     isInitialized = true;
     return true;
   } catch (error) {
@@ -61,10 +73,6 @@ export function sendDeliveryMetric(
   try {
     const members = testName.split("-")[1] || "";
 
-    // Send delivery rate metric
-    console.log(
-      `Sending metric: xmtp.sdk.${metricName} with value ${metricValue}`,
-    );
     metrics.gauge(`xmtp.sdk.${metricName}`, metricValue, [
       `libxmtp:${libxmtpVersion}`,
       `test:${testName}`,
@@ -91,7 +99,6 @@ export function sendTestResults(
     // Send metric to Datadog using metrics.gauge
     const metricValue = status === "success" ? 1 : 0;
     const metricName = `xmtp.sdk.workflow.status`;
-    console.log(`Sending metric: ${metricName} with value ${metricValue}`);
     metrics.gauge(metricName, metricValue, [`status:${status}`]);
 
     console.log(`Successfully reported ${status} to Datadog`);
@@ -116,12 +123,23 @@ export async function sendPerformanceMetric(
     const metricDescription = testName.split(":")[1];
     // Extract operation name for tagging
     const operationParts = metricName.split(".");
-    const operationName = operationParts[1];
     const testNameExtracted = operationParts[0];
-    const members = testNameExtracted.split("-")[1] || "";
+    const operationName = operationParts[1].split("-")[0];
+    const members = operationParts[1].split("-")[1] || "";
     const durationMetricName = `xmtp.sdk.duration`;
 
     // Send main operation metric
+    console.debug({
+      durationMetricName,
+      metricValue,
+      libxmtpVersion,
+      operationName,
+      testNameExtracted,
+      metricDescription,
+      members,
+      geo: currentGeo,
+      countryCode: getCountryCodeFromGeo(currentGeo),
+    });
     metrics.gauge(durationMetricName, metricValue, [
       `libxmtp:${libxmtpVersion}`,
       `operation:${operationName}`,
@@ -135,14 +153,31 @@ export async function sendPerformanceMetric(
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
 
+      const geo = currentGeo || "";
+      const countryCode = getCountryCodeFromGeo(geo);
+
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const metricValue = statValue * 1000; // Convert to milliseconds
+        // Send main operation metric
+        console.debug({
+          durationMetricName,
+          metricValue,
+          libxmtpVersion,
+          operationName,
+          testNameExtracted,
+          metric_type: "network",
+          network_phase: statName.toLowerCase().replace(/\s+/g, "_"),
+          countryCode: getCountryCodeFromGeo(currentGeo),
+          members,
+        });
         metrics.gauge(durationMetricName, metricValue, [
           `libxmtp:${libxmtpVersion}`,
           `operation:${operationName}`,
-          `test:${testName}`,
+          `test:${testNameExtracted}`,
           `metric_type:network`,
           `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
+          `geo.country_iso_code:${countryCode}`,
+          `members:${members}`,
         ]);
       }
     }
@@ -193,8 +228,23 @@ export async function getNetworkStats(
 ): Promise<NetworkStats> {
   const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}, \\"Total Time\\": %{time_total}}" -o /dev/null --max-time 10 ${endpoint}`;
 
-  // Execute the curl command
-  const { stdout } = await execAsync(curlCommand);
+  let stdout: string;
+
+  try {
+    const result = await execAsync(curlCommand);
+    stdout = result.stdout;
+  } catch (error: any) {
+    // Even if curl returns an error, we might still have useful stdout
+    if (error.stdout) {
+      stdout = error.stdout;
+      console.warn(
+        `⚠️ Curl command returned error code ${error.code}, but stdout is available.`,
+      );
+    } else {
+      console.error(`❌ Curl command failed without stdout:`, error);
+      throw error; // rethrow if no stdout is available
+    }
+  }
 
   // Parse the JSON response
   const stats = JSON.parse(stdout.trim()) as NetworkStats & {

@@ -43,3 +43,423 @@ fabrizioguespe@fabrizios-MacBook-Pro qa-testing %
 
 
 
+
+ERS) }
+2025-03-10T17:11:08.537128Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(51), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537162Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.537169Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.537172Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(19), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.537186Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:08.537189Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:08.537190Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:08.537192Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:08.537194Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(11), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537195Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(13), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537218Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(15), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537222Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537285Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(21), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.537295Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(19) }
+2025-03-10T17:11:08.537297Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(21) }
+2025-03-10T17:11:08.537299Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(19), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.537301Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(21), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.547277Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 29 }
+2025-03-10T17:11:08.547299Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.547302Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.547310Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547319Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(19) }
+2025-03-10T17:11:08.547393Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547401Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:08.547404Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547411Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547425Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547432Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:08.547434Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547443Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547458Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(21) }
+2025-03-10T17:11:08.547476Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547484Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547487Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:08.547490Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547538Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547542Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:08.547545Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547547Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547550Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:08.547601Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.547660Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa91c...5181 at 336265
+2025-03-10T17:11:08.547665Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xca1d...c1d3 at 336228
+2025-03-10T17:11:08.547666Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x9628...7036 at 336212
+2025-03-10T17:11:08.547668Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x8317...9a29 at 336248
+2025-03-10T17:11:08.547669Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x04fb...705d at 336236
+2025-03-10T17:11:08.547671Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xfefa...2e51 at 336187
+2025-03-10T17:11:08.547672Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xf2a1...f68c at 336257
+2025-03-10T17:11:08.547674Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to group messages inbox_id="e9b1d78deea304aadd60c640367e416f9a342b33f39096b70dc653042856c103"
+2025-03-10T17:11:08.547812Z DEBUG stream_all_messages: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:08.547838Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.547847Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23) }
+2025-03-10T17:11:08.547849Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.602709Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 188 }
+2025-03-10T17:11:08.602822Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.602842Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.602885Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.669235Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 29 }
+2025-03-10T17:11:08.669327Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.669344Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.669405Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.669454Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:08.669481Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.669501Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.669531Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:08.669552Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.669939Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.669986Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:08.670005Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.670021Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.670033Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:08.670046Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.670269Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa91c...5181 at 336265
+2025-03-10T17:11:08.670288Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x8317...9a29 at 336248
+2025-03-10T17:11:08.670297Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x9628...7036 at 336212
+2025-03-10T17:11:08.670305Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x04fb...705d at 336236
+2025-03-10T17:11:08.670312Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to group messages inbox_id="0224d1cacc320652446e688cf03f53337358a41b41f75db4cadfc39d1e8df231"
+2025-03-10T17:11:08.670476Z DEBUG stream_all_messages: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:08.670612Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.670661Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:08.670675Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.734109Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 29 }
+2025-03-10T17:11:08.734170Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.734185Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.734216Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.734242Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:08.734278Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.734297Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.734321Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(21) }
+2025-03-10T17:11:08.734338Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(51), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.734350Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(51) }
+2025-03-10T17:11:08.734590Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.734614Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(51), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.734628Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.734640Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(23) }
+2025-03-10T17:11:08.734652Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(23), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.734664Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.734675Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:08.735072Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735121Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735147Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:08.735160Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735173Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(25), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735185Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(25) }
+2025-03-10T17:11:08.735196Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(25), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735346Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735375Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:08.735390Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735404Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(35), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735416Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(35) }
+2025-03-10T17:11:08.735603Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(35), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735621Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(37), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735638Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(37) }
+2025-03-10T17:11:08.735651Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(37), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735686Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735704Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:08.735717Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735756Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(39), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735771Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(39) }
+2025-03-10T17:11:08.735782Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(39), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735797Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735809Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(19) }
+2025-03-10T17:11:08.735820Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.735832Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(27), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.735843Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(27) }
+2025-03-10T17:11:08.736470Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(27), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.736488Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(41), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.736507Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(41) }
+2025-03-10T17:11:08.736519Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(41), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.736532Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(43), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.736547Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(43) }
+2025-03-10T17:11:08.736557Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(43), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.736638Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(29), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.736658Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(29) }
+2025-03-10T17:11:08.736679Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(29), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.759968Z DEBUG h2::codec::framed_read: received frame=Settings { flags: (0x0), max_frame_size: 16384 }
+2025-03-10T17:11:08.760006Z DEBUG h2::codec::framed_write: send frame=Settings { flags: (0x1: ACK) }
+2025-03-10T17:11:08.760010Z DEBUG h2::codec::framed_read: received frame=Settings { flags: (0x1: ACK) }
+2025-03-10T17:11:08.760011Z DEBUG h2::proto::settings: received settings ACK; applying Settings { flags: (0x0), enable_push: 0, initial_window_size: 2097152, max_frame_size: 16384, max_header_list_size: 16384 }
+2025-03-10T17:11:08.760016Z DEBUG h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 51 }
+2025-03-10T17:11:08.760020Z DEBUG h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.760023Z DEBUG h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.760038Z DEBUG h2::codec::framed_read: received frame=Headers { stream_id: StreamId(1), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.760120Z DEBUG h2::codec::framed_read: received frame=Data { stream_id: StreamId(1) }
+2025-03-10T17:11:08.760133Z DEBUG h2::codec::framed_read: received frame=Headers { stream_id: StreamId(1), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.760303Z DEBUG h2::codec::framed_write: send frame=GoAway { error_code: NO_ERROR, last_stream_id: StreamId(0) }
+2025-03-10T17:11:08.760310Z DEBUG h2::proto::connection: Connection::poll; connection error error=GoAway(b"", NO_ERROR, Library)
+2025-03-10T17:11:08.854963Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 188 }
+2025-03-10T17:11:08.854985Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.854989Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.854996Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.909643Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}: hyper_util::client::legacy::connect::http: connecting to 3.132.13.169:443
+2025-03-10T17:11:08.909947Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}: hyper_util::client::legacy::connect::http: connected to 3.132.13.169:443
+2025-03-10T17:11:08.919395Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(31), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919420Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(31) }
+2025-03-10T17:11:08.919425Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(31), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.919428Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(45), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919432Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(45) }
+2025-03-10T17:11:08.919468Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(45), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.919474Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(47), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919479Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(47) }
+2025-03-10T17:11:08.919481Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(47), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.919502Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(33), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919538Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(33) }
+2025-03-10T17:11:08.919544Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(33), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.919547Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(49), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919550Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(49) }
+2025-03-10T17:11:08.919552Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(49), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.919593Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x337a...c1d0 at 336270
+2025-03-10T17:11:08.919597Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xdcf7...7cb5 at 336251
+2025-03-10T17:11:08.919599Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x4ca9...f4b3 at 336241
+2025-03-10T17:11:08.919601Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x92bc...efc2 at 336642
+2025-03-10T17:11:08.919603Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xca1d...c1d3 at 336228
+2025-03-10T17:11:08.919604Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x9628...7036 at 336212
+2025-03-10T17:11:08.919606Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x7ed2...32c4 at 336284
+2025-03-10T17:11:08.919636Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x7b71...86b9 at 336246
+2025-03-10T17:11:08.919639Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x3224...cae0 at 336303
+2025-03-10T17:11:08.919641Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x118f...fe08 at 336420
+2025-03-10T17:11:08.919642Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xca18...5054 at 336298
+2025-03-10T17:11:08.919644Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa91c...5181 at 336265
+2025-03-10T17:11:08.919645Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xf2a1...f68c at 336257
+2025-03-10T17:11:08.919647Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x7f12...6718 at 336426
+2025-03-10T17:11:08.919689Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x04fb...705d at 336236
+2025-03-10T17:11:08.919692Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x8317...9a29 at 336248
+2025-03-10T17:11:08.919693Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xbd4b...6b97 at 336637
+2025-03-10T17:11:08.919695Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x2672...acee at 336217
+2025-03-10T17:11:08.919696Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xfefa...2e51 at 336187
+2025-03-10T17:11:08.919698Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x6639...595a at 336222
+2025-03-10T17:11:08.919699Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x3990...af54 at 336275
+2025-03-10T17:11:08.919701Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x686e...9b16 at 336289
+2025-03-10T17:11:08.919702Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to group messages inbox_id="ffefef1beb9c5e12536a0f9265c6c6e6f020748c99a83aa1df64a2b94731989e"
+2025-03-10T17:11:08.919714Z DEBUG stream_all_messages: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:08.919739Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(53), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.919748Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(53) }
+2025-03-10T17:11:08.919785Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(53), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.936657Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 29 }
+2025-03-10T17:11:08.936678Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.936682Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:08.946587Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946611Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:08.946615Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946618Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946625Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:08.946669Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946675Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946679Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(19) }
+2025-03-10T17:11:08.946682Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(19), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946691Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946731Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(21) }
+2025-03-10T17:11:08.946735Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(21), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946746Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946749Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:08.946751Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946778Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946783Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:08.946786Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(17), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946789Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946794Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:08.946839Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:08.946865Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xca1d...c1d3 at 336228
+2025-03-10T17:11:08.946868Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xfefa...2e51 at 336187
+2025-03-10T17:11:08.946869Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x9628...7036 at 336212
+2025-03-10T17:11:08.946871Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x04fb...705d at 336236
+2025-03-10T17:11:08.946873Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x8317...9a29 at 336248
+2025-03-10T17:11:08.946874Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa91c...5181 at 336265
+2025-03-10T17:11:08.946876Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xf2a1...f68c at 336257
+2025-03-10T17:11:08.946877Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to group messages inbox_id="d4d9b969d8401d6fc72c9d23c5c7f1a774c1fb0a78a18d68b8494064dea89d8e"
+2025-03-10T17:11:08.946891Z DEBUG stream_all_messages: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:08.946915Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:08.946924Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23) }
+2025-03-10T17:11:08.946927Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(23), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:08.960603Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increme
+
+ ❯ tests/groups.test.ts 0/10
+
+ Test Files 0 passed (1)
+      Tests 0 passed (10)
+   Start at 14:11:04
+   Duration 4.94s
+2025-03-10T17:11:09.156001Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 1142 }
+2025-03-10T17:11:09.156104Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.156123Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.156168Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(53), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:09.334344Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 347 }
+2025-03-10T17:11:09.334369Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.334373Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.334381Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(23), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:09.457780Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}: h2::client: binding client connection
+2025-03-10T17:11:09.457822Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}: h2::client: client connection bound
+2025-03-10T17:11:09.457827Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}: h2::codec::framed_write: send frame=Settings { flags: (0x0), enable_push: 0, initial_window_size: 2097152, max_frame_size: 16384, max_header_list_size: 16384 }
+2025-03-10T17:11:09.457859Z  INFO new:new_database: xmtp_mls::storage::encrypted_store: Setting up DB connection pool
+2025-03-10T17:11:09.457872Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Settings { flags: (0x0), max_frame_size: 16384 }
+2025-03-10T17:11:09.457880Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Settings { flags: (0x1: ACK) }
+2025-03-10T17:11:09.457884Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=WindowUpdate { stream_id: StreamId(0), size_increment: 2147418112 }
+2025-03-10T17:11:09.457906Z DEBUG new:new_database: xmtp_mls::storage::encrypted_store::sqlcipher_connection: db @ [/Users/fabrizioguespe/DevRel/qa-testing/.data/oscar/oscar-a-0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b-44-6bd613d-dev] exists? [true]
+2025-03-10T17:11:09.458085Z DEBUG new:new_database: xmtp_mls::storage::encrypted_store::sqlcipher_connection: salt and database exist, db=[/Users/fabrizioguespe/DevRel/qa-testing/.data/oscar/oscar-a-0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b-44-6bd613d-dev], salt=[/Users/fabrizioguespe/DevRel/qa-testing/.data/oscar/oscar-a-0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b-44-6bd613d-dev.sqlcipher_salt] salt=/Users/fabrizioguespe/DevRel/qa-testing/.data/oscar/oscar-a-0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b-44-6bd613d-dev.sqlcipher_salt db=/Users/fabrizioguespe/DevRel/qa-testing/.data/oscar/oscar-a-0x594F13ebC1B5c4e18D9A00102563Bd6A05431F2b-44-6bd613d-dev
+2025-03-10T17:11:09.461842Z  INFO new:new_database:init_db: xmtp_mls::storage::encrypted_store::sqlcipher_connection: Sqlite cipher_version=Some("4.5.7 community"), cipher_provider_version="OpenSSL 3.4.0 22 Oct 2024"
+2025-03-10 14:11:09.461: sqlcipher_set_log: set log to stderr
+2025-03-10T17:11:09.461870Z DEBUG new:new_database:init_db: xmtp_mls::storage::encrypted_store::sqlcipher_connection: SQLCipher Database validated.
+2025-03-10T17:11:09.462733Z  INFO new:new_database:init_db: xmtp_mls::storage::encrypted_store::private: Running DB migrations
+2025-03-10T17:11:09.462799Z  INFO new:new_database:init_db: xmtp_mls::storage::encrypted_store::private: sqlite_version=3.45.3
+2025-03-10T17:11:09.462801Z  INFO new:new_database:init_db: xmtp_mls::storage::encrypted_store::private: Migrations successful
+2025-03-10T17:11:09.462828Z  INFO xmtp_mls::identity: Initializing identity
+2025-03-10T17:11:09.463250Z DEBUG xmtp_mls::identity: identity in store: Some(Identity { inbox_id: "432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d", installation_keys: XmtpInstallationCredential(SigningKey { verifying_key: VerifyingKey(CompressedEdwardsY: [76, 177, 218, 63, 166, 49, 28, 152, 202, 74, 31, 147, 232, 119, 170, 149, 15, 175, 26, 247, 213, 233, 89, 34, 32, 240, 58, 222, 249, 181, 247, 220]), EdwardsPoint{
+        X: FieldElement51([735464663239707, 773435954950734, 407101018439573, 1568441498322056, 1762095741517458]),
+        Y: FieldElement51([1601537524066936, 2182577986430117, 101278668090647, 1949816915183388, 2083380278257947]),
+        Z: FieldElement51([884206943042687, 1932287530225753, 1248445964146131, 2175445176470541, 2133595651960753]),
+        T: FieldElement51([1850864707580265, 1311101901426486, 393441460750691, 1919506301890041, 2081226203793964])
+}), .. }), credential: Credential { credential_type: Basic, serialized_credential_content: VLBytes { 0x0a4034333264396437666238376436326138303465353135633563386665613938306437633939383562653933333631383332333437356664613366326436613164 } }, signature_request: None, is_ready: true })
+2025-03-10T17:11:09.463285Z DEBUG xmtp_mls::identity: Found existing identity in store installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc" inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:09.463289Z DEBUG xmtp_mls::builder: Initialized identity inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d" installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"
+2025-03-10T17:11:09.463292Z DEBUG xmtp_mls::identity_updates: Fetching identity updates for: ["432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"]
+2025-03-10T17:11:09.463427Z DEBUG get_identity_updates_v2{filters=[GetIdentityUpdatesV2Filter { inbox_id: "432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d", sequence_id: Some(66360) }] len=1}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:09.463467Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(1), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:09.463479Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(1) }
+2025-03-10T17:11:09.463482Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(1), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:09.637571Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Settings { flags: (0x1: ACK) }
+2025-03-10T17:11:09.637664Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::proto::settings: received settings ACK; applying Settings { flags: (0x0), enable_push: 0, initial_window_size: 2097152, max_frame_size: 16384, max_header_list_size: 16384 }
+2025-03-10T17:11:09.816300Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 77 }
+2025-03-10T17:11:09.816392Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.816408Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:09.816479Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(1), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:09.816524Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(1) }
+2025-03-10T17:11:09.816551Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(1), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:09.817090Z DEBUG xmtp_mls::groups::device_sync: starting sync worker inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d" installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"
+2025-03-10T17:11:09.817502Z  INFO xmtp_mls::groups::device_sync: Initializing device sync... url: Some("https://message-history.dev.ephemera.network") inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d" installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"
+2025-03-10T17:11:09.819084Z  INFO xmtp_mls::groups::device_sync: Device sync initialized. inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d" installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"
+2025-03-10T17:11:09.819419Z DEBUG sync_welcomes:query_welcome_messages{id_cursor=Some(2616747) installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"}: xmtp_api::mls: query welcomes installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc" cursor=2616747 inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+stdout | tests/groups.test.ts > ts_groups
+[2025-03-10T17:11:09.818Z] [warn] [oscar-a] Create XMTP client v:6bd613d 5.016s
+
+
+ ❯ tests/groups.test.ts 0/10
+
+ Test Files 0 passed (1)
+      Tests 0 passed (10)
+   Start at 14:11:04
+   Duration 5.96s
+2025-03-10T17:11:10.226050Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 50 }
+2025-03-10T17:11:10.226152Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.226170Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.226209Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(3), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.226244Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(3) }
+2025-03-10T17:11:10.226298Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(3), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:10.226890Z DEBUG stream_all_messages: xmtp_mls::subscriptions: stream all messages inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d" installation_id=4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc conversation_type=None
+2025-03-10T17:11:10.227138Z DEBUG stream_all_messages:sync_welcomes:query_welcome_messages{id_cursor=Some(2616747) installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"}: xmtp_api::mls: query welcomes installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc" cursor=2616747 inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.227216Z DEBUG stream_all_messages:sync_welcomes:query_welcome_messages{id_cursor=Some(2616747) installation_id="4cb1da3fa6311c98ca4a1f93e877aa950faf1af7d5e9592220f03adef9b5f7dc"}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:10.227339Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(5), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.227562Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(5) }
+2025-03-10T17:11:10.227580Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(5), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:10.413906Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 50 }
+2025-03-10T17:11:10.414010Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.414029Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.414087Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(5), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.414140Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(5) }
+2025-03-10T17:11:10.414166Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(5), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:10.415253Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_conversations: Setting up conversation stream cursor = 2616747 cursor=2616747 inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.415286Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to welcome messages inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+stdout | tests/groups.test.ts > ts_groups
+[2025-03-10T17:11:10.227Z] [warn] [oscar-a] Start message stream 407.904ms
+
+stdout | tests/groups.test.ts > ts_groups
+[2025-03-10T17:11:10.228Z] [warn] [oscar-a] Start stream 409.015ms
+[2025-03-10T17:11:10.228Z] [warn] [oscar-a] Initialize XMTP client 5.427s
+
+stdout | tests/groups.test.ts > ts_groups
+[2025-03-10T17:11:10.696Z] [info] The tests indicated that the test ts_groups was success
+[2025-03-10T17:11:10.697Z] [info] Successfully reported success to Datadog
+
+
+ ❯ tests/groups.test.ts 1/10
+
+ Test Files 0 passed (1)
+      Tests 0 passed | 1 skipped (10)
+   Start at 14:11:04
+   Duration 6.66s
+2025-03-10T17:11:10.823442Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 46 }
+2025-03-10T17:11:10.823471Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.823475Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:10.823488Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(7), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.823604Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: setting up messages subscription
+2025-03-10T17:11:10.823615Z DEBUG stream_all_messages:query_latest_group_message{group_id="a91cea7c5d005bc1ebf78e7699d95181"}: xmtp_api::mls: query latest group message group_id="a91cea7c5d005bc1ebf78e7699d95181" inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.823630Z DEBUG stream_all_messages:query_latest_group_message{group_id="96282119ca23100642cfc2f555ff7036"}: xmtp_api::mls: query latest group message group_id="96282119ca23100642cfc2f555ff7036" inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.823635Z DEBUG stream_all_messages:query_latest_group_message{group_id="04fbc81439a86b5a27d956119be3705d"}: xmtp_api::mls: query latest group message group_id="04fbc81439a86b5a27d956119be3705d" inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.823640Z DEBUG stream_all_messages:query_latest_group_message{group_id="8317783c5d79484e181c6160366a9a29"}: xmtp_api::mls: query latest group message group_id="8317783c5d79484e181c6160366a9a29" inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:10.823652Z DEBUG stream_all_messages:query_latest_group_message{group_id="a91cea7c5d005bc1ebf78e7699d95181"}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:10.823665Z DEBUG stream_all_messages:query_latest_group_message{group_id="96282119ca23100642cfc2f555ff7036"}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:10.823668Z DEBUG stream_all_messages:query_latest_group_message{group_id="04fbc81439a86b5a27d956119be3705d"}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:10.823670Z DEBUG stream_all_messages:query_latest_group_message{group_id="8317783c5d79484e181c6160366a9a29"}: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:10.823702Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.823712Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.823717Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.823720Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:10.823725Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:10.823727Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:10.823729Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:10.823731Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:10.823759Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(9), flags: (0x1: END_STREAM
+
+ ❯ tests/groups.test.ts 10/10
+
+ Test Files 0 passed (1)
+      Tests 0 passed | 10 skipped (10)
+   Start at 14:11:04
+   Duration 6.97s
+2025-03-10T17:11:11.227300Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increment: 29 }
+2025-03-10T17:11:11.227399Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Ping { ack: false, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:11.227418Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Ping { ack: true, payload: [2, 4, 16, 16, 9, 14, 7, 7] }
+2025-03-10T17:11:11.227460Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:11.227494Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(9) }
+2025-03-10T17:11:11.227598Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(9), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:11.227621Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:11.227651Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(11) }
+2025-03-10T17:11:11.227669Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(11), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:11.227683Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:11.228069Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(13) }
+2025-03-10T17:11:11.228089Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(13), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:11.228130Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:11.228146Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Data { stream_id: StreamId(15) }
+2025-03-10T17:11:11.228157Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=Headers { stream_id: StreamId(15), flags: (0x5: END_HEADERS | END_STREAM) }
+2025-03-10T17:11:11.228476Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa91c...5181 at 336265
+2025-03-10T17:11:11.228501Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x9628...7036 at 336212
+2025-03-10T17:11:11.228511Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x04fb...705d at 336236
+2025-03-10T17:11:11.228519Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x8317...9a29 at 336248
+2025-03-10T17:11:11.228530Z DEBUG stream_all_messages: xmtp_api::mls: subscribing to group messages inbox_id="432d9d7fb87d62a804e515c5c8fea980d7c9985be933618323475fda3f2d6a1d"
+2025-03-10T17:11:11.228595Z DEBUG stream_all_messages: tower::buffer::worker: service.ready=true processing request
+2025-03-10T17:11:11.228709Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Headers { stream_id: StreamId(17), flags: (0x4: END_HEADERS) }
+2025-03-10T17:11:11.228766Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17) }
+2025-03-10T17:11:11.228781Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_write: send frame=Data { stream_id: StreamId(17), flags: (0x1: END_STREAM) }
+2025-03-10T17:11:11.416164Z DEBUG grpc_connect{address="https://grpc.dev.xmtp.network:443"}:Connection{peer=Client}: h2::codec::framed_read: received frame=WindowUpdate { stream_id: StreamId(0), size_increme
+ ❯ tests/groups.test.ts (10 tests | 10 skipped) 6700ms
+   ↓ ts_groups > createGroup-4: should create a large group of 4 participants 4
+   ↓ ts_groups > syncGroup-4: should sync a large group of 4 participants 4
+   ↓ ts_groups > updateGroupName-4: should update the group name
+   ↓ ts_groups > removeMembers-4: should remove a participant from a group
+   ↓ ts_groups > sendGroupMessage-4: should measure sending a gm in a group of 4 participants
+   ↓ ts_groups > createGroup-8: should create a large group of 8 participants 8
+   ↓ ts_groups > syncGroup-8: should sync a large group of 8 participants 8
+   ↓ ts_groups > updateGroupName-8: should update the group name
+   ↓ ts_groups > removeMembers-8: should remove a participant from a group
+   ↓ ts_groups > sendGroupMessage-8: should measure sending a gm in a group of 8 participants
+
+ ❯ tests/groups.test.ts 11/10
+
+ Test Files 0 passed (1)
+      Tests 0 passed | 11 skipped (10)
+   Start at 14:11:04
+   Duration 7.37s
+2025-03-10T17:11:11.461725Z DEBUG tower::buffer::worker: buffer closing; waking pending tasks
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  tests/groups.test.ts > ts_groups
+Error: API client error: endpoint: get_inbox_ids, source: status: Unknown, message: "transport error", details: [], metadata: MetadataMap { headers: {} }
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  tests/groups.test.ts > ts_groups
+TypeError: Cannot convert undefined or null to object
