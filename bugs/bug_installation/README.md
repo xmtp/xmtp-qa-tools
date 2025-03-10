@@ -24,6 +24,10 @@ Wallet Addresses with conflicts:
 
 ![](./image-2.png)
 
+### Random failures in node 20
+
+![](./image-3.png)
+
 ## Description
 
 ```bash

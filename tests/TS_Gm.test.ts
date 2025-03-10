@@ -42,7 +42,10 @@ describe(testName, () => {
       expect(messagesAfter).toBe(prevMessages + 2);
       console.log("Messages before:", prevMessages, "after:", messagesAfter);
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -54,7 +57,10 @@ describe(testName, () => {
       expect(result).toBe(true);
       console.timeEnd("respond-to-message-test");
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });

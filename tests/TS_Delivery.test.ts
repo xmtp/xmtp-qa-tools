@@ -67,7 +67,10 @@ describe(
         );
         expect(collectedMessages.allReceived).toBe(true);
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
@@ -108,7 +111,10 @@ describe(
           "order",
         );
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
@@ -165,7 +171,10 @@ describe(
           "order",
         );
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });

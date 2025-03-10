@@ -71,7 +71,10 @@ describe(testName, () => {
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -88,7 +91,10 @@ describe(testName, () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -100,7 +106,10 @@ describe(testName, () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });

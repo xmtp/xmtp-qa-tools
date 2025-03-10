@@ -30,6 +30,7 @@ export default tseslint.config(
   },
   {
     rules: {
+      "prefer-const": "off",
       "@typescript-eslint/consistent-type-exports": [
         "error",
         {

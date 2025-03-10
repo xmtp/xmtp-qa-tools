@@ -70,7 +70,10 @@ describe(testName, () => {
       const inboxState = await personas.henry.client?.inboxState(true);
       expect(inboxState?.installations.length).toBeGreaterThan(0);
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -83,7 +86,10 @@ describe(testName, () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -101,7 +107,10 @@ describe(testName, () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
+      );
       hasFailures = true;
     }
   });
@@ -113,162 +122,74 @@ describe(testName, () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("createGroup: should measure creating a group", async () => {
-    try {
-      group = await personas.henry.client!.conversations.newGroup([
-        personas.ivy.client!.accountAddress as `0x${string}`,
-        personas.jack.client!.accountAddress as `0x${string}`,
-        personas.karen.client!.accountAddress as `0x${string}`,
-        personas.nancy.client!.accountAddress as `0x${string}`,
-        personas.oscar.client!.accountAddress as `0x${string}`,
-        personas.mary.client!.accountAddress as `0x${string}`,
-        personas.larry.client!.accountAddress as `0x${string}`,
-      ]);
-      console.log("Henry's group", group.id);
-      expect(group.id).toBeDefined();
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
-    try {
-      const groupByInboxIds =
-        await personas.henry.client!.conversations.newGroupByInboxIds([
-          personas.ivy.client!.inboxId,
-          personas.jack.client!.inboxId,
-          personas.karen.client!.inboxId,
-        ]);
-
-      console.log("Henry's groupByInboxIds", groupByInboxIds.id);
-      expect(groupByInboxIds.id).toBeDefined();
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("updateGroupName: should create a group and update group name", async () => {
-    try {
-      const result = await verifyStream(
-        group,
-        [personas.nancy],
-        "group_updated",
+      console.error(
+        `[vitest] Test failed in ${expect.getState().currentTestName}`,
+        e,
       );
-      expect(result.allReceived).toBe(true);
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
       hasFailures = true;
     }
   });
 
-  it("addMembers: should measure adding a participant to a group", async () => {
-    try {
-      await (group as Group).addMembers([
-        personas.randomguy.client!.accountAddress as `0x${string}`,
-      ]);
-      expect(true).toBe(true);
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-  it("syncGroup: should measure syncing a group", async () => {
-    try {
-      await group.sync();
-      await group.members();
-      expect(true).toBe(true);
-    } catch (e) {
-      console.error("[vitest]   Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("removeMembers: should remove a participant from a group", async () => {
-    try {
-      const previousMembers = await group.members();
-      await (group as Group).removeMembers([
-        personas.nancy.client!.accountAddress as `0x${string}`,
-      ]);
-      const members = await group.members();
-      expect(members.length).toBe(previousMembers.length - 1);
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("sendGroupMessage: should measure sending a gm in a group", async () => {
-    try {
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-      await group.send(groupMessage);
-      console.log("GM Message sent in group", groupMessage);
-      expect(groupMessage).toBeDefined();
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
-
-  it("receiveGroupMessage: should create a group and measure all streams", async () => {
-    try {
-      const verifyResult = await verifyStreamAll(group, personas);
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      console.error("[vitest] Test failed", (e as Error).message);
-      hasFailures = true;
-    }
-  });
   for (let i = batchSize; i <= total; i += batchSize) {
+    let newGroup: Conversation;
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        group = await personas.henry.client!.conversations.newGroupByInboxIds(
-          sliced.map((inbox) => inbox.inboxId),
-        );
-        expect(group.id).toBeDefined();
+        newGroup =
+          await personas.henry.client!.conversations.newGroupByInboxIds(
+            sliced.map((inbox) => inbox.inboxId),
+          );
+        expect(newGroup.id).toBeDefined();
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
     it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       try {
-        await group.sync();
-        const members = await group.members();
+        await newGroup.sync();
+        const members = await newGroup.members();
         expect(members.length).toBe(i + 1);
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
       try {
-        await (group as Group).updateName("Large Group");
-        expect((group as Group).name).toBe("Large Group");
+        const newName = "Large Group";
+        await (newGroup as Group).updateName(newName);
+        await newGroup.sync();
+        const name = (newGroup as Group).name;
+        expect(name).toBe(newName);
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       try {
-        const previousMembers = await group.members();
-        await (group as Group).removeMembers([
-          previousMembers[previousMembers.length - 1]
-            .accountAddresses[0] as `0x${string}`,
+        const previousMembers = await newGroup.members();
+        await (newGroup as Group).removeMembers([
+          previousMembers[1].accountAddresses[0] as `0x${string}`,
         ]);
-        const members = await group.members();
+
+        const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });
@@ -277,11 +198,14 @@ describe(testName, () => {
         const groupMessage =
           "gm-" + Math.random().toString(36).substring(2, 15);
 
-        await group.send(groupMessage);
+        await newGroup.send(groupMessage);
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
-        console.error("[vitest] Test failed", (e as Error).message);
+        console.error(
+          `[vitest] Test failed in ${expect.getState().currentTestName}`,
+          e,
+        );
         hasFailures = true;
       }
     });

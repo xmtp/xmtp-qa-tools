@@ -1,0 +1,107 @@
+{
+  "title": "XMTP Performance Overview",
+  "description": "Comprehensive metrics for XMTP SDK operations based on performance testing data",
+  "experience_type": "default",
+  "widgets": [
+    {
+      "id": 1234567890123456,
+      "definition": {
+        "title": "Core SDK operations performance",
+        "type": "query_table",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$geo,$test,$libxmtp,$members} by {operation,members}"
+              }
+            ],
+            "response_format": "scalar",
+            "order": "desc",
+            "limit": 100,
+            "sort": {
+              "count": 500,
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
+            },
+            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
+          }
+        ],
+        "has_search_bar": "auto"
+      },
+      "layout": { "x": 0, "y": 0, "width": 6, "height": 4 }
+    },
+    {
+      "id": 2075918014507897,
+      "definition": {
+        "title": "Group operations by size",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$geo,$test,$libxmtp,$members} by {members}"
+              }
+            ],
+            "response_format": "timeseries",
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
+    }
+  ],
+  "template_variables": [
+    {
+      "name": "env",
+      "prefix": "env",
+      "available_values": ["dev", "prod"],
+      "default": "dev"
+    },
+    {
+      "name": "geo",
+      "prefix": "geo",
+      "available_values": [
+        "south-america",
+        "europe",
+        "asia",
+        "us-east",
+        "us",
+        "us-west"
+      ],
+      "default": "us"
+    },
+    {
+      "name": "test",
+      "prefix": "test",
+      "available_values": [],
+      "default": "performance_overview"
+    },
+    {
+      "name": "libxmtp",
+      "prefix": "libxmtp",
+      "available_values": [],
+      "default": "*"
+    },
+    {
+      "name": "operation",
+      "prefix": "operation",
+      "available_values": [],
+      "default": "*"
+    },
+    {
+      "name": "members",
+      "prefix": "members",
+      "available_values": [],
+      "default": "*"
+    }
+  ],
+  "layout_type": "ordered",
+  "notify_list": [],
+  "reflow_type": "fixed"
+}

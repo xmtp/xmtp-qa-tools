@@ -4,7 +4,7 @@ import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const testName = "TS_Forked";
+const testName = "forked";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -79,7 +79,7 @@ describe(testName, () => {
       personas.alice.client?.accountAddress as `0x${string}`,
     ]);
 
-    const op2 = (bellaGroup as Group)?.removeMembers([
+    const op2 = (bellaGroup as Group).removeMembers([
       personas.random.client?.accountAddress as `0x${string}`,
     ]);
 
