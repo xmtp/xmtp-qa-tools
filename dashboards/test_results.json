@@ -165,7 +165,6 @@
         "europe",
         "asia",
         "us-east",
-        "us",
         "us-west"
       ],
       "default": "*"

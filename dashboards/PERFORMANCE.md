@@ -54,7 +54,6 @@ _Note: Performance metrics based on US testing on dev and production network. Ge
 | us-east       | 276.6            | 87.2               | Baseline                | ✅ On Target           |
 | us-west       | 229.3            | 111.1              | -15.6%                  | ✅ On Target           |
 | europe        | 178.5            | 111.4              | -33.2%                  | ✅ On Target           |
-| us            | 155.7            | 121.0              | -40.8%                  | ✅ On Target           |
 | asia          | 411.0            | 103.7              | +46.5%                  | ✅ On Target           |
 | south-america | 754.6            | 573.1              | +160.3%                 | ⚠️ Performance Concern |
 

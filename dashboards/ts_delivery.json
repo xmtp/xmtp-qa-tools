@@ -1,6 +1,7 @@
 {
   "title": "XMTP SDK Delivery",
   "description": "Metrics for XMTP SDK delivery",
+  "experience_type": "default",
   "widgets": [
     {
       "id": 504026830671482,
@@ -34,7 +35,75 @@
         ],
         "autoscale": true
       },
-      "layout": { "x": 0, "y": 0, "width": 2, "height": 2 }
+      "layout": { "x": 0, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 7386776256176399,
+      "definition": {
+        "title": "Stream Order Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 2, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 2407062479686085,
+      "definition": {
+        "title": "Offline Order Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 5725909012596498,
@@ -68,79 +137,10 @@
         ],
         "autoscale": true
       },
-      "layout": { "x": 2, "y": 0, "width": 2, "height": 2 }
+      "layout": { "x": 0, "y": 1, "width": 2, "height": 1 }
     },
     {
-      "id": 504026830671482,
-      "definition": {
-        "title": "Stream Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
-    },
-
-    {
-      "id": 504026830671482,
-      "definition": {
-        "title": "Offline Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 4, "y": 0, "width": 2, "height": 2 }
-    },
-    {
-      "id": 5725909012596498,
+      "id": 4612667987992580,
       "definition": {
         "title": "Poll Order Rate (%)",
         "title_size": "16",
@@ -171,7 +171,7 @@
         ],
         "autoscale": true
       },
-      "layout": { "x": 6, "y": 0, "width": 2, "height": 2 }
+      "layout": { "x": 2, "y": 1, "width": 2, "height": 1 }
     },
     {
       "id": 3827551407888457,
@@ -193,7 +193,6 @@
               { "formula": "query5" },
               { "formula": "query6" }
             ],
-
             "queries": [
               {
                 "name": "query1",
@@ -236,7 +235,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 2, "width": 8, "height": 4 }
+      "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
@@ -246,7 +245,18 @@
       "available_values": [],
       "default": "dev"
     },
-    { "name": "geo", "prefix": "geo", "available_values": [], "default": "us" },
+    {
+      "name": "geo",
+      "prefix": "geo",
+      "available_values": [
+        "south-america",
+        "europe",
+        "asia",
+        "us-east",
+        "us-west"
+      ],
+      "default": "*"
+    },
     {
       "name": "test",
       "prefix": "test",
@@ -285,7 +295,7 @@
     {
       "name": "us",
       "template_variables": [
-        { "name": "geo", "value": "us" },
+        { "name": "geo", "value": "us-east" },
         { "name": "test", "value": "ts_delivery" }
       ]
     }
