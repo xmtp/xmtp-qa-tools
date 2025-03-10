@@ -332,6 +332,7 @@
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
+        "time": {},
         "type": "query_table",
         "requests": [
           {
@@ -339,10 +340,14 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp,$members} by {network_phase}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp,$members} by {network_phase,geo}"
               }
             ],
             "response_format": "scalar",
+            "sort": {
+              "order_by": [{ "type": "group", "name": "geo", "order": "asc" }],
+              "count": 500
+            },
             "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
           }
         ],
