@@ -9,7 +9,6 @@ let currentGeo = "";
 function getCountryCodeFromGeo(geolocation: string): string {
   // Map your geo regions to ISO country codes
   const geoToCountryCode: Record<string, string> = {
-    us: "US",
     "us-east": "US",
     "us-west": "US",
     europe: "FR", // Using France as a representative for Europe

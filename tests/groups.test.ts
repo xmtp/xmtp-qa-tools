@@ -3,6 +3,7 @@ import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { exportTestResults, logError } from "@helpers/tests";
 import { type Conversation, type Group, type Persona } from "@helpers/types";
+import { verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
   afterAll,
@@ -125,6 +126,14 @@ describe(testName, () => {
         await newGroup.send(groupMessage);
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
+      } catch (e) {
+        hasFailures = logError(e, expect);
+      }
+    });
+    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
+      try {
+        const verifyResult = await verifyStreamAll(newGroup, personas);
+        expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);
       }

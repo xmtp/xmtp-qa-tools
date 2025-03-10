@@ -332,7 +332,6 @@
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
-        "time": {},
         "type": "query_table",
         "requests": [
           {
@@ -371,10 +370,9 @@
         "europe",
         "asia",
         "us-east",
-        "us",
         "us-west"
       ],
-      "default": "us"
+      "default": "us-east"
     },
     {
       "name": "test",
@@ -413,7 +411,7 @@
     {
       "name": "us",
       "template_variables": [
-        { "name": "geo", "value": "us" },
+        { "name": "geo", "value": "us-east" },
         { "name": "test", "value": "ts_performance" }
       ]
     }
