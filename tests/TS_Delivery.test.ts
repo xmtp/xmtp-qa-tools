@@ -44,7 +44,6 @@ describe(
         );
         await new Promise((resolve) => setTimeout(resolve, 3000));
         for (const persona of Object.values(personas)) {
-          console.log("syncing", persona.client?.inboxId);
           await persona.client!.conversations.sync();
         }
         console.log("Group created", group.id);
@@ -171,6 +170,91 @@ describe(
           Object.values(personas)[0].version,
           testName,
           "poll",
+          "order",
+        );
+      } catch (e) {
+        hasFailures = logError(e, expect);
+      }
+    });
+
+    it("tc_offline_recovery: verify message recovery after disconnection", async () => {
+      try {
+        // Select one persona to take offline
+        const offlinePersona = Object.values(personas)[1]; // Second persona
+        const onlinePersona = Object.values(personas)[0]; // First persona
+
+        console.log(`Taking ${offlinePersona.name} offline`);
+
+        // Disconnect the selected persona
+        await offlinePersona.worker!.terminate();
+
+        // Send messages from an online persona
+        const conversation =
+          await onlinePersona.client!.conversations.getConversationById(
+            group.id,
+          );
+
+        console.log(
+          `Sending ${amountofMessages} messages while client is offline`,
+        );
+        for (let i = 0; i < amountofMessages; i++) {
+          const message = `offline-msg-${i + 1}-${randomSuffix}`;
+          await conversation!.send(message);
+          console.log(`Sent message ${message}`);
+        }
+
+        // Reconnect the offline persona
+        console.log(`Reconnecting ${offlinePersona.name}`);
+        const { client } = await offlinePersona.worker!.initialize();
+        offlinePersona.client = client;
+        await offlinePersona.client.conversations.sync();
+
+        // Verify message recovery
+        const recoveredConversation =
+          await offlinePersona.client.conversations.getConversationById(
+            group.id,
+          );
+        await recoveredConversation?.sync();
+        const messages = await recoveredConversation?.messages();
+
+        const messagesByPersona: string[][] = [];
+        const recoveredMessages: string[] = [];
+        for (const message of messages ?? []) {
+          if (
+            message.content &&
+            typeof message.content === "string" &&
+            message.content.includes(`offline-msg-`) &&
+            message.content.includes(randomSuffix)
+          ) {
+            recoveredMessages.push(message.content);
+          }
+        }
+
+        messagesByPersona.push(recoveredMessages);
+
+        const stats = calculateMessageStats(
+          messagesByPersona,
+          "offline-msg-",
+          amountofMessages,
+          randomSuffix,
+        );
+
+        // We expect all messages to be received and in order
+        expect(stats.receptionPercentage).toBeGreaterThan(95);
+        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+
+        sendDeliveryMetric(
+          stats.receptionPercentage,
+          offlinePersona.version,
+          testName,
+          "offline",
+          "delivery",
+        );
+        sendDeliveryMetric(
+          stats.orderPercentage,
+          offlinePersona.version,
+          testName,
+          "offline",
           "order",
         );
       } catch (e) {

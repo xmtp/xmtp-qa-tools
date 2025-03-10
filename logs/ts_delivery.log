@@ -1,0 +1,64 @@
+[2025-03-10T20:53:20.459Z] [info] envPath .env
+[2025-03-10T20:53:20.490Z] [info] [PersonaFactory] Using env keys for bob: 0x8224CA014be321b462E6a3684349bA30246CC884
+[2025-03-10T20:53:20.491Z] [info] [PersonaFactory] Using env keys for alice: 0xB02abB07fb9bD949957AE6Ea867289187719b1F1
+[2025-03-10T20:53:20.493Z] [info] [PersonaFactory] Using env keys for fabri: 0xd05fD52c941C03526e3EB84e681292089ADB377B
+[2025-03-10T20:53:20.494Z] [info] [PersonaFactory] Using env keys for bot: 0xdE52395db19118fadF88516c0428A5Ad3820dc50
+[2025-03-10T20:53:22.602Z] [warn] [fabri-a] Create XMTP client v:6bd613d 2.103s
+[2025-03-10T20:53:22.642Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.142s
+[2025-03-10T20:53:22.743Z] [warn] [alice-a] Create XMTP client v:6bd613d 2.244s
+[2025-03-10T20:53:22.866Z] [warn] [bot-a] Create XMTP client v:6bd613d 2.367s
+[2025-03-10T20:53:23.000Z] [warn] [bob-a] Start message stream 357.018ms
+[2025-03-10T20:53:23.001Z] [warn] [bob-a] Start stream 359.026ms
+[2025-03-10T20:53:23.001Z] [warn] [bob-a] Initialize XMTP client 2.505s
+[2025-03-10T20:53:23.004Z] [warn] [fabri-a] Start message stream 400.544ms
+[2025-03-10T20:53:23.004Z] [warn] [fabri-a] Start stream 401.062ms
+[2025-03-10T20:53:23.004Z] [warn] [fabri-a] Initialize XMTP client 2.506s
+[2025-03-10T20:53:23.146Z] [warn] [alice-a] Start message stream 401.096ms
+[2025-03-10T20:53:23.147Z] [warn] [alice-a] Start stream 402.813ms
+[2025-03-10T20:53:23.147Z] [warn] [alice-a] Initialize XMTP client 2.650s
+[2025-03-10T20:53:23.255Z] [warn] [bot-a] Start message stream 388.099ms
+[2025-03-10T20:53:23.255Z] [warn] [bot-a] Start stream 388.573ms
+[2025-03-10T20:53:23.256Z] [warn] [bot-a] Initialize XMTP client 2.757s
+[2025-03-10T20:53:23.256Z] [info] creating group
+[2025-03-10T20:53:28.641Z] [info] Group created 42e2a82682f51e2607df9769bd91d920
+[2025-03-10T20:53:28.646Z] [info] [alice-a] Collecting 10 messages from convo:42e2a82682f51e2607df9769bd91d920
+[2025-03-10T20:53:28.646Z] [info] [fabri-a] Collecting 10 messages from convo:42e2a82682f51e2607df9769bd91d920
+[2025-03-10T20:53:28.646Z] [info] [bot-a] Collecting 10 messages from convo:42e2a82682f51e2607df9769bd91d920
+[2025-03-10T20:53:28.646Z] [info] Sending message #1: gm-1-brc8xfzp5yv
+[2025-03-10T20:53:29.626Z] [info] Sending message #2: gm-2-brc8xfzp5yv
+[2025-03-10T20:53:30.453Z] [info] Sending message #3: gm-3-brc8xfzp5yv
+[2025-03-10T20:53:31.228Z] [info] Sending message #4: gm-4-brc8xfzp5yv
+[2025-03-10T20:53:31.974Z] [info] Sending message #5: gm-5-brc8xfzp5yv
+[2025-03-10T20:53:32.793Z] [info] Sending message #6: gm-6-brc8xfzp5yv
+[2025-03-10T20:53:33.562Z] [info] Sending message #7: gm-7-brc8xfzp5yv
+[2025-03-10T20:53:34.104Z] [info] Sending message #8: gm-8-brc8xfzp5yv
+[2025-03-10T20:53:35.284Z] [info] Sending message #9: gm-9-brc8xfzp5yv
+[2025-03-10T20:53:35.838Z] [info] Sending message #10: gm-10-brc8xfzp5yv
+[2025-03-10T20:53:36.651Z] [info] All participants received the expected number of messages.
+[2025-03-10T20:53:36.653Z] [info] Expected messages pattern: gm-[1-10]-brc8xfzp5yv
+[2025-03-10T20:53:36.653Z] [info] Reception percentage: 100.00% (30/30 messages)
+[2025-03-10T20:53:36.653Z] [info] Order percentage: 100.00% (3/3 personas)
+[2025-03-10T20:53:37.011Z] [info] Expected messages pattern: gm-[1-10]-brc8xfzp5yv
+[2025-03-10T20:53:37.011Z] [info] Reception percentage: 100.00% (40/40 messages)
+[2025-03-10T20:53:37.011Z] [info] Order percentage: 100.00% (4/4 personas)
+[2025-03-10T20:53:37.012Z] [info] Taking alice offline
+[2025-03-10T20:53:37.012Z] [warn] [alice-a] Terminated stream
+[2025-03-10T20:53:37.012Z] [info] Sending 10 messages while client is offline
+[2025-03-10T20:53:37.810Z] [info] Sent message offline-msg-1-brc8xfzp5yv
+[2025-03-10T20:53:38.562Z] [info] Sent message offline-msg-2-brc8xfzp5yv
+[2025-03-10T20:53:39.156Z] [info] Sent message offline-msg-3-brc8xfzp5yv
+[2025-03-10T20:53:39.956Z] [info] Sent message offline-msg-4-brc8xfzp5yv
+[2025-03-10T20:53:41.078Z] [info] Sent message offline-msg-5-brc8xfzp5yv
+[2025-03-10T20:53:41.900Z] [info] Sent message offline-msg-6-brc8xfzp5yv
+[2025-03-10T20:53:42.679Z] [info] Sent message offline-msg-7-brc8xfzp5yv
+[2025-03-10T20:53:43.485Z] [info] Sent message offline-msg-8-brc8xfzp5yv
+[2025-03-10T20:53:44.292Z] [info] Sent message offline-msg-9-brc8xfzp5yv
+[2025-03-10T20:53:45.092Z] [info] Sent message offline-msg-10-brc8xfzp5yv
+[2025-03-10T20:53:45.092Z] [info] Reconnecting alice
+[2025-03-10T20:53:47.267Z] [warn] [alice-a] Create XMTP client v:6bd613d 2.172s
+[2025-03-10T20:53:47.459Z] [warn] [alice-a] Initialize XMTP client 2.366s
+[2025-03-10T20:53:48.462Z] [info] Expected messages pattern: offline-msg-[1-10]-brc8xfzp5yv
+[2025-03-10T20:53:48.462Z] [info] Reception percentage: 100.00% (10/10 messages)
+[2025-03-10T20:53:48.462Z] [info] Order percentage: 100.00% (1/1 personas)
+[2025-03-10T20:53:48.462Z] [info] The tests indicated that the test ts_delivery was success
+[2025-03-10T20:53:48.463Z] [info] Successfully reported success to Datadog
