@@ -4,6 +4,21 @@ import metrics from "datadog-metrics";
 
 let isInitialized = false;
 
+// Add this mapping function
+function getCountryCodeFromGeo(geolocation: string): string {
+  // Map your geo regions to ISO country codes
+  const geoToCountryCode: Record<string, string> = {
+    us: "US",
+    "us-east": "US",
+    "us-west": "US",
+    europe: "FR", // Using France as a representative for Europe
+    asia: "JP", // Using Japan as a representative for Asia
+    "south-america": "BR", // Using Brazil as a representative for South America
+  };
+
+  return geoToCountryCode[geolocation] || "US"; // Default to US if not found
+}
+
 export function initDataDog(
   testName: string,
   envValue: string,
@@ -25,12 +40,14 @@ export function initDataDog(
   }
 
   try {
+    const countryCode = getCountryCodeFromGeo(geolocation);
     const initConfig = {
       apiKey: apiKey,
       defaultTags: [
         `env:${envValue}`,
         `test:${testName}`,
         `geo:${geolocation}`,
+        `geo.country_iso_code:${countryCode}`,
       ],
     };
     metrics.init(initConfig);
@@ -61,10 +78,6 @@ export function sendDeliveryMetric(
   try {
     const members = testName.split("-")[1] || "";
 
-    // Send delivery rate metric
-    console.log(
-      `Sending metric: xmtp.sdk.${metricName} with value ${metricValue}`,
-    );
     metrics.gauge(`xmtp.sdk.${metricName}`, metricValue, [
       `libxmtp:${libxmtpVersion}`,
       `test:${testName}`,
@@ -91,7 +104,6 @@ export function sendTestResults(
     // Send metric to Datadog using metrics.gauge
     const metricValue = status === "success" ? 1 : 0;
     const metricName = `xmtp.sdk.workflow.status`;
-    console.log(`Sending metric: ${metricName} with value ${metricValue}`);
     metrics.gauge(metricName, metricValue, [`status:${status}`]);
 
     console.log(`Successfully reported ${status} to Datadog`);
@@ -135,6 +147,13 @@ export async function sendPerformanceMetric(
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
 
+      // Get the geo from default tags
+      const geo =
+        metrics.config?.defaultTags
+          ?.find((tag) => tag.startsWith("geo:"))
+          ?.split(":")[1] || "";
+      const countryCode = getCountryCodeFromGeo(geo);
+
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const metricValue = statValue * 1000; // Convert to milliseconds
         metrics.gauge(durationMetricName, metricValue, [
@@ -143,6 +162,7 @@ export async function sendPerformanceMetric(
           `test:${testName}`,
           `metric_type:network`,
           `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
+          `geo.country_iso_code:${countryCode}`,
         ]);
       }
     }

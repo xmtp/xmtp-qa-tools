@@ -1,6 +1,7 @@
 {
   "title": "XMTP SDK Performance",
   "description": "Metrics for XMTP SDK operations (DNS, TLS, Server Processing)",
+  "experience_type": "default",
   "widgets": [
     {
       "id": 8186190636625556,
@@ -249,6 +250,35 @@
       "layout": { "x": 6, "y": 2, "width": 6, "height": 4 }
     },
     {
+      "id": 403905557672626,
+      "definition": {
+        "title": "Xmtp sdk performance by country",
+        "title_size": "16",
+        "title_align": "left",
+        "time": {},
+        "type": "geomap",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call} by {geo.country_iso_code}"
+              }
+            ],
+            "response_format": "scalar",
+            "formulas": [
+              { "alias": "Server call duration (ms)", "formula": "query1" }
+            ]
+          }
+        ],
+        "style": { "palette": "green_to_orange", "palette_flip": false },
+        "view": { "focus": "WORLD" }
+      },
+      "layout": { "x": 0, "y": 6, "width": 6, "height": 5 }
+    },
+    {
+      "id": 442804707850245,
       "definition": {
         "title": "Sdk operations performance (ordered by duration)",
         "type": "query_table",
@@ -327,16 +357,16 @@
       "default": "*"
     }
   ],
+  "layout_type": "ordered",
+  "notify_list": [],
   "template_variable_presets": [
     {
       "name": "us",
       "template_variables": [
-        { "name": "geo", "values": ["us"] },
+        { "name": "geo", "value": "us" },
         { "name": "test", "value": "ts_performance" }
       ]
     }
   ],
-  "layout_type": "ordered",
-  "notify_list": [],
   "reflow_type": "fixed"
 }
