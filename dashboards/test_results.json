@@ -155,7 +155,7 @@
       "name": "env",
       "prefix": "env",
       "available_values": [],
-      "default": "dev"
+      "default": "*"
     },
     {
       "name": "geo",
@@ -168,13 +168,13 @@
         "us",
         "us-west"
       ],
-      "default": "us"
+      "default": "*"
     },
     {
       "name": "test",
       "prefix": "test",
       "available_values": [],
-      "default": "ts_performance"
+      "default": "*"
     }
   ],
   "layout_type": "ordered",
