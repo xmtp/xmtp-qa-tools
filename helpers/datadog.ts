@@ -99,7 +99,16 @@ export function sendTestResults(
     // Send metric to Datadog using metrics.gauge
     const metricValue = status === "success" ? 1 : 0;
     const metricName = `xmtp.sdk.workflow.status`;
-    metrics.gauge(metricName, metricValue, [`status:${status}`]);
+    console.debug({
+      metricName,
+      metricValue,
+      status,
+      workflow: testName,
+    });
+    metrics.gauge(metricName, metricValue, [
+      `status:${status}`,
+      `workflow:${testName}`,
+    ]);
 
     console.log(`Successfully reported ${status} to Datadog`);
   } catch (error) {
@@ -183,6 +192,13 @@ export async function sendPerformanceMetric(
     }
   } catch (error) {
     console.error(`❌ Error sending metric '${testName}':`, error);
+    // Add more detailed error logging
+    if (error instanceof Error) {
+      console.error(`Error details: ${error.message}`);
+      console.error(`Error stack: ${error.stack}`);
+    } else {
+      console.error(`Unknown error type:`, typeof error);
+    }
   }
 }
 
