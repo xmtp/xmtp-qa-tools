@@ -33,6 +33,12 @@ jobs:
       #     command: |
       #       echo "Running performance test on US West:"
       #       railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
+      #       # Check the exit code of the test command
+      #       TEST_EXIT_CODE=${PIPESTATUS[0]}
+      #       if [ $TEST_EXIT_CODE -ne 0 ]; then
+      #         echo "Test failed with exit code $TEST_EXIT_CODE"
+      #         exit 1
+      #       fi
       #     retry_on: error
       #   env:
       #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
@@ -48,30 +54,36 @@ jobs:
       #     command: |
       #       echo "Running performance test on US East:"
       #       railway run -s xmtp-qa-testing:us-east yarn test ts_performance | tee logs/us-east-performance.log
+      #       # Check the exit code of the test command
+      #       TEST_EXIT_CODE=${PIPESTATUS[0]}
+      #       if [ $TEST_EXIT_CODE -ne 0 ]; then
+      #         echo "Test failed with exit code $TEST_EXIT_CODE"
+      #         exit 1
+      #       fi
       #     retry_on: error
       #   env:
       #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
-      # Europe Region Test
-      - name: Run performance test on Europe
-        id: europe-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on Europe:"
-            railway run -s xmtp-qa-testing:europe yarn test ts_performance | tee logs/europe-performance.log
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $TEST_EXIT_CODE"
-              exit 1
-            fi
-          retry_on: error
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      # # Europe Region Test
+      # - name: Run performance test on Europe
+      #   id: europe-test
+      #   continue-on-error: true
+      #   uses: nick-fields/retry@v2
+      #   with:
+      #     timeout_minutes: 10
+      #     max_attempts: 3
+      #     command: |
+      #       echo "Running performance test on Europe:"
+      #       railway run -s xmtp-qa-testing:europe yarn test ts_performance | tee logs/europe-performance.log
+      #       # Check the exit code of the test command
+      #       TEST_EXIT_CODE=${PIPESTATUS[0]}
+      #       if [ $TEST_EXIT_CODE -ne 0 ]; then
+      #         echo "Test failed with exit code $TEST_EXIT_CODE"
+      #         exit 1
+      #       fi
+      #     retry_on: error
+      #   env:
+      #     RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       # Asia Region Test
       - name: Run performance test on Asia
@@ -84,6 +96,12 @@ jobs:
           command: |
             echo "Running performance test on Asia:"
             railway run -s xmtp-qa-testing:asia yarn test ts_performance | tee logs/asia-performance.log
+            # Check the exit code of the test command
+            TEST_EXIT_CODE=${PIPESTATUS[0]}
+            if [ $TEST_EXIT_CODE -ne 0 ]; then
+              echo "Test failed with exit code $TEST_EXIT_CODE"
+              exit 1
+            fi
           retry_on: error
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
