@@ -28,20 +28,7 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - name: Ensure data folder exists
         run: mkdir -p .data
-      - name: List data folder contents before caching
-        run: ls -la .data
-      - name: Cache data folder and .env file
-        uses: actions/cache@v3
-        with:
-          path: |
-            .data
-            .env
-          key: ${{ runner.os }}-TS_Delivery-cache
-          restore-keys: |
-            ${{ runner.os }}-TS_Delivery-
-          enableCrossOsArchive: false
-          fail-on-cache-miss: false
-      - name: List data folder contents after cache restore
+      - name: List data folder contents
         run: ls -la .data
       - run: corepack enable
       - run: yarn
