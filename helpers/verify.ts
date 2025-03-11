@@ -315,9 +315,9 @@ export function calculateMessageStats(
           }
 
           if (discrepancies.length > 0) {
-            console.log(`Discrepancies:`);
+            console.debug(`Discrepancies:`);
             discrepancies.forEach((d) => {
-              console.log(d);
+              console.debug(d);
             });
           }
         }
