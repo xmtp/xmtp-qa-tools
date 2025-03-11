@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
@@ -114,6 +115,7 @@ export class WorkerClient extends Worker {
     client: Client;
     dbPath: string;
     version: string;
+    installationCount: string;
   }> {
     console.time(`[${this.nameId}] Initialize XMTP client`);
 
@@ -215,7 +217,17 @@ export class WorkerClient extends Worker {
       }
     })();
   }
-
+  async clearDB() {
+    const address = await this.client.accountAddress;
+    const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+    const dbPath = getDbPath(this.name, address, this.testName, {
+      installationId: this.installationId,
+      sdkVersion: this.sdkVersion,
+      libxmtpVersion: version,
+    });
+    console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
+    fs.rmSync(dbPath, { recursive: true, force: true });
+  }
   async terminate() {
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent

@@ -16,7 +16,7 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.workflow.status{test:*} by {test}",
+                "query": "avg:xmtp.sdk.workflow.status{$test} by {test}",
                 "aggregator": "avg"
               }
             ],

@@ -1,3 +1,4 @@
+import fs from "fs";
 import { sendPerformanceMetric } from "./datadog";
 import type { Persona } from "./types";
 
@@ -12,7 +13,11 @@ export const logError = (e: any, expect: any): boolean => {
   }
   return true;
 };
-
+// export const removeDB = (fileName: string) => {
+//   const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
+//   console.log("testFilePath", fileName, testFilePath);
+//   fs.rmSync(".data", { recursive: true, force: true });
+// };
 export const exportTestResults = (
   expect: any,
   personas: Record<string, Persona>,
@@ -30,3 +35,25 @@ export const exportTestResults = (
     );
   }
 };
+export async function listInstallations(personas: Record<string, Persona>) {
+  for (const persona of Object.values(personas)) {
+    const inboxState = await persona.client?.inboxState();
+    if (inboxState) {
+      console.log(
+        persona.name,
+        " has ",
+        inboxState.installations.length,
+        " installations",
+      );
+      for (const installation of inboxState.installations) {
+        // console.debug(
+        //   persona.name +
+        //     "(" +
+        //     String(inboxState.installations.length) +
+        //     ")" +
+        //     installation.id,
+        // );
+      }
+    }
+  }
+}

@@ -12,11 +12,7 @@ describe(testName, () => {
   let convo: Conversation;
   beforeAll(async () => {
     fs.rmSync(".data", { recursive: true, force: true });
-    personas = await getWorkers(
-      ["henry", "bob-a", "bob-b", "bob-c", "bob-d"],
-      testName,
-      "none",
-    );
+    personas = await getWorkers(["henry"], testName, "none");
   });
 
   afterAll(async () => {
