@@ -1,5 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Conversation, type Group, type Persona } from "@helpers/types";
+import {
+  type Conversation,
+  type Group,
+  type NestedPersonas,
+} from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -8,7 +12,7 @@ const testName = "forked";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
   let group: Conversation;
 
   beforeAll(async () => {
@@ -24,11 +28,13 @@ describe(testName, () => {
 
   it("should create a group and establish baseline communication", async () => {
     // Create initial group with a few members
-    group = await personas.bella.client!.conversations.newGroupByInboxIds([
-      personas.bella.client?.inboxId as `0x${string}`,
-      personas.dave.client?.inboxId as `0x${string}`,
-      personas.elon.client?.inboxId as `0x${string}`,
-    ]);
+    group = await personas
+      .get("bella")!
+      .client!.conversations.newGroupByInboxIds([
+        personas.get("bella")?.client?.inboxId as `0x${string}`,
+        personas.get("dave")?.client?.inboxId as `0x${string}`,
+        personas.get("elon")?.client?.inboxId as `0x${string}`,
+      ]);
 
     expect(group).toBeDefined();
     expect(group.id).toBeDefined();
@@ -36,7 +42,10 @@ describe(testName, () => {
     // Send initial messages to establish that communication works
     await group.send("Initial message in epoch 0");
 
-    const result = await verifyStream(group, [personas.elon, personas.dave]);
+    const result = await verifyStream(group, [
+      personas.get("elon")!,
+      personas.get("dave")!,
+    ]);
     expect(result.allReceived).toBe(true);
   });
 
@@ -44,8 +53,8 @@ describe(testName, () => {
     // Adding members should trigger an epoch transition in MLS
     console.log("Adding members to trigger epoch transition");
     await (group as Group).addMembers([
-      personas.diana.client?.accountAddress as `0x${string}`,
-      personas.random.client?.accountAddress as `0x${string}`,
+      personas.get("diana")?.client?.accountAddress as `0x${string}`,
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Send a message in the new epoch
@@ -53,10 +62,10 @@ describe(testName, () => {
 
     // Verify all members including new ones can receive messages
     const result = await verifyStream(group, [
-      personas.elon,
-      personas.dave,
-      personas.diana,
-      personas.random,
+      personas.get("elon")!,
+      personas.get("dave")!,
+      personas.get("diana")!,
+      personas.get("random")!,
     ]);
     expect(result.allReceived).toBe(true);
   });
@@ -64,10 +73,12 @@ describe(testName, () => {
   it("should create concurrent operations to potentially cause epoch divergence", async () => {
     // Get references to the same group for different members
     const bellaGroup = group;
-    const daveGroup =
-      await personas.dave.client?.conversations.getConversationById(group.id);
-    const elonGroup =
-      await personas.elon.client?.conversations.getConversationById(group.id);
+    const daveGroup = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
+    const elonGroup = await personas
+      .get("elon")
+      ?.client?.conversations.getConversationById(group.id);
 
     if (!daveGroup || !elonGroup) {
       throw new Error("Could not get group references for all members");
@@ -76,11 +87,11 @@ describe(testName, () => {
     // Create promises for concurrent operations from different members
     // This has the potential to create epoch forks if not properly synchronized
     const op1 = (bellaGroup as Group).addMembers([
-      personas.alice.client?.accountAddress as `0x${string}`,
+      personas.get("alice")?.client?.accountAddress as `0x${string}`,
     ]);
 
     const op2 = (bellaGroup as Group).removeMembers([
-      personas.random.client?.accountAddress as `0x${string}`,
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
     ]);
 
     const op3 = (elonGroup as Group).updateName("Updated in potential fork");
@@ -98,11 +109,11 @@ describe(testName, () => {
 
     // Verify messages can be received by all remaining members
     const result = await verifyStream(group, [
-      personas.bella,
-      personas.dave,
-      personas.elon,
-      personas.diana,
-      personas.alice,
+      personas.get("bella")!,
+      personas.get("dave")!,
+      personas.get("elon")!,
+      personas.get("diana")!,
+      personas.get("alice")!,
     ]);
 
     expect(result.allReceived).toBe(true);
@@ -112,24 +123,28 @@ describe(testName, () => {
     // Get messages as seen by different members
     await group.sync();
     const bellaMessages = await group.messages();
-    const daveGroup =
-      await personas.dave.client?.conversations.getConversationById(group.id);
+    const daveGroup = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
 
     await daveGroup?.sync();
     const daveMessages = await daveGroup?.messages();
 
-    const elonGroup =
-      await personas.elon.client?.conversations.getConversationById(group.id);
+    const elonGroup = await personas
+      .get("elon")
+      ?.client?.conversations.getConversationById(group.id);
     await elonGroup?.sync();
     const elonMessages = await elonGroup?.messages();
 
-    const dianaGroup =
-      await personas.diana.client?.conversations.getConversationById(group.id);
+    const dianaGroup = await personas
+      .get("diana")
+      ?.client?.conversations.getConversationById(group.id);
     await dianaGroup?.sync();
     const dianaMessages = await dianaGroup?.messages();
 
-    const aliceGroup =
-      await personas.alice.client?.conversations.getConversationById(group.id);
+    const aliceGroup = await personas
+      .get("alice")
+      ?.client?.conversations.getConversationById(group.id);
     await aliceGroup?.sync();
     const aliceMessages = await aliceGroup?.messages();
 
@@ -143,15 +158,15 @@ describe(testName, () => {
 
     // Alice was added during the concurrent operations test, so she should have fewer messages
     // than Diana and the original members
-    expect(aliceMessages?.length).toBe(4);
+    expect(aliceMessages?.length).toBe(5);
   });
 
   it("should remove a member and re-add them from a different device without forking", async () => {
     // First, remove Diana from the group
     console.log("Removing Diana from the group");
-    // await group.removeMembers([
-    //   personas.diana.client?.accountAddress as `0x${string}`,
-    // ]);
+    await (group as Group).removeMembers([
+      personas.get("diana")?.client?.accountAddress as `0x${string}`,
+    ]);
 
     // Send a message after removal
     await group.send("Message after Diana was removed");
@@ -162,15 +177,15 @@ describe(testName, () => {
     // Create a new installation for Diana (simulating a different device)
     console.log("Creating a new installation for Diana");
 
-    const dianaNewDevice = personas["diana-b"];
+    const dianaNewDevice = personas.get("diana", "b")!;
     expect(dianaNewDevice).toBeDefined();
     expect(dianaNewDevice.client).toBeDefined();
     expect(dianaNewDevice.installationId).not.toBe(
-      personas.diana.installationId,
+      personas.get("diana")?.installationId,
     );
 
     console.log(
-      `Diana's original installation ID: ${personas.diana.installationId}`,
+      `Diana's original installation ID: ${personas.get("diana")?.installationId}`,
     );
     console.log(
       `Diana's new installation ID: ${dianaNewDevice.installationId}`,
@@ -185,8 +200,9 @@ describe(testName, () => {
     // Send messages from different members
     await group.send("Message from Bella after Diana was re-added");
 
-    const elonGroup =
-      await personas.elon.client?.conversations.getConversationById(group.id);
+    const elonGroup = await personas
+      .get("elon")
+      ?.client?.conversations.getConversationById(group.id);
     await elonGroup?.send("Message from Elon after Diana was re-added");
 
     // Allow time for synchronization
@@ -205,7 +221,10 @@ describe(testName, () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Verify all members can communicate
-    const result = await verifyStream(group, [personas.bella, dianaNewDevice]);
+    const result = await verifyStream(group, [
+      personas.get("bella")!,
+      dianaNewDevice,
+    ]);
 
     expect(result.allReceived).toBe(true);
 
@@ -234,8 +253,9 @@ describe(testName, () => {
   it("should simulate a network partition by adding members from different clients", async () => {
     // Get references to the group for different members
     const bellaGroup = group;
-    const daveGroup =
-      await personas.dave.client?.conversations.getConversationById(group.id);
+    const daveGroup = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
 
     if (!daveGroup) {
       throw new Error("Could not get group reference for Dave");
@@ -243,7 +263,7 @@ describe(testName, () => {
 
     // Add a member from Bella's client
     await (bellaGroup as Group).addMembers([
-      personas.bob.client?.accountAddress as `0x${string}`,
+      personas.get("bob")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Send a message from Bella
@@ -260,12 +280,12 @@ describe(testName, () => {
 
     // Verify all members are in sync and can receive messages
     const result = await verifyStream(group, [
-      personas.bella,
-      personas.dave,
-      personas.elon,
-      personas.diana,
-      personas.alice,
-      personas.bob,
+      personas.get("bella")!,
+      personas.get("dave")!,
+      personas.get("elon")!,
+      personas.get("diana")!,
+      personas.get("alice")!,
+      personas.get("bob")!,
     ]);
 
     expect(result.allReceived).toBe(true);
@@ -276,27 +296,27 @@ describe(testName, () => {
 
     // Add one member
     await (group as Group).addMembers([
-      personas.random.client?.accountAddress as `0x${string}`,
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Immediately remove that member
     await (group as Group).removeMembers([
-      personas.random.client?.accountAddress as `0x${string}`,
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Add them again
     await (group as Group).addMembers([
-      personas.random.client?.accountAddress as `0x${string}`,
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Remove a different member
     await (group as Group).removeMembers([
-      personas.bob.client?.accountAddress as `0x${string}`,
+      personas.get("bob")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Add the removed member back
     await (group as Group).addMembers([
-      personas.bob.client?.accountAddress as `0x${string}`,
+      personas.get("bob")?.client?.accountAddress as `0x${string}`,
     ]);
 
     // Allow time for synchronization
@@ -304,13 +324,15 @@ describe(testName, () => {
 
     // Send a message from different members
     await group.send("Message from Bella after rapid member changes");
-    const daveGroup =
-      await personas.dave.client?.conversations.getConversationById(group.id);
+    const daveGroup = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
 
     await daveGroup?.send("Message from Dave after rapid member changes");
 
-    const randomGroup =
-      await personas.random.client?.conversations.getConversationById(group.id);
+    const randomGroup = await personas
+      .get("random")
+      ?.client?.conversations.getConversationById(group.id);
 
     await randomGroup?.send("Message from Random after rapid member changes");
 
@@ -325,8 +347,9 @@ describe(testName, () => {
 
     // Get references to the group for different members
     const bellaGroup = group;
-    const bobGroup =
-      await personas.bob.client?.conversations.getConversationById(group.id);
+    const bobGroup = await personas
+      .get("bob")
+      ?.client?.conversations.getConversationById(group.id);
 
     if (!bobGroup) {
       throw new Error("Could not get group reference for Bob");
@@ -340,24 +363,27 @@ describe(testName, () => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
 
     // Check that all members see the same group state
-    const bellaMetadata =
-      await personas.bella.client?.conversations.getConversationById(group.id);
-    const bobMetadata =
-      await personas.bob.client?.conversations.getConversationById(group.id);
-    const daveMetadata =
-      await personas.dave.client?.conversations.getConversationById(group.id);
+    const bellaMetadata = await personas
+      .get("bella")
+      ?.client?.conversations.getConversationById(group.id);
+    const bobMetadata = await personas
+      .get("bob")
+      ?.client?.conversations.getConversationById(group.id);
+    const daveMetadata = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
 
     expect((bobMetadata as Group).name).toBe((bellaMetadata as Group).name);
     expect((daveMetadata as Group).name).toBe((bellaMetadata as Group).name);
 
     // Verify messages can be sent and received
     const result = await verifyStream(group, [
-      personas.bella,
-      personas.dave,
-      personas.elon,
-      personas.diana,
-      personas.alice,
-      personas.bob,
+      personas.get("bella")!,
+      personas.get("dave")!,
+      personas.get("elon")!,
+      personas.get("diana")!,
+      personas.get("alice")!,
+      personas.get("bob")!,
     ]);
 
     expect(result.allReceived).toBe(true);

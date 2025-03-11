@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import type { Persona } from "@helpers/types";
+import type { NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -7,7 +7,7 @@ const testName = "bug_cointoss";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
 
   beforeAll(async () => {
     personas = await getWorkers(["bob", "alice", "joe"], testName, "none");
@@ -25,28 +25,28 @@ describe(testName, () => {
   });
 
   it("should create a group with bob and alice", async () => {
-    const group = await personas[
-      "bob"
-    ].client!.conversations.newGroupByInboxIds([
-      personas["alice"].client!.inboxId,
-    ]);
+    const group = await personas
+      .get("bob")!
+      .client!.conversations.newGroupByInboxIds([
+        personas.get("alice")!.client!.inboxId,
+      ]);
     expect(group.id).toBeDefined();
   });
 
   it("should create a group with bob and alice", async () => {
-    const group = await personas[
-      "bob"
-    ].client!.conversations.newGroupByInboxIds([
-      personas["joe"].client!.inboxId,
-    ]);
+    const group = await personas
+      .get("bob")!
+      .client!.conversations.newGroupByInboxIds([
+        personas.get("joe")!.client!.inboxId,
+      ]);
     expect(group.id).toBeDefined();
   });
   it("joe with alice", async () => {
-    const group = await personas[
-      "joe"
-    ].client!.conversations.newGroupByInboxIds([
-      personas["alice"].client!.inboxId,
-    ]);
+    const group = await personas
+      .get("joe")!
+      .client!.conversations.newGroupByInboxIds([
+        personas.get("alice")!.client!.inboxId,
+      ]);
     expect(group.id).toBeDefined();
   });
   // it("fabri creates a grop with all", async () => {

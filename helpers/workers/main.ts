@@ -11,12 +11,10 @@ import {
   type Consent,
   type Conversation,
   type DecodedMessage,
-  type Persona,
   type PersonaBase,
   type typeofStream,
 } from "@helpers/types";
 import OpenAI from "openai";
-import { PersonaFactory } from "./factory";
 
 export type MessageStreamWorker = {
   type: string;
@@ -54,15 +52,13 @@ const workerBootstrap = /* JavaScript */ `
 
 export class WorkerClient extends Worker {
   public name: string;
-  private installationId: string;
-  private sdkVersion: string;
   private testName: string;
   private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
-
+  private folder: string;
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
@@ -82,9 +78,9 @@ export class WorkerClient extends Worker {
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
     this.name = persona.name;
-    this.installationId = persona.installationId;
-    this.nameId = `${this.name.replaceAll("-" + this.installationId, "")}-${this.installationId}`;
-    this.sdkVersion = persona.sdkVersion;
+    this.folder = persona.folder;
+    this.nameId = persona.name;
+
     this.testName = persona.testName;
     this.walletKey = persona.walletKey;
     this.encryptionKeyHex = persona.encryptionKey;
@@ -109,64 +105,6 @@ export class WorkerClient extends Worker {
     });
   }
 
-  // Add this method to your WorkerClient class
-  /**
-   * Creates a new installation of this persona.
-   * This uses the same wallet key (identity) but a new encryption key (storage).
-   * The installation ID is returned from the protocol rather than specified.
-   *
-   * @returns A new Persona object with the installation ID returned from protocol
-   */
-  public async createInstallation(): Promise<Persona> {
-    // Generate installation ID from protocol
-    const protocolInstallationId = await this.getInstallationIdFromProtocol();
-    // Extract the base name from the current persona name
-    const currentPersonaName = this.persona?.name;
-    const baseName = this.persona?.name.split("-")[0];
-
-    // Create a new descriptor with the installation ID from protocol
-    const newDescriptor = `${baseName}-${protocolInstallationId}`;
-
-    // Check if this installation already exists in the global cache
-    if (
-      globalWorkerCache[newDescriptor] &&
-      globalWorkerCache[newDescriptor].client
-    ) {
-      console.log(
-        `[WorkerClient] Reusing existing installation: ${newDescriptor}`,
-      );
-      return globalWorkerCache[newDescriptor];
-    }
-
-    console.log(
-      `[WorkerClient] Creating new installation: ${newDescriptor} from ${currentPersonaName} with protocol-assigned ID: ${protocolInstallationId}`,
-    );
-
-    // Create a PersonaFactory with the same settings as this worker
-    const factory = new PersonaFactory(
-      this.persona.testName,
-      this.typeofStream,
-      this.gptEnabled,
-    );
-
-    // Create the new persona with the requested installation ID
-    const personas = await factory.createPersonas([newDescriptor]);
-
-    if (personas.length === 0) {
-      throw new Error(`Failed to create installation ${newDescriptor}`);
-    }
-
-    return personas[0];
-  }
-
-  /**
-   * Get installation ID from the protocol
-   * This is a mock implementation - replace with actual protocol logic
-   */
-  getInstallationIdFromProtocol(): Promise<string> {
-    return Promise.resolve("1");
-  }
-
   /**
    * Initializes the underlying XMTP client in the Worker.
    * Returns the XMTP Client object for convenience.
@@ -184,8 +122,7 @@ export class WorkerClient extends Worker {
       type: "initialize",
       data: {
         name: this.name,
-        installationId: this.installationId,
-        sdkVersion: this.sdkVersion,
+        folder: this.folder,
       },
     });
     const signer = createSigner(this.walletKey as `0x${string}`);
@@ -193,17 +130,28 @@ export class WorkerClient extends Worker {
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
 
     const address = await signer.getAddress();
-    const dbPath = getDbPath(this.name, address, this.testName, {
-      installationId: this.installationId,
-      sdkVersion: this.sdkVersion,
-      libxmtpVersion: version,
-    });
+    const params = {
+      name: this.name,
+      address,
+      testName: this.testName,
+      folder: this.folder,
+      version,
+    };
+    console.debug(params);
+    const dbPath = getDbPath(
+      this.name,
+      address,
+      this.testName,
+      this.folder,
+      version,
+    );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
       // @ts-expect-error: loggingLevel is not typed
       loggingLevel: process.env.LOGGING_LEVEL,
     });
+
     console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);
 
     if (this.typeofStream === "message") {
@@ -226,14 +174,10 @@ export class WorkerClient extends Worker {
       console.log(`[${this.nameId}] No stream started`);
     }
 
-    console.log("this.client.installationId", this.client.installationId);
-    console.timeEnd(`[${this.nameId}] Initialize XMTP client`);
-    return {
-      client: this.client,
-      dbPath,
-      version,
-      installationId: this.client.installationId,
-    };
+    const installationId = this.client.installationId;
+    const debugLog = { client: this.client, dbPath, version, installationId };
+    //console.debug(debugLog);
+    return debugLog;
   }
 
   /**
@@ -281,11 +225,13 @@ export class WorkerClient extends Worker {
   async clearDB() {
     const address = await this.client.accountAddress;
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
-    const dbPath = getDbPath(this.name, address, this.testName, {
-      installationId: this.installationId,
-      sdkVersion: this.sdkVersion,
-      libxmtpVersion: version,
-    });
+    const dbPath = getDbPath(
+      this.name,
+      address,
+      this.testName,
+      this.folder,
+      version,
+    );
     console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
     fs.rmSync(dbPath, { recursive: true, force: true });
   }

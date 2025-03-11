@@ -1,80 +1,52 @@
-import { exec } from "child_process";
-import { promisify } from "util";
-import {
-  createSigner,
-  getEncryptionKeyFromHex,
-  loadEnv,
-} from "@helpers/client";
-import { Client } from "@helpers/types";
+import { loadEnv } from "@helpers/client";
+import { type Client, type NestedPersonas, type XmtpEnv } from "@helpers/types";
+import { getWorkers } from "@helpers/workers/factory";
 
-const execAsync = promisify(exec);
-const API_HOST = "grpc.dev.xmtp.network";
+const testName = "test-bot";
+loadEnv(testName);
 
-loadEnv("gm-bot");
-const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
-if (!WALLET_KEY || !ENCRYPTION_KEY)
-  throw new Error("Missing environment variables");
+async function main() {
+  // Get 20 dynamic workers
+  let personas: NestedPersonas;
+  personas = await getWorkers(["bot"], testName, "message", true);
 
-// Function to block the XMTP API using /etc/hosts
-async function blockXmtpApi() {
-  console.log(`🚫 Blocking access to ${API_HOST}...`);
+  const client = personas.get("bot")?.client as Client;
 
-  try {
-    // Add entry to /etc/hosts to redirect the API domain to localhost
-    await execAsync(`sudo sh -c 'echo "127.0.0.1 ${API_HOST}" >> /etc/hosts'`);
+  const env = process.env.XMTP_ENV as XmtpEnv;
+  console.log(`Agent initialized on address ${client.accountAddress}`);
+  console.log(`Agent initialized on inbox ${client.inboxId}`);
+  console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
 
-    // Flush DNS cache
-    await execAsync(
-      "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder",
-    );
-
-    console.log(`Access to ${API_HOST} blocked via /etc/hosts`);
-  } catch (error) {
-    console.error("Failed to block API:", error);
-  }
-}
-
-// Function to unblock the XMTP API
-async function unblockXmtpApi() {
-  console.log(`✅ Restoring access to ${API_HOST}...`);
-
-  try {
-    // Remove the entry from /etc/hosts
-    await execAsync(`sudo sed -i '' '/${API_HOST}/d' /etc/hosts`);
-
-    // Flush DNS cache
-    await execAsync(
-      "sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder",
-    );
-
-    console.log(`Access to ${API_HOST} restored`);
-  } catch (error) {
-    console.error("Failed to unblock API:", error);
-  }
-}
-
-(async () => {
-  const client = await Client.create(
-    createSigner(WALLET_KEY),
-    getEncryptionKeyFromHex(ENCRYPTION_KEY),
-    { env: "dev" },
-  );
+  console.log("Syncing conversations...");
   await client.conversations.sync();
-  console.log(`Agent initialized on ${client.accountAddress}`);
-  console.log(
-    `Send a message on http://xmtp.chat/dm/${client.accountAddress}?env=dev`,
-  );
 
-  for await (const message of await client.conversations.streamAllMessages()) {
+  console.log("Waiting for messages...");
+  const stream = client.conversations.streamAllMessages();
+  for await (const message of await stream) {
+    /* Ignore messages from the same agent or non-text messages */
     if (
       message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
       message?.contentType?.typeId !== "text"
-    )
+    ) {
       continue;
+    }
+
+    console.log(
+      `Received message: ${message.content as string} by ${message.senderInboxId}`,
+    );
+
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
-    console.log(`Sending "gm" response...`);
-    await conversation?.send("gm");
+
+    if (!conversation) {
+      console.log("Unable to find conversation, skipping");
+      continue;
+    }
+    await conversation.send("gm");
+    console.log("Waiting for messages...");
   }
-})().catch(console.error);
+}
+
+// Run the bot
+main().catch(console.error);

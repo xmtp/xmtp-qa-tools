@@ -136,18 +136,18 @@ export async function sendPerformanceMetric(
     const members = operationParts[1].split("-")[1] || "";
     const durationMetricName = `xmtp.sdk.duration`;
 
-    // Send main operation metric
-    console.debug({
-      durationMetricName,
-      metricValue,
-      libxmtpVersion,
-      operationName,
-      testNameExtracted,
-      metricDescription,
-      members,
-      geo: currentGeo,
-      countryCode: getCountryCodeFromGeo(currentGeo),
-    });
+    // // Send main operation metric
+    // console.debug({
+    //   durationMetricName,
+    //   metricValue,
+    //   libxmtpVersion,
+    //   operationName,
+    //   testNameExtracted,
+    //   metricDescription,
+    //   members,
+    //   geo: currentGeo,
+    //   countryCode: getCountryCodeFromGeo(currentGeo),
+    // });
     metrics.gauge(durationMetricName, Math.round(metricValue), [
       `libxmtp:${libxmtpVersion}`,
       `operation:${operationName}`,
@@ -167,17 +167,17 @@ export async function sendPerformanceMetric(
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const metricValue = Math.round(statValue * 1000); // Convert to milliseconds
         // Send main operation metric
-        console.debug({
-          durationMetricName,
-          metricValue,
-          libxmtpVersion,
-          operationName,
-          testNameExtracted,
-          metric_type: "network",
-          network_phase: statName.toLowerCase().replace(/\s+/g, "_"),
-          countryCode: getCountryCodeFromGeo(currentGeo),
-          members,
-        });
+        // console.debug({
+        //   durationMetricName,
+        //   metricValue,
+        //   libxmtpVersion,
+        //   operationName,
+        //   testNameExtracted,
+        //   metric_type: "network",
+        //   network_phase: statName.toLowerCase().replace(/\s+/g, "_"),
+        //   countryCode: getCountryCodeFromGeo(currentGeo),
+        //   members,
+        // });
         metrics.gauge(durationMetricName, metricValue, [
           `libxmtp:${libxmtpVersion}`,
           `operation:${operationName}`,

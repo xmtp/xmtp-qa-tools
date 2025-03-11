@@ -1,6 +1,7 @@
 import {
   type Conversation,
   type Group,
+  type NestedPersonas,
   type Persona,
   type VerifyStreamResult,
 } from "./types";
@@ -8,25 +9,21 @@ import type { MessageStreamWorker } from "./workers/main";
 
 export async function getPersonasFromGroup(
   group: Conversation,
-  personas: Record<string, Persona>,
+  personas: NestedPersonas,
 ): Promise<Persona[]> {
   await group.sync();
   const members = await group.members();
-  const memberInboxIds = members.map((member) => {
-    return {
-      inboxId: member.inboxId,
-    };
-  });
-  const personasFromGroup = memberInboxIds.map((m) => {
-    return Object.keys(personas).find(
-      (name) => personas[name].client?.inboxId === m.inboxId,
-    );
-  });
-  // Convert persona names to actual Persona objects and filter out undefined values
-  const personaObjects = personasFromGroup
-    .filter((name): name is string => name !== undefined)
-    .map((name) => personas[name]);
-  return personaObjects;
+  const memberInboxIds = members.map((member) => member.inboxId);
+
+  // Use the getPersonas method to retrieve all personas
+  const allPersonas = personas.getPersonas();
+
+  // Find personas whose client inboxId matches the group members' inboxIds
+  const personasFromGroup = allPersonas.filter((persona) =>
+    memberInboxIds.includes(persona.client?.inboxId || ""),
+  );
+
+  return personasFromGroup;
 }
 
 /**
@@ -51,7 +48,7 @@ const nameUpdater = async (group: Conversation, payload: string) => {
 
 export async function verifyStreamAll(
   group: Conversation,
-  participants: Record<string, Persona>,
+  participants: NestedPersonas,
   count = 1,
 ) {
   const allPersonas = await getPersonasFromGroup(group, participants);

@@ -1,7 +1,7 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type Signer } from "@helpers/types";
+import { type NestedPersonas, type Signer } from "@helpers/types";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -9,7 +9,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
-import { defaultValues, type Persona, type XmtpEnv } from "./types";
+import { type Persona, type XmtpEnv } from "./types";
 import { clearWorkerCache } from "./workers/factory";
 
 interface User {
@@ -45,12 +45,16 @@ export const createSigner = (key: string): Signer => {
     },
   };
 };
-function loadDataPath(name: string, testName: string): string {
+function loadDataPath(
+  name: string,
+  installationId: string,
+  testName: string,
+): string {
   // Extract the base name without installation ID for folder structure
   const baseName = name.toLowerCase().split("-")[0];
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
   // Use baseName for the parent folder, not the full name
-  let basePath = `${preBasePath}/.data/${baseName}`;
+  let basePath = `${preBasePath}/.data/${baseName}/${installationId}`;
 
   //Load data for bugs
   if (testName.includes("bug")) {
@@ -62,32 +66,19 @@ export const getDbPath = (
   name: string,
   accountAddress: string,
   testName: string,
-  instance?: {
-    installationId?: string;
-    sdkVersion?: string;
-    libxmtpVersion?: string;
-  },
+  installationId: string,
+  libxmtpVersion: string,
 ): string => {
   console.time(`[${name}] - getDbPath`);
 
-  // For the identifier, use either the name as-is (if it already has installation ID)
-  // or construct it with the installation ID from instance
-  let identifier;
   const env = process.env.XMTP_ENV as XmtpEnv;
-  if (name.includes("-")) {
-    // Name already has installation ID (e.g., "fabritest-a")
-    identifier = `${name.toLowerCase()}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
-  } else {
-    // Name doesn't have installation ID, use the one from instance
-    const installationId =
-      instance?.installationId?.toLowerCase() ?? defaultValues.installationId;
-    identifier = `${name.toLowerCase()}-${installationId}-${accountAddress}-${instance?.sdkVersion ?? defaultValues.sdkVersion}-${instance?.libxmtpVersion ?? ""}-${env}`;
-  }
-  const basePath = loadDataPath(name, testName);
+  let identifier = `${accountAddress}-${libxmtpVersion}-${env}`;
+
+  const basePath = loadDataPath(name, installationId, testName);
 
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
-    console.warn("Creating directory", basePath);
+    console.debug("Creating directory", basePath);
   }
   console.timeEnd(`[${name}] - getDbPath`);
 
@@ -140,15 +131,11 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
-export async function closeEnv(
-  testName: string,
-  personas: Record<string, Persona>,
-) {
+export async function closeEnv(testName: string, personas: NestedPersonas) {
   flushLogger(testName);
 
   await flushMetrics();
-
-  for (const persona of Object.values(personas)) {
+  for (const persona of personas.getPersonas()) {
     await persona.worker?.terminate();
   }
 

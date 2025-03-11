@@ -1,12 +1,11 @@
-import fs from "fs";
 import { sendPerformanceMetric } from "./datadog";
-import type { Persona } from "./types";
+import { type NestedPersonas, type Persona } from "./types";
 
 export const logError = (e: any, expect: any): boolean => {
   if (e instanceof Error) {
     console.error(
       `[vitest] Test failed in ${expect.getState().currentTestName}`,
-      e,
+      e.message,
     );
   } else {
     console.error(`Unknown error type:`, typeof e);
@@ -20,7 +19,7 @@ export const logError = (e: any, expect: any): boolean => {
 // };
 export const exportTestResults = (
   expect: any,
-  personas: Record<string, Persona>,
+  personas: NestedPersonas,
   start: number,
 ) => {
   const testName = expect.getState().currentTestName;
@@ -31,12 +30,12 @@ export const exportTestResults = (
     void sendPerformanceMetric(
       performance.now() - start,
       testName as string,
-      Object.values(personas)[0].version,
+      personas.getVersion(),
     );
   }
 };
-export async function listInstallations(personas: Record<string, Persona>) {
-  for (const persona of Object.values(personas)) {
+export async function listInstallations(personas: NestedPersonas) {
+  for (const persona of personas.getPersonas()) {
     const inboxState = await persona.client?.inboxState();
     if (inboxState) {
       console.log(
@@ -45,15 +44,15 @@ export async function listInstallations(personas: Record<string, Persona>) {
         inboxState.installations.length,
         " installations",
       );
-      for (const installation of inboxState.installations) {
-        // console.debug(
-        //   persona.name +
-        //     "(" +
-        //     String(inboxState.installations.length) +
-        //     ")" +
-        //     installation.id,
-        // );
-      }
+      //for (const installation of inboxState.installations) {
+      // console.debug(
+      //   persona.name +
+      //     "(" +
+      //     String(inboxState.installations.length) +
+      //     ")" +
+      //     installation.id,
+      // );
+      //}
     }
   }
 }

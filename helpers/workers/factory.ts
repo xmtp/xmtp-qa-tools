@@ -4,7 +4,9 @@ import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
 import {
   defaultValues,
+  NestedPersonas,
   type Client,
+  type NestedPersonasStructure,
   type Persona,
   type PersonaBase,
   type typeofStream,
@@ -12,15 +14,7 @@ import {
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
-// Adding createInstallation to the WorkerClient interface
-declare module "./main" {
-  interface WorkerClient {
-    createInstallation(newInstallationId: string): Promise<Persona>;
-  }
-}
-
 // Global cache to store workers across multiple getWorkers calls
-// Using a more complex key that includes installation ID
 const globalWorkerCache: Record<string, Persona> = {};
 
 /**
@@ -31,8 +25,8 @@ export class PersonaFactory {
   private testName: string;
   private activeWorkers: WorkerClient[] = []; // Add this to track workers
   private gptEnabled: boolean;
-  private typeofStream: typeofStream;
 
+  private typeofStream: typeofStream;
   constructor(
     testName: string,
     typeofStream: typeofStream,
@@ -44,309 +38,135 @@ export class PersonaFactory {
   }
 
   /**
-   * Ensure a particular persona (by name and installation) has appropriate keys.
-   * Keys are specific to base name + installation ID combinations.
+   * Ensure a particular persona (by name) has a wallet key and encryption key.
+   * If these are not found in the environment variables, generate them via a yarn script.
    */
+  // keep a cache of keys
   private keysCache: Record<
     string,
     { walletKey: string; encryptionKey: string }
   > = {};
-
-  private ensureKeys(
-    baseName: string,
-    installationId: string,
-  ): {
+  private ensureKeys(name: string): {
     walletKey: string;
     encryptionKey: string;
   } {
-    // Create a unique key combining name and installation
-    const cacheKey = `${baseName}-${installationId}`;
+    // Extract the base name without installation ID for key lookup
+    const baseName = name.split("-")[0];
 
-    if (cacheKey in this.keysCache) {
-      console.log(`[PersonaFactory] Using cached keys for ${cacheKey}`);
-      return this.keysCache[cacheKey];
+    if (baseName in this.keysCache) {
+      console.log(`Using cached keys for ${baseName}`);
+      return this.keysCache[baseName];
     }
 
-    // Check if we have specific keys for this installation
-    const installationSpecificKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}_${installationId.toUpperCase()}`;
-    const installationSpecificEncKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}_${installationId.toUpperCase()}`;
+    const walletKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}`;
+    const encryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
 
-    // Also check for base keys (backward compatibility)
-    const baseWalletKeyEnv = `WALLET_KEY_${baseName.toUpperCase()}`;
-    const baseEncryptionKeyEnv = `ENCRYPTION_KEY_${baseName.toUpperCase()}`;
-
-    // First, try installation-specific keys
+    // Check if keys exist in environment variables
     if (
-      process.env[installationSpecificKeyEnv] !== undefined &&
-      process.env[installationSpecificEncKeyEnv] !== undefined
+      process.env[walletKeyEnv] !== undefined &&
+      process.env[encryptionKeyEnv] !== undefined
     ) {
       const account = privateKeyToAccount(
-        process.env[installationSpecificKeyEnv] as `0x${string}`,
+        process.env[walletKeyEnv] as `0x${string}`,
       );
-      console.log(
-        `[PersonaFactory] Using installation-specific keys for ${cacheKey}: ${account.address}`,
-      );
+      console.log(`Using env keys for ${baseName}: ${account.address}`);
 
-      this.keysCache[cacheKey] = {
-        walletKey: process.env[installationSpecificKeyEnv],
-        encryptionKey: process.env[installationSpecificEncKeyEnv],
+      this.keysCache[baseName] = {
+        walletKey: process.env[walletKeyEnv],
+        encryptionKey: process.env[encryptionKeyEnv],
       };
 
-      return this.keysCache[cacheKey];
+      return this.keysCache[baseName];
     }
 
-    // Next, try base keys if no installation-specific keys exist
-    if (
-      process.env[baseWalletKeyEnv] !== undefined &&
-      process.env[baseEncryptionKeyEnv] !== undefined
-    ) {
-      // For different installations of the same base name,
-      // we'll use the same wallet key but different encryption keys
-      // This allows for multiple installations with same identity
-      const walletKey = process.env[baseWalletKeyEnv];
-
-      // For different installations, we need different encryption keys
-      // If we're using installation "a", use the base encryption key
-      // Otherwise, generate a new one for this installation
-      let encryptionKey;
-      if (installationId.toLowerCase() === "a") {
-        encryptionKey = process.env[baseEncryptionKeyEnv];
-      } else {
-        // For other installations, generate a new encryption key
-        // This ensures different DB paths and installations
-        encryptionKey = generateEncryptionKeyHex();
-      }
-
-      const account = privateKeyToAccount(walletKey as `0x${string}`);
-
-      console.log(
-        `[PersonaFactory] Using base wallet key with ${installationId === "a" ? "base" : "new"} encryption key for ${cacheKey}: ${account.address}`,
-      );
-
-      this.keysCache[cacheKey] = {
-        walletKey,
-        encryptionKey,
-      };
-
-      // Store the new encryption key in env for persistence
-      process.env[installationSpecificEncKeyEnv] = encryptionKey;
-
-      // If this isn't a random persona, also append to .env file
-      if (!baseName.includes("random")) {
-        const filePath =
-          process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
-        void appendFile(
-          filePath,
-          `\n${installationSpecificEncKeyEnv}=${encryptionKey}\n# Installation ${installationId} for ${baseName}\n`,
-        );
-      }
-
-      return this.keysCache[cacheKey];
-    }
-
-    // If we get here, we need to generate completely new keys
-    console.log(`[PersonaFactory] Generating new keys for ${cacheKey}`);
+    // Keys don't exist, generate new ones
+    console.log(`Generating new keys for ${baseName}`);
     const walletKey = generatePrivateKey();
     const account = privateKeyToAccount(walletKey);
     const encryptionKey = generateEncryptionKeyHex();
     const publicKey = account.address;
 
     // Store in cache
-    this.keysCache[cacheKey] = {
+    this.keysCache[baseName] = {
       walletKey,
       encryptionKey,
     };
 
-    // Update process.env directly
-    process.env[installationSpecificKeyEnv] = walletKey;
-    process.env[installationSpecificEncKeyEnv] = encryptionKey;
+    // Update process.env directly so subsequent calls in the same process will find the keys
+    process.env[walletKeyEnv] = walletKey;
+    process.env[encryptionKeyEnv] = encryptionKey;
 
-    // Also set base keys if this is installation "a"
-    if (installationId.toLowerCase() === "a") {
-      process.env[baseWalletKeyEnv] = walletKey;
-      process.env[baseEncryptionKeyEnv] = encryptionKey;
-    }
-
-    if (!baseName.includes("random")) {
+    if (!name.includes("random")) {
       // Append to .env file for persistence across runs
       const filePath =
         process.env.CURRENT_ENV_PATH || path.resolve(process.cwd(), ".env");
       void appendFile(
         filePath,
-        `\n${installationSpecificKeyEnv}=${walletKey}\n${installationSpecificEncKeyEnv}=${encryptionKey}\n# Installation ${installationId} for ${baseName}, public key is ${publicKey}\n`,
+        `\n${walletKeyEnv}=${walletKey}\n${encryptionKeyEnv}=${encryptionKey}\n# public key is ${publicKey}\n`,
       );
-
-      // Also append base keys if this is installation "a"
-      if (installationId.toLowerCase() === "a") {
-        void appendFile(
-          filePath,
-          `\n${baseWalletKeyEnv}=${walletKey}\n${baseEncryptionKeyEnv}=${encryptionKey}\n# Base keys for ${baseName}\n`,
-        );
-      }
     }
 
-    return this.keysCache[cacheKey];
+    return this.keysCache[baseName];
   }
 
-  /**
-   * Parses a persona descriptor like "bob-a-12" into its components:
-   * baseName, installationId, and sdkVersion.
-   *
-   * e.g. "bob-a-12" => { name: "bob", installationId: "a", sdkVersion: "12" }
-   *
-   * If any parts are missing, fall back to defaults.
-   */
-  public parsePersonaDescriptor(
-    descriptor: string,
-    defaults: {
-      installationId: string;
-      sdkVersion: string;
-    } = {
-      installationId: defaultValues.installationId,
-      sdkVersion: defaultValues.sdkVersion,
-    },
-  ): {
-    name: string;
-    installationId: string;
-    sdkVersion: string;
-  } {
-    const parts = descriptor.split("-");
-    const baseName = parts[0];
-    const installationId =
-      parts.length > 1 ? parts[1] : defaults.installationId;
-    const sdkVersion = parts.length > 2 ? parts[2] : defaults.sdkVersion;
+  public async createPersona(descriptor: string): Promise<Persona> {
+    // Check if the persona already exists in the global cache
+    if (
+      Object.values(globalWorkerCache).some((p) => p.name === descriptor) &&
+      globalWorkerCache[descriptor].client
+    ) {
+      console.log(`Reusing cached worker for ${descriptor}`);
+      return globalWorkerCache[descriptor];
+    }
 
-    return {
-      name: baseName,
-      installationId,
-      sdkVersion,
+    // Split the descriptor to get the base name and installation ID
+    const [baseName, installationId] = descriptor.split("-");
+    const folder = installationId || getNextFolderName();
+
+    console.debug(descriptor, baseName, installationId, folder);
+    const { walletKey, encryptionKey } = this.ensureKeys(descriptor);
+
+    const personaData: PersonaBase = {
+      name: descriptor,
+      folder,
+      testName: this.testName,
+      walletKey,
+      encryptionKey,
     };
+
+    const workerClient = new WorkerClient(
+      personaData,
+      this.typeofStream,
+      this.gptEnabled,
+    );
+    const worker = await workerClient.initialize();
+
+    const persona: Persona = {
+      ...personaData,
+      client: worker.client,
+      dbPath: worker.dbPath,
+      version: worker.version,
+      address: worker.client.accountAddress,
+      installationId: worker.installationId,
+      worker: workerClient,
+    };
+
+    // Add to global cache for future reuse
+    globalWorkerCache[persona.name] = persona;
+
+    // Store the new worker for potential cleanup later
+    this.activeWorkers.push(workerClient);
+
+    return persona;
   }
-
-  public async flushWorkers(): Promise<void> {
-    await Promise.all(this.activeWorkers.map((worker) => worker.terminate()));
-    this.activeWorkers = [];
-  }
-
-  /**
-   * Creates an array of Persona objects from the given descriptors.
-   * Each persona either has pre-existing keys (if the descriptor is "alice", etc.)
-   * or random keys (if descriptor includes "random").
-   * Then spins up a WorkerClient for each persona, initializes it,
-   * and returns the complete Persona array.
-   */
-  public async createPersonas(descriptors: string[]): Promise<Persona[]> {
-    await this.flushWorkers();
-
-    const personas: Persona[] = [];
-    const newDescriptors: string[] = [];
-    const newPersonas: Persona[] = [];
-
-    // First, check which personas already exist in the global cache
-    for (const desc of descriptors) {
-      if (globalWorkerCache[desc] && globalWorkerCache[desc].client) {
-        console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
-        personas.push(globalWorkerCache[desc]);
-        continue;
-      } else {
-        // Add all other descriptors to the list of new ones to create
-        newDescriptors.push(desc);
-      }
-    }
-
-    // Only create new personas for descriptors not in the cache
-    if (newDescriptors.length > 0) {
-      for (const desc of newDescriptors) {
-        let personaData: PersonaBase;
-        const { name, installationId, sdkVersion } =
-          this.parsePersonaDescriptor(desc);
-
-        if (desc.includes("random")) {
-          // Generate ephemeral keys
-          const { walletKey, encryptionKey } = this.ensureKeys(
-            name,
-            installationId,
-          );
-
-          personaData = {
-            name: desc,
-            testName: this.testName,
-            installationId,
-            sdkVersion,
-            walletKey,
-            encryptionKey,
-          };
-        } else {
-          // Use or generate keys from environment
-          const { walletKey, encryptionKey } = this.ensureKeys(
-            name,
-            installationId,
-          );
-
-          personaData = {
-            name: desc, // Use full descriptor as name to preserve the full descriptor
-            testName: this.testName,
-            installationId,
-            sdkVersion,
-            walletKey,
-            encryptionKey,
-          };
-        }
-
-        newPersonas.push({
-          ...personaData,
-          worker: null,
-          client: null,
-          dbPath: "",
-          address: "",
-          version: "",
-        });
-      }
-
-      // Spin up Workers in parallel only for new personas
-      const messageWorkers = await Promise.all(
-        newPersonas.map(
-          (p) => new WorkerClient(p, this.typeofStream, this.gptEnabled),
-        ),
-      );
-
-      // Initialize each worker's XMTP client in parallel
-      const workers = await Promise.all([
-        ...messageWorkers.map((w) => w.initialize()),
-      ]);
-
-      newPersonas.forEach((p, index) => {
-        p.client = workers[index].client;
-        p.dbPath = workers[index].dbPath;
-        p.version = workers[index].version;
-        p.worker = messageWorkers[index];
-
-        // Add to global cache for future reuse
-        globalWorkerCache[p.name] = p;
-      });
-
-      // Store the new workers for potential cleanup later
-      this.activeWorkers = [...this.activeWorkers, ...messageWorkers];
-
-      // Combine existing and new personas
-      personas.push(...newPersonas);
-    }
-
-    return personas;
-  }
-
-  /**
-   * This method is now moved directly to the WorkerClient class
-   * See WorkerClient.createInstallation() below
-   */
 }
 
 /**
  * Helper function to create a keyed record of Persona objects from descriptors.
  * This is useful if you want something like:
- *   { "alice-a": Persona, "bob-b": Persona }
+ *   { alice: Persona, bob: Persona }
  *
- * @param descriptors e.g. ["alice-a", "bob-b", "random1-a"]
+ * @param descriptors e.g. ["aliceA12", "bob", "random1"]
  * @param testName    Not currently used, but can be used for labeling or logging
  */
 export async function getWorkers(
@@ -354,30 +174,64 @@ export async function getWorkers(
   testName: string,
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
-): Promise<Record<string, Persona>> {
+): Promise<NestedPersonas> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
-    // When a number is provided, create default personas with installation "b"
     const workerNames = defaultValues.defaultNames;
-    descriptors = workerNames
-      .slice(0, descriptorsOrAmount)
-      .map((name) => `${name}-b`); // Append default installation ID "b"
+    const orderedNames = workerNames.slice(0, descriptorsOrAmount);
+    descriptors = orderedNames;
   } else {
     descriptors = descriptorsOrAmount;
   }
 
   const personaFactory = new PersonaFactory(testName, typeofStream, gptEnabled);
 
-  const personas = await personaFactory.createPersonas(descriptors);
+  // Process descriptors in parallel
+  const personaPromises = descriptors.map((descriptor) => {
+    // Split the descriptor to get the base name and installation ID
+    const [baseName, installationId] = descriptor.split("-");
+    const finalDescriptor = installationId
+      ? descriptor
+      : `${baseName}-${getNextFolderName()}`;
 
-  return personas.reduce<Record<string, Persona>>((acc, p) => {
-    // Use the full descriptor as the key in the returned object
-    acc[p.name] = p;
+    console.debug(finalDescriptor);
+    return personaFactory.createPersona(finalDescriptor);
+  });
+
+  const personasArray = await Promise.all(personaPromises);
+
+  // Convert the array of personas to a nested record
+  const personas = personasArray.reduce<
+    Record<string, Record<string, Persona>>
+  >((acc, persona) => {
+    const [baseName, installationId] = persona.name.split("-");
+
+    // Initialize the baseName object if it doesn't exist
+    if (!acc[baseName]) {
+      acc[baseName] = {};
+    }
+
+    acc[baseName][installationId || "a"] = persona; // Use 'a' as default if no installationId
     return acc;
   }, {});
+
+  return new NestedPersonas(personas);
 }
 
-// We'll remove this function and implement it directly in the WorkerClient
+// Helper function to get the next available folder name
+function getNextFolderName(): string {
+  const dataPath = path.resolve(process.cwd(), ".data");
+  let folder = "a";
+  if (fs.existsSync(dataPath)) {
+    const existingFolders = fs
+      .readdirSync(dataPath)
+      .filter((f) => /^[a-z]$/.test(f));
+    folder = String.fromCharCode(
+      "a".charCodeAt(0) + (existingFolders.length % 26),
+    );
+  }
+  return folder;
+}
 
 // Function to clear the global worker cache if needed
 export async function clearWorkerCache(): Promise<void> {
@@ -393,7 +247,18 @@ export async function clearWorkerCache(): Promise<void> {
     }
   }
 
+  // Clear the cache by setting all entries to undefined
+  for (const key in globalWorkerCache) {
+    try {
+      // @ts-expect-error: We're intentionally clearing the cache
+      globalWorkerCache[key] = undefined;
+    } catch (error) {
+      console.warn(`Error clearing cache for ${key}:`, error);
+    }
+  }
+
   // Create a new empty object with the same reference
+  // This is a workaround to avoid using delete on dynamically computed property keys
   const keys = Object.keys(globalWorkerCache);
   keys.forEach((key) => {
     // @ts-expect-error: We're intentionally clearing the cache

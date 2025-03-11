@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
-import { type Group, type Persona } from "@helpers/types";
+import { type Group, type NestedPersonas } from "@helpers/types";
 import { calculateMessageStats } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -16,7 +16,7 @@ const timeoutMax = 60000; // 1 minute timeout
 describe(
   testName,
   () => {
-    let personas: Record<string, Persona>;
+    let personas: NestedPersonas;
     let group: Group;
     let hasFailures = false;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
@@ -26,13 +26,16 @@ describe(
         // Create personas for testing
         personas = await getWorkers(participantCount, testName);
         // Create a group conversation
-        group = await personas.bob.client!.conversations.newGroupByInboxIds(
-          Object.values(personas).map((p) => p.client?.inboxId as string),
-        );
+        group = await personas
+          .get("bob")!
+          .client!.conversations.newGroupByInboxIds(
+            personas.getPersonas().map((p) => p.client?.inboxId as string),
+          );
 
         console.log("Group created", group.id);
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
@@ -41,13 +44,14 @@ describe(
         await closeEnv(testName, personas);
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one persona to take offline
-        const offlinePersona = Object.values(personas)[1]; // Second persona
-        const onlinePersona = Object.values(personas)[0]; // First persona
+        const offlinePersona = personas.get("bob")!; // Second persona
+        const onlinePersona = personas.get("alice")!; // First persona
 
         console.log(`Taking ${offlinePersona.name} offline`);
 
@@ -125,6 +129,7 @@ describe(
         );
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
   },

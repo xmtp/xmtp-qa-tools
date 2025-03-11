@@ -1,7 +1,10 @@
-import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { listInstallations } from "@helpers/tests";
-import { type Conversation, type Persona } from "@helpers/types";
+import {
+  type Conversation,
+  type NestedPersonas,
+  type Persona,
+} from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -10,15 +13,15 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation | null;
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
   let sender: Persona;
   let receiver: Persona;
 
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
     personas = await getWorkers(["henry", "ivy", "bob"], testName);
-    sender = personas.henry;
-    receiver = personas.bob;
+    sender = personas.get("henry")!;
+    receiver = personas.get("bob")!;
   });
 
   afterAll(async () => {
@@ -29,8 +32,8 @@ describe(testName, () => {
   });
 
   it("new dm with bug", async () => {
-    convo = await personas.henry.client!.conversations.newDm(
-      personas.bob.client!.accountAddress,
+    convo = await sender.client!.conversations.newDm(
+      receiver.client!.accountAddress,
     );
     expect(convo.id).toBeDefined();
     await convo.send("hello");
