@@ -2,12 +2,11 @@ import { sendPerformanceMetric } from "./datadog";
 import type { Persona } from "./types";
 
 export const logError = (e: any, expect: any): boolean => {
-  console.error(
-    `[vitest] Test failed in ${expect.getState().currentTestName}`,
-    e,
-  );
   if (e instanceof Error) {
-    console.error(`Error details: ${e.message}`);
+    console.error(
+      `[vitest] Test failed in ${expect.getState().currentTestName}`,
+      e,
+    );
   } else {
     console.error(`Unknown error type:`, typeof e);
   }
