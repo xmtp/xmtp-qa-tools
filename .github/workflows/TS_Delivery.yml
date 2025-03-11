@@ -70,4 +70,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: delivery-logs
-          path: logs/
+          path: logs/ts-delivery.log
