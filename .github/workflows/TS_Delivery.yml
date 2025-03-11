@@ -54,9 +54,10 @@ jobs:
           max_attempts: 3
           command: |
             echo "Running TS_Delivery test:"
-            yarn test TS_Delivery | tee logs/ts-delivery.log
+            # Redirect all output to log file without displaying in terminal
+            yarn test TS_Delivery > logs/ts-delivery.log 2>&1
             # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
+            TEST_EXIT_CODE=$?
             if [ $TEST_EXIT_CODE -ne 0 ]; then
               echo "Test failed with exit code $TEST_EXIT_CODE"
               exit 1
@@ -67,6 +68,8 @@ jobs:
               echo "Test passed but with unhandled errors. Treating as failure."
               exit 1
             fi
+
+            echo "Test completed successfully"
           retry_on: error
       - name: Upload log files
         uses: actions/upload-artifact@v4
