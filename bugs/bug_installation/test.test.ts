@@ -18,7 +18,7 @@ describe(testName, () => {
   });
 
   it("inboxState", async () => {
-    for (const persona of Object.values(personas)) {
+    for (const persona of personas.getPersonas()) {
       const inboxState = await persona.client!.inboxState();
       console.log("Installations", inboxState.installations.length);
     }

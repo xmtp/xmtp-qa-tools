@@ -25,8 +25,8 @@ export const exportTestResults = (
   const testName = expect.getState().currentTestName;
   if (testName) {
     console.timeEnd(testName as string);
-    expect(Object.values(personas)).toBeDefined();
-    expect(Object.values(personas).length).toBeGreaterThan(0);
+    expect(personas.getPersonas()).toBeDefined();
+    expect(personas.getPersonas().length).toBeGreaterThan(0);
     void sendPerformanceMetric(
       performance.now() - start,
       testName as string,

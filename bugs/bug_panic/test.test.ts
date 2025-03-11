@@ -8,7 +8,7 @@ loadEnv(testName);
 describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
     const personas = await getWorkers(50, testName);
-    const workerArray = Object.values(personas);
+    const workerArray = personas.getPersonas();
     const groupByInboxIds = await personas
       .get("bob")!
       .client!.conversations.newGroupByInboxIds(

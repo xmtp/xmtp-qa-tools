@@ -1,11 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
-import {
-  type Conversation,
-  type NestedPersonas,
-  type Persona,
-} from "@helpers/types";
+import { type Conversation, type NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testGmBot } from "../playwright/gm-bot.playwright";

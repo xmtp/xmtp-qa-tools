@@ -6,7 +6,6 @@ import {
   type Conversation,
   type Group,
   type NestedPersonas,
-  type Persona,
 } from "@helpers/types";
 import { verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";

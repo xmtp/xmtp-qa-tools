@@ -6,7 +6,6 @@ import {
   defaultValues,
   NestedPersonas,
   type Client,
-  type NestedPersonasStructure,
   type Persona,
   type PersonaBase,
   type typeofStream,
@@ -111,10 +110,7 @@ export class PersonaFactory {
 
   public async createPersona(descriptor: string): Promise<Persona> {
     // Check if the persona already exists in the global cache
-    if (
-      Object.values(globalWorkerCache).some((p) => p.name === descriptor) &&
-      globalWorkerCache[descriptor].client
-    ) {
+    if (globalWorkerCache[descriptor] && globalWorkerCache[descriptor].client) {
       console.log(`Reusing cached worker for ${descriptor}`);
       return globalWorkerCache[descriptor];
     }

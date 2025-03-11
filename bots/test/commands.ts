@@ -194,7 +194,7 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!Object.keys(this.personas).includes(personaName)) {
+      if (!this.personas.get(personaName)) {
         await groupToAddTo.send(`Persona "${personaName}" not found`);
         return;
       }
@@ -253,7 +253,7 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!Object.keys(this.personas).includes(personaName)) {
+      if (!this.personas.get(personaName)) {
         await groupToRemoveFrom.send(
           `Persona "${personaName}" not found. Check /workers to see all available personas`,
         );
@@ -429,10 +429,9 @@ export class CommandHandler {
 
     await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
     for (let i = 0; i < repeatCount; i++) {
-      for (const persona of Object.values(this.personas).slice(
-        0,
-        countOfPersonas,
-      )) {
+      for (const persona of this.personas
+        .getPersonas()
+        .slice(0, countOfPersonas)) {
         const personaGroup = await persona.client?.conversations.newDmByInboxId(
           message.senderInboxId,
         );
