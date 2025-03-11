@@ -170,6 +170,7 @@ export async function getWorkers(
   testName: string,
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
+  existingPersonas?: NestedPersonas,
 ): Promise<NestedPersonas> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
@@ -184,7 +185,6 @@ export async function getWorkers(
 
   // Process descriptors in parallel
   const personaPromises = descriptors.map((descriptor) => {
-    // Split the descriptor to get the base name and installation ID
     const [baseName, installationId] = descriptor.split("-");
     const finalDescriptor = installationId
       ? descriptor
@@ -196,18 +196,26 @@ export async function getWorkers(
 
   const personasArray = await Promise.all(personaPromises);
 
+  // If existing personas are provided, add new workers to it
+  if (existingPersonas) {
+    personasArray.forEach((persona) => {
+      const [baseName, installationId] = persona.name.split("-");
+      existingPersonas.addWorker(baseName, installationId || "a", persona);
+    });
+    return existingPersonas;
+  }
+
   // Convert the array of personas to a nested record
   const personas = personasArray.reduce<
     Record<string, Record<string, Persona>>
   >((acc, persona) => {
     const [baseName, installationId] = persona.name.split("-");
 
-    // Initialize the baseName object if it doesn't exist
     if (!acc[baseName]) {
       acc[baseName] = {};
     }
 
-    acc[baseName][installationId || "a"] = persona; // Use 'a' as default if no installationId
+    acc[baseName][installationId || "a"] = persona;
     return acc;
   }, {});
 

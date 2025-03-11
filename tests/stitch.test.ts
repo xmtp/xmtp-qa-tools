@@ -12,15 +12,15 @@ const testName = "stitch";
 loadEnv(testName);
 
 describe(testName, () => {
-  let convo: Conversation | null;
+  let convo: Conversation;
   let personas: NestedPersonas;
   let sender: Persona;
   let receiver: Persona;
 
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
-    personas = await getWorkers(["henry", "ivy", "bob"], testName);
-    sender = personas.get("henry")!;
+    personas = await getWorkers(["ivy", "bob"], testName);
+    sender = personas.get("ivy")!;
     receiver = personas.get("bob")!;
   });
 
@@ -32,8 +32,8 @@ describe(testName, () => {
   });
 
   it("new dm with bug", async () => {
-    convo = await sender.client!.conversations.newDm(
-      receiver.client!.accountAddress,
+    convo = await sender.client!.conversations.newDmByInboxId(
+      receiver.client!.inboxId,
     );
     expect(convo.id).toBeDefined();
     await convo.send("hello");
@@ -44,54 +44,86 @@ describe(testName, () => {
     await listInstallations(personas);
   });
   it("should count conversations", async () => {
-    await receiver.client?.conversations.sync();
-    const listUniqueConversations =
-      await receiver.client?.conversations.listDms({
-        includeDuplicateDms: false,
-      });
-    const listDuplicateConversations =
-      await receiver.client?.conversations.listDms({
-        includeDuplicateDms: true,
-      });
-    console.log("listUniqueConversations", listUniqueConversations?.length);
-    console.log(
-      "listDuplicateConversations",
-      listDuplicateConversations?.length,
-    );
-  });
-
-  it("inboxState", async () => {
-    await listInstallations(personas);
+    await compareDms(sender, receiver);
   });
 
   it("should handle different conversation IDs and require manual sync", async () => {
-    await sender.worker?.clearDB(); // Hypothetical method to clear local data
-    await sender.worker?.initialize();
+    personas = await getWorkers(
+      ["ivy-b", "bob-b"],
+      testName,
+      "message",
+      true,
+      personas,
+    );
     await listInstallations(personas);
   });
-  // it("should handle different conversation IDs and require manual sync", async () => {
-  //   // Initiate a new DM with a specific conversation ID
-  //   const convo1 = await sender.client!.conversations.newDm(
-  //     receiver.client!.accountAddress,
-  //   );
-  //   expect(convo1.id).toBeDefined();
-  //   await convo1.send("Hi there!");
 
-  //   // Simulate receiver listening on a different channel
-  //   const convo2 = await receiver.client!.conversations.newDm(
-  //     sender.client!.accountAddress,
-  //   );
-  //   expect(convo2.id).toBeDefined();
+  it("should count conversations", async () => {
+    await compareDms(sender, receiver);
+  });
 
-  //   // Verify that the message is not received until sync
-  //   await receiver.client?.conversations.sync();
-  //   const listConversations = receiver.client?.conversations.listDms({
-  //     includeDuplicateDms: true,
-  //   });
-  //   console.log(
-  //     "Conversations for receiver after sync:",
-  //     listConversations?.length,
-  //   );
-  //   expect(listConversations?.length).toBeGreaterThanOrEqual(1);
-  // });
+  it("should handle different conversation IDs and require manual sync", async () => {
+    // Initiate a new DM with a specific conversation ID
+    const newSender = personas.get("ivy", "b")!;
+    const newReceiver = personas.get("bob", "b")!;
+    const convo1 = await newSender.client!.conversations.newDm(
+      newReceiver.client!.accountAddress,
+    );
+    expect(convo1.id).toBeDefined();
+    await convo1.send("Hi there!");
+
+    // Simulate receiver listening on a different channel
+    const convo2 = await sender.client!.conversations.newDmByInboxId(
+      newReceiver.client!.inboxId,
+    );
+    expect(convo2.id).toBeDefined();
+
+    const convo3 = await newReceiver.client!.conversations.newDmByInboxId(
+      newSender.client!.inboxId,
+    );
+    expect(convo3.id).toBeDefined();
+    await convo3.send("Hi there!");
+  });
+  it("should count conversations", async () => {
+    await compareDms(sender, receiver);
+  });
 });
+
+async function compareDms(sender: Persona, receiver: Persona) {
+  await receiver.client?.conversations.sync();
+  const allUnique = (await receiver.client?.conversations.listDms()) ?? [];
+  const allWithDuplicates =
+    (await receiver.client?.conversations.listDms({
+      includeDuplicateDms: true,
+    })) ?? [];
+
+  // Save filtered results
+  const senderUnique = allUnique.filter((conversation) => {
+    return sender.client?.inboxId === conversation.peerInboxId;
+  });
+
+  const senderWithDuplicates = allWithDuplicates.filter((conversation) => {
+    return sender.client?.inboxId === conversation.peerInboxId;
+  });
+
+  // Log details of all conversations
+  console.log(
+    "All unique conversations:",
+    allUnique.map((c) => ({
+      id: c.id,
+      peerInboxId: c.peerInboxId,
+    })),
+  );
+
+  console.log(
+    "Filtered unique conversations:",
+    senderUnique.map((c) => ({
+      id: c.id,
+      peerInboxId: c.peerInboxId,
+    })),
+  );
+
+  expect(senderUnique.length).toBe(1);
+  console.log("listUniqueConversations", senderUnique.length);
+  console.log("listDuplicateConversations", senderWithDuplicates.length);
+}

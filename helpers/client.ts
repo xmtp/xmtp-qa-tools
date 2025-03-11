@@ -135,8 +135,10 @@ export async function closeEnv(testName: string, personas: NestedPersonas) {
   flushLogger(testName);
 
   await flushMetrics();
-  for (const persona of personas.getPersonas()) {
-    await persona.worker?.terminate();
+  if (personas) {
+    for (const persona of personas.getPersonas()) {
+      await persona.worker?.terminate();
+    }
   }
 
   await clearWorkerCache();

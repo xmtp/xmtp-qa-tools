@@ -1,5 +1,5 @@
 import { sendPerformanceMetric } from "./datadog";
-import { type NestedPersonas, type Persona } from "./types";
+import { type NestedPersonas } from "./types";
 
 export const logError = (e: any, expect: any): boolean => {
   if (e instanceof Error) {
@@ -40,9 +40,9 @@ export async function listInstallations(personas: NestedPersonas) {
     if (inboxState) {
       console.log(
         persona.name,
-        " has ",
+        "has",
         inboxState.installations.length,
-        " installations",
+        "installations",
       );
       //for (const installation of inboxState.installations) {
       // console.debug(
