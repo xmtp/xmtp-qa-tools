@@ -1,5 +1,5 @@
-name: TS_Geolocation
-description: "should verify geolocation of the library in the dev network"
+name: TS Delivery
+description: "should verify delivery of the library in the dev network"
 
 on:
   schedule:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  geolocation:
+  delivery:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
