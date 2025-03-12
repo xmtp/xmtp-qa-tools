@@ -45,7 +45,7 @@ describe(testName, () => {
       // Create conversation with the bot
       convo = await personas
         .get("bob")!
-        .client!.conversations.newDmByIdentifier({
+        .client.conversations.newDmByIdentifier({
           identifier: gmBotAddress,
           identifierKind: IdentifierKind.Ethereum,
         });

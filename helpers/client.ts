@@ -101,7 +101,7 @@ export const getDbPath = (
 
   if (!fs.existsSync(basePath)) {
     fs.mkdirSync(basePath, { recursive: true });
-    console.debug("Creating directory", basePath);
+    //console.debug("Creating directory", basePath);
   }
   console.timeEnd(`[${name}] - getDbPath`);
 
@@ -159,7 +159,7 @@ export async function closeEnv(testName: string, personas: NestedPersonas) {
   await flushMetrics();
   if (personas && typeof personas.getPersonas === "function") {
     for (const persona of personas.getPersonas()) {
-      await persona.worker?.terminate();
+      await persona.worker.terminate();
     }
   }
 

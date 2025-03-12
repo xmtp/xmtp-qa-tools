@@ -49,12 +49,12 @@ describe(
         personas = await getWorkers(receiverAmount, testName);
         await new Promise((resolve) => setTimeout(resolve, 3000));
         console.log("creating group");
-        group = await personas.get("bob")!.client!.conversations.newGroup([]);
+        group = await personas.get("bob")!.client.conversations.newGroup([]);
 
         console.log("Group created", group.id);
         for (const persona of personas.getPersonas()) {
-          await group.addMembers([persona.client!.inboxId]);
-          console.log("Added member", persona.client!.inboxId);
+          await group.addMembers([persona.client.inboxId]);
+          console.log("Added member", persona.client.inboxId);
         }
         expect(personas).toBeDefined();
         expect(personas.getPersonas().length).toBe(receiverAmount);
@@ -141,7 +141,7 @@ describe(
 
         for (const persona of personasFromGroup) {
           const conversation =
-            await persona.client!.conversations.getConversationById(group.id);
+            await persona.client.conversations.getConversationById(group.id);
           if (!conversation) {
             throw new Error("Conversation not found");
           }
@@ -200,11 +200,11 @@ describe(
         console.log(`Taking ${offlinePersona.name} offline`);
 
         // Disconnect the selected persona
-        await offlinePersona.worker!.terminate();
+        await offlinePersona.worker.terminate();
 
         // Send messages from an online persona
         const conversation =
-          await onlinePersona.client!.conversations.getConversationById(
+          await onlinePersona.client.conversations.getConversationById(
             group.id,
           );
 
@@ -219,7 +219,7 @@ describe(
 
         // Reconnect the offline persona
         console.log(`Reconnecting ${offlinePersona.name}`);
-        const { client } = await offlinePersona.worker!.initialize();
+        const { client } = await offlinePersona.worker.initialize();
         offlinePersona.client = client;
         await offlinePersona.client.conversations.sync();
 

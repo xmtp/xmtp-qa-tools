@@ -117,9 +117,7 @@ export class CommandHandler {
     // Get random personas
     const randomPersonas = this.getRandomPersonas(count);
 
-    const personaInboxIds = randomPersonas.map(
-      (p) => p.client?.inboxId as string,
-    );
+    const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
 
     // Create the group name
     const groupName = `group-${Math.random().toString(36).substring(2, 15)}`;
@@ -128,7 +126,7 @@ export class CommandHandler {
     const memberInboxIds = [
       ...personaInboxIds,
       message.senderInboxId,
-      client.inboxId, // Add the bot itself
+      client.inboxId,
     ];
     console.log(memberInboxIds);
     // Create the group

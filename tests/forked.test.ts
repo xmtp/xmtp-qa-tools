@@ -33,9 +33,9 @@ describe(testName, () => {
     // Create initial group with a few members
     group = await personas
       .get("bella")!
-      .client!.conversations.newGroup([
-        personas.get("dave")!.client!.inboxId,
-        personas.get("elon")!.client!.inboxId,
+      .client.conversations.newGroup([
+        personas.get("dave")!.client.inboxId,
+        personas.get("elon")!.client.inboxId,
       ]);
     console.log("Group created", group.id);
     expect(group).toBeDefined();
@@ -52,12 +52,12 @@ describe(testName, () => {
     // Adding members should trigger an epoch transition in MLS
     console.log("Adding members to trigger epoch transition");
     console.log(
-      personas.get("diana")!.client!.inboxId,
-      personas.get("random")!.client!.inboxId,
+      personas.get("diana")!.client.inboxId,
+      personas.get("random")!.client.inboxId,
     );
     await (group as Group).addMembers([
-      personas.get("diana")!.client!.inboxId,
-      personas.get("random")!.client!.inboxId,
+      personas.get("diana")!.client.inboxId,
+      personas.get("random")!.client.inboxId,
     ]);
     // Verify all members including new ones can receive messages
     const result = await verifyStreamAll(group, personas);
@@ -84,9 +84,9 @@ describe(testName, () => {
     expect(randomGroup.id).toBe(group.id);
   });
   it("should execute concurrent operations", async () => {
-    await bellaGroup.addMembers([personas.get("alice")!.client!.inboxId]);
+    await bellaGroup.addMembers([personas.get("alice")!.client.inboxId]);
 
-    await bellaGroup.removeMembers([personas.get("elon")!.client!.inboxId]);
+    await bellaGroup.removeMembers([personas.get("elon")!.client.inboxId]);
 
     await bellaGroup.updateName("Updated in potential fork");
   });
@@ -145,7 +145,7 @@ describe(testName, () => {
     // First, remove Diana from the group
     console.log("Removing Diana from the group");
     await (group as Group).removeMembers([
-      personas.get("diana")!.client!.inboxId,
+      personas.get("diana")!.client.inboxId,
     ]);
 
     // Send a message after removal

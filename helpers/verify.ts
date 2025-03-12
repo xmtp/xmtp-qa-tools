@@ -321,12 +321,12 @@ export function calculateMessageStats(
       });
     }
   };
-  const showComparativeTable = (messagesByPersona: string[][]) => {
-    console.log("Comparative Table:");
-    messagesByPersona.forEach((messages, index) => {
-      console.log(`Persona ${index + 1}: ${messages.join(", ")}`);
-    });
-  };
+  // const showComparativeTable = (messagesByPersona: string[][]) => {
+  //   console.log("Comparative Table:");
+  //   messagesByPersona.forEach((messages, index) => {
+  //     console.log(`Persona ${index + 1}: ${messages.join(", ")}`);
+  //   });
+  // };
   // Check message reception
   let totalExpectedMessages = 0;
   let totalReceivedMessages = 0;

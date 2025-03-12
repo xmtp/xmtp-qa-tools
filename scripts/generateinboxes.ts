@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import {
   createSigner,
-  createUser,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";

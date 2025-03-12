@@ -98,12 +98,12 @@ export function sendTestResults(
     // Send metric to Datadog using metrics.gauge
     const metricValue = status === "success" ? 1 : 0;
     const metricName = `xmtp.sdk.workflow.status`;
-    console.debug({
-      metricName,
-      metricValue,
-      status,
-      workflow: testName,
-    });
+    // console.debug({
+    //   metricName,
+    //   metricValue,
+    //   status,
+    //   workflow: testName,
+    // });
     metrics.gauge(metricName, metricValue, [
       `status:${status}`,
       `workflow:${testName}`,

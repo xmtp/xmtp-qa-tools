@@ -130,14 +130,7 @@ export class WorkerClient extends Worker {
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
-    const params = {
-      name: this.name,
-      address: this.address,
-      testName: this.testName,
-      folder: this.folder,
-      version,
-    };
-    console.debug(params);
+
     const dbPath = getDbPath(
       this.name,
       this.address,

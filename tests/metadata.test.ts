@@ -29,7 +29,7 @@ describe(testName, () => {
     console.time("create group");
     group = await personas
       .get("henry")!
-      .client!.conversations.newGroup([
+      .client.conversations.newGroup([
         personas.get("nancy")?.client?.inboxId ?? "",
         personas.get("oscar")?.client?.inboxId ?? "",
         personas.get("jack")?.client?.inboxId ?? "",
@@ -56,7 +56,7 @@ describe(testName, () => {
 
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
-    await group.addMembers([personas.get("randomguy")!.client!.inboxId]);
+    await group.addMembers([personas.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     console.timeEnd("add members");
     expect(members.length).toBe(5);
@@ -64,7 +64,7 @@ describe(testName, () => {
 
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
     console.time("remove members");
-    await group.removeMembers([personas.get("randomguy")!.client!.inboxId]);
+    await group.removeMembers([personas.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     console.timeEnd("remove members");
     expect(members.length).toBe(4);

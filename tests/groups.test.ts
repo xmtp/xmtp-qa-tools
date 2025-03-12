@@ -85,7 +85,7 @@ describe(testName, () => {
         const sliced = generatedInboxes.slice(0, i);
         newGroup = await personas
           .get("henry")!
-          .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);
