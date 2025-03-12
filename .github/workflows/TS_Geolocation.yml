@@ -36,7 +36,7 @@ jobs:
         run: mkdir -p logs
 
       - name: Make geolocation test script executable
-        run: chmod +x ./scripts/run-geolocation-test.sh
+        run: chmod +x ./scripts/run-test.sh
 
       # US West Region Test
       - name: Run performance test on US West
