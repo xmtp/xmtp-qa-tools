@@ -2,7 +2,12 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { exportTestResults, logError } from "@helpers/tests";
-import type { Conversation, Group, NestedPersonas } from "@helpers/types";
+import {
+  IdentifierKind,
+  type Conversation,
+  type Group,
+  type NestedPersonas,
+} from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import {
@@ -138,6 +143,23 @@ describe(testName, () => {
           .get("henry")!
           .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
+      try {
+        const sliced = generatedInboxes.slice(0, i);
+        const newGroupByIdentifier = await personas
+          .get("henry")!
+          .client!.conversations.newGroupByIdentifiers(
+            sliced.map((inbox) => ({
+              identifier: inbox.accountAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+          );
+        expect(newGroupByIdentifier.id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
