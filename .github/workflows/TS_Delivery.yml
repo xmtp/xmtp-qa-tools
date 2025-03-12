@@ -42,8 +42,8 @@ jobs:
           retry_on: error
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-          DELIVERY_AMOUNT: 10
-          DELIVERY_RECEIVERS: 25
+          CLI_DELIVERY_AMOUNT: 10
+          CLI_DELIVERY_RECEIVERS: 25
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
