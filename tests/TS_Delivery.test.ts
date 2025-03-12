@@ -47,11 +47,11 @@ describe(
         //fs.rmSync(".data", { recursive: true, force: true });
         // Use getWorkers to spin up many personas. This is resource-intensive.
         personas = await getWorkers(receiverAmount, testName);
+        await new Promise((resolve) => setTimeout(resolve, 3000));
         console.log("creating group");
         group = await personas.get("bob")!.client!.conversations.newGroup([]);
 
         console.log("Group created", group.id);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
         for (const persona of personas.getPersonas()) {
           await group.addMembers([persona.client!.inboxId]);
           console.log("Added member", persona.client!.inboxId);

@@ -51,6 +51,10 @@ jobs:
             # Test passed, ignore unhandled errors
             echo "Test completed successfully"
           retry_on: error
+          retry_wait_seconds: 10
+          polling_interval_seconds: 1
+          warning_on_retry: true
+          continue_on_error: false
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
