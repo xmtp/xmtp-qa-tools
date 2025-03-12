@@ -1,0 +1,35 @@
+[2025-03-12T00:01:09.677Z] [info] envPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_multiple_ops/.env
+[2025-03-12T00:01:09.680Z] [info] Generating new keys for bella
+[2025-03-12T00:01:09.710Z] [info] Generating new keys for dave
+[2025-03-12T00:01:09.713Z] [info] Generating new keys for elon
+[2025-03-12T00:01:09.717Z] [info] Generating new keys for diana
+[2025-03-12T00:01:09.718Z] [info] Generating new keys for alice
+[2025-03-12T00:01:09.720Z] [info] Generating new keys for bob
+[2025-03-12T00:01:13.499Z] [warn] [dave-a] Create XMTP client v:6bd613d 3.776s
+[2025-03-12T00:01:13.704Z] [warn] [diana-a] Create XMTP client v:6bd613d 3.981s
+[2025-03-12T00:01:13.708Z] [warn] [bella-a] Create XMTP client v:6bd613d 3.986s
+[2025-03-12T00:01:13.738Z] [warn] [elon-a] Create XMTP client v:6bd613d 4.015s
+[2025-03-12T00:01:13.825Z] [warn] [alice-a] Create XMTP client v:6bd613d 4.102s
+[2025-03-12T00:01:13.904Z] [warn] [bob-a] Create XMTP client v:6bd613d 4.181s
+[2025-03-12T00:01:13.921Z] [warn] [dave-a] Start message stream 422.436ms
+[2025-03-12T00:01:13.921Z] [warn] [dave-a] Start stream 422.789ms
+[2025-03-12T00:01:14.102Z] [warn] [elon-a] Start message stream 363.636ms
+[2025-03-12T00:01:14.102Z] [warn] [elon-a] Start stream 364.052ms
+[2025-03-12T00:01:14.106Z] [warn] [bella-a] Start message stream 398.196ms
+[2025-03-12T00:01:14.107Z] [warn] [bella-a] Start stream 398.441ms
+[2025-03-12T00:01:14.107Z] [warn] [diana-a] Start message stream 402.997ms
+[2025-03-12T00:01:14.107Z] [warn] [diana-a] Start stream 403.055ms
+[2025-03-12T00:01:14.232Z] [warn] [alice-a] Start message stream 406.778ms
+[2025-03-12T00:01:14.232Z] [warn] [alice-a] Start stream 407.013ms
+[2025-03-12T00:01:14.272Z] [warn] [bob-a] Start message stream 367.944ms
+[2025-03-12T00:01:14.272Z] [warn] [bob-a] Start stream 368.142ms
+[2025-03-12T00:01:17.453Z] [info] [dave-a] Collecting 1 messages from convo:6abee51bc232b467ce02d9cf7c727007
+[2025-03-12T00:01:17.453Z] [info] [elon-a] Collecting 1 messages from convo:6abee51bc232b467ce02d9cf7c727007
+[2025-03-12T00:01:17.453Z] [info] Sending message #1: gm-1-6gknmcmw64e
+[2025-03-12T00:01:18.198Z] [info] All participants received the expected number of messages.
+[2025-03-12T00:01:18.198Z] [info] Adding members to trigger epoch transition
+[2025-03-12T00:01:20.690Z] [info] [dave-a] Collecting 1 messages from convo:6abee51bc232b467ce02d9cf7c727007
+[2025-03-12T00:01:20.690Z] [info] [elon-a] Collecting 1 messages from convo:6abee51bc232b467ce02d9cf7c727007
+[2025-03-12T00:01:20.690Z] [info] [diana-a] Collecting 1 messages from convo:6abee51bc232b467ce02d9cf7c727007
+[2025-03-12T00:01:20.690Z] [info] Sending message #1: gm-1-v2h40tm1xl
+[2025-03-12T00:01:21.572Z] [info] All participants received the expected number of messages.
