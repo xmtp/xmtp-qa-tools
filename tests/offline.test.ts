@@ -69,7 +69,7 @@ describe(
         );
         for (let i = 0; i < amountofMessages; i++) {
           const message = `offline-msg-${i + 1}-${randomSuffix}`;
-          await conversation!.send(message);
+          await conversation?.send(message);
           console.log(`Sent message ${message}`);
         }
 

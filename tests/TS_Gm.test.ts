@@ -1,7 +1,11 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
-import { type Conversation, type NestedPersonas } from "@helpers/types";
+import {
+  IdentifierKind,
+  type Conversation,
+  type NestedPersonas,
+} from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { testGmBot } from "../playwright/gm-bot.playwright";
@@ -41,17 +45,22 @@ describe(testName, () => {
       // Create conversation with the bot
       convo = await personas
         .get("bob")!
-        .client!.conversations.newDm(gmBotAddress);
+        .client!.conversations.newDmByIdentifier({
+          identifier: gmBotAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+      await convo.sync();
       const prevMessages = (await convo.messages()).length;
 
       // Send a simple message
       await convo.send("gm");
 
       // Wait briefly for response
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-      // Check if we got a response
-      const messagesAfter = (await convo.messages()).length;
+      const messages = await convo.messages();
+
+      const messagesAfter = messages.length;
 
       // We should have at least 2 messages (our message and bot's response)
       expect(messagesAfter).toBe(prevMessages + 2);

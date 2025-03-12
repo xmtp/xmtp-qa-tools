@@ -2,7 +2,6 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
-  createUser,
   getDbPath,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
@@ -225,20 +224,20 @@ export class WorkerClient extends Worker {
     })();
   }
 
-  clearDB() {
-    const identifier = this.client.identifier;
-    const address = identifier.identifier as `0x${string}`;
-    const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
-    const dbPath = getDbPath(
-      this.name,
-      address,
-      this.testName,
-      this.folder,
-      version,
-    );
-    console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
-    fs.rmSync(dbPath, { recursive: true, force: true });
-  }
+  // clearDB() {
+  //   const identifier = this.client.identifier;
+  //   const address = identifier.identifier as `0x${string}`;
+  //   const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+  //   const dbPath = getDbPath(
+  //     this.name,
+  //     address,
+  //     this.testName,
+  //     this.folder,
+  //     version,
+  //   );
+  //   console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
+  //   fs.rmSync(dbPath, { recursive: true, force: true });
+  // }
   async terminate() {
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent

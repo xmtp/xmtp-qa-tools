@@ -4,6 +4,7 @@ import path from "node:path";
 import {
   IdentifierKind,
   type NestedPersonas,
+  type Signer,
   type XmtpEnv,
 } from "@helpers/types";
 import {
@@ -11,7 +12,6 @@ import {
   getInboxIdForIdentifier as getInboxIdForIdentifierBinding,
   type Identifier,
 } from "@xmtp/node-bindings";
-import bindingsVersion from "@xmtp/node-bindings/version.json" with { type: "json" };
 import { ApiUrls } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
@@ -22,35 +22,11 @@ import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
 import { clearWorkerCache } from "./workers/factory";
 
-export type SignMessage = (message: string) => Promise<Uint8Array> | Uint8Array;
-export type GetIdentifier = () => Promise<Identifier> | Identifier;
-export type GetChainId = () => bigint;
-export type GetBlockNumber = () => bigint;
-
 interface User {
   key: `0x${string}`;
   account: ReturnType<typeof privateKeyToAccount>;
   wallet: ReturnType<typeof createWalletClient>;
 }
-
-export type Signer =
-  | {
-      type: "EOA";
-      signMessage: SignMessage;
-      getIdentifier: GetIdentifier;
-    }
-  | {
-      type: "SCW";
-      signMessage: SignMessage;
-      getIdentifier: GetIdentifier;
-      getBlockNumber?: GetBlockNumber;
-      getChainId: GetChainId;
-    };
-
-export type EOASigner = Extract<Signer, { type: "EOA" }>;
-export type SCWSigner = Extract<Signer, { type: "SCW" }>;
-
-export const version = `${bindingsVersion.branch}@${bindingsVersion.version} (${bindingsVersion.date})`;
 
 export const createUser = (key: `0x${string}`): User => {
   const accountKey = key;

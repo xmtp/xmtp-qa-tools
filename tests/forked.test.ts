@@ -37,7 +37,7 @@ describe(testName, () => {
         personas.get("dave")!.client!.inboxId,
         personas.get("elon")!.client!.inboxId,
       ]);
-
+    console.log("Group created", group.id);
     expect(group).toBeDefined();
     expect(group.id).toBeDefined();
 
@@ -51,6 +51,10 @@ describe(testName, () => {
   it("should force an epoch transition by adding members", async () => {
     // Adding members should trigger an epoch transition in MLS
     console.log("Adding members to trigger epoch transition");
+    console.log(
+      personas.get("diana")!.client!.inboxId,
+      personas.get("random")!.client!.inboxId,
+    );
     await (group as Group).addMembers([
       personas.get("diana")!.client!.inboxId,
       personas.get("random")!.client!.inboxId,
@@ -80,11 +84,9 @@ describe(testName, () => {
     expect(randomGroup.id).toBe(group.id);
   });
   it("should execute concurrent operations", async () => {
-    await bellaGroup.addMembers([personas.get("alice")?.client?.inboxId ?? ""]);
+    await bellaGroup.addMembers([personas.get("alice")!.client!.inboxId]);
 
-    await bellaGroup.removeMembers([
-      personas.get("elon")?.client?.inboxId ?? "",
-    ]);
+    await bellaGroup.removeMembers([personas.get("elon")!.client!.inboxId]);
 
     await bellaGroup.updateName("Updated in potential fork");
   });
