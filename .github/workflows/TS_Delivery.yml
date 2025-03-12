@@ -30,27 +30,12 @@ jobs:
         run: ls -la .data
       - run: corepack enable
       - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-delivery-test.sh
       - name: Run tests with retry
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i..."
-            # Add environment variable for Rust backtrace
-            export RUST_BACKTRACE=1
-            # Run the test with more verbose output
-            yarn test TS_Delivery --verbose
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "Tests passed successfully!"
-              break
-            fi
-            echo "Test failed with exit code $exit_code. Retrying in 30 seconds..."
-            # Increase sleep time to allow for potential network/service recovery
-            sleep 30
-            # Force garbage collection before next attempt
-            node --expose-gc -e "global.gc()"
-          done
+        run: ./scripts/run-delivery-test.sh TS_Delivery
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: delivery-logs
-          path: logs/ts-delivery.log
+          name: delivery_logs
+          path: logs/ts_delivery.log

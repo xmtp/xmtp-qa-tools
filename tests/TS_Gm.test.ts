@@ -13,10 +13,12 @@ import { testGmBot } from "../playwright/gm-bot.playwright";
 const testName = "ts_gm";
 loadEnv(testName);
 
+const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
+console.log(`[${testName}] GM Bot Address: ${gmBotAddress}`);
+
 describe(testName, () => {
   let convo: Conversation;
   let personas: NestedPersonas;
-  const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {

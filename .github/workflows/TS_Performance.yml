@@ -26,20 +26,12 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-delivery-test.sh
       - name: Run tests with retry
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i..."
-            yarn test TS_Performance
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "Tests passed successfully!"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "Test failed after 3 attempts."
-              exit 1
-            fi
-            echo "Test failed with exit code $exit_code. Retrying..."
-            sleep 10
-          done
+        run: ./scripts/run-delivery-test.sh TS_Performance
+      - name: Upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance_logs
+          path: logs/ts_performance.log

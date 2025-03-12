@@ -23,13 +23,19 @@ import {
 const testName = "ts_performance";
 loadEnv(testName);
 
+const batchSize = parseInt(
+  process.env.CLI_BATCH_SIZE ?? process.env.BATCH_SIZE ?? "5",
+);
+const total = parseInt(
+  process.env.CLI_GROUP_SIZE ?? process.env.MAX_GROUP_SIZE ?? "10",
+);
+console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
+
 describe(testName, () => {
   let dm: Conversation;
   let personas: NestedPersonas;
   let start: number;
   let hasFailures: boolean = false;
-  const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
-  const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
   beforeAll(async () => {
     try {
