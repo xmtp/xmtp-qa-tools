@@ -46,6 +46,7 @@ jobs:
             fi
             echo "Test failed with exit code $exit_code. Retrying..."
             sleep 10
+          done
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
