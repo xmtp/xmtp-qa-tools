@@ -104,7 +104,7 @@ See our CI/CD pipeline configuration in the [workflows section](/.github/workflo
 
 We use Vitest for running tests with an interactive UI for better visualization.
 
-> Check out our live deployment on [Railway](https://ephemera-test.up.railway.app/__vitest__/#/)
+> Check out our live deployment on [Railway](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
 
 ![](/media/vitest.jpeg)
 
