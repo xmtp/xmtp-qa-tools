@@ -5,7 +5,6 @@
   "type": "module",
   "scripts": {
     "bot": "tsx  bots/test/index.ts",
-    "bug:stream": "tsx bugs/bug_dead_stream/index.ts",
     "build": "tsc",
     "clean": "rimraf node_modules && yarn clean:dbs",
     "clean:dbs": "rimraf *.db3* ||:",

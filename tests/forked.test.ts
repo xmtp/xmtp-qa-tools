@@ -56,54 +56,46 @@ describe(testName, () => {
     expect(result.allReceived).toBe(true);
   });
 
-  // it("should create concurrent operations to potentially cause epoch divergence", async () => {
-  //   // Get references to the same group for different members
-  //   const bellaGroup = group;
-  //   const daveGroup = await personas
-  //     .get("dave")
-  //     ?.client?.conversations.getConversationById(group.id);
-  //   const elonGroup = await personas
-  //     .get("elon")
-  //     ?.client?.conversations.getConversationById(group.id);
+  it("should create concurrent operations to potentially cause epoch divergence", async () => {
+    const daveGroup = await personas
+      .get("dave")
+      ?.client?.conversations.getConversationById(group.id);
+    const elonGroup = await personas
+      .get("elon")
+      ?.client?.conversations.getConversationById(group.id);
 
-  //   if (!daveGroup || !elonGroup) {
-  //     throw new Error("Could not get group references for all members");
-  //   }
+    if (!daveGroup || !elonGroup) {
+      throw new Error("Could not get group references for all members");
+    }
 
-  //   // Create promises for concurrent operations from different members
-  //   // This has the potential to create epoch forks if not properly synchronized
-  //   const op1 = (bellaGroup as Group).addMembers([
-  //     personas.get("alice")?.client?.accountAddress as `0x${string}`,
-  //   ]);
+    // Create promises for concurrent operations from different members
+    // This has the potential to create epoch forks if not properly synchronized
+    const op1 = (group as Group).addMembers([
+      personas.get("alice")?.client?.accountAddress as `0x${string}`,
+    ]);
 
-  //   const op2 = (bellaGroup as Group).removeMembers([
-  //     personas.get("random")?.client?.accountAddress as `0x${string}`,
-  //   ]);
+    const op2 = (group as Group).removeMembers([
+      personas.get("random")?.client?.accountAddress as `0x${string}`,
+    ]);
 
-  //   const op3 = (elonGroup as Group).updateName("Updated in potential fork");
+    const op3 = (elonGroup as Group).updateName("Updated in potential fork");
 
-  //   // Execute all operations at roughly the same time
-  //   await Promise.all([op1, op2, op3]);
+    // Execute all operations at roughly the same time
+    await Promise.all([op1, op2, op3]);
 
-  //   // Allow some time for synchronization
-  //   await new Promise((resolve) => setTimeout(resolve, 1000));
+    // Allow some time for synchronization
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-  //   // Send messages from different clients to check if they're still in sync
-  //   await bellaGroup.send("Message from Bella after concurrent operations");
-  //   await daveGroup.send("Message from Dave after concurrent operations");
-  //   await elonGroup.send("Message from Elon after concurrent operations");
+    // Send messages from different clients to check if they're still in sync
+    await group.send("Message from Bella after concurrent operations");
+    await daveGroup.send("Message from Dave after concurrent operations");
+    await elonGroup.send("Message from Elon after concurrent operations");
 
-  //   // Verify messages can be received by all remaining members
-  //   const result = await verifyStream(group, [
-  //     personas.get("bella")!,
-  //     personas.get("dave")!,
-  //     personas.get("elon")!,
-  //     personas.get("diana")!,
-  //     personas.get("alice")!,
-  //   ]);
+    // Verify messages can be received by all remaining members
+    const result = await verifyStreamAll(group, personas);
 
-  //   expect(result.allReceived).toBe(true);
-  // });
+    expect(result.allReceived).toBe(true);
+  });
 
   // it("should verify group consistency after potential fork", async () => {
   //   // Get messages as seen by different members

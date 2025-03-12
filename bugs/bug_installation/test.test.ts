@@ -3,7 +3,7 @@ import type { NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-const testName = "bug_cointoss";
+const testName = "bug_installation";
 loadEnv(testName);
 
 describe(testName, () => {
