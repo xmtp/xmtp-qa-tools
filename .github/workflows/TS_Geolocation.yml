@@ -9,6 +9,11 @@ on:
 jobs:
   geolocation:
     runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ vars.XMTP_ENV }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -16,99 +21,42 @@ jobs:
       - name: Install Railway CLI
         run: npm install -g @railway/cli
 
-      - name: Install dependencies once
-        run: yarn install
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+
+      - run: corepack enable
+      - run: yarn install
 
       - name: Create logs directory
         run: mkdir -p logs
 
+      - name: Make geolocation test script executable
+        run: chmod +x ./scripts/run-geolocation-test.sh
+
       # US West Region Test
       - name: Run performance test on US West
         id: us-west-test
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i for US West region..."
-            railway run -s xmtp-qa-testing:us-west yarn test ts_performance
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "US West tests passed successfully!"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "US West test failed after 3 attempts."
-              exit 1
-            fi
-            echo "US West test failed with exit code $exit_code. Retrying..."
-            sleep 10
-          done
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: ./scripts/run-test.sh TS_Performance
 
       # US East Region Test
       - name: Run performance test on US East
         id: us-east-test
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i for US East region..."
-            railway run -s xmtp-qa-testing:us-east yarn test ts_performance
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "US East tests passed successfully!"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "US East test failed after 3 attempts."
-              exit 1
-            fi
-            echo "US East test failed with exit code $exit_code. Retrying..."
-            sleep 10
-          done
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: ./scripts/run-test.sh TS_Performance
 
       # Europe Region Test
       - name: Run performance test on Europe
         id: europe-test
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i for Europe region..."
-            railway run -s xmtp-qa-testing:europe yarn test ts_performance
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "Europe tests passed successfully!"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "Europe test failed after 3 attempts."
-              exit 1
-            fi
-            echo "Europe test failed with exit code $exit_code. Retrying..."
-            sleep 10
-          done
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: ./scripts/run-test.sh TS_Performance
 
       # Asia Region Test
       - name: Run performance test on Asia
         id: asia-test
-        run: |
-          for i in {1..3}; do
-            echo "Attempt $i for Asia region..."
-            railway run -s xmtp-qa-testing:asia yarn test ts_performance
-            exit_code=$?
-            if [ $exit_code -eq 0 ]; then
-              echo "Asia tests passed successfully!"
-              break
-            fi
-            if [ $i -eq 3 ]; then
-              echo "Asia test failed after 3 attempts."
-              exit 1
-            fi
-            echo "Asia test failed with exit code $exit_code. Retrying..."
-            sleep 10
-          done
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+        run: ./scripts/run-test.sh TS_Performance
 
       - name: Upload log files
         uses: actions/upload-artifact@v4

@@ -33,9 +33,9 @@ jobs:
       - run: corepack enable
       - run: yarn
       - name: Make test script executable
-        run: chmod +x ./scripts/run-delivery-test.sh
+        run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-delivery-test.sh TS_Gm
+        run: ./scripts/run-test.sh TS_Gm
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
