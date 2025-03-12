@@ -63,11 +63,11 @@ describe(testName, () => {
     expect(charlieConvs?.length).toBeGreaterThan(0);
 
     // Create a backup installation for charlie
-    const fourthPersonas = await getWorkers(["charlie-a"], testName);
+    const fourthPersonas = await getWorkers(["charlie-c"], testName);
     // Backup installation should also be able to access the conversation after syncing
     await fourthPersonas.get("charlie")?.client.conversations.syncAll();
     const backupConvs = await fourthPersonas
-      .get("charlie")
+      .get("charlie", "c")
       ?.client.conversations.list();
     expect(backupConvs?.length).toBeGreaterThan(0);
   });

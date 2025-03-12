@@ -15,7 +15,10 @@ export class NestedPersonas {
     }
     return count;
   }
-
+  getRandomCount(count: number): Persona[] {
+    const allPersonas = this.getPersonas();
+    return allPersonas.sort(() => 0.5 - Math.random()).slice(0, count);
+  }
   public getVersion(): string {
     return this.personas[Object.keys(this.personas)[0]][
       Object.keys(this.personas[Object.keys(this.personas)[0]])[0]

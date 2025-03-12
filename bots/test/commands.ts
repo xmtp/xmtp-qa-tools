@@ -55,15 +55,6 @@ export class CommandHandler {
     );
   }
 
-  // Helper to get random personas from the available list
-  getRandomPersonas(count: number) {
-    // Filter out excluded personas
-    const eligiblePersonas = this.personas.getPersonas();
-    return eligiblePersonas
-      .sort(() => 0.5 - Math.random())
-      .slice(0, Math.min(count, eligiblePersonas.length));
-  }
-
   welcomeMessages = [
     "Thanks for adding me to the group!",
     "Hello everyone!",
@@ -101,71 +92,76 @@ export class CommandHandler {
   }
   // Create a new group
   async create(message: DecodedMessage, client: Client, args: string[] = []) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
 
-    // Parse the number of  to add (default: 5)
-    const count =
-      args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 5;
+      // Parse the number of  to add (default: 5)
+      const count =
+        args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 5;
 
-    console.log(`Creating group with ${count} random personas...`);
-    await conversation?.send(
-      `hang tight, creating group with ${count} random personas...`,
-    );
+      console.log(`Creating group with ${count} random personas...`);
+      await conversation?.send(
+        `hang tight, creating group with ${count} random personas...`,
+      );
 
-    // Get random personas
-    const randomPersonas = this.getRandomPersonas(count);
+      // Get random personas
+      const randomPersonas = this.personas.getRandomCount(count);
 
-    const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
+      const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
 
-    // Create the group name
-    const groupName = `group-${Math.random().toString(36).substring(2, 15)}`;
+      // Create the group name
+      const groupName = `group-${Math.random().toString(36).substring(2, 15)}`;
 
-    // Make sure the bot and sender are included in the group
-    const memberInboxIds = [
-      ...personaInboxIds,
-      message.senderInboxId,
-      client.inboxId,
-    ];
-    console.log(memberInboxIds);
-    // Create the group
-    const group = await client.conversations.newGroup(memberInboxIds, {
-      groupName: groupName,
-      groupDescription: `Test group with ${count} random personas`,
-    });
-    await group.addSuperAdmin(message.senderInboxId);
+      // Make sure the bot and sender are included in the group
+      const memberInboxIds = [
+        ...personaInboxIds,
+        message.senderInboxId,
+        client.inboxId,
+      ];
+      // Create the group
+      const group = await client.conversations.newGroup(memberInboxIds);
 
-    console.log(
-      `Group created with name ${groupName} by ${message.senderInboxId}`,
-    );
-    await conversation?.send(
-      `Group created with name ${groupName} by ${message.senderInboxId}`,
-    );
-    // Send a message as the bot
-    await group.send(
-      `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
-    );
-    await this.populateGroup(group, randomPersonas);
+      console.log(
+        `Group created with id ${group.id} by ${message.senderInboxId}`,
+      );
+      await conversation?.send(
+        `Group created with id ${group.id} by ${message.senderInboxId}`,
+      );
+      // Send a message as the bot
+      await group.send(
+        `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
+      );
+      await this.populateGroup(group.id, randomPersonas);
+    } catch (error) {
+      console.error("Error creating group:", error);
+    }
   }
-  async populateGroup(group: Group, personas: Persona[]) {
-    for (const persona of personas) {
-      const randomMessage =
-        randomMessages[Math.floor(Math.random() * randomMessages.length)];
+  async populateGroup(groupID: string, personas: Persona[]) {
+    try {
+      console.log("Populating group:", groupID, "with", personas, "personas");
+      for (const persona of personas) {
+        const randomMessage =
+          randomMessages[Math.floor(Math.random() * randomMessages.length)];
 
-      const personaGroup =
-        await persona.client?.conversations.getConversationById(group.id);
+        const personaGroup =
+          await persona.client?.conversations.getConversationById(groupID);
 
-      await personaGroup?.send(`${persona.name}:\n${randomMessage}`);
+        await personaGroup?.send(`${persona.name}:\n${randomMessage}`);
+      }
+    } catch (error) {
+      console.error("Error populating group:", error);
     }
   }
   // Rename the current group
   async rename(message: DecodedMessage, client: Client, args: string[] = []) {
-    const group = await client.conversations.getConversationById(
+    const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
+    const group = (await conversation) as Group;
     const newName = args.join(" ").trim();
-    await (group as Group).updateName(newName);
+    await group.updateName(newName);
     await group?.send(`Bot :\n This group has been renamed to "${newName}"`);
   }
 

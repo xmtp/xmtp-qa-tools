@@ -22,10 +22,12 @@ async function main() {
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();
   for await (const message of await stream) {
+    console.log("Message received:", message);
     /* Ignore messages from the same agent or non-text messages */
     if (
       message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
-      message?.contentType?.typeId !== "text"
+      message?.contentType?.typeId !== "text" ||
+      message?.content === "gm"
     ) {
       continue;
     }

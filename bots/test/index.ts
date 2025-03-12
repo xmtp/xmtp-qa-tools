@@ -31,31 +31,36 @@ async function main() {
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();
   for await (const message of await stream) {
-    /* Ignore messages from the same agent or non-text messages */
-    if (
-      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
-      message?.contentType?.typeId !== "text"
-    ) {
-      continue;
+    try {
+      /* Ignore messages from the same agent or non-text messages */
+      if (
+        message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
+        message?.contentType?.typeId !== "text"
+      ) {
+        continue;
+      }
+
+      console.log(
+        `Received message: ${message.content as string} by ${message.senderInboxId}`,
+      );
+
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+
+      if (!conversation) {
+        console.log("Unable to find conversation, skipping");
+        continue;
+      }
+
+      // Parse the message content to extract command and arguments
+      await processCommand(message, conversation, client, commandHandler);
+
+      console.log("Waiting for messages...");
+    } catch (error) {
+      console.error("Error processing message:", error);
+      // Continue the loop despite errors
     }
-
-    console.log(
-      `Received message: ${message.content as string} by ${message.senderInboxId}`,
-    );
-
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-
-    if (!conversation) {
-      console.log("Unable to find conversation, skipping");
-      continue;
-    }
-
-    // Parse the message content to extract command and arguments
-    await processCommand(message, conversation, client, commandHandler);
-
-    console.log("Waiting for messages...");
   }
 }
 

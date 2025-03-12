@@ -62,7 +62,7 @@
       "name": "test",
       "prefix": "test",
       "available_values": ["ts_performance", "ts_delivery", "ts_gm"],
-      "default": "ts_performance"
+      "default": "*"
     }
   ],
   "layout_type": "ordered",
