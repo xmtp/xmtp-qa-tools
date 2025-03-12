@@ -1,60 +1,64 @@
-name: TS_Delivery
-description: "should verify message loss when receiving via 200 streams"
+name: TS_Geolocation
+description: "should verify geolocation of the library in the dev network"
 
 on:
   schedule:
-    - cron: "*/40 * * * *" # every 40 min
+    - cron: "*/32 * * * *" # This cron expression means every 32 minutes
   workflow_dispatch:
 
 jobs:
-  test:
+  geolocation:
     runs-on: ubuntu-latest
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-      # Add environment variable to prevent SQLCipher mlock errors
-      SQLCIPHER_NO_MLOCK: 1
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - name: Ensure data folder exists
-        run: mkdir -p .data
-      - name: List data folder contents
-        run: ls -la .data
-      - run: corepack enable
-      - run: yarn
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Install dependencies once
+        run: yarn install
+
       - name: Create logs directory
         run: mkdir -p logs
-      - name: Run tests with retry
+
+      # US East Region Test
+      - name: Run delivery test on US East
+        id: us-east-test
+        continue-on-error: true
         uses: nick-fields/retry@v2
         with:
-          timeout_minutes: 15
+          timeout_minutes: 10
           max_attempts: 3
           command: |
-            echo "Running TS_Delivery test:"
-            # Redirect all output to log file without displaying in terminal
-            yarn test TS_Delivery > logs/ts-delivery.log 2>&1
+            echo "Running delivery test on US East:"
+            railway run -s xmtp-qa-testing:us-east yarn test ts_delivery | tee logs/us-east-delivery.log
             # Check the exit code of the test command
-            TEST_EXIT_CODE=$?
+            TEST_EXIT_CODE=${PIPESTATUS[0]}
             if [ $TEST_EXIT_CODE -ne 0 ]; then
               echo "Test failed with exit code $TEST_EXIT_CODE"
               exit 1
             fi
-
-            # Test passed, ignore unhandled errors
-            echo "Test completed successfully"
           retry_on: error
+        env:
+          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+f
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
           name: delivery-logs
-          path: logs/ts-delivery.log
+          path: logs/
+
+      - name: Check for failures
+        run: |
+          echo "Region test results:"
+          echo "US East: ${{ steps.us-east-test.outcome }}"
+
+          if [[ "${{ steps.us-east-test.outcome }}" == "failure" ]]; then
+            echo "One or more region tests failed after retries"
+            echo "See logs for details"
+            exit 1  # Make the workflow fail if any region test failed
+          fi
+
+      - name: Print completion message
+        run: echo "Railway test execution completed for all regions"

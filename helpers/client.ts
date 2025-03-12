@@ -1,15 +1,11 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import {
-  IdentifierKind,
-  type NestedPersonas,
-  type Signer,
-  type XmtpEnv,
-} from "@helpers/types";
+import { type NestedPersonas, type Signer, type XmtpEnv } from "@helpers/types";
 import {
   generateInboxId as generateInboxIdBinding,
   getInboxIdForIdentifier as getInboxIdForIdentifierBinding,
+  IdentifierKind,
   type Identifier,
 } from "@xmtp/node-bindings";
 import { ApiUrls } from "@xmtp/node-sdk";
@@ -87,7 +83,6 @@ function loadDataPath(
   if (testName.includes("bug")) {
     basePath = basePath.replace("/.data/", `/bugs/${testName}/.data/`);
   }
-  console.log("basePath", basePath);
   return basePath;
 }
 export const getDbPath = (
@@ -127,7 +122,6 @@ function getEnvPath(testName: string): string {
   if (testName.includes("bug")) {
     envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
   }
-  console.log("envPath", envPath);
   if (!fs.existsSync(envPath)) {
     // Create the directory structure for the env file
     fs.mkdirSync(path.dirname(envPath), { recursive: true });

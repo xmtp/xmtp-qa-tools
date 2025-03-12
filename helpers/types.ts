@@ -1,17 +1,15 @@
 import {
+  Client,
   ConsentEntityType,
   ConsentState,
-  IdentifierKind,
-  type Consent,
-  type LogLevel,
-} from "@xmtp/node-bindings";
-import {
-  Client,
   Conversation,
   Dm,
   Group,
+  IdentifierKind,
+  type Consent,
   type DecodedMessage,
   type Installation,
+  type LogLevel,
   type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
