@@ -25,84 +25,88 @@ jobs:
       # US West Region Test
       - name: Run performance test on US West
         id: us-west-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on US West:"
-            railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $TEST_EXIT_CODE"
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i for US West region..."
+            railway run -s xmtp-qa-testing:us-west yarn test ts_performance
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+              echo "US West tests passed successfully!"
+              break
+            fi
+            if [ $i -eq 3 ]; then
+              echo "US West test failed after 3 attempts."
               exit 1
             fi
-          retry_on: error
+            echo "US West test failed with exit code $exit_code. Retrying..."
+            sleep 10
+          done
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       # US East Region Test
       - name: Run performance test on US East
         id: us-east-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on US East:"
-            railway run -s xmtp-qa-testing:us-east yarn test ts_performance | tee logs/us-east-performance.log
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $TEST_EXIT_CODE"
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i for US East region..."
+            railway run -s xmtp-qa-testing:us-east yarn test ts_performance
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+              echo "US East tests passed successfully!"
+              break
+            fi
+            if [ $i -eq 3 ]; then
+              echo "US East test failed after 3 attempts."
               exit 1
             fi
-          retry_on: error
+            echo "US East test failed with exit code $exit_code. Retrying..."
+            sleep 10
+          done
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       # Europe Region Test
       - name: Run performance test on Europe
         id: europe-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on Europe:"
-            railway run -s xmtp-qa-testing:europe yarn test ts_performance | tee logs/europe-performance.log
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $TEST_EXIT_CODE"
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i for Europe region..."
+            railway run -s xmtp-qa-testing:europe yarn test ts_performance
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+              echo "Europe tests passed successfully!"
+              break
+            fi
+            if [ $i -eq 3 ]; then
+              echo "Europe test failed after 3 attempts."
               exit 1
             fi
-          retry_on: error
+            echo "Europe test failed with exit code $exit_code. Retrying..."
+            sleep 10
+          done
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
       # Asia Region Test
       - name: Run performance test on Asia
         id: asia-test
-        continue-on-error: true
-        uses: nick-fields/retry@v2
-        with:
-          timeout_minutes: 10
-          max_attempts: 3
-          command: |
-            echo "Running performance test on Asia:"
-            railway run -s xmtp-qa-testing:asia yarn test ts_performance | tee logs/asia-performance.log
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=${PIPESTATUS[0]}
-            if [ $TEST_EXIT_CODE -ne 0 ]; then
-              echo "Test failed with exit code $TEST_EXIT_CODE"
+        run: |
+          for i in {1..3}; do
+            echo "Attempt $i for Asia region..."
+            railway run -s xmtp-qa-testing:asia yarn test ts_performance
+            exit_code=$?
+            if [ $exit_code -eq 0 ]; then
+              echo "Asia tests passed successfully!"
+              break
+            fi
+            if [ $i -eq 3 ]; then
+              echo "Asia test failed after 3 attempts."
               exit 1
             fi
-          retry_on: error
+            echo "Asia test failed with exit code $exit_code. Retrying..."
+            sleep 10
+          done
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
 
@@ -122,7 +126,6 @@ jobs:
 
           if [[ "${{ steps.us-west-test.outcome }}" == "failure" || "${{ steps.us-east-test.outcome }}" == "failure" || "${{ steps.europe-test.outcome }}" == "failure" || "${{ steps.asia-test.outcome }}" == "failure" ]]; then
             echo "One or more region tests failed after retries"
-            echo "See logs for details"
             exit 1  # Make the workflow fail if any region test failed
           fi
 
