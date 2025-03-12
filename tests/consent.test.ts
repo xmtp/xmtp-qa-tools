@@ -38,12 +38,12 @@ describe(testName, () => {
   it("should stream consent updates when a user is blocked", async () => {
     console.log(
       "Creating DM conversation with address:",
-      personas.get("randomguy")?.client?.accountAddress,
+      personas.get("randomguy")?.client?.inboxId,
     );
     const dmConversation = await personas
       .get("henry")
       ?.client?.conversations.newDm(
-        personas.get("randomguy")?.client?.accountAddress ?? "",
+        personas.get("randomguy")?.client?.inboxId ?? "",
       );
 
     if (!dmConversation) {
@@ -60,8 +60,8 @@ describe(testName, () => {
     const getConsentState = await personas
       .get("henry")
       ?.client?.getConsentState(
-        ConsentEntityType.Address,
-        personas.get("randomguy")?.client?.accountAddress ?? "",
+        ConsentEntityType.InboxId,
+        personas.get("randomguy")?.client?.inboxId ?? "",
       );
     console.log("Consent state:", getConsentState);
     console.timeEnd("get-initial-consent");
@@ -71,8 +71,8 @@ describe(testName, () => {
     console.log(`Alice is ${getConsentState ? "blocking" : "allowing"} Bob...`);
     await personas.get("henry")?.client?.setConsentStates([
       {
-        entity: personas.get("randomguy")?.client?.accountAddress ?? "",
-        entityType: ConsentEntityType.Address,
+        entity: personas.get("randomguy")?.client?.inboxId ?? "",
+        entityType: ConsentEntityType.InboxId,
         state:
           getConsentState === ConsentState.Allowed
             ? ConsentState.Denied
@@ -85,8 +85,8 @@ describe(testName, () => {
     const getConsentStateUpdated = await personas
       .get("henry")
       ?.client?.getConsentState(
-        ConsentEntityType.Address,
-        personas.get("randomguy")?.client?.accountAddress ?? "",
+        ConsentEntityType.InboxId,
+        personas.get("randomguy")?.client?.inboxId ?? "",
       );
     console.timeEnd("get-updated-consent");
 
@@ -103,10 +103,10 @@ describe(testName, () => {
   it("should manage consent for all members in a group", async () => {
     // Get addresses of all participants
     const participantAddresses = [
-      personas.get("jack")?.client?.accountAddress,
-      personas.get("nancy")?.client?.accountAddress,
-      personas.get("oscar")?.client?.accountAddress,
-      personas.get("karen")?.client?.accountAddress,
+      personas.get("jack")?.client?.inboxId,
+      personas.get("nancy")?.client?.inboxId,
+      personas.get("oscar")?.client?.inboxId,
+      personas.get("karen")?.client?.inboxId,
     ].filter(Boolean) as string[];
 
     console.time("create-group");
@@ -156,8 +156,8 @@ describe(testName, () => {
     // Alice blocks Bob specifically
     await personas.get("henry")?.client?.setConsentStates([
       {
-        entity: personas.get("jack")?.client?.accountAddress as string,
-        entityType: ConsentEntityType.Address,
+        entity: personas.get("jack")?.client?.inboxId as string,
+        entityType: ConsentEntityType.InboxId,
         state: ConsentState.Denied,
       },
     ]);
@@ -167,8 +167,8 @@ describe(testName, () => {
     const bobConsentState = await personas
       .get("henry")
       ?.client?.getConsentState(
-        ConsentEntityType.Address,
-        personas.get("jack")?.client?.accountAddress ?? "",
+        ConsentEntityType.InboxId,
+        personas.get("jack")?.client?.inboxId ?? "",
       );
     console.log(
       `Alice's consent state for Bob is : ${
@@ -197,8 +197,8 @@ describe(testName, () => {
         state: ConsentState.Allowed,
       },
       {
-        entity: personas.get("jack")?.client?.accountAddress as string,
-        entityType: ConsentEntityType.Address,
+        entity: personas.get("jack")?.client?.inboxId as string,
+        entityType: ConsentEntityType.InboxId,
         state: ConsentState.Allowed,
       },
     ]);

@@ -88,7 +88,7 @@ describe(testName, () => {
       dm = await personas
         .get("henry")!
         .client!.conversations.newDm(
-          personas.get("randomguy")!.client!.accountAddress,
+          personas.get("randomguy")!.client!.inboxId,
         );
 
       expect(dm).toBeDefined();
@@ -105,7 +105,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client?.accountAddress}`,
+        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client?.inboxId}`,
       );
 
       const dmId = await dm.send(message);
@@ -136,9 +136,7 @@ describe(testName, () => {
         const sliced = generatedInboxes.slice(0, i);
         newGroup = await personas
           .get("henry")!
-          .client!.conversations.newGroupByInboxIds(
-            sliced.map((inbox) => inbox.inboxId),
-          );
+          .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -170,7 +168,7 @@ describe(testName, () => {
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       try {
         const previousMembers = await newGroup.members();
-        await (newGroup as Group).removeMembersByInboxId([
+        await (newGroup as Group).removeMembers([
           previousMembers.filter(
             (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
           )[0].inboxId,

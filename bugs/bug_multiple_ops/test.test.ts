@@ -30,9 +30,9 @@ describe(testName, () => {
     // Create initial group with a few members
     group = await personas
       .get("bella")!
-      .client!.conversations.newGroupByInboxIds([
-        personas.get("dave")?.client?.inboxId as `0x${string}`,
-        personas.get("elon")?.client?.inboxId as `0x${string}`,
+      .client!.conversations.newGroup([
+        personas.get("dave")!.client!.inboxId,
+        personas.get("elon")!.client!.inboxId,
       ]);
 
     expect(group).toBeDefined();
@@ -48,9 +48,7 @@ describe(testName, () => {
   it("should force an epoch transition by adding members", async () => {
     // Adding members should trigger an epoch transition in MLS
     console.log("Adding members to trigger epoch transition");
-    await (group as Group).addMembers([
-      personas.get("diana")?.client?.accountAddress as `0x${string}`,
-    ]);
+    await (group as Group).addMembers([personas.get("diana")!.client!.inboxId]);
     // Verify all members including new ones can receive messages
     const result = await verifyStreamAll(group, personas);
     expect(result.allReceived).toBe(true);
@@ -73,11 +71,11 @@ describe(testName, () => {
   //   // Create promises for concurrent operations from different members
   //   // This has the potential to create epoch forks if not properly synchronized
   //   const op1 = (bellaGroup as Group).addMembers([
-  //     personas.get("alice")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("alice")?.client?.inboxId,
   //   ]);
 
   //   const op2 = (bellaGroup as Group).removeMembers([
-  //     personas.get("random")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("random")?.client?.inboxId,
   //   ]);
 
   //   const op3 = (elonGroup as Group).updateName("Updated in potential fork");
@@ -151,7 +149,7 @@ describe(testName, () => {
   //   // First, remove Diana from the group
   //   console.log("Removing Diana from the group");
   //   await (group as Group).removeMembers([
-  //     personas.get("diana")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("diana")?.client?.inboxId,
   //   ]);
 
   //   // Send a message after removal
@@ -249,7 +247,7 @@ describe(testName, () => {
 
   //   // Add a member from Bella's client
   //   await (bellaGroup as Group).addMembers([
-  //     personas.get("bob")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("bob")?.client?.inboxId,
   //   ]);
 
   //   // Send a message from Bella
@@ -282,27 +280,27 @@ describe(testName, () => {
 
   //   // Add one member
   //   await (group as Group).addMembers([
-  //     personas.get("random")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("random")?.client?.inboxId,
   //   ]);
 
   //   // Immediately remove that member
   //   await (group as Group).removeMembers([
-  //     personas.get("random")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("random")?.client?.inboxId,
   //   ]);
 
   //   // Add them again
   //   await (group as Group).addMembers([
-  //     personas.get("random")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("random")?.client?.inboxId,
   //   ]);
 
   //   // Remove a different member
   //   await (group as Group).removeMembers([
-  //     personas.get("bob")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("bob")?.client?.inboxId,
   //   ]);
 
   //   // Add the removed member back
   //   await (group as Group).addMembers([
-  //     personas.get("bob")?.client?.accountAddress as `0x${string}`,
+  //     personas.get("bob")?.client?.inboxId,
   //   ]);
 
   //   // Allow time for synchronization

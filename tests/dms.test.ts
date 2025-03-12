@@ -77,7 +77,7 @@ describe(testName, () => {
       convo = await personas
         .get("henry")!
         .client!.conversations.newDm(
-          personas.get("randomguy")!.client!.accountAddress,
+          personas.get("randomguy")!.client!.inboxId,
         );
 
       expect(convo).toBeDefined();
@@ -93,7 +93,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")?.name}] Creating DM with ${personas.get("randomguy")?.name} at ${personas.get("randomguy")?.client!.accountAddress}`,
+        `[${personas.get("henry")?.name}] Creating DM with ${personas.get("randomguy")?.name} at ${personas.get("randomguy")?.client!.inboxId}`,
       );
 
       const dmId = await convo.send(message);

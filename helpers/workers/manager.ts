@@ -41,7 +41,6 @@ export class NestedPersonas {
       const [name, installationId] = baseName.split("-");
       return this.personas[name][installationId];
     }
-    console.log("baseName", this.personas, baseName, installationId);
     return this.personas[baseName][installationId];
   }
   public addWorker(

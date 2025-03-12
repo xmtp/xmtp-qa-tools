@@ -132,13 +132,10 @@ export class CommandHandler {
     ];
     console.log(memberInboxIds);
     // Create the group
-    const group = await client.conversations.newGroupByInboxIds(
-      memberInboxIds,
-      {
-        groupName: groupName,
-        groupDescription: `Test group with ${count} random personas`,
-      },
-    );
+    const group = await client.conversations.newGroup(memberInboxIds, {
+      groupName: groupName,
+      groupDescription: `Test group with ${count} random personas`,
+    });
     await group.addSuperAdmin(message.senderInboxId);
 
     console.log(
@@ -215,9 +212,7 @@ export class CommandHandler {
       }
 
       // Add the persona to the group
-      await groupToAddTo.addMembersByInboxId([
-        personaToAdd2?.client?.inboxId as string,
-      ]);
+      await groupToAddTo.addMembers([personaToAdd2?.client?.inboxId as string]);
 
       // Announce in the group
       await groupToAddTo.send(`Bot :\n Added ${personaName} to the group.`);
@@ -294,7 +289,7 @@ export class CommandHandler {
       );
 
       // Remove the member
-      await groupToRemoveFrom.removeMembersByInboxId([memberToRemove.inboxId]);
+      await groupToRemoveFrom.removeMembers([memberToRemove.inboxId]);
 
       await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
     } catch (error) {
@@ -432,7 +427,7 @@ export class CommandHandler {
       for (const persona of this.personas
         .getPersonas()
         .slice(0, countOfPersonas)) {
-        const personaGroup = await persona.client?.conversations.newDmByInboxId(
+        const personaGroup = await persona.client?.conversations.newDm(
           message.senderInboxId,
         );
         await conversation?.send(` ${persona.name} just sent you a message`);
@@ -458,9 +453,7 @@ export class CommandHandler {
       message.conversationId,
     );
     try {
-      await (conversation as Group).removeMembersByInboxId([
-        message.senderInboxId,
-      ]);
+      await (conversation as Group).removeMembers([message.senderInboxId]);
 
       await conversation?.send(`You, has left the group.`);
     } catch (error) {

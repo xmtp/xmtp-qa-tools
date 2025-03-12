@@ -1,7 +1,18 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type NestedPersonas, type Signer } from "@helpers/types";
+import {
+  IdentifierKind,
+  type NestedPersonas,
+  type XmtpEnv,
+} from "@helpers/types";
+import {
+  generateInboxId as generateInboxIdBinding,
+  getInboxIdForIdentifier as getInboxIdForIdentifierBinding,
+  type Identifier,
+} from "@xmtp/node-bindings";
+import bindingsVersion from "@xmtp/node-bindings/version.json" with { type: "json" };
+import { ApiUrls } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -9,19 +20,43 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
-import { type Persona, type XmtpEnv } from "./types";
 import { clearWorkerCache } from "./workers/factory";
 
+export type SignMessage = (message: string) => Promise<Uint8Array> | Uint8Array;
+export type GetIdentifier = () => Promise<Identifier> | Identifier;
+export type GetChainId = () => bigint;
+export type GetBlockNumber = () => bigint;
+
 interface User {
-  key: string;
+  key: `0x${string}`;
   account: ReturnType<typeof privateKeyToAccount>;
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-const createUser = (key: string): User => {
-  const account = privateKeyToAccount(key as `0x${string}`);
+export type Signer =
+  | {
+      type: "EOA";
+      signMessage: SignMessage;
+      getIdentifier: GetIdentifier;
+    }
+  | {
+      type: "SCW";
+      signMessage: SignMessage;
+      getIdentifier: GetIdentifier;
+      getBlockNumber?: GetBlockNumber;
+      getChainId: GetChainId;
+    };
+
+export type EOASigner = Extract<Signer, { type: "EOA" }>;
+export type SCWSigner = Extract<Signer, { type: "SCW" }>;
+
+export const version = `${bindingsVersion.branch}@${bindingsVersion.version} (${bindingsVersion.date})`;
+
+export const createUser = (key: `0x${string}`): User => {
+  const accountKey = key;
+  const account = privateKeyToAccount(accountKey);
   return {
-    key,
+    key: accountKey,
     account,
     wallet: createWalletClient({
       account,
@@ -31,11 +66,14 @@ const createUser = (key: string): User => {
   };
 };
 
-export const createSigner = (key: string): Signer => {
+export const createSigner = (key: `0x${string}`): Signer => {
   const user = createUser(key);
   return {
-    walletType: "EOA",
-    getAddress: () => user.account.address,
+    type: "EOA",
+    getIdentifier: () => ({
+      identifierKind: IdentifierKind.Ethereum,
+      identifier: user.account.address.toLowerCase(),
+    }),
     signMessage: async (message: string) => {
       const signature = await user.wallet.signMessage({
         message,
@@ -45,6 +83,20 @@ export const createSigner = (key: string): Signer => {
     },
   };
 };
+
+export const generateInboxId = (identifier: Identifier): string => {
+  return generateInboxIdBinding(identifier);
+};
+
+export const getInboxIdForIdentifier = async (
+  identifier: Identifier,
+  env: XmtpEnv = "dev",
+) => {
+  const host = ApiUrls[env];
+  const isSecure = host.startsWith("https");
+  return getInboxIdForIdentifierBinding(host, isSecure, identifier);
+};
+
 function loadDataPath(
   name: string,
   installationId: string,
@@ -135,10 +187,9 @@ export async function closeEnv(testName: string, personas: NestedPersonas) {
   flushLogger(testName);
 
   await flushMetrics();
-  if (personas) {
-    for (const persona of personas.getPersonas()) {
-      await persona.worker?.terminate();
-    }
+
+  for (const persona of personas.getPersonas()) {
+    await persona.worker?.terminate();
   }
 
   await clearWorkerCache();

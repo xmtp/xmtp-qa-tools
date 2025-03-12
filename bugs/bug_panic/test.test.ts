@@ -11,7 +11,7 @@ describe(testName, () => {
     const workerArray = personas.getPersonas();
     const groupByInboxIds = await personas
       .get("bob")!
-      .client!.conversations.newGroupByInboxIds(
+      .client!.conversations.newGroup(
         personas.getPersonas().map((persona) => persona.client!.inboxId),
       );
     for (const worker of workerArray) {

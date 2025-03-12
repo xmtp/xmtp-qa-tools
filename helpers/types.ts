@@ -1,6 +1,7 @@
 import {
   ConsentEntityType,
   ConsentState,
+  IdentifierKind,
   type Consent,
   type LogLevel,
 } from "@xmtp/node-bindings";
@@ -33,6 +34,7 @@ export {
   Conversation,
   Dm,
   Group,
+  IdentifierKind,
   type Installation,
   type Signer,
   type LogLevel,

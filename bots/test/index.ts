@@ -21,9 +21,9 @@ async function main() {
   const client = personas.get("bot")?.client as Client;
 
   const env = process.env.XMTP_ENV as XmtpEnv;
-  console.log(`Agent initialized on address ${client.accountAddress}`);
+  console.log(`Agent initialized on address ${client.inboxId}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);
-  console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
+  console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
 
   console.log("Syncing conversations...");
   await client.conversations.sync();

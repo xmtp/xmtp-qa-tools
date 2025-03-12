@@ -27,32 +27,26 @@ describe(testName, () => {
   it("should create a group with bob and alice", async () => {
     const group = await personas
       .get("bob")!
-      .client!.conversations.newGroupByInboxIds([
-        personas.get("alice")!.client!.inboxId,
-      ]);
+      .client!.conversations.newGroup([personas.get("alice")!.client!.inboxId]);
     expect(group.id).toBeDefined();
   });
 
   it("should create a group with bob and alice", async () => {
     const group = await personas
       .get("bob")!
-      .client!.conversations.newGroupByInboxIds([
-        personas.get("joe")!.client!.inboxId,
-      ]);
+      .client!.conversations.newGroup([personas.get("joe")!.client!.inboxId]);
     expect(group.id).toBeDefined();
   });
   it("joe with alice", async () => {
     const group = await personas
       .get("joe")!
-      .client!.conversations.newGroupByInboxIds([
-        personas.get("alice")!.client!.inboxId,
-      ]);
+      .client!.conversations.newGroup([personas.get("alice")!.client!.inboxId]);
     expect(group.id).toBeDefined();
   });
   // it("fabri creates a grop with all", async () => {
   //   const group = await personas[
   //     "fabri"
-  //   ].client!.conversations.newGroupByInboxIds([
+  //   ].client!.conversations.newGroup([
   //     personas["bob"].client!.inboxId,
   //     personas["alice"].client!.inboxId,
   //     personas["joe"].client!.inboxId,

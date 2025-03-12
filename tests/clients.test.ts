@@ -22,21 +22,21 @@ describe(testName, () => {
   it("create random personas", async () => {
     personas = await getWorkers(["random"], testName, "none");
     folderCount++;
-    expect(personas.get("random")?.client?.accountAddress).toBeDefined();
+    expect(personas.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create a persona", async () => {
     personas = await getWorkers(["bob", "random"], testName, "none");
     folderCount++;
-    expect(personas.get("bob")?.client?.accountAddress).toBeDefined();
+    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create a random persona", async () => {
     personas = await getWorkers(["random"], testName, "none");
 
-    expect(personas.get("random")?.client?.accountAddress).toBeDefined();
+    expect(personas.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
@@ -49,10 +49,10 @@ describe(testName, () => {
     folderCount++;
     folderCount++;
     folderCount++;
-    expect(personas.get("bob")?.client?.accountAddress).toBeDefined();
-    expect(personas.get("alice")?.client?.accountAddress).toBeDefined();
-    expect(personas.get("randompep")?.client?.accountAddress).toBeDefined();
-    expect(personas.get("randombob")?.client?.accountAddress).toBeDefined();
+    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
+    expect(personas.get("alice")?.client?.inboxId).toBeDefined();
+    expect(personas.get("randompep")?.client?.inboxId).toBeDefined();
+    expect(personas.get("randombob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 });

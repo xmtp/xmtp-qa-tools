@@ -28,7 +28,7 @@ describe(
         // Create a group conversation
         group = await personas
           .get("bob")!
-          .client!.conversations.newGroupByInboxIds(
+          .client!.conversations.newGroup(
             personas.getPersonas().map((p) => p.client?.inboxId as string),
           );
 

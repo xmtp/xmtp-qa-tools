@@ -1,6 +1,7 @@
 import * as fs from "fs";
 import {
   createSigner,
+  createUser,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
@@ -20,8 +21,7 @@ async function main() {
     const privateKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
 
     try {
-      // Create a signer from the private key
-      const signer = createSigner(privateKey);
+      const signer = createSigner(privateKey as `0x${string}`);
 
       // Generate encryption key
       const encryptionKeyHex = generateEncryptionKeyHex();
@@ -35,7 +35,7 @@ async function main() {
       });
       // Get the inbox ID for this client
       const inboxId = client.inboxId;
-      const accountAddress = client.accountAddress;
+      const accountAddress = client.inboxId;
 
       // Store the account address and inbox ID
       accountData.push({

@@ -55,9 +55,7 @@ describe(testName, () => {
     group = await personas
       .get("bob")!
       .client!.conversations.newGroup(
-        personas
-          .getPersonas()
-          .map((p) => p.client?.accountAddress as `0x${string}`),
+        personas.getPersonas().map((p) => p.client!.inboxId),
       );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
@@ -99,10 +97,10 @@ describe(testName, () => {
     group = await personas
       .get("bob")!
       .client!.conversations.newGroup([
-        personas.get("joe")?.client?.accountAddress as `0x${string}`,
-        personas.get("bob")?.client?.accountAddress as `0x${string}`,
-        personas.get("alice")?.client?.accountAddress as `0x${string}`,
-        personas.get("sam")?.client?.accountAddress as `0x${string}`,
+        personas.get("joe")!.client!.inboxId,
+        personas.get("bob")!.client!.inboxId,
+        personas.get("alice")!.client!.inboxId,
+        personas.get("sam")!.client!.inboxId,
       ]);
 
     const messages: string[] = [];

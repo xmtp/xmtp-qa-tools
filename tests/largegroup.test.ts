@@ -35,18 +35,14 @@ describe(testName, () => {
     const sliced = generatedInboxes.slice(0, 450);
     group = await personas
       .get("henry")!
-      .client!.conversations.newGroupByInboxIds(
-        sliced.map((inbox) => inbox.inboxId),
-      );
+      .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();
   });
   it(`createGroup-500: should create a large group of 500 participants 500`, async () => {
     const sliced = generatedInboxes.slice(0, 500);
     group = await personas
       .get("henry")!
-      .client!.conversations.newGroupByInboxIds(
-        sliced.map((inbox) => inbox.inboxId),
-      );
+      .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();
   });
 });

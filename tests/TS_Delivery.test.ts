@@ -41,7 +41,7 @@ describe(
         console.log("creating group");
         group = await personas
           .get("bob")!
-          .client!.conversations.newGroupByInboxIds(
+          .client!.conversations.newGroup(
             personas.getPersonas().map((p) => p.client?.inboxId as string),
           );
         await new Promise((resolve) => setTimeout(resolve, 3000));

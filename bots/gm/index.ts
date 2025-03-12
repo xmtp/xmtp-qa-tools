@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type NestedPersonas, type XmtpEnv } from "@helpers/types";
+import { type Client, type NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 
 const testName = "test-bot";
@@ -12,11 +12,6 @@ async function main() {
 
   const client = personas.get("bot")?.client as Client;
 
-  const env = process.env.XMTP_ENV as XmtpEnv;
-  console.log(`Agent initialized on address ${client.accountAddress}`);
-  console.log(`Agent initialized on inbox ${client.inboxId}`);
-  console.log(`https://xmtp.chat/dm/${client.accountAddress}?env=${env}`);
-
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
@@ -25,7 +20,7 @@ async function main() {
   for await (const message of await stream) {
     /* Ignore messages from the same agent or non-text messages */
     if (
-      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
+      message?.senderInboxId.toLowerCase() === client!.inboxId.toLowerCase() ||
       message?.contentType?.typeId !== "text"
     ) {
       continue;

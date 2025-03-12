@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
+  createUser,
   getDbPath,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
@@ -129,7 +130,8 @@ export class WorkerClient extends Worker {
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
 
-    const address = await signer.getAddress();
+    const identifier = await signer.getIdentifier();
+    const address = identifier.identifier as `0x${string}`;
     const params = {
       name: this.name,
       address,
@@ -222,8 +224,10 @@ export class WorkerClient extends Worker {
       }
     })();
   }
-  async clearDB() {
-    const address = await this.client.accountAddress;
+
+  clearDB() {
+    const identifier = this.client.identifier;
+    const address = identifier.identifier as `0x${string}`;
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
     const dbPath = getDbPath(
       this.name,

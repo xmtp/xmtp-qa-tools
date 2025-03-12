@@ -29,7 +29,7 @@
     "@hyperbrowser/sdk": "^0.29.0",
     "@railway/cli": "^3.22.2",
     "@vitest/ui": "^3.0.6",
-    "@xmtp/node-sdk": "0.0.47",
+    "@xmtp/node-sdk": "1.0.0-rc1",
     "alchemy-sdk": "^3.0.0",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",

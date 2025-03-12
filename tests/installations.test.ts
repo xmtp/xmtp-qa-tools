@@ -31,11 +31,11 @@ describe(testName, () => {
     expect(secondaryPersonas.get("bob", "b")?.folder).toBe("b");
 
     // Verify installations of the same person share identity
-    expect(initialPersonas.get("bob")?.client?.accountAddress).toBe(
-      secondaryPersonas.get("bob", "b")?.client?.accountAddress,
+    expect(initialPersonas.get("bob")?.client?.inboxId).toBe(
+      secondaryPersonas.get("bob", "b")?.client?.inboxId,
     );
-    expect(initialPersonas.get("alice")?.client?.accountAddress).toBe(
-      secondaryPersonas.get("alice", "desktop")?.client?.accountAddress,
+    expect(initialPersonas.get("alice")?.client?.inboxId).toBe(
+      secondaryPersonas.get("alice", "desktop")?.client?.inboxId,
     );
     expect(initialPersonas.get("bob")?.dbPath).not.toBe(
       secondaryPersonas.get("bob", "b")?.dbPath,
@@ -51,7 +51,7 @@ describe(testName, () => {
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryPersonas.get("alice", "desktop");
     const conversation = await aliceDesktop?.client!.conversations.newDm(
-      terciaryPersonas.get("charlie")?.client?.accountAddress ?? "",
+      terciaryPersonas.get("charlie")?.client?.inboxId ?? "",
     );
     await conversation?.send("Hello Charlie from Alice's desktop");
 

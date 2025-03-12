@@ -176,7 +176,7 @@ export async function verifyConversationStream(
     if (!p.client) {
       throw new Error(`Participant ${p.name} has no client`);
     }
-    return p.client.accountAddress;
+    return p.client.inboxId;
   });
 
   const createdGroup = await groupCreator(initiator, participantAddresses);

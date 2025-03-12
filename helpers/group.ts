@@ -28,7 +28,7 @@ export async function createGroupWithBatch(
   console.time(logLabel);
 
   // Create the group with the specified number of participants
-  const group = await creator.client?.conversations.newGroupByInboxIds(
+  const group = await creator.client?.conversations.newGroup(
     allPersonas
       .getPersonas()
       .map((persona) => persona.client?.inboxId as string)
