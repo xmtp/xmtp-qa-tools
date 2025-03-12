@@ -19,6 +19,16 @@ const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
 await conversation.send("Hello from Alice to Bob");
 ```
 
+#### Considerations:
+
+- If a persona doesn't exist, its keys are automatically created
+- Existing personas use keys from the env file and .data folder
+- Missing data folders are created automatically
+- Personas with the "random" prefix have keys stored only in memory
+
+> [!TIP]
+> Access our repository of 600 dummy wallets with inboxIds in the [generated-inboxes.json](./helpers/generated-inboxes.json) file
+
 ## Working with multiple installations
 
 You can create different installations of the same persona to simulate multiple devices:

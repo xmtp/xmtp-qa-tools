@@ -17,11 +17,11 @@ async function main() {
   let personas: NestedPersonas;
   personas = await getWorkers(20, testName, "message", true);
   const commandHandler = new CommandHandler(personas);
-
-  const client = personas.get("bot")?.client as Client;
+  const bot = personas.get("bot");
+  const client = bot?.client as Client;
 
   const env = process.env.XMTP_ENV as XmtpEnv;
-  console.log(`Agent initialized on address ${client.inboxId}`);
+  console.log(`Agent initialized on address ${bot?.address}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);
   console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
 

@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type NestedPersonas } from "@helpers/types";
+import { type Client, type XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 
 const testName = "test-bot";
@@ -7,11 +7,15 @@ loadEnv(testName);
 
 async function main() {
   // Get 20 dynamic workers
-  let personas: NestedPersonas;
-  personas = await getWorkers(["bot"], testName, "message", true);
+  const personas = await getWorkers(["bot"], testName, "message", true);
 
-  const client = personas.get("bot")?.client as Client;
+  const bot = personas.get("bot");
+  const client = bot?.client as Client;
 
+  const env = process.env.XMTP_ENV as XmtpEnv;
+  console.log(`Agent initialized on address ${bot?.address}`);
+  console.log(`Agent initialized on inbox ${client.inboxId}`);
+  console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
