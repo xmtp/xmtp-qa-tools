@@ -46,9 +46,10 @@ describe(testName, () => {
       convo = await personas
         .get("bob")!
         .client.conversations.newDmByIdentifier({
-          identifier: gmBotAddress,
           identifierKind: IdentifierKind.Ethereum,
+          identifier: gmBotAddress,
         });
+
       await convo.sync();
       const prevMessages = (await convo.messages()).length;
 
