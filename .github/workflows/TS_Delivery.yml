@@ -16,6 +16,8 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+      # Add environment variable to prevent SQLCipher mlock errors
+      SQLCIPHER_NO_MLOCK: 1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -39,14 +41,10 @@ jobs:
           max_attempts: 3
           command: |
             echo "Running TS_Delivery test:"
-            # Run test and capture all output
-            yarn test TS_Delivery > logs/ts-delivery-full.log 2>&1
+            # Redirect all output to log file without displaying in terminal
+            yarn test TS_Delivery > logs/ts-delivery.log 2>&1
             # Check the exit code of the test command
             TEST_EXIT_CODE=$?
-
-            # Filter out sqlcipher_mem_lock error messages for the clean log
-            cat logs/ts-delivery-full.log | grep -v "sqlcipher_mem_lock: mlock" > logs/ts-delivery.log
-
             if [ $TEST_EXIT_CODE -ne 0 ]; then
               echo "Test failed with exit code $TEST_EXIT_CODE"
               exit 1
@@ -55,14 +53,8 @@ jobs:
             # Test passed, ignore unhandled errors
             echo "Test completed successfully"
           retry_on: error
-          retry_wait_seconds: 10
-          polling_interval_seconds: 1
-          warning_on_retry: true
-          continue_on_error: false
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
           name: delivery-logs
-          path: |
-            logs/ts-delivery.log
-            logs/ts-delivery-full.log
+          path: logs/ts-delivery.log
