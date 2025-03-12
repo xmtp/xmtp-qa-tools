@@ -59,45 +59,13 @@ XMTP_ENV="dev" # dev, production
 OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 ```
 
-## 🧰 Workers
-
-Predefined personas like Bob, Joe, and Sam are initialized with the `getWorkers` function. For example:
-
-```
-const names = [
-  "bob",
-  "alice",
-  "fabri",
-  "bot",
-  "elon",
-  "joe",
-  "charlie",
-  "dave",
-  "rosalie",
-  "eve",
-  "frank",
-  "grace",
-  "henry",
-  "ivy",
-  "jack",
-  "karen",
-  "larry",
-  "mary",
-  "nancy",
-  "oscar",
-  "paul",
-]
-
-const personas = await getWorkers(names, testName);
-```
-
-Considerations
+## 🧪 Considerations
 
 - If a persona does not exist, its keys are created.
 - If persona exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
 - Personas prefixed with "random" have keys that are stored only in memory.
 
-```
+## Workers
 
-```
+See more about workers in the [WORKERS.md](../../WORKERS.md) file

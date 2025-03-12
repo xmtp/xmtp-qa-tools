@@ -64,9 +64,12 @@ const personas = await getWorkers(["alice", "bob", "randomguy"], testName);
 const personaFactory = new PersonaFactory(testName, typeofStream);
 const personas = await personaFactory.createPersonas(descriptors);
 
+const bob = personas.get("bob");
 // Clear worker cache when tests are complete
 await clearWorkerCache();
 ```
+
+To see more about the factory, check the [WORKERS.md](../WORKERS.md) file
 
 ### group.ts
 
@@ -239,41 +242,6 @@ The `generated-inboxes.json` file contains pre-generated wallet addresses and in
    - `datadog.ts` sends performance and reliability metrics to Datadog
    - Performance metrics include operation duration and network stats
    - Delivery metrics track message reception rates
-
-## 🚀 Getting Started
-
-To use these helpers in your tests:
-
-```typescript
-import { getWorkers } from "@helpers/factory";
-import { verifyStreamAll } from "@helpers/verify";
-
-describe("Message delivery test", () => {
-  let personas;
-
-  beforeAll(async () => {
-    // Get test personas
-    personas = await getWorkers(["alice", "bob", "charlie"], "delivery_test");
-  });
-
-  it("should deliver messages to all participants", async () => {
-    // Create a group
-    const group = await personas.alice.client.conversations.newGroup([
-      personas.bob.client.accountAddress,
-      personas.charlie.client.accountAddress,
-    ]);
-
-    // Verify message delivery
-    const result = await verifyStreamAll(group, personas, 5);
-    expect(result.allReceived).toBe(true);
-  });
-
-  afterAll(async () => {
-    // Clean up
-    await clearWorkerCache();
-  });
-});
-```
 
 ## 📈 Performance Testing
 

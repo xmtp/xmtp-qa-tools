@@ -54,11 +54,10 @@ beforeAll(async () => {
   personas = await getWorkers(["alice", "bob", "randomguy"], testName);
 });
 
-// Use them directly in your tests
-convo = await personas.alice.client.conversations.newDm(
-  personas.randomguy.client.accountAddress,
-);
+const bob = personas.get("bob");
 ```
+
+See more in the [WORKERS.md](./WORKERS.md) file
 
 ### Key Considerations:
 
