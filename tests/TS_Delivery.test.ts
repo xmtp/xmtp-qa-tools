@@ -20,6 +20,8 @@ loadEnv(testName);
 
 const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
 const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
+console.log("amountofMessages", amountofMessages);
+console.log("receiverAmount", receiverAmount);
 // 2 seconds per message, multiplied by the total number of participants
 // valiable for github actions
 const timeoutMax =
