@@ -92,6 +92,15 @@ export const createLogger = (testName: string) => {
 };
 
 function filterLog(args: any[]): string {
+  // First, check if this is a SQLCipher memory lock related log
+  const logStr = args.join(" ").toString();
+  if (
+    logStr.includes("sqlcipher_mem_lock") ||
+    logStr.includes("SQLCIPHER_NO_MLOCK")
+  ) {
+    return ""; // Skip these logs entirely
+  }
+
   // Check for the console.time/timeEnd pattern: where args[0] is "%s: %s"
   if (args.length >= 2 && args[0] === "%s: %s") {
     // Join the remaining parts into one message
