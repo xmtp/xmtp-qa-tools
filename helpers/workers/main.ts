@@ -116,8 +116,6 @@ export class WorkerClient extends Worker {
     version: string;
     installationId: string;
   }> {
-    console.time(`[${this.nameId}] Initialize XMTP client`);
-
     // Tell the Worker to do any internal initialization
     this.postMessage({
       type: "initialize",

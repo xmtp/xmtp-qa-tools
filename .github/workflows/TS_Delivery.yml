@@ -32,7 +32,7 @@ jobs:
           max_attempts: 3
           command: |
             echo "Running delivery test on US East:"
-            railway run -s xmtp-qa-testing:us-east yarn test ts_delivery | tee logs/us-east-delivery.log
+            railway run -s xmtp-qa-testing:us-east DELIVERY_AMOUNT=100 DELIVERY_RECEIVERS=45 yarn test ts_delivery | tee logs/us-east-delivery.log
             # Check the exit code of the test command
             TEST_EXIT_CODE=${PIPESTATUS[0]}
             if [ $TEST_EXIT_CODE -ne 0 ]; then
