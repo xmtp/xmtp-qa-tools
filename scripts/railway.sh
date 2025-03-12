@@ -14,4 +14,4 @@ railway status
 
 # Run your performance test
 echo "Running performance test on service:"
-railway run -s xmtp-qa-testing:us-west yarn test ts_performance
+railway run -s xmtp-qa-testing:us-east yarn test ts_delivery

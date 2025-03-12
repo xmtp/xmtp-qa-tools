@@ -59,6 +59,7 @@ export class WorkerClient extends Worker {
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
   private folder: string;
+  public address!: `0x${string}`;
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
@@ -115,8 +116,6 @@ export class WorkerClient extends Worker {
     version: string;
     installationId: string;
   }> {
-    console.time(`[${this.nameId}] Initialize XMTP client`);
-
     // Tell the Worker to do any internal initialization
     this.postMessage({
       type: "initialize",
@@ -130,10 +129,10 @@ export class WorkerClient extends Worker {
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
 
     const identifier = await signer.getIdentifier();
-    const address = identifier.identifier as `0x${string}`;
+    this.address = identifier.identifier as `0x${string}`;
     const params = {
       name: this.name,
-      address,
+      address: this.address,
       testName: this.testName,
       folder: this.folder,
       version,
@@ -141,12 +140,13 @@ export class WorkerClient extends Worker {
     console.debug(params);
     const dbPath = getDbPath(
       this.name,
-      address,
+      this.address,
       this.testName,
       this.folder,
       version,
     );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
+    console.log(dbPath);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
       // @ts-expect-error: loggingLevel is not typed

@@ -142,7 +142,7 @@ export class PersonaFactory {
       client: worker.client,
       dbPath: worker.dbPath,
       version: worker.version,
-      address: worker.client.inboxId,
+      address: worker.address,
       installationId: worker.installationId,
       worker: workerClient,
     };

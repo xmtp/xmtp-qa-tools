@@ -41,16 +41,16 @@ jobs:
           max_attempts: 3
           command: |
             echo "Running TS_Delivery test:"
-            # Redirect all output to log file without displaying in terminal
-            yarn test TS_Delivery > logs/ts-delivery.log 2>&1
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=$?
+            # Run the test with output displayed in terminal and also saved to log file
+            yarn test TS_Delivery 2>&1 | tee logs/ts-delivery.log
+            # Store the exit code from the test
+            TEST_EXIT_CODE=${PIPESTATUS[0]}
             if [ $TEST_EXIT_CODE -ne 0 ]; then
               echo "Test failed with exit code $TEST_EXIT_CODE"
-              exit 1
+              exit $TEST_EXIT_CODE
             fi
 
-            # Test passed, ignore unhandled errors
+            # Test passed
             echo "Test completed successfully"
           retry_on: error
       - name: Upload log files
