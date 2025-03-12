@@ -68,4 +68,4 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 
 ## Workers
 
-See more about workers in the [WORKERS.md](../../WORKERS.md) file
+See more about workers in the [workers section](../../WORKERS.md) file

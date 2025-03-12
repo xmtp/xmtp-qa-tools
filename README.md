@@ -19,13 +19,13 @@ Run tests for specific modules using these commands:
 
   [View test source](./tests/TS_Performance.test.ts)
 
-  - **TS_Geolocation**: Measures geolocation of the library in the dev network
+- **TS_Geolocation**: Measures geolocation of the library in the dev network
 
-    ```bash
-    railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
-    ```
+  ```bash
+  railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
+  ```
 
-    [View test source](./tests/TS_Geolocation.test.ts)
+  [View test source](./tests/TS_Geolocation.test.ts)
 
 - **TS_Delivery**: Tests multiple concurrent streams to detect any message losses
 
@@ -57,7 +57,7 @@ beforeAll(async () => {
 const bob = personas.get("bob");
 ```
 
-See more in the [WORKERS.md](./WORKERS.md) file
+See more in the [workers section](./WORKERS.md)
 
 ### Key Considerations:
 
