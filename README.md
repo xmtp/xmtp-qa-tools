@@ -11,37 +11,37 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 Run tests for specific modules using these commands:
 
-- **TS_Performance**: Measures operations in milliseconds and aggregates results in a Datadog dashboard
+#### TS_Performance\*\*: Measures operations in milliseconds and aggregates results in a Datadog dashboard
 
-  ```bash
-  yarn test ts_performance
-  ```
+```bash
+yarn test ts_performance
+```
 
-  [View test source](./tests/TS_Performance.test.ts)
+[View test source](./tests/TS_Performance.test.ts)
 
-- **TS_Geolocation**: Measures geolocation of the library in the dev network
+#### TS_Geolocation: Measures geolocation of the library in the dev network
 
-  ```bash
-  railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
-  ```
+```bash
+railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
+```
 
-  [View test source](./tests/TS_Geolocation.test.ts)
+[View test source](./tests/TS_Geolocation.test.ts)
 
-- **TS_Delivery**: Tests multiple concurrent streams to detect any message losses
+#### TS_Delivery: Tests multiple concurrent streams to detect any message losses
 
-  ```bash
-  yarn test ts_delivery
-  ```
+```bash
+yarn test ts_delivery
+```
 
-  [View test source](./tests/TS_Delivery.test.ts)
+[View test source](./tests/TS_Delivery.test.ts)
 
-- **TS_Gm**: End-to-end testing for the Gm bot across browser and Node.js environments
+#### TS_Gm: End-to-end testing for the Gm bot across browser and Node.js environments
 
-  ```bash
-  yarn test ts_gm
-  ```
+```bash
+yarn test ts_gm
+```
 
-  [View test source](./tests/TS_Gm.test.ts)
+[View test source](./tests/TS_Gm.test.ts)
 
 ## 👥 Workers
 
