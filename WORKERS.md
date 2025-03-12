@@ -68,6 +68,86 @@ const bobConversations = await primaryPersonas
   .client.conversations.list();
 ```
 
+## Start workers with numbers
+
+```typescript
+const personas = await getWorkers(4, testName);
+// this will start 4 workers with listed from the default names
+```
+
+## Pick one from default names
+
+The default names are:
+
+```typescript
+import { defaultNames } from "@helpers/types";
+```
+
+```typescript
+// Default personas as an enum
+const defaultNames = [
+  "bob",
+  "alice",
+  "fabri",
+  "bot",
+  "elon",
+  "joe",
+  "charlie",
+  "dave",
+  "rosalie",
+  "eve",
+  "frank",
+  "grace",
+  "henry",
+  "ivy",
+  "jack",
+  "karen",
+  "larry",
+  "mary",
+  "nancy",
+  "oscar",
+  "paul",
+  "quinn",
+  "rachel",
+  "steve",
+  "tom",
+  "ursula",
+  "victor",
+  "wendy",
+  "xavier",
+  "yolanda",
+  "zack",
+  "adam",
+  "bella",
+  "carl",
+  "diana",
+  "eric",
+  "fiona",
+  "george",
+  "hannah",
+  "ian",
+  "julia",
+  "keith",
+  "lisa",
+  "mike",
+  "nina",
+  "oliver",
+  "penny",
+  "quentin",
+  "rosa",
+  "sam",
+  "tina",
+  "uma",
+  "vince",
+  "walt",
+  "xena",
+  "yara",
+  "zara",
+  "guada",
+  //max 61
+];
+```
+
 ## Cleanup
 
 Always clean up your personas after tests:
