@@ -54,8 +54,8 @@ describe(testName, () => {
     // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
     group = await personas
       .get("bob")!
-      .client!.conversations.newGroup(
-        personas.getPersonas().map((p) => p.client!.inboxId),
+      .client.conversations.newGroup(
+        personas.getPersonas().map((p) => p.client.inboxId),
       );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
@@ -96,11 +96,11 @@ describe(testName, () => {
   it("tc_poll: should verify message order when receiving via pull", async () => {
     group = await personas
       .get("bob")!
-      .client!.conversations.newGroup([
-        personas.get("joe")!.client!.inboxId,
-        personas.get("bob")!.client!.inboxId,
-        personas.get("alice")!.client!.inboxId,
-        personas.get("sam")!.client!.inboxId,
+      .client.conversations.newGroup([
+        personas.get("joe")!.client.inboxId,
+        personas.get("bob")!.client.inboxId,
+        personas.get("alice")!.client.inboxId,
+        personas.get("sam")!.client.inboxId,
       ]);
 
     const messages: string[] = [];
@@ -120,7 +120,7 @@ describe(testName, () => {
 
     for (const persona of personasFromGroup) {
       const conversation =
-        await persona.client!.conversations.getConversationById(group.id);
+        await persona.client.conversations.getConversationById(group.id);
       if (!conversation) {
         throw new Error("Conversation not found");
       }

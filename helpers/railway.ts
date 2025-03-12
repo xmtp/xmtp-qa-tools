@@ -45,10 +45,14 @@ export async function getLatestDeployment() {
 
   console.log("Response:", response.data);
   const deployment = response.data.data.deployments.edges[0]?.node;
-  return deployment;
+
+  return deployment as {
+    id: string;
+    staticUrl: string;
+  };
 }
 
-export async function redeployDeployment(deploymentId: string) {
+export async function redeployDeployment(deploymentId: string | undefined) {
   console.log(`Redeploying deployment with ID: ${deploymentId}...`);
 
   if (!RAILWAY_API_TOKEN) {
@@ -83,5 +87,13 @@ export async function redeployDeployment(deploymentId: string) {
 
   console.log("Deployment redeploy successful!");
   console.log("Response:", response.data);
-  return response.data.data.deploymentRedeploy;
+  const deployment = response.data.data.deploymentRedeploy;
+  if (!deployment) {
+    throw new Error("No deployment found");
+  }
+  return deployment as {
+    id: string;
+    status: string;
+    staticUrl: string;
+  };
 }

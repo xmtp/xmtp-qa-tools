@@ -3,7 +3,7 @@ import type { NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, describe, expect, it } from "vitest";
 
-const testName = "dynamic-installations";
+const testName = "installations";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -31,11 +31,11 @@ describe(testName, () => {
     expect(secondaryPersonas.get("bob", "b")?.folder).toBe("b");
 
     // Verify installations of the same person share identity
-    expect(initialPersonas.get("bob")?.client?.inboxId).toBe(
-      secondaryPersonas.get("bob", "b")?.client?.inboxId,
+    expect(initialPersonas.get("bob")?.client.inboxId).toBe(
+      secondaryPersonas.get("bob", "b")?.client.inboxId,
     );
-    expect(initialPersonas.get("alice")?.client?.inboxId).toBe(
-      secondaryPersonas.get("alice", "desktop")?.client?.inboxId,
+    expect(initialPersonas.get("alice")?.client.inboxId).toBe(
+      secondaryPersonas.get("alice", "desktop")?.client.inboxId,
     );
     expect(initialPersonas.get("bob")?.dbPath).not.toBe(
       secondaryPersonas.get("bob", "b")?.dbPath,
@@ -50,25 +50,25 @@ describe(testName, () => {
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryPersonas.get("alice", "desktop");
-    const conversation = await aliceDesktop?.client!.conversations.newDm(
-      terciaryPersonas.get("charlie")?.client?.inboxId ?? "",
+    const conversation = await aliceDesktop?.client.conversations.newDm(
+      terciaryPersonas.get("charlie")?.client.inboxId ?? "",
     );
     await conversation?.send("Hello Charlie from Alice's desktop");
 
     // Charlie can see the message
-    await terciaryPersonas.get("charlie")?.client?.conversations.syncAll();
+    await terciaryPersonas.get("charlie")?.client.conversations.syncAll();
     const charlieConvs = await terciaryPersonas
       .get("charlie")
-      ?.client?.conversations.list();
+      ?.client.conversations.list();
     expect(charlieConvs?.length).toBeGreaterThan(0);
 
     // Create a backup installation for charlie
     const fourthPersonas = await getWorkers(["charlie-a"], testName);
     // Backup installation should also be able to access the conversation after syncing
-    await fourthPersonas.get("charlie")?.client?.conversations.syncAll();
+    await fourthPersonas.get("charlie")?.client.conversations.syncAll();
     const backupConvs = await fourthPersonas
       .get("charlie")
-      ?.client?.conversations.list();
+      ?.client.conversations.list();
     expect(backupConvs?.length).toBeGreaterThan(0);
   });
 });

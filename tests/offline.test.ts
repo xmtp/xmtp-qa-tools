@@ -28,8 +28,8 @@ describe(
         // Create a group conversation
         group = await personas
           .get("bob")!
-          .client!.conversations.newGroup(
-            personas.getPersonas().map((p) => p.client?.inboxId as string),
+          .client.conversations.newGroup(
+            personas.getPersonas().map((p) => p.client.inboxId),
           );
 
         console.log("Group created", group.id);
@@ -42,6 +42,7 @@ describe(
     afterAll(async () => {
       try {
         await closeEnv(testName, personas);
+        console.log(hasFailures);
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -56,11 +57,11 @@ describe(
         console.log(`Taking ${offlinePersona.name} offline`);
 
         // Disconnect the selected persona
-        await offlinePersona.worker!.terminate();
+        await offlinePersona.worker.terminate();
 
         // Send messages from an online persona
         const conversation =
-          await onlinePersona.client!.conversations.getConversationById(
+          await onlinePersona.client.conversations.getConversationById(
             group.id,
           );
 
@@ -75,7 +76,7 @@ describe(
 
         // Reconnect the offline persona
         console.log(`Reconnecting ${offlinePersona.name}`);
-        const { client } = await offlinePersona.worker!.initialize();
+        const { client } = await offlinePersona.worker.initialize();
         offlinePersona.client = client;
         await offlinePersona.client.conversations.sync();
 

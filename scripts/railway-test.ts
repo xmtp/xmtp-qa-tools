@@ -42,7 +42,7 @@ async function runTests(): Promise<void> {
   }
 
   // Report results to Datadog
-  await sendTestResults(status, testName);
+  sendTestResults(status, testName);
 }
 
 // Run tests when this script is executed

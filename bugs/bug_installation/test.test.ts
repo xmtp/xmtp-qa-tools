@@ -19,7 +19,7 @@ describe(testName, () => {
 
   it("inboxState", async () => {
     for (const persona of personas.getPersonas()) {
-      const inboxState = await persona.client!.inboxState();
+      const inboxState = await persona.client.inboxState();
       console.log("Installations", inboxState.installations.length);
     }
   });
@@ -27,29 +27,29 @@ describe(testName, () => {
   it("should create a group with bob and alice", async () => {
     const group = await personas
       .get("bob")!
-      .client!.conversations.newGroup([personas.get("alice")!.client!.inboxId]);
+      .client.conversations.newGroup([personas.get("alice")!.client.inboxId]);
     expect(group.id).toBeDefined();
   });
 
   it("should create a group with bob and alice", async () => {
     const group = await personas
       .get("bob")!
-      .client!.conversations.newGroup([personas.get("joe")!.client!.inboxId]);
+      .client.conversations.newGroup([personas.get("joe")!.client.inboxId]);
     expect(group.id).toBeDefined();
   });
   it("joe with alice", async () => {
     const group = await personas
       .get("joe")!
-      .client!.conversations.newGroup([personas.get("alice")!.client!.inboxId]);
+      .client.conversations.newGroup([personas.get("alice")!.client.inboxId]);
     expect(group.id).toBeDefined();
   });
   // it("fabri creates a grop with all", async () => {
   //   const group = await personas[
   //     "fabri"
-  //   ].client!.conversations.newGroup([
-  //     personas["bob"].client!.inboxId,
-  //     personas["alice"].client!.inboxId,
-  //     personas["joe"].client!.inboxId,
+  //   ].client.conversations.newGroup([
+  //     personas["bob"].client.inboxId,
+  //     personas["alice"].client.inboxId,
+  //     personas["joe"].client.inboxId,
   //   ]);
   //   expect(group.id).toBeDefined();
   // });

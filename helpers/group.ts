@@ -31,7 +31,7 @@ export async function createGroupWithBatch(
   const group = await creator.client?.conversations.newGroup(
     allPersonas
       .getPersonas()
-      .map((persona) => persona.client?.inboxId as string)
+      .map((persona) => persona.client.inboxId)
       .slice(0, batchSize),
   );
 

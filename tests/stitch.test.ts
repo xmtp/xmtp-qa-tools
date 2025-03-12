@@ -32,7 +32,7 @@ describe(testName, () => {
   });
 
   it("new dm with bug", async () => {
-    convo = await sender.client!.conversations.newDm(receiver.client!.inboxId);
+    convo = await sender.client.conversations.newDm(receiver.client.inboxId);
     expect(convo.id).toBeDefined();
     await convo.send("hello");
     console.log("convo", convo.id);
@@ -64,20 +64,20 @@ describe(testName, () => {
     // Initiate a new DM with a specific conversation ID
     const newSender = personas.get("ivy", "b")!;
     const newReceiver = personas.get("bob", "b")!;
-    const convo1 = await newSender.client!.conversations.newDm(
-      newReceiver.client!.inboxId,
+    const convo1 = await newSender.client.conversations.newDm(
+      newReceiver.client.inboxId,
     );
     expect(convo1.id).toBeDefined();
     await convo1.send("Hi there!");
 
     // Simulate receiver listening on a different channel
-    const convo2 = await sender.client!.conversations.newDm(
-      newReceiver.client!.inboxId,
+    const convo2 = await sender.client.conversations.newDm(
+      newReceiver.client.inboxId,
     );
     expect(convo2.id).toBeDefined();
 
-    const convo3 = await newReceiver.client!.conversations.newDm(
-      newSender.client!.inboxId,
+    const convo3 = await newReceiver.client.conversations.newDm(
+      newSender.client.inboxId,
     );
     expect(convo3.id).toBeDefined();
     await convo3.send("Hi there!");

@@ -179,9 +179,9 @@ export const overrideConsole = (logger: winston.Logger) => {
       }
     };
     // Add a new debug method that only logs in non-production environments
-    console.debug = (...args: any[]) => {
-      logger.log("debug", args.join(" ").trim() || "");
-    };
+    // console.debug = (...args: any[]) => {
+    //   logger.log("debug", args.join(" ").trim() || "");
+    // };
   } catch (error) {
     console.error("Error overriding console", error);
   }

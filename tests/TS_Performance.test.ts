@@ -81,8 +81,8 @@ describe(testName, () => {
 
   it("inboxState: should measure inboxState of henry", async () => {
     try {
-      const inboxState = await personas.get("henry")!.client?.inboxState(true);
-      expect(inboxState?.installations.length).toBeGreaterThan(0);
+      const inboxState = await personas.get("henry")!.client.inboxState(true);
+      expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -92,9 +92,7 @@ describe(testName, () => {
     try {
       dm = await personas
         .get("henry")!
-        .client!.conversations.newDm(
-          personas.get("randomguy")!.client!.inboxId,
-        );
+        .client.conversations.newDm(personas.get("randomguy")!.client.inboxId);
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -110,7 +108,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client?.inboxId}`,
+        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client.inboxId}`,
       );
 
       const dmId = await dm.send(message);
@@ -141,7 +139,7 @@ describe(testName, () => {
         const sliced = generatedInboxes.slice(0, i);
         newGroup = await personas
           .get("henry")!
-          .client!.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -153,7 +151,7 @@ describe(testName, () => {
         const sliced = generatedInboxes.slice(0, i);
         const newGroupByIdentifier = await personas
           .get("henry")!
-          .client!.conversations.newGroupByIdentifiers(
+          .client.conversations.newGroupByIdentifiers(
             sliced.map((inbox) => ({
               identifier: inbox.accountAddress,
               identifierKind: IdentifierKind.Ethereum,

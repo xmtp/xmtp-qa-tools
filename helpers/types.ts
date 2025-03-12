@@ -49,8 +49,8 @@ export interface Persona {
   installationId: string;
   version: string;
   dbPath: string;
-  worker: WorkerClient | null;
-  client: Client | null;
+  worker: WorkerClient;
+  client: Client;
 }
 
 export type GroupMetadataContent = {
@@ -147,9 +147,9 @@ export interface PersonaBase {
 }
 
 export interface Persona extends PersonaBase {
-  worker: WorkerClient | null;
+  worker: WorkerClient;
   dbPath: string;
-  client: Client | null;
+  client: Client;
   version: string;
   installationId: string;
   address: string;

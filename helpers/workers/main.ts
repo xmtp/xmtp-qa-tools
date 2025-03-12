@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
@@ -115,6 +114,7 @@ export class WorkerClient extends Worker {
     dbPath: string;
     version: string;
     installationId: string;
+    address: `0x${string}`;
   }> {
     // Tell the Worker to do any internal initialization
     this.postMessage({
@@ -130,14 +130,7 @@ export class WorkerClient extends Worker {
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
-    const params = {
-      name: this.name,
-      address: this.address,
-      testName: this.testName,
-      folder: this.folder,
-      version,
-    };
-    console.debug(params);
+
     const dbPath = getDbPath(
       this.name,
       this.address,
@@ -176,8 +169,14 @@ export class WorkerClient extends Worker {
     }
 
     const installationId = this.client.installationId;
-    const debugLog = { client: this.client, dbPath, version, installationId };
-    //console.debug(debugLog);
+    const debugLog = {
+      client: this.client,
+      dbPath,
+      version,
+      address: this.address,
+      installationId,
+    };
+    console.debug(debugLog);
     return debugLog;
   }
 

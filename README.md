@@ -55,8 +55,8 @@ beforeAll(async () => {
 });
 
 // Use them directly in your tests
-convo = await personas.alice.client!.conversations.newDm(
-  personas.randomguy.client!.accountAddress,
+convo = await personas.alice.client.conversations.newDm(
+  personas.randomguy.client.accountAddress,
 );
 ```
 
