@@ -3,6 +3,7 @@ import * as fs from "fs/promises";
 import { promisify } from "util";
 import {
   createSigner,
+  createUser,
   getEncryptionKeyFromHex,
   loadEnv,
 } from "@helpers/client";
@@ -90,15 +91,16 @@ async function simulateTransportError(durationMs = 10000) {
 }
 
 (async () => {
+  const signer = createSigner(WALLET_KEY as `0x${string}`);
   const client = await Client.create(
-    createSigner(WALLET_KEY),
+    signer,
     getEncryptionKeyFromHex(ENCRYPTION_KEY),
     { env: "dev", loggingLevel: "error" as LogLevel },
   );
   await client.conversations.sync();
-  console.log(`Agent initialized on ${client.accountAddress}`);
+  console.log(`Agent initialized on ${client.inboxId}`);
   console.log(
-    `Send a message on http://xmtp.chat/dm/${client.accountAddress}?env=dev`,
+    `Send a message on http://xmtp.chat/dm/${client.inboxId}?env=dev`,
   );
 
   // Set up a timer to simulate transport error after 30 seconds

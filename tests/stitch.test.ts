@@ -1,6 +1,10 @@
-import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Conversation, type Persona } from "@helpers/types";
+import { listInstallations } from "@helpers/tests";
+import {
+  type Conversation,
+  type NestedPersonas,
+  type Persona,
+} from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -8,45 +12,116 @@ const testName = "stitch";
 loadEnv(testName);
 
 describe(testName, () => {
-  let convo: Conversation | null;
-  let personas: Record<string, Persona>;
+  let convo: Conversation;
+  let personas: NestedPersonas;
+  let sender: Persona;
+  let receiver: Persona;
 
   beforeAll(async () => {
-    const testFilePath = __filename.split("/").slice(0, -1).join("/") + "/";
-    fs.rmSync(testFilePath + ".data", { recursive: true, force: true });
-
-    personas = await getWorkers(["henry", "ivy", "bug-a", "bug-b"], testName);
+    //fs.rmSync(".data", { recursive: true, force: true });
+    personas = await getWorkers(["ivy", "bob"], testName);
+    sender = personas.get("ivy")!;
+    receiver = personas.get("bob")!;
   });
 
   afterAll(async () => {
     await closeEnv(testName, personas);
   });
   it("inboxState", async () => {
-    const inboxState = await personas["bug-a"].client!.inboxState();
-    console.log("Installations", inboxState.installations.length);
-    const inboxState2 = await personas["bug-b"].client!.inboxState();
-    console.log("Installations", inboxState2.installations.length);
+    await listInstallations(personas);
   });
 
   it("new dm with bug", async () => {
-    convo = await personas.henry.client!.conversations.newDm(
-      personas["bug-a"].client!.accountAddress,
-    );
+    convo = await sender.client!.conversations.newDm(receiver.client!.inboxId);
     expect(convo.id).toBeDefined();
     await convo.send("hello");
     console.log("convo", convo.id);
   });
 
+  it("inboxState", async () => {
+    await listInstallations(personas);
+  });
   it("should count conversations", async () => {
-    await personas["bug-a"].client?.conversations.sync();
-    const listConversations =
-      await personas["bug-a"].client?.conversations.list();
-    console.log(listConversations?.length);
-    expect(listConversations?.length).toBe(1);
-    await personas["bug-b"].client?.conversations.sync();
-    const listConversations2 =
-      await personas["bug-b"].client?.conversations.list();
-    console.log(listConversations2?.length);
-    expect(listConversations2?.length).toBe(1);
+    await compareDms(sender, receiver);
+  });
+
+  it("should handle different conversation IDs and require manual sync", async () => {
+    personas = await getWorkers(
+      ["ivy-b", "bob-b"],
+      testName,
+      "message",
+      true,
+      personas,
+    );
+    await listInstallations(personas);
+  });
+
+  it("should count conversations", async () => {
+    await compareDms(sender, receiver);
+  });
+
+  it("should handle different conversation IDs and require manual sync", async () => {
+    // Initiate a new DM with a specific conversation ID
+    const newSender = personas.get("ivy", "b")!;
+    const newReceiver = personas.get("bob", "b")!;
+    const convo1 = await newSender.client!.conversations.newDm(
+      newReceiver.client!.inboxId,
+    );
+    expect(convo1.id).toBeDefined();
+    await convo1.send("Hi there!");
+
+    // Simulate receiver listening on a different channel
+    const convo2 = await sender.client!.conversations.newDm(
+      newReceiver.client!.inboxId,
+    );
+    expect(convo2.id).toBeDefined();
+
+    const convo3 = await newReceiver.client!.conversations.newDm(
+      newSender.client!.inboxId,
+    );
+    expect(convo3.id).toBeDefined();
+    await convo3.send("Hi there!");
+  });
+  it("should count conversations", async () => {
+    await compareDms(sender, receiver);
   });
 });
+
+async function compareDms(sender: Persona, receiver: Persona) {
+  await receiver.client?.conversations.sync();
+  const allUnique = (await receiver.client?.conversations.listDms()) ?? [];
+  const allWithDuplicates =
+    (await receiver.client?.conversations.listDms({
+      includeDuplicateDms: true,
+    })) ?? [];
+
+  // Save filtered results
+  const senderUnique = allUnique.filter((conversation) => {
+    return sender.client?.inboxId === conversation.peerInboxId;
+  });
+
+  const senderWithDuplicates = allWithDuplicates.filter((conversation) => {
+    return sender.client?.inboxId === conversation.peerInboxId;
+  });
+
+  // Log details of all conversations
+  console.log(
+    "All unique conversations:",
+    allUnique.map((c) => ({
+      id: c.id,
+      peerInboxId: c.peerInboxId,
+    })),
+  );
+
+  console.log(
+    "Filtered unique conversations:",
+    senderUnique.map((c) => ({
+      id: c.id,
+      peerInboxId: c.peerInboxId,
+    })),
+  );
+
+  expect(senderUnique.length).toBe(1);
+  console.log("listUniqueConversations", senderUnique.length);
+  console.log("listDuplicateConversations", senderWithDuplicates.length);
+}

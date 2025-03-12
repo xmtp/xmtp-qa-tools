@@ -1,3 +1,4 @@
+import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
@@ -51,15 +52,13 @@ const workerBootstrap = /* JavaScript */ `
 
 export class WorkerClient extends Worker {
   public name: string;
-  private installationId: string;
-  private sdkVersion: string;
   private testName: string;
   private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
-
+  private folder: string;
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
@@ -79,9 +78,9 @@ export class WorkerClient extends Worker {
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
     this.name = persona.name;
-    this.installationId = persona.installationId;
-    this.nameId = `${this.name.replaceAll("-" + this.installationId, "")}-${this.installationId}`;
-    this.sdkVersion = persona.sdkVersion;
+    this.folder = persona.folder;
+    this.nameId = persona.name;
+
     this.testName = persona.testName;
     this.walletKey = persona.walletKey;
     this.encryptionKeyHex = persona.encryptionKey;
@@ -114,6 +113,7 @@ export class WorkerClient extends Worker {
     client: Client;
     dbPath: string;
     version: string;
+    installationId: string;
   }> {
     console.time(`[${this.nameId}] Initialize XMTP client`);
 
@@ -122,20 +122,30 @@ export class WorkerClient extends Worker {
       type: "initialize",
       data: {
         name: this.name,
-        installationId: this.installationId,
-        sdkVersion: this.sdkVersion,
+        folder: this.folder,
       },
     });
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
     const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
 
-    const address = await signer.getAddress();
-    const dbPath = getDbPath(this.name, address, this.testName, {
-      installationId: this.installationId,
-      sdkVersion: this.sdkVersion,
-      libxmtpVersion: version,
-    });
+    const identifier = await signer.getIdentifier();
+    const address = identifier.identifier as `0x${string}`;
+    const params = {
+      name: this.name,
+      address,
+      testName: this.testName,
+      folder: this.folder,
+      version,
+    };
+    console.debug(params);
+    const dbPath = getDbPath(
+      this.name,
+      address,
+      this.testName,
+      this.folder,
+      version,
+    );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
@@ -165,12 +175,10 @@ export class WorkerClient extends Worker {
       console.log(`[${this.nameId}] No stream started`);
     }
 
-    // // Start conversation streaming
-    // console.log(`[${this.nameId}] Start conversation stream`);
-    // this.startConversationStream();
-
-    console.timeEnd(`[${this.nameId}] Initialize XMTP client`);
-    return { client: this.client, dbPath, version };
+    const installationId = this.client.installationId;
+    const debugLog = { client: this.client, dbPath, version, installationId };
+    //console.debug(debugLog);
+    return debugLog;
   }
 
   /**
@@ -216,6 +224,20 @@ export class WorkerClient extends Worker {
     })();
   }
 
+  // clearDB() {
+  //   const identifier = this.client.identifier;
+  //   const address = identifier.identifier as `0x${string}`;
+  //   const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+  //   const dbPath = getDbPath(
+  //     this.name,
+  //     address,
+  //     this.testName,
+  //     this.folder,
+  //     version,
+  //   );
+  //   console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
+  //   fs.rmSync(dbPath, { recursive: true, force: true });
+  // }
   async terminate() {
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent

@@ -2,6 +2,7 @@ import {
   Group,
   type Client,
   type DecodedMessage,
+  type NestedPersonas,
   type Persona,
 } from "@helpers/types";
 
@@ -38,8 +39,8 @@ export const // Random messages for group interactions
   ];
 
 export class CommandHandler {
-  private personas: Record<string, Persona>;
-  constructor(personas: Record<string, Persona>) {
+  private personas: NestedPersonas;
+  constructor(personas: NestedPersonas) {
     this.personas = personas;
   }
   async workers(message: DecodedMessage, client: Client) {
@@ -47,14 +48,17 @@ export class CommandHandler {
       message.conversationId,
     );
     await conversation?.send(
-      `Personas:\n${Object.keys(this.personas).join("\n")}`,
+      `Personas:\n${this.personas
+        .getPersonas()
+        .map((p) => p.name)
+        .join("\n")}`,
     );
   }
 
   // Helper to get random personas from the available list
   getRandomPersonas(count: number) {
     // Filter out excluded personas
-    const eligiblePersonas = Object.values(this.personas);
+    const eligiblePersonas = this.personas.getPersonas();
     return eligiblePersonas
       .sort(() => 0.5 - Math.random())
       .slice(0, Math.min(count, eligiblePersonas.length));
@@ -128,13 +132,10 @@ export class CommandHandler {
     ];
     console.log(memberInboxIds);
     // Create the group
-    const group = await client.conversations.newGroupByInboxIds(
-      memberInboxIds,
-      {
-        groupName: groupName,
-        groupDescription: `Test group with ${count} random personas`,
-      },
-    );
+    const group = await client.conversations.newGroup(memberInboxIds, {
+      groupName: groupName,
+      groupDescription: `Test group with ${count} random personas`,
+    });
     await group.addSuperAdmin(message.senderInboxId);
 
     console.log(
@@ -190,17 +191,17 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!Object.keys(this.personas).includes(personaName)) {
+      if (!this.personas.get(personaName)) {
         await groupToAddTo.send(`Persona "${personaName}" not found`);
         return;
       }
 
-      const personaToAdd = this.personas[personaName];
+      const personaToAdd2 = this.personas.get(personaName);
 
       // Check if the persona is already in the group
       const currentMembers = await groupToAddTo.members();
       const isAlreadyMember = currentMembers.some(
-        (member) => member.inboxId === personaToAdd.client?.inboxId,
+        (member) => member.inboxId === personaToAdd2?.client?.inboxId,
       );
 
       if (isAlreadyMember) {
@@ -211,14 +212,13 @@ export class CommandHandler {
       }
 
       // Add the persona to the group
-      await groupToAddTo.addMembersByInboxId([
-        personaToAdd.client?.inboxId as string,
-      ]);
+      await groupToAddTo.addMembers([personaToAdd2?.client?.inboxId as string]);
 
       // Announce in the group
       await groupToAddTo.send(`Bot :\n Added ${personaName} to the group.`);
-
-      await this.populateGroup(groupToAddTo, [this.personas[personaName]]);
+      if (personaToAdd2) {
+        await this.populateGroup(groupToAddTo, [personaToAdd2]);
+      }
     } catch (error) {
       console.error("Error adding member to group:", error);
       await groupToAddTo?.send(
@@ -248,21 +248,21 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!Object.keys(this.personas).includes(personaName)) {
+      if (!this.personas.get(personaName)) {
         await groupToRemoveFrom.send(
           `Persona "${personaName}" not found. Check /workers to see all available personas`,
         );
         return;
       }
 
-      const personaToRemove = this.personas[personaName];
+      const personaToRemove = this.personas.get(personaName);
 
       // Get current members
       const currentMembers = await groupToRemoveFrom.members();
 
       // Check if the persona is in the group
       const memberToRemove = currentMembers.find(
-        (member) => member.inboxId === personaToRemove.client?.inboxId,
+        (member) => member.inboxId === personaToRemove?.client?.inboxId,
       );
 
       if (!memberToRemove) {
@@ -289,7 +289,7 @@ export class CommandHandler {
       );
 
       // Remove the member
-      await groupToRemoveFrom.removeMembersByInboxId([memberToRemove.inboxId]);
+      await groupToRemoveFrom.removeMembers([memberToRemove.inboxId]);
 
       await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
     } catch (error) {
@@ -310,9 +310,9 @@ export class CommandHandler {
       const members = await (conversation as Group).members();
 
       const memberDetails = members.map((member) => {
-        const persona = Object.values(this.personas).find(
-          (p) => p.client?.inboxId === member.inboxId,
-        );
+        const persona = this.personas
+          .getPersonas()
+          .find((p) => p.client?.inboxId === member.inboxId);
         return persona?.name || "You";
       });
 
@@ -343,9 +343,9 @@ export class CommandHandler {
       console.log(superAdmins);
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
-        const persona = Object.values(this.personas).find(
-          (p) => p.client?.inboxId === admin,
-        );
+        const persona = this.personas
+          .getPersonas()
+          .find((p) => p.client?.inboxId === admin);
         return persona?.name || "You";
       });
 
@@ -424,11 +424,10 @@ export class CommandHandler {
 
     await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
     for (let i = 0; i < repeatCount; i++) {
-      for (const persona of Object.values(this.personas).slice(
-        0,
-        countOfPersonas,
-      )) {
-        const personaGroup = await persona.client?.conversations.newDmByInboxId(
+      for (const persona of this.personas
+        .getPersonas()
+        .slice(0, countOfPersonas)) {
+        const personaGroup = await persona.client?.conversations.newDm(
           message.senderInboxId,
         );
         await conversation?.send(` ${persona.name} just sent you a message`);
@@ -454,9 +453,7 @@ export class CommandHandler {
       message.conversationId,
     );
     try {
-      await (conversation as Group).removeMembersByInboxId([
-        message.senderInboxId,
-      ]);
+      await (conversation as Group).removeMembers([message.senderInboxId]);
 
       await conversation?.send(`You, has left the group.`);
     } catch (error) {

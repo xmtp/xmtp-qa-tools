@@ -1,6 +1,7 @@
 import {
   ConsentEntityType,
   ConsentState,
+  IdentifierKind,
   type Consent,
   type LogLevel,
 } from "@xmtp/node-bindings";
@@ -15,6 +16,10 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import type { WorkerClient } from "./workers/main";
+import { NestedPersonas } from "./workers/manager";
+
+export { NestedPersonas };
+export type NestedPersonasStructure = Record<string, Record<string, Persona>>;
 
 export type WorkerStreamMessage = {
   type: "stream_message";
@@ -29,6 +34,7 @@ export {
   Conversation,
   Dm,
   Group,
+  IdentifierKind,
   type Installation,
   type Signer,
   type LogLevel,
@@ -124,8 +130,6 @@ export const defaultValues = {
   amount: 5,
   timeout: 40000,
   perMessageTimeout: 3000,
-  sdkVersion: "44",
-  installationId: "a",
   defaultNames,
 };
 
@@ -138,8 +142,7 @@ export interface LogInfo {
 }
 export interface PersonaBase {
   name: string;
-  installationId: string;
-  sdkVersion: string;
+  folder: string;
   walletKey: string;
   encryptionKey: string;
   testName: string;
@@ -149,5 +152,7 @@ export interface Persona extends PersonaBase {
   worker: WorkerClient | null;
   dbPath: string;
   client: Client | null;
+  version: string;
+  installationId: string;
   address: string;
 }

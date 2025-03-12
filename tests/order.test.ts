@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import {
   type Group,
-  type Persona,
+  type NestedPersonas,
   type VerifyStreamResult,
 } from "@helpers/types";
 import {
@@ -19,7 +19,7 @@ const amount = 5; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
 
 describe(testName, () => {
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -52,18 +52,18 @@ describe(testName, () => {
 
   it("tc_stream: send the stream", async () => {
     // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-    group = await personas.bob.client!.conversations.newGroup(
-      Object.values(personas).map(
-        (p) => p.client?.accountAddress as `0x${string}`,
-      ),
-    );
+    group = await personas
+      .get("bob")!
+      .client!.conversations.newGroup(
+        personas.getPersonas().map((p) => p.client!.inboxId),
+      );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
 
     // Collect messages by setting up listeners before sending and then sending known messages.
     collectedMessages = await verifyStream(
       group,
-      Object.values(personas),
+      personas.getPersonas(),
       "text",
       amount,
       (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -94,12 +94,14 @@ describe(testName, () => {
   });
 
   it("tc_poll: should verify message order when receiving via pull", async () => {
-    group = await personas.bob.client!.conversations.newGroup([
-      personas.joe.client?.accountAddress as `0x${string}`,
-      personas.bob.client?.accountAddress as `0x${string}`,
-      personas.alice.client?.accountAddress as `0x${string}`,
-      personas.sam.client?.accountAddress as `0x${string}`,
-    ]);
+    group = await personas
+      .get("bob")!
+      .client!.conversations.newGroup([
+        personas.get("joe")!.client!.inboxId,
+        personas.get("bob")!.client!.inboxId,
+        personas.get("alice")!.client!.inboxId,
+        personas.get("sam")!.client!.inboxId,
+      ]);
 
     const messages: string[] = [];
     for (let i = 0; i < amount; i++) {

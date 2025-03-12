@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Group, type Persona } from "@helpers/types";
+import { type Group, type NestedPersonas } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -9,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let group: Group;
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
   beforeAll(async () => {
     personas = await getWorkers(
       [
@@ -27,11 +27,13 @@ describe(testName, () => {
     );
 
     console.time("create group");
-    group = await personas.henry.client!.conversations.newGroupByInboxIds([
-      personas.nancy.client?.inboxId ?? "",
-      personas.oscar.client?.inboxId ?? "",
-      personas.jack.client?.inboxId ?? "",
-    ]);
+    group = await personas
+      .get("henry")!
+      .client!.conversations.newGroup([
+        personas.get("nancy")?.client?.inboxId ?? "",
+        personas.get("oscar")?.client?.inboxId ?? "",
+        personas.get("jack")?.client?.inboxId ?? "",
+      ]);
     console.log("group", group.id);
     console.timeEnd("create group");
   });
@@ -45,7 +47,7 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       group,
-      [personas.oscar],
+      [personas.get("oscar")!],
       "group_updated",
     );
     expect(verifyResult.allReceived).toBe(true);
@@ -54,9 +56,7 @@ describe(testName, () => {
 
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
-    await group.addMembers([
-      personas.randomguy.client?.accountAddress as `0x${string}`,
-    ]);
+    await group.addMembers([personas.get("randomguy")!.client!.inboxId]);
     const members = await group.members();
     console.timeEnd("add members");
     expect(members.length).toBe(5);
@@ -64,9 +64,7 @@ describe(testName, () => {
 
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
     console.time("remove members");
-    await group.removeMembers([
-      personas.randomguy.client?.accountAddress as `0x${string}`,
-    ]);
+    await group.removeMembers([personas.get("randomguy")!.client!.inboxId]);
     const members = await group.members();
     console.timeEnd("remove members");
     expect(members.length).toBe(4);

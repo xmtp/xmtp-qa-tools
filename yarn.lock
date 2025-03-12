@@ -1590,6 +1590,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/lodash@npm:^4":
+  version: 4.17.16
+  resolution: "@types/lodash@npm:4.17.16"
+  checksum: 10/9a8bb7471a7521bd65d528e1bd14f79819a3eeb6f8a35a8a44649a7d773775c0813e93fd93bd32ccf350bb076c0bf02c6d47877c4625f526f6dd4d283c746aec
+  languageName: node
+  linkType: hard
+
 "@types/node-fetch@npm:^2.6.4":
   version: 2.6.12
   resolution: "@types/node-fetch@npm:2.6.12"
@@ -1905,23 +1912,23 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:^0.0.41":
-  version: 0.0.41
-  resolution: "@xmtp/node-bindings@npm:0.0.41"
-  checksum: 10/809347d36de2b4f205fe46cc3869b1eab7595107fd14b0535457732745d14851121d1e7b0f22a0845deb32e48dfca29a7ad36a12bf9fc5c46b445a308a589c10
+"@xmtp/node-bindings@npm:^1.0.0-rc2":
+  version: 1.0.0-rc2
+  resolution: "@xmtp/node-bindings@npm:1.0.0-rc2"
+  checksum: 10/2cd22b55accdc90f463d983eba43e3b78335e974036622808c42488b99589b9c94a8c7dfce6e76f32d6e5da5fc65cb2888a09f2dc7210a85ed058109f26a50bf
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:0.0.47":
-  version: 0.0.47
-  resolution: "@xmtp/node-sdk@npm:0.0.47"
+"@xmtp/node-sdk@npm:1.0.0-rc1":
+  version: 1.0.0-rc1
+  resolution: "@xmtp/node-sdk@npm:1.0.0-rc1"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
-    "@xmtp/node-bindings": "npm:^0.0.41"
+    "@xmtp/node-bindings": "npm:^1.0.0-rc2"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/bf3b5e59cc5be0b9ec02acd2d7cf59bcae5f478971b5ffc772e6153c8d59515032c95436faf2c741e1de334d9572dc1991098395d9813ec5364f0eb09666a815
+  checksum: 10/0f79fd211e56a627250015104c90605ca4b4cf39716877761311bc067c9dcf61b31e687a88880809a6a89d8fdb2729a271b309a961001660a53fec88ae2afbce
   languageName: node
   linkType: hard
 
@@ -4098,6 +4105,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lodash@npm:^4.17.21":
+  version: 4.17.21
+  resolution: "lodash@npm:4.17.21"
+  checksum: 10/c08619c038846ea6ac754abd6dd29d2568aa705feb69339e836dfa8d8b09abbb2f859371e86863eda41848221f9af43714491467b5b0299122431e202bb0c532
+  languageName: node
+  linkType: hard
+
 "logform@npm:^2.7.0":
   version: 2.7.0
   resolution: "logform@npm:2.7.0"
@@ -6156,10 +6170,11 @@ __metadata:
     "@playwright/test": "npm:^1.50.1"
     "@railway/cli": "npm:^3.22.2"
     "@types/eslint__js": "npm:^8.42.3"
+    "@types/lodash": "npm:^4"
     "@types/node": "npm:^22.13.0"
     "@vitest/coverage-v8": "npm:3.0.6"
     "@vitest/ui": "npm:^3.0.6"
-    "@xmtp/node-sdk": "npm:0.0.47"
+    "@xmtp/node-sdk": "npm:1.0.0-rc1"
     alchemy-sdk: "npm:^3.0.0"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
@@ -6168,6 +6183,7 @@ __metadata:
     eslint-config-prettier: "npm:^10.0.1"
     eslint-plugin-prettier: "npm:^5.2.3"
     globals: "npm:^15.14.0"
+    lodash: "npm:^4.17.21"
     openai: "npm:latest"
     playwright-chromium: "npm:^1.50.1"
     prettier: "npm:^3.4.2"

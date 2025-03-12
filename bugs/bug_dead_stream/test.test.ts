@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { redeployDeployment } from "@helpers/railway";
-import { type Conversation, type Persona } from "@helpers/types";
+import { type Conversation, type NestedPersonas } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -9,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
   const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
   let streamAlive = false;
 
@@ -23,7 +23,9 @@ describe(testName, () => {
 
   it("gm-bot: should check if bot is alive", async () => {
     // Create conversation with the bot
-    convo = await personas.bob.client!.conversations.newDm(gmBotAddress);
+    convo = await personas
+      .get("bob")!
+      .client!.conversations.newDm(gmBotAddress);
     const prevMessages = (await convo.messages()).length;
 
     // Send a simple message

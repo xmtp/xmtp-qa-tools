@@ -4,6 +4,7 @@ import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
 import {
   defaultValues,
+  NestedPersonas,
   type Client,
   type Persona,
   type PersonaBase,
@@ -52,7 +53,7 @@ export class PersonaFactory {
     const baseName = name.split("-")[0];
 
     if (baseName in this.keysCache) {
-      console.log(`[PersonaFactory] Using cached keys for ${baseName}`);
+      console.log(`Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
 
@@ -67,9 +68,7 @@ export class PersonaFactory {
       const account = privateKeyToAccount(
         process.env[walletKeyEnv] as `0x${string}`,
       );
-      console.log(
-        `[PersonaFactory] Using env keys for ${baseName}: ${account.address}`,
-      );
+      console.log(`Using env keys for ${baseName}: ${account.address}`);
 
       this.keysCache[baseName] = {
         walletKey: process.env[walletKeyEnv],
@@ -80,7 +79,7 @@ export class PersonaFactory {
     }
 
     // Keys don't exist, generate new ones
-    console.log(`[PersonaFactory] Generating new keys for ${baseName}`);
+    console.log(`Generating new keys for ${baseName}`);
     const walletKey = generatePrivateKey();
     const account = privateKeyToAccount(walletKey);
     const encryptionKey = generateEncryptionKeyHex();
@@ -109,150 +108,52 @@ export class PersonaFactory {
     return this.keysCache[baseName];
   }
 
-  /**
-   * Parses a persona descriptor like "aliceA42" into its components:
-   * baseName, installationId, sdkVersion, and libxmtpVersion.
-   *
-   * e.g. "bobB12" => { name: "bob", installationId: "B", sdkVersion: "12", libxmtpVersion: "12" }
-   *
-   * If any parts are missing, fall back to defaults.
-   */
-  public parsePersonaDescriptor(
-    descriptor: string,
-    defaults: {
-      installationId: string;
-      sdkVersion: string;
-    } = {
-      installationId: defaultValues.installationId,
-      sdkVersion: defaultValues.sdkVersion,
-    },
-  ): {
-    name: string;
-    installationId: string;
-    sdkVersion: string;
-  } {
-    const baseName = descriptor.split("-")[0];
-    const installationId = descriptor.split("-")[1];
-    const sdkVersion = descriptor.split("-")[2];
+  public async createPersona(descriptor: string): Promise<Persona> {
+    // Check if the persona already exists in the global cache
+    if (globalWorkerCache[descriptor] && globalWorkerCache[descriptor].client) {
+      console.log(`Reusing cached worker for ${descriptor}`);
+      return globalWorkerCache[descriptor];
+    }
 
-    return {
-      name: baseName,
-      installationId: installationId || defaults.installationId,
-      sdkVersion: sdkVersion || defaults.sdkVersion,
+    // Split the descriptor to get the base name and installation ID
+    const [baseName, installationId] = descriptor.split("-");
+    const folder = installationId || getNextFolderName();
+
+    console.debug(descriptor, baseName, installationId, folder);
+    const { walletKey, encryptionKey } = this.ensureKeys(descriptor);
+
+    const personaData: PersonaBase = {
+      name: descriptor,
+      folder,
+      testName: this.testName,
+      walletKey,
+      encryptionKey,
     };
-  }
 
-  public async flushWorkers(): Promise<void> {
-    await Promise.all(this.activeWorkers.map((worker) => worker.terminate()));
-    this.activeWorkers = [];
-  }
+    const workerClient = new WorkerClient(
+      personaData,
+      this.typeofStream,
+      this.gptEnabled,
+    );
+    const worker = await workerClient.initialize();
 
-  /**
-   * Creates an array of Persona objects from the given descriptors.
-   * Each persona either has pre-existing keys (if the descriptor is "alice", etc.)
-   * or random keys (if descriptor includes "random").
-   * Then spins up a WorkerClient for each persona, initializes it,
-   * and returns the complete Persona array.
-   */
-  public async createPersonas(descriptors: string[]): Promise<Persona[]> {
-    await this.flushWorkers();
+    const persona: Persona = {
+      ...personaData,
+      client: worker.client,
+      dbPath: worker.dbPath,
+      version: worker.version,
+      address: worker.client.inboxId,
+      installationId: worker.installationId,
+      worker: workerClient,
+    };
 
-    const personas: Persona[] = [];
-    const newDescriptors: string[] = [];
-    const newPersonas: Persona[] = [];
+    // Add to global cache for future reuse
+    globalWorkerCache[persona.name] = persona;
 
-    // First, check which personas already exist in the global cache
-    for (const desc of descriptors) {
-      if (
-        Object.values(globalWorkerCache).some((p) => p.name === desc) &&
-        globalWorkerCache[desc].client
-      ) {
-        console.log(`[PersonaFactory] Reusing cached worker for ${desc}`);
-        personas.push(globalWorkerCache[desc]);
-        continue;
-      } else {
-        // Add all other descriptors to the list of new ones to create
-        newDescriptors.push(desc);
-      }
-    }
+    // Store the new worker for potential cleanup later
+    this.activeWorkers.push(workerClient);
 
-    // Only create new personas for descriptors not in the cache
-    if (newDescriptors.length > 0) {
-      for (const desc of newDescriptors) {
-        let personaData: PersonaBase;
-
-        if (desc.includes("random")) {
-          // Generate ephemeral keys
-          const { name, installationId, sdkVersion } =
-            this.parsePersonaDescriptor(desc);
-
-          const { walletKey, encryptionKey } = this.ensureKeys(name);
-
-          personaData = {
-            name: desc,
-            testName: this.testName,
-            installationId,
-            sdkVersion,
-            walletKey,
-            encryptionKey,
-          };
-        } else {
-          // Use or generate keys from environment
-          const { name, installationId, sdkVersion } =
-            this.parsePersonaDescriptor(desc);
-
-          const { walletKey, encryptionKey } = this.ensureKeys(name);
-
-          personaData = {
-            name: desc, // Use full descriptor as name to preserve installation ID
-            testName: this.testName,
-            installationId,
-            sdkVersion,
-            walletKey,
-            encryptionKey,
-          };
-        }
-
-        newPersonas.push({
-          ...personaData,
-          worker: null,
-          client: null,
-          dbPath: "",
-          address: "",
-          version: "",
-        });
-      }
-
-      // Spin up Workers in parallel only for new personas
-      const messageWorkers = await Promise.all(
-        newPersonas.map(
-          (p) => new WorkerClient(p, this.typeofStream, this.gptEnabled),
-        ),
-      );
-
-      // Initialize each worker's XMTP client in parallel
-      const workers = await Promise.all([
-        ...messageWorkers.map((w) => w.initialize()),
-      ]);
-
-      newPersonas.forEach((p, index) => {
-        p.client = workers[index].client;
-        p.dbPath = workers[index].dbPath;
-        p.version = workers[index].version;
-        p.worker = messageWorkers[index];
-
-        // Add to global cache for future reuse
-        globalWorkerCache[p.name] = p;
-      });
-
-      // Store the new workers for potential cleanup later
-      this.activeWorkers = [...this.activeWorkers, ...messageWorkers];
-
-      // Combine existing and new personas
-      personas.push(...newPersonas);
-    }
-
-    return personas;
+    return persona;
   }
 }
 
@@ -269,7 +170,8 @@ export async function getWorkers(
   testName: string,
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
-): Promise<Record<string, Persona>> {
+  existingPersonas?: NestedPersonas,
+): Promise<NestedPersonas> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
     const workerNames = defaultValues.defaultNames;
@@ -281,13 +183,58 @@ export async function getWorkers(
 
   const personaFactory = new PersonaFactory(testName, typeofStream, gptEnabled);
 
-  const personas = await personaFactory.createPersonas(descriptors);
+  // Process descriptors in parallel
+  const personaPromises = descriptors.map((descriptor) => {
+    const [baseName, installationId] = descriptor.split("-");
+    const finalDescriptor = installationId
+      ? descriptor
+      : `${baseName}-${getNextFolderName()}`;
 
-  return personas.reduce<Record<string, Persona>>((acc, p) => {
-    // Use the full descriptor as the key in the returned object
-    acc[p.name] = p;
+    console.debug(finalDescriptor);
+    return personaFactory.createPersona(finalDescriptor);
+  });
+
+  const personasArray = await Promise.all(personaPromises);
+
+  // If existing personas are provided, add new workers to it
+  if (existingPersonas) {
+    personasArray.forEach((persona) => {
+      const [baseName, installationId] = persona.name.split("-");
+      existingPersonas.addWorker(baseName, installationId || "a", persona);
+    });
+    return existingPersonas;
+  }
+
+  // Convert the array of personas to a nested record
+  const personas = personasArray.reduce<
+    Record<string, Record<string, Persona>>
+  >((acc, persona) => {
+    const [baseName, installationId] = persona.name.split("-");
+
+    if (!acc[baseName]) {
+      acc[baseName] = {};
+    }
+
+    acc[baseName][installationId || "a"] = persona;
     return acc;
   }, {});
+
+  return new NestedPersonas(personas);
+}
+
+// Helper function to get the next available folder name
+function getNextFolderName(): string {
+  const dataPath = path.resolve(process.cwd(), ".data");
+  let folder = "a";
+  if (fs.existsSync(dataPath)) {
+    const existingFolders = fs
+      .readdirSync(dataPath)
+      .filter((f) => /^[a-z]$/.test(f));
+    folder = String.fromCharCode(
+      "a".charCodeAt(0) + (existingFolders.length % 26),
+    );
+  }
+  return folder;
 }
 
 // Function to clear the global worker cache if needed

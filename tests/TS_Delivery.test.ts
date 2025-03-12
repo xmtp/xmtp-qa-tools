@@ -4,7 +4,7 @@ import { logError } from "@helpers/tests";
 import {
   defaultValues,
   type Group,
-  type Persona,
+  type NestedPersonas,
   type VerifyStreamResult,
 } from "@helpers/types";
 import {
@@ -28,7 +28,7 @@ const timeoutMax =
 describe(
   testName,
   () => {
-    let personas: Record<string, Persona>;
+    let personas: NestedPersonas;
     let group: Group;
     let collectedMessages: VerifyStreamResult;
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -39,18 +39,21 @@ describe(
         // Use getWorkers to spin up many personas. This is resource-intensive.
         personas = await getWorkers(receiverAmount, testName);
         console.log("creating group");
-        group = await personas.bob.client!.conversations.newGroupByInboxIds(
-          Object.values(personas).map((p) => p.client?.inboxId as string),
-        );
+        group = await personas
+          .get("bob")!
+          .client!.conversations.newGroup(
+            personas.getPersonas().map((p) => p.client?.inboxId as string),
+          );
         await new Promise((resolve) => setTimeout(resolve, 3000));
-        for (const persona of Object.values(personas)) {
+        for (const persona of personas.getPersonas()) {
           await persona.client!.conversations.sync();
         }
         console.log("Group created", group.id);
         expect(personas).toBeDefined();
-        expect(Object.values(personas).length).toBe(receiverAmount);
+        expect(personas.getPersonas().length).toBe(receiverAmount);
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
@@ -60,6 +63,7 @@ describe(
         await closeEnv(testName, personas);
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
@@ -70,7 +74,7 @@ describe(
         // Collect messages by setting up listeners before sending and then sending known messages.
         collectedMessages = await verifyStream(
           group,
-          Object.values(personas),
+          personas.getPersonas(),
           "text",
           amountofMessages,
           (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -78,6 +82,7 @@ describe(
         expect(collectedMessages.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
@@ -104,20 +109,21 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          Object.values(personas)[0].version,
+          personas.get("bob")!.version,
           testName,
           "stream",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          Object.values(personas)[0].version,
+          personas.get("bob")!.version,
           testName,
           "stream",
           "order",
         );
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
@@ -160,28 +166,29 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          Object.values(personas)[0].version,
+          personas.get("bob")!.version,
           testName,
           "poll",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          Object.values(personas)[0].version,
+          personas.get("bob")!.version,
           testName,
           "poll",
           "order",
         );
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
 
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one persona to take offline
-        const offlinePersona = Object.values(personas)[1]; // Second persona
-        const onlinePersona = Object.values(personas)[0]; // First persona
+        const offlinePersona = personas.get("bob")!; // Second persona
+        const onlinePersona = personas.get("alice")!; // First persona
 
         console.log(`Taking ${offlinePersona.name} offline`);
 
@@ -259,6 +266,7 @@ describe(
         );
       } catch (e) {
         hasFailures = logError(e, expect);
+        throw e;
       }
     });
   },

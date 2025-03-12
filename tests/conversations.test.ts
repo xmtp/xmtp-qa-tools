@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Persona } from "@helpers/types";
+import { type NestedPersonas } from "@helpers/types";
 import { verifyConversationStream } from "@helpers/verify";
 import { getWorkers } from "@helpers/workers/factory";
 import { afterAll, beforeAll, describe, it } from "vitest";
@@ -8,7 +8,7 @@ const testName = "conversations";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: Record<string, Persona>;
+  let personas: NestedPersonas;
 
   beforeAll(async () => {
     personas = await getWorkers(
@@ -33,19 +33,19 @@ describe(testName, () => {
   });
 
   it("detects new group conversation creation with three participants", async () => {
-    const sender = personas.henry;
-    const participants = [personas.nancy, personas.oscar];
+    const sender = personas.get("henry")!;
+    const participants = [personas.get("nancy")!, personas.get("oscar")!];
 
     await verifyConversationStream(sender, participants);
   });
 
   it("detects new group conversation with all available personas", async () => {
-    const sender = personas.henry;
+    const sender = personas.get("henry")!;
     const participants = [
-      personas.nancy,
-      personas.oscar,
-      personas.jack,
-      personas.ivy,
+      personas.get("nancy")!,
+      personas.get("oscar")!,
+      personas.get("jack")!,
+      personas.get("ivy")!,
     ];
 
     await verifyConversationStream(sender, participants);
