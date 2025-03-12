@@ -14,6 +14,8 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ vars.XMTP_ENV }}
+      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
+      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
