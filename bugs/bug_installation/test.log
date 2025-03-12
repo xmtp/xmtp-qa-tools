@@ -1,13 +1,15 @@
-[2025-03-09T23:04:04.342Z] [info] envPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_cointoss/.env
-[2025-03-09T23:04:04.370Z] [info] [PersonaFactory] Using env keys for bob: 0x1c541A1c11095aa7b36Cf138922Da1bF6a6bD54c
-[2025-03-09T23:04:04.372Z] [info] [PersonaFactory] Using env keys for alice: 0x95484cb08200C26F69131CD5cb5a1b3acb0FAa30
-[2025-03-09T23:04:04.373Z] [info] [PersonaFactory] Using env keys for joe: 0x1dd038E110b53152af9491cf490C36B1cC720dAa
-[2025-03-09T23:04:06.383Z] [warn] [joe-a] Create XMTP client v:6bd613d 2.006s
-[2025-03-09T23:04:06.384Z] [info] [joe-a] No stream started
-[2025-03-09T23:04:06.384Z] [warn] [joe-a] Initialize XMTP client 2.007s
-[2025-03-09T23:04:06.447Z] [warn] [bob-a] Create XMTP client v:6bd613d 2.069s
-[2025-03-09T23:04:06.447Z] [info] [bob-a] No stream started
-[2025-03-09T23:04:06.447Z] [warn] [bob-a] Initialize XMTP client 2.072s
-[2025-03-09T23:04:06.551Z] [warn] [alice-a] Create XMTP client v:6bd613d 2.173s
-[2025-03-09T23:04:06.551Z] [info] [alice-a] No stream started
-[2025-03-09T23:04:06.552Z] [warn] [alice-a] Initialize XMTP client 2.175s
+[2025-03-12T15:51:15.718Z] [info] envPath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_installation/.env
+[2025-03-12T15:51:15.742Z] [info] Using env keys for bob: 0x1c541A1c11095aa7b36Cf138922Da1bF6a6bD54c
+[2025-03-12T15:51:15.746Z] [info] Using env keys for alice: 0x95484cb08200C26F69131CD5cb5a1b3acb0FAa30
+[2025-03-12T15:51:15.748Z] [info] Using env keys for joe: 0x1dd038E110b53152af9491cf490C36B1cC720dAa
+[2025-03-12T15:51:15.750Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_installation/.data/bob/a
+[2025-03-12T15:51:15.750Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_installation/.data/alice/a
+[2025-03-12T15:51:15.750Z] [info] basePath /Users/fabrizioguespe/DevRel/qa-testing/bugs/bug_installation/.data/joe/a
+[2025-03-12T15:51:17.751Z] [warn] [joe-a] Create XMTP client v:e8c52be 2.000s
+[2025-03-12T15:51:17.751Z] [info] [joe-a] No stream started
+[2025-03-12T15:51:17.778Z] [warn] [alice-a] Create XMTP client v:e8c52be 2.028s
+[2025-03-12T15:51:17.778Z] [info] [alice-a] No stream started
+[2025-03-12T15:51:17.984Z] [warn] [bob-a] Create XMTP client v:e8c52be 2.233s
+[2025-03-12T15:51:17.984Z] [info] [bob-a] No stream started
+[2025-03-12T15:51:17.989Z] [info] Installations 4
+[2025-03-12T15:51:17.993Z] [info] Installations 11

@@ -84,10 +84,10 @@ function loadDataPath(
   // Use baseName for the parent folder, not the full name
   let basePath = `${preBasePath}/.data/${baseName}/${installationId}`;
 
-  //Load data for bugs
   if (testName.includes("bug")) {
-    basePath = `${preBasePath}/bugs/${testName}/.data/${baseName}`;
+    basePath = basePath.replace("/.data/", `/bugs/${testName}/.data/`);
   }
+  console.log("basePath", basePath);
   return basePath;
 }
 export const getDbPath = (
@@ -163,9 +163,10 @@ export async function closeEnv(testName: string, personas: NestedPersonas) {
   flushLogger(testName);
 
   await flushMetrics();
-
-  for (const persona of personas.getPersonas()) {
-    await persona.worker?.terminate();
+  if (personas && typeof personas.getPersonas === "function") {
+    for (const persona of personas.getPersonas()) {
+      await persona.worker?.terminate();
+    }
   }
 
   await clearWorkerCache();
