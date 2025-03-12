@@ -121,7 +121,10 @@ export class CommandHandler {
         client.inboxId,
       ];
       // Create the group
-      const group = await client.conversations.newGroup(memberInboxIds);
+      const group = await client.conversations.newGroup(memberInboxIds, {
+        groupName: groupName,
+        groupDescription: "This is a test group",
+      });
 
       console.log(
         `Group created with id ${group.id} by ${message.senderInboxId}`,
@@ -211,7 +214,7 @@ export class CommandHandler {
       // Announce in the group
       await groupToAddTo.send(`Bot :\n Added ${personaName} to the group.`);
       if (personaToAdd2) {
-        await this.populateGroup(groupToAddTo, [personaToAdd2]);
+        await this.populateGroup(groupToAddTo.id, [personaToAdd2]);
       }
     } catch (error) {
       console.error("Error adding member to group:", error);
