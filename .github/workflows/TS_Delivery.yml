@@ -16,8 +16,6 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-      # Add environment variable to prevent SQLCipher mlock errors
-      SQLCIPHER_NO_MLOCK: 1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,10 +39,10 @@ jobs:
           max_attempts: 3
           command: |
             echo "Running TS_Delivery test:"
-            # Redirect all output to log file without displaying in terminal
-            yarn test TS_Delivery > logs/ts-delivery.log 2>&1
-            # Check the exit code of the test command
-            TEST_EXIT_CODE=$?
+            # Run test and filter out sqlcipher_mem_lock error messages
+            yarn test TS_Delivery 2>&1 | grep -v "sqlcipher_mem_lock: mlock" > logs/ts-delivery.log
+            # Check the exit code of the test command (need to use pipestatus since we're using a pipe)
+            TEST_EXIT_CODE=${PIPESTATUS[0]}
             if [ $TEST_EXIT_CODE -ne 0 ]; then
               echo "Test failed with exit code $TEST_EXIT_CODE"
               exit 1

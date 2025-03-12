@@ -19,17 +19,20 @@ const testName = "ts_delivery";
 loadEnv(testName);
 
 const amountofMessages = parseInt(
-  process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
+  process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "100",
 );
 const receiverAmount = parseInt(
-  process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
+  process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "40",
 );
 console.log("amountofMessages", amountofMessages);
 console.log("receiverAmount", receiverAmount);
 // 2 seconds per message, multiplied by the total number of participants
 // valiable for github actions
 const timeoutMax =
-  amountofMessages * receiverAmount * defaultValues.perMessageTimeout;
+  amountofMessages *
+  receiverAmount *
+  defaultValues.perMessageTimeout *
+  defaultValues.perMessageTimeout;
 
 describe(
   testName,
@@ -51,7 +54,7 @@ describe(
         await new Promise((resolve) => setTimeout(resolve, 3000));
         for (const persona of personas.getPersonas()) {
           await group.addMembers([persona.client!.inboxId]);
-          await new Promise((resolve) => setTimeout(resolve, 500));
+          console.log("Added member", persona.client!.inboxId);
         }
         expect(personas).toBeDefined();
         expect(personas.getPersonas().length).toBe(receiverAmount);
