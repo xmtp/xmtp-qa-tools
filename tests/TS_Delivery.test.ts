@@ -45,16 +45,14 @@ describe(
         // Use getWorkers to spin up many personas. This is resource-intensive.
         personas = await getWorkers(receiverAmount, testName);
         console.log("creating group");
-        group = await personas
-          .get("bob")!
-          .client!.conversations.newGroup(
-            personas.getPersonas().map((p) => p.client?.inboxId as string),
-          );
+        group = await personas.get("bob")!.client!.conversations.newGroup([]);
+
+        console.log("Group created", group.id);
         await new Promise((resolve) => setTimeout(resolve, 3000));
         for (const persona of personas.getPersonas()) {
-          await persona.client!.conversations.sync();
+          await group.addMembers([persona.client!.inboxId]);
+          await new Promise((resolve) => setTimeout(resolve, 500));
         }
-        console.log("Group created", group.id);
         expect(personas).toBeDefined();
         expect(personas.getPersonas().length).toBe(receiverAmount);
       } catch (e) {
