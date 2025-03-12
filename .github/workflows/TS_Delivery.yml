@@ -42,7 +42,6 @@ jobs:
           retry_on: error
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-f
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
