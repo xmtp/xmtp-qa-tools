@@ -119,7 +119,6 @@ export class PersonaFactory {
     const [baseName, installationId] = descriptor.split("-");
     const folder = installationId || getNextFolderName();
 
-    console.debug(descriptor, baseName, installationId, folder);
     const { walletKey, encryptionKey } = this.ensureKeys(descriptor);
 
     const personaData: PersonaBase = {
@@ -190,7 +189,6 @@ export async function getWorkers(
       ? descriptor
       : `${baseName}-${getNextFolderName()}`;
 
-    console.debug(finalDescriptor);
     return personaFactory.createPersona(finalDescriptor);
   });
 
