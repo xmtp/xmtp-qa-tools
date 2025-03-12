@@ -16,8 +16,6 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-      # Add environment variable to prevent SQLCipher mlock errors
-      SQLCIPHER_NO_MLOCK: 1
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
