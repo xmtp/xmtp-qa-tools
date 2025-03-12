@@ -1,4 +1,4 @@
-name: TS Delivery
+name: TS_Delivery
 description: "should verify delivery of the library in the dev network"
 
 on:
