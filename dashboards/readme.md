@@ -6,7 +6,7 @@ The XMTP SDK sends comprehensive performance metrics to Datadog to track various
 
 ### 🔄 Workflow Dashboard
 
-**Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
+**Dashboard URL:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nz)
 
 ![Workflow Dashboard](/media/workflows.png)
 
