@@ -7,13 +7,15 @@ import {
 } from "playwright-chromium";
 
 let browser: Browser | null = null;
-const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
-const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
-const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
-const ENCRYPTION_KEY_XMTP_CHAT = process.env.ENCRYPTION_KEY_XMTP_CHAT as string;
 
 export async function createGroupAndReceiveGm(addresses: string[]) {
   try {
+    const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
+    const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
+    const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
+    const ENCRYPTION_KEY_XMTP_CHAT = process.env
+      .ENCRYPTION_KEY_XMTP_CHAT as string;
+
     browser = await chromium.launch({ headless: isHeadless });
     const context: BrowserContext = await browser.newContext();
     const page: Page = await context.newPage();
@@ -22,6 +24,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     // Fix: Pass the env value correctly to the init script
     await context.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
+        console.log({ envValue, walletKey, walletEncryptionKey });
         //@ts-ignore
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
         //@ts-ignore

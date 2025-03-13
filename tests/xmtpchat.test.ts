@@ -12,7 +12,6 @@ describe(
   testName,
   () => {
     it("should respond to a message", async () => {
-      const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
       const result = await createGroupAndReceiveGm([gmBotAddress]);
       expect(result).toBe(true);
     });
