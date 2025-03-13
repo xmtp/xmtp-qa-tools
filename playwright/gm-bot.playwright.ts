@@ -7,7 +7,7 @@ import {
 } from "playwright-chromium";
 
 let browser: Browser | null = null;
-
+const window = globalThis.window;
 export async function createGroupAndReceiveGm(addresses: string[]) {
   try {
     const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
@@ -24,15 +24,15 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     await context.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
         console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-        //@ts-ignore
+
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        //@ts-ignore
+
         window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
-        //@ts-ignore
+
         window.localStorage.setItem("XMTP_NETWORK", envValue);
-        //@ts-ignore
+
         window.localStorage.setItem("XMTP_LOGGING_LEVEL", "debug");
-        //@ts-ignore
+
         window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
       },
       {
@@ -70,17 +70,10 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     }
     await page.getByRole("button", { name: "Create" }).click();
     // Wait a couple seconds for the bot's response to appear
-    await sleep();
+    await sleep(5000);
     await page.getByRole("textbox", { name: "Type a message..." }).click();
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(1000);
     await page.getByRole("textbox", { name: "Type a message..." }).fill("gm");
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(1000);
     await page.getByRole("button", { name: "Send" }).click();
-    // Wait a couple seconds for the bot's response to appear
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(4000);
     await page.waitForSelector(
       '[data-testid="virtuoso-item-list"] div:has-text("gm")',
     );
