@@ -1,21 +1,5 @@
 # ✅ XMTP QA Testing Suite
 
-<table style="font-size: 0.2em;">
-  <tr>
-    <th>Test Suite</th>
-    <th>Dev Network Status</th>
-    <th>Production Network Status</th>
-    <th>Run frequency</th>
-  </tr>
-  <tr>
-    <td>🚀 Performance</td>
-    <td><a href="https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml"><img src="https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml/badge.svg" alt="TS_Performance_dev"></a></td>
-    <td><a href="https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml"><img src="https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml/badge.svg" alt="TS_Performance_production"></a></td>
-    <td>Every 30 min</td>
-  </tr>
-  <!-- Add other rows similarly -->
-</table>
-
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
 | Test Suite     | Dev Network Status                                                                                                                                                                                    | Production Network Status                                                                                                                                                                                                  | Run frequency |
