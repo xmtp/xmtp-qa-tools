@@ -69,7 +69,7 @@ const bob = personas.get("bob");
 await clearWorkerCache();
 ```
 
-To see more about the factory, check the [workers section](../WORKERS.md) file
+To see more about the factory, check the [workers section](.@workers.md) file
 
 ### group.ts
 

@@ -9,7 +9,7 @@ import {
   type NestedPersonas,
 } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import {
   afterAll,
   afterEach,

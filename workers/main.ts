@@ -70,7 +70,7 @@ export class WorkerClient extends Worker {
     options: WorkerOptions = {},
   ) {
     options.workerData = {
-      __ts_worker_filename: new URL("../workers/thread.ts", import.meta.url)
+      __ts_worker_filename: new URL(".@workers/thread.ts", import.meta.url)
         .pathname,
       persona,
     };

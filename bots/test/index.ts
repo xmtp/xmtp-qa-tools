@@ -6,7 +6,7 @@ import {
   type NestedPersonas,
   type XmtpEnv,
 } from "@helpers/types";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { CommandHandler } from "./commands";
 
 const testName = "test-bot";

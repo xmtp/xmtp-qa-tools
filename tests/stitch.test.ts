@@ -5,7 +5,7 @@ import {
   type NestedPersonas,
   type Persona,
 } from "@helpers/types";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "stitch";

@@ -7,7 +7,7 @@ import {
   type Conversation,
   type NestedPersonas,
 } from "@helpers/types";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createGroupAndReceiveGm } from "../playwright/gm-bot.playwright";
 

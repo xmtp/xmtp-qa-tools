@@ -2,6 +2,7 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import { type NestedPersonas, type Signer, type XmtpEnv } from "@helpers/types";
+import { clearWorkerCache } from "@workers/factory";
 import {
   generateInboxId as generateInboxIdBinding,
   IdentifierKind,
@@ -14,7 +15,6 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
-import { clearWorkerCache } from "./workers/factory";
 
 interface User {
   key: `0x${string}`;

@@ -9,7 +9,7 @@ import {
   getPersonasFromGroup,
   verifyStream,
 } from "@helpers/verify";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "order";

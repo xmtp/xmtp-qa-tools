@@ -3,7 +3,7 @@ import { sendTestResults } from "@helpers/datadog";
 import { exportTestResults, logError } from "@helpers/tests";
 import { type Conversation, type NestedPersonas } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import {
   afterAll,
   afterEach,

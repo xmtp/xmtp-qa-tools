@@ -1,7 +1,7 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { type NestedPersonas } from "@helpers/types";
-import { getDataSubFolderCount, getWorkers } from "@helpers/workers/factory";
+import { getDataSubFolderCount, getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";

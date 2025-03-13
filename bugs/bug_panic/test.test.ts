@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_panic";

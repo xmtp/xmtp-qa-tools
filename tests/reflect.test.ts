@@ -2,7 +2,7 @@
 // import { closeEnv, loadEnv } from "@helpers/client";
 // import ReflectTestSuite from "@helpers/reflect";
 // import type { Conversation, Persona } from "@helpers/types";
-// import { getWorkers } from "@helpers/workers/factory";
+// import { getWorkers } from "@workers/factory";
 // import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // const testName = "Sending a GM";

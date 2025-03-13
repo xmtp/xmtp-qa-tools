@@ -3,7 +3,7 @@ import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
 import { type Group, type NestedPersonas } from "@helpers/types";
 import { calculateMessageStats } from "@helpers/verify";
-import { getWorkers } from "@helpers/workers/factory";
+import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "recovery";

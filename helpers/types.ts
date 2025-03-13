@@ -1,3 +1,5 @@
+import type { WorkerClient } from "@workers/main";
+import { NestedPersonas } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
@@ -16,8 +18,6 @@ import {
   type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import type { WorkerClient } from "./workers/main";
-import { NestedPersonas } from "./workers/manager";
 
 export { NestedPersonas };
 export type NestedPersonasStructure = Record<string, Record<string, Persona>>;

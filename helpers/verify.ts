@@ -1,3 +1,4 @@
+import type { MessageStreamWorker } from "@workers/main";
 import {
   type Conversation,
   type Group,
@@ -5,7 +6,6 @@ import {
   type Persona,
   type VerifyStreamResult,
 } from "./types";
-import type { MessageStreamWorker } from "./workers/main";
 
 export async function getPersonasFromGroup(
   group: Conversation,

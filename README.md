@@ -9,19 +9,9 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 👋 Gm          | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)                            | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)                            | Every 30 min  |
 | 🌎 Geolocation | [![TS_Geolocation_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![TS_Geolocation_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
 
-## Overview
-
-This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node SDK and React Native SDKs.
-
 ## 1. Operations performance
 
 ![](/media/performance.png)
-
-## Overview
-
-This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node SDK and React Native SDKs.
-
-## 1. Operations performance
 
 ### Core SDK Operations Performance
 
@@ -76,7 +66,7 @@ _Note: Performance metrics based on `us-east` testing on dev and production netw
 | asia          | 411.0            | 103.7              | +46.5%                  | ⚠️ Performance Concern |
 | south-america | 754.6            | 573.1              | +160.3%                 | ⚠️ Performance Concern |
 
-_Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the us-east baseline._
+_Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the `us-east` baseline._
 
 ## 2. Message reliability
 
@@ -129,19 +119,7 @@ _Note: Haven't been able to produce reports in cross- testing until we have acce
 | South-america & Asia    | more than 40%              | <20% difference            | ⚠️ Performance Concern |
 | US & Europe             | less than 20% variance     | <20% difference            | ✅ On Target           |
 
-## 5. Testing Infrastructure and Roadmap
-
-### Current Testing Infrastructure
-
-- Multi-region testing nodes
-- 30-minute automated test execution intervals
-- Comprehensive data aggregation in datadog
-- Testing directly on top of SDKs for real-world scenarios
-- Automated regression tests starting `>4.0.0` ⏳ WIP
-- Alerts monitoring ⏳ WIP
-- Status page ⏳ WIP
-
-### Disclaimers
+#### Disclaimers
 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
@@ -158,18 +136,7 @@ _Note: Haven't been able to produce reports in cross- testing until we have acce
 
 ## 🔨 Development
 
-- **Workers:** Predefined personas (Bob, Joe, Sam, etc.) are initialized with the `getWorkers` function:
-
-```tsx
-let personas: Record<string, Persona>;
-
-beforeAll(async () => {
-  personas = await getWorkers(["alice", "bob", "randomguy"], testName);
-});
-
-const bob = personas.get("bob");
-```
-
+- **Workers:** Predefined personas like `bob`, `alice`, `randomguy`with [workers](./helpers/workers/)
 - **Helpers:** Utility functions in the [helpers section](./helpers/)
 - **Scripts:** Automation scripts in the [scripts section](./scripts/)
 
