@@ -3,7 +3,7 @@ description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "*/30 * * * *"
+    - cron: "0 * * * *"
   workflow_dispatch:
 
 jobs:
