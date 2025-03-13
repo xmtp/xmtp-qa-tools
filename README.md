@@ -17,37 +17,44 @@ This assessment outlines how XMTP ensures messaging protocol reliability and per
 
 ![](/media/performance.png)
 
+## Overview
+
+This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node SDK and React Native SDKs.
+
+## 1. Operations performance
+
 ### Core SDK Operations Performance
 
-| Operation           | Description                            | Avg     | Target | Status       |
-| ------------------- | -------------------------------------- | ------- | ------ | ------------ |
-| createDM            | Creating a direct message conversation | 254-306 | <500ms | ✅ On Target |
-| sendGM              | Sending a group message                | 123-132 | <200ms | ✅ On Target |
-| receiveGM           | Receiving a group message              | 90-94   | <200ms | ✅ On Target |
-| receiveGroupMessage | Processing group message streams       | 119-127 | <200ms | ✅ On Target |
-| updateGroupName     | Updating group metadata                | 105-108 | <200ms | ✅ On Target |
-| syncGroup           | Syncing group state                    | 78-89   | <200ms | ✅ On Target |
-| addMembers          | Adding participants to a group         | 238-280 | <500ms | ✅ On Target |
-| removeMembers       | Removing participants from a group     | 147-168 | <300ms | ✅ On Target |
-| inboxState          | Checking inbox state                   | 36      | <100ms | ✅ On Target |
+| Operation           | Description                            | Current Avg (ms) | Target | Status       |
+| ------------------- | -------------------------------------- | ---------------- | ------ | ------------ |
+| createDM            | Creating a direct message conversation | 254-306          | <500ms | ✅ On Target |
+| sendGM              | Sending a group message                | 123-132          | <200ms | ✅ On Target |
+| receiveGM           | Receiving a group message              | 90-94            | <200ms | ✅ On Target |
+| receiveGroupMessage | Processing group message streams       | 119-127          | <200ms | ✅ On Target |
+| updateGroupName     | Updating group metadata                | 105-108          | <200ms | ✅ On Target |
+| syncGroup           | Syncing group state                    | 78-89            | <200ms | ✅ On Target |
+| addMembers          | Adding participants to a group         | 238-280          | <500ms | ✅ On Target |
+| removeMembers       | Removing participants from a group     | 147-168          | <300ms | ✅ On Target |
+| inboxState          | Checking inbox state                   | 36               | <100ms | ✅ On Target |
 
-_Note: Based on data from 79 measured operations in the US testing environment._
+_Note: Based on data from 79 measured operations in the `us-east` testing environment._
 
 ### Group Operations Performance by Size
 
-| Size | Create | Send | Sync | Update | Remove | (Create)  | Status                 |
-| ---- | ------ | ---- | ---- | ------ | ------ | --------- | ---------------------- |
-| 50   | 990    | 71   | 61   | 81     | 140    | <2,000ms  | ✅ On Target           |
-| 100  | 1,599  | 67   | 66   | 91     | 182    | <2,000ms  | ✅ On Target           |
-| 150  | 2,956  | 72   | 85   | 104    | 183    | <4,000ms  | ✅ On Target           |
-| 200  | 4,598  | 73   | 103  | 139    | 211    | <5,000ms  | ✅ On Target           |
-| 250  | 5,983  | 76   | 120  | 164    | 234    | <7,000ms  | ✅ On Target           |
-| 300  | 8,707  | 81   | 321  | 255    | 309    | <9,000ms  | ✅ On Target           |
-| 350  | 9,826  | 79   | 132  | 228    | 368    | <11,000ms | ⚠️ Performance Concern |
-| 400  | 11,451 | 84   | 170  | 427    | 501    | <15,000ms | ⚠️ Performance Concern |
-| 450  | -      | -    | -    | -      | -      | -         | ❌ Severe impact       |
+| Size | Create (ms) | Send (ms) | Sync
+(ms) | Update (ms) | Remove (ms) | Target (Create) | Status |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| 50 | 990 | 71 | 61 | 81 | 140 | <2,000ms | ✅ On Target |
+| 100 | 1,599 | 67 | 66 | 91 | 182 | <2,000ms | ✅ On Target |
+| 150 | 2,956 | 72 | 85 | 104 | 183 | <4,000ms | ✅ On Target |
+| 200 | 4,598 | 73 | 103 | 139 | 211 | <5,000ms | ✅ On Target |
+| 250 | 5,983 | 76 | 120 | 164 | 234 | <7,000ms | ✅ On Target |
+| 300 | 8,707 | 81 | 321 | 255 | 309 | <9,000ms | ✅ On Target |
+| 350 | 9,826 | 79 | 132 | 228 | 368 | <11,000ms | ⚠️ Performance Concern |
+| 400 | 11,451 | 84 | 170 | 427 | 501 | <15,000ms | ⚠️ Performance Concern |
+| 450 | - | - | - | - | - | - | ❌ Severe impact |
 
-_Note: Performance increases significantly beyond 400 members, which represents a hard limit on the protocol. Group creation operations scale with group size, while other operations remain relatively consistent regardless of member count._
+_Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
 
 ### Network performance
 
@@ -56,19 +63,19 @@ _Note: Performance increases significantly beyond 400 members, which represents 
 | Server Call Response | 78.4ms avg          | <100ms P95        | ✅ On Target |
 | TLS Handshake        | 83.6ms avg          | <100ms P95        | ✅ On Target |
 | Message Processing   | 212.5ms avg         | <300ms end-to-end | ✅ On Target |
-| Geographic Variance  | 18.3% US-to-Non-US  | <20% difference   | ✅ On Target |
 
-_Note: Performance metrics based on US testing on dev and production network. Geographic variance reflects US vs Non-US comparison._
+_Note: Performance metrics based on `us-east` testing on dev and production network._
 
 ### Regional Network Performance
 
-| Region        | Server | TLS   | Difference from us-east | Status                 |
-| ------------- | ------ | ----- | ----------------------- | ---------------------- |
-| us-east       | 276.6  | 87.2  | Baseline                | ✅ On Target           |
-| us-west       | 229.3  | 111.1 | -15.6%                  | ✅ On Target           |
-| europe        | 178.5  | 111.4 | -33.2%                  | ✅ On Target           |
-| asia          | 411.0  | 103.7 | +46.5%                  | ✅ On Target           |
-| south-america | 754.6  | 573.1 | +160.3%                 | ⚠️ Performance Concern |
+| Region        | Server Call (ms) | TLS Handshake (ms) | Difference from us-east | Status                 |
+| ------------- | ---------------- | ------------------ | ----------------------- | ---------------------- |
+| us-east       | 276.6            | 87.2               | Baseline                | ✅ On Target           |
+| us-west       | 229.3            | 111.1              | -15.6%                  | ✅ On Target           |
+| europe        | 178.5            | 111.4              | -33.2%                  | ✅ On Target           |
+| us            | 155.7            | 121.0              | -40.8%                  | ✅ On Target           |
+| asia          | 411.0            | 103.7              | +46.5%                  | ⚠️ Performance Concern |
+| south-america | 754.6            | 573.1              | +160.3%                 | ⚠️ Performance Concern |
 
 _Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the us-east baseline._
 
@@ -76,13 +83,14 @@ _Note: Regional performance testing shows significant latency increases in south
 
 ### Message delivery testing
 
-| Test Area                             | Current Performance | Target                     | Status       |
-| ------------------------------------- | ------------------- | -------------------------- | ------------ |
-| Stream Delivery Rate                  | 100% successful     | 99.9% minimum              | ✅ On Target |
-| Poll Delivery Rate                    | 100% successful     | 99.9% minimum              | ✅ On Target |
-| Message Sequence Integrity in Streams | 100% in order       | 100% in correct order      | ✅ On Target |
-| Message Sequence Integrity in Poll    | 100% in order       | 100% in correct order      | ✅ On Target |
-| Offline Message Recovery              |                     | 100% recovery on reconnect | ⏳ WIP       |
+| Test Area              | Current Performance | Target          | Status       |
+| ---------------------- | ------------------- | --------------- | ------------ |
+| Stream Delivery Rate   | 100% successful     | 99.9% minimum   | ✅ On Target |
+| Poll Delivery Rate     | 100% successful     | 99.9% minimum   | ✅ On Target |
+| Stream Order           | 100% in order       | 100% in order   | ✅ On Target |
+| Poll Order             | 100% in order       | 100% in order   | ✅ On Target |
+| Offline Recovery Rate  | 100% successful     | 100% successful | ✅ On Target |
+| Offline Recovery Order | 100% in order       | 100% in order   | ✅ On Target |
 
 _Note: Testing regularly in groups of 40 active members listening to one user sending 100 messages_
 
@@ -110,63 +118,48 @@ _Note: Haven't been able to produce reports in cross- testing until we have acce
 
 ## 4. Success criteria summary
 
-| Metric                  | Current Performance        | Target                  | Status                |
-| ----------------------- | -------------------------- | ----------------------- | --------------------- |
-| Core SDK Operations     | All within targets         | Meet defined targets    | ✅ On Target          |
-| Group Operations        | ≤400 members within target | <400 members hard limit | ✅ On Target          |
-| Network Performance     | All metrics within target  | Meet defined targets    | ✅ On Target          |
-| Message Delivery        | 100%                       | 99.9% minimum           | ✅ On Target          |
-| Stream Message Loss     | 0.0%                       | 0% (zero tolerance)     | ✅ On Target          |
-| Cross-SDK Compatibility | 80%                        | 100% operation success  | ⏳ WIP                |
-| Non-us performance      | 40%                        | <20% difference         | ❌ Performance Impact |
+| Metric                  | Current Performance        | Target                     | Status                 |
+| ----------------------- | -------------------------- | -------------------------- | ---------------------- |
+| Core SDK Operations     | All within targets         | Meet defined targets       | ✅ On Target           |
+| Group Operations        | ≤300 members within target | ≤300 members within target | ✅ On Target           |
+| Network Performance     | All metrics within target  | Meet defined targets       | ✅ On Target           |
+| Message Delivery        | 100%                       | 99.9% minimum              | ✅ On Target           |
+| Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
+| Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
+| Cross-SDK Compatibility |                            | 100% operation success     | ⏳ WIP                 |
+| South-america & Asia    | more than 40%              | <20% difference            | ⚠️ Performance Concern |
+| US & Europe             | less than 20% variance     | <20% difference            | ✅ On Target           |
 
-## 🧪 Test Suites
+## 5. Testing Infrastructure and Roadmap
 
-Run tests for specific modules using these commands:
+### Current Testing Infrastructure
 
-#### TS_Performance:
+- Multi-region testing nodes
+- 30-minute automated test execution intervals
+- Comprehensive data aggregation in datadog
+- Testing directly on top of SDKs for real-world scenarios
+- Automated regression tests starting `>4.0.0` ⏳ WIP
+- Alerts monitoring ⏳ WIP
+- Status page ⏳ WIP
 
-Measures operations in milliseconds and aggregates results in a Datadog dashboard
+### Disclaimers
 
-```bash
-yarn test ts_performance
-```
+- **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
+- **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
 
-[View test source](./tests/TS_Performance.test.ts)
+## 🧰 Tools & Utilities
 
-#### TS_Geolocation:
+- **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
+- **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
+- **Live Deployment:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
+- Visit our Public [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **QA Board:** Follow progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
+- **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
+- Explore more in the [dashboards section](./dashboards/)
 
-Measures geolocation of the library in the dev network
+## 🔨 Development
 
-```bash
-railway run -s xmtp-qa-testing:us-west yarn test ts_performance | tee logs/us-west-performance.log
-```
-
-[View test source](./tests/TS_Geolocation.test.ts)
-
-#### TS_Delivery:
-
-Tests multiple concurrent streams to detect any message losses
-
-```bash
-yarn test ts_delivery
-```
-
-[View test source](./tests/TS_Delivery.test.ts)
-
-#### TS_Gm:
-
-End-to-end testing for the Gm bot across browser and Node.js environments
-
-```bash
-yarn test ts_gm
-```
-
-[View test source](./tests/TS_Gm.test.ts)
-
-## 👥 Workers
-
-Predefined personas (Bob, Joe, Sam, etc.) are initialized with the `getWorkers` function:
+- **Workers:** Predefined personas (Bob, Joe, Sam, etc.) are initialized with the `getWorkers` function:
 
 ```tsx
 let personas: Record<string, Persona>;
@@ -178,37 +171,8 @@ beforeAll(async () => {
 const bob = personas.get("bob");
 ```
 
-See more in the [workers section](./WORKERS.md)
-
-## 🤖 Test bots
-
-A versatile bot for manual interaction testing:
-
-```bash
-yarn bot
-```
-
-Learn more in the [test bot section](./bots/test/)
-
-## 📊 Datadog Dashboards
-
-- **Message Delivery:** [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nzf?fromUser=false&p=1&from_ts=1741437030591&to_ts=1741440630591&live=true)
-- **SDK Performance:** [Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
-
-Explore more in the [dashboards section](./dashboards/)
-
-## 🧰 Tools & Utilities
-
 - **Helpers:** Utility functions in the [helpers section](./helpers/)
 - **Scripts:** Automation scripts in the [scripts section](./scripts/)
-- **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
-- **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
-- **Live Deployment:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
-- Visit our Public [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **QA Board:** Follow progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
-- **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
-
-## 🔨 Development
 
 ### Prerequisites
 
