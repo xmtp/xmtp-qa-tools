@@ -15,33 +15,33 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 ### Core SDK Operations Performance
 
-| Operation           | Description                            | Current Avg (ms) | Target | Status       |
-| ------------------- | -------------------------------------- | ---------------- | ------ | ------------ |
-| createDM            | Creating a direct message conversation | 254-306          | <500ms | ✅ On Target |
-| sendGM              | Sending a group message                | 123-132          | <200ms | ✅ On Target |
-| receiveGM           | Receiving a group message              | 90-94            | <200ms | ✅ On Target |
-| receiveGroupMessage | Processing group message streams       | 119-127          | <200ms | ✅ On Target |
-| updateGroupName     | Updating group metadata                | 105-108          | <200ms | ✅ On Target |
-| syncGroup           | Syncing group state                    | 78-89            | <200ms | ✅ On Target |
-| addMembers          | Adding participants to a group         | 238-280          | <500ms | ✅ On Target |
-| removeMembers       | Removing participants from a group     | 147-168          | <300ms | ✅ On Target |
-| inboxState          | Checking inbox state                   | 36               | <100ms | ✅ On Target |
+| Operation           | Description                            | Avg (ms) | Target | Status       |
+| ------------------- | -------------------------------------- | -------- | ------ | ------------ |
+| createDM            | Creating a direct message conversation | 254-306  | <500ms | ✅ On Target |
+| sendGM              | Sending a group message                | 123-132  | <200ms | ✅ On Target |
+| receiveGM           | Receiving a group message              | 90-94    | <200ms | ✅ On Target |
+| receiveGroupMessage | Processing group message streams       | 119-127  | <200ms | ✅ On Target |
+| updateGroupName     | Updating group metadata                | 105-108  | <200ms | ✅ On Target |
+| syncGroup           | Syncing group state                    | 78-89    | <200ms | ✅ On Target |
+| addMembers          | Adding participants to a group         | 238-280  | <500ms | ✅ On Target |
+| removeMembers       | Removing participants from a group     | 147-168  | <300ms | ✅ On Target |
+| inboxState          | Checking inbox state                   | 36       | <100ms | ✅ On Target |
 
 _Note: Based on data from 79 measured operations in the `us-east` testing environment._
 
 ### Group Operations Performance by Size
 
-| Size | Create (ms) | Send (ms) | Sync (ms) | Update (ms) | Remove (ms) | Target (Create) | Status                 |
-| ---- | ----------- | --------- | --------- | ----------- | ----------- | --------------- | ---------------------- |
-| 50   | 990         | 71        | 61        | 81          | 140         | <2,000ms        | ✅ On Target           |
-| 100  | 1,599       | 67        | 66        | 91          | 182         | <2,000ms        | ✅ On Target           |
-| 150  | 2,956       | 72        | 85        | 104         | 183         | <4,000ms        | ✅ On Target           |
-| 200  | 4,598       | 73        | 103       | 139         | 211         | <5,000ms        | ✅ On Target           |
-| 250  | 5,983       | 76        | 120       | 164         | 234         | <7,000ms        | ✅ On Target           |
-| 300  | 8,707       | 81        | 321       | 255         | 309         | <9,000ms        | ✅ On Target           |
-| 350  | 9,826       | 79        | 132       | 228         | 368         | <11,000ms       | ⚠️ Performance Concern |
-| 400  | 11,451      | 84        | 170       | 427         | 501         | <15,000ms       | ⚠️ Performance Concern |
-| 450  | -           | -         | -         | -           | -           | -               | ❌ Severe impact       |
+| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
+| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
+| 50   | 990        | 71       | 61       | 81         | 140        | <2,000ms       | ✅ On Target           |
+| 100  | 1,599      | 67       | 66       | 91         | 182        | <2,000ms       | ✅ On Target           |
+| 150  | 2,956      | 72       | 85       | 104        | 183        | <4,000ms       | ✅ On Target           |
+| 200  | 4,598      | 73       | 103      | 139        | 211        | <5,000ms       | ✅ On Target           |
+| 250  | 5,983      | 76       | 120      | 164        | 234        | <7,000ms       | ✅ On Target           |
+| 300  | 8,707      | 81       | 321      | 255        | 309        | <9,000ms       | ✅ On Target           |
+| 350  | 9,826      | 79       | 132      | 228        | 368        | <11,000ms      | ⚠️ Performance Concern |
+| 400  | 11,451     | 84       | 170      | 427        | 501        | <15,000ms      | ⚠️ Performance Concern |
+| 450  | -          | -        | -        | -          | -          | -              | ❌ Severe impact       |
 
 _Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
 
@@ -126,14 +126,15 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 
 - **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
 - **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
-- **Live Deployment:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
-- Visit our Public [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **Vitest:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
+- **Railway:** Visit our [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **QA Board:** Follow progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
 - **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
-- Explore more in the [dashboards section](./dashboards/)
+- **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
 ## 🔨 Development
 
+- **Local:** Work in local network with [dev section](./dev/)
 - **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](./workers/)
 - **Helpers:** Utility functions in the [helpers section](./helpers/)
 - **Scripts:** Automation scripts in the [scripts section](./scripts/)
