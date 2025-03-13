@@ -7,7 +7,6 @@ import {
 } from "playwright-chromium";
 
 let browser: Browser | null = null;
-const window = globalThis.window;
 export async function createGroupAndReceiveGm(addresses: string[]) {
   try {
     const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
@@ -24,15 +23,15 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     await context.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
         console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-
+        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-
+        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
-
+        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
-
+        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_LOGGING_LEVEL", "debug");
-
+        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
       },
       {
