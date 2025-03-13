@@ -128,6 +128,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 
 ## Tools & Utilities
 
+- **Bots:** Bots for testing, see our [bots section](./bots/)
 - **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
 - **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
 - **Vitest:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
