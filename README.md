@@ -67,7 +67,7 @@ const bob = personas.get("bob");
 
 See more in the [workers section](./WORKERS.md)
 
-## 🤖 Test Bot
+## 🤖 Test bots
 
 A versatile bot for manual interaction testing:
 
@@ -86,59 +86,49 @@ Learn more in the [test bot section](./bots/test/)
 
 Explore more in the [dashboards section](./dashboards/)
 
-## 🔄 GitHub Workflows
-
-See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
-
 ## 🧰 Tools & Utilities
 
 - **Helpers:** Utility functions in the [helpers section](./helpers/)
 - **Scripts:** Automation scripts in the [scripts section](./scripts/)
-
-## 🧩 Development Tools
-
-### Vitest UI
-
-We use Vitest for running tests with an interactive UI for better visualization.
-
-> Check out our live deployment on [Railway](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
-
-![](/media/vitest.jpeg)
-
-Run the Vitest UI locally:
-
-```bash
-yarn start
-```
-
-### Playwright
-
-We use Playwright for web automation testing:
-
-> See our example [xmtp.chat script](./playwright/)
-
-```bash
-yarn test xmtpchat
-```
-
-https://github.com/user-attachments/assets/e7c38c97-a0f3-4402-92ce-4214621e6047
-
-## 🐛 Bug Tracking
-
-We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
-
-## 📚 Related Repositories
-
-- [libxmtp](https://github.com/xmtp/libxmtp) - Core library implementation
-- [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/node-sdk) - Node.js SDK
-- [react-native-sdk](https://github.com/xmtp/xmtp-react-native) - React Native implementation
-
-## 🚂 Railway Deployment
-
+- **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
+- **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
+- **Related Repos:**
+  - [libxmtp](https://github.com/xmtp/libxmtp) - Core library implementation
+  - [node-sdk](https://github.com/xmtp/xmtp-js/tree/d7908ad96186026f081309ceb5c608279aab24a5/sdks/node-sdk) - Node.js SDK
+  - [react-native-sdk](https://github.com/xmtp/xmtp-react-native) - React Native implementation
+- **Live Deployment:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
 - Visit our Public [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **QA Board:** Follow our progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
+- **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
 
-## 📋 Issue Tracking
+## 🔨 Development
 
-Follow our progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
+### Prerequisites
 
-- Repo [issues](https://github.com/xmtp/xmtp-qa-testing/issues)
+- Node.js (>20.18.0)
+- Yarn
+
+### Installation
+
+```bash
+git clone https://github.com/xmtp/xmtp-qa-testing
+cd xmtp-qa-testing
+yarn install
+```
+
+### Use local network
+
+- Install docker
+- Run the local network
+
+```bash
+./dev/up
+```
+
+### Run tests
+
+Example:
+
+```bash
+yarn test dms
+```
