@@ -52,25 +52,6 @@ sendPerformanceMetric(durationMs, testName, libxmtpVersion);
 const networkStats = await getNetworkStats();
 ```
 
-### factory.ts
-
-Creates and manages test personas:
-
-```typescript
-// Get a collection of test personas
-const personas = await getWorkers(["alice", "bob", "randomguy"], testName);
-
-// Create persona objects with appropriate keys and clients
-const personaFactory = new PersonaFactory(testName, typeofStream);
-const personas = await personaFactory.createPersonas(descriptors);
-
-const bob = personas.get("bob");
-// Clear worker cache when tests are complete
-await clearWorkerCache();
-```
-
-To see more about the factory, check the [workers section](.@workers.md) file
-
 ### group.ts
 
 Utilities for creating and managing test groups:
@@ -219,45 +200,3 @@ const stats = calculateMessageStats(
   suffix,
 );
 ```
-
-## 📊 Helper Data Files
-
-The `generated-inboxes.json` file contains pre-generated wallet addresses and inbox IDs for testing. This is used to quickly set up test scenarios without having to create new wallets each time.
-
-## 🧩 How Components Work Together
-
-1. **Test Setup**:
-
-   - `factory.ts` creates test personas with appropriate keys
-   - `client.ts` handles signer creation and database paths
-   - `logger.ts` provides logging capabilities
-
-2. **Test Execution**:
-
-   - `main.ts` and `thread.ts` handle multi-threaded message processing
-   - `group.ts` creates test groups with specific participants
-   - `verify.ts` validates message delivery
-
-3. **Metrics Collection**:
-   - `datadog.ts` sends performance and reliability metrics to Datadog
-   - Performance metrics include operation duration and network stats
-   - Delivery metrics track message reception rates
-
-## 📈 Performance Testing
-
-The helpers provide tools for performance testing:
-
-1. Use `createGroupsWithIncrementalBatches` to test group creation with increasing sizes
-2. Use `sendPerformanceMetric` to track operation duration
-3. Use `getNetworkStats` to measure network performance
-4. Analyze results in Datadog dashboards
-
-## 🔄 Message Delivery Testing
-
-For testing message delivery reliability:
-
-1. Use `verifyStream` or `verifyStreamAll` to send test messages
-2. Use `calculateMessageStats` to analyze message reception rates
-3. Track delivery metrics with `sendDeliveryMetric`
-
-These helpers form the foundation of XMTP's continuous testing infrastructure, ensuring reliable performance and message delivery across different environments.

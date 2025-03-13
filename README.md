@@ -134,7 +134,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 
 ## 🔨 Development
 
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy`with [workers](./helpers/workers/)
+- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](./workers/)
 - **Helpers:** Utility functions in the [helpers section](./helpers/)
 - **Scripts:** Automation scripts in the [scripts section](./scripts/)
 
