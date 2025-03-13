@@ -19,7 +19,6 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     browser = await chromium.launch({ headless: isHeadless });
     const context: BrowserContext = await browser.newContext();
     const page: Page = await context.newPage();
-    console.log("env before init script:", XMTP_ENV); // Debug log
 
     // Fix: Pass the env value correctly to the init script
     await context.addInitScript(
@@ -42,6 +41,11 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
         walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
       },
     );
+    console.log("env keys", {
+      envValue: XMTP_ENV,
+      walletKey: WALLET_KEY_XMTP_CHAT,
+      walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
+    });
 
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
