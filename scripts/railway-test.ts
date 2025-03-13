@@ -18,6 +18,7 @@ async function runTests(): Promise<void> {
   if (!process.env.XMTP_ENV) {
     console.warn("XMTP_ENV is not set. Using default environment.");
   }
+  console.log("XMTP_ENV", process.env.XMTP_ENV);
   console.log("Starting performance tests...");
 
   // Run the tests with retry logic

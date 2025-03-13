@@ -4,11 +4,9 @@ import path from "node:path";
 import { type NestedPersonas, type Signer, type XmtpEnv } from "@helpers/types";
 import {
   generateInboxId as generateInboxIdBinding,
-  getInboxIdForIdentifier as getInboxIdForIdentifierBinding,
   IdentifierKind,
   type Identifier,
 } from "@xmtp/node-bindings";
-import { ApiUrls } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -60,15 +58,6 @@ export const generateInboxId = (identifier: Identifier): string => {
   return generateInboxIdBinding(identifier);
 };
 
-export const getInboxIdForIdentifier = async (
-  identifier: Identifier,
-  env: XmtpEnv = "dev",
-) => {
-  const host = ApiUrls[env];
-  const isSecure = host.startsWith("https");
-  return getInboxIdForIdentifierBinding(host, isSecure, identifier);
-};
-
 function loadDataPath(
   name: string,
   installationId: string,
@@ -95,6 +84,7 @@ export const getDbPath = (
   console.time(`[${name}] - getDbPath`);
 
   const env = process.env.XMTP_ENV as XmtpEnv;
+  console.log("XMTP_ENV", env);
   let identifier = `${accountAddress}-${libxmtpVersion}-${env}`;
 
   const basePath = loadDataPath(name, installationId, testName);
@@ -146,6 +136,7 @@ export function loadEnv(testName: string) {
   if (env !== "dev" && env !== "production" && env !== "local") {
     throw new Error("XMTP_ENV is not set in .env file or its not valid");
   }
+  console.log("XMTP_ENV", env);
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",

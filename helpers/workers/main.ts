@@ -10,8 +10,10 @@ import {
   type Consent,
   type Conversation,
   type DecodedMessage,
+  type LogLevel,
   type PersonaBase,
   type typeofStream,
+  type XmtpEnv,
 } from "@helpers/types";
 import OpenAI from "openai";
 
@@ -141,8 +143,8 @@ export class WorkerClient extends Worker {
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
-      // @ts-expect-error: loggingLevel is not typed
-      loggingLevel: process.env.LOGGING_LEVEL,
+      env: process.env.XMTP_ENV as XmtpEnv,
+      loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     });
 
     console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);

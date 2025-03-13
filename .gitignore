@@ -8,10 +8,10 @@ node_modules
 # testing
 coverage
 .data/
-!bugs/**/.data/
-!bugs/**/.env
-!bugs/**/.data/.env
-!bugs/**/.data/**/.env
+bugs/**/.data/
+bugs/**/.env
+bugs/**/.data/.env
+bugs/**/.data/**/.env
 
 # misc
 .DS_Store
