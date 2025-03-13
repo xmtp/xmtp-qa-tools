@@ -2,8 +2,6 @@
 
 Internal testing toolkit for XMTP protocol development.
 
-## All bots
-
 ### 👋 GM Bot
 
 This is a simple bot that replies `gm` to any message.
