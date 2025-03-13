@@ -16,7 +16,7 @@ This dashboard tracks our three continuous workflows and is connected to the `#n
 
 **Dashboard URL:** [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/)
 
-![Performance Dashboard](/media/ts_performance.png)
+![Performance Dashboard](/media/performance.png)
 
 ## Metrics Collection
 
