@@ -13,13 +13,7 @@ A lightweight toolkit for app developers to test messaging functionality against
 git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
-```
-
-## 🏃‍♂️ Running the Bot
-
-If you need to run the test bot locally:
-
-```bash
+# Run the bot
 yarn bot
 ```
 
