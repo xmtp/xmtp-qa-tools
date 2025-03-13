@@ -12,6 +12,16 @@ import { CommandHandler } from "./commands";
 const testName = "test-bot";
 loadEnv(testName);
 
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection at:", promise, "reason:", reason);
+  process.exit(1);
+});
+
 async function main() {
   // Get 20 dynamic workers
   let personas: NestedPersonas;
@@ -29,38 +39,45 @@ async function main() {
   await client.conversations.sync();
 
   console.log("Waiting for messages...");
-  const stream = client.conversations.streamAllMessages();
-  for await (const message of await stream) {
-    try {
-      /* Ignore messages from the same agent or non-text messages */
-      if (
-        message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
-        message?.contentType?.typeId !== "text"
-      ) {
-        continue;
+  try {
+    const stream = client.conversations.streamAllMessages();
+    for await (const message of await stream) {
+      try {
+        /* Ignore messages from the same agent or non-text messages */
+        if (
+          message?.senderInboxId.toLowerCase() ===
+            client.inboxId.toLowerCase() ||
+          message?.contentType?.typeId !== "text"
+        ) {
+          continue;
+        }
+
+        console.log(
+          `Received message: ${message.content as string} by ${message.senderInboxId}`,
+        );
+
+        const conversation = await client.conversations.getConversationById(
+          message.conversationId,
+        );
+
+        if (!conversation) {
+          console.log("Unable to find conversation, skipping");
+          continue;
+        }
+
+        // Parse the message content to extract command and arguments
+        await processCommand(message, conversation, client, commandHandler);
+
+        console.log("Waiting for messages...");
+      } catch (error) {
+        console.error("Error processing message:", error);
+        // Continue the loop despite errors
       }
-
-      console.log(
-        `Received message: ${message.content as string} by ${message.senderInboxId}`,
-      );
-
-      const conversation = await client.conversations.getConversationById(
-        message.conversationId,
-      );
-
-      if (!conversation) {
-        console.log("Unable to find conversation, skipping");
-        continue;
-      }
-
-      // Parse the message content to extract command and arguments
-      await processCommand(message, conversation, client, commandHandler);
-
-      console.log("Waiting for messages...");
-    } catch (error) {
-      console.error("Error processing message:", error);
-      // Continue the loop despite errors
     }
+  } catch (error) {
+    console.error("Error streaming messages:", error);
+    // Add more detailed error logging
+    console.error("Error details:", JSON.stringify(error, null, 2));
   }
 }
 
@@ -144,4 +161,8 @@ async function processCommand(
 }
 
 // Run the bot
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error("Fatal error in main function:", error);
+  console.error("Error details:", JSON.stringify(error, null, 2));
+  process.exit(1); // Explicitly exit with error code
+});

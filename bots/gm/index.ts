@@ -5,6 +5,16 @@ import { getWorkers } from "@helpers/workers/factory";
 const testName = "test-bot";
 loadEnv(testName);
 
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection at:", promise, "reason:", reason);
+  process.exit(1);
+});
+
 async function main() {
   // Get 20 dynamic workers
   const personas = await getWorkers(["bot"], testName, "message", true);
@@ -20,34 +30,51 @@ async function main() {
   await client.conversations.sync();
 
   console.log("Waiting for messages...");
-  const stream = client.conversations.streamAllMessages();
-  for await (const message of await stream) {
-    console.log("Message received:", message);
-    /* Ignore messages from the same agent or non-text messages */
-    if (
-      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
-      message?.contentType?.typeId !== "text" ||
-      message?.content === "gm"
-    ) {
-      continue;
+  try {
+    const stream = client.conversations.streamAllMessages();
+    for await (const message of await stream) {
+      try {
+        console.log("Message received:", message);
+        /* Ignore messages from the same agent or non-text messages */
+        if (
+          message?.senderInboxId.toLowerCase() ===
+            client.inboxId.toLowerCase() ||
+          message?.contentType?.typeId !== "text" ||
+          message?.content === "gm"
+        ) {
+          continue;
+        }
+
+        console.log(
+          `Received message: ${message.content as string} by ${message.senderInboxId}`,
+        );
+
+        const conversation = await client.conversations.getConversationById(
+          message.conversationId,
+        );
+
+        if (!conversation) {
+          console.log("Unable to find conversation, skipping");
+          continue;
+        }
+        await conversation.send("gm");
+        console.log("Waiting for messages...");
+      } catch (error) {
+        console.error("Error sending message:", error);
+        // Add more detailed error logging
+        console.error("Error details:", JSON.stringify(error, null, 2));
+      }
     }
-
-    console.log(
-      `Received message: ${message.content as string} by ${message.senderInboxId}`,
-    );
-
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-
-    if (!conversation) {
-      console.log("Unable to find conversation, skipping");
-      continue;
-    }
-    await conversation.send("gm");
-    console.log("Waiting for messages...");
+  } catch (error) {
+    console.error("Error streaming messages:", error);
+    // Add more detailed error logging
+    console.error("Error details:", JSON.stringify(error, null, 2));
   }
 }
 
 // Run the bot
-main().catch(console.error);
+main().catch((error: unknown) => {
+  console.error("Fatal error in main function:", error);
+  console.error("Error details:", JSON.stringify(error, null, 2));
+  process.exit(1); // Explicitly exit with error code
+});
