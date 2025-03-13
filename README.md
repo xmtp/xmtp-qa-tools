@@ -131,7 +131,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 ### Prerequisites
 
 - Node.js (>20.18.0)
-- Yarn
+- Yarn 4.6.0
 
 ### Installation
 
