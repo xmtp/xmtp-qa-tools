@@ -15,8 +15,8 @@ jobs:
       XMTP_ENV: ${{ vars.XMTP_ENV }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-      WALLET_KEY_XMTP_CHAT: ${{ vars.WALLET_KEY_XMTP_CHAT }}
-      ENCRYPTION_KEY_XMTP_CHAT: ${{ vars.ENCRYPTION_KEY_XMTP_CHAT }}
+      WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
+      ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
     steps:
       - uses: actions/checkout@v4
       - name: Debug API key
