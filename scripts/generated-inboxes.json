@@ -1,2 +1,8 @@
 [
+  {
+    "accountAddress": "0x0efe53b0286afb31ffea7a7a43f9e14ef06a33e3",
+    "inboxId": "a4354813ca54f52a009f6192569fcfdb2b456c11bd7f55db357412a3a4784684",
+    "privateKey": "0xc9b76c4fff920c583a0a6e23f653c63dfbd9f32a206af48dd6a6d0aa7e9ed714",
+    "encryptionKey": "51d6d2b14c411dc9867b4028332554038f04ab577923e92e6c1cfa6914d36c87"
+  }
 ]
