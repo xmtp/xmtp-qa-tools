@@ -11,6 +11,12 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 👋 Gm          | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)                   | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)                   | Every 30 min  |
 | 🌎 Geolocation | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
 
+### Performance dashboard
+
+![performance dashboard](./media/performance.png)
+
+- **Datadog:** Explore more in the [dashboards section](./dashboards/)
+
 ### Core SDK Operations Performance
 
 | Operation           | Description                            | Avg (ms) | Target | Status       |
@@ -79,6 +85,8 @@ _Note: Regional performance testing shows significant latency increases in south
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
+- **Datadog:** Explore more in the [dashboards section](./dashboards/)
+
 ### Stream vs. Poll reliability
 
 | Retrieval Method | Reliability   | Latency           | Use Case               | Status       |
@@ -88,6 +96,8 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | Hybrid approach  | 100% delivery | Optimized         | Recommended for Agents | ✅ On Target |
 
 _Note: A hybrid approach using `streams` with `poll`-based verification provides the most reliable message delivery guarantee._
+
+- **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
 ### Cross-SDK Testing
 
