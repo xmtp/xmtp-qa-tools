@@ -50,6 +50,9 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 - If the data folder doesnt exist, it creates one
 - Personas prefixed with "random" have keys that are stored only in memory.
 
-## Workers
+### Resources
 
-See more about workers in the [workers section](../.@workers.md) file
+- **Local:** Work in local network with [dev section](/dev/)
+- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](/workers/)
+- **Helpers:** Utility functions in the [helpers section](/helpers/)
+- **Scripts:** Automation scripts in the [scripts section](/scripts/)
