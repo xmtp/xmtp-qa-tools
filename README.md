@@ -1,6 +1,6 @@
 # ✅ XMTP QA Testing Suite
 
-<table style="font-size: 0.8em;">
+<table style="font-size: 0.2em;">
   <tr>
     <th>Test Suite</th>
     <th>Dev Network Status</th>
