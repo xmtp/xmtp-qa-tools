@@ -135,7 +135,7 @@ We document bugs in the [bugs folder](./bugs/) for easy reproduction and trackin
 
 ## 🚂 Railway Deployment
 
-- [xmtp-qa-testing project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
+- Visit our Public [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 
 ## 📋 Issue Tracking
 
