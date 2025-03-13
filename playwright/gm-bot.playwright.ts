@@ -24,7 +24,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     // Fix: Pass the env value correctly to the init script
     await context.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        console.log({ envValue, walletKey, walletEncryptionKey });
+        console.log("env keys", { envValue, walletKey, walletEncryptionKey });
         //@ts-ignore
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
         //@ts-ignore
