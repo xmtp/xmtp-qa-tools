@@ -70,7 +70,6 @@ const defaultNames = [
   "bob",
   "alice",
   "fabri",
-  "bot",
   "elon",
   "joe",
   "charlie",

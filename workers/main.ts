@@ -156,9 +156,6 @@ export class WorkerClient extends Worker {
       console.time(`[${this.nameId}] Start stream`);
       await this.startStream();
       console.timeEnd(`[${this.nameId}] Start stream`);
-
-      // Enable GPT agent for message streams
-      this.enableGptAgent();
     } else if (this.typeofStream === "conversation") {
       // Start conversation streaming
       console.log(`[${this.nameId}] Start conversation stream`);
@@ -204,6 +201,43 @@ export class WorkerClient extends Worker {
         if (!this.messageStream) return;
         for await (const message of this.messageStream) {
           if (this.isTerminated) break;
+
+          if (
+            message?.senderInboxId.toLowerCase() ===
+              this.client.inboxId.toLowerCase() ||
+            message?.contentType?.typeId !== "text"
+          ) {
+            continue;
+          }
+          // Get the base name without installation ID
+          const baseName = this.name.split("-")[0].toLowerCase();
+          if (
+            message.content.includes(baseName) &&
+            !message.content.includes("/") &&
+            !message.content.includes("members") &&
+            !message.content.includes("admins") &&
+            this.gptEnabled
+          ) {
+            console.time(`[${this.nameId}] GPT Agent: Response`);
+            // Get the conversation from the message
+            const conversation =
+              await this.client.conversations.getConversationById(
+                message.conversationId as string,
+              );
+            const messages = await conversation?.messages();
+
+            // Generate a response using OpenAI
+            const response = await this.generateOpenAIResponse(
+              message.content as string,
+              messages ?? [],
+              baseName,
+            );
+            console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
+            // Send the response
+            await conversation?.send(response);
+            console.timeEnd(`[${this.nameId}] GPT Agent: Response`);
+            continue;
+          }
           console.time(`[${this.nameId}] Process message`);
           const workerMessage: MessageStreamWorker = {
             type: "stream_message",
@@ -226,20 +260,6 @@ export class WorkerClient extends Worker {
     })();
   }
 
-  // clearDB() {
-  //   const identifier = this.client.identifier;
-  //   const address = identifier.identifier as `0x${string}`;
-  //   const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
-  //   const dbPath = getDbPath(
-  //     this.name,
-  //     address,
-  //     this.testName,
-  //     this.folder,
-  //     version,
-  //   );
-  //   console.log(`[${this.nameId}] Clearing DB: ${dbPath}`);
-  //   fs.rmSync(dbPath, { recursive: true, force: true });
-  // }
   async terminate() {
     if (this.isTerminated) {
       return super.terminate(); // Already terminated, just call parent
@@ -515,59 +535,18 @@ export class WorkerClient extends Worker {
   }
 
   /**
-   * Enables a GPT agent that uses OpenAI API to generate responses
-   * when the persona's name is mentioned in a message.
-   */
-  enableGptAgent(): void {
-    if (!this.gptEnabled || !process.env.OPENAI_API_KEY) return;
-    console.log(`[${this.nameId}] Enabling GPT agent with OpenAI`);
-    // Listen for messages that mention this persona's name
-    this.on("message", (msg: MessageStreamWorker) => {
-      void (async () => {
-        // Get the base name without installation ID
-        const baseName = this.name.split("-")[0].toLowerCase();
-        if (msg.type !== "stream_message") return;
-        if (!msg.message.content.includes(baseName)) return;
-        if (msg.message.content.includes("/")) return;
-        // Skip messages sent by this persona
-        if (msg.message.senderInboxId === this.client.inboxId) return;
-
-        // Get the conversation from the message
-        const conversation =
-          await this.client.conversations.getConversationById(
-            msg.message.conversationId,
-          );
-
-        // Generate a response using OpenAI
-        const response = await this.generateOpenAIResponse(
-          msg.message,
-          baseName,
-        );
-        console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
-        // Send the response
-        await conversation?.send(response);
-      })();
-    });
-
-    console.log(`[${this.nameId}] GPT agent enabled with OpenAI`);
-  }
-
-  /**
    * Generates a response using OpenAI based on the message content.
    */
   private async generateOpenAIResponse(
-    message: DecodedMessage,
+    message: string,
+    history: DecodedMessage[],
     personaName: string,
   ): Promise<string> {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-    const conversation = await this.client.conversations.getConversationById(
-      message.conversationId,
-    );
-    const messages = await conversation?.messages();
     /* Get the AI response */
     console.log(
-      `[${this.nameId}] Generating OpenAI response for message: ${message.content}`,
+      `[${this.nameId}] Generating OpenAI response for message: ${message}`,
     );
     const completion = await openai.chat.completions.create({
       messages: [
@@ -576,12 +555,12 @@ export class WorkerClient extends Worker {
           content: `You are ${personaName}, a fake persona in a group chat. 
                      Keep your responses concise (under 100 words) and friendly. 
                      Never mention other personas in your responses.Never answer more than 1 question per response.
-                     For context, these were the last 10 messages in the conversation: ${messages
+                     For context, these were the last 10 messages in the conversation: ${history
                        ?.slice(0, 10)
                        .map((m) => m.content as string)
                        .join("\n")}`,
         },
-        { role: "user", content: message.content as string },
+        { role: "user", content: message },
       ],
       model: "gpt-4o-mini",
     });

@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type XmtpEnv } from "@helpers/types";
+import { type Client, type Group, type XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@workers/factory";
 
 const testName = "test-bot";
@@ -17,7 +17,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   // Get 20 dynamic workers
-  const personas = await getWorkers(["bot"], testName, "none", true);
+  const personas = await getWorkers(["bot"], testName, "message", true);
 
   const bot = personas.get("bot");
   const client = bot?.client as Client;
@@ -57,7 +57,21 @@ async function main() {
           console.log("Unable to find conversation, skipping");
           continue;
         }
+        try {
+          const groupToUpdate = await client.conversations.getConversationById(
+            message.conversationId,
+          );
+          console.log("conversation", groupToUpdate?.id, client.inboxId);
+          await (groupToUpdate as Group).updateName("sdsd");
 
+          await groupToUpdate?.send(
+            `Bot :\n This group has been renamed to "sdsd"`,
+          );
+        } catch (error) {
+          console.error("Error updating group:", error);
+        }
+
+        await conversation.send("gm");
         console.log("Waiting for messages...");
       } catch (error) {
         console.error("Error sending message:", error);

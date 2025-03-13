@@ -39,16 +39,16 @@ export const // Random messages for group interactions
   ];
 
 export class CommandHandler {
-  private personas: NestedPersonas;
-  constructor(personas: NestedPersonas) {
-    this.personas = personas;
-  }
-  async workers(message: DecodedMessage, client: Client) {
+  async workers(
+    message: DecodedMessage,
+    client: Client,
+    personas: NestedPersonas,
+  ) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
     await conversation?.send(
-      `Personas:\n${this.personas
+      `Personas:\n${personas
         .getPersonas()
         .map((p) => p.name)
         .join("\n")}`,
@@ -73,27 +73,44 @@ export class CommandHandler {
 
   // Simple gm response
   async gm(message: DecodedMessage, client: Client) {
-    console.log("gm", message);
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    console.log("conversation", conversation?.id);
-    await conversation?.send("gm");
+    try {
+      console.log("gm", message);
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      console.log("conversation", conversation?.id);
+      await conversation?.send("gm");
+    } catch (error) {
+      console.error("Error sending gm:", error);
+    }
   }
   async block(message: DecodedMessage, client: Client, args: string[] = []) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    await conversation?.send(`blocked ${args.join(" ")}`);
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      await conversation?.send(`blocked ${args.join(" ")}`);
+    } catch (error) {
+      console.error("Error blocking:", error);
+    }
   }
   async unblock(message: DecodedMessage, client: Client, args: string[] = []) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    await conversation?.send(`unblocked ${args.join(" ")}`);
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      await conversation?.send(`unblocked ${args.join(" ")}`);
+    } catch (error) {
+      console.error("Error unblocking:", error);
+    }
   }
   // Create a new group
-  async create(message: DecodedMessage, client: Client, args: string[] = []) {
+  async create(
+    message: DecodedMessage,
+    client: Client,
+    args: string[] = [],
+    personas: NestedPersonas,
+  ) {
     try {
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
@@ -109,7 +126,7 @@ export class CommandHandler {
       );
 
       // Get random personas
-      const randomPersonas = this.personas.getRandomCount(count);
+      const randomPersonas = personas.getRandomCount(count);
 
       const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
 
@@ -159,22 +176,36 @@ export class CommandHandler {
   }
   // Rename the current group
   async rename(message: DecodedMessage, client: Client, args: string[] = []) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    const group = (await conversation) as Group;
-    const newName = args.join(" ").trim();
-    await group.updateName(newName);
-    await group?.send(`Bot :\n This group has been renamed to "${newName}"`);
+    try {
+      const newName = args.join(" ").trim();
+
+      const groupToUpdate = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      console.log("conversation", groupToUpdate?.id);
+      await groupToUpdate?.sync();
+      await (groupToUpdate as Group).updateName(newName);
+
+      await groupToUpdate?.send(
+        `Bot :\n This group has been renamed to "${newName}"`,
+      );
+    } catch (error) {
+      console.error("Error renaming group:", error);
+    }
   }
 
   // Add personas to the current group
-  async add(message: DecodedMessage, client: Client, args: string[] = []) {
-    const groupToAddTo = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-
+  async add(
+    message: DecodedMessage,
+    client: Client,
+    args: string[] = [],
+    personas: NestedPersonas,
+  ) {
     try {
+      const groupToAddTo = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+
       if (!(groupToAddTo instanceof Group)) {
         await groupToAddTo?.send("Group not found");
         return;
@@ -188,12 +219,12 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!this.personas.get(personaName)) {
+      if (!personas.get(personaName)) {
         await groupToAddTo.send(`Persona "${personaName}" not found`);
         return;
       }
 
-      const personaToAdd2 = this.personas.get(personaName);
+      const personaToAdd2 = personas.get(personaName);
 
       // Check if the persona is already in the group
       const currentMembers = await groupToAddTo.members();
@@ -218,18 +249,20 @@ export class CommandHandler {
       }
     } catch (error) {
       console.error("Error adding member to group:", error);
-      await groupToAddTo?.send(
-        `Error adding member: ${(error as Error).message}`,
-      );
     }
   }
 
   // Remove personas from the current group
-  async remove(message: DecodedMessage, client: Client, args: string[] = []) {
-    const groupToRemoveFrom = await client.conversations.getConversationById(
-      message.conversationId,
-    );
+  async remove(
+    message: DecodedMessage,
+    client: Client,
+    args: string[] = [],
+    personas: NestedPersonas,
+  ) {
     try {
+      const groupToRemoveFrom = await client.conversations.getConversationById(
+        message.conversationId,
+      );
       if (!(groupToRemoveFrom instanceof Group)) {
         await groupToRemoveFrom?.send("Group not found");
         return;
@@ -245,14 +278,14 @@ export class CommandHandler {
       const personaName = args[0].trim();
 
       // Check if the persona exists
-      if (!this.personas.get(personaName)) {
+      if (!personas.get(personaName)) {
         await groupToRemoveFrom.send(
           `Persona "${personaName}" not found. Check /workers to see all available personas`,
         );
         return;
       }
 
-      const personaToRemove = this.personas.get(personaName);
+      const personaToRemove = personas.get(personaName);
 
       // Get current members
       const currentMembers = await groupToRemoveFrom.members();
@@ -291,23 +324,24 @@ export class CommandHandler {
       await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
     } catch (error) {
       console.error("Error removing member from group:", error);
-      await groupToRemoveFrom?.send(
-        `Error removing member: ${(error as Error).message}`,
-      );
     }
   }
 
   // List all members in the current group
-  async members(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
+  async members(
+    message: DecodedMessage,
+    client: Client,
+    personas: NestedPersonas,
+  ) {
     try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
       // Get current members
       const members = await (conversation as Group).members();
 
       const memberDetails = members.map((member) => {
-        const persona = this.personas
+        const persona = personas
           .getPersonas()
           .find((p) => p.client?.inboxId === member.inboxId);
         return persona?.name || "You";
@@ -318,20 +352,21 @@ export class CommandHandler {
       );
     } catch (error) {
       console.error("Error listing members:", error);
-      await conversation?.send(
-        `Error listing members: ${(error as Error).message}`,
-      );
     }
   }
-  async admins(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    if (!(conversation instanceof Group)) {
-      await conversation?.send("Group not found");
-      return;
-    }
+  async admins(
+    message: DecodedMessage,
+    client: Client,
+    personas: NestedPersonas,
+  ) {
     try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      if (!(conversation instanceof Group)) {
+        await conversation?.send("Group not found");
+        return;
+      }
       // Get current members
       await conversation.sync();
       const admins = await conversation.admins;
@@ -340,7 +375,7 @@ export class CommandHandler {
       console.log(superAdmins);
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
-        const persona = this.personas
+        const persona = personas
           .getPersonas()
           .find((p) => p.client?.inboxId === admin);
         return persona?.name || "You";
@@ -351,18 +386,15 @@ export class CommandHandler {
       );
     } catch (error) {
       console.error("Error listing admins:", error);
-      await conversation.send(
-        `Error listing admins: ${(error as Error).message}`,
-      );
     }
   }
 
   // List all active groups
   async groups(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
     try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
       const preGroups = await client.conversations.listGroups();
       const groupsImAdmin = preGroups.filter((group) =>
         group.isAdmin(message.senderInboxId),
@@ -382,91 +414,99 @@ export class CommandHandler {
       await conversation?.send(groupsList);
     } catch (error) {
       console.error("Error listing groups:", error);
-      await conversation?.send(
-        `Error listing groups: ${(error as Error).message}`,
-      );
     }
   }
-  async blast(message: DecodedMessage, client: Client, args: string[] = []) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    // Extract the message and optional count parameters
-    // Format: /blast <message> <count> <repeat>
-    // Example: /blast jaja 5 5 - sends "jaja" to 5 personas, 5 times each
+  async blast(
+    message: DecodedMessage,
+    client: Client,
+    args: string[] = [],
+    personas: NestedPersonas,
+  ) {
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      // Extract the message and optional count parameters
+      // Format: /blast <message> <count> <repeat>
+      // Example: /blast jaja 5 5 - sends "jaja" to 5 personas, 5 times each
 
-    // Get the message from all arguments
-    let blastMessage = args.join(" ").trim();
+      // Get the message from all arguments
+      let blastMessage = args.join(" ").trim();
 
-    // Default values
-    let countOfPersonas = 5; // Number of personas to message
-    let repeatCount = 1; // Number of times to send the message
+      // Default values
+      let countOfPersonas = 5; // Number of personas to message
+      let repeatCount = 1; // Number of times to send the message
 
-    // Check if the last two arguments are numbers
-    const lastArg = args[args.length - 1];
-    const secondLastArg = args[args.length - 2];
+      // Check if the last two arguments are numbers
+      const lastArg = args[args.length - 1];
+      const secondLastArg = args[args.length - 2];
 
-    if (
-      lastArg &&
-      !isNaN(parseInt(lastArg)) &&
-      secondLastArg &&
-      !isNaN(parseInt(secondLastArg))
-    ) {
-      repeatCount = parseInt(lastArg);
-      countOfPersonas = parseInt(secondLastArg);
-      // Remove the numbers from the message
-      const messageWords = blastMessage.split(" ");
-      blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
-    }
-
-    await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
-    for (let i = 0; i < repeatCount; i++) {
-      for (const persona of this.personas
-        .getPersonas()
-        .slice(0, countOfPersonas)) {
-        const personaGroup = await persona.client?.conversations.newDm(
-          message.senderInboxId,
-        );
-        await conversation?.send(` ${persona.name} just sent you a message`);
-        await personaGroup?.send(`${persona.name}:\n${blastMessage}`);
+      if (
+        lastArg &&
+        !isNaN(parseInt(lastArg)) &&
+        secondLastArg &&
+        !isNaN(parseInt(secondLastArg))
+      ) {
+        repeatCount = parseInt(lastArg);
+        countOfPersonas = parseInt(secondLastArg);
+        // Remove the numbers from the message
+        const messageWords = blastMessage.split(" ");
+        blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
       }
+
+      await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
+      for (let i = 0; i < repeatCount; i++) {
+        for (const persona of personas
+          .getPersonas()
+          .slice(0, countOfPersonas)) {
+          const personaGroup = await persona.client?.conversations.newDm(
+            message.senderInboxId,
+          );
+          await conversation?.send(` ${persona.name} just sent you a message`);
+          await personaGroup?.send(`${persona.name}:\n${blastMessage}`);
+        }
+      }
+    } catch (error) {
+      console.error("Error blasting:", error);
     }
   }
 
   // Broadcast a message to all participants in all groups
   async broadcast(client: Client, args: string[] = []) {
-    const allGroups = await client.conversations.listGroups();
+    try {
+      const allGroups = await client.conversations.listGroups();
 
-    const broadcastMessage = args.join(" ").trim();
+      const broadcastMessage = args.join(" ").trim();
 
-    for (const group of allGroups) {
-      await group.send(`🔊 Broadcast: ${broadcastMessage}`);
+      for (const group of allGroups) {
+        console.log("sending to " + group.name);
+        await group.send(`🔊 Broadcast: ${broadcastMessage}`);
+      }
+    } catch (error) {
+      console.error("Error broadcasting:", error);
     }
   }
 
   // Leave the current group
   async leave(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
     try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
       await (conversation as Group).removeMembers([message.senderInboxId]);
 
       await conversation?.send(`You, has left the group.`);
     } catch (error) {
       console.error("Error leaving group:", error);
-      await conversation?.send(
-        `Error leaving group: ${(error as Error).message}`,
-      );
     }
   }
 
   // Get info about the current group
   async info(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
     try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
       const groupInfo = conversation as Group;
       const members = await groupInfo.members();
       const infoMessage = `Group info:\n- ID: ${groupInfo.id}\n- Name: ${groupInfo.name || "Unnamed"}\n- Description: ${groupInfo.description || "No description"}\n- Created: ${new Date(groupInfo.createdAt).toLocaleString()}\n- Member count: ${members.length}`;
@@ -474,9 +514,6 @@ export class CommandHandler {
       await conversation?.send(infoMessage);
     } catch (error) {
       console.error("Error getting group info:", error);
-      await conversation?.send(
-        `Error getting group info: ${(error as Error).message}`,
-      );
     }
   }
 }

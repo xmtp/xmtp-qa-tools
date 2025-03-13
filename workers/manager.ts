@@ -53,5 +53,4 @@ export class NestedPersonas {
   ): void {
     this.personas[baseName][installationId] = persona;
   }
-  // Additional methods to manipulate or access personas can be added here
 }
