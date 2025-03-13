@@ -7,8 +7,8 @@ import {
   type NestedPersonas,
 } from "@helpers/types";
 import { getWorkers } from "@helpers/workers/factory";
+import { createGroupAndReceiveGm } from "playwright/gm-bot.playwright";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { testGmBot } from "../playwright/gm-bot.playwright";
 
 const testName = "ts_gm";
 loadEnv(testName);
@@ -77,7 +77,12 @@ describe(testName, () => {
   it("should respond to a message", async () => {
     try {
       console.time("respond-to-message-test");
-      const result = await testGmBot(gmBotAddress);
+      const result = await createGroupAndReceiveGm(
+        [gmBotAddress],
+        env,
+        WALLET_KEY_XMTP_CHAT,
+        ENCRYPTION_KEY_XMTP_CHAT,
+      );
       expect(result).toBe(true);
       console.timeEnd("respond-to-message-test");
     } catch (e) {
