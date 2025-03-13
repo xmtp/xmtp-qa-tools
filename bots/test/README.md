@@ -2,10 +2,6 @@
 
 A lightweight toolkit for app developers to test messaging functionality against XMTP bots.
 
-> Send a message to `0x5348Ca464c55856AcfEE5F4490d12BF51D24B01F`
-
-## 🚀 Getting Started
-
 ### Prerequisites
 
 - Node.js (20.18.0)
@@ -26,12 +22,6 @@ If you need to run the test bot locally:
 ```bash
 yarn bot
 ```
-
-This will return the address of the bot
-
-![](/media/test.png)
-
-In the example the public key is `0x6Cb6aA63AA37E42B4741430cE6a5A8d236C1b14F`
 
 ## 💬 Available Commands
 

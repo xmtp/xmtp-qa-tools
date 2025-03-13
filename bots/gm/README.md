@@ -1,10 +1,6 @@
 ### 👋 GM Bot
 
-```bash
-Address: 0x9a1C0F4b648C6D8783b259db194be44c8310a943 (dev)
-Function: Replies "gm" to any message
-Use case: Quick connectivity verification
-```
+This is a simple bot that replies `gm` to any message.
 
 ## Quick Setup
 
