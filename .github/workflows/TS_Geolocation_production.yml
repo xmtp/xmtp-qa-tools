@@ -1,9 +1,9 @@
-name: TS_Geolocation
-description: "should verify geolocation of the library in the dev network"
+name: TS_Geolocation_production
+description: "should verify geolocation of the library in the production network"
 
 on:
   schedule:
-    - cron: "*/32 * * * *" # This cron expression means every 32 minutes
+    - cron: "*/30 * * * *" # This cron expression means every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -13,7 +13,7 @@ jobs:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
+      XMTP_ENV: "production"
       BATCH_SIZE: ${{ vars.BATCH_SIZE }}
       MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
     steps:

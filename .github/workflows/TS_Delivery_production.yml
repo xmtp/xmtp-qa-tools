@@ -1,0 +1,41 @@
+name: TS_Delivery_production
+description: "should verify message loss when receiving via 200 streams"
+
+on:
+  schedule:
+    - cron: "*/30 * * * *" # every 30 min
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: "production"
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Ensure data folder exists
+        run: mkdir -p .data
+      - name: List data folder contents
+        run: ls -la .data
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        run: ./scripts/run-test.sh TS_Delivery
+      - name: Upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: delivery_logs
+          path: logs/ts_delivery.log

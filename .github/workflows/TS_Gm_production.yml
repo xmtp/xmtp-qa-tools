@@ -1,9 +1,9 @@
-name: TS_Gm
-description: "should verify performance of the library in the dev network"
+name: TS_Gm_production
+description: "should verify performance of the library in the production network"
 
 on:
   schedule:
-    - cron: "0 * * * *"
+    - cron: "*/30 * * * *" # This cron expression means every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -12,7 +12,7 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
+      XMTP_ENV: "production"
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}

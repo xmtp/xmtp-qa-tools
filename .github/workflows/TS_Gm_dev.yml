@@ -1,9 +1,9 @@
-name: TS_Performance
+name: TS_Gm_dev
 description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # This cron expression means every 30 minutes
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
@@ -12,12 +12,20 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ vars.XMTP_ENV }}
+      XMTP_ENV: "dev"
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
-      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+      WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
+      ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
     steps:
       - uses: actions/checkout@v4
+      - name: Debug API key
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "API key is available in test job"
+          else
+            echo "API key is NOT available in test job"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
@@ -29,9 +37,9 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Performance
+        run: ./scripts/run-test.sh TS_Gm
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs
-          path: logs/ts_performance.log
+          name: gm_logs
+          path: logs/ts_gm.log
