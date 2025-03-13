@@ -80,11 +80,10 @@ export const getDbPath = (
   testName: string,
   installationId: string,
   libxmtpVersion: string,
+  env: XmtpEnv,
 ): string => {
   console.time(`[${name}] - getDbPath`);
 
-  const env = process.env.XMTP_ENV as XmtpEnv;
-  console.log("XMTP_ENV", env);
   let identifier = `${accountAddress}-${libxmtpVersion}-${env}`;
 
   const basePath = loadDataPath(name, installationId, testName);

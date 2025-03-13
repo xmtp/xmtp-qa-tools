@@ -132,6 +132,7 @@ export class WorkerClient extends Worker {
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
+    const env = process.env.XMTP_ENV as XmtpEnv;
 
     const dbPath = getDbPath(
       this.name,
@@ -139,11 +140,12 @@ export class WorkerClient extends Worker {
       this.testName,
       this.folder,
       version,
+      env,
     );
     console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
-      env: process.env.XMTP_ENV as XmtpEnv,
+      env,
       loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     });
 
