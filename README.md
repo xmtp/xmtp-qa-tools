@@ -41,18 +41,17 @@ _Note: Based on data from 79 measured operations in the `us-east` testing enviro
 
 ### Group Operations Performance by Size
 
-| Size | Create (ms) | Send (ms) | Sync
-(ms) | Update (ms) | Remove (ms) | Target (Create) | Status |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 50 | 990 | 71 | 61 | 81 | 140 | <2,000ms | ✅ On Target |
-| 100 | 1,599 | 67 | 66 | 91 | 182 | <2,000ms | ✅ On Target |
-| 150 | 2,956 | 72 | 85 | 104 | 183 | <4,000ms | ✅ On Target |
-| 200 | 4,598 | 73 | 103 | 139 | 211 | <5,000ms | ✅ On Target |
-| 250 | 5,983 | 76 | 120 | 164 | 234 | <7,000ms | ✅ On Target |
-| 300 | 8,707 | 81 | 321 | 255 | 309 | <9,000ms | ✅ On Target |
-| 350 | 9,826 | 79 | 132 | 228 | 368 | <11,000ms | ⚠️ Performance Concern |
-| 400 | 11,451 | 84 | 170 | 427 | 501 | <15,000ms | ⚠️ Performance Concern |
-| 450 | - | - | - | - | - | - | ❌ Severe impact |
+| Size | Create (ms) | Send (ms) | Sync (ms) | Update (ms) | Remove (ms) | Target (Create) | Status                 |
+| ---- | ----------- | --------- | --------- | ----------- | ----------- | --------------- | ---------------------- |
+| 50   | 990         | 71        | 61        | 81          | 140         | <2,000ms        | ✅ On Target           |
+| 100  | 1,599       | 67        | 66        | 91          | 182         | <2,000ms        | ✅ On Target           |
+| 150  | 2,956       | 72        | 85        | 104         | 183         | <4,000ms        | ✅ On Target           |
+| 200  | 4,598       | 73        | 103       | 139         | 211         | <5,000ms        | ✅ On Target           |
+| 250  | 5,983       | 76        | 120       | 164         | 234         | <7,000ms        | ✅ On Target           |
+| 300  | 8,707       | 81        | 321       | 255         | 309         | <9,000ms        | ✅ On Target           |
+| 350  | 9,826       | 79        | 132       | 228         | 368         | <11,000ms       | ⚠️ Performance Concern |
+| 400  | 11,451      | 84        | 170       | 427         | 501         | <15,000ms       | ⚠️ Performance Concern |
+| 450  | -           | -         | -         | -           | -           | -               | ❌ Severe impact       |
 
 _Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
 
@@ -92,7 +91,7 @@ _Note: Regional performance testing shows significant latency increases in south
 | Offline Recovery Rate  | 100% successful     | 100% successful | ✅ On Target |
 | Offline Recovery Order | 100% in order       | 100% in order   | ✅ On Target |
 
-_Note: Testing regularly in groups of 40 active members listening to one user sending 100 messages_
+_Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
 ### Stream vs. Poll reliability
 
