@@ -3,7 +3,7 @@ description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "30 * * * *" # Runs at 30 minutes past each hour
   workflow_dispatch:
 
 jobs:

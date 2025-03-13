@@ -3,7 +3,7 @@ description: "should verify geolocation of the library in the production network
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # This cron expression means every 30 minutes
+    - cron: "30 * * * *" # Runs at 30 minutes past each hour
   workflow_dispatch:
 
 jobs:
