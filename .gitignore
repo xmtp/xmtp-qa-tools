@@ -9,6 +9,7 @@ node_modules
 coverage
 .data/
 scripts/db/
+scripts/db/*
 bugs/**/.data/
 bugs/**/.env
 bugs/**/.data/.env
