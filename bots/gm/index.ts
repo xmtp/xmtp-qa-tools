@@ -17,7 +17,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   // Get 20 dynamic workers
-  const personas = await getWorkers(["bot"], testName, "message", true);
+  const personas = await getWorkers(["bot"], testName, "none", true);
 
   const bot = personas.get("bot");
   const client = bot?.client as Client;
@@ -57,7 +57,7 @@ async function main() {
           console.log("Unable to find conversation, skipping");
           continue;
         }
-        await conversation.send("gm");
+
         console.log("Waiting for messages...");
       } catch (error) {
         console.error("Error sending message:", error);

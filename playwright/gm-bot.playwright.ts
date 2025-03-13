@@ -73,6 +73,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     await page.getByRole("textbox", { name: "Type a message..." }).click();
     await page.getByRole("textbox", { name: "Type a message..." }).fill("gm");
     await page.getByRole("button", { name: "Send" }).click();
+    await sleep(4000);
     await page.waitForSelector(
       '[data-testid="virtuoso-item-list"] div:has-text("gm")',
     );
@@ -83,7 +84,6 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
       .locator("div")
       .filter({ hasText: "gm" })
       .all();
-    await sleep(1000);
     console.log("Found messages");
     const response =
       messages.length > 0

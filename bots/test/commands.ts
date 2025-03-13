@@ -114,7 +114,6 @@ export class CommandHandler {
       const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
 
       // Create the group name
-      const groupName = `group-${Math.random().toString(36).substring(2, 15)}`;
 
       // Make sure the bot and sender are included in the group
       const memberInboxIds = [
@@ -123,6 +122,7 @@ export class CommandHandler {
         client.inboxId,
       ];
       // Create the group
+      const groupName = `testBotGroup-${Math.random().toString(36).substring(2, 15)}`;
       const group = await client.conversations.newGroup(memberInboxIds, {
         groupName: groupName,
         groupDescription: "This is a test group",
@@ -145,14 +145,12 @@ export class CommandHandler {
   }
   async populateGroup(groupID: string, personas: Persona[]) {
     try {
-      console.log("Populating group:", groupID, "with", personas, "personas");
       for (const persona of personas) {
         const randomMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-
+        await persona.client?.conversations.sync();
         const personaGroup =
           await persona.client?.conversations.getConversationById(groupID);
-
         await personaGroup?.send(`${persona.name}:\n${randomMessage}`);
       }
     } catch (error) {

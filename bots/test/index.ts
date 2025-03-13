@@ -25,7 +25,7 @@ process.on("unhandledRejection", (reason, promise) => {
 async function main() {
   // Get 20 dynamic workers
   let personas: NestedPersonas;
-  personas = await getWorkers(20, testName, "message", true);
+  personas = await getWorkers(20, testName, "none", true);
   const commandHandler = new CommandHandler(personas);
   const bot = personas.get("bot");
   const client = bot?.client as Client;
