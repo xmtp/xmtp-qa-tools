@@ -73,9 +73,11 @@ export class CommandHandler {
 
   // Simple gm response
   async gm(message: DecodedMessage, client: Client) {
+    console.log("gm", message);
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
+    console.log("conversation", conversation?.id);
     await conversation?.send("gm");
   }
   async block(message: DecodedMessage, client: Client, args: string[] = []) {

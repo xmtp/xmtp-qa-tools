@@ -1,9 +1,11 @@
+import type { XmtpEnv } from "@helpers/types";
 import {
   chromium,
   type Browser,
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
+import { add } from "winston";
 
 let browser: Browser | null = null;
 
@@ -15,6 +17,9 @@ export async function testGmBot(gmBotAddress: string): Promise<boolean> {
     browser = await chromium.launch({ headless: isHeadless });
     const context: BrowserContext = await browser.newContext();
     const page: Page = await context.newPage();
+
+    const xmtpEnv = process.env.XMTP_ENV as XmtpEnv;
+    console.log("xmtpEnv", xmtpEnv);
     console.log("Starting test");
     await page.goto(`https://xmtp.chat`);
     // Be more specific with the Settings button selector
@@ -30,7 +35,7 @@ export async function testGmBot(gmBotAddress: string): Promise<boolean> {
       .getByRole("button", { name: "Connect" })
       .click();
     console.log("Connected");
-    await page.goto(`https://xmtp.chat/dm/${gmBotAddress}?env=dev`);
+    await page.goto(`https://xmtp.chat/dm/${gmBotAddress}?env=${env}`);
     console.log("Navigated to GM bot");
     await page.getByRole("textbox", { name: "Type a message..." }).click();
     const message = "gm-" + Math.random().toString(36).substring(2, 15);
@@ -71,43 +76,37 @@ export async function testGmBot(gmBotAddress: string): Promise<boolean> {
   }
 }
 
-export async function createGroupAndReceiveGm(addresses: string[]) {
+export async function createGroupAndReceiveGm(
+  addresses: string[],
+  env: XmtpEnv,
+  walletKey: string,
+  walletEncryptionKey: string,
+) {
   try {
-    // Launch the browser
     browser = await chromium.launch({ headless: isHeadless });
     const context: BrowserContext = await browser.newContext();
     const page: Page = await context.newPage();
+    console.log("env before init script:", env); // Debug log
+
+    // Fix: Pass the env value correctly to the init script
+    await context.addInitScript(
+      ({ envValue, walletKey, walletEncryptionKey }) => {
+        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+        window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+        window.localStorage.setItem("XMTP_NETWORK", envValue);
+        window.localStorage.setItem("XMTP_LOGGING_LEVEL", "debug");
+        window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
+      },
+      { envValue: env, walletKey, walletEncryptionKey },
+    );
 
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
-    await page.getByLabel("Settings").first().click();
-    await page
-      .locator("label")
-      .filter({ hasText: "Use ephemeral account" })
-      .locator("span")
-      .first()
-      .click();
-    await page
-      .locator('p:has-text("LOGGING")')
-      .locator("xpath=..")
-      .locator("select")
-      .selectOption("debug");
-    await page
-      .locator('p:has-text("network")')
-      .locator("xpath=..")
-      .locator("select")
-      .selectOption("production");
     await page
       .getByRole("banner")
       .getByRole("button", { name: "Connect" })
       .click();
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(3000);
     await dismissErrorModal(page);
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(1000);
-    await page.getByRole("button", { name: "Sync" }).click();
-    await sleep(1000);
     console.log("Connected");
     await page
       .getByRole("main")
@@ -145,6 +144,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
       .locator("div")
       .filter({ hasText: "gm" })
       .all();
+    await sleep(1000);
     console.log("Found messages");
     const response =
       messages.length > 0
@@ -152,6 +152,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
         : null;
 
     console.log(`Received response: ${response}`);
+    return response === "gm";
   } catch (error) {
     console.error("Test failed:", error);
     return false;
