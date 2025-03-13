@@ -8,6 +8,7 @@ node_modules
 # testing
 coverage
 .data/
+scripts/db/
 bugs/**/.data/
 bugs/**/.env
 bugs/**/.data/.env
