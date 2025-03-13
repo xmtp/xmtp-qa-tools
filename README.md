@@ -1,8 +1,8 @@
-# ✅ XMTP QA Testing Suite
+# XMTP QA Testing Suite
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
-## 🔄 Test Status
+### Test Status
 
 | Test Suite     | Dev Network Status                                                                                                                                                                     | Production Network Status                                                                                                                                                                                   | Run frequency |
 | -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
@@ -10,8 +10,6 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 📬 Delivery    | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml)       | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml)       | Every 30 min  |
 | 👋 Gm          | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)                   | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)                   | Every 30 min  |
 | 🌎 Geolocation | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
-
-## 📊 Performance Metrics
 
 ### Core SDK Operations Performance
 
@@ -68,8 +66,6 @@ _Note: Performance metrics based on `us-east` testing on dev and production netw
 
 _Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the `us-east` baseline._
 
-## 2. Message reliability
-
 ### Message delivery testing
 
 | Test Area              | Current Performance | Target          | Status       |
@@ -93,8 +89,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 _Note: A hybrid approach using `streams` with `poll`-based verification provides the most reliable message delivery guarantee._
 
-## 3. Integration testing
-
 ### Cross-SDK Testing
 
 | SDK Combination              | Test Focus                    | Status      |
@@ -103,7 +97,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 | React Native ↔ React Native | Non- coinbase build           | ⏳ WIP      |
 | React Native ↔ Node SDK     | Client-to-Agent communication | ⏳ WIP      |
 
-## 4. Success criteria summary
+### Success criteria summary
 
 | Metric                  | Current Performance        | Target                     | Status                 |
 | ----------------------- | -------------------------- | -------------------------- | ---------------------- |
