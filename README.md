@@ -116,7 +116,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
 
-## 🧰 Tools & Utilities
+## Tools & Utilities
 
 - **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
 - **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
@@ -126,12 +126,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 - **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
 - **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
-## 🔨 Development
-
-- **Local:** Work in local network with [dev section](./dev/)
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](./workers/)
-- **Helpers:** Utility functions in the [helpers section](./helpers/)
-- **Scripts:** Automation scripts in the [scripts section](./scripts/)
+## Development
 
 ### Prerequisites
 
@@ -146,19 +141,9 @@ cd xmtp-qa-testing
 yarn install
 ```
 
-### Use local network
+### Resources
 
-- Install docker
-- Run the local network
-
-```bash
-./dev/up
-```
-
-### Run tests
-
-Example:
-
-```bash
-yarn test dms
-```
+- **Local:** Work in local network with [dev section](./dev/)
+- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](./workers/)
+- **Helpers:** Utility functions in the [helpers section](./helpers/)
+- **Scripts:** Automation scripts in the [scripts section](./scripts/)
