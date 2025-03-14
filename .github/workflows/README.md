@@ -204,16 +204,6 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery_dev.yml) workflow automat
 
 This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
 
-1. **Message Delivery Rate (%)**
-
-   - 🟢 **Green**: ≥ 99.9% delivery rate
-   - 🟡 **Yellow**: ≥ 99% delivery rate
-   - 🔴 **Red**: < 99% delivery rate
-
-2. **Delivery Trends** - Historical view of delivery rates to identify patterns
-
-The dashboard supports comprehensive filtering by environment, geographic region, test name, library version, and participant count.
-
 #### Message Delivery Metrics
 
 The test suite reports delivery reliability via the `xmtp.sdk.delivery_rate` metric:
@@ -243,90 +233,45 @@ This test suite uses a hybrid approach that combines direct SDK integration with
 
 The test suite evaluates:
 
-- Direct messaging with the GM bot using the latest SDK
+- Direct messaging with the GM bot using different SDK versions
 - Group messaging functionality with the bot and random participants
 - Cross-version compatibility through the bot's consistent interface
 - Real-world browser interactions via Playwright automation
 
 Key implementation highlights:
 
-```javascript
-// Direct SDK integration test
-it("gm-bot: should check if bot is alive", async () => {
-  try {
-    // Create conversation with the bot using Ethereum identifier
-    convo = await workers
-      .get("bob")!
-      .client.conversations.newDmWithIdentifier({
-        identifierKind: IdentifierKind.Ethereum,
-        identifier: gmBotAddress,
-      });
-
-    await convo.sync();
-    const prevMessages = (await convo.messages()).length;
-
-    // Send a simple message
-    await convo.send("gm");
-
-    // Wait briefly for response
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-
-    // Verify response received
-    const messagesAfter = (await convo.messages()).length;
-    expect(messagesAfter).toBe(prevMessages + 2);
-  } catch (e) {
-    hasFailures = logError(e, expect);
-    throw e;
-  }
-});
-
-// Playwright-based integration test
-it("should respond to a message", async () => {
-  try {
-    // Uses Playwright to simulate browser interaction with the bot
-    const result = await createGroupAndReceiveGm([gmBotAddress]);
-    expect(result).toBe(true);
-  } catch (e) {
-    hasFailures = logError(e, expect);
-    throw e;
-  }
-});
-```
-
 The Playwright helper function facilitates browser-based testing:
 
 ```javascript
-// Helper function that uses Playwright for browser automation
-export async function createGroupAndReceiveGm(members) {
-  // Initialize browser session
-  const browser = await playwright.chromium.launch();
-  const page = await browser.newPage();
-
-  // Navigate to XMTP web interface
-  await page.goto("https://example.com/xmtp-interface");
-
-  // Simulate user creating conversation with bot
-  await page.click("#create-conversation");
-
-  // Add members to the conversation
-  for (const member of members) {
-    await page.fill("#member-input", member);
-    await page.click("#add-member");
-  }
-
-  // Send message and wait for response
-  await page.fill("#message-input", "gm");
-  await page.click("#send-button");
-
-  // Wait for and verify response
-  const responseReceived = await page
-    .waitForSelector(".bot-response", { timeout: 5000 })
-    .then(() => true)
-    .catch(() => false);
-
-  await browser.close();
-  return responseReceived;
+await page.goto(`https://xmtp.chat/`);
+await page.getByRole("main").getByRole("button", { name: "Connect" }).click();
+await page
+  .getByRole("main")
+  .getByRole("button", { name: "New conversation" })
+  .click();
+console.log("Clicking address textbox");
+await page.getByRole("textbox", { name: "Address" }).click();
+for (const address of addresses) {
+  console.log(`Filling address: ${address}`);
+  await page.getByRole("textbox", { name: "Address" }).fill(address);
+  console.log("Clicking Add button");
+  await page.getByRole("button", { name: "Add" }).click();
 }
+console.log("Clicking Create button");
+await page.getByRole("button", { name: "Create" }).click();
+console.log("Clicking message textbox");
+await page.getByRole("textbox", { name: "Type a message..." }).click();
+console.log("Filling message with 'hi'");
+await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+console.log("Clicking Send button");
+await page.getByRole("button", { name: "Send" }).click();
+
+const hiMessage = await page.getByText("hi");
+const hiMessageText = await hiMessage.textContent();
+console.log("hiMessageText", hiMessageText);
+const botMessage = await page.getByText("gm");
+const botMessageText = await botMessage.textContent();
+console.log("botMessageText", botMessageText);
 ```
 
 ### Associated Workflow
