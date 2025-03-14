@@ -111,17 +111,17 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 
 ### Success criteria summary
 
-| Metric                  | Current Performance        | Target                     | Status                 |
-| ----------------------- | -------------------------- | -------------------------- | ---------------------- |
-| Core SDK Operations     | All within targets         | Meet defined targets       | ✅ On Target           |
-| Group Operations        | ≤300 members within target | ≤300 members within target | ✅ On Target           |
-| Network Performance     | All metrics within target  | Meet defined targets       | ✅ On Target           |
-| Message Delivery        | 100%                       | 99.9% minimum              | ✅ On Target           |
-| Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
-| Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
-| Cross-SDK Compatibility | 100%                       | 100% operation success     | ✅ On Target           |
-| South-america & Asia    | more than 40%              | <20% difference            | ⚠️ Performance Concern |
-| US & Europe             | less than 20% variance     | <20% difference            | ✅ On Target           |
+| Metric                  | Current Performance       | Target                 | Status                 |
+| ----------------------- | ------------------------- | ---------------------- | ---------------------- |
+| Core SDK Operations     | All within targets        | Meet defined targets   | ✅ On Target           |
+| Group Operations        | ≤300 members              | ≤300 members on target | ✅ On Target           |
+| Network Performance     | All metrics within target | Meet defined targets   | ✅ On Target           |
+| Message Delivery        | 100%                      | 99.9% minimum          | ✅ On Target           |
+| Stream Message Loss     | 100%                      | 99.9% minimum          | ✅ On Target           |
+| Stream Message Loss     | 100%                      | 99.9% minimum          | ✅ On Target           |
+| Cross-SDK Compatibility | 100%                      | 100% operation success | ✅ On Target           |
+| South-america & Asia    | more than 40%             | <20% difference        | ⚠️ Performance Concern |
+| US & Europe             | less than 20% variance    | <20% difference        | ✅ On Target           |
 
 #### Disclaimers
 
