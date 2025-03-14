@@ -27,7 +27,7 @@ The primary metric sent to Datadog is `xmtp.sdk.duration`, which measures execut
 const durationMetricName = `xmtp.sdk.duration`;
 
 metrics.gauge(durationMetricName, value, [
-  `libxmtp:${firstPersona.version}`,
+  `libxmtp:${firstWorker.version}`,
   `operation:${operationName}`,
   `test:${testName}`,
   `metric_type:operation`,
@@ -61,7 +61,7 @@ if (!skipNetworkStats) {
   for (const [statName, statValue] of Object.entries(networkStats)) {
     const metricValue = statValue * 1000; // Convert to milliseconds
     metrics.gauge(durationMetricName, metricValue, [
-      `libxmtp:${firstPersona.version}`,
+      `libxmtp:${firstWorker.version}`,
       `operation:${operationName}`,
       `test:${testName}`,
       `metric_type:network`,
@@ -96,7 +96,7 @@ Beyond performance metrics, we track message delivery reliability through the `x
 ```tsx
 // Send delivery rate metric
 metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
-  `libxmtp:${firstPersona.version}`,
+  `libxmtp:${firstWorker.version}`,
   `test:${testName}`,
   `metric_type:reliability`,
   `members:${members}`,

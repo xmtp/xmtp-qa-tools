@@ -1,13 +1,13 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import type { NestedPersonas } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import type { WorkerManager } from "@helpers/types";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "bug_installation";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
 
   beforeAll(async () => {
     personas = await getWorkers(["bob", "alice", "joe"], testName, "none");
@@ -18,7 +18,7 @@ describe(testName, () => {
   });
 
   it("inboxState", async () => {
-    for (const persona of personas.getPersonas()) {
+    for (const persona of personas.getWorkers()) {
       const inboxState = await persona.client.inboxState();
       console.log("Installations", inboxState.installations.length);
     }

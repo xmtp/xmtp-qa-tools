@@ -5,10 +5,10 @@ import { exportTestResults, logError } from "@helpers/tests";
 import {
   type Conversation,
   type Group,
-  type NestedPersonas,
+  type WorkerManager,
 } from "@helpers/types";
 import { verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import {
   afterAll,
   afterEach,
@@ -22,7 +22,7 @@ import {
 const testName = "ts_groups";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 

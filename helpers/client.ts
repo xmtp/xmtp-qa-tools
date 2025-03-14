@@ -1,8 +1,7 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type NestedPersonas, type Signer, type XmtpEnv } from "@helpers/types";
-import { clearWorkerCache } from "@workers/factory";
+import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
 import {
   generateInboxId as generateInboxIdBinding,
   IdentifierKind,
@@ -135,7 +134,6 @@ export function loadEnv(testName: string) {
   if (env !== "dev" && env !== "production" && env !== "local") {
     throw new Error("XMTP_ENV is not set in .env file or its not valid");
   }
-  console.log("XMTP_ENV", env);
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",
@@ -143,15 +141,13 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
-export async function closeEnv(testName: string, personas: NestedPersonas) {
+export async function closeEnv(testName: string, personas: WorkerManager) {
   flushLogger(testName);
 
   await flushMetrics();
-  if (personas && typeof personas.getPersonas === "function") {
-    for (const persona of personas.getPersonas()) {
+  if (personas && typeof personas.getWorkers === "function") {
+    for (const persona of personas.getWorkers()) {
       await persona.worker.terminate();
     }
   }
-
-  await clearWorkerCache();
 }

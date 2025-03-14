@@ -1,9 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
-import { type Group, type NestedPersonas } from "@helpers/types";
+import { type Group, type WorkerManager } from "@helpers/types";
 import { calculateMessageStats } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "recovery";
@@ -16,7 +16,7 @@ const timeoutMax = 60000; // 1 minute timeout
 describe(
   testName,
   () => {
-    let personas: NestedPersonas;
+    let personas: WorkerManager;
     let group: Group;
     let hasFailures = false;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
@@ -29,7 +29,7 @@ describe(
         group = await personas
           .get("bob")!
           .client.conversations.newGroup(
-            personas.getPersonas().map((p) => p.client.inboxId),
+            personas.getWorkers().map((p) => p.client.inboxId),
           );
 
         console.log("Group created", group.id);
@@ -51,19 +51,17 @@ describe(
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one persona to take offline
-        const offlinePersona = personas.get("bob")!; // Second persona
-        const onlinePersona = personas.get("alice")!; // First persona
+        const offlineWorker = personas.get("bob")!; // Second persona
+        const onlineWorker = personas.get("alice")!; // First persona
 
-        console.log(`Taking ${offlinePersona.name} offline`);
+        console.log(`Taking ${offlineWorker.name} offline`);
 
         // Disconnect the selected persona
-        await offlinePersona.worker.terminate();
+        await offlineWorker.worker.terminate();
 
         // Send messages from an online persona
         const conversation =
-          await onlinePersona.client.conversations.getConversationById(
-            group.id,
-          );
+          await onlineWorker.client.conversations.getConversationById(group.id);
 
         console.log(
           `Sending ${amountofMessages} messages while client is offline`,
@@ -75,20 +73,20 @@ describe(
         }
 
         // Reconnect the offline persona
-        console.log(`Reconnecting ${offlinePersona.name}`);
-        const { client } = await offlinePersona.worker.initialize();
-        offlinePersona.client = client;
-        await offlinePersona.client.conversations.sync();
+        console.log(`Reconnecting ${offlineWorker.name}`);
+        const { client } = await offlineWorker.worker.initialize();
+        offlineWorker.client = client;
+        await offlineWorker.client.conversations.sync();
 
         // Verify message recovery
         const recoveredConversation =
-          await offlinePersona.client.conversations.getConversationById(
+          await offlineWorker.client.conversations.getConversationById(
             group.id,
           );
         await recoveredConversation?.sync();
         const messages = await recoveredConversation?.messages();
 
-        const messagesByPersona: string[][] = [];
+        const messagesByWorker: string[][] = [];
         const recoveredMessages: string[] = [];
         for (const message of messages ?? []) {
           if (
@@ -101,10 +99,10 @@ describe(
           }
         }
 
-        messagesByPersona.push(recoveredMessages);
+        messagesByWorker.push(recoveredMessages);
 
         const stats = calculateMessageStats(
-          messagesByPersona,
+          messagesByWorker,
           "offline-msg-",
           amountofMessages,
           randomSuffix,
@@ -116,14 +114,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          offlinePersona.version,
+          offlineWorker.version,
           testName,
           "offline",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          offlinePersona.version,
+          offlineWorker.version,
           testName,
           "offline",
           "order",

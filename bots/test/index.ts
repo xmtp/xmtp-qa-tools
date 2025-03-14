@@ -3,10 +3,10 @@ import {
   type Client,
   type Conversation,
   type DecodedMessage,
-  type NestedPersonas,
+  type WorkerManager,
   type XmtpEnv,
 } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { CommandHandler } from "./commands";
 
 const testName = "test-bot";
@@ -26,8 +26,8 @@ async function main() {
   try {
     // First create the bot persona
     console.log("Initializing bot...");
-    const botPersona = await getWorkers(["bot"], testName, "message");
-    const bot = botPersona.get("bot");
+    const botWorker = await getWorkers(["bot"], testName, "message");
+    const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 
     const env = process.env.XMTP_ENV as XmtpEnv;
@@ -103,7 +103,7 @@ async function processCommand(
   conversation: Conversation,
   client: Client,
   commandHandler: CommandHandler,
-  personas: NestedPersonas,
+  personas: WorkerManager,
 ) {
   try {
     const messageContent = message.content as string;

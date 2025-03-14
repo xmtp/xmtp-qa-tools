@@ -2,8 +2,8 @@ import {
   Group,
   type Client,
   type DecodedMessage,
-  type NestedPersonas,
-  type Persona,
+  type Worker,
+  type WorkerManager,
 } from "@helpers/types";
 
 export const // Command help info
@@ -42,14 +42,14 @@ export class CommandHandler {
   async workers(
     message: DecodedMessage,
     client: Client,
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
     await conversation?.send(
-      `Personas:\n${personas
-        .getPersonas()
+      `Workers:\n${personas
+        .getWorkers()
         .map((p) => p.name)
         .join("\n")}`,
     );
@@ -109,7 +109,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -126,9 +126,9 @@ export class CommandHandler {
       );
 
       // Get random personas
-      const randomPersonas = personas.getRandomCount(count);
+      const randomWorkers = personas.getRandomWorkers(count);
 
-      const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
+      const personaInboxIds = randomWorkers.map((p) => p.client.inboxId);
 
       // Create the group name
 
@@ -155,12 +155,12 @@ export class CommandHandler {
       await group.send(
         `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
       );
-      await this.populateGroup(group.id, randomPersonas);
+      await this.populateGroup(group.id, randomWorkers);
     } catch (error) {
       console.error("Error creating group:", error);
     }
   }
-  async populateGroup(groupID: string, personas: Persona[]) {
+  async populateGroup(groupID: string, personas: Worker[]) {
     try {
       for (const persona of personas) {
         const randomMessage =
@@ -199,7 +199,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const groupToAddTo = await client.conversations.getConversationById(
@@ -220,7 +220,7 @@ export class CommandHandler {
 
       // Check if the persona exists
       if (!personas.get(personaName)) {
-        await groupToAddTo.send(`Persona "${personaName}" not found`);
+        await groupToAddTo.send(`Worker "${personaName}" not found`);
         return;
       }
 
@@ -257,7 +257,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const groupToRemoveFrom = await client.conversations.getConversationById(
@@ -280,7 +280,7 @@ export class CommandHandler {
       // Check if the persona exists
       if (!personas.get(personaName)) {
         await groupToRemoveFrom.send(
-          `Persona "${personaName}" not found. Check /workers to see all available personas`,
+          `Worker "${personaName}" not found. Check /workers to see all available personas`,
         );
         return;
       }
@@ -331,7 +331,7 @@ export class CommandHandler {
   async members(
     message: DecodedMessage,
     client: Client,
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -342,7 +342,7 @@ export class CommandHandler {
 
       const memberDetails = members.map((member) => {
         const persona = personas
-          .getPersonas()
+          .getWorkers()
           .find((p) => p.client?.inboxId === member.inboxId);
         return persona?.name || "You";
       });
@@ -357,7 +357,7 @@ export class CommandHandler {
   async admins(
     message: DecodedMessage,
     client: Client,
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -376,7 +376,7 @@ export class CommandHandler {
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
         const persona = personas
-          .getPersonas()
+          .getWorkers()
           .find((p) => p.client?.inboxId === admin);
         return persona?.name || "You";
       });
@@ -420,7 +420,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    personas: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -434,7 +434,7 @@ export class CommandHandler {
       let blastMessage = args.join(" ").trim();
 
       // Default values
-      let countOfPersonas = 5; // Number of personas to message
+      let countOfWorkers = 5; // Number of personas to message
       let repeatCount = 1; // Number of times to send the message
 
       // Check if the last two arguments are numbers
@@ -448,7 +448,7 @@ export class CommandHandler {
         !isNaN(parseInt(secondLastArg))
       ) {
         repeatCount = parseInt(lastArg);
-        countOfPersonas = parseInt(secondLastArg);
+        countOfWorkers = parseInt(secondLastArg);
         // Remove the numbers from the message
         const messageWords = blastMessage.split(" ");
         blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
@@ -456,9 +456,7 @@ export class CommandHandler {
 
       await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
       for (let i = 0; i < repeatCount; i++) {
-        for (const persona of personas
-          .getPersonas()
-          .slice(0, countOfPersonas)) {
+        for (const persona of personas.getWorkers().slice(0, countOfWorkers)) {
           const personaGroup = await persona.client?.conversations.newDm(
             message.senderInboxId,
           );

@@ -4,18 +4,15 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                                 |
-| ------------------------ | ------------------------------------------------------- |
-| [client.ts](#clientts)   | Creates signers and manages keys for test personas      |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                    |
-| [factory.ts](#factoryts) | Creates and manages test personas with workers          |
-| [group.ts](#groupts)     | Creates test groups with specified participants         |
-| [logger.ts](#loggerts)   | Logging utilities for test output                       |
-| [main.ts](#maints)       | Worker client implementation for multi-threaded testing |
-| [reflect.ts](#reflectts) | Integration with Reflect testing platform               |
-| [thread.ts](#threadts)   | Worker thread implementation for background processing  |
-| [types.ts](#typests)     | Type definitions used throughout the testing framework  |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery       |
+| Module                   | Purpose                                                |
+| ------------------------ | ------------------------------------------------------ |
+| [client.ts](#clientts)   | Creates signers and manages keys for test personas     |
+| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                   |
+| [group.ts](#groupts)     | Creates test groups with specified participants        |
+| [logger.ts](#loggerts)   | Logging utilities for test output                      |
+| [test.ts](#testts)       | Test utilities for creating and managing tests         |
+| [types.ts](#typests)     | Type definitions used throughout the testing framework |
+| [verify.ts](#verifyts)   | Validation utilities for testing message delivery      |
 
 ## 🔍 Module Details
 
@@ -60,7 +57,7 @@ Utilities for creating and managing test groups:
 // Create a group with a specific number of participants
 const result = await createGroupWithBatch(
   creator,
-  allPersonas,
+  allWorkers,
   batchSize,
   installationsPerUser,
 );
@@ -68,7 +65,7 @@ const result = await createGroupWithBatch(
 // Create multiple groups with increasing batch sizes
 const results = await createGroupsWithIncrementalBatches(
   creator,
-  allPersonas,
+  allWorkers,
   startBatchSize,
   batchIncrement,
   maxParticipants,
@@ -149,7 +146,7 @@ Type definitions used throughout the testing framework:
 
 ```typescript
 // Core types for personas and clients
-interface Persona {
+interface Worker {
   name: string;
   installationId: string;
   version: string;
@@ -194,7 +191,7 @@ const result = await verifyConversationStream(initiator, participants);
 
 // Calculate statistics about message delivery
 const stats = calculateMessageStats(
-  messagesByPersona,
+  messagesByWorker,
   messagePrefix,
   messageCount,
   suffix,

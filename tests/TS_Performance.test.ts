@@ -6,10 +6,10 @@ import {
   IdentifierKind,
   type Conversation,
   type Group,
-  type NestedPersonas,
+  type WorkerManager,
 } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import {
   afterAll,
   afterEach,
@@ -33,7 +33,7 @@ console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 
 describe(testName, () => {
   let dm: Conversation;
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
 
@@ -54,7 +54,7 @@ describe(testName, () => {
         testName,
       );
       expect(personas).toBeDefined();
-      expect(personas.getPersonas().length).toBe(9);
+      expect(personas.getWorkers().length).toBe(9);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

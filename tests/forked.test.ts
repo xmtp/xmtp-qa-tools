@@ -2,17 +2,17 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import {
   type Conversation,
   type Group,
-  type NestedPersonas,
+  type WorkerManager,
 } from "@helpers/types";
 import { verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "forked";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   let group: Conversation;
   let daveGroup: Group;
   let bellaGroup: Group;
@@ -158,8 +158,8 @@ describe(testName, () => {
     console.log("Creating a new installation for Diana");
 
     // Create a different installation of diana
-    const secondaryPersonas = await getWorkers(["diana-b"], testName);
-    const dianaNewDevice = secondaryPersonas.get("diana", "b")!;
+    const secondaryWorkers = await getWorkers(["diana-b"], testName);
+    const dianaNewDevice = secondaryWorkers.get("diana", "b")!;
     expect(dianaNewDevice).toBeDefined();
     expect(dianaNewDevice.client).toBeDefined();
     expect(dianaNewDevice.installationId).not.toBe(

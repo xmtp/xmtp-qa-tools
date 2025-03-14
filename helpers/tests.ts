@@ -1,5 +1,5 @@
 import { sendPerformanceMetric } from "./datadog";
-import { type NestedPersonas } from "./types";
+import { type WorkerManager } from "./types";
 
 export const logError = (e: any, expect: any): boolean => {
   if (e instanceof Error) {
@@ -19,14 +19,14 @@ export const logError = (e: any, expect: any): boolean => {
 // };
 export const exportTestResults = (
   expect: any,
-  personas: NestedPersonas,
+  personas: WorkerManager,
   start: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
     console.timeEnd(testName as string);
-    expect(personas.getPersonas()).toBeDefined();
-    expect(personas.getPersonas().length).toBeGreaterThan(0);
+    expect(personas.getWorkers()).toBeDefined();
+    expect(personas.getWorkers().length).toBeGreaterThan(0);
     void sendPerformanceMetric(
       performance.now() - start,
       testName as string,
@@ -34,8 +34,8 @@ export const exportTestResults = (
     );
   }
 };
-export async function listInstallations(personas: NestedPersonas) {
-  for (const persona of personas.getPersonas()) {
+export async function listInstallations(personas: WorkerManager) {
+  for (const persona of personas.getWorkers()) {
     const inboxState = await persona.client?.inboxState();
     if (inboxState) {
       console.log(

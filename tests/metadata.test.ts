@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Group, type NestedPersonas } from "@helpers/types";
+import { type Group, type WorkerManager } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";
@@ -9,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let group: Group;
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   beforeAll(async () => {
     personas = await getWorkers(
       [

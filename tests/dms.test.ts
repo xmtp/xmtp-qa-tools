@@ -1,9 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import { exportTestResults, logError } from "@helpers/tests";
-import { type Conversation, type NestedPersonas } from "@helpers/types";
+import { type Conversation, type WorkerManager } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import {
   afterAll,
   afterEach,
@@ -19,7 +19,7 @@ const testName = "ts_dms";
 describe(testName, () => {
   loadEnv(testName);
   let convo: Conversation;
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   let hasFailures: boolean = false;
   let start: number;
 

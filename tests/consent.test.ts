@@ -2,16 +2,16 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import {
   ConsentEntityType,
   ConsentState,
-  type NestedPersonas,
+  type WorkerManager,
 } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "consent";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
 
   beforeAll(async () => {
     personas = await getWorkers(

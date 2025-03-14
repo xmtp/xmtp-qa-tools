@@ -48,7 +48,7 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 - If a persona does not exist, its keys are created.
 - If persona exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
-- Personas prefixed with "random" have keys that are stored only in memory.
+- Workers prefixed with "random" have keys that are stored only in memory.
 
 ### Resources
 

@@ -1,17 +1,17 @@
-import { type NestedPersonas, type Persona } from "./types";
+import { type Worker, type WorkerManager } from "./types";
 
 /**
  * Creates a group with a specified number of participants and measures performance
  *
  * @param creator - The persona that will create the group
- * @param allPersonas - Record of all available personas
+ * @param allWorkers - Record of all available personas
  * @param batchSize - Number of participants to include in the group
  * @param installationsPerUser - Number of installations per user (for logging purposes)
  * @returns Object containing group information and performance metrics
  */
 export async function createGroupWithBatch(
-  creator: Persona,
-  allPersonas: NestedPersonas,
+  creator: Worker,
+  allWorkers: WorkerManager,
   batchSize: number,
   installationsPerUser: number,
 ): Promise<{
@@ -29,8 +29,8 @@ export async function createGroupWithBatch(
 
   // Create the group with the specified number of participants
   const group = await creator.client?.conversations.newGroup(
-    allPersonas
-      .getPersonas()
+    allWorkers
+      .getWorkers()
       .map((persona) => persona.client.inboxId)
       .slice(0, batchSize),
   );
@@ -63,7 +63,7 @@ export async function createGroupWithBatch(
  * Creates multiple groups with increasing batch sizes
  *
  * @param creator - The persona that will create the groups
- * @param allPersonas - Record of all available personas
+ * @param allWorkers - Record of all available personas
  * @param startBatchSize - Initial batch size
  * @param batchIncrement - How much to increase batch size for each iteration
  * @param maxParticipants - Maximum number of participants to include
@@ -71,8 +71,8 @@ export async function createGroupWithBatch(
  * @returns Array of results from each group creation
  */
 export async function createGroupsWithIncrementalBatches(
-  creator: Persona,
-  allPersonas: NestedPersonas,
+  creator: Worker,
+  allWorkers: WorkerManager,
   startBatchSize: number = 5,
   batchIncrement: number = 5,
   maxParticipants: number,
@@ -92,7 +92,7 @@ export async function createGroupsWithIncrementalBatches(
   while (currentBatchSize <= maxParticipants) {
     const result = await createGroupWithBatch(
       creator,
-      allPersonas,
+      allWorkers,
       currentBatchSize,
       installationsPerUser,
     );

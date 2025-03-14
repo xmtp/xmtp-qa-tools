@@ -1,5 +1,4 @@
-import type { WorkerClient } from "@workers/main";
-import { NestedPersonas } from "@workers/manager";
+import type { Worker, WorkerManager } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
@@ -19,9 +18,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 
-export { NestedPersonas };
-export type NestedPersonasStructure = Record<string, Record<string, Persona>>;
-
+export type { WorkerManager, Worker };
 export type WorkerStreamMessage = {
   type: "stream_message";
   message: DecodedMessage;
@@ -47,15 +44,6 @@ export type VerifyStreamResult = {
   allReceived: boolean;
   messages: string[][];
 };
-
-export interface Persona {
-  name: string;
-  installationId: string;
-  version: string;
-  dbPath: string;
-  worker: WorkerClient;
-  client: Client;
-}
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -140,20 +128,4 @@ export interface LogInfo {
   level: string;
   message: string;
   [key: symbol]: string | undefined;
-}
-export interface PersonaBase {
-  name: string;
-  folder: string;
-  walletKey: string;
-  encryptionKey: string;
-  testName: string;
-}
-
-export interface Persona extends PersonaBase {
-  worker: WorkerClient;
-  dbPath: string;
-  client: Client;
-  version: string;
-  installationId: string;
-  address: string;
 }

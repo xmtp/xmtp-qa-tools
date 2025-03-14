@@ -1,15 +1,11 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import {
-  type Group,
-  type NestedPersonas,
-  type VerifyStreamResult,
-} from "@helpers/types";
+import { type Group, type VerifyStreamResult } from "@helpers/types";
 import {
   calculateMessageStats,
-  getPersonasFromGroup,
+  getWorkersFromGroup,
   verifyStream,
 } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "order";
@@ -19,7 +15,7 @@ const amount = 5; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -55,7 +51,7 @@ describe(testName, () => {
     group = await personas
       .get("bob")!
       .client.conversations.newGroup(
-        personas.getPersonas().map((p) => p.client.inboxId),
+        personas.getWorkers().map((p) => p.client.inboxId),
       );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
@@ -63,7 +59,7 @@ describe(testName, () => {
     // Collect messages by setting up listeners before sending and then sending known messages.
     collectedMessages = await verifyStream(
       group,
-      personas.getPersonas(),
+      personas.getWorkers(),
       "text",
       amount,
       (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -74,15 +70,15 @@ describe(testName, () => {
 
   it("tc_stream_order: verify message order when receiving via streams", () => {
     // Group messages by persona
-    const messagesByPersona: string[][] = [];
+    const messagesByWorker: string[][] = [];
 
     // Normalize the collectedMessages structure to match the pull test
     for (let i = 0; i < collectedMessages.messages.length; i++) {
-      messagesByPersona.push(collectedMessages.messages[i]);
+      messagesByWorker.push(collectedMessages.messages[i]);
     }
 
     const stats = calculateMessageStats(
-      messagesByPersona,
+      messagesByWorker,
       "gm-",
       amount,
       randomSuffix,
@@ -115,8 +111,8 @@ describe(testName, () => {
   });
 
   it("tc_poll_order: verify message order when receiving via pull", async () => {
-    const personasFromGroup = await getPersonasFromGroup(group, personas);
-    const messagesByPersona: string[][] = [];
+    const personasFromGroup = await getWorkersFromGroup(group, personas);
+    const messagesByWorker: string[][] = [];
 
     for (const persona of personasFromGroup) {
       const conversation =
@@ -136,11 +132,11 @@ describe(testName, () => {
         }
       }
 
-      messagesByPersona.push(filteredMessages);
+      messagesByWorker.push(filteredMessages);
     }
 
     const stats = calculateMessageStats(
-      messagesByPersona,
+      messagesByWorker,
       "gm-",
       amount,
       randomSuffix,

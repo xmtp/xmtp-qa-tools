@@ -7,12 +7,12 @@ Workers in our testing framework allow you to create predefined personas (like A
 The simplest way to create workers is to use the `getWorkers` function:
 
 ```typescript
-// Initialize personas
-const personas = await getWorkers(["alice", "bob"], testName);
+// Initialize workers
+const workers = await getWorkers(["alice", "bob"], testName);
 
-// Access personas directly
-const alice = personas.get("alice"); // "a" is the default installation
-const bob = personas.get("bob"); // "a" is the default installation
+// Access workers directly
+const alice = workers.get("alice"); // "a" is the default installation
+const bob = workers.get("bob"); // "a" is the default installation
 
 // Use them in your tests
 const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
@@ -35,18 +35,18 @@ You can create different installations of the same persona to simulate multiple 
 
 ```typescript
 // Create primary personas with default installation
-const primaryPersonas = await getWorkers(["alice", "bob"], testName);
+const primaryWorkers = await getWorkers(["alice", "bob"], testName);
 
 // Create secondary installations
-const secondaryPersonas = await getWorkers(
+const secondaryWorkers = await getWorkers(
   ["alice-desktop", "bob-mobile"],
   testName,
 );
 
 // Access specific installations
-const aliceDefault = primaryPersonas.get("alice");
-const aliceDesktop = secondaryPersonas.get("alice", "desktop");
-const bobMobile = secondaryPersonas.get("bob", "mobile");
+const aliceDefault = primaryWorkers.get("alice");
+const aliceDesktop = secondaryWorkers.get("alice", "desktop");
+const bobMobile = secondaryWorkers.get("bob", "mobile");
 ```
 
 ## Key features
@@ -58,22 +58,22 @@ const bobMobile = secondaryPersonas.get("bob", "mobile");
 ## Example: Testing multi-device scenario
 
 ```typescript
-// Create primary personas
-const primaryPersonas = await getWorkers(["alice", "bob"], testName);
+// Create primary workers
+const primaryWorkers = await getWorkers(["alice", "bob"], testName);
 
 // Create a desktop installation for Alice
-const secondaryPersonas = await getWorkers(["alice-desktop"], testName);
-const aliceDesktop = secondaryPersonas.get("alice", "desktop");
+const secondaryWorkers = await getWorkers(["alice-desktop"], testName);
+const aliceDesktop = secondaryWorkers.get("alice", "desktop");
 
 // Send a message from Alice's desktop
 const conversation = await aliceDesktop.client.conversations.newDm(
-  primaryPersonas.get("bob").client.inboxId,
+  primaryWorkers.get("bob").client.inboxId,
 );
 await conversation.send("Hello from Alice's desktop");
 
 // Bob can see the message after syncing
-await primaryPersonas.get("bob").client.conversations.syncAll();
-const bobConversations = await primaryPersonas
+await primaryWorkers.get("bob").client.conversations.syncAll();
+const bobConversations = await primaryWorkers
   .get("bob")
   .client.conversations.list();
 ```
@@ -81,7 +81,7 @@ const bobConversations = await primaryPersonas
 ## Start workers with numbers
 
 ```typescript
-const personas = await getWorkers(4, testName);
+const workers = await getWorkers(4, testName);
 // this will start 4 workers with listed from the default names
 ```
 

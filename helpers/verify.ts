@@ -1,26 +1,25 @@
 import type { MessageStreamWorker } from "@workers/main";
+import { type Worker, type WorkerManager } from "@workers/manager";
 import {
   type Conversation,
   type Group,
-  type NestedPersonas,
-  type Persona,
   type VerifyStreamResult,
 } from "./types";
 
-export async function getPersonasFromGroup(
+export async function getWorkersFromGroup(
   group: Conversation,
-  personas: NestedPersonas,
-): Promise<Persona[]> {
+  personas: WorkerManager,
+): Promise<Worker[]> {
   await group.sync();
   const members = await group.members();
   const memberInboxIds = members.map((member) => member.inboxId);
 
-  // Use the getPersonas method to retrieve all personas
-  const allPersonas = personas.getPersonas();
+  // Use the getWorkers method to retrieve all personas
+  const allWorkers = personas.getWorkers();
 
   // Find personas whose client inboxId matches the group members' inboxIds
-  const personasFromGroup = allPersonas.filter((persona) =>
-    memberInboxIds.includes(persona.client?.inboxId || ""),
+  const personasFromGroup = allWorkers.filter((persona) =>
+    memberInboxIds.includes(persona.client.inboxId),
   );
 
   return personasFromGroup;
@@ -31,7 +30,7 @@ export async function getPersonasFromGroup(
  * and ensures each participant collects exactly `count` messages.
  *
  * @param group Conversation (e.g. a group conversation)
- * @param participants Array of Persona objects
+ * @param participants Array of Worker objects
  * @param messageGenerator A function that produces the content (including a suffix)
  * @param sender Function to send messages to the conversation
  * @param collectorType The contentType ID to match in collecting
@@ -48,15 +47,15 @@ const nameUpdater = async (group: Conversation, payload: string) => {
 
 export async function verifyStreamAll(
   group: Conversation,
-  participants: NestedPersonas,
+  participants: WorkerManager,
   count = 1,
 ) {
-  const allPersonas = await getPersonasFromGroup(group, participants);
-  return verifyStream(group, allPersonas, "text", count);
+  const allWorkers = await getWorkersFromGroup(group, participants);
+  return verifyStream(group, allWorkers, "text", count);
 }
 export async function verifyStream<T extends string = string>(
   group: Conversation,
-  participants: Persona[],
+  participants: Worker[],
   collectorType = "text",
   count = 1,
   generator: (index: number, suffix: string) => T = (
@@ -129,11 +128,11 @@ export async function verifyStream<T extends string = string>(
  * @returns Promise resolving with results of the verification
  */
 export async function verifyConversationStream(
-  initiator: Persona,
-  participants: Persona[],
+  initiator: Worker,
+  participants: Worker[],
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
   const groupCreator = async (
-    initiator: Persona,
+    initiator: Worker,
     participantAddresses: string[],
   ) => {
     if (!initiator.client) {
@@ -225,7 +224,7 @@ export async function verifyConversationStream(
 
 // Helper function to calculate message reception and order percentages
 export function calculateMessageStats(
-  messagesByPersona: string[][],
+  messagesByWorker: string[][],
   prefix: string,
   amount: number,
   suffix: string,
@@ -272,7 +271,7 @@ export function calculateMessageStats(
     if (personasInOrder < personaCount) {
       console.log("Message order discrepancies detected:");
 
-      messagesByPersona.forEach((messages, index) => {
+      messagesByWorker.forEach((messages, index) => {
         const { inOrder, expectedMessages } = verifyMessageOrder(
           messages,
           prefix,
@@ -281,7 +280,7 @@ export function calculateMessageStats(
 
         if (!inOrder) {
           console.log(
-            `Persona ${index + 1} received messages out of order or missing messages:`,
+            `Worker ${index + 1} received messages out of order or missing messages:`,
           );
 
           // Check for missing messages
@@ -321,10 +320,10 @@ export function calculateMessageStats(
       });
     }
   };
-  // const showComparativeTable = (messagesByPersona: string[][]) => {
+  // const showComparativeTable = (messagesByWorker: string[][]) => {
   //   console.log("Comparative Table:");
-  //   messagesByPersona.forEach((messages, index) => {
-  //     console.log(`Persona ${index + 1}: ${messages.join(", ")}`);
+  //   messagesByWorker.forEach((messages, index) => {
+  //     console.log(`Worker ${index + 1}: ${messages.join(", ")}`);
   //   });
   // };
   // Check message reception
@@ -333,9 +332,9 @@ export function calculateMessageStats(
 
   // Check message order
   let personasInOrder = 0;
-  const personaCount = messagesByPersona.length;
+  const personaCount = messagesByWorker.length;
 
-  for (const personaMessages of messagesByPersona) {
+  for (const personaMessages of messagesByWorker) {
     totalExpectedMessages += amount;
     totalReceivedMessages += personaMessages.length;
 
@@ -358,7 +357,7 @@ export function calculateMessageStats(
     `Order percentage: ${orderPercentage.toFixed(2)}% (${personasInOrder}/${personaCount} personas)`,
   );
   showDiscrepancies(personasInOrder, personaCount, prefix, amount);
-  //showComparativeTable(messagesByPersona);
+  //showComparativeTable(messagesByWorker);
   return {
     receptionPercentage,
     orderPercentage,

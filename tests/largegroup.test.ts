@@ -1,13 +1,13 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { type Conversation, type NestedPersonas } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { type Conversation, type WorkerManager } from "@helpers/types";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "largegroup";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
   let group: Conversation;
 
   beforeAll(async () => {

@@ -1,14 +1,14 @@
 import fs from "fs";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type NestedPersonas } from "@helpers/types";
-import { getDataSubFolderCount, getWorkers } from "@workers/factory";
+import { type WorkerManager } from "@helpers/types";
+import { getDataSubFolderCount, getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
 
   let folderCount: number = 0;
   beforeAll(() => {

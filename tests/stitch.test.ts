@@ -1,11 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { listInstallations } from "@helpers/tests";
-import {
-  type Conversation,
-  type NestedPersonas,
-  type Persona,
-} from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { type Conversation } from "@helpers/types";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "stitch";
@@ -13,9 +9,9 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: NestedPersonas;
-  let sender: Persona;
-  let receiver: Persona;
+  let personas: WorkerManager;
+  let sender: Worker;
+  let receiver: Worker;
 
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
@@ -87,7 +83,7 @@ describe(testName, () => {
   });
 });
 
-async function compareDms(sender: Persona, receiver: Persona) {
+async function compareDms(sender: Worker, receiver: Worker) {
   await receiver.client?.conversations.sync();
   const allUnique = (await receiver.client?.conversations.listDms()) ?? [];
   const allWithDuplicates =

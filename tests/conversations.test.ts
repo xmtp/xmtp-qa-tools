@@ -1,14 +1,14 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type NestedPersonas } from "@helpers/types";
+import { type WorkerManager } from "@helpers/types";
 import { verifyConversationStream } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
+import { getWorkers } from "@workers/manager";
 import { afterAll, beforeAll, describe, it } from "vitest";
 
 const testName = "conversations";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: WorkerManager;
 
   beforeAll(async () => {
     personas = await getWorkers(
