@@ -17,15 +17,7 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 - **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
-## Overview
-
-This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node , Browser, and React Native SDKs.
-
-## Testing strategy
-
-The highlighted path (red dashed line) in the architecture diagram represents our core testing focus:
-
-### Architecture
+## Architecture
 
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
@@ -87,9 +79,7 @@ flowchart LR
   class centralNode,libxmtp,webApps,messagingApps,botAgents highlightStroke;
 ```
 
-### Critical Testing Path (Red Line)
-
-This testing path is critical as it represents the most common integration path for automated services and high-throughput applications covering all the bindings and SDKs.
+The highlighted path (red dashed line) in the architecture diagram represents our core testing focus:
 
 1. **Node → libxmtp**
 
