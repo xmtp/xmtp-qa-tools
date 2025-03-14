@@ -15,8 +15,6 @@ This document provides a comprehensive overview of the XMTP testing infrastructu
 
 The TS_Performance test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
 
-![TS_Performance](/datadog/ts_performance.png)
-
 ### Implementation Details
 
 This test suite evaluates:
@@ -78,6 +76,8 @@ The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation_dev.yml) workflow r
 
 ### Monitoring Dashboard
 
+![TS_Performance](/datadog/ts_performance.png)
+
 Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
 
 - Operation durations across different functions
@@ -132,8 +132,6 @@ for (const [statName, statValue] of Object.entries(networkStats)) {
 ## 📬 TS_Delivery Test Suite
 
 The TS_Delivery test suite rigorously evaluates message delivery reliability across multiple streams, ensuring messages are delivered correctly and in order under varying conditions.
-
-![TS_Delivery](/datadog/ts_delivery.png)
 
 ### Implementation Details
 
@@ -202,6 +200,8 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery_dev.yml) workflow automat
 
 ### Monitoring Dashboard
 
+![TS_Delivery](/datadog/ts_delivery.png)
+
 This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
 
 1. **Message Delivery Rate (%)**
@@ -231,6 +231,8 @@ metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
 ## 👋 TS_Gm Test Suite
 
 The TS_Gm test suite serves as a critical regression testing tool by verifying the GM bot functionality across different SDK versions. By using a simple bot as a consistent reference point, it ensures that new SDK versions maintain backward compatibility and reliable messaging capabilities.
+
+![TS_Gm](/datadog/ts_gm.png)
 
 ### Implementation Details
 

@@ -8,7 +8,7 @@ import {
   type Page,
 } from "playwright-chromium";
 
-const snapshotDir = path.join(process.cwd(), "playwright/test-snapshots");
+const snapshotDir = path.join(process.cwd(), "snapshots");
 let browser: Browser | null = null;
 if (!fs.existsSync(snapshotDir)) {
   fs.mkdirSync(snapshotDir, { recursive: true });
@@ -113,9 +113,8 @@ async function setLocalStorage(
   await page.addInitScript(
     ({ envValue, walletKey, walletEncryptionKey }) => {
       console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-      // @ts-expect-error Window localStorage access in browser context
+
       //window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-      // @ts-expect-error Window localStorage access in browser context
       // window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
       // @ts-expect-error Window localStorage access in browser context
       window.localStorage.setItem("XMTP_NETWORK", envValue);
