@@ -18,6 +18,25 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
 ```mermaid
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#0D1117',
+    'primaryTextColor': '#c9d1d9',
+    'primaryBorderColor': '#30363d',
+    'lineColor': '#8b949e',
+    'secondaryColor': '#161b22',
+    'tertiaryColor': '#161b22'
+  },
+  'flowchart': {
+    'useMaxWidth': true,
+    'htmlLabels': true
+  },
+  'securityLevel': 'strict',
+  'disableClick': true,
+  'disableZoom': true,
+  'disablePan': true
+}}%%
 
 flowchart LR
   %% Core components and bindings
@@ -72,7 +91,7 @@ flowchart LR
   napi -.- reactNativeSDK
 
   linkStyle 0,4,12,13 stroke:#f66,stroke-width:4px,stroke-dasharray: 5,5;
-  classDef highlightStroke fill:#fff,stroke:#f66,color:#000,stroke-width:4px;
+  classDef highlightStroke fill:#1f2937,stroke:#f66,color:#c9d1d9,stroke-width:4px;
   class centralNode,libxmtp,webApps,messagingApps,botAgents highlightStroke;
 ```
 
