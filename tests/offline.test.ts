@@ -1,9 +1,10 @@
+import { createAgent } from "@agents/factory";
+import { type AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
-import { type Group, type NestedPersonas } from "@helpers/types";
+import { type Group } from "@helpers/types";
 import { calculateMessageStats } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "recovery";
@@ -16,7 +17,7 @@ const timeoutMax = 60000; // 1 minute timeout
 describe(
   testName,
   () => {
-    let personas: NestedPersonas;
+    let agents: AgentManager;
     let group: Group;
     let hasFailures = false;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
@@ -24,12 +25,12 @@ describe(
     beforeAll(async () => {
       try {
         // Create personas for testing
-        personas = await getWorkers(participantCount, testName);
+        agents = await createAgent(participantCount, testName);
         // Create a group conversation
-        group = await personas
+        group = await agents
           .get("bob")!
           .client.conversations.newGroup(
-            personas.getPersonas().map((p) => p.client.inboxId),
+            agents.getAgents().map((p) => p.client.inboxId),
           );
 
         console.log("Group created", group.id);
@@ -41,7 +42,7 @@ describe(
 
     afterAll(async () => {
       try {
-        await closeEnv(testName, personas);
+        await closeEnv(testName, agents);
         console.log(hasFailures);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -51,8 +52,8 @@ describe(
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one persona to take offline
-        const offlinePersona = personas.get("bob")!; // Second persona
-        const onlinePersona = personas.get("alice")!; // First persona
+        const offlinePersona = agents.get("bob")!; // Second persona
+        const onlinePersona = agents.get("alice")!; // First persona
 
         console.log(`Taking ${offlinePersona.name} offline`);
 

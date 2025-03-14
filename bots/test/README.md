@@ -31,7 +31,7 @@ yarn bot
 | `/broadcast [message]` | Broadcast a message to all participants in the current group |
 | `/leave`               | Leave the current group                                      |
 | `/info`                | Get info about the current group                             |
-| `/workers`             | List all available workers                                   |
+| `/agents`              | List all available agents                                    |
 
 ## ⚙️ Environment Configuration
 
@@ -46,13 +46,13 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 ## 🧪 Considerations
 
 - If a persona does not exist, its keys are created.
-- If persona exists uses the existing env file keys and .data folder
+- If agent exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
-- Personas prefixed with "random" have keys that are stored only in memory.
+- Agents prefixed with "random" have keys that are stored only in memory.
 
 ### Resources
 
 - **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](/workers/)
+- **Agents:** Predefined agents like `bob`, `alice`, `randomguy` with [agents](/agents/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)

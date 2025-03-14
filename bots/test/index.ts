@@ -1,12 +1,12 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { loadEnv } from "@helpers/client";
 import {
   type Client,
   type Conversation,
   type DecodedMessage,
-  type NestedPersonas,
   type XmtpEnv,
 } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
 import { CommandHandler } from "./commands";
 
 const testName = "test-bot";
@@ -26,7 +26,7 @@ async function main() {
   try {
     // First create the bot persona
     console.log("Initializing bot...");
-    const botPersona = await getWorkers(["bot"], testName, "message");
+    const botPersona = await createAgent(["bot"], testName, "message");
     const bot = botPersona.get("bot");
     const client = bot?.client as Client;
 
@@ -35,9 +35,9 @@ async function main() {
     console.log(`Agent initialized on inbox ${client.inboxId}`);
     console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
 
-    // Then create the dynamic workers
-    console.log("Initializing worker personas...");
-    const personas = await getWorkers(20, testName, "message", true);
+    // Then create the dynamic agents
+    console.log("Initializing agent personas...");
+    const agents = await createAgent(20, testName, "message", true);
     const commandHandler = new CommandHandler();
 
     console.log("Syncing conversations...");
@@ -76,7 +76,7 @@ async function main() {
             conversation,
             client,
             commandHandler,
-            personas,
+            agents,
           );
 
           console.log("Waiting for messages...");
@@ -103,7 +103,7 @@ async function processCommand(
   conversation: Conversation,
   client: Client,
   commandHandler: CommandHandler,
-  personas: NestedPersonas,
+  agents: AgentManager,
 ) {
   try {
     const messageContent = message.content as string;
@@ -129,7 +129,7 @@ async function processCommand(
         await commandHandler.help(message, client);
         break;
       case "create":
-        await commandHandler.create(message, client, args, personas);
+        await commandHandler.create(message, client, args, agents);
         break;
       case "block":
         await commandHandler.block(message, client, args);
@@ -141,13 +141,13 @@ async function processCommand(
         await commandHandler.rename(message, client, args);
         break;
       case "members":
-        await commandHandler.members(message, client, personas);
+        await commandHandler.members(message, client, agents);
         break;
       case "admins":
-        await commandHandler.admins(message, client, personas);
+        await commandHandler.admins(message, client, agents);
         break;
       case "blast":
-        await commandHandler.blast(message, client, args, personas);
+        await commandHandler.blast(message, client, args, agents);
         break;
       case "groups":
         await commandHandler.groups(message, client);
@@ -158,17 +158,17 @@ async function processCommand(
       case "info":
         await commandHandler.info(message, client);
         break;
-      case "workers":
-        await commandHandler.workers(message, client, personas);
+      case "agents":
+        await commandHandler.agents(message, client, agents);
         break;
       case "leave":
         await commandHandler.leave(message, client);
         break;
       case "add":
-        await commandHandler.add(message, client, args, personas);
+        await commandHandler.add(message, client, args, agents);
         break;
       case "remove":
-        await commandHandler.remove(message, client, args, personas);
+        await commandHandler.remove(message, client, args, agents);
         break;
       default:
         await conversation.send(

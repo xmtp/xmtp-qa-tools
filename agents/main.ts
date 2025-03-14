@@ -11,11 +11,11 @@ import {
   type Conversation,
   type DecodedMessage,
   type LogLevel,
-  type PersonaBase,
   type typeofStream,
   type XmtpEnv,
 } from "@helpers/types";
 import OpenAI from "openai";
+import type { AgentBase } from "./manager";
 
 export type MessageStreamWorker = {
   type: string;
@@ -64,28 +64,28 @@ export class WorkerClient extends Worker {
   public client!: Client; // Expose the XMTP client if you need direct DM
 
   constructor(
-    persona: PersonaBase,
+    agent: AgentBase,
     typeofStream: typeofStream,
     gptEnabled: boolean,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
-      __ts_worker_filename: new URL(".@workers/thread.ts", import.meta.url)
+      __ts_worker_filename: new URL(".@agents/thread.ts", import.meta.url)
         .pathname,
-      persona,
+      agent,
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
 
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
-    this.name = persona.name;
-    this.folder = persona.folder;
-    this.nameId = persona.name;
+    this.name = agent.name;
+    this.folder = agent.folder;
+    this.nameId = agent.name;
 
-    this.testName = persona.testName;
-    this.walletKey = persona.walletKey;
-    this.encryptionKeyHex = persona.encryptionKey;
+    this.testName = agent.testName;
+    this.walletKey = agent.walletKey;
+    this.encryptionKeyHex = agent.encryptionKey;
 
     // Log messages from the Worker
     this.on("message", (message) => {
@@ -94,15 +94,13 @@ export class WorkerClient extends Worker {
 
     // Handle Worker errors
     this.on("error", (error) => {
-      console.error(`[${persona.name}] Worker error:`, error);
+      console.error(`[${agent.name}] Worker error:`, error);
     });
 
     // Handle Worker exit
     this.on("exit", (code) => {
       if (code !== 0) {
-        console.error(
-          `[${persona.name}] Worker stopped with exit code ${code}`,
-        );
+        console.error(`[${agent.name}] Worker stopped with exit code ${code}`);
       }
     });
   }

@@ -1,4 +1,4 @@
-import { type NestedPersonas, type Persona } from "./types";
+import type { Agent, AgentManager } from "@agents/manager";
 
 /**
  * Creates a group with a specified number of participants and measures performance
@@ -10,8 +10,8 @@ import { type NestedPersonas, type Persona } from "./types";
  * @returns Object containing group information and performance metrics
  */
 export async function createGroupWithBatch(
-  creator: Persona,
-  allPersonas: NestedPersonas,
+  creator: Agent,
+  allAgents: AgentManager,
   batchSize: number,
   installationsPerUser: number,
 ): Promise<{
@@ -29,9 +29,9 @@ export async function createGroupWithBatch(
 
   // Create the group with the specified number of participants
   const group = await creator.client?.conversations.newGroup(
-    allPersonas
-      .getPersonas()
-      .map((persona) => persona.client.inboxId)
+    allAgents
+      .getAgents()
+      .map((agent) => agent.client.inboxId)
       .slice(0, batchSize),
   );
 
@@ -71,8 +71,8 @@ export async function createGroupWithBatch(
  * @returns Array of results from each group creation
  */
 export async function createGroupsWithIncrementalBatches(
-  creator: Persona,
-  allPersonas: NestedPersonas,
+  creator: Agent,
+  allAgents: AgentManager,
   startBatchSize: number = 5,
   batchIncrement: number = 5,
   maxParticipants: number,
@@ -92,7 +92,7 @@ export async function createGroupsWithIncrementalBatches(
   while (currentBatchSize <= maxParticipants) {
     const result = await createGroupWithBatch(
       creator,
-      allPersonas,
+      allAgents,
       currentBatchSize,
       installationsPerUser,
     );

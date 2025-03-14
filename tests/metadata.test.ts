@@ -1,7 +1,8 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Group, type NestedPersonas } from "@helpers/types";
+import { type Group } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";
@@ -9,9 +10,9 @@ loadEnv(testName);
 
 describe(testName, () => {
   let group: Group;
-  let personas: NestedPersonas;
+  let personas: AgentManager;
   beforeAll(async () => {
-    personas = await getWorkers(
+    personas = await createAgent(
       [
         "henry",
         "ivy",

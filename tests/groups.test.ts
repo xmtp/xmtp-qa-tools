@@ -1,14 +1,11 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { exportTestResults, logError } from "@helpers/tests";
-import {
-  type Conversation,
-  type Group,
-  type NestedPersonas,
-} from "@helpers/types";
+import { type Conversation, type Group } from "@helpers/types";
 import { verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import {
   afterAll,
   afterEach,
@@ -22,7 +19,7 @@ import {
 const testName = "ts_groups";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let personas: AgentManager;
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
@@ -31,7 +28,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(
+      personas = await createAgent(
         [
           "henry",
           "ivy",

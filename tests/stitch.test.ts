@@ -1,11 +1,8 @@
+import { createAgent } from "@agents/factory";
+import { type Agent, type AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { listInstallations } from "@helpers/tests";
-import {
-  type Conversation,
-  type NestedPersonas,
-  type Persona,
-} from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { type Conversation } from "@helpers/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "stitch";
@@ -13,22 +10,22 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: NestedPersonas;
-  let sender: Persona;
-  let receiver: Persona;
+  let agents: AgentManager;
+  let sender: Agent;
+  let receiver: Agent;
 
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
-    personas = await getWorkers(["ivy", "bob"], testName);
-    sender = personas.get("ivy")!;
-    receiver = personas.get("bob")!;
+    agents = await createAgent(["ivy", "bob"], testName);
+    sender = agents.get("ivy")!;
+    receiver = agents.get("bob")!;
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, agents);
   });
   it("inboxState", async () => {
-    await listInstallations(personas);
+    await listInstallations(agents);
   });
 
   it("new dm with bug", async () => {
@@ -39,21 +36,21 @@ describe(testName, () => {
   });
 
   it("inboxState", async () => {
-    await listInstallations(personas);
+    await listInstallations(agents);
   });
   it("should count conversations", async () => {
     await compareDms(sender, receiver);
   });
 
   it("should handle different conversation IDs and require manual sync", async () => {
-    personas = await getWorkers(
+    agents = await createAgent(
       ["ivy-b", "bob-b"],
       testName,
       "message",
       true,
-      personas,
+      agents,
     );
-    await listInstallations(personas);
+    await listInstallations(agents);
   });
 
   it("should count conversations", async () => {
@@ -62,8 +59,8 @@ describe(testName, () => {
 
   it("should handle different conversation IDs and require manual sync", async () => {
     // Initiate a new DM with a specific conversation ID
-    const newSender = personas.get("ivy", "b")!;
-    const newReceiver = personas.get("bob", "b")!;
+    const newSender = agents.get("ivy", "b")!;
+    const newReceiver = agents.get("bob", "b")!;
     const convo1 = await newSender.client.conversations.newDm(
       newReceiver.client.inboxId,
     );
@@ -87,7 +84,7 @@ describe(testName, () => {
   });
 });
 
-async function compareDms(sender: Persona, receiver: Persona) {
+async function compareDms(sender: Agent, receiver: Agent) {
   await receiver.client?.conversations.sync();
   const allUnique = (await receiver.client?.conversations.listDms()) ?? [];
   const allWithDuplicates =

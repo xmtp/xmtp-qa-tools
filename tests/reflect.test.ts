@@ -2,7 +2,7 @@
 // import { closeEnv, loadEnv } from "@helpers/client";
 // import ReflectTestSuite from "@helpers/reflect";
 // import type { Conversation, Persona } from "@helpers/types";
-// import { getWorkers } from "@workers/factory";
+// import { createAgent } from "@agents/factory";
 // import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // const testName = "Sending a GM";
@@ -14,7 +14,7 @@
 
 //   beforeAll(async () => {
 //     fs.rmSync(".data", { recursive: true, force: true });
-//     personas = await getWorkers(["larry"], testName);
+//     personas = await createAgent(["larry"], testName);
 //   });
 
 //   afterAll(async () => {

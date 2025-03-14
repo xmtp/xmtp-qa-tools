@@ -1,16 +1,11 @@
-import {
-  Group,
-  type Client,
-  type DecodedMessage,
-  type NestedPersonas,
-  type Persona,
-} from "@helpers/types";
+import type { Agent, AgentManager } from "@agents/manager";
+import { Group, type Client, type DecodedMessage } from "@helpers/types";
 
 export const // Command help info
   commandHelp = `Available commands:
 gm - Get a greeting back from the bot
 hi [name] - Get a response back to [name]
-/create [number] - Create a new group with [number] random personas (default: 5)
+/create [number] - Create a new group with [number] random agents (default: 5)
 /rename [name] - Rename the current group
 /add [name] - Add [name] to the current group
 /remove [name] - Remove [name] from the current group
@@ -22,7 +17,7 @@ hi [name] - Get a response back to [name]
 /blast [message] [count] [repeat] - Send a message to all participants in the current group
 /leave - Leave the current group
 /info - Get info about the current group
-/workers - List all available personas
+/agents - List all available agents
 /help - Show this message`;
 
 export const // Random messages for group interactions
@@ -39,18 +34,14 @@ export const // Random messages for group interactions
   ];
 
 export class CommandHandler {
-  async workers(
-    message: DecodedMessage,
-    client: Client,
-    personas: NestedPersonas,
-  ) {
+  async agents(message: DecodedMessage, client: Client, agents: AgentManager) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
     await conversation?.send(
-      `Personas:\n${personas
-        .getPersonas()
-        .map((p) => p.name)
+      `Agents:\n${agents
+        .getAgents()
+        .map((a) => a.name)
         .join("\n")}`,
     );
   }
@@ -109,7 +100,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    agents: AgentManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -120,21 +111,21 @@ export class CommandHandler {
       const count =
         args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 5;
 
-      console.log(`Creating group with ${count} random personas...`);
+      console.log(`Creating group with ${count} random agents...`);
       await conversation?.send(
-        `hang tight, creating group with ${count} random personas...`,
+        `hang tight, creating group with ${count} random agents...`,
       );
 
       // Get random personas
-      const randomPersonas = personas.getRandomCount(count);
+      const randomAgents = agents.getRandomCount(count);
 
-      const personaInboxIds = randomPersonas.map((p) => p.client.inboxId);
+      const agentInboxIds = randomAgents.map((a) => a.client.inboxId);
 
       // Create the group name
 
       // Make sure the bot and sender are included in the group
       const memberInboxIds = [
-        ...personaInboxIds,
+        ...agentInboxIds,
         message.senderInboxId,
         client.inboxId,
       ];
@@ -155,20 +146,20 @@ export class CommandHandler {
       await group.send(
         `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
       );
-      await this.populateGroup(group.id, randomPersonas);
+      await this.populateGroup(group.id, randomAgents);
     } catch (error) {
       console.error("Error creating group:", error);
     }
   }
-  async populateGroup(groupID: string, personas: Persona[]) {
+  async populateGroup(groupID: string, agents: Agent[]) {
     try {
-      for (const persona of personas) {
+      for (const agent of agents) {
         const randomMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        await persona.client?.conversations.sync();
-        const personaGroup =
-          await persona.client?.conversations.getConversationById(groupID);
-        await personaGroup?.send(`${persona.name}:\n${randomMessage}`);
+        await agent.client?.conversations.sync();
+        const agentGroup =
+          await agent.client?.conversations.getConversationById(groupID);
+        await agentGroup?.send(`${agent.name}:\n${randomMessage}`);
       }
     } catch (error) {
       console.error("Error populating group:", error);
@@ -199,7 +190,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    personas: AgentManager,
   ) {
     try {
       const groupToAddTo = await client.conversations.getConversationById(
@@ -257,7 +248,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    agents: AgentManager,
   ) {
     try {
       const groupToRemoveFrom = await client.conversations.getConversationById(
@@ -270,34 +261,34 @@ export class CommandHandler {
       // Check if a persona name was provided
       if (args.length === 0) {
         await groupToRemoveFrom.send(
-          "Please specify a persona name to remove. Check /workers to see all available personas",
+          "Please specify a persona name to remove. Check /agents to see all available agents",
         );
         return;
       }
 
-      const personaName = args[0].trim();
+      const agentName = args[0].trim();
 
       // Check if the persona exists
-      if (!personas.get(personaName)) {
+      if (!agents.get(agentName)) {
         await groupToRemoveFrom.send(
-          `Persona "${personaName}" not found. Check /workers to see all available personas`,
+          `Agent "${agentName}" not found. Check /agents to see all available agents`,
         );
         return;
       }
 
-      const personaToRemove = personas.get(personaName);
+      const agentToRemove = agents.get(agentName);
 
       // Get current members
       const currentMembers = await groupToRemoveFrom.members();
 
       // Check if the persona is in the group
       const memberToRemove = currentMembers.find(
-        (member) => member.inboxId === personaToRemove?.client?.inboxId,
+        (member) => member.inboxId === agentToRemove?.client?.inboxId,
       );
 
       if (!memberToRemove) {
         await groupToRemoveFrom.send(
-          `${personaName} is not a member of this group`,
+          `${agentName} is not a member of this group`,
         );
         return;
       }
@@ -308,31 +299,27 @@ export class CommandHandler {
         memberToRemove.inboxId === client.inboxId
       ) {
         await groupToRemoveFrom.send(
-          `Cannot remove ${personaName} from the group`,
+          `Cannot remove ${agentName} from the group`,
         );
         return;
       }
 
       // Announce removal before removing
       await groupToRemoveFrom.send(
-        `Bot :\n Removing ${personaName} from the group.`,
+        `Bot :\n Removing ${agentName} from the group.`,
       );
 
       // Remove the member
       await groupToRemoveFrom.removeMembers([memberToRemove.inboxId]);
 
-      await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
+      await groupToRemoveFrom.send(`Removed ${agentName} from the group.`);
     } catch (error) {
       console.error("Error removing member from group:", error);
     }
   }
 
   // List all members in the current group
-  async members(
-    message: DecodedMessage,
-    client: Client,
-    personas: NestedPersonas,
-  ) {
+  async members(message: DecodedMessage, client: Client, agents: AgentManager) {
     try {
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
@@ -341,8 +328,8 @@ export class CommandHandler {
       const members = await (conversation as Group).members();
 
       const memberDetails = members.map((member) => {
-        const persona = personas
-          .getPersonas()
+        const persona = agents
+          .getAgents()
           .find((p) => p.client?.inboxId === member.inboxId);
         return persona?.name || "You";
       });
@@ -354,11 +341,7 @@ export class CommandHandler {
       console.error("Error listing members:", error);
     }
   }
-  async admins(
-    message: DecodedMessage,
-    client: Client,
-    personas: NestedPersonas,
-  ) {
+  async admins(message: DecodedMessage, client: Client, agents: AgentManager) {
     try {
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
@@ -375,10 +358,10 @@ export class CommandHandler {
       console.log(superAdmins);
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
-        const persona = personas
-          .getPersonas()
+        const agent = agents
+          .getAgents()
           .find((p) => p.client?.inboxId === admin);
-        return persona?.name || "You";
+        return agent?.name || "You";
       });
 
       await conversation.send(
@@ -420,7 +403,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: NestedPersonas,
+    agents: AgentManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -456,14 +439,12 @@ export class CommandHandler {
 
       await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
       for (let i = 0; i < repeatCount; i++) {
-        for (const persona of personas
-          .getPersonas()
-          .slice(0, countOfPersonas)) {
-          const personaGroup = await persona.client?.conversations.newDm(
+        for (const agent of agents.getAgents().slice(0, countOfPersonas)) {
+          const personaGroup = await agent.client?.conversations.newDm(
             message.senderInboxId,
           );
-          await conversation?.send(` ${persona.name} just sent you a message`);
-          await personaGroup?.send(`${persona.name}:\n${blastMessage}`);
+          await conversation?.send(` ${agent.name} just sent you a message`);
+          await personaGroup?.send(`${agent.name}:\n${blastMessage}`);
         }
       }
     } catch (error) {

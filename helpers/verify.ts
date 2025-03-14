@@ -1,29 +1,28 @@
-import type { MessageStreamWorker } from "@workers/main";
+import type { MessageStreamWorker } from "@agents/main";
+import type { Agent, AgentManager } from "@agents/manager";
 import {
   type Conversation,
   type Group,
-  type NestedPersonas,
-  type Persona,
   type VerifyStreamResult,
 } from "./types";
 
-export async function getPersonasFromGroup(
+export async function getAgentsFromGroup(
   group: Conversation,
-  personas: NestedPersonas,
-): Promise<Persona[]> {
+  agents: AgentManager,
+): Promise<Agent[]> {
   await group.sync();
   const members = await group.members();
   const memberInboxIds = members.map((member) => member.inboxId);
 
   // Use the getPersonas method to retrieve all personas
-  const allPersonas = personas.getPersonas();
+  const allAgents = agents.getAgents();
 
   // Find personas whose client inboxId matches the group members' inboxIds
-  const personasFromGroup = allPersonas.filter((persona) =>
-    memberInboxIds.includes(persona.client?.inboxId || ""),
+  const agentsFromGroup = allAgents.filter((agent) =>
+    memberInboxIds.includes(agent.client?.inboxId || ""),
   );
 
-  return personasFromGroup;
+  return agentsFromGroup;
 }
 
 /**
@@ -48,15 +47,15 @@ const nameUpdater = async (group: Conversation, payload: string) => {
 
 export async function verifyStreamAll(
   group: Conversation,
-  participants: NestedPersonas,
+  agents: AgentManager,
   count = 1,
 ) {
-  const allPersonas = await getPersonasFromGroup(group, participants);
-  return verifyStream(group, allPersonas, "text", count);
+  const allAgents = await getAgentsFromGroup(group, agents);
+  return verifyStream(group, allAgents, "text", count);
 }
 export async function verifyStream<T extends string = string>(
   group: Conversation,
-  participants: Persona[],
+  agents: Agent[],
   collectorType = "text",
   count = 1,
   generator: (index: number, suffix: string) => T = (
@@ -76,9 +75,7 @@ export async function verifyStream<T extends string = string>(
   }
   // Exclude the group creator from receiving
   const creatorInboxId = (await group.metadata()).creatorInboxId;
-  const receivers = participants.filter(
-    (p) => p.client?.inboxId !== creatorInboxId,
-  );
+  const receivers = agents.filter((a) => a.client?.inboxId !== creatorInboxId);
 
   // Conversation ID (topic or peerAddress)
   // Modify as needed depending on how you store the ID
@@ -104,7 +101,9 @@ export async function verifyStream<T extends string = string>(
 
   // Wait for collectors
   const collectedMessages = await Promise.all(collectPromises);
-  const allReceived = collectedMessages.every((msgs) => msgs?.length === count);
+  const allReceived = collectedMessages.every(
+    (msgs: T[]) => msgs?.length === count,
+  );
   if (!allReceived) {
     console.error(
       "Not all participants received the expected number of messages.",
@@ -129,11 +128,11 @@ export async function verifyStream<T extends string = string>(
  * @returns Promise resolving with results of the verification
  */
 export async function verifyConversationStream(
-  initiator: Persona,
-  participants: Persona[],
+  initiator: Agent,
+  participants: Agent[],
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
   const groupCreator = async (
-    initiator: Persona,
+    initiator: Agent,
     participantAddresses: string[],
   ) => {
     if (!initiator.client) {
@@ -331,7 +330,7 @@ export function calculateMessageStats(
   let totalExpectedMessages = 0;
   let totalReceivedMessages = 0;
 
-  // Check message order
+  // Check message order and reception
   let personasInOrder = 0;
   const personaCount = messagesByPersona.length;
 

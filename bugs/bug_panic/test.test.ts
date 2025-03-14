@@ -1,5 +1,5 @@
+import { createAgent } from "@agents/factory";
 import { loadEnv } from "@helpers/client";
-import { getWorkers } from "@workers/factory";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_panic";
@@ -7,15 +7,14 @@ loadEnv(testName);
 
 describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
-    const personas = await getWorkers(50, testName);
-    const workerArray = personas.getPersonas();
-    const groupByInboxIds = await personas
+    const agents = await createAgent(50, testName);
+    const groupByInboxIds = await agents
       .get("bob")!
       .client.conversations.newGroup(
-        personas.getPersonas().map((persona) => persona.client.inboxId),
+        agents.getAgents().map((agent) => agent.client.inboxId),
       );
-    for (const worker of workerArray) {
-      await worker.worker?.terminate();
+    for (const agent of agents.getAgents()) {
+      await agent.worker?.terminate();
     }
     expect(groupByInboxIds.id).toBeDefined();
   });

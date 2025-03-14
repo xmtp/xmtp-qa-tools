@@ -1,15 +1,12 @@
+import { createAgent } from "@agents/factory";
+import { type AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
-import {
-  type Group,
-  type NestedPersonas,
-  type VerifyStreamResult,
-} from "@helpers/types";
+import { type Group, type VerifyStreamResult } from "@helpers/types";
 import {
   calculateMessageStats,
-  getPersonasFromGroup,
+  getAgentsFromGroup,
   verifyStream,
 } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "order";
@@ -19,13 +16,13 @@ const amount = 5; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let agents: AgentManager;
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    agents = await createAgent(
       [
         "bob",
         "alice",
@@ -47,15 +44,15 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, agents);
   });
 
   it("tc_stream: send the stream", async () => {
     // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-    group = await personas
+    group = await agents
       .get("bob")!
       .client.conversations.newGroup(
-        personas.getPersonas().map((p) => p.client.inboxId),
+        agents.getAgents().map((p) => p.client.inboxId),
       );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
@@ -63,7 +60,7 @@ describe(testName, () => {
     // Collect messages by setting up listeners before sending and then sending known messages.
     collectedMessages = await verifyStream(
       group,
-      personas.getPersonas(),
+      agents.getAgents(),
       "text",
       amount,
       (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -94,13 +91,13 @@ describe(testName, () => {
   });
 
   it("tc_poll: should verify message order when receiving via pull", async () => {
-    group = await personas
+    group = await agents
       .get("bob")!
       .client.conversations.newGroup([
-        personas.get("joe")!.client.inboxId,
-        personas.get("bob")!.client.inboxId,
-        personas.get("alice")!.client.inboxId,
-        personas.get("sam")!.client.inboxId,
+        agents.get("joe")!.client.inboxId,
+        agents.get("bob")!.client.inboxId,
+        agents.get("alice")!.client.inboxId,
+        agents.get("sam")!.client.inboxId,
       ]);
 
     const messages: string[] = [];
@@ -115,12 +112,13 @@ describe(testName, () => {
   });
 
   it("tc_poll_order: verify message order when receiving via pull", async () => {
-    const personasFromGroup = await getPersonasFromGroup(group, personas);
+    const agentsFromGroup = await getAgentsFromGroup(group, agents);
     const messagesByPersona: string[][] = [];
 
-    for (const persona of personasFromGroup) {
-      const conversation =
-        await persona.client.conversations.getConversationById(group.id);
+    for (const agent of agentsFromGroup) {
+      const conversation = await agent.client.conversations.getConversationById(
+        group.id,
+      );
       if (!conversation) {
         throw new Error("Conversation not found");
       }

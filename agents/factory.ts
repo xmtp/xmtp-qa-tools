@@ -2,19 +2,18 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import {
-  defaultValues,
-  NestedPersonas,
-  type Client,
-  type Persona,
-  type PersonaBase,
-  type typeofStream,
-} from "@helpers/types";
+import { type Client, type typeofStream } from "@helpers/types";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
+import {
+  AgentManager,
+  defaultNames,
+  type Agent,
+  type AgentBase,
+} from "./manager";
 
-// Global cache to store workers across multiple getWorkers calls
-const globalWorkerCache: Record<string, Persona> = {};
+// Global cache to store agents across multiple createAgent calls
+const globalWorkerCache: Record<string, Agent> = {};
 
 /**
  * The PersonaFactory is responsible for creating Persona objects
@@ -22,7 +21,7 @@ const globalWorkerCache: Record<string, Persona> = {};
  */
 export class PersonaFactory {
   private testName: string;
-  private activeWorkers: WorkerClient[] = []; // Add this to track workers
+  private activeAgents: Agent[] = []; // Add this to track agents
   private gptEnabled: boolean;
 
   private typeofStream: typeofStream;
@@ -108,7 +107,7 @@ export class PersonaFactory {
     return this.keysCache[baseName];
   }
 
-  public async createPersona(descriptor: string): Promise<Persona> {
+  public async createAgent(descriptor: string): Promise<Agent> {
     // Check if the persona already exists in the global cache
     if (globalWorkerCache[descriptor] && globalWorkerCache[descriptor].client) {
       console.log(`Reusing cached worker for ${descriptor}`);
@@ -121,8 +120,8 @@ export class PersonaFactory {
 
     const { walletKey, encryptionKey } = this.ensureKeys(descriptor);
 
-    const personaData: PersonaBase = {
-      name: descriptor,
+    const agentData: AgentBase = {
+      name: baseName,
       folder,
       testName: this.testName,
       walletKey,
@@ -130,14 +129,14 @@ export class PersonaFactory {
     };
 
     const workerClient = new WorkerClient(
-      personaData,
+      agentData,
       this.typeofStream,
       this.gptEnabled,
     );
     const worker = await workerClient.initialize();
 
-    const persona: Persona = {
-      ...personaData,
+    const agent: Agent = {
+      ...agentData,
       client: worker.client,
       dbPath: worker.dbPath,
       version: worker.version,
@@ -147,12 +146,12 @@ export class PersonaFactory {
     };
 
     // Add to global cache for future reuse
-    globalWorkerCache[persona.name] = persona;
+    globalWorkerCache[agent.name] = agent;
 
-    // Store the new worker for potential cleanup later
-    this.activeWorkers.push(workerClient);
+    // Store the new worker for potential cl  eanup later
+    this.activeAgents.push(agent);
 
-    return persona;
+    return agent;
   }
 }
 
@@ -164,17 +163,16 @@ export class PersonaFactory {
  * @param descriptors e.g. ["aliceA12", "bob", "random1"]
  * @param testName    Not currently used, but can be used for labeling or logging
  */
-export async function getWorkers(
+export async function createAgent(
   descriptorsOrAmount: string[] | number,
   testName: string,
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
-  existingPersonas?: NestedPersonas,
-): Promise<NestedPersonas> {
+  existingPersonas?: AgentManager,
+): Promise<AgentManager> {
   let descriptors: string[];
   if (typeof descriptorsOrAmount === "number") {
-    const workerNames = defaultValues.defaultNames;
-    const orderedNames = workerNames.slice(0, descriptorsOrAmount);
+    const orderedNames = defaultNames.slice(0, descriptorsOrAmount);
     descriptors = orderedNames;
   } else {
     descriptors = descriptorsOrAmount;
@@ -189,35 +187,36 @@ export async function getWorkers(
       ? descriptor
       : `${baseName}-${getNextFolderName()}`;
 
-    return personaFactory.createPersona(finalDescriptor);
+    return personaFactory.createAgent(finalDescriptor);
   });
 
-  const personasArray = await Promise.all(personaPromises);
+  const agentsArray = await Promise.all(personaPromises);
 
-  // If existing personas are provided, add new workers to it
+  // If existing personas are provided, add new agents to it and return the updated nested personas
   if (existingPersonas) {
-    personasArray.forEach((persona) => {
-      const [baseName, installationId] = persona.name.split("-");
-      existingPersonas.addWorker(baseName, installationId || "a", persona);
+    agentsArray.forEach((agent) => {
+      const [baseName, installationId] = agent.name.split("-");
+      existingPersonas.addAgent(baseName, installationId || "a", agent);
     });
     return existingPersonas;
   }
 
   // Convert the array of personas to a nested record
-  const personas = personasArray.reduce<
-    Record<string, Record<string, Persona>>
-  >((acc, persona) => {
-    const [baseName, installationId] = persona.name.split("-");
+  const agents = agentsArray.reduce<Record<string, Record<string, Agent>>>(
+    (acc, agent) => {
+      const [baseName, installationId] = agent.name.split("-");
 
-    if (!acc[baseName]) {
-      acc[baseName] = {};
-    }
+      if (!acc[baseName]) {
+        acc[baseName] = {};
+      }
 
-    acc[baseName][installationId || "a"] = persona;
-    return acc;
-  }, {});
+      acc[baseName][installationId || "a"] = agent;
+      return acc;
+    },
+    {},
+  );
 
-  return new NestedPersonas(personas);
+  return new AgentManager(agents);
 }
 
 // Helper function to get the next available folder name
@@ -237,15 +236,15 @@ function getNextFolderName(): string {
 
 // Function to clear the global worker cache if needed
 export async function clearWorkerCache(): Promise<void> {
-  // First terminate all workers
+  // First terminate all agents
   for (const key in globalWorkerCache) {
     try {
-      // Check if the key exists and has a worker property before trying to terminate
+      // Check if the key exists and has a agent property before trying to terminate
       if (globalWorkerCache[key].worker) {
         await globalWorkerCache[key].worker.terminate();
       }
     } catch (error) {
-      console.warn(`Error terminating worker for ${key}:`, error);
+      console.warn(`Error terminating agent for ${key}:`, error);
     }
   }
 

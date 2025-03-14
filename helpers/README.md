@@ -4,18 +4,15 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                                 |
-| ------------------------ | ------------------------------------------------------- |
-| [client.ts](#clientts)   | Creates signers and manages keys for test personas      |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                    |
-| [factory.ts](#factoryts) | Creates and manages test personas with workers          |
-| [group.ts](#groupts)     | Creates test groups with specified participants         |
-| [logger.ts](#loggerts)   | Logging utilities for test output                       |
-| [main.ts](#maints)       | Worker client implementation for multi-threaded testing |
-| [reflect.ts](#reflectts) | Integration with Reflect testing platform               |
-| [thread.ts](#threadts)   | Worker thread implementation for background processing  |
-| [types.ts](#typests)     | Type definitions used throughout the testing framework  |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery       |
+| Module                   | Purpose                                                |
+| ------------------------ | ------------------------------------------------------ |
+| [client.ts](#clientts)   | Creates signers and manages keys for test personas     |
+| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                   |
+| [group.ts](#groupts)     | Creates test groups with specified participants        |
+| [logger.ts](#loggerts)   | Logging utilities for test output                      |
+| [reflect.ts](#reflectts) | Integration with Reflect testing platform              |
+| [types.ts](#typests)     | Type definitions used throughout the testing framework |
+| [verify.ts](#verifyts)   | Validation utilities for testing message delivery      |
 
 ## 🔍 Module Details
 
@@ -89,58 +86,6 @@ overrideConsole(logger);
 
 // Flush logs to disk when test completes
 flushLogger(testName);
-```
-
-### main.ts
-
-Worker client implementation for multi-threaded testing:
-
-```typescript
-// Create a worker client for a persona
-const worker = new WorkerClient(persona, typeofStream);
-
-// Initialize the worker with an XMTP client
-const { client, dbPath, version } = await worker.initialize();
-
-// Collect messages from a conversation
-const messages = await worker.collectMessages(groupId, contentType, count);
-
-// Collect conversation events
-const conversations = await worker.collectConversations(peerAddress, count);
-
-// Clean up when done
-await worker.terminate();
-```
-
-### reflect.ts
-
-Integration with the Reflect testing platform:
-
-```typescript
-// Create a Reflect test suite
-const reflectTestSuite = new ReflectTestSuite();
-
-// Run GM sending test
-const result = await reflectTestSuite.runSendingGmTest();
-
-// Monitor test execution status
-await reflectTestSuite.pollExecutionStatus(reflectTestSuite, executionId);
-```
-
-### thread.ts
-
-Worker thread implementation for background processing:
-
-```typescript
-// Listen for messages from parent thread
-parentPort.on("message", (message) => {
-  // Handle initialization and other commands
-});
-
-// Error handling for worker threads
-process.on("unhandledRejection", (reason) => {
-  console.error("[Worker] Unhandled Rejection:", reason);
-});
 ```
 
 ### types.ts

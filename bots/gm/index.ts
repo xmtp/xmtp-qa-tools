@@ -1,6 +1,6 @@
+import { createAgent } from "@agents/factory";
 import { loadEnv } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
 
 const testName = "test-bot";
 loadEnv(testName);
@@ -16,10 +16,10 @@ process.on("unhandledRejection", (reason, promise) => {
 });
 
 async function main() {
-  // Get 20 dynamic workers
-  const personas = await getWorkers(["bot"], testName, "message", true);
+  // Get 20 dynamic agents
+  const agents = await createAgent(["bot"], testName, "message", true);
 
-  const bot = personas.get("bot");
+  const bot = agents.get("bot");
   const client = bot?.client as Client;
 
   const env = process.env.XMTP_ENV as XmtpEnv;

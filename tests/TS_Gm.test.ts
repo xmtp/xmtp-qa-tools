@@ -1,13 +1,10 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/tests";
-import {
-  IdentifierKind,
-  type Conversation,
-  type NestedPersonas,
-} from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { IdentifierKind, type Conversation } from "@helpers/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createGroupAndReceiveGm } from "../playwright/gm-bot.playwright";
 
@@ -18,14 +15,14 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: NestedPersonas;
+  let agents: AgentManager;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(["bob"], testName);
-      expect(personas).toBeDefined();
-      expect(personas.getPersonas().length).toBe(1);
+      agents = await createAgent(["bob"], testName);
+      expect(agents).toBeDefined();
+      expect(agents.getAgents().length).toBe(1);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -35,7 +32,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, agents);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -45,12 +42,10 @@ describe(testName, () => {
   it("gm-bot: should check if bot is alive", async () => {
     try {
       // Create conversation with the bot
-      convo = await personas
-        .get("bob")!
-        .client.conversations.newDmByIdentifier({
-          identifierKind: IdentifierKind.Ethereum,
-          identifier: gmBotAddress,
-        });
+      convo = await agents.get("bob")!.client.conversations.newDmByIdentifier({
+        identifierKind: IdentifierKind.Ethereum,
+        identifier: gmBotAddress,
+      });
 
       await convo.sync();
       const prevMessages = (await convo.messages()).length;

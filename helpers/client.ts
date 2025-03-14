@@ -1,8 +1,9 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type NestedPersonas, type Signer, type XmtpEnv } from "@helpers/types";
-import { clearWorkerCache } from "@workers/factory";
+import { clearWorkerCache } from "@agents/factory";
+import { type AgentManager } from "@agents/manager";
+import { type Signer, type XmtpEnv } from "@helpers/types";
 import {
   generateInboxId as generateInboxIdBinding,
   IdentifierKind,
@@ -143,13 +144,13 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
-export async function closeEnv(testName: string, personas: NestedPersonas) {
+export async function closeEnv(testName: string, agents: AgentManager) {
   flushLogger(testName);
 
   await flushMetrics();
-  if (personas && typeof personas.getPersonas === "function") {
-    for (const persona of personas.getPersonas()) {
-      await persona.worker.terminate();
+  if (agents && typeof agents.getAgents === "function") {
+    for (const agent of agents.getAgents()) {
+      await agent.worker.terminate();
     }
   }
 

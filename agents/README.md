@@ -4,15 +4,15 @@ Workers in our testing framework allow you to create predefined personas (like A
 
 ## Basic usage
 
-The simplest way to create workers is to use the `getWorkers` function:
+The simplest way to create agents is to use the `createAgent` function:
 
 ```typescript
-// Initialize personas
-const personas = await getWorkers(["alice", "bob"], testName);
+// Initialize agents
+const agents = await createAgent(["alice", "bob"], testName);
 
-// Access personas directly
-const alice = personas.get("alice"); // "a" is the default installation
-const bob = personas.get("bob"); // "a" is the default installation
+// Access agents directly
+const alice = agents.get("alice"); // "a" is the default installation
+const bob = agents.get("bob"); // "a" is the default installation
 
 // Use them in your tests
 const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
@@ -35,10 +35,10 @@ You can create different installations of the same persona to simulate multiple 
 
 ```typescript
 // Create primary personas with default installation
-const primaryPersonas = await getWorkers(["alice", "bob"], testName);
+const primaryPersonas = await createAgent(["alice", "bob"], testName);
 
 // Create secondary installations
-const secondaryPersonas = await getWorkers(
+const secondaryPersonas = await createAgent(
   ["alice-desktop", "bob-mobile"],
   testName,
 );
@@ -59,10 +59,10 @@ const bobMobile = secondaryPersonas.get("bob", "mobile");
 
 ```typescript
 // Create primary personas
-const primaryPersonas = await getWorkers(["alice", "bob"], testName);
+const primaryPersonas = await createAgent(["alice", "bob"], testName);
 
 // Create a desktop installation for Alice
-const secondaryPersonas = await getWorkers(["alice-desktop"], testName);
+const secondaryPersonas = await createAgent(["alice-desktop"], testName);
 const aliceDesktop = secondaryPersonas.get("alice", "desktop");
 
 // Send a message from Alice's desktop
@@ -78,11 +78,11 @@ const bobConversations = await primaryPersonas
   .client.conversations.list();
 ```
 
-## Start workers with numbers
+## Start agents with numbers
 
 ```typescript
-const personas = await getWorkers(4, testName);
-// this will start 4 workers with listed from the default names
+const agents = await createAgent(4, testName);
+// this will start 4 agents with listed from the default names
 ```
 
 ## Pick one from default names

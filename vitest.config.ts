@@ -6,8 +6,8 @@ export default defineConfig({
   resolve: {
     alias: {
       "@helpers": resolve(__dirname, "./helpers"),
-      "@workers": resolve(__dirname, "./workers"),
       "@scripts": resolve(__dirname, "./scripts"),
+      "@agents": resolve(__dirname, "./agents"),
     },
   },
   test: {

@@ -19,6 +19,6 @@ XMTP_ENV="dev"         # Network selection
 ### Resources
 
 - **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](/workers/)
+- **Agents:** Predefined personas like `bob`, `alice`, `randomguy` with [agents](/agents/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)

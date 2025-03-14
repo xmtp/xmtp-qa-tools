@@ -1,14 +1,14 @@
 import fs from "fs";
+import { createAgent, getDataSubFolderCount } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type NestedPersonas } from "@helpers/types";
-import { getDataSubFolderCount, getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let agents: AgentManager;
 
   let folderCount: number = 0;
   beforeAll(() => {
@@ -16,32 +16,32 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, agents);
   });
 
   it("create random personas", async () => {
-    personas = await getWorkers(["random"], testName, "none");
+    agents = await createAgent(["random"], testName, "none");
     folderCount++;
-    expect(personas.get("random")?.client?.inboxId).toBeDefined();
+    expect(agents.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create a persona", async () => {
-    personas = await getWorkers(["bob", "random"], testName, "none");
+    agents = await createAgent(["bob", "random"], testName, "none");
     folderCount++;
-    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
+    expect(agents.get("bob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create a random persona", async () => {
-    personas = await getWorkers(["random"], testName, "none");
+    agents = await createAgent(["random"], testName, "none");
 
-    expect(personas.get("random")?.client?.inboxId).toBeDefined();
+    expect(agents.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
   it("should create multiple personas", async () => {
-    personas = await getWorkers(
+    agents = await createAgent(
       ["bob", "alice", "randompep", "randombob"],
       testName,
       "none",
@@ -49,10 +49,10 @@ describe(testName, () => {
     folderCount++;
     folderCount++;
     folderCount++;
-    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
-    expect(personas.get("alice")?.client?.inboxId).toBeDefined();
-    expect(personas.get("randompep")?.client?.inboxId).toBeDefined();
-    expect(personas.get("randombob")?.client?.inboxId).toBeDefined();
+    expect(agents.get("bob")?.client?.inboxId).toBeDefined();
+    expect(agents.get("alice")?.client?.inboxId).toBeDefined();
+    expect(agents.get("randompep")?.client?.inboxId).toBeDefined();
+    expect(agents.get("randombob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 });

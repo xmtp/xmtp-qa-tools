@@ -21,7 +21,7 @@
     "paths": {
       "@helpers/*": ["./helpers/*"],
       "@scripts/*": ["./scripts/*"],
-      "@workers/*": ["./workers/*"]
+      "@agents/*": ["./agents/*"]
     }
   },
   "include": ["**/*.ts", "vitest.config.ts", "vite.config.js"]

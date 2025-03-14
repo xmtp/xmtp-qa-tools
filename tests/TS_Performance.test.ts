@@ -1,15 +1,11 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { exportTestResults, logError } from "@helpers/tests";
-import {
-  IdentifierKind,
-  type Conversation,
-  type Group,
-  type NestedPersonas,
-} from "@helpers/types";
+import { IdentifierKind, type Conversation, type Group } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import {
   afterAll,
   afterEach,
@@ -33,13 +29,13 @@ console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 
 describe(testName, () => {
   let dm: Conversation;
-  let personas: NestedPersonas;
+  let agents: AgentManager;
   let start: number;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(
+      agents = await createAgent(
         [
           "henry",
           "ivy",
@@ -53,8 +49,8 @@ describe(testName, () => {
         ],
         testName,
       );
-      expect(personas).toBeDefined();
-      expect(personas.getPersonas().length).toBe(9);
+      expect(agents).toBeDefined();
+      expect(agents.getAgents().length).toBe(9);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -68,7 +64,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, personas, start);
+      exportTestResults(expect, agents, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -78,7 +74,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, agents);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -87,7 +83,7 @@ describe(testName, () => {
 
   it("inboxState: should measure inboxState of henry", async () => {
     try {
-      const inboxState = await personas.get("henry")!.client.inboxState(true);
+      const inboxState = await agents.get("henry")!.client.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
       hasFailures = logError(e, expect);
@@ -96,9 +92,9 @@ describe(testName, () => {
   });
   it("createDM: should measure creating a DM", async () => {
     try {
-      dm = await personas
+      dm = await agents
         .get("henry")!
-        .client.conversations.newDm(personas.get("randomguy")!.client.inboxId);
+        .client.conversations.newDm(agents.get("randomguy")!.client.inboxId);
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -114,7 +110,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client.inboxId}`,
+        `[${agents.get("henry")!.name}] Creating DM with ${agents.get("randomguy")!.name} at ${agents.get("randomguy")!.client.inboxId}`,
       );
 
       const dmId = await dm.send(message);
@@ -128,7 +124,7 @@ describe(testName, () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyStream(dm, [personas.get("randomguy")!]);
+      const verifyResult = await verifyStream(dm, [agents.get("randomguy")!]);
 
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
@@ -143,7 +139,7 @@ describe(testName, () => {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        newGroup = await personas
+        newGroup = await agents
           .get("henry")!
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
@@ -155,7 +151,7 @@ describe(testName, () => {
     it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        const newGroupByIdentifier = await personas
+        const newGroupByIdentifier = await agents
           .get("henry")!
           .client.conversations.newGroupByIdentifiers(
             sliced.map((inbox) => ({
@@ -222,7 +218,7 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(newGroup, personas);
+        const verifyResult = await verifyStreamAll(newGroup, agents);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);

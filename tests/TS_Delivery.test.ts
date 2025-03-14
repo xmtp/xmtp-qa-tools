@@ -1,18 +1,18 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/tests";
 import {
   defaultValues,
   type Group,
-  type NestedPersonas,
   type VerifyStreamResult,
 } from "@helpers/types";
 import {
   calculateMessageStats,
-  getPersonasFromGroup,
+  getAgentsFromGroup,
   verifyStream,
 } from "@helpers/verify";
-import { getWorkers } from "@workers/factory";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_delivery";
@@ -36,7 +36,7 @@ const timeoutMax =
 describe(
   testName,
   () => {
-    let personas: NestedPersonas;
+    let agents: AgentManager;
     let group: Group;
     let collectedMessages: VerifyStreamResult;
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -44,18 +44,18 @@ describe(
     beforeAll(async () => {
       try {
         //fs.rmSync(".data", { recursive: true, force: true });
-        // Use getWorkers to spin up many personas. This is resource-intensive.
-        personas = await getWorkers(receiverAmount, testName);
+        // Use createAgent to spin up many personas. This is resource-intensive.
+        agents = await createAgent(receiverAmount, testName);
         await new Promise((resolve) => setTimeout(resolve, 3000));
         console.log("creating group");
-        group = await personas
+        group = await agents
           .get("bob")!
           .client.conversations.newGroup([
-            ...personas.getPersonas().map((p) => p.client.inboxId),
+            ...agents.getAgents().map((p) => p.client.inboxId),
           ]);
 
-        expect(personas).toBeDefined();
-        expect(personas.getPersonas().length).toBe(receiverAmount);
+        expect(group).toBeDefined();
+        expect(agents.getAgents().length).toBe(receiverAmount);
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -65,7 +65,7 @@ describe(
     afterAll(async () => {
       try {
         sendTestResults(hasFailures ? "failure" : "success", testName);
-        await closeEnv(testName, personas);
+        await closeEnv(testName, agents);
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -79,7 +79,7 @@ describe(
         // Collect messages by setting up listeners before sending and then sending known messages.
         collectedMessages = await verifyStream(
           group,
-          personas.getPersonas(),
+          agents.getAgents(),
           "text",
           amountofMessages,
           (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -114,14 +114,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          personas.get("bob")!.version,
+          agents.get("bob")!.version,
           testName,
           "stream",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          personas.get("bob")!.version,
+          agents.get("bob")!.version,
           testName,
           "stream",
           "order",
@@ -134,12 +134,12 @@ describe(
 
     it("tc_poll_order: verify message order when receiving via pull", async () => {
       try {
-        const personasFromGroup = await getPersonasFromGroup(group, personas);
+        const agentsFromGroup = await getAgentsFromGroup(group, agents);
         const messagesByPersona: string[][] = [];
 
-        for (const persona of personasFromGroup) {
+        for (const agent of agentsFromGroup) {
           const conversation =
-            await persona.client.conversations.getConversationById(group.id);
+            await agent.client.conversations.getConversationById(group.id);
           if (!conversation) {
             throw new Error("Conversation not found");
           }
@@ -171,14 +171,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          personas.get("bob")!.version,
+          agents.get("bob")!.version,
           testName,
           "poll",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          personas.get("bob")!.version,
+          agents.get("bob")!.version,
           testName,
           "poll",
           "order",
@@ -192,8 +192,8 @@ describe(
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one persona to take offline
-        const offlinePersona = personas.get("bob")!; // Second persona
-        const onlinePersona = personas.get("alice")!; // First persona
+        const offlinePersona = agents.get("bob")!; // Second persona
+        const onlinePersona = agents.get("alice")!; // First persona
 
         console.log(`Taking ${offlinePersona.name} offline`);
 

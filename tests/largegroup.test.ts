@@ -1,17 +1,18 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { type Conversation, type NestedPersonas } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
+import { type Conversation } from "@helpers/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "largegroup";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: NestedPersonas;
+  let agents: AgentManager;
   let group: Conversation;
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    agents = await createAgent(
       [
         "henry",
         "ivy",
@@ -28,19 +29,19 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, agents);
   });
 
   it(`createGroup-450: should create a large group of 450 participants 450`, async () => {
     const sliced = generatedInboxes.slice(0, 450);
-    group = await personas
+    group = await agents
       .get("henry")!
       .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();
   });
   it(`createGroup-500: should create a large group of 500 participants 500`, async () => {
     const sliced = generatedInboxes.slice(0, 500);
-    group = await personas
+    group = await agents
       .get("henry")!
       .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();

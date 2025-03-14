@@ -1,6 +1,6 @@
+import { createAgent } from "@agents/factory";
+import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
-import type { NestedPersonas } from "@helpers/types";
-import { getWorkers } from "@workers/factory";
 import { afterAll, describe, expect, it } from "vitest";
 
 const testName = "installations";
@@ -8,21 +8,21 @@ loadEnv(testName);
 
 describe(testName, () => {
   // Create a container to hold all personas for cleanup
-  let initialPersonas: NestedPersonas;
+  let agents: AgentManager;
 
   afterAll(async () => {
-    await closeEnv(testName, initialPersonas);
+    await closeEnv(testName, agents);
   });
 
   it("should create and use personas on demand", async () => {
     // Create alice with default installation "b"
-    initialPersonas = await getWorkers(["alice", "bob"], testName);
+    agents = await createAgent(["alice", "bob"], testName);
     // Merge the new personas with the existing ones
-    expect(initialPersonas.get("alice")?.folder).toBe("a");
-    expect(initialPersonas.get("bob")?.folder).toBe("a");
+    expect(agents.get("alice")?.folder).toBe("a");
+    expect(agents.get("bob")?.folder).toBe("a");
 
     // Create a different installation of alice
-    const secondaryPersonas = await getWorkers(
+    const secondaryPersonas = await createAgent(
       ["alice-desktop", "bob-b"],
       testName,
     );
@@ -31,13 +31,13 @@ describe(testName, () => {
     expect(secondaryPersonas.get("bob", "b")?.folder).toBe("b");
 
     // Verify installations of the same person share identity
-    expect(initialPersonas.get("bob")?.client.inboxId).toBe(
+    expect(agents.get("bob")?.client.inboxId).toBe(
       secondaryPersonas.get("bob", "b")?.client.inboxId,
     );
-    expect(initialPersonas.get("alice")?.client.inboxId).toBe(
+    expect(agents.get("alice")?.client.inboxId).toBe(
       secondaryPersonas.get("alice", "desktop")?.client.inboxId,
     );
-    expect(initialPersonas.get("bob")?.dbPath).not.toBe(
+    expect(agents.get("bob")?.dbPath).not.toBe(
       secondaryPersonas.get("bob", "b")?.dbPath,
     );
 
@@ -46,7 +46,7 @@ describe(testName, () => {
       secondaryPersonas.get("bob", "b")?.dbPath,
     );
     // Create charlie only when we need him
-    const terciaryPersonas = await getWorkers(["charlie"], testName);
+    const terciaryPersonas = await createAgent(["charlie"], testName);
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryPersonas.get("alice", "desktop");
@@ -63,7 +63,7 @@ describe(testName, () => {
     expect(charlieConvs?.length).toBeGreaterThan(0);
 
     // Create a backup installation for charlie
-    const fourthPersonas = await getWorkers(["charlie-c"], testName);
+    const fourthPersonas = await createAgent(["charlie-c"], testName);
     // Backup installation should also be able to access the conversation after syncing
     await fourthPersonas.get("charlie")?.client.conversations.syncAll();
     const backupConvs = await fourthPersonas
