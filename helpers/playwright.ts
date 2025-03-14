@@ -30,10 +30,14 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     });
 
     // Create context with a larger viewport to ensure all messages are visible
-    const context: BrowserContext = await browser.newContext({
-      viewport: { width: 1920, height: 1080 }, // Use a large viewport size
-      deviceScaleFactor: 1,
-    });
+    const context: BrowserContext = await browser.newContext(
+      isHeadless
+        ? {
+            viewport: { width: 1920, height: 1080 }, // Use a large viewport size
+            deviceScaleFactor: 1,
+          }
+        : {},
+    );
 
     page = await context.newPage();
 
@@ -47,7 +51,10 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
 
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
-
+    await page
+      .getByRole("main")
+      .getByRole("button", { name: "Connect" })
+      .click();
     await page
       .getByRole("main")
       .getByRole("button", { name: "New conversation" })
@@ -107,9 +114,9 @@ async function setLocalStorage(
     ({ envValue, walletKey, walletEncryptionKey }) => {
       console.log("env keys", { envValue, walletKey, walletEncryptionKey });
       // @ts-expect-error Window localStorage access in browser context
-      window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+      //window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
       // @ts-expect-error Window localStorage access in browser context
-      window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+      // window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
       // @ts-expect-error Window localStorage access in browser context
       window.localStorage.setItem("XMTP_NETWORK", envValue);
       // @ts-expect-error Window localStorage access in browser context

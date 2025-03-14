@@ -4,15 +4,16 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                           |
-| ------------------------ | ------------------------------------------------- |
-| [client.ts](#clientts)   | Creates signers and manages keys for test workers |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog              |
-| [group.ts](#groupts)     | Creates test groups with specified participants   |
-| [logger.ts](#loggerts)   | Logging utilities for test output                 |
-| [test.ts](#testts)       | Test utilities for creating and managing tests    |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery |
-| [railway.ts](#railwayts) | Railway utilities for testing message delivery    |
+| Module                         | Purpose                                           |
+| ------------------------------ | ------------------------------------------------- |
+| [client.ts](#clientts)         | Creates signers and manages keys for test workers |
+| [datadog.ts](#datadogts)       | Sends performance metrics to Datadog              |
+| [group.ts](#groupts)           | Creates test groups with specified participants   |
+| [logger.ts](#loggerts)         | Logging utilities for test output                 |
+| [test.ts](#testts)             | Test utilities for creating and managing tests    |
+| [verify.ts](#verifyts)         | Validation utilities for testing message delivery |
+| [railway.ts](#railwayts)       | Railway utilities for testing message delivery    |
+| [playwright.ts](#playwrightts) | Playwright utilities for testing message delivery |
 
 ## 🔍 Module Details
 
@@ -86,6 +87,24 @@ overrideConsole(logger);
 
 // Flush logs to disk when test completes
 flushLogger(testName);
+```
+
+### playwright.ts
+
+Utilities for testing message delivery using Playwright:
+
+```typescript
+// Initialize Playwright browser
+const browser = await playwright.launch({ headless: true });
+
+// Create a new page
+const page = await browser.newPage();
+
+// Navigate to a specific URL
+await page.goto("https://xmtp.chat");
+
+// Close the browser
+await browser.close();
 ```
 
 ### verify.ts

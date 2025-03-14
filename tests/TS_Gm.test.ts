@@ -5,7 +5,7 @@ import { logError } from "@helpers/logger";
 import { IdentifierKind, type Conversation } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createGroupAndReceiveGm } from "../playwright/gm-bot.playwright";
+import { createGroupAndReceiveGm } from "../helpers/playwright";
 
 const testName = "ts_gm";
 loadEnv(testName);
