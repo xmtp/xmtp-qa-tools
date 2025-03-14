@@ -118,7 +118,8 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 | Network Performance     | All metrics within target | Meet defined targets   | ✅ On Target           |
 | Message Delivery        | 100%                      | 99.9% minimum          | ✅ On Target           |
 | Stream Message Loss     | 100%                      | 99.9% minimum          | ✅ On Target           |
-| Stream Message Loss     | 100%                      | 99.9% minimum          | ✅ On Target           |
+| Poll Message Loss       | 100%                      | 99.9% minimum          | ✅ On Target           |
+| Message Order           | 100%                      | 100% in order          | ✅ On Target           |
 | Cross-SDK Compatibility | 100%                      | 100% operation success | ✅ On Target           |
 | South-america & Asia    | more than 40%             | <20% difference        | ⚠️ Performance Concern |
 | US & Europe             | less than 20% variance    | <20% difference        | ✅ On Target           |
