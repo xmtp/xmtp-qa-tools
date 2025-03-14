@@ -11,8 +11,6 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 👋 Gm          | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min  |
 | 🌎 Geolocation | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
 
-![performance dashboard](./media/performance.png)
-
 ## Architecture
 
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
@@ -82,6 +80,16 @@ flowchart LR
 `LibXMTP` is a shared library built in Rust and compiled to WASM, Napi, and FFI bindings. It encapsulates the core cryptography functions of the XMTP messaging protocol. Due to the complexity of the protocol, we are using `openmls` as the underlying cryptographic library, it's important to test how this bindings perform in their own language environments.
 
 We can test all XMTP bindings using three main applications. We use xmtp.chat to test the Browser SDK's Wasm binding in actual web environments. We use Convos to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use agents to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
+
+### Testing scope
+
+- Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
+- 30-minute automated test execution intervals
+- Comprehensive data aggregation in datadog
+- Testing directly on top of SDKs for real-world scenarios
+- `dev` and `production` network covered
+- Manual testing for cross-platform and cross-sdk compatibility
+- Human & agents testing for real-world simulations
 
 ## Operation performance
 
@@ -156,7 +164,7 @@ _Note: Performance metrics based on `us-east` testing on dev and production netw
 | asia          | 411.0            | 103.7    | +46.5%    | ⚠️ Performance Concern |
 | south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
-_Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the `us-east` baseline._
+_Note: Regional performance testing shows significant latency increases in `south-america` (+160.3%) and `asia` (+46.5%) regions compared to the `us-east` baseline._
 
 ### Dev vs Production Network Performance Comparison
 
@@ -185,8 +193,6 @@ _Note: Production environment consistently shows better network performance acro
 | Offline Recovery Order | 100% in order       | 100% in order   | ✅ On Target |
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
-
-- **Datadog:** Explore more in the [dashboards section](https://www.notion.so/ephemerahq/dashboards/)
 
 ### Stream vs. Poll reliability
 
@@ -229,24 +235,13 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
 
-## Testing Infrastructure
-
-- Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
-- 30-minute automated test execution intervals
-- Comprehensive data aggregation in datadog
-- Testing directly on top of SDKs for real-world scenarios
-- `dev` and `production` network covered
-
 ## Tools & Utilities
 
-- **Bots:** Bots for testing, see our [bots section](./bots/)
-- **Workflows:** See our CI/CD pipeline configuration in the [workflows section](/.github/workflows)
-- **Bugs:** We document bugs in the [bugs folder](./bugs/) for easy reproduction and tracking.
-- **Vitest:** We use Vitest for running tests with an interactive [UI](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
-- **Railway:** Visit our [Railway project](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **QA Board:** Follow progress on the [QA Board](https://github.com/orgs/xmtp/projects/30)
-- **Repo Issues:** Report bugs and feature requests in the [repo issues](https://github.com/xmtp/xmtp-qa-testing/issues)
-- **Datadog:** Explore more in the [dashboards section](./dashboards/)
+- **Bots:** Bots for testing - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/bots/)
+- **Workflows:** See our CI/CD pipeline configuration - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
+- **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
+- **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **Datadog:** Explore our datadog dashboards - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/dashboards/)
 
 ## Development
 
