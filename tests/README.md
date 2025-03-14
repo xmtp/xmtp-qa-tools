@@ -2,179 +2,22 @@
 
 This document provides a comprehensive overview of the XMTP testing infrastructure, organized by test suites and their associated workflows and monitoring dashboards.
 
-## Workflow Overview
+## Test Suites Overview
 
-| Workflow           | Schedule     | Purpose                                                | Key Features                   |
-| ------------------ | ------------ | ------------------------------------------------------ | ------------------------------ |
-| **TS_Gm**          | Every 30 min | Tests GM bot functionality                             | Message exchange validation    |
-| **TS_Delivery**    | Every 40 min | Tests message reliability across 200 streams           | High-volume delivery testing   |
-| **TS_Performance** | Every 30 min | Measures XMTP network performance                      | Performance metrics collection |
-| **TS_Geolocation** | Every 32 min | Measures geolocation of the library in the dev network | Geolocation metrics collection |
+| Test Suite     | Purpose                                                | Dev Network Status                                                                                                                                                                     | Production Network Status                                                                                                                                                                                   | Run frequency |
+| -------------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| 🚀 Performance | Measures XMTP network performance                      | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml) | Every 30 min  |
+| 📬 Delivery    | Tests message reliability across 200 streams           | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml)       | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml)       | Every 30 min  |
+| 👋 Gm          | Tests GM bot functionality                             | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min  |
+| 🌎 Geolocation | Measures geolocation of the library in various regions | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
 
-| Test Suite     | Dev Network Status                                                                                                                                                                     | Production Network Status                                                                                                                                                                                   | Run frequency |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 🚀 Performance | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml) | Every 30 min  |
-| 📬 Delivery    | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml)       | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml)       | Every 30 min  |
-| 👋 Gm          | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min  |
-| 🌎 Geolocation | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
+## 🚀 TS_Performance Test Suite
 
-## 🤖 TS_Gm Test Suite
-
-The TS_Gm test suite verifies the reliability of the GM bot functionality, ensuring that the messaging service responds correctly to user interactions.
+The TS_Performance test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
 
 ### Implementation Details
 
-The test suite includes tests for:
-
-- Direct messaging with the GM bot
-- Verifying bot responses to messages
-- Group messaging with the GM bot
-- Testing with both direct bot address and Ethereum identifier formats
-
-```javascript
-// Example from TS_Gm implementation
-it("gm-bot: should check if bot is alive", async () => {
-  try {
-    // Create conversation with the bot
-    convo = await workers
-      .get("bob")!
-      .client.conversations.newDmWithIdentifier({
-        identifierKind: IdentifierKind.Ethereum,
-        identifier: gmBotAddress,
-      });
-
-    // Send a simple message and verify response
-    await convo.send("gm");
-    // ... verification logic
-  } catch (e) {
-    hasFailures = logError(e, expect);
-    throw e;
-  }
-});
-```
-
-### Associated Workflow
-
-The `TS_Gm.yml` workflow automates the test suite execution:
-
-- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
-- 🔄 **Retry Mechanism**: Uses up to 3 attempts for test stability
-- 📊 **Reporting**: Reports test results to Datadog for monitoring
-- 🧪 **Environment**: Tests against the configured GM bot address in Dev
-
-```bash
-# Manually trigger the workflow
-# Navigate to: Actions > TS_Gm > Run workflow
-```
-
-### Monitoring Dashboard
-
-Results from this test suite feed into the [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nz), which provides real-time visibility into test execution status and is connected to the `#notify-eng-testing` Slack channel for alerts.
-
-## 📨 TS_Delivery Test Suite
-
-The TS_Delivery test suite evaluates message delivery reliability across multiple streams, ensuring messages are delivered correctly and in order.
-
-### Implementation Details
-
-This test suite tests:
-
-- Message delivery in streaming mode
-- Message order verification
-- Message delivery via polling
-- Offline recovery (message recovery after disconnection)
-
-Configurable parameters include:
-
-```javascript
-// Configuration parameters from TS_Delivery
-const amountofMessages = parseInt(
-  process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
-);
-const receiverAmount = parseInt(
-  process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
-);
-```
-
-Key test implementations:
-
-```javascript
-// Example from TS_Delivery implementation
-it("tc_stream_order: verify message order when receiving via streams", () => {
-  try {
-    // Verify message reception and order
-    const stats = calculateMessageStats(
-      messagesByWorker,
-      "gm-",
-      amountofMessages,
-      randomSuffix,
-    );
-
-    // We expect all messages to be received and in order
-    expect(stats.receptionPercentage).toBeGreaterThan(95);
-    expect(stats.orderPercentage).toBeGreaterThan(95);
-
-    // Report metrics to Datadog
-    sendDeliveryMetric(
-      stats.receptionPercentage,
-      workers.get("bob")!.version,
-      testName,
-      "stream",
-      "delivery",
-    );
-  } catch (e) {
-    hasFailures = logError(e, expect);
-    throw e;
-  }
-});
-```
-
-### Associated Workflow
-
-The `TS_Delivery.yml` workflow automates this test suite execution:
-
-- ⏱️ **Schedule**: Runs every 40 minutes via cron schedule
-- 🔧 **Configuration**: Optimizes system resources for SQLCipher performance
-- 🔍 **Error Handling**: Uses sophisticated filtering for transient issues
-- 🔄 **Retry Logic**: Implements up to 3 retry attempts for stability
-- 📊 **Metrics**: Sends detailed metrics to Datadog for tracking
-- ⚙️ **Configuration**: Supports adjustable message volume via environment variables
-
-### Monitoring Dashboard
-
-This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
-
-1. **Message Delivery Rate (%)**
-
-   - 🟢 **Green**: ≥ 99.9% delivery rate
-   - 🟡 **Yellow**: ≥ 99% delivery rate
-   - 🔴 **Red**: < 99% delivery rate
-
-2. **Delivery Trends** - Historical view of delivery rates to identify patterns
-
-The dashboard supports filtering by environment, geographic region, test name, library version, and participant count.
-
-#### Message Delivery Metrics
-
-The test suite reports delivery reliability via the `xmtp.sdk.delivery_rate` metric:
-
-```tsx
-// Send delivery rate metric
-metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
-  `libxmtp:${firstWorker.version}`,
-  `test:${testName}`,
-  `metric_type:reliability`,
-  `members:${members}`,
-]);
-```
-
-## ⚡ TS_Performance Test Suite
-
-The TS_Performance test suite measures XMTP network performance across various operations, providing insights into system scalability and responsiveness.
-
-### Implementation Details
-
-This comprehensive test suite evaluates:
+This test suite evaluates:
 
 - Client creation performance
 - Inbox state retrieval speeds
@@ -254,7 +97,7 @@ metrics.gauge(durationMetricName, value, [
 
 #### Network Performance Metrics
 
-For each operation, the test suite tracks network performance across five phases:
+For each operation, the test suite tracks network performance across five key phases:
 
 | Phase            | Description                                                        |
 | ---------------- | ------------------------------------------------------------------ |
@@ -282,24 +125,176 @@ if (!skipNetworkStats) {
 }
 ```
 
-## 📊 TS_Geolocation Test Suite
+## 📬 TS_Delivery Test Suite
+
+The TS_Delivery test suite rigorously evaluates message delivery reliability across multiple streams, ensuring messages are delivered correctly and in order under varying conditions.
+
+### Implementation Details
+
+This test suite focuses on:
+
+- Message delivery in streaming mode
+- Message order verification
+- Message delivery via polling
+- Offline recovery (message recovery after disconnection)
+
+Configurable parameters include:
+
+```javascript
+// Configuration parameters from TS_Delivery
+const amountofMessages = parseInt(
+  process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
+);
+const receiverAmount = parseInt(
+  process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
+);
+```
+
+Key test implementation:
+
+```javascript
+// Example from TS_Delivery implementation
+it("tc_stream_order: verify message order when receiving via streams", () => {
+  try {
+    // Verify message reception and order
+    const stats = calculateMessageStats(
+      messagesByWorker,
+      "gm-",
+      amountofMessages,
+      randomSuffix,
+    );
+
+    // We expect all messages to be received and in order
+    expect(stats.receptionPercentage).toBeGreaterThan(95);
+    expect(stats.orderPercentage).toBeGreaterThan(95);
+
+    // Report metrics to Datadog
+    sendDeliveryMetric(
+      stats.receptionPercentage,
+      workers.get("bob")!.version,
+      testName,
+      "stream",
+      "delivery",
+    );
+  } catch (e) {
+    hasFailures = logError(e, expect);
+    throw e;
+  }
+});
+```
+
+### Associated Workflow
+
+The `TS_Delivery.yml` workflow automates this test suite execution:
+
+- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
+- 🔧 **Configuration**: Optimizes system resources for SQLCipher performance
+- 🔍 **Error Handling**: Uses sophisticated filtering for transient issues
+- 🔄 **Retry Logic**: Implements up to 3 retry attempts for stability
+- 📊 **Metrics**: Sends detailed metrics to Datadog for tracking
+- ⚙️ **Configuration**: Supports adjustable message volume via environment variables
+
+### Monitoring Dashboard
+
+This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
+
+1. **Message Delivery Rate (%)**
+
+   - 🟢 **Green**: ≥ 99.9% delivery rate
+   - 🟡 **Yellow**: ≥ 99% delivery rate
+   - 🔴 **Red**: < 99% delivery rate
+
+2. **Delivery Trends** - Historical view of delivery rates to identify patterns
+
+The dashboard supports comprehensive filtering by environment, geographic region, test name, library version, and participant count.
+
+#### Message Delivery Metrics
+
+The test suite reports delivery reliability via the `xmtp.sdk.delivery_rate` metric:
+
+```tsx
+// Send delivery rate metric
+metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
+  `libxmtp:${firstWorker.version}`,
+  `test:${testName}`,
+  `metric_type:reliability`,
+  `members:${members}`,
+]);
+```
+
+## 👋 TS_Gm Test Suite
+
+The TS_Gm test suite verifies the reliability of the GM bot functionality, ensuring that the messaging service responds correctly to user interactions in both direct and group contexts.
+
+### Implementation Details
+
+The test suite includes tests for:
+
+- Direct messaging with the GM bot
+- Verifying bot responses to messages
+- Group messaging with the GM bot
+- Testing with both direct bot address and Ethereum identifier formats
+
+```javascript
+// Example from TS_Gm implementation
+it("gm-bot: should check if bot is alive", async () => {
+  try {
+    // Create conversation with the bot
+    convo = await workers
+      .get("bob")!
+      .client.conversations.newDmWithIdentifier({
+        identifierKind: IdentifierKind.Ethereum,
+        identifier: gmBotAddress,
+      });
+
+    // Send a simple message and verify response
+    await convo.send("gm");
+    // ... verification logic
+  } catch (e) {
+    hasFailures = logError(e, expect);
+    throw e;
+  }
+});
+```
+
+### Associated Workflow
+
+The `TS_Gm.yml` workflow automates the test suite execution:
+
+- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
+- 🔄 **Retry Mechanism**: Uses up to 3 attempts for test stability
+- 📊 **Reporting**: Reports test results to Datadog for monitoring
+- 🧪 **Environment**: Tests against the configured GM bot address in Dev and Production environments
+
+```bash
+# Manually trigger the workflow
+# Navigate to: Actions > TS_Gm > Run workflow
+```
+
+### Monitoring Dashboard
+
+Results from this test suite feed into the [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nz), which provides real-time visibility into test execution status and is connected to the `#notify-eng-testing` Slack channel for alerts.
+
+## 🌎 TS_Geolocation Test Suite
 
 The TS_Geolocation test suite measures the geographical performance of the XMTP library across different regions, providing insights into regional variations in performance and reliability.
 
 ### Implementation Details
 
-While specific implementation details aren't provided in the documentation, this test suite likely evaluates:
+This test suite evaluates:
 
 - Regional performance differences
 - Latency variations across geographic locations
 - Network reliability in different regions
+- Regional message delivery rates
 
 ### Associated Workflow
 
 The `TS_Geolocation.yml` workflow automates this test suite:
 
-- ⏱️ **Schedule**: Runs every 32 minutes via cron schedule
+- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - 📊 **Reporting**: Reports geolocation metrics to Datadog for monitoring
+- 🌐 **Coverage**: Tests both Dev and Production environments
 
 ### Monitoring Dashboard
 
@@ -307,10 +302,11 @@ Geolocation data feeds into both the main [Workflow Dashboard](https://app.datad
 
 - US region performance
 - South America region performance
+- Other global regions
 
 ## 📊 Unified Monitoring & Observability
 
-All test suites integrate with Datadog monitoring that provides:
+All test suites integrate with a comprehensive Datadog monitoring system that provides:
 
 - 📝 Status events with detailed context for each test run
 - 📈 Success/failure metrics for monitoring
