@@ -1,5 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/tests";
 import {
   IdentifierKind,
@@ -82,17 +83,17 @@ describe(testName, () => {
       throw e;
     }
   });
-  // it("should create a group and send a message", async () => {
-  //   try {
-  //     const randomInboxes = [...generatedInboxes].slice(0, 3);
-  //     const result = await createGroupAndReceiveGm([
-  //       ...randomInboxes.map((inbox) => inbox.accountAddress),
-  //       gmBotAddress,
-  //     ]);
-  //     expect(result).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
+  it("should create a group and send a message", async () => {
+    try {
+      const randomInboxes = [...generatedInboxes].slice(0, 3);
+      const result = await createGroupAndReceiveGm([
+        ...randomInboxes.map((inbox) => inbox.accountAddress),
+        gmBotAddress,
+      ]);
+      expect(result).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 });

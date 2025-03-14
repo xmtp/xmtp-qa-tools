@@ -30,8 +30,6 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
         // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_LOGGING_LEVEL", "debug");
-        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
       },
       {
@@ -48,12 +46,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
 
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
-    await page
-      .getByRole("banner")
-      .getByRole("button", { name: "Connect" })
-      .click();
-    await dismissErrorModal(page);
-    console.log("Connected");
+
     await page
       .getByRole("main")
       .getByRole("button", { name: "New conversation" })
@@ -61,15 +54,12 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     // Wait a couple seconds for the bot's response to appear
     await sleep();
     await page.getByRole("textbox", { name: "Address" }).click();
-    // Wait a couple seconds for the bot's response to appear
-    await sleep();
     for (const address of addresses) {
       await page.getByRole("textbox", { name: "Address" }).fill(address);
       await page.getByRole("button", { name: "Add" }).click();
     }
     await page.getByRole("button", { name: "Create" }).click();
-    // Wait a couple seconds for the bot's response to appear
-    await sleep(5000);
+    await sleep(3000);
     await page.getByRole("textbox", { name: "Type a message..." }).click();
     await page.getByRole("textbox", { name: "Type a message..." }).fill("gm");
     await page.getByRole("button", { name: "Send" }).click();
@@ -104,15 +94,19 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
 // Add a function to check for and dismiss error modals
 const dismissErrorModal = async (page: Page) => {
   try {
-    const modalVisible = await page.getByText("error").isVisible();
-    console.log("Modal visible", modalVisible);
-    if (modalVisible) {
-      await page.getByRole("button", { name: "OK" }).click();
-      console.log("Dismissed error modal");
+    // Method 4: Last resort - try to find any modal with an OK button
+    const anyModal = await page.locator('[role="dialog"]');
+    if (await anyModal.isVisible()) {
+      const modalButton = await anyModal.locator('button:has-text("OK")');
+      if (await modalButton.isVisible()) {
+        await modalButton.click();
+        console.log("Dismissed dialog with OK button");
+        return;
+      }
     }
   } catch (error: unknown) {
     // Ignore errors if the modal isn't present
-    console.log("No error modal found", error);
+    console.log("No error modal found or error during dismissal", error);
   }
 };
 function sleep(ms: number = 1000) {
