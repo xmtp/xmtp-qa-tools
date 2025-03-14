@@ -18,7 +18,25 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
 ```mermaid
-%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
+%%{init: {
+  'theme': 'dark',
+  'themeVariables': {
+    'primaryColor': '#0D1117',
+    'primaryTextColor': '#c9d1d9',
+    'primaryBorderColor': '#30363d',
+    'lineColor': '#8b949e',
+    'secondaryColor': '#161b22',
+    'tertiaryColor': '#161b22'
+  },
+  'flowchart': {
+    'useMaxWidth': true,
+    'htmlLabels': true
+  },
+  'securityLevel': 'strict',
+  'disableClick': true,
+  'disableZoom': true,
+  'disablePan': true
+}}%%
 
 flowchart LR
   %% Core components and bindings
