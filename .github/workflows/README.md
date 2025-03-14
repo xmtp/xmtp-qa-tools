@@ -63,7 +63,7 @@ it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, as
 
 ### Associated Workflow
 
-The [`TS_Performance.yml`](/.github/workflows/TS_Performance.yml) workflow automates this test suite:
+The [`TS_Performance.yml`](/.github/workflows/TS_Performance_dev.yml) workflow automates this test suite:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - ⚙️ **Configuration**: Supports adjustable batch size and group size parameters
@@ -71,7 +71,7 @@ The [`TS_Performance.yml`](/.github/workflows/TS_Performance.yml) workflow autom
 - 📊 **Metrics**: Reports comprehensive performance metrics to Datadog
 - 👁️ **Visibility**: Provides real-time visibility into XMTP network performance
 
-The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation.yml) workflow replicates this test suite for the production network.
+The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation_dev.yml) workflow replicates this test suite for the production network.
 
 - **Regions**: `us-east, us-west, asia, europe`
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
@@ -191,7 +191,7 @@ it("tc_stream_order: verify message order when receiving via streams", () => {
 
 ### Associated Workflow
 
-The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery.yml) workflow automates this test suite execution:
+The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery_dev.yml) workflow automates this test suite execution:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - 🔧 **Configuration**: Optimizes system resources for SQLCipher performance
@@ -230,22 +230,29 @@ metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
 
 ## 👋 TS_Gm Test Suite
 
-The TS_Gm test suite verifies the reliability of the GM bot functionality, ensuring that the messaging service responds correctly to user interactions in both direct and group contexts.
+The TS_Gm test suite serves as a critical regression testing tool by verifying the GM bot functionality across different SDK versions. By using a simple bot as a consistent reference point, it ensures that new SDK versions maintain backward compatibility and reliable messaging capabilities.
 
 ### Implementation Details
 
-The test suite includes tests for:
+This test suite uses a hybrid approach that combines direct SDK integration with Playwright-based browser automation:
 
-- Direct messaging with the GM bot
-- Verifying bot responses to messages
-- Group messaging with the GM bot
-- Testing with both direct bot address and Ethereum identifier formats
+- **SDK Integration Tests**: Direct SDK-to-bot communication testing
+- **Playwright Automation**: Browser-based interaction testing that simulates real user experience
+
+The test suite evaluates:
+
+- Direct messaging with the GM bot using the latest SDK
+- Group messaging functionality with the bot and random participants
+- Cross-version compatibility through the bot's consistent interface
+- Real-world browser interactions via Playwright automation
+
+Key implementation highlights:
 
 ```javascript
-// Example from TS_Gm implementation
+// Direct SDK integration test
 it("gm-bot: should check if bot is alive", async () => {
   try {
-    // Create conversation with the bot
+    // Create conversation with the bot using Ethereum identifier
     convo = await workers
       .get("bob")!
       .client.conversations.newDmWithIdentifier({
@@ -253,9 +260,30 @@ it("gm-bot: should check if bot is alive", async () => {
         identifier: gmBotAddress,
       });
 
-    // Send a simple message and verify response
+    await convo.sync();
+    const prevMessages = (await convo.messages()).length;
+
+    // Send a simple message
     await convo.send("gm");
-    // ... verification logic
+
+    // Wait briefly for response
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+
+    // Verify response received
+    const messagesAfter = (await convo.messages()).length;
+    expect(messagesAfter).toBe(prevMessages + 2);
+  } catch (e) {
+    hasFailures = logError(e, expect);
+    throw e;
+  }
+});
+
+// Playwright-based integration test
+it("should respond to a message", async () => {
+  try {
+    // Uses Playwright to simulate browser interaction with the bot
+    const result = await createGroupAndReceiveGm([gmBotAddress]);
+    expect(result).toBe(true);
   } catch (e) {
     hasFailures = logError(e, expect);
     throw e;
@@ -263,11 +291,49 @@ it("gm-bot: should check if bot is alive", async () => {
 });
 ```
 
+The Playwright helper function facilitates browser-based testing:
+
+```javascript
+// Helper function that uses Playwright for browser automation
+export async function createGroupAndReceiveGm(members) {
+  // Initialize browser session
+  const browser = await playwright.chromium.launch();
+  const page = await browser.newPage();
+
+  // Navigate to XMTP web interface
+  await page.goto("https://example.com/xmtp-interface");
+
+  // Simulate user creating conversation with bot
+  await page.click("#create-conversation");
+
+  // Add members to the conversation
+  for (const member of members) {
+    await page.fill("#member-input", member);
+    await page.click("#add-member");
+  }
+
+  // Send message and wait for response
+  await page.fill("#message-input", "gm");
+  await page.click("#send-button");
+
+  // Wait for and verify response
+  const responseReceived = await page
+    .waitForSelector(".bot-response", { timeout: 5000 })
+    .then(() => true)
+    .catch(() => false);
+
+  await browser.close();
+  return responseReceived;
+}
+```
+
 ### Associated Workflow
 
-The [`TS_Gm.yml`](/.github/workflows/TS_Gm.yml) workflow automates the test suite execution:
+The [`TS_Gm.yml`](/.github/workflows/TS_Gm_dev.yml) workflow automates the test suite execution:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - 🔄 **Retry Mechanism**: Uses up to 3 attempts for test stability
 - 📊 **Reporting**: Reports test results to Datadog for monitoring
-- 🧪 **Environment**: Tests against the configured GM bot address in Dev and Production environments
+- 🧪 **Multi-environment**: Tests against both Dev and Production environments
+- 🔍 **Regression Testing**: Compares behavior across different SDK versions
+- 🌐 **Browser Testing**: Includes Playwright-based browser automation tests
