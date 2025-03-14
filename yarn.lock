@@ -1531,16 +1531,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk@npm:1.0.0-rc1":
-  version: 1.0.0-rc1
-  resolution: "@xmtp/node-sdk@npm:1.0.0-rc1"
+"@xmtp/node-sdk@npm:1.0.0-rc2":
+  version: 1.0.0-rc2
+  resolution: "@xmtp/node-sdk@npm:1.0.0-rc2"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.0"
     "@xmtp/content-type-primitives": "npm:^2.0.0"
     "@xmtp/content-type-text": "npm:^2.0.0"
     "@xmtp/node-bindings": "npm:^1.0.0-rc2"
     "@xmtp/proto": "npm:^3.72.3"
-  checksum: 10/0f79fd211e56a627250015104c90605ca4b4cf39716877761311bc067c9dcf61b31e687a88880809a6a89d8fdb2729a271b309a961001660a53fec88ae2afbce
+  checksum: 10/ec5a95eb2bfc624680ee88aec0020f032a6cb64a283f8163a62d7c68e72241b875e2bec8cf919aa3af6f2d9d53f56f233e855a5459c9b5fcadd8d835f309f559
   languageName: node
   linkType: hard
 
@@ -5467,7 +5467,7 @@ __metadata:
     "@types/node": "npm:^22.13.0"
     "@vitest/coverage-v8": "npm:3.0.6"
     "@vitest/ui": "npm:^3.0.6"
-    "@xmtp/node-sdk": "npm:1.0.0-rc1"
+    "@xmtp/node-sdk": "npm:1.0.0-rc2"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.4.7"

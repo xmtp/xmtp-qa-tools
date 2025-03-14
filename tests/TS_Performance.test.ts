@@ -157,7 +157,7 @@ describe(testName, () => {
         const sliced = generatedInboxes.slice(0, i);
         const newGroupByIdentifier = await personas
           .get("henry")!
-          .client.conversations.newGroupByIdentifiers(
+          .client.conversations.newGroupWithIdentifiers(
             sliced.map((inbox) => ({
               identifier: inbox.accountAddress,
               identifierKind: IdentifierKind.Ethereum,
