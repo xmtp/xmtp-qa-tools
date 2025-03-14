@@ -359,8 +359,8 @@
     {
       "name": "env",
       "prefix": "env",
-      "available_values": [],
-      "default": "dev"
+      "available_values": ["dev", "production"],
+      "default": "*"
     },
     {
       "name": "geo",
@@ -412,6 +412,20 @@
       "name": "us",
       "template_variables": [
         { "name": "geo", "value": "us-east" },
+        { "name": "test", "value": "ts_performance" }
+      ]
+    },
+    {
+      "name": "eu",
+      "template_variables": [
+        { "name": "geo", "value": "europe" },
+        { "name": "test", "value": "ts_performance" }
+      ]
+    },
+    {
+      "name": "asia",
+      "template_variables": [
+        { "name": "geo", "value": "asia" },
         { "name": "test", "value": "ts_performance" }
       ]
     }
