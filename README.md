@@ -18,25 +18,7 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
 ```mermaid
-%%{init: {
-  'theme': 'dark',
-  'themeVariables': {
-    'primaryColor': '#0D1117',
-    'primaryTextColor': '#c9d1d9',
-    'primaryBorderColor': '#30363d',
-    'lineColor': '#8b949e',
-    'secondaryColor': '#161b22',
-    'tertiaryColor': '#161b22'
-  },
-  'flowchart': {
-    'useMaxWidth': true,
-    'htmlLabels': true
-  },
-  'securityLevel': 'strict',
-  'disableClick': true,
-  'disableZoom': true,
-  'disablePan': true
-}}%%
+%%{init: {'theme': 'dark', 'themeVariables': { 'primaryColor': '#0D1117', 'primaryTextColor': '#c9d1d9', 'primaryBorderColor': '#30363d', 'lineColor': '#8b949e', 'secondaryColor': '#161b22', 'tertiaryColor': '#161b22' }}}%%
 
 flowchart LR
   %% Core components and bindings
@@ -63,7 +45,7 @@ flowchart LR
     backendServices["Backend Services"]
   end
 
-  centralNode["Node"] --> libxmtp["libxmtp<br>(openmls)<br>(diesel)"]
+  centralNode["Node"] --> libxmtp["LibXMTP<br>(openmls)<br>(diesel)"]
   libxmtp --- wasm
   libxmtp --- ffi
   kotlinSDK --- mobileApps
@@ -91,13 +73,15 @@ flowchart LR
   napi -.- reactNativeSDK
 
   linkStyle 0,4,12,13 stroke:#f66,stroke-width:4px,stroke-dasharray: 5,5;
-  classDef highlightStroke fill:#1f2937,stroke:#f66,color:#c9d1d9,stroke-width:4px;
+  classDef highlightStroke stroke:#f66,color:#c9d1d9,stroke-width:4px;
   class centralNode,libxmtp,webApps,messagingApps,botAgents highlightStroke;
 ```
 
 > The highlighted path (red dashed line) in the architecture diagram shows our main testing focus.
 
-We test all XMTP bindings using three main applications. We use xmtp.chat to test the Browser SDK's Wasm binding in actual web environments. We use Convos to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use agents to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
+`LibXMTP` is a shared library built in Rust and compiled to WASM, Napi, and FFI bindings. It encapsulates the core cryptography functions of the XMTP messaging protocol. Due to the complexity of the protocol, we are using `openmls` as the underlying cryptographic library, it's important to test how this bindings perform in their own language environments.
+
+We can test all XMTP bindings using three main applications. We use xmtp.chat to test the Browser SDK's Wasm binding in actual web environments. We use Convos to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use agents to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
 ## Operation performance
 
