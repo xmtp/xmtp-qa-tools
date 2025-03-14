@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import type { XmtpEnv } from "@helpers/types";
 import {
   chromium,
@@ -6,7 +8,13 @@ import {
   type Page,
 } from "playwright-chromium";
 
+const snapshotDir = path.join(process.cwd(), "playwright/test-snapshots");
 let browser: Browser | null = null;
+if (!fs.existsSync(snapshotDir)) {
+  fs.mkdirSync(snapshotDir, { recursive: true });
+}
+let page: Page | null = null;
+
 export async function createGroupAndReceiveGm(addresses: string[]) {
   try {
     const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
@@ -15,34 +23,27 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     const ENCRYPTION_KEY_XMTP_CHAT = process.env
       .ENCRYPTION_KEY_XMTP_CHAT as string;
 
-    browser = await chromium.launch({ headless: isHeadless });
-    const context: BrowserContext = await browser.newContext();
-    const page: Page = await context.newPage();
+    browser = await chromium.launch({
+      headless: isHeadless,
+      // Add slower animations for debugging if not in CI
+      slowMo: isHeadless ? 0 : 100,
+    });
+
+    // Create context with a larger viewport to ensure all messages are visible
+    const context: BrowserContext = await browser.newContext({
+      viewport: { width: 1920, height: 1080 }, // Use a large viewport size
+      deviceScaleFactor: 1,
+    });
+
+    page = await context.newPage();
 
     // Fix: Pass the env value correctly to the init script
-    await context.addInitScript(
-      ({ envValue, walletKey, walletEncryptionKey }) => {
-        console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_NETWORK", envValue);
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
-      },
-      {
-        envValue: XMTP_ENV,
-        walletKey: WALLET_KEY_XMTP_CHAT,
-        walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
-      },
+    await setLocalStorage(
+      page,
+      XMTP_ENV,
+      WALLET_KEY_XMTP_CHAT,
+      ENCRYPTION_KEY_XMTP_CHAT,
     );
-    console.log("env keys", {
-      envValue: XMTP_ENV,
-      walletKey: WALLET_KEY_XMTP_CHAT,
-      walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
-    });
 
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
@@ -51,64 +52,73 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
       .getByRole("main")
       .getByRole("button", { name: "New conversation" })
       .click();
-    // Wait a couple seconds for the bot's response to appear
-    await sleep();
+    console.log("Clicking address textbox");
     await page.getByRole("textbox", { name: "Address" }).click();
     for (const address of addresses) {
+      console.log(`Filling address: ${address}`);
       await page.getByRole("textbox", { name: "Address" }).fill(address);
+      console.log("Clicking Add button");
       await page.getByRole("button", { name: "Add" }).click();
     }
+    console.log("Clicking Create button");
     await page.getByRole("button", { name: "Create" }).click();
-    await sleep(3000);
+    console.log("Clicking message textbox");
     await page.getByRole("textbox", { name: "Type a message..." }).click();
-    await page.getByRole("textbox", { name: "Type a message..." }).fill("gm");
+    console.log("Filling message with 'hi'");
+    await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+    console.log("Clicking Send button");
     await page.getByRole("button", { name: "Send" }).click();
-    await sleep(4000);
-    await page.waitForSelector(
-      '[data-testid="virtuoso-item-list"] div:has-text("gm")',
-    );
-    console.log("Found response");
-    // Get all messages and find the bot's response (should be the message after the one we sent)
-    const messages = await page
-      .getByTestId("virtuoso-item-list")
-      .locator("div")
-      .filter({ hasText: "gm" })
-      .all();
-    console.log("Found messages");
-    const response =
-      messages.length > 0
-        ? await messages[messages.length - 1].textContent()
-        : null;
 
-    console.log(`Received response: ${response}`);
-    return response === "gm";
+    const hiMessage = await page.getByText("hi");
+    const hiMessageText = await hiMessage.textContent();
+    console.log("hiMessageText", hiMessageText);
+    const botMessage = await page.getByText("gm");
+    const botMessageText = await botMessage.textContent();
+    console.log("botMessageText", botMessageText);
+
+    return botMessageText === "gm";
   } catch (error) {
-    console.error("Test failed:", error);
-    return false;
+    console.error("Could not find 'gm' message:", error);
+    // Take a screenshot to see what's visible
+    if (page) await takeSnapshot(page, "before-finding-gm", addresses);
   } finally {
     // Close the browser
     if (browser) await browser.close();
   }
 }
 
-// Add a function to check for and dismiss error modals
-const dismissErrorModal = async (page: Page) => {
-  try {
-    // Method 4: Last resort - try to find any modal with an OK button
-    const anyModal = await page.locator('[role="dialog"]');
-    if (await anyModal.isVisible()) {
-      const modalButton = await anyModal.locator('button:has-text("OK")');
-      if (await modalButton.isVisible()) {
-        await modalButton.click();
-        console.log("Dismissed dialog with OK button");
-        return;
-      }
-    }
-  } catch (error: unknown) {
-    // Ignore errors if the modal isn't present
-    console.log("No error modal found or error during dismissal", error);
+// Helper function to take snapshots
+async function takeSnapshot(page: Page, name: string, addresses: string[]) {
+  if (addresses.length > 1) {
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+
+    console.log(`Snapshot saved: ${name} (${screenshotPath})`);
   }
-};
-function sleep(ms: number = 1000) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+async function setLocalStorage(
+  page: Page,
+  XMTP_ENV: XmtpEnv,
+  WALLET_KEY_XMTP_CHAT: string,
+  ENCRYPTION_KEY_XMTP_CHAT: string,
+) {
+  await page.addInitScript(
+    ({ envValue, walletKey, walletEncryptionKey }) => {
+      console.log("env keys", { envValue, walletKey, walletEncryptionKey });
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_NETWORK", envValue);
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
+    },
+    {
+      envValue: XMTP_ENV,
+      walletKey: WALLET_KEY_XMTP_CHAT,
+      walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
+    },
+  );
 }
