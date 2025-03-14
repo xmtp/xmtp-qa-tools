@@ -85,6 +85,16 @@ describe(testName, () => {
     }
   });
 
+  it("clientCreate: should measure creating a client", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "message");
+      expect(client).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+
   it("inboxState: should measure inboxState of henry", async () => {
     try {
       const inboxState = await workers.get("henry")!.client.inboxState(true);

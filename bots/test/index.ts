@@ -25,7 +25,12 @@ process.on("unhandledRejection", (reason, promise) => {
 async function main() {
   try {
     // First create the bot worker
-    console.log("Initializing bot...");
+
+    // Then create the dynamic workers
+    console.log("Initializing worker workers...");
+    const workers = await getWorkers(20, testName, "message", true);
+    const commandHandler = new CommandHandler();
+
     const botWorker = await getWorkers(["bot"], testName, "message");
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
@@ -34,12 +39,6 @@ async function main() {
     console.log(`Agent initialized on address ${bot?.address}`);
     console.log(`Agent initialized on inbox ${client.inboxId}`);
     console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
-
-    // Then create the dynamic workers
-    console.log("Initializing worker workers...");
-    const workers = await getWorkers(20, testName, "message", true);
-    const commandHandler = new CommandHandler();
-
     console.log("Syncing conversations...");
     await client.conversations.sync();
 

@@ -197,13 +197,11 @@ export class WorkerClient extends Worker {
       env,
     );
 
-    console.time(`[${this.nameId}] Create XMTP client v:${version}`);
     this.client = await Client.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     });
-    console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);
 
     // Start the appropriate stream based on configuration
     await this.startStream();
@@ -230,7 +228,6 @@ export class WorkerClient extends Worker {
       return;
     }
 
-    console.time(`[${this.nameId}] Start ${this.typeofStream} stream`);
     try {
       switch (this.typeofStream) {
         case "message":
@@ -247,7 +244,6 @@ export class WorkerClient extends Worker {
           return;
       }
 
-      console.timeEnd(`[${this.nameId}] Start ${this.typeofStream} stream`);
       console.log(`[${this.nameId}] ${this.typeofStream} stream started`);
     } catch (error) {
       console.error(

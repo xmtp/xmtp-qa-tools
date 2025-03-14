@@ -144,6 +144,7 @@ export class CommandHandler {
         groupName: groupName,
         groupDescription: "This is a test group",
       });
+      await group.addSuperAdmin(message.senderInboxId);
 
       console.log(
         `Group created with id ${group.id} by ${message.senderInboxId}`,
@@ -177,6 +178,7 @@ export class CommandHandler {
   // Rename the current group
   async rename(message: DecodedMessage, client: Client, args: string[] = []) {
     try {
+      await client.conversations.sync();
       const newName = args.join(" ").trim();
 
       const groupToUpdate = await client.conversations.getConversationById(
@@ -202,6 +204,7 @@ export class CommandHandler {
     workers: WorkerManager,
   ) {
     try {
+      await client.conversations.sync();
       const groupToAddTo = await client.conversations.getConversationById(
         message.conversationId,
       );
@@ -260,6 +263,7 @@ export class CommandHandler {
     workers: WorkerManager,
   ) {
     try {
+      await client.conversations.sync();
       const groupToRemoveFrom = await client.conversations.getConversationById(
         message.conversationId,
       );
@@ -334,6 +338,7 @@ export class CommandHandler {
     workers: WorkerManager,
   ) {
     try {
+      await client.conversations.sync();
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
@@ -344,7 +349,9 @@ export class CommandHandler {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === member.inboxId);
-        return worker?.name || "You";
+        return (
+          worker?.name || (member.inboxId == client.inboxId ? "Bot" : "You")
+        );
       });
 
       await conversation?.send(
@@ -360,6 +367,7 @@ export class CommandHandler {
     workers: WorkerManager,
   ) {
     try {
+      await client.conversations.sync();
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
@@ -371,14 +379,12 @@ export class CommandHandler {
       await conversation.sync();
       const admins = await conversation.admins;
       const superAdmins = await conversation.superAdmins;
-      console.log(admins);
-      console.log(superAdmins);
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === admin);
-        return worker?.name || "You";
+        return worker?.name || (admin == client.inboxId ? "Bot" : "You");
       });
 
       await conversation.send(
@@ -392,6 +398,7 @@ export class CommandHandler {
   // List all active groups
   async groups(message: DecodedMessage, client: Client) {
     try {
+      await client.conversations.sync();
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
