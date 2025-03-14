@@ -7,7 +7,7 @@ const testName = "installations";
 loadEnv(testName);
 
 describe(testName, () => {
-  // Create a container to hold all personas for cleanup
+  // Create a container to hold all workers for cleanup
   let initialWorkers: WorkerManager;
 
   beforeAll(async () => {
@@ -17,7 +17,7 @@ describe(testName, () => {
     await closeEnv(testName, initialWorkers);
   });
 
-  it("should create and use personas on demand", async () => {
+  it("should create and use workers on demand", async () => {
     expect(initialWorkers.get("alice")?.folder).toBe("a");
     expect(initialWorkers.get("bob")?.folder).toBe("a");
 
@@ -26,7 +26,7 @@ describe(testName, () => {
       ["alice-desktop", "bob-b"],
       testName,
     );
-    // Merge the new personas with the existing ones
+    // Merge the new workers with the existing ones
     expect(secondaryWorkers.get("alice", "desktop")?.folder).toBe("desktop");
     expect(secondaryWorkers.get("bob", "b")?.folder).toBe("b");
 

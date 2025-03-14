@@ -19,13 +19,13 @@ const testName = "ts_dms";
 describe(testName, () => {
   loadEnv(testName);
   let convo: Conversation;
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let hasFailures: boolean = false;
   let start: number;
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(
+      workers = await getWorkers(
         [
           "henry",
           "ivy",
@@ -39,8 +39,8 @@ describe(testName, () => {
         ],
         testName,
       );
-      expect(personas).toBeDefined();
-      expect(personas.getLength()).toBe(9);
+      expect(workers).toBeDefined();
+      expect(workers.getLength()).toBe(9);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -55,7 +55,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, personas, start);
+      exportTestResults(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -65,7 +65,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -74,9 +74,9 @@ describe(testName, () => {
 
   it("createDM: should measure creating a DM", async () => {
     try {
-      convo = await personas
+      convo = await workers
         .get("henry")!
-        .client.conversations.newDm(personas.get("randomguy")!.client.inboxId);
+        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
@@ -91,7 +91,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")?.name}] Creating DM with ${personas.get("randomguy")?.name} at ${personas.get("randomguy")?.client.inboxId}`,
+        `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
       );
 
       const dmId = await convo.send(message);
@@ -106,7 +106,7 @@ describe(testName, () => {
   it("receiveGM: should measure receiving a gm", async () => {
     try {
       const verifyResult = await verifyStream(convo, [
-        personas.get("randomguy")!,
+        workers.get("randomguy")!,
       ]);
 
       expect(verifyResult.messages.length).toEqual(1);

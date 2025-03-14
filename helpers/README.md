@@ -1,18 +1,18 @@
 # 🧰 XMTP Testing Helpers
 
-This directory contains utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test personas, collecting metrics, and validating test results.
+This directory contains utility modules that power the XMTP testing framework. These helpers provide the foundation for creating test scenarios, managing test workers, collecting metrics, and validating test results.
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                            |
-| ------------------------ | -------------------------------------------------- |
-| [client.ts](#clientts)   | Creates signers and manages keys for test personas |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog               |
-| [group.ts](#groupts)     | Creates test groups with specified participants    |
-| [logger.ts](#loggerts)   | Logging utilities for test output                  |
-| [test.ts](#testts)       | Test utilities for creating and managing tests     |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery  |
-| [railway.ts](#railwayts) | Railway utilities for testing message delivery     |
+| Module                   | Purpose                                           |
+| ------------------------ | ------------------------------------------------- |
+| [client.ts](#clientts)   | Creates signers and manages keys for test workers |
+| [datadog.ts](#datadogts) | Sends performance metrics to Datadog              |
+| [group.ts](#groupts)     | Creates test groups with specified participants   |
+| [logger.ts](#loggerts)   | Logging utilities for test output                 |
+| [test.ts](#testts)       | Test utilities for creating and managing tests    |
+| [verify.ts](#verifyts)   | Validation utilities for testing message delivery |
+| [railway.ts](#railwayts) | Railway utilities for testing message delivery    |
 
 ## 🔍 Module Details
 
@@ -25,7 +25,7 @@ Handles XMTP client creation and key management:
 const signer = createSigner(privateKey);
 
 // Generate a path for the client database
-const dbPath = getDbPath(personaName, accountAddress, testName);
+const dbPath = getDbPath(workerName, accountAddress, testName);
 
 // Generate random encryption keys
 const encryptionKey = generateEncryptionKeyHex();
@@ -94,7 +94,7 @@ Validation utilities for testing message delivery:
 
 ```typescript
 // Verify that all participants in a group receive messages
-const result = await verifyStreamAll(group, personas, messageCount);
+const result = await verifyStreamAll(group, workers, messageCount);
 
 // Verify message delivery with custom settings
 const result = await verifyStream(

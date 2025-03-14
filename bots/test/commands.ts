@@ -10,7 +10,7 @@ export const // Command help info
   commandHelp = `Available commands:
 gm - Get a greeting back from the bot
 hi [name] - Get a response back to [name]
-/create [number] - Create a new group with [number] random personas (default: 5)
+/create [number] - Create a new group with [number] random workers (default: 5)
 /rename [name] - Rename the current group
 /add [name] - Add [name] to the current group
 /remove [name] - Remove [name] from the current group
@@ -22,7 +22,7 @@ hi [name] - Get a response back to [name]
 /blast [message] [count] [repeat] - Send a message to all participants in the current group
 /leave - Leave the current group
 /info - Get info about the current group
-/workers - List all available personas
+/workers - List all available workers
 /help - Show this message`;
 
 export const // Random messages for group interactions
@@ -42,13 +42,13 @@ export class CommandHandler {
   async workers(
     message: DecodedMessage,
     client: Client,
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     const conversation = await client.conversations.getConversationById(
       message.conversationId,
     );
     await conversation?.send(
-      `Workers:\n${personas
+      `Workers:\n${workers
         .getWorkers()
         .map((p) => p.name)
         .join("\n")}`,
@@ -109,7 +109,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -120,21 +120,21 @@ export class CommandHandler {
       const count =
         args.length > 0 && !isNaN(parseInt(args[0])) ? parseInt(args[0]) : 5;
 
-      console.log(`Creating group with ${count} random personas...`);
+      console.log(`Creating group with ${count} random workers...`);
       await conversation?.send(
-        `hang tight, creating group with ${count} random personas...`,
+        `hang tight, creating group with ${count} random workers...`,
       );
 
-      // Get random personas
-      const randomWorkers = personas.getRandomWorkers(count);
+      // Get random workers
+      const randomWorkers = workers.getRandomWorkers(count);
 
-      const personaInboxIds = randomWorkers.map((p) => p.client.inboxId);
+      const workerInboxIds = randomWorkers.map((p) => p.client.inboxId);
 
       // Create the group name
 
       // Make sure the bot and sender are included in the group
       const memberInboxIds = [
-        ...personaInboxIds,
+        ...workerInboxIds,
         message.senderInboxId,
         client.inboxId,
       ];
@@ -153,22 +153,22 @@ export class CommandHandler {
       );
       // Send a message as the bot
       await group.send(
-        `Bot :\n Group chat initialized with ${count} personas. Welcome everyone!`,
+        `Bot :\n Group chat initialized with ${count} workers. Welcome everyone!`,
       );
       await this.populateGroup(group.id, randomWorkers);
     } catch (error) {
       console.error("Error creating group:", error);
     }
   }
-  async populateGroup(groupID: string, personas: Worker[]) {
+  async populateGroup(groupID: string, workers: Worker[]) {
     try {
-      for (const persona of personas) {
+      for (const worker of workers) {
         const randomMessage =
           randomMessages[Math.floor(Math.random() * randomMessages.length)];
-        await persona.client?.conversations.sync();
-        const personaGroup =
-          await persona.client?.conversations.getConversationById(groupID);
-        await personaGroup?.send(`${persona.name}:\n${randomMessage}`);
+        await worker.client?.conversations.sync();
+        const workerGroup =
+          await worker.client?.conversations.getConversationById(groupID);
+        await workerGroup?.send(`${worker.name}:\n${randomMessage}`);
       }
     } catch (error) {
       console.error("Error populating group:", error);
@@ -194,12 +194,12 @@ export class CommandHandler {
     }
   }
 
-  // Add personas to the current group
+  // Add workers to the current group
   async add(
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const groupToAddTo = await client.conversations.getConversationById(
@@ -210,54 +210,54 @@ export class CommandHandler {
         await groupToAddTo?.send("Group not found");
         return;
       }
-      // Check if a persona name was provided
+      // Check if a worker name was provided
       if (args.length === 0) {
-        await groupToAddTo.send("Please specify a persona name to add");
+        await groupToAddTo.send("Please specify a worker name to add");
         return;
       }
 
-      const personaName = args[0].trim();
+      const workerName = args[0].trim();
 
-      // Check if the persona exists
-      if (!personas.get(personaName)) {
-        await groupToAddTo.send(`Worker "${personaName}" not found`);
+      // Check if the worker exists
+      if (!workers.get(workerName)) {
+        await groupToAddTo.send(`Worker "${workerName}" not found`);
         return;
       }
 
-      const personaToAdd2 = personas.get(personaName);
+      const workerToAdd2 = workers.get(workerName);
 
-      // Check if the persona is already in the group
+      // Check if the worker is already in the group
       const currentMembers = await groupToAddTo.members();
       const isAlreadyMember = currentMembers.some(
-        (member) => member.inboxId === personaToAdd2?.client?.inboxId,
+        (member) => member.inboxId === workerToAdd2?.client?.inboxId,
       );
 
       if (isAlreadyMember) {
         await groupToAddTo.send(
-          `${personaName} is already a member of this group`,
+          `${workerName} is already a member of this group`,
         );
         return;
       }
 
-      // Add the persona to the group
-      await groupToAddTo.addMembers([personaToAdd2?.client?.inboxId as string]);
+      // Add the worker to the group
+      await groupToAddTo.addMembers([workerToAdd2?.client?.inboxId as string]);
 
       // Announce in the group
-      await groupToAddTo.send(`Bot :\n Added ${personaName} to the group.`);
-      if (personaToAdd2) {
-        await this.populateGroup(groupToAddTo.id, [personaToAdd2]);
+      await groupToAddTo.send(`Bot :\n Added ${workerName} to the group.`);
+      if (workerToAdd2) {
+        await this.populateGroup(groupToAddTo.id, [workerToAdd2]);
       }
     } catch (error) {
       console.error("Error adding member to group:", error);
     }
   }
 
-  // Remove personas from the current group
+  // Remove workers from the current group
   async remove(
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const groupToRemoveFrom = await client.conversations.getConversationById(
@@ -267,37 +267,37 @@ export class CommandHandler {
         await groupToRemoveFrom?.send("Group not found");
         return;
       }
-      // Check if a persona name was provided
+      // Check if a worker name was provided
       if (args.length === 0) {
         await groupToRemoveFrom.send(
-          "Please specify a persona name to remove. Check /workers to see all available personas",
+          "Please specify a worker name to remove. Check /workers to see all available workers",
         );
         return;
       }
 
-      const personaName = args[0].trim();
+      const workerName = args[0].trim();
 
-      // Check if the persona exists
-      if (!personas.get(personaName)) {
+      // Check if the worker exists
+      if (!workers.get(workerName)) {
         await groupToRemoveFrom.send(
-          `Worker "${personaName}" not found. Check /workers to see all available personas`,
+          `Worker "${workerName}" not found. Check /workers to see all available workers`,
         );
         return;
       }
 
-      const personaToRemove = personas.get(personaName);
+      const workerToRemove = workers.get(workerName);
 
       // Get current members
       const currentMembers = await groupToRemoveFrom.members();
 
-      // Check if the persona is in the group
+      // Check if the worker is in the group
       const memberToRemove = currentMembers.find(
-        (member) => member.inboxId === personaToRemove?.client?.inboxId,
+        (member) => member.inboxId === workerToRemove?.client?.inboxId,
       );
 
       if (!memberToRemove) {
         await groupToRemoveFrom.send(
-          `${personaName} is not a member of this group`,
+          `${workerName} is not a member of this group`,
         );
         return;
       }
@@ -308,20 +308,20 @@ export class CommandHandler {
         memberToRemove.inboxId === client.inboxId
       ) {
         await groupToRemoveFrom.send(
-          `Cannot remove ${personaName} from the group`,
+          `Cannot remove ${workerName} from the group`,
         );
         return;
       }
 
       // Announce removal before removing
       await groupToRemoveFrom.send(
-        `Bot :\n Removing ${personaName} from the group.`,
+        `Bot :\n Removing ${workerName} from the group.`,
       );
 
       // Remove the member
       await groupToRemoveFrom.removeMembers([memberToRemove.inboxId]);
 
-      await groupToRemoveFrom.send(`Removed ${personaName} from the group.`);
+      await groupToRemoveFrom.send(`Removed ${workerName} from the group.`);
     } catch (error) {
       console.error("Error removing member from group:", error);
     }
@@ -331,7 +331,7 @@ export class CommandHandler {
   async members(
     message: DecodedMessage,
     client: Client,
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -341,10 +341,10 @@ export class CommandHandler {
       const members = await (conversation as Group).members();
 
       const memberDetails = members.map((member) => {
-        const persona = personas
+        const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === member.inboxId);
-        return persona?.name || "You";
+        return worker?.name || "You";
       });
 
       await conversation?.send(
@@ -357,7 +357,7 @@ export class CommandHandler {
   async admins(
     message: DecodedMessage,
     client: Client,
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -375,10 +375,10 @@ export class CommandHandler {
       console.log(superAdmins);
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
-        const persona = personas
+        const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === admin);
-        return persona?.name || "You";
+        return worker?.name || "You";
       });
 
       await conversation.send(
@@ -420,7 +420,7 @@ export class CommandHandler {
     message: DecodedMessage,
     client: Client,
     args: string[] = [],
-    personas: WorkerManager,
+    workers: WorkerManager,
   ) {
     try {
       const conversation = await client.conversations.getConversationById(
@@ -428,13 +428,13 @@ export class CommandHandler {
       );
       // Extract the message and optional count parameters
       // Format: /blast <message> <count> <repeat>
-      // Example: /blast jaja 5 5 - sends "jaja" to 5 personas, 5 times each
+      // Example: /blast jaja 5 5 - sends "jaja" to 5 workers, 5 times each
 
       // Get the message from all arguments
       let blastMessage = args.join(" ").trim();
 
       // Default values
-      let countOfWorkers = 5; // Number of personas to message
+      let countOfWorkers = 5; // Number of workers to message
       let repeatCount = 1; // Number of times to send the message
 
       // Check if the last two arguments are numbers
@@ -456,12 +456,12 @@ export class CommandHandler {
 
       await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
       for (let i = 0; i < repeatCount; i++) {
-        for (const persona of personas.getWorkers().slice(0, countOfWorkers)) {
-          const personaGroup = await persona.client?.conversations.newDm(
+        for (const worker of workers.getWorkers().slice(0, countOfWorkers)) {
+          const workerGroup = await worker.client?.conversations.newDm(
             message.senderInboxId,
           );
-          await conversation?.send(` ${persona.name} just sent you a message`);
-          await personaGroup?.send(`${persona.name}:\n${blastMessage}`);
+          await conversation?.send(` ${worker.name} just sent you a message`);
+          await workerGroup?.send(`${worker.name}:\n${blastMessage}`);
         }
       }
     } catch (error) {

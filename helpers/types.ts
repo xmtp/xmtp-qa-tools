@@ -53,7 +53,7 @@ export type GroupMetadataContent = {
   }>;
 };
 
-// Default personas as an enum
+// Default workers as an enum
 const defaultNames = [
   "bob",
   "alice",

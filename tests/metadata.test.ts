@@ -9,9 +9,9 @@ loadEnv(testName);
 
 describe(testName, () => {
   let group: Group;
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   beforeAll(async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       [
         "henry",
         "ivy",
@@ -27,19 +27,19 @@ describe(testName, () => {
     );
 
     console.time("create group");
-    group = await personas
+    group = await workers
       .get("henry")!
       .client.conversations.newGroup([
-        personas.get("nancy")?.client?.inboxId ?? "",
-        personas.get("oscar")?.client?.inboxId ?? "",
-        personas.get("jack")?.client?.inboxId ?? "",
+        workers.get("nancy")?.client?.inboxId ?? "",
+        workers.get("oscar")?.client?.inboxId ?? "",
+        workers.get("jack")?.client?.inboxId ?? "",
       ]);
     console.log("group", group.id);
     console.timeEnd("create group");
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
   it("TC_ReceiveMetadata: should update group name", async () => {
@@ -47,7 +47,7 @@ describe(testName, () => {
 
     const verifyResult = await verifyStream(
       group,
-      [personas.get("oscar")!],
+      [workers.get("oscar")!],
       "group_updated",
     );
     expect(verifyResult.allReceived).toBe(true);
@@ -56,7 +56,7 @@ describe(testName, () => {
 
   it("TC_AddMembers: should measure adding a participant to a group", async () => {
     console.time("add members");
-    await group.addMembers([personas.get("randomguy")!.client.inboxId]);
+    await group.addMembers([workers.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     console.timeEnd("add members");
     expect(members.length).toBe(5);
@@ -64,7 +64,7 @@ describe(testName, () => {
 
   it("TC_RemoveMembers: should remove a participant from a group", async () => {
     console.time("remove members");
-    await group.removeMembers([personas.get("randomguy")!.client.inboxId]);
+    await group.removeMembers([workers.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     console.timeEnd("remove members");
     expect(members.length).toBe(4);

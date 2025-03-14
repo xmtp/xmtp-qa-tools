@@ -8,7 +8,7 @@ const testName = "clients";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
 
   let folderCount: number = 0;
   beforeAll(() => {
@@ -16,32 +16,32 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
-  it("create random personas", async () => {
-    personas = await getWorkers(["random"], testName, "none");
+  it("create random workers", async () => {
+    workers = await getWorkers(["random"], testName, "none");
     folderCount++;
-    expect(personas.get("random")?.client?.inboxId).toBeDefined();
+    expect(workers.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
-  it("should create a persona", async () => {
-    personas = await getWorkers(["bob", "random"], testName, "none");
+  it("should create a worker", async () => {
+    workers = await getWorkers(["bob", "random"], testName, "none");
     folderCount++;
-    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
+    expect(workers.get("bob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
-  it("should create a random persona", async () => {
-    personas = await getWorkers(["random"], testName, "none");
+  it("should create a random worker", async () => {
+    workers = await getWorkers(["random"], testName, "none");
 
-    expect(personas.get("random")?.client?.inboxId).toBeDefined();
+    expect(workers.get("random")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 
-  it("should create multiple personas", async () => {
-    personas = await getWorkers(
+  it("should create multiple workers", async () => {
+    workers = await getWorkers(
       ["bob", "alice", "randompep", "randombob"],
       testName,
       "none",
@@ -49,10 +49,10 @@ describe(testName, () => {
     folderCount++;
     folderCount++;
     folderCount++;
-    expect(personas.get("bob")?.client?.inboxId).toBeDefined();
-    expect(personas.get("alice")?.client?.inboxId).toBeDefined();
-    expect(personas.get("randompep")?.client?.inboxId).toBeDefined();
-    expect(personas.get("randombob")?.client?.inboxId).toBeDefined();
+    expect(workers.get("bob")?.client?.inboxId).toBeDefined();
+    expect(workers.get("alice")?.client?.inboxId).toBeDefined();
+    expect(workers.get("randompep")?.client?.inboxId).toBeDefined();
+    expect(workers.get("randombob")?.client?.inboxId).toBeDefined();
     expect(getDataSubFolderCount()).toBe(folderCount);
   });
 });

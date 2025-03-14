@@ -22,7 +22,7 @@ import {
 const testName = "ts_groups";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
@@ -31,7 +31,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(
+      workers = await getWorkers(
         [
           "henry",
           "ivy",
@@ -45,8 +45,8 @@ describe(testName, () => {
         ],
         testName,
       );
-      expect(personas).toBeDefined();
-      expect(personas.getLength()).toBe(9);
+      expect(workers).toBeDefined();
+      expect(workers.getLength()).toBe(9);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -61,7 +61,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, personas, start);
+      exportTestResults(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -71,7 +71,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -83,7 +83,7 @@ describe(testName, () => {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        newGroup = await personas
+        newGroup = await workers
           .get("henry")!
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
@@ -145,7 +145,7 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(newGroup, personas);
+        const verifyResult = await verifyStreamAll(newGroup, workers);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);

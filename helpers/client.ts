@@ -141,30 +141,30 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
-export async function closeEnv(testName: string, personas: WorkerManager) {
+export async function closeEnv(testName: string, workers: WorkerManager) {
   flushLogger(testName);
 
   await flushMetrics();
-  if (personas && typeof personas.getWorkers === "function") {
-    for (const persona of personas.getWorkers()) {
-      await persona.worker.terminate();
+  if (workers && typeof workers.getWorkers === "function") {
+    for (const worker of workers.getWorkers()) {
+      await worker.worker.terminate();
     }
   }
 }
 
-export async function listInstallations(personas: WorkerManager) {
-  for (const persona of personas.getWorkers()) {
-    const inboxState = await persona.client?.inboxState();
+export async function listInstallations(workers: WorkerManager) {
+  for (const worker of workers.getWorkers()) {
+    const inboxState = await worker.client?.inboxState();
     if (inboxState) {
       console.log(
-        persona.name,
+        worker.name,
         "has",
         inboxState.installations.length,
         "installations",
       );
       //for (const installation of inboxState.installations) {
       // console.debug(
-      //   persona.name +
+      //   worker.name +
       //     "(" +
       //     String(inboxState.installations.length) +
       //     ")" +

@@ -14,14 +14,14 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(["bob"], testName);
-      expect(personas).toBeDefined();
-      expect(personas.getWorkers().length).toBe(1);
+      workers = await getWorkers(["bob"], testName);
+      expect(workers).toBeDefined();
+      expect(workers.getWorkers().length).toBe(1);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -31,7 +31,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -41,7 +41,7 @@ describe(testName, () => {
   it("gm-bot: should check if bot is alive", async () => {
     try {
       // Create conversation with the bot
-      convo = await personas
+      convo = await workers
         .get("bob")!
         .client.conversations.newDmWithIdentifier({
           identifierKind: IdentifierKind.Ethereum,

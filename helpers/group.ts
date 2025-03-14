@@ -3,8 +3,8 @@ import { type Worker, type WorkerManager } from "./types";
 /**
  * Creates a group with a specified number of participants and measures performance
  *
- * @param creator - The persona that will create the group
- * @param allWorkers - Record of all available personas
+ * @param creator - The worker that will create the group
+ * @param allWorkers - Record of all available workers
  * @param batchSize - Number of participants to include in the group
  * @param installationsPerUser - Number of installations per user (for logging purposes)
  * @returns Object containing group information and performance metrics
@@ -31,7 +31,7 @@ export async function createGroupWithBatch(
   const group = await creator.client?.conversations.newGroup(
     allWorkers
       .getWorkers()
-      .map((persona) => persona.client.inboxId)
+      .map((worker) => worker.client.inboxId)
       .slice(0, batchSize),
   );
 
@@ -62,8 +62,8 @@ export async function createGroupWithBatch(
 /**
  * Creates multiple groups with increasing batch sizes
  *
- * @param creator - The persona that will create the groups
- * @param allWorkers - Record of all available personas
+ * @param creator - The worker that will create the groups
+ * @param allWorkers - Record of all available workers
  * @param startBatchSize - Initial batch size
  * @param batchIncrement - How much to increase batch size for each iteration
  * @param maxParticipants - Maximum number of participants to include

@@ -17,9 +17,9 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   // Get 20 dynamic workers
-  const personas = await getWorkers(["bot"], testName, "message", true);
+  const workers = await getWorkers(["bot"], testName, "message", true);
 
-  const bot = personas.get("bot");
+  const bot = workers.get("bot");
   const client = bot?.client as Client;
 
   const env = process.env.XMTP_ENV as XmtpEnv;

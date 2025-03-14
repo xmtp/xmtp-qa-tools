@@ -8,10 +8,10 @@ const testName = "conversations";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       [
         "henry",
         "ivy",
@@ -29,23 +29,23 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
   it("detects new group conversation creation with three participants", async () => {
-    const sender = personas.get("henry")!;
-    const participants = [personas.get("nancy")!, personas.get("oscar")!];
+    const sender = workers.get("henry")!;
+    const participants = [workers.get("nancy")!, workers.get("oscar")!];
 
     await verifyConversationStream(sender, participants);
   });
 
-  it("detects new group conversation with all available personas", async () => {
-    const sender = personas.get("henry")!;
+  it("detects new group conversation with all available workers", async () => {
+    const sender = workers.get("henry")!;
     const participants = [
-      personas.get("nancy")!,
-      personas.get("oscar")!,
-      personas.get("jack")!,
-      personas.get("ivy")!,
+      workers.get("nancy")!,
+      workers.get("oscar")!,
+      workers.get("jack")!,
+      workers.get("ivy")!,
     ];
 
     await verifyConversationStream(sender, participants);

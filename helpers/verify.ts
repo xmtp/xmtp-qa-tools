@@ -8,21 +8,21 @@ import {
 
 export async function getWorkersFromGroup(
   group: Conversation,
-  personas: WorkerManager,
+  workers: WorkerManager,
 ): Promise<Worker[]> {
   await group.sync();
   const members = await group.members();
   const memberInboxIds = members.map((member) => member.inboxId);
 
-  // Use the getWorkers method to retrieve all personas
-  const allWorkers = personas.getWorkers();
+  // Use the getWorkers method to retrieve all workers
+  const allWorkers = workers.getWorkers();
 
-  // Find personas whose client inboxId matches the group members' inboxIds
-  const personasFromGroup = allWorkers.filter((persona) =>
-    memberInboxIds.includes(persona.client.inboxId),
+  // Find workers whose client inboxId matches the group members' inboxIds
+  const workersFromGroup = allWorkers.filter((worker) =>
+    memberInboxIds.includes(worker.client.inboxId),
   );
 
-  return personasFromGroup;
+  return workersFromGroup;
 }
 
 /**
@@ -122,8 +122,8 @@ export async function verifyStream<T extends string = string>(
  * Verifies that group conversation stream events are properly received
  * by all participants when a new group is created.
  *
- * @param initiator - The persona creating the group conversation
- * @param participants - Array of personas that should be added to the group and receive the event
+ * @param initiator - The worker creating the group conversation
+ * @param participants - Array of workers that should be added to the group and receive the event
  * @param groupCreator - Function to create a new group conversation
  * @returns Promise resolving with results of the verification
  */
@@ -262,13 +262,13 @@ export function calculateMessageStats(
     };
   };
   const showDiscrepancies = (
-    personasInOrder: number,
-    personaCount: number,
+    workersInOrder: number,
+    workerCount: number,
     prefix: string,
     amount: number,
   ) => {
     // Log any discrepancies in message order
-    if (personasInOrder < personaCount) {
+    if (workersInOrder < workerCount) {
       console.log("Message order discrepancies detected:");
 
       messagesByWorker.forEach((messages, index) => {
@@ -331,38 +331,38 @@ export function calculateMessageStats(
   let totalReceivedMessages = 0;
 
   // Check message order
-  let personasInOrder = 0;
-  const personaCount = messagesByWorker.length;
+  let workersInOrder = 0;
+  const workerCount = messagesByWorker.length;
 
-  for (const personaMessages of messagesByWorker) {
+  for (const workerMessages of messagesByWorker) {
     totalExpectedMessages += amount;
-    totalReceivedMessages += personaMessages.length;
+    totalReceivedMessages += workerMessages.length;
 
-    const { inOrder } = verifyMessageOrder(personaMessages, prefix, amount);
+    const { inOrder } = verifyMessageOrder(workerMessages, prefix, amount);
 
     if (inOrder) {
-      personasInOrder++;
+      workersInOrder++;
     }
   }
 
   const receptionPercentage =
     (totalReceivedMessages / totalExpectedMessages) * 100;
-  const orderPercentage = (personasInOrder / personaCount) * 100;
+  const orderPercentage = (workersInOrder / workerCount) * 100;
 
   console.log("Expected messages pattern:", `${prefix}[1-${amount}]-${suffix}`);
   console.log(
     `Reception percentage: ${receptionPercentage.toFixed(2)}% (${totalReceivedMessages}/${totalExpectedMessages} messages)`,
   );
   console.log(
-    `Order percentage: ${orderPercentage.toFixed(2)}% (${personasInOrder}/${personaCount} personas)`,
+    `Order percentage: ${orderPercentage.toFixed(2)}% (${workersInOrder}/${workerCount} workers)`,
   );
-  showDiscrepancies(personasInOrder, personaCount, prefix, amount);
+  showDiscrepancies(workersInOrder, workerCount, prefix, amount);
   //showComparativeTable(messagesByWorker);
   return {
     receptionPercentage,
     orderPercentage,
-    personasInOrder,
-    personaCount,
+    workersInOrder,
+    workerCount,
     totalReceivedMessages,
     totalExpectedMessages,
   };

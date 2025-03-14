@@ -24,8 +24,8 @@ yarn bot
 | `gm`                   | Returns gm to your message                                   |
 | `/create [5]`          | Creates a test group with simulated users and conversation   |
 | `/rename [name]`       | Rename the current group                                     |
-| `/add [name]`          | Add the name of a persona to the group                       |
-| `/remove [name]`       | Remove the name of a persona from the group                  |
+| `/add [name]`          | Add the name of a worker to the group                        |
+| `/remove [name]`       | Remove the name of a worker from the group                   |
 | `/groups`              | List all active groups                                       |
 | `/members`             | List all members in the current group                        |
 | `/broadcast [message]` | Broadcast a message to all participants in the current group |
@@ -45,14 +45,14 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 
 ## 🧪 Considerations
 
-- If a persona does not exist, its keys are created.
-- If persona exists uses the existing env file keys and .data folder
+- If a worker does not exist, its keys are created.
+- If worker exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
 - Workers prefixed with "random" have keys that are stored only in memory.
 
 ### Resources
 
 - **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](/workers/)
+- **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)

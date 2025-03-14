@@ -33,13 +33,13 @@ console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 
 describe(testName, () => {
   let dm: Conversation;
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
-      personas = await getWorkers(
+      workers = await getWorkers(
         [
           "henry",
           "ivy",
@@ -53,8 +53,8 @@ describe(testName, () => {
         ],
         testName,
       );
-      expect(personas).toBeDefined();
-      expect(personas.getWorkers().length).toBe(9);
+      expect(workers).toBeDefined();
+      expect(workers.getWorkers().length).toBe(9);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -68,7 +68,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, personas, start);
+      exportTestResults(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -78,7 +78,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures ? "failure" : "success", testName);
-      await closeEnv(testName, personas);
+      await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -87,7 +87,7 @@ describe(testName, () => {
 
   it("inboxState: should measure inboxState of henry", async () => {
     try {
-      const inboxState = await personas.get("henry")!.client.inboxState(true);
+      const inboxState = await workers.get("henry")!.client.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
       hasFailures = logError(e, expect);
@@ -96,9 +96,9 @@ describe(testName, () => {
   });
   it("createDM: should measure creating a DM", async () => {
     try {
-      dm = await personas
+      dm = await workers
         .get("henry")!
-        .client.conversations.newDm(personas.get("randomguy")!.client.inboxId);
+        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -114,7 +114,7 @@ describe(testName, () => {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
-        `[${personas.get("henry")!.name}] Creating DM with ${personas.get("randomguy")!.name} at ${personas.get("randomguy")!.client.inboxId}`,
+        `[${workers.get("henry")!.name}] Creating DM with ${workers.get("randomguy")!.name} at ${workers.get("randomguy")!.client.inboxId}`,
       );
 
       const dmId = await dm.send(message);
@@ -128,7 +128,7 @@ describe(testName, () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyStream(dm, [personas.get("randomguy")!]);
+      const verifyResult = await verifyStream(dm, [workers.get("randomguy")!]);
 
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
@@ -143,7 +143,7 @@ describe(testName, () => {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        newGroup = await personas
+        newGroup = await workers
           .get("henry")!
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
@@ -155,7 +155,7 @@ describe(testName, () => {
     it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
-        const newGroupByIdentifier = await personas
+        const newGroupByIdentifier = await workers
           .get("henry")!
           .client.conversations.newGroupWithIdentifiers(
             sliced.map((inbox) => ({
@@ -222,7 +222,7 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(newGroup, personas);
+        const verifyResult = await verifyStreamAll(newGroup, workers);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);

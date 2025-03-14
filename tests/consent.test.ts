@@ -11,10 +11,10 @@ const testName = "consent";
 loadEnv(testName);
 
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       [
         "henry",
         "ivy",
@@ -32,18 +32,18 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
   it("should stream consent updates when a user is blocked", async () => {
     console.log(
       "Creating DM conversation with address:",
-      personas.get("randomguy")?.client?.inboxId,
+      workers.get("randomguy")?.client?.inboxId,
     );
-    const dmConversation = await personas
+    const dmConversation = await workers
       .get("henry")
       ?.client?.conversations.newDm(
-        personas.get("randomguy")?.client?.inboxId ?? "",
+        workers.get("randomguy")?.client?.inboxId ?? "",
       );
 
     if (!dmConversation) {
@@ -51,17 +51,17 @@ describe(testName, () => {
     }
 
     console.time("setup-consent-stream");
-    const consentPromise = personas
+    const consentPromise = workers
       .get("henry")
       ?.worker?.collectConsentUpdates();
     console.timeEnd("setup-consent-stream");
 
     console.time("get-initial-consent");
-    const getConsentState = await personas
+    const getConsentState = await workers
       .get("henry")
       ?.client?.getConsentState(
         ConsentEntityType.InboxId,
-        personas.get("randomguy")?.client?.inboxId ?? "",
+        workers.get("randomguy")?.client?.inboxId ?? "",
       );
     console.log("Consent state:", getConsentState);
     console.timeEnd("get-initial-consent");
@@ -69,9 +69,9 @@ describe(testName, () => {
     console.time("set-consent-state");
     // Alice blocks Bob
     console.log(`Alice is ${getConsentState ? "blocking" : "allowing"} Bob...`);
-    await personas.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.setConsentStates([
       {
-        entity: personas.get("randomguy")?.client?.inboxId ?? "",
+        entity: workers.get("randomguy")?.client?.inboxId ?? "",
         entityType: ConsentEntityType.InboxId,
         state:
           getConsentState === ConsentState.Allowed
@@ -82,11 +82,11 @@ describe(testName, () => {
     console.timeEnd("set-consent-state");
 
     console.time("get-updated-consent");
-    const getConsentStateUpdated = await personas
+    const getConsentStateUpdated = await workers
       .get("henry")
       ?.client?.getConsentState(
         ConsentEntityType.InboxId,
-        personas.get("randomguy")?.client?.inboxId ?? "",
+        workers.get("randomguy")?.client?.inboxId ?? "",
       );
     console.timeEnd("get-updated-consent");
 
@@ -103,15 +103,15 @@ describe(testName, () => {
   it("should manage consent for all members in a group", async () => {
     // Get addresses of all participants
     const participantAddresses = [
-      personas.get("jack")?.client?.inboxId,
-      personas.get("nancy")?.client?.inboxId,
-      personas.get("oscar")?.client?.inboxId,
-      personas.get("karen")?.client?.inboxId,
+      workers.get("jack")?.client?.inboxId,
+      workers.get("nancy")?.client?.inboxId,
+      workers.get("oscar")?.client?.inboxId,
+      workers.get("karen")?.client?.inboxId,
     ].filter(Boolean) as string[];
 
     console.time("create-group");
     console.log("Creating a group conversation...");
-    const groupConversation = await personas
+    const groupConversation = await workers
       .get("henry")
       ?.client?.conversations.newGroup(participantAddresses);
     console.timeEnd("create-group");
@@ -123,14 +123,14 @@ describe(testName, () => {
     console.timeEnd("get-members");
 
     // Set up consent streams for all members to listen for updates
-    const consentPromise = personas
+    const consentPromise = workers
       .get("henry")
       ?.worker?.collectConsentUpdates();
 
     console.time("block-group");
     // Alice blocks the entire group
     console.log("Alice is blocking the group...");
-    await personas.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.setConsentStates([
       {
         entity: groupConversation?.id ?? "",
         entityType: ConsentEntityType.GroupId,
@@ -141,7 +141,7 @@ describe(testName, () => {
 
     console.time("get-group-consent");
     // Verify Alice's consent state for the group
-    const groupConsentState = await personas
+    const groupConsentState = await workers
       .get("henry")
       ?.client?.getConsentState(
         ConsentEntityType.GroupId,
@@ -154,9 +154,9 @@ describe(testName, () => {
 
     console.time("block-bob");
     // Alice blocks Bob specifically
-    await personas.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.setConsentStates([
       {
-        entity: personas.get("jack")?.client?.inboxId as string,
+        entity: workers.get("jack")?.client?.inboxId as string,
         entityType: ConsentEntityType.InboxId,
         state: ConsentState.Denied,
       },
@@ -164,11 +164,11 @@ describe(testName, () => {
     console.timeEnd("block-bob");
 
     console.time("get-bob-consent");
-    const bobConsentState = await personas
+    const bobConsentState = await workers
       .get("henry")
       ?.client?.getConsentState(
         ConsentEntityType.InboxId,
-        personas.get("jack")?.client?.inboxId ?? "",
+        workers.get("jack")?.client?.inboxId ?? "",
       );
     console.log(
       `Alice's consent state for Bob is : ${
@@ -190,14 +190,14 @@ describe(testName, () => {
     console.time("unblock-all");
     // Unblock everyone
     console.log("Unblocking all entities...");
-    await personas.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.setConsentStates([
       {
         entity: groupConversation?.id ?? "",
         entityType: ConsentEntityType.GroupId,
         state: ConsentState.Allowed,
       },
       {
-        entity: personas.get("jack")?.client?.inboxId as string,
+        entity: workers.get("jack")?.client?.inboxId as string,
         entityType: ConsentEntityType.InboxId,
         state: ConsentState.Allowed,
       },
@@ -206,7 +206,7 @@ describe(testName, () => {
 
     console.time("get-final-state");
     // Final verification
-    const finalGroupState = await personas
+    const finalGroupState = await workers
       .get("henry")
       ?.client?.getConsentState(
         ConsentEntityType.GroupId,

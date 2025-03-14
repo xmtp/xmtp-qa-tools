@@ -15,13 +15,13 @@ const amount = 5; // Number of messages to collect per receiver
 // 2 seconds per message, multiplied by the total number of participants
 
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       [
         "bob",
         "alice",
@@ -43,15 +43,15 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
   it("tc_stream: send the stream", async () => {
     // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-    group = await personas
+    group = await workers
       .get("bob")!
       .client.conversations.newGroup(
-        personas.getWorkers().map((p) => p.client.inboxId),
+        workers.getWorkers().map((p) => p.client.inboxId),
       );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
@@ -59,7 +59,7 @@ describe(testName, () => {
     // Collect messages by setting up listeners before sending and then sending known messages.
     collectedMessages = await verifyStream(
       group,
-      personas.getWorkers(),
+      workers.getWorkers(),
       "text",
       amount,
       (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -69,7 +69,7 @@ describe(testName, () => {
   });
 
   it("tc_stream_order: verify message order when receiving via streams", () => {
-    // Group messages by persona
+    // Group messages by worker
     const messagesByWorker: string[][] = [];
 
     // Normalize the collectedMessages structure to match the pull test
@@ -86,17 +86,17 @@ describe(testName, () => {
 
     // We expect all messages to be received and in order
     expect(stats.receptionPercentage).toBeGreaterThan(95);
-    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
   });
 
   it("tc_poll: should verify message order when receiving via pull", async () => {
-    group = await personas
+    group = await workers
       .get("bob")!
       .client.conversations.newGroup([
-        personas.get("joe")!.client.inboxId,
-        personas.get("bob")!.client.inboxId,
-        personas.get("alice")!.client.inboxId,
-        personas.get("sam")!.client.inboxId,
+        workers.get("joe")!.client.inboxId,
+        workers.get("bob")!.client.inboxId,
+        workers.get("alice")!.client.inboxId,
+        workers.get("sam")!.client.inboxId,
       ]);
 
     const messages: string[] = [];
@@ -111,12 +111,12 @@ describe(testName, () => {
   });
 
   it("tc_poll_order: verify message order when receiving via pull", async () => {
-    const personasFromGroup = await getWorkersFromGroup(group, personas);
+    const workersFromGroup = await getWorkersFromGroup(group, workers);
     const messagesByWorker: string[][] = [];
 
-    for (const persona of personasFromGroup) {
+    for (const worker of workersFromGroup) {
       const conversation =
-        await persona.client.conversations.getConversationById(group.id);
+        await worker.client.conversations.getConversationById(group.id);
       if (!conversation) {
         throw new Error("Conversation not found");
       }
@@ -144,6 +144,6 @@ describe(testName, () => {
 
     // We expect all messages to be received and in order
     expect(stats.receptionPercentage).toBeGreaterThan(95);
-    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
   });
 });

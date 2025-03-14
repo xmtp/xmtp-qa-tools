@@ -8,22 +8,22 @@ loadEnv(testName);
 
 describe(testName, () => {
   let convo: Conversation;
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let sender: Worker;
   let receiver: Worker;
 
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
-    personas = await getWorkers(["ivy", "bob"], testName);
-    sender = personas.get("ivy")!;
-    receiver = personas.get("bob")!;
+    workers = await getWorkers(["ivy", "bob"], testName);
+    sender = workers.get("ivy")!;
+    receiver = workers.get("bob")!;
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
   it("inboxState", async () => {
-    await listInstallations(personas);
+    await listInstallations(workers);
   });
 
   it("new dm with bug", async () => {
@@ -34,21 +34,21 @@ describe(testName, () => {
   });
 
   it("inboxState", async () => {
-    await listInstallations(personas);
+    await listInstallations(workers);
   });
   it("should count conversations", async () => {
     await compareDms(sender, receiver);
   });
 
   it("should handle different conversation IDs and require manual sync", async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       ["ivy-b", "bob-b"],
       testName,
       "message",
       true,
-      personas,
+      workers,
     );
-    await listInstallations(personas);
+    await listInstallations(workers);
   });
 
   it("should count conversations", async () => {
@@ -57,8 +57,8 @@ describe(testName, () => {
 
   it("should handle different conversation IDs and require manual sync", async () => {
     // Initiate a new DM with a specific conversation ID
-    const newSender = personas.get("ivy", "b")!;
-    const newReceiver = personas.get("bob", "b")!;
+    const newSender = workers.get("ivy", "b")!;
+    const newReceiver = workers.get("bob", "b")!;
     const convo1 = await newSender.client.conversations.newDm(
       newReceiver.client.inboxId,
     );

@@ -118,25 +118,25 @@ export class WorkerClient extends Worker {
   private isTerminated = false;
 
   constructor(
-    persona: WorkerBase,
+    worker: WorkerBase,
     typeofStream: typeofStream,
     gptEnabled: boolean,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
-      persona,
+      worker,
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
 
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
-    this.name = persona.name;
-    this.folder = persona.folder;
-    this.nameId = persona.name;
-    this.testName = persona.testName;
-    this.walletKey = persona.walletKey;
-    this.encryptionKeyHex = persona.encryptionKey;
+    this.name = worker.name;
+    this.folder = worker.folder;
+    this.nameId = worker.name;
+    this.testName = worker.testName;
+    this.walletKey = worker.walletKey;
+    this.encryptionKeyHex = worker.encryptionKey;
 
     this.setupEventHandlers();
   }
@@ -616,7 +616,7 @@ export class WorkerClient extends Worker {
   private async generateOpenAIResponse(
     message: string,
     history: DecodedMessage[],
-    personaName: string,
+    workerName: string,
   ): Promise<string> {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -628,9 +628,9 @@ export class WorkerClient extends Worker {
       messages: [
         {
           role: "system",
-          content: `You are ${personaName}, a fake persona in a group chat. 
+          content: `You are ${workerName}, a fake worker in a group chat. 
                      Keep your responses concise (under 100 words) and friendly. 
-                     Never mention other personas in your responses. Never answer more than 1 question per response.
+                     Never mention other workers in your responses. Never answer more than 1 question per response.
                      For context, these were the last 10 messages in the conversation: ${history
                        ?.slice(0, 10)
                        .map((m) => m.content as string)
@@ -642,7 +642,7 @@ export class WorkerClient extends Worker {
     });
 
     return (
-      personaName +
+      workerName +
       ":\n" +
       (completion.choices[0]?.message?.content ||
         "I'm not sure how to respond to that.")

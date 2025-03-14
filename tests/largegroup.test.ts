@@ -7,11 +7,11 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 const testName = "largegroup";
 loadEnv(testName);
 describe(testName, () => {
-  let personas: WorkerManager;
+  let workers: WorkerManager;
   let group: Conversation;
 
   beforeAll(async () => {
-    personas = await getWorkers(
+    workers = await getWorkers(
       [
         "henry",
         "ivy",
@@ -28,19 +28,19 @@ describe(testName, () => {
   });
 
   afterAll(async () => {
-    await closeEnv(testName, personas);
+    await closeEnv(testName, workers);
   });
 
   it(`createGroup-450: should create a large group of 450 participants 450`, async () => {
     const sliced = generatedInboxes.slice(0, 450);
-    group = await personas
+    group = await workers
       .get("henry")!
       .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();
   });
   it(`createGroup-500: should create a large group of 500 participants 500`, async () => {
     const sliced = generatedInboxes.slice(0, 500);
-    group = await personas
+    group = await workers
       .get("henry")!
       .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
     expect(group.id).toBeDefined();

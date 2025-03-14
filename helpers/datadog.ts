@@ -21,18 +21,18 @@ function getCountryCodeFromGeo(geolocation: string): string {
 }
 export const exportTestResults = (
   expect: any,
-  personas: WorkerManager,
+  workers: WorkerManager,
   start: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
     console.timeEnd(testName as string);
-    expect(personas.getWorkers()).toBeDefined();
-    expect(personas.getWorkers().length).toBeGreaterThan(0);
+    expect(workers.getWorkers()).toBeDefined();
+    expect(workers.getWorkers().length).toBeGreaterThan(0);
     void sendPerformanceMetric(
       performance.now() - start,
       testName as string,
-      personas.getVersion(),
+      workers.getVersion(),
     );
   }
 };

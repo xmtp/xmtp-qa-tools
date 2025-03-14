@@ -7,12 +7,12 @@ loadEnv(testName);
 
 describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
-    const personas = await getWorkers(50, testName);
-    const workerArray = personas.getWorkers();
-    const groupByInboxIds = await personas
+    const workers = await getWorkers(50, testName);
+    const workerArray = workers.getWorkers();
+    const groupByInboxIds = await workers
       .get("bob")!
       .client.conversations.newGroup(
-        personas.getWorkers().map((persona) => persona.client.inboxId),
+        workers.getWorkers().map((worker) => worker.client.inboxId),
       );
     for (const worker of workerArray) {
       await worker.worker?.terminate();

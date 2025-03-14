@@ -16,20 +16,20 @@ const timeoutMax = 60000; // 1 minute timeout
 describe(
   testName,
   () => {
-    let personas: WorkerManager;
+    let workers: WorkerManager;
     let group: Group;
     let hasFailures = false;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
 
     beforeAll(async () => {
       try {
-        // Create personas for testing
-        personas = await getWorkers(participantCount, testName);
+        // Create workers for testing
+        workers = await getWorkers(participantCount, testName);
         // Create a group conversation
-        group = await personas
+        group = await workers
           .get("bob")!
           .client.conversations.newGroup(
-            personas.getWorkers().map((p) => p.client.inboxId),
+            workers.getWorkers().map((p) => p.client.inboxId),
           );
 
         console.log("Group created", group.id);
@@ -41,7 +41,7 @@ describe(
 
     afterAll(async () => {
       try {
-        await closeEnv(testName, personas);
+        await closeEnv(testName, workers);
         console.log(hasFailures);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -50,16 +50,16 @@ describe(
     });
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
-        // Select one persona to take offline
-        const offlineWorker = personas.get("bob")!; // Second persona
-        const onlineWorker = personas.get("alice")!; // First persona
+        // Select one worker to take offline
+        const offlineWorker = workers.get("bob")!; // Second worker
+        const onlineWorker = workers.get("alice")!; // First worker
 
         console.log(`Taking ${offlineWorker.name} offline`);
 
-        // Disconnect the selected persona
+        // Disconnect the selected worker
         await offlineWorker.worker.terminate();
 
-        // Send messages from an online persona
+        // Send messages from an online worker
         const conversation =
           await onlineWorker.client.conversations.getConversationById(group.id);
 
@@ -72,7 +72,7 @@ describe(
           console.log(`Sent message ${message}`);
         }
 
-        // Reconnect the offline persona
+        // Reconnect the offline worker
         console.log(`Reconnecting ${offlineWorker.name}`);
         const { client } = await offlineWorker.worker.initialize();
         offlineWorker.client = client;
@@ -110,7 +110,7 @@ describe(
 
         // We expect all messages to be received and in order
         expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
 
         sendDeliveryMetric(
           stats.receptionPercentage,

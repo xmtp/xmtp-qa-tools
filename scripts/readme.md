@@ -28,7 +28,7 @@ npx ts-node scripts/generateKeys.ts
 **Use Cases:**
 
 - Creating test accounts for development
-- Setting up new personas for simulation testing
+- Setting up new workers for simulation testing
 - Generating keys for ephemeral test instances
 
 ## 📨 Generate Inboxes

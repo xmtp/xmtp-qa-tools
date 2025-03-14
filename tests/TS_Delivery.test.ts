@@ -35,7 +35,7 @@ const timeoutMax =
 describe(
   testName,
   () => {
-    let personas: WorkerManager;
+    let workers: WorkerManager;
     let group: Group;
     let collectedMessages: VerifyStreamResult;
     const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -43,18 +43,18 @@ describe(
     beforeAll(async () => {
       try {
         //fs.rmSync(".data", { recursive: true, force: true });
-        // Use getWorkers to spin up many personas. This is resource-intensive.
-        personas = await getWorkers(receiverAmount, testName);
+        // Use getWorkers to spin up many workers. This is resource-intensive.
+        workers = await getWorkers(receiverAmount, testName);
         await new Promise((resolve) => setTimeout(resolve, 3000));
         console.log("creating group");
-        group = await personas
+        group = await workers
           .get("bob")!
           .client.conversations.newGroup([
-            ...personas.getWorkers().map((p) => p.client.inboxId),
+            ...workers.getWorkers().map((p) => p.client.inboxId),
           ]);
 
-        expect(personas).toBeDefined();
-        expect(personas.getWorkers().length).toBe(receiverAmount);
+        expect(workers).toBeDefined();
+        expect(workers.getWorkers().length).toBe(receiverAmount);
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -64,7 +64,7 @@ describe(
     afterAll(async () => {
       try {
         sendTestResults(hasFailures ? "failure" : "success", testName);
-        await closeEnv(testName, personas);
+        await closeEnv(testName, workers);
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -78,7 +78,7 @@ describe(
         // Collect messages by setting up listeners before sending and then sending known messages.
         collectedMessages = await verifyStream(
           group,
-          personas.getWorkers(),
+          workers.getWorkers(),
           "text",
           amountofMessages,
           (index) => `gm-${index + 1}-${randomSuffix}`,
@@ -92,7 +92,7 @@ describe(
 
     it("tc_stream_order: verify message order when receiving via streams", () => {
       try {
-        // Group messages by persona
+        // Group messages by worker
         const messagesByWorker: string[][] = [];
 
         // Normalize the collectedMessages structure to match the pull test
@@ -113,14 +113,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          personas.get("bob")!.version,
+          workers.get("bob")!.version,
           testName,
           "stream",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          personas.get("bob")!.version,
+          workers.get("bob")!.version,
           testName,
           "stream",
           "order",
@@ -133,12 +133,12 @@ describe(
 
     it("tc_poll_order: verify message order when receiving via pull", async () => {
       try {
-        const personasFromGroup = await getWorkersFromGroup(group, personas);
+        const workersFromGroup = await getWorkersFromGroup(group, workers);
         const messagesByWorker: string[][] = [];
 
-        for (const persona of personasFromGroup) {
+        for (const worker of workersFromGroup) {
           const conversation =
-            await persona.client.conversations.getConversationById(group.id);
+            await worker.client.conversations.getConversationById(group.id);
           if (!conversation) {
             throw new Error("Conversation not found");
           }
@@ -166,18 +166,18 @@ describe(
 
         // We expect all messages to be received and in order
         expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          personas.get("bob")!.version,
+          workers.get("bob")!.version,
           testName,
           "poll",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          personas.get("bob")!.version,
+          workers.get("bob")!.version,
           testName,
           "poll",
           "order",
@@ -190,16 +190,16 @@ describe(
 
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
-        // Select one persona to take offline
-        const offlineWorker = personas.get("bob")!; // Second persona
-        const onlineWorker = personas.get("alice")!; // First persona
+        // Select one worker to take offline
+        const offlineWorker = workers.get("bob")!; // Second worker
+        const onlineWorker = workers.get("alice")!; // First worker
 
         console.log(`Taking ${offlineWorker.name} offline`);
 
-        // Disconnect the selected persona
+        // Disconnect the selected worker
         await offlineWorker.worker.terminate();
 
-        // Send messages from an online persona
+        // Send messages from an online worker
         const conversation =
           await onlineWorker.client.conversations.getConversationById(group.id);
 
@@ -212,7 +212,7 @@ describe(
           console.log(`Sent message ${message}`);
         }
 
-        // Reconnect the offline persona
+        // Reconnect the offline worker
         console.log(`Reconnecting ${offlineWorker.name}`);
         const { client } = await offlineWorker.worker.initialize();
         offlineWorker.client = client;
@@ -250,7 +250,7 @@ describe(
 
         // We expect all messages to be received and in order
         expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some personas should have correct order
+        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
 
         sendDeliveryMetric(
           stats.receptionPercentage,

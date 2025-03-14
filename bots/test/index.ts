@@ -24,7 +24,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   try {
-    // First create the bot persona
+    // First create the bot worker
     console.log("Initializing bot...");
     const botWorker = await getWorkers(["bot"], testName, "message");
     const bot = botWorker.get("bot");
@@ -36,8 +36,8 @@ async function main() {
     console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
 
     // Then create the dynamic workers
-    console.log("Initializing worker personas...");
-    const personas = await getWorkers(20, testName, "message", true);
+    console.log("Initializing worker workers...");
+    const workers = await getWorkers(20, testName, "message", true);
     const commandHandler = new CommandHandler();
 
     console.log("Syncing conversations...");
@@ -76,7 +76,7 @@ async function main() {
             conversation,
             client,
             commandHandler,
-            personas,
+            workers,
           );
 
           console.log("Waiting for messages...");
@@ -103,7 +103,7 @@ async function processCommand(
   conversation: Conversation,
   client: Client,
   commandHandler: CommandHandler,
-  personas: WorkerManager,
+  workers: WorkerManager,
 ) {
   try {
     const messageContent = message.content as string;
@@ -129,7 +129,7 @@ async function processCommand(
         await commandHandler.help(message, client);
         break;
       case "create":
-        await commandHandler.create(message, client, args, personas);
+        await commandHandler.create(message, client, args, workers);
         break;
       case "block":
         await commandHandler.block(message, client, args);
@@ -141,13 +141,13 @@ async function processCommand(
         await commandHandler.rename(message, client, args);
         break;
       case "members":
-        await commandHandler.members(message, client, personas);
+        await commandHandler.members(message, client, workers);
         break;
       case "admins":
-        await commandHandler.admins(message, client, personas);
+        await commandHandler.admins(message, client, workers);
         break;
       case "blast":
-        await commandHandler.blast(message, client, args, personas);
+        await commandHandler.blast(message, client, args, workers);
         break;
       case "groups":
         await commandHandler.groups(message, client);
@@ -159,16 +159,16 @@ async function processCommand(
         await commandHandler.info(message, client);
         break;
       case "workers":
-        await commandHandler.workers(message, client, personas);
+        await commandHandler.workers(message, client, workers);
         break;
       case "leave":
         await commandHandler.leave(message, client);
         break;
       case "add":
-        await commandHandler.add(message, client, args, personas);
+        await commandHandler.add(message, client, args, workers);
         break;
       case "remove":
-        await commandHandler.remove(message, client, args, personas);
+        await commandHandler.remove(message, client, args, workers);
         break;
       default:
         await conversation.send(

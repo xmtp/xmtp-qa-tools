@@ -4,7 +4,7 @@
 
 ## 🌟 Overview
 
-Our testing framework provides worker utilities that allow you to easily create predefined personas (like Alice, Bob, etc.) with different installations. This is particularly useful for testing multi-device scenarios or different client configurations within our test suite.
+Our testing framework provides worker utilities that allow you to easily create predefined workers (like Alice, Bob, etc.) with different installations. This is particularly useful for testing multi-device scenarios or different client configurations within our test suite.
 
 ```typescript
 // Quick example
@@ -20,7 +20,7 @@ await conversation.send("Hello from Alice to Bob");
 ## ✨ Key Features
 
 - **🔑 Identity Management**: Automatic key creation with persistence between test runs
-- **📱 Multi-Device Testing**: Simulate multiple installations (desktop, mobile, etc.) for the same persona
+- **📱 Multi-Device Testing**: Simulate multiple installations (desktop, mobile, etc.) for the same worker
 - **📊 Separate Storage**: Independent database paths for each installation
 - **🔄 Stream Handling**: Built-in support for message, conversation, and consent streams
 - **🤖 GPT Integration**: Optional AI-powered responses for automated testing scenarios
@@ -140,9 +140,9 @@ const workers = await getWorkers(4, testName);
 | `worker.worker.collectConversations(fromPeer, count?, timeout?)`  | Collects conversation stream events      |
 | `worker.worker.collectConsentUpdates(count?, timeout?)`           | Collects consent stream events           |
 
-## 📚 Available Default Personas
+## 📚 Available names for workers
 
-The framework comes with 61 predefined persona names that you can use:
+The framework comes with 61 predefined worker names that you can use:
 
 ```typescript
 import { defaultNames } from "@helpers/types";
@@ -159,14 +159,14 @@ Always clean up your workers after tests:
 
 ```typescript
 afterAll(async () => {
-  await closeEnv(testName, allPersonas);
+  await closeEnv(testName, allWorkers);
 });
 ```
 
 ## 🔍 Implementation Details
 
 - Worker instances use Node.js worker threads for parallel processing
-- Keys are stored in `.env` files (except for "random" personas which store keys only in memory)
+- Keys are stored in `.env` files (except for "random" workers which store keys only in memory)
 - Database paths follow a structured format to avoid conflicts between tests
 - Message streams, conversation streams, and consent streams are supported
 - GPT responses are generated using OpenAI's API if enabled

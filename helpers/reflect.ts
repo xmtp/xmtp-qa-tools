@@ -115,16 +115,16 @@ export default ReflectTestSuite;
 // loadEnv(testName);
 
 // describe("Basic test", () => {
-//   let personas: Record<string, Worker>;
+//   let workers: Record<string, Worker>;
 //   const reflectTestSuite = new ReflectTestSuite();
 
 //   beforeAll(async () => {
 //     fs.rmSync(".data", { recursive: true, force: true });
-//     personas = await getWorkers(["larry"], testName);
+//     workers = await getWorkers(["larry"], testName);
 //   });
 
 //   afterAll(async () => {
-//     await closeEnv(testName, personas);
+//     await closeEnv(testName, workers);
 //   });
 
 //   it("should return true", async () => {

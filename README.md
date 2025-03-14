@@ -188,6 +188,6 @@ yarn install
 ### Resources
 
 - **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined personas like `bob`, `alice`, `randomguy` with [workers](/workers/)
+- **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
