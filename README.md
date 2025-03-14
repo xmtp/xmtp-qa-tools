@@ -17,6 +17,12 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 - **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
+## Overview
+
+This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node , Browser, and React Native SDKs.
+
+## Operation peformance
+
 ### Core SDK Operations Performance
 
 | Operation           | Description                            | Avg (ms) | Target | Status       |
@@ -65,6 +71,8 @@ _Note: Production environment consistently outperforms Dev across all operations
 
 _Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
 
+## Networks performance
+
 ### Network performance
 
 | Performance Metric   | Current Performance | Target            | Status       |
@@ -101,6 +109,8 @@ _Note: Regional performance testing shows significant latency increases in south
 
 _Note: Production environment consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
+## Message reliability
+
 ### Message delivery testing
 
 | Test Area              | Current Performance | Target          | Status       |
@@ -114,7 +124,7 @@ _Note: Production environment consistently shows better network performance acro
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-- **Datadog:** Explore more in the [dashboards section](./dashboards/)
+- **Datadog:** Explore more in the [dashboards section](https://www.notion.so/ephemerahq/dashboards/)
 
 ### Stream vs. Poll reliability
 
@@ -125,8 +135,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | Hybrid approach  | 100% delivery | Optimized         | Recommended for Agents | ✅ On Target |
 
 _Note: A hybrid approach using `streams` with `poll`-based verification provides the most reliable message delivery guarantee._
-
-- **Datadog:** Explore more in the [dashboards section](./dashboards/)
 
 ### Cross-SDK Testing
 
@@ -154,10 +162,18 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 | US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
-#### Disclaimers
+### Disclaimers
 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
+
+## Testing Infrastructure
+
+- Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
+- 30-minute automated test execution intervals
+- Comprehensive data aggregation in datadog
+- Testing directly on top of SDKs for real-world scenarios
+- `dev` and `production` network covered
 
 ## Tools & Utilities
 
