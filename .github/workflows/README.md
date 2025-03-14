@@ -76,7 +76,7 @@ The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation_dev.yml) workflow r
 
 ### Monitoring Dashboard
 
-![TS_Performance](/datadog/ts_performance.png)
+![TS_Performance](/media/ts_performance.png)
 
 Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
 
@@ -200,7 +200,7 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery_dev.yml) workflow automat
 
 ### Monitoring Dashboard
 
-![TS_Delivery](/datadog/ts_delivery.png)
+![TS_Delivery](/media/ts_delivery.png)
 
 This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
 
@@ -232,7 +232,7 @@ metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
 
 The TS_Gm test suite serves as a critical regression testing tool by verifying the GM bot functionality across different SDK versions. By using a simple bot as a consistent reference point, it ensures that new SDK versions maintain backward compatibility and reliable messaging capabilities.
 
-![TS_Gm](/datadog/ts_gm.png)
+![TS_Gm](/media/ts_gm.png)
 
 ### Implementation Details
 
