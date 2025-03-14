@@ -44,21 +44,29 @@ jobs:
       - name: Run performance test on US West
         id: us-west-test
         run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: us-west
 
       # US East Region Test
       - name: Run performance test on US East
         id: us-east-test
         run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: us-east
 
       # Europe Region Test
       - name: Run performance test on Europe
         id: europe-test
         run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: europe
 
       # Asia Region Test
       - name: Run performance test on Asia
         id: asia-test
         run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: asia
 
       - name: Upload log files
         uses: actions/upload-artifact@v4

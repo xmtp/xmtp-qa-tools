@@ -214,6 +214,7 @@ export class WorkerClient extends Worker {
           if (
             message.content.includes(baseName) &&
             !message.content.includes("/") &&
+            !message.content.includes("agents") &&
             !message.content.includes("members") &&
             !message.content.includes("admins") &&
             this.gptEnabled
