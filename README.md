@@ -35,10 +35,10 @@ flowchart LR
   end
 
   subgraph Applications["Applications"]
-    webApps["Web Applications"]
+    webApps["xmtp.chat"]
     mobileApps["Native Apps"]
     crossPlatformApps["Cross-platform Apps"]
-    messagingApps["RN Mobile Apps"]
+    messagingApps["Convos"]
     botAgents["Bots & Agents"]
     backendServices["Backend Services"]
   end
