@@ -95,30 +95,9 @@ flowchart LR
   class centralNode,libxmtp,webApps,messagingApps,botAgents highlightStroke;
 ```
 
-The highlighted path (red dashed line) in the architecture diagram represents our core testing focus:
+> The highlighted path (red dashed line) in the architecture diagram shows our main testing focus.
 
-1. **Node → libxmtp**
-
-   - Performance testing of core protocol operations
-   - Message encryption/decryption validation
-   - Database operations verification
-
-2. **libxmtp → Napi**
-
-   - Binding layer performance metrics
-   - Memory management validation
-   - Cross-language compatibility testing
-
-3. **Napi → Node SDK**
-
-   - SDK operation benchmarking
-   - API consistency verification
-   - Error handling validation
-
-4. **Node SDK → Applications**
-   - End-to-end message delivery testing
-   - Bot/Agent integration validation
-   - Backend service reliability testing
+We test all XMTP bindings using three main applications. We use xmtp.chat to test the Browser SDK's Wasm binding in actual web environments. We use Convos to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use agents to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
 ## Operation performance
 
