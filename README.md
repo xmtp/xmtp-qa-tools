@@ -21,7 +21,100 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 This assessment outlines how XMTP ensures messaging protocol reliability and performance, with focus on Messaging and Agents built using our Node , Browser, and React Native SDKs.
 
-## Operation peformance
+## Testing strategy
+
+The highlighted path (red dashed line) in the architecture diagram represents our core testing focus:
+
+### Architecture
+
+This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
+
+```mermaid
+flowchart LR
+  %% Core components and bindings
+  subgraph Bindings["Bindings"]
+    wasm["WASM"]
+    ffi["FFI"]
+    napi["Napi"]
+  end
+
+  subgraph SDKs["SDKs"]
+    browserSDK["Browser SDK"]
+    swiftSDK["Swift SDK"]
+    kotlinSDK["Kotlin SDK"]
+    reactNativeSDK["React Native SDK"]
+    nodesdk["Node SDK"]
+  end
+
+  subgraph Applications["Applications"]
+    webApps["Web Applications"]
+    mobileApps["Native Apps"]
+    crossPlatformApps["Cross-platform Apps"]
+    messagingApps["RN Mobile Apps"]
+    botAgents["Bots & Agents"]
+    backendServices["Backend Services"]
+  end
+
+  centralNode["Node"] --> libxmtp["libxmtp<br>(openmls)<br>(diesel)"]
+  libxmtp --- wasm
+  libxmtp --- ffi
+  kotlinSDK --- mobileApps
+  libxmtp --- napi
+
+  wasm --- browserSDK
+  ffi --- swiftSDK
+  ffi --- kotlinSDK
+
+  swiftSDK --- reactNativeSDK
+  kotlinSDK --- reactNativeSDK
+
+  browserSDK --- webApps
+
+  swiftSDK --- mobileApps
+
+  napi --- nodesdk
+  nodesdk --- botAgents
+  nodesdk --- backendServices
+
+  decentralNode["Decentralized Nodes"] -.- libxmtp
+
+
+  reactNativeSDK --- messagingApps
+  napi -.- reactNativeSDK
+
+  linkStyle 0,4,12,13 stroke:#f66,stroke-width:4px,stroke-dasharray: 5,5;
+  classDef highlightStroke fill:#fff,stroke:#f66,color:#000,stroke-width:4px;
+  class centralNode,libxmtp,webApps,messagingApps,botAgents highlightStroke;
+```
+
+### Critical Testing Path (Red Line)
+
+This testing path is critical as it represents the most common integration path for automated services and high-throughput applications covering all the bindings and SDKs.
+
+1. **Node → libxmtp**
+
+   - Performance testing of core protocol operations
+   - Message encryption/decryption validation
+   - Database operations verification
+
+2. **libxmtp → Napi**
+
+   - Binding layer performance metrics
+   - Memory management validation
+   - Cross-language compatibility testing
+
+3. **Napi → Node SDK**
+
+   - SDK operation benchmarking
+   - API consistency verification
+   - Error handling validation
+
+4. **Node SDK → Applications**
+   - End-to-end message delivery testing
+   - Bot/Agent integration validation
+   - Backend service reliability testing
+
+## Operation performance
 
 ### Core SDK Operations Performance
 
