@@ -237,7 +237,7 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 
 ## Tools & Utilities
 
-- **Bots:** Bots for testing - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/bots/)
+- **Test bot:** Bot for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/test/)
 - **Workflows:** See our CI/CD pipeline configuration - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
