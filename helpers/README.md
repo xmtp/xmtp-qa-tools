@@ -4,15 +4,17 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                                |
-| ------------------------ | ------------------------------------------------------ |
-| [client.ts](#clientts)   | Creates signers and manages keys for test personas     |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                   |
-| [group.ts](#groupts)     | Creates test groups with specified participants        |
-| [logger.ts](#loggerts)   | Logging utilities for test output                      |
-| [reflect.ts](#reflectts) | Integration with Reflect testing platform              |
-| [types.ts](#typests)     | Type definitions used throughout the testing framework |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery      |
+| Module                         | Purpose                                                |
+| ------------------------------ | ------------------------------------------------------ |
+| [client.ts](#clientts)         | Creates signers and manages keys for test personas     |
+| [datadog.ts](#datadogts)       | Sends performance metrics to Datadog                   |
+| [group.ts](#groupts)           | Creates test groups with specified participants        |
+| [logger.ts](#loggerts)         | Logging utilities for test output                      |
+| [reflect.ts](#reflectts)       | Integration with Reflect testing platform              |
+| [types.ts](#typests)           | Type definitions used throughout the testing framework |
+| [verify.ts](#verifyts)         | Validation utilities for testing message delivery      |
+| [playwright.ts](#playwrightts) | Playwright utilities for testing                       |
+| [test.ts](#testts)             | Test utilities for testing                             |
 
 ## 🔍 Module Details
 
@@ -29,6 +31,23 @@ const dbPath = getDbPath(personaName, accountAddress, testName);
 
 // Generate random encryption keys
 const encryptionKey = generateEncryptionKeyHex();
+```
+
+#### playwright.ts
+
+Playwright utilities for testing:
+
+```typescript
+// Initialize Playwright browser
+const browser = await playwright.chromium.launch();
+```
+
+#### test.ts
+
+Test utilities for testing:
+
+```typescript
+// Initialize test environment
 ```
 
 ### datadog.ts
@@ -86,34 +105,6 @@ overrideConsole(logger);
 
 // Flush logs to disk when test completes
 flushLogger(testName);
-```
-
-### types.ts
-
-Type definitions used throughout the testing framework:
-
-```typescript
-// Core types for personas and clients
-interface Persona {
-  name: string;
-  installationId: string;
-  version: string;
-  dbPath: string;
-  worker: WorkerClient | null;
-  client: Client | null;
-}
-
-// Message and conversation stream types
-type WorkerStreamMessage = {
-  type: "stream_message";
-  message: DecodedMessage;
-};
-
-// Verification result types
-type VerifyStreamResult = {
-  allReceived: boolean;
-  messages: string[][];
-};
 ```
 
 ### verify.ts

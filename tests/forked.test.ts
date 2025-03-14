@@ -155,8 +155,7 @@ describe(testName, () => {
     // Create a different installation of diana
     const secondaryAgents = await createAgent(["diana-b"], testName);
     const dianaNewDevice = secondaryAgents.get("diana", "b")!;
-    expect(dianaNewDevice).toBeDefined();
-    expect(dianaNewDevice.client).toBeDefined();
+    expect(dianaNewDevice.client.inboxId).toBeDefined();
     expect(dianaNewDevice.installationId).not.toBe(
       agents.get("diana")?.installationId,
     );

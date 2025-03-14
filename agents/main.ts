@@ -81,7 +81,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = agent.name;
     this.folder = agent.folder;
-    this.nameId = agent.name;
+    this.nameId = agent.name + "-" + agent.folder;
 
     this.testName = agent.testName;
     this.walletKey = agent.walletKey;
@@ -150,20 +150,11 @@ export class WorkerClient extends Worker {
     console.timeEnd(`[${this.nameId}] Create XMTP client v:${version}`);
 
     if (this.typeofStream === "message") {
-      // Start message streaming in the background
-      console.time(`[${this.nameId}] Start stream`);
       await this.startStream();
-      console.timeEnd(`[${this.nameId}] Start stream`);
     } else if (this.typeofStream === "conversation") {
-      // Start conversation streaming
-      console.log(`[${this.nameId}] Start conversation stream`);
       await this.startConversationStream();
     } else if (this.typeofStream === "consent") {
-      // Start consent streaming
-      console.log(`[${this.nameId}] Start consent stream`);
       this.startConsentStream();
-    } else {
-      console.log(`[${this.nameId}] No stream started`);
     }
 
     const installationId = this.client.installationId;
@@ -189,9 +180,7 @@ export class WorkerClient extends Worker {
   private isTerminated = false;
 
   private async startStream() {
-    console.time(`[${this.nameId}] Start message stream`);
     this.messageStream = await this.client.conversations.streamAllMessages();
-    console.timeEnd(`[${this.nameId}] Start message stream`);
 
     // Process messages asynchronously
     void (async () => {

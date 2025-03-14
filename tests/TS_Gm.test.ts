@@ -3,10 +3,10 @@ import type { AgentManager } from "@agents/manager";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { createGroupAndReceiveGm } from "@helpers/playwright";
 import { logError } from "@helpers/tests";
 import { IdentifierKind, type Conversation } from "@helpers/types";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
-import { createGroupAndReceiveGm } from "../playwright/gm-bot.playwright";
 
 const testName = "ts_gm";
 loadEnv(testName);

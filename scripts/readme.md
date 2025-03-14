@@ -137,7 +137,7 @@ The `generated-inboxes.json` file contains previously generated test inboxes. Th
 
 ```typescript
 // Example usage in tests
-import inboxes from "../helpers/generated-inboxes.json";
+import inboxes from "@helpers/generated-inboxes.json";
 
 // Use a random inbox
 const randomIndex = Math.floor(Math.random() * inboxes.length);

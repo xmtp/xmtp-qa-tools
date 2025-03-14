@@ -1,6 +1,6 @@
-# Workers
+# Agents
 
-Workers in our testing framework allow you to create predefined personas (like Alice, Bob, etc.) with different installations. This is useful for testing multi-device scenarios or different client configurations.
+Agents in our testing framework allow you to create predefined personas (like Alice, Bob, etc.) with different installations. This is useful for testing multi-device scenarios or different client configurations.
 
 ## Basic usage
 

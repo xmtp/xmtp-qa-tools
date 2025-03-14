@@ -30,10 +30,14 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     });
 
     // Create context with a larger viewport to ensure all messages are visible
-    const context: BrowserContext = await browser.newContext({
-      viewport: { width: 1920, height: 1080 }, // Use a large viewport size
-      deviceScaleFactor: 1,
-    });
+    const context: BrowserContext = await browser.newContext(
+      isHeadless
+        ? {
+            viewport: { width: 1920, height: 1080 }, // Use a large viewport size
+            deviceScaleFactor: 1,
+          }
+        : {},
+    );
 
     page = await context.newPage();
 

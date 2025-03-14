@@ -24,24 +24,21 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   try {
-    // First create the bot persona
-    console.log("Initializing bot...");
+    const env = process.env.XMTP_ENV as XmtpEnv;
     const botPersona = await createAgent(["bot"], testName, "message");
     const bot = botPersona.get("bot");
     const client = bot?.client as Client;
 
-    const env = process.env.XMTP_ENV as XmtpEnv;
-    console.log(`Agent initialized on address ${bot?.address}`);
-    console.log(`Agent initialized on inbox ${client.inboxId}`);
-    console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
-
-    // Then create the dynamic agents
-    console.log("Initializing agent personas...");
     const agents = await createAgent(20, testName, "message", true);
     const commandHandler = new CommandHandler();
 
     console.log("Syncing conversations...");
     await client.conversations.sync();
+
+    console.log(`Agent initialized on address ${bot?.address}`);
+    console.log(`Agent initialized on inbox ${client.inboxId}`);
+    console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
+    console.log("Initializing agent personas...");
 
     console.log("Waiting for messages...");
     try {
