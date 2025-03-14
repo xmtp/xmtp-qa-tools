@@ -4,16 +4,18 @@ This document provides a comprehensive overview of the XMTP testing infrastructu
 
 ## Test Suites Overview
 
-| Test Suite  | Purpose                                                | Dev Network                                                                                                                                                                            | Production Network                                                                                                                                                                                          | Frequency    |
-| ----------- | ------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
-| Performance | Measures XMTP network performance                      | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml) | Every 30 min |
-| Delivery    | Tests message reliability across 200 streams           | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml)       | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml)       | Every 30 min |
-| Gm          | Tests GM bot functionality                             | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min |
-| Geolocation | Measures geolocation of the library in various regions | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min |
+| Test Suite  | Purpose                               | Dev Network                                                                                                                                                                            | Production Network                                                                                                                                                                                          | Frequency    |
+| ----------- | ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------ |
+| Performance | Measures SDK operations performance   | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance_production.yml) | Every 30 min |
+| Delivery    | Message reliability and ordering      | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_dev.yml)       | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery_production.yml)       | Every 30 min |
+| Gm          | Tests GM cross-platform functionality | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min |
+| Geolocation | Tests performance in various regions  | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min |
 
 ## 🚀 TS_Performance Test Suite
 
 The TS_Performance test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
+
+![TS_Performance](/datadog/ts_performance.png)
 
 ### Implementation Details
 
@@ -61,13 +63,18 @@ it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, as
 
 ### Associated Workflow
 
-The `TS_Performance.yml` workflow automates this test suite:
+The [`TS_Performance.yml`](/.github/workflows/TS_Performance.yml) workflow automates this test suite:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - ⚙️ **Configuration**: Supports adjustable batch size and group size parameters
 - 🔄 **Retry Mechanism**: Implements retry logic for test stability
 - 📊 **Metrics**: Reports comprehensive performance metrics to Datadog
 - 👁️ **Visibility**: Provides real-time visibility into XMTP network performance
+
+The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation.yml) workflow replicates this test suite for the production network.
+
+- **Regions**: `us-east, us-west, asia, europe`
+- **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 
 ### Monitoring Dashboard
 
@@ -108,26 +115,25 @@ For each operation, the test suite tracks network performance across five key ph
 | `processing`     | Server processing time (calculated as server_call - tls_handshake) |
 
 ```tsx
-// Handle network stats
-if (!skipNetworkStats) {
-  const networkStats = await getNetworkStats();
+const networkStats = await getNetworkStats();
 
-  for (const [statName, statValue] of Object.entries(networkStats)) {
-    const metricValue = statValue * 1000; // Convert to milliseconds
-    metrics.gauge(durationMetricName, metricValue, [
-      `libxmtp:${firstWorker.version}`,
-      `operation:${operationName}`,
-      `test:${testName}`,
-      `metric_type:network`,
-      `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
-    ]);
-  }
+for (const [statName, statValue] of Object.entries(networkStats)) {
+  const metricValue = statValue * 1000; // Convert to milliseconds
+  metrics.gauge(durationMetricName, metricValue, [
+    `libxmtp:${firstWorker.version}`,
+    `operation:${operationName}`,
+    `test:${testName}`,
+    `metric_type:network`,
+    `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
+  ]);
 }
 ```
 
 ## 📬 TS_Delivery Test Suite
 
 The TS_Delivery test suite rigorously evaluates message delivery reliability across multiple streams, ensuring messages are delivered correctly and in order under varying conditions.
+
+![TS_Delivery](/datadog/ts_delivery.png)
 
 ### Implementation Details
 
@@ -185,7 +191,7 @@ it("tc_stream_order: verify message order when receiving via streams", () => {
 
 ### Associated Workflow
 
-The `TS_Delivery.yml` workflow automates this test suite execution:
+The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery.yml) workflow automates this test suite execution:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - 🔧 **Configuration**: Optimizes system resources for SQLCipher performance
@@ -259,7 +265,7 @@ it("gm-bot: should check if bot is alive", async () => {
 
 ### Associated Workflow
 
-The `TS_Gm.yml` workflow automates the test suite execution:
+The [`TS_Gm.yml`](/.github/workflows/TS_Gm.yml) workflow automates the test suite execution:
 
 - ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
 - 🔄 **Retry Mechanism**: Uses up to 3 attempts for test stability
@@ -274,57 +280,3 @@ The `TS_Gm.yml` workflow automates the test suite execution:
 ### Monitoring Dashboard
 
 Results from this test suite feed into the [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nz), which provides real-time visibility into test execution status and is connected to the `#notify-eng-testing` Slack channel for alerts.
-
-## 🌎 TS_Geolocation Test Suite
-
-The TS_Geolocation test suite measures the geographical performance of the XMTP library across different regions, providing insights into regional variations in performance and reliability.
-
-### Implementation Details
-
-This test suite evaluates:
-
-- Regional performance differences
-- Latency variations across geographic locations
-- Network reliability in different regions
-- Regional message delivery rates
-
-### Associated Workflow
-
-The `TS_Geolocation.yml` workflow automates this test suite:
-
-- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
-- 📊 **Reporting**: Reports geolocation metrics to Datadog for monitoring
-- 🌐 **Coverage**: Tests both Dev and Production environments
-
-### Monitoring Dashboard
-
-Geolocation data feeds into both the main [Workflow Dashboard](https://app.datadoghq.com/dashboard/9we-bpa-nz) and has preset filters in the delivery dashboard for regional comparisons:
-
-- US region performance
-- South America region performance
-- Other global regions
-
-## 📊 Unified Monitoring & Observability
-
-All test suites integrate with a comprehensive Datadog monitoring system that provides:
-
-- 📝 Status events with detailed context for each test run
-- 📈 Success/failure metrics for monitoring
-- 🏷️ Data tagging with repository, branch, and trigger information
-- 🔗 Links to GitHub workflow runs for easy debugging
-- 🚨 Alerting capabilities for test failures
-
-### Metric Tagging System
-
-All metrics use a consistent tagging system to enable precise filtering and analysis:
-
-| Tag           | Description                              |
-| ------------- | ---------------------------------------- |
-| `libxmtp`     | XMTP library version                     |
-| `operation`   | Specific operation being measured        |
-| `test`        | Test name                                |
-| `metric_type` | "operation" or "network"                 |
-| `description` | Additional context                       |
-| `members`     | Number of members (for group operations) |
-
-These automated test suites and their monitoring infrastructure form a critical part of XMTP's continuous quality assurance system, ensuring network reliability and performance for all developers building on the protocol.
