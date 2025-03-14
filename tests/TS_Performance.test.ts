@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendTestResults } from "@helpers/datadog";
+import { exportTestResults, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { exportTestResults, logError } from "@helpers/tests";
+import { logError } from "@helpers/logger";
 import {
   IdentifierKind,
   type Conversation,

@@ -1,5 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
+import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
 let isInitialized = false;
@@ -18,7 +19,23 @@ function getCountryCodeFromGeo(geolocation: string): string {
 
   return geoToCountryCode[geolocation] || "US"; // Default to US if not found
 }
-
+export const exportTestResults = (
+  expect: any,
+  personas: WorkerManager,
+  start: number,
+) => {
+  const testName = expect.getState().currentTestName;
+  if (testName) {
+    console.timeEnd(testName as string);
+    expect(personas.getWorkers()).toBeDefined();
+    expect(personas.getWorkers().length).toBeGreaterThan(0);
+    void sendPerformanceMetric(
+      performance.now() - start,
+      testName as string,
+      personas.getVersion(),
+    );
+  }
+};
 export function initDataDog(
   testName: string,
   envValue: string,

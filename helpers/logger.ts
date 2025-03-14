@@ -199,3 +199,21 @@ export const overrideConsole = (logger: winston.Logger) => {
 if (!fs.existsSync("logs")) {
   fs.mkdirSync("logs");
 }
+
+export const logError = (e: any, expect: any): boolean => {
+  if (e instanceof Error) {
+    console.error(
+      `[vitest] Test failed in ${expect.getState().currentTestName}`,
+      e.message,
+    );
+  } else {
+    console.error(`Unknown error type:`, typeof e);
+  }
+  return true;
+};
+// export const removeDB = (fileName: string) => {
+//   const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
+//   console.log("testFilePath", fileName, testFilePath);
+//   fs.rmSync(".data", { recursive: true, force: true });
+// };
+

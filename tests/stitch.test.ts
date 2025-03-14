@@ -1,5 +1,4 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { listInstallations } from "@helpers/tests";
+import { closeEnv, listInstallations, loadEnv } from "@helpers/client";
 import { type Conversation } from "@helpers/types";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

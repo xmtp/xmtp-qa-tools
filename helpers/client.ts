@@ -151,3 +151,26 @@ export async function closeEnv(testName: string, personas: WorkerManager) {
     }
   }
 }
+
+export async function listInstallations(personas: WorkerManager) {
+  for (const persona of personas.getWorkers()) {
+    const inboxState = await persona.client?.inboxState();
+    if (inboxState) {
+      console.log(
+        persona.name,
+        "has",
+        inboxState.installations.length,
+        "installations",
+      );
+      //for (const installation of inboxState.installations) {
+      // console.debug(
+      //   persona.name +
+      //     "(" +
+      //     String(inboxState.installations.length) +
+      //     ")" +
+      //     installation.id,
+      // );
+      //}
+    }
+  }
+}

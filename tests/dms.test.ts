@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendTestResults } from "@helpers/datadog";
-import { exportTestResults, logError } from "@helpers/tests";
+import { exportTestResults, sendTestResults } from "@helpers/datadog";
+import { logError } from "@helpers/logger";
 import { type Conversation, type WorkerManager } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@workers/manager";

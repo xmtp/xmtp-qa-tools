@@ -4,15 +4,15 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 📋 Core Modules
 
-| Module                   | Purpose                                                |
-| ------------------------ | ------------------------------------------------------ |
-| [client.ts](#clientts)   | Creates signers and manages keys for test personas     |
-| [datadog.ts](#datadogts) | Sends performance metrics to Datadog                   |
-| [group.ts](#groupts)     | Creates test groups with specified participants        |
-| [logger.ts](#loggerts)   | Logging utilities for test output                      |
-| [test.ts](#testts)       | Test utilities for creating and managing tests         |
-| [types.ts](#typests)     | Type definitions used throughout the testing framework |
-| [verify.ts](#verifyts)   | Validation utilities for testing message delivery      |
+| Module                   | Purpose                                            |
+| ------------------------ | -------------------------------------------------- |
+| [client.ts](#clientts)   | Creates signers and manages keys for test personas |
+| [datadog.ts](#datadogts) | Sends performance metrics to Datadog               |
+| [group.ts](#groupts)     | Creates test groups with specified participants    |
+| [logger.ts](#loggerts)   | Logging utilities for test output                  |
+| [test.ts](#testts)       | Test utilities for creating and managing tests     |
+| [verify.ts](#verifyts)   | Validation utilities for testing message delivery  |
+| [railway.ts](#railwayts) | Railway utilities for testing message delivery     |
 
 ## 🔍 Module Details
 
@@ -88,86 +88,6 @@ overrideConsole(logger);
 flushLogger(testName);
 ```
 
-### main.ts
-
-Worker client implementation for multi-threaded testing:
-
-```typescript
-// Create a worker client for a persona
-const worker = new WorkerClient(persona, typeofStream);
-
-// Initialize the worker with an XMTP client
-const { client, dbPath, version } = await worker.initialize();
-
-// Collect messages from a conversation
-const messages = await worker.collectMessages(groupId, contentType, count);
-
-// Collect conversation events
-const conversations = await worker.collectConversations(peerAddress, count);
-
-// Clean up when done
-await worker.terminate();
-```
-
-### reflect.ts
-
-Integration with the Reflect testing platform:
-
-```typescript
-// Create a Reflect test suite
-const reflectTestSuite = new ReflectTestSuite();
-
-// Run GM sending test
-const result = await reflectTestSuite.runSendingGmTest();
-
-// Monitor test execution status
-await reflectTestSuite.pollExecutionStatus(reflectTestSuite, executionId);
-```
-
-### thread.ts
-
-Worker thread implementation for background processing:
-
-```typescript
-// Listen for messages from parent thread
-parentPort.on("message", (message) => {
-  // Handle initialization and other commands
-});
-
-// Error handling for worker threads
-process.on("unhandledRejection", (reason) => {
-  console.error("[Worker] Unhandled Rejection:", reason);
-});
-```
-
-### types.ts
-
-Type definitions used throughout the testing framework:
-
-```typescript
-// Core types for personas and clients
-interface Worker {
-  name: string;
-  installationId: string;
-  version: string;
-  dbPath: string;
-  worker: WorkerClient | null;
-  client: Client | null;
-}
-
-// Message and conversation stream types
-type WorkerStreamMessage = {
-  type: "stream_message";
-  message: DecodedMessage;
-};
-
-// Verification result types
-type VerifyStreamResult = {
-  allReceived: boolean;
-  messages: string[][];
-};
-```
-
 ### verify.ts
 
 Validation utilities for testing message delivery:
@@ -197,3 +117,43 @@ const stats = calculateMessageStats(
   suffix,
 );
 ```
+
+### railway.ts
+
+The `helpers/railway.ts` module provides utility functions for interacting with Railway deployments:
+
+### getLatestDeployment()
+
+Fetches the most recent deployment for your Railway service using the Railway GraphQL API.
+
+```typescript
+import { getLatestDeployment } from "./helpers/railway";
+
+// Get the latest deployment information
+const deployment = await getLatestDeployment();
+console.log(`Latest deployment ID: ${deployment.id}`);
+console.log(`Static URL: ${deployment.staticUrl}`);
+```
+
+### redeployDeployment(deploymentId)
+
+Triggers a redeployment of a specific deployment using the Railway GraphQL API.
+
+```typescript
+import { getLatestDeployment, redeployDeployment } from "./helpers/railway";
+
+// Get the latest deployment and then redeploy it
+const latestDeployment = await getLatestDeployment();
+const redeployedDeployment = await redeployDeployment(latestDeployment.id);
+
+console.log(`Redeployed deployment status: ${redeployedDeployment.status}`);
+```
+
+### Required environment variables
+
+To use these functions, you need to set the following environment variables:
+
+- `RAILWAY_SERVICE_ID`: The ID of your Railway service
+- `RAILWAY_API_TOKEN`: Your Railway API token
+- `RAILWAY_PROJECT_ID`: Your Railway project ID
+- `RAILWAY_ENVIRONMENT_ID`: Your Railway environment ID

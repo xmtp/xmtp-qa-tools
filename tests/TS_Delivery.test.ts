@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
-import { logError } from "@helpers/tests";
+import { logError } from "@helpers/logger";
 import {
   defaultValues,
   type Group,

@@ -332,6 +332,7 @@
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
+        "time": {},
         "type": "query_table",
         "requests": [
           {
@@ -339,7 +340,12 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,$env,$geo,$test,$libxmtp,$members} by {network_phase,geo}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,env:production,$geo,$test,$libxmtp,$members} by {network_phase,geo}"
+              },
+              {
+                "data_source": "metrics",
+                "name": "query2",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,env:dev,$geo,$test,$libxmtp,$members} by {network_phase,geo}"
               }
             ],
             "response_format": "scalar",
@@ -347,7 +353,10 @@
               "order_by": [{ "type": "group", "name": "geo", "order": "asc" }],
               "count": 500
             },
-            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
+            "formulas": [
+              { "alias": "Production (ms)", "formula": "query1" },
+              { "alias": "Dev (ms)", "formula": "query2" }
+            ]
           }
         ],
         "has_search_bar": "auto"
@@ -360,7 +369,7 @@
       "name": "env",
       "prefix": "env",
       "available_values": ["dev", "production"],
-      "default": "*"
+      "default": "production"
     },
     {
       "name": "geo",
@@ -409,9 +418,9 @@
   "notify_list": [],
   "template_variable_presets": [
     {
-      "name": "us",
+      "name": "asia",
       "template_variables": [
-        { "name": "geo", "value": "us-east" },
+        { "name": "geo", "value": "asia" },
         { "name": "test", "value": "ts_performance" }
       ]
     },
@@ -423,9 +432,9 @@
       ]
     },
     {
-      "name": "asia",
+      "name": "us",
       "template_variables": [
-        { "name": "geo", "value": "asia" },
+        { "name": "geo", "value": "us-east" },
         { "name": "test", "value": "ts_performance" }
       ]
     }

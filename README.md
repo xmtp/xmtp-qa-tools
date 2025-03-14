@@ -33,6 +33,22 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 _Note: Based on data from 79 measured operations in the `us-east` testing environment._
 
+### Dev vs Production Performance Comparison
+
+| Operation           | Dev Avg (ms) | Production Avg (ms) | Difference | Status               |
+| ------------------- | ------------ | ------------------- | ---------- | -------------------- |
+| createDM            | 289          | 256                 | -11.4%     | ✅ Production Better |
+| sendGM              | 140          | 128                 | -8.6%      | ✅ Production Better |
+| receiveGM           | 96           | 91                  | -5.2%      | ✅ Production Better |
+| receiveGroupMessage | 130          | 122                 | -6.2%      | ✅ Production Better |
+| updateGroupName     | 110          | 105                 | -4.5%      | ✅ Production Better |
+| syncGroup           | 94           | 84                  | -10.6%     | ✅ Production Better |
+| addMembers          | 292          | 245                 | -16.1%     | ✅ Production Better |
+| removeMembers       | 175          | 152                 | -13.1%     | ✅ Production Better |
+| inboxState          | 39           | 36                  | -7.7%      | ✅ Production Better |
+
+_Note: Production environment consistently outperforms Dev across all operations, with improvements ranging from 4.5% to 16.1%._
+
 ### Group Operations Performance by Size
 
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
@@ -71,6 +87,19 @@ _Note: Performance metrics based on `us-east` testing on dev and production netw
 | south-america | 754.6           | 573.1             | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the `us-east` baseline._
+
+### Dev vs Production Network Performance Comparison
+
+| Region        | Dev Server Call (ms) | Production Server Call (ms) | Difference | Status               |
+| ------------- | -------------------- | --------------------------- | ---------- | -------------------- |
+| us-east       | 294.8                | 276.6                       | -6.2%      | ✅ Production Better |
+| us-west       | 247.1                | 229.3                       | -7.2%      | ✅ Production Better |
+| europe        | 196.3                | 178.5                       | -9.1%      | ✅ Production Better |
+| us            | 168.9                | 155.7                       | -7.8%      | ✅ Production Better |
+| asia          | 439.8                | 411.0                       | -6.5%      | ✅ Production Better |
+| south-america | 798.2                | 754.6                       | -5.5%      | ✅ Production Better |
+
+_Note: Production environment consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
 ### Message delivery testing
 
@@ -111,18 +140,19 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 
 ### Success criteria summary
 
-| Metric                  | Current Performance       | Target                 | Status                 |
-| ----------------------- | ------------------------- | ---------------------- | ---------------------- |
-| Core SDK Operations     | All within targets        | Meet defined targets   | ✅ On Target           |
-| Group Operations        | ≤300 members              | ≤300 members on target | ✅ On Target           |
-| Network Performance     | All metrics within target | Meet defined targets   | ✅ On Target           |
-| Message Delivery        | 100%                      | 99.9% minimum          | ✅ On Target           |
-| Stream Message Loss     | 100%                      | 99.9% minimum          | ✅ On Target           |
-| Poll Message Loss       | 100%                      | 99.9% minimum          | ✅ On Target           |
-| Message Order           | 100%                      | 100% in order          | ✅ On Target           |
-| Cross-SDK Compatibility | 100%                      | 100% operation success | ✅ On Target           |
-| South-america & Asia    | more than 40%             | <20% difference        | ⚠️ Performance Concern |
-| US & Europe             | less than 20% variance    | <20% difference        | ✅ On Target           |
+| Metric                  | Current Performance         | Target                 | Status                 |
+| ----------------------- | --------------------------- | ---------------------- | ---------------------- |
+| Core SDK Operations     | All within targets          | Meet defined targets   | ✅ On Target           |
+| Group Operations        | ≤300 members                | ≤300 members on target | ✅ On Target           |
+| Network Performance     | All metrics within target   | Meet defined targets   | ✅ On Target           |
+| Message Delivery        | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Stream Message Loss     | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Poll Message Loss       | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Message Order           | 100%                        | 100% in order          | ✅ On Target           |
+| Cross-SDK Compatibility | 100%                        | 100% operation success | ✅ On Target           |
+| South-america & Asia    | more than 40%               | <20% difference        | ⚠️ Performance Concern |
+| US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target           |
+| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
 #### Disclaimers
 
