@@ -69,35 +69,35 @@ _Note: Performance increases significantly beyond `350` members, which represent
 
 | Performance Metric   | Current Performance | Target            | Status       |
 | -------------------- | ------------------- | ----------------- | ------------ |
-| Server Call Response | 78.4ms avg          | <100ms P95        | ✅ On Target |
-| TLS Handshake        | 83.6ms avg          | <100ms P95        | ✅ On Target |
+| Server Call Response | 78.4ms avg          | <100ms            | ✅ On Target |
+| TLS Handshake        | 83.6ms avg          | <100ms            | ✅ On Target |
 | Message Processing   | 212.5ms avg         | <300ms end-to-end | ✅ On Target |
 
 _Note: Performance metrics based on `us-east` testing on dev and production network._
 
 ### Regional Network Performance
 
-| Region        | Server_Call(ms) | TLS_Handshake(ms) | ~ us-east | Status                 |
-| ------------- | --------------- | ----------------- | --------- | ---------------------- |
-| us-east       | 276.6           | 87.2              | Baseline  | ✅ On Target           |
-| us-west       | 229.3           | 111.1             | -15.6%    | ✅ On Target           |
-| europe        | 178.5           | 111.4             | -33.2%    | ✅ On Target           |
-| us            | 155.7           | 121.0             | -40.8%    | ✅ On Target           |
-| asia          | 411.0           | 103.7             | +46.5%    | ⚠️ Performance Concern |
-| south-america | 754.6           | 573.1             | +160.3%   | ⚠️ Performance Concern |
+| Region        | Server Call (ms) | TLS (ms) | ~ us-east | Status                 |
+| ------------- | ---------------- | -------- | --------- | ---------------------- |
+| us-east       | 276.6            | 87.2     | Baseline  | ✅ On Target           |
+| us-west       | 229.3            | 111.1    | -15.6%    | ✅ On Target           |
+| europe        | 178.5            | 111.4    | -33.2%    | ✅ On Target           |
+| us            | 155.7            | 121.0    | -40.8%    | ✅ On Target           |
+| asia          | 411.0            | 103.7    | +46.5%    | ⚠️ Performance Concern |
+| south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Regional performance testing shows significant latency increases in south-america (+160.3%) and asia (+46.5%) regions compared to the `us-east` baseline._
 
 ### Dev vs Production Network Performance Comparison
 
-| Region        | Dev Server Call (ms) | Production Server Call (ms) | Difference | Status               |
-| ------------- | -------------------- | --------------------------- | ---------- | -------------------- |
-| us-east       | 294.8                | 276.6                       | -6.2%      | ✅ Production Better |
-| us-west       | 247.1                | 229.3                       | -7.2%      | ✅ Production Better |
-| europe        | 196.3                | 178.5                       | -9.1%      | ✅ Production Better |
-| us            | 168.9                | 155.7                       | -7.8%      | ✅ Production Better |
-| asia          | 439.8                | 411.0                       | -6.5%      | ✅ Production Better |
-| south-america | 798.2                | 754.6                       | -5.5%      | ✅ Production Better |
+| Region        | Dev (ms) | Production (ms) | Difference | Status               |
+| ------------- | -------- | --------------- | ---------- | -------------------- |
+| us-east       | 294.8    | 276.6           | -6.2%      | ✅ Production Better |
+| us-west       | 247.1    | 229.3           | -7.2%      | ✅ Production Better |
+| europe        | 196.3    | 178.5           | -9.1%      | ✅ Production Better |
+| us            | 168.9    | 155.7           | -7.8%      | ✅ Production Better |
+| asia          | 439.8    | 411.0           | -6.5%      | ✅ Production Better |
+| south-america | 798.2    | 754.6           | -5.5%      | ✅ Production Better |
 
 _Note: Production environment consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
