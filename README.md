@@ -107,6 +107,8 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 | Web ↔ Node SDK          | Client-to-Agent communication | ✅ Verified |
 | React Native ↔ Node SDK | Client-to-Agent communication | ✅ Verified |
 
+_Note: Cross-SDK was tested using the `operations` describe above and is not covering all edge cases._
+
 ### Success criteria summary
 
 | Metric                  | Current Performance        | Target                     | Status                 |
@@ -117,7 +119,7 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 | Message Delivery        | 100%                       | 99.9% minimum              | ✅ On Target           |
 | Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
 | Stream Message Loss     | 100%                       | 99.9% minimum              | ✅ On Target           |
-| Cross-SDK Compatibility |                            | 100% operation success     | ⏳ WIP                 |
+| Cross-SDK Compatibility | 100%                       | 100% operation success     | ✅ On Target           |
 | South-america & Asia    | more than 40%              | <20% difference            | ⚠️ Performance Concern |
 | US & Europe             | less than 20% variance     | <20% difference            | ✅ On Target           |
 
