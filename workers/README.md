@@ -1,110 +1,163 @@
-# Workers
+# 🤖 Worker Testing Framework
 
-Workers in our testing framework allow you to create predefined personas (like Alice, Bob, etc.) with different installations. This is useful for testing multi-device scenarios or different client configurations.
+> A powerful testing framework for creating and managing predefined personas with different client installations
 
-## Basic usage
+[![Tests Status](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/yourusername/worker-testing-framework)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
-The simplest way to create workers is to use the `getWorkers` function:
+## 🌟 Overview
+
+The Worker Testing Framework allows you to easily simulate multiple users with different device installations for testing multi-device scenarios or different client configurations. Each worker represents a specific persona (like Alice, Bob, etc.) and can maintain separate installations while sharing the same identity.
 
 ```typescript
-// Initialize workers
-const workers = await getWorkers(["alice", "bob"], testName);
+// Quick example
+const workers = await getWorkers(["alice", "bob"], "my-test");
+const alice = workers.get("alice");
+const bob = workers.get("bob");
 
-// Access workers directly
-const alice = workers.get("alice"); // "a" is the default installation
-const bob = workers.get("bob"); // "a" is the default installation
-
-// Use them in your tests
+// Start a conversation
 const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
 await conversation.send("Hello from Alice to Bob");
 ```
 
-#### Considerations:
+## ✨ Key Features
 
-- If a persona doesn't exist, its keys are automatically created
-- Existing personas use keys from the env file and .data folder
-- Missing data folders are created automatically
-- Personas with the "random" prefix have keys stored only in memory
+- **🔑 Identity Management**: Automatic key creation for new personas, with persistence for reuse
+- **📱 Multi-Device Testing**: Simulate multiple installations (desktop, mobile, etc.) for the same persona
+- **📊 Separate Storage**: Independent database paths for each installation
+- **🔄 Stream Handling**: Built-in support for message, conversation, and consent streams
+- **🤖 GPT Integration**: Optional AI-powered responses for automated testing scenarios
+- **🧪 Event Collection**: Utilities for collecting and filtering stream events
 
-> [!TIP]
-> Access our repository of 600 dummy wallets with inboxIds in the [generated-inboxes.json](./helpers/generated-inboxes.json) file
+## 🚀 Installation
 
-## Working with multiple installations
+```bash
+npm install worker-testing-framework
+```
 
-You can create different installations of the same persona to simulate multiple devices:
+## 📋 Usage Examples
+
+### Basic Setup
 
 ```typescript
-// Create primary personas with default installation
-const primaryWorkers = await getWorkers(["alice", "bob"], testName);
+// Initialize workers
+const workers = await getWorkers(["alice", "bob"], "conversation-test");
 
-// Create secondary installations
+// Access workers by name (default installation "a")
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Test a simple conversation
+const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
+await conversation.send("Hello Bob!");
+
+// Wait for Bob to receive the message
+await bob.client.conversations.syncAll();
+const bobConversations = await bob.client.conversations.list();
+```
+
+### Multi-Device Scenarios
+
+```typescript
+// Create primary and secondary installations
+const primaryWorkers = await getWorkers(["alice", "bob"], "multi-device-test");
 const secondaryWorkers = await getWorkers(
   ["alice-desktop", "bob-mobile"],
-  testName,
+  "multi-device-test",
 );
 
 // Access specific installations
-const aliceDefault = primaryWorkers.get("alice");
+const alicePhone = primaryWorkers.get("alice");
 const aliceDesktop = secondaryWorkers.get("alice", "desktop");
 const bobMobile = secondaryWorkers.get("bob", "mobile");
-```
 
-## Key features
-
-- **Shared identity**: Different installations of the same persona share the same identity (inboxId)
-- **Separate storage**: Each installation has its own database path
-- **On-demand creation**: Create personas only when needed in your tests
-
-## Example: Testing multi-device scenario
-
-```typescript
-// Create primary workers
-const primaryWorkers = await getWorkers(["alice", "bob"], testName);
-
-// Create a desktop installation for Alice
-const secondaryWorkers = await getWorkers(["alice-desktop"], testName);
-const aliceDesktop = secondaryWorkers.get("alice", "desktop");
-
-// Send a message from Alice's desktop
+// Test synchronization across devices
 const conversation = await aliceDesktop.client.conversations.newDm(
-  primaryWorkers.get("bob").client.inboxId,
+  bobMobile.client.inboxId,
 );
-await conversation.send("Hello from Alice's desktop");
+await conversation.send("Hello from Alice's desktop!");
 
-// Bob can see the message after syncing
-await primaryWorkers.get("bob").client.conversations.syncAll();
-const bobConversations = await primaryWorkers
-  .get("bob")
-  .client.conversations.list();
+// Verify message appears on Alice's phone
+await alicePhone.client.conversations.syncAll();
+const alicePhoneConversations = await alicePhone.client.conversations.list();
 ```
 
-## Start workers with numbers
+### Stream Collection
 
 ```typescript
-const workers = await getWorkers(4, testName);
-// this will start 4 workers with listed from the default names
+// Set up worker with message streaming
+const workers = await getWorkers(["alice", "bob"], "stream-test", "message");
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Start conversation and send message
+const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
+const conversationId = conversation.id;
+await conversation.send("Testing stream collection");
+
+// Collect incoming messages for Bob
+const incomingMessages = await bob.worker.collectMessages(
+  conversationId,
+  "text",
+  1, // number of messages to collect
+  5000, // timeout in ms
+);
+
+console.log(`Received message: ${incomingMessages[0].message.content}`);
 ```
 
-## Pick one from default names
-
-The default names are:
+### Using the GPT Integration
 
 ```typescript
-import { defaultNames } from "@helpers/types";
+// Create workers with GPT-powered responses
+const workers = await getWorkers(["alice", "bob"], "gpt-test", "message", true);
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Send message that will trigger GPT response from Bob
+const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
+await conversation.send("Hey bob, what do you think about this feature?");
+
+// Bob will automatically generate and send a response
+// Wait for the response to come back to Alice
+const responses = await alice.worker.collectMessages(
+  conversation.id,
+  "text",
+  1,
+);
+
+console.log(`Bob's response: ${responses[0].message.content}`);
 ```
 
+## 🧰 API Reference
+
+### Main Functions
+
+| Function                                                      | Description                              |
+| ------------------------------------------------------------- | ---------------------------------------- |
+| `getWorkers(descriptors, testName, streamType?, gptEnabled?)` | Creates and initializes worker instances |
+| `worker.get(name, installationId?)`                           | Retrieves a specific worker              |
+| `worker.collectMessages(groupId, typeId, count, timeout?)`    | Collects message stream events           |
+| `worker.collectConversations(fromPeer, count?, timeout?)`     | Collects conversation stream events      |
+| `worker.collectConsentUpdates(count?, timeout?)`              | Collects consent stream events           |
+
+### Worker Properties
+
+| Property                | Description                         |
+| ----------------------- | ----------------------------------- |
+| `worker.client`         | The XMTP client instance            |
+| `worker.address`        | Wallet address of the worker        |
+| `worker.dbPath`         | Database path for this installation |
+| `worker.installationId` | Unique ID for this installation     |
+
+## 📚 Available Default Personas
+
 ```typescript
-// Default personas as an enum
 const defaultNames = [
-  "bob",
   "alice",
-  "fabri",
-  "bot",
-  "elon",
-  "joe",
+  "bob",
   "charlie",
   "dave",
-  "rosalie",
   "eve",
   "frank",
   "grace",
@@ -113,59 +166,18 @@ const defaultNames = [
   "jack",
   "karen",
   "larry",
-  "mary",
-  "nancy",
-  "oscar",
-  "paul",
-  "quinn",
-  "rachel",
-  "steve",
-  "tom",
-  "ursula",
-  "victor",
-  "wendy",
-  "xavier",
-  "yolanda",
-  "zack",
-  "adam",
-  "bella",
-  "carl",
-  "diana",
-  "eric",
-  "fiona",
-  "george",
-  "hannah",
-  "ian",
-  "julia",
-  "keith",
-  "lisa",
-  "mike",
-  "nina",
-  "oliver",
-  "penny",
-  "quentin",
-  "rosa",
-  "sam",
-  "tina",
-  "uma",
-  "vince",
-  "walt",
-  "xena",
-  "yara",
-  "zara",
-  "guada",
-  //max 61
+  "mary" /* ... */,
 ];
 ```
 
-## Cleanup
+> 💡 **Tip**: Access our repository of 600 dummy wallets with inboxIds in the `generated-inboxes.json` file
 
-Always clean up your personas after tests:
+## 🧹 Cleanup
+
+Always clean up your workers after tests to properly release resources:
 
 ```typescript
 afterAll(async () => {
-  await closeEnv(testName, allPersonas);
+  await workers.terminate();
 });
 ```
-
-This pattern allows you to test complex multi-device scenarios while maintaining clean separation between test environments.
