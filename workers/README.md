@@ -2,9 +2,6 @@
 
 > A powerful testing framework for creating and managing predefined personas with different client installations
 
-[![Tests Status](https://img.shields.io/badge/tests-passing-brightgreen.svg)](https://github.com/yourusername/worker-testing-framework)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
-
 ## 🌟 Overview
 
 The Worker Testing Framework allows you to easily simulate multiple users with different device installations for testing multi-device scenarios or different client configurations. Each worker represents a specific persona (like Alice, Bob, etc.) and can maintain separate installations while sharing the same identity.
