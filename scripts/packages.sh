@@ -75,17 +75,17 @@ test_package_manager() {
         
         case $pm in
             "pnpm")
-                pnpm install && pnpm run build && pnpm run check || test_success=false
+                pnpm install && pnpm run build && pnpm run client-check || test_success=false
                 ;;
             "npm")
-                npm install && npm run build && npm run check || test_success=false
+                npm install && npm run build && npm run client-check || test_success=false
                 ;;
             "bun")
-                bun install && bun run build && bun check || test_success=false
+                bun install && bun run build && bun client-check || test_success=false
                 ;; 
             "yarn")
                 touch yarn.lock
-                yarn install && yarn build && yarn check || test_success=false
+                yarn install && yarn build && yarn client-check || test_success=false
                 ;;
         esac
         

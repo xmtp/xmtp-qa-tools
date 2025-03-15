@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "check": "tsx src/check.ts",
+    "client-check": "tsx src/check.ts",
     "start": "tsx src/index.ts"
   },
   "dependencies": {

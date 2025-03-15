@@ -23,8 +23,7 @@
     "redeploy": "tsx scripts/redeploy.ts",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest",
-    "test:packages": "./scripts/packages.sh",
-    "test:yarn1": "./scripts/yarn1.sh"
+    "test:packages": "./scripts/packages.sh"
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
