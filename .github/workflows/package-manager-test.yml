@@ -7,9 +7,6 @@ on:
 jobs:
   test-package-managers:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: bots/gm-bot
     steps:
       - uses: actions/checkout@v4
 
@@ -18,23 +15,7 @@ jobs:
         with:
           node-version: 20
 
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v1
-        with:
-          bun-version: latest
-
-      - name: Install pnpm
-        run: npm install -g pnpm
-
-      - name: Cache dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            bots/gm-bot/node_modules
-            ~/.bun/install/cache
-          key: ${{ runner.os }}-deps-${{ hashFiles('bots/gm-bot/package.json') }}
-
       - name: Run package manager tests
         run: |
-          chmod +x ../../scripts/packages.sh
-          ../../scripts/packages.sh
+          chmod +x ./scripts/packages.sh
+          ./scripts/packages.sh
