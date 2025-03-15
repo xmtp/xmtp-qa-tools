@@ -2,8 +2,8 @@ name: TS_Gm_dev
 description: "should verify performance of the library in the dev network"
 
 on:
-  pull_request:
-    branches: [any]
+  push:
+    branches-ignore: [main]
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:

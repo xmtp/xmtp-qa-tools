@@ -1,8 +1,8 @@
 name: Validate code quality
 
 on:
-  pull_request:
-    branches: [any]
+  push:
+    branches-ignore: [main]
 
 jobs:
   check:
