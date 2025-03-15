@@ -49,7 +49,7 @@ jobs:
       - name: Create deployment branch
         run: |
           VERSION="${{ needs.detect-version-bump.outputs.new_version }}"
-          BRANCH_NAME="bots"
+          BRANCH_NAME="deploy"
 
           # Create new branch (or reset if it exists)
           git checkout -B $BRANCH_NAME
@@ -59,7 +59,7 @@ jobs:
           git add deploy-metadata.json
 
           # Commit and push
-          git commit -m "Update bots to version $VERSION"
+          git commit -m "Update deploy to version $VERSION"
           git push -f origin $BRANCH_NAME
 
       - name: Create PR
@@ -74,7 +74,7 @@ jobs:
             const existingPRs = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: `${context.repo.owner}:bots`,
+              head: `${context.repo.owner}:deploy`,
               state: 'open'
             });
 
@@ -92,9 +92,9 @@ jobs:
             const pr = await github.rest.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: `Deploy bots version ${version}`,
-              body: `Automatic PR for deploying bots version ${version}`,
-              head: 'bots',
+              title: `Deploy deploy version ${version}`,
+              body: `Automatic PR for deploying deploy version ${version}`,
+              head: 'deploy',
               base: 'main'
             });
             return pr.data.number;

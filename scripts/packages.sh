@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Navigate to the gm-bot directory
+cd bots/gm-bot || exit 1
+
+touch yarn.lock
 # Add this at the beginning of the script
 corepack disable
 
@@ -18,8 +22,21 @@ check_nvm() {
     fi
 }
 
-# Navigate to the gm-bot directory
-cd bots/gm-bot || exit 1
+
+# At the beginning of the script
+ROOT_PACKAGE_JSON="../package.json"
+ROOT_PACKAGE_JSON_BACKUP="../package.json.backup"
+
+# Backup and modify root package.json if it exists and has packageManager field
+if [ -f "$ROOT_PACKAGE_JSON" ]; then
+    if grep -q "\"packageManager\"" "$ROOT_PACKAGE_JSON"; then
+        echo "📦 Temporarily backing up root package.json to avoid packageManager conflicts"
+        cp "$ROOT_PACKAGE_JSON" "$ROOT_PACKAGE_JSON_BACKUP"
+        # Remove packageManager field for testing
+        sed -i.bak '/packageManager/d' "$ROOT_PACKAGE_JSON"
+        rm -f "$ROOT_PACKAGE_JSON.bak"
+    fi
+fi
 
 # Function to test a package manager with different Node versions
 test_package_manager() {
@@ -50,21 +67,24 @@ test_package_manager() {
         rm -f pnpm-lock.yaml
         rm -f yarn.lock
         
+        # Disable corepack before each package manager test
+        corepack disable
+        
         local test_success=true
         
         case $pm in
             "pnpm")
-                pnpm install --ignore-workspace && pnpm run build && pnpm test || test_success=false
+                pnpm install && pnpm run build && pnpm run check || test_success=false
                 ;;
             "npm")
-                npm install && npm run build && npm test || test_success=false
+                npm install && npm run build && npm run check || test_success=false
                 ;;
             "bun")
-                bun install && bun run build && bun test || test_success=false
-                ;;
+                bun install && bun run build && bun check || test_success=false
+                ;; 
             "yarn")
                 touch yarn.lock
-                yarn install && yarn build && yarn test || test_success=false
+                yarn install && yarn build && yarn check || test_success=false
                 ;;
         esac
         
@@ -140,4 +160,11 @@ echo "-----------------------------------"
 echo "🎉 Testing completed!"
 
 # Re-enable corepack at the end
-corepack enable 
+corepack enable
+
+# At the end of the script
+# Restore original package.json if we backed it up
+if [ -f "$ROOT_PACKAGE_JSON_BACKUP" ]; then
+    echo "📦 Restoring original root package.json"
+    mv "$ROOT_PACKAGE_JSON_BACKUP" "$ROOT_PACKAGE_JSON"
+fi 
