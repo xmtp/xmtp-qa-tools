@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Unset PREFIX immediately if it exists to avoid nvm conflicts
+if [ ! -z "$PREFIX" ]; then
+    echo "Unsetting PREFIX environment variable to avoid nvm conflicts"
+    unset PREFIX
+fi
+
 # Navigate to the gm-bot directory
 cd bots/gm-bot || exit 1
 
@@ -13,15 +19,10 @@ corepack disable
 # Check if nvm is available after sourcing
 check_nvm() {
     if [ -z "$(command -v nvm)" ]; then
+        echo "❌ nvm not found. Please install nvm first."
         exit 1
     fi
-    
-    # Unset PREFIX if it exists to avoid nvm conflicts
-    if [ ! -z "$PREFIX" ]; then
-        unset PREFIX
-    fi
 }
-
 
 # At the beginning of the script
 ROOT_PACKAGE_JSON="../package.json"
@@ -131,7 +132,6 @@ check_package_managers() {
 }
 
 # Main execution
-declare -A all_results
 package_managers=("pnpm" "npm" "yarn" "bun")
 
 echo "🔍 Starting package manager compatibility tests"
