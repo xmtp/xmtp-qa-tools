@@ -3,8 +3,12 @@ name: Package Manager Compatibility Test
 on:
   push:
     branches: [main, master]
+    paths:
+      - "bots/gm-bot/**"
   pull_request:
     branches: [main, master]
+    paths:
+      - "bots/gm-bot/**"
   workflow_dispatch:
 
 jobs:
@@ -55,16 +59,24 @@ jobs:
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-          # Ensure global npm packages are in PATH
-          export PATH="$(npm config get prefix)/bin:$PATH"
+          # Add package managers to PATH
+          export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
+          export BUN_PATH="$HOME/.bun/bin"
+          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$PATH"
 
           # Verify package managers are available
           echo "Checking package managers:"
-          which npm
-          which yarn
-          which pnpm
-          which bun
+          which npm || echo "npm not found"
+          which yarn || echo "yarn not found"
+          which pnpm || echo "pnpm not found"
+          which bun || echo "bun not found"
 
-          # Make the script executable and run it
-          chmod +x ./scripts/packages.sh
-          ./scripts/packages.sh
+          # Only proceed if all package managers are available
+          if which npm && which yarn && which pnpm && which bun; then
+            # Make the script executable and run it
+            chmod +x ./scripts/packages.sh
+            ./scripts/packages.sh
+          else
+            echo "Some package managers are missing. Cannot proceed."
+            exit 1
+          fi
