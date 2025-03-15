@@ -22,13 +22,6 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install NVM
-        run: |
-          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-          nvm --version
-
       - name: Install package managers
         run: |
           # Install required package managers
@@ -39,43 +32,36 @@ jobs:
           # Source bashrc to make bun available
           source ~/.bashrc
 
-          # Add bun to PATH
-          export BUN_PATH="$HOME/.bun/bin"
-          echo "PATH=$BUN_PATH:$PATH" >> $GITHUB_ENV
+          # Determine paths
+          NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
+          BUN_PATH="$HOME/.bun/bin"
 
-          # Ensure global npm packages are in PATH
-          export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
-          echo "PATH=$NPM_GLOBAL_PATH:$PATH" >> $GITHUB_ENV
+          # Export paths to GITHUB_PATH (preferred over GITHUB_ENV for PATH modifications)
+          echo "$NPM_GLOBAL_PATH" >> $GITHUB_PATH
+          echo "$BUN_PATH" >> $GITHUB_PATH
 
-          # Add PNPM to PATH explicitly
+          # Create PNPM_HOME dir and configure it
           export PNPM_HOME="$HOME/.local/share/pnpm"
           mkdir -p "$PNPM_HOME"
-          echo "PATH=$PNPM_HOME:$PATH" >> $GITHUB_ENV
+          echo "$PNPM_HOME" >> $GITHUB_PATH
+
+          # Add PNPM to current session PATH
+          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$PNPM_HOME:$PATH"
+
+          # Set up PNPM properly
+          pnpm setup
 
           # Verify installations
           echo "Node version: $(node --version)"
-          echo "NPM version: $(npm --version)"
+          echo "NPM version: $(npm --version)" 
           echo "Yarn version: $(yarn --version)"
           echo "PNPM version: $(pnpm --version || echo 'Not available')"
           echo "Bun version: $(bun --version || echo 'Not available')"
 
-          # Disable corepack initially (script will handle it)
-          corepack disable
-
       - name: Run package manager tests
         run: |
-          # Source bashrc to make bun available
+          # Source bashrc again to ensure all paths are available
           source ~/.bashrc
-
-          # Source NVM
-          export NVM_DIR="$HOME/.nvm"
-          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-          # Add package managers to PATH
-          export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
-          export BUN_PATH="$HOME/.bun/bin"
-          export PNPM_HOME="$HOME/.local/share/pnpm"
-          export PATH="$BUN_PATH:$NPM_GLOBAL_PATH:$PNPM_HOME:$PATH"
 
           # Verify package managers are available
           echo "Checking package managers:"
@@ -84,21 +70,16 @@ jobs:
           which pnpm || echo "pnpm not found"
           which bun || echo "bun not found"
 
-          # Install pnpm if not available
-          if ! which pnpm; then
-            echo "Installing pnpm again..."
-            npm install -g pnpm@latest
-            # Make sure pnpm is in PATH after installation
-            export PNPM_HOME="$HOME/.local/share/pnpm"
-            export PATH="$PNPM_HOME:$(npm config get prefix)/bin:$PATH"
+          # Create a symlink to ensure pnpm is found where expected
+          if [ ! -d "$HOME/.local/share/pnpm" ] && which pnpm; then
+            mkdir -p "$HOME/.local/share/pnpm"
+            ln -sf "$(which pnpm)" "$HOME/.local/share/pnpm/pnpm"
+            export PATH="$HOME/.local/share/pnpm:$PATH"
           fi
 
-          # Only proceed if all package managers are available
-          if which npm && which yarn && which pnpm && which bun; then
-            # Make the script executable and run it
-            chmod +x ./scripts/packages.sh
-            ./scripts/packages.sh
-          else
-            echo "Some package managers are missing. Cannot proceed."
-            exit 1
-          fi
+          # Final verification
+          which pnpm || echo "pnpm still not found after symlink"
+
+          # Run your test script
+          chmod +x ./scripts/packages.sh
+          ./scripts/packages.sh
