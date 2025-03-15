@@ -2,7 +2,7 @@ name: Package Manager Compatibility Test
 
 on:
   pull_request:
-    branches: [deploy]
+    branches: [any]
 
 jobs:
   test-package-managers:

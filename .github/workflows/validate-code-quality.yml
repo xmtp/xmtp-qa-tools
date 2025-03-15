@@ -1,6 +1,8 @@
 name: Validate code quality
 
-on: [pull_request]
+on:
+  pull_request:
+    branches: [any]
 
 jobs:
   check:
