@@ -32,8 +32,12 @@ jobs:
           curl -fsSL https://bun.sh/install | bash
 
           # Add bun to PATH
-          export PATH="$HOME/.bun/bin:$PATH"
-          echo "PATH=$PATH" >> $GITHUB_ENV
+          export BUN_PATH="$HOME/.bun/bin"
+          echo "PATH=$BUN_PATH:$PATH" >> $GITHUB_ENV
+
+          # Ensure global npm packages are in PATH
+          export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
+          echo "PATH=$NPM_GLOBAL_PATH:$PATH" >> $GITHUB_ENV
 
           # Verify installations
           echo "Node version: $(node --version)"
@@ -50,6 +54,16 @@ jobs:
           # Source NVM
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+          # Ensure global npm packages are in PATH
+          export PATH="$(npm config get prefix)/bin:$PATH"
+
+          # Verify package managers are available
+          echo "Checking package managers:"
+          which npm
+          which yarn
+          which pnpm
+          which bun
 
           # Make the script executable and run it
           chmod +x ./scripts/packages.sh
