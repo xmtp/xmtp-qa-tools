@@ -32,8 +32,12 @@ jobs:
       - name: Install package managers
         run: |
           # Install required package managers
-          npm install -g yarn pnpm
+          npm install -g yarn
+          npm install -g pnpm@latest
           curl -fsSL https://bun.sh/install | bash
+
+          # Source bashrc to make bun available
+          source ~/.bashrc
 
           # Add bun to PATH
           export BUN_PATH="$HOME/.bun/bin"
@@ -47,14 +51,17 @@ jobs:
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
           echo "Yarn version: $(yarn --version)"
-          echo "PNPM version: $(pnpm --version)"
-          echo "Bun version: $(bun --version)"
+          echo "PNPM version: $(pnpm --version || echo 'Not available')"
+          echo "Bun version: $(bun --version || echo 'Not available')"
 
           # Disable corepack initially (script will handle it)
           corepack disable
 
       - name: Run package manager tests
         run: |
+          # Source bashrc to make bun available
+          source ~/.bashrc
+
           # Source NVM
           export NVM_DIR="$HOME/.nvm"
           [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
@@ -62,7 +69,7 @@ jobs:
           # Add package managers to PATH
           export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
           export BUN_PATH="$HOME/.bun/bin"
-          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$PATH"
+          export PATH="$BUN_PATH:$NPM_GLOBAL_PATH:$PATH"
 
           # Verify package managers are available
           echo "Checking package managers:"
@@ -70,6 +77,12 @@ jobs:
           which yarn || echo "yarn not found"
           which pnpm || echo "pnpm not found"
           which bun || echo "bun not found"
+
+          # Install pnpm if not available
+          if ! which pnpm; then
+            echo "Installing pnpm again..."
+            npm install -g pnpm@latest
+          fi
 
           # Only proceed if all package managers are available
           if which npm && which yarn && which pnpm && which bun; then
