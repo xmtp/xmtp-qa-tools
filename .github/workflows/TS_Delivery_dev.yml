@@ -2,8 +2,6 @@ name: TS_Delivery_dev
 description: "should verify message loss when receiving via 200 streams"
 
 on:
-  push:
-    branches-ignore: [main]
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:

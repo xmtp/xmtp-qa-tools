@@ -1,8 +1,13 @@
 name: Validate code quality
 
 on:
-  push:
-    branches-ignore: [main]
+  workflow_dispatch:
+    # Optional inputs if you want to provide parameters when running manually
+    inputs:
+      reason:
+        description: "Reason for running the test"
+        required: false
+        default: "Pre-merge verification"
 
 jobs:
   check:
