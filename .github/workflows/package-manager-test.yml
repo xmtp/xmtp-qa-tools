@@ -36,5 +36,5 @@ jobs:
 
       - name: Run package manager tests
         run: |
-          chmod +x ./scripts/packages.sh
-          ./scripts/packages.sh
+          chmod +x ../../scripts/packages.sh
+          ../../scripts/packages.sh
