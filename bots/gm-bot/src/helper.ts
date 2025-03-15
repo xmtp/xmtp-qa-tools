@@ -48,11 +48,11 @@ export const createSigner = (key: `0x${string}`): Signer => {
  * Generate a random encryption key
  * @returns The encryption key
  */
-export const generateEncryptionKeyHex = () => {
+export const generateEncryptionKeyHex = (): string => {
   /* Generate a random encryption key */
   const uint8Array = getRandomValues(new Uint8Array(32));
   /* Convert the encryption key to a hex string */
-  return toString(uint8Array, "hex");
+  return toString(uint8Array, "hex") as string;
 };
 
 /**
@@ -60,7 +60,7 @@ export const generateEncryptionKeyHex = () => {
  * @param hex - The hex string
  * @returns The encryption key
  */
-export const getEncryptionKeyFromHex = (hex: string) => {
+export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   /* Convert the hex string to an encryption key */
-  return fromString(hex, "hex");
+  return fromString(hex, "hex") as Uint8Array;
 };

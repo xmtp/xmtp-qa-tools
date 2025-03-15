@@ -1,4 +1,3 @@
-import { IdentifierKind } from "@xmtp/node-bindings";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { createSigner, getEncryptionKeyFromHex } from "./helper.js";
@@ -25,7 +24,7 @@ async function checkGmBot(): Promise<boolean> {
   const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
 
   try {
-    const client = await Client.create(signer, encryptionKey as Uint8Array, {
+    const client = await Client.create(signer, encryptionKey, {
       env,
       loggingLevel: process.env.LOGGING_LEVEL as any,
     });

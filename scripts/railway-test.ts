@@ -3,7 +3,7 @@ import { sendTestResults } from "@helpers/datadog";
 
 type TestResult = "success" | "failure";
 
-async function runTests(): Promise<void> {
+function runTests(): void {
   let status: TestResult = "failure";
   // Get the test name from command line arguments or use default
   const testName = process.argv[2] || "TS_Performance";
@@ -47,4 +47,4 @@ async function runTests(): Promise<void> {
 }
 
 // Run tests when this script is executed
-void runTests();
+runTests();

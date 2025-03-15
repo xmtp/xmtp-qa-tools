@@ -6,7 +6,6 @@ dotenv.config();
 
 const RAILWAY_SERVICE_ID = process.env.RAILWAY_SERVICE_ID;
 const RAILWAY_API_TOKEN = process.env.RAILWAY_API_TOKEN;
-const RAILWAY_PROJECT_TOKEN = process.env.RAILWAY_PROJECT_TOKEN;
 const RAILWAY_PROJECT_ID = process.env.RAILWAY_PROJECT_ID;
 const RAILWAY_ENVIRONMENT_ID = process.env.RAILWAY_ENVIRONMENT_ID;
 
@@ -33,58 +32,58 @@ async function main() {
 
 void main();
 
-async function testConnection() {
-  console.log("Testing Railway API connection...");
+// async function testConnection() {
+//   console.log("Testing Railway API connection...");
 
-  const testQuery = {
-    query: `query { me { name email } }`,
-  };
+//   const testQuery = {
+//     query: `query { me { name email } }`,
+//   };
 
-  const response = await axios.post(
-    "https://backboard.railway.com/graphql/v2",
-    testQuery,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${RAILWAY_API_TOKEN}`,
-      },
-    },
-  );
+//   const response = await axios.post(
+//     "https://backboard.railway.com/graphql/v2",
+//     testQuery,
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//         Authorization: `Bearer ${RAILWAY_API_TOKEN}`,
+//       },
+//     },
+//   );
 
-  console.log("Connection successful!");
-  console.log("User info:", response.data);
-  return true;
-}
+//   console.log("Connection successful!");
+//   console.log("User info:", response.data);
+//   return true;
+// }
 
-async function getProjectInfo() {
-  console.log("Getting project information using Project Access Token...");
+// async function getProjectInfo() {
+//   console.log("Getting project information using Project Access Token...");
 
-  if (!RAILWAY_PROJECT_TOKEN) {
-    console.error(
-      "Error: RAILWAY_PROJECT_TOKEN is not set in your environment variables",
-    );
-    return null;
-  }
+//   if (!RAILWAY_PROJECT_TOKEN) {
+//     console.error(
+//       "Error: RAILWAY_PROJECT_TOKEN is not set in your environment variables",
+//     );
+//     return null;
+//   }
 
-  const projectQuery = {
-    query: `query { projectToken { projectId environmentId } }`,
-  };
+//   const projectQuery = {
+//     query: `query { projectToken { projectId environmentId } }`,
+//   };
 
-  const response = await axios.post(
-    "https://backboard.railway.app/graphql/v2",
-    projectQuery,
-    {
-      headers: {
-        "Content-Type": "application/json",
-        "Project-Access-Token": RAILWAY_PROJECT_TOKEN,
-      },
-    },
-  );
+//   const response = await axios.post(
+//     "https://backboard.railway.app/graphql/v2",
+//     projectQuery,
+//     {
+//       headers: {
+//         "Content-Type": "application/json",
+//         "Project-Access-Token": RAILWAY_PROJECT_TOKEN,
+//       },
+//     },
+//   );
 
-  console.log("Project info retrieved successfully!");
-  console.log("Project info:", response.data);
-  return response.data!.data!.projectToken;
-}
+//   console.log("Project info retrieved successfully!");
+//   console.log("Project info:", response.data);
+//   return response.data!.data!.projectToken;
+// }
 
 async function getLatestDeployment() {
   console.log("Getting latest deployment...");
@@ -126,7 +125,7 @@ async function getLatestDeployment() {
 
   console.log("Response:", response.data);
   const deployment = response.data.data.deployments.edges[0]?.node;
-  return deployment;
+  return deployment as { id: string; staticUrl: string };
 }
 
 async function redeployDeployment(deploymentId: string) {
@@ -164,5 +163,5 @@ async function redeployDeployment(deploymentId: string) {
 
   console.log("Deployment redeploy successful!");
   console.log("Response:", response.data);
-  return response.data.data.deploymentRedeploy;
+  return response.data.data.deploymentRedeploy as string;
 }
