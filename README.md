@@ -88,7 +88,8 @@ We can test all XMTP bindings using three main applications. We use xmtp.chat to
 - Comprehensive data aggregation in datadog
 - Testing directly on top of SDKs for real-world scenarios
 - `dev` and `production` network covered
-- Manual testing for cross-platform and cross-sdk compatibility
+- Automated testing for web app `xmtp.chat`
+- Manual testing for react native app
 - Human & agents testing for real-world simulations
 
 ## Operation performance
@@ -242,6 +243,7 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 - **Workflows:** See our CI/CD pipeline configuration - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testing.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **Gm bot:** Bot for testing with older version of the protocol - [see section](https://github.com/xmtp/gm-bot)
 
 ## Development
 
