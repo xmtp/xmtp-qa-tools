@@ -27,11 +27,13 @@ async function checkGmBot(): Promise<boolean> {
   try {
     let volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
     await fs.mkdir(volumePath, { recursive: true });
+    const dbPath = `${volumePath}/check-${env}`;
     const client = await Client.create(signer, encryptionKey, {
       env,
-      dbPath: volumePath,
+      dbPath,
       loggingLevel: process.env.LOGGING_LEVEL as any,
     });
+    console.log("client", client.inboxId);
     return client.inboxId !== undefined;
   } catch (error) {
     console.error("Error checking GM bot:", error);

@@ -1,27 +1,55 @@
 name: Package Manager Compatibility Test
 
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
 jobs:
   test-package-managers:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js with nvm
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Run package manager tests
+      - name: Install NVM
+        run: |
+          curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+          nvm --version
+
+      - name: Install package managers
         run: |
           # Install required package managers
           npm install -g yarn pnpm
           curl -fsSL https://bun.sh/install | bash
 
           # Add bun to PATH
-          echo "$HOME/.bun/bin" >> $GITHUB_PATH
+          export PATH="$HOME/.bun/bin:$PATH"
+          echo "PATH=$PATH" >> $GITHUB_ENV
 
-          # Enable corepack for yarn management
-          corepack enable
+          # Verify installations
+          echo "Node version: $(node --version)"
+          echo "NPM version: $(npm --version)"
+          echo "Yarn version: $(yarn --version)"
+          echo "PNPM version: $(pnpm --version)"
+          echo "Bun version: $(bun --version)"
+
+          # Disable corepack initially (script will handle it)
+          corepack disable
+
+      - name: Run package manager tests
+        run: |
+          # Source NVM
+          export NVM_DIR="$HOME/.nvm"
+          [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
           # Make the script executable and run it
           chmod +x ./scripts/packages.sh
