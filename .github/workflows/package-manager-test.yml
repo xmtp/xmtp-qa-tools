@@ -47,6 +47,11 @@ jobs:
           export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
           echo "PATH=$NPM_GLOBAL_PATH:$PATH" >> $GITHUB_ENV
 
+          # Add PNPM to PATH explicitly
+          export PNPM_HOME="$HOME/.local/share/pnpm"
+          mkdir -p "$PNPM_HOME"
+          echo "PATH=$PNPM_HOME:$PATH" >> $GITHUB_ENV
+
           # Verify installations
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)"
@@ -69,7 +74,8 @@ jobs:
           # Add package managers to PATH
           export NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
           export BUN_PATH="$HOME/.bun/bin"
-          export PATH="$BUN_PATH:$NPM_GLOBAL_PATH:$PATH"
+          export PNPM_HOME="$HOME/.local/share/pnpm"
+          export PATH="$BUN_PATH:$NPM_GLOBAL_PATH:$PNPM_HOME:$PATH"
 
           # Verify package managers are available
           echo "Checking package managers:"
@@ -82,6 +88,9 @@ jobs:
           if ! which pnpm; then
             echo "Installing pnpm again..."
             npm install -g pnpm@latest
+            # Make sure pnpm is in PATH after installation
+            export PNPM_HOME="$HOME/.local/share/pnpm"
+            export PATH="$PNPM_HOME:$(npm config get prefix)/bin:$PATH"
           fi
 
           # Only proceed if all package managers are available
