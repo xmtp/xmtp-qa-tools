@@ -24,6 +24,9 @@ jobs:
 
       - name: Install package managers
         run: |
+          # Set shell explicitly for pnpm
+          export SHELL=/bin/bash
+
           # Install required package managers
           npm install -g yarn
           npm install -g pnpm@latest
@@ -36,20 +39,19 @@ jobs:
           NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
           BUN_PATH="$HOME/.bun/bin"
 
-          # Export paths to GITHUB_PATH (preferred over GITHUB_ENV for PATH modifications)
+          # Export paths to GITHUB_PATH
           echo "$NPM_GLOBAL_PATH" >> $GITHUB_PATH
           echo "$BUN_PATH" >> $GITHUB_PATH
 
-          # Create PNPM_HOME dir and configure it
-          export PNPM_HOME="$HOME/.local/share/pnpm"
-          mkdir -p "$PNPM_HOME"
-          echo "$PNPM_HOME" >> $GITHUB_PATH
+          # Create pnpm directory manually instead of using pnpm setup
+          mkdir -p "$HOME/.local/share/pnpm"
+          echo "$HOME/.local/share/pnpm" >> $GITHUB_PATH
 
-          # Add PNPM to current session PATH
-          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$PNPM_HOME:$PATH"
+          # Add symlink for pnpm
+          ln -sf "$(which pnpm)" "$HOME/.local/share/pnpm/pnpm"
 
-          # Set up PNPM properly
-          pnpm setup
+          # Add to current session PATH
+          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$HOME/.local/share/pnpm:$PATH"
 
           # Verify installations
           echo "Node version: $(node --version)"
@@ -70,16 +72,8 @@ jobs:
           which pnpm || echo "pnpm not found"
           which bun || echo "bun not found"
 
-          # Create a symlink to ensure pnpm is found where expected
-          if [ ! -d "$HOME/.local/share/pnpm" ] && which pnpm; then
-            mkdir -p "$HOME/.local/share/pnpm"
-            ln -sf "$(which pnpm)" "$HOME/.local/share/pnpm/pnpm"
-            export PATH="$HOME/.local/share/pnpm:$PATH"
-          fi
-
-          # Final verification
-          which pnpm || echo "pnpm still not found after symlink"
-
           # Run your test script
           chmod +x ./scripts/packages.sh
           ./scripts/packages.sh
+        env:
+          SHELL: /bin/bash
