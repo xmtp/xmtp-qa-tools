@@ -13,7 +13,7 @@
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",
     "generate": "tsx scripts/generate.ts",
-    "gm": "tsx  bots/gm-bot/index.ts",
+    "gm": "cd bots/gm-bot && tsx src/index.ts",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "monitor:live": "bash scripts/monitor.sh",

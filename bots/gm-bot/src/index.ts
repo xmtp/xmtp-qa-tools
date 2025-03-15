@@ -23,21 +23,8 @@ const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
 async function main() {
   console.log(`Creating client on the '${env}' network...`);
   let volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  // Ensure the volume path directory exists
-  if (await fs.stat(volumePath).catch(() => false)) {
-    await fs.mkdir(volumePath, { recursive: true });
-  }
-  if (process.env.RAILWAY_VOLUME_MOUNT_PATH) {
-    console.log(
-      `Using Railway volume path: ${process.env.RAILWAY_VOLUME_MOUNT_PATH}`,
-    );
-    try {
-      const files = await fs.readdir(volumePath);
-      console.log(`Contents of ${volumePath}:`, files);
-    } catch (error) {
-      console.error(`Error reading directory ${volumePath}:`, error);
-    }
-  }
+  await fs.mkdir(volumePath, { recursive: true });
+
   const identifier = await signer.getIdentifier();
   const address = identifier.identifier;
   const dbPath = `${volumePath}/${address}-${env}`;
