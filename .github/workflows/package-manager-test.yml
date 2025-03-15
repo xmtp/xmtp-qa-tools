@@ -24,56 +24,52 @@ jobs:
 
       - name: Install package managers
         run: |
-          # Set shell explicitly for pnpm
-          export SHELL=/bin/bash
-
-          # Install required package managers
+          # Install via npm global (standard approach)
           npm install -g yarn
-          npm install -g pnpm@latest
-          curl -fsSL https://bun.sh/install | bash
+          npm install -g pnpm
 
-          # Source bashrc to make bun available
+          # Install bun
+          curl -fsSL https://bun.sh/install | bash
           source ~/.bashrc
 
-          # Determine paths
-          NPM_GLOBAL_PATH="$(npm config get prefix)/bin"
-          BUN_PATH="$HOME/.bun/bin"
-
-          # Export paths to GITHUB_PATH
-          echo "$NPM_GLOBAL_PATH" >> $GITHUB_PATH
-          echo "$BUN_PATH" >> $GITHUB_PATH
-
-          # Create pnpm directory manually instead of using pnpm setup
-          mkdir -p "$HOME/.local/share/pnpm"
-          echo "$HOME/.local/share/pnpm" >> $GITHUB_PATH
-
-          # Add symlink for pnpm
-          ln -sf "$(which pnpm)" "$HOME/.local/share/pnpm/pnpm"
-
-          # Add to current session PATH
-          export PATH="$NPM_GLOBAL_PATH:$BUN_PATH:$HOME/.local/share/pnpm:$PATH"
-
-          # Verify installations
+          # Verify installations directly
           echo "Node version: $(node --version)"
           echo "NPM version: $(npm --version)" 
-          echo "Yarn version: $(yarn --version)"
+          echo "Yarn version: $(yarn --version || echo 'Not available')"
           echo "PNPM version: $(pnpm --version || echo 'Not available')"
           echo "Bun version: $(bun --version || echo 'Not available')"
 
-      - name: Run package manager tests
+      - name: Examine packages.sh script
         run: |
-          # Source bashrc again to ensure all paths are available
+          # Let's see how the script is checking for package managers
+          if [ -f "./scripts/packages.sh" ]; then
+            echo "First 30 lines of packages.sh:"
+            head -n 30 ./scripts/packages.sh
+            
+            # Check how it's detecting package managers
+            grep -n "pnpm" ./scripts/packages.sh
+          else
+            echo "packages.sh not found at expected location"
+            find . -name "packages.sh" -type f
+          fi
+
+      - name: Fix permission and run tests
+        run: |
+          # Source bashrc to make bun available
           source ~/.bashrc
 
-          # Verify package managers are available
-          echo "Checking package managers:"
-          which npm || echo "npm not found"
-          which yarn || echo "yarn not found"
-          which pnpm || echo "pnpm not found"
-          which bun || echo "bun not found"
+          # Print all available package managers and their locations
+          echo "Available package managers:"
+          npm -g list | head -n 10
+          which npm
+          which yarn
+          which pnpm
+          which bun
 
-          # Run your test script
+          # Create all possible symlinks to increase chances of detection
+          sudo ln -sf $(which pnpm) /usr/local/bin/pnpm
+          sudo ln -sf $(which pnpm) /usr/bin/pnpm
+
+          # Try running the script
           chmod +x ./scripts/packages.sh
           ./scripts/packages.sh
-        env:
-          SHELL: /bin/bash
