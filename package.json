@@ -3,19 +3,22 @@
   "version": "0.0.5",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "bots/*"
+  ],
   "scripts": {
-    "bot": "tsx  bots/test/index.ts",
+    "bot:gm": "tsx  bots/gm/index.ts",
+    "bot:test": "tsx  bots/test/index.ts",
     "build": "tsc",
-    "clean": "rimraf node_modules && yarn clean:dbs",
-    "clean:dbs": "rimraf *.db3* ||:",
+    "clean": "rimraf .data/ ||:",
     "datadog": "tsx scripts/send-to-datadog.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "gen:keys": "tsx scripts/generateKeys.ts",
     "generate": "tsx scripts/generate.ts",
-    "gm": "tsx  bots/gm/index.ts",
+    "gm": "tsx  bots/gm-bot/index.ts",
     "lint": "eslint .",
-    "monitor:dev": "httpstat  https://grpc.dev.xmtp.network:443",
+    "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "monitor:live": "bash scripts/monitor.sh",
     "monitor:network": "bash scripts/network.sh",
     "railway": "bash scripts/railway.sh",
@@ -23,7 +26,7 @@
     "redeploy": "tsx scripts/redeploy.ts",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest",
-    "typecheck": "tsc"
+    "test:packages": "./scripts/packages.sh"
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
