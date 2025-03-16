@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
@@ -643,5 +645,12 @@ export class WorkerClient extends Worker {
       (completion.choices[0]?.message?.content ||
         "I'm not sure how to respond to that.")
     );
+  }
+
+  clearDB() {
+    const dataPath = path.resolve(process.cwd(), ".data/" + this.name);
+    if (fs.existsSync(dataPath)) {
+      fs.rmSync(dataPath, { recursive: true, force: true });
+    }
   }
 }

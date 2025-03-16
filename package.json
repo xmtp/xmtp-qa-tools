@@ -4,8 +4,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "bot:gm": "tsx  bots/gm/index.ts",
-    "bot:test": "tsx  bots/test/index.ts",
+    "bots:simple": "tsx  bots/simple/index.ts",
+    "bots:test": "tsx  bots/test/index.ts",
     "build": "tsc",
     "clean": "rimraf .data/ ||:",
     "datadog": "tsx scripts/send-to-datadog.ts",

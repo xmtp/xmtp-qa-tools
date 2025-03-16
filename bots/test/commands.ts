@@ -1,3 +1,4 @@
+import { getAddressOfMember } from "@helpers/client";
 import {
   Group,
   IdentifierKind,
@@ -77,7 +78,6 @@ export class CommandHandler {
   // Simple gm response
   async gm(message: DecodedMessage, client: Client) {
     try {
-      console.log("gm", message);
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
@@ -86,6 +86,16 @@ export class CommandHandler {
     } catch (error) {
       console.error("Error sending gm:", error);
     }
+  }
+  async me(message: DecodedMessage, client: Client) {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    const members = (await conversation?.members()) ?? [];
+    const address = getAddressOfMember(members, message.senderInboxId);
+    await conversation?.send(`${address}`);
+    await conversation?.send(client.inboxId);
+    await conversation?.send(client.installationId);
   }
   async block(message: DecodedMessage, client: Client, args: string[] = []) {
     try {

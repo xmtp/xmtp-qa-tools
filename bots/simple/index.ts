@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type Group, type XmtpEnv } from "@helpers/types";
+import { type Client, type XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 
 const testName = "test-bot";
@@ -17,15 +17,11 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   // Get 20 dynamic workers
-  const workers = await getWorkers(["bot"], testName, "message", true);
-
-  const bot = workers.get("bot");
+  const workers = await getWorkers(["bob"], testName, "message", true);
+  const bot = workers.get("bob");
   const client = bot?.client as Client;
-
-  const env = process.env.XMTP_ENV as XmtpEnv;
   console.log(`Agent initialized on address ${bot?.address}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);
-  console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
@@ -34,13 +30,11 @@ async function main() {
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
-        console.log("Message received:", message);
-        /* Ignore messages from the same agent or non-text messages */
+        console.log(message);
         if (
           message?.senderInboxId.toLowerCase() ===
             client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text" ||
-          message?.content === "gm"
+          message?.contentType?.typeId !== "text"
         ) {
           continue;
         }
@@ -57,20 +51,8 @@ async function main() {
           console.log("Unable to find conversation, skipping");
           continue;
         }
-        try {
-          const groupToUpdate = await client.conversations.getConversationById(
-            message.conversationId,
-          );
-          console.log("conversation", groupToUpdate?.id, client.inboxId);
-          await (groupToUpdate as Group).updateName("sdsd");
-
-          await groupToUpdate?.send(
-            `Bot :\n This group has been renamed to "sdsd"`,
-          );
-        } catch (error) {
-          console.error("Error updating group:", error);
-        }
-
+        await conversation.send("Your inboxId is: " + message.senderInboxId);
+        await conversation.send("conversationId: " + conversation.id);
         await conversation.send("gm");
         console.log("Waiting for messages...");
       } catch (error) {

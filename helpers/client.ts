@@ -3,8 +3,8 @@ import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
 import {
-  generateInboxId as generateInboxIdBinding,
   IdentifierKind,
+  type GroupMember,
   type Identifier,
 } from "@xmtp/node-bindings";
 import dotenv from "dotenv";
@@ -51,10 +51,6 @@ export const createSigner = (key: `0x${string}`): Signer => {
       return toBytes(signature);
     },
   };
-};
-
-export const generateInboxId = (identifier: Identifier): string => {
-  return generateInboxIdBinding(identifier);
 };
 
 function loadDataPath(
@@ -134,6 +130,7 @@ export function loadEnv(testName: string) {
   if (env !== "dev" && env !== "production" && env !== "local") {
     throw new Error("XMTP_ENV is not set in .env file or its not valid");
   }
+  console.log("XMTP_ENV", process.env.XMTP_ENV);
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",
@@ -141,6 +138,19 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
+export function getAddressOfMember(members: GroupMember[], inboxId: string) {
+  for (const member of members) {
+    for (const identifier of member.accountIdentifiers) {
+      if (
+        identifier.identifierKind === IdentifierKind.Ethereum &&
+        member.inboxId === inboxId
+      ) {
+        return identifier.identifier;
+      }
+    }
+  }
+}
+
 export async function closeEnv(testName: string, workers: WorkerManager) {
   flushLogger(testName);
 
