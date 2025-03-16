@@ -1,0 +1,230 @@
+lockdown-install.js:1 Removing unpermitted intrinsics
+client-DriowbAq.js:2  INFO init_db: xmtp_mls::storage::encrypted_store::private: Running DB migrations
+
+client-DriowbAq.js:2  INFO init_db: xmtp_mls::storage::encrypted_store::private: sqlite_version=3.49.0
+
+client-DriowbAq.js:2  INFO init_db: xmtp_mls::storage::encrypted_store::private: Migrations successful
+
+client-DriowbAq.js:2  INFO xmtp_mls::identity: Initializing identity
+
+client-DriowbAq.js:2  INFO xmtp_common::stream_handles::wasm: Spawning local task on web executor
+
+client-DriowbAq.js:2  INFO xmtp_common::stream_handles::wasm: Spawning local task on web executor
+
+client-DriowbAq.js:2  INFO xmtp_mls::groups::device_sync: Initializing device sync... url: Some("https://message-history.dev.ephemera.network") inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id="8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02"
+
+client-DriowbAq.js:2  INFO xmtp_mls::groups::device_sync: Device sync initialized. inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id="8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02"
+
+index-VhSroeJO.js:152 client received event data {id: '7e0e4d97-1531-4237-806c-78994d46b15b', action: 'init', result: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'createInboxSignatureText', id: 'e7b59016-5c61-4063-985d-5a73420145ac', data: undefined}
+index-VhSroeJO.js:152 client received event data {id: 'e7b59016-5c61-4063-985d-5a73420145ac', action: 'createInboxSignatureText', result: undefined}
+client-DriowbAq.js:2 client worker received event data {action: 'syncConversations', id: 'edf869e3-663b-47c6-983b-ef1345a35d6b', data: undefined}
+client-DriowbAq.js:2  INFO sync_welcomes:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+
+client-DriowbAq.js:2 ERROR sync_welcomes: xmtp_mls::client: failed to create group from welcome: Hpke error: Key not found
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func3444 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4876f7
+$func441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1cb2a4
+$func4453 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4f44
+$func238 @ bindings_wasm_bg-D_zzhc1k.wasm:0x47e99
+$func757 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2abf23
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+client-DriowbAq.js:2  INFO sync_welcomes: xmtp_mls::client: error is not retryable. Hpke(KeyNotFound):Hpke error: Key not found
+
+client-DriowbAq.js:2  INFO sync_welcomes:create_from_welcome: xmtp_mls::groups::mls_ext::mls_ext_welcome: Trying to decrypt welcome
+
+client-DriowbAq.js:2 ERROR sync_welcomes: xmtp_mls::client: failed to create group from welcome: Hpke error: Key not found
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func3444 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4876f7
+$func441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1cb2a4
+$func4453 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4f44
+$func238 @ bindings_wasm_bg-D_zzhc1k.wasm:0x47e99
+$func757 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2abf23
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+client-DriowbAq.js:2  INFO sync_welcomes: xmtp_mls::client: error is not retryable. Hpke(KeyNotFound):Hpke error: Key not found
+
+index-VhSroeJO.js:152 client received event data {id: 'edf869e3-663b-47c6-983b-ef1345a35d6b', action: 'syncConversations', result: undefined}
+client-DriowbAq.js:2 client worker received event data {action: 'getConversations', id: 'c7ee1e5f-a0ea-4c81-9bfa-ca22e1415b8b', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: 'c7ee1e5f-a0ea-4c81-9bfa-ca22e1415b8b', action: 'getConversations', result: Array(11)}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '63298e96-42d8-4d4b-95b0-c05fe9714dfe', data: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '7e2d3e01-e467-492c-b925-3800ad7593e7', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: '63298e96-42d8-4d4b-95b0-c05fe9714dfe', action: 'getGroupMembers', result: Array(2)}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: 'b7b78f24-5d62-4876-8d3d-8443f6cdef0f', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: '7e2d3e01-e467-492c-b925-3800ad7593e7', action: 'getGroupMembers', result: Array(7)}
+index-VhSroeJO.js:152 client received event data {id: 'b7b78f24-5d62-4876-8d3d-8443f6cdef0f', action: 'getGroupMembers', result: Array(8)}
+client-DriowbAq.js:2 client worker received event data {action: 'getConversationById', id: 'c6773a09-7fe1-4710-ab98-6d82f006597d', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: 'c6773a09-7fe1-4710-ab98-6d82f006597d', action: 'getConversationById', result: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupConsentState', id: 'a03bc854-e614-4e05-b54f-83a20f25030b', data: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMessages', id: '1beac44d-99ce-44f0-a1db-8ca56a224cc5', data: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'streamGroupMessages', id: '079711b8-8afc-4cd6-bbac-2bfbe8bb13c0', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: 'a03bc854-e614-4e05-b54f-83a20f25030b', action: 'getGroupConsentState', result: 1}
+client-DriowbAq.js:2  INFO xmtp_common::stream_handles::wasm: Spawning local task on web executor
+
+index-VhSroeJO.js:152 client received event data {id: '1beac44d-99ce-44f0-a1db-8ca56a224cc5', action: 'getGroupMessages', result: Array(17)}
+index-VhSroeJO.js:152 client received event data {id: '079711b8-8afc-4cd6-bbac-2bfbe8bb13c0', action: 'streamGroupMessages', result: undefined}
+client-DriowbAq.js:2  INFO subscribe_group_messages:create_grpc_stream_inner: xmtp_api_http::http_stream: new http stream id=2ThCU9Z3dZPW
+
+client-DriowbAq.js:2 client worker received event data {action: 'sendGroupMessage', id: '3f1a2edf-ec98-4620-b7ba-51e5011cac55', data: {…}}
+client-DriowbAq.js:2  INFO send_message:load_mls_group_with_lock_async: xmtp_mls::identity_updates: Getting installation diff. Old: GroupMembership { members: {"ebb1d57a3bf5080e70bfd9dd69372c012ca4a95e175f6b9dacae1df4844abe04": 95737, "3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891": 95756}, failed_installations: [] }. New GroupMembership { members: {"ebb1d57a3bf5080e70bfd9dd69372c012ca4a95e175f6b9dacae1df4844abe04": 95737, "3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891": 95756}, failed_installations: [] }
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:publish_intents:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] published intent [29] of type [SendMessage] intent.id=29 intent.kind=SendMessage inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de"
+
+client-DriowbAq.js:2  INFO process:process_message{allow_epoch_increment=false}: xmtp_mls::groups::mls_sync: Processing envelope with hash 2dce03e5ec9bea7c9796c8691c9ad814d8ecfcca593be3452a82f1828872a186, id = 572951 inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572951
+
+client-DriowbAq.js:2  INFO process:process_message{allow_epoch_increment=false}: xmtp_mls::groups::mls_sync: client [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] is about to process own envelope [572951] for intent [29] inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572951 intent_id=29 intent.kind=SendMessage
+
+index-VhSroeJO.js:152 client received event data {type: 'message', streamId: '1197c835-c55e-447a-b163-fabec4be7a6e', result: {…}}
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: Processing envelope with hash 2dce03e5ec9bea7c9796c8691c9ad814d8ecfcca593be3452a82f1828872a186, id = 572951 inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572951
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: client [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] is about to process own envelope [572951] for intent [29] inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572951 intent_id=29 intent.kind=SendMessage
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Transaction failed: process for group [a1b0f81d62e0a3a79ef1caba8a6bb3de] envelope cursor [572951] error:[[572951] already processed]
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: error is not retryable. ProcessIntent(AlreadyProcessed(572951)):[572951] already processed
+
+client-DriowbAq.js:2 ERROR send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(572951))] group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id="8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02"
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func268 @ bindings_wasm_bg-D_zzhc1k.wasm:0x88e96
+$func587 @ bindings_wasm_bg-D_zzhc1k.wasm:0x24e87b
+$func4428 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3e91
+$func251 @ bindings_wasm_bg-D_zzhc1k.wasm:0x68782
+$func4422 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3a8f
+$func1071 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30ce9a
+$func369 @ bindings_wasm_bg-D_zzhc1k.wasm:0x16de44
+$func4441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4740
+$func1063 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30b778
+$func982 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2f4646
+$func4451 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4dee
+$func414 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1a6ba2
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+client-DriowbAq.js:2 ERROR send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(572951))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(572951))]
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func4706 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4e5ad3
+$func251 @ bindings_wasm_bg-D_zzhc1k.wasm:0x68a0c
+$func4422 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3a8f
+$func1071 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30ce9a
+$func369 @ bindings_wasm_bg-D_zzhc1k.wasm:0x16de44
+$func4441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4740
+$func1063 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30b778
+$func982 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2f4646
+$func4451 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4dee
+$func414 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1a6ba2
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+index-VhSroeJO.js:152 client received event data {id: '3f1a2edf-ec98-4620-b7ba-51e5011cac55', action: 'sendGroupMessage', result: 'e07fae0fa5c01092a781c21cd6c10bf01a59830de8b5cd76bce6310c962c17bf'}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '99ad6d96-b8c4-45fa-8867-54d92031eaeb', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: '99ad6d96-b8c4-45fa-8867-54d92031eaeb', action: 'getGroupMembers', result: Array(6)}
+client-DriowbAq.js:2 client worker received event data {action: 'sendGroupMessage', id: '526d4900-35a0-4504-8cfc-8b102b8f9004', data: {…}}
+client-DriowbAq.js:2  INFO send_message:load_mls_group_with_lock_async: xmtp_mls::identity_updates: Getting installation diff. Old: GroupMembership { members: {"ebb1d57a3bf5080e70bfd9dd69372c012ca4a95e175f6b9dacae1df4844abe04": 95737, "3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891": 95756}, failed_installations: [] }. New GroupMembership { members: {"ebb1d57a3bf5080e70bfd9dd69372c012ca4a95e175f6b9dacae1df4844abe04": 95737, "3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891": 95756}, failed_installations: [] }
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:publish_intents:load_mls_group_with_lock_async: xmtp_mls::groups::mls_sync: [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] published intent [30] of type [SendMessage] intent.id=30 intent.kind=SendMessage inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de"
+
+client-DriowbAq.js:2  INFO process:process_message{allow_epoch_increment=false}: xmtp_mls::groups::mls_sync: Processing envelope with hash 4626271771f8a314c7e984b13526d423f82c826dcef2525c801044d02354f770, id = 572953 inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572953
+
+client-DriowbAq.js:2  INFO process:process_message{allow_epoch_increment=false}: xmtp_mls::groups::mls_sync: client [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] is about to process own envelope [572953] for intent [30] inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572953 intent_id=30 intent.kind=SendMessage
+
+index-VhSroeJO.js:152 client received event data {type: 'message', streamId: '1197c835-c55e-447a-b163-fabec4be7a6e', result: {…}}
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: Processing envelope with hash 4626271771f8a314c7e984b13526d423f82c826dcef2525c801044d02354f770, id = 572953 inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572953
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive:process_message{allow_epoch_increment=true}: xmtp_mls::groups::mls_sync: client [3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891] is about to process own envelope [572953] for intent [30] inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id=8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02 group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" cursor=572953 intent_id=30 intent.kind=SendMessage
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Transaction failed: process for group [a1b0f81d62e0a3a79ef1caba8a6bb3de] envelope cursor [572953] error:[[572953] already processed]
+
+client-DriowbAq.js:2  INFO send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: error is not retryable. ProcessIntent(AlreadyProcessed(572953)):[572953] already processed
+
+client-DriowbAq.js:2 ERROR send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(572953))] group_id="a1b0f81d62e0a3a79ef1caba8a6bb3de" inbox_id="3de7744418a2f205700ee2ed098a2aaa2d3d3fab7afdcb53e4691c2609f63891" installation_id="8b9082958a181a993f10608f23b632d53d66d9cee1322165afa029319627cf02"
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func268 @ bindings_wasm_bg-D_zzhc1k.wasm:0x88e96
+$func587 @ bindings_wasm_bg-D_zzhc1k.wasm:0x24e87b
+$func4428 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3e91
+$func251 @ bindings_wasm_bg-D_zzhc1k.wasm:0x68782
+$func4422 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3a8f
+$func1071 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30ce9a
+$func369 @ bindings_wasm_bg-D_zzhc1k.wasm:0x16de44
+$func4441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4740
+$func1063 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30b778
+$func982 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2f4646
+$func4451 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4dee
+$func414 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1a6ba2
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+client-DriowbAq.js:2 ERROR send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(572953))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(572953))]
+
+Se._.wbg.__wbg_error_524f506f44df1645 @ client-DriowbAq.js:2
+$func8382 @ bindings_wasm_bg-D_zzhc1k.wasm:0x584fdd
+$func6099 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5322ee
+$func1045 @ bindings_wasm_bg-D_zzhc1k.wasm:0x307939
+$func6207 @ bindings_wasm_bg-D_zzhc1k.wasm:0x535ed2
+$func9170 @ bindings_wasm_bg-D_zzhc1k.wasm:0x594b33
+$func4706 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4e5ad3
+$func251 @ bindings_wasm_bg-D_zzhc1k.wasm:0x68a0c
+$func4422 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d3a8f
+$func1071 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30ce9a
+$func369 @ bindings_wasm_bg-D_zzhc1k.wasm:0x16de44
+$func4441 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4740
+$func1063 @ bindings_wasm_bg-D_zzhc1k.wasm:0x30b778
+$func982 @ bindings_wasm_bg-D_zzhc1k.wasm:0x2f4646
+$func4451 @ bindings_wasm_bg-D_zzhc1k.wasm:0x4d4dee
+$func414 @ bindings_wasm_bg-D_zzhc1k.wasm:0x1a6ba2
+$func2774 @ bindings_wasm_bg-D_zzhc1k.wasm:0x44b138
+$func10220 @ bindings_wasm_bg-D_zzhc1k.wasm:0x5b6dc7
+$closure3753_externref_shim @ bindings_wasm_bg-D_zzhc1k.wasm:0x5bd350
+le @ client-DriowbAq.js:2
+o @ client-DriowbAq.js:1
+index-VhSroeJO.js:152 client received event data {id: '526d4900-35a0-4504-8cfc-8b102b8f9004', action: 'sendGroupMessage', result: 'c16d4ef1d171ce3e46e55dd40beeded96a187ca8ca5aba03abbec6865e32e394'}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: 'c4bfa35a-1f1c-4443-b4d4-85c06cbe1d06', data: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '5958b61d-7958-4e7b-bba5-3282c1573ed2', data: {…}}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '5f97b53c-5f36-4905-83f5-d25903dfeb6e', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: 'c4bfa35a-1f1c-4443-b4d4-85c06cbe1d06', action: 'getGroupMembers', result: Array(8)}
+index-VhSroeJO.js:152 client received event data {id: '5958b61d-7958-4e7b-bba5-3282c1573ed2', action: 'getGroupMembers', result: Array(3)}
+client-DriowbAq.js:2 client worker received event data {action: 'getGroupMembers', id: '0988c5c4-7a3f-4886-baee-b4f82161f84f', data: {…}}
+index-VhSroeJO.js:152 client received event data {id: '5f97b53c-5f36-4905-83f5-d25903dfeb6e', action: 'getGroupMembers', result: Array(2)}
+index-VhSroeJO.js:152 client received event data {id: '0988c5c4-7a3f-4886-baee-b4f82161f84f', action: 'getGroupMembers', result: Array(2)}
