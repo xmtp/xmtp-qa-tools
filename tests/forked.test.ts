@@ -119,6 +119,7 @@ describe(testName, () => {
       await new Promise((resolve) => setTimeout(resolve, 300));
     } catch (e) {
       // Alice might not be in the group yet
+      console.log(e);
     }
 
     // Add Alice
@@ -210,7 +211,7 @@ describe(testName, () => {
         ]),
       );
     } catch (e) {
-      // Elon might already be in the group
+      console.log(e);
     }
 
     // Execute operations in random order
