@@ -2,12 +2,22 @@
 
 Get apps to be in a stitch state where they are talking in different unsynced dms.
 
-1- Create a Dm conversation from node
-2- send a dm
-3- Remove installation
-4- Create a new Dm conversation from node
-5- send a dm
-6- Notice that the messages are not in the received messages list
+0- Open convos or XMTP chat
+
+1- Set the inbox Id of the receiver `destinationInboxId`
+
+2- Run test `yarn test bug_dms_stitch`
+
+- will create a new dm with the `destinationInboxId`
+- send a message to the dm
+- Remove installation
+
+3- Run again the test `yarn test bug_dms_stitch`
+
+- Create a new Dm conversation from node
+- send a dm
+
+> Notice that the messages are not in the received messages list
 
 ## Description
 
