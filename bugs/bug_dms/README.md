@@ -15,7 +15,7 @@ Get apps to be in a stitch state where they are talking in different unsynced dm
 git clone https://github.com/xmtp/xmtp-qa-testing/
 cd xmtp-qa-testing
 yarn
-yarn test bug_stitch
+yarn test bug_stitched
 ```
 
 ## Test code

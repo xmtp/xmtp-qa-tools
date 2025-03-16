@@ -1,9 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { type Client } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, describe } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
-const testName = "stitch";
+const testName = "bug_stitch";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -28,9 +28,7 @@ describe(testName, () => {
 
     const initialConvos = await client.conversations.listDms();
     if (initialConvos.length > 0) {
-      console.warn(
-        "Step 2: Ivy (web) terminates, deletes local data, and restarts",
-      );
+      console.warn("Ivy  terminates, deletes local data, and restarts");
       ivy?.worker.clearDB();
     } else {
       const newConvo = await client.conversations.newDm(webInboxId);
