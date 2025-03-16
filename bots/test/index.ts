@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { checkGroupInWebClient } from "@helpers/playwright";
 import {
   type Client,
   type Conversation,
@@ -11,7 +12,6 @@ import { CommandHandler } from "./commands";
 
 const testName = "test-bot";
 loadEnv(testName);
-
 process.on("uncaughtException", (error) => {
   console.error("Uncaught exception:", error);
   process.exit(1);
@@ -31,7 +31,7 @@ async function main() {
     const workers = await getWorkers(20, testName, "message", true);
     const commandHandler = new CommandHandler();
 
-    const botWorker = await getWorkers(["bot"], testName, "message");
+    const botWorker = await getWorkers(["bot"], testName, "message", true);
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 
@@ -169,6 +169,18 @@ async function processCommand(
       case "remove":
         await commandHandler.remove(message, client, args, workers);
         break;
+      case "verify": {
+        // Launch browser and verify group exists in web client
+        const result = await checkGroupInWebClient(message, client);
+        if (result.success) {
+          await conversation.send("Group verified successfully in web client!");
+        } else {
+          await conversation.send(
+            `Group verification failed: ${result.error || "Unknown error"}`,
+          );
+        }
+        break;
+      }
       default:
         await conversation.send(
           `Unknown command: /${command}\nType /help to see available commands.`,

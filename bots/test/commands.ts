@@ -1,16 +1,19 @@
 import {
   Group,
+  IdentifierKind,
   type Client,
   type DecodedMessage,
   type Worker,
   type WorkerManager,
 } from "@helpers/types";
 
+export const walletUser = "0x3b9B663B435787cE05D734ab32ebD9B0DBd88A53";
 export const // Command help info
   commandHelp = `Available commands:
 gm - Get a greeting back from the bot
 hi [name] - Get a response back to [name]
 /create [number] - Create a new group with [number] random workers (default: 5)
+/verify - Verify that the group was created in the web client
 /rename [name] - Rename the current group
 /add [name] - Add [name] to the current group
 /remove [name] - Remove [name] from the current group
@@ -145,6 +148,13 @@ export class CommandHandler {
         groupDescription: "This is a test group",
       });
       await group.addSuperAdmin(message.senderInboxId);
+      await group.addMembersByIdentifiers([
+        {
+          identifierKind: IdentifierKind.Ethereum,
+          identifier: walletUser,
+        },
+      ]);
+      await group.addSuperAdmin(walletUser);
 
       console.log(
         `Group created with id ${group.id} by ${message.senderInboxId}`,
@@ -154,7 +164,7 @@ export class CommandHandler {
       );
       // Send a message as the bot
       await group.send(
-        `Bot :\n Group chat initialized with ${count} workers. Welcome everyone!`,
+        `Bot :\n Group chat initialized with ${count} workers, you and web wallet: ${walletUser} are super admins. Welcome everyone!`,
       );
       await this.populateGroup(group.id, randomWorkers);
     } catch (error) {
@@ -404,14 +414,12 @@ export class CommandHandler {
       );
       const preGroups = await client.conversations.listGroups();
       const groupsImAdmin = preGroups.filter((group) =>
-        group.isAdmin(message.senderInboxId),
+        group.isSuperAdmin(message.senderInboxId),
       );
-      const groupsHasBot = groupsImAdmin.filter((group) =>
-        group.isAdmin(client.inboxId),
-      );
+
       let groupsList = "Active groups:\n";
-      for (let i = 0; i < groupsHasBot.length; i++) {
-        const group = groupsHasBot[i];
+      for (let i = 0; i < groupsImAdmin.length; i++) {
+        const group = groupsImAdmin[i];
         const memberCount = await group
           .members()
           .then((members) => members.length);

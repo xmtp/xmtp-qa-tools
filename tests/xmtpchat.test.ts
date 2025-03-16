@@ -11,10 +11,10 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(
   testName,
   () => {
-    // it("should respond to a message", async () => {
-    //   const result = await createGroupAndReceiveGm([gmBotAddress]);
-    //   expect(result).toBe(true);
-    // });
+    it("should respond to a message", async () => {
+      const result = await createGroupAndReceiveGm([gmBotAddress]);
+      expect(result).toBe(true);
+    });
     it("should create a group and send a message", async () => {
       const randomInboxes = [...generatedInboxes].slice(0, 3);
       const result = await createGroupAndReceiveGm([
