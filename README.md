@@ -245,7 +245,7 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 | pnpm            | ✅      | ✅      | ✅      | ✅      |
 | npm             | ✅      | ✅      | ✅      | ✅      |
 | yarn@4.6.0      | ✅      | ✅      | ✅      | ✅      |
-| yarn@1.22.19    | ⚠️      | ⚠️      | ⚠️      | ⚠️      |
+| yarn@1.22.19    | ✅      | ✅      | ✅      | ✅      |
 | bun             | ✅      | ✅      | ✅      | ✅      |
 
 ## Tools & Utilities
