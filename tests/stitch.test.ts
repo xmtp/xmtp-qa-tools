@@ -9,35 +9,87 @@ loadEnv(testName);
 describe(testName, () => {
   let convo: Conversation;
   let workers: WorkerManager;
-  let sender: Worker;
-  let receiver: Worker;
-
+  let ivy: Worker;
+  let bob: Worker;
+  let xmtp_chat: Worker;
+  let alice: Worker;
+  let secondWorkers: WorkerManager;
   beforeAll(async () => {
     //fs.rmSync(".data", { recursive: true, force: true });
     workers = await getWorkers(["ivy", "bob"], testName);
-    sender = workers.get("ivy")!;
-    receiver = workers.get("bob")!;
+    ivy = workers.get("ivy")!;
+    bob = workers.get("bob")!;
+    secondWorkers = await getWorkers(
+      ["xmtp_chat", "alice-b"],
+      testName,
+      "none",
+      false,
+    );
+    xmtp_chat = secondWorkers.get("xmtp_chat")!;
+    alice = secondWorkers.get("alice", "b")!;
   });
 
   afterAll(async () => {
     await closeEnv(testName, workers);
   });
   it("inboxState", async () => {
+    await listInstallations(secondWorkers);
     await listInstallations(workers);
   });
 
-  it("new dm with bug", async () => {
-    convo = await sender.client.conversations.newDm(receiver.client.inboxId);
+  it("new dm with ivy with xmtp_chat ", async () => {
+    convo = await ivy.client.conversations.newDm(xmtp_chat.client.inboxId);
     expect(convo.id).toBeDefined();
+    console.log("convo", convo.id);
     await convo.send("hello");
+  });
+  it("new dm with xmtp_chat and bob", async () => {
+    convo = await xmtp_chat.client.conversations.newDm(bob.client.inboxId);
+    expect(convo.id).toBeDefined();
+    console.log("convo", convo.id);
+    await convo.send("hello");
+  });
+  it("new dm alice with xmtp_chat", async () => {
+    convo = await alice.client.conversations.newDm(xmtp_chat.client.inboxId);
+    expect(convo.id).toBeDefined();
+    console.log("convo", convo.id);
+    await convo.send("hello");
+  });
+  it("new dm xmtp_chat with alice", async () => {
+    convo = await xmtp_chat.client.conversations.newDm(alice.client.inboxId);
+    expect(convo.id).toBeDefined();
+    console.log("convo", convo.id);
+    await convo.send("hello");
+  });
+
+  it("should count conversations", async () => {
+    await compareDms(xmtp_chat, alice);
+    await compareDms(xmtp_chat, bob);
+    await compareDms(xmtp_chat, ivy);
+  });
+
+  it("new group with xmtp_chat", async () => {
+    await xmtp_chat.client.conversations.sync();
+    const countofGroups = await xmtp_chat.client.conversations.listGroups();
+    const groupName = "test-" + String(countofGroups.length);
+    convo = await xmtp_chat.client.conversations.newGroup(
+      [bob.client.inboxId, alice.client.inboxId],
+      {
+        groupName,
+      },
+    );
+    expect(convo.id).toBeDefined();
+    await convo.send(groupName + "\n" + String(countofGroups.length));
     console.log("convo", convo.id);
   });
 
-  it("inboxState", async () => {
-    await listInstallations(workers);
-  });
-  it("should count conversations", async () => {
-    await compareDms(sender, receiver);
+  it("check xmtp_chat inbox", async () => {
+    await xmtp_chat.client.conversations.sync();
+    const dms = await xmtp_chat.client.conversations.listDms();
+    console.log("dms", dms.length);
+
+    const groups = await xmtp_chat.client.conversations.listGroups();
+    console.log("groups", groups.length);
   });
 
   it("should handle different conversation IDs and require manual sync", async () => {
@@ -51,10 +103,6 @@ describe(testName, () => {
     await listInstallations(workers);
   });
 
-  it("should count conversations", async () => {
-    await compareDms(sender, receiver);
-  });
-
   it("should handle different conversation IDs and require manual sync", async () => {
     // Initiate a new DM with a specific conversation ID
     const newSender = workers.get("ivy", "b")!;
@@ -66,9 +114,7 @@ describe(testName, () => {
     await convo1.send("Hi there!");
 
     // Simulate receiver listening on a different channel
-    const convo2 = await sender.client.conversations.newDm(
-      newReceiver.client.inboxId,
-    );
+    const convo2 = await ivy.client.conversations.newDm(bob.client.inboxId);
     expect(convo2.id).toBeDefined();
 
     const convo3 = await newReceiver.client.conversations.newDm(
@@ -78,17 +124,17 @@ describe(testName, () => {
     await convo3.send("Hi there!");
   });
   it("should count conversations", async () => {
-    await compareDms(sender, receiver);
+    await compareDms(ivy, bob);
   });
 });
 
 async function compareDms(sender: Worker, receiver: Worker) {
   await receiver.client?.conversations.sync();
-  const allUnique = (await receiver.client?.conversations.listDms()) ?? [];
-  const allWithDuplicates =
-    (await receiver.client?.conversations.listDms({
-      includeDuplicateDms: true,
-    })) ?? [];
+  await sender.client?.conversations.sync();
+  const allUnique = await receiver.client?.conversations.listDms();
+  const allWithDuplicates = await receiver.client?.conversations.listDms({
+    includeDuplicateDms: true,
+  });
 
   // Save filtered results
   const senderUnique = allUnique.filter((conversation) => {
@@ -115,8 +161,9 @@ async function compareDms(sender: Worker, receiver: Worker) {
       peerInboxId: c.peerInboxId,
     })),
   );
-
   expect(senderUnique.length).toBe(1);
-  console.log("listUniqueConversations", senderUnique.length);
-  console.log("listDuplicateConversations", senderWithDuplicates.length);
+  console.log("sender is:", sender.name + " and receiver is " + receiver.name, {
+    unique: senderUnique.length,
+    duplicates: senderWithDuplicates.length,
+  });
 }
