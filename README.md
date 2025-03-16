@@ -236,6 +236,18 @@ _Note: Cross-SDK was tested using the `operations` describe above and is not cov
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
 
+## Agents QA
+
+### Package Manager Test Results
+
+| Package Manager | Node 20 | Node 21 | Node 22 | Node 23 |
+| --------------- | ------- | ------- | ------- | ------- |
+| pnpm            | ✅      | ✅      | ✅      | ✅      |
+| npm             | ✅      | ✅      | ✅      | ✅      |
+| yarn@4.6.0      | ✅      | ✅      | ✅      | ✅      |
+| yarn@1.22.19    | ✅      | ✅      | ✅      | ✅      |
+| bun             | ✅      | ✅      | ✅      | ✅      |
+
 ## Tools & Utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring

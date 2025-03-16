@@ -22,9 +22,9 @@ module.exports = {
   importOrder: [
     "<BUILTIN_MODULES>",
     "<THIRD_PARTY_MODULES>",
-    "^@(/.*)$",
-    "^@test(/.*)$",
-    "^@bench(/.*)$",
+    "^@/(.*)$",
+    "^@test/(.*)$",
+    "^@bench/(.*)$",
     "^[.]",
   ],
   importOrderTypeScriptVersion: "5.6.3",

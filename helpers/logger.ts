@@ -211,9 +211,9 @@ export const logError = (e: any, expect: any): boolean => {
   }
   return true;
 };
-// export const removeDB = (fileName: string) => {
-//   const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
-//   console.log("testFilePath", fileName, testFilePath);
-//   fs.rmSync(".data", { recursive: true, force: true });
-// };
 
+export const removeDB = (fileName: string) => {
+  const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
+  console.log("testFilePath", fileName, testFilePath);
+  fs.rmSync(".data", { recursive: true, force: true });
+};

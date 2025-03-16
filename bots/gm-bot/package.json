@@ -1,0 +1,25 @@
+{
+  "name": "gm-bot",
+  "version": "0.0.5",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "client-check": "tsx src/check.ts",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@xmtp/node-sdk": "1.0.0-rc2",
+    "tsx": "^4.19.2",
+    "uint8arrays": "^5.1.0",
+    "viem": "^2.22.17"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.2",
+    "dotenv": "^16.4.5",
+    "typescript": "^5.4.5"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

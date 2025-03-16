@@ -1,6 +1,8 @@
 name: Validate code quality
 
-on: [pull_request]
+on:
+  push:
+    branches-ignore: [main]
 
 jobs:
   check:
@@ -16,5 +18,5 @@ jobs:
       - run: corepack enable
       - run: yarn
       - run: yarn format
-      - run: yarn typecheck
+      - run: yarn build
       - run: yarn lint

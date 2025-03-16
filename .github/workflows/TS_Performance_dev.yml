@@ -2,6 +2,8 @@ name: TS_Performance_dev
 description: "should verify performance of the library in the dev network"
 
 on:
+  pull_request:
+    branches: [deploy]
   schedule:
     - cron: "30 * * * *" # Runs at 30 minutes past each hour
   workflow_dispatch:

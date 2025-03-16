@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { createGroupAndReceiveGm } from "@helpers/playwright";
 import { describe, expect, it } from "vitest";
-import { createGroupAndReceiveGm } from "../helpers/playwright";
 
 const testName = "xmtpchat";
 loadEnv(testName);
