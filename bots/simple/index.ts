@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client, type XmtpEnv } from "@helpers/types";
+import { type Client } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 
 const testName = "test-bot";
