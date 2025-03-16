@@ -156,17 +156,15 @@ export class CommandHandler {
       ]);
       await group.addSuperAdmin(walletUser);
 
-      console.log(
-        `Group created with id ${group.id} by ${message.senderInboxId}`,
-      );
       await conversation?.send(
-        `Group created with id ${group.id} by ${message.senderInboxId}`,
+        `Bot :\n populating group with messsges from  random workers...`,
       );
-      // Send a message as the bot
       await group.send(
         `Bot :\n Group chat initialized with ${count} workers, you and web wallet: ${walletUser} are super admins. Welcome everyone!`,
       );
-      await this.populateGroup(group.id, randomWorkers);
+      await this.populateGroup(group.id, randomWorkers); // Send a message as the bot
+
+      await conversation?.send(`Group created with name ${group.name}`);
     } catch (error) {
       console.error("Error creating group:", error);
     }

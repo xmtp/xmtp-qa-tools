@@ -171,9 +171,12 @@ async function setLocalStorage(
   await page.addInitScript(
     ({ envValue, walletKey, walletEncryptionKey }) => {
       console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-
-      //window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-      // window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+      if (walletKey && walletEncryptionKey) {
+        // @ts-expect-error Window localStorage access in browser context
+        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+        // @ts-expect-error Window localStorage access in browser context
+        window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+      }
       // @ts-expect-error Window localStorage access in browser context
       window.localStorage.setItem("XMTP_NETWORK", envValue);
       // @ts-expect-error Window localStorage access in browser context
