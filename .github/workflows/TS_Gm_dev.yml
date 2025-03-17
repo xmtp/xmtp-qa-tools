@@ -1,4 +1,4 @@
-name: TS_Gm_dev
+name: TS_Gm
 description: "should verify performance of the library in the dev network"
 
 on:
@@ -7,12 +7,55 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
+  dev:
     runs-on: ubuntu-latest
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: "dev"
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+      WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
+      ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debug API key
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "API key is available in test job"
+          else
+            echo "API key is NOT available in test job"
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        run: ./scripts/run-test.sh TS_Gm
+      - name: Upload log files
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: gm_logs
+          path: logs/ts_gm.log
+      - name: Upload snapshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright_snapshots
+          path: logs/snapshots/*.png
+  production:
+    runs-on: ubuntu-latest
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: "production"
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
