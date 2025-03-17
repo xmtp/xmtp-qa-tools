@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { checkGroupInWebClient } from "@helpers/playwright";
 import {
+  IdentifierKind,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -40,6 +41,15 @@ async function main() {
     console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
     console.log("Syncing conversations...");
     await client.conversations.sync();
+
+    //Send dm to the bot
+    // const addressApp = "0xb222ec34482e3503988cfe81ced46ef10099c3e6";
+    // const dm = await client.conversations.newDmWithIdentifier({
+    //   identifierKind: IdentifierKind.Ethereum,
+    //   identifier: addressApp,
+    // });
+    // await dm.send("gm from bot");
+    // console.log("DM sent:", dm);
 
     console.log("Waiting for messages...");
     try {
