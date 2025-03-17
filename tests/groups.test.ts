@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { exportTestResults, sendTestResults } from "@helpers/datadog";
+import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {
@@ -61,7 +61,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, workers, start);
+      sendPerformanceResult(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

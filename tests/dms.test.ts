@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { exportTestResults, sendTestResults } from "@helpers/datadog";
+import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { type Conversation, type WorkerManager } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
@@ -55,7 +55,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      exportTestResults(expect, workers, start);
+      sendPerformanceResult(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

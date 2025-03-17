@@ -143,11 +143,14 @@ function filterLog(args: any[]): string {
   );
 }
 const getLogFilePath = (testName: string): string => {
-  const sanitizedName = testName.replace(/[^a-zA-Z0-9-_]/g, "_");
+  const env = process.env.XMTP_ENV as string;
+  const logName = testName + "_" + env;
+  const sanitizedName = logName.replace(/[^a-zA-Z0-9-_]/g, "_");
+  console.log("sanitizedName", sanitizedName);
   const fileName = `${sanitizedName}.log`;
 
   return testName.includes("bug")
-    ? path.join("bugs", testName, "test.log")
+    ? path.join("bugs", logName, "test.log")
     : path.join("logs", fileName);
 };
 

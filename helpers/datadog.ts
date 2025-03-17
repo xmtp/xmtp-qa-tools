@@ -170,7 +170,7 @@ export function getThresholdForOperation(
   );
 }
 
-export const exportTestResults = (
+export const sendPerformanceResult = (
   expect: any,
   workers: WorkerManager,
   start: number,
@@ -253,7 +253,7 @@ export function sendMetric(
 
 export function sendTestResults(hasFailures: boolean, testName: string): void {
   if (!isInitialized) {
-    console.error("WARNING: Datadog metrics not initialized");
+    console.warn("Datadog metrics not initialized");
     return;
   }
   const status = hasFailures ? "failed" : "successful";
