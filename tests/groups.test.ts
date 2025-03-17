@@ -19,7 +19,7 @@ import {
   it,
 } from "vitest";
 
-const testName = "ts_groups";
+const testName = "groups";
 loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;

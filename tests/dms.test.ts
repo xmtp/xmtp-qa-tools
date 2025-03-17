@@ -14,7 +14,7 @@ import {
   it,
 } from "vitest";
 
-const testName = "ts_dms";
+const testName = "dms";
 
 describe(testName, () => {
   loadEnv(testName);
