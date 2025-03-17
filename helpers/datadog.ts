@@ -241,6 +241,7 @@ export function sendMetric(
       ([key, value]) => `${key}:${String(value)}`,
     );
 
+    console.debug(fullMetricName, Math.round(metricValue), allTags);
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(
