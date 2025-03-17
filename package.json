@@ -1,11 +1,11 @@
 {
   "name": "xmtp-qa-testing",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "private": true,
   "type": "module",
   "scripts": {
-    "bots:simple": "tsx  bots/simple/index.ts",
-    "bots:test": "tsx  bots/test/index.ts",
+    "bot:simple": "tsx  bots/simple/index.ts",
+    "bot:test": "tsx  bots/test/index.ts",
     "build": "tsc",
     "clean": "rimraf .data/ ||:",
     "datadog": "tsx scripts/send-to-datadog.ts",
