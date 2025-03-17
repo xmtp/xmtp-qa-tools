@@ -1,4 +1,4 @@
-name: TS_Geolocation_dev
+name: TS_Geolocation
 description: "should verify geolocation of the library in the dev network"
 
 on:
@@ -7,13 +7,95 @@ on:
   workflow_dispatch:
 
 jobs:
-  geolocation:
+  dev:
     runs-on: ubuntu-latest
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: "dev"
+      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
+      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Railway CLI
+        run: npm install -g @railway/cli
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+
+      - run: corepack enable
+      - run: yarn install
+
+      - name: Create logs directory
+        run: mkdir -p logs
+
+      - name: Make geolocation test script executable
+        run: chmod +x ./scripts/run-test.sh
+
+      # US West Region Test
+      - name: Run performance test on US West
+        id: us-west-test
+        run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: us-west
+
+      # US East Region Test
+      - name: Run performance test on US East
+        id: us-east-test
+        run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: us-east
+
+      # Europe Region Test
+      - name: Run performance test on Europe
+        id: europe-test
+        run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: europe
+
+      # Asia Region Test
+      - name: Run performance test on Asia
+        id: asia-test
+        run: ./scripts/run-test.sh TS_Performance
+        env:
+          GEOLOCATION: asia
+
+      - name: Upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-logs
+          path: logs/
+
+      - name: Check for failures
+        run: |
+          echo "Region test results:"
+          echo "US West: ${{ steps.us-west-test.outcome }}"
+          echo "US East: ${{ steps.us-east-test.outcome }}"
+          echo "Europe: ${{ steps.europe-test.outcome }}"
+          echo "Asia: ${{ steps.asia-test.outcome }}"
+
+          if [[ "${{ steps.us-west-test.outcome }}" == "failure" || "${{ steps.us-east-test.outcome }}" == "failure" || "${{ steps.europe-test.outcome }}" == "failure" || "${{ steps.asia-test.outcome }}" == "failure" ]]; then
+            echo "One or more region tests failed after retries"
+            exit 1  # Make the workflow fail if any region test failed
+          fi
+
+      - name: Print completion message
+        run: echo "Railway test execution completed for all regions"
+  production:
+    runs-on: ubuntu-latest
+    env:
+      RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: "production"
       BATCH_SIZE: ${{ vars.BATCH_SIZE }}
       MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
     steps:
