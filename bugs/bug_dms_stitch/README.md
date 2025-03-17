@@ -38,6 +38,9 @@ yarn test bug_dms_stitch
 
 - Browser doesn't show new messages but never shows duplicate conversations
 - Convos list shows duplicates until is reopened, on refresh, only the old conversation is kept
+- Video shows forked state in a DM between browser and convos
+
+https://github.com/user-attachments/assets/7c8a03df-66b2-4b03-a21f-bf531fabc4e1
 
 ## Files
 
