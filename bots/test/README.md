@@ -14,7 +14,7 @@ git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 # Run the bot
-yarn bot
+yarn bot:test
 ```
 
 ## 💬 Available Commands
@@ -32,6 +32,8 @@ yarn bot
 | `/leave`               | Leave the current group                                      |
 | `/info`                | Get info about the current group                             |
 | `/workers`             | List all available workers                                   |
+| `/blast [message]`     | Blast a message to all participants in the current group     |
+| `/me`                  | Get info about the current worker                            |
 
 ## ⚙️ Environment Configuration
 

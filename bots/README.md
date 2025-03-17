@@ -22,7 +22,7 @@ This bot is used to test complex messaging scenarios.
 yarn install
 
 # Launch test environment
-yarn bot
+yarn bot:test
 ```
 
 See more in [test/README.md](./test/README.md)
