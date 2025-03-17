@@ -3,50 +3,9 @@ import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
-let isInitialized = false;
-let currentGeo = "";
-
-// Add this mapping function
-function getCountryCodeFromGeo(geolocation: string): string {
-  // Map your geo regions to ISO country codes
-  const geoToCountryCode: Record<string, string> = {
-    "us-east": "US",
-    "us-west": "US",
-    europe: "FR", // Using France as a representative for Europe
-    asia: "JP", // Using Japan as a representative for Asia
-    "south-america": "BR", // Using Brazil as a representative for South America
-  };
-
-  return geoToCountryCode[geolocation] || "US"; // Default to US if not found
-}
-export const exportTestResults = (
-  expect: any,
-  workers: WorkerManager,
-  start: number,
-) => {
-  const testName = expect.getState().currentTestName;
-  if (testName) {
-    console.timeEnd(testName as string);
-    expect(workers.getWorkers()).toBeDefined();
-    expect(workers.getWorkers().length).toBeGreaterThan(0);
-    void sendPerformanceMetric(
-      performance.now() - start,
-      testName as string,
-      workers.getVersion(),
-    );
-  }
-};
-// Add success status tag to duration metrics
-
-// Expanded threshold function to handle different operation types and regions
-export function getThresholdForOperation(
-  operation: string,
-  operationType: string = "core",
-  members: string = "",
-  region: string = "us-east",
-): number {
-  // 1. Core SDK Operations thresholds
-  const coreOperationThresholds: Record<string, number> = {
+// Refactored thresholds into a single configuration object
+const THRESHOLDS = {
+  core: {
     createdm: 500,
     sendgm: 200,
     receivegm: 200,
@@ -56,10 +15,13 @@ export function getThresholdForOperation(
     addmembers: 500,
     removemembers: 300,
     inboxstate: 100,
-  };
-
-  // 2. Group Operations thresholds by size
-  const groupSizeThresholds: Record<string, Record<string, number>> = {
+  },
+  network: {
+    server_call: 100,
+    tls_handshake: 100,
+    processing: 300,
+  },
+  group: {
     create: {
       "50": 2000,
       "100": 2000,
@@ -71,7 +33,7 @@ export function getThresholdForOperation(
       "400": 15000,
     },
     send: {
-      "50": 100, // Using conservative values based on README
+      "50": 100,
       "100": 100,
       "150": 100,
       "200": 150,
@@ -110,45 +72,106 @@ export function getThresholdForOperation(
       "350": 400,
       "400": 550,
     },
-  };
+  },
+  regionMultipliers: {
+    "us-east": 1.0,
+    "us-west": 1.0,
+    europe: 1.0,
+    asia: 1.5,
+    "south-america": 2.6,
+  },
+};
 
-  // 3. Regional performance adjustments (multipliers based on baseline us-east)
-  const regionMultipliers: Record<string, number> = {
-    "us-east": 1.0, // Baseline
-    "us-west": 1.0, // Similar to us-east
-    europe: 1.0, // Similar to us-east
-    asia: 1.5, // 50% slower expected
-    "south-america": 2.6, // 160% slower expected
-  };
+// Simplified geo mapping
+const GEO_TO_COUNTRY_CODE: Record<string, string> = {
+  "us-east": "US",
+  "us-west": "US",
+  europe: "FR",
+  asia: "JP",
+  "south-america": "BR",
+};
 
-  // 4. Network performance thresholds
-  const networkThresholds: Record<string, number> = {
-    server_call: 100,
-    tls_handshake: 100,
-    processing: 300, // end-to-end
-  };
+// Global state variables
+let isInitialized = false;
+let currentGeo: string = "";
 
-  // Determine which threshold to use
-  if (operationType === "network") {
-    return networkThresholds[operation.toLowerCase()] || 200;
-  } else if (operationType === "group") {
-    // Extract group operation type and size
-    const groupOp = operation.toLowerCase().replace(/group/, "");
-    const size = members || "50"; // Default to smallest group size if not specified
-
-    if (groupSizeThresholds[groupOp] && groupSizeThresholds[groupOp][size]) {
-      const baseThreshold = groupSizeThresholds[groupOp][size];
-      // Apply regional adjustment for group operations
-      return Math.round(baseThreshold * (regionMultipliers[region] || 1.0));
-    }
-    return 2000; // Default fallback for group operations
-  } else {
-    // Handle core operations with regional adjustments
-    const baseThreshold =
-      coreOperationThresholds[operation.toLowerCase()] || 300;
-    return Math.round(baseThreshold * (regionMultipliers[region] || 1.0));
-  }
+function getCountryCodeFromGeo(geolocation: string): string {
+  return GEO_TO_COUNTRY_CODE[geolocation] || "US";
 }
+
+// Simplified threshold function
+export function getThresholdForOperation(
+  operation: string,
+  operationType: string = "core",
+  members: string = "",
+  region: string = "us-east",
+): number {
+  if (operationType === "network") {
+    const networkThreshold =
+      THRESHOLDS.network[
+        operation.toLowerCase() as keyof typeof THRESHOLDS.network
+      ];
+    return typeof networkThreshold === "number" ? networkThreshold : 200;
+  }
+
+  if (operationType === "group") {
+    const groupOp = operation.toLowerCase().replace(/group/, "");
+    const size = members || "50";
+
+    // Get the operation-specific thresholds object
+    const groupThresholds =
+      THRESHOLDS.group[groupOp as keyof typeof THRESHOLDS.group];
+
+    // Safely check if this size exists, defaulting to 2000 if not
+    let baseThreshold = 2000;
+    if (groupThresholds) {
+      // Use type assertion to tell TypeScript this is a valid lookup
+      const sizeKey = size as unknown as keyof typeof groupThresholds;
+      if (sizeKey in groupThresholds) {
+        baseThreshold = groupThresholds[sizeKey];
+      }
+    }
+
+    return Math.round(
+      baseThreshold *
+        (THRESHOLDS.regionMultipliers[
+          region as keyof typeof THRESHOLDS.regionMultipliers
+        ] || 1.0),
+    );
+  }
+
+  const coreOp = operation.toLowerCase();
+  const baseThreshold =
+    coreOp in THRESHOLDS.core
+      ? THRESHOLDS.core[coreOp as keyof typeof THRESHOLDS.core]
+      : 300;
+
+  return Math.round(
+    baseThreshold *
+      (THRESHOLDS.regionMultipliers[
+        region as keyof typeof THRESHOLDS.regionMultipliers
+      ] || 1.0),
+  );
+}
+
+export const exportTestResults = (
+  expect: any,
+  workers: WorkerManager,
+  start: number,
+) => {
+  const testName = expect.getState().currentTestName;
+  if (testName) {
+    console.timeEnd(testName as string);
+    expect(workers.getWorkers()).toBeDefined();
+    expect(workers.getWorkers().length).toBeGreaterThan(0);
+    void sendPerformanceMetric(
+      performance.now() - start,
+      testName as string,
+      workers.getVersion(),
+    );
+  }
+};
+// Add success status tag to duration metrics
 
 export function initDataDog(
   testName: string,
@@ -188,60 +211,75 @@ export function initDataDog(
   }
 }
 
-// Enhanced function to send message delivery metrics with success tags
+// Combined metric sending function to reduce duplication
+export function sendMetric(
+  metricName: string,
+  metricValue: number,
+  tags: Record<string, any>,
+  category: string = "performance",
+): void {
+  if (!isInitialized) return;
+
+  try {
+    const fullMetricName = `xmtp.sdk.${metricName}`;
+    const allTags = Object.entries({ ...tags, metric_category: category }).map(
+      ([key, value]) => `${key}:${String(value)}`,
+    );
+
+    metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
+  } catch (error) {
+    console.error(
+      `❌ Error sending metric '${metricName}':`,
+      error instanceof Error ? error.message : String(error),
+    );
+  }
+}
+
+// Replace sendDeliveryMetric with simplified version using the common function
 export function sendDeliveryMetric(
   metricValue: number,
   testName: string,
   libxmtpVersion: string,
   metricType: string = "stream",
   metricName: string = "delivery",
-  deliveryStatus: string = "success", // "success", "order_error", or "failed"
+  deliveryStatus: string = "success",
   isOrderCorrect: boolean = true,
 ): void {
-  if (!isInitialized) {
-    return;
-  }
+  const members = testName.split("-")[1] || "";
+  const isSuccess =
+    metricName === "order" ? isOrderCorrect : deliveryStatus === "success";
+  const threshold = metricName === "order" ? 100 : 99.9;
 
-  try {
-    const members = testName.split("-")[1] || "";
+  sendMetric(
+    metricName,
+    Math.round(metricValue),
+    {
+      libxmtp: libxmtpVersion,
+      test: testName,
+      metric_type: metricType,
+      members: members,
+      success: isSuccess,
+      delivery_status: deliveryStatus,
+      order_correct: isOrderCorrect,
+      threshold: threshold,
+    },
+    "reliability",
+  );
 
-    // Determine thresholds - for message delivery we want 100% success (or 99.9% minimum)
-    let isSuccess = false;
-    if (metricName === "delivery" || metricName === "recovery") {
-      isSuccess = deliveryStatus === "success";
-    } else if (metricName === "order") {
-      isSuccess = isOrderCorrect;
-    }
-
-    // Set target thresholds based on README
-    const threshold = metricName === "order" ? 100 : 99.9;
-
-    metrics.gauge(`xmtp.sdk.${metricName}`, Math.round(metricValue), [
-      `libxmtp:${libxmtpVersion}`,
-      `test:${testName}`,
-      `metric_type:${metricType}`, // "stream", "poll", or "recovery"
-      `members:${members}`,
-      `success:${isSuccess}`,
-      `delivery_status:${deliveryStatus}`,
-      `order_correct:${isOrderCorrect}`,
-      `threshold:${threshold}`,
-      `metric_category:reliability`,
-    ]);
-
-    // For binary metrics (success/fail), also send a 1/0 value
-    const binaryValue = isSuccess ? 100 : 0;
-    metrics.gauge(`xmtp.sdk.${metricName}.status`, binaryValue, [
-      `libxmtp:${libxmtpVersion}`,
-      `test:${testName}`,
-      `metric_type:${metricType}`,
-      `members:${members}`,
-      `delivery_status:${deliveryStatus}`,
-      `order_correct:${isOrderCorrect}`,
-      `metric_category:reliability`,
-    ]);
-  } catch (error) {
-    console.error("❌ Error sending message delivery metrics:", error);
-  }
+  // Binary success metric
+  sendMetric(
+    `${metricName}.status`,
+    isSuccess ? 100 : 0,
+    {
+      libxmtp: libxmtpVersion,
+      test: testName,
+      metric_type: metricType,
+      members: members,
+      delivery_status: deliveryStatus,
+      order_correct: isOrderCorrect,
+    },
+    "reliability",
+  );
 }
 
 export function sendTestResults(hasFailures: boolean, testName: string): void {
@@ -257,12 +295,12 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
     // Send metric to Datadog using metrics.gauge
     const metricValue = hasFailures ? 0 : 1;
     const metricName = `xmtp.sdk.workflow.status`;
-    // console.debug({
-    //   metricName,
-    //   metricValue,
-    //   status,
-    //   workflow: testName,
-    // });
+    console.debug({
+      metricName,
+      metricValue,
+      status,
+      workflow: testName,
+    });
     metrics.gauge(metricName, Math.round(metricValue), [
       `status:${status}`,
       `workflow:${testName}`,
@@ -275,106 +313,79 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
   }
 }
 
+// Simplified version of sendPerformanceMetric
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,
   libxmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
-  if (!isInitialized) {
-    return;
-  }
+  if (!isInitialized) return;
 
   try {
     const metricNameParts = testName.split(":")[0];
     const metricName = metricNameParts.replaceAll(" > ", ".");
-    const metricDescription = testName.split(":")[1];
-    // Extract operation name for tagging
+    const metricDescription = testName.split(":")[1] || "";
     const operationParts = metricName.split(".");
     const testNameExtracted = operationParts[0];
-    const operationName = operationParts[1].split("-")[0];
-    const members = operationParts[1].split("-")[1] || "";
-    const durationMetricName = `xmtp.sdk.duration`;
+    const operationName = operationParts[1]?.split("-")[0] || "";
+    const members = operationParts[1]?.split("-")[1] || "";
 
-    // Determine operation type (core, group, network)
-    let operationType = "core";
-    if (operationName.toLowerCase().includes("group")) {
-      operationType = "group";
-    }
-
-    // Get threshold based on operation type, name, members count, and region
+    const operationType = operationName.toLowerCase().includes("group")
+      ? "group"
+      : "core";
     const threshold = getThresholdForOperation(
       operationName,
       operationType,
       members,
       currentGeo,
     );
-
     const isSuccess = metricValue <= threshold;
 
-    console.debug({
-      durationMetricName,
-      metricValue,
-      libxmtpVersion,
-      operationName,
-      operationType,
-      testNameExtracted,
-      metricDescription,
-      members,
-      isSuccess,
-      threshold,
-      currentGeo,
+    sendMetric("duration", metricValue, {
+      libxmtp: libxmtpVersion,
+      operation: operationName,
+      test: testNameExtracted,
+      metric_type: operationType,
+      description: metricDescription,
+      members: members,
+      success: isSuccess,
+      threshold: threshold,
+      region: currentGeo,
     });
 
-    // Send main operation metric
-    metrics.gauge(durationMetricName, Math.round(metricValue), [
-      `libxmtp:${libxmtpVersion}`,
-      `operation:${operationName}`,
-      `test:${testNameExtracted}`,
-      `metric_type:${operationType}`,
-      `description:${metricDescription}`,
-      `members:${members}`,
-      `success:${isSuccess}`,
-      `threshold:${threshold}`,
-      `region:${currentGeo}`,
-      `metric_category:performance`,
-    ]);
-
-    // Handle network stats if needed
+    // Network stats handling
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
-      const geo = currentGeo || "";
-      const countryCode = getCountryCodeFromGeo(geo);
+      const countryCode = getCountryCodeFromGeo(currentGeo);
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
-        const networkMetricValue = Math.round(statValue * 1000); // Convert to milliseconds
+        const networkMetricValue = Math.round(statValue * 1000);
         const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
-
-        // Get network threshold for this specific phase
         const networkThreshold = getThresholdForOperation(
           networkPhase,
           "network",
         );
-        const networkSuccess = networkMetricValue <= networkThreshold;
 
-        metrics.gauge(durationMetricName, networkMetricValue, [
-          `libxmtp:${libxmtpVersion}`,
-          `operation:${operationName}`,
-          `test:${testNameExtracted}`,
-          `metric_type:network`,
-          `network_phase:${networkPhase}`,
-          `geo.country_iso_code:${countryCode}`,
-          `members:${members}`,
-          `success:${networkSuccess}`,
-          `threshold:${networkThreshold}`,
-          `region:${currentGeo}`,
-          `metric_category:performance`,
-        ]);
+        sendMetric("duration", networkMetricValue, {
+          libxmtp: libxmtpVersion,
+          operation: operationName,
+          test: testNameExtracted,
+          metric_type: "network",
+          network_phase: networkPhase,
+          "geo.country_iso_code": countryCode,
+          members: members,
+          success: networkMetricValue <= networkThreshold,
+          threshold: networkThreshold,
+          region: currentGeo,
+        });
       }
     }
   } catch (error) {
-    console.error(`❌ Error sending metric '${testName}':`, error);
-    // Existing error handling
+    console.error(
+      `❌ Error sending performance metric for '${testName}':`,
+      error,
+    );
   }
 }
 
