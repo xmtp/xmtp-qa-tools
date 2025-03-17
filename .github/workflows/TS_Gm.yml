@@ -42,8 +42,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: gm_logs
-          path: logs/ts_gm.log
+          name: gm_logs_dev
+          path: logs/ts_gm_dev.log
       - name: Upload snapshots
         uses: actions/upload-artifact@v4
         if: always()
@@ -85,8 +85,8 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: gm_logs
-          path: logs/ts_gm.log
+          name: gm_logs_production
+          path: logs/ts_gm_production.log
       - name: Upload snapshots
         uses: actions/upload-artifact@v4
         if: always()

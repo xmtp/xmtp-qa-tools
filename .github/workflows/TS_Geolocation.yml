@@ -89,6 +89,12 @@ jobs:
 
       - name: Print completion message
         run: echo "Railway test execution completed for all regions"
+     - name: Upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: geolocation_logs_dev
+          path: logs/ts_geolocation_dev.log
+
   production:
     runs-on: ubuntu-latest
     env:
@@ -171,3 +177,8 @@ jobs:
 
       - name: Print completion message
         run: echo "Railway test execution completed for all regions"
+      - name: Upload log files
+        uses: actions/upload-artifact@v4
+        with:
+          name: geolocation_logs_production
+          path: logs/ts_geolocation_production.log

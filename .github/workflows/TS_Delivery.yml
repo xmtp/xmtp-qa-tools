@@ -37,7 +37,7 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: delivery_logs
+          name: delivery_logs_dev
           path: logs/ts_delivery_dev.log
   production:
     runs-on: ubuntu-latest
@@ -69,5 +69,5 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: delivery_logs
+          name: delivery_logs_production
           path: logs/ts_delivery_production.log
