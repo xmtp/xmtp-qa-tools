@@ -43,7 +43,7 @@ jobs:
         if: always()
         with:
           name: gm_logs_dev
-          path: logs/ts_gm_dev.log
+          path: logs/
       - name: Upload snapshots
         uses: actions/upload-artifact@v4
         if: always()
@@ -86,7 +86,7 @@ jobs:
         if: always()
         with:
           name: gm_logs_production
-          path: logs/ts_gm_production.log
+          path: logs/
       - name: Upload snapshots
         uses: actions/upload-artifact@v4
         if: always()

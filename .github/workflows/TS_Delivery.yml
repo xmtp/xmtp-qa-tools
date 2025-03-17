@@ -38,7 +38,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: delivery_logs_dev
-          path: logs/ts_delivery_dev.log
+          path: logs/
   production:
     runs-on: ubuntu-latest
     env:
@@ -70,4 +70,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: delivery_logs_production
-          path: logs/ts_delivery_production.log
+          path: logs/

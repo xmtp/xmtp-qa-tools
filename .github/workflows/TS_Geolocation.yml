@@ -71,7 +71,7 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance-logs
+          name: geolocation_logs_dev
           path: logs/
 
       - name: Check for failures
@@ -154,7 +154,7 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance-logs
+          name: geolocation_logs_production
           path: logs/
 
       - name: Check for failures
