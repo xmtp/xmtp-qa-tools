@@ -5,83 +5,21 @@ import {
   chromium,
   type Browser,
   type BrowserContext,
-  type BrowserContextOptions,
   type Page,
 } from "playwright-chromium";
 
-const snapshotDir = path.join(process.cwd(), ".data/snapshots");
-const storageStatePath = path.join(process.cwd(), ".data/storageState.json");
+const snapshotDir = path.join(process.cwd(), "./logs/snapshots");
 let browser: Browser | null = null;
 if (!fs.existsSync(snapshotDir)) {
   fs.mkdirSync(snapshotDir, { recursive: true });
 }
-
-// Create a shared context that can be reused
-let sharedContext: BrowserContext | null = null;
-
-// Function to initialize browser if not already initialized
-async function initBrowser() {
-  if (!browser) {
-    const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
-    browser = await chromium.launch({
-      headless: isHeadless,
-      // Add slower animations for debugging if not in CI
-      slowMo: isHeadless ? 0 : 100,
-    });
-  }
-  return browser;
-}
-
-// Function to get or create a shared context
-async function getSharedContext(
-  useStorageState = true,
-): Promise<BrowserContext> {
-  const browser = await initBrowser();
-  const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
-
-  // If we already have a shared context, return it
-  if (sharedContext) {
-    return sharedContext;
-  }
-
-  // Create a new context with storage state if it exists and is requested
-  const contextOptions: BrowserContextOptions = isHeadless
-    ? {
-        viewport: { width: 1920, height: 1080 },
-        deviceScaleFactor: 1,
-      }
-    : {};
-
-  // Use storage state if it exists and is requested
-  if (useStorageState && fs.existsSync(storageStatePath)) {
-    contextOptions.storageState = storageStatePath;
-  }
-
-  sharedContext = await browser.newContext(contextOptions);
-  return sharedContext;
-}
-
-// Function to save the current storage state
-async function saveStorageState() {
-  if (sharedContext) {
-    await sharedContext.storageState({ path: storageStatePath });
-    console.log("Storage state saved to:", storageStatePath);
-  }
-}
+let page: Page | null = null;
 
 export async function createGroupAndReceiveGm(addresses: string[]) {
-  await initBrowser();
-  const context = await getSharedContext(false); // Don't use storage state for this test
-  const page = await context.newPage();
-
+  const { page, browser } = await startPage(false);
   try {
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
-
-    // Set up localStorage for this page
-    const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
-    await setLocalStorage(page, XMTP_ENV, "", "");
-
     await page
       .getByRole("main")
       .getByRole("button", { name: "Connect" })
@@ -114,18 +52,14 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
     const botMessageText = await botMessage.textContent();
     console.log("botMessageText", botMessageText);
 
-    // Save the storage state after successful test
-    await saveStorageState();
-
     return botMessageText === "gm";
   } catch (error) {
     console.error("Could not find 'gm' message:", error);
     // Take a screenshot to see what's visible
     if (page) await takeSnapshot(page, "before-finding-gm", addresses);
-    return false;
   } finally {
-    // Close the page but keep the context and browser
-    await page.close();
+    // Close the browser
+    if (browser) await browser.close();
   }
 }
 
@@ -139,7 +73,40 @@ async function takeSnapshot(page: Page, name: string, addresses: string[]) {
     console.log(`Snapshot saved: ${name} (${screenshotPath})`);
   }
 }
+async function startPage(defaultUser: boolean) {
+  const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
+  const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
+  const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
+  const ENCRYPTION_KEY_XMTP_CHAT = process.env
+    .ENCRYPTION_KEY_XMTP_CHAT as string;
 
+  browser = await chromium.launch({
+    headless: isHeadless,
+    // Add slower animations for debugging if not in CI
+    slowMo: isHeadless ? 0 : 100,
+  });
+
+  // Create context with a larger viewport to ensure all messages are visible
+  const context: BrowserContext = await browser.newContext(
+    isHeadless
+      ? {
+          viewport: { width: 1920, height: 1080 }, // Use a large viewport size
+          deviceScaleFactor: 1,
+        }
+      : {},
+  );
+
+  page = await context.newPage();
+
+  // Fix: Pass the env value correctly to the init script
+  await setLocalStorage(
+    page,
+    XMTP_ENV,
+    defaultUser ? WALLET_KEY_XMTP_CHAT : "",
+    defaultUser ? ENCRYPTION_KEY_XMTP_CHAT : "",
+  );
+  return { browser, page };
+}
 // Helper function to check if a group exists in the web client
 export async function checkGroupInWebClient(
   message: DecodedMessage,
@@ -152,24 +119,7 @@ export async function checkGroupInWebClient(
     return { success: false, error: "Group not found" };
   }
   const groupName = (group as Group).name;
-
-  // Use the shared context
-  const context = await getSharedContext();
-  const page = await context.newPage();
-
-  // Set up localStorage
-  const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
-  const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
-  const ENCRYPTION_KEY_XMTP_CHAT = process.env
-    .ENCRYPTION_KEY_XMTP_CHAT as string;
-
-  await setLocalStorage(
-    page,
-    XMTP_ENV,
-    WALLET_KEY_XMTP_CHAT,
-    ENCRYPTION_KEY_XMTP_CHAT,
-  );
-
+  const { page, browser } = await startPage(true);
   try {
     await page.goto(`https://xmtp.chat/`);
 
@@ -196,9 +146,6 @@ export async function checkGroupInWebClient(
     // Check if the group exists
     const isGroupVisible = await groupElement.isVisible();
 
-    // Save the storage state after successful check
-    await saveStorageState();
-
     if (isGroupVisible) {
       console.log(`Group "${groupName}" found in web client`);
       return { success: true };
@@ -210,20 +157,8 @@ export async function checkGroupInWebClient(
     console.error("Error checking group in web client:", error);
     return { success: false, error: error.message || "Unknown error" };
   } finally {
-    // Close the page but keep the context and browser
-    await page.close();
-  }
-}
-
-// Add a function to close the browser and clean up resources
-export async function closeBrowser() {
-  if (sharedContext) {
-    await sharedContext.close();
-    sharedContext = null;
-  }
-  if (browser) {
-    await browser.close();
-    browser = null;
+    // Close the browser
+    if (browser) await browser.close();
   }
 }
 
@@ -236,12 +171,9 @@ async function setLocalStorage(
   await page.addInitScript(
     ({ envValue, walletKey, walletEncryptionKey }) => {
       console.log("env keys", { envValue, walletKey, walletEncryptionKey });
-      if (walletKey && walletEncryptionKey) {
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
-      }
+
+      //window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+      // window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
       // @ts-expect-error Window localStorage access in browser context
       window.localStorage.setItem("XMTP_NETWORK", envValue);
       // @ts-expect-error Window localStorage access in browser context
