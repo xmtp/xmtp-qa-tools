@@ -321,6 +321,7 @@ export async function sendPerformanceMetric(
       success: isSuccess,
       threshold: threshold,
       region: currentGeo,
+      metric_category: "performance",
     });
 
     // Network stats handling
@@ -347,6 +348,7 @@ export async function sendPerformanceMetric(
           success: networkMetricValue <= networkThreshold,
           threshold: networkThreshold,
           region: currentGeo,
+          metric_category: "performance",
         });
       }
     }
