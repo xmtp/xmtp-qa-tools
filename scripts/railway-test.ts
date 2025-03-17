@@ -1,10 +1,8 @@
 import { execSync } from "child_process";
 import { sendTestResults } from "@helpers/datadog";
 
-type TestResult = "success" | "failure";
-
 function runTests(): void {
-  let status: TestResult = "failure";
+  let hasFailures: boolean = false;
   // Get the test name from command line arguments or use default
   const testName = process.argv[2] || "TS_Performance";
 
@@ -26,14 +24,12 @@ function runTests(): void {
     try {
       console.log(`Attempt ${i}...` + testName);
       execSync(`yarn test ${testName}`, { stdio: "inherit" });
-      // If we get here, tests passed
-      status = "success";
       break;
     } catch (e) {
       console.log(e);
       if (i === 3) {
         console.log("Test failed after 3 attempts.");
-        status = "failure";
+        hasFailures = true;
       } else {
         console.log("Retrying in 10 seconds...");
         // Wait 10 seconds before retrying
@@ -43,7 +39,7 @@ function runTests(): void {
   }
 
   // Report results to Datadog
-  sendTestResults(status, testName);
+  sendTestResults(hasFailures, testName);
 }
 
 // Run tests when this script is executed

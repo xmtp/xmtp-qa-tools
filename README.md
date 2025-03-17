@@ -108,23 +108,7 @@ We can test all XMTP bindings using three main applications. We use xmtp.chat to
 | removeMembers       | Removing participants from a group     | 147-168  | <300ms | ✅ On Target |
 | inboxState          | Checking inbox state                   | 36       | <100ms | ✅ On Target |
 
-_Note: Based on data from 79 measured operations in the `us-east` testing environment._
-
-### Dev vs Production Performance Comparison
-
-| Operation           | Dev Avg (ms) | Production Avg (ms) | Difference | Status               |
-| ------------------- | ------------ | ------------------- | ---------- | -------------------- |
-| createDM            | 289          | 256                 | -11.4%     | ✅ Production Better |
-| sendGM              | 140          | 128                 | -8.6%      | ✅ Production Better |
-| receiveGM           | 96           | 91                  | -5.2%      | ✅ Production Better |
-| receiveGroupMessage | 130          | 122                 | -6.2%      | ✅ Production Better |
-| updateGroupName     | 110          | 105                 | -4.5%      | ✅ Production Better |
-| syncGroup           | 94           | 84                  | -10.6%     | ✅ Production Better |
-| addMembers          | 292          | 245                 | -16.1%     | ✅ Production Better |
-| removeMembers       | 175          | 152                 | -13.1%     | ✅ Production Better |
-| inboxState          | 39           | 36                  | -7.7%      | ✅ Production Better |
-
-_Note: Production environment consistently outperforms Dev across all operations, with improvements ranging from 4.5% to 16.1%._
+_Note: Based on data from 79 measured operations in the `us-east` region and `production` network._
 
 ### Group Operations Performance by Size
 
@@ -161,11 +145,10 @@ _Note: Performance metrics based on `us-east` testing on dev and production netw
 | us-east       | 276.6            | 87.2     | Baseline  | ✅ On Target           |
 | us-west       | 229.3            | 111.1    | -15.6%    | ✅ On Target           |
 | europe        | 178.5            | 111.4    | -33.2%    | ✅ On Target           |
-| us            | 155.7            | 121.0    | -40.8%    | ✅ On Target           |
 | asia          | 411.0            | 103.7    | +46.5%    | ⚠️ Performance Concern |
 | south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
-_Note: Regional performance testing shows significant latency increases in `south-america` (+160.3%) and `asia` (+46.5%) regions compared to the `us-east` baseline._
+_Note: Baseline is `us-east` region and `production` network._
 
 ### Dev vs Production Network Performance Comparison
 
@@ -174,11 +157,10 @@ _Note: Regional performance testing shows significant latency increases in `sout
 | us-east       | 294.8    | 276.6           | -6.2%      | ✅ Production Better |
 | us-west       | 247.1    | 229.3           | -7.2%      | ✅ Production Better |
 | europe        | 196.3    | 178.5           | -9.1%      | ✅ Production Better |
-| us            | 168.9    | 155.7           | -7.8%      | ✅ Production Better |
 | asia          | 439.8    | 411.0           | -6.5%      | ✅ Production Better |
 | south-america | 798.2    | 754.6           | -5.5%      | ✅ Production Better |
 
-_Note: Production environment consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
+_Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
 ## Message reliability
 
@@ -203,7 +185,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | Poll-based       | 100% delivery | Delayed (30s max) | Backup/recovery        | ✅ On Target |
 | Hybrid approach  | 100% delivery | Optimized         | Recommended for Agents | ✅ On Target |
 
-_Note: A hybrid approach using `streams` with `poll`-based verification provides the most reliable message delivery guarantee._
+_Note: A hybrid approach using `stream` and `poll`-based verification provides the most reliable message delivery guarantee._
 
 ### Success criteria summary
 
