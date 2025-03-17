@@ -266,6 +266,7 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
     metrics.gauge(metricName, Math.round(metricValue), [
       `status:${status}`,
       `workflow:${testName}`,
+      `metric_category:workflow`,
     ]);
 
     console.log(`Successfully reported ${status} to Datadog`);
@@ -336,6 +337,7 @@ export async function sendPerformanceMetric(
       `success:${isSuccess}`,
       `threshold:${threshold}`,
       `region:${currentGeo}`,
+      `metric_category:performance`,
     ]);
 
     // Handle network stats if needed
@@ -366,6 +368,7 @@ export async function sendPerformanceMetric(
           `success:${networkSuccess}`,
           `threshold:${networkThreshold}`,
           `region:${currentGeo}`,
+          `metric_category:performance`,
         ]);
       }
     }
