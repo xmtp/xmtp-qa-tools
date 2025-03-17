@@ -1,12 +1,10 @@
 {
   "title": "XMTP QA Worflows",
   "description": "[[suggested_dashboards]]",
-  "experience_type": "default",
   "widgets": [
     {
       "id": 2728971946510230,
       "definition": {
-        "time": {},
         "title": "Test uptime percentage",
         "type": "treemap",
         "requests": [
@@ -42,6 +40,22 @@
         "has_padding": true
       },
       "layout": { "x": 4, "y": 0, "width": 2, "height": 4 }
+    },
+    {
+      "id": 7245798317934790,
+      "definition": {
+        "title": "",
+        "title_size": "16",
+        "title_align": "left",
+        "requests": [
+          {
+            "request_type": "slo_list",
+            "query": { "query_string": "tags:xmtp-qa-testing", "limit": 100 }
+          }
+        ],
+        "type": "slo_list"
+      },
+      "layout": { "x": 6, "y": 0, "width": 4, "height": 4 }
     }
   ],
   "template_variables": [
