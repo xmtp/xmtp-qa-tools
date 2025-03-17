@@ -34,6 +34,9 @@ yarn bot:test
 | `/workers`             | List all available workers                                   |
 | `/blast [message]`     | Blast a message to all participants in the current group     |
 | `/me`                  | Get info about the current worker                            |
+| `/address`             | Get the address of the current group                         |
+| `/block [name]`        | Block the name of a worker                                   |
+| `/unblock [name]`      | Unblock the name of a worker                                 |
 
 ## ⚙️ Environment Configuration
 

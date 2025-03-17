@@ -39,21 +39,14 @@ export default tseslint.config(
       ],
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-deprecated": "warn",
+      "@typescript-eslint/no-unused-vars": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/await-thenable": "off",
       "@typescript-eslint/no-unnecessary-condition": "off",
       "@typescript-eslint/no-unsafe-member-access": "off",
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
-      "@typescript-eslint/no-unused-vars": [
-        "error",
-        {
-          argsIgnorePattern: "^_",
-          destructuredArrayIgnorePattern: "^_",
-          ignoreRestSiblings: true,
-          varsIgnorePattern: "^_",
-        },
-      ],
+
       "@typescript-eslint/restrict-template-expressions": [
         "error",
         {

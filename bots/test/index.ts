@@ -24,14 +24,13 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   try {
+    const commandHandler = new CommandHandler();
     // First create the bot worker
 
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
     const workers = await getWorkers(20, testName, "message", true);
-    const commandHandler = new CommandHandler();
-
-    const botWorker = await getWorkers(["bot"], testName, "message", true);
+    const botWorker = await getWorkers(["bot"], testName, "none", false);
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 
@@ -56,10 +55,6 @@ async function main() {
             continue;
           }
 
-          console.log(
-            `Received message: ${message.content as string} by ${message.senderInboxId}`,
-          );
-
           const conversation = await client.conversations.getConversationById(
             message.conversationId,
           );
@@ -68,6 +63,9 @@ async function main() {
             console.log("Unable to find conversation, skipping");
             continue;
           }
+          console.log(
+            `Received message: ${message.content as string} by ${message.senderInboxId}`,
+          );
 
           // Parse the message content to extract command and arguments
           await processCommand(
@@ -138,6 +136,9 @@ async function processCommand(
         break;
       case "rename":
         await commandHandler.rename(message, client, args);
+        break;
+      case "me":
+        await commandHandler.me(message, client);
         break;
       case "members":
         await commandHandler.members(message, client, workers);
