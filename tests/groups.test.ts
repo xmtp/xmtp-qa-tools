@@ -19,7 +19,7 @@ import {
   it,
 } from "vitest";
 
-const testName = "ts_groups";
+const testName = "groups";
 loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
@@ -70,7 +70,7 @@ describe(testName, () => {
 
   afterAll(async () => {
     try {
-      sendTestResults(hasFailures ? "failure" : "success", testName);
+      sendTestResults(hasFailures, testName);
       await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);

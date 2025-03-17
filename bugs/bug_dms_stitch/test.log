@@ -1,5 +1,0 @@
-[2025-03-16T23:46:06.772Z] [info] XMTP_ENV dev
-[2025-03-16T23:46:06.801Z] [info] Using env keys for ivy: 0x37a507A22946E83C5e88F507609ed7Ba8AeBAeF9
-[2025-03-16T23:46:09.290Z] [info] [ivy] message stream started
-[2025-03-16T23:46:10.098Z] [info] gm from ivy-a 00ec88c04740954143db61a9c735d014
-[2025-03-16T23:46:11.653Z] [warn] Ivy  terminates, deletes local data, and restarts

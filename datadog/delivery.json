@@ -1,7 +1,6 @@
 {
   "title": "XMTP SDK Delivery",
   "description": "Metrics for XMTP SDK delivery",
-  "experience_type": "default",
   "widgets": [
     {
       "id": 504026830671482,
@@ -38,9 +37,9 @@
       "layout": { "x": 0, "y": 0, "width": 2, "height": 1 }
     },
     {
-      "id": 7386776256176399,
+      "id": 8856927638744357,
       "definition": {
-        "title": "Stream Order Rate (%)",
+        "title": "Poll Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -51,7 +50,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -72,9 +71,9 @@
       "layout": { "x": 2, "y": 0, "width": 2, "height": 1 }
     },
     {
-      "id": 2407062479686085,
+      "id": 5725909012596498,
       "definition": {
-        "title": "Offline Order Rate (%)",
+        "title": "Recovery Delivery Date",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -85,7 +84,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -106,9 +105,9 @@
       "layout": { "x": 4, "y": 0, "width": 2, "height": 1 }
     },
     {
-      "id": 5725909012596498,
+      "id": 7386776256176399,
       "definition": {
-        "title": "Poll Delivery Rate (%)",
+        "title": "Stream Order Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -119,7 +118,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -174,6 +173,40 @@
       "layout": { "x": 2, "y": 1, "width": 2, "height": 1 }
     },
     {
+      "id": 2407062479686085,
+      "definition": {
+        "title": "Recovery Order Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 4, "y": 1, "width": 2, "height": 1 }
+    },
+    {
       "id": 3827551407888457,
       "definition": {
         "title": "Stream Delivery Rate (%)",
@@ -192,6 +225,7 @@
               { "formula": "query4" },
               { "formula": "query5" },
               { "formula": "query6" }
+              
             ],
             "queries": [
               {
@@ -217,12 +251,12 @@
               {
                 "name": "query5",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:offline,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}"
               },
               {
                 "name": "query6",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:offline,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}"
               }
             ],
             "response_format": "timeseries",
@@ -242,8 +276,8 @@
     {
       "name": "env",
       "prefix": "env",
-      "available_values": [],
-      "default": "dev"
+      "available_values": ["dev", "production"],
+      "default": "production"
     },
     {
       "name": "geo",
@@ -255,7 +289,7 @@
         "us-east",
         "us-west"
       ],
-      "default": "*"
+      "default": "us-east"
     },
     {
       "name": "test",
@@ -264,14 +298,20 @@
       "default": "ts_delivery"
     },
     {
-      "name": "metric_type",
-      "prefix": "metric_type",
-      "available_values": ["stream", "poll", "offline"],
+      "name": "libxmtp",
+      "prefix": "libxmtp",
+      "available_values": [],
       "default": "*"
     },
     {
-      "name": "libxmtp",
-      "prefix": "libxmtp",
+      "name": "operation",
+      "prefix": "operation",
+      "available_values": [],
+      "default": "*"
+    },
+    {
+      "name": "metric_type",
+      "prefix": "metric_type",
       "available_values": [],
       "default": "*"
     },
@@ -284,21 +324,5 @@
   ],
   "layout_type": "ordered",
   "notify_list": [],
-  "template_variable_presets": [
-    {
-      "name": "outside-us",
-      "template_variables": [
-        { "name": "geo", "value": "south-america" },
-        { "name": "test", "value": "ts_delivery" }
-      ]
-    },
-    {
-      "name": "us",
-      "template_variables": [
-        { "name": "geo", "value": "us-east" },
-        { "name": "test", "value": "ts_delivery" }
-      ]
-    }
-  ],
   "reflow_type": "fixed"
 }

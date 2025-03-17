@@ -1,0 +1,9 @@
+[2025-03-17T19:57:42.414Z] [info] XMTP_ENV dev
+[2025-03-17T19:57:42.442Z] [info] Using env keys for ivy: 0x37a507A22946E83C5e88F507609ed7Ba8AeBAeF9
+[2025-03-17T19:57:45.068Z] [info] [ivy] message stream started
+[2025-03-17T19:57:48.004Z] [info] Sending message: gm from ivy-a 00ec88c04740954143db61a9c735d014 - 2025-03-17T19:57:48.003Z
+[2025-03-17T19:57:48.584Z] [info] Found 1 conversations before restart
+[2025-03-17T19:57:48.584Z] [warn] Simulating client restart: clearing local data and restarting
+[2025-03-17T19:57:49.387Z] [info] Sending second message: gm after restart 00ec88c04740954143db61a9c735d014 - 2025-03-17T19:57:49.386Z
+[2025-03-17T19:57:49.933Z] [info] Found 1 conversations after restart
+[2025-03-17T19:57:49.934Z] [info] Conversation IDs: ["00ec88c04740954143db61a9c735d014"]

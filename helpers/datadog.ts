@@ -3,22 +3,173 @@ import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
+// Global state variables
 let isInitialized = false;
-let currentGeo = "";
+let currentGeo: string = "";
 
-// Add this mapping function
-function getCountryCodeFromGeo(geolocation: string): string {
-  // Map your geo regions to ISO country codes
-  const geoToCountryCode: Record<string, string> = {
+// Refactored thresholds into a single configuration object
+const THRESHOLDS = {
+  core: {
+    createdm: 500,
+    sendgm: 200,
+    receivegm: 200,
+    receivegroupmessage: 200,
+    updategroupname: 200,
+    syncgroup: 200,
+    addmembers: 500,
+    removemembers: 300,
+    inboxstate: 100,
+  },
+  network: {
+    server_call: 100,
+    tls_handshake: 100,
+    processing: 300,
+  },
+  group: {
+    create: {
+      "50": 2000,
+      "100": 2000,
+      "150": 4000,
+      "200": 5000,
+      "250": 7000,
+      "300": 9000,
+      "350": 11000,
+      "400": 15000,
+    },
+    send: {
+      "50": 100,
+      "100": 100,
+      "150": 100,
+      "200": 150,
+      "250": 200,
+      "300": 300,
+      "350": 350,
+      "400": 500,
+    },
+    sync: {
+      "50": 100,
+      "100": 100,
+      "150": 100,
+      "200": 150,
+      "250": 200,
+      "300": 350,
+      "350": 350,
+      "400": 500,
+    },
+    update: {
+      "50": 100,
+      "100": 100,
+      "150": 150,
+      "200": 200,
+      "250": 200,
+      "300": 300,
+      "350": 350,
+      "400": 500,
+    },
+    remove: {
+      "50": 150,
+      "100": 200,
+      "150": 200,
+      "200": 250,
+      "250": 300,
+      "300": 350,
+      "350": 400,
+      "400": 550,
+    },
+  },
+  regionMultipliers: {
+    "us-east": 1.0,
+    "us-west": 1.0,
+    europe: 1.0,
+    asia: 1.5,
+    "south-america": 2.6,
+  },
+  GEO_TO_COUNTRY_CODE: {
     "us-east": "US",
     "us-west": "US",
-    europe: "FR", // Using France as a representative for Europe
-    asia: "JP", // Using Japan as a representative for Asia
-    "south-america": "BR", // Using Brazil as a representative for South America
-  };
+    europe: "FR",
+    asia: "JP",
+    "south-america": "BR",
+  },
+  reliability: {
+    stream: {
+      threshold: 99.9,
+    },
+    poll: {
+      threshold: 99.9,
+    },
+    order: {
+      threshold: 100,
+    },
+    delivery: {
+      threshold: 99.9,
+    },
+  },
+};
 
-  return geoToCountryCode[geolocation] || "US"; // Default to US if not found
+function getCountryCodeFromGeo(geolocation: string): string {
+  return (
+    THRESHOLDS.GEO_TO_COUNTRY_CODE[
+      geolocation as keyof typeof THRESHOLDS.GEO_TO_COUNTRY_CODE
+    ] || "US"
+  );
 }
+
+// Simplified threshold function
+export function getThresholdForOperation(
+  operation: string,
+  operationType: string = "core",
+  members: string = "",
+  region: string = "us-east",
+): number {
+  if (operationType === "network") {
+    const networkThreshold =
+      THRESHOLDS.network[
+        operation.toLowerCase() as keyof typeof THRESHOLDS.network
+      ];
+    return typeof networkThreshold === "number" ? networkThreshold : 200;
+  }
+
+  if (operationType === "group") {
+    const groupOp = operation.toLowerCase().replace(/group/, "");
+    const size = members || "50";
+
+    // Get the operation-specific thresholds object
+    const groupThresholds =
+      THRESHOLDS.group[groupOp as keyof typeof THRESHOLDS.group];
+
+    // Safely check if this size exists, defaulting to 2000 if not
+    let baseThreshold = 2000;
+    if (groupThresholds) {
+      // Use type assertion to tell TypeScript this is a valid lookup
+      const sizeKey = size as unknown as keyof typeof groupThresholds;
+      if (sizeKey in groupThresholds) {
+        baseThreshold = groupThresholds[sizeKey];
+      }
+    }
+
+    return Math.round(
+      baseThreshold *
+        (THRESHOLDS.regionMultipliers[
+          region as keyof typeof THRESHOLDS.regionMultipliers
+        ] || 1.0),
+    );
+  }
+
+  const coreOp = operation.toLowerCase();
+  const baseThreshold =
+    coreOp in THRESHOLDS.core
+      ? THRESHOLDS.core[coreOp as keyof typeof THRESHOLDS.core]
+      : 300;
+
+  return Math.round(
+    baseThreshold *
+      (THRESHOLDS.regionMultipliers[
+        region as keyof typeof THRESHOLDS.regionMultipliers
+      ] || 1.0),
+  );
+}
+
 export const exportTestResults = (
   expect: any,
   workers: WorkerManager,
@@ -36,6 +187,8 @@ export const exportTestResults = (
     );
   }
 };
+// Add success status tag to duration metrics
+
 export function initDataDog(
   testName: string,
   envValue: string,
@@ -74,56 +227,52 @@ export function initDataDog(
   }
 }
 
-// Add this new function to send message delivery metrics
-export function sendDeliveryMetric(
+// Combined metric sending function to reduce duplication
+export function sendMetric(
+  metricName: string,
   metricValue: number,
-  testName: string,
-  libxmtpVersion: string,
-  metricType: string = "stream",
-  metricName: string = "delivery",
+  tags: Record<string, any>,
 ): void {
-  if (!isInitialized) {
-    return;
-  }
+  if (!isInitialized) return;
 
   try {
-    const members = testName.split("-")[1] || "";
+    const fullMetricName = `xmtp.sdk.${metricName}`;
+    const allTags = Object.entries({ ...tags }).map(
+      ([key, value]) => `${key}:${String(value)}`,
+    );
 
-    metrics.gauge(`xmtp.sdk.${metricName}`, Math.round(metricValue), [
-      `libxmtp:${libxmtpVersion}`,
-      `test:${testName}`,
-      `metric_type:${metricType}`,
-      `members:${members}`,
-    ]);
+    metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
-    console.error("❌ Error sending message delivery metrics:", error);
+    console.error(
+      `❌ Error sending metric '${metricName}':`,
+      error instanceof Error ? error.message : String(error),
+    );
   }
 }
 
-export function sendTestResults(
-  status: "success" | "failure",
-  testName: string,
-): void {
+export function sendTestResults(hasFailures: boolean, testName: string): void {
   if (!isInitialized) {
     console.error("WARNING: Datadog metrics not initialized");
     return;
   }
+  const status = hasFailures ? "failed" : "successful";
 
   console.log(`The tests indicated that the test ${testName} was ${status}`);
 
   try {
     // Send metric to Datadog using metrics.gauge
-    const metricValue = status === "success" ? 1 : 0;
+    const metricValue = hasFailures ? 0 : 1;
     const metricName = `xmtp.sdk.workflow.status`;
-    // console.debug({
-    //   metricName,
-    //   metricValue,
-    //   status,
-    //   workflow: testName,
-    // });
-    metrics.gauge(metricName, metricValue, [
+    console.debug({
+      metricName,
+      metricValue,
+      status,
+      workflow: testName,
+    });
+    metrics.gauge(metricName, Math.round(metricValue), [
       `status:${status}`,
       `workflow:${testName}`,
+      `metric_category:workflow`,
     ]);
 
     console.log(`Successfully reported ${status} to Datadog`);
@@ -132,89 +281,81 @@ export function sendTestResults(
   }
 }
 
+// Simplified version of sendPerformanceMetric
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,
   libxmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
-  if (!isInitialized) {
-    return;
-  }
+  if (!isInitialized) return;
 
   try {
     const metricNameParts = testName.split(":")[0];
     const metricName = metricNameParts.replaceAll(" > ", ".");
-    const metricDescription = testName.split(":")[1];
-    // Extract operation name for tagging
+    const metricDescription = testName.split(":")[1] || "";
     const operationParts = metricName.split(".");
     const testNameExtracted = operationParts[0];
-    const operationName = operationParts[1].split("-")[0];
-    const members = operationParts[1].split("-")[1] || "";
-    const durationMetricName = `xmtp.sdk.duration`;
+    const operationName = operationParts[1]?.split("-")[0] || "";
+    const members = operationParts[1]?.split("-")[1] || "";
 
-    // // Send main operation metric
-    // console.debug({
-    //   durationMetricName,
-    //   metricValue,
-    //   libxmtpVersion,
-    //   operationName,
-    //   testNameExtracted,
-    //   metricDescription,
-    //   members,
-    //   geo: currentGeo,
-    //   countryCode: getCountryCodeFromGeo(currentGeo),
-    // });
-    metrics.gauge(durationMetricName, Math.round(metricValue), [
-      `libxmtp:${libxmtpVersion}`,
-      `operation:${operationName}`,
-      `test:${testNameExtracted}`,
-      `metric_type:operation`,
-      `description:${metricDescription}`,
-      `members:${members}`,
-    ]);
+    const operationType = operationName.toLowerCase().includes("group")
+      ? "group"
+      : "core";
+    const threshold = getThresholdForOperation(
+      operationName,
+      operationType,
+      members,
+      currentGeo,
+    );
+    const isSuccess = metricValue <= threshold;
 
-    // Handle network stats if needed
+    sendMetric("duration", metricValue, {
+      libxmtp: libxmtpVersion,
+      operation: operationName,
+      test: testNameExtracted,
+      metric_type: operationType,
+      description: metricDescription,
+      members: members,
+      success: isSuccess,
+      threshold: threshold,
+      region: currentGeo,
+      metric_category: "performance",
+    });
+
+    // Network stats handling
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
-
-      const geo = currentGeo || "";
-      const countryCode = getCountryCodeFromGeo(geo);
+      const countryCode = getCountryCodeFromGeo(currentGeo);
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
-        const metricValue = Math.round(statValue * 1000); // Convert to milliseconds
-        // Send main operation metric
-        // console.debug({
-        //   durationMetricName,
-        //   metricValue,
-        //   libxmtpVersion,
-        //   operationName,
-        //   testNameExtracted,
-        //   metric_type: "network",
-        //   network_phase: statName.toLowerCase().replace(/\s+/g, "_"),
-        //   countryCode: getCountryCodeFromGeo(currentGeo),
-        //   members,
-        // });
-        metrics.gauge(durationMetricName, metricValue, [
-          `libxmtp:${libxmtpVersion}`,
-          `operation:${operationName}`,
-          `test:${testNameExtracted}`,
-          `metric_type:network`,
-          `network_phase:${statName.toLowerCase().replace(/\s+/g, "_")}`,
-          `geo.country_iso_code:${countryCode}`,
-          `members:${members}`,
-        ]);
+        const networkMetricValue = Math.round(statValue * 1000);
+        const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
+        const networkThreshold = getThresholdForOperation(
+          networkPhase,
+          "network",
+        );
+
+        sendMetric("duration", networkMetricValue, {
+          libxmtp: libxmtpVersion,
+          operation: operationName,
+          test: testNameExtracted,
+          metric_type: "network",
+          network_phase: networkPhase,
+          "geo.country_iso_code": countryCode,
+          members: members,
+          success: networkMetricValue <= networkThreshold,
+          threshold: networkThreshold,
+          region: currentGeo,
+          metric_category: "performance",
+        });
       }
     }
   } catch (error) {
-    console.error(`❌ Error sending metric '${testName}':`, error);
-    // Add more detailed error logging
-    if (error instanceof Error) {
-      console.error(`Error details: ${error.message}`);
-      console.error(`Error stack: ${error.stack}`);
-    } else {
-      console.error(`Unknown error type:`, typeof error);
-    }
+    console.error(
+      `❌ Error sending performance metric for '${testName}':`,
+      error,
+    );
   }
 }
 
@@ -320,4 +461,50 @@ export async function getNetworkStats(
   }
 
   return stats as NetworkStats;
+}
+
+// Unified delivery metrics function
+export function sendDeliveryMetric(
+  metricValue: number,
+  version: string,
+  testName: string,
+  metricType: "stream" | "poll" | "recovery",
+  metricSubType: "delivery" | "order",
+): void {
+  // Determine success based on the metric subtype
+  const threshold =
+    metricSubType === "order"
+      ? THRESHOLDS.reliability.order.threshold
+      : THRESHOLDS.reliability.delivery.threshold;
+
+  const isSuccess = metricValue >= threshold;
+
+  console.debug({
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    metric_subtype: metricSubType,
+    success: isSuccess,
+    threshold: threshold,
+  });
+
+  // Send primary metric
+  sendMetric(metricSubType, Math.round(metricValue), {
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    success: isSuccess,
+    threshold: threshold,
+    metric_category: "reliability",
+  });
+
+  // Binary success metric
+  sendMetric(`${metricSubType}.status`, isSuccess ? 100 : 0, {
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    success: isSuccess,
+    threshold: threshold,
+    metric_category: "reliability",
+  });
 }

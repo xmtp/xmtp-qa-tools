@@ -209,16 +209,21 @@ export class WorkerClient extends Worker {
     await this.startStream();
 
     const installationId = this.client.installationId;
-    const debugLog = {
+
+    console.debug({
+      inboxId: this.client.inboxId,
+      dbPath,
+      version,
+      address: this.address,
+      installationId,
+    });
+    return {
       client: this.client,
       dbPath,
       version,
       address: this.address,
       installationId,
     };
-
-    console.debug(debugLog);
-    return debugLog;
   }
 
   /**

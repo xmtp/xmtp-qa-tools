@@ -30,7 +30,7 @@ describe(testName, () => {
 
   afterAll(async () => {
     try {
-      sendTestResults(hasFailures ? "failure" : "success", testName);
+      sendTestResults(hasFailures, testName);
       await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
