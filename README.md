@@ -1,9 +1,5 @@
 # XMTP QA Testing Suite
 
-## Overview
-
-This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
-
 | Test suite     | Status                                                                                                                                                                            | Run frequency |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
 | 🚀 Performance | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml) | Every 30 min  |
@@ -12,6 +8,8 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 🌎 Geolocation | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml) | Every 30 min  |
 
 ## Testing scope
+
+This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
 ### Architecture
 
