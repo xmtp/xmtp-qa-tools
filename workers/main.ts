@@ -521,7 +521,9 @@ export class WorkerClient extends Worker {
             );
           }
 
-          console.log(`[${this.nameId}] Received ${type}: ${logContent}`);
+          if (!this.testName.includes("ts")) {
+            console.log(`[${this.nameId}] Received ${type}: ${logContent}`);
+          }
 
           events.push(msg as T);
           if (events.length >= count) {
@@ -602,7 +604,7 @@ export class WorkerClient extends Worker {
       if (this.activeStream && typeof this.activeStream.return === "function") {
         await this.activeStream.return();
         this.isTerminated = true;
-        console.warn(`[${this.nameId}] Terminated stream`);
+        //console.warn(`[${this.nameId}] Terminated stream`);
       }
     } catch (error) {
       console.error(`[${this.nameId}] Error during stream cleanup:`, error);
