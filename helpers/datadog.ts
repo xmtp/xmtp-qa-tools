@@ -467,8 +467,8 @@ export function sendDeliveryMetric(
   metricValue: number,
   version: string,
   testName: string,
-  metricType: string, // "stream", "poll", "offline", "recovery", etc.
-  metricSubType: string, // "delivery", "order", etc.
+  metricType: "stream" | "poll" | "recovery",
+  metricSubType: "delivery" | "order",
   options: {
     totalMessages?: number;
   } = {},

@@ -256,14 +256,14 @@ describe(
           stats.receptionPercentage,
           offlineWorker.version,
           testName,
-          "offline",
+          "recovery",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
           offlineWorker.version,
           testName,
-          "offline",
+          "recovery",
           "order",
         );
       } catch (e) {
