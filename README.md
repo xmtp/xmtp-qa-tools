@@ -205,6 +205,29 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 _Note: A hybrid approach using `streams` with `poll`-based verification provides the most reliable message delivery guarantee._
 
+### Success criteria summary
+
+| Metric               | Current Performance         | Target                 | Status                 |
+| -------------------- | --------------------------- | ---------------------- | ---------------------- |
+| Core SDK Operations  | All within targets          | Meet defined targets   | ✅ On Target           |
+| Group Operations     | ≤300 members                | ≤300 members on target | ✅ On Target           |
+| Network Performance  | All metrics within target   | Meet defined targets   | ✅ On Target           |
+| Message Delivery     | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Stream Message Loss  | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Poll Message Loss    | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Message Order        | 100%                        | 100% in order          | ✅ On Target           |
+| South-america & Asia | more than 40%               | <20% difference        | ⚠️ Performance Concern |
+| US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
+| Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
+
+### Disclaimers
+
+- **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
+- **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
+- **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
+
+## Other
+
 ### Cross-SDK Testing
 
 | SDK Combination          | Test Focus                    | Status      |
@@ -214,29 +237,6 @@ _Note: A hybrid approach using `streams` with `poll`-based verification provides
 | React Native ↔ Node SDK | Client-to-Agent communication | ✅ Verified |
 
 _Note: Cross-SDK was tested using the `operations` describe above and is not covering all edge cases._
-
-### Success criteria summary
-
-| Metric                  | Current Performance         | Target                 | Status                 |
-| ----------------------- | --------------------------- | ---------------------- | ---------------------- |
-| Core SDK Operations     | All within targets          | Meet defined targets   | ✅ On Target           |
-| Group Operations        | ≤300 members                | ≤300 members on target | ✅ On Target           |
-| Network Performance     | All metrics within target   | Meet defined targets   | ✅ On Target           |
-| Message Delivery        | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Stream Message Loss     | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Poll Message Loss       | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Message Order           | 100%                        | 100% in order          | ✅ On Target           |
-| Cross-SDK Compatibility | 100%                        | 100% operation success | ✅ On Target           |
-| South-america & Asia    | more than 40%               | <20% difference        | ⚠️ Performance Concern |
-| US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target           |
-| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
-
-### Disclaimers
-
-- **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
-- **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
-
-## Agents QA
 
 ### Package Manager Test Results
 
