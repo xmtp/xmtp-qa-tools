@@ -11,7 +11,9 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | 👋 Gm          | [![TS_Gm_dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_dev.yml)             | [![TS_Gm_production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm_production.yml)             | Every 30 min  |
 | 🌎 Geolocation | [![Dev](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_dev.yml) | [![Production](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation_production.yml) | Every 30 min  |
 
-## Architecture
+## Testing scope
+
+### Architecture
 
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
@@ -81,7 +83,7 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use xmtp.chat to test the Browser SDK's Wasm binding in actual web environments. We use Convos to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use agents to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-### Testing scope
+### Testing details
 
 - Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
 - 30-minute automated test execution intervals
@@ -91,6 +93,15 @@ We can test all XMTP bindings using three main applications. We use xmtp.chat to
 - Automated testing for web app `xmtp.chat`
 - Manual testing for react native app
 - Human & agents testing for real-world simulations
+
+### TLDR: Metrics
+
+- **Core SDK Performance**: Direct message creation (<500ms), group operations (<200-500ms)
+- **Network Performance**: Server call (<100ms), TLS handshake (<100ms), total processing (<300ms)
+- **Group Scaling**: Supports up to 300 members efficiently (create: 9s, operations: <350ms)
+- **Regional Performance**: US/Europe optimal, Asia/South America higher latency (+46-160%)
+- **Message Reliability**: 100% delivery rate (target: 99.9%), perfect ordering
+- **Environments**: Production consistently outperforms Dev network by 5-9%
 
 ## Operation performance
 

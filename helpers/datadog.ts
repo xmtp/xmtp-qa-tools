@@ -3,6 +3,10 @@ import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
+// Global state variables
+let isInitialized = false;
+let currentGeo: string = "";
+
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
@@ -80,23 +84,35 @@ const THRESHOLDS = {
     asia: 1.5,
     "south-america": 2.6,
   },
+  GEO_TO_COUNTRY_CODE: {
+    "us-east": "US",
+    "us-west": "US",
+    europe: "FR",
+    asia: "JP",
+    "south-america": "BR",
+  },
+  reliability: {
+    stream: {
+      threshold: 99.9,
+    },
+    poll: {
+      threshold: 99.9,
+    },
+    order: {
+      threshold: 100,
+    },
+    delivery: {
+      threshold: 99.9,
+    },
+  },
 };
-
-// Simplified geo mapping
-const GEO_TO_COUNTRY_CODE: Record<string, string> = {
-  "us-east": "US",
-  "us-west": "US",
-  europe: "FR",
-  asia: "JP",
-  "south-america": "BR",
-};
-
-// Global state variables
-let isInitialized = false;
-let currentGeo: string = "";
 
 function getCountryCodeFromGeo(geolocation: string): string {
-  return GEO_TO_COUNTRY_CODE[geolocation] || "US";
+  return (
+    THRESHOLDS.GEO_TO_COUNTRY_CODE[
+      geolocation as keyof typeof THRESHOLDS.GEO_TO_COUNTRY_CODE
+    ] || "US"
+  );
 }
 
 // Simplified threshold function
@@ -248,8 +264,19 @@ export function sendDeliveryMetric(
   const members = testName.split("-")[1] || "";
   const isSuccess =
     metricName === "order" ? isOrderCorrect : deliveryStatus === "success";
-  const threshold = metricName === "order" ? 100 : 99.9;
+  const threshold =
+    metricName === "order"
+      ? THRESHOLDS.reliability.order.threshold
+      : THRESHOLDS.reliability.delivery.threshold;
 
+  console.debug({
+    libxmtp: libxmtpVersion,
+    test: testName,
+    metric_type: metricType,
+    members: members,
+    success: isSuccess,
+    threshold: threshold,
+  });
   sendMetric(
     metricName,
     Math.round(metricValue),
@@ -257,10 +284,7 @@ export function sendDeliveryMetric(
       libxmtp: libxmtpVersion,
       test: testName,
       metric_type: metricType,
-      members: members,
       success: isSuccess,
-      delivery_status: deliveryStatus,
-      order_correct: isOrderCorrect,
       threshold: threshold,
     },
     "reliability",
@@ -275,8 +299,8 @@ export function sendDeliveryMetric(
       test: testName,
       metric_type: metricType,
       members: members,
-      delivery_status: deliveryStatus,
-      order_correct: isOrderCorrect,
+      success: isSuccess,
+      threshold: threshold,
     },
     "reliability",
   );
