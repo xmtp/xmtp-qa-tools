@@ -232,13 +232,12 @@ export function sendMetric(
   metricName: string,
   metricValue: number,
   tags: Record<string, any>,
-  category: string = "performance",
 ): void {
   if (!isInitialized) return;
 
   try {
     const fullMetricName = `xmtp.sdk.${metricName}`;
-    const allTags = Object.entries({ ...tags, metric_category: category }).map(
+    const allTags = Object.entries({ ...tags }).map(
       ([key, value]) => `${key}:${String(value)}`,
     );
 
@@ -471,12 +470,7 @@ export function sendDeliveryMetric(
   testName: string,
   metricType: "stream" | "poll" | "recovery",
   metricSubType: "delivery" | "order",
-  options: {
-    totalMessages?: number;
-  } = {},
 ): void {
-  const { totalMessages } = options;
-
   // Determine success based on the metric subtype
   const threshold =
     metricSubType === "order"
@@ -495,39 +489,22 @@ export function sendDeliveryMetric(
   });
 
   // Send primary metric
-  sendMetric(
-    metricSubType,
-    Math.round(metricValue),
-    {
-      libxmtp: version,
-      test: testName,
-      metric_type: metricType,
-      success: isSuccess,
-      threshold: threshold,
-    },
-    "reliability",
-  );
+  sendMetric(metricSubType, Math.round(metricValue), {
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    success: isSuccess,
+    threshold: threshold,
+    metric_category: "reliability",
+  });
 
   // Binary success metric
-  sendMetric(
-    `${metricSubType}.status`,
-    isSuccess ? 100 : 0,
-    {
-      libxmtp: version,
-      test: testName,
-      metric_type: metricType,
-      success: isSuccess,
-      threshold: threshold,
-    },
-    "reliability",
-  );
-
-  // Send message count for reference if provided
-  if (totalMessages !== undefined) {
-    metrics.gauge(`xmtp.sdk.${metricSubType}.count`, totalMessages, [
-      `test:${testName}`,
-      `metric_type:${metricType}`,
-      `metric_category:reliability`,
-    ]);
-  }
+  sendMetric(`${metricSubType}.status`, isSuccess ? 100 : 0, {
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    success: isSuccess,
+    threshold: threshold,
+    metric_category: "reliability",
+  });
 }

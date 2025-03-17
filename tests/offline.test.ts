@@ -119,7 +119,6 @@ describe(
           testName,
           "recovery",
           "delivery",
-          { totalMessages: amountofMessages },
         );
 
         // Use the unified sendDeliveryMetric for order metrics
@@ -129,7 +128,6 @@ describe(
           testName,
           "recovery",
           "order",
-          { totalMessages: amountofMessages },
         );
       } catch (e) {
         hasFailures = logError(e, expect);
