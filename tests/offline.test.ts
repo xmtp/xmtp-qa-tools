@@ -112,19 +112,24 @@ describe(
         expect(stats.receptionPercentage).toBeGreaterThan(95);
         expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
 
+        // Use the unified sendDeliveryMetric for delivery metrics
         sendDeliveryMetric(
           stats.receptionPercentage,
           offlineWorker.version,
           testName,
-          "offline",
+          "recovery",
           "delivery",
+          { totalMessages: amountofMessages },
         );
+
+        // Use the unified sendDeliveryMetric for order metrics
         sendDeliveryMetric(
           stats.orderPercentage,
           offlineWorker.version,
           testName,
-          "offline",
+          "recovery",
           "order",
+          { totalMessages: amountofMessages },
         );
       } catch (e) {
         hasFailures = logError(e, expect);

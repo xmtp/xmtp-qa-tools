@@ -251,61 +251,6 @@ export function sendMetric(
   }
 }
 
-// Replace sendDeliveryMetric with simplified version using the common function
-export function sendDeliveryMetric(
-  metricValue: number,
-  testName: string,
-  libxmtpVersion: string,
-  metricType: string = "stream",
-  metricName: string = "delivery",
-  deliveryStatus: string = "success",
-  isOrderCorrect: boolean = true,
-): void {
-  const members = testName.split("-")[1] || "";
-  const isSuccess =
-    metricName === "order" ? isOrderCorrect : deliveryStatus === "success";
-  const threshold =
-    metricName === "order"
-      ? THRESHOLDS.reliability.order.threshold
-      : THRESHOLDS.reliability.delivery.threshold;
-
-  console.debug({
-    libxmtp: libxmtpVersion,
-    test: testName,
-    metric_type: metricType,
-    members: members,
-    success: isSuccess,
-    threshold: threshold,
-  });
-  sendMetric(
-    metricName,
-    Math.round(metricValue),
-    {
-      libxmtp: libxmtpVersion,
-      test: testName,
-      metric_type: metricType,
-      success: isSuccess,
-      threshold: threshold,
-    },
-    "reliability",
-  );
-
-  // Binary success metric
-  sendMetric(
-    `${metricName}.status`,
-    isSuccess ? 100 : 0,
-    {
-      libxmtp: libxmtpVersion,
-      test: testName,
-      metric_type: metricType,
-      members: members,
-      success: isSuccess,
-      threshold: threshold,
-    },
-    "reliability",
-  );
-}
-
 export function sendTestResults(hasFailures: boolean, testName: string): void {
   if (!isInitialized) {
     console.error("WARNING: Datadog metrics not initialized");
@@ -517,79 +462,70 @@ export async function getNetworkStats(
   return stats as NetworkStats;
 }
 
-// Helper function for stream/poll delivery rate
-export function sendDeliveryRateMetric(
-  successRate: number, // percentage 0-100
+// Unified delivery metrics function
+export function sendDeliveryMetric(
+  metricValue: number,
+  version: string,
   testName: string,
-  libxmtpVersion: string,
-  deliveryType: "stream" | "poll",
-  totalMessages: number,
+  metricType: string, // "stream", "poll", "offline", "recovery", etc.
+  metricSubType: string, // "delivery", "order", etc.
+  options: {
+    totalMessages?: number;
+  } = {},
 ): void {
-  sendDeliveryMetric(
-    successRate,
-    testName,
-    libxmtpVersion,
-    deliveryType,
-    "delivery",
-    successRate >= 99.9 ? "success" : "failed",
-    true,
+  const { totalMessages } = options;
+
+  // Determine success based on the metric subtype
+  const threshold =
+    metricSubType === "order"
+      ? THRESHOLDS.reliability.order.threshold
+      : THRESHOLDS.reliability.delivery.threshold;
+
+  const isSuccess = metricValue >= threshold;
+
+  console.debug({
+    libxmtp: version,
+    test: testName,
+    metric_type: metricType,
+    metric_subtype: metricSubType,
+    success: isSuccess,
+    threshold: threshold,
+  });
+
+  // Send primary metric
+  sendMetric(
+    metricSubType,
+    Math.round(metricValue),
+    {
+      libxmtp: version,
+      test: testName,
+      metric_type: metricType,
+      success: isSuccess,
+      threshold: threshold,
+    },
+    "reliability",
   );
 
-  // Also send message count for reference
-  metrics.gauge(`xmtp.sdk.delivery.count`, totalMessages, [
-    `test:${testName}`,
-    `metric_type:${deliveryType}`,
-    `metric_category:reliability`,
-  ]);
-}
-
-// Helper function for stream/poll order correctness
-export function sendOrderCorrectnessMetric(
-  isCorrect: boolean,
-  testName: string,
-  libxmtpVersion: string,
-  orderType: "stream" | "poll",
-  totalMessages: number,
-): void {
-  sendDeliveryMetric(
-    isCorrect ? 100 : 0,
-    testName,
-    libxmtpVersion,
-    orderType,
-    "order",
-    "success",
-    isCorrect,
+  // Binary success metric
+  sendMetric(
+    `${metricSubType}.status`,
+    isSuccess ? 100 : 0,
+    {
+      libxmtp: version,
+      test: testName,
+      metric_type: metricType,
+      success: isSuccess,
+      threshold: threshold,
+    },
+    "reliability",
   );
 
-  // Also send message count for reference
-  metrics.gauge(`xmtp.sdk.order.count`, totalMessages, [
-    `test:${testName}`,
-    `metric_type:${orderType}`,
-    `metric_category:reliability`,
-  ]);
-}
-
-// Helper function for offline recovery
-export function sendRecoveryMetric(
-  successRate: number, // percentage 0-100
-  testName: string,
-  libxmtpVersion: string,
-  isOrderCorrect: boolean,
-  totalMessages: number,
-): void {
-  sendDeliveryMetric(
-    successRate,
-    testName,
-    libxmtpVersion,
-    "recovery",
-    "recovery",
-    successRate >= 100 ? "success" : "failed",
-    isOrderCorrect,
-  );
-
-  // Also send message count for reference
-  metrics.gauge(`xmtp.sdk.recovery.count`, totalMessages, [
-    `test:${testName}`,
-    `metric_category:reliability`,
-  ]);
+  // Send message count for reference if provided
+  if (totalMessages !== undefined) {
+    metrics.gauge(`xmtp.sdk.${metricSubType}.count`, totalMessages, [
+      `test:${testName}`,
+      `metric_type:${metricType}`,
+      `metric_category:reliability`,
+    ]);
+  }
 }
