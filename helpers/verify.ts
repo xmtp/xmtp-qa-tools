@@ -97,9 +97,10 @@ export async function verifyStream<T extends string = string>(
   // Send the messages
   for (let i = 0; i < count; i++) {
     const payload = generator(i, randomSuffix);
-    console.log(`Sending message #${i + 1}:`, payload);
+    //console.log(`Sending message #${i + 1}:`, payload);
     await sender(group, payload);
   }
+  console.log(`Sent ${count} messages`);
 
   // Wait for collectors
   const collectedMessages = await Promise.all(collectPromises);
