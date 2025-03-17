@@ -40,6 +40,13 @@ jobs:
         run: ./scripts/run-test.sh TS_Gm
       - name: Upload log files
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: gm_logs
           path: logs/ts_gm.log
+      - name: Upload snapshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright_snapshots
+          path: logs/snapshots/*.png
