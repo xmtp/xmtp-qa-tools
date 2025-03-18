@@ -36,16 +36,18 @@ jobs:
         run: |
           mkdir -p artifacts/logs
           cp -r logs/* artifacts/logs/
-          find artifacts/logs -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
+          find artifacts/logs -type f -name "*.log" -exec bash -c 'mv "$0" "${0%.log}.run-${{ github.run_id }}-dev.txt"' {} \;
+          find artifacts/logs -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.txt"' {} \;
       - name: Rename datadog reports with run ID prefix
         run: |
           mkdir -p artifacts/reports
           cp -r datadog/reports/* artifacts/reports/
-          find artifacts/reports -type f -exec mv {} {}.run-${{ github.run_id }}-dev.md \;
+          find artifacts/reports -type f -name "*.md" -exec bash -c 'mv "$0" "${0%.md}.run-${{ github.run_id }}-dev.md"' {} \;
+          find artifacts/reports -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.md"' {} \;
       - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_data_${{ env.XMTP_ENV }}
+          name: ts_performance_${{ env.XMTP_ENV }}
           path: artifacts/
   production:
     runs-on: ubuntu-latest
@@ -74,14 +76,16 @@ jobs:
         run: |
           mkdir -p artifacts/logs
           cp -r logs/* artifacts/logs/
-          find artifacts/logs -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
+          find artifacts/logs -type f -name "*.log" -exec bash -c 'mv "$0" "${0%.log}.run-${{ github.run_id }}-production.txt"' {} \;
+          find artifacts/logs -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-production.txt"' {} \;
       - name: Rename datadog reports with run ID prefix
         run: |
           mkdir -p artifacts/reports
           cp -r datadog/reports/* artifacts/reports/
-          find artifacts/reports -type f -exec mv {} {}.run-${{ github.run_id }}-production.md \;
+          find artifacts/reports -type f -name "*.md" -exec bash -c 'mv "$0" "${0%.md}.run-${{ github.run_id }}-production.md"' {} \;
+          find artifacts/reports -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-production.md"' {} \;
       - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_data_${{ env.XMTP_ENV }}
+          name: ts_performance_${{ env.XMTP_ENV }}
           path: artifacts/
