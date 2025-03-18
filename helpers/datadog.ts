@@ -16,13 +16,13 @@ let collectedMetrics: Record<
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
-    creategroup: 600,
-    creategroupbyidentifiers: 550,
-    sendgroupmessage: 98,
-    syncgroup: 135,
-    updategroupname: 200,
+    creategroup: 1700,
+    creategroupbyidentifiers: 1450,
+    sendgroupmessage: 56,
+    syncgroup: 100,
+    updategroupname: 110,
     removemembers: 250,
-    receivegroupmessage: 150,
+    receivegroupmessage: 102,
     clientcreate: 550,
     createdm: 200,
     sendgm: 100,
@@ -37,17 +37,16 @@ const THRESHOLDS = {
     processing: 175,
     server_call: 175,
   },
-  group: {
-    memberMultipliers: {
-      creategroup: 22,
-      creategroupbyidentifiers: 18,
-      sendgroupmessage: 0.12,
-      syncgroup: 0.1,
-      updategroupname: 0.4,
-      removemembers: 0.7,
-      receivegroupmessage: 0.1,
-    },
+  memberMultipliers: {
+    creategroup: 1100,
+    creategroupbyidentifiers: 900,
+    sendgroupmessage: 6,
+    syncgroup: 0,
+    updategroupname: 10,
+    removemembers: 0,
+    receivegroupmessage: 2,
   },
+
   regionMultipliers: {
     "us-east": 1.0,
     "us-west": 1.0,
@@ -106,24 +105,24 @@ export function getThresholdForOperation(
     // Parse the member count, default to 50 if not provided or invalid
     const memberCount = parseInt(members || "50", 10) || 50;
 
-    // Get the base value for this operation
+    // Get the base value for this operation (which is for 50 members)
     const baseValue =
       THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 500;
 
     // Get the multiplier for this operation
     const memberMultiplier =
-      THRESHOLDS.group.memberMultipliers[
-        operationLower as keyof typeof THRESHOLDS.group.memberMultipliers
+      THRESHOLDS.memberMultipliers[
+        operationLower as keyof typeof THRESHOLDS.memberMultipliers
       ] || 0;
 
-    // Calculate the threshold based on compounding member count
-    // Each member above the base threshold compounds the effect
+    // Calculate threshold based on group size increases in batches of 50
+    // First 50 members use the base value
+    // Each additional batch of 50 members adds the multiplier
     let calculatedThreshold = baseValue;
 
-    // Apply the multiplier in a compounding fashion
-    // For each member, increase the threshold by the multiplier based on the current value
-    for (let i = 0; i < memberCount; i++) {
-      calculatedThreshold += memberMultiplier;
+    if (memberCount > 50) {
+      const additionalBatches = Math.floor((memberCount - 50) / 50);
+      calculatedThreshold += memberMultiplier * additionalBatches;
     }
 
     // Apply region multiplier
