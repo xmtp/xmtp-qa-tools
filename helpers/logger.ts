@@ -192,14 +192,14 @@ export const overrideConsole = (logger: winston.Logger) => {
     };
     console.debug = (...args: any[]) => {
       // Only show debug logs when not in CI
-      if (!process.env.CI) {
-        // Use the original console.debug function
-        const originalConsoleDebug = Function.prototype.bind.call(
-          console.constructor.prototype.debug,
-          console,
-        );
-        originalConsoleDebug(...args);
-      }
+      //if (!process.env.CI) {
+      // Use the original console.debug function
+      const originalConsoleDebug = Function.prototype.bind.call(
+        console.constructor.prototype.debug,
+        console,
+      );
+      originalConsoleDebug(...args);
+      //}
     };
   } catch (error) {
     console.error("Error overriding console", error);
