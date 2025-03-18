@@ -23,9 +23,9 @@ const THRESHOLDS = {
   },
   network: {
     dns_lookup: 100,
-    tcp_connection: 100,
-    tls_handshake: 200,
-    processing: 100,
+    tcp_connection: 200,
+    tls_handshake: 300,
+    processing: 50,
     server_call: 300,
   },
   group: {
