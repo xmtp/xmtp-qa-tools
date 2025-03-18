@@ -250,7 +250,7 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
     const metricName = `workflow`;
     sendMetric(metricName, metricValue, {
       workflow: testName,
-      metric_category: "workflow",
+      metric_type: "workflow",
     });
     console.log(
       `The tests indicated that the test ${testName} was ${hasFailures}`,
@@ -300,7 +300,6 @@ export async function sendPerformanceMetric(
       success: isSuccess,
       threshold: threshold,
       region: currentGeo,
-      metric_category: "performance",
     });
 
     // Network stats handling
@@ -327,7 +326,6 @@ export async function sendPerformanceMetric(
           success: networkMetricValue <= networkThreshold,
           threshold: networkThreshold,
           region: currentGeo,
-          metric_category: "performance",
         });
       }
     }
@@ -460,9 +458,8 @@ export function sendDeliveryMetric(
   sendMetric(metricSubType, Math.round(metricValue), {
     libxmtp: version,
     test: testName,
-    metric_type: metricType,
+    metric_type: "delivery",
     success: isSuccess,
     threshold: threshold,
-    metric_category: "reliability",
   });
 }
