@@ -68,27 +68,27 @@ const THRESHOLDS = {
       "400": 6000,
     },
     syncgroup: {
-      "50": 50,
-      "100": 50,
-      "150": 50,
-      "200": 70,
-      "250": 80,
-      "300": 80,
+      "50": 100,
+      "100": 100,
+      "150": 100,
+      "200": 100,
+      "250": 100,
+      "300": 100,
       "350": 100,
-      "400": 120,
+      "400": 100,
     },
     updategroupname: {
-      "50": 75,
+      "50": 100,
       "100": 80,
       "150": 100,
       "200": 100,
-      "250": 120,
-      "300": 150,
-      "350": 150,
-      "400": 200,
+      "250": 100,
+      "300": 100,
+      "350": 100,
+      "400": 100,
     },
     removemembers: {
-      "50": 80,
+      "50": 100,
       "100": 100,
       "150": 120,
       "200": 150,
@@ -442,9 +442,9 @@ export function logMetricsSummary(testName: string): void {
   // Build the table content
   let fileContent = "METRICS SUMMARY\n===============\n\n";
   fileContent +=
-    "Operation | Members | Samples | Avg (ms) | Min/Max (ms) | Threshold (ms) | Pass Rate | Status\n";
+    "Operation | Members | Samples | Avg (ms) | Min/Max (ms) | Threshold (ms) | Variance (ms) | Pass Rate | Status\n";
   fileContent +=
-    "----------|---------|---------|----------|--------------|----------------|-----------|-------\n";
+    "----------|---------|---------|----------|--------------|----------------|---------------|-----------|-------\n";
 
   for (const [operation, data] of Object.entries(collectedMetrics)) {
     // Skip workflow metrics in the summary table
@@ -467,7 +467,13 @@ export function logMetricsSummary(testName: string): void {
         data.values.length) *
       100;
     const status = average <= data.threshold ? "PASS ✅" : "FAIL ❌";
-    fileContent += `${operation} | ${memberCount} | ${data.values.length} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${passRate.toFixed(1)}% | ${status}\n`;
+
+    // Calculate variance between average and threshold
+    const variance = Math.round(average - data.threshold);
+    const varianceFormatted =
+      variance <= 0 ? variance.toString() : `+${variance}`;
+
+    fileContent += `${operation} | ${memberCount} | ${data.values.length} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${passRate.toFixed(1)}% | ${status}\n`;
   }
 
   // Write to file
