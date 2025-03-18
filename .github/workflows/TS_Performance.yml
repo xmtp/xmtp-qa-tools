@@ -32,23 +32,11 @@ jobs:
   #       run: chmod +x ./scripts/run-test.sh
   #     - name: Run tests with retry
   #       run: ./scripts/run-test.sh TS_Performance
-  #     - name: Rename logs with run ID prefix
-  #       run: |
-  #         mkdir -p artifacts/logs
-  #         cp -r logs/* artifacts/logs/
-  #         find artifacts/logs -type f -name "*.log" -exec bash -c 'mv "$0" "${0%.log}.run-${{ github.run_id }}-dev.txt"' {} \;
-  #         find artifacts/logs -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.txt"' {} \;
-  #     - name: Rename logs/reports with run ID prefix
-  #       run: |
-  #         mkdir -p artifacts/reports
-  #         cp -r logs/reports/* artifacts/reports/
-  #         find artifacts/reports -type f -name "*.md" -exec bash -c 'mv "$0" "${0%.md}.run-${{ github.run_id }}-dev.md"' {} \;
-  #         find artifacts/reports -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.md"' {} \;
-  #     - name: Upload all artifacts
-  #       uses: actions/upload-artifact@v4
-  #       with:
-  #         name: ts_performance_${{ env.XMTP_ENV }}
-  #         path: artifacts/
+  #     - name: Upload reports artifacts
+  # uses: actions/upload-artifact@v4
+  # with:
+  #   name: ts_performance_${{ env.XMTP_ENV }}
+  #   path: logs/
   production:
     runs-on: ubuntu-latest
     env:
@@ -75,5 +63,5 @@ jobs:
       - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ts_performance_${{ env.XMTP_ENV }}_reports
+          name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/

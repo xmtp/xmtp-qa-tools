@@ -38,13 +38,13 @@ const THRESHOLDS = {
     server_call: 175,
   },
   memberMultipliers: {
-    creategroup: 1100,
-    creategroupbyidentifiers: 900,
+    creategroup: 2,
+    creategroupbyidentifiers: 2,
     sendgroupmessage: 6,
-    syncgroup: 0,
-    updategroupname: 10,
-    removemembers: 0,
-    receivegroupmessage: 2,
+    syncgroup: 0.1,
+    updategroupname: 0.2,
+    removemembers: 0.1,
+    receivegroupmessage: 0.2,
   },
 
   regionMultipliers: {
