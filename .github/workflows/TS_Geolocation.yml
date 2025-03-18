@@ -71,7 +71,7 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: geolocation_logs_dev
+          name: ts_geolocation_${{ env.XMTP_ENV }}
           path: logs/
 
       - name: Check for failures
@@ -154,7 +154,7 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: geolocation_logs_production
+          name: ts_geolocation_${{ env.XMTP_ENV }}
           path: logs/
 
       - name: Check for failures

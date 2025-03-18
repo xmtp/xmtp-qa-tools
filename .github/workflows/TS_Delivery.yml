@@ -34,10 +34,10 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Delivery
-      - name: Upload log files
+      - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: delivery_logs_dev
+          name: ts_delivery_${{ env.XMTP_ENV }}
           path: logs/
   production:
     runs-on: ubuntu-latest
@@ -66,8 +66,8 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Delivery
-      - name: Upload log files
+      - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: delivery_logs_production
+          name: ts_delivery_${{ env.XMTP_ENV }}
           path: logs/

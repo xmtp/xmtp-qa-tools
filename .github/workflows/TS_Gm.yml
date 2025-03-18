@@ -38,18 +38,11 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Gm
-      - name: Upload log files
+      - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: gm_logs_dev
+          name: ts_gm_${{ env.XMTP_ENV }}
           path: logs/
-      - name: Upload snapshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright_snapshots
-          path: logs/snapshots/*.png
   production:
     runs-on: ubuntu-latest
     env:
@@ -83,13 +76,6 @@ jobs:
         run: ./scripts/run-test.sh TS_Gm
       - name: Upload log files
         uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: gm_logs_production
+          name: ts_gm_${{ env.XMTP_ENV }}
           path: logs/
-      - name: Upload snapshots
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: playwright_snapshots
-          path: logs/snapshots/*.png
