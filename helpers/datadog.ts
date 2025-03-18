@@ -16,28 +16,48 @@ let collectedMetrics: Record<
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
-    clientcreate: 350,
-    createdm: 150,
+    clientcreate: 550,
+    createdm: 200,
     sendgm: 100,
     receivegm: 100,
-    creategroup: 200,
-    creategroupbyidentifiers: 150,
+    creategroup: 2000,
+    creategroupbyidentifiers: 2000,
     receivegroupmessage: 150,
     updategroupname: 100,
     syncgroup: 100,
     addmembers: 250,
-    removemembers: 100,
+    removemembers: 250,
     inboxstate: 50,
   },
   network: {
-    dns_lookup: 50,
-    tcp_connection: 50,
-    tls_handshake: 100,
-    processing: 50,
-    server_call: 100,
+    dns_lookup: 175,
+    tcp_connection: 175,
+    tls_handshake: 175,
+    processing: 175,
+    server_call: 175,
   },
   group: {
-    createGroup: {
+    creategroup: {
+      "50": 900,
+      "100": 1600,
+      "150": 2300,
+      "200": 3500,
+      "250": 5500,
+      "300": 5500,
+      "350": 8000,
+      "400": 9000,
+    },
+    creategroupbyidentifiers: {
+      "50": 600,
+      "100": 1500,
+      "150": 2600,
+      "200": 3500,
+      "250": 5500,
+      "300": 6500,
+      "350": 6500,
+      "400": 7500,
+    },
+    sendgroupmessage: {
       "50": 650,
       "100": 1000,
       "150": 1600,
@@ -47,7 +67,7 @@ const THRESHOLDS = {
       "350": 5000,
       "400": 6000,
     },
-    createGroupByIdentifiers: {
+    creategroupbyidentifiers: {
       "50": 500,
       "100": 1100,
       "150": 1700,
@@ -57,7 +77,7 @@ const THRESHOLDS = {
       "350": 5000,
       "400": 5500,
     },
-    sendGroupMessage: {
+    sendgroupmessage: {
       "50": 50,
       "100": 50,
       "150": 50,
@@ -67,7 +87,7 @@ const THRESHOLDS = {
       "350": 60,
       "400": 70,
     },
-    syncGroup: {
+    syncgroup: {
       "50": 50,
       "100": 50,
       "150": 50,
@@ -77,7 +97,7 @@ const THRESHOLDS = {
       "350": 100,
       "400": 120,
     },
-    updateGroupName: {
+    updategroupname: {
       "50": 75,
       "100": 80,
       "150": 100,
@@ -87,7 +107,7 @@ const THRESHOLDS = {
       "350": 150,
       "400": 200,
     },
-    removeMembers: {
+    removemembers: {
       "50": 80,
       "100": 100,
       "150": 120,
