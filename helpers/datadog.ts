@@ -16,17 +16,18 @@ let collectedMetrics: Record<
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
+    creategroup: 600,
+    creategroupbyidentifiers: 550,
+    sendgroupmessage: 50,
+    syncgroup: 100,
+    updategroupname: 100,
+    removemembers: 75,
+    receivegroupmessage: 100,
     clientcreate: 550,
     createdm: 200,
     sendgm: 100,
     receivegm: 100,
-    creategroup: 2000,
-    creategroupbyidentifiers: 2000,
-    receivegroupmessage: 150,
-    updategroupname: 100,
-    syncgroup: 100,
     addmembers: 250,
-    removemembers: 250,
     inboxstate: 50,
   },
   network: {
@@ -37,65 +38,23 @@ const THRESHOLDS = {
     server_call: 175,
   },
   group: {
-    creategroup: {
-      "50": 900,
-      "100": 1600,
-      "150": 2300,
-      "200": 3500,
-      "250": 5500,
-      "300": 5500,
-      "350": 8000,
-      "400": 9000,
+    baseValues: {
+      creategroup: 600,
+      creategroupbyidentifiers: 550,
+      sendgroupmessage: 50,
+      syncgroup: 100,
+      updategroupname: 100,
+      removemembers: 75,
+      receivegroupmessage: 100,
     },
-    creategroupbyidentifiers: {
-      "50": 600,
-      "100": 1500,
-      "150": 2600,
-      "200": 3500,
-      "250": 5500,
-      "300": 6500,
-      "350": 6500,
-      "400": 7500,
-    },
-    sendgroupmessage: {
-      "50": 650,
-      "100": 1000,
-      "150": 1600,
-      "200": 2500,
-      "250": 3500,
-      "300": 4500,
-      "350": 5000,
-      "400": 6000,
-    },
-    syncgroup: {
-      "50": 100,
-      "100": 100,
-      "150": 100,
-      "200": 100,
-      "250": 100,
-      "300": 100,
-      "350": 100,
-      "400": 100,
-    },
-    updategroupname: {
-      "50": 100,
-      "100": 80,
-      "150": 100,
-      "200": 100,
-      "250": 100,
-      "300": 100,
-      "350": 100,
-      "400": 100,
-    },
-    removemembers: {
-      "50": 100,
-      "100": 100,
-      "150": 120,
-      "200": 150,
-      "250": 175,
-      "300": 200,
-      "350": 225,
-      "400": 250,
+    memberMultipliers: {
+      creategroup: 22,
+      creategroupbyidentifiers: 18,
+      sendgroupmessage: 0.12,
+      syncgroup: 0,
+      updategroupname: 0.2,
+      removemembers: 0.5,
+      receivegroupmessage: 0.05,
     },
   },
   regionMultipliers: {
@@ -153,28 +112,28 @@ export function getThresholdForOperation(
   }
 
   if (operationType === "group") {
-    const size = members || "50";
+    // Parse the member count, default to 50 if not provided or invalid
+    const memberCount = parseInt(members || "50", 10) || 50;
 
-    // Get the operation-specific thresholds object
-    const groupThresholds =
-      THRESHOLDS.group[operationLower as keyof typeof THRESHOLDS.group];
+    // Get the base value for this operation
+    const baseValue =
+      THRESHOLDS.group.baseValues[
+        operationLower as keyof typeof THRESHOLDS.group.baseValues
+      ] || 500;
 
-    // Safely check if this size exists, defaulting to 2000 if not
-    let baseThreshold = 2000;
-    if (groupThresholds) {
-      // Use type assertion to tell TypeScript this is a valid lookup
-      const sizeKey = size as unknown as keyof typeof groupThresholds;
-      if (sizeKey in groupThresholds) {
-        baseThreshold = groupThresholds[sizeKey];
-      }
-    }
+    // Get the multiplier for this operation
+    const memberMultiplier =
+      THRESHOLDS.group.memberMultipliers[
+        operationLower as keyof typeof THRESHOLDS.group.memberMultipliers
+      ] || 0;
 
-    return Math.round(
-      baseThreshold *
-        (THRESHOLDS.regionMultipliers[
-          region as keyof typeof THRESHOLDS.regionMultipliers
-        ] || 1.0),
-    );
+    // Calculate the threshold based on member count
+    const calculatedThreshold = baseValue + memberCount * memberMultiplier;
+
+    // Apply region multiplier
+    const finalThreshold = Math.round(calculatedThreshold * regionMultiplier);
+
+    return finalThreshold;
   }
 
   // For core operations, ensure we're using lowercase for lookup
