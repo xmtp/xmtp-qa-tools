@@ -40,11 +40,11 @@ const THRESHOLDS = {
   memberMultipliers: {
     creategroup: 3,
     creategroupbyidentifiers: 3,
-    sendgroupmessage: 0.3,
-    syncgroup: 0.3,
-    updategroupname: 0.3,
-    removemembers: 0.3,
-    receivegroupmessage: 0.3,
+    sendgroupmessage: 1.3,
+    syncgroup: 1.3,
+    updategroupname: 1.3,
+    removemembers: 1.3,
+    receivegroupmessage: 1.3,
   },
 
   regionMultipliers: {
