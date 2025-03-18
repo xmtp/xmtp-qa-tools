@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { sendTestResults } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
+import { sendTestResults } from "@datadog/helper";
 
 function runTests(): void {
   let hasFailures: boolean = false;

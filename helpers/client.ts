@@ -9,7 +9,7 @@ import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { b } from "vitest/dist/chunks/suite.qtkXWc6R.js";
-import { flushMetrics, initDataDog } from "../datadog/git add . && git commit -m "fix datadog summary"  && git push;";
+import { flushMetrics, initDataDog } from "../datadog/helper";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
 
 interface User {

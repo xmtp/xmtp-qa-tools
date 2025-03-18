@@ -1,4 +1,4 @@
-import { sendTestResults } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
+import { sendTestResults } from "@datadog/helper";
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";

@@ -1,4 +1,4 @@
-import { sendPerformanceResult, sendTestResults } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
+import { sendPerformanceResult, sendTestResults } from "@datadog/helper";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { type Conversation, type WorkerManager } from "@helpers/types";
