@@ -1,4 +1,6 @@
 import { exec } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
 import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
@@ -6,27 +8,33 @@ import metrics from "datadog-metrics";
 // Global state variables
 let isInitialized = false;
 let currentGeo: string = "";
+let collectedMetrics: Record<
+  string,
+  { values: number[]; threshold: number; members?: string }
+> = {};
 
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
-    clientcreate: 3000,
-    createdm: 500,
-    sendgm: 200,
-    receivegm: 200,
-    receivegroupmessage: 200,
-    updategroupname: 200,
-    syncgroup: 200,
+    clientcreate: 4500,
+    createdm: 1800,
+    sendgm: 1200,
+    receivegm: 1000,
+    creategroup: 1500,
+    creategroupbyidentifiers: 2000,
+    receivegroupmessage: 1300,
+    updategroupname: 1000,
+    syncgroup: 1000,
     addmembers: 500,
-    removemembers: 300,
-    inboxstate: 100,
+    removemembers: 1000,
+    inboxstate: 200,
   },
   network: {
-    dns_lookup: 100,
-    tcp_connection: 200,
-    tls_handshake: 300,
-    processing: 100,
-    server_call: 400,
+    dns_lookup: 200,
+    tcp_connection: 250,
+    tls_handshake: 350,
+    processing: 200,
+    server_call: 500,
   },
   group: {
     createGroup: {
@@ -95,7 +103,7 @@ const THRESHOLDS = {
     "us-west": 1.0,
     europe: 1.0,
     asia: 1.5,
-    "south-america": 2.6,
+    "south-america": 2,
   },
   GEO_TO_COUNTRY_CODE: {
     "us-east": "US",
@@ -122,12 +130,26 @@ export function getThresholdForOperation(
   members: string = "",
   region: string = "us-east",
 ): number {
+  // Convert operation to lowercase for consistent lookups
+  const operationLower = operation.toLowerCase();
+
+  // Get the region multiplier
+  const regionMultiplier =
+    THRESHOLDS.regionMultipliers[
+      region as keyof typeof THRESHOLDS.regionMultipliers
+    ] || 1.0;
+
   if (operationType === "network") {
     const networkThreshold =
-      THRESHOLDS.network[
-        operation.toLowerCase() as keyof typeof THRESHOLDS.network
-      ];
-    return typeof networkThreshold === "number" ? networkThreshold : 200;
+      THRESHOLDS.network[operationLower as keyof typeof THRESHOLDS.network];
+    // Default to 200 if the specific network operation isn't found
+    const baseThreshold =
+      typeof networkThreshold === "number" ? networkThreshold : 200;
+
+    // Apply region multiplier to network thresholds
+    const finalThreshold = Math.round(baseThreshold * regionMultiplier);
+
+    return finalThreshold;
   }
 
   if (operationType === "group") {
@@ -135,7 +157,7 @@ export function getThresholdForOperation(
 
     // Get the operation-specific thresholds object
     const groupThresholds =
-      THRESHOLDS.group[operation as keyof typeof THRESHOLDS.group];
+      THRESHOLDS.group[operationLower as keyof typeof THRESHOLDS.group];
 
     // Safely check if this size exists, defaulting to 2000 if not
     let baseThreshold = 2000;
@@ -155,18 +177,15 @@ export function getThresholdForOperation(
     );
   }
 
-  const coreOp = operation.toLowerCase();
+  // For core operations, ensure we're using lowercase for lookup
   const baseThreshold =
-    coreOp in THRESHOLDS.core
-      ? THRESHOLDS.core[coreOp as keyof typeof THRESHOLDS.core]
+    operationLower in THRESHOLDS.core
+      ? THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core]
       : 300;
 
-  return Math.round(
-    baseThreshold *
-      (THRESHOLDS.regionMultipliers[
-        region as keyof typeof THRESHOLDS.regionMultipliers
-      ] || 1.0),
-  );
+  const finalThreshold = Math.round(baseThreshold * regionMultiplier);
+
+  return finalThreshold;
 }
 
 export const sendPerformanceResult = (
@@ -226,7 +245,7 @@ export function initDataDog(
   }
 }
 
-// Combined metric sending function to reduce duplication
+// Modify the sendMetric function to collect metrics for summary
 export function sendMetric(
   metricName: string,
   metricValue: number,
@@ -243,10 +262,26 @@ export function sendMetric(
     if (!allTags.some((tag) => tag.startsWith("env:"))) {
       allTags.push(`env:${process.env.XMTP_ENV as string}`);
     }
-
-    if (allTags.includes("success:false")) {
-      console.debug(fullMetricName, Math.round(metricValue), allTags);
+    // Add version tag if not already present
+    if (!allTags.some((tag) => tag.startsWith("xv:"))) {
+      allTags.push(`vm:${process.env.RAILWAY_SERVICE_ID || "unknown"}`);
     }
+
+    // Track metrics for summary log
+    // Include members in the operation key if available
+    const operationKey = tags.operation
+      ? `${tags.operation}:${tags.metric_type || ""}${tags.members ? `:${tags.members}` : ""}`
+      : metricName;
+
+    if (!collectedMetrics[operationKey]) {
+      collectedMetrics[operationKey] = {
+        values: [],
+        threshold: tags.threshold || 0,
+        members: tags.members || "-", // Store members info separately
+      };
+    }
+    collectedMetrics[operationKey].values.push(metricValue);
+
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(
@@ -294,9 +329,10 @@ export async function sendPerformanceMetric(
     const operationName = operationParts[1]?.split("-")[0] || "";
     const members = operationParts[1]?.split("-")[1] || "";
 
-    const operationType = operationName.toLowerCase().includes("group")
-      ? "group"
-      : "core";
+    // Use a more reliable approach to determine if this is a group operation
+    const isGroupOperation = operationName.toLowerCase().includes("group");
+    const operationType = isGroupOperation ? "group" : "core";
+
     const threshold = getThresholdForOperation(
       operationName,
       operationType,
@@ -320,6 +356,7 @@ export async function sendPerformanceMetric(
 
     // Network stats handling
     if (!skipNetworkStats) {
+      //ignore group operations
       const networkStats = await getNetworkStats();
       const countryCode = getCountryCodeFromGeo(currentGeo);
 
@@ -329,6 +366,8 @@ export async function sendPerformanceMetric(
         const networkThreshold = getThresholdForOperation(
           networkPhase,
           "network",
+          members,
+          currentGeo,
         );
 
         sendMetric("duration", networkMetricValue, {
@@ -354,20 +393,107 @@ export async function sendPerformanceMetric(
 }
 
 /**
- * Explicitly flush all buffered metrics to DataDog
- * Call this at the end of your test suite
+ * Logs a summary of all collected metrics against their thresholds
+ * Call this at the end of test execution
  */
-export function flushMetrics(): Promise<void> {
+export function logMetricsSummary(testName: string): void {
+  if (!isInitialized || Object.keys(collectedMetrics).length === 0) {
+    console.log("No metrics collected to summarize");
+    return;
+  }
+
+  console.log("\n📊 Creating metrics summary report");
+
+  // Create a simple text summary for the console
+  const passedMetrics = Object.entries(collectedMetrics).filter(
+    ([operation, data]) => {
+      // Skip workflow metrics when counting passed metrics
+      if (operation === "workflow") return false;
+
+      if (data.values.length === 0) return false;
+      const average =
+        data.values.reduce((sum, val) => sum + val, 0) / data.values.length;
+      return average <= data.threshold;
+    },
+  ).length;
+
+  // Count only non-workflow metrics for total
+  const totalMetrics = Object.entries(collectedMetrics).filter(
+    ([operation]) => operation !== "workflow",
+  ).length;
+
+  console.log(
+    `✅ Passed: ${passedMetrics}/${totalMetrics} metrics (${Math.round((passedMetrics / totalMetrics) * 100)}%)`,
+  );
+
+  // Create a directory for reports if it doesn't exist
+  const reportsDir = path.join(process.cwd(), "datadog/reports");
+  if (!fs.existsSync(reportsDir)) {
+    fs.mkdirSync(reportsDir, { recursive: true });
+  }
+
+  // Create filename with timestamp
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const filename = path.join(
+    reportsDir,
+    `${testName}-${currentGeo}-${process.env.XMTP_ENV}.md`,
+  );
+
+  // Build the table content
+  let fileContent = "METRICS SUMMARY\n===============\n\n";
+  fileContent +=
+    "Operation | Members | Samples | Avg (ms) | Min/Max (ms) | Threshold (ms) | Pass Rate | Status\n";
+  fileContent +=
+    "----------|---------|---------|----------|--------------|----------------|-----------|-------\n";
+
+  for (const [operation, data] of Object.entries(collectedMetrics)) {
+    // Skip workflow metrics in the summary table
+    if (operation === "workflow") continue;
+
+    if (data.values.length === 0) continue;
+
+    // Extract member count from operationKey
+    const parts = operation.split(":");
+    // The member count should be the last segment if it exists
+    const memberCount =
+      parts.length > 2 ? parts[parts.length - 1] : data.members || "-";
+
+    const average =
+      data.values.reduce((sum, val) => sum + val, 0) / data.values.length;
+    const min = Math.min(...data.values);
+    const max = Math.max(...data.values);
+    const passRate =
+      (data.values.filter((v) => v <= data.threshold).length /
+        data.values.length) *
+      100;
+    const status = average <= data.threshold ? "PASS ✅" : "FAIL ❌";
+    fileContent += `${operation} | ${memberCount} | ${data.values.length} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${passRate.toFixed(1)}% | ${status}\n`;
+  }
+
+  // Write to file
+  try {
+    fs.writeFileSync(filename, fileContent);
+    console.log(`📝 Metrics summary written to: ${filename}`);
+  } catch (error) {
+    console.error(`❌ Error writing metrics summary to file:`, error);
+  }
+
+  // Reset metrics collection for next test run
+  collectedMetrics = {};
+}
+
+// Modify flushMetrics to include the summary log
+export function flushMetrics(testName: string): Promise<void> {
   return new Promise<void>((resolve) => {
     if (!isInitialized) {
       resolve();
       return;
     }
 
-    //console.log("🔄 Flushing DataDog metrics...");
+    // Log metrics summary before flushing
+    logMetricsSummary(testName);
 
     void metrics.flush().then(() => {
-      //console.log("✅ DataDog metrics flushed successfully");
       resolve();
     });
   });

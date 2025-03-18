@@ -23,28 +23,31 @@ echo "Using Railway project token: ${RAILWAY_PROJECT_TOKEN:0:8}..."
 echo "Railway CLI version:"
 railway --version
 
-# Link to the project, environment, and specific service
-echo "Linking to project and service..."
-railway link --project "$RAILWAY_PROJECT_ID" --environment "$RAILWAY_ENVIRONMENT_ID" --service "xmtp-qa-testing:us-east"
-
 # Check connection status
 echo "Checking Railway status:"
 railway status
 
-# Run your performance test
-echo "Running performance test..."
+# Important: The key issue is understanding what 'railway run' does
+# It executes a command locally but with Railway environment variables
+# To truly run on Railway infrastructure, we need to use railway exec
 
-# Run with proper environment variables
-railway run --env XMTP_ENV=production -- \
-  bash -c 'echo "Service details:"; 
-  echo "- Project name: $RAILWAY_PROJECT_NAME"; 
-  echo "- Environment: $RAILWAY_ENVIRONMENT_NAME";
-  echo "- Service name: $RAILWAY_SERVICE_NAME";
+echo "Running test on Railway remote infrastructure..."
+# Use railway exec to run a command on the remote service
+railway run --service "xmtp-qa-testing:us-east" -- bash -c '
+  echo "Running on Railway remote infrastructure"
+  echo "Service details:" 
+  echo "- Project name: $RAILWAY_PROJECT_NAME" 
+  echo "- Environment: $RAILWAY_ENVIRONMENT_NAME"
+  echo "- Service name: $RAILWAY_SERVICE_NAME"
+  echo "- Service ID: $RAILWAY_SERVICE_ID"
   
-  # Extract geolocation from service name
-  export GEOLOCATION=$(echo $RAILWAY_SERVICE_NAME | cut -d":" -f2);
-  echo "- Extracted geolocation: $GEOLOCATION";
-  echo "- XMTP environment: $XMTP_ENV";
+  # Set XMTP_ENV to production manually
+  export XMTP_ENV=production
+  export GEOLOCATION=us-east
+  
+  echo "- XMTP environment: $XMTP_ENV"
+  echo "- Geolocation: $GEOLOCATION"
   
   # Run the test
-  yarn test ts_performance'
+  yarn test ts_performance
+'

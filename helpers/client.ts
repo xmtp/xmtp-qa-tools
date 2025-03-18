@@ -150,7 +150,7 @@ export function getAddressOfMember(members: GroupMember[], inboxId: string) {
 export async function closeEnv(testName: string, workers: WorkerManager) {
   flushLogger(testName);
 
-  await flushMetrics();
+  await flushMetrics(testName);
   if (workers && typeof workers.getWorkers === "function") {
     for (const worker of workers.getWorkers()) {
       await worker.worker.terminate();

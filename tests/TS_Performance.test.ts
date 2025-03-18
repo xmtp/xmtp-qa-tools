@@ -147,6 +147,96 @@ describe(testName, () => {
       throw e;
     }
   });
+  let i = 4;
+  let newGroup: Conversation;
+  it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
+    try {
+      const sliced = generatedInboxes.slice(0, i);
+      newGroup = await workers
+        .get("henry")!
+        .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+      expect(newGroup.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
+    try {
+      const sliced = generatedInboxes.slice(0, i);
+      const newGroupByIdentifier = await workers
+        .get("henry")!
+        .client.conversations.newGroupWithIdentifiers(
+          sliced.map((inbox) => ({
+            identifier: inbox.accountAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          })),
+        );
+      expect(newGroupByIdentifier.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`syncGroup: should sync a large group of ${i} participants ${i}`, async () => {
+    try {
+      await newGroup.sync();
+      const members = await newGroup.members();
+      expect(members.length).toBe(i + 1);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`updateGroupName: should update the group name`, async () => {
+    try {
+      const newName = "Large Group";
+      await (newGroup as Group).updateName(newName);
+      await newGroup.sync();
+      const name = (newGroup as Group).name;
+      expect(name).toBe(newName);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`removeMembers: should remove a participant from a group`, async () => {
+    try {
+      const previousMembers = await newGroup.members();
+      await (newGroup as Group).removeMembers([
+        previousMembers.filter(
+          (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+        )[0].inboxId,
+      ]);
+
+      const members = await newGroup.members();
+      expect(members.length).toBe(previousMembers.length - 1);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
+    try {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+      await newGroup.send(groupMessage);
+      console.log("GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
+    try {
+      const verifyResult = await verifyStreamAll(newGroup, workers);
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
   for (let i = batchSize; i <= total; i += batchSize) {
     let newGroup: Conversation;

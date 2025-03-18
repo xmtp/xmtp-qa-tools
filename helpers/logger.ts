@@ -145,7 +145,6 @@ function filterLog(args: any[]): string {
 const getLogFilePath = (testName: string): string => {
   const env = process.env.XMTP_ENV as string;
   const logName = testName + "_" + env;
-  console.log("logName", logName);
   const sanitizedName = logName.replace(/[^a-zA-Z0-9-_]/g, "_");
   const fileName = `${sanitizedName}.log`;
 

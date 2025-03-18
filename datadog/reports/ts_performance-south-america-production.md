@@ -1,0 +1,55 @@
+# METRICS SUMMARY
+
+| Operation                            | Members | Samples | Avg (ms) | Min/Max (ms) | Threshold (ms) | Pass Rate | Status  |
+| ------------------------------------ | ------- | ------- | -------- | ------------ | -------------- | --------- | ------- |
+| clientCreate:operation               | -       | 1       | 4018     | 4018/4018    | 9000           | 100.0%    | PASS ✅ |
+| inboxState:operation                 | -       | 1       | 192      | 192/192      | 400            | 100.0%    | PASS ✅ |
+| clientCreate:network                 | -       | 5       | 344      | 54/805       | 400            | 60.0%     | PASS ✅ |
+| inboxState:network                   | -       | 5       | 307      | 5/764        | 400            | 60.0%     | PASS ✅ |
+| createDM:operation                   | -       | 1       | 2064     | 2064/2064    | 3600           | 100.0%    | PASS ✅ |
+| createDM:network                     | -       | 5       | 328      | 3/818        | 400            | 60.0%     | PASS ✅ |
+| sendGM:operation                     | -       | 1       | 1022     | 1022/1022    | 2400           | 100.0%    | PASS ✅ |
+| receiveGM:operation                  | -       | 1       | 805      | 805/805      | 2000           | 100.0%    | PASS ✅ |
+| sendGM:network                       | -       | 5       | 321      | 9/793        | 400            | 60.0%     | PASS ✅ |
+| receiveGM:network                    | -       | 5       | 310      | 4/770        | 400            | 60.0%     | PASS ✅ |
+| createGroup:operation                | -       | 1       | 2113     | 2113/2113    | 4000           | 100.0%    | PASS ✅ |
+| createGroup:network                  | -       | 5       | 328      | 5/814        | 400            | 60.0%     | PASS ✅ |
+| createGroupByIdentifiers:operation   | -       | 1       | 2315     | 2315/2315    | 4000           | 100.0%    | PASS ✅ |
+| createGroupByIdentifiers:network     | -       | 5       | 318      | 6/788        | 400            | 60.0%     | PASS ✅ |
+| syncGroup:operation                  | -       | 1       | 854      | 854/854      | 4000           | 100.0%    | PASS ✅ |
+| updateGroupName:operation            | -       | 1       | 794      | 794/794      | 4000           | 100.0%    | PASS ✅ |
+| syncGroup:network                    | -       | 5       | 345      | 10/852       | 400            | 60.0%     | PASS ✅ |
+| updateGroupName:network              | -       | 5       | 322      | 3/803        | 400            | 60.0%     | PASS ✅ |
+| removeMembers:operation              | -       | 1       | 853      | 853/853      | 2000           | 100.0%    | PASS ✅ |
+| removeMembers:network                | -       | 5       | 319      | 5/792        | 400            | 60.0%     | PASS ✅ |
+| sendGroupMessage:operation           | -       | 1       | 861      | 861/861      | 4000           | 100.0%    | PASS ✅ |
+| sendGroupMessage:network             | -       | 5       | 321      | 4/798        | 400            | 60.0%     | PASS ✅ |
+| receiveGroupMessage:operation        | -       | 1       | 1053     | 1053/1053    | 4000           | 100.0%    | PASS ✅ |
+| receiveGroupMessage:network          | -       | 5       | 389      | 3/968        | 400            | 60.0%     | PASS ✅ |
+| createGroup:operation:4              | 4       | 1       | 1828     | 1828/1828    | 4000           | 100.0%    | PASS ✅ |
+| createGroup:network:4                | 4       | 5       | 322      | 5/800        | 400            | 60.0%     | PASS ✅ |
+| createGroupByIdentifiers:operation:4 | 4       | 1       | 2370     | 2370/2370    | 4000           | 100.0%    | PASS ✅ |
+| syncGroup:operation:4                | 4       | 1       | 847      | 847/847      | 4000           | 100.0%    | PASS ✅ |
+| createGroupByIdentifiers:network:4   | 4       | 5       | 333      | 2/829        | 400            | 60.0%     | PASS ✅ |
+| syncGroup:network:4                  | 4       | 5       | 392      | 3/977        | 400            | 60.0%     | PASS ✅ |
+| updateGroupName:operation:4          | 4       | 1       | 1089     | 1089/1089    | 4000           | 100.0%    | PASS ✅ |
+| removeMembers:operation:4            | 4       | 1       | 845      | 845/845      | 2000           | 100.0%    | PASS ✅ |
+| updateGroupName:network:4            | 4       | 5       | 338      | 2/842        | 400            | 60.0%     | PASS ✅ |
+| sendGroupMessage:operation:4         | 4       | 1       | 605      | 605/605      | 4000           | 100.0%    | PASS ✅ |
+| removeMembers:network:4              | 4       | 5       | 425      | 4/1059       | 400            | 60.0%     | FAIL ❌ |
+| sendGroupMessage:network:4           | 4       | 5       | 335      | 10/826       | 400            | 60.0%     | PASS ✅ |
+| receiveGroupMessage:operation:4      | 4       | 1       | 1283     | 1283/1283    | 4000           | 100.0%    | PASS ✅ |
+| receiveGroupMessage:network:4        | 4       | 5       | 317      | 3/789        | 400            | 60.0%     | PASS ✅ |
+| createGroup:operation:8              | 8       | 1       | 1698     | 1698/1698    | 4000           | 100.0%    | PASS ✅ |
+| createGroup:network:8                | 8       | 5       | 319      | 5/792        | 400            | 60.0%     | PASS ✅ |
+| createGroupByIdentifiers:operation:8 | 8       | 1       | 2218     | 2218/2218    | 4000           | 100.0%    | PASS ✅ |
+| syncGroup:operation:8                | 8       | 1       | 762      | 762/762      | 4000           | 100.0%    | PASS ✅ |
+| createGroupByIdentifiers:network:8   | 8       | 5       | 320      | 3/797        | 400            | 60.0%     | PASS ✅ |
+| updateGroupName:operation:8          | 8       | 1       | 794      | 794/794      | 4000           | 100.0%    | PASS ✅ |
+| syncGroup:network:8                  | 8       | 5       | 387      | 9/958        | 400            | 60.0%     | PASS ✅ |
+| updateGroupName:network:8            | 8       | 5       | 315      | 4/783        | 400            | 60.0%     | PASS ✅ |
+| removeMembers:operation:8            | 8       | 1       | 875      | 875/875      | 2000           | 100.0%    | PASS ✅ |
+| sendGroupMessage:operation:8         | 8       | 1       | 772      | 772/772      | 4000           | 100.0%    | PASS ✅ |
+| removeMembers:network:8              | 8       | 5       | 315      | 2/786        | 400            | 60.0%     | PASS ✅ |
+| sendGroupMessage:network:8           | 8       | 5       | 336      | 3/836        | 400            | 60.0%     | PASS ✅ |
+| receiveGroupMessage:operation:8      | 8       | 1       | 1064     | 1064/1064    | 4000           | 100.0%    | PASS ✅ |
