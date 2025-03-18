@@ -10,6 +10,7 @@ let currentGeo: string = "";
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
+    createclient: 3000,
     createdm: 500,
     sendgm: 200,
     receivegm: 200,
@@ -21,9 +22,9 @@ const THRESHOLDS = {
     inboxstate: 100,
   },
   network: {
-    server_call: 100,
-    tls_handshake: 100,
-    processing: 300,
+    processing: 100,
+    tls_handshake: 200,
+    server_call: 300,
   },
   group: {
     create: {

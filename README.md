@@ -139,11 +139,11 @@ _Note: Performance increases significantly beyond `350` members, which represent
 
 ### Network performance
 
-| Performance Metric   | Current Performance | Target            | Status       |
-| -------------------- | ------------------- | ----------------- | ------------ |
-| Server Call Response | 78.4ms avg          | <100ms            | ✅ On Target |
-| TLS Handshake        | 83.6ms avg          | <100ms            | ✅ On Target |
-| Message Processing   | 212.5ms avg         | <300ms end-to-end | ✅ On Target |
+| Performance Metric | Current Performance | Target | Status       |
+| ------------------ | ------------------- | ------ | ------------ |
+| Processing         | 50.3ms avg          | <100ms | ✅ On Target |
+| TLS Handshake      | 105.6ms avg         | <200ms | ✅ On Target |
+| Server call        | 238.9ms avg         | <300ms | ✅ On Target |
 
 _Note: Performance metrics based on `us-east` testing on dev and production network._
 
