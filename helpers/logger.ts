@@ -103,21 +103,23 @@ function filterLog(args: any[]): string {
 
   // Check for the console.time/timeEnd pattern: where args[0] is "%s: %s"
   if (args.length >= 2 && args[0] === "%s: %s") {
-    // Join the remaining parts into one message
-    const message = args.slice(1).join(" ");
-    const timePattern = /(\d+(\.\d+)?)(ms|s)\b/;
-    const match = message.match(timePattern);
-    if (match) {
-      const timeValue = parseFloat(match[1]);
-      const unit = match[3];
-      const timeInMs = unit === "ms" ? timeValue : timeValue * 1000;
-      // Skip logs for durations less than or equal to 300ms
-      if (timeInMs <= 300) {
-        return "";
-      }
-    }
-    // Remove any "%s" placeholders from the message.
-    return message.replace(/%s/g, "").trim();
+    //dont log time
+    return "";
+    // // Join the remaining parts into one message
+    // const message = args.slice(1).join(" ");
+    // const timePattern = /(\d+(\.\d+)?)(ms|s)\b/;
+    // const match = message.match(timePattern);
+    // if (match) {
+    //   const timeValue = parseFloat(match[1]);
+    //   const unit = match[3];
+    //   const timeInMs = unit === "ms" ? timeValue : timeValue * 1000;
+    //   // Skip logs for durations less than or equal to 300ms
+    //   if (timeInMs <= 300) {
+    //     return "";
+    //   }
+    // }
+    // // Remove any "%s" placeholders from the message.
+    // return message.replace(/%s/g, "").trim();
   }
 
   return (
