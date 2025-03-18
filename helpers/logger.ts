@@ -145,8 +145,8 @@ function filterLog(args: any[]): string {
 const getLogFilePath = (testName: string): string => {
   const env = process.env.XMTP_ENV as string;
   const logName = testName + "_" + env;
+  console.log("logName", logName);
   const sanitizedName = logName.replace(/[^a-zA-Z0-9-_]/g, "_");
-  console.log("sanitizedName", sanitizedName);
   const fileName = `${sanitizedName}.log`;
 
   return testName.includes("bug")
@@ -191,7 +191,15 @@ export const overrideConsole = (logger: winston.Logger) => {
       }
     };
     console.debug = (...args: any[]) => {
-      logger.log("debug", args.join(" ").trim() || "");
+      // Only show debug logs when not in CI
+      if (!process.env.CI) {
+        // Use the original console.debug function
+        const originalConsoleDebug = Function.prototype.bind.call(
+          console.constructor.prototype.debug,
+          console,
+        );
+        originalConsoleDebug(...args);
+      }
     };
   } catch (error) {
     console.error("Error overriding console", error);

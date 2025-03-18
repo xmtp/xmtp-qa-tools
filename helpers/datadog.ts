@@ -91,20 +91,7 @@ const THRESHOLDS = {
     asia: "JP",
     "south-america": "BR",
   },
-  reliability: {
-    stream: {
-      threshold: 99.9,
-    },
-    poll: {
-      threshold: 99.9,
-    },
-    order: {
-      threshold: 100,
-    },
-    delivery: {
-      threshold: 99.9,
-    },
-  },
+  reliability: 99.9,
 };
 
 function getCountryCodeFromGeo(geolocation: string): string {
@@ -256,27 +243,16 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
     console.warn("Datadog metrics not initialized");
     return;
   }
-  const status = hasFailures ? "failed" : "successful";
-
-  console.log(`The tests indicated that the test ${testName} was ${status}`);
-
   try {
-    // Send metric to Datadog using metrics.gauge
     const metricValue = hasFailures ? 0 : 1;
-    const metricName = `xmtp.sdk.workflow.status`;
-    console.debug({
-      metricName,
-      metricValue,
-      status,
+    const metricName = `workflow`;
+    sendMetric(metricName, metricValue, {
       workflow: testName,
+      metric_category: "workflow",
     });
-    metrics.gauge(metricName, Math.round(metricValue), [
-      `status:${status}`,
-      `workflow:${testName}`,
-      `metric_category:workflow`,
-    ]);
-
-    console.log(`Successfully reported ${status} to Datadog`);
+    console.log(
+      `The tests indicated that the test ${testName} was ${hasFailures}`,
+    );
   } catch (error) {
     console.error("Error reporting to Datadog:", error);
   }
@@ -474,21 +450,9 @@ export function sendDeliveryMetric(
   metricSubType: "delivery" | "order",
 ): void {
   // Determine success based on the metric subtype
-  const threshold =
-    metricSubType === "order"
-      ? THRESHOLDS.reliability.order.threshold
-      : THRESHOLDS.reliability.delivery.threshold;
+  const threshold = THRESHOLDS.reliability;
 
   const isSuccess = metricValue >= threshold;
-
-  console.debug({
-    libxmtp: version,
-    test: testName,
-    metric_type: metricType,
-    metric_subtype: metricSubType,
-    success: isSuccess,
-    threshold: threshold,
-  });
 
   // Send primary metric
   sendMetric(metricSubType, Math.round(metricValue), {

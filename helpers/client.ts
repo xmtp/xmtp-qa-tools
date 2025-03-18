@@ -118,9 +118,9 @@ function getEnvPath(testName: string): string {
  * Loads environment variables from the specified test's .env file
  */
 export function loadEnv(testName: string) {
+  dotenv.config({ path: getEnvPath(testName) });
   const logger = createLogger(testName);
   overrideConsole(logger);
-  dotenv.config({ path: getEnvPath(testName) });
   // Create the .env file path
   const env = process.env.XMTP_ENV;
   if (env !== "dev" && env !== "production" && env !== "local") {
