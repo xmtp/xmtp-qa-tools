@@ -25,6 +25,9 @@ const THRESHOLDS = {
     processing: 100,
     tls_handshake: 200,
     server_call: 300,
+    total_time: 300,
+    dns_lookup: 100,
+    tcp_connection: 100,
   },
   group: {
     createGroup: {
