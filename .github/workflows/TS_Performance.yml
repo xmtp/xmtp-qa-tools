@@ -34,24 +34,19 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
       - name: Rename logs with run ID prefix
         run: |
-          mkdir -p renamed_logs
-          cp -r logs/* renamed_logs/
-          find renamed_logs -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
+          mkdir -p artifacts/logs
+          cp -r logs/* artifacts/logs/
+          find artifacts/logs -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
       - name: Rename datadog reports with run ID prefix
         run: |
-          mkdir -p renamed_reports
-          cp -r datadog/reports/* renamed_reports/
-          find renamed_reports -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
-      - name: Upload log files
+          mkdir -p artifacts/reports
+          cp -r datadog/reports/* artifacts/reports/
+          find artifacts/reports -type f -exec mv {} {}.run-${{ github.run_id }}-dev.md \;
+      - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_${{ env.XMTP_ENV }}
-          path: renamed_logs/
-      - name: Upload datadog reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: datadog_reports_${{ env.XMTP_ENV }}
-          path: renamed_reports/
+          name: performance_data_${{ env.XMTP_ENV }}
+          path: artifacts/
   production:
     runs-on: ubuntu-latest
     env:
@@ -77,21 +72,16 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
       - name: Rename logs with run ID prefix
         run: |
-          mkdir -p renamed_logs
-          cp -r logs/* renamed_logs/
-          find renamed_logs -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
+          mkdir -p artifacts/logs
+          cp -r logs/* artifacts/logs/
+          find artifacts/logs -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
       - name: Rename datadog reports with run ID prefix
         run: |
-          mkdir -p renamed_reports
-          cp -r datadog/reports/* renamed_reports/
-          find renamed_reports -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
-      - name: Upload log files
+          mkdir -p artifacts/reports
+          cp -r datadog/reports/* artifacts/reports/
+          find artifacts/reports -type f -exec mv {} {}.run-${{ github.run_id }}-production.md \;
+      - name: Upload all artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_${{ env.XMTP_ENV }}
-          path: renamed_logs/
-      - name: Upload datadog reports
-        uses: actions/upload-artifact@v4
-        with:
-          name: datadog_reports_${{ env.XMTP_ENV }}
-          path: renamed_reports/
+          name: performance_data_${{ env.XMTP_ENV }}
+          path: artifacts/
