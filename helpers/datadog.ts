@@ -22,12 +22,11 @@ const THRESHOLDS = {
     inboxstate: 100,
   },
   network: {
-    processing: 100,
-    tls_handshake: 200,
-    server_call: 300,
-    total_time: 300,
     dns_lookup: 100,
     tcp_connection: 100,
+    tls_handshake: 200,
+    processing: 100,
+    server_call: 300,
   },
   group: {
     createGroup: {
@@ -387,14 +386,14 @@ interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
   "TLS Handshake": number;
-  "Server Call": number;
   Processing: number;
+  "Server Call": number;
 }
 
 export async function getNetworkStats(
   endpoint = "https://grpc.dev.xmtp.network:443",
 ): Promise<NetworkStats> {
-  const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}, \\"Total Time\\": %{time_total}}" -o /dev/null --max-time 10 ${endpoint}`;
+  const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}}" -o /dev/null --max-time 10 ${endpoint}`;
 
   let stdout: string;
 
@@ -415,23 +414,16 @@ export async function getNetworkStats(
   }
 
   // Parse the JSON response
-  const stats = JSON.parse(stdout.trim()) as NetworkStats & {
-    "Total Time": number;
-  };
+  const stats = JSON.parse(stdout.trim()) as NetworkStats;
 
   // Handle the case where Server Call time is 0
   if (stats["Server Call"] === 0) {
     console.warn(
-      `Network request to ${endpoint} returned Server Call time of 0. Total time: ${stats["Total Time"]}s`,
+      `Network request to ${endpoint} returned Server Call time of 0.`,
     );
 
-    // Use Total Time as a fallback if it's available and non-zero
-    if (stats["Total Time"] && stats["Total Time"] > stats["TLS Handshake"]) {
-      stats["Server Call"] = stats["Total Time"];
-    } else {
-      // Otherwise use a reasonable estimate
-      stats["Server Call"] = stats["TLS Handshake"] + 0.1;
-    }
+    // Use a reasonable estimate
+    stats["Server Call"] = stats["TLS Handshake"] + 0.1;
   }
 
   // Calculate processing time
@@ -455,7 +447,7 @@ export async function getNetworkStats(
     }
   }
 
-  return stats as NetworkStats;
+  return stats;
 }
 
 // Unified delivery metrics function

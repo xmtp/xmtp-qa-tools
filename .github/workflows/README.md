@@ -106,13 +106,13 @@ metrics.gauge(durationMetricName, value, [
 
 For each operation, the test suite tracks network performance across five key phases:
 
-| Phase            | Description                                                        |
-| ---------------- | ------------------------------------------------------------------ |
-| `dns_lookup`     | DNS resolution time                                                |
-| `tcp_connection` | TCP connection establishment time                                  |
-| `tls_handshake`  | TLS handshake duration                                             |
-| `server_call`    | Server response time                                               |
-| `processing`     | Server processing time (calculated as server_call - tls_handshake) |
+| Phase            | Description                                                 |
+| ---------------- | ----------------------------------------------------------- |
+| `dns_lookup`     | DNS resolution time                                         |
+| `tcp_connection` | TCP connection establishment time                           |
+| `tls_handshake`  | TLS handshake duration                                      |
+| `processing`     | Processing time (calculated as server_call - tls_handshake) |
+| `server_call`    | Server response time                                        |
 
 ```tsx
 const networkStats = await getNetworkStats();
