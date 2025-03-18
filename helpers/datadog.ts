@@ -16,35 +16,35 @@ let collectedMetrics: Record<
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
-    creategroup: 1700,
-    creategroupbyidentifiers: 1450,
+    clientcreate: 550,
+    inboxstate: 50,
+    createdm: 200,
+    sendgm: 100,
+    receivegm: 100,
+    receivegroupmessage: 102,
+    creategroup: 300,
+    creategroupbyidentifiers: 300,
     sendgroupmessage: 56,
     syncgroup: 100,
     updategroupname: 110,
     removemembers: 250,
-    receivegroupmessage: 102,
-    clientcreate: 550,
-    createdm: 200,
-    sendgm: 100,
-    receivegm: 100,
     addmembers: 250,
-    inboxstate: 50,
   },
   network: {
-    dns_lookup: 175,
-    tcp_connection: 175,
-    tls_handshake: 175,
-    processing: 175,
-    server_call: 175,
+    dns_lookup: 50,
+    tcp_connection: 50,
+    tls_handshake: 150,
+    processing: 100,
+    server_call: 250,
   },
   memberMultipliers: {
-    creategroup: 2,
-    creategroupbyidentifiers: 2,
-    sendgroupmessage: 6,
-    syncgroup: 0.1,
-    updategroupname: 0.2,
-    removemembers: 0.1,
-    receivegroupmessage: 0.2,
+    creategroup: 3,
+    creategroupbyidentifiers: 3,
+    sendgroupmessage: 0.3,
+    syncgroup: 0.3,
+    updategroupname: 0.3,
+    removemembers: 0.3,
+    receivegroupmessage: 0.3,
   },
 
   regionMultipliers: {
@@ -123,6 +123,9 @@ export function getThresholdForOperation(
     if (memberCount > 50) {
       const additionalBatches = Math.floor((memberCount - 50) / 50);
       calculatedThreshold += memberMultiplier * additionalBatches;
+      console.log(
+        `calculatedThreshold: ${calculatedThreshold} for ${memberCount} members`,
+      );
     }
 
     // Apply region multiplier
