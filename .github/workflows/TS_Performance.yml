@@ -37,6 +37,11 @@ jobs:
         with:
           name: performance_logs_dev
           path: logs/
+      - name: Upload datadog reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: datadog_reports_dev
+          path: datadog/reports/
   production:
     runs-on: ubuntu-latest
     env:
@@ -65,3 +70,8 @@ jobs:
         with:
           name: performance_logs_production
           path: logs/
+      - name: Upload datadog reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: datadog_reports_production
+          path: datadog/reports/
