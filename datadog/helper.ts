@@ -212,8 +212,6 @@ export async function sendPerformanceMetric(
       operationType,
       members,
       currentGeo,
-      batchSize ?? undefined,
-      memberCount, // Pass the actual member count here
     );
 
     const isSuccess = metricValue <= threshold;
@@ -253,8 +251,6 @@ export async function sendPerformanceMetric(
           "network",
           members,
           currentGeo,
-          batchSize,
-          total,
         );
 
         sendMetric("duration", networkMetricValue, {

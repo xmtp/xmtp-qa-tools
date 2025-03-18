@@ -130,8 +130,6 @@ export function logMetricsSummary(
       operationName.toLowerCase().includes("-") ? "group" : "core",
       group.members as string,
       currentGeo,
-      batchSize,
-      memberCount, // Pass the preserved member count
     );
 
     // Update the threshold in the data

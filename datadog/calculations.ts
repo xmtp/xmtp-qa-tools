@@ -6,11 +6,14 @@ export function getThresholdForOperation(
   operationType: "core" | "group" | "network",
   members: string = "",
   region: string = "us-east",
-  batchSize: number = 10,
-  total: number = 10,
 ): number {
   // Convert operation to lowercase for consistent lookups
   const operationLower = operation.toLowerCase();
+
+  // Extract batch size from operation name if it contains a dash
+  const batchSize = operation.includes("-")
+    ? parseInt(operation.split("-")[1]) || 1
+    : 1;
 
   // Normalize region name and ensure it exists in the thresholds
   const regionNormalized = region.toLowerCase().trim();
@@ -31,9 +34,11 @@ export function getThresholdForOperation(
   if (operationType === "network") {
     const networkThreshold =
       THRESHOLDS.network[operationLower as keyof typeof THRESHOLDS.network];
-    // Default to 200 if the specific network operation isn't found
+    // Default to network threshold based on the operation or fallback value
     const baseThreshold =
-      typeof networkThreshold === "number" ? networkThreshold : 200;
+      typeof networkThreshold === "number"
+        ? networkThreshold
+        : THRESHOLDS.network.server_call;
 
     // Apply region multiplier to network thresholds
     const finalThreshold = Math.round(baseThreshold * regionMultiplier);
@@ -44,7 +49,7 @@ export function getThresholdForOperation(
   if (operationType === "group") {
     // Parse the member count from the members string if available
     // Use a more robust parsing approach
-    let memberCount = total; // Default to total
+    let memberCount = 0;
 
     if (members && members !== "-") {
       const parsedMember = parseInt(members);
@@ -70,12 +75,14 @@ export function getThresholdForOperation(
     let calculatedThreshold = baseValue;
 
     // Calculate based on the actual member count
-    const batches = Math.ceil(memberCount / batchSize);
-    calculatedThreshold = baseValue * (1 + memberMultiplier * (batches - 1));
+    if (memberCount > 0) {
+      const batches = Math.ceil(memberCount / batchSize);
+      calculatedThreshold = baseValue * (1 + memberMultiplier * (batches - 1));
 
-    console.log(
-      `Operation: ${operation}, Using memberCount: ${memberCount} (from members: ${members}), batches: ${batches}, threshold: ${calculatedThreshold}`,
-    );
+      console.log(
+        `Operation: ${operation}, Using memberCount: ${memberCount} (from members: ${members}), batches: ${batches}, threshold: ${calculatedThreshold}`,
+      );
+    }
 
     // Apply region multiplier
     const finalThreshold = Math.round(calculatedThreshold * regionMultiplier);
@@ -87,7 +94,7 @@ export function getThresholdForOperation(
   const baseThreshold =
     operationLower in THRESHOLDS.core
       ? THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core]
-      : 300;
+      : null;
 
   // Check if this is a group operation that needs member multiplier
   const isGroupOperation = operationLower in THRESHOLDS.memberMultipliers;
@@ -100,18 +107,30 @@ export function getThresholdForOperation(
       ] || 0;
 
     let calculatedThreshold = baseThreshold;
+    let memberCount = 0;
 
-    // Always calculate based on batch size and total
-    const batches = Math.ceil(total / batchSize);
-    calculatedThreshold =
-      baseThreshold * (1 + memberMultiplier * (batches - 1));
+    if (members && members !== "-") {
+      const parsedMember = parseInt(members);
+      if (!isNaN(parsedMember)) {
+        memberCount = parsedMember;
+      }
+    }
+
+    // Calculate based on batch size and member count
+    if (memberCount > 0) {
+      const batches = Math.ceil(memberCount / batchSize);
+      calculatedThreshold =
+        (baseThreshold ?? 0) * (1 + memberMultiplier * (batches - 1));
+    }
 
     // Apply region multiplier
-    const finalThreshold = Math.round(calculatedThreshold * regionMultiplier);
+    const finalThreshold = Math.round(
+      (calculatedThreshold ?? 0) * regionMultiplier,
+    );
     return finalThreshold;
   }
 
   // For regular core operations
-  const finalThreshold = Math.round(baseThreshold * regionMultiplier);
+  const finalThreshold = Math.round((baseThreshold ?? 0) * regionMultiplier);
   return finalThreshold;
 }
