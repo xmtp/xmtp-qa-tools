@@ -119,11 +119,10 @@ export function getThresholdForOperation(
 
     if (memberCount > 50) {
       const additionalBatches = Math.floor((memberCount - 50) / 50);
-      // Apply multiplier as a percentage increase per batch instead of a fixed value
-      calculatedThreshold +=
-        baseValue * ((memberMultiplier * additionalBatches) / 100);
+      calculatedThreshold =
+        baseValue * (1 + (memberMultiplier * additionalBatches) / 10);
       console.log(
-        `calculatedThreshold: ${calculatedThreshold} for ${memberCount} members`,
+        `calculatedThreshold: ${calculatedThreshold} for ${memberCount} members with multiplier ${memberMultiplier}`,
       );
     }
 
