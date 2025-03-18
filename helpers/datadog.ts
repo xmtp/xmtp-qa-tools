@@ -446,8 +446,8 @@ export function sendDeliveryMetric(
   metricValue: number,
   version: string,
   testName: string,
-  metricType: "stream" | "poll" | "recovery",
-  metricSubType: "delivery" | "order",
+  metricSubType: "stream" | "poll" | "recovery",
+  metricType: "delivery" | "order",
 ): void {
   // Determine success based on the metric subtype
   const threshold = THRESHOLDS.reliability;
@@ -458,7 +458,8 @@ export function sendDeliveryMetric(
   sendMetric(metricSubType, Math.round(metricValue), {
     libxmtp: version,
     test: testName,
-    metric_type: "delivery",
+    metric_type: metricType,
+    metric_subtype: metricSubType,
     success: isSuccess,
     threshold: threshold,
   });
