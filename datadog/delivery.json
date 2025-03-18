@@ -16,7 +16,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:stream,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -50,7 +50,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -84,7 +84,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -118,7 +118,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -152,7 +152,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:poll,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{metric_type:poll,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -186,7 +186,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -230,32 +230,32 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:stream,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery{metric_type:stream,$env,$region,$test,$libxmtp,$members}"
               },
               {
                 "name": "query2",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery{metric_type:poll,$env,$region,$test,$libxmtp,$members}"
               },
               {
                 "name": "query3",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.order{metric_type:stream,$env,$region,$test,$libxmtp,$members}"
               },
               {
                 "name": "query4",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:poll,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.order{metric_type:poll,$env,$region,$test,$libxmtp,$members}"
               },
               {
                 "name": "query5",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery{metric_type:recovery,$env,$region,$test,$libxmtp,$members}"
               },
               {
                 "name": "query6",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$geo,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.order{metric_type:recovery,$env,$region,$test,$libxmtp,$members}"
               }
             ],
             "response_format": "timeseries",

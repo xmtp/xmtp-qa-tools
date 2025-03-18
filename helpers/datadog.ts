@@ -202,7 +202,7 @@ export function initDataDog(
         `env:${envValue}`,
         `test:${testName}`,
         `region:${geolocation}`,
-        `geo.country_iso_code:${countryCode}`,
+        `country_iso_code:${countryCode}`,
       ],
     };
     metrics.init(initConfig);
@@ -321,7 +321,7 @@ export async function sendPerformanceMetric(
           test: testNameExtracted,
           metric_type: "network",
           network_phase: networkPhase,
-          "geo.country_iso_code": countryCode,
+          country_iso_code: countryCode,
           members: members,
           success: networkMetricValue <= networkThreshold,
           threshold: networkThreshold,
@@ -455,7 +455,7 @@ export function sendDeliveryMetric(
   const isSuccess = metricValue >= threshold;
 
   // Send primary metric
-  sendMetric(metricSubType, Math.round(metricValue), {
+  sendMetric(metricType, Math.round(metricValue), {
     libxmtp: version,
     test: testName,
     metric_type: metricType,
