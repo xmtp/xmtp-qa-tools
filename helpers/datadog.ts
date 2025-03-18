@@ -10,7 +10,7 @@ let currentGeo: string = "";
 // Refactored thresholds into a single configuration object
 const THRESHOLDS = {
   core: {
-    createclient: 3000,
+    clientcreate: 3000,
     createdm: 500,
     sendgm: 200,
     receivegm: 200,
@@ -27,7 +27,7 @@ const THRESHOLDS = {
     server_call: 300,
   },
   group: {
-    create: {
+    createGroup: {
       "50": 2000,
       "100": 2000,
       "150": 4000,
@@ -37,7 +37,17 @@ const THRESHOLDS = {
       "350": 11000,
       "400": 15000,
     },
-    send: {
+    createGroupByIdentifiers: {
+      "50": 2300,
+      "100": 2500,
+      "150": 3000,
+      "200": 3500,
+      "250": 4000,
+      "300": 4500,
+      "350": 5000,
+      "400": 15000,
+    },
+    sendGroupMessage: {
       "50": 100,
       "100": 100,
       "150": 100,
@@ -47,7 +57,7 @@ const THRESHOLDS = {
       "350": 350,
       "400": 500,
     },
-    sync: {
+    syncGroup: {
       "50": 100,
       "100": 100,
       "150": 100,
@@ -57,7 +67,7 @@ const THRESHOLDS = {
       "350": 350,
       "400": 500,
     },
-    update: {
+    updateGroupName: {
       "50": 100,
       "100": 100,
       "150": 150,
@@ -67,7 +77,7 @@ const THRESHOLDS = {
       "350": 350,
       "400": 500,
     },
-    remove: {
+    removeMembers: {
       "50": 150,
       "100": 200,
       "150": 200,
@@ -119,12 +129,11 @@ export function getThresholdForOperation(
   }
 
   if (operationType === "group") {
-    const groupOp = operation.toLowerCase().replace(/group/, "");
     const size = members || "50";
 
     // Get the operation-specific thresholds object
     const groupThresholds =
-      THRESHOLDS.group[groupOp as keyof typeof THRESHOLDS.group];
+      THRESHOLDS.group[operation as keyof typeof THRESHOLDS.group];
 
     // Safely check if this size exists, defaulting to 2000 if not
     let baseThreshold = 2000;

@@ -145,7 +145,7 @@ _Note: Performance increases significantly beyond `350` members, which represent
 | TLS Handshake      | 105.6ms avg         | <200ms | ✅ On Target |
 | Server call        | 238.9ms avg         | <300ms | ✅ On Target |
 
-_Note: Performance metrics based on `us-east` testing on dev and production network._
+_Note: Performance metrics based on `us-east` testing on `production` network._
 
 ### Regional Network Performance
 
