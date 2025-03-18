@@ -427,7 +427,7 @@ export function logMetricsSummary(testName: string): void {
   );
 
   // Create a directory for reports if it doesn't exist
-  const reportsDir = path.join(process.cwd(), "datadog/reports");
+  const reportsDir = path.join(process.cwd(), "logs/reports");
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }

@@ -38,10 +38,10 @@ jobs:
           cp -r logs/* artifacts/logs/
           find artifacts/logs -type f -name "*.log" -exec bash -c 'mv "$0" "${0%.log}.run-${{ github.run_id }}-dev.txt"' {} \;
           find artifacts/logs -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.txt"' {} \;
-      - name: Rename datadog reports with run ID prefix
+      - name: Rename logs/reports with run ID prefix
         run: |
           mkdir -p artifacts/reports
-          cp -r datadog/reports/* artifacts/reports/
+          cp -r logs/reports/* artifacts/reports/
           find artifacts/reports -type f -name "*.md" -exec bash -c 'mv "$0" "${0%.md}.run-${{ github.run_id }}-dev.md"' {} \;
           find artifacts/reports -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-dev.md"' {} \;
       - name: Upload all artifacts
@@ -78,10 +78,10 @@ jobs:
           cp -r logs/* artifacts/logs/
           find artifacts/logs -type f -name "*.log" -exec bash -c 'mv "$0" "${0%.log}.run-${{ github.run_id }}-production.txt"' {} \;
           find artifacts/logs -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-production.txt"' {} \;
-      - name: Rename datadog reports with run ID prefix
+      - name: Rename logs/reports with run ID prefix
         run: |
           mkdir -p artifacts/reports
-          cp -r datadog/reports/* artifacts/reports/
+          cp -r logs/reports/* artifacts/reports/
           find artifacts/reports -type f -name "*.md" -exec bash -c 'mv "$0" "${0%.md}.run-${{ github.run_id }}-production.md"' {} \;
           find artifacts/reports -type f ! -name "*.run-*" -exec bash -c 'mv "$0" "$0.run-${{ github.run_id }}-production.md"' {} \;
       - name: Upload all artifacts
