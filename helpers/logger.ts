@@ -121,6 +121,10 @@ function filterLog(args: any[]): string {
       // Remove any "%s" placeholders from the message.
       return message.replace(/%s/g, "").trim();
     }
+  } else {
+    if (args.length >= 2 && args[0] === "%s: %s") {
+      return "";
+    }
   }
 
   return (
@@ -194,14 +198,14 @@ export const overrideConsole = (logger: winston.Logger) => {
     };
 
     console.debug = (...args: any[]) => {
-      //if (!process.env.CI) {
-      // Using a specific function type for console.debug
-      const originalConsoleDebug = Function.prototype.bind.call(
-        console.constructor.prototype.debug as (...args: any[]) => void,
-        console,
-      );
-      originalConsoleDebug(...args);
-      //}
+      if (!process.env.CI) {
+        // Using a specific function type for console.debug
+        const originalConsoleDebug = Function.prototype.bind.call(
+          console.constructor.prototype.debug as (...args: any[]) => void,
+          console,
+        );
+        originalConsoleDebug(...args);
+      }
     };
   } catch (error) {
     console.error("Error overriding console", error);
