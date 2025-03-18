@@ -32,16 +32,26 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Performance
+      - name: Rename logs with run ID prefix
+        run: |
+          mkdir -p renamed_logs
+          cp -r logs/* renamed_logs/
+          find renamed_logs -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
+      - name: Rename datadog reports with run ID prefix
+        run: |
+          mkdir -p renamed_reports
+          cp -r datadog/reports/* renamed_reports/
+          find renamed_reports -type f -exec mv {} {}.run-${{ github.run_id }}-dev \;
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_dev
-          path: logs/
+          name: performance_logs
+          path: renamed_logs/
       - name: Upload datadog reports
         uses: actions/upload-artifact@v4
         with:
-          name: datadog_reports_dev
-          path: datadog/reports/
+          name: datadog_reports
+          path: renamed_reports/
   production:
     runs-on: ubuntu-latest
     env:
@@ -65,13 +75,23 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Performance
+      - name: Rename logs with run ID prefix
+        run: |
+          mkdir -p renamed_logs
+          cp -r logs/* renamed_logs/
+          find renamed_logs -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
+      - name: Rename datadog reports with run ID prefix
+        run: |
+          mkdir -p renamed_reports
+          cp -r datadog/reports/* renamed_reports/
+          find renamed_reports -type f -exec mv {} {}.run-${{ github.run_id }}-production \;
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_production
-          path: logs/
+          name: performance_logs
+          path: renamed_logs/
       - name: Upload datadog reports
         uses: actions/upload-artifact@v4
         with:
-          name: datadog_reports_production
-          path: datadog/reports/
+          name: datadog_reports
+          path: renamed_reports/
