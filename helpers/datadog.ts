@@ -38,15 +38,6 @@ const THRESHOLDS = {
     server_call: 175,
   },
   group: {
-    baseValues: {
-      creategroup: 600,
-      creategroupbyidentifiers: 550,
-      sendgroupmessage: 50,
-      syncgroup: 100,
-      updategroupname: 100,
-      removemembers: 75,
-      receivegroupmessage: 100,
-    },
     memberMultipliers: {
       creategroup: 22,
       creategroupbyidentifiers: 18,
@@ -117,9 +108,7 @@ export function getThresholdForOperation(
 
     // Get the base value for this operation
     const baseValue =
-      THRESHOLDS.group.baseValues[
-        operationLower as keyof typeof THRESHOLDS.group.baseValues
-      ] || 500;
+      THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 500;
 
     // Get the multiplier for this operation
     const memberMultiplier =
@@ -127,8 +116,15 @@ export function getThresholdForOperation(
         operationLower as keyof typeof THRESHOLDS.group.memberMultipliers
       ] || 0;
 
-    // Calculate the threshold based on member count
-    const calculatedThreshold = baseValue + memberCount * memberMultiplier;
+    // Calculate the threshold based on compounding member count
+    // Each member above the base threshold compounds the effect
+    let calculatedThreshold = baseValue;
+
+    // Apply the multiplier in a compounding fashion
+    // For each member, increase the threshold by the multiplier based on the current value
+    for (let i = 0; i < memberCount; i++) {
+      calculatedThreshold += memberMultiplier;
+    }
 
     // Apply region multiplier
     const finalThreshold = Math.round(calculatedThreshold * regionMultiplier);
