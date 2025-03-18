@@ -7,7 +7,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | Module                         | Purpose                                           |
 | ------------------------------ | ------------------------------------------------- |
 | [client.ts](#clientts)         | Creates signers and manages keys for test workers |
-| [datadog.ts](#datadogts)       | Sends performance metrics to Datadog              |
 | [group.ts](#groupts)           | Creates test groups with specified participants   |
 | [logger.ts](#loggerts)         | Logging utilities for test output                 |
 | [test.ts](#testts)             | Test utilities for creating and managing tests    |
@@ -30,24 +29,6 @@ const dbPath = getDbPath(workerName, accountAddress, testName);
 
 // Generate random encryption keys
 const encryptionKey = generateEncryptionKeyHex();
-```
-
-### datadog.ts
-
-Sends performance metrics to Datadog for monitoring:
-
-```typescript
-// Initialize Datadog metrics
-initDataDog(testName, envValue, geolocation, apiKey);
-
-// Send delivery rate metrics
-sendDeliveryMetric(deliveryRate, testName, libxmtpVersion);
-
-// Send performance metrics
-sendPerformanceMetric(durationMs, testName, libxmtpVersion);
-
-// Measure network performance
-const networkStats = await getNetworkStats();
 ```
 
 ### group.ts

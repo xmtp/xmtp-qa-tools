@@ -8,6 +8,7 @@ export default defineConfig({
       "@helpers": resolve(__dirname, "./helpers"),
       "@workers": resolve(__dirname, "./workers"),
       "@scripts": resolve(__dirname, "./scripts"),
+      "@datadog": resolve(__dirname, "./datadog"),
     },
   },
   test: {

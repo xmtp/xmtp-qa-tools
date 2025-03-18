@@ -1,0 +1,48 @@
+{
+  "core": {
+    "clientcreate": 550,
+    "inboxstate": 300,
+    "createdm": 200,
+    "sendgm": 100,
+    "receivegm": 100,
+    "receivegroupmessage": 102,
+    "creategroup": 300,
+    "creategroupbyidentifiers": 300,
+    "sendgroupmessage": 56,
+    "syncgroup": 100,
+    "updategroupname": 110,
+    "removemembers": 250,
+    "addmembers": 250
+  },
+  "network": {
+    "dns_lookup": 50,
+    "tcp_connection": 50,
+    "tls_handshake": 150,
+    "processing": 100,
+    "server_call": 250
+  },
+  "memberMultipliers": {
+    "creategroup": 3,
+    "creategroupbyidentifiers": 3,
+    "sendgroupmessage": 1.3,
+    "syncgroup": 1.3,
+    "updategroupname": 1.3,
+    "removemembers": 1.3,
+    "receivegroupmessage": 1.3
+  },
+  "regionMultipliers": {
+    "us-east": 1.0,
+    "us-west": 1.0,
+    "europe": 1.0,
+    "asia": 1.5,
+    "south-america": 10
+  },
+  "GEO_TO_COUNTRY_CODE": {
+    "us-east": "US",
+    "us-west": "US",
+    "europe": "FR",
+    "asia": "JP",
+    "south-america": "BR"
+  },
+  "reliability": 99.9
+}

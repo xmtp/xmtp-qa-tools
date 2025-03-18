@@ -1,5 +1,5 @@
+import { sendDeliveryMetric } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { type Group, type WorkerManager } from "@helpers/types";
 import { calculateMessageStats } from "@helpers/verify";

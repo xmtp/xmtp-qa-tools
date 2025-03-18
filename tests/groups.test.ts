@@ -1,5 +1,5 @@
+import { sendPerformanceResult, sendTestResults } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {

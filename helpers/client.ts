@@ -8,7 +8,8 @@ import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { flushMetrics, initDataDog } from "./datadog";
+import { b } from "vitest/dist/chunks/suite.qtkXWc6R.js";
+import { flushMetrics, initDataDog } from "../datadog/git add . && git commit -m "fix datadog summary"  && git push;";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
 
 interface User {
@@ -147,10 +148,14 @@ export function getAddressOfMember(members: GroupMember[], inboxId: string) {
   }
 }
 
-export async function closeEnv(testName: string, workers: WorkerManager) {
+export async function closeEnv(
+  testName: string,
+  workers: WorkerManager,
+  batchSize?: number,
+) {
   flushLogger(testName);
 
-  await flushMetrics(testName);
+  await flushMetrics(testName, batchSize);
   if (workers && typeof workers.getWorkers === "function") {
     for (const worker of workers.getWorkers()) {
       await worker.worker.terminate();

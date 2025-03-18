@@ -1,5 +1,5 @@
+import { sendPerformanceResult, sendTestResults } from "@datadog/git add . && git commit -m "fix datadog summary"  && git push;";
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {
@@ -68,7 +68,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      sendPerformanceResult(expect, workers, start);
+      sendPerformanceResult(expect, workers, start, batchSize, total);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -78,7 +78,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
+      await closeEnv(testName, workers, batchSize);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
