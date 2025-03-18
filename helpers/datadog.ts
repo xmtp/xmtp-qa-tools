@@ -499,14 +499,4 @@ export function sendDeliveryMetric(
     threshold: threshold,
     metric_category: "reliability",
   });
-
-  // Binary success metric
-  sendMetric(`${metricSubType}.status`, isSuccess ? 100 : 0, {
-    libxmtp: version,
-    test: testName,
-    metric_type: metricType,
-    success: isSuccess,
-    threshold: threshold,
-    metric_category: "reliability",
-  });
 }
