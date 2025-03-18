@@ -144,8 +144,8 @@ _Note: Performance increases significantly beyond `350` members, which represent
 | DNS Lookup         | 50.3ms avg          | <100ms | ✅ On Target |
 | TCP Connection     | 105.6ms avg         | <200ms | ✅ On Target |
 | TLS Handshake      | 238.9ms avg         | <300ms | ✅ On Target |
-| Processing         | 30ms avg            | <50ms  | ✅ On Target |
-| Server Call        | 238.9ms avg         | <300ms | ✅ On Target |
+| Processing         | 30ms avg            | <100ms | ✅ On Target |
+| Server Call        | 238.9ms avg         | <400ms | ✅ On Target |
 
 _Note: Performance metrics based on `us-east` testing on `production` network._
 
