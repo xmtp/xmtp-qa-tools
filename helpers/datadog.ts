@@ -227,6 +227,10 @@ export function sendMetric(
     const allTags = Object.entries({ ...tags }).map(
       ([key, value]) => `${key}:${String(value)}`,
     );
+    // Add environment tag if not already present
+    if (!allTags.some((tag) => tag.startsWith("env:"))) {
+      allTags.push(`env:${process.env.XMTP_ENV as string}`);
+    }
 
     if (allTags.includes("success:false")) {
       console.debug(fullMetricName, Math.round(metricValue), allTags);

@@ -340,12 +340,12 @@
               {
                 "data_source": "metrics",
                 "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,env:production,$region,$test,$libxmtp,$members} by {network_phase,geo}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,env:production,$region,$test,$libxmtp,$members} by {network_phase,region}"
               },
               {
                 "data_source": "metrics",
                 "name": "query2",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,env:dev,$region,$test,$libxmtp,$members} by {network_phase,geo}"
+                "query": "avg:xmtp.sdk.duration{metric_type:network,env:dev,$region,$test,$libxmtp,$members} by {network_phase,region}"
               }
             ],
             "response_format": "scalar",
