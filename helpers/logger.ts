@@ -189,12 +189,12 @@ export const overrideConsole = (logger: winston.Logger) => {
         logger.log("error", message);
       }
     };
+
     console.debug = (...args: any[]) => {
-      // Only show debug logs when not in CI
       //if (!process.env.CI) {
-      // Use the original console.debug function
+      // Using a specific function type for console.debug
       const originalConsoleDebug = Function.prototype.bind.call(
-        console.constructor.prototype.debug,
+        console.constructor.prototype.debug as (...args: any[]) => void,
         console,
       );
       originalConsoleDebug(...args);
