@@ -61,8 +61,8 @@
   "template_variables": [
     { "name": "env", "prefix": "env", "available_values": [], "default": "*" },
     {
-      "name": "geo",
-      "prefix": "geo",
+      "name": "region",
+      "prefix": "region",
       "available_values": [
         "south-america",
         "europe",

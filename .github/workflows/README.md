@@ -206,11 +206,11 @@ This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq
 
 #### Message Delivery Metrics
 
-The test suite reports delivery reliability via the `xmtp.sdk.delivery_rate` metric:
+The test suite reports delivery reliability via the `xmtp.sdk.delivery` metric:
 
 ```tsx
 // Send delivery rate metric
-metrics.gauge("xmtp.sdk.delivery_rate", deliveryRate, [
+metrics.gauge("xmtp.sdk.delivery", deliveryRate, [
   `libxmtp:${firstWorker.version}`,
   `test:${testName}`,
   `metric_type:reliability`,

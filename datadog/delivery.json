@@ -225,7 +225,6 @@
               { "formula": "query4" },
               { "formula": "query5" },
               { "formula": "query6" }
-              
             ],
             "queries": [
               {
@@ -280,8 +279,8 @@
       "default": "production"
     },
     {
-      "name": "geo",
-      "prefix": "geo",
+      "name": "region",
+      "prefix": "region",
       "available_values": [
         "south-america",
         "europe",

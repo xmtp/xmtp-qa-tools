@@ -201,7 +201,7 @@ export function initDataDog(
       defaultTags: [
         `env:${envValue}`,
         `test:${testName}`,
-        `geo:${geolocation}`,
+        `region:${geolocation}`,
         `geo.country_iso_code:${countryCode}`,
       ],
     };
@@ -228,7 +228,9 @@ export function sendMetric(
       ([key, value]) => `${key}:${String(value)}`,
     );
 
-    console.debug(fullMetricName, Math.round(metricValue), allTags);
+    if (allTags.includes("success:false")) {
+      console.debug(fullMetricName, Math.round(metricValue), allTags);
+    }
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(

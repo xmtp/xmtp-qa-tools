@@ -350,7 +350,9 @@
             ],
             "response_format": "scalar",
             "sort": {
-              "order_by": [{ "type": "group", "name": "geo", "order": "asc" }],
+              "order_by": [
+                { "type": "group", "name": "region", "order": "asc" }
+              ],
               "count": 500
             },
             "formulas": [
@@ -372,8 +374,8 @@
       "default": "production"
     },
     {
-      "name": "geo",
-      "prefix": "geo",
+      "name": "region",
+      "prefix": "region",
       "available_values": [
         "south-america",
         "europe",
@@ -420,21 +422,21 @@
     {
       "name": "asia",
       "template_variables": [
-        { "name": "geo", "value": "asia" },
+        { "name": "region", "value": "asia" },
         { "name": "test", "value": "ts_performance" }
       ]
     },
     {
       "name": "eu",
       "template_variables": [
-        { "name": "geo", "value": "europe" },
+        { "name": "region", "value": "europe" },
         { "name": "test", "value": "ts_performance" }
       ]
     },
     {
       "name": "us",
       "template_variables": [
-        { "name": "geo", "value": "us-east" },
+        { "name": "region", "value": "us-east" },
         { "name": "test", "value": "ts_performance" }
       ]
     }
