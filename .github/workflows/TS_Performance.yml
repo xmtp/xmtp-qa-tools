@@ -45,12 +45,12 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs
+          name: performance_logs_${{ env.XMTP_ENV }}
           path: renamed_logs/
       - name: Upload datadog reports
         uses: actions/upload-artifact@v4
         with:
-          name: datadog_reports
+          name: datadog_reports_${{ env.XMTP_ENV }}
           path: renamed_reports/
   production:
     runs-on: ubuntu-latest
@@ -88,10 +88,10 @@ jobs:
       - name: Upload log files
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs
+          name: performance_logs_${{ env.XMTP_ENV }}
           path: renamed_logs/
       - name: Upload datadog reports
         uses: actions/upload-artifact@v4
         with:
-          name: datadog_reports
+          name: datadog_reports_${{ env.XMTP_ENV }}
           path: renamed_reports/

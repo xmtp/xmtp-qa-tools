@@ -560,19 +560,6 @@ export async function getNetworkStats(
     stats["Processing"] = 0;
   }
 
-  if (
-    stats["Processing"] * 1000 > 300 ||
-    stats["TLS Handshake"] * 1000 > 300 ||
-    stats["Server Call"] * 1000 > 300
-  ) {
-    if (!firstLogShared) {
-      firstLogShared = true;
-      console.warn(
-        `Slow connection detected - total: ${stats["Server Call"] * 1000}ms, TLS: ${stats["TLS Handshake"] * 1000}ms, processing: ${stats["Processing"] * 1000}ms`,
-      );
-    }
-  }
-
   return stats;
 }
 
