@@ -115,14 +115,13 @@ export function getThresholdForOperation(
         operationLower as keyof typeof THRESHOLDS.memberMultipliers
       ] || 0;
 
-    // Calculate threshold based on group size increases in batches of 50
-    // First 50 members use the base value
-    // Each additional batch of 50 members adds the multiplier
     let calculatedThreshold = baseValue;
 
     if (memberCount > 50) {
       const additionalBatches = Math.floor((memberCount - 50) / 50);
-      calculatedThreshold += memberMultiplier * additionalBatches;
+      // Apply multiplier as a percentage increase per batch instead of a fixed value
+      calculatedThreshold +=
+        baseValue * ((memberMultiplier * additionalBatches) / 100);
       console.log(
         `calculatedThreshold: ${calculatedThreshold} for ${memberCount} members`,
       );
