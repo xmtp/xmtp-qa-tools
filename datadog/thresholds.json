@@ -1,18 +1,18 @@
 {
   "core": {
-    "clientcreate": 550,
-    "inboxstate": 300,
+    "clientcreate": 350,
+    "inboxstate": 200,
     "createdm": 200,
     "sendgm": 100,
     "receivegm": 100,
     "receivegroupmessage": 102,
-    "creategroup": 300,
-    "creategroupbyidentifiers": 300,
+    "creategroup": 200,
+    "creategroupbyidentifiers": 150,
     "sendgroupmessage": 56,
     "syncgroup": 100,
     "updategroupname": 110,
-    "removemembers": 250,
-    "addmembers": 250
+    "removemembers": 100,
+    "addmembers": 100
   },
   "network": {
     "dns_lookup": 50,
@@ -22,12 +22,12 @@
     "server_call": 250
   },
   "memberMultipliers": {
-    "creategroup": 3,
-    "creategroupbyidentifiers": 3,
+    "creategroup": 1.5,
+    "creategroupbyidentifiers": 1.5,
     "sendgroupmessage": 1.3,
     "syncgroup": 1.3,
     "updategroupname": 1.3,
-    "removemembers": 1.3,
+    "removemembers": 0.8,
     "receivegroupmessage": 1.3
   },
   "regionMultipliers": {
