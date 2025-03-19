@@ -9,35 +9,34 @@ on:
   workflow_dispatch:
 
 jobs:
-  dev:
-    runs-on: ubuntu-latest
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: "dev"
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
-      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - run: corepack enable
-      - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
-      - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Performance
-      - name: Upload reports artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ts_performance_${{ env.XMTP_ENV }}
-          path: logs/
-
+  # dev:
+  #   runs-on: ubuntu-latest
+  #   env:
+  #     DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+  #     LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+  #     XMTP_ENV: "dev"
+  #     GEOLOCATION: ${{ vars.GEOLOCATION }}
+  #     BATCH_SIZE: ${{ vars.BATCH_SIZE }}
+  #     MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+  #   steps:
+  #     - uses: actions/checkout@v4
+  #     - uses: actions/setup-node@v4
+  #       with:
+  #         node-version-file: ".node-version"
+  #         cache: "yarn"
+  #       env:
+  #         SKIP_YARN_COREPACK_CHECK: "1"
+  #     - run: corepack enable
+  #     - run: yarn
+  #     - name: Make test script executable
+  #       run: chmod +x ./scripts/run-test.sh
+  #     - name: Run tests with retry
+  #       run: ./scripts/run-test.sh TS_Performance
+  #     - name: Upload reports artifacts
+  # uses: actions/upload-artifact@v4
+  # with:
+  #   name: ts_performance_${{ env.XMTP_ENV }}
+  #   path: logs/
   production:
     runs-on: ubuntu-latest
     env:
