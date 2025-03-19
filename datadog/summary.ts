@@ -86,9 +86,9 @@ function generateReportContent(
 ): string {
   let content = "METRICS SUMMARY\n===============\n\n";
   content +=
-    "Operation | Members | Avg (ms) | Min/Max (ms) | Threshold (ms) | Variance (ms) | Status\n";
+    "Operation | Members | Avg (ms) | Min/Max (ms) | Threshold (ms) | Variance (ms) | Network (ms) | Status\n";
   content +=
-    "----------|---------|----------|--------------|----------------|---------------|-------\n";
+    "----------|---------|----------|--------------|----------------|---------------|-------------|-------\n";
 
   // Group metrics by operation name and member count
   const operationGroups = groupMetricsByOperation(validMetrics);
@@ -111,6 +111,14 @@ function generateReportContent(
       currentGeo,
     );
 
+    // Get network threshold for this operation
+    const networkThreshold = getThresholdForOperation(
+      operationName,
+      "network",
+      memberCount,
+      currentGeo,
+    );
+
     const average = calculateAverage(data.values);
     const min = Math.min(...data.values);
     const max = Math.max(...data.values);
@@ -121,7 +129,7 @@ function generateReportContent(
     const varianceFormatted =
       variance <= 0 ? variance.toString() : `+${variance}`;
 
-    content += `${operationName} | ${members} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${status}\n`;
+    content += `${operationName} | ${members} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${networkThreshold} | ${status}\n`;
   }
 
   return content;
