@@ -83,9 +83,11 @@ describe(testName, () => {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
+        console.log("Creating group with", sliced.length, "participants");
         newGroup = await workers
           .get("henry")!
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+        console.log("Group created", newGroup.id);
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);

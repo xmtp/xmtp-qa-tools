@@ -22,20 +22,20 @@
     "server_call": 250
   },
   "memberMultipliers": {
-    "creategroup": 1.1,
-    "creategroupbyidentifiers": 1.01,
-    "sendgroupmessage": 1.03,
-    "syncgroup": 1.03,
-    "updategroupname": 1.03,
-    "removemembers": 1.03,
-    "receivegroupmessage": 1.1
+    "creategroup": 1.2,
+    "creategroupbyidentifiers": 1.2,
+    "sendgroupmessage": 1,
+    "syncgroup": 1,
+    "updategroupname": 1,
+    "removemembers": 1,
+    "receivegroupmessage": 1
   },
   "regionMultipliers": {
     "us-east": 1.0,
     "us-west": 1.0,
     "europe": 1.0,
     "asia": 1.5,
-    "south-america": 2
+    "south-america": 1.5
   },
   "GEO_TO_COUNTRY_CODE": {
     "us-east": "US",

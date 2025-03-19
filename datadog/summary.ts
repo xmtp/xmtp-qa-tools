@@ -85,10 +85,6 @@ export function logMetricsSummary(
     // Create a unique key for each operation + member count combination
     const groupKey = `${operationName}-${memberCount}`;
 
-    console.log(
-      `Processing metric: ${operation} → ${groupKey} (Members: ${memberCount})`,
-    );
-
     if (!operationGroups.has(groupKey)) {
       operationGroups.set(groupKey, {
         operationName: operationName,
@@ -112,10 +108,6 @@ export function logMetricsSummary(
     // Use the member count preserved in the group
     const memberCount =
       group.members !== "-" ? parseInt(group.members as string) : 10;
-
-    console.log(
-      `Calculating threshold for ${operationName} with ${memberCount} members`,
-    );
 
     const operationType = operationName.toLowerCase().includes("-")
       ? "group"
@@ -154,11 +146,8 @@ export function logMetricsSummary(
     fileContent += `${operationName} | ${group.members} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${status}\n`;
   }
 
-  console.log(`Passed: ${passedMetrics}/${totalMetrics}`);
-  // Write to file
   try {
     fs.writeFileSync(filename, fileContent);
-    console.log(`📝 Metrics summary written to: ${filename}`);
   } catch (error) {
     console.error(`❌ Error writing metrics summary to file:`, error);
   }

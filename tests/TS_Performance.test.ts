@@ -155,6 +155,7 @@ describe(testName, () => {
       newGroup = await workers
         .get("henry")!
         .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+      console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     } catch (e) {
       hasFailures = logError(e, expect);

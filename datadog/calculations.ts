@@ -37,16 +37,15 @@ export function getThresholdForOperation(
         operationLower as keyof typeof THRESHOLDS.memberMultipliers
       ] || 1;
 
-    batches.add(members > 0 ? parseInt(members.toString()) : 1);
-    console.log("Current batch sizes:", Array.from(batches));
-
+    batches.add(members);
+    const batchSize = batches.size - 1;
     // Apply the multiplier based on batch number
     // Batch 1 gets multiplier x1, Batch 2 gets x2, etc.
-    const multiplier = batches.size * operationMultiplier;
+    const multiplier = batchSize * operationMultiplier;
     baseThreshold = baseThreshold * multiplier;
 
     console.warn(
-      `Operation: ${operation}, batch: ${batches.size}, multiplier: ${multiplier}x, adjusted threshold: ${baseThreshold}`,
+      `Operation: ${operation}, batch: ${batchSize}, multiplier: ${multiplier}x, adjusted threshold: ${baseThreshold}`,
     );
   }
 
