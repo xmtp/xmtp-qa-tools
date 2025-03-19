@@ -18,7 +18,6 @@ export function logMetricsSummary(
       members?: string;
     }
   >,
-  batchSize?: number,
 ): void {
   if (!isInitialized || Object.keys(collectedMetrics).length === 0) {
     console.log("No metrics collected to summarize");
@@ -142,14 +141,13 @@ export function logMetricsSummary(
     const varianceFormatted =
       variance <= 0 ? variance.toString() : `+${variance}`;
 
-    console.debug("getThresholdForOperation inputs:", {
-      operationName,
-      operationType: operationName.includes("-") ? "group" : "core",
-      memberCountStr: group.members,
-      currentGeo,
-      batchSize,
-      actualMemberCount: memberCount,
-    });
+    // console.debug("getThresholdForOperation inputs:", {
+    //   operationName,
+    //   operationType: operationName.includes("-") ? "group" : "core",
+    //   memberCountStr: group.members,
+    //   currentGeo,
+    //   actualMemberCount: memberCount,
+    // });
 
     fileContent += `${operationName} | ${group.members} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${status}\n`;
   }

@@ -44,10 +44,14 @@ export function getThresholdForOperation(
       ] || 0;
 
     if (memberMultiplier > 0 && memberCount > 0) {
-      const batches = Math.ceil(memberCount / batchSize);
-      baseThreshold = baseThreshold * (1 + memberMultiplier * (batches - 1));
+      const batchNumber = Math.ceil(memberCount / batchSize);
+
+      // Apply the multiplier based on batch number
+      // Batch 1 gets multiplier x1, Batch 2 gets x2, etc.
+      baseThreshold = baseThreshold * batchNumber * memberMultiplier;
+
       console.warn(
-        `Operation: ${operation}, member count: ${memberCount}, batches: ${batches}, multiplier: ${memberMultiplier}, adjusted threshold: ${baseThreshold}`,
+        `Operation: ${operation}, member count: ${memberCount}, batch: ${batchNumber}, multiplier: ${memberMultiplier}x, adjusted threshold: ${baseThreshold}`,
       );
     }
   }
