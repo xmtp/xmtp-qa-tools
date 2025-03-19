@@ -256,9 +256,9 @@ export function getThresholdForOperation(
     if (memberThresholds && operationLower in memberThresholds) {
       baseThreshold =
         memberThresholds[operationLower as keyof typeof memberThresholds];
-      console.log(
-        `Operation: ${operation}, members: ${members}, bucket: ${applicableBucket}, threshold: ${baseThreshold}`,
-      );
+      // console.log(
+      //   `Operation: ${operation}, members: ${members}, bucket: ${applicableBucket}, threshold: ${baseThreshold}`,
+      // );
     } else {
       baseThreshold =
         THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
