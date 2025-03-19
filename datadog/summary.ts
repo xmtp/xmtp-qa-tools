@@ -117,17 +117,19 @@ export function logMetricsSummary(
       `Calculating threshold for ${operationName} with ${memberCount} members`,
     );
 
+    const operationType = operationName.toLowerCase().includes("-")
+      ? "group"
+      : "core";
     // Recalculate threshold with correct values
     const calculatedThreshold = getThresholdForOperation(
       operationName as string,
-      operationName.toLowerCase().includes("-") ? "group" : "core",
+      operationType,
       group.members as number,
       currentGeo,
     );
 
     // Update the threshold in the data
     data.threshold = calculatedThreshold;
-    console.debug(data.threshold);
     const average =
       data.values.reduce((sum: number, val: number) => sum + val, 0) /
       data.values.length;
@@ -152,6 +154,7 @@ export function logMetricsSummary(
     fileContent += `${operationName} | ${group.members} | ${Math.round(average)} | ${Math.round(min)}/${Math.round(max)} | ${data.threshold} | ${varianceFormatted} | ${status}\n`;
   }
 
+  console.log(`Passed: ${passedMetrics}/${totalMetrics}`);
   // Write to file
   try {
     fs.writeFileSync(filename, fileContent);

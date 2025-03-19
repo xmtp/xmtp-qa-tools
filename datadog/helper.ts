@@ -185,7 +185,7 @@ export async function sendPerformanceMetric(
     const threshold = getThresholdForOperation(
       operationName,
       operationType,
-      members,
+      parseInt(members),
       currentGeo,
     );
 
@@ -216,7 +216,7 @@ export async function sendPerformanceMetric(
         const networkThreshold = getThresholdForOperation(
           networkPhase,
           "network",
-          members,
+          parseInt(members),
           currentGeo,
         );
 
