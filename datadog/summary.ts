@@ -49,7 +49,7 @@ export function logMetricsSummary(
   );
 
   // Create a directory for reports if it doesn't exist
-  const reportsDir = path.join(process.cwd(), "logs/reports");
+  const reportsDir = path.join(process.cwd(), "logs");
   if (!fs.existsSync(reportsDir)) {
     fs.mkdirSync(reportsDir, { recursive: true });
   }
