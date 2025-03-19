@@ -1,5 +1,5 @@
-import { sendPerformanceResult, sendTestResults } from "@datadog/helper";
 import { closeEnv, loadEnv } from "@helpers/client";
+import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { type Conversation, type WorkerManager } from "@helpers/types";
 import { verifyStream } from "@helpers/verify";

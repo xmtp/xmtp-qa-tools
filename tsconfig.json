@@ -21,7 +21,6 @@
     "paths": {
       "@helpers/*": ["./helpers/*"],
       "@scripts/*": ["./scripts/*"],
-      "@datadog/*": ["./datadog/*"],
       "@workers/*": ["./workers/*"]
     }
   },

@@ -1,5 +1,5 @@
-import { sendDeliveryMetric, sendTestResults } from "@datadog/helper";
 import { closeEnv, loadEnv } from "@helpers/client";
+import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import {
   defaultValues,
