@@ -121,7 +121,7 @@ export function logMetricsSummary(
     const calculatedThreshold = getThresholdForOperation(
       operationName as string,
       operationName.toLowerCase().includes("-") ? "group" : "core",
-      group.members as string,
+      group.members as number,
       currentGeo,
     );
 

@@ -1,17 +1,15 @@
 import THRESHOLDS from "./thresholds.json";
 
+let batches = new Set<number>();
 export function getThresholdForOperation(
   operation: string,
   operationType: "core" | "group" | "network",
-  members: string = "",
+  members: number = 0,
   region: string = "us-east",
 ): number {
   // Normalize inputs
   const operationLower = operation.toLowerCase();
   const regionNormalized = region.toLowerCase().trim();
-  const batchSize = operation.includes("-")
-    ? parseInt(operation.split("-")[1]) || 1
-    : 1;
 
   // Get region multiplier
   const regionMultiplier =
@@ -19,11 +17,7 @@ export function getThresholdForOperation(
       regionNormalized as keyof typeof THRESHOLDS.regionMultipliers
     ] || 1.0;
 
-  // Parse member count
-  const memberCount = members && members !== "-" ? parseInt(members) || 0 : 0;
-
-  // Calculate base threshold based on operation type
-  let baseThreshold: number;
+  let baseThreshold: number = 1;
 
   if (operationType === "network") {
     const networkThreshold =
@@ -32,28 +26,28 @@ export function getThresholdForOperation(
       typeof networkThreshold === "number"
         ? networkThreshold
         : THRESHOLDS.network.server_call;
-  } else {
+  } else if (operationType === "group" || operationType === "core") {
     // For both "core" and "group" types, get the base value
     baseThreshold =
       THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
 
     // Apply member multiplier if applicable
-    const memberMultiplier =
+    const operationMultiplier =
       THRESHOLDS.memberMultipliers[
         operationLower as keyof typeof THRESHOLDS.memberMultipliers
-      ] || 0;
+      ] || 1;
 
-    if (memberMultiplier > 0 && memberCount > 0) {
-      const batchNumber = Math.ceil(memberCount / batchSize);
+    batches.add(members > 0 ? parseInt(members.toString()) : 1);
+    console.log("Current batch sizes:", Array.from(batches));
 
-      // Apply the multiplier based on batch number
-      // Batch 1 gets multiplier x1, Batch 2 gets x2, etc.
-      baseThreshold = baseThreshold * batchNumber * memberMultiplier;
+    // Apply the multiplier based on batch number
+    // Batch 1 gets multiplier x1, Batch 2 gets x2, etc.
+    const multiplier = batches.size * operationMultiplier;
+    baseThreshold = baseThreshold * multiplier;
 
-      console.warn(
-        `Operation: ${operation}, member count: ${memberCount}, batch: ${batchNumber}, multiplier: ${memberMultiplier}x, adjusted threshold: ${baseThreshold}`,
-      );
-    }
+    console.warn(
+      `Operation: ${operation}, batch: ${batches.size}, multiplier: ${multiplier}x, adjusted threshold: ${baseThreshold}`,
+    );
   }
 
   // Apply region multiplier and round
