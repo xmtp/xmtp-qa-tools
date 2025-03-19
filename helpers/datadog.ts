@@ -82,11 +82,11 @@ const THRESHOLDS: ThresholdsData = {
     receivegroupmessage: 200,
   },
   network: {
-    dns_lookup: 50,
-    tcp_connection: 50,
-    tls_handshake: 150,
+    dns_lookup: 100,
+    tcp_connection: 150,
+    tls_handshake: 250,
     processing: 100,
-    server_call: 250,
+    server_call: 350,
   },
   memberBasedThresholds: {
     "50": {
@@ -110,6 +110,16 @@ const THRESHOLDS: ThresholdsData = {
       addmembers: 200,
     },
     "150": {
+      creategroup: 400,
+      creategroupbyidentifiers: 400,
+      receivegroupmessage: 400,
+      sendgroupmessage: 200,
+      syncgroup: 200,
+      updategroupname: 200,
+      removemembers: 200,
+      addmembers: 200,
+    },
+    "200": {
       creategroup: 500,
       creategroupbyidentifiers: 500,
       receivegroupmessage: 500,
@@ -119,20 +129,10 @@ const THRESHOLDS: ThresholdsData = {
       removemembers: 200,
       addmembers: 200,
     },
-    "200": {
+    "250": {
       creategroup: 700,
       creategroupbyidentifiers: 700,
       receivegroupmessage: 700,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 200,
-      addmembers: 200,
-    },
-    "250": {
-      creategroup: 850,
-      creategroupbyidentifiers: 850,
-      receivegroupmessage: 850,
       sendgroupmessage: 200,
       syncgroup: 200,
       updategroupname: 200,
@@ -150,9 +150,9 @@ const THRESHOLDS: ThresholdsData = {
       addmembers: 200,
     },
     "350": {
-      creategroup: 1500,
-      creategroupbyidentifiers: 1500,
-      receivegroupmessage: 1500,
+      creategroup: 1000,
+      creategroupbyidentifiers: 1000,
+      receivegroupmessage: 1000,
       sendgroupmessage: 200,
       syncgroup: 200,
       updategroupname: 200,
@@ -160,9 +160,9 @@ const THRESHOLDS: ThresholdsData = {
       addmembers: 200,
     },
     "400": {
-      creategroup: 1800,
-      creategroupbyidentifiers: 1800,
-      receivegroupmessage: 1800,
+      creategroup: 1300,
+      creategroupbyidentifiers: 1300,
+      receivegroupmessage: 1300,
       sendgroupmessage: 200,
       syncgroup: 200,
       updategroupname: 200,
@@ -315,7 +315,10 @@ export function groupMetricsByOperation(
     groups.get(groupKey).operationData = data;
   }
 
-  return groups;
+  return groups as Map<
+    string,
+    { operationName: string; members: string; operationData: MetricData }
+  >;
 }
 
 /**
