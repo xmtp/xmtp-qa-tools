@@ -105,17 +105,20 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Core SDK Operations Performance
 
-| Operation           | Description                            | Avg (ms) | Target | Status       |
-| ------------------- | -------------------------------------- | -------- | ------ | ------------ |
-| createDM            | Creating a direct message conversation | 254-306  | <500ms | ✅ On Target |
-| sendGM              | Sending a group message                | 123-132  | <200ms | ✅ On Target |
-| receiveGM           | Receiving a group message              | 90-94    | <200ms | ✅ On Target |
-| receiveGroupMessage | Processing group message streams       | 119-127  | <200ms | ✅ On Target |
-| updateGroupName     | Updating group metadata                | 105-108  | <200ms | ✅ On Target |
-| syncGroup           | Syncing group state                    | 78-89    | <200ms | ✅ On Target |
-| addMembers          | Adding participants to a group         | 238-280  | <500ms | ✅ On Target |
-| removeMembers       | Removing participants from a group     | 147-168  | <300ms | ✅ On Target |
-| inboxState          | Checking inbox state                   | 36       | <100ms | ✅ On Target |
+| Operation                | Description                            | Avg (ms) | Target | Status       |
+| ------------------------ | -------------------------------------- | -------- | ------ | ------------ |
+| clientCreate             | Creating a client                      | 254-306  | <350ms | ✅ On Target |
+| inboxState               | Checking inbox state                   | 300      | <350ms | ✅ On Target |
+| createDM                 | Creating a direct message conversation | 200-250  | <350ms | ✅ On Target |
+| sendGM                   | Sending a group message                | 123-160  | <200ms | ✅ On Target |
+| receiveGM                | Receiving a group message              | 90-140   | <200ms | ✅ On Target |
+| createGroup              | Creating a group                       | 254-306  | <350ms | ✅ On Target |
+| createGroupByIdentifiers | Creating a group by address            | 254-306  | <350ms | ✅ On Target |
+| syncGroup                | Syncing group state                    | 78-89    | <200ms | ✅ On Target |
+| updateGroupName          | Updating group metadata                | 105-160  | <200ms | ✅ On Target |
+| removeMembers            | Removing participants from a group     | 110-168  | <250ms | ✅ On Target |
+| sendGroupMessage         | Sending a group message                | 100-127  | <200ms | ✅ On Target |
+| receiveGroupMessage      | Processing group message streams       | 119-127  | <200ms | ✅ On Target |
 
 _Note: Based on data from 79 measured operations in the `us-east` region and `production` network._
 
