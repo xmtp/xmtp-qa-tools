@@ -114,9 +114,9 @@ export function logMetricsSummary(
       : "core";
     // Recalculate threshold with correct values
     const calculatedThreshold = getThresholdForOperation(
-      operationName as string,
+      operationName,
       operationType,
-      group.members as number,
+      memberCount,
       currentGeo,
     );
 

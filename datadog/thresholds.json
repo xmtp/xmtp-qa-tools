@@ -31,9 +31,9 @@
     "receivegroupmessage": 1
   },
   "regionMultipliers": {
-    "us-east": 1.0,
-    "us-west": 1.0,
-    "europe": 1.0,
+    "us-east": 1,
+    "us-west": 1,
+    "europe": 1,
     "asia": 1.5,
     "south-america": 1.5
   },
