@@ -27,12 +27,6 @@ export function logMetricsSummary(
 
   console.log("\n📊 Creating metrics summary report");
 
-  // ADD THIS: Log the raw collected metrics to see what's actually there
-  console.log(
-    "RAW COLLECTED METRICS:",
-    JSON.stringify(collectedMetrics, null, 2),
-  );
-
   // Create a simple text summary for the console
   const passedMetrics = Object.entries(collectedMetrics).filter(
     ([operation, data]) => {

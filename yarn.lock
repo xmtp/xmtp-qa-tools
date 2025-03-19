@@ -1357,9 +1357,9 @@ __metadata:
   linkType: hard
 
 "@xmtp/node-bindings@npm:^1.0.0-rc2":
-  version: 1.0.0-rc3
-  resolution: "@xmtp/node-bindings@npm:1.0.0-rc3"
-  checksum: 10/b9afdfd4ca409778c6845acf342ba53220829be2e1b1c818cdc57fd6611c39930a07038d78ff31f8e06c6756bcd3996dfae04b695064639541295d112b977ae8
+  version: 1.0.0
+  resolution: "@xmtp/node-bindings@npm:1.0.0"
+  checksum: 10/8bf91003ea3859f1c535f871013d13eb1096728f51e3c81471eb5ad9a27de65a19a9817eb8efbd56e257c07076af94771845643211764ff028103e202779f6ce
   languageName: node
   linkType: hard
 

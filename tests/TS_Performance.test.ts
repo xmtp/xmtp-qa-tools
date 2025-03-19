@@ -68,7 +68,7 @@ describe(testName, () => {
 
   afterEach(function () {
     try {
-      sendPerformanceResult(expect, workers, start, batchSize, total);
+      sendPerformanceResult(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -78,7 +78,7 @@ describe(testName, () => {
   afterAll(async () => {
     try {
       sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers, batchSize);
+      await closeEnv(testName, workers);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

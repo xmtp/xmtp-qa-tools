@@ -9,7 +9,7 @@
     "creategroup": 200,
     "creategroupbyidentifiers": 200,
     "sendgroupmessage": 200,
-    "syncgroup": 100,
+    "syncgroup": 200,
     "updategroupname": 200,
     "removemembers": 200,
     "addmembers": 200

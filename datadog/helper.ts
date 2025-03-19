@@ -25,8 +25,6 @@ export const sendPerformanceResult = (
   expect: any,
   workers: WorkerManager,
   start: number,
-  batchSize?: number,
-  total?: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
@@ -38,8 +36,6 @@ export const sendPerformanceResult = (
       testName as string,
       workers.getVersion(),
       false,
-      batchSize ?? undefined,
-      total ?? undefined,
     );
   }
 };
@@ -92,10 +88,6 @@ export function sendMetric(
   if (!isInitialized) return;
 
   try {
-    console.log(
-      `SENDING METRIC: ${metricName}, Value: ${metricValue}, Members: ${tags.members || "none"}`,
-    );
-
     const fullMetricName = `xmtp.sdk.${metricName}`;
     const allTags = Object.entries({ ...tags }).map(
       ([key, value]) => `${key}:${String(value)}`,
@@ -115,11 +107,6 @@ export function sendMetric(
     const operationKey = tags.operation
       ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
       : metricName;
-
-    // For debugging
-    console.log(
-      `METRIC KEY: ${operationKey} (Operation: ${tags.operation}, Members: ${memberCount})`,
-    );
 
     if (!collectedMetrics[operationKey]) {
       collectedMetrics[operationKey] = {
@@ -151,9 +138,6 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
       workflow: testName,
       metric_type: "workflow",
     });
-    console.log(
-      `The tests indicated that the test ${testName} was ${hasFailures}`,
-    );
   } catch (error) {
     console.error("Error reporting to Datadog:", error);
   }
@@ -165,8 +149,6 @@ export async function sendPerformanceMetric(
   testName: string,
   libxmtpVersion: string,
   skipNetworkStats: boolean = false,
-  batchSize?: number,
-  total?: number,
 ): Promise<void> {
   if (!isInitialized) return;
 
@@ -197,16 +179,9 @@ export async function sendPerformanceMetric(
       }
     }
 
-    // Debug output
-    console.log(
-      `Extracted from test name: Operation=${operationName}, Members=${members}, Test=${testNameExtracted}`,
-    );
-
     const isGroupOperation = operationName.toLowerCase().includes("-");
     const operationType = isGroupOperation ? "group" : "core";
 
-    // Use the extracted member count for threshold calculation
-    const memberCount = members ? parseInt(members) : total;
     const threshold = getThresholdForOperation(
       operationName,
       operationType,
@@ -215,14 +190,6 @@ export async function sendPerformanceMetric(
     );
 
     const isSuccess = metricValue <= threshold;
-
-    console.log(`Operation metrics:`, {
-      operation: operationName,
-      members: members,
-      testName: testName,
-    });
-
-    console.log(`Running test with ${memberCount} members`);
 
     sendMetric("duration", metricValue, {
       libxmtp: libxmtpVersion,
@@ -276,23 +243,14 @@ export async function sendPerformanceMetric(
 }
 
 // Modify flushMetrics to include the summary log
-export function flushMetrics(
-  testName: string,
-  batchSize?: number,
-): Promise<void> {
+export function flushMetrics(testName: string): Promise<void> {
   return new Promise<void>((resolve) => {
     if (!isInitialized) {
       resolve();
       return;
     }
 
-    logMetricsSummary(
-      testName,
-      currentGeo,
-      isInitialized,
-      collectedMetrics,
-      batchSize ?? undefined,
-    );
+    logMetricsSummary(testName, currentGeo, isInitialized, collectedMetrics);
 
     void metrics.flush().then(() => {
       resolve();
