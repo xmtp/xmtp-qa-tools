@@ -1,7 +1,7 @@
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
-import { getThresholdForOperation } from "./calculations";
 import { getNetworkStats } from "./network";
+import { getThresholdForOperation } from "./slo";
 import { logMetricsSummary } from "./summary";
 import THRESHOLDS from "./thresholds.json";
 
