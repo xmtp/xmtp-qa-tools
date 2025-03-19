@@ -126,14 +126,14 @@ _Note: Based on data from 79 measured operations in the `us-east` region and `pr
 
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
-| 50   | 990        | 71       | 61       | 81         | 140        | <2,000ms       | ✅ On Target           |
-| 100  | 1,599      | 67       | 66       | 91         | 182        | <2,000ms       | ✅ On Target           |
-| 150  | 2,956      | 72       | 85       | 104        | 183        | <4,000ms       | ✅ On Target           |
-| 200  | 4,598      | 73       | 103      | 139        | 211        | <5,000ms       | ✅ On Target           |
-| 250  | 5,983      | 76       | 120      | 164        | 234        | <7,000ms       | ✅ On Target           |
-| 300  | 8,707      | 81       | 321      | 255        | 309        | <9,000ms       | ✅ On Target           |
-| 350  | 9,826      | 79       | 132      | 228        | 368        | <11,000ms      | ⚠️ Performance Concern |
-| 400  | 11,451     | 84       | 170      | 427        | 501        | <15,000ms      | ⚠️ Performance Concern |
+| 50   | 323        | 71       | 61       | 81         | 140        | <350ms         | ✅ On Target           |
+| 100  | 289        | 67       | 66       | 91         | 182        | <350ms         | ✅ On Target           |
+| 150  | 330        | 72       | 85       | 104        | 183        | <400ms         | ✅ On Target           |
+| 200  | 474        | 73       | 103      | 139        | 211        | <500ms         | ✅ On Target           |
+| 250  | 654        | 76       | 120      | 164        | 234        | <700ms         | ✅ On Target           |
+| 300  | 758        | 81       | 321      | 255        | 309        | <1000ms        | ✅ On Target           |
+| 350  | 1064       | 79       | 132      | 228        | 368        | <1000ms        | ⚠️ Performance Concern |
+| 400  | 1305       | 84       | 170      | 427        | 501        | <1300ms        | ⚠️ Performance Concern |
 | 450  | -          | -        | -        | -          | -          | -              | ❌ Severe impact       |
 
 _Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
@@ -148,7 +148,7 @@ _Note: Performance increases significantly beyond `350` members, which represent
 | TCP Connection     | 105.6ms avg         | <200ms | ✅ On Target |
 | TLS Handshake      | 238.9ms avg         | <300ms | ✅ On Target |
 | Processing         | 30ms avg            | <100ms | ✅ On Target |
-| Server Call        | 238.9ms avg         | <400ms | ✅ On Target |
+| Server Call        | 238.9ms avg         | <300ms | ✅ On Target |
 
 _Note: Performance metrics based on `us-east` testing on `production` network._
 
@@ -180,14 +180,14 @@ _Note: `Production` network consistently shows better network performance across
 
 ### Message delivery testing
 
-| Test Area              | Current Performance | Target          | Status       |
-| ---------------------- | ------------------- | --------------- | ------------ |
-| Stream Delivery Rate   | 100% successful     | 99.9% minimum   | ✅ On Target |
-| Poll Delivery Rate     | 100% successful     | 99.9% minimum   | ✅ On Target |
-| Stream Order           | 100% in order       | 100% in order   | ✅ On Target |
-| Poll Order             | 100% in order       | 100% in order   | ✅ On Target |
-| Offline Recovery Rate  | 100% successful     | 100% successful | ✅ On Target |
-| Offline Recovery Order | 100% in order       | 100% in order   | ✅ On Target |
+| Test Area            | Current Performance | Target         | Status       |
+| -------------------- | ------------------- | -------------- | ------------ |
+| Stream Delivery Rate | 100% successful     | 99.9% minimum  | ✅ On Target |
+| Poll Delivery Rate   | 100% successful     | 99.9% minimum  | ✅ On Target |
+| Recovery Rate        | 100% successful     | 99.9% minimum  | ✅ On Target |
+| Stream Order         | 100% in order       | 99.9% in order | ✅ On Target |
+| Poll Order           | 100% in order       | 99.9% in order | ✅ On Target |
+| Recovery Order       | 100% in order       | 99.9% in order | ✅ On Target |
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
@@ -221,28 +221,6 @@ _Note: A hybrid approach using `stream` and `poll`-based verification provides t
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
 - **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
-
-## Other
-
-### Cross-SDK Testing
-
-| SDK Combination          | Test Focus                    | Status      |
-| ------------------------ | ----------------------------- | ----------- |
-| Node SDK ↔ Node SDK     | Agent-to-Agent communication  | ✅ Verified |
-| Web ↔ Node SDK          | Client-to-Agent communication | ✅ Verified |
-| React Native ↔ Node SDK | Client-to-Agent communication | ✅ Verified |
-
-_Note: Cross-SDK was tested using the `operations` describe above and is not covering all edge cases._
-
-### Package Manager Test Results
-
-| Package Manager | Node 20 | Node 21 | Node 22 | Node 23 |
-| --------------- | ------- | ------- | ------- | ------- |
-| pnpm            | ✅      | ✅      | ✅      | ✅      |
-| npm             | ✅      | ✅      | ✅      | ✅      |
-| yarn@4.6.0      | ✅      | ✅      | ✅      | ✅      |
-| yarn@1.22.19    | ✅      | ✅      | ✅      | ✅      |
-| bun             | ✅      | ✅      | ✅      | ✅      |
 
 ## Tools & Utilities
 
