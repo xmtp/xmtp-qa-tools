@@ -8,6 +8,7 @@ import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
+import { b } from "vitest/dist/chunks/suite.qtkXWc6R.js";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
 
@@ -150,7 +151,7 @@ export function getAddressOfMember(members: GroupMember[], inboxId: string) {
 export async function closeEnv(testName: string, workers: WorkerManager) {
   flushLogger(testName);
 
-  await flushMetrics();
+  await flushMetrics(testName);
   if (workers && typeof workers.getWorkers === "function") {
     for (const worker of workers.getWorkers()) {
       await worker.worker.terminate();

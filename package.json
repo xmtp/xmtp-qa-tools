@@ -7,7 +7,7 @@
     "bot:simple": "tsx  bots/simple/index.ts",
     "bot:test": "tsx  bots/test/index.ts",
     "build": "tsc",
-    "clean": "rimraf .data/ ||:",
+    "clean": "rimraf .data/ ||: && rimraf logs/ ||:",
     "datadog": "tsx scripts/send-to-datadog.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",

@@ -32,11 +32,12 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Performance
-      - name: Upload log files
+      - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_dev
+          name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/
+
   production:
     runs-on: ubuntu-latest
     env:
@@ -60,8 +61,8 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Performance
-      - name: Upload log files
+      - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: performance_logs_production
+          name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/

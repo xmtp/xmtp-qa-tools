@@ -210,13 +210,13 @@ export class WorkerClient extends Worker {
 
     const installationId = this.client.installationId;
 
-    console.debug({
-      inboxId: this.client.inboxId,
-      dbPath,
-      version,
-      address: this.address,
-      installationId,
-    });
+    // console.debug({
+    //   inboxId: this.client.inboxId,
+    //   dbPath,
+    //   version,
+    //   address: this.address,
+    //   installationId,
+    // });
     return {
       client: this.client,
       dbPath,

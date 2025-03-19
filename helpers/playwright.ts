@@ -8,7 +8,7 @@ import {
   type Page,
 } from "playwright-chromium";
 
-const snapshotDir = path.join(process.cwd(), "./logs/snapshots");
+const snapshotDir = path.join(process.cwd(), "./logs");
 let browser: Browser | null = null;
 if (!fs.existsSync(snapshotDir)) {
   fs.mkdirSync(snapshotDir, { recursive: true });
