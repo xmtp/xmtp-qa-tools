@@ -19,7 +19,7 @@ describe(testName, () => {
 
   it("inboxState", async () => {
     for (const worker of workers.getWorkers()) {
-      const inboxState = await worker.client.inboxState();
+      const inboxState = await worker.client.preferences.inboxState();
       console.log("Installations", inboxState.installations.length);
     }
   });

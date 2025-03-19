@@ -1,4 +1,4 @@
-# xmtp-qa-testing
+# XMTP QA Testing
 
 | Test suite     | Status                                                                                                                                                                            | Run frequency |
 | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
@@ -126,17 +126,17 @@ _Note: Based on data from 79 measured operations in the `us-east` region and `pr
 
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
-| 50   | 323        | 71       | 61       | 81         | 140        | <350ms         | ✅ On Target           |
-| 100  | 289        | 67       | 66       | 91         | 182        | <400ms         | ✅ On Target           |
-| 150  | 330        | 72       | 85       | 104        | 183        | <500ms         | ✅ On Target           |
-| 200  | 474        | 73       | 103      | 139        | 211        | <700ms         | ✅ On Target           |
-| 250  | 654        | 76       | 120      | 164        | 234        | <900ms         | ✅ On Target           |
-| 300  | 758        | 81       | 321      | 255        | 309        | <1100ms        | ✅ On Target           |
-| 350  | 1064       | 79       | 132      | 228        | 368        | <1300ms        | ⚠️ Performance Concern |
-| 400  | 1305       | 84       | 170      | 427        | 501        | <1400ms        | ⚠️ Performance Concern |
+| 50   | 1130       | 71       | 61       | 81         | 140        | <1300ms        | ✅ On Target           |
+| 100  | 1278       | 67       | 66       | 91         | 182        | <1400ms        | ✅ On Target           |
+| 150  | 1902       | 72       | 85       | 104        | 183        | <2000ms        | ✅ On Target           |
+| 200  | 2897       | 73       | 103      | 139        | 211        | <3000ms        | ✅ On Target           |
+| 250  | 3255       | 76       | 120      | 164        | 234        | <3500ms        | ✅ On Target           |
+| 300  | 5089       | 81       | 321      | 255        | 309        | <5500ms        | ✅ On Target           |
+| 350  | 5966       | 89       | 432      | 355        | 409        | <6000ms        | ⚠️ Performance Concern |
+| 400  | 6542       | 89       | 432      | 355        | 409        | <7000ms        | ⚠️ Performance Concern |
 | 450  | -          | -        | -        | -          | -          | -              | ❌ Severe impact       |
 
-_Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._
+_Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._
 
 ## Networks performance
 

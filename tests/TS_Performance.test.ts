@@ -97,7 +97,9 @@ describe(testName, () => {
 
   it("inboxState: should measure inboxState of henry", async () => {
     try {
-      const inboxState = await workers.get("henry")!.client.inboxState(true);
+      const inboxState = await workers
+        .get("henry")!
+        .client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
       hasFailures = logError(e, expect);

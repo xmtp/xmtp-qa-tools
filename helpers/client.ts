@@ -161,7 +161,7 @@ export async function closeEnv(testName: string, workers: WorkerManager) {
 
 export async function listInstallations(workers: WorkerManager) {
   for (const worker of workers.getWorkers()) {
-    const inboxState = await worker.client?.inboxState();
+    const inboxState = await worker.client?.preferences.inboxState();
     if (inboxState) {
       console.log(
         worker.name,

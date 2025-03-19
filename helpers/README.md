@@ -10,6 +10,7 @@ This directory contains utility modules that power the XMTP testing framework. T
 | [group.ts](#groupts)           | Creates test groups with specified participants   |
 | [logger.ts](#loggerts)         | Logging utilities for test output                 |
 | [test.ts](#testts)             | Test utilities for creating and managing tests    |
+| [datadog.ts](#datadogts)       | Datadog utilities for testing message delivery    |
 | [verify.ts](#verifyts)         | Validation utilities for testing message delivery |
 | [railway.ts](#railwayts)       | Railway utilities for testing message delivery    |
 | [playwright.ts](#playwrightts) | Playwright utilities for testing message delivery |
@@ -29,6 +30,21 @@ const dbPath = getDbPath(workerName, accountAddress, testName);
 
 // Generate random encryption keys
 const encryptionKey = generateEncryptionKeyHex();
+```
+
+### datadog.ts
+
+Utilities for sending metrics to Datadog:
+
+```typescript
+// Send a metric to Datadog
+sendMetric(metricName, metricValue, tags);
+
+// Send a test result to Datadog
+sendTestResults(hasFailures, testName);
+
+// Send a performance metric to Datadog
+sendPerformanceMetric(metricValue, testName, libxmtpVersion, skipNetworkStats);
 ```
 
 ### group.ts

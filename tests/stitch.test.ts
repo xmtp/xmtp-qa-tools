@@ -3,15 +3,14 @@ import { type Client } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
-const testName = "bug_dms_stitch";
+const testName = "stitch";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
   let client: Client;
   let webInboxId =
-    "45aeedf9b01400ca72c426a725c8960140d73b9a0aba7eb8c7c45e7cef524c1f";
-  //ebb1d57a3bf5080e70bfd9dd69372c012ca4a95e175f6b9dacae1df4844abe04
+    "7291f1082bc8da64d0c78495408634f3cbd62e6b32da2b5d31d5e75c03f4e1b2";
   afterAll(async () => {
     await closeEnv(testName, workers);
   });

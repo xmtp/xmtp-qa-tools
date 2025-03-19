@@ -7,8 +7,9 @@ import {
 import { Client } from "@helpers/types";
 
 async function main() {
-  // Number of accounts to generate
-  const numAccounts = 800;
+  // Get number of accounts from command line arguments
+  const args = process.argv.slice(2);
+  const numAccounts = args.length > 0 ? parseInt(args[0], 10) : 800; // Default to 800 if no argument provided
 
   // Array to store account data
   const accountData = [];
@@ -52,7 +53,7 @@ async function main() {
 
       // Write the data to a JSON file
       fs.writeFileSync(
-        `./scripts/generated-inboxes.json`,
+        `./logs/generated-inboxes.json`,
         JSON.stringify(accountData, null, 2),
       );
       console.log(`Created account ${i + 1}/${numAccounts}: ${address}`);
