@@ -37,6 +37,7 @@ jobs:
         with:
           name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/
+
   production:
     runs-on: ubuntu-latest
     env:
