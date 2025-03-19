@@ -3,7 +3,7 @@ import { type Client } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
-const testName = "bug_dms_stitch";
+const testName = "stitch";
 loadEnv(testName);
 
 describe(testName, () => {
