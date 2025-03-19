@@ -127,13 +127,13 @@ _Note: Based on data from 79 measured operations in the `us-east` region and `pr
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
 | 50   | 323        | 71       | 61       | 81         | 140        | <350ms         | ✅ On Target           |
-| 100  | 289        | 67       | 66       | 91         | 182        | <350ms         | ✅ On Target           |
-| 150  | 330        | 72       | 85       | 104        | 183        | <400ms         | ✅ On Target           |
-| 200  | 474        | 73       | 103      | 139        | 211        | <500ms         | ✅ On Target           |
-| 250  | 654        | 76       | 120      | 164        | 234        | <700ms         | ✅ On Target           |
-| 300  | 758        | 81       | 321      | 255        | 309        | <1000ms        | ✅ On Target           |
-| 350  | 1064       | 79       | 132      | 228        | 368        | <1000ms        | ⚠️ Performance Concern |
-| 400  | 1305       | 84       | 170      | 427        | 501        | <1300ms        | ⚠️ Performance Concern |
+| 100  | 289        | 67       | 66       | 91         | 182        | <400ms         | ✅ On Target           |
+| 150  | 330        | 72       | 85       | 104        | 183        | <500ms         | ✅ On Target           |
+| 200  | 474        | 73       | 103      | 139        | 211        | <700ms         | ✅ On Target           |
+| 250  | 654        | 76       | 120      | 164        | 234        | <900ms         | ✅ On Target           |
+| 300  | 758        | 81       | 321      | 255        | 309        | <1100ms        | ✅ On Target           |
+| 350  | 1064       | 79       | 132      | 228        | 368        | <1300ms        | ⚠️ Performance Concern |
+| 400  | 1305       | 84       | 170      | 427        | 501        | <1400ms        | ⚠️ Performance Concern |
 | 450  | -          | -        | -        | -          | -          | -              | ❌ Severe impact       |
 
 _Note: Performance increases significantly beyond `350` members, which represents a hard limit on the protocol._

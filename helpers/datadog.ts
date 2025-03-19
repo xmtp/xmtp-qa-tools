@@ -109,9 +109,9 @@ const THRESHOLDS: ThresholdsData = {
       addmembers: 200,
     },
     "150": {
-      creategroup: 400,
-      creategroupbyidentifiers: 400,
-      receivegroupmessage: 400,
+      creategroup: 500,
+      creategroupbyidentifiers: 500,
+      receivegroupmessage: 500,
       sendgroupmessage: 200,
       syncgroup: 200,
       updategroupname: 200,
