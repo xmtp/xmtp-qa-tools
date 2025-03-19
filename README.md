@@ -191,16 +191,6 @@ _Note: `Production` network consistently shows better network performance across
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-### Stream vs. Poll reliability
-
-| Retrieval Method | Reliability   | Latency           | Use Case               | Status       |
-| ---------------- | ------------- | ----------------- | ---------------------- | ------------ |
-| Stream-based     | 100% delivery | Real-time         | Active conversations   | ✅ On Target |
-| Poll-based       | 100% delivery | Delayed (30s max) | Backup/recovery        | ✅ On Target |
-| Hybrid approach  | 100% delivery | Optimized         | Recommended for Agents | ✅ On Target |
-
-_Note: A hybrid approach using `stream` and `poll`-based verification provides the most reliable message delivery guarantee._
-
 ### Success criteria summary
 
 | Metric               | Current Performance         | Target                 | Status                 |
@@ -220,7 +210,6 @@ _Note: A hybrid approach using `stream` and `poll`-based verification provides t
 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
-- **Pre-Release Status**: This assessment reflects the current development version targeting the `4.0.0` stable release. Optimizations and improvements are ongoing.
 
 ## Tools & Utilities
 
