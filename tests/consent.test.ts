@@ -59,7 +59,7 @@ describe(testName, () => {
     console.time("get-initial-consent");
     const getConsentState = await workers
       .get("henry")
-      ?.client?.getConsentState(
+      ?.client?.preferences.getConsentState(
         ConsentEntityType.InboxId,
         workers.get("randomguy")?.client?.inboxId ?? "",
       );
@@ -69,7 +69,7 @@ describe(testName, () => {
     console.time("set-consent-state");
     // Alice blocks Bob
     console.log(`Alice is ${getConsentState ? "blocking" : "allowing"} Bob...`);
-    await workers.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.preferences.setConsentStates([
       {
         entity: workers.get("randomguy")?.client?.inboxId ?? "",
         entityType: ConsentEntityType.InboxId,
@@ -84,7 +84,7 @@ describe(testName, () => {
     console.time("get-updated-consent");
     const getConsentStateUpdated = await workers
       .get("henry")
-      ?.client?.getConsentState(
+      ?.client?.preferences.getConsentState(
         ConsentEntityType.InboxId,
         workers.get("randomguy")?.client?.inboxId ?? "",
       );
@@ -130,7 +130,7 @@ describe(testName, () => {
     console.time("block-group");
     // Alice blocks the entire group
     console.log("Alice is blocking the group...");
-    await workers.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.preferences.setConsentStates([
       {
         entity: groupConversation?.id ?? "",
         entityType: ConsentEntityType.GroupId,
@@ -143,7 +143,7 @@ describe(testName, () => {
     // Verify Alice's consent state for the group
     const groupConsentState = await workers
       .get("henry")
-      ?.client?.getConsentState(
+      ?.client?.preferences.getConsentState(
         ConsentEntityType.GroupId,
         groupConversation?.id ?? "",
       );
@@ -154,7 +154,7 @@ describe(testName, () => {
 
     console.time("block-bob");
     // Alice blocks Bob specifically
-    await workers.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.preferences.setConsentStates([
       {
         entity: workers.get("jack")?.client?.inboxId as string,
         entityType: ConsentEntityType.InboxId,
@@ -166,7 +166,7 @@ describe(testName, () => {
     console.time("get-bob-consent");
     const bobConsentState = await workers
       .get("henry")
-      ?.client?.getConsentState(
+      ?.client?.preferences.getConsentState(
         ConsentEntityType.InboxId,
         workers.get("jack")?.client?.inboxId ?? "",
       );
@@ -190,7 +190,7 @@ describe(testName, () => {
     console.time("unblock-all");
     // Unblock everyone
     console.log("Unblocking all entities...");
-    await workers.get("henry")?.client?.setConsentStates([
+    await workers.get("henry")?.client?.preferences.setConsentStates([
       {
         entity: groupConversation?.id ?? "",
         entityType: ConsentEntityType.GroupId,
@@ -208,7 +208,7 @@ describe(testName, () => {
     // Final verification
     const finalGroupState = await workers
       .get("henry")
-      ?.client?.getConsentState(
+      ?.client?.preferences.getConsentState(
         ConsentEntityType.GroupId,
         groupConversation?.id ?? "",
       );

@@ -427,7 +427,7 @@ export class WorkerClient extends Worker {
    */
   private initConsentStream() {
     // Use the stream method to listen for consent updates
-    this.activeStream = this.client.conversations.streamConsent();
+    this.activeStream = this.client.preferences.streamConsent();
 
     // Process consent updates asynchronously
     void (async () => {
