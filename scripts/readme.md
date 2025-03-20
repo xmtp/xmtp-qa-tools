@@ -1,52 +1,91 @@
-# 📜 Scripts Documentation
+# 📜 Scripts documentation
 
 This document provides practical instructions for using the scripts in the `/scripts` directory.
 
-## Quick Reference
+## Quick reference
 
-| Script                 | Purpose                        | Key Features                   |
-| ---------------------- | ------------------------------ | ------------------------------ |
-| **generateKeys.ts**    | Creates new XMTP keys          | Single key generation          |
-| **generateinboxes.ts** | Creates multiple test inboxes  | Bulk account creation          |
-| **hyperbrowser.ts**    | Browser automation tool        | Headless testing, screenshots  |
-| **network.sh**         | Checks XMTP node status        | Network monitoring             |
-| **monitor.sh**         | System monitoring              | Service status tracking        |
-| **run.ts**             | General-purpose task runner    | Configurable operations        |
-| **redeploy.ts**        | Redeploys a Railway deployment | Redeploys a Railway deployment |
+| Script              | Purpose                        | Key Features                   |
+| ------------------- | ------------------------------ | ------------------------------ |
+| **generateKeys.ts** | Creates new XMTP keys          | Single key generation          |
+| **generate.ts**     | Creates test data              | Test data generation           |
+| **hyperbrowser.ts** | Browser automation tool        | Headless testing, screenshots  |
+| **monitor.sh**      | System monitoring              | Service status tracking        |
+| **network.sh**      | Checks XMTP node status        | Network monitoring             |
+| **oldpackages.ts**  | Old packages creation          | Old packages creation          |
+| **packages.sh**     | Manages packages               | Package management             |
+| **railway.sh**      | Railway deployment script      | Railway management             |
+| **railway-test.ts** | Tests Railway deployments      | Railway testing                |
+| **redeploy.ts**     | Redeploys a Railway deployment | Redeploys a Railway deployment |
+| **run.ts**          | General-purpose task runner    | Configurable operations        |
+| **run-test.sh**     | Runs tests                     | Test execution                 |
+| **update.ts**       | Updates dependencies           | Dependency management          |
 
-## 🔑 Generate Keys
+## Available commands
+
+You can run these scripts using the yarn commands defined in package.json:
+
+```bash
+# Generate XMTP keys
+yarn gen:keys
+
+# Monitor development environment
+yarn monitor:dev
+
+# Send data to Datadog
+yarn script:datadog
+
+# Generate test data
+yarn script:generate
+
+# Monitor network status
+yarn script:monitor
+
+# Manage old packages
+yarn script:oldpackages
+
+# Manage packages
+yarn script:packages
+
+# Manage Railway deployments
+yarn script:railway
+
+# Record browser interactions with Playwright
+yarn script:record
+
+# Redeploy services
+yarn script:redeploy
+
+# Update dependencies
+yarn script:update
+```
+
+## 🔑 Generate keys
 
 The `generateKeys.ts` script creates new XMTP keys for testing purposes.
 
 ```bash
 # Run the script
-npx ts-node scripts/generateKeys.ts
+yarn gen:keys
 ```
 
-**Expected Result:** The script will generate and output a new XMTP private key in hex format.
+**Expected result:** The script will generate and output a new XMTP private key in hex format.
 
-**Use Cases:**
+**Use cases:**
 
 - Creating test accounts for development
 - Setting up new workers for simulation testing
 - Generating keys for ephemeral test instances
 
-## 📨 Generate Inboxes
+## 🔄 Generate test data
 
-The `generateinboxes.ts` script creates multiple XMTP inboxes for testing.
+The `generate.ts` script creates test data for XMTP testing.
 
 ```bash
 # Run the script
-npx ts-node scripts/generateinboxes.ts
+yarn script:generate
 ```
 
-**Expected Result:** The script will generate multiple XMTP inboxes and save them to `generated-inboxes.json`. Each inbox contains a private key and wallet address.
-
-**Use Cases:**
-
-- Setting up large-scale tests
-- Preparing for load testing scenarios
-- Creating a test inbox repository
+**Expected result:** The script will generate test data according to its configuration.
 
 ## 🌐 Hyperbrowser
 
@@ -54,13 +93,13 @@ The `hyperbrowser.ts` script provides a headless browser automation tool for XMT
 
 ```bash
 # Run the script with a specific URL
-npx ts-node scripts/hyperbrowser.ts --url="https://example.com"
+yarn tsx scripts/hyperbrowser.ts --url="https://example.com"
 
 # Run with additional options
-npx ts-node scripts/hyperbrowser.ts --url="https://example.com" --headless=false --screenshot=true
+yarn tsx scripts/hyperbrowser.ts --url="https://example.com" --headless=false --screenshot=true
 ```
 
-**Expected Result:** The script will launch a browser session to the specified URL, perform automated actions, and optionally take screenshots.
+**Expected result:** The script will launch a browser session to the specified URL, perform automated actions, and optionally take screenshots.
 
 **Options:**
 
@@ -68,16 +107,16 @@ npx ts-node scripts/hyperbrowser.ts --url="https://example.com" --headless=false
 - `--headless`: Whether to run in headless mode (default: true)
 - `--screenshot`: Whether to capture screenshots (default: false)
 
-## 🌍 Network Monitoring
+## 🌍 Network monitoring
 
 The `network.sh` script checks the status of XMTP network nodes.
 
 ```bash
 # Run the script
-bash scripts/network.sh
+yarn script:monitor
 ```
 
-**Expected Result:** The script will output the status of XMTP network nodes, showing which ones are online or offline.
+**Expected result:** The script will output the status of XMTP network nodes, showing which ones are online or offline.
 
 **Features:**
 
@@ -85,7 +124,7 @@ bash scripts/network.sh
 - Connection latency measurements
 - Color-coded status indicators
 
-## 📊 System Monitoring
+## 📊 System monitoring
 
 The `monitor.sh` script provides system monitoring for XMTP services.
 
@@ -94,25 +133,58 @@ The `monitor.sh` script provides system monitoring for XMTP services.
 bash scripts/monitor.sh
 ```
 
-**Expected Result:** The script will display system metrics and service status information.
+**Expected result:** The script will display system metrics and service status information.
 
-**Metrics Tracked:**
+**Metrics tracked:**
 
 - Service uptime
 - Resource utilization
 - Response times
 - Error rates
 
-## ⚙️ Run Script
+## 📦 Package management
+
+The `packages.sh` and `oldpackages.ts` scripts help manage package dependencies.
+
+```bash
+# Run packages.sh
+yarn script:packages
+
+# Run oldpackages.ts
+yarn script:oldpackages
+```
+
+## 🚂 Railway deployment
+
+The `railway.sh`, `railway-test.ts`, and `redeploy.ts` scripts manage Railway deployments.
+
+```bash
+# Run railway.sh
+yarn script:railway
+
+# Run redeploy.ts
+yarn script:redeploy
+```
+
+## 🔄 Update dependencies
+
+The `update.ts` script helps update project dependencies.
+
+```bash
+# Run the script
+yarn script:update
+```
+
+## ⚙️ Run script
 
 The `run.ts` script is a general-purpose runner for XMTP-related tasks.
 
 ```bash
 # Run the script
-npx ts-node scripts/run.ts
+yarn tsx scripts/run.ts
 ```
 
-**Expected Result:** The script will execute predefined XMTP operations based on the configuration in the file.
+**Expected result:** The script will execute predefined XMTP operations based on the configuration in the file.
 
 **Configuration:**
 
@@ -120,45 +192,21 @@ npx ts-node scripts/run.ts
 - Set environment variables to control behavior
 - Output logs to console or file
 
-## 📁 Generated Inboxes
+## 🧪 Run tests
 
-The `generated-inboxes.json` file contains previously generated test inboxes. This is not a script but a data file used by other scripts.
-
-```json
-// Example entry in generated-inboxes.json
-{
-  "address": "0x1234...",
-  "privateKey": "0xabcd...",
-  "inboxId": "..."
-}
-```
-
-**Usage:** Reference this file in your tests when you need pre-generated XMTP accounts.
-
-```typescript
-// Example usage in tests
-import inboxes from "@helpers/generated-inboxes.json";
-
-// Use a random inbox
-const randomIndex = Math.floor(Math.random() * inboxes.length);
-const testAccount = inboxes[randomIndex];
-```
-
-## 🔄 Redeploy
-
-The `redeploy.ts` script redeploys a Railway deployment.
+The `run-test.sh` script executes tests for the project.
 
 ```bash
 # Run the script
-npx ts-node scripts/redeploy.ts
+bash scripts/run-test.sh
 ```
 
-## 📝 Best Practices
+## 📝 Best practices
 
 When using these scripts, consider the following best practices:
 
-1. **Version Control:** Avoid committing private keys to version control
-2. **Environment Variables:** Use environment variables for sensitive configuration
-3. **Error Handling:** Check script outputs for errors before proceeding
-4. **Resource Management:** For browser automation, ensure resources are properly closed
+1. **Version control:** Avoid committing private keys to version control
+2. **Environment variables:** Use environment variables for sensitive configuration
+3. **Error handling:** Check script outputs for errors before proceeding
+4. **Resource management:** For browser automation, ensure resources are properly closed
 5. **Logging:** Enable appropriate logging for debugging issues
