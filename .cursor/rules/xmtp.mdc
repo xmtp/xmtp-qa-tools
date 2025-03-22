@@ -1,0 +1,595 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+---
+# Specify the following for Cursor rules
+description: Coding rules for XMTP Agent development
+globs: "**/*.ts"
+---
+
+# Writing XMTP Agents
+
+You're an expert in writing TypeScript with Node.js. Generate **high-quality XMTP Agents** that adhere to the following best practices:
+
+## Guidelines
+
+1. Use modern JavaScript/TypeScript patterns and ESM modules. All examples should be structured as ES modules with `import` statements rather than CommonJS `require()`.
+
+2. Use the XMTP node-sdk v1.0.2 or newer, which offers enhanced functionality including group conversations.
+
+3. Only import from @xmtp/node-sdk for XMTP functionality. Do not import from any other XMTP-related packages or URLs. Specifically:
+
+   - Never use the deprecated @xmtp/xmtp-js library, which has been completely replaced by @xmtp/node-sdk
+   - Always import directly from @xmtp/node-sdk as shown below:
+
+   ```typescript
+   // CORRECT:
+   import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+
+   // INCORRECT - DEPRECATED:
+   import { Client } from "@xmtp/xmtp-js";
+   import { XmtpClient } from "some-other-package";
+   ```
+
+4. Follow the consistent pattern for initializing XMTP clients:
+
+   ```typescript
+   const signer = createSigner(WALLET_KEY);
+   const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+   const client = await Client.create(signer, encryptionKey, { env });
+   ```
+
+5. Use proper environment variable validation at the start of each application. Check for required environment variables and show descriptive errors if missing.
+
+6. Never use the concept of "topic" when working with XMTP. The current SDK doesn't use topics for message organization - work directly with conversations, groups, and DMs instead.
+
+7. Handle both Group and DM conversations properly. The `Group` and `Dm` classes extend the `Conversation` class and provide specific functionality:
+
+   ```typescript
+   if (conversation instanceof Group) {
+     // Group-specific functionality like group.name or group.addMembers
+   } else if (conversation instanceof Dm) {
+     // DM-specific functionality like conversation.peerInboxId
+   }
+   ```
+
+8. Always sync conversations before streaming messages:
+
+   ```typescript
+   await client.conversations.sync();
+   const stream = client.conversations.streamAllMessages();
+   ```
+
+9. Filter out messages from the agent itself to prevent endless loops:
+
+   ```typescript
+   if (message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase()) {
+     continue;
+   }
+   ```
+
+10. When using external APIs (like OpenAI, Gaia, Alchemy), properly handle errors and provide fallback responses.
+
+11. For storage implementations (for example, in agents that need to store state), implement both Redis and local file storage options with proper fallback mechanisms.
+
+12. Consistent error handling pattern with try/catch blocks and specific error messages.
+
+13. Use the helper functions from the shared helpers directory for common operations:
+
+    - `createSigner` - Creates a signer from a private key
+    - `getEncryptionKeyFromHex` - Converts a hex string to an encryption key
+    - `getAddressOfMember` - Gets the Ethereum address of a group member
+
+14. For AI/LLM integration, use proper conversation management and provide clear system prompts.
+
+## Example Agent Structure
+
+Here's the recommended structure for XMTP agents:
+
+```typescript
+import "dotenv/config";
+import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
+
+// Environment variables validation
+const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
+if (!WALLET_KEY) throw new Error("WALLET_KEY must be set");
+if (!ENCRYPTION_KEY) throw new Error("ENCRYPTION_KEY must be set");
+
+// Initialize client
+const signer = createSigner(WALLET_KEY);
+const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
+
+async function main() {
+  console.log(`Creating client on the '${env}' network...`);
+  const client = await Client.create(signer, encryptionKey, { env });
+
+  console.log("Syncing conversations...");
+  await client.conversations.sync();
+
+  // Log connection details
+  const identifier = await signer.getIdentifier();
+  const address = identifier.identifier;
+  console.log(
+    `Agent initialized on ${address}\nSend a message on http://xmtp.chat/dm/${address}?env=${env}`,
+  );
+
+  // Start listening for messages
+  console.log("Waiting for messages...");
+  const stream = client.conversations.streamAllMessages();
+
+  for await (const message of await stream) {
+    // Process messages here
+  }
+}
+
+main().catch(console.error);
+```
+
+## Key Type References
+
+### Core Types
+
+Here are the essential types you'll work with when developing XMTP agents:
+
+#### Conversations Class
+
+```typescript
+declare class Conversations {
+  #private;
+  constructor(client: Client, conversations: Conversations$1);
+  getConversationById(id: string): Promise<Dm | Group | undefined>;
+  getDmByInboxId(inboxId: string): Dm | undefined;
+  getMessageById<T = any>(id: string): DecodedMessage<T> | undefined;
+  newGroupWithIdentifiers(
+    identifiers: Identifier[],
+    options?: CreateGroupOptions,
+  ): Promise<Group>;
+  newGroup(inboxIds: string[], options?: CreateGroupOptions): Promise<Group>;
+  newDmWithIdentifier(
+    identifier: Identifier,
+    options?: CreateDmOptions,
+  ): Promise<Dm>;
+  newDm(inboxId: string, options?: CreateDmOptions): Promise<Dm>;
+  list(options?: ListConversationsOptions): Promise<(Dm | Group)[]>;
+  listGroups(
+    options?: Omit<ListConversationsOptions, "conversationType">,
+  ): Group[];
+  listDms(options?: Omit<ListConversationsOptions, "conversationType">): Dm[];
+  sync(): Promise<void>;
+  syncAll(consentStates?: ConsentState[]): Promise<bigint>;
+  stream(callback?: StreamCallback<Group | Dm>): AsyncStream<Dm | Group>;
+  streamGroups(callback?: StreamCallback<Group>): AsyncStream<Group>;
+  streamDms(callback?: StreamCallback<Dm>): AsyncStream<Dm>;
+  streamAllMessages(
+    callback?: StreamCallback<DecodedMessage>,
+  ): Promise<AsyncStream<DecodedMessage<any>>>;
+  streamAllGroupMessages(
+    callback?: StreamCallback<DecodedMessage>,
+  ): Promise<AsyncStream<DecodedMessage<any>>>;
+  streamAllDmMessages(
+    callback?: StreamCallback<DecodedMessage>,
+  ): Promise<AsyncStream<DecodedMessage<any>>>;
+  hmacKeys(): Record<string, _xmtp_node_bindings.HmacKey[]>;
+}
+```
+
+#### Dm Class
+
+```typescript
+declare class Dm extends Conversation {
+  #private;
+  constructor(
+    client: Client,
+    conversation: Conversation$1,
+    lastMessage?: Message | null,
+  );
+  get peerInboxId(): string;
+}
+```
+
+#### Group Class
+
+```typescript
+declare class Group extends Conversation {
+  #private;
+  constructor(
+    client: Client,
+    conversation: Conversation$1,
+    lastMessage?: Message | null,
+  );
+  get name(): string;
+  updateName(name: string): Promise<void>;
+  get imageUrl(): string;
+  updateImageUrl(imageUrl: string): Promise<void>;
+  get description(): string;
+  updateDescription(description: string): Promise<void>;
+  get permissions(): {
+    policyType: _xmtp_node_bindings.GroupPermissionsOptions;
+    policySet: _xmtp_node_bindings.PermissionPolicySet;
+  };
+  updatePermission(
+    permissionType: PermissionUpdateType,
+    policy: PermissionPolicy,
+    metadataField?: MetadataField,
+  ): Promise<void>;
+  get admins(): string[];
+  get superAdmins(): string[];
+  isAdmin(inboxId: string): boolean;
+  isSuperAdmin(inboxId: string): boolean;
+  addMembersByIdentifiers(identifiers: Identifier[]): Promise<void>;
+  addMembers(inboxIds: string[]): Promise<void>;
+  removeMembersByIdentifiers(identifiers: Identifier[]): Promise<void>;
+  removeMembers(inboxIds: string[]): Promise<void>;
+  addAdmin(inboxId: string): Promise<void>;
+  removeAdmin(inboxId: string): Promise<void>;
+  addSuperAdmin(inboxId: string): Promise<void>;
+  removeSuperAdmin(inboxId: string): Promise<void>;
+}
+```
+
+#### GroupMember Class
+
+```typescript
+declare class GroupMember {
+  inboxId: string;
+  accountIdentifiers: Array<Identifier>;
+  installationIds: Array<string>;
+  permissionLevel: PermissionLevel;
+  consentState: ConsentState;
+}
+```
+
+### Common Usage Patterns
+
+When working with these classes:
+
+1. **Conversations**
+
+   - Central interface for managing all conversations
+   - Use `sync()` before accessing local conversation data
+   - Use `streamAllMessages()` to listen for new messages in real-time
+
+2. **Dm**
+
+   - Access the peer using `conversation.peerInboxId`
+   - Create new DMs with `client.conversations.newDm(inboxId)`
+   - Send messages with `dm.send(content)`
+
+3. **Group**
+
+   - Manage group metadata with `updateName()`, `updateDescription()`, etc.
+   - Add/remove members with `addMembers()` and `removeMembers()`
+   - Manage permissions with admin methods: `addAdmin()`, `addSuperAdmin()`, etc.
+   - Check permissions with `isAdmin()` and `isSuperAdmin()`
+
+4. **GroupMember**
+   - Use `member.inboxId` to identify members
+   - Access Ethereum addresses through `member.accountIdentifiers`
+   - Check permission level with `member.permissionLevel`
+   - Verify consent state with `member.consentState`
+
+## Fetching Messages
+
+There are two ways to retrieve messages from conversations:
+
+### 1. Streaming Messages (Recommended for Agents)
+
+Stream all messages to process them in real-time:
+
+```typescript
+const stream = client.conversations.streamAllMessages();
+for await (const message of await stream) {
+  // Process each message as it arrives
+  console.log(`Received message: ${message.content as string}`);
+}
+```
+
+### 2. Polling Messages
+
+Retrieve all messages at once from the local database:
+
+```typescript
+// First sync the conversations from the network to update the local db
+await client.conversations.sync();
+
+// Then get all messages as an array
+const messages = await client.conversations.messages();
+```
+
+### Linting and Code Style Best Practices
+
+XMTP agents should follow consistent TypeScript linting practices to ensure code quality and readability. The project uses ESLint with TypeScript-ESLint and Prettier integration.
+
+```typescript
+// Import the necessary types
+import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+```
+
+### Key Linting Guidelines
+
+1. **Use TypeScript Type Imports**
+
+   - Always use `import type` for importing types:
+     ```typescript
+     import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+     ```
+
+2. **Handle Unused Variables**
+
+   - Prefix unused variables with underscore: `_unusedVar`
+   - This applies to unused function parameters and destructured variables as well
+
+3. **Type Safety**
+
+   - Avoid using `any` whenever possible
+   - Use proper type guards when handling unknown types:
+     ```typescript
+     if (error instanceof Error) {
+       console.error(error.message);
+     } else {
+       console.error(String(error));
+     }
+     ```
+
+4. **Node.js Imports**
+
+   - Use the `node:` prefix for Node.js built-in modules:
+     ```typescript
+     import fs from "node:fs";
+     import path from "node:path";
+     ```
+
+5. **Formatting Consistency**
+   - Use 2 spaces for indentation
+   - Add semicolons at the end of statements
+   - Use trailing commas in multi-line object/array literals
+   - Keep line length reasonable (around 80-100 characters)
+
+### Example of Well-Formatted XMTP Code
+
+```typescript
+import "dotenv/config";
+import { Client, type Conversation, type XmtpEnv } from "@xmtp/node-sdk";
+import { createSigner, getEncryptionKeyFromHex } from "@/helpers";
+
+// Environment variable validation
+const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
+
+if (!WALLET_KEY) {
+  throw new Error("WALLET_KEY must be set");
+}
+
+if (!ENCRYPTION_KEY) {
+  throw new Error("ENCRYPTION_KEY must be set");
+}
+
+// Function with proper type annotations
+async function handleMessage(
+  conversation: Conversation,
+  content: string,
+  senderInboxId: string,
+): Promise<void> {
+  try {
+    await conversation.send(`Received: ${content}`);
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error handling message: ${errorMessage}`);
+  }
+}
+
+// Main function
+async function main(): Promise<void> {
+  const signer = createSigner(WALLET_KEY);
+  const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+  const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
+
+  const client = await Client.create(signer, encryptionKey, { env });
+
+  // Start message processing...
+}
+
+main().catch((error: unknown) => {
+  console.error("Unhandled error:", error);
+  process.exit(1);
+});
+```
+
+### Error Handling Patterns
+
+Always follow these error handling patterns in XMTP agents:
+
+```typescript
+try {
+  // XMTP operations that might fail
+  await conversation.send(message);
+} catch (error: unknown) {
+  // Proper error handling with type narrowing
+  if (error instanceof Error) {
+    console.error(`Operation failed: ${error.message}`);
+  } else {
+    console.error(`Unknown error occurred: ${String(error)}`);
+  }
+
+  // Optionally inform the user
+  await conversation.send("Sorry, an error occurred processing your request.");
+}
+```
+
+## Creating Conversations
+
+XMTP provides two ways to create conversations - using inboxIds or identifiers (like Ethereum addresses). Here are examples of both approaches:
+
+#### Creating DMs
+
+You can create a DM using either an inboxId or an Ethereum address:
+
+```typescript
+// Using inboxId (preferred when you already know the inboxId)
+const dmByInboxId = await client.conversations.newDm("inbox_123456789");
+
+// Using Ethereum address (useful when integrating with wallet addresses)
+const dmByAddress = await client.conversations.newDmWithIdentifier({
+  identifier: "0x1234567890abcdef1234567890abcdef12345678",
+  identifierKind: IdentifierKind.Ethereum,
+});
+
+// Send a message in the new DM
+await dmByInboxId.send("Hello, this is a direct message!");
+```
+
+#### Creating Groups
+
+Similarly, you can create groups with either inboxIds or identifiers:
+
+```typescript
+// Using inboxIds (when you have inboxIds of members)
+const members = ["inbox_123", "inbox_456", "inbox_789"];
+const groupByInboxIds = await client.conversations.newGroup(members);
+
+// Using Ethereum addresses (when integrating with wallet addresses)
+const identifiers = [
+  {
+    identifier: "0x1234567890abcdef1234567890abcdef12345678",
+    identifierKind: IdentifierKind.Ethereum,
+  },
+  {
+    identifier: "0xabcdef1234567890abcdef1234567890abcdef12",
+    identifierKind: IdentifierKind.Ethereum,
+  },
+];
+const groupByIdentifiers =
+  await client.conversations.newGroupWithIdentifiers(identifiers);
+
+// Configure the new group
+await groupByInboxIds.updateName("Project Discussion");
+await groupByInboxIds.updateDescription("A group for discussing our project");
+await groupByInboxIds.addSuperAdmin("inbox_123"); // Make a member a super admin
+
+// Send a message to the group
+await groupByInboxIds.send("Welcome to the Project Discussion group!");
+```
+
+#### Creating an Empty Group and Adding Members Later
+
+Sometimes you may want to create an empty group first and add members later:
+
+```typescript
+// Create an empty group
+const emptyGroup = await client.conversations.newGroup([]);
+
+// Add members one by one or in batches
+await emptyGroup.addMembers(["inbox_123"]);
+await emptyGroup.addMembersByIdentifiers([
+  {
+    identifier: "0x1234567890abcdef1234567890abcdef12345678",
+    identifierKind: IdentifierKind.Ethereum,
+  },
+]);
+
+// Set up permissions
+await emptyGroup.addSuperAdmin("inbox_123");
+```
+
+## Working with Conversation Types
+
+Conversations can be either Groups or DMs. They both extend the base Conversation class but have different capabilities:
+
+```typescript
+import { Dm, Group } from "@xmtp/node-sdk";
+
+// List all conversations
+const conversations: (Group | Dm)[] = await client.conversations.list();
+
+for (const conversation of conversations) {
+  // Check the conversation type and use appropriate methods
+  if (conversation instanceof Group) {
+    // Group-specific functionality
+    console.log(`Group name: ${conversation.name}`);
+    const members = await conversation.members();
+    console.log(`Member count: ${members.length}`);
+  }
+
+  if (conversation instanceof Dm) {
+    // DM-specific functionality
+    console.log(`Peer inbox ID: ${conversation.peerInboxId}`);
+  }
+
+  // Common methods for both types
+  await conversation.send("This message works in both Group and Dm");
+}
+```
+
+## Working with Addresses and Inbox IDs
+
+Since XMTP is interoperable, you may need to convert between addresses and inbox IDs:
+
+```typescript
+import { IdentifierKind, type Identifier } from "@xmtp/node-sdk";
+
+// Get an inbox ID from an Ethereum address
+const inboxId = await getInboxIdForIdentifier({
+  identifier: "0x1234567890abcdef1234567890abcdef12345678",
+  identifierKind: IdentifierKind.Ethereum,
+});
+
+// Find all addresses associated with an inbox ID
+const inboxState = await client.inboxStateFromInboxIds([inboxId]);
+
+// Extract Ethereum addresses from the inbox state
+const ethereumAddresses = inboxState.identifiers
+  .filter((i) => i.identifierKind === IdentifierKind.Ethereum)
+  .map((i) => i.identifier);
+```
+
+## Working with Group Members
+
+When working with groups, you'll often need to handle GroupMember objects:
+
+```typescript
+import { Group, IdentifierKind, type GroupMember } from "@xmtp/node-sdk";
+
+// Get all members of a group
+const group = (await client.conversations.getConversationById(
+  groupId,
+)) as Group;
+const members: GroupMember[] = await group.members();
+
+// Find a specific member by inboxId
+const targetInboxId = "your-target-inbox-id";
+const targetMember = members.find((member) => member.inboxId === targetInboxId);
+
+// Extract Ethereum address from a member
+function getAddressOfMember(
+  members: GroupMember[],
+  inboxId: string,
+): string | undefined {
+  for (const member of members) {
+    for (const identifier of member.accountIdentifiers) {
+      if (
+        identifier.identifierKind === IdentifierKind.Ethereum &&
+        member.inboxId === inboxId
+      ) {
+        return identifier.identifier;
+      }
+    }
+  }
+  return undefined;
+}
+
+// Check member permissions
+const isSuperAdmin = group.isSuperAdmin(inboxId);
+const isAdmin = group.isAdmin(inboxId);
+
+// Add/remove members
+await group.addMembers([newMemberInboxId]);
+await group.removeMember(memberToRemoveInboxId);
+
+// Modify permissions
+await group.addSuperAdmin(inboxId);
+await group.addAdmin(inboxId);
+await group.removeAdmin(inboxId);
+```

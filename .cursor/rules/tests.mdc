@@ -1,6 +1,6 @@
 ---
-description: Testing format
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
-[dms.test.ts](mdc:tests/dms.test.ts)
+[TS_Performance.test.ts](mdc:tests/TS_Performance.test.ts)

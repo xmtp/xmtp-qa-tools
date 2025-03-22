@@ -3,4 +3,4 @@ description: Datadog dashoard format
 globs: 
 alwaysApply: false
 ---
-[dms.json](mdc:dashboards/dms.json)
+[datadog.ts](mdc:helpers/datadog.ts)
