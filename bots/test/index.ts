@@ -42,15 +42,7 @@ async function main() {
     console.log("Syncing conversations...");
     await client.conversations.sync();
 
-    //Send dm to the bot
-    // const addressApp = "0xb222ec34482e3503988cfe81ced46ef10099c3e6";
-    // const dm = await client.conversations.newDmWithIdentifier({
-    //   identifierKind: IdentifierKind.Ethereum,
-    //   identifier: addressApp,
-    // });
-    // await dm.send("gm from bot");
-    // console.log("DM sent:", dm);
-
+    await sendInitialTestMessage(client);
     console.log("Waiting for messages...");
     try {
       const stream = client.conversations.streamAllMessages();
@@ -102,6 +94,15 @@ async function main() {
     console.error("Error details:", JSON.stringify(error, null, 2));
     process.exit(1);
   }
+}
+
+async function sendInitialTestMessage(client: Client) {
+  // Send dm to the bot
+  const addressApp =
+    "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff";
+  const dm = await client.conversations.newDm(addressApp);
+  await dm.send("gm from bot");
+  console.log("DM sent:", dm.id);
 }
 
 // Helper function to process incoming commands

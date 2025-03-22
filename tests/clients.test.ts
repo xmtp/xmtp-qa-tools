@@ -1,55 +1,87 @@
-import fs from "fs";
 import { loadEnv } from "@helpers/client";
+import { logError } from "@helpers/logger";
 import { IdentifierKind } from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);
 
 describe(testName, () => {
-  beforeAll(() => {
-    fs.rmSync(".data", { recursive: true, force: true });
-  });
-
-  it("canMessage: should measure canMessage", async () => {
-    const workers = await getWorkers(["henry"], testName, "none");
-    const address = "0x83e894b586d183380e1fb6602cd8349520c03dfa";
-    const canMessage = await workers.get("henry")!.client.canMessage([
-      {
-        identifier: address,
-        identifierKind: IdentifierKind.Ethereum,
-      },
-    ]);
-    console.log(canMessage.get(address));
-    expect(canMessage.get(address)).toBe(true);
-  });
-
-  it("create random workers", async () => {
-    const workers = await getWorkers(["random"], testName, "none");
-    expect(workers.get("random")?.client?.inboxId).toBeDefined();
-  });
-
-  it("should create a worker", async () => {
-    const workers = await getWorkers(["bob", "random"], testName, "none");
-    expect(workers.get("bob")?.client?.inboxId).toBeDefined();
-  });
-
-  it("should create a random worker", async () => {
-    const workers = await getWorkers(["random"], testName, "none");
-
-    expect(workers.get("random")?.client?.inboxId).toBeDefined();
-  });
-
-  it("should create multiple workers", async () => {
-    const workers = await getWorkers(
-      ["bob", "alice", "randompep", "randombob"],
+  let workers: WorkerManager;
+  let hasFailures = false;
+  beforeAll(async () => {
+    workers = await getWorkers(
+      [
+        "henry",
+        "ivy",
+        "jack",
+        "karen",
+        "bob",
+        "randomguy",
+        "larry",
+        "mary",
+        "nancy",
+        "oscar",
+      ],
       testName,
-      "none",
     );
-    expect(workers.get("bob")?.client?.inboxId).toBeDefined();
-    expect(workers.get("alice")?.client?.inboxId).toBeDefined();
-    expect(workers.get("randompep")?.client?.inboxId).toBeDefined();
-    expect(workers.get("randombob")?.client?.inboxId).toBeDefined();
+  });
+
+  it("clientCreate: should measure creating a client", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "message");
+      expect(client).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("canMessage: should measure canMessage", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "none");
+      if (!client) {
+        throw new Error("Client not found");
+      }
+
+      const randomAddress = client.get("randomclient")!.address;
+      if (!randomAddress) {
+        throw new Error("Random client not found");
+      }
+      const canMessage = await workers.get("henry")!.client.canMessage([
+        {
+          identifier: randomAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        },
+      ]);
+      expect(canMessage.get(randomAddress)).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("inboxState: should measure inboxState of henry", async () => {
+    try {
+      const inboxState = await workers
+        .get("henry")!
+        .client.preferences.inboxState(true);
+      expect(inboxState.installations.length).toBeGreaterThan(0);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("inboxStateFromInboxIds: should measure inboxState of henry", async () => {
+    try {
+      const bobInboxId = workers.get("bob")!.client.inboxId;
+      const inboxState = await workers
+        .get("henry")!
+        .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
+      console.log(inboxState[0].inboxId);
+      expect(inboxState[0].inboxId).toBe(bobInboxId);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
   });
 });

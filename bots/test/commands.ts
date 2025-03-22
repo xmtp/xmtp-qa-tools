@@ -22,6 +22,7 @@ hi [name] - Get a response back to [name]
 /unblock [name] - Unblock [name] from the current group 
 /groups - List all active groups
 /members - List all members in the current group
+/me - Get your address, inbox id and installation id
 /admins - List all admins in the current group
 /blast [message] [count] [repeat] - Send a message to all participants in the current group
 /leave - Leave the current group
@@ -88,14 +89,23 @@ export class CommandHandler {
     }
   }
   async me(message: DecodedMessage, client: Client) {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    const members = (await conversation?.members()) ?? [];
-    const address = getAddressOfMember(members, message.senderInboxId);
-    await conversation?.send(`${address}`);
-    await conversation?.send(client.inboxId);
-    await conversation?.send(client.installationId);
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+      const inboxState = await client.preferences.inboxStateFromInboxIds([
+        message.senderInboxId,
+      ]);
+      const addresses = inboxState[0].identifiers
+        .filter((i) => i.identifierKind === IdentifierKind.Ethereum)
+        .map((i) => i.identifier);
+
+      await conversation?.send(addresses[0]);
+      await conversation?.send(inboxState[0].inboxId);
+      await conversation?.send(inboxState[0].installations[0].id);
+    } catch (error) {
+      console.error("Error sending me:", error);
+    }
   }
   async block(message: DecodedMessage, client: Client, args: string[] = []) {
     try {

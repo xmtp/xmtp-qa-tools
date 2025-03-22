@@ -94,7 +94,29 @@ describe(testName, () => {
       throw e;
     }
   });
+  it("canMessage: should measure canMessage", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "none");
+      if (!client) {
+        throw new Error("Client not found");
+      }
 
+      const randomAddress = client.get("randomclient")!.address;
+      if (!randomAddress) {
+        throw new Error("Random client not found");
+      }
+      const canMessage = await workers.get("henry")!.client.canMessage([
+        {
+          identifier: randomAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        },
+      ]);
+      expect(canMessage.get(randomAddress)).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   it("inboxState: should measure inboxState of henry", async () => {
     try {
       const inboxState = await workers
