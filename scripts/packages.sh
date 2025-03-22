@@ -42,7 +42,7 @@ fi
 # Function to test a package manager with different Node versions
 test_package_manager() {
     local pm=$1
-    local node_versions=("20" "21" "22" "23")
+    local node_versions=("18" "20" "21" "22" "23")
     local results=()
     
     for version in "${node_versions[@]}"; do
@@ -148,7 +148,7 @@ done
 # Print results matrix
 echo "📊 Test Results Matrix"
 echo "-----------------------------------"
-echo "Package Manager | Node 20 | Node 21 | Node 22 | Node 23"
+echo "Package Manager  18 | 20 | 21 | 22 | 23"
 echo "---------------|----------|----------|----------|----------"
 for pm in "${package_managers[@]}"; do
     results_var="results_${pm}[@]"

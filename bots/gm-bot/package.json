@@ -9,7 +9,7 @@
     "start": "tsx src/index.ts"
   },
   "dependencies": {
-    "@xmtp/node-sdk": "1.0.0-rc2",
+    "@xmtp/node-sdk": "1.0.0",
     "tsx": "^4.19.2",
     "uint8arrays": "^5.1.0",
     "viem": "^2.22.17"
@@ -20,6 +20,6 @@
     "typescript": "^5.4.5"
   },
   "engines": {
-    "node": ">=20"
+    "node": ">=18"
   }
 }
