@@ -63,6 +63,41 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
   }
 }
 
+export async function createDmWithDeeplink(address: string) {
+  const { page, browser } = await startPage(false);
+  try {
+    console.log("Starting test");
+    await page.goto(`https://xmtp.chat/dm/${address}?env=dev`);
+
+    await page
+      .getByRole("main")
+      .getByRole("button", { name: "Connect" })
+      .click();
+    console.log("Clicking message textbox");
+    await page.getByRole("textbox", { name: "Type a message..." }).click();
+    console.log("Filling message with 'hi'");
+    await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+    console.log("Clicking Send button");
+    await page.getByRole("button", { name: "Send" }).click();
+
+    const hiMessage = await page.getByText("hi");
+    const hiMessageText = await hiMessage.textContent();
+    console.log("hiMessageText", hiMessageText);
+    const botMessage = await page.getByText("gm");
+    const botMessageText = await botMessage.textContent();
+    console.log("botMessageText", botMessageText);
+
+    return botMessageText === "gm";
+  } catch (error) {
+    console.error("Could not find 'gm' message:", error);
+    // Take a screenshot to see what's visible
+    if (page) await takeSnapshot(page, "before-finding-gm", addresses);
+  } finally {
+    // Close the browser
+    if (browser) await browser.close();
+  }
+}
+
 // Helper function to take snapshots
 async function takeSnapshot(page: Page, name: string, addresses: string[]) {
   if (addresses.length > 1) {

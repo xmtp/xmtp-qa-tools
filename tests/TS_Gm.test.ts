@@ -2,7 +2,10 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import { createGroupAndReceiveGm } from "@helpers/playwright";
+import {
+  createDmWithDeeplink,
+  createGroupAndReceiveGm,
+} from "@helpers/playwright";
 import { IdentifierKind, type Conversation } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -72,7 +75,7 @@ describe(testName, () => {
 
   it("should respond to a message", async () => {
     try {
-      const result = await createGroupAndReceiveGm([gmBotAddress]);
+      const result = await createDmWithDeeplink(gmBotAddress);
       expect(result).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);
