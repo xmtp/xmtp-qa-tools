@@ -8,11 +8,8 @@ import {
   type Page,
 } from "playwright-chromium";
 
-const snapshotDir = path.join(process.cwd(), "./logs");
 let browser: Browser | null = null;
-if (!fs.existsSync(snapshotDir)) {
-  fs.mkdirSync(snapshotDir, { recursive: true });
-}
+
 let page: Page | null = null;
 
 export async function createGroupAndReceiveGm(addresses: string[]) {
@@ -56,7 +53,7 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
   } catch (error) {
     console.error("Could not find 'gm' message:", error);
     // Take a screenshot to see what's visible
-    if (page) await takeSnapshot(page, "before-finding-gm", addresses);
+    if (page) await takeSnapshot(page, "before-finding-gm");
   } finally {
     // Close the browser
     if (browser) await browser.close();
@@ -91,7 +88,7 @@ export async function createDmWithDeeplink(address: string) {
   } catch (error) {
     console.error("Could not find 'gm' message:", error);
     // Take a screenshot to see what's visible
-    if (page) await takeSnapshot(page, "before-finding-gm", addresses);
+    if (page) await takeSnapshot(page, "before-finding-gm");
   } finally {
     // Close the browser
     if (browser) await browser.close();
@@ -99,14 +96,16 @@ export async function createDmWithDeeplink(address: string) {
 }
 
 // Helper function to take snapshots
-async function takeSnapshot(page: Page, name: string, addresses: string[]) {
-  if (addresses.length > 1) {
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
-    await page.screenshot({ path: screenshotPath, fullPage: true });
-
-    console.log(`Snapshot saved: ${name} (${screenshotPath})`);
+async function takeSnapshot(page: Page, name: string) {
+  const snapshotDir = path.join(process.cwd(), "./logs");
+  if (!fs.existsSync(snapshotDir)) {
+    fs.mkdirSync(snapshotDir, { recursive: true });
   }
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+
+  console.log(`Snapshot saved: ${name} (${screenshotPath})`);
 }
 async function startPage(defaultUser: boolean) {
   const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
