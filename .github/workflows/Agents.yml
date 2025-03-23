@@ -2,8 +2,7 @@ name: Check xmtp-agent-examples
 
 on:
   schedule:
-    # Runs every 30 minutes
-    - cron: "*/30 * * * *"
+    - cron: "0 * * * *"
   workflow_dispatch: # Keeps manual triggering option
 
 jobs:
