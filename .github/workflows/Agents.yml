@@ -1,1 +1,44 @@
-// sd
+name: Run XMTP Agent
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allows manual triggering from GitHub Actions tab
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Clone XMTP agent examples
+        run: |
+          git clone https://github.com/ephemeraHQ/xmtp-agent-examples.git
+          cd xmtp-agent-examples
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+
+      - name: Create .env file with secrets
+        run: |
+          cd xmtp-agent-examples
+          echo "XMTP_ENV=${{ secrets.XMTP_ENV }}" > .env
+          echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+
+      - name: Install dependencies
+        run: |
+          cd xmtp-agent-examples
+          yarn install
+
+      - name: Run agent
+        run: |
+          cd xmtp-agent-examples
+          yarn dev
