@@ -1,4 +1,4 @@
-name: Check xmtp-agent-examples
+name: Check agent-examples
 on:
   schedule:
     - cron: "0 * * * *"
@@ -40,7 +40,7 @@ jobs:
       - name: Run agent
         run: |
           cd xmtp-agent-examples
-          timeout 60s yarn dev | tee output.log
+          timeout 20s yarn dev | tee output.log
           if grep -q "Waiting for messages..." output.log; then
             echo "Success: Agent started successfully and is waiting for messages"
             exit 0
