@@ -211,7 +211,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
 
-## Tools & Utilities
+## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
 - **Test bot:** Bot for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/test/)
@@ -241,5 +241,3 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
-
-s
