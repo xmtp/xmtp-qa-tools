@@ -163,6 +163,7 @@ _Note: Performance metrics based on `us-east` testing on `production` network._
 | south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Baseline is `us-east` region and `production` network._
+s
 
 ### Dev vs Production Network Performance Comparison
 
