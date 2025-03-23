@@ -166,8 +166,6 @@ _Note: Baseline is `us-east` region and `production` network._
 
 ### Dev vs Production Network Performance Comparison
 
-s
-
 | Region        | Dev (ms) | Production (ms) | Difference | Status               |
 | ------------- | -------- | --------------- | ---------- | -------------------- |
 | us-east       | 294.8    | 276.6           | -6.2%      | ✅ Production Better |
