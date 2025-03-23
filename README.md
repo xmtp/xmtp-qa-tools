@@ -9,7 +9,7 @@
 
 ## Testing scope
 
-s
+ss
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
