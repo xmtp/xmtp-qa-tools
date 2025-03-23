@@ -2,7 +2,7 @@ name: Check xmtp-agent-examples
 on:
   schedule:
     - cron: "0 * * * *"
-  workflow_dispatch: # Keeps manual triggering option
+  workflow_dispatch:
 
 jobs:
   run-agent:
