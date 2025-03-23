@@ -9,7 +9,7 @@ jobs:
   run-agent:
     runs-on: ubuntu-latest
 
-    steps:
+    steps: # sd
       - name: Checkout repository
         uses: actions/checkout@v3
 
