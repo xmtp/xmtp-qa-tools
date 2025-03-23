@@ -7,7 +7,6 @@
 | 👋 Gm          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                   | Every 30 min  |
 | 🌎 Geolocation | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml) | Every 30 min  |
 
-
 ## Testing scope
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
@@ -164,6 +163,7 @@ _Note: Performance metrics based on `us-east` testing on `production` network._
 | south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Baseline is `us-east` region and `production` network._
+s
 
 ### Dev vs Production Network Performance Comparison
 
