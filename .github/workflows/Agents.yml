@@ -1,9 +1,8 @@
-name: Run XMTP Agent
-
+name: Check xmtp-agent-examples
 on:
-  push:
-    branches: [main]
-  workflow_dispatch: # Allows manual triggering from GitHub Actions tab
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 jobs:
   run-agent:
@@ -29,7 +28,7 @@ jobs:
       - name: Create .env file with secrets
         run: |
           cd xmtp-agent-examples
-          echo "XMTP_ENV=${{ secrets.XMTP_ENV }}" > .env
+          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" > .env
           echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
 
@@ -41,4 +40,11 @@ jobs:
       - name: Run agent
         run: |
           cd xmtp-agent-examples
-          yarn dev
+          timeout 60s yarn dev | tee output.log
+          if grep -q "Waiting for messages..." output.log; then
+            echo "Success: Agent started successfully and is waiting for messages"
+            exit 0
+          else
+            echo "Error: Agent did not reach 'Waiting for messages...' state"
+            exit 1
+          fi
