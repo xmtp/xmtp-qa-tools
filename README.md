@@ -175,9 +175,6 @@ _Note: Baseline is `us-east` region and `production` network._
 | south-america | 798.2    | 754.6           | -5.5%      | ✅ Production Better |
 
 1
-
-s
-s
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
 ## Message reliability
