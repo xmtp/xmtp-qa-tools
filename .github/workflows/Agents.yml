@@ -1,5 +1,5 @@
 name: Check xmtp-agent-examples
-
+# Runs every hour
 on:
   schedule:
     - cron: "0 * * * *"
