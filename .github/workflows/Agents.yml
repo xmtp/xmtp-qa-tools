@@ -1,4 +1,4 @@
-name: Run XMTP Agent
+name: Check xmtp-agent-examples
 
 on:
   schedule:

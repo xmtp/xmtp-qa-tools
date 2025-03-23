@@ -1,4 +1,4 @@
-name: Auto-Deploy to Railway on Version Bump
+name: Railway Deploy
 
 on:
   push:
