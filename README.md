@@ -211,8 +211,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
 - **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
 
-s
-
 ## Tools & Utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
