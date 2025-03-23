@@ -42,4 +42,11 @@ jobs:
       - name: Run agent
         run: |
           cd xmtp-agent-examples
-          yarn dev
+          timeout 60s yarn dev | tee output.log
+          if grep -q "Waiting for messages..." output.log; then
+            echo "Success: Agent started successfully and is waiting for messages"
+            exit 0
+          else
+            echo "Error: Agent did not reach 'Waiting for messages...' state"
+            exit 1
+          fi
