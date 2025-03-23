@@ -164,8 +164,6 @@ _Note: Performance metrics based on `us-east` testing on `production` network._
 
 _Note: Baseline is `us-east` region and `production` network._
 
-s
-
 ### Dev vs Production Network Performance Comparison
 
 | Region        | Dev (ms) | Production (ms) | Difference | Status               |
