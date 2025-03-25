@@ -10,7 +10,7 @@ describe(testName, () => {
   let workers: WorkerManager;
   let client: Client;
   let webInboxId =
-    "7291f1082bc8da64d0c78495408634f3cbd62e6b32da2b5d31d5e75c03f4e1b2";
+    "a0bfeb48af4320f0d213fc23e2ed36aa137f85a0272f492a115ccebcf8850264";
   afterAll(async () => {
     await closeEnv(testName, workers);
   });

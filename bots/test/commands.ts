@@ -1,4 +1,3 @@
-import { getAddressOfMember } from "@helpers/client";
 import {
   Group,
   IdentifierKind,
