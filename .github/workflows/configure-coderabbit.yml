@@ -1,0 +1,59 @@
+name: Configure Coderabbit
+
+on:
+  workflow_dispatch: # Manual trigger
+  schedule:
+    - cron: "0 0 * * *" # Runs daily at midnight UTC
+
+jobs:
+  configure-coderabbit:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Create or Update Coderabbit Config
+        run: |
+          echo '{
+            "enabled": true,
+            "ignore": ["**/*.md", "**/*.txt", "**/*.json", "**/*.yml", "**/*.yaml", "docs/**", ".github/**"],
+            "reviews": {
+              "requested_reviewers": false,
+              "high_level_summary": false,
+              "release_notes": false,
+              "code_suggestions": false,
+              "auto_review": false,
+              "auto_approve": false,
+              "collapse_walkthrough": true,
+              "description_matters": true,
+              "enforce_pr_description": true,
+              "pr_description_template": "## Changes\n\n[Describe your changes here]\n\n## Testing\n\n[Describe how you tested these changes]\n\n## Impact\n\n[Describe the impact of these changes]"
+            },
+            "rules": {
+              "critical": {
+                "severity": "error",
+                "patterns": [
+                  "crypto\\.randomBytes\\(",
+                  "Math\\.random\\(\\)",
+                  "new Date\\(\\)\\.getTime\\(\\)",
+                  "process\\.env\\.",
+                  "console\\.log\\(",
+                  "debugger;",
+                  "TODO:",
+                  "FIXME:"
+                ]
+              }
+            }
+          }' > .github/coderabbit.json
+
+      - name: Commit and Push Changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add .github/coderabbit.json
+          git commit -m "ci: configure coderabbit for minimal intervention" || echo "No changes to commit"
+          git push
