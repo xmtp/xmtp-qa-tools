@@ -242,3 +242,4 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
+  .
