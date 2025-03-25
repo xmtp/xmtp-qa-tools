@@ -134,18 +134,6 @@ export function loadEnv(testName: string) {
     process.env.DATADOG_API_KEY ?? "",
   );
 }
-export function getAddressOfMember(members: GroupMember[], inboxId: string) {
-  for (const member of members) {
-    for (const identifier of member.accountIdentifiers) {
-      if (
-        identifier.identifierKind === IdentifierKind.Ethereum &&
-        member.inboxId === inboxId
-      ) {
-        return identifier.identifier;
-      }
-    }
-  }
-}
 
 export async function closeEnv(testName: string, workers: WorkerManager) {
   flushLogger(testName);
