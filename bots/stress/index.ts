@@ -72,19 +72,12 @@ async function runStressTest(
 ) {
   const startTime = Date.now();
   isStressTestRunning = true;
-  console.log(
-    `Starting stress test with ${config.workerCount} workers, ${config.messageCount} messages each`,
-  );
+  let workers: WorkerManager | undefined;
 
   try {
     await conversation.send("🚀 Initializing workers...");
 
-    const workers = await getWorkers(
-      config.workerCount,
-      testName,
-      "message",
-      true,
-    );
+    workers = await getWorkers(config.workerCount, testName, "message", true);
     console.log(
       `Successfully initialized ${workers.getWorkers().length} workers`,
     );
@@ -182,6 +175,19 @@ async function runStressTest(
     );
     console.error("Stress test error:", errorMessage);
   } finally {
+    // Terminate all workers
+    try {
+      if (workers) {
+        await conversation.send("🧹 Cleaning up - terminating workers...");
+        await workers.terminateAll();
+        await conversation.send("✨ All workers terminated successfully");
+      }
+    } catch (cleanupError) {
+      console.error("Error terminating workers:", cleanupError);
+      await conversation.send(
+        "⚠️ Warning: Some workers may not have terminated properly",
+      );
+    }
     isStressTestRunning = false;
   }
 }

@@ -9,6 +9,7 @@ import {
 import {
   Client,
   defaultValues,
+  Dm,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -284,8 +285,8 @@ export class WorkerClient extends Worker {
           }
 
           // Check for GPT response triggers
-          if (this.shouldGenerateGptResponse(message)) {
-            await this.handleGptResponse(message);
+          if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
+            await this.handleGptResponse(message as DecodedMessage);
             continue;
           }
 
@@ -315,30 +316,33 @@ export class WorkerClient extends Worker {
   /**
    * Check if a message should trigger a GPT response
    */
-  private shouldGenerateGptResponse(message: any): boolean {
+  private shouldGenerateGptResponse(message: DecodedMessage): boolean {
     if (!this.gptEnabled) return false;
-
+    const conversation = this.client.conversations.getConversationById(
+      message.conversationId,
+    );
     // Get the base name without installation ID
     const baseName = this.name.split("-")[0].toLowerCase();
-
-    return (message?.contentType?.typeId === "text" &&
+    const isDm = conversation instanceof Dm;
+    return ((message?.contentType?.typeId === "text" &&
       message.content.includes(baseName) &&
       !message.content.includes("/") &&
       !message.content.includes("workers") &&
       !message.content.includes("members") &&
-      !message.content.includes("admins")) as boolean;
+      !message.content.includes("admins")) ||
+      isDm) as boolean;
   }
 
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleGptResponse(message: any) {
+  private async handleGptResponse(message: DecodedMessage) {
     console.time(`[${this.nameId}] GPT Agent: Response`);
 
     try {
       // Get the conversation from the message
       const conversation = await this.client.conversations.getConversationById(
-        message.conversationId as string,
+        message.conversationId,
       );
 
       const messages = await conversation?.messages();
