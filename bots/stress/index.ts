@@ -10,23 +10,9 @@ import { getWorkers } from "@workers/manager";
 
 const testName = "stress-bot";
 loadEnv(testName);
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
 
 async function main() {
   try {
-    // First create the bot worker
-
-    // Then create the dynamic workers
-    console.log("Initializing worker workers...");
-    const workers = await getWorkers(20, testName, "message", true);
     const botWorker = await getWorkers(["bot"], testName, "none", false);
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
@@ -35,166 +21,200 @@ async function main() {
     console.log(`Agent initialized on address ${bot?.address}`);
     console.log(`Agent initialized on inbox ${client.inboxId}`);
     console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
-    console.log("Syncing conversations...");
+
     await client.conversations.sync();
-
-    //await sendInitialTestMessage(client);
     console.log("Waiting for messages...");
-    try {
-      const stream = client.conversations.streamAllMessages();
-      for await (const message of await stream) {
-        try {
-          /* Ignore messages from the same agent or non-text messages */
-          if (
-            message?.senderInboxId.toLowerCase() ===
-              client.inboxId.toLowerCase() ||
-            message?.contentType?.typeId !== "text"
-          ) {
-            continue;
-          }
 
-          const conversation = await client.conversations.getConversationById(
-            message.conversationId,
-          );
-
-          if (!conversation) {
-            console.log("Unable to find conversation, skipping");
-            continue;
-          }
-          console.log(
-            `Received message: ${message.content as string} by ${message.senderInboxId}`,
-          );
-
-          // Parse the message content to extract command and arguments
-          await processCommand(message, conversation, client, workers);
-
-          console.log("Waiting for messages...");
-        } catch (error) {
-          console.error("Error processing message:", error);
-          // Continue the loop despite errors
+    const stream = client.conversations.streamAllMessages();
+    for await (const message of await stream) {
+      try {
+        if (
+          message?.senderInboxId.toLowerCase() ===
+            client.inboxId.toLowerCase() ||
+          message?.contentType?.typeId !== "text"
+        ) {
+          continue;
         }
+
+        const conversation = await client.conversations.getConversationById(
+          message.conversationId,
+        );
+
+        if (!conversation) {
+          console.log("Unable to find conversation, skipping");
+          continue;
+        }
+
+        const messageContent = message.content as string;
+        if (messageContent.toLowerCase().startsWith("/stress")) {
+          await handleStressTest(message, conversation, client);
+        }
+      } catch (error) {
+        console.error("Error processing message:", error);
       }
-    } catch (error) {
-      console.error("Error streaming messages:", error);
-      // Add more detailed error logging
-      console.error("Error details:", JSON.stringify(error, null, 2));
     }
   } catch (error) {
     console.error("Error during initialization:", error);
-    console.error("Error details:", JSON.stringify(error, null, 2));
     process.exit(1);
   }
 }
 
-async function sendInitialTestMessage(client: Client) {
-  // Send dm to the bot
-  const cbUser = process.env.CB_USER;
-  if (!cbUser) {
-    throw new Error("CB_USER is not set");
-  }
-  const dm = await client.conversations.newDm(cbUser);
-  await dm.send("gm from bot");
-  console.log("DM sent:", dm.id);
-}
-
-// Helper function to process incoming commands
-async function processCommand(
+async function handleStressTest(
   message: DecodedMessage,
   conversation: Conversation,
   client: Client,
-  workers: WorkerManager,
 ) {
   try {
-    const messageContent = message.content as string;
-    const trimmedContent = messageContent.trim();
+    const args = (message.content as string).split(" ");
+    let messageCount = 10; // Default value
+    let workers: WorkerManager | null = null;
 
-    // Extract command name and arguments
-    const parts = trimmedContent.substring(1).split(" ");
-    const command = parts[0].toLowerCase();
-    const args = parts.slice(1);
-
-    // Execute the appropriate command handler
-    switch (command) {
-      case "blast":
-        await blast(message, client, args, workers);
-        break;
-      default:
+    // Add reset command
+    if (args[1]?.toLowerCase() === "reset") {
+      await conversation.send("🔄 Resetting stress test workers...");
+      try {
+        // Terminate all workers if they exist
+        if (workers) {
+          await workers.terminateAll();
+        }
         await conversation.send(
-          `Unknown command: /${command}\nType /help to see available commands.`,
+          "✅ All workers terminated successfully.\n" +
+            "Type /stress to start a new test.",
         );
-        break;
+        return;
+      } catch (error) {
+        await conversation.send(
+          "❌ Error terminating workers: " +
+            (error instanceof Error ? error.message : String(error)),
+        );
+        return;
+      }
     }
-  } catch (error: any) {
-    console.error("Error executing command:", error);
-    try {
+
+    // If no arguments provided, show help including reset command
+    if (args.length === 1) {
       await conversation.send(
-        `Error executing command: ${error.message || "Unknown error"}`,
+        "🤖 Welcome to the XMTP Stress Test!\n\n" +
+          "Available commands:\n" +
+          "- /stress <number> - Start test with specified number of workers\n" +
+          "- /stress reset - Terminate all workers and start over\n\n" +
+          "Please specify how many workers you'd like to use (1-100).\n" +
+          "Reply with a number to continue.",
       );
-    } catch (sendError) {
-      console.error("Failed to send error message:", sendError);
-    }
-  }
-}
-
-async function blast(
-  message: DecodedMessage,
-  client: Client,
-  args: string[] = [],
-  workers: WorkerManager,
-) {
-  try {
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-    // Extract the message and optional count parameters
-    // Format: /blast <message> <count> <repeat>
-    // Example: /blast jaja 5 5 - sends "jaja" to 5 workers, 5 times each
-
-    // Get the message from all arguments
-    let blastMessage = args.join(" ").trim();
-
-    // Default values
-    let countOfWorkers = 5; // Number of workers to message
-    let repeatCount = 1; // Number of times to send the message
-
-    // Check if the last two arguments are numbers
-    const lastArg = args[args.length - 1];
-    const secondLastArg = args[args.length - 2];
-
-    if (
-      lastArg &&
-      !isNaN(parseInt(lastArg)) &&
-      secondLastArg &&
-      !isNaN(parseInt(secondLastArg))
-    ) {
-      repeatCount = parseInt(lastArg);
-      countOfWorkers = parseInt(secondLastArg);
-      // Remove the numbers from the message
-      const messageWords = blastMessage.split(" ");
-      blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
+      return;
     }
 
-    await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
-    for (let i = 0; i < repeatCount; i++) {
-      for (const worker of workers.getWorkers().slice(0, countOfWorkers)) {
-        const workerGroup = await worker.client?.conversations.newDm(
+    // If first argument is a number, it's the worker count
+    if (!isNaN(parseInt(args[1]))) {
+      const requestedWorkers = parseInt(args[1]);
+
+      // Validate worker count
+      if (requestedWorkers < 1 || requestedWorkers > 100) {
+        await conversation.send(
+          "⚠️ Please specify a valid number of workers between 1 and 100.",
+        );
+        return;
+      }
+
+      // Ask for message count
+      if (args.length === 2) {
+        await conversation.send(
+          `👥 You've requested ${requestedWorkers} workers.\n\n` +
+            "How many messages should each worker send?\n" +
+            "Reply with: /stress " +
+            String(requestedWorkers) +
+            " <number_of_messages> (default is 10)",
+        );
+        return;
+      }
+
+      const messageCount = parseInt(args[2]);
+      if (isNaN(messageCount) || messageCount < 1) {
+        await conversation.send(
+          "⚠️ Please specify a valid number of messages per worker.",
+        );
+        return;
+      }
+
+      // Show confirmation with details
+      const totalMessages = requestedWorkers * messageCount * 2; // *2 for DM and group
+      await conversation.send(
+        "📋 Stress Test Configuration:\n\n" +
+          `- Number of workers: ${requestedWorkers}\n` +
+          `- Messages per worker: ${messageCount}\n` +
+          `- Total messages to be sent: ${totalMessages}\n` +
+          `  (${messageCount} DMs + ${messageCount} group messages) × ${requestedWorkers} workers\n\n` +
+          "⚠️ This will create a new group and send multiple messages.\n\n" +
+          "Reply with '/stress confirm' to start the test.",
+      );
+      return;
+    }
+
+    // Handle confirmation
+    if (args[1].toLowerCase() === "confirm") {
+      // Initialize workers only when confirming the test
+      const requestedWorkers = parseInt(args[0].split(" ")[1]);
+      workers = await getWorkers(requestedWorkers, testName, "message", true);
+
+      const workerInboxIds = workers
+        .getWorkers()
+        .map((w) => w.client?.inboxId)
+        .filter(Boolean);
+
+      await conversation.send("🚀 Initializing stress test...");
+
+      // Create group with all participants
+      const memberInboxIds = [
+        ...workerInboxIds,
+        message.senderInboxId,
+        client.inboxId,
+      ];
+
+      const group = await client.conversations.newGroup(memberInboxIds, {
+        groupName: `Stress Test Group ${Date.now()}`,
+        groupDescription: "Group for stress testing",
+      });
+
+      await conversation.send(
+        "📊 Progress:\n1. ✅ Created test group\n2. ⏳ Starting message tests...",
+      );
+
+      // Send DM messages
+      for (const worker of workers.getWorkers()) {
+        const dm = await worker.client?.conversations.newDm(
           message.senderInboxId,
         );
-        await workerGroup?.send(`${worker.name}:\n${blastMessage} ${i}`);
+        const groupFromWorker =
+          await worker.client?.conversations.getConversationById(group.id);
+        for (let i = 0; i < messageCount; i++) {
+          await dm?.send(
+            `DM Stress Test from ${worker.name} - Message ${i + 1}/${messageCount}`,
+          );
+          await groupFromWorker?.send(
+            `Group Stress Test from ${worker.name} - Message ${i + 1}/${messageCount}`,
+          );
+        }
       }
-      await conversation?.send(`🔊 Round ${i + 1} of ${repeatCount} done`);
+
+      const totalMessages = workers.getWorkers().length * messageCount * 2;
+      await conversation.send(
+        `✅ Stress test completed!\n` +
+          `Total messages sent: ${totalMessages}\n` +
+          `- ${messageCount} DM messages from each worker\n` +
+          `- ${messageCount} group messages from each worker\n` +
+          `Total workers: ${workers.getWorkers().length}`,
+      );
     }
-    await conversation?.send(
-      `🔊 You received ${countOfWorkers * repeatCount} messages`,
-    );
   } catch (error) {
-    console.error("Error blasting:", error);
+    console.error("Error in stress test:", error);
+    await conversation.send(
+      `❌ Error during stress test: ${error instanceof Error ? error.message : String(error)}\n` +
+        "You can type '/stress reset' to terminate all workers and start over.",
+    );
   }
 }
 
-// Run the bot
 main().catch((error: unknown) => {
   console.error("Fatal error in main function:", error);
-  console.error("Error details:", JSON.stringify(error, null, 2));
-  process.exit(1); // Explicitly exit with error code
+  process.exit(1);
 });

@@ -19,24 +19,10 @@ yarn bot:stress
 
 ## 💬 Available Commands
 
-| Command                | Description                                                  |
-| ---------------------- | ------------------------------------------------------------ |
-| `gm`                   | Returns gm to your message                                   |
-| `/create [5]`          | Creates a test group with simulated users and conversation   |
-| `/rename [name]`       | Rename the current group                                     |
-| `/add [name]`          | Add the name of a worker to the group                        |
-| `/remove [name]`       | Remove the name of a worker from the group                   |
-| `/groups`              | List all active groups                                       |
-| `/members`             | List all members in the current group                        |
-| `/broadcast [message]` | Broadcast a message to all participants in the current group |
-| `/leave`               | Leave the current group                                      |
-| `/info`                | Get info about the current group                             |
-| `/workers`             | List all available workers                                   |
-| `/blast [message]`     | Blast a message to all participants in the current group     |
-| `/me`                  | Get info about the current worker                            |
-| `/address`             | Get the address of the current group                         |
-| `/block [name]`        | Block the name of a worker                                   |
-| `/unblock [name]`      | Unblock the name of a worker                                 |
+| Command            | Description                                              |
+| ------------------ | -------------------------------------------------------- |
+| `/stress [number]` | Start a stress test with the specified number of workers |
+| `/stress reset`    | Terminate all workers and start over                     |
 
 ## ⚙️ Environment Configuration
 
@@ -54,6 +40,35 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 - If worker exists uses the existing env file keys and .data folder
 - If the data folder doesnt exist, it creates one
 - Workers prefixed with "random" have keys that are stored only in memory.
+
+## Test Environment
+
+- Device: [iPhone 16 Pro Max]
+- Network: [Wifi]
+- XMTP Environment: [dev]
+- App Version: [1.0.0]
+
+## Stress Test Verification Matrix
+
+| Test Scenario | Workers | App Launch | Message Loading | UI Performance | Stream Status | Message Sending | Status | Notes |
+| ------------- | ------- | ---------- | --------------- | -------------- | ------------- | --------------- | ------ | ----- |
+| Light Load    | 5       | < 2s       | Instant         | No Lag         | Connected     | Instant         | ⬜     |       |
+| Medium Load   | 10      | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ⬜     |       |
+| Heavy Load    | 20      | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ⬜     |       |
+| Extreme Load  | 50      | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ⬜     |       |
+
+## Legend
+
+- ⬜ Not Tested
+- ✅ Passed
+- ❌ Failed
+- ⚠️ Partial Pass
+
+## Test Execution Log
+
+| Date | Tester | Environment | Notes |
+| ---- | ------ | ----------- | ----- |
+|      |        |             |       |
 
 ### Resources
 

@@ -52,7 +52,14 @@ export class WorkerManager {
     this.gptEnabled = gptEnabled;
     this.workers = existingWorkers || {};
   }
-
+  async terminateAll() {
+    await Promise.all(
+      this.activeWorkers.map(async (worker) => {
+        await worker?.terminate();
+      }),
+    );
+    this.activeWorkers = [];
+  }
   /**
    * Gets the total number of workers
    */

@@ -1,6 +1,0 @@
----
-description: Datadog dashoard format
-globs: 
-alwaysApply: false
----
-[datadog.ts](mdc:helpers/datadog.ts)
