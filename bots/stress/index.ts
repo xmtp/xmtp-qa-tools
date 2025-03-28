@@ -1,7 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { checkGroupInWebClient } from "@helpers/playwright";
 import {
-  IdentifierKind,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -9,9 +7,8 @@ import {
   type XmtpEnv,
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import { CommandHandler } from "./commands";
 
-const testName = "test-bot";
+const testName = "stress-bot";
 loadEnv(testName);
 process.on("uncaughtException", (error) => {
   console.error("Uncaught exception:", error);
@@ -25,7 +22,6 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   try {
-    const commandHandler = new CommandHandler();
     // First create the bot worker
 
     // Then create the dynamic workers
@@ -70,13 +66,7 @@ async function main() {
           );
 
           // Parse the message content to extract command and arguments
-          await processCommand(
-            message,
-            conversation,
-            client,
-            commandHandler,
-            workers,
-          );
+          await processCommand(message, conversation, client, workers);
 
           console.log("Waiting for messages...");
         } catch (error) {
@@ -112,21 +102,11 @@ async function processCommand(
   message: DecodedMessage,
   conversation: Conversation,
   client: Client,
-  commandHandler: CommandHandler,
   workers: WorkerManager,
 ) {
   try {
     const messageContent = message.content as string;
     const trimmedContent = messageContent.trim();
-
-    if (trimmedContent.toLowerCase() === "gm") {
-      await commandHandler.gm(message, client);
-      return;
-    }
-    // Check if the message is a command (starts with '/')
-    if (!trimmedContent.startsWith("/")) {
-      return; // Not a command, ignore
-    }
 
     // Extract command name and arguments
     const parts = trimmedContent.substring(1).split(" ");
@@ -135,66 +115,9 @@ async function processCommand(
 
     // Execute the appropriate command handler
     switch (command) {
-      case "help":
-        await commandHandler.help(message, client);
-        break;
-      case "create":
-        await commandHandler.create(message, client, args, workers);
-        break;
-      case "block":
-        await commandHandler.block(message, client, args);
-        break;
-      case "unblock":
-        await commandHandler.unblock(message, client, args);
-        break;
-      case "rename":
-        await commandHandler.rename(message, client, args);
-        break;
-      case "me":
-        await commandHandler.me(message, client);
-        break;
-      case "members":
-        await commandHandler.members(message, client, workers);
-        break;
-      case "admins":
-        await commandHandler.admins(message, client, workers);
-        break;
       case "blast":
-        await commandHandler.blast(message, client, args, workers);
+        await blast(message, client, args, workers);
         break;
-      case "groups":
-        await commandHandler.groups(message, client);
-        break;
-      case "broadcast":
-        await commandHandler.broadcast(client, args);
-        break;
-      case "info":
-        await commandHandler.info(message, client);
-        break;
-      case "workers":
-        await commandHandler.workers(message, client, workers);
-        break;
-      case "leave":
-        await commandHandler.leave(message, client);
-        break;
-      case "add":
-        await commandHandler.add(message, client, args, workers);
-        break;
-      case "remove":
-        await commandHandler.remove(message, client, args, workers);
-        break;
-      case "verify": {
-        // Launch browser and verify group exists in web client
-        const result = await checkGroupInWebClient(message, client);
-        if (result.success) {
-          await conversation.send("Group verified successfully in web client!");
-        } else {
-          await conversation.send(
-            `Group verification failed: ${result.error || "Unknown error"}`,
-          );
-        }
-        break;
-      }
       default:
         await conversation.send(
           `Unknown command: /${command}\nType /help to see available commands.`,
@@ -210,6 +133,62 @@ async function processCommand(
     } catch (sendError) {
       console.error("Failed to send error message:", sendError);
     }
+  }
+}
+
+async function blast(
+  message: DecodedMessage,
+  client: Client,
+  args: string[] = [],
+  workers: WorkerManager,
+) {
+  try {
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+    // Extract the message and optional count parameters
+    // Format: /blast <message> <count> <repeat>
+    // Example: /blast jaja 5 5 - sends "jaja" to 5 workers, 5 times each
+
+    // Get the message from all arguments
+    let blastMessage = args.join(" ").trim();
+
+    // Default values
+    let countOfWorkers = 5; // Number of workers to message
+    let repeatCount = 1; // Number of times to send the message
+
+    // Check if the last two arguments are numbers
+    const lastArg = args[args.length - 1];
+    const secondLastArg = args[args.length - 2];
+
+    if (
+      lastArg &&
+      !isNaN(parseInt(lastArg)) &&
+      secondLastArg &&
+      !isNaN(parseInt(secondLastArg))
+    ) {
+      repeatCount = parseInt(lastArg);
+      countOfWorkers = parseInt(secondLastArg);
+      // Remove the numbers from the message
+      const messageWords = blastMessage.split(" ");
+      blastMessage = messageWords.slice(0, messageWords.length - 2).join(" ");
+    }
+
+    await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
+    for (let i = 0; i < repeatCount; i++) {
+      for (const worker of workers.getWorkers().slice(0, countOfWorkers)) {
+        const workerGroup = await worker.client?.conversations.newDm(
+          message.senderInboxId,
+        );
+        await workerGroup?.send(`${worker.name}:\n${blastMessage} ${i}`);
+      }
+      await conversation?.send(`🔊 Round ${i + 1} of ${repeatCount} done`);
+    }
+    await conversation?.send(
+      `🔊 You received ${countOfWorkers * repeatCount} messages`,
+    );
+  } catch (error) {
+    console.error("Error blasting:", error);
   }
 }
 

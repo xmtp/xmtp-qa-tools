@@ -3,6 +3,7 @@ import {
   IdentifierKind,
   type Client,
   type DecodedMessage,
+  type GroupMember,
   type Worker,
   type WorkerManager,
 } from "@helpers/types";
@@ -376,9 +377,7 @@ export class CommandHandler {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === member.inboxId);
-        return (
-          worker?.name || (member.inboxId == client.inboxId ? "Bot" : "You")
-        );
+        return worker?.name || this.processOthers(member.inboxId);
       });
 
       await conversation?.send(
@@ -406,12 +405,13 @@ export class CommandHandler {
       await conversation.sync();
       const admins = await conversation.admins;
       const superAdmins = await conversation.superAdmins;
+
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === admin);
-        return worker?.name || (admin == client.inboxId ? "Bot" : "You");
+        return worker?.name || this.processOthers(admin);
       });
 
       await conversation.send(
@@ -422,6 +422,13 @@ export class CommandHandler {
     }
   }
 
+  processOthers(admin: string) {
+    return admin == process.env.CONVOS_USER
+      ? "Convos Wallet"
+      : admin == process.env.CB_USER
+        ? "CB Wallet"
+        : "You";
+  }
   // List all active groups
   async groups(message: DecodedMessage, client: Client) {
     try {
@@ -492,10 +499,13 @@ export class CommandHandler {
           const workerGroup = await worker.client?.conversations.newDm(
             message.senderInboxId,
           );
-          await conversation?.send(` ${worker.name} just sent you a message`);
-          await workerGroup?.send(`${worker.name}:\n${blastMessage}`);
+          await workerGroup?.send(`${worker.name}:\n${blastMessage} ${i}`);
         }
+        await conversation?.send(`🔊 Round ${i + 1} of ${repeatCount} done`);
       }
+      await conversation?.send(
+        `🔊 You received ${countOfWorkers * repeatCount} messages`,
+      );
     } catch (error) {
       console.error("Error blasting:", error);
     }
@@ -545,5 +555,77 @@ export class CommandHandler {
     } catch (error) {
       console.error("Error getting group info:", error);
     }
+  }
+
+  async stress(
+    message: DecodedMessage,
+    client: Client,
+    args: string[] = [],
+    workers: WorkerManager,
+  ) {
+    try {
+      const conversation = await client.conversations.getConversationById(
+        message.conversationId,
+      );
+
+      if (!(conversation instanceof Group)) {
+        await conversation?.send("This command only works in groups");
+        return;
+      }
+
+      // Parse arguments
+      const messageCount = args.length > 0 ? parseInt(args[0]) : 10;
+      const members = await conversation.members();
+      const workers = this.getWorkersFromMembers(members);
+
+      // Validate inputs
+      if (isNaN(messageCount) || messageCount <= 0) {
+        await conversation.send("Please provide a valid number of messages");
+        return;
+      }
+
+      await conversation.send(
+        `🏋️ Starting stress test:\n- Messages per worker: ${messageCount}\n- Workers participating: ${workers.length}\n- Total messages: ${messageCount * workers.length}`,
+      );
+
+      // Track start time
+      const startTime = Date.now();
+
+      for (const worker of workers) {
+        console.log("sending from " + worker.name);
+        const foundGroup =
+          await worker.client?.conversations.getConversationById(
+            message.conversationId,
+          );
+        for (let i = 0; i < messageCount; i++) {
+          await foundGroup?.send(
+            `${worker.name}:\nStress test message ${i + 1}/${messageCount}`,
+          );
+        }
+      }
+
+      // Calculate duration and stats
+      const duration = (Date.now() - startTime) / 1000;
+      const totalMessages = messageCount * workers.length;
+      const messagesPerSecond = (totalMessages / duration).toFixed(2);
+
+      await conversation.send(
+        `✅ Stress test completed:\n- Duration: ${duration.toFixed(2)}s\n- Total messages: ${totalMessages}\n- Rate: ${messagesPerSecond} msgs/sec`,
+      );
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error in stress test:", errorMessage);
+    }
+  }
+  getWorkersFromMembers(members: GroupMember[]) {
+    const workers: Worker[] = [];
+    for (const member of members) {
+      const worker = workers.find((w) => w.client?.inboxId === member.inboxId);
+      if (worker) {
+        workers.push(worker);
+      }
+    }
+    return workers;
   }
 }
