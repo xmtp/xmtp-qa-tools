@@ -66,7 +66,7 @@ async function handleStressTest(
 ) {
   try {
     const args = (message.content as string).split(" ");
-    let messageCount = 10; // Default value
+    let messageCount = 10; // Changed from const to let since we'll reassign it
     let workers: WorkerManager | null = null;
 
     // Add reset command
@@ -128,7 +128,7 @@ async function handleStressTest(
         return;
       }
 
-      const messageCount = parseInt(args[2]);
+      messageCount = parseInt(args[2]);
       if (isNaN(messageCount) || messageCount < 1) {
         await conversation.send(
           "⚠️ Please specify a valid number of messages per worker.",
@@ -151,9 +151,20 @@ async function handleStressTest(
     }
 
     // Handle confirmation
-    if (args[1].toLowerCase() === "confirm") {
+    if (args[2] && args[2].toLowerCase() === "confirm") {
       // Initialize workers only when confirming the test
-      const requestedWorkers = parseInt(args[0].split(" ")[1]);
+      const requestedWorkers = parseInt(args[1]);
+      if (
+        isNaN(requestedWorkers) ||
+        requestedWorkers < 1 ||
+        requestedWorkers > 100
+      ) {
+        await conversation.send(
+          "⚠️ Invalid worker count. Please start over with /stress <number>",
+        );
+        return;
+      }
+
       workers = await getWorkers(requestedWorkers, testName, "message", true);
 
       const workerInboxIds = workers
