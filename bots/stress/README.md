@@ -1,18 +1,19 @@
-# 🤖 Stress bot
+# 🤖 XMTP Stress Bot
 
 A lightweight toolkit for app developers to test messaging functionality against XMTP bots.
 
-### Prerequisites
+## 📋 Prerequisites
 
 - Node.js (20.18.0)
 - Yarn
 
-### Installation
+## 🔧 Installation
 
 ```bash
 git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
+
 # Run the bot
 yarn bot:stress
 ```
@@ -29,50 +30,52 @@ yarn bot:stress
 Create a `.env` file with the following configuration:
 
 ```bash
-LOGGING_LEVEL="off" # off, error, warn, info, debug, trace
-XMTP_ENV="dev" # dev, production
-OPENAI_API_KEY="sk-proj-..." # OpenAI API key
+LOGGING_LEVEL="off"      # Options: off, error, warn, info, debug, trace
+XMTP_ENV="dev"           # Options: dev, production
+OPENAI_API_KEY="sk-proj-..."  # OpenAI API key
 ```
 
-## 🧪 Considerations
+## 🧪 Worker Behavior
 
-- If a worker does not exist, its keys are created.
-- If worker exists uses the existing env file keys and .data folder
-- If the data folder doesnt exist, it creates one
-- Workers prefixed with "random" have keys that are stored only in memory.
+- New workers have their keys automatically created
+- Existing workers use their stored keys from the env file and .data folder
+- If the data folder doesn't exist, one is created automatically
+- Workers prefixed with "random" have keys that are stored only in memory
 
-## Test Environment
+## 📱 Test Environment Specification
 
-- Device: [iPhone 16 Pro Max]
-- Network: [Wifi]
-- XMTP Environment: [dev]
-- App Version: [1.0.0]
+| Parameter        | Value             |
+| ---------------- | ----------------- |
+| Device           | iPhone 16 Pro Max |
+| Network          | WiFi              |
+| XMTP Environment | dev               |
+| App Version      | 1.0.0             |
 
-## Stress Test Verification Matrix
+## 🔍 Stress Test Verification Matrix
 
 | Test Scenario | Workers | App Launch | Message Loading | UI Performance | Stream Status | Message Sending | Status | Notes |
 | ------------- | ------- | ---------- | --------------- | -------------- | ------------- | --------------- | ------ | ----- |
-| Light Load    | 5       | < 2s       | Instant         | No Lag         | Connected     | Instant         | ❌     |       |
-| Medium Load   | 10      | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ❌     |       |
-| Heavy Load    | 20      | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ❌     |       |
-| Extreme Load  | 50      | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ❌     |       |
+| Light Load    | 5       | < 2s       | Instant         | No Lag         | Connected     | Instant         | ⬜     |       |
+| Medium Load   | 10      | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ⬜     |       |
+| Heavy Load    | 20      | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ⬜     |       |
+| Extreme Load  | 50      | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ⬜     |       |
 
-## Legend
+## 🔑 Legend
 
 - ⬜ Not Tested
 - ✅ Passed
 - ❌ Failed
 - ⚠️ Partial Pass
 
-## Test Execution Log
+## 📝 Test Execution Log
 
 | Date | Tester | Environment | Notes |
 | ---- | ------ | ----------- | ----- |
 |      |        |             |       |
 
-### Resources
+## 📂 Project Structure
 
-- **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
-- **Helpers:** Utility functions in the [helpers section](/helpers/)
-- **Scripts:** Automation scripts in the [scripts section](/scripts/)
+- **Local:** Working in local network with resources in the [dev](/dev/) directory
+- **Workers:** Predefined workers like `bob`, `alice`, `randomguy` in the [workers](/workers/) directory
+- **Helpers:** Utility functions in the [helpers](/helpers/) directory
+- **Scripts:** Automation scripts in the [scripts](/scripts/) directory
