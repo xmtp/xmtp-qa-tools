@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import {
+  Dm,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -11,19 +12,254 @@ import { getWorkers } from "@workers/manager";
 const testName = "stress-bot";
 loadEnv(testName);
 
+// Constants
+const HELP_TEXT = `🤖 XMTP Stress Test Bot
+
+Available Commands:
+/help - Show this help message
+/stress <workers> <messages> - Start a stress test
+/stress reset - Reset all workers
+
+Examples:
+/stress 5 10 - Create test with 5 workers sending 10 messages each
+/stress reset - Terminate all workers and start over
+
+Limits:
+- Workers: 1-40`;
+
+let isStressTestRunning = false;
+
+interface StressTestConfig {
+  workerCount: number;
+  messageCount: number;
+}
+
+async function initializeBot() {
+  const botWorker = await getWorkers(["bot"], testName, "none", false);
+  const bot = botWorker.get("bot");
+  const client = bot?.client as Client;
+  const env = process.env.XMTP_ENV as XmtpEnv;
+
+  console.log(`Agent initialized on address ${bot?.address}`);
+  console.log(`Agent initialized on inbox ${client.inboxId}`);
+  //console.log(`https://converse.xyz/dm/${client.inboxId}?env=${env}`);
+
+  return client;
+}
+
+function parseStressCommand(args: string[]): StressTestConfig | null {
+  if (args.length < 2) return null;
+
+  const workerCount = parseInt(args[1]);
+  let messageCount = 5; // Default to 5 messages if not specified
+
+  if (isNaN(workerCount) || workerCount < 1 || workerCount > 100) return null;
+  if (args[2]) {
+    const parsedMessageCount = parseInt(args[2]);
+    if (!isNaN(parsedMessageCount) && parsedMessageCount > 0) {
+      messageCount = parsedMessageCount;
+    }
+  }
+
+  return { workerCount, messageCount };
+}
+
+async function runStressTest(
+  config: StressTestConfig,
+  message: DecodedMessage,
+  conversation: Conversation,
+  client: Client,
+) {
+  const startTime = Date.now();
+  isStressTestRunning = true;
+  console.log(
+    `Starting stress test with ${config.workerCount} workers, ${config.messageCount} messages each`,
+  );
+
+  try {
+    await conversation.send("🚀 Initializing workers...");
+
+    const workers = await getWorkers(
+      config.workerCount,
+      testName,
+      "message",
+      true,
+    );
+    console.log(
+      `Successfully initialized ${workers.getWorkers().length} workers`,
+    );
+
+    await conversation.send(
+      `✅ Successfully initialized ${config.workerCount} workers\n` +
+        `📝 Each worker will send:\n` +
+        `- ${config.messageCount} DM messages\n` +
+        `- ${config.messageCount} group messages\n` +
+        `Total expected messages: ${config.workerCount * config.messageCount * 2}`,
+    );
+
+    const workerInboxIds = workers
+      .getWorkers()
+      .map((w) => w.client?.inboxId)
+      .filter(Boolean);
+    console.log(`Collected ${workerInboxIds.length} worker inbox IDs`);
+
+    // Create group
+    await conversation.send("⏳ Creating test group...");
+    const group = await client.conversations.newGroup(
+      [...workerInboxIds, message.senderInboxId, client.inboxId],
+      {
+        groupName: `Stress Test Group ${Date.now()}`,
+        groupDescription: "Group for stress testing",
+      },
+    );
+    console.log(`Created test group with ID: ${group.id}`);
+
+    await conversation.send("✅ Test group created successfully");
+
+    console.log("Starting message sending process...");
+    let messagesSent = 0;
+    let lastProgressUpdate = 0;
+    const totalMessages = config.workerCount * config.messageCount * 2;
+
+    for (const worker of workers.getWorkers()) {
+      await conversation.send(`🤖 Worker ${worker.name} starting...`);
+      console.log(`Worker ${worker.name} starting message sends...`);
+
+      const dm = await worker.client?.conversations.newDm(
+        message.senderInboxId,
+      );
+      const groupFromWorker =
+        await worker.client?.conversations.getConversationById(group.id);
+
+      for (let i = 0; i < config.messageCount; i++) {
+        await Promise.all([
+          dm?.send(`DM Test ${worker.name} - ${i + 1}/${config.messageCount}`),
+          groupFromWorker?.send(
+            `Group Test ${worker.name} - ${i + 1}/${config.messageCount}`,
+          ),
+        ]);
+        messagesSent += 2;
+
+        // Update progress every 10% or when a worker completes
+        const progressPercentage = Math.floor(
+          (messagesSent / totalMessages) * 100,
+        );
+        if (
+          progressPercentage >= lastProgressUpdate + 10 ||
+          i === config.messageCount - 1
+        ) {
+          lastProgressUpdate = Math.floor(progressPercentage / 10) * 10;
+          await conversation.send(
+            `📊 Progress Update:\n` +
+              `Messages sent: ${messagesSent}/${totalMessages}\n` +
+              `Completion: ${progressPercentage}%\n` +
+              `Current worker: ${worker.name}`,
+          );
+        }
+      }
+      console.log(`Worker ${worker.name} completed all messages`);
+      await conversation.send(
+        `✅ Worker ${worker.name} completed all messages`,
+      );
+    }
+
+    console.log(
+      `Test completed. Total messages sent: ${messagesSent}/${totalMessages}`,
+    );
+
+    await conversation.send(
+      `🎉 Test completed successfully!\n\n` +
+        `📊 Final Statistics:\n` +
+        `- Total messages sent: ${messagesSent}\n` +
+        `- Workers used: ${config.workerCount}\n` +
+        `- Messages per worker: ${config.messageCount * 2}\n` +
+        `- Test duration: ${Math.floor((Date.now() - startTime) / 1000)}s`,
+    );
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    await conversation.send(
+      `❌ Error during stress test:\n${errorMessage}\n\nUse /stress reset to try again.`,
+    );
+    console.error("Stress test error:", errorMessage);
+  } finally {
+    isStressTestRunning = false;
+  }
+}
+
+async function handleMessage(
+  message: DecodedMessage,
+  conversation: Conversation,
+  client: Client,
+) {
+  const content = message.content as string;
+  console.log(`Processing message: "${content}" from ${message.senderInboxId}`);
+
+  const args = content.split(" ");
+  const command = args[0].toLowerCase();
+
+  // Only show help text for DMs and non-commands
+  const isDM = conversation instanceof Dm;
+  if (!command.startsWith("/") && isDM) {
+    console.log("Sending help text for non-command message in DM");
+    await conversation.send(HELP_TEXT);
+    return;
+  }
+
+  // Handle commands
+  console.log(`Handling command: ${command}`);
+  switch (command) {
+    case "/help":
+      if (isDM) {
+        console.log("Sending help text");
+        await conversation.send(HELP_TEXT);
+      }
+      break;
+
+    case "/stress": {
+      if (args[1]?.toLowerCase() === "reset") {
+        console.log("Processing stress reset command");
+        isStressTestRunning = false;
+        await conversation.send("🔄 Reset complete. Type /help to start over.");
+        return;
+      }
+
+      if (isStressTestRunning) {
+        console.log("Stress test already in progress, rejecting new test");
+        await conversation.send(
+          "⚠️ A stress test is already running. Please either:\n" +
+            "1. Wait for it to complete, or\n" +
+            "2. Use `/stress reset` to force stop all tests",
+        );
+        return;
+      }
+
+      const config = parseStressCommand(args);
+      if (config) {
+        console.log(`Starting stress test with config:`, config);
+        await runStressTest(config, message, conversation, client);
+      } else {
+        if (isDM) {
+          console.log("Invalid stress test command format");
+          await conversation.send(
+            "⚠️ Invalid command format. Type /help for usage instructions.",
+          );
+        }
+      }
+      break;
+    }
+
+    default:
+      if (isDM) {
+        console.log("Unknown command, sending help text");
+        await conversation.send(HELP_TEXT);
+      }
+  }
+}
+
 async function main() {
   try {
-    const botWorker = await getWorkers(["bot"], testName, "none", false);
-    const bot = botWorker.get("bot");
-    const client = bot?.client as Client;
-
-    const env = process.env.XMTP_ENV as XmtpEnv;
-    console.log(`Agent initialized on address ${bot?.address}`);
-    console.log(`Agent initialized on inbox ${client.inboxId}`);
-    console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
-
+    const client = await initializeBot();
     await client.conversations.sync();
-    console.log("Waiting for messages...");
 
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
@@ -32,200 +268,23 @@ async function main() {
           message?.senderInboxId.toLowerCase() ===
             client.inboxId.toLowerCase() ||
           message?.contentType?.typeId !== "text"
-        ) {
+        )
           continue;
-        }
 
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );
+        if (!conversation) continue;
 
-        if (!conversation) {
-          console.log("Unable to find conversation, skipping");
-          continue;
-        }
-
-        const messageContent = message.content as string;
-        if (messageContent.toLowerCase().startsWith("/stress")) {
-          await handleStressTest(message, conversation, client);
-        }
+        await handleMessage(message, conversation, client);
       } catch (error) {
-        console.error("Error processing message:", error);
+        console.error("Message handling error:", error);
       }
     }
   } catch (error) {
-    console.error("Error during initialization:", error);
+    console.error("Fatal error:", error);
     process.exit(1);
   }
 }
 
-async function handleStressTest(
-  message: DecodedMessage,
-  conversation: Conversation,
-  client: Client,
-) {
-  try {
-    const args = (message.content as string).split(" ");
-    let messageCount = 10; // Changed from const to let since we'll reassign it
-    let workers: WorkerManager | null = null;
-
-    // Add reset command
-    if (args[1]?.toLowerCase() === "reset") {
-      await conversation.send("🔄 Resetting stress test workers...");
-      try {
-        // Terminate all workers if they exist
-        if (workers) {
-          await (workers as WorkerManager).terminateAll();
-        }
-        await conversation.send(
-          "✅ All workers terminated successfully.\n" +
-            "Type /stress to start a new test.",
-        );
-        return;
-      } catch (error) {
-        await conversation.send(
-          "❌ Error terminating workers: " +
-            (error instanceof Error ? error.message : String(error)),
-        );
-        return;
-      }
-    }
-
-    // If no arguments provided, show help including reset command
-    if (args.length === 1) {
-      await conversation.send(
-        "🤖 Welcome to the XMTP Stress Test!\n\n" +
-          "Available commands:\n" +
-          "- /stress <number> - Start test with specified number of workers\n" +
-          "- /stress reset - Terminate all workers and start over\n\n" +
-          "Please specify how many workers you'd like to use (1-100).\n" +
-          "Reply with a number to continue.",
-      );
-      return;
-    }
-
-    // If first argument is a number, it's the worker count
-    if (!isNaN(parseInt(args[1]))) {
-      const requestedWorkers = parseInt(args[1]);
-
-      // Validate worker count
-      if (requestedWorkers < 1 || requestedWorkers > 100) {
-        await conversation.send(
-          "⚠️ Please specify a valid number of workers between 1 and 100.",
-        );
-        return;
-      }
-
-      // Ask for message count
-      if (args.length === 2) {
-        await conversation.send(
-          `👥 You've requested ${requestedWorkers} workers.\n\n` +
-            "How many messages should each worker send?\n" +
-            "Reply with: /stress " +
-            String(requestedWorkers) +
-            " <number_of_messages> (default is 10)",
-        );
-        return;
-      }
-
-      messageCount = parseInt(args[2]);
-      if (isNaN(messageCount) || messageCount < 1) {
-        await conversation.send(
-          "⚠️ Please specify a valid number of messages per worker.",
-        );
-        return;
-      }
-
-      // Show confirmation with details
-      const totalMessages = requestedWorkers * messageCount * 2; // *2 for DM and group
-      await conversation.send(
-        "📋 Stress Test Configuration:\n\n" +
-          `- Number of workers: ${requestedWorkers}\n` +
-          `- Messages per worker: ${messageCount}\n` +
-          `- Total messages to be sent: ${totalMessages}\n` +
-          `  (${messageCount} DMs + ${messageCount} group messages) × ${requestedWorkers} workers\n\n` +
-          "⚠️ This will create a new group and send multiple messages.\n\n" +
-          "Reply with '/stress confirm' to start the test.",
-      );
-      return;
-    }
-
-    // Handle confirmation
-    if (args[2] && args[2].toLowerCase() === "confirm") {
-      // Initialize workers only when confirming the test
-      const requestedWorkers = parseInt(args[1]);
-      if (
-        isNaN(requestedWorkers) ||
-        requestedWorkers < 1 ||
-        requestedWorkers > 100
-      ) {
-        await conversation.send(
-          "⚠️ Invalid worker count. Please start over with /stress <number>",
-        );
-        return;
-      }
-
-      workers = await getWorkers(requestedWorkers, testName, "message", true);
-
-      const workerInboxIds = workers
-        .getWorkers()
-        .map((w) => w.client?.inboxId)
-        .filter(Boolean);
-
-      await conversation.send("🚀 Initializing stress test...");
-
-      // Create group with all participants
-      const memberInboxIds = [
-        ...workerInboxIds,
-        message.senderInboxId,
-        client.inboxId,
-      ];
-
-      const group = await client.conversations.newGroup(memberInboxIds, {
-        groupName: `Stress Test Group ${Date.now()}`,
-        groupDescription: "Group for stress testing",
-      });
-
-      await conversation.send(
-        "📊 Progress:\n1. ✅ Created test group\n2. ⏳ Starting message tests...",
-      );
-
-      // Send DM messages
-      for (const worker of workers.getWorkers()) {
-        const dm = await worker.client?.conversations.newDm(
-          message.senderInboxId,
-        );
-        const groupFromWorker =
-          await worker.client?.conversations.getConversationById(group.id);
-        for (let i = 0; i < messageCount; i++) {
-          await dm?.send(
-            `DM Stress Test from ${worker.name} - Message ${i + 1}/${messageCount}`,
-          );
-          await groupFromWorker?.send(
-            `Group Stress Test from ${worker.name} - Message ${i + 1}/${messageCount}`,
-          );
-        }
-      }
-
-      const totalMessages = workers.getWorkers().length * messageCount * 2;
-      await conversation.send(
-        `✅ Stress test completed!\n` +
-          `Total messages sent: ${totalMessages}\n` +
-          `- ${messageCount} DM messages from each worker\n` +
-          `- ${messageCount} group messages from each worker\n` +
-          `Total workers: ${workers.getWorkers().length}`,
-      );
-    }
-  } catch (error) {
-    console.error("Error in stress test:", error);
-    await conversation.send(
-      `❌ Error during stress test: ${error instanceof Error ? error.message : String(error)}\n` +
-        "You can type '/stress reset' to terminate all workers and start over.",
-    );
-  }
-}
-
-main().catch((error: unknown) => {
-  console.error("Fatal error in main function:", error);
-  process.exit(1);
-});
+void main();
