@@ -52,10 +52,10 @@ OPENAI_API_KEY="sk-proj-..." # OpenAI API key
 
 | Test Scenario | Workers | App Launch | Message Loading | UI Performance | Stream Status | Message Sending | Status | Notes |
 | ------------- | ------- | ---------- | --------------- | -------------- | ------------- | --------------- | ------ | ----- |
-| Light Load    | 5       | < 2s       | Instant         | No Lag         | Connected     | Instant         | ⬜     |       |
-| Medium Load   | 10      | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ⬜     |       |
-| Heavy Load    | 20      | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ⬜     |       |
-| Extreme Load  | 50      | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ⬜     |       |
+| Light Load    | 5       | < 2s       | Instant         | No Lag         | Connected     | Instant         | ❌     |       |
+| Medium Load   | 10      | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ❌     |       |
+| Heavy Load    | 20      | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ❌     |       |
+| Extreme Load  | 50      | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ❌     |       |
 
 ## Legend
 

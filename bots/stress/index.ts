@@ -75,7 +75,7 @@ async function handleStressTest(
       try {
         // Terminate all workers if they exist
         if (workers) {
-          await workers.terminateAll();
+          await (workers as WorkerManager).terminateAll();
         }
         await conversation.send(
           "✅ All workers terminated successfully.\n" +

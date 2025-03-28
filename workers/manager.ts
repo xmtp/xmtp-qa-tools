@@ -37,6 +37,7 @@ export class WorkerManager {
     string,
     { walletKey: string; encryptionKey: string }
   > = {};
+  
 
   /**
    * Constructor creates an empty manager or populates it with existing workers
