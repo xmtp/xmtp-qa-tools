@@ -26,3 +26,13 @@ yarn bot test
 ```
 
 See more in [test/README.md](./test/README.md)
+
+### 🔄 Stress Test Bot
+
+This bot is used to stress test the XMTP protocol.
+
+```bash
+yarn bot stress
+```
+
+See more in [stress/README.md](./stress/README.md)
