@@ -28,6 +28,7 @@ Limits:
 - Workers: 1-40`;
 
 let isStressTestRunning = false;
+let workers: WorkerManager | undefined;
 
 interface StressTestConfig {
   workerCount: number;
@@ -72,7 +73,6 @@ async function runStressTest(
 ) {
   const startTime = Date.now();
   isStressTestRunning = true;
-  let workers: WorkerManager | undefined;
 
   try {
     await conversation.send("🚀 Initializing workers...");
@@ -175,19 +175,6 @@ async function runStressTest(
     );
     console.error("Stress test error:", errorMessage);
   } finally {
-    // Terminate all workers
-    try {
-      if (workers) {
-        await conversation.send("🧹 Cleaning up - terminating workers...");
-        await workers.terminateAll();
-        await conversation.send("✨ All workers terminated successfully");
-      }
-    } catch (cleanupError) {
-      console.error("Error terminating workers:", cleanupError);
-      await conversation.send(
-        "⚠️ Warning: Some workers may not have terminated properly",
-      );
-    }
     isStressTestRunning = false;
   }
 }
@@ -208,6 +195,7 @@ async function handleMessage(
 
   if (!command.startsWith("/") && isDM) {
     console.log("Sending help text for non-command message in DM");
+    await conversation.send(message.senderInboxId);
     await conversation.send(HELP_TEXT);
     return;
   }
@@ -225,6 +213,19 @@ async function handleMessage(
     case "/stress": {
       if (args[1]?.toLowerCase() === "reset") {
         console.log("Processing stress reset command");
+        // Terminate all workers
+        try {
+          if (workers) {
+            await conversation.send("🧹 Cleaning up - terminating workers...");
+            await workers.terminateAll();
+            await conversation.send("✨ All workers terminated successfully");
+          }
+        } catch (cleanupError) {
+          console.error("Error terminating workers:", cleanupError);
+          await conversation.send(
+            "⚠️ Warning: Some workers may not have terminated properly",
+          );
+        }
         isStressTestRunning = false;
         await conversation.send("🔄 Reset complete. Type /help to start over.");
         return;

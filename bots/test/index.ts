@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { checkGroupInWebClient } from "@helpers/playwright";
 import {
-  IdentifierKind,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -13,15 +12,6 @@ import { CommandHandler } from "./commands";
 
 const testName = "test-bot";
 loadEnv(testName);
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
 
 async function main() {
   try {
@@ -31,7 +21,7 @@ async function main() {
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
     const workers = await getWorkers(20, testName, "message", true);
-    const botWorker = await getWorkers(["bot"], testName, "none", false);
+    const botWorker = await getWorkers(["bot"], testName, "message", false);
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 
@@ -42,7 +32,7 @@ async function main() {
     console.log("Syncing conversations...");
     await client.conversations.sync();
 
-    //await sendInitialTestMessage(client);
+    await sendInitialTestMessage(client);
     console.log("Waiting for messages...");
     try {
       const stream = client.conversations.streamAllMessages();
@@ -103,6 +93,7 @@ async function sendInitialTestMessage(client: Client) {
     throw new Error("CB_USER is not set");
   }
   const dm = await client.conversations.newDm(cbUser);
+
   await dm.send("gm from bot");
   console.log("DM sent:", dm.id);
 }
@@ -132,7 +123,8 @@ async function processCommand(
     const parts = trimmedContent.substring(1).split(" ");
     const command = parts[0].toLowerCase();
     const args = parts.slice(1);
-
+    console.log("Command:", command);
+    console.log("Args:", args);
     // Execute the appropriate command handler
     switch (command) {
       case "help":
