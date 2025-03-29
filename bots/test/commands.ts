@@ -3,6 +3,7 @@ import {
   IdentifierKind,
   type Client,
   type DecodedMessage,
+  type GroupMember,
   type Worker,
   type WorkerManager,
 } from "@helpers/types";
@@ -376,9 +377,7 @@ export class CommandHandler {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === member.inboxId);
-        return (
-          worker?.name || (member.inboxId == client.inboxId ? "Bot" : "You")
-        );
+        return worker?.name || this.processOthers(member.inboxId);
       });
 
       await conversation?.send(
@@ -406,12 +405,13 @@ export class CommandHandler {
       await conversation.sync();
       const admins = await conversation.admins;
       const superAdmins = await conversation.superAdmins;
+
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
         const worker = workers
           .getWorkers()
           .find((p) => p.client?.inboxId === admin);
-        return worker?.name || (admin == client.inboxId ? "Bot" : "You");
+        return worker?.name || this.processOthers(admin);
       });
 
       await conversation.send(
@@ -422,6 +422,13 @@ export class CommandHandler {
     }
   }
 
+  processOthers(admin: string) {
+    return admin == process.env.CONVOS_USER
+      ? "Convos Wallet"
+      : admin == process.env.CB_USER
+        ? "CB Wallet"
+        : "You";
+  }
   // List all active groups
   async groups(message: DecodedMessage, client: Client) {
     try {
@@ -492,10 +499,13 @@ export class CommandHandler {
           const workerGroup = await worker.client?.conversations.newDm(
             message.senderInboxId,
           );
-          await conversation?.send(` ${worker.name} just sent you a message`);
-          await workerGroup?.send(`${worker.name}:\n${blastMessage}`);
+          await workerGroup?.send(`${worker.name}:\n${blastMessage} ${i}`);
         }
+        await conversation?.send(`🔊 Round ${i + 1} of ${repeatCount} done`);
       }
+      await conversation?.send(
+        `🔊 You received ${countOfWorkers * repeatCount} messages`,
+      );
     } catch (error) {
       console.error("Error blasting:", error);
     }

@@ -52,6 +52,24 @@ export class WorkerManager {
     this.gptEnabled = gptEnabled;
     this.workers = existingWorkers || {};
   }
+  /**
+   * Terminates all active workers and cleans up resources
+   */
+  public async terminateAll(): Promise<void> {
+    const terminationPromises = this.activeWorkers.map(async (worker) => {
+      try {
+        await worker.terminate();
+      } catch (error) {
+        console.warn(`Error terminating worker:`, error);
+      }
+    });
+
+    await Promise.all(terminationPromises);
+    this.activeWorkers = [];
+
+    // Clear the workers object
+    this.workers = {};
+  }
 
   /**
    * Gets the total number of workers
@@ -273,25 +291,6 @@ export class WorkerManager {
       this.createWorker(descriptor),
     );
     return Promise.all(workerPromises);
-  }
-
-  /**
-   * Terminates all active workers and cleans up resources
-   */
-  public async terminate(): Promise<void> {
-    const terminationPromises = this.activeWorkers.map(async (worker) => {
-      try {
-        await worker.terminate();
-      } catch (error) {
-        console.warn(`Error terminating worker:`, error);
-      }
-    });
-
-    await Promise.all(terminationPromises);
-    this.activeWorkers = [];
-
-    // Clear the workers object
-    this.workers = {};
   }
 }
 

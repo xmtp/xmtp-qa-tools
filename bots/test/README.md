@@ -14,7 +14,7 @@ git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 # Run the bot
-yarn bot:test
+yarn bot test
 ```
 
 ## 💬 Available Commands
