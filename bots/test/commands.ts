@@ -93,6 +93,7 @@ export class CommandHandler {
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
+      console.log("conversation", conversation?.id);
       const inboxState = await client.preferences.inboxStateFromInboxIds([
         message.senderInboxId,
       ]);
@@ -100,8 +101,11 @@ export class CommandHandler {
         .filter((i) => i.identifierKind === IdentifierKind.Ethereum)
         .map((i) => i.identifier);
 
+      console.log("addresses", addresses[0]);
       await conversation?.send(addresses[0]);
+      console.log("inboxState", inboxState[0]);
       await conversation?.send(inboxState[0].inboxId);
+      console.log("installations", inboxState[0].installations[0].id);
       await conversation?.send(inboxState[0].installations[0].id);
     } catch (error) {
       console.error("Error sending me:", error);

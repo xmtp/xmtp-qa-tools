@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@hyperbrowser/sdk": "^0.29.0",
-    "@xmtp/node-sdk": "1.0.0",
+    "@xmtp/node-sdk": "1.0.4",
     "axios": "^1.8.2",
     "dotenv": "^16.4.7",
     "openai": "latest",
