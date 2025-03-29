@@ -197,14 +197,15 @@ async function handleMessage(
   conversation: Conversation,
   client: Client,
 ) {
+  // Only show help text for DMs and non-commands
+  const isDM = conversation instanceof Dm;
+  if (!isDM) return;
   const content = message.content as string;
   console.log(`Processing message: "${content}" from ${message.senderInboxId}`);
 
   const args = content.split(" ");
   const command = args[0].toLowerCase();
 
-  // Only show help text for DMs and non-commands
-  const isDM = conversation instanceof Dm;
   if (!command.startsWith("/") && isDM) {
     console.log("Sending help text for non-command message in DM");
     await conversation.send(HELP_TEXT);
