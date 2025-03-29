@@ -59,6 +59,7 @@ OPENAI_API_KEY="sk-proj-..."  # OpenAI API key
 | 10      | 5        | < 3s       | < 1s            | Minimal Lag    | Connected     | < 1s            | ⚠️     | Fast launch, fail sending, lag UX |
 | 20      | 5        | < 4s       | < 2s            | Acceptable     | Connected     | < 2s            | ❌     |                                   |
 | 30      | 5        | < 5s       | < 3s            | Responsive     | Connected     | < 3s            | ❌     |                                   |
+| 50      | 5        | < 6s       | < 4s            | Responsive     | Connected     | < 4s            | ❌     |                                   |
 
 ## 📂 Project Structure
 
