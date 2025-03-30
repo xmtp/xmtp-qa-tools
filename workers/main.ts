@@ -222,7 +222,7 @@ export class WorkerClient extends Worker {
       this.env,
     );
 
-    // @ts-expect-error - signer is not typed
+    // @ts-ignore - ClientClass is a class constructor
     this.client = (await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env: this.env,
