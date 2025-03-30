@@ -1,14 +1,16 @@
-[2025-03-30T20:51:53.221Z] [info] XMTP_ENV dev
-[2025-03-30T20:51:53.224Z] [info] Running test for cb[production]
-[2025-03-30T20:51:53.224Z] [info] Creating worker: ivy (folder: a, version: 100)
-[2025-03-30T20:51:53.251Z] [info] Using env keys for ivy: 0xA750AD179620991160C1a3C9352BBbf1EE1343F0
-[2025-03-30T20:51:53.255Z] [info] Creating worker: ivy (folder: b, version: 104)
-[2025-03-30T20:51:53.255Z] [info] Using cached keys for ivy
-[2025-03-30T20:51:53.257Z] [info] [ivy] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-testing/bugs/bug_stitch/.data/ivy/a
-[2025-03-30T20:51:53.257Z] [info] [ivy] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-testing/bugs/bug_stitch/.data/ivy/b
-[2025-03-30T20:51:57.520Z] [info] syncing all
-[2025-03-30T20:52:01.818Z] [info] sending message
-[2025-03-30T20:52:02.855Z] [warn] Ivy terminates, deletes local data, and restarts
-[2025-03-30T20:52:05.465Z] [info] Original conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
-[2025-03-30T20:52:05.466Z] [info] Recreated conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
-[2025-03-30T20:52:06.065Z] [info] ivy-104 conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
+[2025-03-30T23:30:01.360Z] [info] XMTP_ENV dev
+[2025-03-30T23:30:01.363Z] [info] Setting up test for convos[production]
+[2025-03-30T23:30:01.363Z] [info] env production
+[2025-03-30T23:30:01.363Z] [info] Creating worker: ivy (folder: a, version: 100)
+[2025-03-30T23:30:01.390Z] [info] Using env keys for ivy: 0x7D1B922Efcf0065b773E76f1A929d6D16DB8Eac6
+[2025-03-30T23:30:05.598Z] [info] syncing all
+[2025-03-30T23:30:06.422Z] [error] [vitest] Test failed in bug_stitch > User: convos [production] > should create new DM and group conversations SequenceId not found in local db
+[2025-03-30T23:30:06.423Z] [warn] Ivy terminates, deletes local data, and restarts
+[2025-03-30T23:30:09.084Z] [info] sending message
+[2025-03-30T23:30:11.988Z] [info] Setting up test for convos[production]
+[2025-03-30T23:30:11.988Z] [info] env production
+[2025-03-30T23:30:11.988Z] [info] Creating worker: ivy (folder: b, version: 104)
+[2025-03-30T23:30:11.990Z] [info] Using env keys for ivy: 0x7D1B922Efcf0065b773E76f1A929d6D16DB8Eac6
+[2025-03-30T23:30:11.994Z] [info] [ivy] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-testing/bugs/bug_stitch/.data/ivy/b
+[2025-03-30T23:30:16.245Z] [info] syncing all
+[2025-03-30T23:30:17.021Z] [error] [vitest] Test failed in bug_stitch > User: convos [production] > should create new DM and group conversations SequenceId not found in local db
