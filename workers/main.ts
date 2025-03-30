@@ -222,7 +222,7 @@ export class WorkerClient extends Worker {
       this.env,
     );
 
-    // @ts-ignore - ClientClass is a class constructor
+    // @ts-expect-error Window localStorage access in browser context
     this.client = (await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env: this.env,
