@@ -1,53 +1,22 @@
 import type { Worker, WorkerManager } from "@workers/manager";
 import {
-  Client,
   ConsentEntityType,
   ConsentState,
-  Conversation,
-  Dm,
-  Group,
   IdentifierKind,
   type Consent,
-  type DecodedMessage,
   type GroupMember,
   type Installation,
   type LogLevel,
+} from "@xmtp/node-bindings";
+import {
+  Client,
+  Conversation,
+  Dm,
+  Group,
+  type DecodedMessage,
   type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import {
-  Client as Client100,
-  Conversation as Conversation100,
-  Dm as Dm100,
-  Group as Group100,
-} from "@xmtp/node-sdk-100";
-
-export const sdkVersions = {
-  v104: {
-    Client,
-    Conversation,
-    Dm,
-    Group,
-  },
-  v100: {
-    Client: Client100,
-    Conversation: Conversation100,
-    Dm: Dm100,
-    Group: Group100,
-  },
-  // You can add more versions as needed
-};
-
-// Export types for use with any version
-export type SdkTypes = {
-  Consent: Consent;
-  DecodedMessage: DecodedMessage;
-  GroupMember: GroupMember;
-  Installation: Installation;
-  LogLevel: LogLevel;
-  Signer: Signer;
-  XmtpEnv: XmtpEnv;
-};
 
 export type { WorkerManager, Worker };
 export type WorkerStreamMessage = {
