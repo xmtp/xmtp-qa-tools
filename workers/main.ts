@@ -10,7 +10,6 @@ import {
   Client,
   defaultValues,
   Dm,
-  sdkVersions,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -201,30 +200,7 @@ export class WorkerClient extends Worker {
       env,
     );
 
-    // Extract SDK version from name if it exists (e.g., ivi-100 would use v100)
-    const nameParts = this.name.split("-");
-    const versionSuffix =
-      nameParts.length > 1 ? nameParts[nameParts.length - 1] : null;
-
-    // Determine which SDK version to use
-    let clientClass: typeof Client;
-    if (
-      versionSuffix &&
-      /^\d+$/.test(versionSuffix) &&
-      `v${versionSuffix}` in sdkVersions
-    ) {
-      const version = `v${versionSuffix}` as keyof typeof sdkVersions;
-      console.log(
-        `[${this.nameId}] Using SDK version ${version} for worker ${this.name}`,
-      );
-      clientClass = sdkVersions[version].Client as typeof Client;
-    } else {
-      // Default to latest version (v104)
-      clientClass = sdkVersions.v104.Client;
-    }
-
-    // Create the client with the appropriate version
-    this.client = await clientClass.create(signer, encryptionKey, {
+    this.client = await Client.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
@@ -342,18 +318,12 @@ export class WorkerClient extends Worker {
    */
   private shouldGenerateGptResponse(message: DecodedMessage): boolean {
     if (!this.gptEnabled) return false;
-
-    // Get the conversation
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
     );
-
     // Get the base name without installation ID
     const baseName = this.name.split("-")[0].toLowerCase();
-
-    // Check if it's a DM - need to handle different SDK versions
-    const isDm = this.isDmConversation(conversation);
-
+    const isDm = conversation instanceof Dm;
     return ((message?.contentType?.typeId === "text" &&
       message.content.includes(baseName) &&
       !message.content.includes("/") &&
@@ -361,26 +331,6 @@ export class WorkerClient extends Worker {
       !message.content.includes("members") &&
       !message.content.includes("admins")) ||
       isDm) as boolean;
-  }
-
-  // Add a helper method to check if a conversation is a DM across SDK versions
-  private isDmConversation(conversation: any): boolean {
-    // Extract version suffix if it exists
-    const nameParts = this.name.split("-");
-    const versionSuffix =
-      nameParts.length > 1 ? nameParts[nameParts.length - 1] : null;
-
-    if (
-      versionSuffix &&
-      /^\d+$/.test(versionSuffix) &&
-      `v${versionSuffix}` in sdkVersions
-    ) {
-      const version = `v${versionSuffix}` as keyof typeof sdkVersions;
-      return conversation instanceof sdkVersions[version].Dm;
-    }
-
-    // Default to latest version
-    return conversation instanceof sdkVersions.v104.Dm;
   }
 
   /**

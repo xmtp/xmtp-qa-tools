@@ -229,30 +229,13 @@ export class WorkerManager {
       ? descriptor
       : `${baseName}-${installationId}`;
 
-    // Determine if the descriptor contains a version indicator
-    const versionMatch = providedInstallId?.match(/^(\d+)$/);
-    const isVersioned = !!versionMatch;
-
-    // If the descriptor contains a version but not a folder, add one
-    const finalDescriptor = isVersioned
-      ? `${baseName}-${providedInstallId}-${installationId}`
-      : fullDescriptor;
-
-    // For version-specific workers, adjust the name vs folder
-    const workerName = isVersioned
-      ? `${baseName}-${providedInstallId}`
-      : baseName;
-    const workerFolder = isVersioned
-      ? installationId
-      : providedInstallId || installationId;
-
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(workerName);
+    const { walletKey, encryptionKey } = this.ensureKeys(fullDescriptor);
 
     // Create the base worker data
     const workerData: WorkerBase = {
-      name: workerName,
-      folder: workerFolder,
+      name: baseName,
+      folder: installationId,
       testName: this.testName,
       walletKey,
       encryptionKey,
@@ -281,7 +264,7 @@ export class WorkerManager {
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);
 
-    // Add to our internal storage - still use baseName for organization
+    // Add to our internal storage
     this.addWorker(baseName, installationId, worker);
 
     return worker;
