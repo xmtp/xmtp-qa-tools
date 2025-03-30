@@ -9,7 +9,6 @@ import {
   type XmtpEnv,
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import { V } from "vitest/dist/chunks/environment.d8YfPkTm.js";
 
 const testName = "stress-bot";
 loadEnv(testName);
@@ -237,7 +236,6 @@ async function runStressTest(
 
     console.log("Starting message sending process...");
     let messagesSent = 0;
-    let lastProgressUpdate = 0;
     const totalMessages = config.workerCount * config.messageCount * 2;
 
     for (const worker of workers.getWorkers()) {
@@ -395,7 +393,7 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-    //await sendInitialTestMessage(client);
+    await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
