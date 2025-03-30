@@ -75,17 +75,29 @@ export const getDbPath = (
 ): string => {
   console.time(`[${name}] - getDbPath`);
 
-  let identifier = `${accountAddress}-${libxmtpVersion}-${env}`;
+  // Sanitize version string to make it safe for filesystem
+  const sanitizedVersion = libxmtpVersion
+    .replace(/\//g, "_")
+    .replace(/\s+/g, "_")
+    .replace(/[\(\)@:]/g, "_");
+
+  let identifier = `${accountAddress}-${sanitizedVersion}-${env}`;
+  console.log(`[${name}] Creating DB path with identifier: ${identifier}`);
 
   const basePath = loadDataPath(name, installationId, testName);
+  console.log(`[${name}] Base path: ${basePath}`);
 
   if (!fs.existsSync(basePath)) {
+    console.log(`[${name}] Creating directory: ${basePath}`);
     fs.mkdirSync(basePath, { recursive: true });
-    //console.debug("Creating directory", basePath);
   }
+
+  const fullPath = `${basePath}/${identifier}`;
+  console.log(`[${name}] Full DB path: ${fullPath}`);
+
   console.timeEnd(`[${name}] - getDbPath`);
 
-  return `${basePath}/${identifier}`;
+  return fullPath;
 };
 
 export const generateEncryptionKeyHex = () => {

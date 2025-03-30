@@ -7,9 +7,10 @@ import {
   getEncryptionKeyFromHex,
 } from "@helpers/client";
 import {
-  Client,
   defaultValues,
   Dm,
+  sdkVersions,
+  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -111,6 +112,7 @@ export class WorkerClient extends Worker {
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
   private folder: string;
+  private workerData: WorkerBase;
   public address!: `0x${string}`;
   public client!: Client;
 
@@ -140,6 +142,7 @@ export class WorkerClient extends Worker {
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
+    this.workerData = worker;
 
     this.setupEventHandlers();
   }
@@ -185,12 +188,35 @@ export class WorkerClient extends Worker {
 
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-    const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+    // Get the SDK version from the worker data
+    const sdkVersion = this.workerData.sdkVersion;
+    console.log(
+      `[${this.nameId}] Initializing with SDK version: ${sdkVersion || "default"}, descriptor: ${JSON.stringify(this.workerData)}`,
+    );
+
+    // Select the appropriate SDK client based on version
+    let ClientClass;
+    if (sdkVersion === "100") {
+      ClientClass = sdkVersions.v100.Client;
+      console.log(`[${this.nameId}] Using SDK version 1.0.0`);
+    } else {
+      // Default to latest version
+      ClientClass = sdkVersions.v104.Client;
+      console.log(`[${this.nameId}] Using default SDK version (latest)`);
+    }
+
+    // Force version to include the SDK version for easier identification
+    const sdkIdentifier = sdkVersion || "latest";
+    const libXmtpVersion =
+      ClientClass.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+    const version = `${libXmtpVersion}-${sdkIdentifier}`;
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
     const env = process.env.XMTP_ENV as XmtpEnv;
-
+    const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
     const dbPath = getDbPath(
       this.name,
       this.address,
@@ -200,24 +226,20 @@ export class WorkerClient extends Worker {
       env,
     );
 
-    this.client = await Client.create(signer, encryptionKey, {
+    // Create the client with the appropriate SDK version
+    // Using 'any' here because the signer types between different SDK versions
+    // are incompatible at the TypeScript level despite having the same runtime interface
+    this.client = (await ClientClass.create(signer as any, encryptionKey, {
       dbPath,
       env,
-      loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
-    });
+      loggingLevel: loggingLevel as any,
+    })) as Client;
 
     // Start the appropriate stream based on configuration
     await this.startStream();
 
     const installationId = this.client.installationId;
 
-    // console.debug({
-    //   inboxId: this.client.inboxId,
-    //   dbPath,
-    //   version,
-    //   address: this.address,
-    //   installationId,
-    // });
     return {
       client: this.client,
       dbPath,

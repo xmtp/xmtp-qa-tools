@@ -210,7 +210,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 ### Disclaimers
 
 - **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
-- **Node-sdk only**: Metrics are based on node-sdk only operations and are not covering performance across all SDKs.
+- **Node-sdk only**: Metrics are based on `node-sdk` `latest` version only operations and are not covering performance across all SDKs.
 
 ## Tools & utilities
 

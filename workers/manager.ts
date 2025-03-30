@@ -12,6 +12,7 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
+  sdkVersion?: string;
 }
 
 export interface Worker extends WorkerBase {
@@ -124,7 +125,9 @@ export class WorkerManager {
     installationId: string = "a",
   ): Worker | undefined {
     if (baseName.includes("-")) {
-      const [name, id] = baseName.split("-");
+      const parts = baseName.split("-");
+      const name = parts[0];
+      const id = parts[1];
       return this.workers[name]?.[id];
     }
     return this.workers[baseName]?.[installationId];
@@ -215,9 +218,13 @@ export class WorkerManager {
    * Creates a new worker with all necessary initialization
    */
   public async createWorker(descriptor: string): Promise<Worker> {
-    // Check if the worker already exists in our internal storage
-    const [baseName, providedInstallId] = descriptor.split("-");
+    // Parse the descriptor into components: name, folder, and version
+    const parts = descriptor.split("-");
+    const baseName = parts[0];
+    const providedInstallId = parts.length > 1 ? parts[1] : undefined;
+    const version = parts.length > 2 ? parts[2] : undefined;
 
+    // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.log(`Reusing existing worker for ${descriptor}`);
       return this.workers[baseName][providedInstallId];
@@ -229,8 +236,12 @@ export class WorkerManager {
       ? descriptor
       : `${baseName}-${installationId}`;
 
+    console.log(
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${version || "default"})`,
+    );
+
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(fullDescriptor);
+    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
 
     // Create the base worker data
     const workerData: WorkerBase = {
@@ -239,6 +250,7 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
+      sdkVersion: version,
     };
 
     // Create and initialize the worker
