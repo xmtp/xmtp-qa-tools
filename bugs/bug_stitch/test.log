@@ -1,19 +1,14 @@
-[2025-03-30T20:23:12.769Z] [info] XMTP_ENV dev
-[2025-03-30T20:23:12.771Z] [info] Creating worker: ivy (folder: 100, version: 100)
-[2025-03-30T20:23:12.798Z] [info] Using env keys for ivy: 0x2f5F1F995A2E0522D763A390b57A4F8D1E931207
-[2025-03-30T20:23:12.801Z] [info] Creating worker: ivy (folder: 104, version: 104)
-[2025-03-30T20:23:12.801Z] [info] Using cached keys for ivy
-[2025-03-30T20:23:15.850Z] [info] syncing all
-[2025-03-30T20:23:16.908Z] [info] sending message
-[2025-03-30T20:23:18.043Z] [warn] Ivy  terminates, deletes local data, and restarts
-[2025-03-30T20:23:20.650Z] [info] gm from ivy-a100 f958fddf99936421ae9800b5f1fd4ae0
-[2025-03-30T20:23:21.215Z] [info] gm from ivy-a104 9f058d5a4da164ce1d762ca177cee8fa
-[2025-03-30T20:23:22.645Z] [info] Creating worker: ivy (folder: 100, version: 100)
-[2025-03-30T20:23:22.648Z] [info] Using env keys for ivy: 0x2f5F1F995A2E0522D763A390b57A4F8D1E931207
-[2025-03-30T20:23:22.650Z] [info] Creating worker: ivy (folder: 104, version: 104)
-[2025-03-30T20:23:22.651Z] [info] Using cached keys for ivy
-[2025-03-30T20:23:25.112Z] [info] syncing all
-[2025-03-30T20:23:25.926Z] [info] sending message
-[2025-03-30T20:23:27.127Z] [warn] Ivy  terminates, deletes local data, and restarts
-[2025-03-30T20:23:29.509Z] [info] gm from ivy-a100 43edc5652bf2839a05820fde23548858
-[2025-03-30T20:23:30.097Z] [info] gm from ivy-a104 43edc5652bf2839a05820fde23548858
+[2025-03-30T20:51:53.221Z] [info] XMTP_ENV dev
+[2025-03-30T20:51:53.224Z] [info] Running test for cb[production]
+[2025-03-30T20:51:53.224Z] [info] Creating worker: ivy (folder: a, version: 100)
+[2025-03-30T20:51:53.251Z] [info] Using env keys for ivy: 0xA750AD179620991160C1a3C9352BBbf1EE1343F0
+[2025-03-30T20:51:53.255Z] [info] Creating worker: ivy (folder: b, version: 104)
+[2025-03-30T20:51:53.255Z] [info] Using cached keys for ivy
+[2025-03-30T20:51:53.257Z] [info] [ivy] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-testing/bugs/bug_stitch/.data/ivy/a
+[2025-03-30T20:51:53.257Z] [info] [ivy] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-testing/bugs/bug_stitch/.data/ivy/b
+[2025-03-30T20:51:57.520Z] [info] syncing all
+[2025-03-30T20:52:01.818Z] [info] sending message
+[2025-03-30T20:52:02.855Z] [warn] Ivy terminates, deletes local data, and restarts
+[2025-03-30T20:52:05.465Z] [info] Original conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
+[2025-03-30T20:52:05.466Z] [info] Recreated conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
+[2025-03-30T20:52:06.065Z] [info] ivy-104 conversation ID: cb2f3b8db219a4cb5819e42bbdfc4ba8
