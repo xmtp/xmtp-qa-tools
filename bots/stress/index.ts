@@ -9,7 +9,7 @@ import {
   type XmtpEnv,
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import { create } from "node_modules/axios/index.cjs";
+import { V } from "vitest/dist/chunks/environment.d8YfPkTm.js";
 
 const testName = "stress-bot";
 loadEnv(testName);
@@ -76,8 +76,42 @@ function parseStressCommand(args: string[]): StressTestConfig | null {
 }
 
 /**
+ * Sends messages from a worker to a specified group
+ * @param worker The worker that will send messages
+ * @param groupId ID of the group to send messages to
+ * @param messageCount Number of messages to send
+ * @param progressCallback Optional callback function to report progress
+ * @returns Number of messages successfully sent
+ */
+async function sendWorkerMessagesToGroup(
+  workers: WorkerManager,
+  groupId: string,
+  messageCount: number,
+): Promise<void> {
+  for (const worker of workers.getWorkers()) {
+    console.log(
+      `Worker ${worker.name} sending ${messageCount} messages to group ${groupId}`,
+    );
+    await worker.client?.conversations.syncAll();
+    let messagesSent = 0;
+    const groupFromWorker =
+      await worker.client?.conversations.getConversationById(groupId);
+
+    for (let i = 0; i < messageCount; i++) {
+      await groupFromWorker?.send(
+        `Group Test ${worker.name} - ${i + 1}/${messageCount}`,
+      );
+      messagesSent++;
+    }
+
+    console.log(
+      `Worker ${worker.name} sent ${messagesSent}/${messageCount} messages to group ${groupId}`,
+    );
+  }
+}
+
+/**
  * Creates a large group with the specified number of members
- *
  * @param memberCount Number of members to include in the group
  * @param client XMTP client used to create the group
  * @param conversation Conversation used to send status updates
@@ -85,6 +119,7 @@ function parseStressCommand(args: string[]): StressTestConfig | null {
  * @returns The group ID if successful, undefined otherwise
  */
 async function createLargeGroup(
+  workers: WorkerManager,
   memberCount: number,
   client: Client,
   conversation: Conversation,
@@ -106,14 +141,16 @@ async function createLargeGroup(
     .slice(0, memberCount)
     .map((entry: GeneratedInbox) => entry.inboxId);
 
+  const workerInboxes = workers.getWorkers().map((w) => w.client?.inboxId);
+
   console.log(
     `Creating ${memberCount}-member group with ${inboxes.length} inboxes`,
   );
 
   try {
-    console.log([...inboxes, client.inboxId, message.senderInboxId]);
+    // console.log([...inboxes, client.inboxId, message.senderInboxId]);
     const group = await client.conversations.newGroup(
-      [...inboxes, client.inboxId, message.senderInboxId],
+      [...inboxes, client.inboxId, ...workerInboxes, message.senderInboxId],
       {
         groupName: `Large Group ${memberCount} - ${Date.now()}`,
         groupDescription: `Large group with ${memberCount} members for stress testing`,
@@ -124,6 +161,9 @@ async function createLargeGroup(
     await conversation.send(
       `✅ Created group with ${memberCount} members, ID: ${group.id}`,
     );
+
+    await sendWorkerMessagesToGroup(workers, group.id, 1);
+
     return group.id;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
@@ -189,7 +229,9 @@ async function runStressTest(
     console.log(`Loaded ${generatedInboxes.length} pre-generated inboxes`);
 
     // Create groups with different member counts
-    await createLargeGroup(10, client, conversation, message);
+    await createLargeGroup(workers, 50, client, conversation, message);
+    await createLargeGroup(workers, 100, client, conversation, message);
+    await createLargeGroup(workers, 200, client, conversation, message);
 
     await conversation.send("✅ Additional groups creation completed");
 
@@ -205,35 +247,18 @@ async function runStressTest(
       const dm = await worker.client?.conversations.newDm(
         message.senderInboxId,
       );
-      const groupFromWorker =
-        await worker.client?.conversations.getConversationById(group.id);
 
+      // Send DM messages
       for (let i = 0; i < config.messageCount; i++) {
-        await Promise.all([
-          dm?.send(`DM Test ${worker.name} - ${i + 1}/${config.messageCount}`),
-          groupFromWorker?.send(
-            `Group Test ${worker.name} - ${i + 1}/${config.messageCount}`,
-          ),
-        ]);
-        messagesSent += 2;
-
-        // Update progress every 10% or when a worker completes
-        const progressPercentage = Math.floor(
-          (messagesSent / totalMessages) * 100,
+        await dm?.send(
+          `DM Test ${worker.name} - ${i + 1}/${config.messageCount}`,
         );
-        if (
-          progressPercentage >= lastProgressUpdate + 10 ||
-          i === config.messageCount - 1
-        ) {
-          lastProgressUpdate = Math.floor(progressPercentage / 10) * 10;
-          await conversation.send(
-            `📊 Progress Update:\n` +
-              `Messages sent: ${messagesSent}/${totalMessages}\n` +
-              `Completion: ${progressPercentage}%\n` +
-              `Current worker: ${worker.name}`,
-          );
-        }
+        messagesSent++;
       }
+
+      // Use the new function for group messages
+      await sendWorkerMessagesToGroup(workers, group.id, config.messageCount);
+
       console.log(`Worker ${worker.name} completed all messages`);
       await conversation.send(
         `✅ Worker ${worker.name} completed all messages`,
@@ -264,13 +289,23 @@ async function runStressTest(
 }
 
 async function sendInitialTestMessage(client: Client) {
-  const dm = await client.conversations.newDm(
-    process.env.CONVOS_USER as string,
-  );
+  try {
+    // Send dm to the bot
+    const dm = await client.conversations.newDm(
+      process.env.CONVOS_USER as string,
+    );
 
-  await dm.send("gm from bot");
-  console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+    await dm.send("gm from bot");
+    console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+
+    const dm2 = await client.conversations.newDm(process.env.CB_USER as string);
+    await dm2.send("gm from bot");
+    console.log("DM sent:", dm2.id, "to", process.env.CB_USER);
+  } catch (error) {
+    console.error("Error sending initial test message:", error);
+  }
 }
+
 async function handleMessage(
   message: DecodedMessage,
   conversation: Conversation,
@@ -370,7 +405,6 @@ async function main() {
           message?.contentType?.typeId !== "text"
         )
           continue;
-        console.log(message);
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );

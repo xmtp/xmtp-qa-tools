@@ -59,6 +59,7 @@ export class WorkerManager {
     this.typeofStream = typeofStream;
     this.gptEnabled = gptEnabled;
     this.env = env;
+    console.log("env", env);
     this.workers = existingWorkers || {};
   }
   /**
