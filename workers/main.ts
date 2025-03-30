@@ -223,11 +223,11 @@ export class WorkerClient extends Worker {
     );
 
     // @ts-expect-error Window localStorage access in browser context
-    this.client = (await ClientClass.create(signer, encryptionKey, {
+    this.client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env: this.env,
       loggingLevel: loggingLevel as any,
-    })) as Client;
+    });
 
     // Start the appropriate stream based on configuration
     await this.startStream();
