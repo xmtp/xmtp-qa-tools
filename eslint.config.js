@@ -48,7 +48,16 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/unnecessary-type-assertion": "off",
       "@typescript-eslint/prefer-ts-expect-error": "off",
-      "@typescript-eslint/ban-ts-comment": "off",
+      "@typescript-eslint/ban-ts-comment": [
+        "off",
+        {
+          "ts-expect-error": false,
+          "ts-ignore": true,
+          "ts-nocheck": true,
+          "ts-check": true,
+        },
+      ],
+
       "@typescript-eslint/restrict-template-expressions": [
         "error",
         {
