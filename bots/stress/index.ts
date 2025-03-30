@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import {
   Dm,
   type Client,
@@ -35,6 +36,14 @@ interface StressTestConfig {
   messageCount: number;
 }
 
+// Define the type for generated inboxes
+interface GeneratedInbox {
+  accountAddress: string;
+  inboxId: string;
+  privateKey: string;
+  encryptionKey: string;
+}
+
 async function initializeBot() {
   const botWorker = await getWorkers(["bot"], testName, "none", false);
   const bot = botWorker.get("bot");
@@ -63,6 +72,66 @@ function parseStressCommand(args: string[]): StressTestConfig | null {
   }
 
   return { workerCount, messageCount };
+}
+
+/**
+ * Creates a large group with the specified number of members
+ *
+ * @param memberCount Number of members to include in the group
+ * @param client XMTP client used to create the group
+ * @param conversation Conversation used to send status updates
+ * @param generatedInboxes Array of generated inboxes to use for members
+ * @returns The group ID if successful, undefined otherwise
+ */
+async function createLargeGroup(
+  memberCount: number,
+  client: Client,
+  conversation: Conversation,
+): Promise<string | undefined> {
+  if (generatedInboxes.length < memberCount) {
+    console.log(
+      `Not enough pre-generated inboxes for ${memberCount}-member group`,
+    );
+    await conversation.send(
+      `⚠️ Not enough pre-generated inboxes for ${memberCount}-member group`,
+    );
+    return undefined;
+  }
+
+  await conversation.send(`⏳ Creating group with ${memberCount} members...`);
+
+  const inboxes: string[] = generatedInboxes
+    .slice(0, memberCount)
+    .map((entry: GeneratedInbox) => entry.inboxId);
+
+  console.log(
+    `Creating ${memberCount}-member group with ${inboxes.length} inboxes`,
+  );
+
+  try {
+    const group = await client.conversations.newGroup(
+      [...inboxes, client.inboxId],
+      {
+        groupName: `Large Group ${memberCount} - ${Date.now()}`,
+        groupDescription: `Large group with ${memberCount} members for stress testing`,
+      },
+    );
+
+    console.log(`Created ${memberCount}-member group with ID: ${group.id}`);
+    await conversation.send(
+      `✅ Created group with ${memberCount} members, ID: ${group.id}`,
+    );
+    return group.id;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(
+      `Error creating ${memberCount}-member group: ${errorMessage}`,
+    );
+    await conversation.send(
+      `❌ Error creating ${memberCount}-member group: ${errorMessage}`,
+    );
+    return undefined;
+  }
 }
 
 async function runStressTest(
@@ -108,6 +177,20 @@ async function runStressTest(
     console.log(`Created test group with ID: ${group.id}`);
 
     await conversation.send("✅ Test group created successfully");
+
+    // Create additional groups with different member counts
+    await conversation.send(
+      "⏳ Creating additional groups with pre-generated inboxes...",
+    );
+
+    console.log(`Loaded ${generatedInboxes.length} pre-generated inboxes`);
+
+    // Create groups with different member counts
+    await createLargeGroup(100, client, conversation);
+    await createLargeGroup(200, client, conversation);
+    await createLargeGroup(300, client, conversation);
+
+    await conversation.send("✅ Additional groups creation completed");
 
     console.log("Starting message sending process...");
     let messagesSent = 0;
