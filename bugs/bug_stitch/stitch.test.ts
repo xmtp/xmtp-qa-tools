@@ -12,7 +12,7 @@ WALLET_KEY_ALICE=0x6f1492016ec6a6265b301ba14ee2da88ea6ab91a5c73a5b24aa1923e0149b
 ENCRYPTION_KEY_ALICE=08b3fc095cfb0d49bb0b53402e2b25ab679cfe4c604ad7827714fbd3ca0bae75
 # public key is 0xD23bfB28265A1E9DA6A4967F0F5DE99980a1ddA2
 */
-const testName = "stitch";
+const testName = "bug_stitch";
 loadEnv(testName);
 
 describe(testName, () => {

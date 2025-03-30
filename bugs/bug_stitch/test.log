@@ -1,0 +1,6 @@
+[2025-03-30T19:54:50.035Z] [info] XMTP_ENV dev
+[2025-03-30T19:54:50.037Z] [info] Creating worker: ivy (folder: 100, version: default)
+[2025-03-30T19:54:50.063Z] [info] Using env keys for ivy: 0x2f5F1F995A2E0522D763A390b57A4F8D1E931207
+[2025-03-30T19:54:50.068Z] [info] Creating worker: ivy (folder: 104, version: default)
+[2025-03-30T19:54:50.068Z] [info] Using cached keys for ivy
+[2025-03-30T19:54:52.532Z] [info] ivy100 6eb1ce4-latest ivy104 6eb1ce4-latest
