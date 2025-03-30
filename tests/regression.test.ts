@@ -17,9 +17,9 @@ describe(testName, () => {
   });
 
   it("should create duplicate conversations when web client restarts", async () => {
-    workers = await getWorkers(["ivy-100", "ivy-104"], testName);
-    const ivy100 = workers.get("ivy-100");
-    const ivy104 = workers.get("ivy-104");
+    workers = await getWorkers(["ivy-100-100", "ivy-104-104"], testName);
+    const ivy100 = workers.get("ivy", "100");
+    const ivy104 = workers.get("ivy", "104");
     console.log("ivy100", ivy100?.version, "ivy104", ivy104?.version);
     expect(ivy100?.version).not.toBe(ivy104?.version);
   });

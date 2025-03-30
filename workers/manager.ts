@@ -2,7 +2,12 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { defaultValues, type Client, type typeofStream } from "@helpers/types";
+import {
+  defaultValues,
+  type Client,
+  type typeofStream,
+  type XmtpEnv,
+} from "@helpers/types";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
@@ -12,6 +17,7 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
+  sdkVersion?: string;
 }
 
 export interface Worker extends WorkerBase {
@@ -31,8 +37,9 @@ export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private testName: string;
   private activeWorkers: WorkerClient[] = [];
-  private typeofStream: typeofStream;
-  private gptEnabled: boolean;
+  private typeofStream: typeofStream = "message";
+  private gptEnabled: boolean = false;
+  private env: XmtpEnv;
   private keysCache: Record<
     string,
     { walletKey: string; encryptionKey: string }
@@ -45,11 +52,14 @@ export class WorkerManager {
     testName: string,
     typeofStream: typeofStream = "message",
     gptEnabled: boolean = false,
+    env: XmtpEnv,
     existingWorkers?: Record<string, Record<string, Worker>>,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStream;
     this.gptEnabled = gptEnabled;
+    this.env = env;
+    console.log("env", env);
     this.workers = existingWorkers || {};
   }
   /**
@@ -124,7 +134,9 @@ export class WorkerManager {
     installationId: string = "a",
   ): Worker | undefined {
     if (baseName.includes("-")) {
-      const [name, id] = baseName.split("-");
+      const parts = baseName.split("-");
+      const name = parts[0];
+      const id = parts[1];
       return this.workers[name]?.[id];
     }
     return this.workers[baseName]?.[installationId];
@@ -215,9 +227,13 @@ export class WorkerManager {
    * Creates a new worker with all necessary initialization
    */
   public async createWorker(descriptor: string): Promise<Worker> {
-    // Check if the worker already exists in our internal storage
-    const [baseName, providedInstallId] = descriptor.split("-");
+    // Parse the descriptor into components: name, folder, and version
+    const parts = descriptor.split("-");
+    const baseName = parts[0];
+    const providedInstallId = parts.length > 1 ? parts[1] : undefined;
+    const version = parts.length > 2 ? parts[2] : undefined;
 
+    // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.log(`Reusing existing worker for ${descriptor}`);
       return this.workers[baseName][providedInstallId];
@@ -225,12 +241,16 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const installationId = providedInstallId || getNextFolderName();
-    const fullDescriptor = providedInstallId
-      ? descriptor
-      : `${baseName}-${installationId}`;
+    // const fullDescriptor = providedInstallId
+    //   ? descriptor
+    //   : `${baseName}-${installationId}`;
+
+    console.log(
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${version || "default"})`,
+    );
 
     // Get or generate keys
-    const { walletKey, encryptionKey } = this.ensureKeys(fullDescriptor);
+    const { walletKey, encryptionKey } = this.ensureKeys(baseName);
 
     // Create the base worker data
     const workerData: WorkerBase = {
@@ -239,6 +259,7 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
+      sdkVersion: version,
     };
 
     // Create and initialize the worker
@@ -246,6 +267,7 @@ export class WorkerManager {
       workerData,
       this.typeofStream,
       this.gptEnabled,
+      this.env,
     );
 
     const initializedWorker = await workerClient.initialize();
@@ -303,9 +325,11 @@ export async function getWorkers(
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
   existingWorkers?: WorkerManager,
+  env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
   const manager =
-    existingWorkers || new WorkerManager(testName, typeofStream, gptEnabled);
+    existingWorkers ||
+    new WorkerManager(testName, typeofStream, gptEnabled, env);
   await manager.createWorkers(descriptorsOrAmount);
   return manager;
 }

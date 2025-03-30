@@ -1,7 +1,6 @@
 {
   "title": "XMTP SDK Performance",
   "description": "Metrics for XMTP SDK operations (DNS, TLS, Server Processing)",
-  "experience_type": "default",
   "widgets": [
     {
       "id": 8186190636625556,
@@ -207,6 +206,7 @@
         "title": "Network Performance",
         "show_legend": true,
         "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
         "type": "timeseries",
         "requests": [
           {
@@ -221,6 +221,13 @@
             "response_format": "timeseries",
             "display_type": "line"
           }
+        ],
+        "markers": [
+          {
+            "label": "Max Threshold (200ms)",
+            "value": "y = 300",
+            "display_type": "error dashed"
+          }
         ]
       },
       "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
@@ -231,6 +238,7 @@
         "title": "SDK Operations Performance",
         "show_legend": true,
         "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
         "type": "timeseries",
         "requests": [
           {
@@ -239,11 +247,23 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members, metric_subtype:core} by {operation}"
               }
             ],
             "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
             "display_type": "line"
+          }
+        ],
+        "markers": [
+          {
+            "label": "Max Threshold (200ms)",
+            "value": "y = 501",
+            "display_type": "error dashed"
           }
         ]
       },
@@ -279,24 +299,35 @@
     {
       "id": 7177057798083011,
       "definition": {
-        "title": "Group operations by size",
+        "title": "Group operations by size (Cumulative Progress)",
         "show_legend": true,
         "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
         "type": "timeseries",
         "requests": [
           {
-            "formulas": [{ "formula": "query1" }],
+            "formulas": [{ "formula": "cumsum(query1)" }],
             "queries": [
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,operation:creategroup,$env,$region,$test,$libxmtp,$members} by {members}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members, metric_subtype:group} by {members}"
               }
             ],
             "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
             "display_type": "line"
           }
-        ]
+        ],
+        "yaxis": {
+          "label": "Cumulative Duration",
+          "scale": "linear",
+          "include_zero": true
+        }
       },
       "layout": { "x": 6, "y": 6, "width": 6, "height": 4 }
     },
@@ -332,7 +363,6 @@
       "id": 3075918014507898,
       "definition": {
         "title": "Network performance",
-        "time": {},
         "type": "query_table",
         "requests": [
           {

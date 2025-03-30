@@ -80,12 +80,15 @@ export const getDbPath = (
   const basePath = loadDataPath(name, installationId, testName);
 
   if (!fs.existsSync(basePath)) {
+    console.log(`[${name}] Creating directory: ${basePath}`);
     fs.mkdirSync(basePath, { recursive: true });
-    //console.debug("Creating directory", basePath);
   }
+
+  const fullPath = `${basePath}/${identifier}`;
+
   console.timeEnd(`[${name}] - getDbPath`);
 
-  return `${basePath}/${identifier}`;
+  return fullPath;
 };
 
 export const generateEncryptionKeyHex = () => {

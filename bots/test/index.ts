@@ -28,7 +28,7 @@ async function main() {
     const env = process.env.XMTP_ENV as XmtpEnv;
     console.log(`Agent initialized on address ${bot?.address}`);
     console.log(`Agent initialized on inbox ${client.inboxId}`);
-    console.log(`https://xmtp.chat/dm/${client.inboxId}?env=${env}`);
+    console.log(`https://xmtp.chat/dm/${bot?.address}?env=${env}`);
     console.log("Syncing conversations...");
     await client.conversations.sync();
 
@@ -88,14 +88,16 @@ async function main() {
 
 async function sendInitialTestMessage(client: Client) {
   // Send dm to the bot
-  const cbUser = process.env.CB_USER;
-  if (!cbUser) {
-    throw new Error("CB_USER is not set");
-  }
-  const dm = await client.conversations.newDm(cbUser);
+  const dm = await client.conversations.newDm(
+    process.env.CONVOS_USER as string,
+  );
 
   await dm.send("gm from bot");
-  console.log("DM sent:", dm.id);
+  console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+
+  const dm2 = await client.conversations.newDm(process.env.CB_USER as string);
+  await dm2.send("gm from bot");
+  console.log("DM sent:", dm2.id, "to", process.env.CB_USER);
 }
 
 // Helper function to process incoming commands

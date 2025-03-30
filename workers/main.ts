@@ -7,9 +7,10 @@ import {
   getEncryptionKeyFromHex,
 } from "@helpers/client";
 import {
-  Client,
   defaultValues,
   Dm,
+  sdkVersions,
+  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -111,9 +112,10 @@ export class WorkerClient extends Worker {
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
   private folder: string;
+  private workerData: WorkerBase;
   public address!: `0x${string}`;
   public client!: Client;
-
+  private env: XmtpEnv;
   // Stream management
   private activeStream?: AsyncIterable<any> & {
     return: (value?: any) => Promise<any>;
@@ -124,6 +126,7 @@ export class WorkerClient extends Worker {
     worker: WorkerBase,
     typeofStream: typeofStream,
     gptEnabled: boolean,
+    env: XmtpEnv,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
@@ -136,10 +139,12 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.folder = worker.folder;
+    this.env = env;
     this.nameId = worker.name;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
+    this.workerData = worker;
 
     this.setupEventHandlers();
   }
@@ -185,25 +190,43 @@ export class WorkerClient extends Worker {
 
     const signer = createSigner(this.walletKey as `0x${string}`);
     const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-    const version = Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+    // Get the SDK version from the worker data
+    const sdkVersion = this.workerData.sdkVersion;
+    // Select the appropriate SDK client based on version
+    let ClientClass;
+    if (sdkVersion === "100") {
+      ClientClass = sdkVersions.v100.Client;
+      console.debug(`[${this.nameId}] Using SDK version 1.0.0`);
+    } else {
+      // Default to latest version
+      ClientClass = sdkVersions.v104.Client;
+    }
+
+    // Force version to include the SDK version for easier identification
+    const sdkIdentifier = sdkVersion || "latest";
+    const libXmtpVersion =
+      ClientClass.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+    const version = `${libXmtpVersion}-${sdkIdentifier}`;
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
-    const env = process.env.XMTP_ENV as XmtpEnv;
-
+    const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
     const dbPath = getDbPath(
       this.name,
       this.address,
       this.testName,
       this.folder,
       version,
-      env,
+      this.env,
     );
 
-    this.client = await Client.create(signer, encryptionKey, {
+    // @ts-expect-error Window localStorage access in browser context
+    this.client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
-      env,
-      loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
+      env: this.env,
+      loggingLevel: loggingLevel as any,
     });
 
     // Start the appropriate stream based on configuration
@@ -211,13 +234,6 @@ export class WorkerClient extends Worker {
 
     const installationId = this.client.installationId;
 
-    // console.debug({
-    //   inboxId: this.client.inboxId,
-    //   dbPath,
-    //   version,
-    //   address: this.address,
-    //   installationId,
-    // });
     return {
       client: this.client,
       dbPath,
@@ -251,8 +267,6 @@ export class WorkerClient extends Worker {
           console.log(`[${this.nameId}] Unsupported stream type`);
           return;
       }
-
-      console.log(`[${this.nameId}] ${this.typeofStream} stream started`);
     } catch (error) {
       console.error(
         `[${this.nameId}] Failed to start ${this.typeofStream} stream:`,

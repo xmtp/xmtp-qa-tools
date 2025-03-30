@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import {
   Dm,
   type Client,
@@ -35,6 +36,14 @@ interface StressTestConfig {
   messageCount: number;
 }
 
+// Define the type for generated inboxes
+interface GeneratedInbox {
+  accountAddress: string;
+  inboxId: string;
+  privateKey: string;
+  encryptionKey: string;
+}
+
 async function initializeBot() {
   const botWorker = await getWorkers(["bot"], testName, "none", false);
   const bot = botWorker.get("bot");
@@ -63,6 +72,108 @@ function parseStressCommand(args: string[]): StressTestConfig | null {
   }
 
   return { workerCount, messageCount };
+}
+
+/**
+ * Sends messages from a worker to a specified group
+ * @param worker The worker that will send messages
+ * @param groupId ID of the group to send messages to
+ * @param messageCount Number of messages to send
+ * @param progressCallback Optional callback function to report progress
+ * @returns Number of messages successfully sent
+ */
+async function sendWorkerMessagesToGroup(
+  workers: WorkerManager,
+  groupId: string,
+  messageCount: number,
+): Promise<void> {
+  for (const worker of workers.getWorkers()) {
+    console.log(
+      `Worker ${worker.name} sending ${messageCount} messages to group ${groupId}`,
+    );
+    await worker.client?.conversations.syncAll();
+    let messagesSent = 0;
+    const groupFromWorker =
+      await worker.client?.conversations.getConversationById(groupId);
+
+    for (let i = 0; i < messageCount; i++) {
+      await groupFromWorker?.send(
+        `Group Test ${worker.name} - ${i + 1}/${messageCount}`,
+      );
+      messagesSent++;
+    }
+
+    console.log(
+      `Worker ${worker.name} sent ${messagesSent}/${messageCount} messages to group ${groupId}`,
+    );
+  }
+}
+
+/**
+ * Creates a large group with the specified number of members
+ * @param memberCount Number of members to include in the group
+ * @param client XMTP client used to create the group
+ * @param conversation Conversation used to send status updates
+ * @param generatedInboxes Array of generated inboxes to use for members
+ * @returns The group ID if successful, undefined otherwise
+ */
+async function createLargeGroup(
+  workers: WorkerManager,
+  memberCount: number,
+  client: Client,
+  conversation: Conversation,
+  message: DecodedMessage,
+): Promise<string | undefined> {
+  if (generatedInboxes.length < memberCount) {
+    console.log(
+      `Not enough pre-generated inboxes for ${memberCount}-member group`,
+    );
+    await conversation.send(
+      `⚠️ Not enough pre-generated inboxes for ${memberCount}-member group`,
+    );
+    return undefined;
+  }
+
+  await conversation.send(`⏳ Creating group with ${memberCount} members...`);
+
+  const inboxes: string[] = generatedInboxes
+    .slice(0, memberCount)
+    .map((entry: GeneratedInbox) => entry.inboxId);
+
+  const workerInboxes = workers.getWorkers().map((w) => w.client?.inboxId);
+
+  console.log(
+    `Creating ${memberCount}-member group with ${inboxes.length} inboxes`,
+  );
+
+  try {
+    // console.log([...inboxes, client.inboxId, message.senderInboxId]);
+    const group = await client.conversations.newGroup(
+      [...inboxes, client.inboxId, ...workerInboxes, message.senderInboxId],
+      {
+        groupName: `Large Group ${memberCount} - ${Date.now()}`,
+        groupDescription: `Large group with ${memberCount} members for stress testing`,
+      },
+    );
+
+    console.log(`Created ${memberCount}-member group with ID: ${group.id}`);
+    await conversation.send(
+      `✅ Created group with ${memberCount} members, ID: ${group.id}`,
+    );
+
+    await sendWorkerMessagesToGroup(workers, group.id, 1);
+
+    return group.id;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(
+      `Error creating ${memberCount}-member group: ${errorMessage}`,
+    );
+    await conversation.send(
+      `❌ Error creating ${memberCount}-member group: ${errorMessage}`,
+    );
+    return undefined;
+  }
 }
 
 async function runStressTest(
@@ -109,9 +220,22 @@ async function runStressTest(
 
     await conversation.send("✅ Test group created successfully");
 
+    // Create additional groups with different member counts
+    await conversation.send(
+      "⏳ Creating additional groups with pre-generated inboxes...",
+    );
+
+    console.log(`Loaded ${generatedInboxes.length} pre-generated inboxes`);
+
+    // Create groups with different member counts
+    await createLargeGroup(workers, 50, client, conversation, message);
+    await createLargeGroup(workers, 100, client, conversation, message);
+    await createLargeGroup(workers, 200, client, conversation, message);
+
+    await conversation.send("✅ Additional groups creation completed");
+
     console.log("Starting message sending process...");
     let messagesSent = 0;
-    let lastProgressUpdate = 0;
     const totalMessages = config.workerCount * config.messageCount * 2;
 
     for (const worker of workers.getWorkers()) {
@@ -121,35 +245,18 @@ async function runStressTest(
       const dm = await worker.client?.conversations.newDm(
         message.senderInboxId,
       );
-      const groupFromWorker =
-        await worker.client?.conversations.getConversationById(group.id);
 
+      // Send DM messages
       for (let i = 0; i < config.messageCount; i++) {
-        await Promise.all([
-          dm?.send(`DM Test ${worker.name} - ${i + 1}/${config.messageCount}`),
-          groupFromWorker?.send(
-            `Group Test ${worker.name} - ${i + 1}/${config.messageCount}`,
-          ),
-        ]);
-        messagesSent += 2;
-
-        // Update progress every 10% or when a worker completes
-        const progressPercentage = Math.floor(
-          (messagesSent / totalMessages) * 100,
+        await dm?.send(
+          `DM Test ${worker.name} - ${i + 1}/${config.messageCount}`,
         );
-        if (
-          progressPercentage >= lastProgressUpdate + 10 ||
-          i === config.messageCount - 1
-        ) {
-          lastProgressUpdate = Math.floor(progressPercentage / 10) * 10;
-          await conversation.send(
-            `📊 Progress Update:\n` +
-              `Messages sent: ${messagesSent}/${totalMessages}\n` +
-              `Completion: ${progressPercentage}%\n` +
-              `Current worker: ${worker.name}`,
-          );
-        }
+        messagesSent++;
       }
+
+      // Use the new function for group messages
+      await sendWorkerMessagesToGroup(workers, group.id, config.messageCount);
+
       console.log(`Worker ${worker.name} completed all messages`);
       await conversation.send(
         `✅ Worker ${worker.name} completed all messages`,
@@ -176,6 +283,24 @@ async function runStressTest(
     console.error("Stress test error:", errorMessage);
   } finally {
     isStressTestRunning = false;
+  }
+}
+
+async function sendInitialTestMessage(client: Client) {
+  try {
+    // Send dm to the bot
+    const dm = await client.conversations.newDm(
+      process.env.CONVOS_USER as string,
+    );
+
+    await dm.send("gm from bot");
+    console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+
+    const dm2 = await client.conversations.newDm(process.env.CB_USER as string);
+    await dm2.send("gm from bot");
+    console.log("DM sent:", dm2.id, "to", process.env.CB_USER);
+  } catch (error) {
+    console.error("Error sending initial test message:", error);
   }
 }
 
@@ -268,7 +393,7 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-
+    await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
@@ -278,12 +403,10 @@ async function main() {
           message?.contentType?.typeId !== "text"
         )
           continue;
-
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );
         if (!conversation) continue;
-
         await handleMessage(message, conversation, client);
       } catch (error) {
         console.error("Message handling error:", error);

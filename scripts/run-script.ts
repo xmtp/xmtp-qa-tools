@@ -11,6 +11,7 @@ if (!scriptName) {
 try {
   execSync(`tsx --watch scripts/${scriptName}.ts`, { stdio: "inherit" });
 } catch (error) {
+  console.error(error);
   console.error(`Error: Script "${scriptName}" not found or failed to start`);
   process.exit(1);
 }
