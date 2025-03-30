@@ -22,9 +22,6 @@ import {
   Conversation as Conversation100,
   Dm as Dm100,
   Group as Group100,
-  type DecodedMessage as DecodedMessage100,
-  type Signer as Signer100,
-  type XmtpEnv as XmtpEnv100,
 } from "@xmtp/node-sdk-100";
 
 // Add version-specific exports

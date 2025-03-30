@@ -94,7 +94,7 @@ function discoverPackages(): VersionConfig[] {
           ),
         );
         sdkVersion = sdkPackageJson.version || "";
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(
           `⚠️  Could not read version from ${sdkPackage}/package.json`,
         );
@@ -108,7 +108,7 @@ function discoverPackages(): VersionConfig[] {
           ),
         );
         bindingsVersion = bindingsPackageJson.version || "";
-      } catch (error) {
+      } catch (error: unknown) {
         console.warn(
           `⚠️  Could not read version from ${matchingBindings}/package.json`,
         );
@@ -175,8 +175,10 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
       );
       try {
         fs.rmSync(sdkNodeModulesDir, { recursive: true, force: true });
-      } catch (error) {
-        console.error(`❌ Error removing directory: ${error}`);
+      } catch (error: unknown) {
+        console.error(
+          `❌ Error removing directory: ${error instanceof Error ? error.message : String(error)}`,
+        );
         continue;
       }
     }
@@ -212,16 +214,20 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
           console.log(
             `📊 ${config.sdkPackage} -> ${config.bindingsPackage} version: ${versionData.branch}@${versionData.version}`,
           );
-        } catch (error) {
-          console.warn(`⚠️  Error reading version.json: ${error}`);
+        } catch (error: unknown) {
+          console.warn(
+            `⚠️  Error reading version.json: ${error instanceof Error ? error.message : String(error)}`,
+          );
         }
       } else {
         console.warn(
           `⚠️  Warning: version.json not found at ${versionJsonPath}`,
         );
       }
-    } catch (error) {
-      console.error(`❌ Error creating symlink: ${error}`);
+    } catch (error: unknown) {
+      console.error(
+        `❌ Error creating symlink: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
   }
 }
@@ -259,8 +265,10 @@ function verifyVersions(configs: VersionConfig[]) {
             `ℹ️  ${config.sdkPackage} doesn't directly import version from node-bindings`,
           );
         }
-      } catch (error) {
-        console.error(`❌ Error reading SDK index file: ${error}`);
+      } catch (error: unknown) {
+        console.error(
+          `❌ Error reading SDK index file: ${error instanceof Error ? error.message : String(error)}`,
+        );
       }
     } else {
       console.warn(`⚠️  SDK index file not found for ${config.sdkPackage}`);
@@ -279,7 +287,7 @@ function cleanPackageJson() {
     return;
   }
 
-  console.log('�� Cleaning "imports" field from package.json...');
+  console.log('🧹 Cleaning "imports" field from package.json...');
 
   try {
     // Read the package.json file
@@ -304,8 +312,10 @@ function cleanPackageJson() {
     } else {
       console.log('ℹ️  No "imports" field found in package.json');
     }
-  } catch (error) {
-    console.error(`❌ Error processing package.json: ${error}`);
+  } catch (error: unknown) {
+    console.error(
+      `❌ Error processing package.json: ${error instanceof Error ? error.message : String(error)}`,
+    );
   }
 }
 

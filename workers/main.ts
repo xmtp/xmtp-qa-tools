@@ -191,19 +191,14 @@ export class WorkerClient extends Worker {
 
     // Get the SDK version from the worker data
     const sdkVersion = this.workerData.sdkVersion;
-    console.log(
-      `[${this.nameId}] Initializing with SDK version: ${sdkVersion || "default"}, descriptor: ${JSON.stringify(this.workerData)}`,
-    );
-
     // Select the appropriate SDK client based on version
     let ClientClass;
     if (sdkVersion === "100") {
       ClientClass = sdkVersions.v100.Client;
-      console.log(`[${this.nameId}] Using SDK version 1.0.0`);
+      console.debug(`[${this.nameId}] Using SDK version 1.0.0`);
     } else {
       // Default to latest version
       ClientClass = sdkVersions.v104.Client;
-      console.log(`[${this.nameId}] Using default SDK version (latest)`);
     }
 
     // Force version to include the SDK version for easier identification
@@ -226,10 +221,8 @@ export class WorkerClient extends Worker {
       env,
     );
 
-    // Create the client with the appropriate SDK version
-    // Using 'any' here because the signer types between different SDK versions
-    // are incompatible at the TypeScript level despite having the same runtime interface
-    this.client = (await ClientClass.create(signer as any, encryptionKey, {
+    // @ts-expect-error - signer is not typed
+    this.client = (await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel: loggingLevel as any,
@@ -273,8 +266,6 @@ export class WorkerClient extends Worker {
           console.log(`[${this.nameId}] Unsupported stream type`);
           return;
       }
-
-      console.log(`[${this.nameId}] ${this.typeofStream} stream started`);
     } catch (error) {
       console.error(
         `[${this.nameId}] Failed to start ${this.typeofStream} stream:`,
