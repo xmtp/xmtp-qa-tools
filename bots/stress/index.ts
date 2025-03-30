@@ -9,6 +9,7 @@ import {
   type XmtpEnv,
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
+import { create } from "node_modules/axios/index.cjs";
 
 const testName = "stress-bot";
 loadEnv(testName);
@@ -87,6 +88,7 @@ async function createLargeGroup(
   memberCount: number,
   client: Client,
   conversation: Conversation,
+  message: DecodedMessage,
 ): Promise<string | undefined> {
   if (generatedInboxes.length < memberCount) {
     console.log(
@@ -109,8 +111,9 @@ async function createLargeGroup(
   );
 
   try {
+    console.log([...inboxes, client.inboxId, message.senderInboxId]);
     const group = await client.conversations.newGroup(
-      [...inboxes, client.inboxId],
+      [...inboxes, client.inboxId, message.senderInboxId],
       {
         groupName: `Large Group ${memberCount} - ${Date.now()}`,
         groupDescription: `Large group with ${memberCount} members for stress testing`,
@@ -186,9 +189,7 @@ async function runStressTest(
     console.log(`Loaded ${generatedInboxes.length} pre-generated inboxes`);
 
     // Create groups with different member counts
-    await createLargeGroup(100, client, conversation);
-    await createLargeGroup(200, client, conversation);
-    await createLargeGroup(300, client, conversation);
+    await createLargeGroup(10, client, conversation, message);
 
     await conversation.send("✅ Additional groups creation completed");
 
@@ -262,6 +263,14 @@ async function runStressTest(
   }
 }
 
+async function sendInitialTestMessage(client: Client) {
+  const dm = await client.conversations.newDm(
+    process.env.CONVOS_USER as string,
+  );
+
+  await dm.send("gm from bot");
+  console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+}
 async function handleMessage(
   message: DecodedMessage,
   conversation: Conversation,
@@ -351,7 +360,7 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-
+    await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
@@ -361,13 +370,15 @@ async function main() {
           message?.contentType?.typeId !== "text"
         )
           continue;
-
+        console.log(message);
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );
         if (!conversation) continue;
-
-        await handleMessage(message, conversation, client);
+        console.log(conversation);
+        await createLargeGroup(10, client, conversation, message);
+        return;
+        //await handleMessage(message, conversation, client);
       } catch (error) {
         console.error("Message handling error:", error);
       }

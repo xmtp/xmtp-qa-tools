@@ -52,8 +52,8 @@ export class WorkerManager {
     testName: string,
     typeofStream: typeofStream = "message",
     gptEnabled: boolean = false,
+    env: XmtpEnv,
     existingWorkers?: Record<string, Record<string, Worker>>,
-    env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStream;
@@ -324,11 +324,11 @@ export async function getWorkers(
   typeofStream: typeofStream = "message",
   gptEnabled: boolean = false,
   existingWorkers?: WorkerManager,
-  env: XmtpEnv = "production",
+  env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
   const manager =
     existingWorkers ||
-    new WorkerManager(testName, typeofStream, gptEnabled, undefined, env);
+    new WorkerManager(testName, typeofStream, gptEnabled, env);
   await manager.createWorkers(descriptorsOrAmount);
   return manager;
 }
