@@ -115,7 +115,7 @@ export class WorkerClient extends Worker {
   private workerData: WorkerBase;
   public address!: `0x${string}`;
   public client!: Client;
-
+  private env: XmtpEnv;
   // Stream management
   private activeStream?: AsyncIterable<any> & {
     return: (value?: any) => Promise<any>;
@@ -126,6 +126,7 @@ export class WorkerClient extends Worker {
     worker: WorkerBase,
     typeofStream: typeofStream,
     gptEnabled: boolean,
+    env: XmtpEnv,
     options: WorkerOptions = {},
   ) {
     options.workerData = {
@@ -138,6 +139,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.folder = worker.folder;
+    this.env = env;
     this.nameId = worker.name;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
@@ -210,7 +212,6 @@ export class WorkerClient extends Worker {
 
     const identifier = await signer.getIdentifier();
     this.address = identifier.identifier as `0x${string}`;
-    const env = process.env.XMTP_ENV as XmtpEnv;
     const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
     const dbPath = getDbPath(
       this.name,
@@ -218,13 +219,13 @@ export class WorkerClient extends Worker {
       this.testName,
       this.folder,
       version,
-      env,
+      this.env,
     );
 
     // @ts-expect-error - signer is not typed
     this.client = (await ClientClass.create(signer, encryptionKey, {
       dbPath,
-      env,
+      env: this.env,
       loggingLevel: loggingLevel as any,
     })) as Client;
 

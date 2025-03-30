@@ -1,8 +1,9 @@
-import { loadEnv } from "@helpers/client";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { IdentifierKind } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);
@@ -26,6 +27,14 @@ describe(testName, () => {
       ],
       testName,
     );
+  });
+  afterAll(async () => {
+    try {
+      await closeEnv(testName, workers);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
   });
 
   it("clientCreate: should measure creating a client", async () => {

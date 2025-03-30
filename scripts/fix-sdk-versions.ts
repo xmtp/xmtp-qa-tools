@@ -95,6 +95,7 @@ function discoverPackages(): VersionConfig[] {
         );
         sdkVersion = sdkPackageJson.version || "";
       } catch (error: unknown) {
+        console.error(error);
         console.warn(
           `⚠️  Could not read version from ${sdkPackage}/package.json`,
         );
@@ -109,6 +110,7 @@ function discoverPackages(): VersionConfig[] {
         );
         bindingsVersion = bindingsPackageJson.version || "";
       } catch (error: unknown) {
+        console.error(error);
         console.warn(
           `⚠️  Could not read version from ${matchingBindings}/package.json`,
         );

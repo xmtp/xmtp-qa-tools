@@ -33,9 +33,6 @@ describe(testName, () => {
     // Prepare test message
     const testMessage = `Hello! Performance test at ${new Date().toISOString()}, Reply as fast as possible`;
 
-    // Set up message listener to capture response
-    let responseReceived = false;
-
     const messageStream = sender.client.conversations.streamAllMessages();
 
     // Send the test message
@@ -63,7 +60,7 @@ describe(testName, () => {
         // Check if this is a response in our conversation
         if (message?.conversationId === conversation?.id) {
           const responseTime = Date.now() - startTime;
-          responseReceived = true;
+
           console.log(`Response received: "${message.content as string}"`);
           console.log(`Response time: ${responseTime}ms`);
           return responseTime;

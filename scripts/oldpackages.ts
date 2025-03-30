@@ -32,12 +32,12 @@ async function main() {
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),
       });
-      const clientProduction = await Client.create(user.account.address, {
+      await Client.create(user.account.address, {
         env: "production",
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),
       });
-      const clientLocal = await Client.create(user.account.address, {
+      await Client.create(user.account.address, {
         env: "local",
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),

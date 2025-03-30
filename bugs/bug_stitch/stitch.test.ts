@@ -1,4 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
+import type { XmtpEnv } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
@@ -12,46 +13,85 @@ WALLET_KEY_ALICE=0x6f1492016ec6a6265b301ba14ee2da88ea6ab91a5c73a5b24aa1923e0149b
 ENCRYPTION_KEY_ALICE=08b3fc095cfb0d49bb0b53402e2b25ab679cfe4c604ad7827714fbd3ca0bae75
 # public key is 0xD23bfB28265A1E9DA6A4967F0F5DE99980a1ddA2
 */
+const users: {
+  [key: string]: {
+    inboxId: string;
+    env: string;
+  };
+} = {
+  cb: {
+    inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
+    env: "production",
+  },
+  convos: {
+    inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
+    env: "dev",
+  },
+  xmtpchat: {
+    inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
+    env: "dev",
+  },
+};
+
 const testName = "bug_stitch";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const cbUser = process.env.CB_USER;
-  const convosUser = process.env.CONVOS_USER;
-  if (!cbUser || !convosUser) {
-    throw new Error("CB_USER or CONVOS_USER is not set");
-  }
   afterAll(async () => {
     await closeEnv(testName, workers);
   });
 
   it("should create duplicate conversations when web client restarts", async () => {
-    workers = await getWorkers(["ivy-100", "ivy-104"], testName);
-    const ivy100 = workers.get("ivy-100");
-    const ivy104 = workers.get("ivy-104");
-    console.log("ivy100", ivy100?.version, "ivy104", ivy104?.version);
-    await ivy100?.client.conversations.syncAll();
-    const newConvo = await ivy100?.client.conversations.newDm(convosUser);
-    console.log("newConvo", newConvo?.id);
-    const message = "gm from ivy-a100" + (newConvo?.id || "");
-    console.log(message);
-    await newConvo?.send(message);
+    for (const user of Object.keys(users)) {
+      //Step 1: Create workers
+      workers = await getWorkers(
+        ["ivy-100-100", "ivy-104-104"],
+        testName,
+        "message",
+        false,
+        undefined,
+        users[user].env as XmtpEnv,
+      );
+      const ivy100 = workers.get("ivy", "100");
+      const ivy104 = workers.get("ivy", "104");
 
-    console.warn("Ivy  terminates, deletes local data, and restarts");
-    await ivy100?.worker.clearDB();
-    await ivy100?.worker.initialize();
+      //Step 2: Sync all
+      console.log("syncing all");
+      await ivy100?.client.conversations.syncAll();
 
-    const newConvo2 = await ivy100?.client.conversations.newDm(convosUser);
-    const message2 = "gm from ivy-a100 " + (newConvo2?.id || "");
-    console.log(message2);
-    await newConvo2?.send(message2);
+      //Step 3: Create new DM
+      const newConvo = await ivy100?.client.conversations.newDm(
+        users[user].inboxId,
+      );
 
-    //104
+      //Step 4: Send message
+      console.log("sending message");
+      const message = "gm from ivy-a100" + (newConvo?.id || "");
+      await newConvo?.send(message);
 
-    const newConvo3 = await ivy104?.client.conversations.newDm(convosUser);
-    const message3 = "gm from ivy-a104 " + (newConvo3?.id || "");
-    console.log(message3);
-    await newConvo3?.send(message3);
+      //Step 5: Terminate and restart
+      console.warn("Ivy  terminates, deletes local data, and restarts");
+      await ivy100?.worker.clearDB();
+      await ivy100?.worker.initialize();
+
+      //Step 6: Create new DM
+      const newConvo2 = await ivy100?.client.conversations.newDm(
+        users[user].inboxId,
+      );
+      const message2 = "gm from ivy-a100 " + (newConvo2?.id || "");
+      console.log(message2);
+      await newConvo2?.send(message2);
+
+      //104
+
+      //Step 7: Create new DM from 104
+      const newConvo3 = await ivy104?.client.conversations.newDm(
+        users[user].inboxId,
+      );
+      const message3 = "gm from ivy-a104 " + (newConvo3?.id || "");
+      console.log(message3);
+      await newConvo3?.send(message3);
+    }
   });
 });
