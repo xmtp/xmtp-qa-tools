@@ -360,7 +360,7 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-    await sendInitialTestMessage(client);
+    //await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
@@ -375,10 +375,7 @@ async function main() {
           message.conversationId,
         );
         if (!conversation) continue;
-        console.log(conversation);
-        await createLargeGroup(10, client, conversation, message);
-        return;
-        //await handleMessage(message, conversation, client);
+        await handleMessage(message, conversation, client);
       } catch (error) {
         console.error("Message handling error:", error);
       }
