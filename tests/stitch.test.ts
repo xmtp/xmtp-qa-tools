@@ -1,5 +1,4 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sdkVersions } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
