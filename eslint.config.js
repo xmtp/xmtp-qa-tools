@@ -47,7 +47,6 @@ export default tseslint.config(
       "@typescript-eslint/no-unsafe-assignment": "off",
       "@typescript-eslint/no-unsafe-call": "off",
       "@typescript-eslint/unnecessary-type-assertion": "off",
-      "@typescript-eslint/prefer-ts-expect-error": "on",
       "@typescript-eslint/restrict-template-expressions": [
         "error",
         {
