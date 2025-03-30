@@ -1328,7 +1328,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/content-type-group-updated@npm:^2.0.1":
+"@xmtp/content-type-group-updated@npm:^2.0.0, @xmtp/content-type-group-updated@npm:^2.0.1":
   version: 2.0.1
   resolution: "@xmtp/content-type-group-updated@npm:2.0.1"
   dependencies:
@@ -1347,7 +1347,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/content-type-primitives@npm:^2.0.1":
+"@xmtp/content-type-primitives@npm:^2.0.0, @xmtp/content-type-primitives@npm:^2.0.1":
   version: 2.0.1
   resolution: "@xmtp/content-type-primitives@npm:2.0.1"
   dependencies:
@@ -1365,7 +1365,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/content-type-text@npm:^2.0.1":
+"@xmtp/content-type-text@npm:^2.0.0, @xmtp/content-type-text@npm:^2.0.1":
   version: 2.0.1
   resolution: "@xmtp/content-type-text@npm:2.0.1"
   dependencies:
@@ -1393,10 +1393,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings@npm:^1.1.2":
+"@xmtp/node-bindings-100@npm:@xmtp/node-bindings@1.0.0":
+  version: 1.0.0
+  resolution: "@xmtp/node-bindings@npm:1.0.0"
+  checksum: 10/8bf91003ea3859f1c535f871013d13eb1096728f51e3c81471eb5ad9a27de65a19a9817eb8efbd56e257c07076af94771845643211764ff028103e202779f6ce
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-bindings@npm:1.1.3, @xmtp/node-bindings@npm:^1.0.0, @xmtp/node-bindings@npm:^1.1.2":
   version: 1.1.3
   resolution: "@xmtp/node-bindings@npm:1.1.3"
   checksum: 10/729473bbb36fcc0da5a700aad65e2ef2441639591ae091a35c605d1294dfac7c7201b0504706d78bc8cabcd7f6473245ed0018c65e92d78e8eaf3b741b87c6fd
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-100@npm:@xmtp/node-sdk@1.0.0":
+  version: 1.0.0
+  resolution: "@xmtp/node-sdk@npm:1.0.0"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.0"
+    "@xmtp/content-type-primitives": "npm:^2.0.0"
+    "@xmtp/content-type-text": "npm:^2.0.0"
+    "@xmtp/node-bindings": "npm:^1.0.0"
+    "@xmtp/proto": "npm:^3.72.3"
+  checksum: 10/9c07530f121304125ace483cb7db361fed43fb6f02136956d553fed669824f84d4b17499428eb0cc8849b6900bd448222c56d1fb76f454db734a4dfe8a56ea26
   languageName: node
   linkType: hard
 
@@ -1413,7 +1433,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/proto@npm:^3.62.1, @xmtp/proto@npm:^3.72.0, @xmtp/proto@npm:^3.78.0":
+"@xmtp/proto@npm:^3.62.1, @xmtp/proto@npm:^3.72.0, @xmtp/proto@npm:^3.72.3, @xmtp/proto@npm:^3.78.0":
   version: 3.78.0
   resolution: "@xmtp/proto@npm:3.78.0"
   dependencies:
@@ -5237,7 +5257,10 @@ __metadata:
     "@vitest/coverage-v8": "npm:3.0.6"
     "@vitest/ui": "npm:^3.0.6"
     "@xmtp/mls-client": "npm:0.0.13"
+    "@xmtp/node-bindings": "npm:1.1.3"
+    "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0"
     "@xmtp/node-sdk": "npm:1.0.4"
+    "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.4.7"
