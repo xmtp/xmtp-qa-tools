@@ -88,7 +88,7 @@ jobs:
           echo "XMTP_ENV=${{ vars.XMTP_ENV }}" > .env
           echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
-          echo "GM_BOT_ADDRESS=${{ secrets.GM_BOT_ADDRESS }}" >> .env
+          echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
           echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
 
       - name: Run client check
