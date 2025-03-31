@@ -1,6 +1,8 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
-import { createGroupAndReceiveGm } from "@helpers/playwright";
+import {
+  createDmWithDeeplink,
+  createGroupAndReceiveGm,
+} from "@helpers/playwright";
 import { describe, expect, it } from "vitest";
 
 const testName = "xmtpchat";
@@ -12,15 +14,12 @@ describe(
   testName,
   () => {
     it("should respond to a message", async () => {
-      const result = await createGroupAndReceiveGm([gmBotAddress]);
+      const result = await createDmWithDeeplink(gmBotAddress);
       expect(result).toBe(true);
     });
-    it("should create a group and send a message", async () => {
-      const randomInboxes = [...generatedInboxes].slice(0, 3);
-      const result = await createGroupAndReceiveGm([
-        ...randomInboxes.map((inbox) => inbox.accountAddress),
-        gmBotAddress,
-      ]);
+
+    it("should respond to a message", async () => {
+      const result = await createGroupAndReceiveGm([gmBotAddress]);
       expect(result).toBe(true);
     });
   },

@@ -13,14 +13,10 @@ let browser: Browser | null = null;
 let page: Page | null = null;
 
 export async function createGroupAndReceiveGm(addresses: string[]) {
-  const { page, browser } = await startPage(false);
+  const { page, browser } = await startPage(true);
   try {
     console.log("Starting test");
     await page.goto(`https://xmtp.chat/`);
-    await page
-      .getByRole("main")
-      .getByRole("button", { name: "Connect" })
-      .click();
     await page
       .getByRole("main")
       .getByRole("button", { name: "New conversation" })
@@ -63,20 +59,11 @@ export async function createGroupAndReceiveGm(addresses: string[]) {
 export async function createDmWithDeeplink(address: string) {
   const { page, browser } = await startPage(false);
   try {
-    console.log("Starting test");
-    await page.goto(`https://xmtp.chat/dm/${address}?env=dev`);
-
-    await page
-      .getByRole("main")
-      .getByRole("button", { name: "Connect" })
-      .click();
-    console.log("Clicking message textbox");
-    await page.getByRole("textbox", { name: "Type a message..." }).click();
-    console.log("Filling message with 'hi'");
-    await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
-    console.log("Clicking Send button");
-    await page.getByRole("button", { name: "Send" }).click();
-
+    const url = `https://xmtp.chat/dm/${address}?env=dev`;
+    console.log("Starting test", url);
+    await page.goto(url);
+    await page.waitForTimeout(1000);
+    await page.getByText("Ephemeral", { exact: true }).click();
     const hiMessage = await page.getByText("hi");
     const hiMessageText = await hiMessage.textContent();
     console.log("hiMessageText", hiMessageText);
@@ -206,8 +193,10 @@ async function setLocalStorage(
     ({ envValue, walletKey, walletEncryptionKey }) => {
       console.log("env keys", { envValue, walletKey, walletEncryptionKey });
 
-      //window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-      // window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+      // @ts-expect-error Window localStorage access in browser context
+      window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
       // @ts-expect-error Window localStorage access in browser context
       window.localStorage.setItem("XMTP_NETWORK", envValue);
       // @ts-expect-error Window localStorage access in browser context

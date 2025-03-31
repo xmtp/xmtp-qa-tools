@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { type Client } from "@helpers/types";
+import { type Client, type XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 
 const testName = "test-bot";
@@ -21,7 +21,9 @@ async function main() {
   const bot = workers.get("bob");
   const client = bot?.client as Client;
   console.log(`Agent initialized on address ${bot?.address}`);
-  console.log(`Agent initialized on inbox ${client.inboxId}`);
+  const env = process.env.XMTP_ENV as XmtpEnv;
+  console.log(`https://xmtp.chat/dm/${bot?.address}?env=${env}`);
+
   console.log("Syncing conversations...");
   await client.conversations.sync();
 
