@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [23]
+        node-version: [20, 21, 22, 23]
         package-manager: [yarn]
       fail-fast: false
 
