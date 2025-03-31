@@ -63,7 +63,7 @@ jobs:
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           touch yarn.lock
-          yarn install
+          yarn install --no-immutable
 
       - name: Install dependencies with pnpm
         if: matrix.package-manager == 'pnpm'
