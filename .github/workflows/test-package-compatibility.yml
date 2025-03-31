@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version: [18, 20, 21, 22, 23]
+        node-version: [20, 21, 22, 23]
         package-manager: [npm, yarn, pnpm, bun]
       fail-fast: false
 
@@ -63,13 +63,14 @@ jobs:
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           touch yarn.lock
-          yarn install
+          yarn install --no-immutable
 
       - name: Install dependencies with pnpm
         if: matrix.package-manager == 'pnpm'
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           pnpm install
+          pnpm add @xmtp/node-bindings
 
       - name: Install dependencies with bun
         if: matrix.package-manager == 'bun'
@@ -81,6 +82,15 @@ jobs:
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           ${{ matrix.package-manager }} run build
+
+      - name: Set environment variables
+        run: |
+          cd xmtp-qa-testing/bots/gm-bot
+          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" > .env
+          echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
+          echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
+          echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
 
       - name: Run client check
         run: |
