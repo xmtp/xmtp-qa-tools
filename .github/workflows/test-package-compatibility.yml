@@ -31,7 +31,7 @@ jobs:
         if: matrix.package-manager == 'pnpm'
         uses: pnpm/action-setup@v3
         with:
-          version: latest
+          version: 10.7.0
 
       - name: Install Bun
         if: matrix.package-manager == 'bun'
