@@ -38,11 +38,13 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Gm
-      - name: Upload reports artifacts
+      - name: Upload reports and snapshots artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ts_gm_${{ env.XMTP_ENV }}
-          path: logs/
+          path: |
+            logs/
+            logs/**/*.png
   production:
     runs-on: ubuntu-latest
     env:
@@ -74,8 +76,10 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Gm
-      - name: Upload log files
+      - name: Upload reports and snapshots artifacts
         uses: actions/upload-artifact@v4
         with:
           name: ts_gm_${{ env.XMTP_ENV }}
-          path: logs/
+          path: |
+            logs/
+            logs/**/*.png
