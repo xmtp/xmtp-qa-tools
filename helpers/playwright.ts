@@ -64,6 +64,12 @@ export async function createDmWithDeeplink(address: string) {
     await page.goto(url);
     await page.waitForTimeout(1000);
     await page.getByText("Ephemeral", { exact: true }).click();
+    console.log("Clicking message textbox");
+    await page.getByRole("textbox", { name: "Type a message..." }).click();
+    console.log("Filling message with 'hi'");
+    await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+    console.log("Clicking Send button");
+    await page.getByRole("button", { name: "Send" }).click();
     const hiMessage = await page.getByText("hi");
     const hiMessageText = await hiMessage.textContent();
     console.log("hiMessageText", hiMessageText);
