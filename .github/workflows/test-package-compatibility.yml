@@ -70,6 +70,7 @@ jobs:
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           pnpm install
+          pnpm add @xmtp/node-bindings
 
       - name: Install dependencies with bun
         if: matrix.package-manager == 'bun'
