@@ -2,8 +2,9 @@ name: Package Compatibility Test
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * 0" # Run weekly on Sundays at midnight
+  push:
+    branches:
+      - main
 
 jobs:
   test-package-compatibility:
