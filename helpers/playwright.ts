@@ -14,8 +14,9 @@ let page: Page | null = null;
 
 export async function createDmWithDeeplink(address: string) {
   const { page, browser } = await startPage(false);
+  const env = process.env.XMTP_ENV as XmtpEnv;
   try {
-    const url = `https://xmtp.chat/dm/${address}?env=dev`;
+    const url = `https://xmtp.chat/dm/${address}?env=${env}`;
     console.log("Starting test", url);
     await page.goto(url);
     await page.waitForTimeout(1000);
@@ -101,7 +102,7 @@ async function takeSnapshot(page: Page, name: string) {
   console.log(`Snapshot saved: ${name} (${screenshotPath})`);
 }
 async function startPage(defaultUser: boolean) {
-  const isHeadless = process.env.GITHUB_ACTIONS !== undefined;
+  const isHeadless = true; //process.env.GITHUB_ACTIONS !== undefined;
   const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
   const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
   const ENCRYPTION_KEY_XMTP_CHAT = process.env
