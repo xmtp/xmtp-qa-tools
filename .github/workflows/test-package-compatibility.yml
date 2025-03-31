@@ -1,4 +1,4 @@
-name: PackageCompatibility
+name: Package Compatibility
 
 on:
   workflow_dispatch:
@@ -7,7 +7,7 @@ on:
       - main
 
 jobs:
-  test-package-compatibility:
+  package:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -95,7 +95,11 @@ jobs:
       - name: Build project
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          ${{ matrix.package-manager }} run build
+          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
+            yarn run build
+          else
+            ${{ matrix.package-manager }} run build
+          fi
 
       - name: Set environment variables
         run: |
@@ -109,4 +113,8 @@ jobs:
       - name: Run client check
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          ${{ matrix.package-manager }} run client-check
+          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
+            yarn run client-check
+          else
+            ${{ matrix.package-manager }} run client-check
+          fi
