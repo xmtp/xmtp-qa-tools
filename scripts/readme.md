@@ -32,31 +32,31 @@ yarn gen:keys
 yarn monitor:dev
 
 # Send data to Datadog
-yarn script:datadog
+yarn script datadog
 
 # Generate test data
-yarn script:generate
+yarn script generate
 
 # Monitor network status
-yarn script:monitor
+yarn script monitor
 
 # Manage old packages
-yarn script:oldpackages
+yarn script oldpackages
 
 # Manage packages
-yarn script:packages
+yarn script packages
 
 # Manage Railway deployments
-yarn script:railway
+yarn script railway
 
 # Record browser interactions with Playwright
-yarn script:record
+yarn script record
 
 # Redeploy services
-yarn script:redeploy
+yarn script redeploy
 
 # Update dependencies
-yarn script:update
+yarn script update
 ```
 
 ## 🔑 Generate keys
@@ -82,7 +82,7 @@ The `generate.ts` script creates test data for XMTP testing.
 
 ```bash
 # Run the script
-yarn script:generate
+yarn script generate
 ```
 
 **Expected result:** The script will generate test data according to its configuration.
@@ -113,7 +113,7 @@ The `network.sh` script checks the status of XMTP network nodes.
 
 ```bash
 # Run the script
-yarn script:monitor
+yarn script monitor
 ```
 
 **Expected result:** The script will output the status of XMTP network nodes, showing which ones are online or offline.
@@ -148,10 +148,10 @@ The `packages.sh` and `oldpackages.ts` scripts help manage package dependencies.
 
 ```bash
 # Run packages.sh
-yarn script:packages
+yarn script packages
 
 # Run oldpackages.ts
-yarn script:oldpackages
+yarn script oldpackages
 ```
 
 ## 🚂 Railway deployment
@@ -160,10 +160,10 @@ The `railway.sh`, `railway-test.ts`, and `redeploy.ts` scripts manage Railway de
 
 ```bash
 # Run railway.sh
-yarn script:railway
+yarn script railway
 
 # Run redeploy.ts
-yarn script:redeploy
+yarn script redeploy
 ```
 
 ## 🔄 Update dependencies
@@ -172,7 +172,7 @@ The `update.ts` script helps update project dependencies.
 
 ```bash
 # Run the script
-yarn script:update
+yarn script update
 ```
 
 ## ⚙️ Run script

@@ -4,12 +4,14 @@ This document provides a comprehensive overview of the XMTP testing infrastructu
 
 ## Test Suites Overview
 
-| Test suite     | Status                                                                                                                                                                            | Run frequency |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 🚀 Performance | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml) | Every 30 min  |
-| 📬 Delivery    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)       | Every 30 min  |
-| 👋 Gm          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                   | Every 30 min  |
-| 🌎 Geolocation | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml) | Every 30 min  |
+| Test suite     | Status                                                                                                                                                                                                    | Run frequency |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| 🚀 Performance | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)                         | Every 30 min  |
+| 📬 Delivery    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)                               | Every 30 min  |
+| 👋 Gm          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                                           | Every 30 min  |
+| 🌎 Geolocation | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)                         | Every 30 min  |
+| 📦 Package     | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/test-package-compatibility.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/test-package-compatibility.yml) | On commit     |
+| 🤖 Agent       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml)                         | Hourly        |
 
 ## 🚀 TS_Performance Test Suite
 
@@ -284,3 +286,50 @@ The [`TS_Gm.yml`](/.github/workflows/TS_Gm.yml) workflow automates the test suit
 - 🧪 **Multi-environment**: Tests against both Dev and Production environments
 - 🔍 **Regression Testing**: Compares behavior across different SDK versions
 - 🌐 **Browser Testing**: Includes Playwright-based browser automation tests
+
+## 📦 Package compatibility
+
+The package compatibility workflow validates that our codebase works correctly across different Node.js versions and package managers, ensuring broad compatibility across developer environments.
+
+### Implementation details
+
+This workflow tests:
+
+- Multiple Node.js versions (20, 21, 22, 23)
+- Various package managers (npm, yarn, yarn1, pnpm, bun)
+- Successful installation of dependencies
+- Build process completion
+- Basic client connectivity check
+
+### Associated workflow
+
+The [`test-package-compatibility.yml`](/.github/workflows/test-package-compatibility.yml) workflow:
+
+- 🚀 **Trigger**: Runs on every commit to main branch or manual dispatch
+- 📊 **Matrix testing**: Tests combinations of Node.js versions and package managers
+- 🔄 **Environment setup**: Configures appropriate package manager in each job
+- 🔍 **Failure isolation**: Uses fail-fast: false to identify specific failing combinations
+- 👁️ **Verification**: Performs a client connection check to validate functionality
+
+## 🤖 Agent examples
+
+The agent examples workflow tests the xmtp-agent-examples repository functionality, ensuring that code examples are valid and operational.
+
+### Implementation details
+
+This workflow:
+
+- Clones the ephemeraHQ/xmtp-agent-examples repository
+- Sets up the required environment with secrets
+- Tests the agent's ability to initialize and connect to XMTP
+- Validates that the agent reaches the "waiting for messages" state
+
+### Associated workflow
+
+The [`agent-examples.yml`](/.github/workflows/agent-examples.yml) workflow:
+
+- ⏱️ **Schedule**: Runs hourly via cron schedule
+- 🧪 **Test environment**: Configures the environment with appropriate secrets
+- 🔄 **Timeout control**: Uses a 20-second timeout to avoid long-running jobs
+- 🔍 **Success verification**: Checks for the "Waiting for messages..." message
+- 👁️ **Error detection**: Reports and fails if agent doesn't initialize correctly
