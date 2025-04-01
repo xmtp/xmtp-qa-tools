@@ -31,13 +31,11 @@ export class XmtpPlaywright {
   async createDmWithDeeplink(address: string): Promise<boolean> {
     const { page, browser } = await this.startPage(false, address);
     try {
-      await page.getByRole("textbox", { name: "Type a message..." }).click();
-      await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
-      await page.getByRole("button", { name: "Send" }).click();
-      await page.waitForTimeout(1000);
-      const botMessage = await page.getByText("gm");
-      const botMessageText = await botMessage.textContent();
-      return botMessageText === "gm";
+      console.log("Creating DM with deeplink");
+      console.log("Sending message and waiting for GM response");
+      const response = await this.sendAndWaitForGm(page, "gm");
+      console.log("GM response:", response);
+      return response;
     } catch (error) {
       console.error("Could not find 'gm' message:", error);
       await this.takeSnapshot(page, "before-finding-gm");
@@ -56,11 +54,17 @@ export class XmtpPlaywright {
   ): Promise<void> {
     const { page, browser } = await this.startPage(false);
     try {
+      console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
-      await this.sendAndWaitForGm(page, "gm", waitForMessage);
+      console.log("Sending message and waiting for GM response");
+      const response = await this.sendAndWaitForGm(page, "gm", waitForMessage);
+      if (!response) {
+        throw new Error("Failed to receive GM response");
+      }
     } catch (error) {
-      console.error("Could not find 'gm' message:", error);
+      console.error("Error in createGroupAndReceiveGm:", error);
       await this.takeSnapshot(page, "before-finding-gm");
+      throw error;
     } finally {
       if (browser) await browser.close();
     }
@@ -114,20 +118,30 @@ export class XmtpPlaywright {
     message: string,
     waitForMessage: boolean = true,
   ): Promise<boolean> {
-    await page.getByRole("textbox", { name: "Type a message..." }).click();
-    await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
-    await page.getByRole("button", { name: "Send" }).click();
+    try {
+      await page.getByRole("textbox", { name: "Type a message..." }).click();
+      await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+      await page.getByRole("button", { name: "Send" }).click();
 
-    const hiMessage = await page.getByText("hi");
-    const hiMessageText = await hiMessage.textContent();
+      // Wait for message to be sent and visible
+      await page.waitForSelector('text="hi"', { timeout: 10000 });
+      const hiMessage = await page.getByText("hi");
+      const hiMessageText = await hiMessage.textContent();
+      console.log("Hi message:", hiMessageText);
 
-    if (waitForMessage) {
-      await page.waitForSelector(`text=${message}`);
-      const botMessage = await page.getByText("gm");
-      const botMessageText = await botMessage.textContent();
-      return botMessageText === "gm";
-    } else {
-      return hiMessageText === "hi";
+      if (waitForMessage) {
+        // Wait for GM response with a longer timeout
+        await page.waitForSelector(`text=${message}`, { timeout: 30000 });
+        const botMessage = await page.getByText("gm");
+        console.log("Bot message:", botMessage);
+        const botMessageText = await botMessage.textContent();
+        return botMessageText === "gm";
+      } else {
+        return hiMessageText === "hi";
+      }
+    } catch (error) {
+      console.error("Error in sendAndWaitForGm:", error);
+      throw error;
     }
   }
 
