@@ -10,7 +10,7 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(testName, () => {
   it("should respond to a message", async () => {
     // Create an instance
-    const xmtpTester = new XmtpPlaywright();
-    await xmtpTester.createGroupAndReceiveGm([gmBotAddress], false);
+    const xmtpTester = new XmtpPlaywright(false, "dev");
+    await xmtpTester.createGroupAndReceiveGm([gmBotAddress]);
   });
 });

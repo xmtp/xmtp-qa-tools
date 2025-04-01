@@ -176,18 +176,6 @@ async function processCommand(
       case "remove":
         await commandHandler.remove(message, client, args, workers);
         break;
-      case "verify": {
-        // Launch browser and verify group exists in web client
-        const result = { success: true }; //await checkGroupInWebClient(message, client);
-        if (result.success) {
-          await conversation.send("Group verified successfully in web client!");
-        } else {
-          await conversation.send(
-            `Group verification failed: ${result.error || "Unknown error"}`,
-          );
-        }
-        break;
-      }
       default:
         await conversation.send(
           `Unknown command: /${command}\nType /help to see available commands.`,

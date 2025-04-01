@@ -81,12 +81,11 @@ describe(testName, () => {
   // });
   it("should create a group and send a message", async () => {
     try {
-      const randomInboxes = [...generatedInboxes].slice(0, 3);
-      const result = await createGroupAndReceiveGm([
-        ...randomInboxes.map((inbox) => inbox.accountAddress),
+      const xmtpTester = new XmtpPlaywright();
+      await xmtpTester.createGroupAndReceiveGm([
+        ...generatedInboxes.map((inbox) => inbox.accountAddress),
         gmBotAddress,
       ]);
-      expect(result).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

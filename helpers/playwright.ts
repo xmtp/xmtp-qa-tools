@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { Client, DecodedMessage, Group, XmtpEnv } from "@helpers/types";
+import type { XmtpEnv } from "@helpers/types";
 import {
   chromium,
   type Browser,
@@ -11,14 +11,27 @@ import {
 export class XmtpPlaywright {
   private browser: Browser | null = null;
   private page: Page | null = null;
+  private headless: boolean = true;
+  private isHeadless: boolean = true;
+  private env: XmtpEnv = "local";
+  private walletKey: string = "";
+  private encryptionKey: string = "";
+  constructor(headless: boolean = true, env: XmtpEnv | null = null) {
+    this.isHeadless =
+      process.env.GITHUB_ACTIONS !== undefined ? true : headless;
+    this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
+    this.walletKey = process.env.WALLET_KEY_XMTP_CHAT as string;
+    this.encryptionKey = process.env.ENCRYPTION_KEY_XMTP_CHAT as string;
+    this.browser = null;
+    this.page = null;
+  }
 
   /**
    * Creates a DM with deeplink and checks for GM response
    */
   async createDmWithDeeplink(address: string): Promise<boolean> {
-    const { page, browser } = await this.startPage(false, false, address);
+    const { page, browser } = await this.startPage(false, address);
     try {
-      await page.getByText("Ephemeral", { exact: true }).click();
       await page.getByRole("textbox", { name: "Type a message..." }).click();
       await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
       await page.getByRole("button", { name: "Send" }).click();
@@ -42,7 +55,7 @@ export class XmtpPlaywright {
     addresses: string[],
     waitForMessage: boolean = true,
   ): Promise<void> {
-    const { page, browser } = await this.startPage(true);
+    const { page, browser } = await this.startPage(false);
     try {
       await this.fillAddressesAndCreate(page, addresses);
       await this.sendAndWaitForGm(page, "gm", waitForMessage);
@@ -124,23 +137,15 @@ export class XmtpPlaywright {
    */
   private async startPage(
     defaultUser: boolean = false,
-    headless: boolean = true,
     address: string = "",
   ): Promise<{ browser: Browser; page: Page }> {
-    const isHeadless =
-      process.env.GITHUB_ACTIONS !== undefined ? true : headless;
-    const XMTP_ENV = process.env.XMTP_ENV as XmtpEnv;
-    const WALLET_KEY_XMTP_CHAT = process.env.WALLET_KEY_XMTP_CHAT as string;
-    const ENCRYPTION_KEY_XMTP_CHAT = process.env
-      .ENCRYPTION_KEY_XMTP_CHAT as string;
-
     this.browser = await chromium.launch({
-      headless: isHeadless,
-      slowMo: isHeadless ? 0 : 100,
+      headless: this.isHeadless,
+      slowMo: this.isHeadless ? 0 : 100,
     });
 
     const context: BrowserContext = await this.browser.newContext(
-      isHeadless
+      this.isHeadless
         ? {
             viewport: { width: 1920, height: 1080 },
             deviceScaleFactor: 1,
@@ -152,18 +157,18 @@ export class XmtpPlaywright {
 
     await this.setLocalStorage(
       this.page,
-      XMTP_ENV,
-      defaultUser ? WALLET_KEY_XMTP_CHAT : "",
-      defaultUser ? ENCRYPTION_KEY_XMTP_CHAT : "",
+      defaultUser ? this.walletKey : "",
+      defaultUser ? this.encryptionKey : "",
     );
 
     let url = "https://xmtp.chat/";
     if (address) {
-      url = `https://xmtp.chat/${address}?env=${XMTP_ENV}`;
+      url = `https://xmtp.chat/${address}?env=${this.env}`;
     }
-
+    console.log("Navigating to:", url);
     await this.page.goto(url);
     await this.page.waitForTimeout(1000);
+    await this.page.getByText("Ephemeral", { exact: true }).click();
 
     return { browser: this.browser, page: this.page };
   }
@@ -173,25 +178,29 @@ export class XmtpPlaywright {
    */
   private async setLocalStorage(
     page: Page,
-    XMTP_ENV: XmtpEnv,
-    WALLET_KEY_XMTP_CHAT: string,
-    ENCRYPTION_KEY_XMTP_CHAT: string,
+    walletKey: string = "",
+    walletEncryptionKey: string = "",
   ): Promise<void> {
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        // @ts-expect-error Window localStorage access in browser context
-        window.localStorage.setItem("XMTP_ENCRYPTION_KEY", walletEncryptionKey);
+        if (walletKey !== "")
+          // @ts-expect-error Window localStorage access in browser context
+          window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+        if (walletEncryptionKey !== "")
+          // @ts-expect-error Window localStorage access in browser context
+          window.localStorage.setItem(
+            "XMTP_ENCRYPTION_KEY",
+            walletEncryptionKey,
+          );
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
       },
       {
-        envValue: XMTP_ENV,
-        walletKey: WALLET_KEY_XMTP_CHAT,
-        walletEncryptionKey: ENCRYPTION_KEY_XMTP_CHAT,
+        envValue: this.env,
+        walletKey: walletKey,
+        walletEncryptionKey: walletEncryptionKey,
       },
     );
   }
