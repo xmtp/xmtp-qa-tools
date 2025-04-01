@@ -14,14 +14,14 @@ const users: {
   //   inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
   //   env: "production",
   // },
-  convos: {
-    inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
-    env: "dev",
-  },
-  // xmtpchat: {
-  //   inboxId: "14b8fcaf1e5df82fd7f27d039b641d34116c440e964f313cf87cffb0e84e0105",
+  // convos: {
+  //   inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
   //   env: "dev",
   // },
+  xmtpchat: {
+    inboxId: "519ba83d74dcede687258389e9950540ef5cec8200679d85a2f3cf16fdb97f2e",
+    env: "dev",
+  },
 };
 
 const testName = "bug_stitch";
