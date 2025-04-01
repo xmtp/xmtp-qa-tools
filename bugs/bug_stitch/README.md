@@ -1,7 +1,56 @@
-Also in convo
+# Stitch test
 
-```bash
-# WALLET_KEY_BOT=0xc55a0e3be2235c93cba8511f6814fbd3807330f84270e8673eca450e9a932a9e
-# ENCRYPTION_KEY_BOT=e864ced3da17e3b56ddf6dc08759919aa9f8b5bafd4a4aeee132ba6874f85df6
-# # public key is 0xc8469361a26e457C7c39C2b0a9eFA1Cf13CA8757
+## Purpose
+
+Tests XMTP conversation stitching across client restarts and multiple instances.
+
+## Test flow
+
+```typescript
+// 1. Initialize first client
+const workers = await getWorkers(
+  ["ivy-a-100"],
+  testName,
+  "message",
+  false,
+  undefined,
+  env,
+);
+ivy100 = workers.get("ivy", "a");
+
+// 2. Create DM and send message
+const newConvo = await sender.conversations.newDm(receiver);
+await newConvo?.send("message 1/3");
+
+// 3. Simulate restart
+await ivy100?.worker.clearDB();
+await ivy100?.worker.initialize();
+
+// 4. Initialize second client
+const workers = await getWorkers(
+  ["ivy-b-104"],
+  testName,
+  "message",
+  false,
+  undefined,
+  env,
+);
+ivy104 = workers.get("ivy", "b");
 ```
+
+## Configuration
+
+```typescript
+const users = {
+  xmtpchat: {
+    inboxId: "519ba83d74dcede687258389e9950540ef5cec8200679d85a2f3cf16fdb97f2e",
+    env: "dev",
+  },
+};
+```
+
+## Expected results
+
+- Messages sync after client restart
+- Multiple clients handle conversations correctly
+- DMs maintain consistency across instances
