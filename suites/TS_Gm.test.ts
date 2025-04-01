@@ -2,10 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import {
-  createDmWithDeeplink,
-  createGroupAndReceiveGm,
-} from "@helpers/playwright";
+import { XmtpPlaywright } from "@helpers/playwright";
 import { IdentifierKind, type Conversation } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
