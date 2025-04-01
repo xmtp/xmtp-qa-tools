@@ -11,7 +11,6 @@ import {
 export class XmtpPlaywright {
   private browser: Browser | null = null;
   private page: Page | null = null;
-  private headless: boolean = true;
   private isHeadless: boolean = true;
   private env: XmtpEnv = "local";
   private walletKey: string = "";
