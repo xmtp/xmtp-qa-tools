@@ -163,7 +163,7 @@ export class XmtpPlaywright {
 
     let url = "https://xmtp.chat/";
     if (address) {
-      url = `https://xmtp.chat/${address}?env=${this.env}`;
+      url = `https://xmtp.chat/dm/${address}?env=${this.env}`;
     }
     console.log("Navigating to:", url);
     await this.page.goto(url);

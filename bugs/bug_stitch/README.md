@@ -4,6 +4,12 @@
 
 Tests XMTP conversation stitching across client restarts and multiple instances.
 
+## Run the test
+
+```bash
+yarn test bug_stitch
+```
+
 ## Test flow
 
 ```typescript
@@ -48,9 +54,3 @@ const users = {
   },
 };
 ```
-
-## Expected results
-
-- Messages sync after client restart
-- Multiple clients handle conversations correctly
-- DMs maintain consistency across instances

@@ -38,52 +38,54 @@ describe(testName, () => {
     }
   });
 
-  // it("gm-bot: should check if bot is alive", async () => {
-  //   try {
-  //     // Create conversation with the bot
-  //     convo = await workers
-  //       .get("bob")!
-  //       .client.conversations.newDmWithIdentifier({
-  //         identifierKind: IdentifierKind.Ethereum,
-  //         identifier: gmBotAddress,
-  //       });
+  it("gm-bot: should check if bot is alive", async () => {
+    try {
+      // Create conversation with the bot
+      convo = await workers
+        .get("bob")!
+        .client.conversations.newDmWithIdentifier({
+          identifierKind: IdentifierKind.Ethereum,
+          identifier: gmBotAddress,
+        });
 
-  //     await convo.sync();
-  //     const prevMessages = (await convo.messages()).length;
+      await convo.sync();
+      const prevMessages = (await convo.messages()).length;
 
-  //     // Send a simple message
-  //     await convo.send("gm");
+      // Send a simple message
+      await convo.send("gm");
 
-  //     // Wait briefly for response
-  //     await new Promise((resolve) => setTimeout(resolve, 3000));
+      // Wait briefly for response
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-  //     const messages = await convo.messages();
+      const messages = await convo.messages();
 
-  //     const messagesAfter = messages.length;
+      const messagesAfter = messages.length;
 
-  //     // We should have at least 2 messages (our message and bot's response)
-  //     expect(messagesAfter).toBe(prevMessages + 2);
-  //     console.log("Messages before:", prevMessages, "after:", messagesAfter);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
+      // We should have at least 2 messages (our message and bot's response)
+      expect(messagesAfter).toBe(prevMessages + 2);
+      console.log("Messages before:", prevMessages, "after:", messagesAfter);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-  // it("should respond to a message", async () => {
-  //   try {
-  //     const result = await createDmWithDeeplink(gmBotAddress);
-  //     expect(result).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
+  it("should respond to a message", async () => {
+    try {
+      const xmtpTester = new XmtpPlaywright(false);
+      const result = await xmtpTester.createDmWithDeeplink(gmBotAddress);
+      expect(result).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   it("should create a group and send a message", async () => {
     try {
-      const xmtpTester = new XmtpPlaywright();
+      const xmtpTester = new XmtpPlaywright(false);
+      const slicedInboxes = generatedInboxes.slice(0, 4);
       await xmtpTester.createGroupAndReceiveGm([
-        ...generatedInboxes.map((inbox) => inbox.accountAddress),
+        ...slicedInboxes.map((inbox) => inbox.accountAddress),
         gmBotAddress,
       ]);
     } catch (e) {
