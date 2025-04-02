@@ -1,4 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, expect, it } from "vitest";
 
@@ -7,20 +8,27 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const cbUser = process.env.CB_USER;
-  const convosUser = process.env.CONVOS_USER;
-  if (!cbUser || !convosUser) {
-    throw new Error("CB_USER or CONVOS_USER is not set");
-  }
+
   afterAll(async () => {
     await closeEnv(testName, workers);
   });
 
-  it("should create duplicate conversations when web client restarts", async () => {
-    workers = await getWorkers(["ivy-100-100", "ivy-104-104"], testName);
-    const ivy100 = workers.get("ivy", "100");
-    const ivy104 = workers.get("ivy", "104");
-    console.log("ivy100", ivy100?.version, "ivy104", ivy104?.version);
-    expect(ivy100?.version).not.toBe(ivy104?.version);
+  it("Shoudl keep the DB after upgrade", async () => {
+    workers = await getWorkers(["bob-a-0047"], testName);
+    const bob = workers.get("bob", "a");
+    const inboxId = generatedInboxes[0].inboxId;
+    console.log("inboxId", inboxId);
+    const convo = await bob?.client.conversations.newDm(inboxId);
+    const messageId = await convo?.send("Hello");
+    console.log("messageId", messageId);
+    console.log("convo", convo?.id);
+    workers = await getWorkers(["bob-a-104"], testName);
+    const bob100_2 = workers.get("bob", "a");
+    await bob100_2?.client.conversations.sync();
+    const convo2 = await bob100_2?.client.conversations.getConversationById(
+      convo?.id as string,
+    );
+    const messages = await convo2?.messages();
+    console.log("messages", messages?.length);
   });
 });

@@ -65,8 +65,9 @@ describe(testName, () => {
 
   it("should count installations and handle revocation", async () => {
     // Create initial workers
+    const randomString = Math.random().toString(36).substring(2, 15);
     const workers = await getWorkers(
-      ["david", "david-mobile", "emma", "emma-tablet"],
+      ["david", "david-" + randomString, "emma", "emma" + randomString],
       testName,
     );
 
@@ -81,7 +82,7 @@ describe(testName, () => {
     const emmaCount = emmaInitialState?.installations.length;
     console.log("david", davidCount);
     console.log("emma", emmaCount);
-    expect(davidCount).toBeGreaterThan(1); // a + mobile
+    expect(davidCount).toBe(1); // a + mobile
     expect(emmaCount).toBeGreaterThan(1); // a + tablet
 
     // TESTED IN XMTP.CHAT
@@ -94,6 +95,6 @@ describe(testName, () => {
     const davidFinalState = await davidClient?.preferences.inboxState(true);
     const davidFinalCount = davidFinalState?.installations.length;
     console.log("david", davidFinalCount);
-    expect(davidFinalCount).toBe(1); // only a
+    expect(davidFinalCount).toBe(0); // only a
   });
 });

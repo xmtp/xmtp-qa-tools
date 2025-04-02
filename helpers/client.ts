@@ -75,7 +75,7 @@ export const getDbPath = (
 ): string => {
   console.time(`[${name}] - getDbPath`);
 
-  let identifier = `${accountAddress}-${libxmtpVersion}-${env}`;
+  let identifier = `${accountAddress}-${env}`;
 
   const basePath = loadDataPath(name, installationId, testName);
 

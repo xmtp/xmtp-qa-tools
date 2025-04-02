@@ -30,14 +30,12 @@ const staticConfigs: VersionConfig[] = [
     sdkVersion: "1.0.0",
     bindingsVersion: "1.0.0",
   },
-  // Add more configurations as needed for specific versions
-  // Example:
-  // {
-  //   sdkPackage: 'node-sdk-101',
-  //   bindingsPackage: 'node-bindings-101',
-  //   sdkVersion: '1.0.1',
-  //   bindingsVersion: '1.0.1',
-  // },
+  {
+    sdkPackage: "node-sdk-0047",
+    bindingsPackage: "node-bindings-0041",
+    sdkVersion: "0.0.47",
+    bindingsVersion: "0.0.41",
+  },
 ];
 
 /**
