@@ -10,18 +10,18 @@ const users: {
     env: string;
   };
 } = {
-  // cb: {
-  //   inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
-  //   env: "production",
-  // },
+  cb: {
+    inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
+    env: "production",
+  },
   // convos: {
   //   inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
   //   env: "dev",
   // },
-  xmtpchat: {
-    inboxId: "3ff987574ccc6bfd85490e7f0af2db6b32140958f3edda9c42e11a38009b284d",
-    env: "local",
-  },
+  // xmtpchat: {
+  //   inboxId: "3ff987574ccc6bfd85490e7f0af2db6b32140958f3edda9c42e11a38009b284d",
+  //   env: "local",
+  // },
 };
 
 const testName = "bug_stitch";
