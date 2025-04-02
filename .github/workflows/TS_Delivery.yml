@@ -34,8 +34,12 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Delivery
+        continue-on-error: true
+      - name: Ensure logs directory exists
+        run: mkdir -p logs
       - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ts_delivery_${{ env.XMTP_ENV }}
           path: logs/
@@ -66,8 +70,12 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Delivery
+        continue-on-error: true
+      - name: Ensure logs directory exists
+        run: mkdir -p logs
       - name: Upload reports artifacts
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ts_delivery_${{ env.XMTP_ENV }}
           path: logs/

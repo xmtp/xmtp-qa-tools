@@ -19,8 +19,8 @@ const users: {
   //   env: "dev",
   // },
   xmtpchat: {
-    inboxId: "519ba83d74dcede687258389e9950540ef5cec8200679d85a2f3cf16fdb97f2e",
-    env: "dev",
+    inboxId: "3ff987574ccc6bfd85490e7f0af2db6b32140958f3edda9c42e11a38009b284d",
+    env: "local",
   },
 };
 

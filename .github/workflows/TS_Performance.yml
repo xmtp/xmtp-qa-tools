@@ -31,12 +31,18 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
+        id: test
+        continue-on-error: true
         run: ./scripts/run-test.sh TS_Performance
       - name: Upload reports artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/
+      - name: Fail if tests failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1
 
   production:
     runs-on: ubuntu-latest
@@ -60,9 +66,15 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
+        id: test
+        continue-on-error: true
         run: ./scripts/run-test.sh TS_Performance
       - name: Upload reports artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ts_performance_${{ env.XMTP_ENV }}
           path: logs/
+      - name: Fail if tests failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1

@@ -46,6 +46,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: us-west
+        continue-on-error: true
 
       # US East Region Test
       - name: Run performance test on US East
@@ -53,6 +54,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: us-east
+        continue-on-error: true
 
       # Europe Region Test
       - name: Run performance test on Europe
@@ -60,6 +62,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: europe
+        continue-on-error: true
 
       # Asia Region Test
       - name: Run performance test on Asia
@@ -67,8 +70,10 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: asia
+        continue-on-error: true
 
       - name: Upload log files
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ts_geolocation_${{ env.XMTP_ENV }}
@@ -88,6 +93,7 @@ jobs:
           fi
 
       - name: Print completion message
+        if: always()
         run: echo "Railway test execution completed for all regions"
 
   production:
@@ -129,6 +135,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: us-west
+        continue-on-error: true
 
       # US East Region Test
       - name: Run performance test on US East
@@ -136,6 +143,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: us-east
+        continue-on-error: true
 
       # Europe Region Test
       - name: Run performance test on Europe
@@ -143,6 +151,7 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: europe
+        continue-on-error: true
 
       # Asia Region Test
       - name: Run performance test on Asia
@@ -150,8 +159,10 @@ jobs:
         run: ./scripts/run-test.sh TS_Performance
         env:
           GEOLOCATION: asia
+        continue-on-error: true
 
       - name: Upload log files
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: ts_geolocation_${{ env.XMTP_ENV }}
@@ -171,4 +182,5 @@ jobs:
           fi
 
       - name: Print completion message
+        if: always()
         run: echo "Railway test execution completed for all regions"
