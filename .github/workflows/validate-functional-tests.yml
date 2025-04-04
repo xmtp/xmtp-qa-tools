@@ -17,4 +17,12 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - run: yarn functional
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        id: test
+        continue-on-error: true
+        run: ./scripts/run-test.sh functional
+      - name: Fail if tests failed
+        if: steps.test.outcome == 'failure'
+        run: exit 1
