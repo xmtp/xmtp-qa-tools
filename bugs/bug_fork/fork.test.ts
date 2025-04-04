@@ -31,7 +31,7 @@ const workerConfigs = [
 ];
 
 // TODO: move toxss1
-// Network condition presets for testing
+// Network condition presets for tessting
 const networkConditions: Record<string, NetworkConditions> = {
   highLatency: {
     latencyMs: 1000,
