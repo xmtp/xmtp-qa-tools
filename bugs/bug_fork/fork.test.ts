@@ -30,6 +30,7 @@ const workerConfigs = [
   { name: "jack", id: "d", number: "112" },
 ];
 
+// TODO: move to worker-manager
 // Network condition presets for testing
 const networkConditions: Record<string, NetworkConditions> = {
   highLatency: {
@@ -46,6 +47,7 @@ const networkConditions: Record<string, NetworkConditions> = {
   bandwidthLimit: {
     bandwidthLimitKbps: 100,
   },
+
   poorConnection: {
     latencyMs: 500,
     jitterMs: 100,
