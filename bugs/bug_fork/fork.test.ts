@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { logError } from "@helpers/logger";
 import type { XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
