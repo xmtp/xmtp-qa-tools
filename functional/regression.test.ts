@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 const testName = "regression";
 loadEnv(testName);

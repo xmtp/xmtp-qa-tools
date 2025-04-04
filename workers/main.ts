@@ -226,7 +226,7 @@ export class WorkerClient extends Worker {
     this.client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env: this.env,
-      loggingLevel: loggingLevel as any,
+      loggingLevel: loggingLevel,
     });
 
     // Start the appropriate stream based on configuration

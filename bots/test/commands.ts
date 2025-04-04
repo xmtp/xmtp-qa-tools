@@ -3,7 +3,6 @@ import {
   IdentifierKind,
   type Client,
   type DecodedMessage,
-  type GroupMember,
   type Worker,
   type WorkerManager,
 } from "@helpers/types";

@@ -182,11 +182,11 @@ async function processCommand(
         );
         break;
     }
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("Error executing command:", error);
     try {
       await conversation.send(
-        `Error executing command: ${error.message || "Unknown error"}`,
+        `Error executing command: ${error instanceof Error ? error.message : "Unknown error"}`,
       );
     } catch (sendError) {
       console.error("Failed to send error message:", sendError);

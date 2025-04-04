@@ -1,8 +1,8 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import type { XmtpEnv } from "@helpers/types";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 
 const users: {
   [key: string]: {
@@ -19,7 +19,7 @@ const users: {
   //   env: "dev",
   // },
   xmtpchat: {
-    inboxId: "3ff987574ccc6bfd85490e7f0af2db6b32140958f3edda9c42e11a38009b284d",
+    inboxId: "dc85c4016ededfe9745c8eb623fc7473be85498bfd70703300d99dc29e10f235",
     env: "local",
   },
 };
