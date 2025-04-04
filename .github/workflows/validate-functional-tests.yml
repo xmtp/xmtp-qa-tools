@@ -22,7 +22,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: ./scripts/run-test.sh functional
+        run: ./scripts/run-test.sh functional 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
         run: exit 1
