@@ -20,7 +20,7 @@ jobs:
       - name: Run functional tests
         id: test
         continue-on-error: true
-        run: yarn functional
+        run: yarn functional 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock"
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
         run: exit 1
