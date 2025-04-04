@@ -16,7 +16,7 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
   export RUST_BACKTRACE=1
   
   # Run the test with the provided test name and filter out SQLCipher logs
-  yarn test $TEST_NAME | grep -v "sqlcipher_mem_lock" | grep -v "SQLCIPHER_NO_MLOCK"
+  yarn test $TEST_NAME | grep -v "sqlcipher_mem_lock" | grep -v "SQLCIPHER_NO_MLOCK" | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
   # Store the exit code of the test command, not grep
   # We need to use PIPESTATUS to get the exit code of yarn test, not grep
   exit_code=${PIPESTATUS[0]}
@@ -31,7 +31,7 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
     exit 1
   fi
   
-  echo "Test failed with exit code $exit_code. Retrying in $RETRY_DELAY seconds..."
+  echo "Test failed with exit code $exit_code. Retrying in $RETRY_DELAY seconds.."
   sleep $RETRY_DELAY
   echo "Clearing memory and cache before next attempt..."
 done 
