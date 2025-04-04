@@ -9,8 +9,8 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 const testName = "recovery";
 loadEnv(testName);
 
-const amountofMessages = parseInt(process.env.OFFLINE_MESSAGE_COUNT ?? "10");
-const participantCount = parseInt(process.env.OFFLINE_PARTICIPANTS ?? "3");
+const amountofMessages = 10;
+const participantCount = 3;
 const timeoutMax = 60000; // 1 minute timeout
 
 describe(

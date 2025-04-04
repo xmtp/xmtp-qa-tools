@@ -23,9 +23,8 @@ const testName = "groups";
 loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
-  const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
-  const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
-
+  const batchSize = 5;
+  const total = 10;
   let hasFailures: boolean = false;
   let start: number;
 
