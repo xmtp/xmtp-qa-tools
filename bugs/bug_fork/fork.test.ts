@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import type { XmtpEnv } from "@helpers/types";
+import type { Worker, XmtpEnv } from "@helpers/types";
 import { getWorkers, type NetworkConditions } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -98,7 +98,7 @@ const getRandomMessage = () => {
 describe(testName, () => {
   let hasFailures = false;
   let groupId: string;
-  const workerInstances: { [key: string]: any } = {};
+  const workerInstances: { [key: string]: Worker } = {};
   const numWorkers = 6; // Number of workers to create
 
   // Function to send random message from a worker

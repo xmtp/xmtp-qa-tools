@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import type { XmtpEnv } from "@helpers/types";
+import type { WorkerClient, XmtpEnv } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -28,12 +28,10 @@ const testName = "bug_stitch";
 loadEnv(testName);
 
 describe(testName, () => {
-  let hasFailures = false;
-
   for (const user of Object.keys(users)) {
     describe(`User: ${user} [${users[user].env}]`, () => {
-      let ivy100: any;
-      let ivy104: any;
+      let ivy100: WorkerClient;
+      let ivy104: WorkerClient;
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
@@ -51,7 +49,7 @@ describe(testName, () => {
           console.log("syncing all");
           await ivy100?.client.conversations.sync();
         } catch (e) {
-          hasFailures = logError(e, expect);
+          logError(e, expect);
           throw e;
         }
       });
@@ -65,7 +63,7 @@ describe(testName, () => {
           const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          hasFailures = logError(e, expect);
+          logError(e, expect);
           throw e;
         }
       });
@@ -85,7 +83,7 @@ describe(testName, () => {
           const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          hasFailures = logError(e, expect);
+          logError(e, expect);
           throw e;
         }
       });
@@ -104,7 +102,7 @@ describe(testName, () => {
           console.log("syncing all");
           await ivy104?.client.conversations.sync();
         } catch (e) {
-          hasFailures = logError(e, expect);
+          logError(e, expect);
           throw e;
         }
       });
@@ -118,7 +116,7 @@ describe(testName, () => {
           const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          hasFailures = logError(e, expect);
+          logError(e, expect);
           throw e;
         }
       });

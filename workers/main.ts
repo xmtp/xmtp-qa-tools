@@ -784,10 +784,15 @@ export class WorkerClient extends Worker {
     );
   }
 
-  clearDB() {
+  /**
+   * Clears the database for this worker
+   * @returns true if the database was cleared, false otherwise
+   */
+  clearDB(): Promise<boolean> {
     const dataPath = path.resolve(process.cwd(), ".data/" + this.name);
     if (fs.existsSync(dataPath)) {
       fs.rmSync(dataPath, { recursive: true, force: true });
     }
+    return Promise.resolve(true);
   }
 }

@@ -4,6 +4,7 @@ import path from "path";
 import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
+import type { ExpectStatic } from "vitest";
 
 // Types definitions
 interface MemberThresholds {
@@ -383,7 +384,7 @@ export function initDataDog(
 export function sendMetric(
   metricName: string,
   metricValue: number,
-  tags: Record<string, any>,
+  tags: Record<string, string>,
 ): void {
   if (!state.isInitialized) return;
 
@@ -454,18 +455,18 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
  * Send performance metrics for tests
  */
 export const sendPerformanceResult = (
-  expect: any,
+  expect: ExpectStatic,
   workers: WorkerManager,
   start: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
-    console.timeEnd(testName as string);
+    console.timeEnd(testName);
     expect(workers.getWorkers()).toBeDefined();
     expect(workers.getWorkers().length).toBeGreaterThan(0);
     void sendPerformanceMetric(
       performance.now() - start,
-      testName as string,
+      testName,
       workers.getVersion(),
       false,
     );
@@ -634,12 +635,12 @@ export async function getNetworkStats(
   try {
     const result = await execAsync(curlCommand);
     stdout = result.stdout;
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Even if curl returns an error, we might still have useful stdout
-    if (error.stdout) {
-      stdout = error.stdout;
+    if (error instanceof Error && "stdout" in error) {
+      stdout = error.stdout as string;
       console.warn(
-        `⚠️ Curl command returned error code ${error.code}, but stdout is available.`,
+        `⚠️ Curl command returned error code ${error?.code}, but stdout is available.`,
       );
     } else {
       console.error(`❌ Curl command failed without stdout:`, error);
@@ -738,7 +739,7 @@ export function logMetricsSummary(testName: string): void {
 
   // Count passed metrics
   const passedMetrics = validMetrics.filter(
-    ([_, data]) => calculateAverage(data.values) <= data.threshold,
+    ([, data]) => calculateAverage(data.values) <= data.threshold,
   ).length;
 
   const totalMetrics = validMetrics.length;
