@@ -10,7 +10,7 @@ const testName = "recovery";
 loadEnv(testName);
 
 const amountofMessages = 10;
-const participantCount = 3;
+const participants = ["random1", "random2", "random3"];
 const timeoutMax = 60000; // 1 minute timeout
 
 describe(
@@ -24,10 +24,10 @@ describe(
     beforeAll(async () => {
       try {
         // Create workers for testing
-        workers = await getWorkers(participantCount, testName);
+        workers = await getWorkers(participants, testName);
         // Create a group conversation
         group = await workers
-          .get("bob")!
+          .get("random1")!
           .client.conversations.newGroup(
             workers.getWorkers().map((p) => p.client.inboxId),
           );
@@ -51,8 +51,8 @@ describe(
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one worker to take offline
-        const offlineWorker = workers.get("bob")!; // Second worker
-        const onlineWorker = workers.get("alice")!; // First worker
+        const offlineWorker = workers.get("random2")!; // Second worker
+        const onlineWorker = workers.get("random1")!; // First worker
 
         console.log(`Taking ${offlineWorker.name} offline`);
 

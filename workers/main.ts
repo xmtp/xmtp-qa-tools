@@ -19,7 +19,7 @@ import {
   type XmtpEnv,
 } from "@helpers/types";
 import OpenAI from "openai";
-import type { WorkerBase } from "./manager";
+import type { NetworkConditions, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -122,6 +122,14 @@ export class WorkerClient extends Worker {
   };
   private isTerminated = false;
 
+  // Network simulation properties
+  private networkConditions?: NetworkConditions;
+  private isDisconnected = false;
+  private disconnectTimeout?: NodeJS.Timeout;
+  private lastOperationTime = 0;
+  private bandwidthUsage = 0;
+  private bandwidthResetTime = 0;
+
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
@@ -145,8 +153,108 @@ export class WorkerClient extends Worker {
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
     this.workerData = worker;
+    this.networkConditions = worker.networkConditions;
 
     this.setupEventHandlers();
+  }
+
+  /**
+   * Sets network conditions for this worker
+   * @param conditions The network conditions to apply
+   */
+  public setNetworkConditions(conditions: NetworkConditions): void {
+    this.networkConditions = conditions;
+    console.log(`[${this.nameId}] Network conditions updated:`, conditions);
+  }
+
+  /**
+   * Simulates network conditions for an operation
+   * @param operation The operation to perform
+   * @returns The result of the operation
+   */
+  private async simulateNetworkConditions<T>(
+    operation: () => Promise<T>,
+  ): Promise<T> {
+    if (!this.networkConditions) {
+      return operation();
+    }
+
+    // Simulate disconnection
+    if (
+      this.networkConditions.disconnectProbability &&
+      Math.random() < this.networkConditions.disconnectProbability &&
+      !this.isDisconnected
+    ) {
+      this.isDisconnected = true;
+      const duration = this.networkConditions.disconnectDurationMs ?? 5000;
+
+      console.log(`[${this.nameId}] Network disconnected for ${duration}ms`);
+
+      this.disconnectTimeout = setTimeout(() => {
+        this.isDisconnected = false;
+        console.log(`[${this.nameId}] Network reconnected`);
+      }, duration);
+
+      throw new Error(`Network disconnected for ${duration}ms`);
+    }
+
+    // Simulate packet loss
+    if (
+      this.networkConditions.packetLossRate &&
+      Math.random() < this.networkConditions.packetLossRate
+    ) {
+      console.log(`[${this.nameId}] Packet lost`);
+      throw new Error("Packet lost");
+    }
+
+    // Simulate bandwidth limit
+    if (this.networkConditions.bandwidthLimitKbps) {
+      const now = Date.now();
+      const bandwidthLimitBytes =
+        (this.networkConditions.bandwidthLimitKbps * 1024) / 8;
+
+      // Reset bandwidth usage counter every second
+      if (now - this.bandwidthResetTime > 1000) {
+        this.bandwidthUsage = 0;
+        this.bandwidthResetTime = now;
+      }
+
+      // Estimate operation size (rough approximation)
+      const estimatedSize = 1024; // Assume 1KB per operation
+
+      if (this.bandwidthUsage + estimatedSize > bandwidthLimitBytes) {
+        const waitTime = 1000 - (now - this.bandwidthResetTime);
+        console.log(
+          `[${this.nameId}] Bandwidth limit reached, waiting ${waitTime}ms`,
+        );
+        await new Promise((resolve) => setTimeout(resolve, waitTime));
+        this.bandwidthUsage = 0;
+        this.bandwidthResetTime = Date.now();
+      }
+
+      this.bandwidthUsage += estimatedSize;
+    }
+
+    // Simulate latency and jitter
+    if (this.networkConditions.latencyMs || this.networkConditions.jitterMs) {
+      const baseLatency = this.networkConditions.latencyMs ?? 0;
+      const jitter = this.networkConditions.jitterMs
+        ? (Math.random() * 2 - 1) * (this.networkConditions.jitterMs ?? 0)
+        : 0;
+
+      const totalLatency = Math.max(0, baseLatency + jitter);
+
+      if (totalLatency > 0) {
+        console.log(
+          `[${this.nameId}] Adding latency: ${totalLatency.toFixed(2)}ms`,
+        );
+        await new Promise((resolve) =>
+          setTimeout(resolve, Math.floor(totalLatency)),
+        );
+      }
+    }
+
+    return operation();
   }
 
   private setupEventHandlers() {
@@ -179,68 +287,70 @@ export class WorkerClient extends Worker {
     installationId: string;
     address: `0x${string}`;
   }> {
-    // Tell the Worker to do any internal initialization
-    this.postMessage({
-      type: "initialize",
-      data: {
-        name: this.name,
-        folder: this.folder,
-      },
+    return this.simulateNetworkConditions(async () => {
+      // Tell the Worker to do any internal initialization
+      this.postMessage({
+        type: "initialize",
+        data: {
+          name: this.name,
+          folder: this.folder,
+        },
+      });
+
+      const signer = createSigner(this.walletKey as `0x${string}`);
+      const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
+
+      // Get the SDK version from the worker data
+      const sdkVersion = this.workerData.sdkVersion;
+      // Select the appropriate SDK client based on version
+      let ClientClass;
+      if (sdkVersion === "100") {
+        ClientClass = sdkVersions.v100.Client;
+        console.debug(`[${this.nameId}] Using SDK version 1.0.0`);
+      } else {
+        // Default to latest version
+        ClientClass = sdkVersions.v104.Client;
+      }
+
+      // Force version to include the SDK version for easier identification
+      const sdkIdentifier = sdkVersion || "latest";
+      const libXmtpVersion =
+        ClientClass.version.split("@")[1].split(" ")[0] ?? "unknown";
+
+      const version = `${libXmtpVersion}-${sdkIdentifier}`;
+
+      const identifier = await signer.getIdentifier();
+      this.address = identifier.identifier as `0x${string}`;
+      const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+      const dbPath = getDbPath(
+        this.name,
+        this.address,
+        this.testName,
+        this.folder,
+        version,
+        this.env,
+      );
+
+      // @ts-expect-error Window localStorage access in browser context
+      this.client = await ClientClass.create(signer, encryptionKey, {
+        dbPath,
+        env: this.env,
+        loggingLevel: loggingLevel,
+      });
+
+      // Start the appropriate stream based on configuration
+      await this.startStream();
+
+      const installationId = this.client.installationId;
+
+      return {
+        client: this.client,
+        dbPath,
+        version,
+        address: this.address,
+        installationId,
+      };
     });
-
-    const signer = createSigner(this.walletKey as `0x${string}`);
-    const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-
-    // Get the SDK version from the worker data
-    const sdkVersion = this.workerData.sdkVersion;
-    // Select the appropriate SDK client based on version
-    let ClientClass;
-    if (sdkVersion === "100") {
-      ClientClass = sdkVersions.v100.Client;
-      console.debug(`[${this.nameId}] Using SDK version 1.0.0`);
-    } else {
-      // Default to latest version
-      ClientClass = sdkVersions.v104.Client;
-    }
-
-    // Force version to include the SDK version for easier identification
-    const sdkIdentifier = sdkVersion || "latest";
-    const libXmtpVersion =
-      ClientClass.version.split("@")[1].split(" ")[0] ?? "unknown";
-
-    const version = `${libXmtpVersion}-${sdkIdentifier}`;
-
-    const identifier = await signer.getIdentifier();
-    this.address = identifier.identifier as `0x${string}`;
-    const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
-    const dbPath = getDbPath(
-      this.name,
-      this.address,
-      this.testName,
-      this.folder,
-      version,
-      this.env,
-    );
-
-    // @ts-expect-error Window localStorage access in browser context
-    this.client = await ClientClass.create(signer, encryptionKey, {
-      dbPath,
-      env: this.env,
-      loggingLevel: loggingLevel,
-    });
-
-    // Start the appropriate stream based on configuration
-    await this.startStream();
-
-    const installationId = this.client.installationId;
-
-    return {
-      client: this.client,
-      dbPath,
-      version,
-      address: this.address,
-      installationId,
-    };
   }
 
   /**
@@ -280,7 +390,9 @@ export class WorkerClient extends Worker {
    * Initialize and handle message stream
    */
   private async initMessageStream() {
-    this.activeStream = await this.client.conversations.streamAllMessages();
+    this.activeStream = await this.simulateNetworkConditions(async () => {
+      return this.client.conversations.streamAllMessages();
+    });
 
     // Process messages asynchronously
     void (async () => {

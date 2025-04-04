@@ -1,12 +1,12 @@
 # XMTP QA Testing
 
-| Test suite        | Status                                                                                                                                                                            | Run frequency |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 🚀 Performance    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml) | Every 30 min  |
-| 📬 Delivery       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)       | Every 30 min  |
-| 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                   | Every 30 min  |
-| 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml) | Every 30 min  |
-| 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml) | Every 30 min  |
+| Test suite        | Status                                                                                                                                                                                        | Run frequency |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
+| 🚀 Performance    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)             | Every 30 min  |
+| 📬 Delivery       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)                   | Every 30 min  |
+| 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                               | Every 30 min  |
+| 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)             | Every 30 min  |
+| 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml) | Every 30 min  |
 
 ## Testing scope
 
