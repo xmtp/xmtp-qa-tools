@@ -4,7 +4,6 @@ import path from "path";
 import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
-import type { ExpectStatic } from "vitest";
 
 // Types definitions
 interface MemberThresholds {
@@ -414,7 +413,7 @@ export function sendMetric(
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        threshold: tags.threshold || 0,
+        threshold: Number(tags.threshold) || 0,
         members: memberCount,
       };
     }
@@ -455,18 +454,18 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
  * Send performance metrics for tests
  */
 export const sendPerformanceResult = (
-  expect: ExpectStatic,
+  expect: any,
   workers: WorkerManager,
   start: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
-    console.timeEnd(testName);
+    console.timeEnd(testName as string);
     expect(workers.getWorkers()).toBeDefined();
     expect(workers.getWorkers().length).toBeGreaterThan(0);
     void sendPerformanceMetric(
       performance.now() - start,
-      testName,
+      testName as string,
       workers.getVersion(),
       false,
     );
@@ -554,8 +553,8 @@ export async function sendPerformanceMetric(
       metric_subtype: operationType,
       description: metricDescription,
       members: members,
-      success: isSuccess,
-      threshold: threshold,
+      success: isSuccess.toString(),
+      threshold: threshold.toString(),
       region: state.currentGeo,
     });
 
@@ -582,8 +581,8 @@ export async function sendPerformanceMetric(
           network_phase: networkPhase,
           country_iso_code: countryCode,
           members: members,
-          success: networkMetricValue <= networkThreshold,
-          threshold: networkThreshold,
+          success: networkMetricValue <= networkThreshold ? "true" : "false",
+          threshold: networkThreshold.toString(),
           region: state.currentGeo,
         });
       }
@@ -614,8 +613,8 @@ export function sendDeliveryMetric(
     test: testName,
     metric_type: metricType,
     metric_subtype: metricSubType,
-    success: isSuccess,
-    threshold: threshold,
+    success: isSuccess.toString(),
+    threshold: threshold.toString(),
   });
 }
 
@@ -640,7 +639,7 @@ export async function getNetworkStats(
     if (error instanceof Error && "stdout" in error) {
       stdout = error.stdout as string;
       console.warn(
-        `⚠️ Curl command returned error code ${error?.code}, but stdout is available.`,
+        `⚠️ Curl command returned error code ${String(error)}, but stdout is available.`,
       );
     } else {
       console.error(`❌ Curl command failed without stdout:`, error);
@@ -739,7 +738,7 @@ export function logMetricsSummary(testName: string): void {
 
   // Count passed metrics
   const passedMetrics = validMetrics.filter(
-    ([, data]) => calculateAverage(data.values) <= data.threshold,
+    ([_, data]) => calculateAverage(data.values) <= data.threshold,
   ).length;
 
   const totalMetrics = validMetrics.length;

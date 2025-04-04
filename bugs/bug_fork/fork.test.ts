@@ -2,6 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import type { Worker, XmtpEnv } from "@helpers/types";
 import { getWorkers, type NetworkConditions } from "@workers/manager";
+import { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const users: {
@@ -71,10 +72,11 @@ const getRandomVersion = () => {
 };
 
 // Function to get random network condition
-const getRandomNetworkCondition = () => {
+const getRandomNetworkCondition = (): NetworkConditions => {
   const conditionKeys = Object.keys(networkConditions);
   const randomIndex = Math.floor(Math.random() * conditionKeys.length);
-  return networkConditions[conditionKeys[randomIndex]];
+  const key = conditionKeys[randomIndex];
+  return networkConditions[key];
 };
 
 // Function to get random message
@@ -147,7 +149,7 @@ describe(testName, () => {
       workerInstances[firstWorkerName] = workers.get(
         firstWorkerName,
         firstWorkerId,
-      );
+      ) as Worker;
 
       console.log("Syncing conversations");
       await workerInstances[firstWorkerName]?.client.conversations.sync();
@@ -203,7 +205,10 @@ describe(testName, () => {
         const workerName = workerNames[i];
         const workerId = workerIds[i];
 
-        workerInstances[workerName] = workers.get(workerName, workerId);
+        workerInstances[workerName] = workers.get(
+          workerName,
+          workerId,
+        ) as Worker;
 
         // Apply random network condition
         const networkCondition = getRandomNetworkCondition();
@@ -482,7 +487,11 @@ describe(testName, () => {
           console.log(
             `Removing member ${memberToRemove.inboxId} from the group`,
           );
-          await firstWorkerGroup.removeMembers([memberToRemove.inboxId]);
+          if (firstWorkerGroup instanceof Group) {
+            await firstWorkerGroup.removeMembers([memberToRemove.inboxId]);
+          } else {
+            console.warn("First worker group is not a Group instance");
+          }
 
           // Wait for the removal to propagate
           await new Promise((resolve) => setTimeout(resolve, 3000));
@@ -503,7 +512,11 @@ describe(testName, () => {
       // Add a new member (the first worker's inbox ID)
       const newMemberInboxId = workerInstances[firstWorkerName].client.inboxId;
       console.log(`Adding member ${newMemberInboxId} to the group`);
-      await firstWorkerGroup.addMembers([newMemberInboxId]);
+      if (firstWorkerGroup instanceof Group) {
+        await firstWorkerGroup.addMembers([newMemberInboxId]);
+      } else {
+        console.warn("First worker group is not a Group instance");
+      }
 
       // Wait for the addition to propagate
       await new Promise((resolve) => setTimeout(resolve, 3000));

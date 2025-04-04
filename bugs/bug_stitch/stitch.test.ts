@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import type { WorkerClient, XmtpEnv } from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import type { XmtpEnv } from "@helpers/types";
+import { getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const users: {
@@ -30,8 +30,8 @@ loadEnv(testName);
 describe(testName, () => {
   for (const user of Object.keys(users)) {
     describe(`User: ${user} [${users[user].env}]`, () => {
-      let ivy100: WorkerClient;
-      let ivy104: WorkerClient;
+      let ivy100: Worker;
+      let ivy104: Worker;
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
@@ -45,7 +45,7 @@ describe(testName, () => {
             undefined,
             users[user].env as XmtpEnv,
           );
-          ivy100 = workers.get("ivy", "a");
+          ivy100 = workers.get("ivy", "a") as Worker;
           console.log("syncing all");
           await ivy100?.client.conversations.sync();
         } catch (e) {
@@ -70,8 +70,8 @@ describe(testName, () => {
       it("terminate and restart", async () => {
         // Simulate termination and restart
         console.warn("Ivy terminates, deletes local data, and restarts");
-        await ivy100?.worker.clearDB();
-        await ivy100?.worker.initialize();
+        await ivy100?.worker?.clearDB();
+        await ivy100?.worker?.initialize();
       });
 
       it("should create new DM and group conversations", async () => {
@@ -98,7 +98,7 @@ describe(testName, () => {
             undefined,
             users[user].env as XmtpEnv,
           );
-          ivy104 = workers.get("ivy", "b");
+          ivy104 = workers.get("ivy", "b") as Worker;
           console.log("syncing all");
           await ivy104?.client.conversations.sync();
         } catch (e) {
