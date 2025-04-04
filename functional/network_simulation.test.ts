@@ -81,13 +81,24 @@ describe(testName, () => {
           // Sync conversations
           await Promise.all(
             workerConfigs.map((w) => {
-              const worker = workerInstances[w.name] as any;
+              const worker = workerInstances[w.name] as {
+                client?: { conversations?: { sync: () => Promise<void> } };
+              };
               return worker?.client?.conversations?.sync();
             }),
           );
 
           // Create group with receiver
-          const worker = workerInstances[workerConfigs[0].name] as any;
+          const worker = workerInstances[workerConfigs[0].name] as {
+            client?: {
+              conversations?: {
+                newGroup: (inboxIds: string[], options: any) => Promise<any>;
+              };
+            };
+          };
+          if (!worker.client?.conversations) {
+            throw new Error("Worker client or conversations not available");
+          }
           const group = await worker.client.conversations.newGroup([receiver], {
             groupName: "Network Test Group",
             groupDescription: "Group for network simulation testing",
