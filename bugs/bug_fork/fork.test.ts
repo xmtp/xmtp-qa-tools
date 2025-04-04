@@ -30,7 +30,7 @@ const workerConfigs = [
   { name: "jack", id: "d", number: "112" },
 ];
 
-// TODO: move toxss
+// TODO: move toxss1
 // Network condition presets for testing
 const networkConditions: Record<string, NetworkConditions> = {
   highLatency: {
