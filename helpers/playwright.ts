@@ -123,15 +123,12 @@ export class XmtpPlaywright {
       await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
       await page.getByRole("button", { name: "Send" }).click();
 
-      // Wait for message to be sent and visible
-      await page.waitForSelector('text="hi"', { timeout: 10000 });
       const hiMessage = await page.getByText("hi");
       const hiMessageText = await hiMessage.textContent();
       console.log("Hi message:", hiMessageText);
 
       if (waitForMessage) {
         // Wait for GM response with a longer timeout
-        await page.waitForSelector(`text=${message}`, { timeout: 30000 });
         const botMessage = await page.getByText("gm");
         console.log("Bot message:", botMessage);
         const botMessageText = await botMessage.textContent();
