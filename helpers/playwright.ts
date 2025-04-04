@@ -99,9 +99,9 @@ export class XmtpPlaywright {
 
     await page
       .getByRole("main")
-      .getByRole("button", { name: "New conversation" })
+      .getByRole("button", { name: "Create a new group" })
       .click();
-
+    await page.getByRole("button", { name: "Members" }).click();
     for (const address of addresses) {
       await page.getByRole("textbox", { name: "Address" }).fill(address);
       await page.getByRole("button", { name: "Add" }).click();
