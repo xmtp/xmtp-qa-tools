@@ -26,20 +26,10 @@ const workerConfigs = [
 
 // Network condition presets for testing
 const networkConditions: Record<string, NetworkConditions> = {
-  highLatency: {
-    latencyMs: 1000,
-    jitterMs: 200,
-  },
-  packetLoss: {
-    packetLossRate: 0.3,
-  },
-  disconnection: {
-    disconnectProbability: 0.2,
-    disconnectDurationMs: 5000,
-  },
-  bandwidthLimit: {
-    bandwidthLimitKbps: 100,
-  },
+  highLatency: { latencyMs: 1000, jitterMs: 200 },
+  packetLoss: { packetLossRate: 0.3 },
+  disconnection: { disconnectProbability: 0.2, disconnectDurationMs: 5000 },
+  bandwidthLimit: { bandwidthLimitKbps: 100 },
   poorConnection: {
     latencyMs: 500,
     jitterMs: 100,
@@ -51,24 +41,21 @@ const networkConditions: Record<string, NetworkConditions> = {
 describe(testName, () => {
   let hasFailures = false;
   let groupId: string;
+  let workerInstances: Record<string, unknown> = {};
 
   for (const user of Object.keys(users)) {
     describe(`User: ${user} [${users[user].env}]`, () => {
-      const workerInstances: { [key: string]: any } = {};
       const receiver = users[user].inboxId;
 
-      it("should initialize workers with network conditions", async () => {
+      it("should initialize workers and create test group", async () => {
         try {
           console.log(
             `Setting up network simulation test for ${user}[${users[user].env}]`,
           );
 
-          // Create workers with different network conditions
+          // Create workers
           const workers = await getWorkers(
-            [
-              `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-              `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-            ],
+            workerConfigs.map((w) => `${w.name}-${w.id}-${w.number}`),
             testName,
             "message",
             false,
@@ -77,16 +64,11 @@ describe(testName, () => {
           );
 
           // Store worker instances
-          workerInstances[workerConfigs[0].name] = workers.get(
-            workerConfigs[0].name,
-            workerConfigs[0].id,
-          );
-          workerInstances[workerConfigs[1].name] = workers.get(
-            workerConfigs[1].name,
-            workerConfigs[1].id,
-          );
+          workerConfigs.forEach((w) => {
+            workerInstances[w.name] = workers.get(w.name, w.id);
+          });
 
-          // Apply network conditions
+          // Apply initial network conditions
           workers.setWorkerNetworkConditions(
             workerConfigs[0].name,
             networkConditions.highLatency,
@@ -96,18 +78,17 @@ describe(testName, () => {
             networkConditions.packetLoss,
           );
 
-          console.log("syncing all");
-          await workerInstances[
-            workerConfigs[0].name
-          ]?.client.conversations.sync();
-          await workerInstances[
-            workerConfigs[1].name
-          ]?.client.conversations.sync();
+          // Sync conversations
+          await Promise.all(
+            workerConfigs.map((w) => {
+              const worker = workerInstances[w.name] as any;
+              return worker?.client?.conversations?.sync();
+            }),
+          );
 
           // Create group with receiver
-          const group = await workerInstances[
-            workerConfigs[0].name
-          ].client.conversations.newGroup([receiver], {
+          const worker = workerInstances[workerConfigs[0].name] as any;
+          const group = await worker.client.conversations.newGroup([receiver], {
             groupName: "Network Test Group",
             groupDescription: "Group for network simulation testing",
           });
@@ -119,136 +100,86 @@ describe(testName, () => {
         }
       });
 
-      it("should send messages with network conditions", async () => {
+      it("should test various network conditions", async () => {
         try {
-          const group =
-            await workerInstances[
-              workerConfigs[0].name
-            ].client.conversations.getConversationById(groupId);
+          // Test cases with different network conditions
+          const testCases = [
+            {
+              name: "high latency and packet loss",
+              workers: [0, 1],
+              conditions: [
+                { worker: 0, condition: networkConditions.highLatency },
+                { worker: 1, condition: networkConditions.packetLoss },
+              ],
+              message: "Message with high latency and packet loss",
+              waitTime: 5000,
+            },
+            {
+              name: "disconnection",
+              workers: [0, 1],
+              conditions: [
+                { worker: 0, condition: networkConditions.disconnection },
+                { worker: 1, condition: networkConditions.disconnection },
+              ],
+              message: "Message with disconnection simulation",
+              waitTime: 10000,
+            },
+            {
+              name: "bandwidth limitation",
+              workers: [0],
+              conditions: [
+                { worker: 0, condition: networkConditions.bandwidthLimit },
+              ],
+              message: "Message with bandwidth limitation",
+              waitTime: 5000,
+            },
+            {
+              name: "poor connection",
+              workers: [1],
+              conditions: [
+                { worker: 1, condition: networkConditions.poorConnection },
+              ],
+              message: "Message with poor connection simulation",
+              waitTime: 5000,
+            },
+          ];
 
-          console.log("Sending message with high latency");
-          await group?.send("Message from high latency worker");
+          // Run each test case
+          for (const testCase of testCases) {
+            console.log(`Testing ${testCase.name}`);
 
-          const group2 =
-            await workerInstances[
-              workerConfigs[1].name
-            ].client.conversations.getConversationById(groupId);
+            // Get workers for this test case
+            const workers = await getWorkers(
+              testCase.workers.map(
+                (i) =>
+                  `${workerConfigs[i].name}-${workerConfigs[i].id}-${workerConfigs[i].number}`,
+              ),
+              testName,
+              "message",
+              false,
+              undefined,
+              users[user].env as XmtpEnv,
+            );
 
-          console.log("Sending message with packet loss");
-          await group2?.send("Message from packet loss worker");
+            // Apply network conditions
+            testCase.conditions.forEach(({ worker, condition }) => {
+              workers.setWorkerNetworkConditions(
+                workerConfigs[worker].name,
+                condition,
+              );
+            });
 
-          // Wait for messages to be processed
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-        } catch (e) {
-          hasFailures = logError(e, expect);
-          throw e;
-        }
-      });
+            // Send message
+            const worker = workerInstances[workerConfigs[0].name] as any;
+            const group =
+              await worker.client.conversations.getConversationById(groupId);
+            await group?.send(testCase.message);
 
-      it("should test disconnection simulation", async () => {
-        try {
-          // Apply disconnection conditions to both workers
-          const workers = await getWorkers(
-            [
-              `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-              `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-            ],
-            testName,
-            "message",
-            false,
-            undefined,
-            users[user].env as XmtpEnv,
-          );
-
-          workers.setWorkerNetworkConditions(
-            workerConfigs[0].name,
-            networkConditions.disconnection,
-          );
-          workers.setWorkerNetworkConditions(
-            workerConfigs[1].name,
-            networkConditions.disconnection,
-          );
-
-          const group =
-            await workerInstances[
-              workerConfigs[0].name
-            ].client.conversations.getConversationById(groupId);
-
-          console.log("Sending message with disconnection simulation");
-          await group?.send("Message with disconnection simulation");
-
-          // Wait for potential disconnections
-          await new Promise((resolve) => setTimeout(resolve, 10000));
-        } catch (e) {
-          hasFailures = logError(e, expect);
-          throw e;
-        }
-      });
-
-      it("should test bandwidth limitation", async () => {
-        try {
-          // Apply bandwidth limitation to a worker
-          const workers = await getWorkers(
-            [
-              `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-            ],
-            testName,
-            "message",
-            false,
-            undefined,
-            users[user].env as XmtpEnv,
-          );
-
-          workers.setWorkerNetworkConditions(
-            workerConfigs[0].name,
-            networkConditions.bandwidthLimit,
-          );
-
-          const group =
-            await workerInstances[
-              workerConfigs[0].name
-            ].client.conversations.getConversationById(groupId);
-
-          console.log("Sending message with bandwidth limitation");
-          await group?.send("Message with bandwidth limitation");
-
-          // Wait for bandwidth-limited operations
-          await new Promise((resolve) => setTimeout(resolve, 5000));
-        } catch (e) {
-          hasFailures = logError(e, expect);
-          throw e;
-        }
-      });
-
-      it("should test poor connection simulation", async () => {
-        try {
-          // Apply poor connection conditions to a worker
-          const workers = await getWorkers(
-            [
-              `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-            ],
-            testName,
-            "message",
-            false,
-            undefined,
-            users[user].env as XmtpEnv,
-          );
-
-          workers.setWorkerNetworkConditions(
-            workerConfigs[1].name,
-            networkConditions.poorConnection,
-          );
-
-          const group =
-            await workerInstances[
-              workerConfigs[1].name
-            ].client.conversations.getConversationById(groupId);
-
-          console.log("Sending message with poor connection simulation");
-          await group?.send("Message with poor connection simulation");
-
-          // Wait for poor connection operations
-          await new Promise((resolve) => setTimeout(resolve, 5000));
+            // Wait for operations to complete
+            await new Promise((resolve) =>
+              setTimeout(resolve, testCase.waitTime),
+            );
+          }
         } catch (e) {
           hasFailures = logError(e, expect);
           throw e;
