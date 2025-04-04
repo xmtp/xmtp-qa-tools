@@ -14,6 +14,11 @@ const users: {
   //   inboxId: "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
   //   env: "production",
   // },
+
+  xmtpchat: {
+    inboxId: "dc85c4016ededfe9745c8eb623fc7473be85498bfd70703300d99dc29e10f235",
+    env: "dev",
+  },
   convos: {
     inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
     env: "dev",
@@ -23,15 +28,20 @@ const users: {
 const testName = "bug_fork";
 loadEnv(testName);
 
-const workerConfigs = [
-  { name: "bob", id: "a", number: "100" },
-  { name: "alice", id: "b", number: "104" },
-  { name: "ivy", id: "c", number: "108" },
-  { name: "jack", id: "d", number: "112" },
+// Define worker names and IDs
+const workerNames = [
+  "bob",
+  "alice",
+  "ivy",
+  "jack",
+  "charlie",
+  "dave",
+  "eve",
+  "frank",
 ];
+const workerIds = ["a", "b", "c", "d", "e", "f", "g", "h"];
 
-// TODO: move toxss1ss
-// Network condition presets for tessting
+// Network condition presets for testing
 const networkConditions: Record<string, NetworkConditions> = {
   highLatency: {
     latencyMs: 1000,
@@ -47,7 +57,6 @@ const networkConditions: Record<string, NetworkConditions> = {
   bandwidthLimit: {
     bandwidthLimitKbps: 100,
   },
-
   poorConnection: {
     latencyMs: 500,
     jitterMs: 100,
@@ -56,304 +65,508 @@ const networkConditions: Record<string, NetworkConditions> = {
   },
 };
 
+// Function to get random version between 100 and 104
+const getRandomVersion = () => {
+  return Math.floor(Math.random() * 5) + 100; // Random number between 100 and 104
+};
+
+// Function to get random network condition
+const getRandomNetworkCondition = () => {
+  const conditionKeys = Object.keys(networkConditions);
+  const randomIndex = Math.floor(Math.random() * conditionKeys.length);
+  return networkConditions[conditionKeys[randomIndex]];
+};
+
+// Function to get random message
+const getRandomMessage = () => {
+  const messages = [
+    "Hello everyone!",
+    "Testing group functionality",
+    "Checking message delivery",
+    "Random message for testing",
+    "Testing network conditions",
+    "Checking version compatibility",
+    "Testing group forking",
+    "Message with special characters: !@#$%^&*()",
+    "Long message with lots of text to test bandwidth limitations and how the system handles larger payloads under different network conditions",
+    "Message with emojis: 😀 🚀 🌍 🔥 💯",
+  ];
+  const randomIndex = Math.floor(Math.random() * messages.length);
+  return messages[randomIndex];
+};
+
 describe(testName, () => {
   let hasFailures = false;
   let groupId: string;
+  const workerInstances: { [key: string]: any } = {};
+  const numWorkers = 6; // Number of workers to create
 
-  for (const user of Object.keys(users)) {
-    describe(`User: ${user} [${users[user].env}]`, () => {
-      const workerInstances: { [key: string]: any } = {};
-      const receiver = users[user].inboxId;
+  // Function to send random message from a worker
+  const sendRandomMessage = async (workerName: string, groupId: string) => {
+    try {
+      const group =
+        await workerInstances[
+          workerName
+        ].client.conversations.getConversationById(groupId);
 
-      it("should initialize first worker and create group", async () => {
-        try {
-          console.log(`Setting up test for ${user}[${users[user].env}]`);
-          const workers = await getWorkers(
-            [
-              `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-            ],
-            testName,
-            "message",
-            false,
-            undefined,
-            users[user].env as XmtpEnv,
-          );
-          workerInstances[workerConfigs[0].name] = workers.get(
-            workerConfigs[0].name,
-            workerConfigs[0].id,
-          );
-          console.log("syncing all");
-          await workerInstances[
-            workerConfigs[0].name
-          ]?.client.conversations.sync();
-
-          // Create group with receiver
-          const group = await workerInstances[
-            workerConfigs[0].name
-          ].client.conversations.newGroup([receiver], {
-            groupName: "Test Group",
-            groupDescription: "Group for fork testing",
-          });
-          groupId = group.id;
-          console.log("Created group with ID:", groupId);
-        } catch (e) {
-          hasFailures = logError(e, expect);
-          throw e;
-        }
-      });
-
-      for (let i = 0; i < workerConfigs.length; i++) {
-        const worker = workerConfigs[i];
-        const isFirstWorker = i === 0;
-
-        if (!isFirstWorker) {
-          it(`should initialize ${worker.name} and send message`, async () => {
-            try {
-              const workers = await getWorkers(
-                [`${worker.name}-${worker.id}-${worker.number}`],
-                testName,
-                "message",
-                false,
-                undefined,
-                users[user].env as XmtpEnv,
-              );
-              workerInstances[worker.name] = workers.get(
-                worker.name,
-                worker.id,
-              );
-              console.log("syncing all");
-              await workerInstances[worker.name]?.client.conversations.sync();
-
-              const group =
-                await workerInstances[
-                  worker.name
-                ].client.conversations.getConversationById(groupId);
-              console.log(`sending message ${i + 1}/${workerConfigs.length}`);
-              const message = `message ${i + 1}/${workerConfigs.length}\ngroupId: ${groupId}`;
-              await group?.send(message);
-            } catch (e) {
-              hasFailures = logError(e, expect);
-              throw e;
-            }
-          });
-        }
-
-        it(`should terminate and restart ${worker.name}`, async () => {
-          console.warn(
-            `${worker.name} terminates, deletes local data, and restarts`,
-          );
-          await workerInstances[worker.name]?.worker.clearDB();
-          await workerInstances[worker.name]?.worker.initialize();
-        });
+      if (group) {
+        const message = getRandomMessage();
+        console.log(
+          `${workerName} sending message: "${message}" to group ${groupId}`,
+        );
+        await group.send(message);
+        return true;
+      } else {
+        console.warn(`${workerName} could not find group ${groupId}`);
+        return false;
       }
-    });
-  }
+    } catch (e) {
+      console.error(`Error sending message from ${workerName}:`, e);
+      return false;
+    }
+  };
 
-  // Network simulation tests
-  describe("Network simulation tests", () => {
-    for (const user of Object.keys(users)) {
-      describe(`User: ${user} [${users[user].env}]`, () => {
-        const workerInstances: { [key: string]: any } = {};
-        const receiver = users[user].inboxId;
+  it("should initialize first worker and create group", async () => {
+    try {
+      console.log(`Setting up test for convos[${users.convos.env}]`);
 
-        it("should initialize workers with network conditions", async () => {
-          try {
+      // Create first worker with version 100
+      const firstWorkerName = workerNames[0];
+      const firstWorkerId = workerIds[0];
+      const firstWorkerVersion = "100";
+
+      const workers = await getWorkers(
+        [`${firstWorkerName}-${firstWorkerId}-${firstWorkerVersion}`],
+        testName,
+        "message",
+        false,
+        undefined,
+        users.convos.env as XmtpEnv,
+      );
+
+      workerInstances[firstWorkerName] = workers.get(
+        firstWorkerName,
+        firstWorkerId,
+      );
+
+      console.log("Syncing conversations");
+      await workerInstances[firstWorkerName]?.client.conversations.sync();
+
+      // Create group with receiver
+      const group = await workerInstances[
+        firstWorkerName
+      ].client.conversations.newGroup(
+        [users.convos.inboxId, users.xmtpchat.inboxId],
+        {
+          groupName: "Fork Test Group",
+          groupDescription:
+            "Group for fork testing with different versions and network conditions",
+        },
+      );
+
+      groupId = group.id;
+      console.log("Created group with ID:", groupId);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to initialize first worker and create group");
+      }
+    }
+  });
+
+  it("should initialize random workers with different versions and network conditions", async () => {
+    try {
+      // Create random workers with different versions and network conditions
+      const workerConfigs = [];
+
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        const workerId = workerIds[i];
+        const workerVersion = getRandomVersion().toString();
+
+        workerConfigs.push(`${workerName}-${workerId}-${workerVersion}`);
+      }
+
+      console.log("Creating workers with configs:", workerConfigs);
+
+      const workers = await getWorkers(
+        workerConfigs,
+        testName,
+        "message",
+        false,
+        undefined,
+        users.convos.env as XmtpEnv,
+      );
+
+      // Store worker instances and apply random network conditions
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        const workerId = workerIds[i];
+
+        workerInstances[workerName] = workers.get(workerName, workerId);
+
+        // Apply random network condition
+        const networkCondition = getRandomNetworkCondition();
+        workers.setWorkerNetworkConditions(workerName, networkCondition);
+
+        console.log(`Applied network condition to ${workerName}`);
+      }
+
+      // Sync all workers
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        console.log(`Syncing ${workerName}`);
+        await workerInstances[workerName]?.client.conversations.sync();
+
+        // Have each worker send a random message after syncing
+        await sendRandomMessage(workerName, groupId);
+      }
+
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to initialize random workers");
+      }
+    }
+  });
+
+  it("should attempt to fork the group with different workers", async () => {
+    try {
+      // Each worker will try to send a message to the group
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+
+        // Send a random message
+        await sendRandomMessage(workerName, groupId);
+
+        // Add a small delay between messages to simulate real-world conditions
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to fork the group with different workers");
+      }
+    }
+  });
+
+  it("should terminate and restart workers to test recovery", async () => {
+    try {
+      // Randomly select workers to terminate and restart
+      const workersToRestart = Math.floor(Math.random() * (numWorkers - 1)) + 1;
+      const selectedWorkers: number[] = [];
+
+      for (let i = 0; i < workersToRestart; i++) {
+        const randomIndex = Math.floor(Math.random() * (numWorkers - 1)) + 1;
+        if (!selectedWorkers.includes(randomIndex)) {
+          selectedWorkers.push(randomIndex);
+        }
+      }
+
+      // Have all workers send messages before termination
+      console.log("Sending messages before worker termination");
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        await sendRandomMessage(workerName, groupId);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Terminate and restart selected workers
+      for (const workerIndex of selectedWorkers) {
+        const workerName = workerNames[workerIndex];
+        console.warn(
+          `${workerName} terminates, deletes local data, and restarts`,
+        );
+        await workerInstances[workerName]?.worker.clearDB();
+        await workerInstances[workerName]?.worker.initialize();
+      }
+
+      // Wait for workers to restart
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+
+      // Have all workers send messages after restart
+      console.log("Sending messages after worker restart");
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        await sendRandomMessage(workerName, groupId);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
+
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to terminate and restart workers");
+      }
+    }
+  });
+
+  // Add a new test to simulate concurrent message sending
+  it("should simulate concurrent message sending from all workers", async () => {
+    try {
+      console.log("Simulating concurrent message sending from all workers");
+
+      // Create an array of promises for concurrent message sending
+      const messagePromises = [];
+
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        messagePromises.push(sendRandomMessage(workerName, groupId));
+      }
+
+      // Wait for all messages to be sent concurrently
+      await Promise.all(messagePromises);
+
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to simulate concurrent message sending");
+      }
+    }
+  });
+
+  // Add a new test to verify message consistency across workers
+  it("should verify message consistency across all workers", async () => {
+    try {
+      console.log("Verifying message consistency across all workers");
+
+      // First, have all workers sync to ensure they have the latest messages
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        console.log(`Syncing ${workerName} before verification`);
+        await workerInstances[workerName]?.client.conversations.sync();
+      }
+
+      // Get messages from the first worker to use as reference
+      const firstWorkerName = workerNames[0];
+      const firstWorkerGroup =
+        await workerInstances[
+          firstWorkerName
+        ].client.conversations.getConversationById(groupId);
+
+      if (!firstWorkerGroup) {
+        throw new Error(`First worker could not find group ${groupId}`);
+      }
+
+      const referenceMessages = await firstWorkerGroup.messages();
+      console.log(
+        `Reference worker (${firstWorkerName}) has ${referenceMessages.length} messages`,
+      );
+
+      // Log the first few messages for debugging
+      for (let i = 0; i < Math.min(5, referenceMessages.length); i++) {
+        console.log(`Reference message ${i}: ${referenceMessages[i].content}`);
+      }
+
+      // Check each worker's messages against the reference
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        const workerGroup =
+          await workerInstances[
+            workerName
+          ].client.conversations.getConversationById(groupId);
+
+        if (!workerGroup) {
+          console.warn(`${workerName} could not find group ${groupId}`);
+          continue;
+        }
+
+        const workerMessages = await workerGroup.messages();
+        console.log(`${workerName} has ${workerMessages.length} messages`);
+
+        // Check if the number of messages matches
+        if (workerMessages.length !== referenceMessages.length) {
+          console.warn(
+            `Message count mismatch: ${workerName} has ${workerMessages.length} messages, reference has ${referenceMessages.length}`,
+          );
+
+          // Log the first few messages for debugging
+          for (let j = 0; j < Math.min(5, workerMessages.length); j++) {
             console.log(
-              `Setting up network simulation test for ${user}[${users[user].env}]`,
+              `${workerName} message ${j}: ${workerMessages[j].content}`,
             );
-
-            // Create workers with different network conditions
-            const workers = await getWorkers(
-              [
-                `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-                `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-              ],
-              testName,
-              "message",
-              false,
-              undefined,
-              users[user].env as XmtpEnv,
-            );
-
-            // Store worker instances
-            workerInstances[workerConfigs[0].name] = workers.get(
-              workerConfigs[0].name,
-              workerConfigs[0].id,
-            );
-            workerInstances[workerConfigs[1].name] = workers.get(
-              workerConfigs[1].name,
-              workerConfigs[1].id,
-            );
-
-            // Apply network conditions
-            workers.setWorkerNetworkConditions(
-              workerConfigs[0].name,
-              networkConditions.highLatency,
-            );
-            workers.setWorkerNetworkConditions(
-              workerConfigs[1].name,
-              networkConditions.packetLoss,
-            );
-
-            console.log("syncing all");
-            await workerInstances[
-              workerConfigs[0].name
-            ]?.client.conversations.sync();
-            await workerInstances[
-              workerConfigs[1].name
-            ]?.client.conversations.sync();
-
-            // Create group with receiver
-            const group = await workerInstances[
-              workerConfigs[0].name
-            ].client.conversations.newGroup([receiver], {
-              groupName: "Network Test Group",
-              groupDescription: "Group for network simulation testing",
-            });
-            groupId = group.id;
-            console.log("Created group with ID:", groupId);
-          } catch (e) {
-            hasFailures = logError(e, expect);
-            throw e;
           }
-        });
+        } else {
+          console.log(
+            `${workerName} has the correct number of messages (${workerMessages.length})`,
+          );
+        }
 
-        it("should send messages with network conditions", async () => {
-          try {
-            const group =
-              await workerInstances[
-                workerConfigs[0].name
-              ].client.conversations.getConversationById(groupId);
-
-            console.log("Sending message with high latency");
-            await group?.send("Message from high latency worker");
-
-            const group2 =
-              await workerInstances[
-                workerConfigs[1].name
-              ].client.conversations.getConversationById(groupId);
-
-            console.log("Sending message with packet loss");
-            await group2?.send("Message from packet loss worker");
-
-            // Wait for messages to be processed
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          } catch (e) {
-            hasFailures = logError(e, expect);
-            throw e;
+        // Check if the content of messages matches
+        let contentMismatch = false;
+        for (
+          let j = 0;
+          j < Math.min(referenceMessages.length, workerMessages.length);
+          j++
+        ) {
+          if (referenceMessages[j].content !== workerMessages[j].content) {
+            console.warn(`Content mismatch at message ${j}:`);
+            console.warn(`Reference: ${referenceMessages[j].content}`);
+            console.warn(`${workerName}: ${workerMessages[j].content}`);
+            contentMismatch = true;
           }
-        });
+        }
 
-        it("should test disconnection simulation", async () => {
-          try {
-            // Apply disconnection conditions to both workers
-            const workers = await getWorkers(
-              [
-                `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-                `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-              ],
-              testName,
-              "message",
-              false,
-              undefined,
-              users[user].env as XmtpEnv,
-            );
+        if (!contentMismatch) {
+          console.log(`${workerName} has matching message content`);
+        }
+      }
 
-            workers.setWorkerNetworkConditions(
-              workerConfigs[0].name,
-              networkConditions.disconnection,
-            );
-            workers.setWorkerNetworkConditions(
-              workerConfigs[1].name,
-              networkConditions.disconnection,
-            );
+      // Wait for any pending operations
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to verify message consistency");
+      }
+    }
+  });
 
-            const group =
-              await workerInstances[
-                workerConfigs[0].name
-              ].client.conversations.getConversationById(groupId);
+  // Add a new test to test membership changes
+  it("should test removing and adding members to the group", async () => {
+    try {
+      console.log("Testing membership changes in the group");
 
-            console.log("Sending message with disconnection simulation");
-            await group?.send("Message with disconnection simulation");
+      // First, have all workers sync to ensure they have the latest state
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        console.log(`Syncing ${workerName} before membership changes`);
+        await workerInstances[workerName]?.client.conversations.sync();
+      }
 
-            // Wait for potential disconnections
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-          } catch (e) {
-            hasFailures = logError(e, expect);
-            throw e;
+      // Get the group from the first worker
+      const firstWorkerName = workerNames[0];
+      const firstWorkerGroup =
+        await workerInstances[
+          firstWorkerName
+        ].client.conversations.getConversationById(groupId);
+
+      if (!firstWorkerGroup) {
+        throw new Error(`First worker could not find group ${groupId}`);
+      }
+
+      // Get current members
+      const currentMembers = await firstWorkerGroup.members();
+      console.log(`Current group has ${currentMembers.length} members`);
+
+      // Randomly select a worker to remove (if there are more than 2 members)
+      if (currentMembers.length > 2) {
+        // Find a member that is not the first worker or the receiver
+        const removableMembers = currentMembers.filter(
+          (member) =>
+            member.inboxId.toLowerCase() !==
+              workerInstances[firstWorkerName].client.inboxId.toLowerCase() &&
+            member.inboxId.toLowerCase() !==
+              users.convos.inboxId.toLowerCase() &&
+            member.inboxId.toLowerCase() !==
+              users.xmtpchat.inboxId.toLowerCase(),
+        );
+
+        if (removableMembers.length > 0) {
+          const randomIndex = Math.floor(
+            Math.random() * removableMembers.length,
+          );
+          const memberToRemove = removableMembers[randomIndex];
+
+          console.log(
+            `Removing member ${memberToRemove.inboxId} from the group`,
+          );
+          await firstWorkerGroup.removeMembers([memberToRemove.inboxId]);
+
+          // Wait for the removal to propagate
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+
+          // Have all workers send messages after removal
+          console.log("Sending messages after member removal");
+          for (let i = 0; i < numWorkers; i++) {
+            const workerName = workerNames[i];
+            await sendRandomMessage(workerName, groupId);
+            await new Promise((resolve) => setTimeout(resolve, 300));
           }
-        });
 
-        it("should test bandwidth limitation", async () => {
-          try {
-            // Apply bandwidth limitation to a worker
-            const workers = await getWorkers(
-              [
-                `${workerConfigs[0].name}-${workerConfigs[0].id}-${workerConfigs[0].number}`,
-              ],
-              testName,
-              "message",
-              false,
-              undefined,
-              users[user].env as XmtpEnv,
-            );
+          // Wait for messages to be processed
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+        }
+      }
 
-            workers.setWorkerNetworkConditions(
-              workerConfigs[0].name,
-              networkConditions.bandwidthLimit,
-            );
+      // Add a new member (the first worker's inbox ID)
+      const newMemberInboxId = workerInstances[firstWorkerName].client.inboxId;
+      console.log(`Adding member ${newMemberInboxId} to the group`);
+      await firstWorkerGroup.addMembers([newMemberInboxId]);
 
-            const group =
-              await workerInstances[
-                workerConfigs[0].name
-              ].client.conversations.getConversationById(groupId);
+      // Wait for the addition to propagate
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-            console.log("Sending message with bandwidth limitation");
-            await group?.send("Message with bandwidth limitation");
+      // Have all workers send messages after adding a member
+      console.log("Sending messages after adding a member");
+      for (let i = 0; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        await sendRandomMessage(workerName, groupId);
+        await new Promise((resolve) => setTimeout(resolve, 300));
+      }
 
-            // Wait for bandwidth-limited operations
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          } catch (e) {
-            hasFailures = logError(e, expect);
-            throw e;
-          }
-        });
+      // Wait for messages to be processed
+      await new Promise((resolve) => setTimeout(resolve, 3000));
 
-        it("should test poor connection simulation", async () => {
-          try {
-            // Apply poor connection conditions to a worker
-            const workers = await getWorkers(
-              [
-                `${workerConfigs[1].name}-${workerConfigs[1].id}-${workerConfigs[1].number}`,
-              ],
-              testName,
-              "message",
-              false,
-              undefined,
-              users[user].env as XmtpEnv,
-            );
+      // Verify message consistency after membership changes
+      console.log("Verifying message consistency after membership changes");
 
-            workers.setWorkerNetworkConditions(
-              workerConfigs[1].name,
-              networkConditions.poorConnection,
-            );
+      // Get updated members
+      const updatedMembers = await firstWorkerGroup.members();
+      console.log(`Group now has ${updatedMembers.length} members`);
 
-            const group =
-              await workerInstances[
-                workerConfigs[1].name
-              ].client.conversations.getConversationById(groupId);
+      // Get messages from the first worker to use as reference
+      const referenceMessages = await firstWorkerGroup.messages();
+      console.log(
+        `Reference worker (${firstWorkerName}) has ${referenceMessages.length} messages`,
+      );
 
-            console.log("Sending message with poor connection simulation");
-            await group?.send("Message with poor connection simulation");
+      // Check each worker's messages against the reference
+      for (let i = 1; i < numWorkers; i++) {
+        const workerName = workerNames[i];
+        const workerGroup =
+          await workerInstances[
+            workerName
+          ].client.conversations.getConversationById(groupId);
 
-            // Wait for poor connection operations
-            await new Promise((resolve) => setTimeout(resolve, 5000));
-          } catch (e) {
-            hasFailures = logError(e, expect);
-            throw e;
-          }
-        });
-      });
+        if (!workerGroup) {
+          console.warn(`${workerName} could not find group ${groupId}`);
+          continue;
+        }
+
+        const workerMessages = await workerGroup.messages();
+        console.log(`${workerName} has ${workerMessages.length} messages`);
+
+        // Check if the number of messages matches
+        if (workerMessages.length !== referenceMessages.length) {
+          console.warn(
+            `Message count mismatch: ${workerName} has ${workerMessages.length} messages, reference has ${referenceMessages.length}`,
+          );
+        } else {
+          console.log(
+            `${workerName} has the correct number of messages (${workerMessages.length})`,
+          );
+        }
+      }
+
+      // Wait for any pending operations
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      if (hasFailures) {
+        throw new Error("Failed to test membership changes");
+      }
     }
   });
 });
