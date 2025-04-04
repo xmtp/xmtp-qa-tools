@@ -1,8 +1,7 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
+import { loadEnv } from "@helpers/client";
 import type { XmtpEnv } from "@helpers/types";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, beforeEach, describe, expect, it } from "vitest";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 
 const users: {
   [key: string]: {

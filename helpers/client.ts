@@ -2,7 +2,7 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
-import { IdentifierKind, type GroupMember } from "@xmtp/node-bindings";
+import { IdentifierKind } from "@xmtp/node-bindings";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";

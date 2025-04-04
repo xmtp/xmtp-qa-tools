@@ -16,6 +16,7 @@ try {
     stdio: "inherit",
   });
 } catch (error) {
+  console.error(error);
   console.error(`Error: Bot "${botName}" not found or failed to start`);
   process.exit(1);
 }

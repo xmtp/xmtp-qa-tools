@@ -1,5 +1,5 @@
 import fs from "fs/promises";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { createSigner, getEncryptionKeyFromHex } from "./helper.js";
 
@@ -31,7 +31,7 @@ async function checkGmBot(): Promise<boolean> {
     const client = await Client.create(signer, encryptionKey, {
       env,
       dbPath,
-      loggingLevel: process.env.LOGGING_LEVEL as any,
+      loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     });
     console.log("client", client.inboxId);
     return client.inboxId !== undefined;

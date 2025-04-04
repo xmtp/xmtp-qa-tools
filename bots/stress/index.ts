@@ -6,7 +6,6 @@ import {
   type Conversation,
   type DecodedMessage,
   type WorkerManager,
-  type XmtpEnv,
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 
@@ -48,7 +47,6 @@ async function initializeBot() {
   const botWorker = await getWorkers(["bot"], testName, "none", false);
   const bot = botWorker.get("bot");
   const client = bot?.client as Client;
-  const env = process.env.XMTP_ENV as XmtpEnv;
 
   console.log(`Agent initialized on address ${bot?.address}`);
   console.log(`Agent initialized on inbox ${client.inboxId}`);

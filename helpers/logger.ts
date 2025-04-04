@@ -183,24 +183,24 @@ export const overrideConsole = (logger: winston.Logger) => {
         }
       }
     };
-    console.warn = (...args: any[]) => {
+    console.warn = (...args: unknown[]) => {
       const message = filterLog(args);
       if (message) {
         logger.log("warn", message);
       }
     };
-    console.error = (...args: any[]) => {
+    console.error = (...args: unknown[]) => {
       const message = filterLog(args);
       if (message) {
         logger.log("error", message);
       }
     };
 
-    console.debug = (...args: any[]) => {
+    console.debug = (...args: unknown[]) => {
       if (!process.env.CI) {
         // Using a specific function type for console.debug
         const originalConsoleDebug = Function.prototype.bind.call(
-          console.constructor.prototype.debug as (...args: any[]) => void,
+          console.constructor.prototype.debug as (...args: unknown[]) => void,
           console,
         );
         originalConsoleDebug(...args);
@@ -215,7 +215,7 @@ if (!fs.existsSync("logs")) {
   fs.mkdirSync("logs");
 }
 
-export const logError = (e: any, expect: any): boolean => {
+export const logError = (e: unknown, expect: any): boolean => {
   if (e instanceof Error) {
     console.error(
       `[vitest] Test failed in ${expect.getState().currentTestName}`,
