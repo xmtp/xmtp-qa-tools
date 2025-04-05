@@ -83,10 +83,10 @@ export const getWorkerConfigs = (testConfig: any) => {
   // Create worker configs for all workers with random versions
   const workerConfigs = [];
 
-  for (let i = 0; i < testConfig.numWorkers; i++) {
+  for (let i = 0; i < testConfig.workerNames.length; i++) {
     const workerName = testConfig.workerNames[i];
     const workerId = testConfig.workerIds[i];
-    const workerVersion = getRandomVersion(testConfig.versions);
+    const workerVersion = getRandomVersion(testConfig.versions as string[]);
     console.log(`${workerName} using version: ${workerVersion}`);
 
     workerConfigs.push(`${workerName}-${workerId}-${workerVersion}`);
