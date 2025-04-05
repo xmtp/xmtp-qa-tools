@@ -1,5 +1,3 @@
-import fs from "node:fs";
-import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,

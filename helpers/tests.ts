@@ -129,10 +129,11 @@ export const getWorkerConfigs = (testConfig: any) => {
 export const getOrCreateGroup = async (groupId: string, creator: Client) => {
   let globalGroup: Conversation | undefined;
   if (!groupId) {
-    return await creator.conversations.newGroup([]);
+    globalGroup = await creator.conversations.newGroup([]);
   } else {
-    return await creator.conversations.getConversationById(groupId);
+    globalGroup = await creator.conversations.getConversationById(groupId);
   }
+  return globalGroup;
 };
 export const randomlyAsignAdmins = async (group: Group) => {
   const randomAdmin = Math.floor(Math.random() * 3);

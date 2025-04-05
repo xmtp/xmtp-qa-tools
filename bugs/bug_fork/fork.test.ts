@@ -13,7 +13,7 @@ import {
 } from "@helpers/tests";
 import type { Worker, WorkerManager } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import type { Client, Conversation, Group } from "@xmtp/node-sdk";
+import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_fork";
