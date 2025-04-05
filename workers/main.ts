@@ -6,11 +6,11 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
+import { sdkVersions } from "@helpers/tests";
 import {
   Client,
   defaultValues,
   Dm,
-  sdkVersions,
   type Consent,
   type Conversation,
   type DecodedMessage,

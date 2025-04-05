@@ -79,10 +79,13 @@ export class WorkerManager {
   /**
    * Terminates all active workers and cleans up resources
    */
-  public async terminateAll(): Promise<void> {
+  public async terminateAll(deleteDbs: boolean = false): Promise<void> {
     const terminationPromises = this.activeWorkers.map(async (worker) => {
       try {
         await worker.terminate();
+        if (deleteDbs) {
+          await worker.clearDB();
+        }
       } catch (error) {
         console.warn(`Error terminating worker:`, error);
       }

@@ -1,16 +1,3 @@
-/**
- * SDK Version Fixer
- *
- * This script creates the necessary symlinks in node_modules to ensure
- * each SDK version uses the correct bindings version for accurate version reporting.
- *
- * It can handle multiple SDK versions with their corresponding bindings.
- *
- * Usage:
- *   yarn script fix-sdk-versions           # Fix all SDK versions
- *   yarn script fix-sdk-versions --clean   # Remove 'imports' field from package.json
- */
-
 import fs from "fs";
 import path from "path";
 
