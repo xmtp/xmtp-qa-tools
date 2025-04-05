@@ -100,6 +100,13 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   return fromString(hex, "hex");
 };
 
+export function getDataPath(testName: string): string {
+  let dataPath = path.join(".data");
+  if (testName.includes("bug")) {
+    dataPath = path.resolve(process.cwd(), "bugs/" + testName + "/.data");
+  }
+  return dataPath;
+}
 function getEnvPath(testName: string): string {
   let envPath = path.join(".env");
   if (testName.includes("bug")) {

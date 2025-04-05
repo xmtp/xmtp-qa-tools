@@ -3,6 +3,7 @@ import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
+  getDataPath,
   getDbPath,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
@@ -791,7 +792,9 @@ export class WorkerClient extends Worker {
    * @returns true if the database was cleared, false otherwise
    */
   clearDB(): Promise<boolean> {
-    const dataPath = path.resolve(process.cwd(), ".data/" + this.name);
+    const dataPath =
+      getDataPath(this.testName) + "/" + this.name + "/" + this.folder;
+    console.log(`[${this.nameId}] Clearing database at ${dataPath}`);
     if (fs.existsSync(dataPath)) {
       fs.rmSync(dataPath, { recursive: true, force: true });
     }

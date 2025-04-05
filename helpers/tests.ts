@@ -1,5 +1,11 @@
 import type { Worker, WorkerManager } from "@workers/manager";
-import { type Client, type Conversation } from "@xmtp/node-sdk";
+import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import {
+  Client as Client47,
+  Conversation as Conversation47,
+  Dm as Dm47,
+  Group as Group47,
+} from "@xmtp/node-sdk-47";
 import {
   Client as Client100,
   Conversation as Conversation100,
@@ -18,8 +24,15 @@ import {
   Dm as Dm105,
   Group as Group105,
 } from "@xmtp/node-sdk-105";
+import { C } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 
 export const sdkVersions = {
+  47: {
+    Client: Client47,
+    Conversation: Conversation47,
+    Dm: Dm47,
+    Group: Group47,
+  },
   100: {
     Client: Client100,
     Conversation: Conversation100,
@@ -38,6 +51,27 @@ export const sdkVersions = {
     Dm: Dm105,
     Group: Group105,
   },
+};
+
+export const createRandomInstallations = async (
+  count: number,
+  worker: Worker,
+) => {
+  let returnWorker: Worker | undefined;
+  console.log(`[${worker.name}] Creating ${count} installations`);
+  const inboxState = await worker.client.preferences.inboxState(true);
+  console.log(`[${worker.name}] Inbox state: ${JSON.stringify(inboxState)}`);
+  for (let i = 0; i < count; i++) {
+    console.log(`[${worker.name}] Creating installation ${i + 1}`);
+    await worker.worker?.clearDB();
+    await worker.worker?.initialize();
+    returnWorker = worker;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+  console.log(`[${worker.name}] Created ${count} installations`);
+  const inboxState2 = await worker.client.preferences.inboxState(true);
+  console.log(`[${worker.name}]   Inbox state: ${JSON.stringify(inboxState2)}`);
+  return returnWorker;
 };
 // Network condition presets for testing
 const networkConditions = {
@@ -62,13 +96,12 @@ export const getRandomVersion = (versions: string[]) => {
   return versions[randomIndex];
 };
 export const getAllWorkersfromConfig = (testConfig: any): string[] => {
-  const allWorkers = testConfig.workers?.getWorkers();
   const manualUsers = testConfig.manualUsers;
   const inboxIds = [];
   for (const user in manualUsers) {
-    inboxIds.push(manualUsers[user].inboxId);
+    inboxIds.push(manualUsers[user]);
   }
-  for (const worker of allWorkers) {
+  for (const worker of testConfig.workers.getWorkers()) {
     inboxIds.push(worker.client.inboxId);
   }
   return inboxIds as string[];
@@ -85,7 +118,7 @@ export const getWorkerConfigs = (testConfig: any) => {
 
   for (let i = 0; i < testConfig.workerNames.length; i++) {
     const workerName = testConfig.workerNames[i];
-    const workerId = testConfig.workerIds[i];
+    const workerId = getRandomVersion(testConfig.workerIds as string[]);
     const workerVersion = getRandomVersion(testConfig.versions as string[]);
     console.log(`${workerName} using version: ${workerVersion}`);
 
@@ -96,19 +129,32 @@ export const getWorkerConfigs = (testConfig: any) => {
 export const getOrCreateGroup = async (groupId: string, creator: Client) => {
   let globalGroup: Conversation | undefined;
   if (!groupId) {
-    globalGroup = await creator.conversations.newGroup([]);
+    return await creator.conversations.newGroup([]);
   } else {
-    globalGroup = await creator.conversations.getConversationById(groupId);
+    return await creator.conversations.getConversationById(groupId);
   }
-  return globalGroup;
 };
-export const randomSyncs = async (workers: Worker[]) => {
-  for (const worker of workers) {
-    const randomSyncs = Math.floor(Math.random() * 3);
+export const randomlyAsignAdmins = async (group: Group) => {
+  const randomAdmin = Math.floor(Math.random() * 3);
+  await group.sync();
+  const members = await group.members();
+  if (randomAdmin === 0) {
+    await group.addAdmin(members[0].inboxId);
+  } else if (randomAdmin === 1) {
+    await group.addSuperAdmin(members[1].inboxId);
+  } else {
+    await group.addAdmin(members[2].inboxId);
+  }
+};
+export const randomSyncs = async (workers: WorkerManager, group: Group) => {
+  for (const worker of workers.getWorkers()) {
+    const randomSyncs = Math.floor(Math.random() * 4);
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {
       await worker.client.conversations.syncAll();
+    } else {
+      await group.sync();
     }
   }
 };
@@ -132,6 +178,18 @@ export const sendMessageWithCount = async (
   } catch (e) {
     console.error(`Error sending message from ${worker.name}:`, e);
     return messageCount;
+  }
+};
+export const randomlyRemoveDb = async (workers: WorkerManager) => {
+  for (const worker of workers.getWorkers()) {
+    let fityfity = Math.random() < 0.5;
+    if (fityfity) {
+      console.warn(
+        `${worker.name} terminates, deletes local data, and restarts`,
+      );
+      await worker.worker?.clearDB();
+      await worker.worker?.initialize();
+    }
   }
 };
 export const setRandomNetworkConditions = (workers: WorkerManager) => {
