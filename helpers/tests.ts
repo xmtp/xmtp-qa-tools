@@ -133,15 +133,29 @@ export const getOrCreateGroup = async (groupId: string, creator: Client) => {
   return globalGroup;
 };
 export const randomlyAsignAdmins = async (group: Group) => {
-  const randomAdmin = Math.floor(Math.random() * 3);
   await group.sync();
   const members = await group.members();
-  if (randomAdmin === 0) {
-    await group.addAdmin(members[0].inboxId);
-  } else if (randomAdmin === 1) {
-    await group.addSuperAdmin(members[1].inboxId);
-  } else {
-    await group.addAdmin(members[2].inboxId);
+
+  // Only proceed if there are members to assign
+  if (members.length === 0) {
+    console.log("No members available to assign as admin");
+    return;
+  }
+
+  // Select a random member from the available members
+  const randomIndex = Math.floor(Math.random() * members.length);
+  const randomAdminType = Math.floor(Math.random() * 2); // 0 for admin, 1 for superAdmin
+
+  try {
+    if (randomAdminType === 0) {
+      await group.addAdmin(members[randomIndex].inboxId);
+      console.log(`Added ${members[randomIndex].inboxId} as admin`);
+    } else {
+      await group.addSuperAdmin(members[randomIndex].inboxId);
+      console.log(`Added ${members[randomIndex].inboxId} as super admin`);
+    }
+  } catch (error) {
+    console.error("Error assigning admin:", error);
   }
 };
 export const randomSyncs = async (workers: WorkerManager, group: Group) => {

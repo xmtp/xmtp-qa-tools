@@ -318,7 +318,6 @@ export class WorkerClient extends Worker {
 
       // Force version to include the SDK version for easier identification
       const sdkIdentifier = sdkVersion || "latest";
-      console.log("sdkIdentifier", sdkIdentifier, ClientClass.version);
       const libXmtpVersion =
         ClientClass.version?.split("@")[1].split(" ")[0] ?? "unknown";
 

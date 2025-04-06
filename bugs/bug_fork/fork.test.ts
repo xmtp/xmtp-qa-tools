@@ -20,8 +20,7 @@ const testName = "bug_fork";
 loadEnv(testName);
 
 const testConfig = {
-  groupId: "d0f58a4c78c7574df2c9b1504721628d",
-  testName: "bug_fork",
+  groupId: "9ab199e07ae6f12c50ba9e3083069677",
   versions: ["100", "104", "105"],
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
@@ -31,7 +30,7 @@ const testConfig = {
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
   workers: undefined as WorkerManager | undefined,
-  removeDbs: true,
+  removeDbs: false,
   enableNetworkConditions: true, // Toggle network condition simulation
   enableRandomSyncs: true, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
@@ -83,7 +82,9 @@ describe(testName, () => {
       await randomSyncs(testConfig.workers, globalGroup as Group);
 
     const inboxIds = getAllWorkersfromConfig(testConfig);
+    console.log("Adding all workers to group", inboxIds);
     await (globalGroup as Group).addMembers(inboxIds);
+    await globalGroup?.sync();
     console.log("Added all workers to group");
   });
 
@@ -116,9 +117,7 @@ describe(testName, () => {
       );
 
       // Add alice to the group and have her send a message
-      console.log(
-        `Removing ${alice?.name} from group ${alice?.client.inboxId}`,
-      );
+      console.log(`Removing ${alice?.name} from group ${globalGroup?.id}`);
       await (globalGroup as Group).removeMembers([alice?.client.inboxId]);
       console.log(`Removed ${alice?.name} from group`);
       if (testConfig.randomlyAsignAdmins)
