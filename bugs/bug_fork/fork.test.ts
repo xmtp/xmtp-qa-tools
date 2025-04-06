@@ -34,6 +34,7 @@ const testConfig = {
   enableNetworkConditions: false, // Toggle network condition simulation
   enableRandomSyncs: true, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
+  removeMembers: false,
   createRandomInstallations: false,
   rootWorker: "fabri",
 };
@@ -126,6 +127,8 @@ describe(testName, () => {
         await randomlyAsignAdmins(globalGroup as Group);
 
       if (testConfig.removeDbs) await randomlyRemoveDb(testConfig.workers);
+      if (testConfig.removeMembers)
+        await (globalGroup as Group).removeMembers([ivy?.client.inboxId]);
       if (testConfig.enableRandomSyncs)
         await randomSyncs(testConfig.workers, globalGroup as Group);
 
