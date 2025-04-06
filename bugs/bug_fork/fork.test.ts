@@ -13,19 +13,19 @@ import {
 } from "@helpers/tests";
 import type { Worker, WorkerManager } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import type { Conversation, Group } from "@xmtp/node-sdk";
+import type { Conversation, Group, XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_fork";
 loadEnv(testName);
 
 const testConfig = {
-  groupId: "62ca541a55a2951c8e653b59264fd55f",
+  groupId: "1a683492171d7027a38a11fdadb355f6",
   versions: ["100", "104", "105"],
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
   manualUsers: {
-    convos: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
+    //convos: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
     xmtpchat:
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
@@ -34,7 +34,7 @@ const testConfig = {
   enableNetworkConditions: false, // Toggle network condition simulation
   enableRandomSyncs: false, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
-  addAllWorkers: false,
+  addAllWorkers: true,
   removeMembers: false,
   createRandomInstallations: false,
   rootWorker: "fabri",
@@ -47,12 +47,7 @@ describe(testName, () => {
   let rootWorker: WorkerManager | undefined;
   const workerConfigs = getWorkerConfigs(testConfig);
   it("should initialize all workers at once and create group", async () => {
-    rootWorker = await getWorkers(
-      [testConfig.rootWorker],
-      testName,
-      "message",
-      false,
-    );
+    rootWorker = await getWorkers([testConfig.rootWorker], testName, "message");
     const fabri = rootWorker.getWorkers()[0];
     globalGroup = (await getOrCreateGroup(
       testConfig.groupId,
@@ -70,12 +65,7 @@ describe(testName, () => {
   });
 
   it("initialize workers", async () => {
-    testConfig.workers = await getWorkers(
-      workerConfigs,
-      testName,
-      "message",
-      false,
-    );
+    testConfig.workers = await getWorkers(workerConfigs, testName, "none");
 
     // Apply random network conditions to each worker if enabled
     if (testConfig.enableNetworkConditions)
