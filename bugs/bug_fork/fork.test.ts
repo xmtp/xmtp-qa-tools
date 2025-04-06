@@ -32,8 +32,9 @@ const testConfig = {
   workers: undefined as WorkerManager | undefined,
   removeDbs: false,
   enableNetworkConditions: false, // Toggle network condition simulation
-  enableRandomSyncs: true, // Toggle random sync operations before sending messages
+  enableRandomSyncs: false, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
+  addAllWorkers: false,
   removeMembers: false,
   createRandomInstallations: false,
   rootWorker: "fabri",
@@ -57,6 +58,7 @@ describe(testName, () => {
       testConfig.groupId,
       fabri.client,
     )) as Conversation;
+    await (globalGroup as Group).updateName(globalGroup.id);
     console.log("Get group with ID:", globalGroup.id);
     // Bob sends first message after creating the group
     messageCount = await sendMessageWithCount(
@@ -84,7 +86,8 @@ describe(testName, () => {
 
     const inboxIds = getAllWorkersfromConfig(testConfig);
     console.log("Adding all workers to group", inboxIds);
-    await (globalGroup as Group).addMembers(inboxIds);
+    if (testConfig.addAllWorkers)
+      await (globalGroup as Group).addMembers(inboxIds);
 
     console.log("Added all workers to group");
   });
@@ -105,6 +108,7 @@ describe(testName, () => {
         throw new Error("Workers not initialized");
       }
 
+      await (globalGroup as Group).updateName(globalGroup?.id as string);
       if (testConfig.createRandomInstallations)
         bob = (await createRandomInstallations(5, bob)) as Worker;
 
@@ -116,6 +120,7 @@ describe(testName, () => {
         testConfig.groupId,
         messageCount,
       );
+      await (globalGroup as Group).updateName(globalGroup?.id as string);
 
       messageCount = await sendMessageWithCount(
         alice,
