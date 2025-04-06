@@ -20,7 +20,7 @@ const testName = "bug_fork";
 loadEnv(testName);
 
 const testConfig = {
-  groupId: "",
+  groupId: "62ca541a55a2951c8e653b59264fd55f",
   versions: ["100", "104", "105"],
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
@@ -30,7 +30,7 @@ const testConfig = {
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
   workers: undefined as WorkerManager | undefined,
-  removeDbs: true,
+  removeDbs: false,
   enableNetworkConditions: false, // Toggle network condition simulation
   enableRandomSyncs: true, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
