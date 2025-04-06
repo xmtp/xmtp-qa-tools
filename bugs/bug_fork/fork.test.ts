@@ -20,7 +20,7 @@ const testName = "bug_fork";
 loadEnv(testName);
 
 const testConfig = {
-  groupId: "9ab199e07ae6f12c50ba9e3083069677",
+  groupId: "",
   versions: ["100", "104", "105"],
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
