@@ -12,6 +12,12 @@ interface VersionConfig {
 // Static configuration
 const staticConfigs: VersionConfig[] = [
   {
+    sdkPackage: "node-sdk-mls",
+    bindingsPackage: "node-bindings-mls",
+    sdkVersion: "0.0.13",
+    bindingsVersion: "0.0.9",
+  },
+  {
     sdkPackage: "node-sdk-47",
     bindingsPackage: "node-bindings-41",
     sdkVersion: "0.0.47",

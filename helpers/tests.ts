@@ -24,15 +24,12 @@ import {
   Dm as Dm105,
   Group as Group105,
 } from "@xmtp/node-sdk-105";
-import { C } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
+import {
+  Client as ClientMls,
+  Conversation as ConversationMls,
+} from "@xmtp/node-sdk-mls";
 
 export const sdkVersions = {
-  47: {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-  },
   100: {
     Client: Client100,
     Conversation: Conversation100,

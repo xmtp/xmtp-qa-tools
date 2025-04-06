@@ -81,7 +81,6 @@ export class XmtpPlaywright {
     for (const message of messages) {
       // Wait for GM response with a longer timeout
       const botMessage = await page.getByText(message);
-      console.log("Bot message:", botMessage);
       const botMessageText = await botMessage.textContent();
       if (botMessageText !== message) {
         allReceived = false;
@@ -149,8 +148,8 @@ export class XmtpPlaywright {
       if (waitForMessage) {
         // Wait for GM response with a longer timeout
         const botMessage = await page.getByText("gm");
-        console.log("Bot message:", botMessage);
         const botMessageText = await botMessage.textContent();
+        console.log("Bot message:", botMessageText);
         return botMessageText === "gm";
       } else {
         return hiMessageText === "hi";
