@@ -5,7 +5,7 @@ import {
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/old_helper";
-import { Client } from "@xmtp/mls-client";
+import { Client as ClientMls } from "@xmtp/node-sdk-mls";
 
 const scriptName = "oldpackages";
 async function main() {
@@ -27,17 +27,17 @@ async function main() {
       const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
       const user = createUser();
-      const client = await Client.create(user.account.address, {
+      const client = await ClientMls.create(user.account.address, {
         env: "dev",
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),
       });
-      await Client.create(user.account.address, {
+      await ClientMls.create(user.account.address, {
         env: "production",
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),
       });
-      await Client.create(user.account.address, {
+      await ClientMls.create(user.account.address, {
         env: "local",
         encryptionKey: encryptionKey,
         dbPath: join("logs", `./test-${user.account.address}.db3`),
