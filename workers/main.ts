@@ -301,12 +301,13 @@ export class WorkerClient extends Worker {
       const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
 
       // Get the SDK version from the worker data
-      const sdkVersion = this.workerData.sdkVersion;
+      const sdkVersion = this.workerData.sdkVersion as
+        | keyof typeof sdkVersions
+        | undefined;
       // Select the appropriate SDK client based on version
-      let ClientClass;
+      let ClientClass: any;
       if (sdkVersion) {
-        ClientClass =
-          sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
+        ClientClass = sdkVersions[sdkVersion].Client;
       } else {
         ClientClass = Client;
       }
@@ -335,12 +336,12 @@ export class WorkerClient extends Worker {
         this.env,
       );
 
-      // @ts-expect-error Window localStorage access in browser context
-      this.client = await ClientClass.create(signer, encryptionKey, {
+      // Use type assertion to handle the client creation
+      this.client = (await ClientClass.create(signer, encryptionKey, {
         dbPath,
         env: this.env,
         loggingLevel: loggingLevel,
-      });
+      })) as Client;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
