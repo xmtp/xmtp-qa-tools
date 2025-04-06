@@ -30,8 +30,8 @@ const testConfig = {
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
   workers: undefined as WorkerManager | undefined,
-  removeDbs: false,
-  enableNetworkConditions: true, // Toggle network condition simulation
+  removeDbs: true,
+  enableNetworkConditions: false, // Toggle network condition simulation
   enableRandomSyncs: true, // Toggle random sync operations before sending messages
   randomlyAsignAdmins: true,
   createRandomInstallations: false,
@@ -84,7 +84,7 @@ describe(testName, () => {
     const inboxIds = getAllWorkersfromConfig(testConfig);
     console.log("Adding all workers to group", inboxIds);
     await (globalGroup as Group).addMembers(inboxIds);
-    await globalGroup?.sync();
+
     console.log("Added all workers to group");
   });
 
@@ -105,7 +105,7 @@ describe(testName, () => {
       }
 
       if (testConfig.createRandomInstallations)
-        bob = (await createRandomInstallations(50, bob)) as Worker;
+        bob = (await createRandomInstallations(5, bob)) as Worker;
 
       if (testConfig.enableRandomSyncs)
         await randomSyncs(testConfig.workers, globalGroup as Group);
@@ -116,10 +116,12 @@ describe(testName, () => {
         messageCount,
       );
 
-      // Add alice to the group and have her send a message
-      console.log(`Removing ${alice?.name} from group ${globalGroup?.id}`);
-      await (globalGroup as Group).removeMembers([alice?.client.inboxId]);
-      console.log(`Removed ${alice?.name} from group`);
+      messageCount = await sendMessageWithCount(
+        alice,
+        testConfig.groupId,
+        messageCount,
+      );
+
       if (testConfig.randomlyAsignAdmins)
         await randomlyAsignAdmins(globalGroup as Group);
 
@@ -134,7 +136,6 @@ describe(testName, () => {
         testConfig.groupId,
         messageCount,
       );
-      if (testConfig.removeDbs) await randomlyRemoveDb(testConfig.workers);
       // Add alice to the group and have her send a message
       await (globalGroup as Group).addMembers([alice?.client.inboxId]);
       console.log(`Added ${alice?.name} to group`);
@@ -158,16 +159,11 @@ describe(testName, () => {
 
       if (testConfig.removeDbs) await randomlyRemoveDb(testConfig.workers);
       // Add alice to the group and have her send a message
-      await (globalGroup as Group).removeMembers([ivy?.client.inboxId]);
-      console.log(`Removed ${ivy?.name} from group`);
-
       messageCount = await sendMessageWithCount(
-        alice,
+        ivy,
         testConfig.groupId,
         messageCount,
       );
-      if (testConfig.randomlyAsignAdmins)
-        await randomlyAsignAdmins(globalGroup as Group);
     } catch (e) {
       logError(e, expect);
       throw e;
