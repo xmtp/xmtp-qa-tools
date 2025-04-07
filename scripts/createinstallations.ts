@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { Client } from "@xmtp/node-sdk-100";
+import { Client } from "@xmtp/node-sdk";
 
 async function main() {
   const numInstallations = 100; // Default to 10 if no argument provided
