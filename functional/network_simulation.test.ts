@@ -8,12 +8,10 @@ import { describe, expect, it } from "vitest";
 const users: {
   [key: string]: {
     inboxId: string;
-    env: string;
   };
 } = {
   convos: {
     inboxId: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
-    env: "dev",
   },
 };
 
@@ -44,14 +42,12 @@ describe(testName, () => {
   let workerInstances: Record<string, WorkerClient> = {};
 
   for (const user of Object.keys(users)) {
-    describe(`User: ${user} [${users[user].env}]`, () => {
+    describe(`User: ${user}`, () => {
       const receiver = users[user].inboxId;
 
       it("should initialize workers and create test group", async () => {
         try {
-          console.log(
-            `Setting up network simulation test for ${user}[${users[user].env}]`,
-          );
+          console.log(`Setting up network simulation test for ${user}`);
 
           // Create workers
           const workers = await getWorkers(
@@ -59,8 +55,6 @@ describe(testName, () => {
             testName,
             "message",
             false,
-            undefined,
-            users[user].env as XmtpEnv,
           );
 
           // Store worker instances
@@ -178,8 +172,6 @@ describe(testName, () => {
               testName,
               "message",
               false,
-              undefined,
-              users[user].env as XmtpEnv,
             );
 
             // Apply network conditions

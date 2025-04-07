@@ -1,12 +1,12 @@
 import * as fs from "fs";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { Client } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 async function main() {
   const numInstallations = 100; // Default to 10 if no argument provided
 
   // Get network from command line arguments or default to "dev"
-  const network = "dev";
+  const network = process.env.XMTP_ENV as XmtpEnv;
   const signer = createSigner(
     "0x0bc27c7141c683e9686cea18efdf3a3085cf6cc82725cf68328634a4acf7d207" as `0x${string}`,
   );
