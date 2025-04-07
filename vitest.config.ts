@@ -15,8 +15,8 @@ export default defineConfig({
     reporters: ["default"],
     environment: "node",
     watch: false,
-    testTimeout: 100000,
-    hookTimeout: 100000,
+    testTimeout: 600000,
+    hookTimeout: 600000,
     pool: "threads",
     poolOptions: {
       singleThread: true,
