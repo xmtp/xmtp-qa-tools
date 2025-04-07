@@ -8,36 +8,36 @@ import {
   randomlyAsignAdmins,
   randomlyRemoveDb,
   randomSyncs,
+  removeMember,
   sendMessageWithCount,
   setRandomNetworkConditions,
 } from "@helpers/tests";
 import type { Worker, WorkerManager } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
-import type { Conversation, Group, XmtpEnv } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import type { Conversation, Group } from "@xmtp/node-sdk";
+import { describe, it } from "vitest";
 
 const testName = "bug_fork";
 loadEnv(testName);
 
 const testConfig = {
-  groupId: "1a683492171d7027a38a11fdadb355f6",
+  testName,
   versions: ["100", "104", "105"],
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
   manualUsers: {
-    //convos: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
+    convos: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
     xmtpchat:
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
   workers: undefined as WorkerManager | undefined,
-  removeDbs: false,
-  enableNetworkConditions: false, // Toggle network condition simulation
-  enableRandomSyncs: false, // Toggle random sync operations before sending messages
+  enableNetworkConditions: false,
+  enableRandomSyncs: true,
   randomlyAsignAdmins: true,
-  addAllWorkers: true,
-  removeMembers: false,
+  removeMembers: true,
   createRandomInstallations: false,
   rootWorker: "fabri",
+  groupId: undefined as string | undefined,
 };
 
 describe(testName, () => {
@@ -49,10 +49,13 @@ describe(testName, () => {
   it("should initialize all workers at once and create group", async () => {
     rootWorker = await getWorkers([testConfig.rootWorker], testName, "message");
     const fabri = rootWorker.getWorkers()[0];
+    testConfig.workers = await getWorkers(workerConfigs, testName, "none");
+
     globalGroup = (await getOrCreateGroup(
-      testConfig.groupId,
+      testConfig,
       fabri.client,
     )) as Conversation;
+    testConfig.groupId = globalGroup.id;
     await (globalGroup as Group).updateName(globalGroup.id);
     console.log("Get group with ID:", globalGroup.id);
     // Bob sends first message after creating the group
@@ -64,107 +67,78 @@ describe(testName, () => {
     console.log("Get group with ID:", globalGroup.id);
   });
 
-  it("initialize workers", async () => {
-    testConfig.workers = await getWorkers(workerConfigs, testName, "none");
-
-    // Apply random network conditions to each worker if enabled
-    if (testConfig.enableNetworkConditions)
-      setRandomNetworkConditions(testConfig.workers);
-
-    if (testConfig.enableRandomSyncs)
-      await randomSyncs(testConfig.workers, globalGroup as Group);
-
-    const inboxIds = getAllWorkersfromConfig(testConfig);
-    console.log("Adding all workers to group", inboxIds);
-    if (testConfig.addAllWorkers)
-      await (globalGroup as Group).addMembers(inboxIds);
-
-    console.log("Added all workers to group");
-  });
-
-  it("should send messages to group", async () => {
-    try {
-      let bob = testConfig.workers?.get("bob", workerConfigs[0].split("-")[1]);
+  for (let i = 0; i < 1; i++) {
+    it("should send messages to group", async () => {
+      let bob = testConfig.workers?.get(
+        "bob",
+        workerConfigs[0].split("-")[1],
+      ) as Worker;
       const alice = testConfig.workers?.get(
         "alice",
         workerConfigs[1].split("-")[1],
-      );
+      ) as Worker;
       const ivy = testConfig.workers?.get(
         "ivy",
         workerConfigs[2].split("-")[1],
-      );
-
-      if (!testConfig.workers || !bob || !alice || !ivy) {
-        throw new Error("Workers not initialized");
-      }
+      ) as Worker;
 
       await (globalGroup as Group).updateName(globalGroup?.id as string);
       if (testConfig.createRandomInstallations)
-        bob = (await createRandomInstallations(5, bob)) as Worker;
+        bob = (await createRandomInstallations(2, bob)) as Worker;
+      // Apply random network conditions to each worker if enabled
+      if (testConfig.enableNetworkConditions)
+        setRandomNetworkConditions(testConfig.workers as WorkerManager);
 
-      if (testConfig.enableRandomSyncs)
-        await randomSyncs(testConfig.workers, globalGroup as Group);
+      if (testConfig.enableRandomSyncs) await randomSyncs(testConfig);
 
       messageCount = await sendMessageWithCount(
         bob,
-        testConfig.groupId,
+        globalGroup?.id as string,
         messageCount,
       );
       await (globalGroup as Group).updateName(globalGroup?.id as string);
 
       messageCount = await sendMessageWithCount(
         alice,
-        testConfig.groupId,
+        globalGroup?.id as string,
         messageCount,
       );
 
       if (testConfig.randomlyAsignAdmins)
         await randomlyAsignAdmins(globalGroup as Group);
 
-      if (testConfig.removeDbs) await randomlyRemoveDb(testConfig.workers);
       if (testConfig.removeMembers)
-        await (globalGroup as Group).removeMembers([ivy?.client.inboxId]);
-      if (testConfig.enableRandomSyncs)
-        await randomSyncs(testConfig.workers, globalGroup as Group);
+        await removeMember(globalGroup as Group, ivy);
 
-      console.log(`Added ${ivy?.name} to group`);
-      // Bob sends first message after creating the group
-      messageCount = await sendMessageWithCount(
-        ivy,
-        testConfig.groupId,
-        messageCount,
-      );
+      if (testConfig.enableRandomSyncs) await randomSyncs(testConfig);
+
       // Add alice to the group and have her send a message
       await (globalGroup as Group).addMembers([alice?.client.inboxId]);
-      console.log(`Added ${alice?.name} to group`);
       messageCount = await sendMessageWithCount(
         alice,
-        testConfig.groupId,
+        globalGroup?.id as string,
         messageCount,
       );
       console.log(`${alice?.name} sent ${messageCount} messages`);
 
-      if (testConfig.enableRandomSyncs)
-        await randomSyncs(testConfig.workers, globalGroup as Group);
+      if (testConfig.enableRandomSyncs) await randomSyncs(testConfig);
 
       messageCount = await sendMessageWithCount(
         bob,
-        testConfig.groupId,
+        globalGroup?.id as string,
         messageCount,
       );
       if (testConfig.randomlyAsignAdmins)
         await randomlyAsignAdmins(globalGroup as Group);
 
-      if (testConfig.removeDbs) await randomlyRemoveDb(testConfig.workers);
+      //Ivy is removed from the group, so we need to add her again
+      await (globalGroup as Group).addMembers([ivy?.client.inboxId]);
       // Add alice to the group and have her send a message
       messageCount = await sendMessageWithCount(
         ivy,
-        testConfig.groupId,
+        globalGroup?.id as string,
         messageCount,
       );
-    } catch (e) {
-      logError(e, expect);
-      throw e;
-    }
-  });
+    });
+  }
 });

@@ -1,3 +1,5 @@
+import fs from "fs";
+import { getEnvPath } from "@helpers/client";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
@@ -121,16 +123,8 @@ export const getWorkerConfigs = (testConfig: any) => {
 
     workerConfigs.push(`${workerName}-${workerId}-${workerVersion}`);
   }
+  console.log("Worker configs:", workerConfigs);
   return workerConfigs;
-};
-export const getOrCreateGroup = async (groupId: string, creator: Client) => {
-  let globalGroup: Conversation | undefined;
-  if (!groupId) {
-    globalGroup = await creator.conversations.newGroup([]);
-  } else {
-    globalGroup = await creator.conversations.getConversationById(groupId);
-  }
-  return globalGroup;
 };
 export const randomlyAsignAdmins = async (group: Group) => {
   await group.sync();
@@ -158,15 +152,42 @@ export const randomlyAsignAdmins = async (group: Group) => {
     console.error("Error assigning admin:", error);
   }
 };
-export const randomSyncs = async (workers: WorkerManager, group: Group) => {
-  for (const worker of workers.getWorkers()) {
-    const randomSyncs = Math.floor(Math.random() * 4);
+export const removeMember = async (group: Group, member: Worker) => {
+  console.log("Removing member", member?.client.inboxId);
+  await group.sync();
+
+  // Check if member is admin or super admin and demote first
+  if (group.isAdmin(member?.client.inboxId)) {
+    console.log(`Demoting admin: ${member?.client.inboxId}`);
+    await group.removeAdmin(member?.client.inboxId);
+  }
+
+  if (group.isSuperAdmin(member?.client.inboxId)) {
+    console.log(`Demoting super admin: ${member?.client.inboxId}`);
+    await group.removeSuperAdmin(member?.client.inboxId);
+  }
+
+  const members = await group.members();
+  console.log(
+    "Members",
+    members.map((m) => m.inboxId),
+  );
+
+  await group.removeMembers([member?.client.inboxId]);
+};
+export const randomSyncs = async (testConfig: any) => {
+  for (const worker of testConfig.workers.getWorkers()) {
+    const randomSyncs = Math.floor(Math.random() * 3);
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {
       await worker.client.conversations.syncAll();
     } else {
-      await group.sync();
+      await worker.client.conversations.sync();
+      const group = await worker.client.conversations.getConversationById(
+        testConfig.groupId as string,
+      );
+      await group?.sync();
     }
   }
 };
@@ -178,6 +199,7 @@ export const sendMessageWithCount = async (
   messageCount: number,
 ): Promise<number> => {
   try {
+    await worker.client.conversations.sync();
     const group =
       await worker.client.conversations.getConversationById(groupId);
     const message = `${worker.name} ${messageCount}`;
@@ -217,4 +239,77 @@ export const setRandomNetworkConditions = (workers: WorkerManager) => {
   workers.setWorkerNetworkConditions("bob", bobCondition);
   workers.setWorkerNetworkConditions("alice", aliceCondition);
   workers.setWorkerNetworkConditions("ivy", ivyCondition);
+};
+
+export const getOrCreateGroup = async (testConfig: any, creator: Client) => {
+  let globalGroup: Conversation | undefined;
+  const GROUP_ID = process.env.GROUP_ID;
+  if (!GROUP_ID) {
+    globalGroup = await creator.conversations.newGroup([]);
+    console.log("Creating group with ID:", globalGroup.id);
+
+    const inboxIds = getAllWorkersfromConfig(testConfig);
+    console.log("Adding all workers to group", inboxIds);
+
+    await (globalGroup as Group).addMembers(inboxIds);
+
+    console.log("Updated test config with group ID:", globalGroup.id);
+
+    // Write the group ID to the .env file
+    await appendToEnv(
+      "GROUP_ID",
+      globalGroup.id,
+      testConfig.testName as string,
+    );
+  } else {
+    globalGroup = await creator.conversations.getConversationById(GROUP_ID);
+  }
+  return globalGroup;
+};
+
+/**
+ * Appends a variable to the .env file
+ * @param key - The environment variable key
+ * @param value - The environment variable value
+ * @param testName - The test name (optional)
+ * @returns Promise that resolves when the operation is complete
+ */
+export const appendToEnv = async (
+  key: string,
+  value: string,
+  testName: string = "",
+): Promise<void> => {
+  try {
+    console.log("Appending to .env file at:", testName);
+    const envPath = getEnvPath(testName);
+    // Update process.env if the property exists
+    if (key in process.env) {
+      process.env[key] = value;
+      console.log(`Updated process.env with new ${key}:`, value);
+    }
+
+    console.log("Appending to .env file at:", envPath);
+    let envContent = "";
+    try {
+      envContent = fs.readFileSync(envPath, "utf8");
+    } catch (error: unknown) {
+      // File doesn't exist, create it
+      console.log("Creating new .env file");
+    }
+
+    // Replace existing key or add it if it doesn't exist
+    if (envContent.includes(`${key}=`)) {
+      envContent = envContent.replace(
+        new RegExp(`${key}=.*(\\r?\\n|$)`, "g"),
+        `${key}="${value}"$1`,
+      );
+    } else {
+      envContent += `\n${key}="${value}"\n`;
+    }
+
+    fs.writeFileSync(envPath, envContent);
+    console.log(`Updated .env file with new ${key}:`, value);
+  } catch (error: unknown) {
+    console.error(`Failed to update .env file with ${key}:`, error);
+  }
 };

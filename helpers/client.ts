@@ -107,7 +107,7 @@ export function getDataPath(testName: string): string {
   }
   return dataPath;
 }
-function getEnvPath(testName: string): string {
+export function getEnvPath(testName: string): string {
   let envPath = path.join(".env");
   if (testName.includes("bug")) {
     envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
@@ -121,6 +121,7 @@ function getEnvPath(testName: string): string {
       console.log(`Created default .env file at ${envPath}`);
     }
   }
+  console.log("Env path:", envPath);
   process.env.CURRENT_ENV_PATH = envPath;
   return envPath;
 }
