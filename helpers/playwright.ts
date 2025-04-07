@@ -70,6 +70,28 @@ export class XmtpPlaywright {
     }
   }
 
+  async readGroupMessages(
+    groupId: string,
+    messages: string[],
+  ): Promise<boolean> {
+    const { page, browser } = await this.startPage(false);
+    try {
+      await page.goto(`https://xmtp.chat/group/${groupId}?env=${this.env}`);
+      await this.takeSnapshot(page, "before-reading-group-messages");
+      let allReceived = true;
+      for (const message of messages) {
+        // Wait for GM response with a longer timeout
+        const botMessage = await page.getByText(message);
+        const botMessageText = await botMessage.textContent();
+        if (botMessageText !== message) {
+          allReceived = false;
+        }
+      }
+      return allReceived;
+    } finally {
+      if (browser) await browser.close();
+    }
+  }
   /**
    * Takes a screenshot and saves it to the logs directory
    */
@@ -130,8 +152,8 @@ export class XmtpPlaywright {
       if (waitForMessage) {
         // Wait for GM response with a longer timeout
         const botMessage = await page.getByText("gm");
-        console.log("Bot message:", botMessage);
         const botMessageText = await botMessage.textContent();
+        console.log("Bot message:", botMessageText);
         return botMessageText === "gm";
       } else {
         return hiMessageText === "hi";

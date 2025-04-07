@@ -1,16 +1,3 @@
-/**
- * SDK Version Fixer
- *
- * This script creates the necessary symlinks in node_modules to ensure
- * each SDK version uses the correct bindings version for accurate version reporting.
- *
- * It can handle multiple SDK versions with their corresponding bindings.
- *
- * Usage:
- *   yarn script fix-sdk-versions           # Fix all SDK versions
- *   yarn script fix-sdk-versions --clean   # Remove 'imports' field from package.json
- */
-
 import fs from "fs";
 import path from "path";
 
@@ -25,16 +12,34 @@ interface VersionConfig {
 // Static configuration
 const staticConfigs: VersionConfig[] = [
   {
+    sdkPackage: "node-sdk-mls",
+    bindingsPackage: "node-bindings-mls",
+    sdkVersion: "0.0.13",
+    bindingsVersion: "0.0.9",
+  },
+  {
+    sdkPackage: "node-sdk-47",
+    bindingsPackage: "node-bindings-41",
+    sdkVersion: "0.0.47",
+    bindingsVersion: "0.0.41",
+  },
+  {
     sdkPackage: "node-sdk-100",
     bindingsPackage: "node-bindings-100",
     sdkVersion: "1.0.0",
     bindingsVersion: "1.0.0",
   },
   {
-    sdkPackage: "node-sdk-0047",
-    bindingsPackage: "node-bindings-0041",
-    sdkVersion: "0.0.47",
-    bindingsVersion: "0.0.41",
+    sdkPackage: "node-sdk-104",
+    bindingsPackage: "node-bindings-104",
+    sdkVersion: "1.0.4",
+    bindingsVersion: "1.1.3",
+  },
+  {
+    sdkPackage: "node-sdk-105",
+    bindingsPackage: "node-bindings-105",
+    sdkVersion: "1.0.5",
+    bindingsVersion: "1.1.3",
   },
 ];
 

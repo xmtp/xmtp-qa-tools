@@ -1,16 +1,16 @@
 import fs from "node:fs";
-import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import {
   createSigner,
+  getDataPath,
   getDbPath,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
+import { sdkVersions } from "@helpers/tests";
 import {
+  Client,
   defaultValues,
   Dm,
-  sdkVersions,
-  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -301,21 +301,25 @@ export class WorkerClient extends Worker {
       const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
 
       // Get the SDK version from the worker data
-      const sdkVersion = this.workerData.sdkVersion;
+      const sdkVersion = this.workerData.sdkVersion as
+        | keyof typeof sdkVersions
+        | undefined;
       // Select the appropriate SDK client based on version
-      let ClientClass;
-      if (sdkVersion === "100") {
-        ClientClass = sdkVersions.v100.Client;
-        console.debug(`[${this.nameId}] Using SDK version 1.0.0`);
+      let ClientClass: any;
+      if (sdkVersion) {
+        ClientClass = sdkVersions[sdkVersion].Client;
       } else {
-        // Default to latest version
-        ClientClass = sdkVersions.v104.Client;
+        ClientClass = Client;
+      }
+
+      if (!ClientClass) {
+        throw new Error(`Unsupported SDK version: ${sdkVersion}`);
       }
 
       // Force version to include the SDK version for easier identification
       const sdkIdentifier = sdkVersion || "latest";
       const libXmtpVersion =
-        ClientClass.version.split("@")[1].split(" ")[0] ?? "unknown";
+        ClientClass.version?.split("@")[1].split(" ")[0] ?? "unknown";
 
       const version = `${libXmtpVersion}-${sdkIdentifier}`;
 
@@ -331,12 +335,12 @@ export class WorkerClient extends Worker {
         this.env,
       );
 
-      // @ts-expect-error Window localStorage access in browser context
-      this.client = await ClientClass.create(signer, encryptionKey, {
+      // Use type assertion to handle the client creation
+      this.client = (await ClientClass.create(signer, encryptionKey, {
         dbPath,
         env: this.env,
         loggingLevel: loggingLevel,
-      });
+      })) as Client;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
@@ -784,10 +788,17 @@ export class WorkerClient extends Worker {
     );
   }
 
-  clearDB() {
-    const dataPath = path.resolve(process.cwd(), ".data/" + this.name);
+  /**
+   * Clears the database for this worker
+   * @returns true if the database was cleared, false otherwise
+   */
+  clearDB(): Promise<boolean> {
+    const dataPath =
+      getDataPath(this.testName) + "/" + this.name + "/" + this.folder;
+    console.log(`[${this.nameId}] Clearing database at ${dataPath}`);
     if (fs.existsSync(dataPath)) {
       fs.rmSync(dataPath, { recursive: true, force: true });
     }
+    return Promise.resolve(true);
   }
 }

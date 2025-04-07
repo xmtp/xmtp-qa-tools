@@ -14,8 +14,18 @@ This directory contains utility modules that power the XMTP testing framework. T
 | [verify.ts](#verifyts)         | Validation utilities for testing message delivery |
 | [railway.ts](#railwayts)       | Railway utilities for testing message delivery    |
 | [playwright.ts](#playwrightts) | Playwright utilities for testing message delivery |
+| [tests.ts](#teststs)           | Test utilities for creating and managing tests    |
 
 ## 🔍 Module Details
+
+### tests.ts
+
+Handles test configuration and setup:
+
+```typescript
+// Create a test configuration
+const testConfig = createTestConfig(testName, workerConfigs);
+```
 
 ### client.ts
 

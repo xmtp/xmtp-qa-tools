@@ -1,5 +1,5 @@
 import { getRandomValues } from "node:crypto";
-import { type Client } from "@xmtp/mls-client";
+import { type Client as ClientMls } from "@xmtp/node-sdk-mls";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes, type WalletClient } from "viem";
 import {
@@ -30,7 +30,7 @@ export const createUser = (): User => {
   };
 };
 
-export const getSignature = async (client: Client, user: User) => {
+export const getSignature = async (client: ClientMls, user: User) => {
   if (client.signatureText) {
     const signature = await user.wallet.signMessage({
       message: client.signatureText,

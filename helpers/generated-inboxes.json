@@ -1467,7 +1467,7 @@
     "accountAddress": "0x0570043f8443cbb19681df2677b04a57aeea4176",
     "inboxId": "ac2ae0eb9332d7c1491fe7f2c4a727de2bad6739da073f45316e341ea622884e",
     "privateKey": "0x2edc601f712e702cb6103b3e99fbfdb940d64226fed3626b278523741b12940b",
-    "encryptionKey": "7cd3fd12dd93591d0db112a6953bea7c4187e0e26d930754aa0047a3d3cc0885"
+    "encryptionKey": "7cd3fd12dd93591d0db112a6953bea7c4187e0e26d930754aa47a3d3cc0885"
   },
   {
     "accountAddress": "0x789583158abde0762bd3c325de6ec2addb888e4b",
@@ -1670,7 +1670,7 @@
   {
     "accountAddress": "0xbe826e9bc9df64a3579c3fca2c1d633a9086df54",
     "inboxId": "10801572eaf109847920fb49ec2f8518a6e901b351f5fcdd7ac00b020401d5ce",
-    "privateKey": "0x240ec0e77e9f00222ffafd8a55e82ae5d82d01f60811aa500470f009dcd760bc",
+    "privateKey": "0x240ec0e77e9f00222ffafd8a55e82ae5d82d01f60811aa5470f009dcd760bc",
     "encryptionKey": "ff689a4e427b9d02c225596a1915d7fafacecd35cfd46cab1926701abefbc4b3"
   },
   {

@@ -17,35 +17,7 @@ import {
   type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import {
-  Client as Client100,
-  Conversation as Conversation100,
-  Dm as Dm100,
-  Group as Group100,
-} from "@xmtp/node-sdk-100";
 
-// Add version-specific exports
-console.log(
-  "SDK v100:",
-  Client100?.version,
-  "imported from @xmtp/node-sdk-100",
-);
-console.log("SDK v104:", Client?.version, "imported from @xmtp/node-sdk");
-
-export const sdkVersions = {
-  v100: {
-    Client: Client100,
-    Conversation: Conversation100,
-    Dm: Dm100,
-    Group: Group100,
-  },
-  v104: {
-    Client,
-    Conversation,
-    Dm,
-    Group,
-  },
-};
 export type { WorkerManager, Worker };
 export type WorkerStreamMessage = {
   type: "stream_message";
