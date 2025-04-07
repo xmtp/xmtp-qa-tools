@@ -112,8 +112,15 @@ describe(TEST_NAME, () => {
       setRandomNetworkConditions(testConfig.workers);
     }
 
-    if (testConfig.enableRandomSyncs) {
-      await randomSyncs(testConfig);
+    if (
+      testConfig.enableRandomSyncs &&
+      testConfig.workers &&
+      testConfig.groupId
+    ) {
+      await randomSyncs({
+        workers: testConfig.workers,
+        groupId: testConfig.groupId,
+      });
     }
 
     // Add bob to group
@@ -153,8 +160,15 @@ describe(TEST_NAME, () => {
     }
 
     // Random syncs if enabled
-    if (testConfig.enableRandomSyncs) {
-      await randomSyncs(testConfig);
+    if (
+      testConfig.enableRandomSyncs &&
+      testConfig.workers &&
+      testConfig.groupId
+    ) {
+      await randomSyncs({
+        workers: testConfig.workers,
+        groupId: testConfig.groupId,
+      });
     }
 
     // Alice sends another message
@@ -166,8 +180,15 @@ describe(TEST_NAME, () => {
     console.log(`${alice?.name} sent ${messageCount} messages`);
 
     // Random syncs if enabled
-    if (testConfig.enableRandomSyncs) {
-      await randomSyncs(testConfig);
+    if (
+      testConfig.enableRandomSyncs &&
+      testConfig.workers &&
+      testConfig.groupId
+    ) {
+      await randomSyncs({
+        workers: testConfig.workers,
+        groupId: testConfig.groupId,
+      });
     }
 
     // Bob sends another message
