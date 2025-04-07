@@ -7,12 +7,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  dev:
+  test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: "dev"
+      XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
@@ -41,41 +44,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ts_delivery_${{ env.XMTP_ENV }}
-          path: logs/
-  production:
-    runs-on: ubuntu-latest
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: "production"
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - name: Ensure data folder exists
-        run: mkdir -p .data
-      - name: List data folder contents
-        run: ls -la .data
-      - run: corepack enable
-      - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
-      - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Delivery
-        continue-on-error: true
-      - name: Ensure logs directory exists
-        run: mkdir -p logs
-      - name: Upload reports artifacts
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ts_delivery_${{ env.XMTP_ENV }}
+          name: ts_delivery_${{ matrix.environment }}
           path: logs/
