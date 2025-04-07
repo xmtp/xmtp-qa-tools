@@ -100,6 +100,9 @@ export const createRandomInstallations = async (
  * Gets a random version from the versions array
  */
 export const getRandomVersion = (versions: string[]): string => {
+  if (versions.length === 0) {
+    throw new Error("versions array is empty");
+  }
   const randomIndex = Math.floor(Math.random() * versions.length);
   return versions[randomIndex];
 };
@@ -370,10 +373,15 @@ export const appendToEnv = (
       console.log("Creating new .env file");
     }
 
+    // Escaping regex special characters from key to avoid unintended matches
+    const escapeRegex = (str: string) =>
+      str.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    const escapedKey = escapeRegex(key);
+
     // Replace existing key or add it if it doesn't exist
     if (envContent.includes(`${key}=`)) {
       envContent = envContent.replace(
-        new RegExp(`${key}=.*(\\r?\\n|$)`, "g"),
+        new RegExp(`${escapedKey}=.*(\\r?\\n|$)`, "g"),
         `${key}="${value}"$1`,
       );
     } else {
