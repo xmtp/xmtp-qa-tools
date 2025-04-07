@@ -133,10 +133,8 @@ export function loadEnv(testName: string) {
   const logger = createLogger(testName);
   overrideConsole(logger);
   // Create the .env file path
-  const env = process.env.XMTP_ENV;
-  if (env !== "dev" && env !== "production" && env !== "local") {
-    throw new Error("XMTP_ENV is not set in .env file or its not valid");
-  }
+  const env = process.env.XMTP_ENV as XmtpEnv;
+
   console.log("XMTP_ENV", process.env.XMTP_ENV);
   initDataDog(
     testName,
