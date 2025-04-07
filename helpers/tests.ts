@@ -31,6 +31,7 @@ import {
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
 
+// SDK version mappings
 export const sdkVersions = {
   100: {
     Client: Client100,
@@ -52,26 +53,6 @@ export const sdkVersions = {
   },
 };
 
-export const createRandomInstallations = async (
-  count: number,
-  worker: Worker,
-) => {
-  let returnWorker: Worker | undefined;
-  console.log(`[${worker.name}] Creating ${count} installations`);
-  const inboxState = await worker.client.preferences.inboxState(true);
-  console.log(`[${worker.name}] Inbox state: ${JSON.stringify(inboxState)}`);
-  for (let i = 0; i < count; i++) {
-    console.log(`[${worker.name}] Creating installation ${i + 1}`);
-    await worker.worker?.clearDB();
-    await worker.worker?.initialize();
-    returnWorker = worker;
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-  }
-  console.log(`[${worker.name}] Created ${count} installations`);
-  const inboxState2 = await worker.client.preferences.inboxState(true);
-  console.log(`[${worker.name}]   Inbox state: ${JSON.stringify(inboxState2)}`);
-  return returnWorker;
-};
 // Network condition presets for testing
 const networkConditions = {
   highLatency: { latencyMs: 1000, jitterMs: 200 },
@@ -89,44 +70,97 @@ const networkConditions = {
 type NetworkConditionKey = keyof typeof networkConditions;
 type NetworkCondition = (typeof networkConditions)[NetworkConditionKey];
 
-// Function to get a random version from the versions array
-export const getRandomVersion = (versions: string[]) => {
+/**
+ * Creates random installations for a worker
+ */
+export const createRandomInstallations = async (
+  count: number,
+  worker: Worker,
+): Promise<Worker | undefined> => {
+  let returnWorker: Worker | undefined;
+  console.log(`[${worker.name}] Creating ${count} installations`);
+  const inboxState = await worker.client.preferences.inboxState(true);
+  console.log(`[${worker.name}] Inbox state: ${JSON.stringify(inboxState)}`);
+
+  for (let i = 0; i < count; i++) {
+    console.log(`[${worker.name}] Creating installation ${i + 1}`);
+    await worker.worker?.clearDB();
+    await worker.worker?.initialize();
+    returnWorker = worker;
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+  }
+
+  console.log(`[${worker.name}] Created ${count} installations`);
+  const inboxState2 = await worker.client.preferences.inboxState(true);
+  console.log(`[${worker.name}]   Inbox state: ${JSON.stringify(inboxState2)}`);
+  return returnWorker;
+};
+
+/**
+ * Gets a random version from the versions array
+ */
+export const getRandomVersion = (versions: string[]): string => {
   const randomIndex = Math.floor(Math.random() * versions.length);
   return versions[randomIndex];
 };
-export const getAllWorkersfromConfig = (testConfig: any): string[] => {
+
+/**
+ * Gets all worker inbox IDs from the test config
+ */
+export const getAllWorkersfromConfig = (testConfig: {
+  manualUsers: Record<string, string>;
+  workers: WorkerManager;
+}): string[] => {
   const manualUsers = testConfig.manualUsers;
-  const inboxIds = [];
+  const inboxIds: string[] = [];
+
   for (const user in manualUsers) {
     inboxIds.push(manualUsers[user]);
   }
+
   for (const worker of testConfig.workers.getWorkers()) {
     inboxIds.push(worker.client.inboxId);
   }
-  return inboxIds as string[];
+
+  return inboxIds;
 };
-// Function to get a random network condition
+
+/**
+ * Gets a random network condition
+ */
 export const getRandomNetworkCondition = (): NetworkCondition => {
   const conditions = Object.keys(networkConditions) as NetworkConditionKey[];
   const randomIndex = Math.floor(Math.random() * conditions.length);
   return networkConditions[conditions[randomIndex]];
 };
-export const getWorkerConfigs = (testConfig: any) => {
-  // Create worker configs for all workers with random versions
-  const workerConfigs = [];
+
+/**
+ * Gets worker configs with random versions
+ */
+export const getWorkerConfigs = (testConfig: {
+  workerNames: string[];
+  workerIds: string[];
+  versions: string[];
+}): string[] => {
+  const workerConfigs: string[] = [];
 
   for (let i = 0; i < testConfig.workerNames.length; i++) {
     const workerName = testConfig.workerNames[i];
-    const workerId = getRandomVersion(testConfig.workerIds as string[]);
-    const workerVersion = getRandomVersion(testConfig.versions as string[]);
+    const workerId = getRandomVersion(testConfig.workerIds);
+    const workerVersion = getRandomVersion(testConfig.versions);
     console.log(`${workerName} using version: ${workerVersion}`);
 
     workerConfigs.push(`${workerName}-${workerId}-${workerVersion}`);
   }
+
   console.log("Worker configs:", workerConfigs);
   return workerConfigs;
 };
-export const randomlyAsignAdmins = async (group: Group) => {
+
+/**
+ * Randomly assigns admin privileges to a group member
+ */
+export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
   await group.sync();
   const members = await group.members();
 
@@ -152,7 +186,14 @@ export const randomlyAsignAdmins = async (group: Group) => {
     console.error("Error assigning admin:", error);
   }
 };
-export const removeMember = async (group: Group, member: Worker) => {
+
+/**
+ * Removes a member from a group
+ */
+export const removeMember = async (
+  group: Group,
+  member: Worker,
+): Promise<void> => {
   console.log("Removing member", member?.client.inboxId);
   await group.sync();
 
@@ -175,7 +216,14 @@ export const removeMember = async (group: Group, member: Worker) => {
 
   await group.removeMembers([member?.client.inboxId]);
 };
-export const randomSyncs = async (testConfig: any) => {
+
+/**
+ * Performs random syncs on workers
+ */
+export const randomSyncs = async (testConfig: {
+  workers: WorkerManager;
+  groupId: string;
+}): Promise<void> => {
   for (const worker of testConfig.workers.getWorkers()) {
     const randomSyncs = Math.floor(Math.random() * 3);
     if (randomSyncs === 0) {
@@ -185,14 +233,16 @@ export const randomSyncs = async (testConfig: any) => {
     } else {
       await worker.client.conversations.sync();
       const group = await worker.client.conversations.getConversationById(
-        testConfig.groupId as string,
+        testConfig.groupId,
       );
       await group?.sync();
     }
   }
 };
 
-// Function to send message from a worker with name and count
+/**
+ * Sends a message from a worker with name and count
+ */
 export const sendMessageWithCount = async (
   worker: Worker,
   groupId: string,
@@ -214,10 +264,16 @@ export const sendMessageWithCount = async (
     return messageCount;
   }
 };
-export const randomlyRemoveDb = async (workers: WorkerManager) => {
+
+/**
+ * Randomly removes database from workers
+ */
+export const randomlyRemoveDb = async (
+  workers: WorkerManager,
+): Promise<void> => {
   for (const worker of workers.getWorkers()) {
-    let fityfity = Math.random() < 0.5;
-    if (fityfity) {
+    const shouldRemove = Math.random() < 0.5;
+    if (shouldRemove) {
       console.warn(
         `${worker.name} terminates, deletes local data, and restarts`,
       );
@@ -226,7 +282,11 @@ export const randomlyRemoveDb = async (workers: WorkerManager) => {
     }
   }
 };
-export const setRandomNetworkConditions = (workers: WorkerManager) => {
+
+/**
+ * Sets random network conditions for workers
+ */
+export const setRandomNetworkConditions = (workers: WorkerManager): void => {
   const bobCondition = getRandomNetworkCondition();
   const aliceCondition = getRandomNetworkCondition();
   const ivyCondition = getRandomNetworkCondition();
@@ -241,29 +301,42 @@ export const setRandomNetworkConditions = (workers: WorkerManager) => {
   workers.setWorkerNetworkConditions("ivy", ivyCondition);
 };
 
-export const getOrCreateGroup = async (testConfig: any, creator: Client) => {
+/**
+ * Adds a member to a group by a worker
+ */
+export const addMemberByWorker = async (
+  groupId: string,
+  membertoAdd: string,
+  memberWhoAdds: Worker,
+): Promise<void> => {
+  const group =
+    await memberWhoAdds.client.conversations.getConversationById(groupId);
+  await (group as Group).addMembers([membertoAdd]);
+};
+
+/**
+ * Gets or creates a group
+ */
+export const getOrCreateGroup = async (
+  testConfig: {
+    testName: string;
+  },
+  creator: Client,
+): Promise<Conversation | undefined> => {
   let globalGroup: Conversation | undefined;
   const GROUP_ID = process.env.GROUP_ID;
+
   if (!GROUP_ID) {
     globalGroup = await creator.conversations.newGroup([]);
     console.log("Creating group with ID:", globalGroup.id);
-
-    const inboxIds = getAllWorkersfromConfig(testConfig);
-    console.log("Adding all workers to group", inboxIds);
-
-    await (globalGroup as Group).addMembers(inboxIds);
-
     console.log("Updated test config with group ID:", globalGroup.id);
 
     // Write the group ID to the .env file
-    await appendToEnv(
-      "GROUP_ID",
-      globalGroup.id,
-      testConfig.testName as string,
-    );
+    appendToEnv("GROUP_ID", globalGroup.id, testConfig.testName);
   } else {
     globalGroup = await creator.conversations.getConversationById(GROUP_ID);
   }
+
   return globalGroup;
 };
 
@@ -272,16 +345,16 @@ export const getOrCreateGroup = async (testConfig: any, creator: Client) => {
  * @param key - The environment variable key
  * @param value - The environment variable value
  * @param testName - The test name (optional)
- * @returns Promise that resolves when the operation is complete
  */
-export const appendToEnv = async (
+export const appendToEnv = (
   key: string,
   value: string,
   testName: string = "",
-): Promise<void> => {
+): void => {
   try {
     console.log("Appending to .env file at:", testName);
     const envPath = getEnvPath(testName);
+
     // Update process.env if the property exists
     if (key in process.env) {
       process.env[key] = value;
