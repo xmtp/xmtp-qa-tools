@@ -9,7 +9,7 @@ loadEnv(testName);
 
 const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(testName, () => {
-  const xmtpTester = new XmtpPlaywright(false, "dev");
+  const xmtpTester = new XmtpPlaywright(true, "dev");
 
   it("should respond to a message", async () => {
     await xmtpTester.createDmWithDeeplink(gmBotAddress);
