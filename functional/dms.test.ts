@@ -1,7 +1,11 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { type Conversation, type WorkerManager } from "@helpers/types";
+import {
+  IdentifierKind,
+  type Conversation,
+  type WorkerManager,
+} from "@helpers/types";
 import { verifyStream } from "@helpers/verify";
 import { getWorkers } from "@workers/manager";
 import {
@@ -32,6 +36,7 @@ describe(testName, () => {
           "jack",
           "karen",
           "randomguy",
+          "randomguy2",
           "larry",
           "mary",
           "nancy",
@@ -40,7 +45,7 @@ describe(testName, () => {
         testName,
       );
       expect(workers).toBeDefined();
-      expect(workers.getLength()).toBe(9);
+      expect(workers.getLength()).toBe(10);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -72,7 +77,7 @@ describe(testName, () => {
     }
   });
 
-  it("createDM: should measure creating a DM", async () => {
+  it("newDm: should measure creating a DM", async () => {
     try {
       convo = await workers
         .get("henry")!
@@ -86,6 +91,22 @@ describe(testName, () => {
     }
   });
 
+  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+    try {
+      const dm2 = await workers
+        .get("henry")!
+        .client.conversations.newDmWithIdentifier({
+          identifier: workers.get("randomguy2")!.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+
+      expect(dm2).toBeDefined();
+      expect(dm2.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   it("sendGM: should measure sending a gm", async () => {
     try {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);

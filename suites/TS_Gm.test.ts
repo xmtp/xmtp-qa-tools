@@ -73,7 +73,7 @@ describe(testName, () => {
   it("should respond to a message", async () => {
     try {
       const xmtpTester = new XmtpPlaywright(false);
-      const result = await xmtpTester.createDmWithDeeplink(gmBotAddress);
+      const result = await xmtpTester.newDmWithDeeplink(gmBotAddress);
       expect(result).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

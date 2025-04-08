@@ -12,7 +12,8 @@ describe(testName, () => {
   const xmtpTester = new XmtpPlaywright(true, "dev");
 
   it("should respond to a message", async () => {
-    await xmtpTester.createDmWithDeeplink(gmBotAddress);
+    const result = await xmtpTester.newDmWithDeeplink(gmBotAddress);
+    expect(result).toBe(true);
   });
 
   it("should create a group and send a message", async () => {

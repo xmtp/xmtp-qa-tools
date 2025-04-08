@@ -46,6 +46,7 @@ describe(testName, () => {
           "jack",
           "karen",
           "randomguy",
+          "randomguy2",
           "larry",
           "mary",
           "nancy",
@@ -54,7 +55,7 @@ describe(testName, () => {
         testName,
       );
       expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(9);
+      expect(workers.getWorkers().length).toBe(10);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -128,7 +129,7 @@ describe(testName, () => {
       throw e;
     }
   });
-  it("createDM: should measure creating a DM", async () => {
+  it("newDm: should measure creating a DM", async () => {
     try {
       dm = await workers
         .get("henry")!
@@ -136,6 +137,22 @@ describe(testName, () => {
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+    try {
+      const dm2 = await workers
+        .get("henry")!
+        .client.conversations.newDmWithIdentifier({
+          identifier: workers.get("randomguy2")!.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+
+      expect(dm2).toBeDefined();
+      expect(dm2.id).toBeDefined();
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

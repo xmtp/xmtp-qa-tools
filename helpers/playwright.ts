@@ -28,7 +28,7 @@ export class XmtpPlaywright {
   /**
    * Creates a DM with deeplink and checks for GM response
    */
-  async createDmWithDeeplink(address: string): Promise<boolean> {
+  async newDmWithDeeplink(address: string): Promise<boolean> {
     const { page, browser } = await this.startPage(false, address);
     try {
       console.log("Creating DM with deeplink");
