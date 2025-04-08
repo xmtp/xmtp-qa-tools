@@ -197,6 +197,10 @@ export const removeMember = async (
   group: Group,
   member: Worker,
 ): Promise<void> => {
+  if (!member?.client.inboxId) {
+    console.log(`Member ${member.name} not found`);
+    return;
+  }
   console.log("Removing member", member?.client.inboxId);
   await group.sync();
 
@@ -312,9 +316,29 @@ export const addMemberByWorker = async (
   membertoAdd: string,
   memberWhoAdds: Worker,
 ): Promise<void> => {
+  await memberWhoAdds.client.conversations.sync();
   const group =
     await memberWhoAdds.client.conversations.getConversationById(groupId);
+
+  if (!group) {
+    console.log(`Group with ID ${groupId} not found`);
+    return;
+  }
+
+  // Check if member already exists in the group
+  const members = await (group as Group).members();
+  const memberExists = members.some(
+    (member) => member.inboxId.toLowerCase() === membertoAdd.toLowerCase(),
+  );
+
+  if (memberExists) {
+    console.log(`Member ${membertoAdd} already exists in group ${groupId}`);
+    return;
+  }
+
+  // Add member if they don't exist
   await (group as Group).addMembers([membertoAdd]);
+  console.log(`Added member ${membertoAdd} to group ${groupId}`);
 };
 
 /**

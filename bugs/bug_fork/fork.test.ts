@@ -25,7 +25,7 @@ const testConfig = {
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
   manualUsers: {
-    convos: "7b7eefbfb80e019656b6566101d6903ec8cf5494e2d6ae5ef0a4c4c886d86a47",
+    convos: "f8a453b9708a2ff98791d35eb56a91a46f7722c2684868c7f37c74ece57af276",
     xmtpchat:
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },
@@ -86,19 +86,13 @@ describe(TEST_NAME, () => {
     }
 
     // Get workers
-    const bob = testConfig.workers?.get(
-      "bob",
-      workerConfigs[0].split("-")[1],
-    ) as Worker;
-    const alice = testConfig.workers?.get(
-      "alice",
-      workerConfigs[1].split("-")[1],
-    ) as Worker;
-    const ivy = testConfig.workers?.get(
-      "ivy",
-      workerConfigs[2].split("-")[1],
-    ) as Worker;
+    const bob = testConfig.workers?.getWorkers()[0] as Worker;
+    const alice = testConfig.workers?.getWorkers()[1] as Worker;
+    const ivy = testConfig.workers?.getWorkers()[2] as Worker;
 
+    if (!bob.client.inboxId || !alice.client.inboxId || !ivy.client.inboxId) {
+      throw new Error("Worker not found");
+    }
     // Update group name
     await globalGroup.updateName(globalGroup.id);
 
@@ -133,6 +127,12 @@ describe(TEST_NAME, () => {
       bobWorker,
     );
 
+    // Add manual user to group
+    await addMemberByWorker(
+      globalGroup.id,
+      testConfig.manualUsers.convos,
+      bobWorker,
+    );
     // Bob sends message
     messageCount = await sendMessageWithCount(
       bobWorker,

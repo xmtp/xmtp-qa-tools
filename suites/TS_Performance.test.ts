@@ -128,11 +128,27 @@ describe(testName, () => {
       throw e;
     }
   });
-  it("createDM: should measure creating a DM", async () => {
+  it("newDm: should measure creating a DM", async () => {
     try {
       dm = await workers
         .get("henry")!
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+
+      expect(dm).toBeDefined();
+      expect(dm.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+    try {
+      dm = await workers
+        .get("henry")!
+        .client.conversations.newDmWithIdentifier({
+          identifier: workers.get("randomguy")!.client.inboxId,
+          identifierKind: IdentifierKind.Ethereum,
+        });
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
