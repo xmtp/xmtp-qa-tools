@@ -110,7 +110,8 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | ------------------------ | -------------------------------------- | -------- | ------ | ------------ |
 | clientCreate             | Creating a client                      | 254-306  | <350ms | ✅ On Target |
 | inboxState               | Checking inbox state                   | 300      | <350ms | ✅ On Target |
-| createDM                 | Creating a direct message conversation | 200-250  | <350ms | ✅ On Target |
+| newDm                    | Creating a direct message conversation | 200-250  | <350ms | ✅ On Target |
+| newDmWithIdentifiers     | Creating a dm by address               | 200-250  | <350ms | ✅ On Target |
 | sendGM                   | Sending a group message                | 123-160  | <200ms | ✅ On Target |
 | receiveGM                | Receiving a group message              | 90-140   | <200ms | ✅ On Target |
 | createGroup              | Creating a group                       | 254-306  | <350ms | ✅ On Target |

@@ -12,7 +12,7 @@ describe(testName, () => {
   const xmtpTester = new XmtpPlaywright(true, "dev");
 
   it("should respond to a message", async () => {
-    await xmtpTester.createDmWithDeeplink(gmBotAddress);
+    await xmtpTester.newDmWithDeeplink(gmBotAddress);
   });
 
   it("should create a group and send a message", async () => {

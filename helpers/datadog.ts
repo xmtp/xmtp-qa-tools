@@ -69,7 +69,8 @@ const THRESHOLDS: ThresholdsData = {
   core: {
     clientcreate: 350,
     inboxstate: 350,
-    createdm: 350,
+    newdm: 350,
+    newdmwithidentifiers: 350,
     sendgm: 200,
     receivegm: 200,
     creategroup: 350,

@@ -72,7 +72,7 @@ describe(testName, () => {
     }
   });
 
-  it("createDM: should measure creating a DM", async () => {
+  it("newDm: should measure creating a DM", async () => {
     try {
       convo = await workers
         .get("henry")!

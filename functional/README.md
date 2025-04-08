@@ -74,7 +74,7 @@ Tests direct message creation, delivery, and reception:
 
 ```typescript
 // Test DM creation and message sending
-it("createDM: should measure creating a DM", async () => {
+it("newDm: should measure creating a DM", async () => {
   const convo = await client.conversations.newDm(recipientInboxId);
   expect(convo).toBeDefined();
 });
