@@ -68,7 +68,4 @@ async function main() {
   console.log(`Data saved to generated-inboxes.json`);
 }
 
-main().catch((error: unknown) => {
-  console.error("Error in main function:", error);
-  process.exit(1);
-});
+void main();

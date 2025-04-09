@@ -397,4 +397,4 @@ async function main() {
   }
 }
 
-void main();
+main().catch(console.error);
