@@ -68,4 +68,4 @@ async function main() {
   console.log(`Data saved to generated-inboxes.json`);
 }
 
-void main();
+main().catch(console.error);

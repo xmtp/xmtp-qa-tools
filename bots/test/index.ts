@@ -194,4 +194,4 @@ async function processCommand(
   }
 }
 
-void main();
+main().catch(console.error);
