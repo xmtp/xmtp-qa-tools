@@ -15,6 +15,14 @@ loadEnv(testName);
 // Constants
 const HELP_TEXT = `🤖 XMTP Stress Test Bot
 
+1. Set up generated inboxes with the generate script and then run the stress test.
+
+yarn script generate
+
+2. Run the stress test.
+
+yarn stress
+
 Available Commands:
 /help - Show this help message
 /stress <workers> <messages> - Start a stress test
@@ -22,10 +30,7 @@ Available Commands:
 
 Examples:
 /stress 5 10 - Create test with 5 workers sending 10 messages each
-/stress reset - Terminate all workers and start over
-
-Limits:
-- Workers: 1-40`;
+/stress reset - Terminate all workers and start over`;
 
 let isStressTestRunning = false;
 let workers: WorkerManager | undefined;
@@ -146,7 +151,7 @@ async function createLargeGroup(
   try {
     // console.log([...inboxes, client.inboxId, message.senderInboxId]);
     const group = await client.conversations.newGroup(
-      [...inboxes, client.inboxId, ...workerInboxes, message.senderInboxId],
+      [...inboxes, ...workerInboxes, message.senderInboxId],
       {
         groupName: `Large Group ${memberCount} - ${Date.now()}`,
         groupDescription: `Large group with ${memberCount} members for stress testing`,
@@ -207,7 +212,7 @@ async function runStressTest(
     // Create group
     await conversation.send("⏳ Creating test group...");
     const group = await client.conversations.newGroup(
-      [...workerInboxIds, message.senderInboxId, client.inboxId],
+      [...workerInboxIds, message.senderInboxId],
       {
         groupName: `Stress Test Group ${Date.now()}`,
         groupDescription: "Group for stress testing",

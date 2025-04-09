@@ -13,9 +13,11 @@ A lightweight toolkit for app developers to test messaging functionality against
 git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
+# generate random inboxes
+yarn script generate
 
 # Run the bot
-yarn bot:stress
+yarn bot stress
 ```
 
 ## 💬 Available Commands
