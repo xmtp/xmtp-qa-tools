@@ -14,6 +14,11 @@ loadEnv(testName);
 
 // Constants
 const HELP_TEXT = `🤖 XMTP Stress Test Bot
+
+If working on a local environment, make sure to update the generated inboxes first:
+
+yarn script local-update
+
 Available Commands:
 /help - Show this help message
 /stress <workers> <messages> - Start a stress test
