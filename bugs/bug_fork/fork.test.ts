@@ -25,7 +25,7 @@ const testConfig = {
   workerNames: ["bob", "alice", "ivy"],
   workerIds: ["a", "device", "device2"],
   manualUsers: {
-    convos: "f8a453b9708a2ff98791d35eb56a91a46f7722c2684868c7f37c74ece57af276",
+    convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
     xmtpchat:
       "a867afb928842d104f7e0f64311398723875ea73c3525399e88bb9f7aa4622f4",
   },

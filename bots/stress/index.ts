@@ -391,7 +391,7 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-    await sendInitialTestMessage(client);
+    //await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
