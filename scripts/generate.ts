@@ -8,6 +8,7 @@ import {
 import { Client, type XmtpEnv } from "@helpers/types";
 
 const BASE_LOGPATH = "./logs";
+const DB_PATH = "/db";
 // Define valid XMTP environments
 const validEnvironments = ["local", "dev", "production"] as XmtpEnv[];
 
@@ -119,9 +120,11 @@ async function main() {
   // Create a custom folder name based on count and environments
   const folderName = `db-generated-${numAccounts}-${environments.join(",")}`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
-
-  verifyStorage(LOGPATH);
-
+  // Create db directory if it doesn't exist
+  if (!fs.existsSync(`${LOGPATH}${DB_PATH}`)) {
+    console.log(`Creating directory: ${LOGPATH}...`);
+    fs.mkdirSync(`${LOGPATH}${DB_PATH}`, { recursive: true });
+  }
   // Array to store account data
   const accountData = [];
 
@@ -151,7 +154,7 @@ async function main() {
 
       for (const env of environments) {
         const client = await Client.create(signer, encryptionKey, {
-          dbPath: `${LOGPATH}/${env}-${address}`,
+          dbPath: `${LOGPATH}${DB_PATH}/${env}-${address}`,
           env: env,
         });
 
@@ -189,11 +192,3 @@ async function main() {
 }
 
 main().catch(console.error);
-
-function verifyStorage(logPath: string) {
-  // Create db directory if it doesn't exist
-  if (!fs.existsSync(logPath)) {
-    console.log(`Creating directory: ${logPath}...`);
-    fs.mkdirSync(logPath, { recursive: true });
-  }
-}
