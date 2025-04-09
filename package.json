@@ -6,8 +6,8 @@
   "scripts": {
     "bot": "tsx scripts/run-bot",
     "build": "tsc",
-    "clean": "rimraf .data/ ||: && rimraf logs/ ||:",
-    "cli": "tsx scripts/cli-send.ts",
+    "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
+    "cli": "tsx scripts/bot-cli.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "functional": "npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false",
