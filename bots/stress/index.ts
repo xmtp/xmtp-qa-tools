@@ -7,7 +7,6 @@ import {
   type DecodedMessage,
   type WorkerManager,
 } from "@helpers/types";
-import { logAgentDetails } from "@helpers/utils";
 import { getWorkers } from "@workers/manager";
 
 const testName = "stress-bot";
@@ -49,11 +48,9 @@ async function initializeBot() {
   const bot = botWorker.get("bot");
   const client = bot?.client as Client;
 
-  logAgentDetails(
-    botWorker.get("bot")?.address as string,
-    client.inboxId,
-    process.env.ENV as string,
-  );
+  console.log(`Agent initialized on address ${bot?.address}`);
+  console.log(`Agent initialized on inbox ${client.inboxId}`);
+
   return client;
 }
 
