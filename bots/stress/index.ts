@@ -14,15 +14,6 @@ loadEnv(testName);
 
 // Constants
 const HELP_TEXT = `🤖 XMTP Stress Test Bot
-
-1. Set up generated inboxes with the generate script and then run the stress test.
-
-yarn script generate
-
-2. Run the stress test.
-
-yarn stress
-
 Available Commands:
 /help - Show this help message
 /stress <workers> <messages> - Start a stress test
