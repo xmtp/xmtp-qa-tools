@@ -139,9 +139,4 @@ async function main() {
   }
 }
 
-// Run the script
-main().catch((error) => {
-  console.error("Unhandled error:");
-  console.error(error);
-  process.exit(1);
-});
+main().catch(console.error);
