@@ -12,13 +12,14 @@ A lightweight toolkit for app developers to test messaging functionality against
 
 By defalt [generated-inboxes.json](../../helpers/generated-inboxes.json) is used to run the stress test with random generated inboxes. But they are not valid for your `local` environment.
 
-If you're developing in a `local` XMTP network, you need to re-initialize the inboxes first:
+> [!IMPORTANT]
+> If you're developing in a `local` XMTP network, you need to re-initialize the inboxes first:
 
 ```bash
 yarn script local-update
 ```
 
-This will make the current import of `generated-inboxes.json` invalid for your `local` environment.
+This will make the current import of `generated-inboxes.json` valid for your `local` environment.
 
 ```typescript
 import generatedInboxes from "@helpers/generated-inboxes.json";
