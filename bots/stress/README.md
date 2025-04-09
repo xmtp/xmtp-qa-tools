@@ -6,6 +6,24 @@ A lightweight toolkit for app developers to test messaging functionality against
 
 - Node.js (20.18.0)
 - Yarn
+- Random generated inboxes
+
+#### Using existing inboxes in local environment
+
+By defalt [generated-inboxes.json](../../helpers/generated-inboxes.json) is used to run the stress test with random generated inboxes. But they are not valid for your `local` environment.
+
+> [!IMPORTANT]
+> If you're developing in a `local` XMTP network, you need to re-initialize the inboxes first:
+
+```bash
+yarn script local-update
+```
+
+This will make the current import of `generated-inboxes.json` valid for your `local` environment.
+
+```typescript
+import generatedInboxes from "@helpers/generated-inboxes.json";
+```
 
 ## 🔧 Installation
 
@@ -14,8 +32,11 @@ git clone https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 
+# generate random inboxes
+yarn script generate
+
 # Run the bot
-yarn bot:stress
+yarn bot stress
 ```
 
 ## 💬 Available Commands
