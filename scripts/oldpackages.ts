@@ -70,7 +70,4 @@ async function main() {
   console.log(`Data saved to ${scriptName}.json`);
 }
 
-main().catch((error: unknown) => {
-  console.error("Error in main function:", error);
-  process.exit(1);
-});
+main().catch(console.error);

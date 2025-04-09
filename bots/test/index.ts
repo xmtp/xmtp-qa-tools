@@ -194,9 +194,4 @@ async function processCommand(
   }
 }
 
-// Run the bot
-main().catch((error: unknown) => {
-  console.error("Fatal error in main function:", error);
-  console.error("Error details:", JSON.stringify(error, null, 2));
-  process.exit(1); // Explicitly exit with error code
-});
+main().catch(console.error);

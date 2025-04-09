@@ -102,6 +102,4 @@
 //   }
 // };
 
-// main().catch((error) => {
-//   console.error(`Encountered an error: ${error}`);
-// });
+//main().catch(console.error);

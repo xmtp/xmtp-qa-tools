@@ -30,7 +30,7 @@ async function main() {
   return true;
 }
 
-void main();
+main().catch(console.error);
 
 // async function testConnection() {
 //   console.log("Testing Railway API connection...");
