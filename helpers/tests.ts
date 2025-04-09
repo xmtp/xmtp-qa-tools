@@ -309,6 +309,27 @@ export const setRandomNetworkConditions = (workers: WorkerManager): void => {
 };
 
 /**
+ * Sends an initial test message to the bot
+ */
+export const sendInitialTestMessage = async (client: Client): Promise<void> => {
+  try {
+    // Send dm to the bot
+    const dm = await client.conversations.newDm(
+      process.env.CONVOS_USER as string,
+    );
+
+    await dm.send("gm from bot");
+    console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
+
+    const dm2 = await client.conversations.newDm(process.env.CB_USER as string);
+    await dm2.send("gm from bot");
+    console.log("DM sent:", dm2.id, "to", process.env.CB_USER);
+  } catch (error) {
+    console.error("Error sending initial test message:", error);
+  }
+};
+
+/**
  * Adds a member to a group by a worker
  */
 export const addMemberByWorker = async (

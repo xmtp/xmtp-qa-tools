@@ -284,24 +284,6 @@ async function runStressTest(
   }
 }
 
-async function sendInitialTestMessage(client: Client) {
-  try {
-    // Send dm to the bot
-    const dm = await client.conversations.newDm(
-      process.env.CONVOS_USER as string,
-    );
-
-    await dm.send("gm from bot");
-    console.log("DM sent:", dm.id, "to", process.env.CONVOS_USER);
-
-    const dm2 = await client.conversations.newDm(process.env.CB_USER as string);
-    await dm2.send("gm from bot");
-    console.log("DM sent:", dm2.id, "to", process.env.CB_USER);
-  } catch (error) {
-    console.error("Error sending initial test message:", error);
-  }
-}
-
 async function handleMessage(
   message: DecodedMessage,
   conversation: Conversation,
@@ -391,7 +373,6 @@ async function main() {
   try {
     const client = await initializeBot();
     await client.conversations.sync();
-    //await sendInitialTestMessage(client);
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
