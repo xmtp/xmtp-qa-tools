@@ -27,6 +27,12 @@ import {
   Group as Group105,
 } from "@xmtp/node-sdk-105";
 import {
+  Client as Client200,
+  Conversation as Conversation200,
+  Dm as Dm200,
+  Group as Group200,
+} from "@xmtp/node-sdk-200";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -50,6 +56,12 @@ export const sdkVersions = {
     Conversation: Conversation105,
     Dm: Dm105,
     Group: Group105,
+  },
+  200: {
+    Client: Client200,
+    Conversation: Conversation200,
+    Dm: Dm200,
+    Group: Group200,
   },
 };
 
