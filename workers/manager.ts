@@ -314,10 +314,6 @@ export class WorkerManager {
     //   ? descriptor
     //   : `${baseName}-${installationId}`;
 
-    console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${version || "default"})`,
-    );
-
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
 
@@ -352,6 +348,10 @@ export class WorkerManager {
       installationId,
       worker: workerClient,
     };
+
+    console.log(
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${initializedWorker.version || "default"})`,
+    );
 
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);

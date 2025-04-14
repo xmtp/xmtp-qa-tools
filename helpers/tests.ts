@@ -15,12 +15,6 @@ import {
   Group as Group100,
 } from "@xmtp/node-sdk-100";
 import {
-  Client as Client104,
-  Conversation as Conversation104,
-  Dm as Dm104,
-  Group as Group104,
-} from "@xmtp/node-sdk-104";
-import {
   Client as Client105,
   Conversation as Conversation105,
   Dm as Dm105,
@@ -39,6 +33,13 @@ import {
 
 // SDK version mappings
 export const sdkVersions = {
+  30: {
+    Client: ClientMls,
+    Conversation: ConversationMls,
+    Dm: ConversationMls,
+    Group: ConversationMls,
+  },
+
   47: {
     Client: Client47,
     Conversation: Conversation47,
@@ -50,12 +51,6 @@ export const sdkVersions = {
     Conversation: Conversation100,
     Dm: Dm100,
     Group: Group100,
-  },
-  104: {
-    Client: Client104,
-    Conversation: Conversation104,
-    Dm: Dm104,
-    Group: Group104,
   },
   105: {
     Client: Client105,

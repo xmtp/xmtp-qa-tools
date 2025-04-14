@@ -20,7 +20,7 @@ loadEnv(testName);
 
 const workerConfigs = [
   { name: "bob", id: "a", number: "100" },
-  { name: "alice", id: "b", number: "104" },
+  { name: "alice", id: "b", number: "105" },
 ];
 
 // Network condition presets for testing
