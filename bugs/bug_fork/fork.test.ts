@@ -71,6 +71,7 @@ describe(TEST_NAME, () => {
     if (!globalGroup?.id || !fabri) {
       throw new Error("Group or fabri not found");
     }
+    setRandomNetworkConditions(testConfig.workers);
   });
 
   // Test message sending and group management
