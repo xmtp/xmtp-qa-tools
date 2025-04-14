@@ -233,6 +233,16 @@ export const removeMemberByWorker = async (
 };
 
 /**
+ * Randomly reinstalls a worker
+ */
+export const randomReinstall = async (
+  workers: WorkerManager,
+): Promise<void> => {
+  const worker = workers.getRandomWorkers(1)[0];
+  await worker.worker?.reinstall();
+};
+
+/**
  * Performs random syncs on workers
  */
 export const randomSyncs = async (testConfig: {
@@ -240,7 +250,7 @@ export const randomSyncs = async (testConfig: {
   groupId: string;
 }): Promise<void> => {
   for (const worker of testConfig.workers.getWorkers()) {
-    const randomSyncs = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
+    const randomSyncs = Math.floor(Math.random() * 2); // 0 for sync, 1 for syncAll
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {

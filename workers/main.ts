@@ -168,6 +168,16 @@ export class WorkerClient extends Worker {
   }
 
   /**
+   * Reinstalls the worker
+   */
+  public async reinstall(): Promise<void> {
+    console.log(`[${this.nameId}] Reinstalling worker`);
+    await this.terminate();
+    await this.clearDB();
+    await this.initialize();
+  }
+
+  /**
    * Simulates network conditions for an operation
    * @param operation The operation to perform
    * @returns The result of the operation
