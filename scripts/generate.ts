@@ -153,7 +153,8 @@ async function main() {
       const clientsInfo = [];
 
       for (const env of environments) {
-        const client = await Client.create(signer, encryptionKey, {
+        const client = await Client.create(signer, {
+          dbEncryptionKey: encryptionKey,
           dbPath: `${LOGPATH}${DB_PATH}/${env}-${address}`,
           env: env,
         });

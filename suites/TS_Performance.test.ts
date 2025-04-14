@@ -10,6 +10,7 @@ import {
 } from "@helpers/types";
 import { verifyStream, verifyStreamAll } from "@helpers/verify";
 import { getWorkers } from "@workers/manager";
+import { type Identifier } from "@xmtp/node-sdk";
 import {
   afterAll,
   afterEach,

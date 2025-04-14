@@ -31,7 +31,8 @@ async function main() {
 
     for (let i = 0; i < numInstallations; i++) {
       // Create an XMTP client using the signer
-      const client = await Client.create(signer, encryptionKey, {
+      const client = await Client.create(signer, {
+        dbEncryptionKey: encryptionKey,
         env: network,
       });
 

@@ -31,7 +31,8 @@ async function restartClients() {
             recursive: true,
           });
         }
-        await Client.create(signer, encryptionKey, {
+        await Client.create(signer, {
+          dbEncryptionKey: encryptionKey,
           dbPath: `./logs/dummy/${account.accountAddress}`,
           env: "local",
         });
