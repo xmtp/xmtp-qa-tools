@@ -151,6 +151,7 @@ export class XmtpPlaywright {
 
       if (waitForMessage) {
         // Wait for GM response with a longer timeout
+        await page?.waitForTimeout(2000);
         const botMessage = await page.getByText("gm");
         const botMessageText = await botMessage.textContent();
         console.log("Bot message:", botMessageText);
