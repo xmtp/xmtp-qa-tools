@@ -41,6 +41,12 @@ const staticConfigs: VersionConfig[] = [
     sdkVersion: "1.0.5",
     bindingsVersion: "1.1.3",
   },
+  {
+    sdkPackage: "node-sdk-200",
+    bindingsPackage: "node-bindings-200",
+    sdkVersion: "2.0.0",
+    bindingsVersion: "1.2.0-dev.bed98df",
+  },
 ];
 
 /**

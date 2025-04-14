@@ -142,14 +142,14 @@ export const getRandomNetworkCondition = (): NetworkCondition => {
  */
 export const getWorkerConfigs = (testConfig: {
   workerNames: string[];
-  workerIds: string[];
+  installationNames: string[];
   versions: string[];
 }): string[] => {
   const workerConfigs: string[] = [];
 
   for (let i = 0; i < testConfig.workerNames.length; i++) {
     const workerName = testConfig.workerNames[i];
-    const workerId = getRandomVersion(testConfig.workerIds);
+    const workerId = getRandomVersion(testConfig.installationNames);
     const workerVersion = getRandomVersion(testConfig.versions);
     console.log(`${workerName} using version: ${workerVersion}`);
 
@@ -191,37 +191,122 @@ export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
 };
 
 /**
- * Removes a member from a group
+ * Randomly updates the name of a group using a random member
  */
-export const removeMember = async (
+export const randomDescriptionUpdate = async (
   group: Group,
-  member: Worker,
+  workers: WorkerManager,
 ): Promise<void> => {
-  if (!member?.client.inboxId) {
-    console.log(`Member ${member.name} not found`);
+  const members = await group.members();
+  if (members.length === 0) {
+    console.log("No members available to update group name");
     return;
   }
-  console.log("Removing member", member?.client.inboxId);
-  await group.sync();
 
-  // Check if member is admin or super admin and demote first
-  if (group.isAdmin(member?.client.inboxId)) {
-    console.log(`Demoting admin: ${member?.client.inboxId}`);
-    await group.removeAdmin(member?.client.inboxId);
+  const randomMember = members[Math.floor(Math.random() * members.length)];
+  const newName = `Randomly updated group name ${Math.random().toString(36).substring(2, 15)}`;
+  const allWorkers = workers.getWorkers();
+  const randomWorker = allWorkers.filter(
+    (w) => w.client.inboxId === randomMember.inboxId,
+  )[0];
+  if (!randomWorker) {
+    console.log("No worker found for random member");
+    return;
   }
-
-  if (group.isSuperAdmin(member?.client.inboxId)) {
-    console.log(`Demoting super admin: ${member?.client.inboxId}`);
-    await group.removeSuperAdmin(member?.client.inboxId);
+  const foundGroup =
+    await randomWorker.client.conversations.getConversationById(group.id);
+  if (!foundGroup) {
+    console.log("No group found for random member");
+    return;
   }
+  await (foundGroup as Group).updateName(newName);
+  console.log(`Group name updated by ${randomMember.inboxId} to: ${newName}`);
+};
 
+/**
+ * Randomly updates the name of a group using a random member
+ */
+export const randomNameUpdate = async (
+  group: Group,
+  workers: WorkerManager,
+): Promise<void> => {
   const members = await group.members();
-  console.log(
-    "Members",
-    members.map((m) => m.inboxId),
-  );
+  if (members.length === 0) {
+    console.log("No members available to update group name");
+    return;
+  }
 
-  await group.removeMembers([member?.client.inboxId]);
+  const randomMember = members[Math.floor(Math.random() * members.length)];
+  const newName = `Randomly updated group name ${Math.random().toString(36).substring(2, 15)}`;
+  const allWorkers = workers.getWorkers();
+  const randomWorker = allWorkers.filter(
+    (w) => w.client.inboxId === randomMember.inboxId,
+  )[0];
+  if (!randomWorker) {
+    console.log("No worker found for random member");
+    return;
+  }
+  const foundGroup =
+    await randomWorker.client.conversations.getConversationById(group.id);
+  if (!foundGroup) {
+    console.log("No group found for random member");
+    return;
+  }
+  await (foundGroup as Group).updateName(newName);
+  console.log(`Group name updated by ${randomMember.inboxId} to: ${newName}`);
+};
+
+/**
+ * Removes a member from a group
+ */
+export const removeMemberByWorker = async (
+  groupId: string,
+  memberToRemove: string,
+  memberWhoRemoves: Worker,
+): Promise<void> => {
+  try {
+    if (!memberToRemove) {
+      console.log(`Member ${memberToRemove} not found`);
+      return;
+    }
+    console.log("Removing member", memberToRemove);
+    const group =
+      await memberWhoRemoves.client.conversations.getConversationById(groupId);
+    await group?.sync();
+    const members = await group?.members();
+    const memberFound = members?.find(
+      (m) => m.inboxId.toLowerCase() === memberToRemove.toLowerCase(),
+    );
+    if (!memberFound) {
+      console.log(`Member ${memberToRemove} not found in group ${groupId}`);
+      return;
+    }
+    // Check if member is admin or super admin and demote first
+    if ((group as Group)?.isAdmin(memberToRemove)) {
+      console.log(`Demoting admin: ${memberToRemove}`);
+      await (group as Group).removeAdmin(memberToRemove);
+    }
+
+    if ((group as Group)?.isSuperAdmin(memberToRemove)) {
+      console.log(`Demoting super admin: ${memberToRemove}`);
+      await (group as Group).removeSuperAdmin(memberToRemove);
+    }
+
+    await (group as Group).removeMembers([memberToRemove]);
+  } catch (error) {
+    console.error("Error removing member:", error);
+  }
+};
+
+/**
+ * Randomly reinstalls a worker
+ */
+export const randomReinstall = async (
+  workers: WorkerManager,
+): Promise<void> => {
+  const worker = workers.getRandomWorkers(1)[0];
+  console.log(`[${worker.name}] Reinstalling worker`);
+  await worker.worker?.reinstall();
 };
 
 /**
@@ -232,13 +317,12 @@ export const randomSyncs = async (testConfig: {
   groupId: string;
 }): Promise<void> => {
   for (const worker of testConfig.workers.getWorkers()) {
-    const randomSyncs = Math.floor(Math.random() * 3);
+    const randomSyncs = Math.floor(Math.random() * 2); // 0 for sync, 1 for syncAll
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {
       await worker.client.conversations.syncAll();
     } else {
-      await worker.client.conversations.sync();
       const group = await worker.client.conversations.getConversationById(
         testConfig.groupId,
       );
@@ -256,7 +340,16 @@ export const sendMessageWithCount = async (
   messageCount: number,
 ): Promise<number> => {
   try {
-    await worker.client.conversations.sync();
+    // Randomly choose between different sync approaches
+    const syncChoice = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
+    if (syncChoice === 0) {
+      await worker.client.conversations.sync();
+      console.log(`${worker.name} performed client sync`);
+    } else if (syncChoice === 1) {
+      await worker.client.conversations.syncAll();
+      console.log(`${worker.name} performed client syncAll`);
+    }
+
     const group =
       await worker.client.conversations.getConversationById(groupId);
     const message = `${worker.name} ${messageCount}`;
@@ -337,7 +430,7 @@ export const addMemberByWorker = async (
   membertoAdd: string,
   memberWhoAdds: Worker,
 ): Promise<void> => {
-  await memberWhoAdds.client.conversations.sync();
+  await memberWhoAdds.client.conversations.syncAll();
   const group =
     await memberWhoAdds.client.conversations.getConversationById(groupId);
 
@@ -438,4 +531,134 @@ export const appendToEnv = (
   } catch (error: unknown) {
     console.error(`Failed to update .env file with ${key}:`, error);
   }
+};
+
+/**
+ * Simulates a client missing cursor messages to reproduce the fork bug
+ * This recreates the scenario where a client misses a critical epoch-advancing message
+ */
+export const simulateMissingCursorMessage = async (
+  worker: Worker,
+  groupId: string,
+): Promise<void> => {
+  console.log(
+    `[${worker.name}] Simulating backgrounded app missing cursor messages`,
+  );
+
+  // First reinstall the worker to clear its state (like app restarting)
+  await worker.worker?.reinstall();
+
+  // Skip sync, which would normally happen after reinstall
+  console.log(
+    `[${worker.name}] Worker reinstalled but sync intentionally skipped`,
+  );
+
+  // Force the cursor to advance by one (simulating the off-by-one error)
+  try {
+    // This is a simulation of the cursor issue. In the real implementation,
+    // we would need to modify the cursor directly in the database or through
+    // an API if available. For now, we'll just log that we're simulating this.
+    console.log(`[${worker.name}] Simulating cursor being off by one message`);
+
+    // In a real fix, we might need to modify the worker's storage
+    // or inject a fake cursor value to reproduce the exact bug
+  } catch (error) {
+    console.error(`Error simulating cursor issue for ${worker.name}:`, error);
+  }
+};
+
+/**
+ * Checks if groups across workers are in a forked state
+ * Returns true if a fork is detected (different group states)
+ */
+export const checkForGroupFork = async (
+  workers: Worker[],
+  groupId: string,
+): Promise<boolean> => {
+  console.log(`Checking for group fork in group ${groupId}`);
+
+  if (workers.length < 2) {
+    console.log("Need at least 2 workers to check for a fork");
+    return false;
+  }
+
+  const groupStates: Record<string, any> = {};
+
+  // Get group state from each worker
+  for (const worker of workers) {
+    try {
+      const group =
+        await worker.client.conversations.getConversationById(groupId);
+
+      if (!group) {
+        console.log(`Group not found for worker ${worker.name}`);
+        continue;
+      }
+
+      // In a real implementation, we would extract the epoch or other state
+      // information that would indicate a fork. For now, we'll use what's available
+      // in the public API.
+      const members = await (group as Group).members();
+      const memberCount = members.length;
+
+      // Store group state for this worker
+      groupStates[worker.name] = {
+        memberCount,
+        name: (group as Group).name,
+        description: (group as Group).description,
+      };
+
+      console.log(
+        `${worker.name} group state:`,
+        JSON.stringify(groupStates[worker.name]),
+      );
+    } catch (error) {
+      console.error(`Error getting group state for ${worker.name}:`, error);
+    }
+  }
+
+  // Compare group states to detect forks
+  const workerNames = Object.keys(groupStates);
+  if (workerNames.length < 2) {
+    console.log("Not enough group states to compare");
+    return false;
+  }
+
+  const firstWorkerState = groupStates[workerNames[0]];
+  let forkDetected = false;
+
+  // Compare each worker's state with the first worker
+  for (let i = 1; i < workerNames.length; i++) {
+    const currentWorkerState = groupStates[workerNames[i]];
+
+    // Compare number of members - a common fork symptom
+    if (currentWorkerState.memberCount !== firstWorkerState.memberCount) {
+      console.log(
+        `FORK DETECTED: ${workerNames[0]} has ${firstWorkerState.memberCount} members, but ${workerNames[i]} has ${currentWorkerState.memberCount} members`,
+      );
+      forkDetected = true;
+    }
+
+    // Compare group name
+    if (currentWorkerState.name !== firstWorkerState.name) {
+      console.log(
+        `FORK DETECTED: ${workerNames[0]} has group name "${firstWorkerState.name}", but ${workerNames[i]} has "${currentWorkerState.name}"`,
+      );
+      forkDetected = true;
+    }
+
+    // Compare group description
+    if (currentWorkerState.description !== firstWorkerState.description) {
+      console.log(
+        `FORK DETECTED: ${workerNames[0]} has description "${firstWorkerState.description}", but ${workerNames[i]} has "${currentWorkerState.description}"`,
+      );
+      forkDetected = true;
+    }
+  }
+
+  if (!forkDetected) {
+    console.log("No group fork detected - all clients have consistent state");
+  }
+
+  return forkDetected;
 };

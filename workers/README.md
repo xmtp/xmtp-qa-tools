@@ -45,7 +45,7 @@ const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
 await conversation.send("Hello Bob!");
 
 // Wait for Bob to receive the message
-await bob.client.conversations.syncAll();
+await bob.client.conversations.sync();
 const bobConversations = await bob.client.conversations.list();
 ```
 
@@ -71,7 +71,7 @@ const conversation = await aliceDesktop.client.conversations.newDm(
 await conversation.send("Hello from Alice's desktop!");
 
 // Verify message appears on Alice's phone
-await alicePhone.client.conversations.syncAll();
+await alicePhone.client.conversations.sync();
 const alicePhoneConversations = await alicePhone.client.conversations.list();
 ```
 
