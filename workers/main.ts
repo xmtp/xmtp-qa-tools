@@ -1,20 +1,13 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
+import { createClient, getDataPath } from "@helpers/client";
 import {
-  createSigner,
-  getDataPath,
-  getDbPath,
-  getEncryptionKeyFromHex,
-} from "@helpers/client";
-import { sdkVersions } from "@helpers/tests";
-import {
-  Client,
   defaultValues,
   Dm,
+  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
-  type LogLevel,
   type typeofStream,
   type XmtpEnv,
 } from "@helpers/types";
@@ -307,50 +300,19 @@ export class WorkerClient extends Worker {
         },
       });
 
-      const signer = createSigner(this.walletKey as `0x${string}`);
-      const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-
-      // Get the SDK version from the worker data
-      const sdkVersion = this.workerData.sdkVersion as
-        | keyof typeof sdkVersions
-        | undefined;
-      // Select the appropriate SDK client based on version
-      let ClientClass: any;
-      if (sdkVersion) {
-        ClientClass = sdkVersions[sdkVersion].Client;
-      } else {
-        ClientClass = Client;
-      }
-
-      if (!ClientClass) {
-        throw new Error(`Unsupported SDK version: ${sdkVersion}`);
-      }
-
-      // Force version to include the SDK version for easier identification
-      const sdkIdentifier = sdkVersion || "latest";
-      const libXmtpVersion =
-        ClientClass.version?.split("@")[1].split(" ")[0] ?? "unknown";
-
-      const version = `${libXmtpVersion}-${sdkIdentifier}`;
-
-      const identifier = await signer.getIdentifier();
-      this.address = identifier.identifier as `0x${string}`;
-      const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
-      const dbPath = getDbPath(
-        this.name,
-        this.address,
-        this.testName,
-        this.folder,
-        version,
+      const { client, dbPath, version, address } = await createClient(
+        this.walletKey as `0x${string}`,
+        this.encryptionKeyHex,
+        {
+          sdkVersion: this.workerData.sdkVersion as string,
+          name: this.name,
+          testName: this.testName,
+          folder: this.folder,
+        },
         this.env,
       );
 
-      // Use type assertion to handle the client creation
-      this.client = (await ClientClass.create(signer, encryptionKey, {
-        dbPath,
-        env: this.env,
-        loggingLevel: loggingLevel,
-      })) as Client;
+      this.client = client as unknown as Client;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
@@ -366,7 +328,6 @@ export class WorkerClient extends Worker {
       };
     });
   }
-
   /**
    * Unified method to start the appropriate stream based on configuration
    */

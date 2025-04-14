@@ -2,7 +2,11 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
-import { IdentifierKind } from "@xmtp/node-bindings";
+import {
+  IdentifierKind,
+  type Client,
+  type LogLevel,
+} from "@xmtp/node-bindings";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -10,6 +14,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
+import { sdkVersions } from "./tests";
 
 interface User {
   key: `0x${string}`;
@@ -17,10 +22,69 @@ interface User {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
+export async function createClient(
+  walletKey: `0x${string}`,
+  encryptionKeyHex: string,
+  workerData: {
+    sdkVersion: string;
+    name: string;
+    testName: string;
+    folder: string;
+  },
+  env: XmtpEnv,
+): Promise<{
+  client: Client;
+  dbPath: string;
+  version: string;
+  address: `0x${string}`;
+}> {
+  const signer = createSigner(walletKey);
+  const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
+
+  // Select the appropriate SDK client based on version
+  let ClientClass =
+    sdkVersions[workerData.sdkVersion as unknown as keyof typeof sdkVersions]
+      .Client;
+
+  if (!ClientClass) {
+    throw new Error(`Unsupported SDK version: ${workerData.sdkVersion}`);
+  }
+
+  // Use type assertion to access the static version property
+  const libXmtpVersion =
+    typeof (ClientClass as any).version === "undefined"
+      ? "unknown"
+      : typeof (ClientClass as any).version === "string"
+        ? (ClientClass as any).version.split("@")[1]?.split(" ")[0] || "unknown"
+        : "unknown";
+
+  const version = `${libXmtpVersion}-${workerData.sdkVersion}`;
+
+  const identifier = await signer.getIdentifier();
+  const address = identifier.identifier as `0x${string}`;
+  const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  const dbPath = getDbPath(
+    workerData.name,
+    address,
+    workerData.testName,
+    workerData.folder,
+    version,
+    env,
+  );
+
+  // Use type assertion to handle the client creation
+  const client = (await ClientClass.create(signer, encryptionKey, {
+    dbPath,
+    env,
+    loggingLevel,
+  })) as Client;
+  return { client, dbPath, version, address };
+}
+
 export const createSigner = (key: `0x${string}`): Signer => {
   const accountKey = key;
   const account = privateKeyToAccount(accountKey);
-  let user = {
+  let user: User = {
     key: accountKey,
     account,
     wallet: createWalletClient({

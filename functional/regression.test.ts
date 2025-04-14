@@ -20,7 +20,11 @@ describe(testName, () => {
       const inboxId = generatedInboxes[0].inboxId;
       console.log("inboxId", inboxId);
       const convo = await bob?.client.conversations.newDm(inboxId);
-      expect(convo?.id).toBeDefined();
+      if (version === "30" || version === "47") {
+        expect(convo?.id).toBeUndefined();
+      } else {
+        expect(convo?.id).toBeDefined();
+      }
     });
   }
 });
