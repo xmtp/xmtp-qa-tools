@@ -33,6 +33,7 @@ const testConfig = {
     "ivan",
     "julia",
   ],
+  creator: "fabri",
   installationNames: ["a"],
   manualUsers: {
     convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
@@ -41,7 +42,6 @@ const testConfig = {
       "20163dfde797c8a9ec05991c062a1904b89dc1fe82c6fc27972fd1f46044088d",
   },
   workers: undefined as WorkerManager | undefined,
-  rootWorker: "fabri",
   groupId: undefined as string | undefined,
 };
 
@@ -49,46 +49,42 @@ describe(TEST_NAME, () => {
   // Test state
   let globalGroup: Group | undefined;
   let messageCount = 0;
-  let fabri: Worker | undefined;
+  let creator: Worker | undefined;
   let rootWorker: WorkerManager | undefined;
   const workerConfigs = getWorkerConfigs(testConfig);
 
   // Initialize workers and create group
   it("should initialize all workers at once and create group", async () => {
     // Initialize root worker (fabri)
-    rootWorker = await getWorkers(
-      [testConfig.rootWorker],
-      TEST_NAME,
-      "message",
-    );
-    fabri = rootWorker.getWorkers()[0];
+    rootWorker = await getWorkers([testConfig.creator], TEST_NAME, "message");
+    creator = rootWorker.getWorkers()[0];
 
     // Initialize other workers
     testConfig.workers = await getWorkers(workerConfigs, TEST_NAME, "none");
 
     // Create or get group
-    globalGroup = (await getOrCreateGroup(testConfig, fabri.client)) as Group;
+    globalGroup = (await getOrCreateGroup(testConfig, creator.client)) as Group;
     testConfig.groupId = globalGroup.id;
     await globalGroup.updateName(globalGroup.id);
 
     // Send initial message from fabri
     messageCount = await sendMessageWithCount(
-      fabri,
+      creator,
       globalGroup?.id,
       messageCount,
     );
 
     // Validate state
-    if (!globalGroup?.id || !fabri) {
-      throw new Error("Group or fabri not found");
+    if (!globalGroup?.id || !creator) {
+      throw new Error("Group or creator not found");
     }
   });
 
   // Test message sending and group management
   it("should send messages to group and manage members", async () => {
     // Validate initial state
-    if (!globalGroup?.id || !fabri || !testConfig.workers) {
-      throw new Error("Group or fabri not found");
+    if (!globalGroup?.id || !creator || !testConfig.workers) {
+      throw new Error("Group or creator not found");
     }
     setRandomNetworkConditions(testConfig.workers);
 
@@ -118,7 +114,7 @@ describe(TEST_NAME, () => {
 
     // Phase 1: Add first batch of workers to the group (bob, alice, dave)
     // Add bob to group
-    await addMemberByWorker(globalGroup.id, bob.client.inboxId, fabri);
+    await addMemberByWorker(globalGroup.id, bob.client.inboxId, creator);
 
     // Bob sends message
     messageCount = await sendMessageWithCount(
