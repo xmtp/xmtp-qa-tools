@@ -9,6 +9,16 @@ import {
 } from "@helpers/types";
 import { getWorkers } from "@workers/manager";
 
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught exception:", error);
+  process.exit(1);
+});
+
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled rejection at:", promise, "reason:", reason);
+  process.exit(1);
+});
+
 const testName = "stress-bot";
 loadEnv(testName);
 
@@ -89,7 +99,7 @@ async function sendWorkerMessagesToGroup(
     console.log(
       `Worker ${worker.name} sending ${messageCount} messages to group ${groupId}`,
     );
-    await worker.client?.conversations.syncAll();
+    await worker.client?.conversations.sync();
     let messagesSent = 0;
     const groupFromWorker =
       await worker.client?.conversations.getConversationById(groupId);

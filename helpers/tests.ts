@@ -236,7 +236,7 @@ export const randomSyncs = async (testConfig: {
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {
-      await worker.client.conversations.syncAll();
+      await worker.client.conversations.sync();
     } else {
       await worker.client.conversations.sync();
       const group = await worker.client.conversations.getConversationById(

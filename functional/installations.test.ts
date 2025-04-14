@@ -46,7 +46,7 @@ describe(testName, () => {
     await conversation?.send("Hello Charlie from Alice's desktop");
 
     // Charlie can see the message
-    await terciaryWorkers.get(names[2])?.client.conversations.syncAll();
+    await terciaryWorkers.get(names[2])?.client.conversations.sync();
     const charlieConvs = await terciaryWorkers
       .get(names[2])
       ?.client.conversations.list();
@@ -55,7 +55,7 @@ describe(testName, () => {
     // Create a backup installation for charlie
     const fourthWorkers = await getWorkers([names[2] + "-c"], testName);
     // Backup installation should also be able to access the conversation after syncing
-    await fourthWorkers.get(names[2])?.client.conversations.syncAll();
+    await fourthWorkers.get(names[2])?.client.conversations.sync();
     const backupConvs = await fourthWorkers
       .get(names[2], "c")
       ?.client.conversations.list();
