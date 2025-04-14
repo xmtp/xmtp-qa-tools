@@ -4,6 +4,7 @@ import {
   getOrCreateGroup,
   getWorkerConfigs,
   randomlyAsignAdmins,
+  randomReinstall,
   randomSyncs,
   removeMemberByWorker,
   sendMessageWithCount,
