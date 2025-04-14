@@ -3,7 +3,9 @@ import {
   addMemberByWorker,
   getOrCreateGroup,
   getWorkerConfigs,
+  randomDescriptionUpdate,
   randomlyAsignAdmins,
+  randomNameUpdate,
   randomReinstall,
   randomSyncs,
   removeMemberByWorker,
@@ -245,8 +247,8 @@ describe(TEST_NAME, () => {
     await removeMemberByWorker(globalGroup.id, dave.client.inboxId, alice);
     await removeMemberByWorker(globalGroup.id, frank.client.inboxId, bob);
 
-    // Update group name
-    await globalGroup.updateName(`${globalGroup.id}-updated`);
+    await randomNameUpdate(globalGroup, testConfig.workers);
+    await randomDescriptionUpdate(globalGroup, testConfig.workers);
 
     await randomSyncs({
       workers: testConfig.workers,
