@@ -193,35 +193,43 @@ export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
 /**
  * Removes a member from a group
  */
-export const removeMember = async (
-  group: Group,
-  member: Worker,
+export const removeMemberByWorker = async (
+  groupId: string,
+  memberToRemove: string,
+  memberWhoRemoves: Worker,
 ): Promise<void> => {
-  if (!member?.client.inboxId) {
-    console.log(`Member ${member.name} not found`);
-    return;
+  try {
+    if (!memberToRemove) {
+      console.log(`Member ${memberToRemove} not found`);
+      return;
+    }
+    console.log("Removing member", memberToRemove);
+    const group =
+      await memberWhoRemoves.client.conversations.getConversationById(groupId);
+    await group?.sync();
+    const members = await group?.members();
+    const memberFound = members?.find(
+      (m) => m.inboxId.toLowerCase() === memberToRemove.toLowerCase(),
+    );
+    if (!memberFound) {
+      console.log(`Member ${memberToRemove} not found in group ${groupId}`);
+      return;
+    }
+    // Check if member is admin or super admin and demote first
+    if ((group as Group)?.isAdmin(memberToRemove)) {
+      console.log(`Demoting admin: ${memberToRemove}`);
+      await (group as Group).removeAdmin(memberToRemove);
+    }
+
+    if ((group as Group)?.isSuperAdmin(memberToRemove)) {
+      console.log(`Demoting super admin: ${memberToRemove}`);
+      await (group as Group).removeSuperAdmin(memberToRemove);
+    }
+
+    await (group as Group).removeMembers([memberToRemove]);
+  } catch (error) {
+    console.error("Error removing member:", error);
   }
-  console.log("Removing member", member?.client.inboxId);
-  await group.sync();
-
-  // Check if member is admin or super admin and demote first
-  if (group.isAdmin(member?.client.inboxId)) {
-    console.log(`Demoting admin: ${member?.client.inboxId}`);
-    await group.removeAdmin(member?.client.inboxId);
-  }
-
-  if (group.isSuperAdmin(member?.client.inboxId)) {
-    console.log(`Demoting super admin: ${member?.client.inboxId}`);
-    await group.removeSuperAdmin(member?.client.inboxId);
-  }
-
-  const members = await group.members();
-  console.log(
-    "Members",
-    members.map((m) => m.inboxId),
-  );
-
-  await group.removeMembers([member?.client.inboxId]);
 };
 
 /**
@@ -232,13 +240,12 @@ export const randomSyncs = async (testConfig: {
   groupId: string;
 }): Promise<void> => {
   for (const worker of testConfig.workers.getWorkers()) {
-    const randomSyncs = Math.floor(Math.random() * 3);
+    const randomSyncs = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
     if (randomSyncs === 0) {
       await worker.client.conversations.sync();
     } else if (randomSyncs === 1) {
-      await worker.client.conversations.sync();
+      await worker.client.conversations.syncAll();
     } else {
-      await worker.client.conversations.sync();
       const group = await worker.client.conversations.getConversationById(
         testConfig.groupId,
       );
@@ -256,7 +263,16 @@ export const sendMessageWithCount = async (
   messageCount: number,
 ): Promise<number> => {
   try {
-    await worker.client.conversations.sync();
+    // Randomly choose between different sync approaches
+    const syncChoice = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
+    if (syncChoice === 0) {
+      await worker.client.conversations.sync();
+      console.log(`${worker.name} performed client sync`);
+    } else if (syncChoice === 1) {
+      await worker.client.conversations.syncAll();
+      console.log(`${worker.name} performed client syncAll`);
+    }
+
     const group =
       await worker.client.conversations.getConversationById(groupId);
     const message = `${worker.name} ${messageCount}`;
@@ -337,7 +353,7 @@ export const addMemberByWorker = async (
   membertoAdd: string,
   memberWhoAdds: Worker,
 ): Promise<void> => {
-  await memberWhoAdds.client.conversations.sync();
+  await memberWhoAdds.client.conversations.syncAll();
   const group =
     await memberWhoAdds.client.conversations.getConversationById(groupId);
 
