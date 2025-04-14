@@ -33,7 +33,7 @@ const testConfig = {
     "ivan",
     "julia",
   ],
-  workerIds: ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"],
+  installationNames: ["a"],
   manualUsers: {
     convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
     convos2: "8137ca5e1cf89dcd3a750aa896bb115dc38277907d0bd5f36665e61cd8f60e99",
@@ -82,18 +82,18 @@ describe(TEST_NAME, () => {
     if (!globalGroup?.id || !fabri) {
       throw new Error("Group or fabri not found");
     }
-    setRandomNetworkConditions(testConfig.workers);
   });
 
   // Test message sending and group management
   it("should send messages to group and manage members", async () => {
     // Validate initial state
-    if (!globalGroup?.id || !fabri) {
+    if (!globalGroup?.id || !fabri || !testConfig.workers) {
       throw new Error("Group or fabri not found");
     }
+    setRandomNetworkConditions(testConfig.workers);
 
     // Get all workers
-    const allWorkers = testConfig.workers?.getWorkers() as Worker[];
+    const allWorkers = testConfig.workers?.getWorkers();
     if (allWorkers.length !== 10) {
       throw new Error(`Expected 10 workers but got ${allWorkers.length}`);
     }
@@ -112,7 +112,7 @@ describe(TEST_NAME, () => {
     await globalGroup.updateName(globalGroup.id);
 
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 
@@ -155,7 +155,7 @@ describe(TEST_NAME, () => {
     await randomlyAsignAdmins(globalGroup);
 
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 
@@ -197,7 +197,7 @@ describe(TEST_NAME, () => {
     );
 
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 
@@ -238,7 +238,7 @@ describe(TEST_NAME, () => {
     await randomlyAsignAdmins(globalGroup);
 
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 
@@ -250,13 +250,13 @@ describe(TEST_NAME, () => {
     await globalGroup.updateName(`${globalGroup.id}-updated`);
 
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 
     // Final sync
     await randomSyncs({
-      workers: testConfig.workers as WorkerManager,
+      workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
 

@@ -142,14 +142,14 @@ export const getRandomNetworkCondition = (): NetworkCondition => {
  */
 export const getWorkerConfigs = (testConfig: {
   workerNames: string[];
-  workerIds: string[];
+  installationNames: string[];
   versions: string[];
 }): string[] => {
   const workerConfigs: string[] = [];
 
   for (let i = 0; i < testConfig.workerNames.length; i++) {
     const workerName = testConfig.workerNames[i];
-    const workerId = getRandomVersion(testConfig.workerIds);
+    const workerId = getRandomVersion(testConfig.installationNames);
     const workerVersion = getRandomVersion(testConfig.versions);
     console.log(`${workerName} using version: ${workerVersion}`);
 
