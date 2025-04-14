@@ -39,6 +39,12 @@ import {
 
 // SDK version mappings
 export const sdkVersions = {
+  47: {
+    Client: Client47,
+    Conversation: Conversation47,
+    Dm: Dm47,
+    Group: Group47,
+  },
   100: {
     Client: Client100,
     Conversation: Conversation100,
