@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { join } from "path";
 import {
-  createUser,
+  createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/old_helper";
@@ -26,7 +26,7 @@ async function main() {
       const encryptionKeyHex = generateEncryptionKeyHex();
       const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-      const user = createUser();
+      const user = createSigner();
       const client = await ClientMls.create(user.account.address, {
         env: "dev",
         encryptionKey: encryptionKey,

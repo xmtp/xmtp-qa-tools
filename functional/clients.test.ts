@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { IdentifierKind } from "@helpers/types";
+import { IdentifierKind, type Identifier } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -55,12 +55,13 @@ describe(testName, () => {
       if (!randomAddress) {
         throw new Error("Random client not found");
       }
-      const canMessage = await workers.get("henry")!.client.canMessage([
-        {
-          identifier: randomAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        },
-      ]);
+      const identifier: Identifier = {
+        identifier: randomAddress,
+        identifierKind: IdentifierKind.Ethereum,
+      };
+      const canMessage = await workers
+        .get("henry")!
+        .client.canMessage([identifier]);
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       logError(e, expect);

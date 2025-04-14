@@ -5,6 +5,7 @@ import {
   IdentifierKind,
   type Consent,
   type GroupMember,
+  type Identifier,
   type Installation,
   type LogLevel,
 } from "@xmtp/node-bindings";
@@ -33,6 +34,7 @@ export {
   Dm,
   Group,
   IdentifierKind,
+  type Identifier,
   type GroupMember,
   type Installation,
   type Signer,

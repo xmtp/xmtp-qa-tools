@@ -16,7 +16,7 @@ export interface User {
   wallet: WalletClient;
 }
 
-export const createUser = (): User => {
+export const createSigner = (): User => {
   const key = generatePrivateKey();
   const account = privateKeyToAccount(key);
   return {
@@ -28,17 +28,6 @@ export const createUser = (): User => {
       transport: http(),
     }),
   };
-};
-
-export const getSignature = async (client: ClientMls, user: User) => {
-  if (client.signatureText) {
-    const signature = await user.wallet.signMessage({
-      message: client.signatureText,
-      account: user.account,
-    });
-    return toBytes(signature);
-  }
-  return null;
 };
 
 /**

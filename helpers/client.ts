@@ -17,10 +17,10 @@ interface User {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-export const createUser = (key: `0x${string}`): User => {
+export const createSigner = (key: `0x${string}`): Signer => {
   const accountKey = key;
   const account = privateKeyToAccount(accountKey);
-  return {
+  let user = {
     key: accountKey,
     account,
     wallet: createWalletClient({
@@ -29,10 +29,6 @@ export const createUser = (key: `0x${string}`): User => {
       transport: http(),
     }),
   };
-};
-
-export const createSigner = (key: `0x${string}`): Signer => {
-  const user = createUser(key);
   return {
     type: "EOA",
     getIdentifier: () => ({

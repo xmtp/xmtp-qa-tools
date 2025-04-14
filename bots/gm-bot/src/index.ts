@@ -29,7 +29,8 @@ async function main() {
   const address = identifier.identifier;
   const dbPath = `${volumePath}/${address}-${env}`;
 
-  const client = await Client.create(signer, encryptionKey, {
+  const client = await Client.create(signer, {
+    dbEncryptionKey: encryptionKey,
     env,
     dbPath,
     loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
