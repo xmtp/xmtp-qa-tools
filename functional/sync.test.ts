@@ -9,8 +9,6 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
-  let start: number;
   let testGroup: Group;
 
   // Define test workers
@@ -28,7 +26,7 @@ describe(testName, () => {
       expect(workers).toBeDefined();
       expect(workers.getLength()).toBe(testWorkers.length);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -66,7 +64,7 @@ describe(testName, () => {
       const members = await testGroup.members();
       expect(members.length).toBe(testWorkers.length);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -84,7 +82,7 @@ describe(testName, () => {
       await groupForIvy.send(testMessage);
       console.log("Test message sent to group:", testMessage);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -116,7 +114,7 @@ describe(testName, () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -151,7 +149,7 @@ describe(testName, () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -183,7 +181,7 @@ describe(testName, () => {
 
       return { retrievalTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });

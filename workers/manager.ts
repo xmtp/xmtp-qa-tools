@@ -2,11 +2,12 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { defaultValues, sdkVersions, type typeofStream } from "@helpers/tests";
+import { defaultValues, sdkVersions } from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
+export type typeofStream = "message" | "conversation" | "consent" | "none";
 // Network simulation interfaces
 export interface NetworkConditions {
   latencyMs?: number; // Artificial delay in milliseconds
@@ -246,11 +247,6 @@ export class WorkerManager {
       process.env[walletKeyEnv] !== undefined &&
       process.env[encryptionKeyEnv] !== undefined
     ) {
-      const account = privateKeyToAccount(
-        process.env[walletKeyEnv] as `0x${string}`,
-      );
-      //console.log(`Using env keys for ${baseName}: ${account.address}`);
-
       this.keysCache[baseName] = {
         walletKey: process.env[walletKeyEnv],
         encryptionKey: process.env[encryptionKeyEnv],

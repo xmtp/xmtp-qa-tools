@@ -67,7 +67,7 @@ export async function createClient(
     dbPath,
     env,
   );
-  return { client, dbPath, version, address };
+  return { client, dbPath, address };
 }
 export const regressionClient = async (
   version: number,
@@ -248,10 +248,7 @@ export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
   const logger = createLogger(testName);
   overrideConsole(logger);
-  // Create the .env file path
-  const env = process.env.XMTP_ENV as XmtpEnv;
 
-  console.log("XMTP_ENV", process.env.XMTP_ENV);
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",

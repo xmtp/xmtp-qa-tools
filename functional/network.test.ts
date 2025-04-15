@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import type { WorkerClient } from "@workers/main";
 import { getWorkers, type NetworkConditions } from "@workers/manager";
-import type { Conversation, XmtpEnv } from "@xmtp/node-sdk";
+import type { Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const users: {
@@ -43,8 +43,6 @@ describe(testName, () => {
 
   for (const user of Object.keys(users)) {
     describe(`User: ${user}`, () => {
-      const receiver = users[user].inboxId;
-
       it("should initialize workers and create test group", async () => {
         try {
           console.log(`Setting up network simulation test for ${user}`);

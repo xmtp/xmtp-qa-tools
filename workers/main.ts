@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues, type typeofStream } from "@helpers/tests";
+import { defaultValues } from "@helpers/tests";
 import {
   Client,
   Dm,
@@ -11,7 +11,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import type { NetworkConditions, WorkerBase } from "./manager";
+import type { NetworkConditions, typeofStream, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -301,7 +301,7 @@ export class WorkerClient extends Worker {
           sdkVersion: this.sdkVersion,
         },
       });
-      const { client, dbPath, version, address } = await createClient(
+      const { client, dbPath, address } = await createClient(
         this.walletKey as `0x${string}`,
         this.encryptionKeyHex,
         {

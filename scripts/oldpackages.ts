@@ -1,7 +1,6 @@
 import * as fs from "fs";
 import { join } from "path";
 import {
-  createSigner,
   createSigner47,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,

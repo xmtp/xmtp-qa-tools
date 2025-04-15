@@ -112,7 +112,6 @@ const defaultNames = [
   "guada",
   //max 61
 ];
-export type typeofStream = "message" | "conversation" | "consent" | "none";
 export const defaultValues = {
   amount: 5,
   timeout: 40000,
@@ -659,7 +658,6 @@ export const appendToEnv = (
  */
 export const simulateMissingCursorMessage = async (
   worker: Worker,
-  groupId: string,
 ): Promise<void> => {
   console.log(
     `[${worker.name}] Simulating backgrounded app missing cursor messages`,
