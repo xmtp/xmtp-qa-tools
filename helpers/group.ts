@@ -179,7 +179,7 @@ export const sendMessageWithCount = async (
 ): Promise<number> => {
   try {
     // Randomly choose between different sync approaches
-    const syncChoice = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
+    const syncChoice = Math.floor(Math.random() * 2); // 0 for sync, 1 for syncAll
     if (syncChoice === 0) {
       await worker.client.conversations.sync();
       console.log(`${worker.name} performed client sync`);
