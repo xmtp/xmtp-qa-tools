@@ -15,7 +15,7 @@ describe(testName, () => {
 
   for (const version of versions) {
     it(`Shoudl keep the DB after upgrade from ${version}`, async () => {
-      workers = await getWorkers(["bob-" + version + "-" + version], testName);
+      workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
       const bob = workers.get("bob", version);
       const inboxId = generatedInboxes[0].inboxId;
       console.log("inboxId", inboxId);

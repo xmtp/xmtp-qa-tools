@@ -73,7 +73,6 @@ export class WorkerManager {
     this.typeofStream = typeofStream;
     this.gptEnabled = gptEnabled;
     this.env = env;
-    console.log("env", env);
     this.workers = existingWorkers || {};
     this.defaultNetworkConditions = defaultNetworkConditions;
   }
@@ -253,7 +252,7 @@ export class WorkerManager {
       const account = privateKeyToAccount(
         process.env[walletKeyEnv] as `0x${string}`,
       );
-      console.log(`Using env keys for ${baseName}: ${account.address}`);
+      //console.log(`Using env keys for ${baseName}: ${account.address}`);
 
       this.keysCache[baseName] = {
         walletKey: process.env[walletKeyEnv],
@@ -335,7 +334,7 @@ export class WorkerManager {
     );
 
     console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion})`,
+      `Created: ${baseName} (folder: ${installationId}, version: ${sdkVersion}, env: ${this.env})`,
     );
 
     const initializedWorker = await workerClient.initialize();
