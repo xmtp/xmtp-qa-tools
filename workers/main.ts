@@ -1,16 +1,15 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
+import { defaultValues, type typeofStream } from "@helpers/tests";
 import {
   Client,
-  defaultValues,
   Dm,
   type Consent,
   type Conversation,
   type DecodedMessage,
-  type typeofStream,
   type XmtpEnv,
-} from "@helpers/types";
+} from "@xmtp/node-sdk";
 import OpenAI from "openai";
 import type { NetworkConditions, WorkerBase } from "./manager";
 
@@ -42,7 +41,7 @@ export type WorkerMessage =
 // Worker thread code as a string
 const workerThreadCode = `
 import { parentPort, workerData } from "node:worker_threads";
-import type { Client } from "@helpers/types";
+import type { Client } from "@xmtp/node-sdk";
 
 // The Worker must be run in a worker thread, so confirm \`parentPort\` is defined
 if (!parentPort) {

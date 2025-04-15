@@ -1,11 +1,12 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Group, type VerifyStreamResult } from "@helpers/types";
 import {
   calculateMessageStats,
   getWorkersFromGroup,
   verifyStream,
-} from "@helpers/verify";
+  type VerifyStreamResult,
+} from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "order";

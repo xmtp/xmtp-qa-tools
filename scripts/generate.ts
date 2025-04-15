@@ -5,7 +5,7 @@ import {
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
 } from "@helpers/client";
-import { Client, type XmtpEnv } from "@helpers/types";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";

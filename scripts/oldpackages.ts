@@ -2,9 +2,10 @@ import * as fs from "fs";
 import { join } from "path";
 import {
   createSigner,
+  createSigner47,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
-} from "@helpers/old_helper";
+} from "@helpers/client";
 import { Client as ClientMls } from "@xmtp/node-sdk-mls";
 
 const scriptName = "oldpackages";
@@ -26,21 +27,21 @@ async function main() {
       const encryptionKeyHex = generateEncryptionKeyHex();
       const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-      const user = createSigner();
-      const client = await ClientMls.create(user.account.address, {
+      const user = createSigner47(privateKey as `0x${string}`);
+      const client = await ClientMls.create(user.getAddress(), {
         env: "dev",
         encryptionKey: encryptionKey,
-        dbPath: join("logs", `./test-${user.account.address}.db3`),
+        dbPath: join("logs", `./test-${user.getAddress()}.db3`),
       });
-      await ClientMls.create(user.account.address, {
+      await ClientMls.create(user.getAddress(), {
         env: "production",
         encryptionKey: encryptionKey,
-        dbPath: join("logs", `./test-${user.account.address}.db3`),
+        dbPath: join("logs", `./test-${user.getAddress()}.db3`),
       });
-      await ClientMls.create(user.account.address, {
+      await ClientMls.create(user.getAddress(), {
         env: "local",
         encryptionKey: encryptionKey,
-        dbPath: join("logs", `./test-${user.account.address}.db3`),
+        dbPath: join("logs", `./test-${user.getAddress()}.db3`),
       });
 
       accountData.push({

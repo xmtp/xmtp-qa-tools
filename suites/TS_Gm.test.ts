@@ -3,8 +3,8 @@ import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { IdentifierKind, type Conversation } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_gm";

@@ -5,7 +5,7 @@ import {
   loadEnv,
 } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { Client, type XmtpEnv } from "@helpers/types";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 // Set constants
 const BASE_LOGPATH = "./logs";

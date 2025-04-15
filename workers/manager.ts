@@ -2,13 +2,8 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { sdkVersions } from "@helpers/tests";
-import {
-  defaultValues,
-  type Client,
-  type typeofStream,
-  type XmtpEnv,
-} from "@helpers/types";
+import { defaultValues, sdkVersions, type typeofStream } from "@helpers/tests";
+import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 

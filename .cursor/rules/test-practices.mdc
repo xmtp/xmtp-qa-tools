@@ -15,7 +15,7 @@ You're an expert in writing TypeScript tests for XMTP applications. Generate **h
    import { closeEnv, loadEnv } from "@helpers/client";
    import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
    import { logError } from "@helpers/logger";
-   import { type Conversation, type WorkerManager } from "@helpers/types";
+   import { type Conversation, type WorkerManager } from "@xmtp/node-sdk";
    import { verifyStream } from "@helpers/verify";
    import { getWorkers } from "@workers/manager";
    import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";

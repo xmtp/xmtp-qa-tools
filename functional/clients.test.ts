@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { Client, IdentifierKind, type Identifier } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { excelonMainnet } from "viem/chains";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 

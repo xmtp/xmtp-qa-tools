@@ -1,11 +1,7 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import {
-  type Conversation,
-  type Group,
-  type WorkerManager,
-} from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import { type Group } from "@xmtp/node-sdk";
 import { beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";

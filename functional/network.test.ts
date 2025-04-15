@@ -1,8 +1,8 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import type { Conversation, XmtpEnv } from "@helpers/types";
 import type { WorkerClient } from "@workers/main";
 import { getWorkers, type NetworkConditions } from "@workers/manager";
+import type { Conversation, XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const users: {

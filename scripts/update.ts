@@ -1,6 +1,6 @@
 import * as fs from "fs";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { Client } from "@helpers/types";
+import { Client } from "@xmtp/node-sdk";
 
 interface AccountData {
   accountAddress: string;

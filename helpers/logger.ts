@@ -3,7 +3,7 @@ import path from "path";
 import type { ExpectStatic } from "vitest";
 import winston from "winston";
 import Transport from "winston-transport";
-import type { LogInfo } from "./types";
+import type { LogInfo } from "./tests";
 
 class MemoryTransport extends Transport {
   logs: string[] = [];

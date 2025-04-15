@@ -1,10 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import {
-  ConsentEntityType,
-  ConsentState,
-  type WorkerManager,
-} from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import { ConsentEntityType, ConsentState } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "consent";

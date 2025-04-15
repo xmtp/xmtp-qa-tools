@@ -1,4 +1,4 @@
-import { type Worker, type WorkerManager } from "./types";
+import { type Worker, type WorkerManager } from "@workers/manager";
 
 /**
  * Creates a group with a specified number of participants and measures performance
@@ -31,7 +31,7 @@ export async function createGroupWithBatch(
   const group = await creator.client?.conversations.newGroup(
     allWorkers
       .getWorkers()
-      .map((worker) => worker.client.inboxId)
+      .map((worker: Worker) => worker.client.inboxId)
       .slice(0, batchSize),
   );
 
@@ -40,7 +40,7 @@ export async function createGroupWithBatch(
   let totalInstallations = 0;
 
   for (const member of members ?? []) {
-    totalInstallations += member.installationIds.length;
+    totalInstallations += member?.installationIds.length ?? 0;
   }
 
   console.log(`Group created with id ${group?.id}`);

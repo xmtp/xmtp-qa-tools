@@ -1,14 +1,14 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
+import type { WorkerManager } from "@workers/manager";
 import {
   IdentifierKind,
   type Client,
   type LogLevel,
   type Signer,
-  type WorkerManager,
   type XmtpEnv,
-} from "@helpers/types";
+} from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";

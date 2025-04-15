@@ -1,12 +1,11 @@
 import { loadEnv } from "@helpers/client";
-import {
-  type Client,
-  type Conversation,
-  type DecodedMessage,
-  type WorkerManager,
-  type XmtpEnv,
-} from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import type {
+  Client,
+  Conversation,
+  DecodedMessage,
+  XmtpEnv,
+} from "@xmtp/node-sdk";
 import { CommandHandler } from "./commands";
 
 const testName = "test-bot";

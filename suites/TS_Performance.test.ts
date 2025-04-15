@@ -2,15 +2,9 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import {
-  IdentifierKind,
-  type Conversation,
-  type Group,
-  type WorkerManager,
-} from "@helpers/types";
-import { verifyStream, verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/manager";
-import { type Identifier } from "@xmtp/node-sdk";
+import { verifyStream, verifyStreamAll } from "@helpers/tests";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import { IdentifierKind, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
   afterAll,
   afterEach,

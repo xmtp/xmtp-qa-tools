@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { XmtpEnv } from "@helpers/types";
+import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
   type Browser,

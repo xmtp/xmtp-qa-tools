@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type Group, type WorkerManager } from "@helpers/types";
-import { verifyStream } from "@helpers/verify";
-import { getWorkers } from "@workers/manager";
+import { verifyStream } from "@helpers/tests";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";

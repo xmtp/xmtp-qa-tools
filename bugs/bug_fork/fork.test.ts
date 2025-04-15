@@ -12,8 +12,7 @@ import {
   sendMessageWithCount,
   setRandomNetworkConditions,
 } from "@helpers/tests";
-import type { Worker, WorkerManager } from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 

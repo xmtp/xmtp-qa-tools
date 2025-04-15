@@ -2,16 +2,14 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import {
-  defaultValues,
-  type Group,
-  type VerifyStreamResult,
-} from "@helpers/types";
-import {
   calculateMessageStats,
+  defaultValues,
   getWorkersFromGroup,
   verifyStream,
-} from "@helpers/verify";
+  type VerifyStreamResult,
+} from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_delivery";
