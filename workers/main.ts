@@ -314,6 +314,7 @@ export class WorkerClient extends Worker {
       );
 
       this.client = client as Client;
+      this.address = address;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
