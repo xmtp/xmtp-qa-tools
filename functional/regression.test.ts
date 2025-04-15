@@ -48,10 +48,6 @@ describe(testName, () => {
     ])) as Conversation;
     console.log(`Group created with id ${group?.id}`);
 
-    let messageCount = 0;
-    if (!henry || !joe || !alice) {
-      throw new Error("One or more workers are not defined");
-    }
     const verifyResult = await verifyStreamAll(group, workers);
     expect(verifyResult.allReceived).toBe(true);
   });
