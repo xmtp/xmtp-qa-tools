@@ -38,7 +38,6 @@ export async function createClient(
   version: string;
   address: `0x${string}`;
 }> {
-  const signer = createSigner(walletKey);
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
   const sdkVersion = Number(workerData.sdkVersion);
@@ -61,7 +60,7 @@ export async function createClient(
   // Use type assertion to handle the client creation
   const client = await regressionClient(
     sdkVersion,
-    signer,
+    walletKey,
     encryptionKey,
     dbPath,
     env,
@@ -70,7 +69,7 @@ export async function createClient(
 }
 export const regressionClient = async (
   version: number,
-  signer: Signer,
+  walletKey: `0x${string}`,
   encryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
@@ -79,26 +78,57 @@ export const regressionClient = async (
   let ClientClass = null;
   let client = null;
 
-  if (version >= 100 && version < 200) {
+  if (version == 30) {
+    throw new Error("Invalid version");
+  } else if (version == 47) {
+    const signer = createSigner47(walletKey);
     ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
+    // @ts-expect-error: SDK version compatibility issues
     client = (await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel,
     })) as unknown as Client;
-  } else if (version >= 200 && version < 300) {
+  } else if (version === 100 || version === 105) {
+    const signer = createSigner100(walletKey);
     ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
+    // @ts-expect-error: SDK version compatibility issues
+    client = (await ClientClass.create(signer, encryptionKey, {
+      dbPath,
+      env,
+      loggingLevel,
+    })) as unknown as Client;
+  } else if (version == 200) {
+    const signer = createSigner200(walletKey);
+    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
+    // @ts-expect-error: SDK version compatibility issues
     client = (await ClientClass.create(signer, {
       dbEncryptionKey: encryptionKey,
       dbPath,
       env,
     })) as unknown as Client;
+  } else {
+    console.log("Invalid version" + String(version));
+    throw new Error("Invalid version" + String(version));
   }
 
-  return client as Client;
+  return client;
 };
 
-export const createSigner = (key: `0x${string}`): Signer => {
+export const createSigner47 = (privateKey: `0x${string}`) => {
+  const account = privateKeyToAccount(privateKey);
+  return {
+    getAddress: () => account.address,
+    signMessage: async (message: string) => {
+      const signature = await account.signMessage({
+        message,
+      });
+      return toBytes(signature);
+    },
+  };
+};
+
+export const createSigner100 = (key: `0x${string}`): Signer => {
   const accountKey = key;
   const account = privateKeyToAccount(accountKey);
   let user: User = {
@@ -112,10 +142,12 @@ export const createSigner = (key: `0x${string}`): Signer => {
   };
   return {
     type: "EOA",
+    walletType: "EOA",
     getIdentifier: () => ({
       identifierKind: IdentifierKind.Ethereum,
       identifier: user.account.address.toLowerCase(),
     }),
+    getAddress: () => Promise.resolve(user.account.address),
     signMessage: async (message: string) => {
       const signature = await user.wallet.signMessage({
         message,
@@ -123,7 +155,42 @@ export const createSigner = (key: `0x${string}`): Signer => {
       });
       return toBytes(signature);
     },
+    getChainId: () => Promise.resolve(BigInt(sepolia.id)),
   };
+};
+export const createSigner200 = (key: `0x${string}`): Signer => {
+  const accountKey = key;
+  const account = privateKeyToAccount(accountKey);
+  let user: User = {
+    key: accountKey,
+    account,
+    wallet: createWalletClient({
+      account,
+      chain: sepolia,
+      transport: http(),
+    }),
+  };
+  return {
+    type: "EOA",
+    walletType: "EOA",
+    getIdentifier: () => ({
+      identifierKind: IdentifierKind.Ethereum,
+      identifier: user.account.address.toLowerCase(),
+    }),
+    getAddress: () => Promise.resolve(user.account.address),
+    signMessage: async (message: string) => {
+      const signature = await user.wallet.signMessage({
+        message,
+        account: user.account,
+      });
+      return toBytes(signature);
+    },
+    getChainId: () => Promise.resolve(BigInt(sepolia.id)),
+  };
+};
+
+export const createSigner = (key: `0x${string}`): Signer => {
+  return createSigner200(key);
 };
 
 function loadDataPath(

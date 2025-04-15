@@ -15,8 +15,8 @@ import {
   Dm,
   Group,
   type DecodedMessage,
-  type Signer,
   type XmtpEnv,
+  type Signer as XmtpSigner,
 } from "@xmtp/node-sdk";
 
 export type { WorkerManager, Worker };
@@ -37,9 +37,8 @@ export {
   type Identifier,
   type GroupMember,
   type Installation,
-  type Signer,
-  type LogLevel,
   type XmtpEnv,
+  type LogLevel,
 };
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
@@ -130,4 +129,14 @@ export interface LogInfo {
   level: string;
   message: string;
   [key: symbol]: string | undefined;
+}
+
+// Signer interface that works with multiple SDK versions
+export interface Signer {
+  type: "EOA";
+  walletType: "EOA"; // For newer SDK versions
+  getIdentifier: () => { identifierKind: IdentifierKind; identifier: string };
+  getAddress: () => Promise<`0x${string}`>; // For newer SDK versions
+  getChainId: () => Promise<bigint>; // For newer SDK versions
+  signMessage: (message: string) => Promise<Uint8Array>;
 }
