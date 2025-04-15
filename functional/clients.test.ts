@@ -73,7 +73,7 @@ describe(testName, () => {
 
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
-      console.log(staticCanMessage);
+      console.log(canMessage);
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       logError(e, expect);
