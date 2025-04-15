@@ -36,6 +36,7 @@ export interface Worker extends WorkerBase {
   sdkVersion: string;
   libXmtpVersion: string;
   installationId: string;
+  inboxId: string;
   address: string;
 }
 
@@ -338,6 +339,7 @@ export class WorkerManager {
     const worker: Worker = {
       ...workerData,
       client: initializedWorker.client,
+      inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,

@@ -1,6 +1,8 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { verifyStreamAll } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { type Conversation } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 const testName = "regression";
@@ -14,7 +16,7 @@ describe(testName, () => {
   });
 
   for (const version of versions) {
-    it(`Shoudl keep the DB after upgrade from ${version}`, async () => {
+    it(`Shoudl test the DB after upgrade from ${version}`, async () => {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const bob = workers.get("bob");
@@ -30,4 +32,27 @@ describe(testName, () => {
       expect(convo?.id).toBeDefined();
     });
   }
+  it("should create a group conversation with all workers", async () => {
+    workers = await getWorkers(
+      ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-200"],
+      testName,
+    );
+    const henry = workers.get("henry", "b");
+    const steve = workers.get("steve", "b");
+    const joe = workers.get("joe", "b");
+    const alice = workers.get("alice", "b");
+    const group = (await henry?.client.conversations.newGroup([
+      steve?.inboxId as string,
+      joe?.inboxId as string,
+      alice?.inboxId as string,
+    ])) as Conversation;
+    console.log(`Group created with id ${group?.id}`);
+
+    let messageCount = 0;
+    if (!henry || !joe || !alice) {
+      throw new Error("One or more workers are not defined");
+    }
+    const verifyResult = await verifyStreamAll(group, workers);
+    expect(verifyResult.allReceived).toBe(true);
+  });
 });

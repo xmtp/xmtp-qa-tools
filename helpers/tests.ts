@@ -462,40 +462,6 @@ export const randomSyncs = async (testConfig: {
 };
 
 /**
- * Sends a message from a worker with name and count
- */
-export const sendMessageWithCount = async (
-  worker: Worker,
-  groupId: string,
-  messageCount: number,
-): Promise<number> => {
-  try {
-    // Randomly choose between different sync approaches
-    const syncChoice = Math.floor(Math.random() * 1); // 0 for sync, 1 for syncAll
-    if (syncChoice === 0) {
-      await worker.client.conversations.sync();
-      console.log(`${worker.name} performed client sync`);
-    } else if (syncChoice === 1) {
-      await worker.client.conversations.syncAll();
-      console.log(`${worker.name} performed client syncAll`);
-    }
-
-    const group =
-      await worker.client.conversations.getConversationById(groupId);
-    const message = `${worker.name} ${messageCount}`;
-
-    console.log(
-      `${worker.name} sending message: "${message}" to group ${groupId}`,
-    );
-    await group?.send(message);
-    return messageCount + 1;
-  } catch (e) {
-    console.error(`Error sending message from ${worker.name}:`, e);
-    return messageCount;
-  }
-};
-
-/**
  * Randomly removes database from workers
  */
 export const randomlyRemoveDb = async (

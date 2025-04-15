@@ -1,5 +1,9 @@
 import { loadEnv } from "@helpers/client";
-import { addMemberByWorker, getOrCreateGroup } from "@helpers/group";
+import {
+  addMemberByWorker,
+  getOrCreateGroup,
+  sendMessageWithCount,
+} from "@helpers/group";
 import {
   getWorkerConfigs,
   randomDescriptionUpdate,
@@ -8,7 +12,6 @@ import {
   randomReinstall,
   randomSyncs,
   removeMemberByWorker,
-  sendMessageWithCount,
   setRandomNetworkConditions,
 } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
