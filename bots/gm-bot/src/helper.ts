@@ -1,6 +1,5 @@
 import { getRandomValues } from "node:crypto";
-import { IdentifierKind } from "@xmtp/node-bindings";
-import { type Signer } from "@xmtp/node-sdk";
+import { IdentifierKind, type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
