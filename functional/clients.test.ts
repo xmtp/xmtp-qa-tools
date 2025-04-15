@@ -84,7 +84,10 @@ describe(testName, () => {
       const staticCanMessage = await Client.canMessage([identifier]);
       console.log(staticCanMessage);
       expect(staticCanMessage.get(randomAddress)).toBe(true);
-
+      console.log(
+        workers.get("henry")!.client.inboxId,
+        workers.get("henry")!.client.installationId,
+      );
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
 
