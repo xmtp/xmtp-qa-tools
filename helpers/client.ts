@@ -131,31 +131,7 @@ export const createSigner47 = (privateKey: `0x${string}`) => {
 };
 
 export const createSigner100 = (key: `0x${string}`): Signer => {
-  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
-  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
-  let user: User = {
-    key: sanitizedKey as `0x${string}`,
-    account,
-    wallet: createWalletClient({
-      account,
-      chain: sepolia,
-      transport: http(),
-    }),
-  };
-  return {
-    type: "EOA",
-    getIdentifier: () => ({
-      identifierKind: IdentifierKind.Ethereum,
-      identifier: user.account.address.toLowerCase(),
-    }),
-    signMessage: async (message: string) => {
-      const signature = await user.wallet.signMessage({
-        message,
-        account: user.account,
-      });
-      return toBytes(signature);
-    },
-  };
+  return createSigner200(key);
 };
 export const createSigner200 = (key: string): Signer => {
   const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
