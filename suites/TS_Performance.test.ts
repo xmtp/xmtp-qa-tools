@@ -106,12 +106,15 @@ describe(testName, () => {
       if (!randomAddress) {
         throw new Error("Random client not found");
       }
-      const canMessage = await Client.canMessage([
-        {
-          identifier: randomAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        },
-      ]);
+      const canMessage = await Client.canMessage(
+        [
+          {
+            identifier: randomAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          },
+        ],
+        client.get("randomclient")!.env,
+      );
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

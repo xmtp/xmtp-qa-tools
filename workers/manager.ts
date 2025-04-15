@@ -37,6 +37,8 @@ export interface Worker extends WorkerBase {
   libXmtpVersion: string;
   installationId: string;
   inboxId: string;
+  env: XmtpEnv;
+  folder: string;
   address: string;
 }
 
@@ -301,7 +303,7 @@ export class WorkerManager {
     }
 
     // Determine folder/installation ID
-    const installationId = providedInstallId || getNextFolderName();
+    const folder = providedInstallId || getNextFolderName();
 
     const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
     const libXmtpVersion = getLibxmtpVersion(sdkVersion);
@@ -312,7 +314,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      folder: installationId,
+      folder,
       testName: this.testName,
       walletKey,
       encryptionKey,
@@ -330,7 +332,7 @@ export class WorkerManager {
     );
 
     console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}-${libXmtpVersion})`,
+      `Creating worker: ${baseName} (folder: ${folder}, version: ${sdkVersion}-${libXmtpVersion})`,
     );
 
     const initializedWorker = await workerClient.initialize();
@@ -344,7 +346,9 @@ export class WorkerManager {
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
-      installationId,
+      installationId: initializedWorker.client.installationId,
+      env: this.env,
+      folder,
       worker: workerClient,
     };
 
@@ -352,7 +356,7 @@ export class WorkerManager {
     this.activeWorkers.push(workerClient);
 
     // Add to our internal storage
-    this.addWorker(baseName, installationId, worker);
+    this.addWorker(baseName, folder, worker);
 
     return worker;
   }
