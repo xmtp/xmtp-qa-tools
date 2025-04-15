@@ -4,7 +4,6 @@ import path from "node:path";
 import type { WorkerManager } from "@workers/manager";
 import {
   IdentifierKind,
-  type Client,
   type LogLevel,
   type Signer,
   type XmtpEnv,
@@ -35,7 +34,7 @@ export async function createClient(
   },
   env: XmtpEnv,
 ): Promise<{
-  client: Client;
+  client: unknown;
   dbPath: string;
   sdkVersion: string;
   libXmtpVersion: string;
@@ -61,11 +60,13 @@ export async function createClient(
   // Use type assertion to handle the client creation
   const client = await regressionClient(
     sdkVersion,
+    libXmtpVersion,
     walletKey,
     encryptionKey,
     dbPath,
     env,
   );
+
   return {
     client,
     dbPath,
@@ -75,53 +76,80 @@ export async function createClient(
   };
 }
 export const regressionClient = async (
-  version: number,
+  sdkVersion: number,
+  libXmtpVersion: string,
   walletKey: `0x${string}`,
   encryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
 ) => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
-  let ClientClass = null;
+  const ClientClass =
+    sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
   let client = null;
-
-  if (version == 30) {
+  let libXmtpVersionAfterClient = "unknown";
+  console.log(
+    "Creating client for version",
+    sdkVersion as keyof typeof sdkVersions,
+  );
+  if (sdkVersion == 30) {
     throw new Error("Invalid version");
-  } else if (version == 47) {
+  } else if (sdkVersion == 47) {
     const signer = createSigner47(walletKey);
-    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
     // @ts-expect-error: SDK version compatibility issues
-    client = (await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel,
-    })) as unknown as Client;
-  } else if (version === 100 || version === 105) {
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else if (sdkVersion === 100 || sdkVersion === 105) {
     const signer = createSigner100(walletKey);
-    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
     // @ts-expect-error: SDK version compatibility issues
-    client = (await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
       env,
       loggingLevel,
-    })) as unknown as Client;
-  } else if (version == 200) {
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else if (sdkVersion === 200) {
     const signer = createSigner200(walletKey);
-    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
     // @ts-expect-error: SDK version compatibility issues
-    client = (await ClientClass.create(signer, {
+    client = await ClientClass.create(signer, {
       dbEncryptionKey: encryptionKey,
       dbPath,
       env,
-    })) as unknown as Client;
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
-    console.log("Invalid version" + String(version));
-    throw new Error("Invalid version" + String(version));
+    console.log("Invalid version" + String(sdkVersion));
+    throw new Error("Invalid version" + String(sdkVersion));
+  }
+
+  if (libXmtpVersion !== libXmtpVersionAfterClient) {
+    console.log(
+      `libXmtpVersion mismatch: ${libXmtpVersionAfterClient} !== ${libXmtpVersion}`,
+    );
   }
 
   return client;
 };
 
+// @ts-expect-error: SDK version compatibility issues
+export const getLibXmtpVersion = (client: typeof ClientClass) => {
+  try {
+    const version = client.version;
+    if (!version || typeof version !== "string") return "unknown";
+
+    const parts = version.split("@");
+    if (parts.length <= 1) return "unknown";
+
+    const spaceParts = parts[1].split(" ");
+    return spaceParts[0] || "unknown";
+  } catch {
+    return "unknown";
+  }
+};
 export const createSigner47 = (privateKey: `0x${string}`) => {
   const account = privateKeyToAccount(privateKey);
   return {

@@ -3,8 +3,8 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
 import { defaultValues } from "@helpers/tests";
 import {
-  Client,
   Dm,
+  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -287,8 +287,6 @@ export class WorkerClient extends Worker {
   async initialize(): Promise<{
     client: Client;
     dbPath: string;
-    sdkVersion: string;
-    libXmtpVersion: string;
     installationId: string;
     address: `0x${string}`;
   }> {
@@ -300,6 +298,7 @@ export class WorkerClient extends Worker {
           name: this.name,
           folder: this.folder,
           sdkVersion: this.sdkVersion,
+          libXmtpVersion: this.libXmtpVersion,
         },
       });
       const { client, dbPath, address } = await createClient(
@@ -314,9 +313,7 @@ export class WorkerClient extends Worker {
         this.env,
       );
 
-      this.client = client as unknown as Client;
-      this.libXmtpVersion =
-        Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+      this.client = client as Client;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
@@ -326,8 +323,6 @@ export class WorkerClient extends Worker {
       return {
         client: this.client,
         dbPath,
-        sdkVersion: this.sdkVersion,
-        libXmtpVersion: this.libXmtpVersion,
         address: address,
         installationId,
       };

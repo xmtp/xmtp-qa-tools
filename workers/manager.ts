@@ -345,11 +345,7 @@ export class WorkerManager {
       installationId,
       worker: workerClient,
     };
-    if (!libXmtpVersion.includes(initializedWorker.libXmtpVersion)) {
-      console.log(
-        `libXmtpVersion mismatch: ${initializedWorker.libXmtpVersion} !== ${libXmtpVersion}`,
-      );
-    }
+
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);
 
