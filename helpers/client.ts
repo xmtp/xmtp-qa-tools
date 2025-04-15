@@ -1,12 +1,14 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
 import {
   IdentifierKind,
   type Client,
   type LogLevel,
-} from "@xmtp/node-bindings";
+  type Signer,
+  type WorkerManager,
+  type XmtpEnv,
+} from "@helpers/types";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -43,7 +45,7 @@ export async function createClient(
   const sdkVersion = Number(workerData.sdkVersion);
   // Use type assertion to access the static version property
   const libXmtpVersion =
-    sdkVersions[sdkVersion as keyof typeof sdkVersions].version;
+    sdkVersions[sdkVersion as keyof typeof sdkVersions].libxmtpVersion;
 
   const version = `${libXmtpVersion}-${workerData.sdkVersion}`;
   const account = privateKeyToAccount(walletKey);
@@ -129,10 +131,10 @@ export const createSigner47 = (privateKey: `0x${string}`) => {
 };
 
 export const createSigner100 = (key: `0x${string}`): Signer => {
-  const accountKey = key;
-  const account = privateKeyToAccount(accountKey);
+  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
+  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
   let user: User = {
-    key: accountKey,
+    key: sanitizedKey as `0x${string}`,
     account,
     wallet: createWalletClient({
       account,
@@ -142,12 +144,10 @@ export const createSigner100 = (key: `0x${string}`): Signer => {
   };
   return {
     type: "EOA",
-    walletType: "EOA",
     getIdentifier: () => ({
       identifierKind: IdentifierKind.Ethereum,
       identifier: user.account.address.toLowerCase(),
     }),
-    getAddress: () => Promise.resolve(user.account.address),
     signMessage: async (message: string) => {
       const signature = await user.wallet.signMessage({
         message,
@@ -155,14 +155,13 @@ export const createSigner100 = (key: `0x${string}`): Signer => {
       });
       return toBytes(signature);
     },
-    getChainId: () => Promise.resolve(BigInt(sepolia.id)),
   };
 };
-export const createSigner200 = (key: `0x${string}`): Signer => {
-  const accountKey = key;
-  const account = privateKeyToAccount(accountKey);
+export const createSigner200 = (key: string): Signer => {
+  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
+  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
   let user: User = {
-    key: accountKey,
+    key: sanitizedKey as `0x${string}`,
     account,
     wallet: createWalletClient({
       account,
@@ -172,12 +171,10 @@ export const createSigner200 = (key: `0x${string}`): Signer => {
   };
   return {
     type: "EOA",
-    walletType: "EOA",
     getIdentifier: () => ({
       identifierKind: IdentifierKind.Ethereum,
       identifier: user.account.address.toLowerCase(),
     }),
-    getAddress: () => Promise.resolve(user.account.address),
     signMessage: async (message: string) => {
       const signature = await user.wallet.signMessage({
         message,
@@ -185,7 +182,6 @@ export const createSigner200 = (key: `0x${string}`): Signer => {
       });
       return toBytes(signature);
     },
-    getChainId: () => Promise.resolve(BigInt(sepolia.id)),
   };
 };
 

@@ -29,6 +29,7 @@ export interface WorkerBase {
   encryptionKey: string;
   testName: string;
   sdkVersion: string;
+  libxmtpVersion: string;
   networkConditions?: NetworkConditions; // Add network conditions
 }
 
@@ -36,7 +37,8 @@ export interface Worker extends WorkerBase {
   worker: WorkerClient;
   dbPath: string;
   client: Client;
-  version: string;
+  sdkVersion: string;
+  libxmtpVersion: string;
   installationId: string;
   address: string;
 }
@@ -127,7 +129,7 @@ export class WorkerManager {
     const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
     if (!firstInstallId) return "unknown";
 
-    return this.workers[firstBaseName][firstInstallId].version;
+    return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
   /**
@@ -310,6 +312,7 @@ export class WorkerManager {
     const installationId = providedInstallId || getNextFolderName();
 
     const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
+    const libxmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -322,6 +325,7 @@ export class WorkerManager {
       walletKey,
       encryptionKey,
       sdkVersion: sdkVersion,
+      libxmtpVersion: libxmtpVersion,
       networkConditions: this.defaultNetworkConditions,
     };
 
@@ -334,7 +338,7 @@ export class WorkerManager {
     );
 
     console.log(
-      `Worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}, env: ${this.env})`,
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}-${libxmtpVersion})`,
     );
 
     const initializedWorker = await workerClient.initialize();
@@ -344,7 +348,7 @@ export class WorkerManager {
       ...workerData,
       client: initializedWorker.client,
       dbPath: initializedWorker.dbPath,
-      version: initializedWorker.version,
+      sdkVersion: initializedWorker.sdkVersion,
       address: initializedWorker.address,
       installationId,
       worker: workerClient,
@@ -434,4 +438,9 @@ export function getDataSubFolderCount() {
 }
 export function getLatestVersion(): string {
   return Object.keys(sdkVersions).pop() as string;
+}
+
+export function getLibxmtpVersion(sdkVersion: string): string {
+  return sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
+    .libxmtpVersion;
 }

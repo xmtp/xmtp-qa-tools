@@ -115,7 +115,7 @@ describe(
         // Use the unified sendDeliveryMetric for delivery metrics
         sendDeliveryMetric(
           stats.receptionPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
           testName,
           "recovery",
           "delivery",
@@ -124,7 +124,7 @@ describe(
         // Use the unified sendDeliveryMetric for order metrics
         sendDeliveryMetric(
           stats.orderPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
           testName,
           "recovery",
           "order",

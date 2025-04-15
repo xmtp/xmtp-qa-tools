@@ -113,14 +113,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
           testName,
           "stream",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
           testName,
           "stream",
           "order",
@@ -170,14 +170,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
           testName,
           "poll",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
           testName,
           "poll",
           "order",
@@ -254,14 +254,14 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
           testName,
           "recovery",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
           testName,
           "recovery",
           "order",

@@ -2,9 +2,9 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
 import {
+  Client,
   defaultValues,
   Dm,
-  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
@@ -106,6 +106,7 @@ export class WorkerClient extends Worker {
   private gptEnabled: boolean;
   private folder: string;
   private sdkVersion: string;
+  private libXmtpVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
@@ -140,6 +141,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
+    this.libXmtpVersion = worker.libxmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.nameId = worker.name;
@@ -286,7 +288,7 @@ export class WorkerClient extends Worker {
   async initialize(): Promise<{
     client: Client;
     dbPath: string;
-    version: string;
+    sdkVersion: string;
     installationId: string;
     address: `0x${string}`;
   }> {
@@ -313,7 +315,7 @@ export class WorkerClient extends Worker {
       );
 
       this.client = client as unknown as Client;
-
+      this.libXmtpVersion = Client.version ?? "unknown";
       // Start the appropriate stream based on configuration
       await this.startStream();
 
@@ -322,7 +324,8 @@ export class WorkerClient extends Worker {
       return {
         client: this.client,
         dbPath,
-        version,
+        sdkVersion: this.sdkVersion,
+        libxmtpVersion: this.libXmtpVersion,
         address: address,
         installationId,
       };
