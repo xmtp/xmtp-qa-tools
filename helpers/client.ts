@@ -42,16 +42,13 @@ export async function createClient(
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
   const sdkVersion = Number(workerData.sdkVersion);
-
   // Use type assertion to access the static version property
   const libXmtpVersion =
     sdkVersions[sdkVersion as keyof typeof sdkVersions].version;
 
   const version = `${libXmtpVersion}-${workerData.sdkVersion}`;
-
-  const identifier = await signer.getIdentifier();
-  const address = identifier.identifier as `0x${string}`;
-  const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  const account = privateKeyToAccount(walletKey);
+  const address = account.address;
   const dbPath = getDbPath(
     workerData.name,
     address,
@@ -62,15 +59,44 @@ export async function createClient(
   );
 
   // Use type assertion to handle the client creation
-  let ClientClass = sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
-  const client = (await ClientClass.create(signer, {
-    dbEncryptionKey: encryptionKey,
+  const client = await regressionClient(
+    sdkVersion,
+    signer,
+    encryptionKey,
     dbPath,
     env,
-    loggingLevel,
-  })) as unknown as Client;
+  );
   return { client, dbPath, version, address };
 }
+export const regressionClient = async (
+  version: number,
+  signer: Signer,
+  encryptionKey: Uint8Array,
+  dbPath: string,
+  env: XmtpEnv,
+) => {
+  const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  let ClientClass = null;
+  let client = null;
+
+  if (version >= 100 && version < 200) {
+    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
+    client = (await ClientClass.create(signer, encryptionKey, {
+      dbPath,
+      env,
+      loggingLevel,
+    })) as unknown as Client;
+  } else if (version >= 200 && version < 300) {
+    ClientClass = sdkVersions[version as keyof typeof sdkVersions].Client;
+    client = (await ClientClass.create(signer, {
+      dbEncryptionKey: encryptionKey,
+      dbPath,
+      env,
+    })) as unknown as Client;
+  }
+
+  return client as Client;
+};
 
 export const createSigner = (key: `0x${string}`): Signer => {
   const accountKey = key;

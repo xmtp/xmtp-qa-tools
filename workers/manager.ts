@@ -334,7 +334,7 @@ export class WorkerManager {
     );
 
     console.log(
-      `Created: ${baseName} (folder: ${installationId}, version: ${sdkVersion}, env: ${this.env})`,
+      `Worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}, env: ${this.env})`,
     );
 
     const initializedWorker = await workerClient.initialize();

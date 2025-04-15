@@ -17,7 +17,7 @@ const users: {
   //
   // },
   xmtpchat: {
-    inboxId: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
+    inboxId: "20163dfde797c8a9ec05991c062a1904b89dc1fe82c6fc27972fd1f46044088d",
   },
 };
 
