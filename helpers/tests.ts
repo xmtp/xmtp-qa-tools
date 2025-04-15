@@ -1,5 +1,6 @@
 import fs from "fs";
 import { getEnvPath } from "@helpers/client";
+import { getWorkersFromGroup } from "@helpers/group";
 import type { MessageStreamWorker } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
 import {
@@ -135,7 +136,7 @@ export const sdkVersions = {
     Dm: ConversationMls,
     Group: ConversationMls,
     sdkVersion: "0.0.30",
-    libxmtpVersion: "unknown",
+    libXmtpVersion: "unknown",
   },
   47: {
     Client: Client47,
@@ -143,7 +144,7 @@ export const sdkVersions = {
     Dm: Dm47,
     Group: Group47,
     sdkVersion: "0.0.47",
-    libxmtpVersion: "0.0.41",
+    libXmtpVersion: "0.0.41",
   },
   100: {
     Client: Client100,
@@ -151,7 +152,7 @@ export const sdkVersions = {
     Dm: Dm100,
     Group: Group100,
     sdkVersion: "1.0.0",
-    libxmtpVersion: "1.0.0",
+    libXmtpVersion: "1.0.0",
   },
   105: {
     Client: Client105,
@@ -159,7 +160,7 @@ export const sdkVersions = {
     Dm: Dm105,
     Group: Group105,
     sdkVersion: "1.0.5",
-    libxmtpVersion: "1.1.3",
+    libXmtpVersion: "1.1.3",
   },
   200: {
     Client: Client200,
@@ -167,7 +168,7 @@ export const sdkVersions = {
     Dm: Dm200,
     Group: Group200,
     sdkVersion: "2.0.0",
-    libxmtpVersion: "1.2.0-dev.bed98df",
+    libXmtpVersion: "1.2.0-dev.bed98df",
   },
 };
 
@@ -542,65 +543,6 @@ export const sendInitialTestMessage = async (client: Client): Promise<void> => {
 };
 
 /**
- * Adds a member to a group by a worker
- */
-export const addMemberByWorker = async (
-  groupId: string,
-  membertoAdd: string,
-  memberWhoAdds: Worker,
-): Promise<void> => {
-  await memberWhoAdds.client.conversations.syncAll();
-  const group =
-    await memberWhoAdds.client.conversations.getConversationById(groupId);
-
-  if (!group) {
-    console.log(`Group with ID ${groupId} not found`);
-    return;
-  }
-
-  // Check if member already exists in the group
-  const members = await (group as Group).members();
-  const memberExists = members.some(
-    (member) => member.inboxId.toLowerCase() === membertoAdd.toLowerCase(),
-  );
-
-  if (memberExists) {
-    console.log(`Member ${membertoAdd} already exists in group ${groupId}`);
-    return;
-  }
-
-  // Add member if they don't exist
-  await (group as Group).addMembers([membertoAdd]);
-  console.log(`Added member ${membertoAdd} to group ${groupId}`);
-};
-
-/**
- * Gets or creates a group
- */
-export const getOrCreateGroup = async (
-  testConfig: {
-    testName: string;
-  },
-  creator: Client,
-): Promise<Conversation | undefined> => {
-  let globalGroup: Conversation | undefined;
-  const GROUP_ID = process.env.GROUP_ID;
-
-  if (!GROUP_ID) {
-    globalGroup = await creator.conversations.newGroup([]);
-    console.log("Creating group with ID:", globalGroup.id);
-    console.log("Updated test config with group ID:", globalGroup.id);
-
-    // Write the group ID to the .env file
-    appendToEnv("GROUP_ID", globalGroup.id, testConfig.testName);
-  } else {
-    globalGroup = await creator.conversations.getConversationById(GROUP_ID);
-  }
-
-  return globalGroup;
-};
-
-/**
  * Appends a variable to the .env file
  * @param key - The environment variable key
  * @param value - The environment variable value
@@ -684,121 +626,6 @@ export const simulateMissingCursorMessage = async (
     console.error(`Error simulating cursor issue for ${worker.name}:`, error);
   }
 };
-
-/**
- * Checks if groups across workers are in a forked state
- * Returns true if a fork is detected (different group states)
- */
-export const checkForGroupFork = async (
-  workers: Worker[],
-  groupId: string,
-): Promise<boolean> => {
-  console.log(`Checking for group fork in group ${groupId}`);
-
-  if (workers.length < 2) {
-    console.log("Need at least 2 workers to check for a fork");
-    return false;
-  }
-
-  const groupStates: Record<string, any> = {};
-
-  // Get group state from each worker
-  for (const worker of workers) {
-    try {
-      const group =
-        await worker.client.conversations.getConversationById(groupId);
-
-      if (!group) {
-        console.log(`Group not found for worker ${worker.name}`);
-        continue;
-      }
-
-      // In a real implementation, we would extract the epoch or other state
-      // information that would indicate a fork. For now, we'll use what's available
-      // in the public API.
-      const members = await (group as Group).members();
-      const memberCount = members.length;
-
-      // Store group state for this worker
-      groupStates[worker.name] = {
-        memberCount,
-        name: (group as Group).name,
-        description: (group as Group).description,
-      };
-
-      console.log(
-        `${worker.name} group state:`,
-        JSON.stringify(groupStates[worker.name]),
-      );
-    } catch (error) {
-      console.error(`Error getting group state for ${worker.name}:`, error);
-    }
-  }
-
-  // Compare group states to detect forks
-  const workerNames = Object.keys(groupStates);
-  if (workerNames.length < 2) {
-    console.log("Not enough group states to compare");
-    return false;
-  }
-
-  const firstWorkerState = groupStates[workerNames[0]];
-  let forkDetected = false;
-
-  // Compare each worker's state with the first worker
-  for (let i = 1; i < workerNames.length; i++) {
-    const currentWorkerState = groupStates[workerNames[i]];
-
-    // Compare number of members - a common fork symptom
-    if (currentWorkerState.memberCount !== firstWorkerState.memberCount) {
-      console.log(
-        `FORK DETECTED: ${workerNames[0]} has ${firstWorkerState.memberCount} members, but ${workerNames[i]} has ${currentWorkerState.memberCount} members`,
-      );
-      forkDetected = true;
-    }
-
-    // Compare group name
-    if (currentWorkerState.name !== firstWorkerState.name) {
-      console.log(
-        `FORK DETECTED: ${workerNames[0]} has group name "${firstWorkerState.name}", but ${workerNames[i]} has "${currentWorkerState.name}"`,
-      );
-      forkDetected = true;
-    }
-
-    // Compare group description
-    if (currentWorkerState.description !== firstWorkerState.description) {
-      console.log(
-        `FORK DETECTED: ${workerNames[0]} has description "${firstWorkerState.description}", but ${workerNames[i]} has "${currentWorkerState.description}"`,
-      );
-      forkDetected = true;
-    }
-  }
-
-  if (!forkDetected) {
-    console.log("No group fork detected - all clients have consistent state");
-  }
-
-  return forkDetected;
-};
-
-export async function getWorkersFromGroup(
-  group: Conversation,
-  workers: WorkerManager,
-): Promise<Worker[]> {
-  await group.sync();
-  const members = await group.members();
-  const memberInboxIds = members.map((member) => member.inboxId);
-
-  // Use the getWorkers method to retrieve all workers
-  const allWorkers = workers.getWorkers();
-
-  // Find workers whose client inboxId matches the group members' inboxIds
-  const workersFromGroup = allWorkers.filter((worker) =>
-    memberInboxIds.includes(worker.client.inboxId),
-  );
-
-  return workersFromGroup;
-}
 
 /**
  * Simplified `verifyStream` that sends messages to a conversation,

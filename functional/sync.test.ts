@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
 loadEnv(testName);
@@ -29,12 +29,6 @@ describe(testName, () => {
       logError(e, expect);
       throw e;
     }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
   });
 
   it("should create a test group with all participants", async () => {

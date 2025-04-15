@@ -140,7 +140,7 @@ export class WorkerClient extends Worker {
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
-    this.libXmtpVersion = worker.libxmtpVersion;
+    this.libXmtpVersion = worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.nameId = worker.name;
@@ -324,7 +324,7 @@ export class WorkerClient extends Worker {
         client: this.client,
         dbPath,
         sdkVersion: this.sdkVersion,
-        libxmtpVersion: this.libXmtpVersion,
+        libXmtpVersion: this.libXmtpVersion,
         address: address,
         installationId,
       };

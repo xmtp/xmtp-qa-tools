@@ -25,7 +25,7 @@ export interface WorkerBase {
   encryptionKey: string;
   testName: string;
   sdkVersion: string;
-  libxmtpVersion: string;
+  libXmtpVersion: string;
   networkConditions?: NetworkConditions; // Add network conditions
 }
 
@@ -34,7 +34,7 @@ export interface Worker extends WorkerBase {
   dbPath: string;
   client: Client;
   sdkVersion: string;
-  libxmtpVersion: string;
+  libXmtpVersion: string;
   installationId: string;
   address: string;
 }
@@ -303,7 +303,7 @@ export class WorkerManager {
     const installationId = providedInstallId || getNextFolderName();
 
     const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
-    const libxmtpVersion = getLibxmtpVersion(sdkVersion);
+    const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -316,7 +316,7 @@ export class WorkerManager {
       walletKey,
       encryptionKey,
       sdkVersion: sdkVersion,
-      libxmtpVersion: libxmtpVersion,
+      libXmtpVersion: libXmtpVersion,
       networkConditions: this.defaultNetworkConditions,
     };
 
@@ -329,7 +329,7 @@ export class WorkerManager {
     );
 
     console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}-${libxmtpVersion})`,
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}-${libXmtpVersion})`,
     );
 
     const initializedWorker = await workerClient.initialize();
@@ -433,5 +433,5 @@ export function getLatestVersion(): string {
 
 export function getLibxmtpVersion(sdkVersion: string): string {
   return sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
-    .libxmtpVersion;
+    .libXmtpVersion;
 }

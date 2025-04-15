@@ -80,7 +80,7 @@ sendMetric(metricName, metricValue, tags);
 sendTestResults(hasFailures, testName);
 
 // Send a performance metric to Datadog
-sendPerformanceMetric(metricValue, testName, libxmtpVersion, skipNetworkStats);
+sendPerformanceMetric(metricValue, testName, libXmtpVersion, skipNetworkStats);
 ```
 
 ### group.ts

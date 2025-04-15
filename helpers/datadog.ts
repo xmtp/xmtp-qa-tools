@@ -523,7 +523,7 @@ export function parseTestName(testName: string): ParsedTestName {
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,
-  libxmtpVersion: string,
+  libXmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
   if (!state.isInitialized) return;
@@ -547,7 +547,7 @@ export async function sendPerformanceMetric(
     const isSuccess = metricValue <= threshold;
 
     sendMetric("duration", metricValue, {
-      libxmtp: libxmtpVersion,
+      libxmtp: libXmtpVersion,
       operation: operationName,
       test: testNameExtracted,
       metric_type: "operation",
@@ -575,7 +575,7 @@ export async function sendPerformanceMetric(
         );
 
         sendMetric("duration", networkMetricValue, {
-          libxmtp: libxmtpVersion,
+          libxmtp: libXmtpVersion,
           operation: operationName,
           test: testNameExtracted,
           metric_type: "network",
@@ -601,7 +601,8 @@ export async function sendPerformanceMetric(
  */
 export function sendDeliveryMetric(
   metricValue: number,
-  version: string,
+  sdkVersion: string,
+  libXmtpVersion: string,
   testName: string,
   metricSubType: MetricSubType,
   metricType: MetricType,
@@ -610,7 +611,8 @@ export function sendDeliveryMetric(
   const isSuccess = metricValue >= threshold;
 
   sendMetric(metricType, Math.round(metricValue), {
-    libxmtp: version,
+    libxmtp: libXmtpVersion,
+    sdk: sdkVersion,
     test: testName,
     metric_type: metricType,
     metric_subtype: metricSubType,
