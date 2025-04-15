@@ -2,6 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { Client, IdentifierKind, type Identifier } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { excelonMainnet } from "viem/chains";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "clients";
@@ -52,8 +53,22 @@ describe(testName, () => {
         identifier: randomAddress,
         identifierKind: IdentifierKind.Ethereum,
       });
-
+      console.log("installationId", client.installationId);
+      expect(client.installationId).toBeDefined();
       expect(inboxId).toBeDefined();
+    } catch (e) {
+      logError(e, expect);
+      throw e;
+    }
+  });
+
+  it("createDm: should measure createDm", async () => {
+    try {
+      const client = workers.get("henry")!.client;
+      const dm = await client.conversations.newDm(
+        workers.get("ivy")!.client.inboxId,
+      );
+      expect(dm.id).toBeDefined();
     } catch (e) {
       logError(e, expect);
       throw e;
@@ -64,7 +79,7 @@ describe(testName, () => {
     try {
       const randomAddress = workers.get("karen")!.address;
       const identifier: Identifier = {
-        identifier: randomAddress,
+        identifier: "0xbfa5ec868f7f28c6a3389b2e30836aabe1f8eaa6",
         identifierKind: IdentifierKind.Ethereum,
       };
       const staticCanMessage = await Client.canMessage([identifier]);
@@ -73,6 +88,7 @@ describe(testName, () => {
 
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
+
       console.log(canMessage);
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
