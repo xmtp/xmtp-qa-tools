@@ -1,17 +1,15 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
+import { getWorkersFromGroup } from "@helpers/group";
 import { logError } from "@helpers/logger";
 import {
-  defaultValues,
-  type Group,
-  type VerifyStreamResult,
-} from "@helpers/types";
-import {
   calculateMessageStats,
-  getWorkersFromGroup,
+  defaultValues,
   verifyStream,
-} from "@helpers/verify";
+  type VerifyStreamResult,
+} from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_delivery";
@@ -113,14 +111,16 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "stream",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "stream",
           "order",
@@ -170,14 +170,16 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "poll",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          workers.get("bob")!.version,
+          workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "poll",
           "order",
@@ -254,14 +256,16 @@ describe(
 
         sendDeliveryMetric(
           stats.receptionPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "delivery",
         );
         sendDeliveryMetric(
           stats.orderPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "order",

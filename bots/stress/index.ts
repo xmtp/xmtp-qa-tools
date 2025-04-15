@@ -1,13 +1,12 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Dm,
   type Client,
   type Conversation,
   type DecodedMessage,
-  type WorkerManager,
-} from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+} from "@xmtp/node-sdk";
 
 process.on("uncaughtException", (error) => {
   console.error("Uncaught exception:", error);

@@ -145,7 +145,7 @@ const workers = await getWorkers(4, testName);
 The framework comes with 61 predefined worker names that you can use:
 
 ```typescript
-import { defaultNames } from "@helpers/types";
+import { defaultNames } from "@xmtp/node-sdk";
 
 // First few names from the list:
 // "bob", "alice", "fabri", "bot", "elon", "joe", "charlie"...

@@ -21,14 +21,15 @@ async function checkGmBot(): Promise<boolean> {
 
   const signer = createSigner(WALLET_KEY as `0x${string}`);
 
-  const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+  const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
   const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
 
   try {
     let volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
     await fs.mkdir(volumePath, { recursive: true });
     const dbPath = `${volumePath}/check-${env}`;
-    const client = await Client.create(signer, encryptionKey, {
+    const client = await Client.create(signer, {
+      dbEncryptionKey,
       env,
       dbPath,
       loggingLevel: process.env.LOGGING_LEVEL as LogLevel,

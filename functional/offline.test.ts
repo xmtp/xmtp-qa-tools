@@ -1,9 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { type Group, type WorkerManager } from "@helpers/types";
-import { calculateMessageStats } from "@helpers/verify";
-import { getWorkers } from "@workers/manager";
+import { calculateMessageStats } from "@helpers/tests";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "recovery";
@@ -115,7 +115,8 @@ describe(
         // Use the unified sendDeliveryMetric for delivery metrics
         sendDeliveryMetric(
           stats.receptionPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "delivery",
@@ -124,7 +125,8 @@ describe(
         // Use the unified sendDeliveryMetric for order metrics
         sendDeliveryMetric(
           stats.orderPercentage,
-          offlineWorker.version,
+          offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "order",

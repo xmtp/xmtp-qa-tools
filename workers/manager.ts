@@ -2,15 +2,12 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import {
-  defaultValues,
-  type Client,
-  type typeofStream,
-  type XmtpEnv,
-} from "@helpers/types";
+import { defaultValues, sdkVersions } from "@helpers/tests";
+import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
+export type typeofStream = "message" | "conversation" | "consent" | "none";
 // Network simulation interfaces
 export interface NetworkConditions {
   latencyMs?: number; // Artificial delay in milliseconds
@@ -27,7 +24,8 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
-  sdkVersion?: string;
+  sdkVersion: string;
+  libXmtpVersion: string;
   networkConditions?: NetworkConditions; // Add network conditions
 }
 
@@ -35,8 +33,10 @@ export interface Worker extends WorkerBase {
   worker: WorkerClient;
   dbPath: string;
   client: Client;
-  version: string;
+  sdkVersion: string;
+  libXmtpVersion: string;
   installationId: string;
+  inboxId: string;
   address: string;
 }
 
@@ -72,7 +72,6 @@ export class WorkerManager {
     this.typeofStream = typeofStream;
     this.gptEnabled = gptEnabled;
     this.env = env;
-    console.log("env", env);
     this.workers = existingWorkers || {};
     this.defaultNetworkConditions = defaultNetworkConditions;
   }
@@ -127,7 +126,7 @@ export class WorkerManager {
     const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
     if (!firstInstallId) return "unknown";
 
-    return this.workers[firstBaseName][firstInstallId].version;
+    return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
   /**
@@ -249,11 +248,6 @@ export class WorkerManager {
       process.env[walletKeyEnv] !== undefined &&
       process.env[encryptionKeyEnv] !== undefined
     ) {
-      const account = privateKeyToAccount(
-        process.env[walletKeyEnv] as `0x${string}`,
-      );
-      console.log(`Using env keys for ${baseName}: ${account.address}`);
-
       this.keysCache[baseName] = {
         walletKey: process.env[walletKeyEnv],
         encryptionKey: process.env[encryptionKeyEnv],
@@ -300,8 +294,6 @@ export class WorkerManager {
     const parts = descriptor.split("-");
     const baseName = parts[0];
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
-    const version = parts.length > 2 ? parts[2] : undefined;
-
     // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.log(`Reusing existing worker for ${descriptor}`);
@@ -310,13 +302,9 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const installationId = providedInstallId || getNextFolderName();
-    // const fullDescriptor = providedInstallId
-    //   ? descriptor
-    //   : `${baseName}-${installationId}`;
 
-    console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${version || "default"})`,
-    );
+    const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
+    const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -328,7 +316,8 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
-      sdkVersion: version,
+      sdkVersion: sdkVersion,
+      libXmtpVersion: libXmtpVersion,
       networkConditions: this.defaultNetworkConditions,
     };
 
@@ -340,14 +329,20 @@ export class WorkerManager {
       this.env,
     );
 
+    console.log(
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion}-${libXmtpVersion})`,
+    );
+
     const initializedWorker = await workerClient.initialize();
 
     // Create the complete worker
     const worker: Worker = {
       ...workerData,
       client: initializedWorker.client,
+      inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
-      version: initializedWorker.version,
+      sdkVersion: sdkVersion,
+      libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
       installationId,
       worker: workerClient,
@@ -435,4 +430,12 @@ function getNextFolderName(): string {
 export function getDataSubFolderCount() {
   const preBasePath = process.cwd();
   return fs.readdirSync(`${preBasePath}/.data`).length;
+}
+export function getLatestVersion(): string {
+  return Object.keys(sdkVersions).pop() as string;
+}
+
+export function getLibxmtpVersion(sdkVersion: string): string {
+  return sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
+    .libXmtpVersion;
 }

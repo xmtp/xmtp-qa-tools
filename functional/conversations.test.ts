@@ -1,7 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { type WorkerManager } from "@helpers/types";
-import { verifyConversationStream } from "@helpers/verify";
-import { getWorkers } from "@workers/manager";
+import { verifyConversationStream } from "@helpers/tests";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, it } from "vitest";
 
 const testName = "conversations";

@@ -1,25 +1,17 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
+import { createClient, getDataPath } from "@helpers/client";
+import { defaultValues } from "@helpers/tests";
 import {
-  createSigner,
-  getDataPath,
-  getDbPath,
-  getEncryptionKeyFromHex,
-} from "@helpers/client";
-import { sdkVersions } from "@helpers/tests";
-import {
-  Client,
-  defaultValues,
   Dm,
+  type Client,
   type Consent,
   type Conversation,
   type DecodedMessage,
-  type LogLevel,
-  type typeofStream,
   type XmtpEnv,
-} from "@helpers/types";
+} from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import type { NetworkConditions, WorkerBase } from "./manager";
+import type { NetworkConditions, typeofStream, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -49,7 +41,7 @@ export type WorkerMessage =
 // Worker thread code as a string
 const workerThreadCode = `
 import { parentPort, workerData } from "node:worker_threads";
-import type { Client } from "@helpers/types";
+import type { Client } from "@xmtp/node-sdk";
 
 // The Worker must be run in a worker thread, so confirm \`parentPort\` is defined
 if (!parentPort) {
@@ -112,7 +104,8 @@ export class WorkerClient extends Worker {
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
   private folder: string;
-  private workerData: WorkerBase;
+  private sdkVersion: string;
+  private libXmtpVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
@@ -146,13 +139,14 @@ export class WorkerClient extends Worker {
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
     this.name = worker.name;
+    this.sdkVersion = worker.sdkVersion;
+    this.libXmtpVersion = worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.nameId = worker.name;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
-    this.workerData = worker;
     this.networkConditions = worker.networkConditions;
 
     this.setupEventHandlers();
@@ -293,7 +287,6 @@ export class WorkerClient extends Worker {
   async initialize(): Promise<{
     client: Client;
     dbPath: string;
-    version: string;
     installationId: string;
     address: `0x${string}`;
   }> {
@@ -304,53 +297,24 @@ export class WorkerClient extends Worker {
         data: {
           name: this.name,
           folder: this.folder,
+          sdkVersion: this.sdkVersion,
+          libXmtpVersion: this.libXmtpVersion,
         },
       });
-
-      const signer = createSigner(this.walletKey as `0x${string}`);
-      const encryptionKey = getEncryptionKeyFromHex(this.encryptionKeyHex);
-
-      // Get the SDK version from the worker data
-      const sdkVersion = this.workerData.sdkVersion as
-        | keyof typeof sdkVersions
-        | undefined;
-      // Select the appropriate SDK client based on version
-      let ClientClass: any;
-      if (sdkVersion) {
-        ClientClass = sdkVersions[sdkVersion].Client;
-      } else {
-        ClientClass = Client;
-      }
-
-      if (!ClientClass) {
-        throw new Error(`Unsupported SDK version: ${sdkVersion}`);
-      }
-
-      // Force version to include the SDK version for easier identification
-      const sdkIdentifier = sdkVersion || "latest";
-      const libXmtpVersion =
-        ClientClass.version?.split("@")[1].split(" ")[0] ?? "unknown";
-
-      const version = `${libXmtpVersion}-${sdkIdentifier}`;
-
-      const identifier = await signer.getIdentifier();
-      this.address = identifier.identifier as `0x${string}`;
-      const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
-      const dbPath = getDbPath(
-        this.name,
-        this.address,
-        this.testName,
-        this.folder,
-        version,
+      const { client, dbPath, address } = await createClient(
+        this.walletKey as `0x${string}`,
+        this.encryptionKeyHex,
+        {
+          sdkVersion: this.sdkVersion,
+          name: this.name,
+          testName: this.testName,
+          folder: this.folder,
+        },
         this.env,
       );
 
-      // Use type assertion to handle the client creation
-      this.client = (await ClientClass.create(signer, encryptionKey, {
-        dbPath,
-        env: this.env,
-        loggingLevel: loggingLevel,
-      })) as Client;
+      this.client = client as Client;
+      this.address = address;
 
       // Start the appropriate stream based on configuration
       await this.startStream();
@@ -360,13 +324,11 @@ export class WorkerClient extends Worker {
       return {
         client: this.client,
         dbPath,
-        version,
-        address: this.address,
+        address: address,
         installationId,
       };
     });
   }
-
   /**
    * Unified method to start the appropriate stream based on configuration
    */
@@ -464,13 +426,16 @@ export class WorkerClient extends Worker {
     // Get the base name without installation ID
     const baseName = this.name.split("-")[0].toLowerCase();
     const isDm = conversation instanceof Dm;
-    return ((message?.contentType?.typeId === "text" &&
-      message.content.includes(baseName) &&
-      !message.content.includes("/") &&
-      !message.content.includes("workers") &&
-      !message.content.includes("members") &&
-      !message.content.includes("admins")) ||
-      isDm) as boolean;
+    const content = message.content as string;
+    return (
+      (message?.contentType?.typeId === "text" &&
+        content.includes(baseName) &&
+        !content.includes("/") &&
+        !content.includes("workers") &&
+        !content.includes("members") &&
+        !content.includes("admins")) ||
+      isDm
+    );
   }
 
   /**

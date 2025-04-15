@@ -1,20 +1,14 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import {
-  type Conversation,
-  type Group,
-  type WorkerManager,
-} from "@helpers/types";
-import { getWorkers } from "@workers/manager";
-import { beforeAll, beforeEach, describe, expect, it } from "vitest";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import { type Group } from "@xmtp/node-sdk";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
-  let start: number;
   let testGroup: Group;
 
   // Define test workers
@@ -32,15 +26,9 @@ describe(testName, () => {
       expect(workers).toBeDefined();
       expect(workers.getLength()).toBe(testWorkers.length);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
   });
 
   it("should create a test group with all participants", async () => {
@@ -70,7 +58,7 @@ describe(testName, () => {
       const members = await testGroup.members();
       expect(members.length).toBe(testWorkers.length);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -88,7 +76,7 @@ describe(testName, () => {
       await groupForIvy.send(testMessage);
       console.log("Test message sent to group:", testMessage);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -120,7 +108,7 @@ describe(testName, () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -155,7 +143,7 @@ describe(testName, () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -187,7 +175,7 @@ describe(testName, () => {
 
       return { retrievalTime, messageCount: messages.length };
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });

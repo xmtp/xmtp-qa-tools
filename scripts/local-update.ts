@@ -1,12 +1,11 @@
 import * as fs from "fs";
-import path from "path";
 import {
   createSigner,
   getEncryptionKeyFromHex,
   loadEnv,
 } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { Client, type XmtpEnv } from "@helpers/types";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 // Set constants
 const BASE_LOGPATH = "./logs";
@@ -71,7 +70,7 @@ async function main() {
       const signer = createSigner(inbox.privateKey as `0x${string}`);
 
       // Get encryption key from hex
-      const encryptionKey = getEncryptionKeyFromHex(inbox.encryptionKey);
+      const dbEncryptionKey = getEncryptionKeyFromHex(inbox.encryptionKey);
 
       // Create a database path in the logs directory
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
@@ -82,7 +81,8 @@ async function main() {
       console.log(`Using database path: ${dbPath}`);
 
       // Create client in local environment
-      const client = await Client.create(signer, encryptionKey, {
+      const client = await Client.create(signer, {
+        dbEncryptionKey,
         dbPath: dbPath,
         env: ENV,
       });

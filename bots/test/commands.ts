@@ -1,11 +1,11 @@
+import { type Worker, type WorkerManager } from "@workers/manager";
 import {
   Group,
   IdentifierKind,
   type Client,
   type DecodedMessage,
-  type Worker,
-  type WorkerManager,
-} from "@helpers/types";
+  type Identifier,
+} from "@xmtp/node-sdk";
 
 export const walletUser = "0x3b9B663B435787cE05D734ab32ebD9B0DBd88A53";
 export const // Command help info
@@ -97,8 +97,8 @@ export class CommandHandler {
         message.senderInboxId,
       ]);
       const addresses = inboxState[0].identifiers
-        .filter((i) => i.identifierKind === IdentifierKind.Ethereum)
-        .map((i) => i.identifier);
+        .filter((i: Identifier) => i.identifierKind === IdentifierKind.Ethereum)
+        .map((i: Identifier) => i.identifier);
 
       console.log("addresses", addresses[0]);
       await conversation?.send(addresses[0]);
@@ -409,7 +409,7 @@ export class CommandHandler {
       const adminDetails = allAdmins.map((admin) => {
         const worker = workers
           .getWorkers()
-          .find((p) => p.client?.inboxId === admin);
+          .find((p: Worker) => p.client?.inboxId === admin);
         return worker?.name || this.processOthers(admin);
       });
 

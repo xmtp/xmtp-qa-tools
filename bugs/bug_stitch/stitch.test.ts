@@ -17,7 +17,7 @@ const users: {
   //
   // },
   xmtpchat: {
-    inboxId: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
+    inboxId: "20163dfde797c8a9ec05991c062a1904b89dc1fe82c6fc27972fd1f46044088d",
   },
 };
 
@@ -28,7 +28,8 @@ describe(testName, () => {
   for (const user of Object.keys(users)) {
     describe(`User: ${user}`, () => {
       let ivy100: Worker;
-      let ivy104: Worker;
+      let ivy105: Worker;
+      let ivy200: Worker;
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
@@ -86,14 +87,14 @@ describe(testName, () => {
         try {
           console.log(`Setting up test for ${user}]`);
           const workers = await getWorkers(
-            ["ivy-b-104"],
+            ["ivy-b-105"],
             testName,
             "message",
             false,
           );
-          ivy104 = workers.get("ivy", "b") as Worker;
+          ivy105 = workers.get("ivy", "b") as Worker;
           console.log("syncing all");
-          await ivy104?.client.conversations.sync();
+          await ivy105?.client.conversations.sync();
         } catch (e) {
           logError(e, expect);
           throw e;
@@ -101,12 +102,44 @@ describe(testName, () => {
       });
 
       it("should create new DM and group conversations", async () => {
-        const sender = ivy104?.client;
+        const sender = ivy105?.client;
         try {
           const newConvo = await sender.conversations.newDm(receiver);
 
           console.log("sending message");
           const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
+          await newConvo?.send(message);
+        } catch (e) {
+          logError(e, expect);
+          throw e;
+        }
+      });
+
+      it("should initialize clients and sync conversations", async () => {
+        try {
+          console.log(`Setting up test for ${user}]`);
+          const workers = await getWorkers(
+            ["ivy-c-201"],
+            testName,
+            "message",
+            false,
+          );
+          ivy200 = workers.get("ivy", "c") as Worker;
+          console.log("syncing all");
+          await ivy200?.client.conversations.sync();
+        } catch (e) {
+          logError(e, expect);
+          throw e;
+        }
+      });
+
+      it("should create new DM and group conversations", async () => {
+        const sender = ivy200?.client;
+        try {
+          const newConvo = await sender.conversations.newDm(receiver);
+
+          console.log("sending message");
+          const message = "message 4/4\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
           logError(e, expect);

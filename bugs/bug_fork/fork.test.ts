@@ -2,6 +2,9 @@ import { loadEnv } from "@helpers/client";
 import {
   addMemberByWorker,
   getOrCreateGroup,
+  sendMessageWithCount,
+} from "@helpers/group";
+import {
   getWorkerConfigs,
   randomDescriptionUpdate,
   randomlyAsignAdmins,
@@ -9,11 +12,9 @@ import {
   randomReinstall,
   randomSyncs,
   removeMemberByWorker,
-  sendMessageWithCount,
   setRandomNetworkConditions,
 } from "@helpers/tests";
-import type { Worker, WorkerManager } from "@helpers/types";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
@@ -23,7 +24,7 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  versions: ["100", "104", "105"],
+  versions: ["100", "105", "201"],
   workerNames: [
     "bob",
     "alice",

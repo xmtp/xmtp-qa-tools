@@ -2,14 +2,14 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
+import { verifyStream, verifyStreamAll } from "@helpers/tests";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
+  Client,
   IdentifierKind,
   type Conversation,
   type Group,
-  type WorkerManager,
-} from "@helpers/types";
-import { verifyStream, verifyStreamAll } from "@helpers/verify";
-import { getWorkers } from "@workers/manager";
+} from "@xmtp/node-sdk-201";
 import {
   afterAll,
   afterEach,
@@ -106,7 +106,7 @@ describe(testName, () => {
       if (!randomAddress) {
         throw new Error("Random client not found");
       }
-      const canMessage = await workers.get("henry")!.client.canMessage([
+      const canMessage = await Client.canMessage([
         {
           identifier: randomAddress,
           identifierKind: IdentifierKind.Ethereum,

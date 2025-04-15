@@ -34,7 +34,7 @@ await ivy100?.worker.initialize();
 
 // 4. Initialize second client
 const workers = await getWorkers(
-  ["ivy-b-104"],
+  ["ivy-b-105"],
   testName,
   "message",
   false,

@@ -1,8 +1,13 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import { type Signer, type WorkerManager, type XmtpEnv } from "@helpers/types";
-import { IdentifierKind } from "@xmtp/node-bindings";
+import type { WorkerManager } from "@workers/manager";
+import {
+  IdentifierKind,
+  type LogLevel,
+  type Signer,
+  type XmtpEnv,
+} from "@xmtp/node-sdk";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -10,6 +15,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
 import { createLogger, flushLogger, overrideConsole } from "./logger";
+import { sdkVersions } from "./tests";
 
 interface User {
   key: `0x${string}`;
@@ -17,11 +23,150 @@ interface User {
   wallet: ReturnType<typeof createWalletClient>;
 }
 
-export const createUser = (key: `0x${string}`): User => {
-  const accountKey = key;
-  const account = privateKeyToAccount(accountKey);
+export async function createClient(
+  walletKey: `0x${string}`,
+  encryptionKeyHex: string,
+  workerData: {
+    sdkVersion: string;
+    name: string;
+    testName: string;
+    folder: string;
+  },
+  env: XmtpEnv,
+): Promise<{
+  client: unknown;
+  dbPath: string;
+  sdkVersion: string;
+  libXmtpVersion: string;
+  address: `0x${string}`;
+}> {
+  const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
+
+  const sdkVersion = Number(workerData.sdkVersion);
+  // Use type assertion to access the static version property
+  const libXmtpVersion =
+    sdkVersions[sdkVersion as keyof typeof sdkVersions].libXmtpVersion;
+
+  const account = privateKeyToAccount(walletKey);
+  const address = account.address;
+  const dbPath = getDbPath(
+    workerData.name,
+    address,
+    workerData.testName,
+    workerData.folder,
+    env,
+  );
+
+  // Use type assertion to handle the client creation
+  const client = await regressionClient(
+    sdkVersion,
+    libXmtpVersion,
+    walletKey,
+    encryptionKey,
+    dbPath,
+    env,
+  );
+
   return {
-    key: accountKey,
+    client,
+    dbPath,
+    address,
+    sdkVersion: String(sdkVersion),
+    libXmtpVersion,
+  };
+}
+export const regressionClient = async (
+  sdkVersion: number,
+  libXmtpVersion: string,
+  walletKey: `0x${string}`,
+  encryptionKey: Uint8Array,
+  dbPath: string,
+  env: XmtpEnv,
+) => {
+  const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  const ClientClass =
+    sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
+  let client = null;
+  let libXmtpVersionAfterClient = "unknown";
+  if (sdkVersion == 30) {
+    throw new Error("Invalid version");
+  } else if (sdkVersion == 47) {
+    const signer = createSigner47(walletKey);
+    // @ts-expect-error: SDK version compatibility issues
+    client = await ClientClass.create(signer, encryptionKey, {
+      dbPath,
+      env,
+      loggingLevel,
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else if (sdkVersion === 100 || sdkVersion === 105) {
+    const signer = createSigner100(walletKey);
+    // @ts-expect-error: SDK version compatibility issues
+    client = await ClientClass.create(signer, encryptionKey, {
+      dbPath,
+      env,
+      loggingLevel,
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else if (sdkVersion === 201) {
+    const signer = createSigner200(walletKey);
+    // @ts-expect-error: SDK version compatibility issues
+    client = await ClientClass.create(signer, {
+      dbEncryptionKey: encryptionKey,
+      dbPath,
+      env,
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else {
+    console.log("Invalid version" + String(sdkVersion));
+    throw new Error("Invalid version" + String(sdkVersion));
+  }
+
+  if (libXmtpVersion !== libXmtpVersionAfterClient) {
+    console.log(
+      `libXmtpVersion mismatch: ${libXmtpVersionAfterClient} !== ${libXmtpVersion}`,
+    );
+  }
+
+  return client;
+};
+
+// @ts-expect-error: SDK version compatibility issues
+export const getLibXmtpVersion = (client: typeof ClientClass) => {
+  try {
+    const version = client.version;
+    if (!version || typeof version !== "string") return "unknown";
+
+    const parts = version.split("@");
+    if (parts.length <= 1) return "unknown";
+
+    const spaceParts = parts[1].split(" ");
+    return spaceParts[0] || "unknown";
+  } catch {
+    return "unknown";
+  }
+};
+export const createSigner47 = (privateKey: `0x${string}`) => {
+  const account = privateKeyToAccount(privateKey);
+  return {
+    getAddress: () => account.address,
+    signMessage: async (message: string) => {
+      const signature = await account.signMessage({
+        message,
+      });
+      return toBytes(signature);
+    },
+  };
+};
+
+export const createSigner100 = (key: `0x${string}`): Signer => {
+  return createSigner200(key);
+};
+export const createSigner200 = (key: string): Signer => {
+  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
+  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
+  let user: User = {
+    key: sanitizedKey as `0x${string}`,
     account,
     wallet: createWalletClient({
       account,
@@ -29,10 +174,6 @@ export const createUser = (key: `0x${string}`): User => {
       transport: http(),
     }),
   };
-};
-
-export const createSigner = (key: `0x${string}`): Signer => {
-  const user = createUser(key);
   return {
     type: "EOA",
     getIdentifier: () => ({
@@ -47,6 +188,10 @@ export const createSigner = (key: `0x${string}`): Signer => {
       return toBytes(signature);
     },
   };
+};
+
+export const createSigner = (key: `0x${string}`): Signer => {
+  return createSigner200(key);
 };
 
 function loadDataPath(
@@ -70,7 +215,6 @@ export const getDbPath = (
   accountAddress: string,
   testName: string,
   installationId: string,
-  libxmtpVersion: string,
   env: XmtpEnv,
 ): string => {
   console.time(`[${name}] - getDbPath`);
@@ -132,10 +276,7 @@ export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
   const logger = createLogger(testName);
   overrideConsole(logger);
-  // Create the .env file path
-  const env = process.env.XMTP_ENV as XmtpEnv;
 
-  console.log("XMTP_ENV", process.env.XMTP_ENV);
   initDataDog(
     testName,
     process.env.XMTP_ENV ?? "",

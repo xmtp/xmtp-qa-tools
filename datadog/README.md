@@ -21,10 +21,10 @@ The XMTP Datadog integration allows you to track crucial performance metrics, me
 initDataDog(testName, envValue, geolocation, apiKey);
 
 // Send delivery rate metrics
-sendDeliveryMetric(deliveryRate, testName, libxmtpVersion);
+sendDeliveryMetric(deliveryRate, testName, libXmtpVersion);
 
 // Send performance metrics
-sendPerformanceMetric(durationMs, testName, libxmtpVersion);
+sendPerformanceMetric(durationMs, testName, libXmtpVersion);
 
 // Measure network performance
 const networkStats = await getNetworkStats();

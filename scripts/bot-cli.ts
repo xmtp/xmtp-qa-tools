@@ -32,7 +32,8 @@ async function main(): Promise<void> {
     const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
     // Create XMTP client
-    const client = await Client.create(signer, encryptionKey, {
+    const client = await Client.create(signer, {
+      dbEncryptionKey: encryptionKey,
       env: (process.env.XMTP_ENV || "dev") as XmtpEnv,
     });
 

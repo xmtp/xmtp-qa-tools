@@ -1,6 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
-import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { describe, expect, it } from "vitest";
 
