@@ -1,48 +1,14 @@
 import fs from "fs";
 import path from "path";
+import { sdkVersions } from "@helpers/tests";
+import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 
-// Configuration for SDK versions and their corresponding bindings
-interface VersionConfig {
-  sdkPackage: string; // SDK package name (in node_modules/@xmtp/)
-  bindingsPackage: string; // Bindings package name (in node_modules/@xmtp/)
-  sdkVersion: string; // SDK version
-  libXmtpVersion: string; // Bindings version
-}
-
-// Static configuration
-const staticConfigs: VersionConfig[] = [
-  {
-    sdkPackage: "node-sdk-mls",
-    bindingsPackage: "node-bindings-mls",
-    sdkVersion: "0.0.13",
-    libXmtpVersion: "0.0.9",
-  },
-  {
-    sdkPackage: "node-sdk-47",
-    bindingsPackage: "node-bindings-41",
-    sdkVersion: "0.0.47",
-    libXmtpVersion: "0.0.41",
-  },
-  {
-    sdkPackage: "node-sdk-100",
-    bindingsPackage: "node-bindings-100",
-    sdkVersion: "1.0.0",
-    libXmtpVersion: "1.0.0",
-  },
-  {
-    sdkPackage: "node-sdk-105",
-    bindingsPackage: "node-bindings-105",
-    sdkVersion: "1.0.5",
-    libXmtpVersion: "1.1.3",
-  },
-  {
-    sdkPackage: "node-sdk-200",
-    bindingsPackage: "node-bindings-200",
-    sdkVersion: "2.0.0",
-    libXmtpVersion: "1.2.0-dev.bed98df",
-  },
-];
-
+type VersionConfig = (typeof sdkVersions)[keyof typeof sdkVersions];
+const staticConfigs = Object.values(sdkVersions).map((version) => ({
+  ...version,
+  sdkPackage: version.sdkPackage,
+  bindingsPackage: version.bindingsPackage,
+}));
 /**
  * Auto-discover SDK and bindings packages in node_modules/@xmtp
  */
@@ -124,6 +90,10 @@ function discoverPackages(): VersionConfig[] {
         bindingsPackage: matchingBindings,
         sdkVersion,
         libXmtpVersion,
+        Client,
+        Conversation,
+        Dm,
+        Group,
       });
 
       console.log(

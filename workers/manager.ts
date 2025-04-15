@@ -340,10 +340,16 @@ export class WorkerManager {
       client: initializedWorker.client,
       dbPath: initializedWorker.dbPath,
       sdkVersion: initializedWorker.sdkVersion,
+      libXmtpVersion: initializedWorker.libXmtpVersion,
       address: initializedWorker.address,
       installationId,
       worker: workerClient,
     };
+    if (!libXmtpVersion.includes(initializedWorker.libXmtpVersion)) {
+      console.log(
+        `libXmtpVersion mismatch: ${initializedWorker.libXmtpVersion} !== ${libXmtpVersion}`,
+      );
+    }
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);
 

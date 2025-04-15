@@ -288,6 +288,7 @@ export class WorkerClient extends Worker {
     client: Client;
     dbPath: string;
     sdkVersion: string;
+    libXmtpVersion: string;
     installationId: string;
     address: `0x${string}`;
   }> {
@@ -314,7 +315,9 @@ export class WorkerClient extends Worker {
       );
 
       this.client = client as unknown as Client;
-      this.libXmtpVersion = Client.version ?? "unknown";
+      this.libXmtpVersion =
+        Client.version.split("@")[1].split(" ")[0] ?? "unknown";
+
       // Start the appropriate stream based on configuration
       await this.startStream();
 
