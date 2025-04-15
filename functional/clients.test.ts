@@ -82,16 +82,17 @@ describe(testName, () => {
         identifierKind: IdentifierKind.Ethereum,
       };
       const staticCanMessage = await Client.canMessage([identifier]);
-      console.log(staticCanMessage);
-      expect(staticCanMessage.get(randomAddress)).toBe(true);
       console.log(
-        workers.get("henry")!.client.inboxId,
-        workers.get("henry")!.client.installationId,
+        "staticCanMessage",
+        identifier,
+        staticCanMessage.get(randomAddress),
       );
+      expect(staticCanMessage.get(randomAddress)).toBe(true);
+
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log(canMessage);
+      console.log("canMessage", identifier, canMessage.get(randomAddress));
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       logError(e, expect);

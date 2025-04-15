@@ -34,7 +34,7 @@ describe(testName, () => {
   }
   it("should create a group conversation with all workers", async () => {
     workers = await getWorkers(
-      ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-200"],
+      ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-201"],
       testName,
     );
     const henry = workers.get("henry", "b");

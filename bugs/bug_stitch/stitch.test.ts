@@ -119,7 +119,7 @@ describe(testName, () => {
         try {
           console.log(`Setting up test for ${user}]`);
           const workers = await getWorkers(
-            ["ivy-c-200"],
+            ["ivy-c-201"],
             testName,
             "message",
             false,
