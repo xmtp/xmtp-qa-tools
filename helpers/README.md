@@ -9,12 +9,10 @@ This directory contains utility modules that power the XMTP testing framework. T
 | [client.ts](#clientts)         | Creates signers and manages keys for test workers |
 | [group.ts](#groupts)           | Creates test groups with specified participants   |
 | [logger.ts](#loggerts)         | Logging utilities for test output                 |
-| [test.ts](#testts)             | Test utilities for creating and managing tests    |
+| [tests.ts](#testts)            | Test utilities for creating and managing tests    |
 | [datadog.ts](#datadogts)       | Datadog utilities for testing message delivery    |
-| [verify.ts](#verifyts)         | Validation utilities for testing message delivery |
 | [railway.ts](#railwayts)       | Railway utilities for testing message delivery    |
 | [playwright.ts](#playwrightts) | Playwright utilities for testing message delivery |
-| [tests.ts](#teststs)           | Test utilities for creating and managing tests    |
 
 ## 🔍 Module Details
 
@@ -25,6 +23,34 @@ Handles test configuration and setup:
 ```typescript
 // Create a test configuration
 const testConfig = createTestConfig(testName, workerConfigs);
+```
+
+Validation utilities for testing message delivery:
+
+```typescript
+// Verify that all participants in a group receive messages
+const result = await verifyStreamAll(group, workers, messageCount);
+
+// Verify message delivery with custom settings
+const result = await verifyStream(
+  group,
+  participants,
+  contentType,
+  messageCount,
+  messageGenerator,
+  messageSender,
+);
+
+// Verify conversation events are received by participants
+const result = await verifyConversationStream(initiator, participants);
+
+// Calculate statistics about message delivery
+const stats = calculateMessageStats(
+  messagesByWorker,
+  messagePrefix,
+  messageCount,
+  suffix,
+);
 ```
 
 ### client.ts
@@ -112,36 +138,6 @@ await page.goto("https://xmtp.chat");
 
 // Close the browser
 await browser.close();
-```
-
-### verify.ts
-
-Validation utilities for testing message delivery:
-
-```typescript
-// Verify that all participants in a group receive messages
-const result = await verifyStreamAll(group, workers, messageCount);
-
-// Verify message delivery with custom settings
-const result = await verifyStream(
-  group,
-  participants,
-  contentType,
-  messageCount,
-  messageGenerator,
-  messageSender,
-);
-
-// Verify conversation events are received by participants
-const result = await verifyConversationStream(initiator, participants);
-
-// Calculate statistics about message delivery
-const stats = calculateMessageStats(
-  messagesByWorker,
-  messagePrefix,
-  messageCount,
-  suffix,
-);
 ```
 
 ### railway.ts

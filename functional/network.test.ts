@@ -117,7 +117,7 @@ describe(testName, () => {
             throw new Error("Alice worker client or inboxId not available");
           }
 
-          const aliceInboxId = aliceWorker.client.inboxId;
+          const aliceInboxId = aliceWorker.client?.inboxId;
           console.log(`Using Alice inboxId: ${aliceInboxId}`);
 
           // Bob creates a conversation with Alice
