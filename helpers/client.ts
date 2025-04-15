@@ -63,9 +63,6 @@ export async function createClient(
 
   // Use type assertion to handle the client creation
   let ClientClass = sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
-  if (!ClientClass) {
-    throw new Error(`Unsupported SDK version: ${workerData.sdkVersion}`);
-  }
   const client = (await ClientClass.create(signer, {
     dbEncryptionKey: encryptionKey,
     dbPath,
