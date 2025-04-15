@@ -1,10 +1,10 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
+import { getWorkersFromGroup } from "@helpers/group";
 import { logError } from "@helpers/logger";
 import {
   calculateMessageStats,
   defaultValues,
-  getWorkersFromGroup,
   verifyStream,
   type VerifyStreamResult,
 } from "@helpers/tests";
@@ -112,6 +112,7 @@ describe(
         sendDeliveryMetric(
           stats.receptionPercentage,
           workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "stream",
           "delivery",
@@ -119,6 +120,7 @@ describe(
         sendDeliveryMetric(
           stats.orderPercentage,
           workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "stream",
           "order",
@@ -169,6 +171,7 @@ describe(
         sendDeliveryMetric(
           stats.receptionPercentage,
           workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "poll",
           "delivery",
@@ -176,6 +179,7 @@ describe(
         sendDeliveryMetric(
           stats.orderPercentage,
           workers.get("bob")!.sdkVersion,
+          workers.get("bob")!.libXmtpVersion,
           testName,
           "poll",
           "order",
@@ -253,6 +257,7 @@ describe(
         sendDeliveryMetric(
           stats.receptionPercentage,
           offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "delivery",
@@ -260,6 +265,7 @@ describe(
         sendDeliveryMetric(
           stats.orderPercentage,
           offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "order",

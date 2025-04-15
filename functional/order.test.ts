@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
+import { getWorkersFromGroup } from "@helpers/group";
 import {
   calculateMessageStats,
-  getWorkersFromGroup,
   verifyStream,
   type VerifyStreamResult,
 } from "@helpers/tests";

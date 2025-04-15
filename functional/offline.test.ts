@@ -116,6 +116,7 @@ describe(
         sendDeliveryMetric(
           stats.receptionPercentage,
           offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "delivery",
@@ -125,6 +126,7 @@ describe(
         sendDeliveryMetric(
           stats.orderPercentage,
           offlineWorker.sdkVersion,
+          offlineWorker.libXmtpVersion,
           testName,
           "recovery",
           "order",

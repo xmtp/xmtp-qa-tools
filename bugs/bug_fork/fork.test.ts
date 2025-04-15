@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
+import { addMemberByWorker, getOrCreateGroup } from "@helpers/group";
 import {
-  addMemberByWorker,
-  getOrCreateGroup,
   getWorkerConfigs,
   randomDescriptionUpdate,
   randomlyAsignAdmins,

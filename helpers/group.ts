@@ -1,5 +1,6 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import { appendToEnv } from "./tests";
 
 /**
  * Creates a group with a specified number of participants and measures performance

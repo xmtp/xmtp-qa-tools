@@ -87,7 +87,7 @@ function discoverPackages(): VersionConfig[] {
     if (matchingBindings) {
       // Try to get actual version from package.json
       let sdkVersion = "";
-      let bindingsVersion = "";
+      let libXmtpVersion = "";
 
       try {
         const sdkPackageJson = JSON.parse(
@@ -111,7 +111,7 @@ function discoverPackages(): VersionConfig[] {
             "utf8",
           ),
         );
-        bindingsVersion = bindingsPackageJson.version || "";
+        libXmtpVersion = bindingsPackageJson.version || "";
       } catch (error: unknown) {
         console.error(error);
         console.warn(
@@ -123,7 +123,7 @@ function discoverPackages(): VersionConfig[] {
         sdkPackage,
         bindingsPackage: matchingBindings,
         sdkVersion,
-        bindingsVersion,
+        libXmtpVersion,
       });
 
       console.log(
