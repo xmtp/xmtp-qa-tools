@@ -425,13 +425,16 @@ export class WorkerClient extends Worker {
     // Get the base name without installation ID
     const baseName = this.name.split("-")[0].toLowerCase();
     const isDm = conversation instanceof Dm;
-    return ((message?.contentType?.typeId === "text" &&
-      message.content.includes(baseName) &&
-      !message.content.includes("/") &&
-      !message.content.includes("workers") &&
-      !message.content.includes("members") &&
-      !message.content.includes("admins")) ||
-      isDm) as boolean;
+    const content = message.content as string;
+    return (
+      (message?.contentType?.typeId === "text" &&
+        content.includes(baseName) &&
+        !content.includes("/") &&
+        !content.includes("workers") &&
+        !content.includes("members") &&
+        !content.includes("admins")) ||
+      isDm
+    );
   }
 
   /**
