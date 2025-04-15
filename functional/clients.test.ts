@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { IdentifierKind, type Identifier } from "@helpers/types";
+import { Client, IdentifierKind, type Identifier } from "@helpers/types";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
@@ -44,24 +44,36 @@ describe(testName, () => {
       throw e;
     }
   });
-  it("canMessage: should measure canMessage", async () => {
+  it("getInboxIdByAddress: should measure getInboxIdByAddress", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName, "none");
-      if (!client) {
-        throw new Error("Client not found");
-      }
+      const client = workers.get("henry")!.client;
+      const randomAddress = workers.get("ivy")!.address;
+      const inboxId = await client.getInboxIdByIdentifier({
+        identifier: randomAddress,
+        identifierKind: IdentifierKind.Ethereum,
+      });
 
-      const randomAddress = client.get("randomclient")!.address;
-      if (!randomAddress) {
-        throw new Error("Random client not found");
-      }
+      expect(inboxId).toBeDefined();
+    } catch (e) {
+      logError(e, expect);
+      throw e;
+    }
+  });
+
+  it("canMessage: should measure static canMessage", async () => {
+    try {
+      const randomAddress = workers.get("karen")!.address;
       const identifier: Identifier = {
         identifier: randomAddress,
         identifierKind: IdentifierKind.Ethereum,
       };
-      const canMessage = await workers
-        .get("henry")!
-        .client.canMessage([identifier]);
+      const staticCanMessage = await Client.canMessage([identifier]);
+      console.log(staticCanMessage);
+      expect(staticCanMessage.get(randomAddress)).toBe(true);
+
+      const henryClient = workers.get("henry")!.client;
+      const canMessage = await henryClient.canMessage([identifier]);
+      console.log(staticCanMessage);
       expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       logError(e, expect);
@@ -74,6 +86,26 @@ describe(testName, () => {
         .get("henry")!
         .client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
+
+      // Retrieve all the installation ids for the target
+      const installationIds = inboxState.installations.map(
+        (installation) => installation.id,
+      );
+
+      // Retrieve a map of installation id to KeyPackageStatus
+      const status = await workers
+        .get("henry")!
+        .client.getKeyPackageStatusesForInstallationIds(installationIds);
+      console.log(status);
+      // Count valid and invalid installations
+      const totalInstallations = Object.keys(status).length;
+      const validInstallations = Object.values(status).filter(
+        (value) => !value?.validationError,
+      ).length;
+      const invalidInstallations = totalInstallations - validInstallations;
+      console.log(
+        `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
+      );
     } catch (e) {
       logError(e, expect);
       throw e;

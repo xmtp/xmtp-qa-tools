@@ -1,22 +1,19 @@
 import type { Worker, WorkerManager } from "@workers/manager";
 import {
+  Client,
   ConsentEntityType,
   ConsentState,
+  Conversation,
+  Dm,
+  Group,
   IdentifierKind,
   type Consent,
+  type DecodedMessage,
   type GroupMember,
   type Identifier,
   type Installation,
   type LogLevel,
-} from "@xmtp/node-bindings";
-import {
-  Client,
-  Conversation,
-  Dm,
-  Group,
-  type DecodedMessage,
   type XmtpEnv,
-  type Signer as XmtpSigner,
 } from "@xmtp/node-sdk";
 
 export type { WorkerManager, Worker };

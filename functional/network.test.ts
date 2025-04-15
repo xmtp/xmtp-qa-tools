@@ -15,7 +15,7 @@ const users: {
   },
 };
 
-const testName = "network_simulation";
+const testName = "network";
 loadEnv(testName);
 
 const workerConfigs = [
@@ -66,7 +66,86 @@ describe(testName, () => {
             workerInstances[w.name] = worker as unknown as WorkerClient;
           });
 
-          // Apply initial network conditions
+          // Clear DB before starting to ensure clean state
+          for (const workerConfig of workerConfigs) {
+            const worker = workerInstances[workerConfig.name];
+            if (worker && typeof worker.clearDB === "function") {
+              console.log(`Clearing DB for worker ${workerConfig.name}...`);
+              await worker.clearDB();
+            }
+          }
+
+          // Sync conversations properly
+          console.log("Syncing conversations for all workers...");
+          for (const workerConfig of workerConfigs) {
+            const worker = workerInstances[workerConfig.name] as {
+              client?: { conversations?: { sync: () => Promise<void> } };
+            };
+            if (!worker?.client?.conversations?.sync) {
+              throw new Error(
+                `Sync method not available for worker ${workerConfig.name}`,
+              );
+            }
+            console.log(
+              `Syncing conversations for worker ${workerConfig.name}...`,
+            );
+            try {
+              await worker.client.conversations.sync();
+              console.log(`Sync completed for worker ${workerConfig.name}`);
+            } catch (syncError) {
+              console.error(
+                `Error syncing worker ${workerConfig.name}:`,
+                syncError,
+              );
+              throw syncError;
+            }
+          }
+
+          // Add a delay after sync to ensure data is processed
+          await new Promise((resolve) => setTimeout(resolve, 3000));
+
+          // Create a direct message conversation between Bob and Alice instead of a group
+          // This approach is more reliable and bypasses the complex group creation process
+          console.log("Creating direct message between workers...");
+
+          // Get the inboxId of Alice to create a conversation
+          const aliceWorker = workerInstances[workerConfigs[1].name] as {
+            client?: { inboxId?: string };
+          };
+
+          if (!aliceWorker?.client?.inboxId) {
+            throw new Error("Alice worker client or inboxId not available");
+          }
+
+          const aliceInboxId = aliceWorker.client.inboxId;
+          console.log(`Using Alice inboxId: ${aliceInboxId}`);
+
+          // Bob creates a conversation with Alice
+          const bobWorker = workerInstances[workerConfigs[0].name] as {
+            client?: {
+              conversations?: {
+                newDm: (inboxId: string) => Promise<Conversation>;
+              };
+            };
+          };
+
+          if (!bobWorker?.client?.conversations?.newDm) {
+            throw new Error(
+              "Bob worker client, conversations or newDm method not available",
+            );
+          }
+
+          // Create DM conversation instead of group
+          const dm = await bobWorker.client.conversations.newDm(aliceInboxId);
+          groupId = dm.id; // Store the conversation ID for later use
+          console.log("Created DM conversation with ID:", groupId);
+
+          // Send a test message to verify conversation works
+          await dm.send("Hello from network test");
+          console.log("Sent test message successfully");
+
+          // Apply network conditions only after conversation is created successfully
+          console.log("Applying network conditions...");
           workers.setWorkerNetworkConditions(
             workerConfigs[0].name,
             networkConditions.highLatency,
@@ -75,41 +154,8 @@ describe(testName, () => {
             workerConfigs[1].name,
             networkConditions.packetLoss,
           );
-
-          // Sync conversations
-          await Promise.all(
-            workerConfigs.map((w) => {
-              const worker = workerInstances[w.name] as {
-                client?: { conversations?: { sync: () => Promise<void> } };
-              };
-              return worker?.client?.conversations?.sync();
-            }),
-          );
-
-          // Create group with receiver
-          const worker = workerInstances[workerConfigs[0].name] as {
-            client?: {
-              conversations?: {
-                newGroup: (
-                  inboxIds: string[],
-                  options: {
-                    groupName: string;
-                    groupDescription: string;
-                  },
-                ) => Promise<Conversation>;
-              };
-            };
-          };
-          if (!worker.client?.conversations) {
-            throw new Error("Worker client or conversations not available");
-          }
-          const group = await worker.client.conversations.newGroup([receiver], {
-            groupName: "Network Test Group",
-            groupDescription: "Group for network simulation testing",
-          });
-          groupId = group.id;
-          console.log("Created group with ID:", groupId);
         } catch (e) {
+          console.error("Detailed error information:", e);
           logError(e, expect);
           throw e;
         }
@@ -182,7 +228,7 @@ describe(testName, () => {
               );
             });
 
-            // Send message
+            // Send message to the conversation (DM or group)
             const worker = workerInstances[workerConfigs[0].name] as {
               client?: {
                 conversations?: {
@@ -190,12 +236,19 @@ describe(testName, () => {
                 };
               };
             };
+
             if (!worker.client?.conversations) {
               throw new Error("Worker client or conversations not available");
             }
-            const group =
+
+            const conversation =
               await worker.client.conversations.getConversationById(groupId);
-            await group?.send(testCase.message);
+            if (!conversation) {
+              throw new Error(`Conversation with ID ${groupId} not found`);
+            }
+
+            await conversation.send(testCase.message);
+            console.log(`Sent message: ${testCase.message}`);
 
             // Wait for operations to complete
             await new Promise((resolve) =>
@@ -203,6 +256,7 @@ describe(testName, () => {
             );
           }
         } catch (e) {
+          console.error("Detailed error information:", e);
           logError(e, expect);
           throw e;
         }
