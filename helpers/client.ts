@@ -88,10 +88,6 @@ export const regressionClient = async (
     sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
-  console.log(
-    "Creating client for version",
-    sdkVersion as keyof typeof sdkVersions,
-  );
   if (sdkVersion == 30) {
     throw new Error("Invalid version");
   } else if (sdkVersion == 47) {

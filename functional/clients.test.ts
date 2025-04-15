@@ -78,7 +78,7 @@ describe(testName, () => {
     try {
       const randomAddress = workers.get("karen")!.address;
       const identifier: Identifier = {
-        identifier: "0xbfa5ec868f7f28c6a3389b2e30836aabe1f8eaa6",
+        identifier: randomAddress,
         identifierKind: IdentifierKind.Ethereum,
       };
       const staticCanMessage = await Client.canMessage([identifier]);
