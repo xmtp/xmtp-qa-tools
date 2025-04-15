@@ -105,7 +105,7 @@ export class WorkerClient extends Worker {
   private typeofStream: typeofStream;
   private gptEnabled: boolean;
   private folder: string;
-  private workerData: WorkerBase;
+  private sdkVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
@@ -139,13 +139,13 @@ export class WorkerClient extends Worker {
     this.gptEnabled = gptEnabled;
     this.typeofStream = typeofStream;
     this.name = worker.name;
+    this.sdkVersion = worker.sdkVersion;
     this.folder = worker.folder;
     this.env = env;
     this.nameId = worker.name;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
-    this.workerData = worker;
     this.networkConditions = worker.networkConditions;
 
     this.setupEventHandlers();
@@ -297,14 +297,14 @@ export class WorkerClient extends Worker {
         data: {
           name: this.name,
           folder: this.folder,
+          sdkVersion: this.sdkVersion,
         },
       });
-
       const { client, dbPath, version, address } = await createClient(
         this.walletKey as `0x${string}`,
         this.encryptionKeyHex,
         {
-          sdkVersion: this.workerData.sdkVersion as string,
+          sdkVersion: this.sdkVersion,
           name: this.name,
           testName: this.testName,
           folder: this.folder,
@@ -323,7 +323,7 @@ export class WorkerClient extends Worker {
         client: this.client,
         dbPath,
         version,
-        address: this.address,
+        address: address,
         installationId,
       };
     });

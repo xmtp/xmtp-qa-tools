@@ -2,6 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
+import { sdkVersions } from "@helpers/tests";
 import {
   defaultValues,
   type Client,
@@ -27,7 +28,7 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
-  sdkVersion?: string;
+  sdkVersion: string;
   networkConditions?: NetworkConditions; // Add network conditions
 }
 
@@ -300,8 +301,6 @@ export class WorkerManager {
     const parts = descriptor.split("-");
     const baseName = parts[0];
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
-    const version = parts.length > 2 ? parts[2] : undefined;
-
     // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.log(`Reusing existing worker for ${descriptor}`);
@@ -310,9 +309,8 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const installationId = providedInstallId || getNextFolderName();
-    // const fullDescriptor = providedInstallId
-    //   ? descriptor
-    //   : `${baseName}-${installationId}`;
+
+    const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -324,7 +322,7 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
-      sdkVersion: version,
+      sdkVersion: sdkVersion,
       networkConditions: this.defaultNetworkConditions,
     };
 
@@ -334,6 +332,10 @@ export class WorkerManager {
       this.typeofStream,
       this.gptEnabled,
       this.env,
+    );
+
+    console.log(
+      `Creating worker: ${baseName} (folder: ${installationId}, version: ${sdkVersion})`,
     );
 
     const initializedWorker = await workerClient.initialize();
@@ -348,11 +350,6 @@ export class WorkerManager {
       installationId,
       worker: workerClient,
     };
-
-    console.log(
-      `Creating worker: ${baseName} (folder: ${installationId}, version: ${initializedWorker.version || "default"})`,
-    );
-
     // Store the new worker for potential cleanup later
     this.activeWorkers.push(workerClient);
 
@@ -435,4 +432,7 @@ function getNextFolderName(): string {
 export function getDataSubFolderCount() {
   const preBasePath = process.cwd();
   return fs.readdirSync(`${preBasePath}/.data`).length;
+}
+export function getLatestVersion(): string {
+  return Object.keys(sdkVersions).pop() as string;
 }

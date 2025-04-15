@@ -41,22 +41,11 @@ export async function createClient(
   const signer = createSigner(walletKey);
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-  // Select the appropriate SDK client based on version
-  let ClientClass =
-    sdkVersions[workerData.sdkVersion as unknown as keyof typeof sdkVersions]
-      .Client;
-
-  if (!ClientClass) {
-    throw new Error(`Unsupported SDK version: ${workerData.sdkVersion}`);
-  }
+  const sdkVersion = Number(workerData.sdkVersion);
 
   // Use type assertion to access the static version property
   const libXmtpVersion =
-    typeof (ClientClass as any).version === "undefined"
-      ? "unknown"
-      : typeof (ClientClass as any).version === "string"
-        ? (ClientClass as any).version.split("@")[1]?.split(" ")[0] || "unknown"
-        : "unknown";
+    sdkVersions[sdkVersion as keyof typeof sdkVersions].version;
 
   const version = `${libXmtpVersion}-${workerData.sdkVersion}`;
 
@@ -73,11 +62,16 @@ export async function createClient(
   );
 
   // Use type assertion to handle the client creation
-  const client = (await ClientClass.create(signer, encryptionKey, {
+  let ClientClass = sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
+  if (!ClientClass) {
+    throw new Error(`Unsupported SDK version: ${workerData.sdkVersion}`);
+  }
+  const client = (await ClientClass.create(signer, {
+    dbEncryptionKey: encryptionKey,
     dbPath,
     env,
     loggingLevel,
-  })) as Client;
+  })) as unknown as Client;
   return { client, dbPath, version, address };
 }
 

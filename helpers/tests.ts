@@ -38,31 +38,35 @@ export const sdkVersions = {
     Conversation: ConversationMls,
     Dm: ConversationMls,
     Group: ConversationMls,
+    version: "30",
   },
-
   47: {
     Client: Client47,
     Conversation: Conversation47,
     Dm: Dm47,
     Group: Group47,
+    version: "47",
   },
   100: {
     Client: Client100,
     Conversation: Conversation100,
     Dm: Dm100,
     Group: Group100,
+    version: "100",
   },
   105: {
     Client: Client105,
     Conversation: Conversation105,
     Dm: Dm105,
     Group: Group105,
+    version: "105",
   },
   200: {
     Client: Client200,
     Conversation: Conversation200,
     Dm: Dm200,
     Group: Group200,
+    version: "200",
   },
 };
 
