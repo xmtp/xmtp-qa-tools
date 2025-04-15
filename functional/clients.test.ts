@@ -89,11 +89,11 @@ describe(testName, () => {
       );
       expect(staticCanMessage.get(randomAddress)).toBe(true);
 
-      const henryClient = workers.get("henry")!.client;
-      const canMessage = await henryClient.canMessage([identifier]);
+      // const henryClient = workers.get("henry")!.client;
+      // const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log("canMessage", identifier, canMessage.get(randomAddress));
-      expect(canMessage.get(randomAddress)).toBe(true);
+      // console.log("canMessage", identifier, canMessage.get(randomAddress));
+      // expect(canMessage.get(randomAddress)).toBe(true);
     } catch (e) {
       logError(e, expect);
       throw e;

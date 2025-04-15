@@ -10,7 +10,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = ["47", "100", "105", "200"];
+  const versions = ["47", "100", "105", "201"];
   afterAll(async () => {
     await closeEnv(testName, workers);
   });
