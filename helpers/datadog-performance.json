@@ -224,7 +224,7 @@
         ],
         "markers": [
           {
-            "label": "Max Threshold (200ms)",
+            "label": " Max Threshold (300ms) ",
             "value": "y = 300",
             "display_type": "error dashed"
           }
@@ -261,8 +261,8 @@
         ],
         "markers": [
           {
-            "label": "Max Threshold (200ms)",
-            "value": "y = 501",
+            "label": " Max Threshold (1s) ",
+            "value": "y = 1000",
             "display_type": "error dashed"
           }
         ]
