@@ -91,8 +91,8 @@ describe(testName, () => {
 
       console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
       console.log("canMessage", Object.fromEntries(canMessage));
-      expect(staticCanMessage.get(randomAddress)).toBe(true);
-      expect(canMessage.get(randomAddress)).toBe(true);
+      expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
+      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
       logError(e, expect);
       throw e;

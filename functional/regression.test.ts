@@ -10,7 +10,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = ["47", "100", "105", "201"];
+  const versions = ["47", "100", "105", "202"];
   afterAll(async () => {
     await closeEnv(testName, workers);
   });
@@ -34,7 +34,7 @@ describe(testName, () => {
   }
   it("should create a group conversation with all workers", async () => {
     workers = await getWorkers(
-      ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-201"],
+      ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-202"],
       testName,
     );
     const henry = workers.get("henry", "b");

@@ -24,7 +24,7 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  versions: ["100", "105", "201"],
+  versions: ["100", "105", "202"],
   workerNames: [
     "bob",
     "alice",

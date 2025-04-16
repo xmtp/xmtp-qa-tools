@@ -9,7 +9,7 @@ import {
   IdentifierKind,
   type Conversation,
   type Group,
-} from "@xmtp/node-sdk-201";
+} from "@xmtp/node-sdk";
 import {
   afterAll,
   afterEach,
