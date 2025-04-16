@@ -208,11 +208,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
-### Disclaimers
-
-- **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
-- **Node-sdk only**: Metrics are based on `node-sdk` `latest` version only operations and are not covering performance across all SDKs.
-
 ## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
@@ -243,4 +238,3 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
-  .
