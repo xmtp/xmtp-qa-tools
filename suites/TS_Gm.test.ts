@@ -19,7 +19,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      workers = await getWorkers(["bob"], testName);
+      workers = await getWorkers(["bob-a-105"], testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(1);
     } catch (e) {

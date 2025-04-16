@@ -41,16 +41,16 @@ describe(testName, () => {
     try {
       workers = await getWorkers(
         [
-          "henry",
-          "ivy",
-          "jack",
-          "karen",
-          "randomguy",
-          "randomguy2",
-          "larry",
-          "mary",
-          "nancy",
-          "oscar",
+          "henry-a-100",
+          "ivy-a-100",
+          "jack-a-202",
+          "karen-a-100",
+          "randomguy-a-100",
+          "randomguy2-a-100",
+          "larry-a-100",
+          "mary-a-105",
+          "nancy-a-100",
+          "oscar-a-105",
         ],
         testName,
       );
@@ -115,7 +115,7 @@ describe(testName, () => {
         ],
         client.get("randomclient")!.env,
       );
-      expect(canMessage.get(randomAddress)).toBe(true);
+      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
