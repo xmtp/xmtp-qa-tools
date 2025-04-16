@@ -208,19 +208,13 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
-### Disclaimers
-
-- **Ideal Network Conditions**: Real-world performance may vary significantly when the network is under stress or high load.
-- **Node-sdk only**: Metrics are based on `node-sdk` `latest` version only operations and are not covering performance across all SDKs.
-
 ## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
-- **Test bot:** Bot for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/test/)
 - **Workflows:** See our CI/CD pipeline configuration - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **Gm bot:** Bot for testing with older version of the protocol - [see section](https://github.com/xmtp/gm-bot)
+- **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
 
 ## Development
 
@@ -243,4 +237,3 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
-  .
