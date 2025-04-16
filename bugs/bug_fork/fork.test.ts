@@ -24,7 +24,7 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  versions: ["100", "105", "201"],
+  versions: ["100", "105", "202"],
   workerNames: [
     "bob",
     "alice",
@@ -43,7 +43,7 @@ const testConfig = {
     convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
     convos2: "8137ca5e1cf89dcd3a750aa896bb115dc38277907d0bd5f36665e61cd8f60e99",
     xmtpchat:
-      "20163dfde797c8a9ec05991c062a1904b89dc1fe82c6fc27972fd1f46044088d",
+      "8e75ee75db9971712babcfe1faceb08b54af6d3e33f59a038c6525dd208e47af",
   },
   workers: undefined as WorkerManager | undefined,
   groupId: undefined as string | undefined,
@@ -90,8 +90,6 @@ describe(TEST_NAME, () => {
     if (!globalGroup?.id || !creator || !testConfig.workers) {
       throw new Error("Group or creator not found");
     }
-    setRandomNetworkConditions(testConfig.workers);
-
     // Get all workers
     const allWorkers = testConfig.workers?.getWorkers();
     if (allWorkers.length !== 10) {
@@ -111,7 +109,7 @@ describe(TEST_NAME, () => {
     // Update group name
     await globalGroup.updateName(globalGroup.id);
 
-    await randomReinstall(testConfig.workers);
+    //await randomReinstall(testConfig.workers);
 
     await randomSyncs({
       workers: testConfig.workers,

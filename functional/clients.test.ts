@@ -85,18 +85,14 @@ describe(testName, () => {
         [identifier],
         workers.get("henry")!.env,
       );
-      console.log(
-        "staticCanMessage",
-        identifier,
-        staticCanMessage.get(randomAddress),
-      );
-      expect(staticCanMessage.get(randomAddress)).toBe(true);
-
+      // Create a client to test the canMessage method
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log("canMessage", identifier, canMessage.get(randomAddress));
-      // expect(canMessage.get(randomAddress)).toBe(true);
+      console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
+      console.log("canMessage", Object.fromEntries(canMessage));
+      expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
+      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
       logError(e, expect);
       throw e;

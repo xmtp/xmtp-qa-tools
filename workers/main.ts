@@ -316,6 +316,9 @@ export class WorkerClient extends Worker {
       this.client = client as Client;
       this.address = address;
 
+      console.log(
+        `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
+      );
       // Start the appropriate stream based on configuration
       await this.startStream();
 
@@ -334,7 +337,6 @@ export class WorkerClient extends Worker {
    */
   private async startStream() {
     if (!this.typeofStream || this.typeofStream === "none") {
-      console.log(`[${this.nameId}] No stream requested`);
       return;
     }
 

@@ -331,10 +331,6 @@ export class WorkerManager {
       this.env,
     );
 
-    console.log(
-      `Creating worker: ${baseName} (folder: ${folder}, version: ${sdkVersion}-${libXmtpVersion})`,
-    );
-
     const initializedWorker = await workerClient.initialize();
 
     // Create the complete worker
