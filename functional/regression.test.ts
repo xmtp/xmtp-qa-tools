@@ -32,6 +32,23 @@ describe(testName, () => {
       expect(convo?.id).toBeDefined();
     });
   }
+  for (const version of versions.reverse()) {
+    it(`Shoudl test the DB after downgrade from ${version}`, async () => {
+      workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      const bob = workers.get("bob");
+      const inboxId = generatedInboxes[0].inboxId;
+      console.log("inboxId", inboxId);
+      let convo;
+      if (version === "47") {
+        // @ts-expect-error: SDK version compatibility issues
+        convo = await bob?.client.conversations.newDmByInboxId(inboxId);
+      } else {
+        convo = await bob?.client.conversations.newDm(inboxId);
+      }
+      expect(convo?.id).toBeDefined();
+    });
+  }
   it("should create a group conversation with all workers", async () => {
     workers = await getWorkers(
       ["henry-b-100", "steve-b-100", "joe-b-105", "alice-b-202"],
