@@ -33,40 +33,7 @@
         "autoscale": true,
         "precision": 2
       },
-      "layout": { "x": 0, "y": 0, "width": 4, "height": 1 }
-    },
-    {
-      "id": 7062709793280578,
-      "definition": {
-        "title": "TLS Handshake Average (ms)",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:tls_handshake,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
-              {
-                "comparator": "<=",
-                "value": 300,
-                "palette": "white_on_yellow"
-              },
-              { "comparator": ">", "value": 300, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true,
-        "precision": 2
-      },
-      "layout": { "x": 4, "y": 0, "width": 4, "height": 1 }
+      "layout": { "x": 0, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 2793414807712549,
@@ -99,73 +66,7 @@
         "autoscale": true,
         "precision": 2
       },
-      "layout": { "x": 8, "y": 0, "width": 4, "height": 1 }
-    },
-    {
-      "id": 8268482323253859,
-      "definition": {
-        "title": "Processing Average (ms)",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
-              {
-                "comparator": "<=",
-                "value": 300,
-                "palette": "white_on_yellow"
-              },
-              { "comparator": ">", "value": 300, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true,
-        "precision": 2
-      },
-      "layout": { "x": 0, "y": 1, "width": 4, "height": 1 }
-    },
-    {
-      "id": 3707182648216683,
-      "definition": {
-        "title": "Top operation by duration (ms)",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "max:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
-              {
-                "comparator": "<=",
-                "value": 300,
-                "palette": "white_on_yellow"
-              },
-              { "comparator": ">", "value": 300, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true,
-        "precision": 2
-      },
-      "layout": { "x": 4, "y": 1, "width": 4, "height": 1 }
+      "layout": { "x": 2, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 132554502285611,
@@ -198,7 +99,108 @@
         "autoscale": true,
         "precision": 2
       },
-      "layout": { "x": 8, "y": 1, "width": 4, "height": 1 }
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 8268482323253859,
+      "definition": {
+        "title": "Processing Average (ms)",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:processing,$env,$region,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              { "comparator": "<=", "value": 100, "palette": "white_on_green" },
+              {
+                "comparator": "<=",
+                "value": 300,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 300, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true,
+        "precision": 2
+      },
+      "layout": { "x": 6, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 504026830671482,
+      "definition": {
+        "title": "Stream Delivery Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 8, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 7386776256176399,
+      "definition": {
+        "title": "Stream Order Rate (%)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
+                "aggregator": "avg"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": ">=",
+                "value": 99.9,
+                "palette": "white_on_green"
+              },
+              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
+              { "comparator": "<", "value": 99, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 10, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 7792773130762525,
@@ -230,7 +232,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 2, "width": 6, "height": 4 }
+      "layout": { "x": 0, "y": 1, "width": 6, "height": 4 }
     },
     {
       "id": 4980151126779186,
@@ -267,7 +269,7 @@
           }
         ]
       },
-      "layout": { "x": 6, "y": 2, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 1, "width": 6, "height": 4 }
     },
     {
       "id": 403905557672626,
@@ -294,7 +296,7 @@
         "style": { "palette": "green_to_orange", "palette_flip": false },
         "view": { "focus": "WORLD" }
       },
-      "layout": { "x": 0, "y": 6, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 5, "width": 6, "height": 3 }
     },
     {
       "id": 7177057798083011,
@@ -329,7 +331,7 @@
           "include_zero": true
         }
       },
-      "layout": { "x": 6, "y": 6, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 5, "width": 6, "height": 4 }
     },
     {
       "id": 3075918014507898,
@@ -365,7 +367,7 @@
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 0, "y": 9, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 8, "width": 6, "height": 3 }
     },
     {
       "id": 1234567890123456,
@@ -393,7 +395,7 @@
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 6, "y": 10, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 9, "width": 6, "height": 4 }
     },
     {
       "id": 2728971946510230,
@@ -416,211 +418,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 12, "width": 6, "height": 2 }
-    },
-    {
-      "id": 2407062479686085,
-      "definition": {
-        "title": "Recovery Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 0, "y": 14, "width": 2, "height": 1 }
-    },
-    {
-      "id": 4612667987992580,
-      "definition": {
-        "title": "Poll Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 2, "y": 14, "width": 2, "height": 1 }
-    },
-    {
-      "id": 7386776256176399,
-      "definition": {
-        "title": "Stream Order Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 4, "y": 14, "width": 2, "height": 1 }
-    },
-    {
-      "id": 5725909012596498,
-      "definition": {
-        "title": "Recovery Delivery Date",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 6, "y": 14, "width": 2, "height": 1 }
-    },
-    {
-      "id": 8856927638744357,
-      "definition": {
-        "title": "Poll Delivery Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 8, "y": 14, "width": 2, "height": 1 }
-    },
-    {
-      "id": 504026830671482,
-      "definition": {
-        "title": "Stream Delivery Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "query_value",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
-                "aggregator": "avg"
-              }
-            ],
-            "formulas": [{ "formula": "query1" }],
-            "conditional_formats": [
-              {
-                "comparator": ">=",
-                "value": 99.9,
-                "palette": "white_on_green"
-              },
-              { "comparator": ">=", "value": 99, "palette": "white_on_yellow" },
-              { "comparator": "<", "value": 99, "palette": "white_on_red" }
-            ]
-          }
-        ],
-        "autoscale": true
-      },
-      "layout": { "x": 10, "y": 14, "width": 2, "height": 1 }
+      "layout": { "x": 0, "y": 11, "width": 6, "height": 2 }
     },
     {
       "id": 5871193681027559,
@@ -666,7 +464,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 15, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 13, "width": 6, "height": 3 }
     },
     {
       "id": 3827551407888457,
@@ -712,7 +510,7 @@
           }
         ]
       },
-      "layout": { "x": 6, "y": 15, "width": 6, "height": 3 }
+      "layout": { "x": 6, "y": 13, "width": 6, "height": 3 }
     }
   ],
   "template_variables": [
