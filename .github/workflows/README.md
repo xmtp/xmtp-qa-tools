@@ -78,9 +78,9 @@ The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation.yml) workflow repli
 
 ### Monitoring Dashboard
 
-![TS_Performance](/media/ts_performance.png)
+> Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
 
-Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
+![TS_Performance](/media/ts_performance.png)
 
 - Operation durations across different functions
 - Network performance metrics
@@ -201,10 +201,6 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery.yml) workflow automates t
 - ⚙️ **Configuration**: Supports adjustable message volume via environment variables
 
 ### Monitoring Dashboard
-
-![TS_Delivery](/media/ts_delivery.png)
-
-This test suite feeds data to the [SDK Delivery Dashboard](https://app.datadoghq.com/dashboard/pm2-3j8-yc5), which visualizes:
 
 #### Message Delivery Metrics
 
