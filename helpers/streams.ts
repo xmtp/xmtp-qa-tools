@@ -31,16 +31,17 @@ export async function verifyStream<T extends string = string>(
   count = 1,
   generator: (i: number, suffix: string) => T = (i, suffix): T =>
     `gm-${i + 1}-${suffix}` as T,
-  sender: (group: Conversation, payload: T) => Promise<void> = async (
+  sender: (group: Conversation, payload: string) => Promise<string> = async (
     g,
     payload,
   ) => await g.send(payload),
 ): Promise<VerifyStreamResult> {
   // Use name updater for group_updated collector type
   if (collectorType === "group_updated") {
-    generator = ((i, suffix) => `New name-${i + 1}-${suffix}`) as any;
-    sender = (async (g, payload) => {
-      await (g as Group).updateName(payload);
+    generator = ((i: number, suffix: string) =>
+      `New name-${i + 1}-${suffix}`) as any;
+    sender = (async (g: Group, payload: string) => {
+      await g.updateName(payload);
     }) as any;
   }
 

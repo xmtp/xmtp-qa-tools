@@ -1,7 +1,7 @@
 import fs from "fs";
 import { getEnvPath } from "@helpers/client";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { type Client, type Group, type GroupMember } from "@xmtp/node-sdk";
+import { type Client, type Group } from "@xmtp/node-sdk";
 import {
   Client as Client47,
   Conversation as Conversation47,
