@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { verifyStreamAll } from "@helpers/tests";
+import { verifyStreamAll } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";

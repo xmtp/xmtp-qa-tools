@@ -1,13 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
-import { getWorkersFromGroup } from "@helpers/group";
+import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import {
-  calculateMessageStats,
-  defaultValues,
-  verifyStream,
-  type VerifyStreamResult,
-} from "@helpers/tests";
+import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
+import { calculateMessageStats, defaultValues } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";

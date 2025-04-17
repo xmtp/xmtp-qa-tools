@@ -1,7 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { verifyStream } from "@helpers/tests";
+import { verifyStream } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import {

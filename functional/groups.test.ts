@@ -2,7 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import { verifyStreamAll } from "@helpers/tests";
+import { verifyStreamAll } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import {

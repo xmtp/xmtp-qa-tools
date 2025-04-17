@@ -3,7 +3,7 @@ import {
   addMemberByWorker,
   getOrCreateGroup,
   sendMessageWithCount,
-} from "@helpers/group";
+} from "@helpers/groups";
 import {
   getWorkerConfigs,
   randomDescriptionUpdate,
