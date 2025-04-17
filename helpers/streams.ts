@@ -9,14 +9,9 @@ export type VerifyStreamResult = {
   messages: string[][];
 };
 
-const nameUpdateGenerator = (i: number, suffix: string) => {
-  return `New name-${i + 1}-${suffix}`;
-};
-
-const nameUpdater = async (group: Conversation, payload: string) => {
-  await (group as Group).updateName(payload);
-};
-
+/**
+ * Verifies stream functionality for all workers in a group
+ */
 export async function verifyStreamAll(
   group: Conversation,
   participants: WorkerManager,
@@ -25,37 +20,34 @@ export async function verifyStreamAll(
   const allWorkers = await getWorkersFromGroup(group, participants);
   return verifyStream(group, allWorkers, "text", count);
 }
+
+/**
+ * Verifies message streaming with flexible message generation and sending
+ */
 export async function verifyStream<T extends string = string>(
   group: Conversation,
   participants: Worker[],
   collectorType = "text",
   count = 1,
-  generator: (index: number, suffix: string) => T = (
-    i: number,
-    suffix: string,
-  ): T => `gm-${i + 1}-${suffix}` as T,
+  generator: (i: number, suffix: string) => T = (i, suffix): T =>
+    `gm-${i + 1}-${suffix}` as T,
   sender: (group: Conversation, payload: T) => Promise<void> = async (
-    group: Conversation,
-    payload: T,
-  ) => {
-    await group.send(payload);
-  },
+    g,
+    payload,
+  ) => await g.send(payload),
 ): Promise<VerifyStreamResult> {
+  // Use name updater for group_updated collector type
   if (collectorType === "group_updated") {
-    generator = nameUpdateGenerator as (index: number, suffix: string) => T;
-    sender = nameUpdater as (group: Conversation, payload: T) => Promise<void>;
+    generator = ((i, suffix) => `New name-${i + 1}-${suffix}`) as any;
+    sender = (async (g, payload) => {
+      await (g as Group).updateName(payload);
+    }) as any;
   }
-  // Exclude the group creator from receiving
-  const creatorInboxId = (await group.metadata()).creatorInboxId;
-  const receivers = participants.filter(
-    (p) => p.client?.inboxId !== creatorInboxId,
-  );
 
-  // Conversation ID (topic or peerAddress)
-  // Modify as needed depending on how you store the ID
+  // Exclude group creator from receivers
+  const creatorId = (await group.metadata()).creatorInboxId;
+  const receivers = participants.filter((p) => p.client?.inboxId !== creatorId);
   const conversationId = group.id;
-
-  // Unique random suffix to avoid counting old messages
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   // Start collectors
@@ -66,24 +58,22 @@ export async function verifyStream<T extends string = string>(
         msgs.map((m) => m.message.content as T),
       ),
   );
+
   // Send the messages
   for (let i = 0; i < count; i++) {
-    const payload = generator(i, randomSuffix);
-    //console.log(`Sending message #${i + 1}:`, payload);
-    await sender(group, payload);
+    await sender(group, generator(i, randomSuffix));
   }
   console.log(`Sent ${count} messages`);
 
   // Wait for collectors
   const collectedMessages = await Promise.all(collectPromises);
   const allReceived = collectedMessages.every((msgs) => msgs?.length === count);
-  if (!allReceived) {
-    console.error(
-      "Not all participants received the expected number of messages.",
-    );
-  } else {
-    console.log("All participants received the expected number of messages.");
-  }
+
+  console.log(
+    allReceived
+      ? "All participants received the expected number of messages"
+      : "Not all participants received the expected number of messages",
+  );
 
   return {
     allReceived,
@@ -91,71 +81,46 @@ export async function verifyStream<T extends string = string>(
   };
 }
 
+/**
+ * Verifies conversation streaming functionality
+ */
 export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
-  const groupCreator = async (
-    initiator: Worker,
-    participantAddresses: string[],
-  ) => {
-    if (!initiator.client) {
-      throw new Error("Initiator has no client");
-    }
-    return initiator.client.conversations.newGroup(participantAddresses);
-  };
-
-  console.log(
-    `[${initiator.name}] Starting group conversation stream verification test with ${participants.length} participants`,
-  );
-
-  if (!initiator.worker) {
-    throw new Error(`Initiator ${initiator.name} has no worker`);
+  if (!initiator.client || !initiator.worker) {
+    throw new Error(`Initiator ${initiator.name} not properly initialized`);
   }
 
-  // Set up promises to collect conversations for all participants
+  console.log(
+    `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
+  );
+
+  // Set up collector promises
   const participantPromises = participants.map((participant) => {
     if (!participant.worker) {
       console.warn(`Participant ${participant.name} has no worker`);
       return Promise.resolve(null);
     }
 
-    if (!initiator.client) {
-      throw new Error(`Initiator ${initiator.name} has no client`);
-    }
-
-    // Use the worker's collectConversations method to wait for conversation events
     return participant.worker.collectConversations(
       initiator.client.inboxId,
-      1, // We expect just one conversation
+      1, // Expect one conversation
     );
   });
 
-  // Create a new group conversation
-  console.log(
-    `[${initiator.name}] Creating new group conversation with ${participants.length} participants`,
-  );
+  // Get participant addresses and create group
   const participantAddresses = participants.map((p) => {
-    if (!p.client) {
-      throw new Error(`Participant ${p.name} has no client`);
-    }
+    if (!p.client) throw new Error(`Participant ${p.name} has no client`);
     return p.client.inboxId;
   });
 
-  const createdGroup = await groupCreator(initiator, participantAddresses);
+  const createdGroup =
+    await initiator.client.conversations.newGroup(participantAddresses);
+  console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
 
-  const createdGroupId = createdGroup.id;
-  console.log(
-    `[${initiator.name}] Created group conversation with ID: ${createdGroupId}`,
-  );
-
-  // Wait for all participant promises to resolve ()
+  // Wait for all notifications
   const results = await Promise.all(participantPromises);
-  console.log(
-    `[${initiator.name}] Received ${results.length} group conversation notifications`,
-  );
-
-  // Count how many participants received the conversation
   const receivedCount = results.filter(
     (result) => result && result.length > 0,
   ).length;
@@ -163,15 +128,13 @@ export async function verifyConversationStream(
 
   if (!allReceived) {
     const missing = participants
-      .filter((_, index) => !results[index] || results[index].length === 0)
+      .filter((_, i) => !results[i] || results[i].length === 0)
       .map((p) => p.name);
+
     console.warn(
-      `[${initiator.name}] Some participants did not receive group conversation: ${missing.join(", ")}`,
+      `[${initiator.name}] Missing participants: ${missing.join(", ")}`,
     );
   }
 
-  return {
-    allReceived,
-    receivedCount,
-  };
+  return { allReceived, receivedCount };
 }

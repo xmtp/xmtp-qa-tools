@@ -3,13 +3,7 @@ import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { appendToEnv } from "./tests";
 
 /**
- * Creates a group with a specified number of participants and measures performance
- *
- * @param creator - The worker that will create the group
- * @param allWorkers - Record of all available workers
- * @param batchSize - Number of participants to include in the group
- * @param installationsPerUser - Number of installations per user (for logging purposes)
- * @returns Object containing group information and performance metrics
+ * Creates a group with specified participants and measures performance
  */
 export async function createGroupWithBatch(
   creator: Worker,
@@ -23,54 +17,37 @@ export async function createGroupWithBatch(
   executionTimeMs: number;
 }> {
   const startTime = performance.now();
-  const logLabel = `create group with ${batchSize} participants and total ${
-    batchSize * installationsPerUser
-  } installations`;
-
+  const logLabel = `create group with ${batchSize} participants (${batchSize * installationsPerUser} installations)`;
   console.time(logLabel);
 
-  // Create the group with the specified number of participants
   const group = await creator.client?.conversations.newGroup(
     allWorkers
       .getWorkers()
-      .map((worker: Worker) => worker.client.inboxId)
+      .map((w) => w.client.inboxId)
       .slice(0, batchSize),
   );
 
-  // Get group members and count installations
   const members = await group?.members();
-  let totalInstallations = 0;
+  const totalInstallations = (members ?? []).reduce(
+    (sum, m) => sum + (m?.installationIds.length ?? 0),
+    0,
+  );
 
-  for (const member of members ?? []) {
-    totalInstallations += member?.installationIds.length ?? 0;
-  }
-
-  console.log(`Group created with id ${group?.id}`);
-  console.log(`Total members: ${members?.length}`);
-  console.log(`Total installations: ${totalInstallations}`);
-
+  console.log(
+    `Group created: ${group?.id} | Members: ${members?.length} | Installations: ${totalInstallations}`,
+  );
   console.timeEnd(logLabel);
-
-  const endTime = performance.now();
 
   return {
     groupId: group?.id,
     memberCount: members?.length ?? 0,
     totalInstallations,
-    executionTimeMs: endTime - startTime,
+    executionTimeMs: performance.now() - startTime,
   };
 }
 
 /**
  * Creates multiple groups with increasing batch sizes
- *
- * @param creator - The worker that will create the groups
- * @param allWorkers - Record of all available workers
- * @param startBatchSize - Initial batch size
- * @param batchIncrement - How much to increase batch size for each iteration
- * @param maxParticipants - Maximum number of participants to include
- * @param installationsPerUser - Number of installations per user
- * @returns Array of results from each group creation
  */
 export async function createGroupsWithIncrementalBatches(
   creator: Worker,
@@ -79,43 +56,32 @@ export async function createGroupsWithIncrementalBatches(
   batchIncrement: number = 5,
   maxParticipants: number,
   installationsPerUser: number,
-): Promise<
-  Array<{
-    batchSize: number;
-    groupId: string | undefined;
-    memberCount: number;
-    totalInstallations: number;
-    executionTimeMs: number;
-  }>
-> {
+) {
   const results = [];
-  let currentBatchSize = startBatchSize;
 
-  while (currentBatchSize <= maxParticipants) {
+  for (
+    let size = startBatchSize;
+    size <= maxParticipants;
+    size += batchIncrement
+  ) {
     const result = await createGroupWithBatch(
       creator,
       allWorkers,
-      currentBatchSize,
+      size,
       installationsPerUser,
     );
-
-    results.push({
-      batchSize: currentBatchSize,
-      ...result,
-    });
-
-    currentBatchSize += batchIncrement;
+    results.push({ batchSize: size, ...result });
   }
 
   return results;
 }
 
 /**
- * Adds a member to a group by a worker
+ * Adds a member to a group
  */
 export const addMemberByWorker = async (
   groupId: string,
-  membertoAdd: string,
+  memberToAdd: string,
   memberWhoAdds: Worker,
 ): Promise<void> => {
   await memberWhoAdds.client.conversations.syncAll();
@@ -123,50 +89,39 @@ export const addMemberByWorker = async (
     await memberWhoAdds.client.conversations.getConversationById(groupId);
 
   if (!group) {
-    console.log(`Group with ID ${groupId} not found`);
+    console.log(`Group ${groupId} not found`);
     return;
   }
 
-  // Check if member already exists in the group
   const members = await (group as Group).members();
-  const memberExists = members.some(
-    (member) => member.inboxId.toLowerCase() === membertoAdd.toLowerCase(),
-  );
-
-  if (memberExists) {
-    console.log(`Member ${membertoAdd} already exists in group ${groupId}`);
+  if (
+    members.some((m) => m.inboxId.toLowerCase() === memberToAdd.toLowerCase())
+  ) {
+    console.log(`Member ${memberToAdd} already in group ${groupId}`);
     return;
   }
 
-  // Add member if they don't exist
-  await (group as Group).addMembers([membertoAdd]);
-  console.log(`Added member ${membertoAdd} to group ${groupId}`);
+  await (group as Group).addMembers([memberToAdd]);
+  console.log(`Added ${memberToAdd} to group ${groupId}`);
 };
 
 /**
  * Gets or creates a group
  */
 export const getOrCreateGroup = async (
-  testConfig: {
-    testName: string;
-  },
+  testConfig: { testName: string },
   creator: Client,
 ): Promise<Conversation | undefined> => {
-  let globalGroup: Conversation | undefined;
   const GROUP_ID = process.env.GROUP_ID;
 
   if (!GROUP_ID) {
-    globalGroup = await creator.conversations.newGroup([]);
-    console.log("Creating group with ID:", globalGroup.id);
-    console.log("Updated test config with group ID:", globalGroup.id);
-
-    // Write the group ID to the .env file
-    appendToEnv("GROUP_ID", globalGroup.id, testConfig.testName);
-  } else {
-    globalGroup = await creator.conversations.getConversationById(GROUP_ID);
+    const group = await creator.conversations.newGroup([]);
+    console.log(`Created group: ${group.id}`);
+    appendToEnv("GROUP_ID", group.id, testConfig.testName);
+    return group;
   }
 
-  return globalGroup;
+  return await creator.conversations.getConversationById(GROUP_ID);
 };
 
 /**
@@ -178,142 +133,112 @@ export const sendMessageWithCount = async (
   messageCount: number,
 ): Promise<number> => {
   try {
-    // Randomly choose between different sync approaches
-    const syncChoice = Math.floor(Math.random() * 2); // 0 for sync, 1 for syncAll
-    if (syncChoice === 0) {
-      await worker.client.conversations.sync();
-      console.log(`${worker.name} performed client sync`);
-    } else if (syncChoice === 1) {
-      await worker.client.conversations.syncAll();
-      console.log(`${worker.name} performed client syncAll`);
-    }
+    // Random sync choice
+    const syncChoice = Math.random() < 0.5;
+    await worker.client.conversations[syncChoice ? "sync" : "syncAll"]();
+    console.log(`${worker.name} performed ${syncChoice ? "sync" : "syncAll"}`);
 
     const group =
       await worker.client.conversations.getConversationById(groupId);
     const message = `${worker.name} ${messageCount}`;
 
-    console.log(
-      `${worker.name} sending message: "${message}" to group ${groupId}`,
-    );
+    console.log(`${worker.name} sending: "${message}" to group ${groupId}`);
     await group?.send(message);
     return messageCount + 1;
   } catch (e) {
-    console.error(`Error sending message from ${worker.name}:`, e);
+    console.error(`Error sending from ${worker.name}:`, e);
     return messageCount;
   }
 };
 
 /**
  * Checks if groups across workers are in a forked state
- * Returns true if a fork is detected (different group states)
  */
 export const checkForGroupFork = async (
   workers: Worker[],
   groupId: string,
 ): Promise<boolean> => {
-  console.log(`Checking for group fork in group ${groupId}`);
-
-  if (workers.length < 2) {
-    console.log("Need at least 2 workers to check for a fork");
-    return false;
-  }
+  console.log(`Checking for group fork in ${groupId}`);
+  if (workers.length < 2) return false;
 
   const groupStates: Record<string, any> = {};
 
   // Get group state from each worker
   for (const worker of workers) {
     try {
-      const group =
-        await worker.client.conversations.getConversationById(groupId);
+      const group = (await worker.client.conversations.getConversationById(
+        groupId,
+      )) as Group;
+      if (!group) continue;
 
-      if (!group) {
-        console.log(`Group not found for worker ${worker.name}`);
-        continue;
-      }
-
-      // In a real implementation, we would extract the epoch or other state
-      // information that would indicate a fork. For now, we'll use what's available
-      // in the public API.
-      const members = await (group as Group).members();
-      const memberCount = members.length;
-
-      // Store group state for this worker
+      const members = await group.members();
       groupStates[worker.name] = {
-        memberCount,
-        name: (group as Group).name,
-        description: (group as Group).description,
+        memberCount: members.length,
+        name: group.name,
+        description: group.description,
       };
 
       console.log(
-        `${worker.name} group state:`,
+        `${worker.name} state:`,
         JSON.stringify(groupStates[worker.name]),
       );
     } catch (error) {
-      console.error(`Error getting group state for ${worker.name}:`, error);
+      console.error(`Error getting state for ${worker.name}:`, error);
     }
   }
 
-  // Compare group states to detect forks
+  // Compare group states
   const workerNames = Object.keys(groupStates);
-  if (workerNames.length < 2) {
-    console.log("Not enough group states to compare");
-    return false;
-  }
+  if (workerNames.length < 2) return false;
 
-  const firstWorkerState = groupStates[workerNames[0]];
+  const firstState = groupStates[workerNames[0]];
   let forkDetected = false;
 
-  // Compare each worker's state with the first worker
   for (let i = 1; i < workerNames.length; i++) {
-    const currentWorkerState = groupStates[workerNames[i]];
+    const currentState = groupStates[workerNames[i]];
+    const currentName = workerNames[i];
 
-    // Compare number of members - a common fork symptom
-    if (currentWorkerState.memberCount !== firstWorkerState.memberCount) {
+    // Check members count
+    if (currentState.memberCount !== firstState.memberCount) {
       console.log(
-        `FORK DETECTED: ${workerNames[0]} has ${firstWorkerState.memberCount} members, but ${workerNames[i]} has ${currentWorkerState.memberCount} members`,
+        `FORK: ${workerNames[0]} has ${firstState.memberCount} members, but ${currentName} has ${currentState.memberCount}`,
       );
       forkDetected = true;
     }
 
-    // Compare group name
-    if (currentWorkerState.name !== firstWorkerState.name) {
+    // Check name and description
+    if (currentState.name !== firstState.name) {
       console.log(
-        `FORK DETECTED: ${workerNames[0]} has group name "${firstWorkerState.name}", but ${workerNames[i]} has "${currentWorkerState.name}"`,
+        `FORK: Group name differs between ${workerNames[0]} and ${currentName}`,
       );
       forkDetected = true;
     }
 
-    // Compare group description
-    if (currentWorkerState.description !== firstWorkerState.description) {
+    if (currentState.description !== firstState.description) {
       console.log(
-        `FORK DETECTED: ${workerNames[0]} has description "${firstWorkerState.description}", but ${workerNames[i]} has "${currentWorkerState.description}"`,
+        `FORK: Group description differs between ${workerNames[0]} and ${currentName}`,
       );
       forkDetected = true;
     }
   }
 
   if (!forkDetected) {
-    console.log("No group fork detected - all clients have consistent state");
+    console.log("No group fork detected - consistent state across clients");
   }
 
   return forkDetected;
 };
 
+/**
+ * Gets workers that are members of a group
+ */
 export async function getWorkersFromGroup(
   group: Conversation,
   workers: WorkerManager,
 ): Promise<Worker[]> {
   await group.sync();
-  const members = await group.members();
-  const memberInboxIds = members.map((member) => member.inboxId);
-
-  // Use the getWorkers method to retrieve all workers
-  const allWorkers = workers.getWorkers();
-
-  // Find workers whose client inboxId matches the group members' inboxIds
-  const workersFromGroup = allWorkers.filter((worker) =>
-    memberInboxIds.includes(worker.client.inboxId),
-  );
-
-  return workersFromGroup;
+  const memberIds = (await group.members()).map((m) => m.inboxId);
+  return workers
+    .getWorkers()
+    .filter((w) => memberIds.includes(w.client.inboxId));
 }
