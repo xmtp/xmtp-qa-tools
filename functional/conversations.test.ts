@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { verifyConversationStream } from "@helpers/tests";
+import { verifyConversationStream } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, beforeAll, describe, it } from "vitest";
 

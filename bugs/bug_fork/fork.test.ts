@@ -3,16 +3,14 @@ import {
   addMemberByWorker,
   getOrCreateGroup,
   sendMessageWithCount,
-} from "@helpers/group";
+} from "@helpers/groups";
 import {
   getWorkerConfigs,
   randomDescriptionUpdate,
   randomlyAsignAdmins,
   randomNameUpdate,
-  randomReinstall,
   randomSyncs,
   removeMemberByWorker,
-  setRandomNetworkConditions,
 } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";

@@ -7,7 +7,8 @@ This directory contains utility modules that power the XMTP testing framework. T
 | Module                         | Purpose                                           |
 | ------------------------------ | ------------------------------------------------- |
 | [client.ts](#clientts)         | Creates signers and manages keys for test workers |
-| [group.ts](#groupts)           | Creates test groups with specified participants   |
+| [groups.ts](#groupsts)         | Creates test groups with specified participants   |
+| [streams.ts](#streamsts)       | Streams utilities for testing message delivery    |
 | [logger.ts](#loggerts)         | Logging utilities for test output                 |
 | [tests.ts](#testts)            | Test utilities for creating and managing tests    |
 | [datadog.ts](#datadogts)       | Datadog utilities for testing message delivery    |
@@ -16,16 +17,9 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## 🔍 Module Details
 
-### tests.ts
+### streams.ts
 
-Handles test configuration and setup:
-
-```typescript
-// Create a test configuration
-const testConfig = createTestConfig(testName, workerConfigs);
-```
-
-Validation utilities for testing message delivery:
+Handles stream utilities for testing message delivery:
 
 ```typescript
 // Verify that all participants in a group receive messages
@@ -53,19 +47,53 @@ const stats = calculateMessageStats(
 );
 ```
 
-### client.ts
+### tests.ts
 
-Handles XMTP client creation and key management:
+Handles test configuration and setup:
 
 ```typescript
-// Create a signer for a private key
-const signer = createSigner(privateKey);
+// Create a test configuration
+const testConfig = createTestConfig(testName, workerConfigs);
+```
 
-// Generate a path for the client database
-const dbPath = getDbPath(workerName, accountAddress, testName);
+### client.ts
 
-// Generate random encryption keys
-const encryptionKey = generateEncryptionKeyHex();
+Handles XMTP client creation and version mappings:
+
+```typescript
+// SDK version mappings
+export const sdkVersions = {
+  47: {
+    Client: Client47,
+    Conversation: Conversation47,
+    Dm: Dm47,
+    Group: Group47,
+    sdkPackage: "node-sdk-47",
+    bindingsPackage: "node-bindings-41",
+    sdkVersion: "0.0.47",
+    libXmtpVersion: "6bd613d",
+  },
+  105: {
+    Client: Client105,
+    Conversation: Conversation105,
+    Dm: Dm105,
+    Group: Group105,
+    sdkPackage: "node-sdk-105",
+    bindingsPackage: "node-bindings-113",
+    sdkVersion: "1.0.5",
+    libXmtpVersion: "6eb1ce4",
+  },
+  202: {
+    Client: Client202,
+    Conversation: Conversation202,
+    Dm: Dm202,
+    Group: Group202,
+    sdkPackage: "node-sdk-202",
+    bindingsPackage: "node-bindings-120",
+    sdkVersion: "2.0.2",
+    libXmtpVersion: "bed98df",
+  },
+};
 ```
 
 ### datadog.ts
@@ -83,7 +111,7 @@ sendTestResults(hasFailures, testName);
 sendPerformanceMetric(metricValue, testName, libXmtpVersion, skipNetworkStats);
 ```
 
-### group.ts
+### groups.ts
 
 Utilities for creating and managing test groups:
 

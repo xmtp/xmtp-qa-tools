@@ -106,21 +106,21 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Core SDK Operations Performance
 
-| Operation                | Description                            | Avg (ms) | Target | Status       |
-| ------------------------ | -------------------------------------- | -------- | ------ | ------------ |
-| clientCreate             | Creating a client                      | 254-306  | <350ms | ✅ On Target |
-| inboxState               | Checking inbox state                   | 300      | <350ms | ✅ On Target |
-| newDm                    | Creating a direct message conversation | 200-250  | <350ms | ✅ On Target |
-| newDmWithIdentifiers     | Creating a dm by address               | 200-250  | <350ms | ✅ On Target |
-| sendGM                   | Sending a group message                | 123-160  | <200ms | ✅ On Target |
-| receiveGM                | Receiving a group message              | 90-140   | <200ms | ✅ On Target |
-| createGroup              | Creating a group                       | 254-306  | <350ms | ✅ On Target |
-| createGroupByIdentifiers | Creating a group by address            | 254-306  | <350ms | ✅ On Target |
-| syncGroup                | Syncing group state                    | 78-89    | <200ms | ✅ On Target |
-| updateGroupName          | Updating group metadata                | 105-160  | <200ms | ✅ On Target |
-| removeMembers            | Removing participants from a group     | 110-168  | <250ms | ✅ On Target |
-| sendGroupMessage         | Sending a group message                | 100-127  | <200ms | ✅ On Target |
-| receiveGroupMessage      | Processing group message streams       | 119-127  | <200ms | ✅ On Target |
+| Operation                | Description                            | Avg (ms) | Target | Status                 |
+| ------------------------ | -------------------------------------- | -------- | ------ | ---------------------- |
+| clientCreate             | Creating a client                      | 588.18   | <350ms | ⚠️ Performance Concern |
+| inboxState               | Checking inbox state                   | 41.37    | <350ms | ✅ On Target           |
+| newDm                    | Creating a direct message conversation | 258.05   | <350ms | ✅ On Target           |
+| newDmWithIdentifiers     | Creating a dm by address               | 294.23   | <350ms | ✅ On Target           |
+| sendGM                   | Sending a group message                | 126.19   | <200ms | ✅ On Target           |
+| receiveGM                | Receiving a group message              | 86.82    | <200ms | ✅ On Target           |
+| createGroup              | Creating a group                       | 315.25   | <350ms | ✅ On Target           |
+| createGroupByIdentifiers | Creating a group by address            | 312.83   | <350ms | ✅ On Target           |
+| syncGroup                | Syncing group state                    | 75.96    | <200ms | ✅ On Target           |
+| updateGroupName          | Updating group metadata                | 128.86   | <200ms | ✅ On Target           |
+| removeMembers            | Removing participants from a group     | 127.06   | <250ms | ✅ On Target           |
+| sendGroupMessage         | Sending a group message                | 85.27    | <200ms | ✅ On Target           |
+| receiveGroupMessage      | Processing group message streams       | 124.00   | <200ms | ✅ On Target           |
 
 _Note: Based on data from 79 measured operations in the `us-east` region and `production` network._
 
@@ -128,15 +128,14 @@ _Note: Based on data from 79 measured operations in the `us-east` region and `pr
 
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
-| 50   | 1130       | 71       | 61       | 81         | 140        | <1300ms        | ✅ On Target           |
-| 100  | 1278       | 67       | 66       | 91         | 182        | <1400ms        | ✅ On Target           |
-| 150  | 1902       | 72       | 85       | 104        | 183        | <2000ms        | ✅ On Target           |
-| 200  | 2897       | 73       | 103      | 139        | 211        | <3000ms        | ✅ On Target           |
-| 250  | 3255       | 76       | 120      | 164        | 234        | <3500ms        | ✅ On Target           |
-| 300  | 5089       | 81       | 321      | 255        | 309        | <5500ms        | ✅ On Target           |
-| 350  | 5966       | 89       | 432      | 355        | 409        | <6000ms        | ⚠️ Performance Concern |
-| 400  | 6542       | 89       | 432      | 355        | 409        | <7000ms        | ⚠️ Performance Concern |
-| 450  | -          | -        | -        | -          | -          | -              | ❌ Severe impact       |
+| 50   | 1152.73    | 86.01    | 78.33    | 135.36     | 138.57     | <1300ms        | ✅ On Target           |
+| 100  | 1582.43    | 88.41    | 83.48    | 144.67     | 156.86     | <1400ms        | ✅ On Target           |
+| 150  | 2650.67    | 94.55    | 120.24   | 202.64     | 189.81     | <2000ms        | ✅ On Target           |
+| 200  | 4117.80    | 93.42    | 128.73   | 193.36     | 204.78     | <3000ms        | ✅ On Target           |
+| 250  | 5740.75    | 107.76   | 154.79   | 219.17     | 236.53     | <3500ms        | ✅ On Target           |
+| 300  | 7656.24    | 97.09    | 145.75   | 244.24     | 247.22     | <5500ms        | ⚠️ Performance Concern |
+| 350  | 8272.22    | 99.20    | 155.32   | 244.24     | 270.62     | <6000ms        | ⚠️ Performance Concern |
+| 400  | 9215.61    | 101.34   | 167.90   | 263.91     | 308.01     | <7000ms        | ⚠️ Performance Concern |
 
 _Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._
 
@@ -146,11 +145,11 @@ _Note: Performance increases significantly beyond `350` members, with `400` memb
 
 | Performance Metric | Current Performance | Target | Status       |
 | ------------------ | ------------------- | ------ | ------------ |
-| DNS Lookup         | 50.3ms avg          | <100ms | ✅ On Target |
-| TCP Connection     | 105.6ms avg         | <200ms | ✅ On Target |
-| TLS Handshake      | 238.9ms avg         | <300ms | ✅ On Target |
-| Processing         | 30ms avg            | <100ms | ✅ On Target |
-| Server Call        | 238.9ms avg         | <300ms | ✅ On Target |
+| DNS Lookup         | 13.65ms avg         | <50ms  | ✅ On Target |
+| TCP Connection     | 48.10ms avg         | <70ms  | ✅ On Target |
+| TLS Handshake      | 124.11ms avg        | <150ms | ✅ On Target |
+| Processing         | 35.17ms avg         | <100ms | ✅ On Target |
+| Server Call        | 159.22ms avg        | <250ms | ✅ On Target |
 
 _Note: Performance metrics based on `us-east` testing on `production` network._
 
@@ -158,23 +157,23 @@ _Note: Performance metrics based on `us-east` testing on `production` network._
 
 | Region        | Server Call (ms) | TLS (ms) | ~ us-east | Status                 |
 | ------------- | ---------------- | -------- | --------- | ---------------------- |
-| us-east       | 276.6            | 87.2     | Baseline  | ✅ On Target           |
-| us-west       | 229.3            | 111.1    | -15.6%    | ✅ On Target           |
-| europe        | 178.5            | 111.4    | -33.2%    | ✅ On Target           |
-| asia          | 411.0            | 103.7    | +46.5%    | ⚠️ Performance Concern |
+| us-east       | 158.70           | 123.75   | Baseline  | ✅ On Target           |
+| us-west       | 151.91           | 118.59   | -4.3%     | ✅ On Target           |
+| europe        | 159.84           | 125.04   | +0.7%     | ✅ On Target           |
+| asia          | 152.32           | 119.43   | -3.9%     | ✅ On Target           |
 | south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Baseline is `us-east` region and `production` network._
 
 ### Dev vs Production Network Performance Comparison
 
-| Region        | Dev (ms) | Production (ms) | Difference | Status               |
-| ------------- | -------- | --------------- | ---------- | -------------------- |
-| us-east       | 294.8    | 276.6           | -6.2%      | ✅ Production Better |
-| us-west       | 247.1    | 229.3           | -7.2%      | ✅ Production Better |
-| europe        | 196.3    | 178.5           | -9.1%      | ✅ Production Better |
-| asia          | 439.8    | 411.0           | -6.5%      | ✅ Production Better |
-| south-america | 798.2    | 754.6           | -5.5%      | ✅ Production Better |
+| Region        | Dev (ms) | Production (ms) | Difference | Status                 |
+| ------------- | -------- | --------------- | ---------- | ---------------------- |
+| us-east       | 158.70   | 162.91          | +2.7%      | ✅ Dev Better          |
+| us-west       | 151.91   | 188.87          | +24.3%     | ⚠️ Performance Concern |
+| europe        | 159.84   | 141.36          | -11.5%     | ✅ Production Better   |
+| asia          | 152.32   | 172.09          | +13.0%     | ⚠️ Performance Concern |
+| south-america | 754.6    | 573.1           | -24.1%     | ✅ Production Better   |
 
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
