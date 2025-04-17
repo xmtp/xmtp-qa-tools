@@ -167,13 +167,13 @@ _Note: Baseline is `us-east` region and `production` network._
 
 ### Dev vs Production Network Performance Comparison
 
-| Region        | Dev (ms) | Production (ms) | Difference | Status               |
-| ------------- | -------- | --------------- | ---------- | -------------------- |
-| us-east       | 294.8    | 276.6           | -6.2%      | ✅ Production Better |
-| us-west       | 247.1    | 229.3           | -7.2%      | ✅ Production Better |
-| europe        | 196.3    | 178.5           | -9.1%      | ✅ Production Better |
-| asia          | 439.8    | 411.0           | -6.5%      | ✅ Production Better |
-| south-america | 798.2    | 754.6           | -5.5%      | ✅ Production Better |
+| Region        | Dev (ms) | Production (ms) | Difference | Status                 |
+| ------------- | -------- | --------------- | ---------- | ---------------------- |
+| us-east       | 158.70   | 162.91          | +2.7%      | ✅ Dev Better          |
+| us-west       | 151.91   | 188.87          | +24.3%     | ⚠️ Performance Concern |
+| europe        | 159.84   | 141.36          | -11.5%     | ✅ Production Better   |
+| asia          | 152.32   | 172.09          | +13.0%     | ⚠️ Performance Concern |
+| south-america | 754.6    | 573.1           | -24.1%     | ✅ Production Better   |
 
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
