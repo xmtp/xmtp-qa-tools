@@ -1,16 +1,14 @@
 import { loadEnv } from "@helpers/client";
 import {
-  addMemberByWorker,
   getOrCreateGroup,
+  membershipChange,
   sendMessageWithCount,
 } from "@helpers/groups";
 import {
-  getWorkerConfigs,
   randomDescriptionUpdate,
   randomlyAsignAdmins,
   randomNameUpdate,
   randomSyncs,
-  removeMemberByWorker,
 } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -22,21 +20,19 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  versions: ["100", "105", "202", "203"],
   workerNames: [
-    "bob",
-    "alice",
-    "ivy",
-    "dave",
-    "eve",
-    "frank",
-    "grace",
-    "heidi",
-    "ivan",
-    "julia",
+    "bob-a-203",
+    "alice-a-100",
+    "ivy-a-202",
+    "dave-a-100",
+    "eve-a-100",
+    "frank-a-203",
+    "grace-a-100",
+    "heidi-a-105",
+    "ivan-a-100",
+    "julia-a-105",
   ],
   creator: "fabri",
-  installationNames: ["a", "b"],
   manualUsers: {
     convos: "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
     cbWallet:
@@ -54,7 +50,6 @@ describe(TEST_NAME, () => {
   let messageCount = 0;
   let creator: Worker | undefined;
   let rootWorker: WorkerManager | undefined;
-  const workerConfigs = getWorkerConfigs(testConfig);
 
   // Initialize workers and create group
   it("should initialize all workers at once and create group", async () => {
@@ -63,19 +58,20 @@ describe(TEST_NAME, () => {
     creator = rootWorker.getWorkers()[0];
 
     // Initialize other workers
-    testConfig.workers = await getWorkers(workerConfigs, TEST_NAME, "none");
+    testConfig.workers = await getWorkers(
+      testConfig.workerNames,
+      TEST_NAME,
+      "none",
+    );
 
     // Create or get group
-    globalGroup = (await getOrCreateGroup(testConfig, creator.client)) as Group;
+    globalGroup = (await getOrCreateGroup(
+      testConfig,
+      creator.client,
+      testConfig.workers,
+    )) as Group;
     testConfig.groupId = globalGroup.id;
     await globalGroup.updateName(globalGroup.id);
-
-    // Send initial message from fabri
-    messageCount = await sendMessageWithCount(
-      creator,
-      globalGroup?.id,
-      messageCount,
-    );
 
     // Validate state
     if (!globalGroup?.id || !creator) {
@@ -117,7 +113,7 @@ describe(TEST_NAME, () => {
 
     // Phase 1: Add first batch of workers to the group (bob, alice, dave)
     // Add bob to group
-    await addMemberByWorker(globalGroup.id, bob.client.inboxId, creator);
+    await membershipChange(globalGroup.id, bob.client.inboxId, creator);
 
     // Bob sends message
     messageCount = await sendMessageWithCount(
@@ -127,8 +123,7 @@ describe(TEST_NAME, () => {
     );
 
     // Bob adds alice and dave
-    await addMemberByWorker(globalGroup.id, alice.client.inboxId, bob);
-    await addMemberByWorker(globalGroup.id, dave.client.inboxId, bob);
+    await membershipChange(globalGroup.id, alice.client.inboxId, bob);
 
     // Alice and Dave send messages
     messageCount = await sendMessageWithCount(
@@ -144,7 +139,7 @@ describe(TEST_NAME, () => {
     );
 
     // Add manual user to group
-    await addMemberByWorker(
+    await membershipChange(
       globalGroup.id,
       testConfig.manualUsers.xmtpchat,
       bob,
@@ -159,9 +154,8 @@ describe(TEST_NAME, () => {
     });
 
     // Phase 2: Add eve, frank, and grace
-    await addMemberByWorker(globalGroup.id, eve.client.inboxId, alice);
-    await addMemberByWorker(globalGroup.id, frank.client.inboxId, dave);
-    await addMemberByWorker(globalGroup.id, grace.client.inboxId, bob);
+    await membershipChange(globalGroup.id, eve.client.inboxId, alice);
+    await membershipChange(globalGroup.id, frank.client.inboxId, dave);
 
     // New members send messages
     messageCount = await sendMessageWithCount(
@@ -183,13 +177,13 @@ describe(TEST_NAME, () => {
     );
 
     // Add manual user to group
-    await addMemberByWorker(
+    await membershipChange(
       globalGroup.id,
       testConfig.manualUsers.convos,
       alice,
     );
     // Add manual user to group
-    await addMemberByWorker(
+    await membershipChange(
       globalGroup.id,
       testConfig.manualUsers.cbWallet,
       alice,
@@ -201,12 +195,9 @@ describe(TEST_NAME, () => {
     });
 
     // Phase 3: Add heidi, ivan, julia, and add ivy
-    await addMemberByWorker(globalGroup.id, heidi.client.inboxId, frank);
-    await addMemberByWorker(globalGroup.id, ivan.client.inboxId, grace);
-    await addMemberByWorker(globalGroup.id, julia.client.inboxId, eve);
-
-    // Add ivy who was initialized but not yet added
-    await addMemberByWorker(globalGroup.id, ivy.client.inboxId, bob);
+    await membershipChange(globalGroup.id, heidi.client.inboxId, frank);
+    await membershipChange(globalGroup.id, ivan.client.inboxId, grace);
+    await membershipChange(globalGroup.id, julia.client.inboxId, eve);
 
     // Newly added workers send messages
     messageCount = await sendMessageWithCount(
@@ -227,12 +218,6 @@ describe(TEST_NAME, () => {
       messageCount,
     );
 
-    messageCount = await sendMessageWithCount(
-      ivy,
-      globalGroup.id,
-      messageCount,
-    );
-
     // Randomly assign admins again
     await randomlyAsignAdmins(globalGroup);
 
@@ -240,10 +225,6 @@ describe(TEST_NAME, () => {
       workers: testConfig.workers,
       groupId: testConfig.groupId as string,
     });
-
-    // Phase 4: Remove members
-    await removeMemberByWorker(globalGroup.id, dave.client.inboxId, alice);
-    await removeMemberByWorker(globalGroup.id, frank.client.inboxId, bob);
 
     await randomNameUpdate(globalGroup, testConfig.workers);
     await randomDescriptionUpdate(globalGroup, testConfig.workers);

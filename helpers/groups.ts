@@ -79,30 +79,29 @@ export async function createGroupsWithIncrementalBatches(
 /**
  * Adds a member to a group
  */
-export const addMemberByWorker = async (
+export const membershipChange = async (
   groupId: string,
   memberToAdd: string,
   memberWhoAdds: Worker,
 ): Promise<void> => {
   await memberWhoAdds.client.conversations.syncAll();
-  const group =
-    await memberWhoAdds.client.conversations.getConversationById(groupId);
+  const foundGroup =
+    (await memberWhoAdds.client.conversations.getConversationById(
+      groupId,
+    )) as Group;
 
-  if (!group) {
+  if (!foundGroup) {
     console.log(`Group ${groupId} not found`);
     return;
   }
 
-  const members = await (group as Group).members();
-  if (
-    members.some((m) => m.inboxId.toLowerCase() === memberToAdd.toLowerCase())
-  ) {
-    console.log(`Member ${memberToAdd} already in group ${groupId}`);
-    return;
+  let epochs = 5;
+  for (let epoch = 0; epoch < epochs; epoch++) {
+    await foundGroup.removeMembers([memberToAdd]);
+    await foundGroup.addMembers([memberToAdd]);
+    await foundGroup.sync();
+    console.log(`Epoch ${epoch} completed`);
   }
-
-  await (group as Group).addMembers([memberToAdd]);
-  console.log(`Added ${memberToAdd} to group ${groupId}`);
 };
 
 /**
@@ -111,12 +110,14 @@ export const addMemberByWorker = async (
 export const getOrCreateGroup = async (
   testConfig: { testName: string },
   creator: Client,
+  members: WorkerManager,
 ): Promise<Conversation | undefined> => {
   const GROUP_ID = process.env.GROUP_ID;
 
   if (!GROUP_ID) {
-    const group = await creator.conversations.newGroup([]);
-    console.log(`Created group: ${group.id}`);
+    const inboxIds = members.getWorkers().map((w) => w.client.inboxId);
+    const group = await creator.conversations.newGroup(inboxIds);
+    console.log(`Created group: ${group.id} with ${inboxIds.length} members`);
     appendToEnv("GROUP_ID", group.id, testConfig.testName);
     return group;
   }

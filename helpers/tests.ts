@@ -261,23 +261,6 @@ export const getRandomNetworkCondition = (): NetworkCondition => {
 };
 
 /**
- * Gets worker configs with random versions
- */
-export const getWorkerConfigs = (testConfig: {
-  workerNames: string[];
-  installationNames: string[];
-  versions: string[];
-}): string[] => {
-  const { workerNames, installationNames, versions } = testConfig;
-  return workerNames.map((name) => {
-    const id = getRandomVersion(installationNames);
-    const version = getRandomVersion(versions);
-    console.log(`${name} using version: ${version}`);
-    return `${name}-${id}-${version}`;
-  });
-};
-
-/**
  * Randomly assigns admin privileges to a group member
  */
 export const randomlyAsignAdmins = async (group: Group): Promise<void> => {

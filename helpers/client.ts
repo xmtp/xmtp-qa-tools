@@ -274,7 +274,6 @@ export function getEnvPath(testName: string): string {
       console.log(`Created default .env file at ${envPath}`);
     }
   }
-  console.log("Env path:", envPath, process.env.XMTP_ENV);
   process.env.CURRENT_ENV_PATH = envPath;
   return envPath;
 }
@@ -283,6 +282,7 @@ export function getEnvPath(testName: string): string {
  */
 export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
+  console.log("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
   const logger = createLogger(testName);
   overrideConsole(logger);
 
