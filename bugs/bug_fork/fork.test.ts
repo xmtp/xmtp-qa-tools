@@ -8,7 +8,6 @@ import { describe, it } from "vitest";
 // Test configuration
 const TEST_NAME = "bug_fork";
 loadEnv(TEST_NAME);
-const shouldFix = process.argv.includes("--fix");
 
 const testConfig = {
   testName: TEST_NAME,
@@ -64,11 +63,6 @@ describe(TEST_NAME, () => {
       creator.client,
       allClientIds,
     )) as Group;
-
-    if (shouldFix && globalGroup) {
-      console.log("--fix flag detected, running recoverForks...");
-      await recoverForks(globalGroup);
-    }
 
     if (!globalGroup?.id || !creator)
       throw new Error("Group or creator not found");
