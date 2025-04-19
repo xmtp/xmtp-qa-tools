@@ -120,6 +120,7 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
+export const sdkVersionOptions = [100, 105, 202, 203];
 
 // SDK version mappings
 export const sdkVersions = {

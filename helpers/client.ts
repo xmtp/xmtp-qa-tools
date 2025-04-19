@@ -274,7 +274,7 @@ export function getEnvPath(testName: string): string {
       console.log(`Created default .env file at ${envPath}`);
     }
   }
-  console.log("Env path:", envPath);
+  console.log("Env path:", envPath, process.env.XMTP_ENV);
   process.env.CURRENT_ENV_PATH = envPath;
   return envPath;
 }

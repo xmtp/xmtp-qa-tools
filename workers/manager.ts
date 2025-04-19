@@ -2,7 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { defaultValues, sdkVersions } from "@helpers/tests";
+import { defaultValues, sdkVersionOptions, sdkVersions } from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
@@ -371,7 +371,6 @@ export class WorkerManager {
       descriptors = workerNames.slice(0, descriptorsOrAmount);
       // If we need to create multiple workers with random SDK versions
       // Generate workers with random SDK versions (100, 105, or 202)
-      const sdkVersionOptions = [100, 105, 202];
 
       // Create descriptors with random SDK versions
       descriptors = [];
