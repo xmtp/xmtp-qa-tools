@@ -467,6 +467,12 @@ export const sendInitialTestMessage = async (client: Client): Promise<void> => {
     console.error("Error sending initial test message:", error);
   }
 };
+/**
+ * Sleep utility function
+ */
+export const sleep = (ms: number = 1000): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
 
 /**
  * Appends a variable to the .env file

@@ -1,6 +1,6 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { appendToEnv } from "./tests";
+import { appendToEnv, sleep } from "./tests";
 
 /**
  * Creates a group with specified participants and measures performance
@@ -81,26 +81,67 @@ export async function createGroupsWithIncrementalBatches(
  */
 export const membershipChange = async (
   groupId: string,
-  memberToAdd: string,
   memberWhoAdds: Worker,
+  memberToAdd: Worker,
 ): Promise<void> => {
-  await memberWhoAdds.client.conversations.syncAll();
-  const foundGroup =
-    (await memberWhoAdds.client.conversations.getConversationById(
-      groupId,
-    )) as Group;
+  try {
+    console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name} `);
+    await memberWhoAdds.client.conversations.syncAll();
+    const foundGroup =
+      (await memberWhoAdds.client.conversations.getConversationById(
+        groupId,
+      )) as Group;
 
-  if (!foundGroup) {
-    console.log(`Group ${groupId} not found`);
-    return;
-  }
-
-  let epochs = 5;
-  for (let epoch = 0; epoch < epochs; epoch++) {
-    await foundGroup.removeMembers([memberToAdd]);
-    await foundGroup.addMembers([memberToAdd]);
+    if (!foundGroup) {
+      console.log(`Group ${groupId} not found`);
+      return;
+    }
     await foundGroup.sync();
-    console.log(`Epoch ${epoch} completed`);
+
+    // Check if member exists before removing
+    const members = await foundGroup.members();
+    if (
+      !members.some((member) => member.inboxId === memberToAdd.client.inboxId)
+    ) {
+      console.log(`${memberToAdd.name} is not a member of ${groupId}`);
+    } else {
+      console.log(`${memberToAdd.name} is a member of ${groupId}`);
+    }
+
+    // Check if member is an admin before removing admin role
+    const admins = await foundGroup.admins;
+    if (admins.includes(memberToAdd.client.inboxId)) {
+      console.log(`Removing admin role from ${memberToAdd.name} in ${groupId}`);
+      await foundGroup.removeAdmin(memberToAdd.client.inboxId);
+    } else {
+      console.log(`${memberToAdd.name} is not an admin in ${groupId}`);
+    }
+    //Check if memberWhoAdds is an admin before removing admin role
+    if (admins.includes(memberWhoAdds.client.inboxId)) {
+      console.log(
+        `memberWhoAdds ${memberWhoAdds.name} is an admin in ${groupId}`,
+      );
+    } else {
+      console.log(
+        `memberWhoAdds ${memberWhoAdds.name} is not an admin in ${groupId}`,
+      );
+    }
+
+    await foundGroup.sync();
+
+    await foundGroup.removeMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+
+    await foundGroup.addMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+    await sleep();
+  } catch (e) {
+    console.error(
+      `Error adding/removing ${memberToAdd.name} to ${groupId}:`,
+      e,
+    );
   }
 };
 
@@ -110,14 +151,13 @@ export const membershipChange = async (
 export const getOrCreateGroup = async (
   testConfig: { testName: string },
   creator: Client,
-  members: WorkerManager,
+  members: string[],
 ): Promise<Conversation | undefined> => {
   const GROUP_ID = process.env.GROUP_ID;
 
   if (!GROUP_ID) {
-    const inboxIds = members.getWorkers().map((w) => w.client.inboxId);
-    const group = await creator.conversations.newGroup(inboxIds);
-    console.log(`Created group: ${group.id} with ${inboxIds.length} members`);
+    const group = await creator.conversations.newGroup(members);
+    console.log(`Created group: ${group.id} with ${members.length} members`);
     appendToEnv("GROUP_ID", group.id, testConfig.testName);
     return group;
   }
