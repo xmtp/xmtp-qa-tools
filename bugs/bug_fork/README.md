@@ -1,6 +1,6 @@
-# Chaos fork testing in XMTP
+# Fork testing in XMTP
 
-This test is designed to test the robustness of the XMTP group protocol under various failure conditions.
+This test is designed to test the XMTP groups with multiple users.
 
 ```bash
 LOGGING_LEVEL="off" # debug, info, warn, error
