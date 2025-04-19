@@ -26,6 +26,7 @@ const testConfig = {
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
+    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
   workers: undefined as WorkerManager | undefined,
   groupId: process.env.GROUP_ID,

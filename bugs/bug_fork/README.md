@@ -10,8 +10,10 @@ XMTP_ENV="production"
 USER_CONVOS=""
 USER_CB_WALLET=""
 USER_XMTPCHAT=""
-USER_CONVOS_DESKTOP="ca727d8cd02271a0dab564d6be9be6254fb103bb0bcbfdec660d39f4bc16671"
+USER_CONVOS_DESKTOP=""
 ```
+
+> To learn your inboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`
 
 Group ID
 
