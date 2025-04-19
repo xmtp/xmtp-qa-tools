@@ -1,6 +1,5 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { appendToEnv } from "./tests";
 
 /**
  * Creates a group with specified participants and measures performance
@@ -106,32 +105,21 @@ export const membershipChange = async (
     await foundGroup.addMembers([memberToAdd.client.inboxId]);
 
     await foundGroup.sync();
+    await foundGroup.sync();
+
+    await foundGroup.removeMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+
+    await foundGroup.addMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
   } catch (e) {
     console.error(
       `Error adding/removing ${memberToAdd.name} to ${groupId}:`,
       e,
     );
   }
-};
-
-/**
- * Gets or creates a group
- */
-export const getOrCreateGroup = async (
-  testConfig: { testName: string },
-  creator: Client,
-  members: string[],
-): Promise<Conversation | undefined> => {
-  const GROUP_ID = process.env.GROUP_ID;
-
-  if (!GROUP_ID) {
-    const group = await creator.conversations.newGroup(members);
-    console.log(`Created group: ${group.id} with ${members.length} members`);
-    appendToEnv("GROUP_ID", group.id, testConfig.testName);
-    return group;
-  }
-
-  return await creator.conversations.getConversationById(GROUP_ID);
 };
 
 /**

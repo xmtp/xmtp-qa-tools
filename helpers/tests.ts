@@ -237,20 +237,6 @@ export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
 
 /**
- * Gets all worker inbox IDs from the test config
- */
-export const getAllWorkersfromConfig = (testConfig: {
-  manualUsers: Record<string, string>;
-  workers: WorkerManager;
-}): string[] => {
-  const inboxIds = Object.values(testConfig.manualUsers);
-  testConfig.workers
-    .getWorkers()
-    .forEach((worker) => inboxIds.push(worker.client.inboxId));
-  return inboxIds;
-};
-
-/**
  * Gets a random network condition
  */
 export const getRandomNetworkCondition = (): NetworkCondition => {
