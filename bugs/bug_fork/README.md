@@ -2,10 +2,16 @@
 
 This test is designed to test the XMTP groups with 12 clients.
 
-- 8 bots (running on latest node-sdk version)
-- 4 manual users (convos io, convos desktop, xmtpchat web and CB build IOS)
+
+https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
+
+
 
 ## Setup
+
+
+- 8 bots (running on latest node-sdk version)
+- 4 manual users (convos io, convos desktop, xmtpchat web and CB build IOS)
 
 ```bash
 git clone https://github.com/xmtp/xmtp-qa-testing
