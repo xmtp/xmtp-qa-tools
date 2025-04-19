@@ -40,3 +40,25 @@ GROUP_ID="" # the group will be set here for reutilization
 ```bash
 yarn test fork
 ```
+
+## Test logic
+
+- Creator creates a group that includes all test workers + 4 manual users
+- Creator updates group name with current timestamp and sends a start message
+- The test then performs these specific actions:
+  - Bob is added/removed 3 times by Creator
+  - Bob, Alice, and Ivy each send a message
+  - Alice is added/removed 3 times by Creator
+  - Dave sends a message
+  - Ivy is added/removed 3 times by Creator
+  - Eve sends a message
+  - Dave is added/removed 3 times by Creator
+  - Frank sends a message
+  - Eve is added/removed 3 times by Creator
+  - Grace sends a message
+  - Frank is added/removed 3 times by Creator
+- Creator sends a final "Done" message
+
+## How to fork
+
+While running the test, send messages randomly from the manual users.
