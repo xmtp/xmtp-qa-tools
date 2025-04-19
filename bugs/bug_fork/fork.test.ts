@@ -4,7 +4,6 @@ import {
   membershipChange,
   sendMessageWithCount,
 } from "@helpers/groups";
-import { randomDescriptionUpdate, randomNameUpdate } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
@@ -63,8 +62,16 @@ describe(TEST_NAME, () => {
       ...Object.values(testConfig.manualUsers),
     ])) as Group;
     testConfig.groupId = globalGroup.id;
-    await globalGroup.updateName("Fork group");
-
+    const date = new Date().toISOString();
+    // Extract only hours from the current time (format: HH:MM)
+    const time = new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+    console.log(`Current time: ${time}`);
+    await globalGroup.updateName("Fork group " + time);
+    await globalGroup.send("Starting run for " + time);
     // Validate state
     if (!globalGroup?.id || !creator) {
       throw new Error("Group or creator not found");
@@ -117,7 +124,7 @@ describe(TEST_NAME, () => {
     );
 
     // Add manual user to group
-    await membershipChange(globalGroup.id, creator, allWorkers[3]);
+    await membershipChange(globalGroup.id, creator, allWorkers[1]);
     // Bob sends message
     messageCount = await sendMessageWithCount(
       allWorkers[3],
@@ -126,7 +133,7 @@ describe(TEST_NAME, () => {
     );
 
     // Phase 2: Add eve, frank, and grace
-    await membershipChange(globalGroup.id, creator, allWorkers[4]);
+    await membershipChange(globalGroup.id, creator, allWorkers[2]);
 
     // New members send messages
     messageCount = await sendMessageWithCount(
@@ -135,23 +142,25 @@ describe(TEST_NAME, () => {
       messageCount,
     );
 
+    // Phase 2: Add eve, frank, and grace
+    await membershipChange(globalGroup.id, creator, allWorkers[3]);
     messageCount = await sendMessageWithCount(
-      allWorkers[4],
+      allWorkers[5],
+      globalGroup.id,
+      messageCount,
+    );
+    // Phase 2: Add eve, frank, and grace
+    await membershipChange(globalGroup.id, creator, allWorkers[4]);
+
+    messageCount = await sendMessageWithCount(
+      allWorkers[6],
       globalGroup.id,
       messageCount,
     );
 
-    messageCount = await sendMessageWithCount(
-      allWorkers[4],
-      globalGroup.id,
-      messageCount,
-    );
+    await membershipChange(globalGroup.id, creator, allWorkers[5]);
 
-    await membershipChange(
-      globalGroup.id,
-      creator,
-      testConfig.workers.getWorkers()[3],
-    );
+    await globalGroup.send("Done");
 
     console.log(`Total message count: ${messageCount}`);
   });

@@ -97,16 +97,6 @@ const result = await createGroupWithBatch(
   batchSize,
   installationsPerUser,
 );
-
-// Create multiple groups with increasing batch sizes
-const results = await createGroupsWithIncrementalBatches(
-  creator,
-  allWorkers,
-  startBatchSize,
-  batchIncrement,
-  maxParticipants,
-  installationsPerUser,
-);
 ```
 
 ### logger.ts
