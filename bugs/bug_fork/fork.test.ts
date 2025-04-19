@@ -147,16 +147,11 @@ describe(TEST_NAME, () => {
       messageCount,
     );
 
-    // Add manual user to group
-    //await membershipChange(globalGroup, testConfig.manualUsers.convos, creator);
-
-    await randomNameUpdate(globalGroup, testConfig.workers);
-    await randomDescriptionUpdate(globalGroup, testConfig.workers);
-    // await membershipChange(
-    //   globalGroup.id,
-    //   creator,
-    //   allWorkers[3].client.inboxId,
-    // );
+    await membershipChange(
+      globalGroup.id,
+      creator,
+      testConfig.workers.getWorkers()[3],
+    );
 
     console.log(`Total message count: ${messageCount}`);
   });
