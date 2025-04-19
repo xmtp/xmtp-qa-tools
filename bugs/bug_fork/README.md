@@ -2,45 +2,20 @@
 
 This test is designed to test the robustness of the XMTP group protocol under various failure conditions.
 
-## Key helper methods
+```bash
+LOGGING_LEVEL="off" # debug, info, warn, error
+XMTP_ENV="production" # production, dev
 
-```typescript
-// Creates unpredictable network conditions for realistic testing
-setRandomNetworkConditions(testConfig.workers);
-
-// Performs intentionally inconsistent syncs across workers
-await randomSyncs({
-  workers: testConfig.workers as WorkerManager,
-  groupId: testConfig.groupId as string,
-});
-
-// Adds members to groups with potential failures
-await addMemberByWorker(globalGroup.id, bobWorker?.client.inboxId, fabri);
-
-// Sends messages with count tracking to verify consistency
-messageCount = await sendMessageWithCount(
-  bobWorker,
-  globalGroup.id,
-  messageCount,
-);
-
-// Assigns admin privileges with potential permission errors
-await randomlyAsignAdmins(globalGroup);
-
-// Removes members with potential race conditions
-await removeMemberByWorker(globalGroup.id, ivy?.client.inboxId, bobWorker);
-
-// Randomly clears DB data to test recovery scenarios
-await randomlyRemoveDb(testConfig.workers as WorkerManager);
+USER_CONVOS="" # InboxID
+USER_CB_WALLET="" # InboxID
+USER_XMTPCHAT="" # InboxID
+USER_CONVOS_DESKTOP="" # InboxID
 ```
 
-## Test workflows
+> To learn your inboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`
 
-For each core operation, we run multiple iterations with random failure injections:
+Group ID
 
-1. **Group creation**: Tests ability to create consistent groups despite failures
-2. **Member addition**: Verifies that member additions succeed or fail cleanly
-3. **Message sending**: Ensures messages are consistently delivered or cleanly fail
-4. **Metadata changes**: Tests group name/description updates with failures
-5. **Member removal**: Verifies clean member removal despite failures
-6. **Admin assignment**: Tests permission changes with potential failures
+```bash
+GROUP_ID="" # the group will be set here for reutilization
+```

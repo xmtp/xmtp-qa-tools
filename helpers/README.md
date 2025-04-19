@@ -63,36 +63,10 @@ Handles XMTP client creation and version mappings:
 ```typescript
 // SDK version mappings
 export const sdkVersions = {
-  47: {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-    sdkPackage: "node-sdk-47",
-    bindingsPackage: "node-bindings-41",
-    sdkVersion: "0.0.47",
-    libXmtpVersion: "6bd613d",
-  },
-  105: {
-    Client: Client105,
-    Conversation: Conversation105,
-    Dm: Dm105,
-    Group: Group105,
-    sdkPackage: "node-sdk-105",
-    bindingsPackage: "node-bindings-113",
-    sdkVersion: "1.0.5",
-    libXmtpVersion: "6eb1ce4",
-  },
-  202: {
-    Client: Client202,
-    Conversation: Conversation202,
-    Dm: Dm202,
-    Group: Group202,
-    sdkPackage: "node-sdk-202",
-    bindingsPackage: "node-bindings-120",
-    sdkVersion: "2.0.2",
-    libXmtpVersion: "bed98df",
-  },
+  47: {},
+  105: {},
+  202: {},
+  203: {},
 };
 ```
 
@@ -121,16 +95,6 @@ const result = await createGroupWithBatch(
   creator,
   allWorkers,
   batchSize,
-  installationsPerUser,
-);
-
-// Create multiple groups with increasing batch sizes
-const results = await createGroupsWithIncrementalBatches(
-  creator,
-  allWorkers,
-  startBatchSize,
-  batchIncrement,
-  maxParticipants,
   installationsPerUser,
 );
 ```

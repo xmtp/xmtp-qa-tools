@@ -117,6 +117,15 @@ export const regressionClient = async (
       env,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
+  } else if (sdkVersion === 203) {
+    const signer = createSigner200(walletKey);
+    // @ts-expect-error: SDK version compatibility issues
+    client = await ClientClass.create(signer, {
+      dbEncryptionKey: encryptionKey,
+      dbPath,
+      env,
+    });
+    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
     console.log("Invalid version" + String(sdkVersion));
     throw new Error("Invalid version" + String(sdkVersion));
@@ -265,7 +274,6 @@ export function getEnvPath(testName: string): string {
       console.log(`Created default .env file at ${envPath}`);
     }
   }
-  console.log("Env path:", envPath);
   process.env.CURRENT_ENV_PATH = envPath;
   return envPath;
 }
@@ -274,6 +282,7 @@ export function getEnvPath(testName: string): string {
  */
 export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
+  console.log("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
   const logger = createLogger(testName);
   overrideConsole(logger);
 

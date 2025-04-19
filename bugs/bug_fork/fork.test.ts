@@ -1,263 +1,239 @@
 import { loadEnv } from "@helpers/client";
-import {
-  addMemberByWorker,
-  getOrCreateGroup,
-  sendMessageWithCount,
-} from "@helpers/groups";
-import {
-  getWorkerConfigs,
-  randomDescriptionUpdate,
-  randomlyAsignAdmins,
-  randomNameUpdate,
-  randomSyncs,
-  removeMemberByWorker,
-} from "@helpers/tests";
+import { sendMessageWithCount } from "@helpers/groups";
+import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
+import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "bug_fork";
 loadEnv(TEST_NAME);
+const shouldFix = process.argv.includes("--fix");
 
 const testConfig = {
   testName: TEST_NAME,
-  versions: ["100", "105", "202"],
   workerNames: [
-    "bob",
-    "alice",
-    "ivy",
-    "dave",
-    "eve",
-    "frank",
-    "grace",
-    "heidi",
-    "ivan",
-    "julia",
+    "bob-a-203",
+    "alice-a-203",
+    "ivy-a-203",
+    "dave-a-203",
+    "eve-a-203",
+    "frank-a-203",
+    "grace-a-203",
   ],
   creator: "fabri",
-  installationNames: ["a", "b"],
   manualUsers: {
-    convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
-    convos2: "8137ca5e1cf89dcd3a750aa896bb115dc38277907d0bd5f36665e61cd8f60e99",
-    xmtpchat:
-      "8e75ee75db9971712babcfe1faceb08b54af6d3e33f59a038c6525dd208e47af",
+    USER_CONVOS: process.env.USER_CONVOS,
+    USER_CB_WALLET: process.env.USER_CB_WALLET,
+    USER_XMTPCHAT: process.env.USER_XMTPCHAT,
+    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
   workers: undefined as WorkerManager | undefined,
-  groupId: undefined as string | undefined,
+  groupId: process.env.GROUP_ID,
 };
 
 describe(TEST_NAME, () => {
-  // Test state
   let globalGroup: Group | undefined;
-  let messageCount = 0;
+  let messageCount = 1;
   let creator: Worker | undefined;
-  let rootWorker: WorkerManager | undefined;
-  const workerConfigs = getWorkerConfigs(testConfig);
 
-  // Initialize workers and create group
-  it("should initialize all workers at once and create group", async () => {
-    // Initialize root worker (fabri)
-    rootWorker = await getWorkers([testConfig.creator], TEST_NAME, "message");
+  it("should initialize workers and create group", async () => {
+    // Initialize workers
+    const rootWorker = await getWorkers(
+      [testConfig.creator],
+      TEST_NAME,
+      "message",
+    );
     creator = rootWorker.getWorkers()[0];
-
-    // Initialize other workers
-    testConfig.workers = await getWorkers(workerConfigs, TEST_NAME, "none");
+    testConfig.workers = await getWorkers(
+      testConfig.workerNames,
+      TEST_NAME,
+      "none",
+    );
 
     // Create or get group
-    globalGroup = (await getOrCreateGroup(testConfig, creator.client)) as Group;
-    testConfig.groupId = globalGroup.id;
-    await globalGroup.updateName(globalGroup.id);
+    const manualUsers = Object.values(testConfig.manualUsers).filter(
+      Boolean,
+    ) as string[];
+    const allClientIds = [
+      ...testConfig.workers.getWorkers().map((w) => w.client.inboxId),
+      ...manualUsers,
+    ];
 
-    // Send initial message from fabri
-    messageCount = await sendMessageWithCount(
-      creator,
-      globalGroup?.id,
-      messageCount,
-    );
+    globalGroup = (await getOrCreateGroup(
+      creator.client,
+      allClientIds,
+    )) as Group;
 
-    // Validate state
-    if (!globalGroup?.id || !creator) {
-      throw new Error("Group or creator not found");
+    if (shouldFix && globalGroup) {
+      console.log("--fix flag detected, running recoverForks...");
+      await recoverForks(globalGroup);
     }
+
+    if (!globalGroup?.id || !creator)
+      throw new Error("Group or creator not found");
   });
 
-  // Test message sending and group management
-  it("should send messages to group and manage members", async () => {
-    // Validate initial state
-    if (!globalGroup?.id || !creator || !testConfig.workers) {
+  it("should send messages and manage members", async () => {
+    if (!globalGroup?.id || !creator || !testConfig.workers)
       throw new Error("Group or creator not found");
-    }
-    // Get all workers
-    const allWorkers = testConfig.workers?.getWorkers();
-    if (allWorkers.length !== 10) {
-      throw new Error(`Expected 10 workers but got ${allWorkers.length}`);
-    }
 
-    const [bob, alice, ivy, dave, eve, frank, grace, heidi, ivan, julia] =
-      allWorkers;
-
-    // Verify all workers are initialized correctly
-    for (const worker of allWorkers) {
-      if (!worker.client.inboxId) {
+    const workers = testConfig.workers.getWorkers();
+    for (const worker of workers) {
+      if (!worker.client.inboxId)
         throw new Error(`Worker ${worker.name} not properly initialized`);
-      }
     }
 
-    // Update group name
-    await globalGroup.updateName(globalGroup.id);
+    await globalGroup.sync();
 
-    //await randomReinstall(testConfig.workers);
-
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
-    // Phase 1: Add first batch of workers to the group (bob, alice, dave)
-    // Add bob to group
-    await addMemberByWorker(globalGroup.id, bob.client.inboxId, creator);
-
-    // Bob sends message
+    // First batch of membership changes and messages
+    await membershipChange(globalGroup.id, creator, workers[0]);
     messageCount = await sendMessageWithCount(
-      bob,
+      workers[0],
+      globalGroup.id,
+      messageCount,
+    );
+    messageCount = await sendMessageWithCount(
+      workers[1],
+      globalGroup.id,
+      messageCount,
+    );
+    messageCount = await sendMessageWithCount(
+      workers[2],
       globalGroup.id,
       messageCount,
     );
 
-    // Bob adds alice and dave
-    await addMemberByWorker(globalGroup.id, alice.client.inboxId, bob);
-    await addMemberByWorker(globalGroup.id, dave.client.inboxId, bob);
-
-    // Alice and Dave send messages
+    // Second batch
+    await membershipChange(globalGroup.id, creator, workers[1]);
     messageCount = await sendMessageWithCount(
-      alice,
+      workers[3],
       globalGroup.id,
       messageCount,
     );
 
+    // Third batch
+    await membershipChange(globalGroup.id, creator, workers[2]);
     messageCount = await sendMessageWithCount(
-      dave,
+      workers[4],
       globalGroup.id,
       messageCount,
     );
 
-    // Add manual user to group
-    await addMemberByWorker(
-      globalGroup.id,
-      testConfig.manualUsers.xmtpchat,
-      bob,
-    );
-
-    // Randomly assign admins
-    await randomlyAsignAdmins(globalGroup);
-
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
-    // Phase 2: Add eve, frank, and grace
-    await addMemberByWorker(globalGroup.id, eve.client.inboxId, alice);
-    await addMemberByWorker(globalGroup.id, frank.client.inboxId, dave);
-    await addMemberByWorker(globalGroup.id, grace.client.inboxId, bob);
-
-    // New members send messages
+    // Fourth batch
+    await membershipChange(globalGroup.id, creator, workers[3]);
     messageCount = await sendMessageWithCount(
-      eve,
+      workers[5],
       globalGroup.id,
       messageCount,
     );
 
+    // Final batch
+    await membershipChange(globalGroup.id, creator, workers[4]);
     messageCount = await sendMessageWithCount(
-      frank,
+      workers[6],
       globalGroup.id,
       messageCount,
     );
+    await membershipChange(globalGroup.id, creator, workers[5]);
 
-    messageCount = await sendMessageWithCount(
-      grace,
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Add manual user to group
-    await addMemberByWorker(
-      globalGroup.id,
-      testConfig.manualUsers.convos,
-      alice,
-    );
-    // Add manual user to group
-    await addMemberByWorker(
-      globalGroup.id,
-      testConfig.manualUsers.convos2,
-      alice,
-    );
-
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
-    // Phase 3: Add heidi, ivan, julia, and add ivy
-    await addMemberByWorker(globalGroup.id, heidi.client.inboxId, frank);
-    await addMemberByWorker(globalGroup.id, ivan.client.inboxId, grace);
-    await addMemberByWorker(globalGroup.id, julia.client.inboxId, eve);
-
-    // Add ivy who was initialized but not yet added
-    await addMemberByWorker(globalGroup.id, ivy.client.inboxId, bob);
-
-    // Newly added workers send messages
-    messageCount = await sendMessageWithCount(
-      heidi,
-      globalGroup.id,
-      messageCount,
-    );
-
-    messageCount = await sendMessageWithCount(
-      ivan,
-      globalGroup.id,
-      messageCount,
-    );
-
-    messageCount = await sendMessageWithCount(
-      julia,
-      globalGroup.id,
-      messageCount,
-    );
-
-    messageCount = await sendMessageWithCount(
-      ivy,
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Randomly assign admins again
-    await randomlyAsignAdmins(globalGroup);
-
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
-    // Phase 4: Remove members
-    await removeMemberByWorker(globalGroup.id, dave.client.inboxId, alice);
-    await removeMemberByWorker(globalGroup.id, frank.client.inboxId, bob);
-
-    await randomNameUpdate(globalGroup, testConfig.workers);
-    await randomDescriptionUpdate(globalGroup, testConfig.workers);
-
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
-    // Final sync
-    await randomSyncs({
-      workers: testConfig.workers,
-      groupId: testConfig.groupId as string,
-    });
-
+    await globalGroup.send(creator.name + " : Done");
     console.log(`Total message count: ${messageCount}`);
   });
 });
+
+const recoverForks = async (group: Group) => {
+  const manualUsers = Object.values(testConfig.manualUsers).filter(
+    Boolean,
+  ) as string[];
+  await group.removeMembers(manualUsers);
+  await group.addMembers(manualUsers);
+};
+
+const getOrCreateGroup = async (
+  creator: Client,
+  addedMembers: string[],
+): Promise<Conversation | undefined> => {
+  let group: Group;
+
+  if (!testConfig.groupId) {
+    console.log(`Creating group with ${addedMembers.length} members`);
+    group = await creator.conversations.newGroup(addedMembers);
+    appendToEnv("GROUP_ID", group.id, testConfig.testName);
+  } else {
+    console.log(`Fetching group with ID ${testConfig.groupId}`);
+    group = (await creator.conversations.getConversationById(
+      testConfig.groupId,
+    )) as Group;
+  }
+
+  const members = await group.members();
+  if (members.length !== addedMembers.length + 1) {
+    console.error(
+      "Members count mismatch:",
+      members.length,
+      "vs",
+      addedMembers.length + 1,
+    );
+  }
+
+  const time = new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+
+  await group.updateName("Fork group " + time);
+  await group.send("Starting run for " + time);
+
+  return group;
+};
+
+const membershipChange = async (
+  groupId: string,
+  memberWhoAdds: Worker,
+  memberToAdd: Worker,
+): Promise<void> => {
+  try {
+    console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
+    await memberWhoAdds.client.conversations.syncAll();
+
+    const group = (await memberWhoAdds.client.conversations.getConversationById(
+      groupId,
+    )) as Group;
+    if (!group) {
+      console.log(`Group ${groupId} not found`);
+      return;
+    }
+
+    await group.sync();
+
+    // Check membership status
+    const memberInboxId = memberToAdd.client.inboxId;
+    const members = await group.members();
+    const isMember = members.some((member) => member.inboxId === memberInboxId);
+    console.log(
+      `${memberToAdd.name} is ${isMember ? "" : "not "}a member of ${groupId}`,
+    );
+
+    // Check admin status
+    const admins = await group.admins;
+    if (admins.includes(memberInboxId)) {
+      console.log(`Removing admin role from ${memberToAdd.name}`);
+      await group.removeAdmin(memberInboxId);
+    }
+
+    // Perform add/remove cycles
+    const epochs = 3;
+    for (let i = 0; i < epochs; i++) {
+      await group.sync();
+      await group.removeMembers([memberInboxId]);
+      await group.sync();
+      await group.addMembers([memberInboxId]);
+      await group.sync();
+      console.warn(`Epoch ${i} done`);
+    }
+  } catch (e) {
+    console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+  }
+};

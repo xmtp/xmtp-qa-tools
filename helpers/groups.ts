@@ -1,6 +1,5 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { appendToEnv } from "./tests";
 
 /**
  * Creates a group with specified participants and measures performance
@@ -47,81 +46,80 @@ export async function createGroupWithBatch(
 }
 
 /**
- * Creates multiple groups with increasing batch sizes
- */
-export async function createGroupsWithIncrementalBatches(
-  creator: Worker,
-  allWorkers: WorkerManager,
-  startBatchSize: number = 5,
-  batchIncrement: number = 5,
-  maxParticipants: number,
-  installationsPerUser: number,
-) {
-  const results = [];
-
-  for (
-    let size = startBatchSize;
-    size <= maxParticipants;
-    size += batchIncrement
-  ) {
-    const result = await createGroupWithBatch(
-      creator,
-      allWorkers,
-      size,
-      installationsPerUser,
-    );
-    results.push({ batchSize: size, ...result });
-  }
-
-  return results;
-}
-
-/**
  * Adds a member to a group
  */
-export const addMemberByWorker = async (
+export const membershipChange = async (
   groupId: string,
-  memberToAdd: string,
   memberWhoAdds: Worker,
+  memberToAdd: Worker,
 ): Promise<void> => {
-  await memberWhoAdds.client.conversations.syncAll();
-  const group =
-    await memberWhoAdds.client.conversations.getConversationById(groupId);
+  try {
+    console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name} `);
+    await memberWhoAdds.client.conversations.syncAll();
+    const foundGroup =
+      (await memberWhoAdds.client.conversations.getConversationById(
+        groupId,
+      )) as Group;
 
-  if (!group) {
-    console.log(`Group ${groupId} not found`);
-    return;
+    if (!foundGroup) {
+      console.log(`Group ${groupId} not found`);
+      return;
+    }
+    await foundGroup.sync();
+
+    // Check if member exists before removing
+    const members = await foundGroup.members();
+    if (
+      !members.some((member) => member.inboxId === memberToAdd.client.inboxId)
+    ) {
+      console.log(`${memberToAdd.name} is not a member of ${groupId}`);
+    } else {
+      console.log(`${memberToAdd.name} is a member of ${groupId}`);
+    }
+
+    // Check if member is an admin before removing admin role
+    const admins = await foundGroup.admins;
+    if (admins.includes(memberToAdd.client.inboxId)) {
+      console.log(`Removing admin role from ${memberToAdd.name} in ${groupId}`);
+      await foundGroup.removeAdmin(memberToAdd.client.inboxId);
+    } else {
+      console.log(`${memberToAdd.name} is not an admin in ${groupId}`);
+    }
+    //Check if memberWhoAdds is an admin before removing admin role
+    if (admins.includes(memberWhoAdds.client.inboxId)) {
+      console.log(
+        `memberWhoAdds ${memberWhoAdds.name} is an admin in ${groupId}`,
+      );
+    } else {
+      console.log(
+        `memberWhoAdds ${memberWhoAdds.name} is not an admin in ${groupId}`,
+      );
+    }
+
+    await foundGroup.sync();
+
+    await foundGroup.removeMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+
+    await foundGroup.addMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+    await foundGroup.sync();
+
+    await foundGroup.removeMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+
+    await foundGroup.addMembers([memberToAdd.client.inboxId]);
+
+    await foundGroup.sync();
+  } catch (e) {
+    console.error(
+      `Error adding/removing ${memberToAdd.name} to ${groupId}:`,
+      e,
+    );
   }
-
-  const members = await (group as Group).members();
-  if (
-    members.some((m) => m.inboxId.toLowerCase() === memberToAdd.toLowerCase())
-  ) {
-    console.log(`Member ${memberToAdd} already in group ${groupId}`);
-    return;
-  }
-
-  await (group as Group).addMembers([memberToAdd]);
-  console.log(`Added ${memberToAdd} to group ${groupId}`);
-};
-
-/**
- * Gets or creates a group
- */
-export const getOrCreateGroup = async (
-  testConfig: { testName: string },
-  creator: Client,
-): Promise<Conversation | undefined> => {
-  const GROUP_ID = process.env.GROUP_ID;
-
-  if (!GROUP_ID) {
-    const group = await creator.conversations.newGroup([]);
-    console.log(`Created group: ${group.id}`);
-    appendToEnv("GROUP_ID", group.id, testConfig.testName);
-    return group;
-  }
-
-  return await creator.conversations.getConversationById(GROUP_ID);
 };
 
 /**
@@ -149,84 +147,6 @@ export const sendMessageWithCount = async (
     console.error(`Error sending from ${worker.name}:`, e);
     return messageCount;
   }
-};
-
-/**
- * Checks if groups across workers are in a forked state
- */
-export const checkForGroupFork = async (
-  workers: Worker[],
-  groupId: string,
-): Promise<boolean> => {
-  console.log(`Checking for group fork in ${groupId}`);
-  if (workers.length < 2) return false;
-
-  const groupStates: Record<string, any> = {};
-
-  // Get group state from each worker
-  for (const worker of workers) {
-    try {
-      const group = (await worker.client.conversations.getConversationById(
-        groupId,
-      )) as Group;
-      if (!group) continue;
-
-      const members = await group.members();
-      groupStates[worker.name] = {
-        memberCount: members.length,
-        name: group.name,
-        description: group.description,
-      };
-
-      console.log(
-        `${worker.name} state:`,
-        JSON.stringify(groupStates[worker.name]),
-      );
-    } catch (error) {
-      console.error(`Error getting state for ${worker.name}:`, error);
-    }
-  }
-
-  // Compare group states
-  const workerNames = Object.keys(groupStates);
-  if (workerNames.length < 2) return false;
-
-  const firstState = groupStates[workerNames[0]];
-  let forkDetected = false;
-
-  for (let i = 1; i < workerNames.length; i++) {
-    const currentState = groupStates[workerNames[i]];
-    const currentName = workerNames[i];
-
-    // Check members count
-    if (currentState.memberCount !== firstState.memberCount) {
-      console.log(
-        `FORK: ${workerNames[0]} has ${firstState.memberCount} members, but ${currentName} has ${currentState.memberCount}`,
-      );
-      forkDetected = true;
-    }
-
-    // Check name and description
-    if (currentState.name !== firstState.name) {
-      console.log(
-        `FORK: Group name differs between ${workerNames[0]} and ${currentName}`,
-      );
-      forkDetected = true;
-    }
-
-    if (currentState.description !== firstState.description) {
-      console.log(
-        `FORK: Group description differs between ${workerNames[0]} and ${currentName}`,
-      );
-      forkDetected = true;
-    }
-  }
-
-  if (!forkDetected) {
-    console.log("No group fork detected - consistent state across clients");
-  }
-
-  return forkDetected;
 };
 
 /**

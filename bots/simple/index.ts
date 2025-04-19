@@ -32,7 +32,6 @@ async function main() {
     const stream = client.conversations.streamAllMessages();
     for await (const message of await stream) {
       try {
-        console.log(message);
         if (
           message?.senderInboxId.toLowerCase() ===
             client.inboxId.toLowerCase() ||
@@ -53,8 +52,20 @@ async function main() {
           console.log("Unable to find conversation, skipping");
           continue;
         }
-        await conversation.send("Your inboxId is: " + message.senderInboxId);
-        await conversation.send("conversationId: " + conversation.id);
+        console.log("conversation", conversation.id);
+        console.log("message", message.senderInboxId);
+
+        const inboxState = await client.preferences.inboxStateFromInboxIds([
+          message.senderInboxId,
+        ]);
+        const addressFromInboxId = inboxState[0].identifiers[0].identifier;
+        console.log(`Sending "gm" response to ${addressFromInboxId}...`);
+        await conversation.send("address");
+        await conversation.send(addressFromInboxId);
+        await conversation.send("inboxId");
+        await conversation.send(message.senderInboxId);
+        await conversation.send("conversationId");
+        await conversation.send(conversation.id);
         await conversation.send("gm");
         console.log("Waiting for messages...");
       } catch (error) {

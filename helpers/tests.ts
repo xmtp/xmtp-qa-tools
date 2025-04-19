@@ -27,6 +27,12 @@ import {
   Group as Group202,
 } from "@xmtp/node-sdk-202";
 import {
+  Client as Client203,
+  Conversation as Conversation203,
+  Dm as Dm203,
+  Group as Group203,
+} from "@xmtp/node-sdk-203";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -114,6 +120,7 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
+export const sdkVersionOptions = [100, 105, 202, 203];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -163,9 +170,19 @@ export const sdkVersions = {
     Dm: Dm202,
     Group: Group202,
     sdkPackage: "node-sdk-202",
-    bindingsPackage: "node-bindings-120",
+    bindingsPackage: "node-bindings-120-1",
     sdkVersion: "2.0.2",
     libXmtpVersion: "bed98df",
+  },
+  203: {
+    Client: Client203,
+    Conversation: Conversation203,
+    Dm: Dm203,
+    Group: Group203,
+    sdkPackage: "node-sdk-203",
+    bindingsPackage: "node-bindings-120-2",
+    sdkVersion: "2.0.3",
+    libXmtpVersion: "c24af30",
   },
 };
 
@@ -220,20 +237,6 @@ export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
 
 /**
- * Gets all worker inbox IDs from the test config
- */
-export const getAllWorkersfromConfig = (testConfig: {
-  manualUsers: Record<string, string>;
-  workers: WorkerManager;
-}): string[] => {
-  const inboxIds = Object.values(testConfig.manualUsers);
-  testConfig.workers
-    .getWorkers()
-    .forEach((worker) => inboxIds.push(worker.client.inboxId));
-  return inboxIds;
-};
-
-/**
  * Gets a random network condition
  */
 export const getRandomNetworkCondition = (): NetworkCondition => {
@@ -241,23 +244,6 @@ export const getRandomNetworkCondition = (): NetworkCondition => {
   return networkConditions[
     conditions[Math.floor(Math.random() * conditions.length)]
   ];
-};
-
-/**
- * Gets worker configs with random versions
- */
-export const getWorkerConfigs = (testConfig: {
-  workerNames: string[];
-  installationNames: string[];
-  versions: string[];
-}): string[] => {
-  const { workerNames, installationNames, versions } = testConfig;
-  return workerNames.map((name) => {
-    const id = getRandomVersion(installationNames);
-    const version = getRandomVersion(versions);
-    console.log(`${name} using version: ${version}`);
-    return `${name}-${id}-${version}`;
-  });
 };
 
 /**
@@ -466,6 +452,12 @@ export const sendInitialTestMessage = async (client: Client): Promise<void> => {
   } catch (error) {
     console.error("Error sending initial test message:", error);
   }
+};
+/**
+ * Sleep utility function
+ */
+export const sleep = (ms: number = 1000): Promise<void> => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
 /**
