@@ -18,11 +18,5 @@ USER_CONVOS_DESKTOP=""
 Group ID
 
 ```bash
-GROUP_ID="the group will be set here for reutilization"
-```
-
-Run the test with the fix flag to recover forked users from the group
-
-```bash
-npm run test -- --fix
+GROUP_ID="" # the group will be set here for reutilization
 ```
