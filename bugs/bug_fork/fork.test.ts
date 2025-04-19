@@ -63,7 +63,7 @@ describe(TEST_NAME, () => {
       ...Object.values(testConfig.manualUsers),
     ])) as Group;
     testConfig.groupId = globalGroup.id;
-    await globalGroup.updateName(globalGroup.id);
+    await globalGroup.updateName("Fork group");
 
     // Validate state
     if (!globalGroup?.id || !creator) {
