@@ -142,7 +142,9 @@ describe(TEST_NAME, () => {
 });
 
 const recoverForks = async (group: Group) => {
-  const manualUsers = Object.values(testConfig.manualUsers).filter(Boolean);
+  const manualUsers = Object.values(testConfig.manualUsers).filter(
+    Boolean,
+  ) as string[];
   await group.removeMembers(manualUsers);
   await group.addMembers(manualUsers);
 };
@@ -206,29 +208,29 @@ const membershipChange = async (
     await group.sync();
 
     // Check membership status
+    const memberInboxId = memberToAdd.client.inboxId;
     const members = await group.members();
-    const isMember = members.some(
-      (member) => member.inboxId === memberToAdd.client.inboxId,
-    );
+    const isMember = members.some((member) => member.inboxId === memberInboxId);
     console.log(
       `${memberToAdd.name} is ${isMember ? "" : "not "}a member of ${groupId}`,
     );
 
     // Check admin status
     const admins = await group.admins;
-    if (admins.includes(memberToAdd.client.inboxId)) {
+    if (admins.includes(memberInboxId)) {
       console.log(`Removing admin role from ${memberToAdd.name}`);
-      await group.removeAdmin(memberToAdd.client.inboxId);
+      await group.removeAdmin(memberInboxId);
     }
 
     // Perform add/remove cycles
     const epochs = 3;
     for (let i = 0; i < epochs; i++) {
       await group.sync();
-      await group.removeMembers([memberToAdd.client.inboxId]);
+      await group.removeMembers([memberInboxId]);
       await group.sync();
-      await group.addMembers([memberToAdd.client.inboxId]);
+      await group.addMembers([memberInboxId]);
       await group.sync();
+      console.warn(`Epoch ${i} done`);
     }
   } catch (e) {
     console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
