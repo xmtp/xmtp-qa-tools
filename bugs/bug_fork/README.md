@@ -34,3 +34,9 @@ Group ID
 ```bash
 GROUP_ID="" # the group will be set here for reutilization
 ```
+
+## Run the test
+
+```bash
+yarn test fork
+```
