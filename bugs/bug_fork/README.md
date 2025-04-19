@@ -1,6 +1,21 @@
 # Fork testing in XMTP
 
-This test is designed to test the XMTP groups with multiple users.
+This test is designed to test the XMTP groups with 12 clients.
+
+- 8 bots (running on latest node-sdk version)
+- 4 manual users (convos io, convos desktop, xmtpchat web and CB build IOS)
+
+## Setup
+
+```bash
+git clone https://github.com/xmtp/xmtp-qa-testing
+cd xmtp-qa-testing
+yarn install
+```
+
+## Environment variables
+
+Create a `.env` file in the `bugs/bug_fork` directory and set the following variables:
 
 ```bash
 LOGGING_LEVEL="off" # debug, info, warn, error
