@@ -38,10 +38,11 @@ const testConfig = {
   creator: "fabri",
   installationNames: ["a", "b"],
   manualUsers: {
-    convos: "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
-    convos2: "8137ca5e1cf89dcd3a750aa896bb115dc38277907d0bd5f36665e61cd8f60e99",
+    convos: "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
+    cbWallet:
+      "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
     xmtpchat:
-      "8e75ee75db9971712babcfe1faceb08b54af6d3e33f59a038c6525dd208e47af",
+      "4382c5142373a8fa5ad16f4a3bf03f9ad07d2a6ac1e3cd271998e53505456996",
   },
   workers: undefined as WorkerManager | undefined,
   groupId: undefined as string | undefined,
@@ -190,7 +191,7 @@ describe(TEST_NAME, () => {
     // Add manual user to group
     await addMemberByWorker(
       globalGroup.id,
-      testConfig.manualUsers.convos2,
+      testConfig.manualUsers.cbWallet,
       alice,
     );
 
