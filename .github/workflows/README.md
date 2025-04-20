@@ -2,6 +2,14 @@
 
 This document provides a comprehensive overview of the XMTP testing infrastructure, organized by test suites and their associated workflows and monitoring dashboards.
 
+## Table of Contents
+
+- [TS_Performance Test Suite](#-ts_performance-test-suite)
+- [TS_Delivery Test Suite](#-ts_delivery-test-suite)
+- [TS_Gm Test Suite](#-ts_gm-test-suite)
+- [Package Compatibility](#-package-compatibility)
+- [Agent Examples](#-agent-examples)
+
 ## 🚀 TS_Performance Test Suite
 
 The TS_Performance test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
@@ -67,7 +75,7 @@ The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation.yml) workflow repli
 
 ### Monitoring Dashboard
 
-> Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
+Performance metrics feed into the [SDK Performance Dashboard](https://app.datadoghq.com/dashboard/9z2-in4-3we/), which visualizes:
 
 ![TS_Performance](/media/ts_performance.png)
 
@@ -79,7 +87,7 @@ The [`TS_Geolocation.yml`](/.github/workflows/TS_Geolocation.yml) workflow repli
 
 The test suite reports detailed performance metrics via the `xmtp.sdk.duration` metric:
 
-```tsx
+```javascript
 // Send main operation metric
 const durationMetricName = `xmtp.sdk.duration`;
 
@@ -105,7 +113,7 @@ For each operation, the test suite tracks network performance across five key ph
 | `processing`     | Processing time (calculated as server_call - tls_handshake) |
 | `server_call`    | Server response time                                        |
 
-```tsx
+```javascript
 const networkStats = await getNetworkStats();
 
 for (const [statName, statValue] of Object.entries(networkStats)) {
@@ -187,7 +195,7 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery.yml) workflow automates t
 - 🔍 **Error Handling**: Uses sophisticated filtering for transient issues
 - 🔄 **Retry Logic**: Implements up to 3 retry attempts for stability
 - 📊 **Metrics**: Sends detailed metrics to Datadog for tracking
-- ⚙️ **Configuration**: Supports adjustable message volume via environment variables
+- ⚙️ **Parameters**: Supports adjustable message volume via environment variables
 
 ### Monitoring Dashboard
 
@@ -195,7 +203,7 @@ The [`TS_Delivery.yml`](/.github/workflows/TS_Delivery.yml) workflow automates t
 
 The test suite reports delivery reliability via the `xmtp.sdk.delivery` metric:
 
-```tsx
+```javascript
 // Send delivery rate metric
 metrics.gauge("xmtp.sdk.delivery", deliveryRate, [
   `libxmtp:${firstWorker.version}`,
@@ -227,9 +235,8 @@ The test suite evaluates:
 
 Key implementation highlights:
 
-The Playwright helper function facilitates browser-based testing:
-
 ```javascript
+// Playwright helper function for browser-based testing
 await page.goto(`https://xmtp.chat/`);
 await page.getByRole("main").getByRole("button", { name: "Connect" }).click();
 await page
@@ -272,11 +279,11 @@ The [`TS_Gm.yml`](/.github/workflows/TS_Gm.yml) workflow automates the test suit
 - 🔍 **Regression Testing**: Compares behavior across different SDK versions
 - 🌐 **Browser Testing**: Includes Playwright-based browser automation tests
 
-## 📦 Package compatibility
+## 📦 Package Compatibility
 
 The package compatibility workflow validates that our codebase works correctly across different Node.js versions and package managers, ensuring broad compatibility across developer environments.
 
-### Implementation details
+### Implementation Details
 
 This workflow tests:
 
@@ -286,21 +293,21 @@ This workflow tests:
 - Build process completion
 - Basic client connectivity check
 
-### Associated workflow
+### Associated Workflow
 
 The [`test-package-compatibility.yml`](/.github/workflows/test-package-compatibility.yml) workflow:
 
 - 🚀 **Trigger**: Runs on every commit to main branch or manual dispatch
-- 📊 **Matrix testing**: Tests combinations of Node.js versions and package managers
-- 🔄 **Environment setup**: Configures appropriate package manager in each job
-- 🔍 **Failure isolation**: Uses fail-fast: false to identify specific failing combinations
+- 📊 **Matrix Testing**: Tests combinations of Node.js versions and package managers
+- 🔄 **Environment Setup**: Configures appropriate package manager in each job
+- 🔍 **Failure Isolation**: Uses fail-fast: false to identify specific failing combinations
 - 👁️ **Verification**: Performs a client connection check to validate functionality
 
-## 🤖 Agent examples
+## 🤖 Agent Examples
 
-The agent examples workflow tests the xmtp-agent-examples repository functionality, ensuring that code examples are valid and operational.
+The agent examples workflow tests the [xmtp-agent-examples](https://github.com/ephemeraHQ/xmtp-agent-examples/) repository functionality, ensuring that code examples are valid and operational.
 
-### Implementation details
+### Implementation Details
 
 This workflow:
 
@@ -309,12 +316,12 @@ This workflow:
 - Tests the agent's ability to initialize and connect to XMTP
 - Validates that the agent reaches the "waiting for messages" state
 
-### Associated workflow
+### Associated Workflow
 
 The [`agent-examples.yml`](/.github/workflows/agent-examples.yml) workflow:
 
 - ⏱️ **Schedule**: Runs hourly via cron schedule
-- 🧪 **Test environment**: Configures the environment with appropriate secrets
-- 🔄 **Timeout control**: Uses a 20-second timeout to avoid long-running jobs
-- 🔍 **Success verification**: Checks for the "Waiting for messages..." message
-- 👁️ **Error detection**: Reports and fails if agent doesn't initialize correctly
+- 🧪 **Test Environment**: Configures the environment with appropriate secrets
+- 🔄 **Timeout Control**: Uses a 20-second timeout to avoid long-running jobs
+- 🔍 **Success Verification**: Checks for the "Waiting for messages..." message
+- 👁️ **Error Detection**: Reports and fails if agent doesn't initialize correctly
