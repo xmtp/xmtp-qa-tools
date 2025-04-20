@@ -1,5 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import { sendMessageWithCount } from "@helpers/groups";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
@@ -12,13 +11,11 @@ loadEnv(TEST_NAME);
 const testConfig = {
   testName: TEST_NAME,
   workerNames: [
-    "bob-a-203",
-    "alice-a-203",
-    "ivy-a-203",
+    "bob-a-100",
+    "alice-a-105",
+    "ivy-a-202",
     "dave-a-203",
-    "eve-a-203",
-    "frank-a-203",
-    "grace-a-203",
+    "eve-a-105",
   ],
   creator: "fabri",
   manualUsers: {
@@ -66,6 +63,7 @@ describe(TEST_NAME, () => {
 
     if (!globalGroup?.id || !creator)
       throw new Error("Group or creator not found");
+    await globalGroup.sync();
   });
 
   it("should send messages and manage members", async () => {
@@ -73,63 +71,17 @@ describe(TEST_NAME, () => {
       throw new Error("Group or creator not found");
 
     const workers = testConfig.workers.getWorkers();
-    for (const worker of workers) {
-      if (!worker.client.inboxId)
-        throw new Error(`Worker ${worker.name} not properly initialized`);
+
+    let trys = 3;
+    let epochs = 5;
+    for (let i = 1; i <= trys; i++) {
+      await sendMessageToGroup(
+        workers[i],
+        globalGroup.id,
+        workers[i].name + ":" + String(i),
+      );
+      await membershipChange(globalGroup.id, creator, workers[i], epochs);
     }
-
-    await globalGroup.sync();
-
-    // First batch of membership changes and messages
-    await membershipChange(globalGroup.id, creator, workers[0]);
-    messageCount = await sendMessageWithCount(
-      workers[0],
-      globalGroup.id,
-      messageCount,
-    );
-    messageCount = await sendMessageWithCount(
-      workers[1],
-      globalGroup.id,
-      messageCount,
-    );
-    messageCount = await sendMessageWithCount(
-      workers[2],
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Second batch
-    await membershipChange(globalGroup.id, creator, workers[1]);
-    messageCount = await sendMessageWithCount(
-      workers[3],
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Third batch
-    await membershipChange(globalGroup.id, creator, workers[2]);
-    messageCount = await sendMessageWithCount(
-      workers[4],
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Fourth batch
-    await membershipChange(globalGroup.id, creator, workers[3]);
-    messageCount = await sendMessageWithCount(
-      workers[5],
-      globalGroup.id,
-      messageCount,
-    );
-
-    // Final batch
-    await membershipChange(globalGroup.id, creator, workers[4]);
-    messageCount = await sendMessageWithCount(
-      workers[6],
-      globalGroup.id,
-      messageCount,
-    );
-    await membershipChange(globalGroup.id, creator, workers[5]);
 
     await globalGroup.send(creator.name + " : Done");
     console.log(`Total message count: ${messageCount}`);
@@ -183,10 +135,31 @@ const getOrCreateGroup = async (
   return group;
 };
 
+/**
+ * Sends a message from a worker with name and count
+ */
+export const sendMessageToGroup = async (
+  worker: Worker,
+  groupId: string,
+  message: string,
+): Promise<void> => {
+  try {
+    await worker.client.conversations.syncAll();
+
+    const foundGroup =
+      await worker.client.conversations.getConversationById(groupId);
+
+    console.log(`${worker.name} sending: "${message}" to group ${groupId}`);
+    await foundGroup?.send(message);
+  } catch (e) {
+    console.error(`Error sending from ${worker.name}:`, e);
+  }
+};
 const membershipChange = async (
   groupId: string,
   memberWhoAdds: Worker,
   memberToAdd: Worker,
+  trys: number,
 ): Promise<void> => {
   try {
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
@@ -218,13 +191,9 @@ const membershipChange = async (
     }
 
     // Perform add/remove cycles
-    const epochs = 3;
-    for (let i = 0; i < epochs; i++) {
-      await group.sync();
+    for (let i = 0; i <= trys; i++) {
       await group.removeMembers([memberInboxId]);
-      await group.sync();
       await group.addMembers([memberInboxId]);
-      await group.sync();
       console.warn(`Epoch ${i} done`);
     }
   } catch (e) {
