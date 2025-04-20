@@ -2,17 +2,6 @@
 
 This document provides a comprehensive overview of the XMTP testing infrastructure, organized by test suites and their associated workflows and monitoring dashboards.
 
-## Test Suites Overview
-
-| Test suite     | Status                                                                                                                                                                                                    | Run frequency |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 🚀 Performance | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)                         | Every 30 min  |
-| 📬 Delivery    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)                               | Every 30 min  |
-| 👋 Gm          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                                           | Every 30 min  |
-| 🌎 Geolocation | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)                         | Every 30 min  |
-| 📦 Package     | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/test-package-compatibility.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/test-package-compatibility.yml) | On commit     |
-| 🤖 Agent       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/agent-examples.yml)                         | Hourly        |
-
 ## 🚀 TS_Performance Test Suite
 
 The TS_Performance test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
