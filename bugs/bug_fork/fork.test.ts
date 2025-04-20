@@ -29,32 +29,27 @@ const testConfig = {
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
     USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
-  workers: [] as Worker[],
   groupId: process.env.GROUP_ID,
 };
 
 describe(TEST_NAME, () => {
+  let workers: Worker[];
   let globalGroup: Group | undefined;
   let messageCount = 1;
   let creator: Worker | undefined;
 
   it("should initialize workers and create group", async () => {
     // Initialize workers
-    const rootWorker = await getWorkers(
-      [testConfig.creator],
-      TEST_NAME,
-      "message",
-    );
+    const rootWorker = await getWorkers([testConfig.creator], TEST_NAME);
     creator = rootWorker.getWorkers()[0];
-    const workers = await getWorkers(testConfig.workerNames, TEST_NAME, "none");
-    testConfig.workers = workers.getWorkers();
+    workers = (
+      await getWorkers(testConfig.workerNames, TEST_NAME)
+    ).getWorkers();
 
     // Create or get group
-    const manualUsers = Object.values(testConfig.manualUsers).filter(
-      Boolean,
-    ) as string[];
+    const manualUsers = Object.values(testConfig.manualUsers) as string[];
     const allClientIds = [
-      ...testConfig.workers.map((w) => w.client.inboxId),
+      ...workers.map((w) => w.client.inboxId),
       ...manualUsers,
     ];
 
@@ -69,37 +64,23 @@ describe(TEST_NAME, () => {
   });
 
   it("should send messages and manage members", async () => {
-    if (!globalGroup?.id || !creator || !testConfig.workers)
+    if (!globalGroup?.id || !creator || !workers)
       throw new Error("Group or creator not found");
 
     let trys = 3;
     let epochs = 5;
     for (let i = 1; i <= trys; i++) {
       await sendMessageToGroup(
-        testConfig.workers[i],
+        workers[i],
         globalGroup.id,
-        testConfig.workers[i].name + ":" + String(i),
+        workers[i].name + ":" + String(i),
       );
-      await membershipChange(
-        globalGroup.id,
-        creator,
-        testConfig.workers[i],
-        epochs,
-      );
+      await membershipChange(globalGroup.id, creator, workers[i], epochs);
     }
 
     await globalGroup.send(creator.name + " : Done");
-    console.log(`Total message count: ${messageCount}`);
   });
 });
-
-// const recoverForks = async (group: Group) => {
-//   const manualUsers = Object.values(testConfig.manualUsers).filter(
-//     Boolean,
-//   ) as string[];
-//   await group.removeMembers(manualUsers);
-//   await group.addMembers(manualUsers);
-// };
 
 const getOrCreateGroup = async (
   creator: Client,
@@ -116,16 +97,6 @@ const getOrCreateGroup = async (
     group = (await creator.conversations.getConversationById(
       testConfig.groupId,
     )) as Group;
-  }
-
-  const members = await group.members();
-  if (members.length !== addedMembers.length + 1) {
-    console.error(
-      "Members count mismatch:",
-      members.length,
-      "vs",
-      addedMembers.length + 1,
-    );
   }
 
   const time = new Date().toLocaleTimeString("en-US", {
@@ -179,24 +150,9 @@ const membershipChange = async (
     }
 
     await group.sync();
-
-    // Check membership status
     const memberInboxId = memberToAdd.client.inboxId;
-    const members = await group.members();
-    const isMember = members.some((member) => member.inboxId === memberInboxId);
-    console.log(
-      `${memberToAdd.name} is ${isMember ? "" : "not "}a member of ${groupId}`,
-    );
-
-    // Check admin status
-    const admins = await group.admins;
-    if (admins.includes(memberInboxId)) {
-      console.log(`Removing admin role from ${memberToAdd.name}`);
-      await group.removeAdmin(memberInboxId);
-    }
-
-    // Perform add/remove cycles
     for (let i = 0; i <= trys; i++) {
+      await group.addMembers([memberInboxId]);
       await group.removeMembers([memberInboxId]);
       await group.addMembers([memberInboxId]);
       console.warn(`Epoch ${i} done`);
