@@ -503,9 +503,7 @@ export function parseTestName(testName: string): ParsedTestName {
     }
   }
 
-  const operationType = operationName.toLowerCase().includes("group")
-    ? "group"
-    : "core";
+  const operationType = parseInt(members) > 5 ? "group" : "core";
 
   return {
     metricName,
@@ -685,119 +683,8 @@ export function flushMetrics(testName: string): Promise<void> {
       return;
     }
 
-    logMetricsSummary(testName);
-
     void metrics.flush().then(() => {
       resolve();
     });
   });
-}
-
-/**
- * Creates and saves the metrics report
- */
-function saveMetricsReport(
-  testName: string,
-  validMetrics: [string, MetricData][],
-): void {
-  // Create directory for reports
-  const reportsDir = path.join(process.cwd(), "logs");
-  if (!fs.existsSync(reportsDir)) {
-    fs.mkdirSync(reportsDir, { recursive: true });
-  }
-
-  // Create filename with environment info
-  const filename = path.join(
-    reportsDir,
-    `${testName}-${state.currentGeo}-${process.env.XMTP_ENV}.md`,
-  );
-
-  try {
-    fs.writeFileSync(filename, generateReportContent(validMetrics));
-    console.log(`✅ Report saved to ${filename}`);
-  } catch (error) {
-    console.error(`❌ Error writing metrics summary to file:`, error);
-  }
-}
-
-/**
- * Generate and log a metrics summary report
- */
-export function logMetricsSummary(testName: string): void {
-  if (
-    !state.isInitialized ||
-    Object.keys(state.collectedMetrics).length === 0
-  ) {
-    console.log("No metrics collected to summarize");
-    return;
-  }
-
-  console.log("\n📊 Creating metrics summary report");
-
-  // Filter out workflow metrics and empty value arrays
-  const validMetrics = Object.entries(state.collectedMetrics).filter(
-    ([operation, data]) => operation !== "workflow" && data.values.length > 0,
-  );
-
-  // Count passed metrics
-  const passedMetrics = validMetrics.filter(
-    ([_, data]) => calculateAverage(data.values) <= data.threshold,
-  ).length;
-
-  const totalMetrics = validMetrics.length;
-  const passRate =
-    totalMetrics > 0 ? Math.round((passedMetrics / totalMetrics) * 100) : 0;
-
-  console.log(
-    `✅ Passed: ${passedMetrics}/${totalMetrics} metrics (${passRate}%)`,
-  );
-
-  saveMetricsReport(testName, validMetrics);
-
-  // Reset metrics collection for next test run
-  state.collectedMetrics = {};
-}
-
-/**
- * Generate the markdown report content
- */
-function generateReportContent(validMetrics: [string, MetricData][]): string {
-  let content = "# METRICS SUMMARY\n\n";
-  content +=
-    "| Operation | Members | Avg (ms) | Min/Max (ms) | Threshold (ms) | Variance (ms) | Status |\n";
-  content +=
-    "|-----------|---------|----------|--------------|----------------|---------------|---------|\n";
-
-  // Group metrics by operation name and member count
-  const operationGroups = groupMetricsByOperation(validMetrics);
-
-  // Generate table rows
-  for (const group of operationGroups.values()) {
-    if (!group.operationData) continue;
-
-    const { operationName, members, operationData: data } = group;
-    const memberCount = members !== "-" ? parseInt(members) : 0;
-    const operationType = operationName.toLowerCase().includes("group")
-      ? "group"
-      : "core";
-
-    // Calculate metrics data
-    const threshold = getThresholdForOperation(
-      operationName,
-      operationType as OperationType,
-      memberCount,
-      state.currentGeo,
-    );
-    data.threshold = threshold;
-
-    const average = calculateAverage(data.values);
-    const variance = Math.round(average - threshold);
-    const varianceFormatted =
-      variance <= 0 ? variance.toString() : `+${variance}`;
-
-    // Format table row
-    content += `| ${operationName} | ${members} | ${Math.round(average)} | ${Math.round(Math.min(...data.values))}/${Math.round(Math.max(...data.values))} | ${threshold} | ${varianceFormatted} | ${average <= threshold ? "PASS ✅" : "FAIL ❌"} |\n`;
-  }
-
-  return content;
 }

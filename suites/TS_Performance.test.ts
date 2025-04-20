@@ -245,6 +245,15 @@ describe(testName, () => {
       throw e;
     }
   });
+
+  it(`addMembers: should add members to a group`, async () => {
+    try {
+      await (newGroup as Group).addMembers([workers.get("randomguy")!.inboxId]);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   it(`removeMembers: should remove a participant from a group`, async () => {
     try {
       const previousMembers = await newGroup.members();

@@ -1,8 +1,8 @@
-import { loadEnv } from "@helpers/client";
+import { closeEnv, loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "bug_fork";
@@ -31,7 +31,13 @@ describe(TEST_NAME, () => {
   let creator: Worker | undefined;
   let globalGroup: Group | undefined;
 
+  afterAll(async () => {
+    await closeEnv(TEST_NAME);
+  });
   it("should initialize workers and create group", async () => {
+    const start = performance.now();
+    console.time("initialize workers and create group");
+
     // Initialize workers
     workers = (
       await getWorkers(testConfig.workerNames, TEST_NAME)
@@ -60,6 +66,12 @@ describe(TEST_NAME, () => {
     }
 
     await globalGroup.send(creator.name + " : Done");
+
+    const end = performance.now();
+    console.log(
+      `initialize workers and create group - Duration: ${end - start}ms`,
+    );
+    console.timeEnd("initialize workers and create group");
   });
 });
 
@@ -67,6 +79,9 @@ const getOrCreateGroup = async (
   creator: Client,
   addedMembers: string[],
 ): Promise<Conversation | undefined> => {
+  const start = performance.now();
+  console.time("getOrCreateGroup");
+
   let group: Group;
 
   if (!testConfig.groupId) {
@@ -92,6 +107,10 @@ const getOrCreateGroup = async (
   await group.updateName("Fork group " + time);
   await group.send("Starting run for " + time);
 
+  const end = performance.now();
+  console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
+  console.timeEnd("getOrCreateGroup");
+
   return group;
 };
 
@@ -103,6 +122,9 @@ export const sendMessageToGroup = async (
   groupId: string,
   message: string,
 ): Promise<void> => {
+  const start = performance.now();
+  console.time(`sendMessageToGroup-${worker.name}`);
+
   try {
     await worker.client.conversations.syncAll();
 
@@ -113,14 +135,24 @@ export const sendMessageToGroup = async (
     await foundGroup?.send(message);
   } catch (e) {
     console.error(`Error sending from ${worker.name}:`, e);
+  } finally {
+    const end = performance.now();
+    console.log(
+      `sendMessageToGroup for ${worker.name} - Duration: ${end - start}ms`,
+    );
+    console.timeEnd(`sendMessageToGroup-${worker.name}`);
   }
 };
+
 const membershipChange = async (
   groupId: string,
   memberWhoAdds: Worker,
   memberToAdd: Worker,
   trys: number,
 ): Promise<void> => {
+  const start = performance.now();
+  console.time(`membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`);
+
   try {
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
     await memberWhoAdds.client.conversations.syncAll();
@@ -136,12 +168,25 @@ const membershipChange = async (
     await group.sync();
     const memberInboxId = memberToAdd.client.inboxId;
     for (let i = 0; i <= trys; i++) {
+      const epochStart = performance.now();
+
       await group.addMembers([memberInboxId]);
       await group.removeMembers([memberInboxId]);
       await group.addMembers([memberInboxId]);
+
+      const epochEnd = performance.now();
+      console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
       console.warn(`Epoch ${i} done`);
     }
   } catch (e) {
     console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+  } finally {
+    const end = performance.now();
+    console.log(
+      `membershipChange for ${memberWhoAdds.name} and ${memberToAdd.name} - Duration: ${end - start}ms`,
+    );
+    console.timeEnd(
+      `membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`,
+    );
   }
 };
