@@ -54,7 +54,7 @@ it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, as
 
 The [`TS_Performance.yml`](/.github/workflows/TS_Performance.yml) workflow automates this test suite:
 
-- ⏱️ **Schedule**: Runs every 30 minutes via cron schedule
+- ⏱️ **Schedule**: Runs every 15 minutes via cron schedule
 - ⚙️ **Configuration**: Supports adjustable batch size and group size parameters
 - 🔄 **Retry Mechanism**: Implements retry logic for test stability
 - 📊 **Metrics**: Reports comprehensive performance metrics to Datadog
