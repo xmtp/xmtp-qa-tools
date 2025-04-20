@@ -3,213 +3,390 @@ description:
 globs: 
 alwaysApply: true
 ---
-# XMTP QA Testing Practices
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import generatedInboxes from "@helpers/generated-inboxes.json";
+import { logError } from "@helpers/logger";
+import { verifyStream, verifyStreamAll } from "@helpers/streams";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import {
+  Client,
+  IdentifierKind,
+  type Conversation,
+  type Group,
+} from "@xmtp/node-sdk";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  it,
+} from "vitest";
 
-You're an expert in writing TypeScript tests for XMTP applications. Generate **high-quality tests** that adhere to the following best practices:
+const testName = "ts_performance";
+loadEnv(testName);
 
-## Test Structure
+const batchSize = parseInt(
+  process.env.CLI_BATCH_SIZE ?? process.env.BATCH_SIZE ?? "5",
+);
+const total = parseInt(
+  process.env.CLI_GROUP_SIZE ?? process.env.MAX_GROUP_SIZE ?? "10",
+);
+console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 
-1. Use Vitest as the testing framework with a consistent structure:
+describe(testName, () => {
+  let dm: Conversation;
+  let workers: WorkerManager;
+  let start: number;
+  let hasFailures: boolean = false;
 
-   ```typescript
-   import { closeEnv, loadEnv } from "@helpers/client";
-   import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
-   import { logError } from "@helpers/logger";
-   import { type Conversation, type WorkerManager } from "@xmtp/node-sdk";
-   import { verifyStream } from "@helpers/verify";
-   import { getWorkers } from "@workers/manager";
-   import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it } from "vitest";
+  beforeAll(async () => {
+    try {
+      workers = await getWorkers(
+        [
+          "henry-a-203",
+          "ivy-a-100",
+          "jack-a-202",
+          "karen-a-100",
+          "randomguy-a-100",
+          "randomguy2-a-203",
+          "larry-a-100",
+          "mary-a-105",
+          "nancy-a-100",
+          "oscar-a-105",
+        ],
+        testName,
+      );
+      expect(workers).toBeDefined();
+      expect(workers.getWorkers().length).toBe(10);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  beforeEach(() => {
+    const testName = expect.getState().currentTestName;
+    start = performance.now();
+    console.time(testName);
+  });
 
-   const testName = "feature-name";
+  afterEach(function () {
+    try {
+      sendPerformanceResult(expect, workers, start);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-   describe(testName, () => {
-     loadEnv(testName);
-     let workers: WorkerManager;
-     let hasFailures: boolean = false;
-     let start: number;
+  afterAll(async () => {
+    try {
+      sendTestResults(hasFailures, testName);
+      await closeEnv(testName, workers);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-     beforeAll(async () => {
-       try {
-         workers = await getWorkers(["worker1", "worker2"], testName);
-         expect(workers).toBeDefined();
-       } catch (e) {
-         hasFailures = logError(e, expect);
-         throw e;
-       }
-     });
+  it("clientCreate: should measure creating a client", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "message");
+      expect(client).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("canMessage: should measure canMessage", async () => {
+    try {
+      const client = await getWorkers(["randomclient"], testName, "none");
+      if (!client) {
+        throw new Error("Client not found");
+      }
 
-     beforeEach(() => {
-       const testName = expect.getState().currentTestName;
-       start = performance.now();
-       console.time(testName);
-     });
+      const randomAddress = client.get("randomclient")!.address;
+      if (!randomAddress) {
+        throw new Error("Random client not found");
+      }
+      const canMessage = await Client.canMessage(
+        [
+          {
+            identifier: randomAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          },
+        ],
+        client.get("randomclient")!.env,
+      );
+      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("inboxState: should measure inboxState of henry", async () => {
+    try {
+      const inboxState = await workers
+        .get("henry")!
+        .client.preferences.inboxState(true);
+      expect(inboxState.installations.length).toBeGreaterThan(0);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("newDm: should measure creating a DM", async () => {
+    try {
+      dm = await workers
+        .get("henry")!
+        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
-     afterEach(function () {
-       try {
-         sendPerformanceResult(expect, workers, start);
-       } catch (e) {
-         hasFailures = logError(e, expect);
-         throw e;
-       }
-     });
+      expect(dm).toBeDefined();
+      expect(dm.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+    try {
+      const dm2 = await workers
+        .get("henry")!
+        .client.conversations.newDmWithIdentifier({
+          identifier: workers.get("randomguy2")!.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
 
-     afterAll(async () => {
-       try {
-         sendTestResults(hasFailures, testName);
-         await closeEnv(testName, workers);
-       } catch (e) {
-         hasFailures = logError(e, expect);
-         throw e;
-       }
-     });
+      expect(dm2).toBeDefined();
+      expect(dm2.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-     it("testName: should describe what the test does", async () => {
-       try {
-         // Test implementation
-         expect(result).toBeDefined();
-       } catch (e) {
-         hasFailures = logError(e, expect);
-         throw e;
-       }
-     });
-   });
-   ```
+  it("sendGM: should measure sending a gm", async () => {
+    try {
+      // We'll expect this random message to appear in Joe's stream
+      const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-2. Always include performance measurement in tests:
-   - Use `console.time(testName)` in `beforeEach`
-   - Use `sendPerformanceResult(expect, workers, start)` in `afterEach`
-   - Track failures with `hasFailures` flag
+      console.log(
+        `[${workers.get("henry")!.name}] Creating DM with ${workers.get("randomguy")!.name} at ${workers.get("randomguy")!.client.inboxId}`,
+      );
 
-3. Properly clean up resources in `afterAll`:
-   - Send test results with `sendTestResults(hasFailures, testName)`
-   - Close environment with `closeEnv(testName, workers)`
+      const dmId = await dm.send(message);
 
-## Worker Management
+      expect(dmId).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-1. Use the `WorkerManager` class to manage test participants:
-   - Initialize with `getWorkers(["worker1", "worker2"], testName)`
-   - Access workers with `workers.get("workerName")`
-   - Get all workers with `workers.getWorkers()`
+  it("receiveGM: should measure receiving a gm", async () => {
+    try {
+      const verifyResult = await verifyStream(dm, [workers.get("randomguy")!]);
 
-2. Create workers with descriptive names that indicate their role:
-   - Use names like "henry", "ivy", "jack" for consistent test participants
-   - Use "randomguy" for one-off participants
+      expect(verifyResult.messages.length).toEqual(1);
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  let i = 4;
+  let newGroup: Conversation;
+  it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
+    try {
+      const sliced = generatedInboxes.slice(0, i);
+      newGroup = await workers
+        .get("henry")!
+        .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+      console.log("New group created", newGroup.id);
+      expect(newGroup.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
+    try {
+      const sliced = generatedInboxes.slice(0, i);
+      const newGroupByIdentifier = await workers
+        .get("henry")!
+        .client.conversations.newGroupWithIdentifiers(
+          sliced.map((inbox) => ({
+            identifier: inbox.accountAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          })),
+        );
+      expect(newGroupByIdentifier.id).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`syncGroup: should sync a large group of ${i} participants ${i}`, async () => {
+    try {
+      await newGroup.sync();
+      const members = await newGroup.members();
+      expect(members.length).toBe(i + 1);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`updateGroupName: should update the group name`, async () => {
+    try {
+      const newName = "Large Group";
+      await (newGroup as Group).updateName(newName);
+      await newGroup.sync();
+      const name = (newGroup as Group).name;
+      expect(name).toBe(newName);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-3. Apply network conditions when testing network-related features:
-   ```typescript
-   workers.setWorkerNetworkConditions("workerName", {
-     latencyMs: 100,
-     packetLossRate: 0.1,
-     disconnectProbability: 0.05,
-     disconnectDurationMs: 1000,
-     bandwidthLimitKbps: 1000,
-     jitterMs: 50
-   });
-   ```
+  it(`addMembers: should add members to a group`, async () => {
+    try {
+      await (newGroup as Group).addMembers([workers.get("randomguy")!.inboxId]);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`removeMembers: should remove a participant from a group`, async () => {
+    try {
+      const previousMembers = await newGroup.members();
+      await (newGroup as Group).removeMembers([
+        previousMembers.filter(
+          (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+        )[0].inboxId,
+      ]);
 
-## Verification Helpers
+      const members = await newGroup.members();
+      expect(members.length).toBe(previousMembers.length - 1);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
+    try {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-1. Use the verification helpers for message testing:
-   - `verifyStream` for testing message delivery in conversations
-   - `verifyStreamAll` for testing message delivery to all participants
-   - `verifyConversationStream` for testing conversation creation and message delivery
+      await newGroup.send(groupMessage);
+      console.log("GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
+    try {
+      const verifyResult = await verifyStreamAll(newGroup, workers);
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
-2. Use message generators for consistent test data:
-   ```typescript
-   const message = "gm-" + Math.random().toString(36).substring(2, 15);
-   ```
+  for (let i = batchSize; i <= total; i += batchSize) {
+    let newGroup: Conversation;
+    it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
+      try {
+        const sliced = generatedInboxes.slice(0, i);
+        newGroup = await workers
+          .get("henry")!
+          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+        expect(newGroup.id).toBeDefined();
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
+      try {
+        const sliced = generatedInboxes.slice(0, i);
+        const newGroupByIdentifier = await workers
+          .get("henry")!
+          .client.conversations.newGroupWithIdentifiers(
+            sliced.map((inbox) => ({
+              identifier: inbox.accountAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            })),
+          );
+        expect(newGroupByIdentifier.id).toBeDefined();
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+      try {
+        await newGroup.sync();
+        const members = await newGroup.members();
+        expect(members.length).toBe(i + 1);
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`updateGroupName-${i}: should update the group name`, async () => {
+      try {
+        const newName = "Large Group";
+        await (newGroup as Group).updateName(newName);
+        await newGroup.sync();
+        const name = (newGroup as Group).name;
+        expect(name).toBe(newName);
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+      try {
+        const previousMembers = await newGroup.members();
+        await (newGroup as Group).removeMembers([
+          previousMembers.filter(
+            (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+          )[0].inboxId,
+        ]);
 
-3. Verify message delivery with appropriate assertions:
-   ```typescript
-   expect(verifyResult.messages.length).toEqual(expectedCount);
-   expect(verifyResult.allReceived).toBe(true);
-   ```
+        const members = await newGroup.members();
+        expect(members.length).toBe(previousMembers.length - 1);
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
+      try {
+        const groupMessage =
+          "gm-" + Math.random().toString(36).substring(2, 15);
 
-## Error Handling
-
-1. Use consistent error handling pattern with try/catch blocks:
-   ```typescript
-   try {
-     // Test implementation
-   } catch (e) {
-     hasFailures = logError(e, expect);
-     throw e;
-   }
-   ```
-
-2. Use the `logError` helper to properly log errors:
-   ```typescript
-   hasFailures = logError(e, expect);
-   ```
-
-3. Always rethrow errors after logging to ensure test failure is properly reported
-
-## Test Naming
-
-1. Use descriptive test names that follow the pattern:
-   ```
-   actionName: should describe what the test verifies
-   ```
-
-2. Examples:
-   - `createDM: should measure creating a DM`
-   - `sendGM: should measure sending a gm`
-   - `receiveGM: should measure receiving a gm`
-
-## Environment Management
-
-1. Always load the appropriate environment at the start of tests:
-   ```typescript
-   loadEnv(testName);
-   ```
-
-2. Use the test name to isolate test data and prevent cross-test contamination
-
-3. Close the environment properly at the end of tests:
-   ```typescript
-   await closeEnv(testName, workers);
-   ```
-
-## Performance Testing
-
-1. Measure performance for all operations:
-   - Use `performance.now()` to track start time
-   - Send results to Datadog with `sendPerformanceResult`
-
-2. Include appropriate assertions to verify functionality:
-   - Check that objects are defined
-   - Verify expected properties exist
-   - Confirm correct message counts
-
-## Network Simulation
-
-1. Use the network simulation features to test under various conditions:
-   - Latency
-   - Packet loss
-   - Disconnections
-   - Bandwidth limitations
-   - Jitter
-
-2. Apply network conditions to specific workers or all workers:
-   ```typescript
-   // Apply to specific worker
-   workers.setWorkerNetworkConditions("workerName", conditions);
-   
-   // Apply to all workers
-   workers.applyNetworkConditionsToAll(conditions);
-   ```
-
-3. Set default network conditions for all new workers:
-   ```typescript
-   workers.setDefaultNetworkConditions(conditions);
-   ```
-
-## Test Categories
-
-1. Organize tests by feature area:
-   - `dms.test.ts` for direct message tests
-   - `groups.test.ts` for group conversation tests
-   - `offline.test.ts` for offline functionality tests
-   - `network_simulation.test.ts` for network condition tests
-
-2. Use consistent patterns across test categories while adapting to specific feature requirements 
+        await newGroup.send(groupMessage);
+        console.log("GM Message sent in group", groupMessage);
+        expect(groupMessage).toBeDefined();
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
+      try {
+        const verifyResult = await verifyStreamAll(newGroup, workers);
+        expect(verifyResult.allReceived).toBe(true);
+      } catch (e) {
+        hasFailures = logError(e, expect);
+        throw e;
+      }
+    });
+  }
+});

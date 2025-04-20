@@ -8,15 +8,6 @@ import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
 export type typeofStream = "message" | "conversation" | "consent" | "none";
-// Network simulation interfaces
-export interface NetworkConditions {
-  latencyMs?: number; // Artificial delay in milliseconds
-  packetLossRate?: number; // Probability of dropping a message (0-1)
-  disconnectProbability?: number; // Probability of temporary disconnection (0-1)
-  disconnectDurationMs?: number; // How long disconnections last
-  bandwidthLimitKbps?: number; // Bandwidth limit in Kbps
-  jitterMs?: number; // Random variation in latency
-}
 
 export interface WorkerBase {
   name: string;
@@ -26,7 +17,6 @@ export interface WorkerBase {
   testName: string;
   sdkVersion: string;
   libXmtpVersion: string;
-  networkConditions?: NetworkConditions; // Add network conditions
 }
 
 export interface Worker extends WorkerBase {
@@ -57,7 +47,6 @@ export class WorkerManager {
     string,
     { walletKey: string; encryptionKey: string }
   > = {};
-  private defaultNetworkConditions?: NetworkConditions;
 
   /**
    * Constructor creates an empty manager or populates it with existing workers
@@ -68,14 +57,12 @@ export class WorkerManager {
     gptEnabled: boolean = false,
     env: XmtpEnv,
     existingWorkers?: Record<string, Record<string, Worker>>,
-    defaultNetworkConditions?: NetworkConditions,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStream;
     this.gptEnabled = gptEnabled;
     this.env = env;
     this.workers = existingWorkers || {};
-    this.defaultNetworkConditions = defaultNetworkConditions;
   }
   /**
    * Terminates all active workers and cleans up resources
@@ -175,58 +162,6 @@ export class WorkerManager {
   }
 
   /**
-   * Sets network conditions for a specific worker
-   * @param workerName The name of the worker to configure
-   * @param conditions The network conditions to apply
-   */
-  public setWorkerNetworkConditions(
-    workerName: string,
-    conditions: NetworkConditions,
-  ): void {
-    const worker = this.get(workerName);
-    if (worker) {
-      worker.worker.setNetworkConditions(conditions);
-      // Update the worker's network conditions in our records
-      worker.networkConditions = conditions;
-    }
-  }
-
-  /**
-   * Sets default network conditions for all new workers
-   * @param conditions The network conditions to apply
-   */
-  public setDefaultNetworkConditions(conditions: NetworkConditions): void {
-    this.defaultNetworkConditions = conditions;
-  }
-
-  /**
-   * Applies network conditions to all existing workers
-   * @param conditions The network conditions to apply
-   */
-  public applyNetworkConditionsToAll(conditions: NetworkConditions): void {
-    const allWorkers = this.getWorkers();
-    for (const worker of allWorkers) {
-      this.setWorkerNetworkConditions(worker.name, conditions);
-    }
-  }
-
-  /**
-   * Creates a worker with poor network conditions
-   * @param descriptor Worker descriptor
-   * @param conditions Network conditions to apply
-   * @returns The created worker
-   */
-  public async createWorkerWithNetworkConditions(
-    descriptor: string,
-    conditions: NetworkConditions,
-  ): Promise<Worker> {
-    // Create the worker with the specified network conditions
-    const worker = await this.createWorker(descriptor);
-    this.setWorkerNetworkConditions(worker.name, conditions);
-    return worker;
-  }
-
-  /**
    * Ensures a worker has wallet and encryption keys
    * Either retrieves from env vars or generates new ones
    */
@@ -320,7 +255,6 @@ export class WorkerManager {
       encryptionKey,
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
-      networkConditions: this.defaultNetworkConditions,
     };
 
     // Create and initialize the worker
@@ -405,18 +339,10 @@ export async function getWorkers(
   gptEnabled: boolean = false,
   existingWorkers?: WorkerManager,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
-  defaultNetworkConditions?: NetworkConditions,
 ): Promise<WorkerManager> {
   const manager =
     existingWorkers ||
-    new WorkerManager(
-      testName,
-      typeofStream,
-      gptEnabled,
-      env,
-      undefined,
-      defaultNetworkConditions,
-    );
+    new WorkerManager(testName, typeofStream, gptEnabled, env, undefined);
   await manager.createWorkers(descriptorsOrAmount);
   return manager;
 }

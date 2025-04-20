@@ -1,7 +1,3 @@
-import { exec } from "child_process";
-import fs from "fs";
-import path from "path";
-import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
@@ -676,7 +672,7 @@ export async function getNetworkStats(
 /**
  * Flush all metrics and generate summary report
  */
-export function flushMetrics(testName: string): Promise<void> {
+export function flushMetrics(): Promise<void> {
   return new Promise<void>((resolve) => {
     if (!state.isInitialized) {
       resolve();
