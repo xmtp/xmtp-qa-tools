@@ -1,6 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import {
+  getWorkers,
+  type Worker,
+  type WorkerBase,
+  type WorkerManager,
+} from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
@@ -24,7 +29,7 @@ const testConfig = {
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
     USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
-  workers: undefined as WorkerManager | undefined,
+  workers: [] as Worker[],
   groupId: process.env.GROUP_ID,
 };
 
@@ -41,18 +46,15 @@ describe(TEST_NAME, () => {
       "message",
     );
     creator = rootWorker.getWorkers()[0];
-    testConfig.workers = await getWorkers(
-      testConfig.workerNames,
-      TEST_NAME,
-      "none",
-    );
+    const workers = await getWorkers(testConfig.workerNames, TEST_NAME, "none");
+    testConfig.workers = workers.getWorkers();
 
     // Create or get group
     const manualUsers = Object.values(testConfig.manualUsers).filter(
       Boolean,
     ) as string[];
     const allClientIds = [
-      ...testConfig.workers.getWorkers().map((w) => w.client.inboxId),
+      ...testConfig.workers.map((w) => w.client.inboxId),
       ...manualUsers,
     ];
 
@@ -70,17 +72,20 @@ describe(TEST_NAME, () => {
     if (!globalGroup?.id || !creator || !testConfig.workers)
       throw new Error("Group or creator not found");
 
-    const workers = testConfig.workers.getWorkers();
-
     let trys = 3;
     let epochs = 5;
     for (let i = 1; i <= trys; i++) {
       await sendMessageToGroup(
-        workers[i],
+        testConfig.workers[i],
         globalGroup.id,
-        workers[i].name + ":" + String(i),
+        testConfig.workers[i].name + ":" + String(i),
       );
-      await membershipChange(globalGroup.id, creator, workers[i], epochs);
+      await membershipChange(
+        globalGroup.id,
+        creator,
+        testConfig.workers[i],
+        epochs,
+      );
     }
 
     await globalGroup.send(creator.name + " : Done");
@@ -88,13 +93,13 @@ describe(TEST_NAME, () => {
   });
 });
 
-const recoverForks = async (group: Group) => {
-  const manualUsers = Object.values(testConfig.manualUsers).filter(
-    Boolean,
-  ) as string[];
-  await group.removeMembers(manualUsers);
-  await group.addMembers(manualUsers);
-};
+// const recoverForks = async (group: Group) => {
+//   const manualUsers = Object.values(testConfig.manualUsers).filter(
+//     Boolean,
+//   ) as string[];
+//   await group.removeMembers(manualUsers);
+//   await group.addMembers(manualUsers);
+// };
 
 const getOrCreateGroup = async (
   creator: Client,
