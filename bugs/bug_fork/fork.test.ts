@@ -1,11 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
-import {
-  getWorkers,
-  type Worker,
-  type WorkerBase,
-  type WorkerManager,
-} from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
@@ -22,7 +17,6 @@ const testConfig = {
     "dave-a-203",
     "eve-a-105",
   ],
-  creator: "fabri",
   manualUsers: {
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
@@ -34,38 +28,25 @@ const testConfig = {
 
 describe(TEST_NAME, () => {
   let workers: Worker[];
-  let globalGroup: Group | undefined;
-  let messageCount = 1;
   let creator: Worker | undefined;
+  let globalGroup: Group | undefined;
 
   it("should initialize workers and create group", async () => {
     // Initialize workers
-    const rootWorker = await getWorkers([testConfig.creator], TEST_NAME);
-    creator = rootWorker.getWorkers()[0];
     workers = (
       await getWorkers(testConfig.workerNames, TEST_NAME)
     ).getWorkers();
 
-    // Create or get group
-    const manualUsers = Object.values(testConfig.manualUsers) as string[];
+    creator = workers[0];
     const allClientIds = [
       ...workers.map((w) => w.client.inboxId),
-      ...manualUsers,
+      ...(Object.values(testConfig.manualUsers) as string[]),
     ];
 
     globalGroup = (await getOrCreateGroup(
       creator.client,
       allClientIds,
     )) as Group;
-
-    if (!globalGroup?.id || !creator)
-      throw new Error("Group or creator not found");
-    await globalGroup.sync();
-  });
-
-  it("should send messages and manage members", async () => {
-    if (!globalGroup?.id || !creator || !workers)
-      throw new Error("Group or creator not found");
 
     let trys = 3;
     let epochs = 5;
@@ -98,6 +79,9 @@ const getOrCreateGroup = async (
       testConfig.groupId,
     )) as Group;
   }
+
+  const members = await group.members();
+  console.log(`Group ${group.id} has ${members.length} members`);
 
   const time = new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
