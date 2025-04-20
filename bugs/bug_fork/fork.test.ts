@@ -1,13 +1,8 @@
-import { loadEnv } from "@helpers/client";
+import { closeEnv, loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
-import {
-  getWorkers,
-  type Worker,
-  type WorkerBase,
-  type WorkerManager,
-} from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "bug_fork";
@@ -22,40 +17,36 @@ const testConfig = {
     "dave-a-203",
     "eve-a-105",
   ],
-  creator: "fabri",
   manualUsers: {
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
     USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
-  workers: [] as Worker[],
   groupId: process.env.GROUP_ID,
 };
 
 describe(TEST_NAME, () => {
-  let globalGroup: Group | undefined;
-  let messageCount = 1;
+  let workers: Worker[];
   let creator: Worker | undefined;
+  let globalGroup: Group | undefined;
 
+  afterAll(async () => {
+    await closeEnv(TEST_NAME);
+  });
   it("should initialize workers and create group", async () => {
-    // Initialize workers
-    const rootWorker = await getWorkers(
-      [testConfig.creator],
-      TEST_NAME,
-      "message",
-    );
-    creator = rootWorker.getWorkers()[0];
-    const workers = await getWorkers(testConfig.workerNames, TEST_NAME, "none");
-    testConfig.workers = workers.getWorkers();
+    const start = performance.now();
+    console.time("initialize workers and create group");
 
-    // Create or get group
-    const manualUsers = Object.values(testConfig.manualUsers).filter(
-      Boolean,
-    ) as string[];
+    // Initialize workers
+    workers = (
+      await getWorkers(testConfig.workerNames, TEST_NAME)
+    ).getWorkers();
+
+    creator = workers[0];
     const allClientIds = [
-      ...testConfig.workers.map((w) => w.client.inboxId),
-      ...manualUsers,
+      ...workers.map((w) => w.client.inboxId),
+      ...(Object.values(testConfig.manualUsers) as string[]),
     ];
 
     globalGroup = (await getOrCreateGroup(
@@ -63,48 +54,34 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    if (!globalGroup?.id || !creator)
-      throw new Error("Group or creator not found");
-    await globalGroup.sync();
-  });
-
-  it("should send messages and manage members", async () => {
-    if (!globalGroup?.id || !creator || !testConfig.workers)
-      throw new Error("Group or creator not found");
-
     let trys = 3;
     let epochs = 5;
     for (let i = 1; i <= trys; i++) {
       await sendMessageToGroup(
-        testConfig.workers[i],
+        workers[i],
         globalGroup.id,
-        testConfig.workers[i].name + ":" + String(i),
+        workers[i].name + ":" + String(i),
       );
-      await membershipChange(
-        globalGroup.id,
-        creator,
-        testConfig.workers[i],
-        epochs,
-      );
+      await membershipChange(globalGroup.id, creator, workers[i], epochs);
     }
 
     await globalGroup.send(creator.name + " : Done");
-    console.log(`Total message count: ${messageCount}`);
+
+    const end = performance.now();
+    console.log(
+      `initialize workers and create group - Duration: ${end - start}ms`,
+    );
+    console.timeEnd("initialize workers and create group");
   });
 });
-
-// const recoverForks = async (group: Group) => {
-//   const manualUsers = Object.values(testConfig.manualUsers).filter(
-//     Boolean,
-//   ) as string[];
-//   await group.removeMembers(manualUsers);
-//   await group.addMembers(manualUsers);
-// };
 
 const getOrCreateGroup = async (
   creator: Client,
   addedMembers: string[],
 ): Promise<Conversation | undefined> => {
+  const start = performance.now();
+  console.time("getOrCreateGroup");
+
   let group: Group;
 
   if (!testConfig.groupId) {
@@ -119,14 +96,7 @@ const getOrCreateGroup = async (
   }
 
   const members = await group.members();
-  if (members.length !== addedMembers.length + 1) {
-    console.error(
-      "Members count mismatch:",
-      members.length,
-      "vs",
-      addedMembers.length + 1,
-    );
-  }
+  console.log(`Group ${group.id} has ${members.length} members`);
 
   const time = new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
@@ -136,6 +106,10 @@ const getOrCreateGroup = async (
 
   await group.updateName("Fork group " + time);
   await group.send("Starting run for " + time);
+
+  const end = performance.now();
+  console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
+  console.timeEnd("getOrCreateGroup");
 
   return group;
 };
@@ -148,6 +122,9 @@ export const sendMessageToGroup = async (
   groupId: string,
   message: string,
 ): Promise<void> => {
+  const start = performance.now();
+  console.time(`sendMessageToGroup-${worker.name}`);
+
   try {
     await worker.client.conversations.syncAll();
 
@@ -158,14 +135,24 @@ export const sendMessageToGroup = async (
     await foundGroup?.send(message);
   } catch (e) {
     console.error(`Error sending from ${worker.name}:`, e);
+  } finally {
+    const end = performance.now();
+    console.log(
+      `sendMessageToGroup for ${worker.name} - Duration: ${end - start}ms`,
+    );
+    console.timeEnd(`sendMessageToGroup-${worker.name}`);
   }
 };
+
 const membershipChange = async (
   groupId: string,
   memberWhoAdds: Worker,
   memberToAdd: Worker,
   trys: number,
 ): Promise<void> => {
+  const start = performance.now();
+  console.time(`membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`);
+
   try {
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
     await memberWhoAdds.client.conversations.syncAll();
@@ -179,29 +166,27 @@ const membershipChange = async (
     }
 
     await group.sync();
-
-    // Check membership status
     const memberInboxId = memberToAdd.client.inboxId;
-    const members = await group.members();
-    const isMember = members.some((member) => member.inboxId === memberInboxId);
-    console.log(
-      `${memberToAdd.name} is ${isMember ? "" : "not "}a member of ${groupId}`,
-    );
-
-    // Check admin status
-    const admins = await group.admins;
-    if (admins.includes(memberInboxId)) {
-      console.log(`Removing admin role from ${memberToAdd.name}`);
-      await group.removeAdmin(memberInboxId);
-    }
-
-    // Perform add/remove cycles
     for (let i = 0; i <= trys; i++) {
+      const epochStart = performance.now();
+
+      await group.addMembers([memberInboxId]);
       await group.removeMembers([memberInboxId]);
       await group.addMembers([memberInboxId]);
+
+      const epochEnd = performance.now();
+      console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
       console.warn(`Epoch ${i} done`);
     }
   } catch (e) {
     console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+  } finally {
+    const end = performance.now();
+    console.log(
+      `membershipChange for ${memberWhoAdds.name} and ${memberToAdd.name} - Duration: ${end - start}ms`,
+    );
+    console.timeEnd(
+      `membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`,
+    );
   }
 };

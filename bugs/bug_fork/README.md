@@ -29,6 +29,7 @@ USER_XMTPCHAT="" # InboxID
 USER_CONVOS_DESKTOP="" # InboxID
 ```
 
+> [!TIP]
 > To learn your inboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`
 > Send `/kc address` to get your address and inbox ID
 
@@ -44,22 +45,45 @@ yarn test fork
 
 ## Test logic
 
-- Creator creates a group that includes all test workers + 4 manual users
-- Creator updates group name with current timestamp and sends a start message
-- The test then performs these specific actions:
-  - Bob is added/removed 3 times by Creator
-  - Bob, Alice, and Ivy each send a message
-  - Alice is added/removed 3 times by Creator
-  - Dave sends a message
-  - Ivy is added/removed 3 times by Creator
-  - Eve sends a message
-  - Dave is added/removed 3 times by Creator
-  - Frank sends a message
-  - Eve is added/removed 3 times by Creator
-  - Grace sends a message
-  - Frank is added/removed 3 times by Creator
-- Creator sends a final "Done" message
+The test executes the following sequence:
+
+- Group creator updates the group name with the current timestamp and sends a start message
+- In a loop for the first 3 worker participants:
+  - Each worker sends a message with their name and iteration count
+  - The creator performs multiple add/remove cycles for each worker
+
+```typescript
+for (let i = 1; i <= trys; i++) {
+  await sendMessageToGroup(
+    testConfig.workers[i],
+    globalGroup.id,
+    testConfig.workers[i].name + ":" + String(i),
+  );
+  await membershipChange(
+    globalGroup.id,
+    creator,
+    testConfig.workers[i],
+    epochs,
+  );
+}
+```
+
+The membership changes include:
+
+```typescript
+// Perform add/remove cycles
+for (let i = 0; i <= trys; i++) {
+  await group.removeMembers([memberInboxId]);
+  await group.addMembers([memberInboxId]);
+  console.warn(`Epoch ${i} done`);
+}
+```
+
+Creator sends a final "Done" message to complete the test.
 
 ## How to fork
 
-While running the test, send messages randomly from the manual users.
+While running the test, send messages randomly from the manual users (convos io, convos desktop, xmtpchat web, and CB build IOS) to test real-world fork conditions.
+
+> Estimate SDK calls
+> Total SDK calls = 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51 calls

@@ -294,7 +294,7 @@ export function loadEnv(testName: string) {
   );
 }
 
-export async function closeEnv(testName: string, workers: WorkerManager) {
+export async function closeEnv(testName: string, workers?: WorkerManager) {
   flushLogger(testName);
 
   await flushMetrics(testName);
