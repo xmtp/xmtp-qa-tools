@@ -297,7 +297,7 @@ export function loadEnv(testName: string) {
 export async function closeEnv(testName: string, workers?: WorkerManager) {
   flushLogger(testName);
 
-  await flushMetrics(testName);
+  await flushMetrics();
   if (workers && typeof workers.getWorkers === "function") {
     for (const worker of workers.getWorkers()) {
       await worker.worker.terminate();
