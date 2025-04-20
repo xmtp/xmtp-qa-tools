@@ -175,7 +175,7 @@ const membershipChange = async (
     )) as Group;
     if (!group) {
       console.log(`Group ${groupId} not found`);
-      return;
+      throw new Error(`Group ${groupId} not found`);
     }
 
     await group.sync();
