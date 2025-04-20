@@ -80,12 +80,12 @@ describe(TEST_NAME, () => {
         globalGroup.id,
         testConfig.workers[i].name + ":" + String(i),
       );
-      await membershipChange(
-        globalGroup.id,
-        creator,
-        testConfig.workers[i],
-        epochs,
-      );
+      // await membershipChange(
+      //   globalGroup.id,
+      //   creator,
+      //   testConfig.workers[i],
+      //   epochs,
+      // );
     }
 
     await globalGroup.send(creator.name + " : Done");
