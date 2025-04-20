@@ -503,7 +503,7 @@ export function parseTestName(testName: string): ParsedTestName {
     }
   }
 
-  const operationType = parseInt(members) > 5 ? "group" : "core";
+  const operationType = parseInt(members) >= 5 ? "group" : "core";
 
   return {
     metricName,
