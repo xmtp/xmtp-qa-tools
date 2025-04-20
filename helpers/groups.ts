@@ -1,5 +1,5 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
-import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import { type Conversation } from "@xmtp/node-sdk";
 
 /**
  * Creates a group with specified participants and measures performance

@@ -186,23 +186,6 @@ export const sdkVersions = {
   },
 };
 
-// Network condition presets
-const networkConditions = {
-  highLatency: { latencyMs: 1000, jitterMs: 200 },
-  packetLoss: { packetLossRate: 0.3 },
-  disconnection: { disconnectProbability: 0.2, disconnectDurationMs: 5000 },
-  bandwidthLimit: { bandwidthLimitKbps: 100 },
-  poorConnection: {
-    latencyMs: 500,
-    jitterMs: 100,
-    packetLossRate: 0.1,
-    bandwidthLimitKbps: 200,
-  },
-} as const;
-
-type NetworkConditionKey = keyof typeof networkConditions;
-type NetworkCondition = (typeof networkConditions)[NetworkConditionKey];
-
 /**
  * Creates random installations for a worker
  */
@@ -235,16 +218,6 @@ export const createRandomInstallations = async (
  */
 export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
-
-/**
- * Gets a random network condition
- */
-export const getRandomNetworkCondition = (): NetworkCondition => {
-  const conditions = Object.keys(networkConditions) as NetworkConditionKey[];
-  return networkConditions[
-    conditions[Math.floor(Math.random() * conditions.length)]
-  ];
-};
 
 /**
  * Randomly assigns admin privileges to a group member
@@ -417,23 +390,6 @@ export const randomlyRemoveDb = async (
       await worker.worker?.initialize();
     }
   }
-};
-
-/**
- * Sets random network conditions for workers
- */
-export const setRandomNetworkConditions = (workers: WorkerManager): void => {
-  const testWorkers = ["bob", "alice", "ivy"];
-  const conditions = testWorkers.map((name) => ({
-    name,
-    condition: getRandomNetworkCondition(),
-  }));
-
-  console.log("Applying network conditions:");
-  conditions.forEach(({ name, condition }) => {
-    console.log(`${name}: ${JSON.stringify(condition)}`);
-    workers.setWorkerNetworkConditions(name, condition);
-  });
 };
 
 /**

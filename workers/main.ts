@@ -11,7 +11,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import type { NetworkConditions, typeofStream, WorkerBase } from "./manager";
+import type { typeofStream, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -115,14 +115,6 @@ export class WorkerClient extends Worker {
   };
   private isTerminated = false;
 
-  // Network simulation properties
-  private networkConditions?: NetworkConditions;
-  private isDisconnected = false;
-  private disconnectTimeout?: NodeJS.Timeout;
-  private lastOperationTime = 0;
-  private bandwidthUsage = 0;
-  private bandwidthResetTime = 0;
-
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
@@ -147,18 +139,8 @@ export class WorkerClient extends Worker {
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
-    this.networkConditions = worker.networkConditions;
 
     this.setupEventHandlers();
-  }
-
-  /**
-   * Sets network conditions for this worker
-   * @param conditions The network conditions to apply
-   */
-  public setNetworkConditions(conditions: NetworkConditions): void {
-    this.networkConditions = conditions;
-    console.log(`[${this.nameId}] Network conditions updated:`, conditions);
   }
 
   /**
@@ -169,96 +151,6 @@ export class WorkerClient extends Worker {
     await this.terminate();
     await this.clearDB();
     await this.initialize();
-  }
-
-  /**
-   * Simulates network conditions for an operation
-   * @param operation The operation to perform
-   * @returns The result of the operation
-   */
-  private async simulateNetworkConditions<T>(
-    operation: () => Promise<T>,
-  ): Promise<T> {
-    if (!this.networkConditions) {
-      return operation();
-    }
-
-    // Simulate disconnection
-    if (
-      this.networkConditions.disconnectProbability &&
-      Math.random() < this.networkConditions.disconnectProbability &&
-      !this.isDisconnected
-    ) {
-      this.isDisconnected = true;
-      const duration = this.networkConditions.disconnectDurationMs ?? 5000;
-
-      console.log(`[${this.nameId}] Network disconnected for ${duration}ms`);
-
-      this.disconnectTimeout = setTimeout(() => {
-        this.isDisconnected = false;
-        console.log(`[${this.nameId}] Network reconnected`);
-      }, duration);
-
-      throw new Error(`Network disconnected for ${duration}ms`);
-    }
-
-    // Simulate packet loss
-    if (
-      this.networkConditions.packetLossRate &&
-      Math.random() < this.networkConditions.packetLossRate
-    ) {
-      console.log(`[${this.nameId}] Packet lost`);
-      throw new Error("Packet lost");
-    }
-
-    // Simulate bandwidth limit
-    if (this.networkConditions.bandwidthLimitKbps) {
-      const now = Date.now();
-      const bandwidthLimitBytes =
-        (this.networkConditions.bandwidthLimitKbps * 1024) / 8;
-
-      // Reset bandwidth usage counter every second
-      if (now - this.bandwidthResetTime > 1000) {
-        this.bandwidthUsage = 0;
-        this.bandwidthResetTime = now;
-      }
-
-      // Estimate operation size (rough approximation)
-      const estimatedSize = 1024; // Assume 1KB per operation
-
-      if (this.bandwidthUsage + estimatedSize > bandwidthLimitBytes) {
-        const waitTime = 1000 - (now - this.bandwidthResetTime);
-        console.log(
-          `[${this.nameId}] Bandwidth limit reached, waiting ${waitTime}ms`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, waitTime));
-        this.bandwidthUsage = 0;
-        this.bandwidthResetTime = Date.now();
-      }
-
-      this.bandwidthUsage += estimatedSize;
-    }
-
-    // Simulate latency and jitter
-    if (this.networkConditions.latencyMs || this.networkConditions.jitterMs) {
-      const baseLatency = this.networkConditions.latencyMs ?? 0;
-      const jitter = this.networkConditions.jitterMs
-        ? (Math.random() * 2 - 1) * (this.networkConditions.jitterMs ?? 0)
-        : 0;
-
-      const totalLatency = Math.max(0, baseLatency + jitter);
-
-      if (totalLatency > 0) {
-        console.log(
-          `[${this.nameId}] Adding latency: ${totalLatency.toFixed(2)}ms`,
-        );
-        await new Promise((resolve) =>
-          setTimeout(resolve, Math.floor(totalLatency)),
-        );
-      }
-    }
-
-    return operation();
   }
 
   private setupEventHandlers() {
@@ -290,47 +182,45 @@ export class WorkerClient extends Worker {
     installationId: string;
     address: `0x${string}`;
   }> {
-    return this.simulateNetworkConditions(async () => {
-      // Tell the Worker to do any internal initialization
-      this.postMessage({
-        type: "initialize",
-        data: {
-          name: this.name,
-          folder: this.folder,
-          sdkVersion: this.sdkVersion,
-          libXmtpVersion: this.libXmtpVersion,
-        },
-      });
-      const { client, dbPath, address } = await createClient(
-        this.walletKey as `0x${string}`,
-        this.encryptionKeyHex,
-        {
-          sdkVersion: this.sdkVersion,
-          name: this.name,
-          testName: this.testName,
-          folder: this.folder,
-        },
-        this.env,
-      );
-
-      this.client = client as Client;
-      this.address = address;
-
-      console.log(
-        `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
-      );
-      // Start the appropriate stream based on configuration
-      await this.startStream();
-
-      const installationId = this.client.installationId;
-
-      return {
-        client: this.client,
-        dbPath,
-        address: address,
-        installationId,
-      };
+    // Tell the Worker to do any internal initialization
+    this.postMessage({
+      type: "initialize",
+      data: {
+        name: this.name,
+        folder: this.folder,
+        sdkVersion: this.sdkVersion,
+        libXmtpVersion: this.libXmtpVersion,
+      },
     });
+    const { client, dbPath, address } = await createClient(
+      this.walletKey as `0x${string}`,
+      this.encryptionKeyHex,
+      {
+        sdkVersion: this.sdkVersion,
+        name: this.name,
+        testName: this.testName,
+        folder: this.folder,
+      },
+      this.env,
+    );
+
+    this.client = client as Client;
+    this.address = address;
+
+    console.log(
+      `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
+    );
+    // Start the appropriate stream based on configuration
+    await this.startStream();
+
+    const installationId = this.client.installationId;
+
+    return {
+      client: this.client,
+      dbPath,
+      address: address,
+      installationId,
+    };
   }
   /**
    * Unified method to start the appropriate stream based on configuration
@@ -368,9 +258,7 @@ export class WorkerClient extends Worker {
    * Initialize and handle message stream
    */
   private async initMessageStream() {
-    this.activeStream = await this.simulateNetworkConditions(async () => {
-      return this.client.conversations.streamAllMessages();
-    });
+    this.activeStream = await this.client.conversations.streamAllMessages();
 
     // Process messages asynchronously
     void (async () => {
