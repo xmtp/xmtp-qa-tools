@@ -2,13 +2,9 @@
 
 This test is designed to test the XMTP groups with 12 clients.
 
-
 https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
-
-
 ## Setup
-
 
 - 8 bots (running on latest node-sdk version)
 - 4 manual users (convos io, convos desktop, xmtpchat web and CB build IOS)
@@ -34,8 +30,7 @@ USER_CONVOS_DESKTOP="" # InboxID
 ```
 
 > To learn your inboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`
-
-Group ID
+> Send `/kc address` to get your address and inbox ID
 
 ```bash
 GROUP_ID="" # the group will be set here for reutilization
