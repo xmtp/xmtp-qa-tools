@@ -3,6 +3,7 @@ import generatedInboxes from "@helpers/generated-inboxes.json";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Dm,
+  Group,
   type Client,
   type Conversation,
   type DecodedMessage,
@@ -54,7 +55,7 @@ interface GeneratedInbox {
 }
 
 async function initializeBot() {
-  const botWorker = await getWorkers(["bot"], testName, "none", false);
+  const botWorker = await getWorkers(["bot"], testName, "message", false);
   const bot = botWorker.get("bot");
   const client = bot?.client as Client;
 
@@ -81,14 +82,6 @@ function parseStressCommand(args: string[]): StressTestConfig | null {
   return { workerCount, messageCount };
 }
 
-/**
- * Sends messages from a worker to a specified group
- * @param worker The worker that will send messages
- * @param groupId ID of the group to send messages to
- * @param messageCount Number of messages to send
- * @param progressCallback Optional callback function to report progress
- * @returns Number of messages successfully sent
- */
 async function sendWorkerMessagesToGroup(
   workers: WorkerManager,
   groupId: string,
@@ -116,14 +109,6 @@ async function sendWorkerMessagesToGroup(
   }
 }
 
-/**
- * Creates a large group with the specified number of members
- * @param memberCount Number of members to include in the group
- * @param client XMTP client used to create the group
- * @param conversation Conversation used to send status updates
- * @param generatedInboxes Array of generated inboxes to use for members
- * @returns The group ID if successful, undefined otherwise
- */
 async function createLargeGroup(
   workers: WorkerManager,
   memberCount: number,
@@ -295,12 +280,13 @@ async function runStressTest(
 
 async function handleMessage(
   message: DecodedMessage,
-  conversation: Conversation,
+  conversation: Dm | Group,
   client: Client,
 ) {
+  console.log(message);
   // Only show help text for DMs and non-commands
   const isDM = conversation instanceof Dm;
-  if (!isDM) return;
+
   const content = message.content as string;
   console.log(`Processing message: "${content}" from ${message.senderInboxId}`);
 
@@ -395,6 +381,7 @@ async function main() {
           message.conversationId,
         );
         if (!conversation) continue;
+        if (conversation instanceof Group) continue;
         await handleMessage(message, conversation, client);
       } catch (error) {
         console.error("Message handling error:", error);
