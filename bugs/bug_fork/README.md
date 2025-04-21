@@ -81,3 +81,11 @@ for (let i = 0; i <= trys; i++) {
 - In the forked state, push notifications still come through to Coinbase Wallet
 - Total SDK calls = 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51 calls
   - Some times hitting API limits
+ 
+
+## Potential correlation
+
+> Between the fork and the SDK performance when close to 1 second client creations
+
+![CleanShot 2025-04-20 at 21 07 59@2x](https://github.com/user-attachments/assets/e3836192-1be5-44bf-8738-3b15a185b842)
+
