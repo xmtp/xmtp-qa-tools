@@ -99,8 +99,8 @@ export const regressionClient = async (
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 100 || sdkVersion === 105) {
-    const signer = createSigner100(walletKey);
+  } else if (sdkVersion >= 100 && sdkVersion <= 105) {
+    const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
     client = await ClientClass.create(signer, encryptionKey, {
       dbPath,
@@ -108,17 +108,8 @@ export const regressionClient = async (
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 202) {
-    const signer = createSigner200(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey: encryptionKey,
-      dbPath,
-      env,
-    });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 203) {
-    const signer = createSigner200(walletKey);
+  } else if (sdkVersion >= 200) {
+    const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
     client = await ClientClass.create(signer, {
       dbEncryptionKey: encryptionKey,
@@ -168,10 +159,7 @@ export const createSigner47 = (privateKey: `0x${string}`) => {
   };
 };
 
-export const createSigner100 = (key: `0x${string}`): Signer => {
-  return createSigner200(key);
-};
-export const createSigner200 = (key: string): Signer => {
+export const createSigner = (key: string): Signer => {
   const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
   const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
   let user: User = {
@@ -197,10 +185,6 @@ export const createSigner200 = (key: string): Signer => {
       return toBytes(signature);
     },
   };
-};
-
-export const createSigner = (key: `0x${string}`): Signer => {
-  return createSigner200(key);
 };
 
 function loadDataPath(

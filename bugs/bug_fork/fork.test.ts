@@ -10,7 +10,7 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  workers: 5,
+  workers: 10,
   manualUsers: {
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
@@ -33,7 +33,7 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME);
+    workers = await getWorkers(testConfig.workers, TEST_NAME, "message", true);
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     console.log("Creator is", creator.name);
@@ -48,7 +48,8 @@ describe(TEST_NAME, () => {
     )) as Group;
 
     let epochs = 4;
-    for (let i = 0; i < testConfig.workers; i++) {
+    const testWorkers = ["bob", "alice", "charlie", "daniel"];
+    for (let i = 0; i < testWorkers.length; i++) {
       let currentWorker = allWorkers[i];
       if (currentWorker.name === creator.name) continue;
 
@@ -98,7 +99,7 @@ const getOrCreateGroup = async (
     minute: "2-digit",
     hour12: false,
   });
-
+  await group.sync();
   await group.updateName("Fork group " + time);
   await group.send("Starting run for " + time);
 

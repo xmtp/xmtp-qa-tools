@@ -276,8 +276,12 @@ export class WorkerClient extends Worker {
             continue;
           }
 
-          // Check for GPT response triggers
           if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
+            // Check for GPT response triggers
+            console.log(
+              `[${this.nameId}] Checking for GPT response triggers`,
+              message.content,
+            );
             await this.handleGptResponse(message as DecodedMessage);
             continue;
           }
@@ -340,16 +344,16 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
 
-      const messages = await conversation?.messages();
-      const baseName = this.name.split("-")[0].toLowerCase();
+      // const messages = await conversation?.messages();
+      // const baseName = this.name.split("-")[0].toLowerCase();
 
-      // Generate a response using OpenAI
-      const response = await this.generateOpenAIResponse(
-        message.content as string,
-        messages ?? [],
-        baseName,
-      );
-
+      // // // Generate a response using OpenAI
+      // // const response = await this.generateOpenAIResponse(
+      // //   message.content as string,
+      // //   messages ?? [],
+      // //   baseName,
+      // // );
+      const response = "Hello, how are you?";
       console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
 
       // Send the response
