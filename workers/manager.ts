@@ -320,6 +320,7 @@ export class WorkerManager {
     } else {
       descriptors = descriptorsOrAmount;
     }
+    console.log("Creating workers", descriptors);
 
     // Process descriptors in parallel
     const workerPromises = descriptors.map((descriptor) =>

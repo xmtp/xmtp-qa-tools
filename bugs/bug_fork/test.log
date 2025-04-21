@@ -1,32 +1,93 @@
-[2025-04-20T22:38:17.858Z] [info] dave: Worker created (203-c24af30) - 0x08ed606A1398bc2D6FD2F4463582BF3D597bb57b
-[2025-04-20T22:38:17.859Z] [info] eve: Worker created (105-6eb1ce4) - 0xfe37AA5CccC9a5C065cDaeeC7b4cE2Ad9B1F2658
-[2025-04-20T22:38:17.867Z] [info] alice: Worker created (105-6eb1ce4) - 0x30C1D124607B177B0228a1e3ED8117a1B60fFF6C
-[2025-04-20T22:38:18.061Z] [info] ivy: Worker created (202-bed98df) - 0xd180C66d439BaF194336155E0038226d87c60954
-[2025-04-20T22:38:18.072Z] [info] bob: Worker created (100-c205eec) - 0x40E9E4Bf6438f44d548F2F67bB0da5CBf017F5B3
-[2025-04-20T22:38:18.534Z] [info] Fetching group with ID bfda457394be0826f32a8eb2ed363c5d
-[2025-04-20T22:38:18.541Z] [info] Group bfda457394be0826f32a8eb2ed363c5d has 9 members
-[2025-04-20T22:38:20.647Z] [info] getOrCreateGroup - Duration: 2112.76425ms
-[2025-04-20T22:38:20.648Z] [warn] getOrCreateGroup 2.113s
-[2025-04-20T22:38:21.528Z] [info] alice sending: "alice:1" to group bfda457394be0826f32a8eb2ed363c5d
-[2025-04-20T22:38:22.758Z] [info] sendMessageToGroup for alice - Duration: 2109.5859999999993ms
-[2025-04-20T22:38:22.758Z] [warn] sendMessageToGroup-alice 2.110s
-[2025-04-20T22:38:22.758Z] [info] dave will add/remove alice
-[2025-04-20T22:38:27.063Z] [error] Error managing alice in bfda457394be0826f32a8eb2ed363c5d: {"code":"GenericFailure"}
-[2025-04-20T22:38:27.063Z] [info] membershipChange for dave and alice - Duration: 4304.917167ms
-[2025-04-20T22:38:27.063Z] [warn] membershipChange-dave-alice 4.305s
-[2025-04-20T22:38:28.216Z] [info] eve sending: "eve:2" to group bfda457394be0826f32a8eb2ed363c5d
-[2025-04-20T22:38:29.317Z] [info] sendMessageToGroup for eve - Duration: 2253.4449170000007ms
-[2025-04-20T22:38:29.318Z] [warn] sendMessageToGroup-eve 2.254s
-[2025-04-20T22:38:29.318Z] [info] dave will add/remove eve
-[2025-04-20T22:38:32.829Z] [error] Error managing eve in bfda457394be0826f32a8eb2ed363c5d: {"code":"GenericFailure"}
-[2025-04-20T22:38:32.829Z] [info] membershipChange for dave and eve - Duration: 3511.0016659999983ms
-[2025-04-20T22:38:32.829Z] [warn] membershipChange-dave-eve 3.511s
-[2025-04-20T22:38:33.883Z] [info] ivy sending: "ivy:3" to group bfda457394be0826f32a8eb2ed363c5d
-[2025-04-20T22:38:35.364Z] [info] sendMessageToGroup for ivy - Duration: 2534.220041999997ms
-[2025-04-20T22:38:35.364Z] [warn] sendMessageToGroup-ivy 2.535s
-[2025-04-20T22:38:35.365Z] [info] dave will add/remove ivy
-[2025-04-20T22:38:38.549Z] [error] Error managing ivy in bfda457394be0826f32a8eb2ed363c5d: {"code":"GenericFailure"}
-[2025-04-20T22:38:38.549Z] [info] membershipChange for dave and ivy - Duration: 3184.825584000002ms
-[2025-04-20T22:38:38.549Z] [warn] membershipChange-dave-ivy 3.185s
-[2025-04-20T22:38:39.999Z] [info] initialize workers and create group - Duration: 24903.36075ms
-[2025-04-20T22:38:39.999Z] [warn] initialize workers and create group 24.904s
+[2025-04-21T00:00:26.386Z] [info] Creating workers ["bob-a-203","alice-a-100","fabri-a-105","elon-a-100","joe-a-105"]
+[2025-04-21T00:00:28.486Z] [info] bob: Worker created (203-c24af30) - 0xaFD842255144F2B59c519562591eBB2441CB92F5
+[2025-04-21T00:00:28.586Z] [info] fabri: Worker created (105-6eb1ce4) - 0x4501123f56250B7C5a5fB787d4d768868a74E3D9
+[2025-04-21T00:00:28.637Z] [info] elon: Worker created (100-c205eec) - 0x2c64CAb779f2EeC941bDAe733b15fFF0a4E4b30D
+[2025-04-21T00:00:28.759Z] [info] joe: Worker created (105-6eb1ce4) - 0xeF8ed4de28C996CC25c4CD5CA51258F07E98d6fb
+[2025-04-21T00:00:28.824Z] [info] alice: Worker created (100-c205eec) - 0xe724103D852f6E5479Aa61185e1b250391833A79
+[2025-04-21T00:00:29.247Z] [info] Creator is fabri
+[2025-04-21T00:00:29.248Z] [info] Fetching group with ID fbcca02699e879b2e0d81f30c7c5eddd
+[2025-04-21T00:00:29.253Z] [info] Group fbcca02699e879b2e0d81f30c7c5eddd has 9 members
+[2025-04-21T00:00:31.039Z] [info] getOrCreateGroup - Duration: 1791.0884579999997ms
+[2025-04-21T00:00:31.039Z] [warn] getOrCreateGroup 1.791s
+[2025-04-21T00:00:31.657Z] [info] elon sending: "elon:0" to group fbcca02699e879b2e0d81f30c7c5eddd
+[2025-04-21T00:00:32.908Z] [info] sendMessageToGroup for elon - Duration: 1868.1977080000006ms
+[2025-04-21T00:00:32.908Z] [warn] sendMessageToGroup-elon 1.869s
+[2025-04-21T00:00:32.909Z] [info] fabri will add/remove elon
+[2025-04-21T00:00:33.104Z] [info] Group fbcca02699e879b2e0d81f30c7c5eddd found
+[2025-04-21T00:00:33.109Z] [info] Member 397c565cf1a4e1c5ae870c4af5c7a10a51f6a233db7e5bfffd8fe708e0ab74e4 found
+[2025-04-21T00:00:36.894Z] [info] Epoch 0 - Duration: 3784.612874999999ms
+[2025-04-21T00:00:36.894Z] [warn] Epoch 0 done
+[2025-04-21T00:00:40.720Z] [info] Epoch 1 - Duration: 3826.210833000001ms
+[2025-04-21T00:00:40.721Z] [warn] Epoch 1 done
+[2025-04-21T00:00:45.929Z] [info] Epoch 2 - Duration: 5208.172375ms
+[2025-04-21T00:00:45.929Z] [warn] Epoch 2 done
+[2025-04-21T00:00:50.424Z] [info] Epoch 3 - Duration: 4494.551875000001ms
+[2025-04-21T00:00:50.424Z] [warn] Epoch 3 done
+[2025-04-21T00:00:54.248Z] [info] Epoch 4 - Duration: 3822.002209000002ms
+[2025-04-21T00:00:54.248Z] [warn] Epoch 4 done
+[2025-04-21T00:00:59.435Z] [info] Epoch 5 - Duration: 5185.901667000002ms
+[2025-04-21T00:00:59.435Z] [warn] Epoch 5 done
+[2025-04-21T00:00:59.435Z] [info] membershipChange for fabri and elon - Duration: 26526.128125ms
+[2025-04-21T00:00:59.435Z] [warn] membershipChange-fabri-elon 26.526s
+[2025-04-21T00:01:00.439Z] [info] bob sending: "bob:1" to group fbcca02699e879b2e0d81f30c7c5eddd
+[2025-04-21T00:01:01.791Z] [info] sendMessageToGroup for bob - Duration: 2355.3234159999993ms
+[2025-04-21T00:01:01.792Z] [warn] sendMessageToGroup-bob 2.356s
+[2025-04-21T00:01:01.792Z] [info] fabri will add/remove bob
+[2025-04-21T00:01:01.984Z] [info] Group fbcca02699e879b2e0d81f30c7c5eddd found
+[2025-04-21T00:01:01.985Z] [info] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe found
+[2025-04-21T00:01:06.089Z] [info] Epoch 0 - Duration: 4103.898000000001ms
+[2025-04-21T00:01:06.089Z] [warn] Epoch 0 done
+[2025-04-21T00:01:10.607Z] [info] Epoch 1 - Duration: 4517.2794580000045ms
+[2025-04-21T00:01:10.607Z] [warn] Epoch 1 done
+[2025-04-21T00:01:14.359Z] [info] Epoch 2 - Duration: 3751.1955420000013ms
+[2025-04-21T00:01:14.359Z] [warn] Epoch 2 done
+[2025-04-21T00:01:18.910Z] [info] Epoch 3 - Duration: 4551.025583000002ms
+[2025-04-21T00:01:18.911Z] [warn] Epoch 3 done
+[2025-04-21T00:01:23.688Z] [info] Epoch 4 - Duration: 4777.280999999995ms
+[2025-04-21T00:01:23.688Z] [warn] Epoch 4 done
+[2025-04-21T00:01:28.677Z] [info] Epoch 5 - Duration: 4988.349124999993ms
+[2025-04-21T00:01:28.678Z] [warn] Epoch 5 done
+[2025-04-21T00:01:28.678Z] [info] membershipChange for fabri and bob - Duration: 26885.278834000004ms
+[2025-04-21T00:01:28.678Z] [warn] membershipChange-fabri-bob 26.885s
+[2025-04-21T00:01:29.303Z] [info] joe sending: "joe:2" to group fbcca02699e879b2e0d81f30c7c5eddd
+[2025-04-21T00:01:30.311Z] [info] sendMessageToGroup for joe - Duration: 1632.8411250000063ms
+[2025-04-21T00:01:30.312Z] [warn] sendMessageToGroup-joe 1.633s
+[2025-04-21T00:01:30.312Z] [info] fabri will add/remove joe
+[2025-04-21T00:01:30.507Z] [info] Group fbcca02699e879b2e0d81f30c7c5eddd found
+[2025-04-21T00:01:30.507Z] [info] Member e69c7e446392a89f12f9b677625ab021c33cdd2c89618b993a39ae85748d0c6c found
+[2025-04-21T00:01:34.357Z] [info] Epoch 0 - Duration: 3848.6386670000065ms
+[2025-04-21T00:01:34.357Z] [warn] Epoch 0 done
+[2025-04-21T00:01:37.913Z] [info] Epoch 1 - Duration: 3555.4081250000017ms
+[2025-04-21T00:01:37.913Z] [warn] Epoch 1 done
+[2025-04-21T00:01:41.615Z] [info] Epoch 2 - Duration: 3701.620959000007ms
+[2025-04-21T00:01:41.615Z] [warn] Epoch 2 done
+[2025-04-21T00:01:45.544Z] [info] Epoch 3 - Duration: 3928.858208999998ms
+[2025-04-21T00:01:45.544Z] [warn] Epoch 3 done
+[2025-04-21T00:01:50.328Z] [info] Epoch 4 - Duration: 4783.276207999996ms
+[2025-04-21T00:01:50.328Z] [warn] Epoch 4 done
+[2025-04-21T00:01:56.711Z] [info] Epoch 5 - Duration: 6382.382333000001ms
+[2025-04-21T00:01:56.712Z] [warn] Epoch 5 done
+[2025-04-21T00:01:56.712Z] [info] membershipChange for fabri and joe - Duration: 26399.357332999993ms
+[2025-04-21T00:01:56.712Z] [warn] membershipChange-fabri-joe 26.400s
+[2025-04-21T00:01:57.439Z] [info] alice sending: "alice:4" to group fbcca02699e879b2e0d81f30c7c5eddd
+[2025-04-21T00:01:59.032Z] [info] sendMessageToGroup for alice - Duration: 2319.525041000001ms
+[2025-04-21T00:01:59.032Z] [warn] sendMessageToGroup-alice 2.320s
+[2025-04-21T00:01:59.033Z] [info] fabri will add/remove alice
+[2025-04-21T00:01:59.226Z] [info] Group fbcca02699e879b2e0d81f30c7c5eddd found
+[2025-04-21T00:01:59.228Z] [info] Member d0e52daa89e6bb7a4a2d61cbe23e54b519bf87c356c2f383812a69b9ef341296 found
+[2025-04-21T00:02:03.352Z] [info] Epoch 0 - Duration: 4123.283416999999ms
+[2025-04-21T00:02:03.352Z] [warn] Epoch 0 done
+[2025-04-21T00:02:08.382Z] [info] Epoch 1 - Duration: 5028.313083000001ms
+[2025-04-21T00:02:08.382Z] [warn] Epoch 1 done
+[2025-04-21T00:02:12.727Z] [info] Epoch 2 - Duration: 4344.6966669999965ms
+[2025-04-21T00:02:12.727Z] [warn] Epoch 2 done
+[2025-04-21T00:02:16.763Z] [info] Epoch 3 - Duration: 4034.924457999994ms
+[2025-04-21T00:02:16.763Z] [warn] Epoch 3 done
+[2025-04-21T00:02:21.755Z] [info] Epoch 4 - Duration: 4991.734750000003ms
+[2025-04-21T00:02:21.755Z] [warn] Epoch 4 done
+[2025-04-21T00:02:25.588Z] [info] Epoch 5 - Duration: 3832.4911250000005ms
+[2025-04-21T00:02:25.588Z] [warn] Epoch 5 done
+[2025-04-21T00:02:25.588Z] [info] membershipChange for fabri and alice - Duration: 26555.18083299999ms
+[2025-04-21T00:02:25.588Z] [warn] membershipChange-fabri-alice 26.555s
+[2025-04-21T00:02:26.646Z] [info] initialize workers and create group - Duration: 120258.511125ms
+[2025-04-21T00:02:26.646Z] [warn] initialize workers and create group 2:00.259 (m:ss.mmm)

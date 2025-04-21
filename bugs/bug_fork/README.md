@@ -47,28 +47,19 @@ yarn test fork
 
 The test executes the following sequence:
 
-- Group creator updates the group name with the current timestamp and sends a start message
-- In a loop for the first 3 worker participants:
-  - Each worker sends a message with their name and iteration count
-  - The creator performs multiple add/remove cycles for each worker
+1. Group creator updates the group name with the current timestamp and sends a start message
+
+2. Each worker sends a message with their name and iteration count
 
 ```typescript
-for (let i = 1; i <= trys; i++) {
-  await sendMessageToGroup(
-    testConfig.workers[i],
-    globalGroup.id,
-    testConfig.workers[i].name + ":" + String(i),
-  );
-  await membershipChange(
-    globalGroup.id,
-    creator,
-    testConfig.workers[i],
-    epochs,
-  );
-}
+await sendMessageToGroup(
+  testConfig.workers[i],
+  globalGroup.id,
+  testConfig.workers[i].name + ":" + String(i),
+);
 ```
 
-The membership changes include:
+3. The creator performs multiple add/remove cycles for each worker
 
 ```typescript
 // Perform add/remove cycles
@@ -79,11 +70,14 @@ for (let i = 0; i <= trys; i++) {
 }
 ```
 
-Creator sends a final "Done" message to complete the test.
+4. The creator sends a final "Done" message to complete the test.
 
-## How to fork
+## Other considerations
 
-While running the test, send messages randomly from the manual users (convos io, convos desktop, xmtpchat web, and CB build IOS) to test real-world fork conditions.
-
-> Estimate SDK calls
-> Total SDK calls = 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51 calls
+- Coinbase Wallet build 99.1.0-oneoff-2hmgx (999999) forks consistently
+- Convos Messenger (8) forks less consistently but reproducible
+- The fork occurs when executing a sequence of 12 operations: multiple add/remove cycles in groups combined with message sending from different clients
+- Web and Node SDK clients never get forked during testing
+- In the forked state, push notifications still come through to Coinbase Wallet
+- Total SDK calls = 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51 calls
+  - Some times hitting API limits

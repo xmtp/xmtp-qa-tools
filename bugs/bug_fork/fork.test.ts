@@ -1,6 +1,6 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
-import { getWorkers, type Worker } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
 
@@ -10,13 +10,7 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  workerNames: [
-    "bob-a-100",
-    "alice-a-105",
-    "ivy-a-202",
-    "dave-a-203",
-    "eve-a-105",
-  ],
+  workers: 5,
   manualUsers: {
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
@@ -27,7 +21,7 @@ const testConfig = {
 };
 
 describe(TEST_NAME, () => {
-  let workers: Worker[];
+  let workers: WorkerManager;
   let creator: Worker | undefined;
   let globalGroup: Group | undefined;
 
@@ -39,13 +33,12 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = (
-      await getWorkers(testConfig.workerNames, TEST_NAME)
-    ).getWorkers();
-
-    creator = workers[0];
+    workers = await getWorkers(testConfig.workers, TEST_NAME);
+    creator = workers.get("fabri") as Worker;
+    const allWorkers = workers.getWorkers();
+    console.log("Creator is", creator.name);
     const allClientIds = [
-      ...workers.map((w) => w.client.inboxId),
+      ...allWorkers.map((w) => w.client.inboxId),
       ...(Object.values(testConfig.manualUsers) as string[]),
     ];
 
@@ -54,15 +47,17 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    let trys = 3;
-    let epochs = 5;
-    for (let i = 1; i <= trys; i++) {
+    let epochs = 4;
+    for (let i = 0; i < testConfig.workers; i++) {
+      let currentWorker = allWorkers[i];
+      if (currentWorker.name === creator.name) continue;
+
       await sendMessageToGroup(
-        workers[i],
+        currentWorker,
         globalGroup.id,
-        workers[i].name + ":" + String(i),
+        currentWorker.name + ":" + String(i),
       );
-      await membershipChange(globalGroup.id, creator, workers[i], epochs);
+      await membershipChange(globalGroup.id, creator, currentWorker, epochs);
     }
 
     await globalGroup.send(creator.name + " : Done");
@@ -155,7 +150,7 @@ const membershipChange = async (
 
   try {
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
-    await memberWhoAdds.client.conversations.syncAll();
+    await memberWhoAdds.client.conversations.sync();
 
     const group = (await memberWhoAdds.client.conversations.getConversationById(
       groupId,
@@ -164,19 +159,31 @@ const membershipChange = async (
       console.log(`Group ${groupId} not found`);
       throw new Error(`Group ${groupId} not found`);
     }
+    console.log(`Group ${groupId} found`);
 
-    await group.sync();
     const memberInboxId = memberToAdd.client.inboxId;
+    const member = await group.members();
+    console.log(`Member ${memberInboxId} found`);
     for (let i = 0; i <= trys; i++) {
-      const epochStart = performance.now();
+      try {
+        const memberExists = member.find((m) => m.inboxId === memberInboxId);
+        if (memberExists) {
+          const epochStart = performance.now();
+          await group.sync();
+          await group.removeMembers([memberInboxId]);
+          await group.sync();
+          await group.addMembers([memberInboxId]);
 
-      await group.addMembers([memberInboxId]);
-      await group.removeMembers([memberInboxId]);
-      await group.addMembers([memberInboxId]);
+          const epochEnd = performance.now();
 
-      const epochEnd = performance.now();
-      console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
-      console.warn(`Epoch ${i} done`);
+          console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
+          console.warn(`Epoch ${i} done`);
+        } else {
+          console.warn(`Member ${memberInboxId} not found`);
+        }
+      } catch (e) {
+        console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+      }
     }
   } catch (e) {
     console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
