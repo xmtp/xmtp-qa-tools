@@ -315,7 +315,8 @@ export class WorkerManager {
           sdkVersionOptions[
             Math.floor(Math.random() * sdkVersionOptions.length)
           ];
-        descriptors.push(`${workerName}-a-${randomSdkVersion}`);
+        //fix
+        descriptors.push(`${workerName}-a`);
       }
     } else {
       descriptors = descriptorsOrAmount;

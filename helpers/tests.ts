@@ -60,7 +60,6 @@ const defaultNames = [
   "joe",
   "charlie",
   "dave",
-  "rosalie",
   "eve",
   "frank",
   "grace",

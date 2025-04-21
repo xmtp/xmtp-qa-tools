@@ -96,6 +96,16 @@ The test executes the following sequence:
 
 In the forked state, push notifications continue to reach Coinbase Wallet.
 
+## Testing the fork
+
+To test the fork mention the workers like:
+
+```
+hi frank fabri dave grace eve
+```
+
+You should get a response from each of the workers.
+
 ## Technical Details
 
 - Total SDK calls per test: 51 calls

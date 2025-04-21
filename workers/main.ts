@@ -353,7 +353,7 @@ export class WorkerClient extends Worker {
       // //   messages ?? [],
       // //   baseName,
       // // );
-      const response = "Hello, how are you?";
+      const response = this.nameId + " says: Hello, how are you?";
       console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
 
       // Send the response

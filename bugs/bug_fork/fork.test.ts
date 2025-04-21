@@ -48,9 +48,12 @@ describe(TEST_NAME, () => {
     )) as Group;
 
     let epochs = 4;
-    const testWorkers = ["bob", "alice", "charlie", "daniel"];
+    const testWorkers = ["bob", "alice", "elon", "joe"];
     for (let i = 0; i < testWorkers.length; i++) {
-      let currentWorker = allWorkers[i];
+      let currentWorker = allWorkers.find((w) => w.name === testWorkers[i]);
+      if (!currentWorker) {
+        throw new Error("Worker not found");
+      }
       if (currentWorker.name === creator.name) continue;
 
       await sendMessageToGroup(
@@ -80,27 +83,29 @@ const getOrCreateGroup = async (
 
   let group: Group;
 
+  const time = new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
   if (!testConfig.groupId) {
     console.log(`Creating group with ${addedMembers.length} members`);
     group = await creator.conversations.newGroup(addedMembers);
     appendToEnv("GROUP_ID", group.id, testConfig.testName);
+    await group.updateName("Fork group " + time);
   } else {
     console.log(`Fetching group with ID ${testConfig.groupId}`);
     group = (await creator.conversations.getConversationById(
       testConfig.groupId,
     )) as Group;
   }
+  if (!group) {
+    throw new Error("Group not found");
+  }
 
   const members = await group.members();
   console.log(`Group ${group.id} has ${members.length} members`);
 
-  const time = new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-  await group.sync();
-  await group.updateName("Fork group " + time);
   await group.send("Starting run for " + time);
 
   const end = performance.now();
@@ -181,6 +186,7 @@ const membershipChange = async (
           console.warn(`Epoch ${i} done`);
         } else {
           console.warn(`Member ${memberInboxId} not found`);
+          await group.sync();
         }
       } catch (e) {
         console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
