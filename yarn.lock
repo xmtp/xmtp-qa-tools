@@ -1364,7 +1364,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-203@npm:@xmtp/node-sdk@2.0.3":
+"@xmtp/node-sdk-203@npm:@xmtp/node-sdk@2.0.3, @xmtp/node-sdk@npm:2.0.3":
   version: 2.0.3
   resolution: "@xmtp/node-sdk@npm:2.0.3"
   dependencies:
@@ -1377,7 +1377,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-204@npm:@xmtp/node-sdk@2.0.4, @xmtp/node-sdk@npm:2.0.4":
+"@xmtp/node-sdk-204@npm:@xmtp/node-sdk@2.0.4":
   version: 2.0.4
   resolution: "@xmtp/node-sdk@npm:2.0.4"
   dependencies:
@@ -4653,7 +4653,7 @@ __metadata:
     "@xmtp/node-bindings-120-3": "npm:@xmtp/node-bindings@1.2.0-dev.068bb4c"
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41"
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9"
-    "@xmtp/node-sdk": "npm:2.0.4"
+    "@xmtp/node-sdk": "npm:2.0.3"
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0"
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5"
     "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2"
