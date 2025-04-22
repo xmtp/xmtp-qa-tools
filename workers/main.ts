@@ -253,82 +253,42 @@ export class WorkerClient extends Worker {
   private initMessageStream() {
     // Process messages asynchronously
     void (async () => {
-      // Start stream with a limited number of retries
-      let retryCount = 0;
-      const maxRetries = 3;
+      // Make sure conversations are fully synced before starting the stream
+      await this.client.conversations.sync();
 
-      while (retryCount < maxRetries) {
-        try {
-          // Make sure conversations are fully synced before starting the stream
-          await this.client.conversations.sync();
+      // Add a small delay to ensure sync is complete
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-          // Add a small delay to ensure sync is complete
-          await new Promise((resolve) => setTimeout(resolve, 500));
+      const stream = await this.client.conversations.streamAllMessages();
 
-          const stream = await this.client.conversations.streamAllMessages();
-
-          for await (const message of stream) {
-            if (this.isTerminated) break;
-
-            // Skip messages from self
-            if (
-              message?.senderInboxId?.toLowerCase() ===
-              this.client.inboxId.toLowerCase()
-            ) {
-              continue;
-            }
-
-            if (message?.contentType?.typeId) {
-              if (this.shouldGenerateGptResponse(message)) {
-                await this.handleResponse(message);
-                continue;
-              }
-
-              // Create worker message
-              const workerMessage: MessageStreamWorker = {
-                type: "stream_message",
-                message: message,
-              };
-
-              // Emit if any listeners are attached
-              if (this.listenerCount("message") > 0) {
-                this.emit("message", workerMessage);
-              }
-            }
-          }
-
-          // If we get here with no errors, reset the retry counter
-          retryCount = 0;
-        } catch (error) {
-          if (!this.isTerminated) {
-            retryCount++;
-            console.error(
-              `[${this.nameId}] Message stream error (attempt ${retryCount}/${maxRetries}):`,
-              error,
-            );
-
-            // Try to restart the stream after a delay
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-
-            // Don't emit error to avoid the test failing - just log it
-            if (this.listenerCount("error") > 0) {
-              this.emit("error", error);
-            }
-
-            if (retryCount >= maxRetries) {
-              console.error(
-                `[${this.nameId}] Exceeded maximum retry attempts (${maxRetries}). Stopping message stream.`,
-              );
-              break;
-            }
-          }
-        }
-
-        // If terminated, break out of the loop
+      for await (const message of stream) {
         if (this.isTerminated) break;
 
-        // Wait before trying to restart the stream
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Skip messages from self
+        if (
+          message?.senderInboxId?.toLowerCase() ===
+          this.client.inboxId.toLowerCase()
+        ) {
+          continue;
+        }
+
+        if (message?.contentType?.typeId) {
+          if (this.shouldRespondToMessage(message)) {
+            await this.handleResponse(message);
+            continue;
+          }
+
+          // Create worker message
+          const workerMessage: MessageStreamWorker = {
+            type: "stream_message",
+            message: message,
+          };
+
+          // Emit if any listeners are attached
+          if (this.listenerCount("message") > 0) {
+            this.emit("message", workerMessage);
+          }
+        }
       }
     })();
   }
@@ -336,7 +296,7 @@ export class WorkerClient extends Worker {
   /**
    * Check if a message should trigger a GPT response
    */
-  private shouldGenerateGptResponse(message: DecodedMessage): boolean {
+  private shouldRespondToMessage(message: DecodedMessage): boolean {
     if (this.typeOfResponse === "none") return false;
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,

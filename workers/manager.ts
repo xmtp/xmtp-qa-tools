@@ -313,7 +313,7 @@ export class WorkerManager {
     let descriptors: string[];
 
     const randomSdkVersionReversed =
-      sdkVersionOptions[sdkVersionOptions.length - 2];
+      sdkVersionOptions[sdkVersionOptions.length - 1];
 
     // Handle numeric input (create N default workers)
     if (typeof descriptorsOrAmount === "number") {
@@ -338,7 +338,6 @@ export class WorkerManager {
       }
     } else {
       descriptors = [];
-      console.log(descriptorsOrAmount);
       for (const descriptor of descriptorsOrAmount) {
         if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
           console.log("Descriptor:", descriptor);
@@ -350,7 +349,6 @@ export class WorkerManager {
         }
       }
     }
-    console.log("Creating workers", descriptors);
 
     // Process descriptors in parallel
     const workerPromises = descriptors.map((descriptor) =>
