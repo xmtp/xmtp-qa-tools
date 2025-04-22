@@ -211,7 +211,7 @@ export class WorkerClient extends Worker {
       `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
     );
     // Start the appropriate stream based on configuration
-    await this.startStream();
+    this.startStream();
 
     const installationId = this.client.installationId;
 
@@ -225,14 +225,14 @@ export class WorkerClient extends Worker {
   /**
    * Unified method to start the appropriate stream based on configuration
    */
-  private async startStream() {
+  private startStream() {
     try {
       switch (this.typeofStream) {
         case "message":
-          await this.initMessageStream();
+          this.initMessageStream();
           break;
         case "conversation":
-          await this.initConversationStream();
+          this.initConversationStream();
           break;
         case "consent":
           this.initConsentStream();
@@ -253,53 +253,60 @@ export class WorkerClient extends Worker {
   /**
    * Initialize and handle message stream
    */
-  private async initMessageStream() {
-    this.activeStream = await this.client.conversations.streamAllMessages();
-    if (this.activeStream === undefined) {
-      console.error(`[${this.nameId}] Failed to create message stream`);
-      return;
-    }
+  private initMessageStream() {
     // Process messages asynchronously
     void (async () => {
-      try {
-        if (!this.activeStream) return;
+      // Start stream in an infinite loop to handle restarts
+      while (true) {
+        try {
+          console.log("✓ Syncing conversations...");
+          await this.client.conversations.sync();
+          console.log("Starting message stream...");
+          const streamPromise = this.client.conversations.streamAllMessages();
+          const stream = await streamPromise;
 
-        for await (const message of this.activeStream) {
-          if (this.isTerminated) break;
+          console.log("Waiting for messages...");
+          for await (const message of stream) {
+            if (this.isTerminated) break;
 
-          // Skip messages from self
-          if (
-            message?.senderInboxId.toLowerCase() ===
-            this.client.inboxId.toLowerCase()
-          ) {
-            continue;
+            // Skip messages from self
+            if (
+              message?.senderInboxId.toLowerCase() ===
+              this.client.inboxId.toLowerCase()
+            ) {
+              continue;
+            }
+
+            // Check for GPT response triggers
+            console.log(
+              "this.typeOfResponse",
+              this.nameId,
+              this.typeOfResponse,
+            );
+            if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
+              await this.handleResponse(message as DecodedMessage);
+              continue;
+            }
+
+            console.time(`[${this.nameId}] Process message`);
+
+            const workerMessage: MessageStreamWorker = {
+              type: "stream_message",
+              message: message as DecodedMessage,
+            };
+
+            // Emit if any listeners are attached
+            if (this.listenerCount("message") > 0) {
+              this.emit("message", workerMessage);
+            }
+
+            console.timeEnd(`[${this.nameId}] Process message`);
           }
-
-          // Check for GPT response triggers
-          console.log("this.typeOfResponse", this.nameId, this.typeOfResponse);
-          if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
-            await this.handleResponse(message as DecodedMessage);
-            continue;
+        } catch (error) {
+          if (!this.isTerminated) {
+            console.error(`[${this.nameId}] Message stream error:`, error);
+            this.emit("error", error);
           }
-
-          console.time(`[${this.nameId}] Process message`);
-
-          const workerMessage: MessageStreamWorker = {
-            type: "stream_message",
-            message: message as DecodedMessage,
-          };
-
-          // Emit if any listeners are attached
-          if (this.listenerCount("message") > 0) {
-            this.emit("message", workerMessage);
-          }
-
-          console.timeEnd(`[${this.nameId}] Process message`);
-        }
-      } catch (error) {
-        if (!this.isTerminated) {
-          console.error(`[${this.nameId}] Stream error:`, error);
-          this.emit("error", error);
         }
       }
     })();
@@ -371,20 +378,20 @@ export class WorkerClient extends Worker {
   /**
    * Initialize and handle conversation stream
    */
-  private async initConversationStream() {
-    // Track initial conversations to avoid duplicates
-    const initialConversations = await this.client.conversations.list();
-    const knownConversations = new Set(initialConversations.map((c) => c.id));
-
-    console.log(
-      `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
-    );
-
-    // Use the stream method to listen for conversation updates
-    this.activeStream = this.client.conversations.stream();
-
+  private initConversationStream() {
     // Process conversations asynchronously
     void (async () => {
+      // Track initial conversations to avoid duplicates
+      const initialConversations = await this.client.conversations.list();
+      const knownConversations = new Set(initialConversations.map((c) => c.id));
+
+      console.log(
+        `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
+      );
+
+      // Use the stream method to listen for conversation updates
+      this.activeStream = this.client.conversations.stream();
+
       try {
         if (!this.activeStream) return;
 
