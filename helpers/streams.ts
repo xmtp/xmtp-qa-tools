@@ -62,15 +62,6 @@ export async function verifyStream<T extends string = string>(
         await r.client.conversations.sync();
         const convo =
           await r.client.conversations.getConversationById(conversationId);
-        if (!convo) {
-          console.warn(
-            `Worker ${r.name} cannot find conversation ${conversationId}`,
-          );
-        } else {
-          console.log(
-            `Worker ${r.name} successfully synced conversation ${conversationId}`,
-          );
-        }
       } catch (err) {
         console.error(`Error syncing for ${r.name}:`, err);
       }

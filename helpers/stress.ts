@@ -39,7 +39,6 @@ export const TEST_CONFIGS: Record<string, StressTestConfig> = {
     sizeLabel: "large",
   },
 };
-
 export const HELP_TEXT = `Stress bot commands:
 /stress <size> - Start a stress test with predefined parameters
 
@@ -58,14 +57,14 @@ Examples:
  */
 export async function createAndSendDms(
   workers: WorkerManager,
+  receiverInboxId: string,
   messageCount: number,
 ) {
   try {
     const sender = workers.getWorkers()[0];
-    const receiver = workers.getWorkers()[1];
-
+    console.log(sender.inboxId, receiverInboxId);
     // Create a DM
-    const dm = await sender.client.conversations.newDm(receiver.client.inboxId);
+    const dm = await sender.client.conversations.newDm(receiverInboxId);
 
     // Send messages
     for (let i = 0; i < messageCount; i++) {

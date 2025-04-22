@@ -207,9 +207,9 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    console.log(
-      `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
-    );
+    // console.log(
+    //   `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
+    // );
     // Start the appropriate stream based on configuration
     this.startStream();
 
@@ -279,15 +279,6 @@ export class WorkerClient extends Worker {
             }
 
             if (message?.contentType?.typeId) {
-              // Process the message
-              console.log(
-                `[${this.nameId}] Received message in conversation ${message.conversationId}: ${
-                  message.contentType.typeId === "text"
-                    ? String(message.content)
-                    : message.contentType.typeId
-                }`,
-              );
-
               if (this.shouldGenerateGptResponse(message)) {
                 await this.handleResponse(message);
                 continue;

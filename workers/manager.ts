@@ -118,6 +118,18 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
+  public printWorkers() {
+    let workersToPrint = [];
+    for (const baseName in this.workers) {
+      for (const installationId in this.workers[baseName]) {
+        const currentWorker = this.workers[baseName][installationId];
+        workersToPrint.push(
+          `${baseName}-${installationId}-${currentWorker.address}-${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+        );
+      }
+    }
+    console.debug("Workers", workersToPrint);
+  }
   /**
    * Gets all workers as a flat array
    */
@@ -367,6 +379,7 @@ export async function getWorkers(
     env,
   );
   await manager.createWorkers(descriptorsOrAmount, randomVersions);
+  manager.printWorkers();
   return manager;
 }
 

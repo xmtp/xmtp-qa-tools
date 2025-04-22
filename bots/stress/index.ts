@@ -1,13 +1,12 @@
 import { loadEnv } from "@helpers/client";
-import { handleStressCommand, TEST_CONFIGS } from "@helpers/stress";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { Dm, type Client } from "@xmtp/node-sdk";
+import { handleStressCommand } from "@helpers/stress";
+import { getWorkers } from "@workers/manager";
+import { type Client } from "@xmtp/node-sdk";
 
 const testName = "stress-bot";
 loadEnv(testName);
 
 let isStressTestRunning = false;
-let workers: WorkerManager | undefined;
 
 async function initializeBot() {
   const botWorker = await getWorkers(["bot"], testName, "none");

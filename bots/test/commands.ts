@@ -1,9 +1,9 @@
 import { type Worker, type WorkerManager } from "@workers/manager";
 import {
-  Group,
   IdentifierKind,
   type Client,
   type DecodedMessage,
+  type Group,
   type Identifier,
 } from "@xmtp/node-sdk";
 
@@ -235,11 +235,11 @@ export class CommandHandler {
       const groupToAddTo = await client.conversations.getConversationById(
         message.conversationId,
       );
-
-      if (!(groupToAddTo instanceof Group)) {
-        await groupToAddTo?.send("Group not found");
+      if (!groupToAddTo) {
+        console.error("Group not found");
         return;
       }
+
       // Check if a worker name was provided
       if (args.length === 0) {
         await groupToAddTo.send("Please specify a worker name to add");
@@ -270,7 +270,9 @@ export class CommandHandler {
       }
 
       // Add the worker to the group
-      await groupToAddTo.addMembers([workerToAdd2?.client?.inboxId as string]);
+      await (groupToAddTo as Group).addMembers([
+        workerToAdd2?.client?.inboxId as string,
+      ]);
 
       // Announce in the group
       await groupToAddTo.send(`Bot :\n Added ${workerName} to the group.`);
@@ -294,7 +296,11 @@ export class CommandHandler {
       const groupToRemoveFrom = await client.conversations.getConversationById(
         message.conversationId,
       );
-      if (!(groupToRemoveFrom instanceof Group)) {
+      if (!groupToRemoveFrom) {
+        console.error("Group not found");
+        return;
+      }
+      if (!("name" in groupToRemoveFrom)) {
         await groupToRemoveFrom?.send("Group not found");
         return;
       }
@@ -396,7 +402,12 @@ export class CommandHandler {
       const conversation = await client.conversations.getConversationById(
         message.conversationId,
       );
-      if (!(conversation instanceof Group)) {
+
+      if (!conversation) {
+        console.error("Group not found");
+        return;
+      }
+      if (!("name" in conversation)) {
         await conversation?.send("Group not found");
         return;
       }
