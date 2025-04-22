@@ -17,14 +17,16 @@ const time = new Date().toLocaleTimeString("en-US", {
   minute: "2-digit",
   hour12: false,
 });
+
 const testConfig = {
   testName: TEST_NAME,
-  workers: parseInt(process.env.WORKERS as string),
-  epochs: parseInt(process.env.EPOCHS as string),
+  workers: parseInt(process.env.WORKERS as string) || 12,
+  epochs: parseInt(process.env.EPOCHS as string) || 4,
   manualUsers: {
-    USER_XMTPCHAT: process.env.USER_XMTPCHAT,
-    USER_CONVOS: process.env.USER_CONVOS,
-    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
+    USER_XMTPCHAT: process.env.USER_XMTPCHAT || "",
+    USER_CONVOS: process.env.USER_CONVOS || "",
+    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP || "",
+    USER_CB_WALLET: process.env.USER_CB_WALLET || "",
   },
   groupId: process.env.GROUP_ID,
 };
@@ -37,9 +39,9 @@ describe(TEST_NAME, () => {
   afterAll(async () => {
     await closeEnv(TEST_NAME);
   });
-  it("should initialize workers and create group", async () => {
+
+  it("should test group forking behavior", async () => {
     const start = performance.now();
-    console.time("initialize workers and create group");
 
     // Initialize workers
     workers = await getWorkers(
@@ -53,31 +55,36 @@ describe(TEST_NAME, () => {
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     console.log("Creator is", creator.name);
+
+    // Get all client IDs including manual users
     const allClientIds = [
       ...allWorkers.map((w) => w.client.inboxId),
-      ...(Object.values(testConfig.manualUsers) as string[]),
+      ...Object.values(testConfig.manualUsers).filter((id) => id),
     ];
 
+    // Create or get existing group
     globalGroup = (await getOrCreateGroup(
       creator.client,
       allClientIds,
     )) as Group;
 
+    // Perform fork check with selected workers
     const checkWorkers = ["fabri", "eve", "charlie", "grace"];
     const testWorkers = ["bob", "alice", "elon", "joe"];
+
     await forkCheck(globalGroup, allWorkers, checkWorkers);
-    for (let i = 0; i < testWorkers.length; i++) {
-      let currentWorker = allWorkers.find((w) => w.name === testWorkers[i]);
-      if (!currentWorker) {
-        throw new Error("Worker not found");
-      }
-      if (currentWorker.name === creator.name) continue;
+
+    // Run add/remove membership cycles for each test worker
+    for (const workerName of testWorkers) {
+      const currentWorker = allWorkers.find((w) => w.name === workerName);
+      if (!currentWorker || currentWorker.name === creator.name) continue;
 
       await sendMessageToGroup(
         currentWorker,
         globalGroup.id,
-        currentWorker.name + ":" + String(i),
+        `${currentWorker.name}:test`,
       );
+
       await membershipChange(
         globalGroup.id,
         creator,
@@ -86,140 +93,104 @@ describe(TEST_NAME, () => {
       );
     }
 
-    await globalGroup.send(creator.name + " : Done");
+    await globalGroup.send(`${creator.name}: Done`);
 
     const end = performance.now();
-    console.log(
-      `initialize workers and create group - Duration: ${end - start}ms`,
-    );
-    console.timeEnd("initialize workers and create group");
+    console.log(`Test completed in ${end - start}ms`);
   });
 });
 
+// Sends messages to specific workers to check for responses
 const forkCheck = async (
   group: Group,
   allWorkers: Worker[],
   testWorkers: string[],
 ) => {
-  let excludedWorkers = allWorkers.filter((w) => testWorkers.includes(w.name));
-  for (let i = 0; i < excludedWorkers.length; i++) {
-    await group.send("hey " + excludedWorkers[i].name);
+  const targetWorkers = allWorkers.filter((w) => testWorkers.includes(w.name));
+  for (const worker of targetWorkers) {
+    await group.send(`hey ${worker.name}`);
   }
 };
 
+// Creates new group or retrieves existing group
 const getOrCreateGroup = async (
   creator: Client,
   addedMembers: string[],
 ): Promise<Conversation | undefined> => {
-  const start = performance.now();
-  console.time("getOrCreateGroup");
-
   let group: Group;
 
   if (!testConfig.groupId) {
     console.log(`Creating group with ${addedMembers.length} members`);
     group = await creator.conversations.newGroup(addedMembers);
     appendToEnv("GROUP_ID", group.id, testConfig.testName);
-    await group.updateName("Fork group " + time);
+    await group.updateName(`Fork group ${time}`);
   } else {
     console.log(`Fetching group with ID ${testConfig.groupId}`);
     group = (await creator.conversations.getConversationById(
       testConfig.groupId,
     )) as Group;
   }
-  if (!group) {
-    throw new Error("Group not found");
-  }
+
+  if (!group) throw new Error("Group not found");
 
   const members = await group.members();
   console.log(`Group ${group.id} has ${members.length} members`);
-
-  await group.send("Starting run for " + time);
-
-  const end = performance.now();
-  console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
-  console.timeEnd("getOrCreateGroup");
+  await group.send(`Starting run for ${time}`);
 
   return group;
 };
 
-/**
- * Sends a message from a worker with name and count
- */
+// Sends a message from a worker to the group
 const sendMessageToGroup = async (
   worker: Worker,
   groupId: string,
   message: string,
 ): Promise<void> => {
-  const start = performance.now();
-  console.time(`sendMessageToGroup-${worker.name}`);
-
   await worker.client.conversations.syncAll();
-
   const foundGroup =
     await worker.client.conversations.getConversationById(groupId);
-
   console.log(`${worker.name} sending: "${message}" to group ${groupId}`);
   await foundGroup?.send(message);
-  console.timeEnd(`sendMessageToGroup-${worker.name}`);
 };
 
+// Performs add/remove cycles to trigger group forking
 const membershipChange = async (
   groupId: string,
   memberWhoAdds: Worker,
   memberToAdd: Worker,
-  trys: number,
+  tries: number,
 ): Promise<void> => {
-  const start = performance.now();
-  console.time(`membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`);
-
   try {
     await memberWhoAdds.client.conversations.sync();
-
     const group = (await memberWhoAdds.client.conversations.getConversationById(
       groupId,
     )) as Group;
-    if (!group) {
-      console.log(`Group ${groupId} not found`);
-      throw new Error(`Group ${groupId} not found`);
-    }
-    console.log(`Group ${groupId} found`);
+
+    if (!group) throw new Error(`Group ${groupId} not found`);
 
     const memberInboxId = memberToAdd.client.inboxId;
-    const member = await group.members();
+    const members = await group.members();
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
-    for (let i = 0; i <= trys; i++) {
+
+    for (let i = 0; i < tries; i++) {
       try {
-        const memberExists = member.find((m) => m.inboxId === memberInboxId);
+        const memberExists = members.find((m) => m.inboxId === memberInboxId);
         if (memberExists) {
-          const epochStart = performance.now();
           await group.sync();
           await group.removeMembers([memberInboxId]);
           await group.sync();
           await group.addMembers([memberInboxId]);
-
-          await group.updateName("Fork group " + time);
-          const epochEnd = performance.now();
-
-          console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
-          console.warn(`Epoch ${i} done`);
+          await group.updateName(`Fork group ${time}`);
+          console.log(`Completed cycle ${i + 1}/${tries}`);
         } else {
-          console.warn(`Member ${memberInboxId} not found`);
+          console.warn(`Member ${memberToAdd.name} not found`);
           await group.sync();
         }
       } catch (e) {
-        console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+        console.error(`Error in cycle ${i + 1} for ${memberToAdd.name}:`, e);
       }
     }
   } catch (e) {
-    console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
-  } finally {
-    const end = performance.now();
-    console.log(
-      `membershipChange for ${memberWhoAdds.name} and ${memberToAdd.name} - Duration: ${end - start}ms`,
-    );
-    console.timeEnd(
-      `membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`,
-    );
+    console.error(`Failed to manage ${memberToAdd.name} in group:`, e);
   }
 };
