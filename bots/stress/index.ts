@@ -157,7 +157,9 @@ export async function handleStressCommand(
 }
 
 async function initializeBot() {
-  const botWorker = await getWorkers(["bot"], testName, "none");
+  console.log("Initializing bot...");
+  const botWorker = await getWorkers(["bot"], testName, "message");
+  console.log("Bot worker:", botWorker);
   const bot = botWorker.get("bot");
   console.log("Bot worker:", bot?.address);
   console.log("Bot worker client:", bot?.client.inboxId);
@@ -167,39 +169,41 @@ async function initializeBot() {
 async function main() {
   try {
     const client = await initializeBot();
-    await client.conversations.sync();
-    const stream = client.conversations.streamAllMessages();
 
-    for await (const message of await stream) {
-      try {
-        // Skip own messages and non-text messages
-        if (
-          message?.senderInboxId.toLowerCase() ===
-            client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text"
-        )
-          continue;
+    // await client.conversations.sync();
+    // const stream = client.conversations.streamAllMessages();
 
-        const conversation = await client.conversations.getConversationById(
-          message.conversationId,
-        );
+    // for await (const message of await stream) {
+    //   try {
+    //     // Skip own messages and non-text messages
+    //     if (
+    //       message?.senderInboxId.toLowerCase() ===
+    //         client.inboxId.toLowerCase() ||
+    //       message?.contentType?.typeId !== "text"
+    //     )
+    //       continue;
 
-        if (!conversation) continue;
+    //     const conversation = await client.conversations.getConversationById(
+    //       message.conversationId,
+    //     );
 
-        // Only handle DM conversations
-        if (!("peerInboxId" in conversation)) continue;
+    //     if (!conversation) continue;
 
-        isStressTestRunning = await handleStressCommand(
-          message,
-          conversation,
-          client,
-          isStressTestRunning,
-        );
-      } catch (error) {
-        console.error("Error handling message:", error);
-      }
-    }
+    //     // Only handle DM conversations
+    //     if (!("peerInboxId" in conversation)) continue;
+
+    //     isStressTestRunning = await handleStressCommand(
+    //       message,
+    //       conversation,
+    //       client,
+    //       isStressTestRunning,
+    //     );
+    //   } catch (error) {
+    //     console.error("Error handling message:", error);
+    //   }
+    // }
   } catch (error) {
+    console.debug(error);
     console.error("Fatal error:", error);
     process.exit(1);
   }

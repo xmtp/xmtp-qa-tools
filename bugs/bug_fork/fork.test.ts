@@ -49,7 +49,7 @@ describe(TEST_NAME, () => {
     )) as Group;
 
     // Perform fork check with selected workers
-    const checkWorkers = ["fabri", "eve"];
+    const checkWorkers = ["fabri", "eve", "dave", "frank"];
     const testWorkers = ["bob", "alice", "elon", "joe"];
 
     await forkCheck(globalGroup, allWorkers, checkWorkers);

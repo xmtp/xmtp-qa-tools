@@ -239,7 +239,6 @@ export class WorkerManager {
    * Creates a new worker with all necessary initialization
    */
   public async createWorker(descriptor: string): Promise<Worker> {
-    // Parse the descriptor into components: name, folder, and version
     const parts = descriptor.split("-");
     const baseName = parts[0];
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
@@ -268,6 +267,7 @@ export class WorkerManager {
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
     };
+    //  console.debug("Worker data created", workerData);
 
     // Create and initialize the worker
     const workerClient = new WorkerClient(
@@ -340,7 +340,6 @@ export class WorkerManager {
       descriptors = [];
       for (const descriptor of descriptorsOrAmount) {
         if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
-          console.log("Descriptor:", descriptor);
           const name = descriptor.split("-")[0];
           const installId = descriptor.split("-")[1] ?? "a";
           descriptors.push(`${name}-${installId}-${randomSdkVersionReversed}`);
@@ -354,7 +353,6 @@ export class WorkerManager {
     const workerPromises = descriptors.map((descriptor) =>
       this.createWorker(descriptor),
     );
-
     return Promise.all(workerPromises);
   }
 }
@@ -377,6 +375,7 @@ export async function getWorkers(
     env,
   );
   await manager.createWorkers(descriptorsOrAmount, randomVersions);
+  console.log("Workers created");
   manager.printWorkers();
   return manager;
 }

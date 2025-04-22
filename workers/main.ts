@@ -207,10 +207,6 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    // console.log(
-    //   `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
-    // );
-    // Start the appropriate stream based on configuration
     this.startStream();
 
     const installationId = this.client.installationId;
