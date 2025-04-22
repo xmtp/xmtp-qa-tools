@@ -236,3 +236,132 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
+
+# TS_Fork test suite
+
+This test suite systematically tests XMTP group conversation functionality to identify and reproduce "forking" issues - where clients diverge in their view of the conversation state.
+
+## Overview
+
+The TS_Fork test suite is designed to reliably reproduce group conversation forking across mixed XMTP client implementations. A fork occurs when different participants in a group conversation see different conversation states, including different message histories or member lists.
+
+![Fork Visualization](https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939)
+
+### Test environment
+
+The test suite uses a mixed-client environment to maximize fork reproducibility:
+
+- **SDK bots**: Running on the latest node-sdk version (configurable number)
+- **Manual clients**:
+  - Convos.io
+  - Convos Desktop
+  - XMTP Chat Web
+  - Coinbase Wallet (iOS build)
+
+## Implementation details
+
+The test suite focuses on:
+
+- Group creation across mixed clients
+- Message delivery and reception validation
+- Member addition and removal operations
+- Fork detection by message response verification
+
+## Configuration
+
+Create a `.env` file with the following parameters:
+
+```bash
+LOGGING_LEVEL="off"  # Options: debug, info, warn, error
+XMTP_ENV="production"  # Options: production, dev
+EPOCHS=4 # Number of add/remove cycles per participant
+WORKERS=8 # Number of node-sdk participants in the test
+USER_CONVOS=""  # InboxID
+USER_CB_WALLET=""  # InboxID
+USER_XMTPCHAT=""  # InboxID
+USER_CONVOS_DESKTOP=""  # InboxID
+
+# Will be populated during test execution
+GROUP_ID=""  # Group ID will be stored here for reuse
+```
+
+> **Tip:** To find your InboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`.
+> Send `/kc address` to receive your wallet address and inbox ID.
+
+## Execution
+
+Run the test with:
+
+```bash
+yarn test fork
+```
+
+## Test methodology
+
+The test executes the following sequence:
+
+1. **Initialization**:
+
+   - Group creator (usually 'fabri') initializes and manages the test group
+   - The group name is updated with current timestamp for identification
+   - Creator sends an initial "start" message to confirm setup
+
+2. **Message exchange**:
+
+   - Selected test workers send messages with their identifier and iteration count
+
+3. **Membership manipulation**:
+
+   - For each test worker, the creator performs multiple add/remove cycles:
+
+   ```typescript
+   await group.sync();
+   await group.removeMembers([memberInboxId]);
+   await group.sync();
+   await group.addMembers([memberInboxId]);
+   ```
+
+4. **Fork verification**:
+
+   - Non-test workers are mentioned to check response
+   - A forked client will not see or respond to messages from clients in different branches
+
+5. **Completion**:
+   - The creator sends a final "Test sequence completed" message to conclude the test
+
+## Observed behavior
+
+The test has demonstrated the following fork behavior patterns:
+
+- **Coinbase Wallet**: Forks consistently
+- **Convos Messenger**: Forks less consistently but is reproducible
+- **Web and Node SDK clients**: Less likely to experience forking during testing
+
+In the forked state:
+
+- Push notifications may still reach mobile clients
+- Clients in different branches cannot see each other's messages
+- The fork persists until clients restart or resync
+
+## Detecting forks
+
+To manually test for the presence of a fork after running the automated test:
+
+1. Mention multiple workers in a single message:
+
+   ```
+   hey bob alice dave joe
+   ```
+
+2. Observe the responses:
+   - In a non-forked group, you'll receive responses from all mentioned workers
+   - In a forked group, you'll only receive responses from workers in your branch
+   - Clients in different branches will not see each other's response messages
+
+## Setup instructions
+
+```bash
+git clone https://github.com/xmtp/xmtp-qa-testing
+cd xmtp-qa-testing
+yarn install
+```

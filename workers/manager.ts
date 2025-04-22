@@ -7,6 +7,7 @@ import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
+export type typeOfResponseEnabled = "none" | "gm" | "gpt";
 export type typeofStream = "message" | "conversation" | "consent" | "none";
 
 export interface WorkerBase {
@@ -37,11 +38,11 @@ export interface Worker extends WorkerBase {
  * Combines the functionality of both WorkerManager and WorkerFactory
  */
 export class WorkerManager {
-  private workers: Record<string, Record<string, Worker>>;
+  private workers: Record<string, Record<string, Worker>> = {};
   private testName: string;
   private activeWorkers: WorkerClient[] = [];
   private typeofStream: typeofStream = "message";
-  private gptEnabled: boolean = false;
+  private responseEnabled: typeOfResponseEnabled = "none";
   private env: XmtpEnv;
   private keysCache: Record<
     string,
@@ -51,18 +52,17 @@ export class WorkerManager {
   /**
    * Constructor creates an empty manager or populates it with existing workers
    */
+
   constructor(
     testName: string,
     typeofStream: typeofStream = "message",
-    gptEnabled: boolean = false,
+    responseEnabled: typeOfResponseEnabled = "none",
     env: XmtpEnv,
-    existingWorkers?: Record<string, Record<string, Worker>>,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStream;
-    this.gptEnabled = gptEnabled;
+    this.responseEnabled = responseEnabled;
     this.env = env;
-    this.workers = existingWorkers || {};
   }
   /**
    * Terminates all active workers and cleans up resources
@@ -261,7 +261,7 @@ export class WorkerManager {
     const workerClient = new WorkerClient(
       workerData,
       this.typeofStream,
-      this.gptEnabled,
+      this.responseEnabled,
       this.env,
     );
 
@@ -296,6 +296,7 @@ export class WorkerManager {
    */
   public async createWorkers(
     descriptorsOrAmount: string[] | number,
+    randomVersions: boolean = false,
   ): Promise<Worker[]> {
     let descriptors: string[];
 
@@ -311,12 +312,15 @@ export class WorkerManager {
       for (let i = 0; i < descriptorsOrAmount; i++) {
         const workerName =
           defaultValues.defaultNames[i % defaultValues.defaultNames.length];
-        const randomSdkVersion =
-          sdkVersionOptions[
-            Math.floor(Math.random() * sdkVersionOptions.length)
-          ];
-        //fix
-        descriptors.push(`${workerName}-a`);
+        if (randomVersions) {
+          const randomSdkVersion =
+            sdkVersionOptions[
+              Math.floor(Math.random() * sdkVersionOptions.length)
+            ];
+          descriptors.push(`${workerName}-a-${randomSdkVersion}`);
+        } else {
+          descriptors.push(`${workerName}-a`);
+        }
       }
     } else {
       descriptors = descriptorsOrAmount;
@@ -338,14 +342,17 @@ export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   testName: string,
   typeofStream: typeofStream = "message",
-  gptEnabled: boolean = false,
-  existingWorkers?: WorkerManager,
+  responseEnabled: typeOfResponseEnabled = "none",
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
+  randomVersions: boolean = false,
 ): Promise<WorkerManager> {
-  const manager =
-    existingWorkers ||
-    new WorkerManager(testName, typeofStream, gptEnabled, env, undefined);
-  await manager.createWorkers(descriptorsOrAmount);
+  const manager = new WorkerManager(
+    testName,
+    typeofStream,
+    responseEnabled,
+    env,
+  );
+  await manager.createWorkers(descriptorsOrAmount, randomVersions);
   return manager;
 }
 

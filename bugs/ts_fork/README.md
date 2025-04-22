@@ -1,4 +1,4 @@
-# 🔍 TS_ForkTesting Test Suite
+# 🔍 TS_Fork test suite
 
 This test suite verifies XMTP group functionality with mixed clients to identify and reproduce forking issues in group conversations.
 
@@ -14,7 +14,7 @@ This test suite verifies XMTP group functionality with mixed clients to identify
 
 ## Overview
 
-The TS_ForkTesting test suite systematically tests group conversation functionality across multiple client types to identify and reproduce "forking" issues - where clients diverge in their view of the conversation state.
+The TS_Fork test suite systematically tests group conversation functionality across multiple client types to identify and reproduce "forking" issues - where clients diverge in their view of the conversation state.
 
 ![Fork Visualization](https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939)
 
@@ -41,15 +41,16 @@ The test suite focuses on:
 Configuration parameters include:
 
 ```javascript
-// Configuration parameters from TS_ForkTesting
+// Configuration parameters from TS_Fork
 const testConfig = {
-  testName: TEST_NAME,
-  workers: parseInt(process.env.WORKERS as string),
-  epochs: parseInt(process.env.EPOCHS as string),
+  testName: testName,
+  workers: parseInt(process.env.WORKERS ?? "8"),
+  epochs: parseInt(process.env.EPOCHS ?? "4"),
   manualUsers: {
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
     USER_CONVOS: process.env.USER_CONVOS,
     USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
+    USER_CB_WALLET: process.env.USER_CB_WALLET,
   },
   groupId: process.env.GROUP_ID,
 };
@@ -58,29 +59,27 @@ const testConfig = {
 Key implementation highlights:
 
 ```javascript
-// Example from fork.test.ts implementation
+// Example from TS_Fork implementation
 const membershipChange = async (
   groupId: string,
   memberWhoAdds: Worker,
   memberToAdd: Worker,
-  trys: number,
+  epochs: number,
 ): Promise<void> => {
   // ...
-  for (let i = 0; i <= trys; i++) {
+  for (let i = 0; i < epochs; i++) {
     try {
-      const memberExists = member.find((m) => m.inboxId === memberInboxId);
-      if (memberExists) {
-        const epochStart = performance.now();
-        await group.sync();
-        await group.removeMembers([memberInboxId]);
-        await group.sync();
-        await group.addMembers([memberInboxId]);
+      const epochStart = performance.now();
+      await group.sync();
+      await group.removeMembers([memberInboxId]);
+      await group.sync();
+      await group.addMembers([memberInboxId]);
 
-        const epochEnd = performance.now();
-        console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);
-      }
+      await group.updateName(`Fork Test Group ${time} - Cycle ${i + 1}`);
+      const epochEnd = performance.now();
+      console.log(`Epoch ${i + 1} completed in ${epochEnd - epochStart}ms`);
     } catch (e) {
-      console.error(`Error managing ${memberToAdd.name} in ${groupId}:`, e);
+      console.error(`Error in epoch ${i + 1} for ${memberToAdd.name}:`, e);
     }
   }
   // ...
@@ -89,13 +88,13 @@ const membershipChange = async (
 
 ## Configuration
 
-Create a `.env` file in the `bugs/bug_fork` directory with the following parameters:
+Create a `.env` file in the `bugs/ts_fork` directory with the following parameters:
 
 ```bash
 LOGGING_LEVEL="off"  # Options: debug, info, warn, error
 XMTP_ENV="production"  # Options: production, dev
 EPOCHS=4 # Number of add/remove cycles per participant
-WORKERS=12 # Number of node-sdk participants in the test
+WORKERS=8 # Number of node-sdk participants in the test
 USER_CONVOS=""  # InboxID
 USER_CB_WALLET=""  # InboxID
 USER_XMTPCHAT=""  # InboxID
@@ -135,7 +134,7 @@ The test executes the following sequence:
    await sendMessageToGroup(
      currentWorker,
      globalGroup.id,
-     currentWorker.name + ":" + String(i),
+     `${currentWorker.name}:${i}`,
    );
    ```
 
@@ -156,7 +155,8 @@ The test executes the following sequence:
    - A forked client will not see or respond to messages from clients in different branches
 
 5. **Completion**:
-   - The creator sends a final "Done" message to conclude the test
+   - The creator sends a final message to conclude the test
+   - The test verifies message delivery across all participants
 
 ## Observed behavior
 
@@ -164,7 +164,7 @@ The test consistently demonstrates fork behavior patterns:
 
 - **Coinbase Wallet** (build 99.1.0-oneoff-2hmgx / 999999): Forks consistently
 - **Convos Messenger**: Forks less consistently but is reproducible
-- **Web and Node SDK clients**: Never experience forking during testing
+- **Web and Node SDK clients**: Less likely to experience forking during testing
 
 In the forked state:
 
@@ -173,11 +173,6 @@ In the forked state:
 - The fork persists until clients restart or resync
 
 ## Technical details
-
-- **Total SDK calls per test**: 51 calls
-
-  - Calculation: 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51
-  - Note: This may occasionally exceed API rate limits
 
 - **Performance correlation**: There appears to be a correlation between forking and SDK performance when client creation intervals approach 1 second
 
@@ -190,7 +185,7 @@ To manually test for the presence of a fork after running the automated test:
 1. Mention multiple workers in a single message:
 
 ```
-hi frank fabri dave grace eve
+hey bob alice dave joe
 ```
 
 2. Observe the responses:

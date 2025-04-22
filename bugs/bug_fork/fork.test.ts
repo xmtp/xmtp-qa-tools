@@ -1,20 +1,29 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { appendToEnv, sleep } from "@helpers/tests";
+import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import {
+  type Client,
+  type Conversation,
+  type Group,
+  type XmtpEnv,
+} from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "bug_fork";
 loadEnv(TEST_NAME);
-
+const time = new Date().toLocaleTimeString("en-US", {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+});
 const testConfig = {
   testName: TEST_NAME,
-  workers: 10,
+  workers: parseInt(process.env.WORKERS as string),
+  epochs: parseInt(process.env.EPOCHS as string),
   manualUsers: {
-    USER_CONVOS: process.env.USER_CONVOS,
-    USER_CB_WALLET: process.env.USER_CB_WALLET,
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
+    USER_CONVOS: process.env.USER_CONVOS,
     USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
   groupId: process.env.GROUP_ID,
@@ -33,7 +42,14 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME, "message", true);
+    workers = await getWorkers(
+      testConfig.workers,
+      TEST_NAME,
+      "message",
+      "gm",
+      process.env.XMTP_ENV as XmtpEnv,
+      true,
+    );
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     console.log("Creator is", creator.name);
@@ -47,9 +63,9 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    let epochs = 6;
+    const checkWorkers = ["fabri", "eve", "charlie", "grace"];
     const testWorkers = ["bob", "alice", "elon", "joe"];
-    await forkCheck(globalGroup, allWorkers, testWorkers);
+    await forkCheck(globalGroup, allWorkers, checkWorkers);
     for (let i = 0; i < testWorkers.length; i++) {
       let currentWorker = allWorkers.find((w) => w.name === testWorkers[i]);
       if (!currentWorker) {
@@ -62,7 +78,12 @@ describe(TEST_NAME, () => {
         globalGroup.id,
         currentWorker.name + ":" + String(i),
       );
-      await membershipChange(globalGroup.id, creator, currentWorker, epochs);
+      await membershipChange(
+        globalGroup.id,
+        creator,
+        currentWorker,
+        testConfig.epochs,
+      );
     }
 
     await globalGroup.send(creator.name + " : Done");
@@ -80,7 +101,7 @@ const forkCheck = async (
   allWorkers: Worker[],
   testWorkers: string[],
 ) => {
-  let excludedWorkers = allWorkers.filter((w) => !testWorkers.includes(w.name));
+  let excludedWorkers = allWorkers.filter((w) => testWorkers.includes(w.name));
   for (let i = 0; i < excludedWorkers.length; i++) {
     await group.send("hey " + excludedWorkers[i].name);
   }
@@ -95,11 +116,6 @@ const getOrCreateGroup = async (
 
   let group: Group;
 
-  const time = new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
   if (!testConfig.groupId) {
     console.log(`Creating group with ${addedMembers.length} members`);
     group = await creator.conversations.newGroup(addedMembers);
@@ -130,7 +146,7 @@ const getOrCreateGroup = async (
 /**
  * Sends a message from a worker with name and count
  */
-export const sendMessageToGroup = async (
+const sendMessageToGroup = async (
   worker: Worker,
   groupId: string,
   message: string,
@@ -138,23 +154,14 @@ export const sendMessageToGroup = async (
   const start = performance.now();
   console.time(`sendMessageToGroup-${worker.name}`);
 
-  try {
-    await worker.client.conversations.syncAll();
+  await worker.client.conversations.syncAll();
 
-    const foundGroup =
-      await worker.client.conversations.getConversationById(groupId);
+  const foundGroup =
+    await worker.client.conversations.getConversationById(groupId);
 
-    console.log(`${worker.name} sending: "${message}" to group ${groupId}`);
-    await foundGroup?.send(message);
-  } catch (e) {
-    console.error(`Error sending from ${worker.name}:`, e);
-  } finally {
-    const end = performance.now();
-    console.log(
-      `sendMessageToGroup for ${worker.name} - Duration: ${end - start}ms`,
-    );
-    console.timeEnd(`sendMessageToGroup-${worker.name}`);
-  }
+  console.log(`${worker.name} sending: "${message}" to group ${groupId}`);
+  await foundGroup?.send(message);
+  console.timeEnd(`sendMessageToGroup-${worker.name}`);
 };
 
 const membershipChange = async (
@@ -167,7 +174,6 @@ const membershipChange = async (
   console.time(`membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`);
 
   try {
-    console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
     await memberWhoAdds.client.conversations.sync();
 
     const group = (await memberWhoAdds.client.conversations.getConversationById(
@@ -181,7 +187,7 @@ const membershipChange = async (
 
     const memberInboxId = memberToAdd.client.inboxId;
     const member = await group.members();
-    console.log(`Member ${memberInboxId} found`);
+    console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
     for (let i = 0; i <= trys; i++) {
       try {
         const memberExists = member.find((m) => m.inboxId === memberInboxId);
@@ -192,6 +198,7 @@ const membershipChange = async (
           await group.sync();
           await group.addMembers([memberInboxId]);
 
+          await group.updateName("Fork group " + time);
           const epochEnd = performance.now();
 
           console.log(`Epoch ${i} - Duration: ${epochEnd - epochStart}ms`);

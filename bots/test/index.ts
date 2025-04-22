@@ -18,8 +18,8 @@ async function main() {
 
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
-    const workers = await getWorkers(20, testName, "message", true);
-    const botWorker = await getWorkers(["bot"], testName, "message", false);
+    const workers = await getWorkers(20, testName, "message", "gpt");
+    const botWorker = await getWorkers(["bot"], testName, "message", "none");
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 

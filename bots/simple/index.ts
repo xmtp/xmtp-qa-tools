@@ -17,7 +17,7 @@ process.on("unhandledRejection", (reason, promise) => {
 
 async function main() {
   // Get 20 dynamic workers
-  const workers = await getWorkers(["bob"], testName, "message", true);
+  const workers = await getWorkers(["bob"], testName, "message", "gpt");
   const bot = workers.get("bob");
   const client = bot?.client as Client;
   console.log(`Agent initialized on address ${bot?.address}`);
