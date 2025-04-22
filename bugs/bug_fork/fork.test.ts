@@ -48,6 +48,12 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
+    // Perform fork check with selected workers
+    const checkWorkers = ["fabri", "eve", "charlie", "grace"];
+    const testWorkers = ["bob", "alice", "elon", "joe"];
+
+    await forkCheck(globalGroup, allWorkers, checkWorkers);
+
     for (let i = 0; i < testConfig.workers; i++) {
       let currentWorker = allWorkers[i];
       if (currentWorker.name === creator.name) continue;
@@ -74,6 +80,17 @@ describe(TEST_NAME, () => {
     console.timeEnd("initialize workers and create group");
   });
 });
+// Sends messages to specific workers to check for responses
+const forkCheck = async (
+  group: Group,
+  allWorkers: Worker[],
+  testWorkers: string[],
+) => {
+  const targetWorkers = allWorkers.filter((w) => testWorkers.includes(w.name));
+  for (const worker of targetWorkers) {
+    await group.send(`hey ${worker.name}`);
+  }
+};
 
 const getOrCreateGroup = async (
   creator: Client,
