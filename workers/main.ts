@@ -253,16 +253,18 @@ export class WorkerClient extends Worker {
   private initMessageStream() {
     // Process messages asynchronously
     void (async () => {
-      // Start stream in an infinite loop to handle restarts
-      while (true) {
+      // Start stream with a limited number of retries
+      let retryCount = 0;
+      const maxRetries = 3;
+
+      while (retryCount < maxRetries) {
         try {
           // Make sure conversations are fully synced before starting the stream
           await this.client.conversations.sync();
 
           // Add a small delay to ensure sync is complete
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 500));
 
-          console.log(`[${this.nameId}] Starting message stream...`);
           const stream = await this.client.conversations.streamAllMessages();
 
           for await (const message of stream) {
@@ -303,9 +305,16 @@ export class WorkerClient extends Worker {
               }
             }
           }
+
+          // If we get here with no errors, reset the retry counter
+          retryCount = 0;
         } catch (error) {
           if (!this.isTerminated) {
-            console.error(`[${this.nameId}] Message stream error:`, error);
+            retryCount++;
+            console.error(
+              `[${this.nameId}] Message stream error (attempt ${retryCount}/${maxRetries}):`,
+              error,
+            );
 
             // Try to restart the stream after a delay
             await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -313,6 +322,13 @@ export class WorkerClient extends Worker {
             // Don't emit error to avoid the test failing - just log it
             if (this.listenerCount("error") > 0) {
               this.emit("error", error);
+            }
+
+            if (retryCount >= maxRetries) {
+              console.error(
+                `[${this.nameId}] Exceeded maximum retry attempts (${maxRetries}). Stopping message stream.`,
+              );
+              break;
             }
           }
         }
@@ -322,7 +338,6 @@ export class WorkerClient extends Worker {
 
         // Wait before trying to restart the stream
         await new Promise((resolve) => setTimeout(resolve, 1000));
-        console.log(`[${this.nameId}] Restarting message stream...`);
       }
     })();
   }
@@ -354,7 +369,7 @@ export class WorkerClient extends Worker {
    * Handle generating and sending GPT responses
    */
   private async handleResponse(message: DecodedMessage) {
-    console.time(`[${this.nameId}] GPT Agent: Response`);
+    console.time(`[${this.nameId}] Worker response`);
 
     try {
       // Get the conversation from the message
@@ -385,7 +400,7 @@ export class WorkerClient extends Worker {
         error,
       );
     } finally {
-      console.timeEnd(`[${this.nameId}] Response`);
+      console.timeEnd(`[${this.nameId}] Worker response`);
     }
   }
 

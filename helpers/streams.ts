@@ -173,7 +173,7 @@ export async function verifyStream<T extends string = string>(
 
     // If we still have missing messages, try one more manual approach
     const combinedMessages = await Promise.all(
-      pullCollectedMessages.map(async (messagelist, workerIdx) => {
+      pullCollectedMessages.map((messagelist, workerIdx) => {
         // Already complete
         if (messagelist.length === count) {
           return messagelist;
