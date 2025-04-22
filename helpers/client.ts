@@ -79,41 +79,42 @@ export const regressionClient = async (
   sdkVersion: string | number,
   libXmtpVersion: string,
   walletKey: `0x${string}`,
-  encryptionKey: Uint8Array,
+  dbEncryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
 ): Promise<any> => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
   const versionStr = String(sdkVersion);
+  const versionInt = parseInt(versionStr);
   const ClientClass =
-    sdkVersions[parseInt(versionStr) as keyof typeof sdkVersions].Client;
+    sdkVersions[versionInt as keyof typeof sdkVersions].Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
-  if (versionStr === "30") {
+  if (versionInt === 30) {
     throw new Error("Invalid version");
-  } else if (versionStr === "47") {
+  } else if (versionInt === 47) {
     const signer = createSigner47(walletKey);
     // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (parseInt(versionStr) >= 100 && parseInt(versionStr) < 200) {
+  } else if (versionInt >= 100 && versionInt < 200) {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (parseInt(versionStr) >= 200) {
+  } else if (versionInt >= 200) {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
     client = await ClientClass.create(signer, {
-      dbEncryptionKey: encryptionKey,
+      dbEncryptionKey,
       dbPath,
       env,
     });

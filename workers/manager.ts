@@ -300,7 +300,9 @@ export class WorkerManager {
   ): Promise<Worker[]> {
     let descriptors: string[];
 
-    const randomSdkVersionReversed = sdkVersionOptions.reverse();
+    const randomSdkVersionReversed =
+      sdkVersionOptions[sdkVersionOptions.length - 1];
+
     // Handle numeric input (create N default workers)
     if (typeof descriptorsOrAmount === "number") {
       const workerNames = defaultValues.defaultNames;
@@ -319,7 +321,7 @@ export class WorkerManager {
             ];
           descriptors.push(`${workerName}-a-${randomSdkVersion}`);
         } else {
-          descriptors.push(`${workerName}-a-${randomSdkVersionReversed[0]}`);
+          descriptors.push(`${workerName}-a-${randomSdkVersionReversed}`);
         }
       }
     } else {

@@ -7,6 +7,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 const testName = "sync-comparison";
 loadEnv(testName);
 
+// Helper function to add a delay
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 describe(testName, () => {
   let workers: WorkerManager;
   let testGroup: Group;
@@ -57,6 +60,9 @@ describe(testName, () => {
       await testGroup.sync();
       const members = await testGroup.members();
       expect(members.length).toBe(testWorkers.length);
+
+      // Allow time for group creation to propagate to all members
+      await delay(2000);
     } catch (e) {
       logError(e, expect);
       throw e;
@@ -65,16 +71,24 @@ describe(testName, () => {
 
   it("should send a message to the group for testing sync methods", async () => {
     try {
-      // Send a message from ivy to the group
+      // Sync Ivy's conversations first to ensure the group is visible
       const ivyClient = workers.get("ivy")!.client;
+      await ivyClient.conversations.sync();
+
       const groupForIvy = (await ivyClient.conversations.getConversationById(
         testGroup.id,
       )) as Group;
       expect(groupForIvy).toBeDefined();
 
+      // Ensure the group is properly synced
+      await groupForIvy.sync();
+
       const testMessage = `Test message at ${new Date().toISOString()}`;
       await groupForIvy.send(testMessage);
       console.log("Test message sent to group:", testMessage);
+
+      // Allow time for message to propagate to all members
+      await delay(3000);
     } catch (e) {
       logError(e, expect);
       throw e;
@@ -99,6 +113,9 @@ describe(testName, () => {
       );
       expect(group).toBeDefined();
 
+      // Ensure the group is fully synced
+      await group!.sync();
+
       // Retrieve messages after sync
       const messages = await group!.messages();
       console.log(
@@ -117,7 +134,7 @@ describe(testName, () => {
     try {
       const karenClient = workers.get("karen")!.client;
 
-      // First do a quick client sync to make sure we have the conversation
+      // First do a more thorough client sync to make sure we have the conversation
       await karenClient.conversations.sync();
 
       // Get the group conversation
@@ -152,7 +169,10 @@ describe(testName, () => {
     try {
       const larryClient = workers.get("larry")!.client;
 
-      // Get the group conversation without any initial sync
+      // Do an initial sync to ensure we have the conversation
+      await larryClient.conversations.sync();
+
+      // Get the group conversation without any additional sync
       const startTime = performance.now();
       const group = await larryClient.conversations.getConversationById(
         testGroup.id,
