@@ -49,19 +49,19 @@ describe(TEST_NAME, () => {
     )) as Group;
 
     // Perform fork check with selected workers
-    const checkWorkers = ["fabri", "eve", "charlie", "grace"];
+    const checkWorkers = ["fabri", "eve"];
     const testWorkers = ["bob", "alice", "elon", "joe"];
 
     await forkCheck(globalGroup, allWorkers, checkWorkers);
-
-    for (let i = 0; i < testConfig.workers; i++) {
-      let currentWorker = allWorkers[i];
-      if (currentWorker.name === creator.name) continue;
+    let count = 1;
+    for (const workerName of testWorkers) {
+      const currentWorker = allWorkers.find((w) => w.name === workerName);
+      if (!currentWorker || currentWorker.name === creator.name) continue;
 
       await sendMessageToGroup(
         currentWorker,
         globalGroup.id,
-        currentWorker.name + ":" + String(i),
+        `${currentWorker.name}:test ${count}`,
       );
       await membershipChange(
         globalGroup.id,
@@ -69,6 +69,7 @@ describe(TEST_NAME, () => {
         currentWorker,
         testConfig.epochs,
       );
+      count++;
     }
 
     await globalGroup.send(creator.name + " : Done");

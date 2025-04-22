@@ -307,7 +307,6 @@ export class WorkerManager {
       descriptors = workerNames.slice(0, descriptorsOrAmount);
       // If we need to create multiple workers with random SDK versions
       // Generate workers with random SDK versions (100, 105, or 202)
-      console.log("sdkVersionOptions", randomVersions);
       // Create descriptors with random SDK versions
       descriptors = [];
       for (let i = 0; i < descriptorsOrAmount; i++) {

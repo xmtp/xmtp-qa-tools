@@ -226,10 +226,6 @@ export class WorkerClient extends Worker {
    * Unified method to start the appropriate stream based on configuration
    */
   private async startStream() {
-    if (!this.typeofStream || this.typeofStream === "none") {
-      return;
-    }
-
     try {
       switch (this.typeofStream) {
         case "message":
@@ -259,7 +255,10 @@ export class WorkerClient extends Worker {
    */
   private async initMessageStream() {
     this.activeStream = await this.client.conversations.streamAllMessages();
-
+    if (this.activeStream === undefined) {
+      console.error(`[${this.nameId}] Failed to create message stream`);
+      return;
+    }
     // Process messages asynchronously
     void (async () => {
       try {
@@ -277,6 +276,7 @@ export class WorkerClient extends Worker {
           }
 
           // Check for GPT response triggers
+          console.log("this.typeOfResponse", this.nameId, this.typeOfResponse);
           if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
             await this.handleResponse(message as DecodedMessage);
             continue;
@@ -309,7 +309,8 @@ export class WorkerClient extends Worker {
    * Check if a message should trigger a GPT response
    */
   private shouldGenerateGptResponse(message: DecodedMessage): boolean {
-    if (this.typeOfResponse !== "gpt") return false;
+    console.log("this.typeOfResponse", this.typeOfResponse);
+    if (this.typeOfResponse === "none") return false;
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
     );
@@ -340,10 +341,9 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
 
-      const messages = await conversation?.messages();
-      const baseName = this.name.split("-")[0].toLowerCase();
-
       if (this.typeOfResponse === "gpt") {
+        const messages = await conversation?.messages();
+        const baseName = this.name.split("-")[0].toLowerCase();
         // Generate a response using OpenAI
         const response = await this.generateOpenAIResponse(
           message.content as string,
@@ -359,9 +359,12 @@ export class WorkerClient extends Worker {
         await conversation?.send(this.nameId + " says: gm");
       }
     } catch (error) {
-      console.error(`[${this.nameId}] Error generating GPT response:`, error);
+      console.error(
+        `[${this.nameId}] Error generating stream response:`,
+        error,
+      );
     } finally {
-      console.timeEnd(`[${this.nameId}] GPT Agent: Response`);
+      console.timeEnd(`[${this.nameId}] Response`);
     }
   }
 

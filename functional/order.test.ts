@@ -37,6 +37,8 @@ describe(testName, () => {
         "larry",
       ],
       testName,
+      "message",
+      "gm",
     );
   });
 
