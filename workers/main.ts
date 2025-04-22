@@ -259,13 +259,10 @@ export class WorkerClient extends Worker {
       // Start stream in an infinite loop to handle restarts
       while (true) {
         try {
-          console.log("✓ Syncing conversations...");
           await this.client.conversations.sync();
-          console.log("Starting message stream...");
           const streamPromise = this.client.conversations.streamAllMessages();
           const stream = await streamPromise;
 
-          console.log("Waiting for messages...");
           for await (const message of stream) {
             if (this.isTerminated) break;
 
