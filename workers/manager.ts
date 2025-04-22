@@ -301,7 +301,7 @@ export class WorkerManager {
     let descriptors: string[];
 
     const randomSdkVersionReversed =
-      sdkVersionOptions[sdkVersionOptions.length - 1];
+      sdkVersionOptions[sdkVersionOptions.length - 2];
 
     // Handle numeric input (create N default workers)
     if (typeof descriptorsOrAmount === "number") {
@@ -325,7 +325,18 @@ export class WorkerManager {
         }
       }
     } else {
-      descriptors = descriptorsOrAmount;
+      descriptors = [];
+      console.log(descriptorsOrAmount);
+      for (const descriptor of descriptorsOrAmount) {
+        if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
+          console.log("Descriptor:", descriptor);
+          const name = descriptor.split("-")[0];
+          const installId = descriptor.split("-")[1] ?? "a";
+          descriptors.push(`${name}-${installId}-${randomSdkVersionReversed}`);
+        } else {
+          descriptors.push(descriptor);
+        }
+      }
     }
     console.log("Creating workers", descriptors);
 
@@ -333,6 +344,7 @@ export class WorkerManager {
     const workerPromises = descriptors.map((descriptor) =>
       this.createWorker(descriptor),
     );
+
     return Promise.all(workerPromises);
   }
 }
