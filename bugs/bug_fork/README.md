@@ -1,19 +1,16 @@
-# Fork Testing in XMTP
+# XMTP Fork Testing Suite
 
-This test suite verifies XMTP group functionality with 12 clients to identify and reproduce forking issues.
+This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
 https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 ## Test Environment
 
-- **8 Bots**: Running on the latest node-sdk version
-- **4 Manual Clients**:
-  - Convos.io
-  - Convos Desktop
-  - XMTP Chat Web
-  - Coinbase Wallet (iOS build)
+- **Client Mix**: 8 programmatic workers + 4 manual clients
+- **SDKs Tested**: Node SDK (bots) and various client implementations
+- **Applications**: Convos.io, Convos Desktop, XMTP Chat Web, Coinbase Wallet iOS
 
-## Setup Instructions
+## Setup
 
 ```bash
 git clone https://github.com/xmtp/xmtp-qa-testing
@@ -23,87 +20,54 @@ yarn install
 
 ## Configuration
 
-Create a `.env` file in the `bugs/bug_fork` directory with the following parameters:
+Create a `.env` file in the `bugs/bug_fork` directory:
 
 ```bash
 LOGGING_LEVEL="off"  # Options: debug, info, warn, error
 XMTP_ENV="production"  # Options: production, dev
+WORKERS=8  # Number of programmatic workers
+EPOCHS=6   # Number of add/remove cycles to perform
 
-# InboxIDs for test participants
-USER_CONVOS=""  # InboxID
-USER_CB_WALLET=""  # InboxID
-USER_XMTPCHAT=""  # InboxID
-USER_CONVOS_DESKTOP=""  # InboxID
+# Manual client InboxIDs
+USER_CONVOS=""
+USER_CONVOS_DESKTOP=""
+USER_CB_WALLET=""
+USER_XMTPCHAT=""
 
-# Will be populated during test execution
-GROUP_ID=""  # Group ID will be stored here for reuse
+# Auto-populated during testing
+GROUP_ID=""
 ```
 
 > [!TIP]
-> To find your InboxID, send a message to `key-check.eth` or `0x235017975ed5F55e23a71979697Cd67DcAE614Fa`
-> Send `/kc address` to receive your wallet address and inbox ID
+> To find your InboxID, message `key-check.eth` with `/kc address`
 
-## Execution
-
-Run the test with:
+## Test Execution
 
 ```bash
 yarn test fork
 ```
 
-## Test Methodology
+## Test Flow
 
-The test executes the following sequence:
+1. **Group Creation**: Initializes workers and creates a test group
+2. **Fork Check**: Targeted messages sent to specific workers to check response
+3. **Message Exchange**: Each test worker sends an identified message
+4. **Membership Cycling**: Creator performs multiple add/remove cycles (defined by EPOCHS)
+   - Each cycle: `removeMembers()` → `addMembers()`
+   - Full sync performed between operations
 
-1. **Initialization**:
+## Performance Metrics
 
-   - Group creator updates the group name with the current timestamp
-   - Creator sends an initial "start" message
+- The test records execution time for key operations:
+  - Group creation/initialization
+  - Message sending
+  - Membership change operations
+  - Individual epoch durations
 
-2. **Message Exchange**:
+## Results Analysis
 
-   - Each worker sends a message with their identifier and iteration count:
+- **Reliable Reproduction**: Coinbase Wallet consistently forks
+- **Intermittent Issues**: Convos Messenger occasionally forks
+- **Resilient Clients**: Web and Node SDK clients remain stable
 
-   ```typescript
-   await sendMessageToGroup(
-     testConfig.workers[i],
-     globalGroup.id,
-     testConfig.workers[i].name + ":" + String(i),
-   );
-   ```
-
-3. **Membership Manipulation**:
-
-   - The creator performs multiple add/remove cycles for each participant:
-
-   ```typescript
-   // Perform add/remove cycles
-   for (let i = 0; i <= trys; i++) {
-     await group.removeMembers([memberInboxId]);
-     await group.addMembers([memberInboxId]);
-     console.warn(`Epoch ${i} done`);
-   }
-   ```
-
-4. **Completion**:
-   - The creator sends a final "Done" message to conclude the test
-
-## Observed Behavior
-
-- **Coinbase Wallet** (build 99.1.0-oneoff-2hmgx / 999999): Forks consistently
-- **Convos Messenger**: Forks less consistently but is reproducible
-- **Web and Node SDK clients**: Never experience forking during testing
-
-In the forked state, push notifications continue to reach Coinbase Wallet.
-
-## Technical Details
-
-- Total SDK calls per test: 51 calls
-  - Calculation: 1 + (1 + 1 + 1) + 1 + 3×(1 + 1 + 1) + 3×(1 + 1 + 1 + 6×2) + 1 = 51
-  - Note: This may occasionally exceed API rate limits
-
-## Observed Correlation
-
-> There appears to be a correlation between forking and SDK performance when client creation intervals approach 1 second
-
-![Performance Correlation](https://github.com/user-attachments/assets/e3836192-1be5-44bf-8738-3b15a185b842)
+The test identifies a correlation between forking and client creation intervals approaching 1 second, suggesting timing-related vulnerabilities in the synchronization process.
