@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { logAgentDetails, validateEnvironment } from "@helpers/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Dm,
@@ -9,34 +10,18 @@ import {
   type DecodedMessage,
 } from "@xmtp/node-sdk";
 
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
-
 const testName = "stress-bot";
 loadEnv(testName);
 
 // Constants
-const HELP_TEXT = `🤖 XMTP Stress Test Bot
-
-If working on a local environment, make sure to update the generated inboxes first:
-
-yarn script local-update
-
-Available Commands:
-/help - Show this help message
+const HELP_TEXT = `Stress bot commands:
 /stress <groups> <workers> <messages> - Start a stress test
 /stress reset - Reset all workers
 
 Examples:
 /stress 3 5 10 - Create 3 groups with 5 workers sending 10 messages each
-/stress reset - Terminate all workers and start over`;
+
+* It will also create 3 large groups with 50, 100 and 200 members`;
 
 let isStressTestRunning = false;
 let workers: WorkerManager | undefined;
@@ -47,21 +32,11 @@ interface StressTestConfig {
   messageCount: number;
 }
 
-// Define the type for generated inboxes
-interface GeneratedInbox {
-  accountAddress: string;
-  inboxId: string;
-  privateKey: string;
-  encryptionKey: string;
-}
-
 async function initializeBot() {
-  const botWorker = await getWorkers(["bot"], testName, "message", "none");
+  const botWorker = await getWorkers(["bot"], testName, "none");
   const bot = botWorker.get("bot");
   const client = bot?.client as Client;
-
-  console.log(`Agent initialized on address ${bot?.address}`);
-  console.log(`Agent initialized on inbox ${client.inboxId}`);
+  logAgentDetails(client);
 
   return client;
 }
@@ -112,7 +87,6 @@ async function sendWorkerMessagesToGroup(
     );
   }
 }
-
 async function createLargeGroup(
   workers: WorkerManager,
   memberCount: number,
@@ -121,53 +95,93 @@ async function createLargeGroup(
   message: DecodedMessage,
 ): Promise<string | undefined> {
   if (generatedInboxes.length < memberCount) {
-    console.log(
-      `Not enough pre-generated inboxes for ${memberCount}-member group`,
-    );
+    console.log(`Not enough inboxes for ${memberCount}-member group`);
     await conversation.send(
-      `⚠️ Not enough pre-generated inboxes for ${memberCount}-member group`,
+      `⚠️ Not enough inboxes for ${memberCount}-member group`,
     );
     return undefined;
   }
 
   await conversation.send(`⏳ Creating group with ${memberCount} members...`);
 
-  const inboxes: string[] = generatedInboxes
+  const inboxes = generatedInboxes
     .slice(0, memberCount)
-    .map((entry: GeneratedInbox) => entry.inboxId);
-
-  const workerInboxes = workers.getWorkers().map((w) => w.client?.inboxId);
-
-  console.log(
-    `Creating ${memberCount}-member group with ${inboxes.length} inboxes`,
-  );
+    .map((entry) => entry.inboxId);
+  const workerInboxes = workers
+    .getWorkers()
+    .map((w) => w.client?.inboxId)
+    .filter(Boolean);
 
   try {
-    // console.log([...inboxes, client.inboxId, message.senderInboxId]);
-    const group = await client.conversations.newGroup(
-      [...inboxes, ...workerInboxes, message.senderInboxId],
-      {
-        groupName: `Large Group ${memberCount} - ${Date.now()}`,
-        groupDescription: `Large group with ${memberCount} members for stress testing`,
-      },
-    );
+    console.log(`Creating large group with ${memberCount} members`);
 
-    console.log(`Created ${memberCount}-member group with ID: ${group.id}`);
+    // Create the group in batches if necessary to avoid timeout issues
+    const maxMembersPerBatch = 50;
+    let group;
+
+    if (memberCount > maxMembersPerBatch) {
+      // First create with a subset of members
+      const initialMembers = [
+        ...inboxes.slice(0, maxMembersPerBatch),
+        message.senderInboxId,
+      ];
+
+      group = await client.conversations.newGroup(initialMembers, {
+        groupName: `Large Group ${memberCount} - ${Date.now()}`,
+        groupDescription: `Test group with ${memberCount} members`,
+      });
+
+      console.log(
+        `Initial group created with ${maxMembersPerBatch} members. Adding remaining members in batches...`,
+      );
+
+      // Add remaining members in batches
+      const remainingInboxes = inboxes.slice(maxMembersPerBatch);
+      const workerInboxesToAdd = workerInboxes.filter(
+        (id) => !initialMembers.includes(id),
+      );
+      const allRemainingInboxes = [...remainingInboxes, ...workerInboxesToAdd];
+
+      for (let i = 0; i < allRemainingInboxes.length; i += maxMembersPerBatch) {
+        const batch = allRemainingInboxes.slice(i, i + maxMembersPerBatch);
+        console.log(
+          `Adding batch of ${batch.length} members to large group...`,
+        );
+        await group.addMembers(batch);
+        console.log(`Successfully added batch of ${batch.length} members`);
+      }
+    } else {
+      // For smaller groups, create with all members at once
+      group = await client.conversations.newGroup(
+        [...inboxes, ...workerInboxes, message.senderInboxId],
+        {
+          groupName: `Large Group ${memberCount} - ${Date.now()}`,
+          groupDescription: `Test group with ${memberCount} members`,
+        },
+      );
+    }
+
     await conversation.send(
       `✅ Created group with ${memberCount} members, ID: ${group.id}`,
     );
 
-    await sendWorkerMessagesToGroup(workers, group.id, 1);
+    try {
+      // Try to send one test message from each worker
+      await sendWorkerMessagesToGroup(workers, group.id, 1);
+    } catch (messagingError) {
+      console.error(
+        `Error sending test messages to large group: ${messagingError instanceof Error ? messagingError.message : String(messagingError)}`,
+      );
+      // Don't fail the entire process due to messaging errors
+    }
 
     return group.id;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(
-      `Error creating ${memberCount}-member group: ${errorMessage}`,
+      `Error creating large group with ${memberCount} members: ${errorMessage}`,
     );
-    await conversation.send(
-      `❌ Error creating ${memberCount}-member group: ${errorMessage}`,
-    );
+    await conversation.send(`❌ Error creating large group: ${errorMessage}`);
     return undefined;
   }
 }
@@ -184,7 +198,7 @@ async function runStressTest(
   try {
     await conversation.send("🚀 Initializing workers...");
 
-    workers = await getWorkers(config.workerCount, testName, "message", "gpt");
+    workers = await getWorkers(config.workerCount, testName, "message", "gm");
     console.log(
       `Successfully initialized ${workers.getWorkers().length} workers`,
     );
@@ -195,12 +209,13 @@ async function runStressTest(
         `- Groups to create: ${config.groupCount}\n` +
         `- Workers per group: ${config.workerCount}\n` +
         `- Messages per worker: ${config.messageCount}\n` +
-        `Total expected messages: ${config.groupCount * config.workerCount * config.messageCount}`,
+        `- Large groups to create: 50, 100, 200\n` +
+        `Total expected messages: ${config.groupCount + 3 * config.workerCount * config.messageCount} `,
     );
 
     const workerInboxIds = workers
       .getWorkers()
-      .map((w) => w.client?.inboxId)
+      .map((w) => w.inboxId)
       .filter(Boolean);
     console.log(`Collected ${workerInboxIds.length} worker inbox IDs`);
 
@@ -209,24 +224,64 @@ async function runStressTest(
 
     await conversation.send(`⏳ Creating ${config.groupCount} test groups...`);
 
+    // Log the inboxes being used
+    const inboxList = [...workerInboxIds, message.senderInboxId].join(", ");
+    console.log(`Adding inboxes: ${inboxList}`);
+
     for (let i = 0; i < config.groupCount; i++) {
-      const group = await client.conversations.newGroup(
-        [...workerInboxIds, message.senderInboxId],
-        {
+      try {
+        await client.conversations.sync();
+        const groupInboxIds = [...workerInboxIds];
+
+        // Ensure sender is included
+        if (!groupInboxIds.includes(message.senderInboxId)) {
+          groupInboxIds.push(message.senderInboxId);
+        }
+
+        // Create group with proper error handling
+        const group = await client.conversations.newGroup(groupInboxIds, {
           groupName: `Stress Test Group ${i + 1} - ${Date.now()}`,
           groupDescription: `Group ${i + 1} for stress testing`,
-        },
-      );
+        });
 
-      console.log(`Created test group ${i + 1} with ID: ${group.id}`);
-      createdGroups.push(group.id);
+        console.log(`Created test group ${i + 1} with ID: ${group.id}`);
+        createdGroups.push(group.id);
+        await group.sync();
+        await conversation.send(`✅ Test group ${i + 1} created successfully`);
+      } catch (groupError) {
+        const errorMsg =
+          groupError instanceof Error ? groupError.message : String(groupError);
+        console.error(`Error creating group ${i + 1}: ${errorMsg}`);
+        await conversation.send(
+          `⚠️ Failed to create group ${i + 1}: ${errorMsg}`,
+        );
+        // Continue with next group creation instead of failing the entire test
+        continue;
+      }
+    }
 
-      await conversation.send(`✅ Test group ${i + 1} created successfully`);
+    const largeGroupSizes = [50, 100, 200];
+    for (const size of largeGroupSizes) {
+      try {
+        await createLargeGroup(workers, size, client, conversation, message);
+      } catch (largeGroupError) {
+        const errorMsg =
+          largeGroupError instanceof Error
+            ? largeGroupError.message
+            : String(largeGroupError);
+        console.error(
+          `Error creating large group with ${size} members: ${errorMsg}`,
+        );
+        await conversation.send(
+          `⚠️ Failed to create large group with ${size} members: ${errorMsg}`,
+        );
+        // Continue with next size instead of failing the entire test
+      }
     }
 
     console.log(`Created ${createdGroups.length} test groups`);
     await conversation.send(
-      `✅ All ${createdGroups.length} groups created successfully`,
+      `✅ Created ${createdGroups.length}/${config.groupCount} groups successfully`,
     );
 
     // Send messages to all groups
@@ -236,16 +291,28 @@ async function runStressTest(
       config.groupCount * config.workerCount * config.messageCount;
 
     for (const groupId of createdGroups) {
-      await conversation.send(`📨 Sending messages to group ${groupId}...`);
-      await sendWorkerMessagesToGroup(workers, groupId, config.messageCount);
+      try {
+        await conversation.send(`📨 Sending messages to group ${groupId}...`);
+        await sendWorkerMessagesToGroup(workers, groupId, config.messageCount);
 
-      const groupMessages = config.workerCount * config.messageCount;
-      messagesSent += groupMessages;
+        const groupMessages = config.workerCount * config.messageCount;
+        messagesSent += groupMessages;
 
-      console.log(`Sent ${groupMessages} messages to group ${groupId}`);
-      await conversation.send(
-        `✅ Sent ${groupMessages} messages to group ${groupId}`,
-      );
+        console.log(`Sent ${groupMessages} messages to group ${groupId}`);
+        await conversation.send(
+          `✅ Sent ${groupMessages} messages to group ${groupId}`,
+        );
+      } catch (sendError) {
+        const errorMsg =
+          sendError instanceof Error ? sendError.message : String(sendError);
+        console.error(
+          `Error sending messages to group ${groupId}: ${errorMsg}`,
+        );
+        await conversation.send(
+          `⚠️ Failed to send messages to group ${groupId}: ${errorMsg}`,
+        );
+        // Continue with next group instead of failing the entire test
+      }
     }
 
     console.log(
@@ -253,7 +320,7 @@ async function runStressTest(
     );
 
     await conversation.send(
-      `🎉 Test completed successfully!\n\n` +
+      `🎉 Test completed!\n\n` +
         `📊 Final Statistics:\n` +
         `- Total messages sent: ${messagesSent}\n` +
         `- Groups created: ${createdGroups.length}\n` +
