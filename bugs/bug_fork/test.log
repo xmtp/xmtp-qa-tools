@@ -1,89 +1,170 @@
-[2025-04-21T23:34:04.343Z] [info] Creating workers ["bob-a","alice-a","fabri-a","elon-a","joe-a","charlie-a","dave-a","eve-a","frank-a","grace-a"]
-[2025-04-21T23:34:06.520Z] [info] bob: Worker created (204-068bb4c) - 0xaFD842255144F2B59c519562591eBB2441CB92F5
-[2025-04-21T23:34:06.529Z] [info] fabri: Worker created (204-068bb4c) - 0x4501123f56250B7C5a5fB787d4d768868a74E3D9
-[2025-04-21T23:34:06.810Z] [info] elon: Worker created (204-068bb4c) - 0x2c64CAb779f2EeC941bDAe733b15fFF0a4E4b30D
-[2025-04-21T23:34:06.860Z] [info] charlie: Worker created (204-068bb4c) - 0x80BFAfDECCab1416A9547ec7F2cE2b4d2c25f0B5
-[2025-04-21T23:34:06.902Z] [info] joe: Worker created (204-068bb4c) - 0xeF8ed4de28C996CC25c4CD5CA51258F07E98d6fb
-[2025-04-21T23:34:07.013Z] [info] dave: Worker created (204-068bb4c) - 0x31D5fa7CA5e6bCE56261ECda8dDEA796a3098D2B
-[2025-04-21T23:34:07.014Z] [info] eve: Worker created (204-068bb4c) - 0x331E33C3C3C3bFA6d58899a294b2eD90d2b678a0
-[2025-04-21T23:34:07.095Z] [info] frank: Worker created (204-068bb4c) - 0x7B82423D51BD99155c304527a43672558DEfA39b
-[2025-04-21T23:34:07.115Z] [info] alice: Worker created (204-068bb4c) - 0xe724103D852f6E5479Aa61185e1b250391833A79
-[2025-04-21T23:34:07.340Z] [info] grace: Worker created (204-068bb4c) - 0x28dD2e1844e42549640C3f5F5E18240F5c8C2337
-[2025-04-21T23:34:07.568Z] [info] Creator is fabri
-[2025-04-21T23:34:07.580Z] [info] Fetching group with ID 0f0a384a91fcefa364f6f809bd162f53
-[2025-04-21T23:34:07.582Z] [info] Group 0f0a384a91fcefa364f6f809bd162f53 has 13 members
-[2025-04-21T23:34:08.591Z] [info] getOrCreateGroup - Duration: 1023.3462499999996ms
-[2025-04-21T23:34:08.592Z] [warn] getOrCreateGroup 1.024s
-[2025-04-21T23:34:12.300Z] [info] bob sending: "bob:0" to group 0f0a384a91fcefa364f6f809bd162f53
-[2025-04-21T23:34:22.980Z] [error] Error sending from bob: {"code":"GenericFailure"}
-[2025-04-21T23:34:22.980Z] [info] sendMessageToGroup for bob - Duration: 14388.253625ms
-[2025-04-21T23:34:22.980Z] [warn] sendMessageToGroup-bob 14.388s
-[2025-04-21T23:34:22.981Z] [info] fabri will add/remove bob
-[2025-04-21T23:34:23.246Z] [info] Group 0f0a384a91fcefa364f6f809bd162f53 found
-[2025-04-21T23:34:23.249Z] [info] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe found
-[2025-04-21T23:34:23.250Z] [warn] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe not found
-[2025-04-21T23:34:23.666Z] [warn] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe not found
-[2025-04-21T23:34:24.115Z] [warn] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe not found
-[2025-04-21T23:34:24.485Z] [warn] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe not found
-[2025-04-21T23:34:24.886Z] [warn] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe not found
-[2025-04-21T23:34:25.348Z] [info] membershipChange for fabri and bob - Duration: 2367.1643750000003ms
-[2025-04-21T23:34:25.348Z] [warn] membershipChange-fabri-bob 2.368s
-[2025-04-21T23:34:27.055Z] [info] alice sending: "alice:1" to group 0f0a384a91fcefa364f6f809bd162f53
-[2025-04-21T23:34:28.227Z] [info] sendMessageToGroup for alice - Duration: 2877.8328330000004ms
-[2025-04-21T23:34:28.227Z] [warn] sendMessageToGroup-alice 2.878s
-[2025-04-21T23:34:28.227Z] [info] fabri will add/remove alice
-[2025-04-21T23:34:28.534Z] [info] Group 0f0a384a91fcefa364f6f809bd162f53 found
-[2025-04-21T23:34:28.535Z] [info] Member d0e52daa89e6bb7a4a2d61cbe23e54b519bf87c356c2f383812a69b9ef341296 found
-[2025-04-21T23:34:32.413Z] [info] Epoch 0 - Duration: 3877.920665999998ms
-[2025-04-21T23:34:32.414Z] [warn] Epoch 0 done
-[2025-04-21T23:34:33.464Z] [error] [alice] Stream error: {"code":"GenericFailure"}
-[2025-04-21T23:34:36.385Z] [info] Epoch 1 - Duration: 3970.4969589999964ms
-[2025-04-21T23:34:36.385Z] [warn] Epoch 1 done
-[2025-04-21T23:34:40.051Z] [info] Epoch 2 - Duration: 3665.4046670000025ms
-[2025-04-21T23:34:40.052Z] [warn] Epoch 2 done
-[2025-04-21T23:34:44.404Z] [info] Epoch 3 - Duration: 4258.260292000006ms
-[2025-04-21T23:34:44.404Z] [warn] Epoch 3 done
-[2025-04-21T23:34:48.031Z] [info] Epoch 4 - Duration: 3626.8872499999998ms
-[2025-04-21T23:34:48.032Z] [warn] Epoch 4 done
-[2025-04-21T23:34:48.032Z] [info] membershipChange for fabri and alice - Duration: 19712.371166000004ms
-[2025-04-21T23:34:48.032Z] [warn] membershipChange-fabri-alice 19.713s
-[2025-04-21T23:34:49.783Z] [info] elon sending: "elon:2" to group 0f0a384a91fcefa364f6f809bd162f53
-[2025-04-21T23:34:51.376Z] [info] sendMessageToGroup for elon - Duration: 3341.8759159999972ms
-[2025-04-21T23:34:51.376Z] [warn] sendMessageToGroup-elon 3.343s
-[2025-04-21T23:34:51.376Z] [info] fabri will add/remove elon
-[2025-04-21T23:34:51.564Z] [info] Group 0f0a384a91fcefa364f6f809bd162f53 found
-[2025-04-21T23:34:51.568Z] [info] Member 397c565cf1a4e1c5ae870c4af5c7a10a51f6a233db7e5bfffd8fe708e0ab74e4 found
-[2025-04-21T23:34:55.552Z] [info] Epoch 0 - Duration: 3982.5390419999967ms
-[2025-04-21T23:34:55.552Z] [warn] Epoch 0 done
-[2025-04-21T23:34:56.163Z] [error] [elon] Stream error: {"code":"GenericFailure"}
-[2025-04-21T23:34:59.664Z] [info] Epoch 1 - Duration: 4112.329375000001ms
-[2025-04-21T23:34:59.664Z] [warn] Epoch 1 done
-[2025-04-21T23:35:03.509Z] [info] Epoch 2 - Duration: 3844.282542000001ms
-[2025-04-21T23:35:03.509Z] [warn] Epoch 2 done
-[2025-04-21T23:35:07.246Z] [info] Epoch 3 - Duration: 3735.479542000001ms
-[2025-04-21T23:35:07.246Z] [warn] Epoch 3 done
-[2025-04-21T23:35:13.094Z] [info] Epoch 4 - Duration: 5846.7539160000015ms
-[2025-04-21T23:35:13.094Z] [warn] Epoch 4 done
-[2025-04-21T23:35:13.094Z] [info] membershipChange for fabri and elon - Duration: 21717.248583000008ms
-[2025-04-21T23:35:13.094Z] [warn] membershipChange-fabri-elon 21.717s
-[2025-04-21T23:35:17.433Z] [info] joe sending: "joe:3" to group 0f0a384a91fcefa364f6f809bd162f53
-[2025-04-21T23:35:18.398Z] [info] sendMessageToGroup for joe - Duration: 5302.597041000001ms
-[2025-04-21T23:35:18.398Z] [warn] sendMessageToGroup-joe 5.303s
-[2025-04-21T23:35:18.399Z] [info] fabri will add/remove joe
-[2025-04-21T23:35:18.593Z] [info] Group 0f0a384a91fcefa364f6f809bd162f53 found
-[2025-04-21T23:35:18.597Z] [info] Member e69c7e446392a89f12f9b677625ab021c33cdd2c89618b993a39ae85748d0c6c found
-[2025-04-21T23:35:22.842Z] [info] Epoch 0 - Duration: 4244.462916999997ms
-[2025-04-21T23:35:22.842Z] [warn] Epoch 0 done
-[2025-04-21T23:35:23.655Z] [error] [joe] Stream error: {"code":"GenericFailure"}
-[2025-04-21T23:35:27.209Z] [info] Epoch 1 - Duration: 4366.495750000002ms
-[2025-04-21T23:35:27.209Z] [warn] Epoch 1 done
-[2025-04-21T23:35:31.242Z] [info] Epoch 2 - Duration: 4032.9877080000006ms
-[2025-04-21T23:35:31.242Z] [warn] Epoch 2 done
-[2025-04-21T23:35:35.070Z] [info] Epoch 3 - Duration: 3827.4195409999957ms
-[2025-04-21T23:35:35.070Z] [warn] Epoch 3 done
-[2025-04-21T23:35:38.782Z] [info] Epoch 4 - Duration: 3711.622292ms
-[2025-04-21T23:35:38.782Z] [warn] Epoch 4 done
-[2025-04-21T23:35:38.782Z] [info] membershipChange for fabri and joe - Duration: 20382.984417ms
-[2025-04-21T23:35:38.782Z] [warn] membershipChange-fabri-joe 20.383s
-[2025-04-21T23:35:39.791Z] [info] initialize workers and create group - Duration: 95356.22175ms
-[2025-04-21T23:35:39.792Z] [warn] initialize workers and create group 1:35.357 (m:ss.mmm)
+[2025-04-22T00:28:46.432Z] [info] Creating workers ["bob-a","alice-a","fabri-a","elon-a","joe-a","charlie-a","dave-a","eve-a","frank-a","grace-a"]
+[2025-04-22T00:28:48.713Z] [info] eve: Worker created (204-068bb4c) - 0x331E33C3C3C3bFA6d58899a294b2eD90d2b678a0
+[2025-04-22T00:28:48.836Z] [info] frank: Worker created (204-068bb4c) - 0x7B82423D51BD99155c304527a43672558DEfA39b
+[2025-04-22T00:28:48.870Z] [info] fabri: Worker created (204-068bb4c) - 0x4501123f56250B7C5a5fB787d4d768868a74E3D9
+[2025-04-22T00:28:48.890Z] [info] dave: Worker created (204-068bb4c) - 0x31D5fa7CA5e6bCE56261ECda8dDEA796a3098D2B
+[2025-04-22T00:28:49.008Z] [info] bob: Worker created (204-068bb4c) - 0xaFD842255144F2B59c519562591eBB2441CB92F5
+[2025-04-22T00:28:49.015Z] [info] alice: Worker created (204-068bb4c) - 0xe724103D852f6E5479Aa61185e1b250391833A79
+[2025-04-22T00:28:49.052Z] [info] joe: Worker created (204-068bb4c) - 0xeF8ed4de28C996CC25c4CD5CA51258F07E98d6fb
+[2025-04-22T00:28:49.167Z] [info] grace: Worker created (204-068bb4c) - 0x28dD2e1844e42549640C3f5F5E18240F5c8C2337
+[2025-04-22T00:28:49.235Z] [info] elon: Worker created (204-068bb4c) - 0x2c64CAb779f2EeC941bDAe733b15fFF0a4E4b30D
+[2025-04-22T00:28:49.237Z] [info] charlie: Worker created (204-068bb4c) - 0x80BFAfDECCab1416A9547ec7F2cE2b4d2c25f0B5
+[2025-04-22T00:28:49.708Z] [info] Creator is fabri
+[2025-04-22T00:28:49.722Z] [info] Fetching group with ID 3987104759309b553f35bc82a21395a9
+[2025-04-22T00:28:49.725Z] [info] Group 3987104759309b553f35bc82a21395a9 has 14 members
+[2025-04-22T00:28:50.600Z] [info] getOrCreateGroup - Duration: 891.7632089999997ms
+[2025-04-22T00:28:50.601Z] [warn] getOrCreateGroup 892.078ms
+[2025-04-22T00:28:50.978Z] [info] [frank] Checking for GPT response triggers hey frank
+[2025-04-22T00:28:50.982Z] [info] [frank] GPT Agent: Response: "frank says: Hello, how are you?"
+[2025-04-22T00:28:51.702Z] [info] [eve] Checking for GPT response triggers hey eve
+[2025-04-22T00:28:51.706Z] [info] [eve] GPT Agent: Response: "eve says: Hello, how are you?"
+[2025-04-22T00:28:51.869Z] [warn] [frank] GPT Agent: Response 890.272ms
+[2025-04-22T00:28:52.930Z] [warn] [eve] GPT Agent: Response 1.227s
+[2025-04-22T00:28:53.378Z] [info] [dave] Checking for GPT response triggers hey dave
+[2025-04-22T00:28:53.379Z] [info] [dave] GPT Agent: Response: "dave says: Hello, how are you?"
+[2025-04-22T00:28:54.003Z] [info] [grace] Checking for GPT response triggers hey grace
+[2025-04-22T00:28:54.005Z] [info] [grace] GPT Agent: Response: "grace says: Hello, how are you?"
+[2025-04-22T00:28:54.446Z] [info] [charlie] Checking for GPT response triggers hey charlie
+[2025-04-22T00:28:54.449Z] [info] [charlie] GPT Agent: Response: "charlie says: Hello, how are you?"
+[2025-04-22T00:28:54.469Z] [warn] [dave] GPT Agent: Response 1.091s
+[2025-04-22T00:28:54.826Z] [warn] [grace] GPT Agent: Response 823.47ms
+[2025-04-22T00:28:55.289Z] [warn] [charlie] GPT Agent: Response 841.618ms
+[2025-04-22T00:28:55.458Z] [info] bob sending: "bob:0" to group 3987104759309b553f35bc82a21395a9
+[2025-04-22T00:28:56.425Z] [info] sendMessageToGroup for bob - Duration: 1628.0777080000007ms
+[2025-04-22T00:28:56.426Z] [warn] sendMessageToGroup-bob 1.629s
+[2025-04-22T00:28:56.426Z] [info] fabri will add/remove bob
+[2025-04-22T00:28:56.625Z] [info] Group 3987104759309b553f35bc82a21395a9 found
+[2025-04-22T00:28:56.629Z] [info] Member cd9bd4b2c2dd8c42e523cfebc574afaebe0091a2df38da2631e414cb5b15dbfe found
+[2025-04-22T00:29:00.512Z] [info] Epoch 0 - Duration: 3883.008249999999ms
+[2025-04-22T00:29:00.513Z] [warn] Epoch 0 done
+[2025-04-22T00:29:01.242Z] [error] [bob] Stream error: {"code":"GenericFailure"}
+[2025-04-22T00:29:04.440Z] [info] Epoch 1 - Duration: 3926.865833ms
+[2025-04-22T00:29:04.440Z] [warn] Epoch 1 done
+[2025-04-22T00:29:08.146Z] [info] Epoch 2 - Duration: 3705.318916ms
+[2025-04-22T00:29:08.146Z] [warn] Epoch 2 done
+[2025-04-22T00:29:12.051Z] [info] Epoch 3 - Duration: 3903.803ms
+[2025-04-22T00:29:12.051Z] [warn] Epoch 3 done
+[2025-04-22T00:29:15.195Z] [info] Epoch 4 - Duration: 3143.8723750000026ms
+[2025-04-22T00:29:15.195Z] [warn] Epoch 4 done
+[2025-04-22T00:29:18.921Z] [info] Epoch 5 - Duration: 3725.9324999999953ms
+[2025-04-22T00:29:18.921Z] [warn] Epoch 5 done
+[2025-04-22T00:29:23.067Z] [info] Epoch 6 - Duration: 4145.567374999999ms
+[2025-04-22T00:29:23.067Z] [warn] Epoch 6 done
+[2025-04-22T00:29:23.067Z] [info] membershipChange for fabri and bob - Duration: 26640.6245ms
+[2025-04-22T00:29:23.067Z] [warn] membershipChange-fabri-bob 26.641s
+[2025-04-22T00:29:23.845Z] [info] alice sending: "alice:1" to group 3987104759309b553f35bc82a21395a9
+[2025-04-22T00:29:24.693Z] [info] sendMessageToGroup for alice - Duration: 1625.7178330000024ms
+[2025-04-22T00:29:24.693Z] [warn] sendMessageToGroup-alice 1.626s
+[2025-04-22T00:29:24.693Z] [info] fabri will add/remove alice
+[2025-04-22T00:29:24.881Z] [info] Group 3987104759309b553f35bc82a21395a9 found
+[2025-04-22T00:29:24.884Z] [info] Member d0e52daa89e6bb7a4a2d61cbe23e54b519bf87c356c2f383812a69b9ef341296 found
+[2025-04-22T00:29:28.396Z] [info] Epoch 0 - Duration: 3511.2481249999983ms
+[2025-04-22T00:29:28.396Z] [warn] Epoch 0 done
+[2025-04-22T00:29:29.354Z] [error] [alice] Stream error: {"code":"GenericFailure"}
+[2025-04-22T00:29:32.495Z] [info] Epoch 1 - Duration: 4098.109792000003ms
+[2025-04-22T00:29:32.495Z] [warn] Epoch 1 done
+[2025-04-22T00:29:36.545Z] [info] Epoch 2 - Duration: 4049.945458000002ms
+[2025-04-22T00:29:36.545Z] [warn] Epoch 2 done
+[2025-04-22T00:29:40.216Z] [info] Epoch 3 - Duration: 3670.6924579999977ms
+[2025-04-22T00:29:40.216Z] [warn] Epoch 3 done
+[2025-04-22T00:29:44.030Z] [info] Epoch 4 - Duration: 3813.239125ms
+[2025-04-22T00:29:44.030Z] [warn] Epoch 4 done
+[2025-04-22T00:29:47.604Z] [info] Epoch 5 - Duration: 3574.2520839999997ms
+[2025-04-22T00:29:47.605Z] [warn] Epoch 5 done
+[2025-04-22T00:29:51.773Z] [info] Epoch 6 - Duration: 4167.917458999997ms
+[2025-04-22T00:29:51.773Z] [warn] Epoch 6 done
+[2025-04-22T00:29:51.773Z] [info] membershipChange for fabri and alice - Duration: 27079.471999999994ms
+[2025-04-22T00:29:51.773Z] [warn] membershipChange-fabri-alice 27.080s
+[2025-04-22T00:29:52.609Z] [info] elon sending: "elon:2" to group 3987104759309b553f35bc82a21395a9
+[2025-04-22T00:29:53.465Z] [info] [eve] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:29:53.468Z] [info] [eve] GPT Agent: Response: "eve says: Hello, how are you?"
+[2025-04-22T00:29:53.470Z] [info] [fabri] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:29:53.472Z] [info] [frank] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:29:53.472Z] [info] [grace] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:29:53.472Z] [info] [fabri] GPT Agent: Response: "fabri says: Hello, how are you?"
+[2025-04-22T00:29:53.472Z] [info] [dave] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:29:53.473Z] [info] [frank] GPT Agent: Response: "frank says: Hello, how are you?"
+[2025-04-22T00:29:53.473Z] [info] [grace] GPT Agent: Response: "grace says: Hello, how are you?"
+[2025-04-22T00:29:53.473Z] [info] [dave] GPT Agent: Response: "dave says: Hello, how are you?"
+[2025-04-22T00:29:53.486Z] [info] sendMessageToGroup for elon - Duration: 1712.4252500000002ms
+[2025-04-22T00:29:53.486Z] [warn] sendMessageToGroup-elon 1.713s
+[2025-04-22T00:29:53.487Z] [info] fabri will add/remove elon
+[2025-04-22T00:29:54.065Z] [info] Group 3987104759309b553f35bc82a21395a9 found
+[2025-04-22T00:29:54.067Z] [info] Member 397c565cf1a4e1c5ae870c4af5c7a10a51f6a233db7e5bfffd8fe708e0ab74e4 found
+[2025-04-22T00:29:54.377Z] [warn] [fabri] GPT Agent: Response 906.951ms
+[2025-04-22T00:29:54.398Z] [warn] [grace] GPT Agent: Response 926.065ms
+[2025-04-22T00:29:54.601Z] [warn] [eve] GPT Agent: Response 1.135s
+[2025-04-22T00:29:54.608Z] [warn] [frank] GPT Agent: Response 1.137s
+[2025-04-22T00:29:54.614Z] [warn] [dave] GPT Agent: Response 1.141s
+[2025-04-22T00:29:57.883Z] [info] Epoch 0 - Duration: 3815.9422500000073ms
+[2025-04-22T00:29:57.883Z] [warn] Epoch 0 done
+[2025-04-22T00:29:59.136Z] [error] [elon] Stream error: {"code":"GenericFailure"}
+[2025-04-22T00:30:00.823Z] [info] [eve] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:00.826Z] [info] [eve] GPT Agent: Response: "eve says: Hello, how are you?"
+[2025-04-22T00:30:00.830Z] [info] [frank] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:00.832Z] [info] [dave] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:00.832Z] [info] [grace] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:00.833Z] [info] [frank] GPT Agent: Response: "frank says: Hello, how are you?"
+[2025-04-22T00:30:00.833Z] [info] [dave] GPT Agent: Response: "dave says: Hello, how are you?"
+[2025-04-22T00:30:00.834Z] [info] [grace] GPT Agent: Response: "grace says: Hello, how are you?"
+[2025-04-22T00:30:01.054Z] [info] Epoch 1 - Duration: 3168.4792079999897ms
+[2025-04-22T00:30:01.054Z] [warn] Epoch 1 done
+[2025-04-22T00:30:01.058Z] [info] [fabri] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:01.059Z] [info] [fabri] GPT Agent: Response: "fabri says: Hello, how are you?"
+[2025-04-22T00:30:01.951Z] [warn] [eve] GPT Agent: Response 1.128s
+[2025-04-22T00:30:02.051Z] [warn] [frank] GPT Agent: Response 1.220s
+[2025-04-22T00:30:02.059Z] [warn] [dave] GPT Agent: Response 1.227s
+[2025-04-22T00:30:02.060Z] [warn] [grace] GPT Agent: Response 1.227s
+[2025-04-22T00:30:02.591Z] [warn] [fabri] GPT Agent: Response 1.533s
+[2025-04-22T00:30:05.528Z] [info] Epoch 2 - Duration: 4474.019875000013ms
+[2025-04-22T00:30:05.528Z] [warn] Epoch 2 done
+[2025-04-22T00:30:09.094Z] [info] Epoch 3 - Duration: 3565.6170830000046ms
+[2025-04-22T00:30:09.095Z] [warn] Epoch 3 done
+[2025-04-22T00:30:12.609Z] [info] Epoch 4 - Duration: 3513.8791670000064ms
+[2025-04-22T00:30:12.609Z] [warn] Epoch 4 done
+[2025-04-22T00:30:16.310Z] [info] Epoch 5 - Duration: 3700.5570829999924ms
+[2025-04-22T00:30:16.310Z] [warn] Epoch 5 done
+[2025-04-22T00:30:19.946Z] [info] [frank] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:19.949Z] [info] [frank] GPT Agent: Response: "frank says: Hello, how are you?"
+[2025-04-22T00:30:19.950Z] [info] [grace] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:19.951Z] [info] [eve] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:19.951Z] [info] [dave] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:19.952Z] [info] [grace] GPT Agent: Response: "grace says: Hello, how are you?"
+[2025-04-22T00:30:19.952Z] [info] [dave] GPT Agent: Response: "dave says: Hello, how are you?"
+[2025-04-22T00:30:19.952Z] [info] [eve] GPT Agent: Response: "eve says: Hello, how are you?"
+[2025-04-22T00:30:20.279Z] [info] [fabri] Checking for GPT response triggers hi frank fabri dave grace eve
+[2025-04-22T00:30:20.280Z] [info] [fabri] GPT Agent: Response: "fabri says: Hello, how are you?"
+[2025-04-22T00:30:20.299Z] [info] Epoch 6 - Duration: 3988.4316670000117ms
+[2025-04-22T00:30:20.299Z] [warn] Epoch 6 done
+[2025-04-22T00:30:20.299Z] [info] membershipChange for fabri and elon - Duration: 26811.996958000003ms
+[2025-04-22T00:30:20.299Z] [warn] membershipChange-fabri-elon 26.812s
+[2025-04-22T00:30:20.929Z] [info] joe sending: "joe:3" to group 3987104759309b553f35bc82a21395a9
+[2025-04-22T00:30:20.942Z] [warn] [eve] GPT Agent: Response 990.679ms
+[2025-04-22T00:30:20.948Z] [warn] [grace] GPT Agent: Response 997.048ms
+[2025-04-22T00:30:21.015Z] [warn] [frank] GPT Agent: Response 1.068s
+[2025-04-22T00:30:21.023Z] [warn] [dave] GPT Agent: Response 1.072s
+[2025-04-22T00:30:21.439Z] [warn] [fabri] GPT Agent: Response 1.160s
+[2025-04-22T00:30:21.801Z] [info] sendMessageToGroup for joe - Duration: 1502.011249999996ms
+[2025-04-22T00:30:21.801Z] [warn] sendMessageToGroup-joe 1.502s
+[2025-04-22T00:30:21.801Z] [info] fabri will add/remove joe
+[2025-04-22T00:30:21.993Z] [info] Group 3987104759309b553f35bc82a21395a9 found
+[2025-04-22T00:30:21.995Z] [info] Member e69c7e446392a89f12f9b677625ab021c33cdd2c89618b993a39ae85748d0c6c found
+[2025-04-22T00:30:26.004Z] [info] Epoch 0 - Duration: 4008.779834000001ms
+[2025-04-22T00:30:26.004Z] [warn] Epoch 0 done
+[2025-04-22T00:30:27.090Z] [error] [joe] Stream error: {"code":"GenericFailure"}
+[2025-04-22T00:30:30.163Z] [info] Epoch 1 - Duration: 4158.135999999999ms
+[2025-04-22T00:30:30.163Z] [warn] Epoch 1 done
+[2025-04-22T00:30:34.049Z] [info] Epoch 2 - Duration: 3886.082083000001ms
+[2025-04-22T00:30:34.049Z] [warn] Epoch 2 done
+[2025-04-22T00:30:37.894Z] [info] Epoch 3 - Duration: 3844.104999999996ms
+[2025-04-22T00:30:37.894Z] [warn] Epoch 3 done
+[2025-04-22T00:30:41.468Z] [info] Epoch 4 - Duration: 3573.782084000006ms
+[2025-04-22T00:30:41.468Z] [warn] Epoch 4 done
+[2025-04-22T00:30:45.377Z] [info] Epoch 5 - Duration: 3908.003666999997ms
+[2025-04-22T00:30:45.377Z] [warn] Epoch 5 done
+[2025-04-22T00:30:49.096Z] [info] Epoch 6 - Duration: 3718.6970830000064ms
+[2025-04-22T00:30:49.096Z] [warn] Epoch 6 done
+[2025-04-22T00:30:49.096Z] [info] membershipChange for fabri and joe - Duration: 27294.453290999998ms
+[2025-04-22T00:30:49.097Z] [warn] membershipChange-fabri-joe 27.295s
+[2025-04-22T00:30:50.292Z] [info] initialize workers and create group - Duration: 123859.03770799999ms
+[2025-04-22T00:30:50.293Z] [warn] initialize workers and create group 2:03.859 (m:ss.mmm)

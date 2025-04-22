@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { appendToEnv } from "@helpers/tests";
+import { appendToEnv, sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
@@ -47,8 +47,9 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    let epochs = 4;
+    let epochs = 6;
     const testWorkers = ["bob", "alice", "elon", "joe"];
+    await forkCheck(globalGroup, allWorkers, testWorkers);
     for (let i = 0; i < testWorkers.length; i++) {
       let currentWorker = allWorkers.find((w) => w.name === testWorkers[i]);
       if (!currentWorker) {
@@ -73,6 +74,17 @@ describe(TEST_NAME, () => {
     console.timeEnd("initialize workers and create group");
   });
 });
+
+const forkCheck = async (
+  group: Group,
+  allWorkers: Worker[],
+  testWorkers: string[],
+) => {
+  let excludedWorkers = allWorkers.filter((w) => !testWorkers.includes(w.name));
+  for (let i = 0; i < excludedWorkers.length; i++) {
+    await group.send("hey " + excludedWorkers[i].name);
+  }
+};
 
 const getOrCreateGroup = async (
   creator: Client,
