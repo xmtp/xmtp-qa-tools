@@ -11,7 +11,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import type { typeofStream, WorkerBase } from "./manager";
+import type { typeOfResponse, typeofStream, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -102,7 +102,7 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
-  private gptEnabled: boolean;
+  private typeOfResponse: typeOfResponse;
   private folder: string;
   private sdkVersion: string;
   private libXmtpVersion: string;
@@ -118,7 +118,7 @@ export class WorkerClient extends Worker {
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
-    gptEnabled: boolean,
+    typeOfResponse: typeOfResponse,
     env: XmtpEnv,
     options: WorkerOptions = {},
   ) {
@@ -128,7 +128,7 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
 
-    this.gptEnabled = gptEnabled;
+    this.typeOfResponse = typeOfResponse;
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
@@ -226,10 +226,6 @@ export class WorkerClient extends Worker {
    * Unified method to start the appropriate stream based on configuration
    */
   private async startStream() {
-    if (!this.typeofStream || this.typeofStream === "none") {
-      return;
-    }
-
     try {
       switch (this.typeofStream) {
         case "message":
@@ -259,7 +255,10 @@ export class WorkerClient extends Worker {
    */
   private async initMessageStream() {
     this.activeStream = await this.client.conversations.streamAllMessages();
-
+    if (this.activeStream === undefined) {
+      console.error(`[${this.nameId}] Failed to create message stream`);
+      return;
+    }
     // Process messages asynchronously
     void (async () => {
       try {
@@ -277,8 +276,9 @@ export class WorkerClient extends Worker {
           }
 
           // Check for GPT response triggers
+          console.log("this.typeOfResponse", this.nameId, this.typeOfResponse);
           if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
-            await this.handleGptResponse(message as DecodedMessage);
+            await this.handleResponse(message as DecodedMessage);
             continue;
           }
 
@@ -309,7 +309,8 @@ export class WorkerClient extends Worker {
    * Check if a message should trigger a GPT response
    */
   private shouldGenerateGptResponse(message: DecodedMessage): boolean {
-    if (!this.gptEnabled) return false;
+    console.log("this.typeOfResponse", this.typeOfResponse);
+    if (this.typeOfResponse === "none") return false;
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
     );
@@ -331,7 +332,7 @@ export class WorkerClient extends Worker {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleGptResponse(message: DecodedMessage) {
+  private async handleResponse(message: DecodedMessage) {
     console.time(`[${this.nameId}] GPT Agent: Response`);
 
     try {
@@ -340,24 +341,30 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
 
-      const messages = await conversation?.messages();
-      const baseName = this.name.split("-")[0].toLowerCase();
+      if (this.typeOfResponse === "gpt") {
+        const messages = await conversation?.messages();
+        const baseName = this.name.split("-")[0].toLowerCase();
+        // Generate a response using OpenAI
+        const response = await this.generateOpenAIResponse(
+          message.content as string,
+          messages ?? [],
+          baseName,
+        );
 
-      // Generate a response using OpenAI
-      const response = await this.generateOpenAIResponse(
-        message.content as string,
-        messages ?? [],
-        baseName,
-      );
+        console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
 
-      console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
-
-      // Send the response
-      await conversation?.send(response);
+        // Send the response
+        await conversation?.send(response);
+      } else {
+        await conversation?.send(this.nameId + " says: gm");
+      }
     } catch (error) {
-      console.error(`[${this.nameId}] Error generating GPT response:`, error);
+      console.error(
+        `[${this.nameId}] Error generating stream response:`,
+        error,
+      );
     } finally {
-      console.timeEnd(`[${this.nameId}] GPT Agent: Response`);
+      console.timeEnd(`[${this.nameId}] Response`);
     }
   }
 

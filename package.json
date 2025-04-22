@@ -99,7 +99,7 @@
     },
     "@xmtp/node-sdk@2.0.4": {
       "dependencies": {
-        "@xmtp/node-bindings": "1.2.0-dev.c24af30"
+        "@xmtp/node-bindings": "1.2.0-dev.068bb4c"
       }
     },
     "@xmtp/mls-client@0.0.9": {
