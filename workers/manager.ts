@@ -261,7 +261,7 @@ export class WorkerManager {
     const workerClient = new WorkerClient(
       workerData,
       this.typeofStream,
-      this.typeOfResponse === "gm",
+      this.typeOfResponse,
       this.env,
     );
 
