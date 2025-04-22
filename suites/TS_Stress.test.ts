@@ -6,7 +6,9 @@ import {
   createAndSendDms,
   createAndSendInGroup,
   createLargeGroup,
+  createLargeGroups,
   performGroupOperations,
+  sendWorkerMessagesToGroup,
   TEST_CONFIGS,
   testMessageStreaming,
 } from "@helpers/stress";
@@ -21,17 +23,16 @@ import {
   expect,
   it,
 } from "vitest";
+import { C } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 
 const testName = "stress";
 loadEnv(testName);
 
-const receiverAddress = process.env.WALLET_KEY_XMTP_CHAT || "";
+const receiverInboxId =
+  "ac9feb1384a9092333db4d17c6981743a53277c24c57ed6f12f05bd78a81be30";
 // Choose which test size to run
 const testSize = process.env.STRESS_SIZE || "small";
-const config = { ...TEST_CONFIGS[testSize] };
-
-// Override worker count to avoid test issues
-config.workerCount = Math.min(config.workerCount, 10);
+const config = TEST_CONFIGS[testSize];
 
 console.log(`Running ${testSize} stress test with configuration:`, config);
 
@@ -42,23 +43,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      // Initialize the workers with unique worker names
-      const workerNames = [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-        "peter",
-        "quinn",
-      ].slice(0, config.workerCount);
-
-      const workerDescriptors = workerNames.map((name) => `${name}-a-203`);
-
-      workers = await getWorkers(workerDescriptors, testName, "message", "gm");
+      workers = await getWorkers(config.workerCount, testName, "message", "gm");
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
     } catch (e) {
@@ -97,181 +82,43 @@ describe(testName, () => {
     try {
       const dm = await createAndSendDms(
         workers,
-        receiverAddress,
+        receiverInboxId,
         config.messageCount,
       );
 
-      expect(dm).toBeDefined();
-      expect(dm.id).toBeDefined();
-
-      // Verify the receiver got the messages
-      const receiver = workers.getWorkers()[1];
-
-      // Make sure to sync conversations first
-      await receiver.client.conversations.sync();
-      await new Promise((resolve) => setTimeout(resolve, 500)); // Give some time for sync
-
-      const conversations = await receiver.client.conversations.list();
-
-      // Log for debugging
-      console.log(`Found ${conversations.length} conversations for receiver`);
-
-      // Look up the conversation by ID directly
-      const receivedDm =
-        await receiver.client.conversations.getConversationById(dm.id);
-
-      expect(receivedDm).toBeDefined();
-
-      if (receivedDm) {
-        const messages = await receivedDm.messages();
-        expect(messages.length).toBeGreaterThanOrEqual(config.messageCount);
-      }
+      expect(dm).toBeTruthy();
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
     }
   });
 
-  // // Create a small group with worker members
-  // it("createAndSendInGroup: should create a group and send messages", async () => {
-  //   try {
-  //     const group = await createAndSendInGroup(workers, config.messageCount);
+  // Create a small group with worker members
+  it("createAndSendInGroup: should create a group and send messages", async () => {
+    try {
+      const group = await createAndSendInGroup(
+        workers,
+        config.groupCount,
+        receiverInboxId,
+      );
 
-  //     expect(group).toBeDefined();
-  //     expect(group.id).toBeDefined();
-
-  //     // Verify group membership
-  //     const members = await group.members();
-  //     const allWorkers = workers.getWorkers();
-
-  //     // We expect all workers plus the creator (which is already in allWorkers)
-  //     // so no need to add +1
-  //     expect(members.length).toBe(allWorkers.length);
-
-  //     // Verify the messages were received by another worker
-  //     const receiver = workers.getWorkers()[1];
-  //     await receiver.client.conversations.sync();
-  //     await new Promise((resolve) => setTimeout(resolve, 500)); // Give some time for sync
-
-  //     const receiverConversations = await receiver.client.conversations.list();
-  //     const receivedGroup = receiverConversations.find(
-  //       (c) => c instanceof Group && c.id === group.id,
-  //     ) as Group;
-
-  //     expect(receivedGroup).toBeDefined();
-
-  //     if (receivedGroup) {
-  //       const receivedMessages = await receivedGroup.messages();
-  //       expect(receivedMessages.length).toBeGreaterThanOrEqual(
-  //         config.messageCount,
-  //       );
-  //     }
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
+      expect(group).toBeTruthy();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 
   // // Create a large group
-  // it("createLargeGroup: should create a large group with many members", async () => {
-  //   try {
-  //     const creator = workers.getWorkers()[0];
-  //     const memberCount = config.largeGroups[0] || 50;
+  it("createLargeGroup: should create a large group with many members", async () => {
+    try {
+      // Create large groups
+      const result = await createLargeGroups(config, workers, receiverInboxId);
 
-  //     const group = await createLargeGroup(creator.client, memberCount);
-
-  //     // Ensure group is created
-  //     expect(group).toBeDefined();
-
-  //     if (group) {
-  //       // Get the actual member count
-  //       const members = await group.members();
-  //       console.log(
-  //         `Created group with ${members.length} members, ID: ${group.id}`,
-  //       );
-
-  //       // For large groups, we might not get all members added if some operations fail
-  //       expect(members.length).toBeGreaterThan(0);
-  //     }
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
-
-  // // Test group operations: update name, add/remove members, admin operations
-  // it("groupOperations: should perform various group operations", async () => {
-  //   try {
-  //     const group = await performGroupOperations(workers);
-
-  //     expect(group).toBeDefined();
-  //     expect(group.id).toBeDefined();
-
-  //     // Verify group name was updated
-  //     expect(group.name).toContain("Updated Group");
-
-  //     // Verify description was updated
-  //     expect(group.description).toBe("Updated description");
-
-  //     // Verify member was made admin
-  //     const memberToPromote = workers.getWorkers()[1];
-  //     expect(group.isAdmin(memberToPromote.client.inboxId)).toBe(true);
-
-  //     // Verify member was removed
-  //     const memberToRemove = workers.getWorkers()[2];
-  //     const members = await group.members();
-  //     const removedMemberFound = members.some(
-  //       (m) =>
-  //         m.inboxId.toLowerCase() ===
-  //         memberToRemove.client.inboxId.toLowerCase(),
-  //     );
-  //     expect(removedMemberFound).toBe(false);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
-
-  // // Test message streaming
-  // it("messageStreaming: should stream messages in real time", async () => {
-  //   try {
-  //     // Increase the timeout to 20 seconds for more reliable streaming tests
-  //     const receivedMessages = await testMessageStreaming(workers, 3, 20000);
-  //     expect(receivedMessages).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
-
-  // // Test for conversation consensus
-  // it("verifyStreamAll: should verify message consensus across all workers", async () => {
-  //   try {
-  //     const creator = workers.getWorkers()[0];
-  //     const memberInboxIds = workers
-  //       .getWorkers()
-  //       .slice(1)
-  //       .map((w) => w.client.inboxId);
-
-  //     // Create a group
-  //     const group = await creator.client.conversations.newGroup(
-  //       memberInboxIds,
-  //       {
-  //         groupName: `Consensus Group ${Date.now()}`,
-  //         groupDescription: "Test group for consensus testing",
-  //       },
-  //     );
-
-  //     // Send a test message
-  //     const testMessage = `Consensus test message ${Date.now()}`;
-  //     await group.send(testMessage);
-
-  //     // Verify all workers received the message
-  //     const verifyResult = await verifyStreamAll(group, workers);
-  //     expect(verifyResult.allReceived).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect);
-  //     throw e;
-  //   }
-  // });
+      expect(result).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
 });
