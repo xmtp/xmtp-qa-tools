@@ -1,12 +1,160 @@
 import { loadEnv } from "@helpers/client";
-import { handleStressCommand } from "@helpers/stress";
-import { getWorkers } from "@workers/manager";
-import { type Client } from "@xmtp/node-sdk";
+import {
+  createGroupsWithWorkers,
+  createLargeGroups,
+  sendDmsFromWorkers,
+  TEST_CONFIGS,
+  type StressTestConfig,
+} from "@helpers/stress";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import {
+  type Client,
+  type Conversation,
+  type DecodedMessage,
+} from "@xmtp/node-sdk";
 
 const testName = "stress-bot";
 loadEnv(testName);
 
 let isStressTestRunning = false;
+
+export const HELP_TEXT = `Stress bot commands:
+/stress <size> - Start a stress test with predefined parameters
+
+Size options:
+- small: Creates a group with 20 members, 3 workers, 5 messages each
+- medium: Creates a group with 50 members, 5 workers, 10 messages each
+- large: Creates a group with 100 members, 10 workers, 15 messages each
+
+Examples:
+/stress small - Run a small test ~ 20 conversations
+/stress medium - Run a medium test ~ 50 conversations
+/stress large - Run a large test ~ 100 conversations`;
+
+/**
+ * Run a complete stress test based on configuration
+ */
+export async function runStressTest(
+  config: StressTestConfig,
+  workers: WorkerManager,
+  client: Client,
+  receiverInboxId: string,
+  conversation?: Conversation,
+  message?: DecodedMessage,
+) {
+  const startTime = Date.now();
+
+  try {
+    if (conversation) {
+      await conversation.send("🚀 Running stress test...");
+    }
+
+    // Send DMs from workers to sender (if message provided)
+    if (message && conversation) {
+      await sendDmsFromWorkers(workers, message.senderInboxId, conversation);
+    }
+
+    // Create large groups
+    await createLargeGroups(config, workers, receiverInboxId, conversation);
+
+    // Create groups with workers and send messages to them
+    await createGroupsWithWorkers(
+      workers,
+      client,
+      config,
+      message?.senderInboxId,
+      conversation,
+    );
+
+    const endTime = Date.now();
+    const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+    if (conversation) {
+      await conversation.send(
+        `✅ Stress test completed in ${duration} seconds!`,
+      );
+    }
+
+    return true;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error("Error during stress test:", errorMessage);
+
+    if (conversation) {
+      await conversation.send(`❌ Stress test failed: ${errorMessage}`);
+    }
+
+    return false;
+  }
+}
+
+/**
+ * Handle message commands for the stress bot
+ */
+export async function handleStressCommand(
+  message: DecodedMessage,
+  conversation: Conversation,
+  client: Client,
+  isStressTestRunning: boolean,
+): Promise<boolean> {
+  const workers = await getWorkers(
+    TEST_CONFIGS.small.workerCount,
+    "stress",
+    "message",
+    "gm",
+  );
+  const content = message.content as string;
+  const args = content.split(" ");
+  const command = args[0].toLowerCase();
+
+  // Only handle /stress commands
+  if (command !== "/stress") {
+    await conversation.send(HELP_TEXT);
+    return false;
+  }
+
+  if (isStressTestRunning) {
+    await conversation.send(
+      "⚠️ A stress test is already running. Please either:\n" +
+        "1. Wait for it to complete, or\n" +
+        "2. Use `/stress reset` to force stop all tests",
+    );
+    return false;
+  }
+
+  if (args.length < 2) {
+    await conversation.send(HELP_TEXT);
+    return false;
+  }
+
+  const sizeArg = args[1].toLowerCase();
+  if (!["small", "medium", "large"].includes(sizeArg)) {
+    await conversation.send(
+      "⚠️ Invalid size option. Use 'small', 'medium', or 'large'.\n" +
+        HELP_TEXT,
+    );
+    return false;
+  }
+
+  const config = TEST_CONFIGS[sizeArg];
+  const receiverInboxId = message.senderInboxId;
+  if (config) {
+    return await runStressTest(
+      config,
+      workers,
+      client,
+      receiverInboxId,
+      conversation,
+      message,
+    );
+  } else {
+    await conversation.send(
+      "⚠️ Invalid command format. Use /stress <size>\n" +
+        "Size options: small, medium, or large",
+    );
+    return false;
+  }
+}
 
 async function initializeBot() {
   const botWorker = await getWorkers(["bot"], testName, "none");

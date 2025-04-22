@@ -1,19 +1,13 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { verifyStreamAll } from "@helpers/streams";
 import {
   createAndSendDms,
   createAndSendInGroup,
-  createLargeGroup,
   createLargeGroups,
-  performGroupOperations,
-  sendWorkerMessagesToGroup,
   TEST_CONFIGS,
-  testMessageStreaming,
 } from "@helpers/stress";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { Dm, Group } from "@xmtp/node-sdk";
 import {
   afterAll,
   afterEach,
@@ -23,7 +17,6 @@ import {
   expect,
   it,
 } from "vitest";
-import { C } from "vitest/dist/chunks/reporters.d.CfRkRKN2.js";
 
 const testName = "stress";
 loadEnv(testName);
