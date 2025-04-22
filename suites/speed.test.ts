@@ -19,7 +19,7 @@ describe(testName, () => {
 
   it("should measure response time from app", async () => {
     // Initialize workers
-    workers = await getWorkers(["alice"], testName, "none", false);
+    workers = await getWorkers(["alice"], testName, "none");
     const sender = workers.get("alice");
 
     if (!sender) {

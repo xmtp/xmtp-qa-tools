@@ -10,12 +10,13 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  workers: 5,
+  epochs: parseInt(process.env.EPOCHS as string),
+  workers: parseInt(process.env.WORKERS as string),
   manualUsers: {
     USER_CONVOS: process.env.USER_CONVOS,
+    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
     USER_CB_WALLET: process.env.USER_CB_WALLET,
     USER_XMTPCHAT: process.env.USER_XMTPCHAT,
-    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
   },
   groupId: process.env.GROUP_ID,
 };
@@ -33,7 +34,7 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME);
+    workers = await getWorkers(testConfig.workers, TEST_NAME, "message", "gm");
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     console.log("Creator is", creator.name);
@@ -47,7 +48,6 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    let epochs = 4;
     for (let i = 0; i < testConfig.workers; i++) {
       let currentWorker = allWorkers[i];
       if (currentWorker.name === creator.name) continue;
@@ -57,7 +57,12 @@ describe(TEST_NAME, () => {
         globalGroup.id,
         currentWorker.name + ":" + String(i),
       );
-      await membershipChange(globalGroup.id, creator, currentWorker, epochs);
+      await membershipChange(
+        globalGroup.id,
+        creator,
+        currentWorker,
+        testConfig.epochs,
+      );
     }
 
     await globalGroup.send(creator.name + " : Done");
@@ -74,39 +79,54 @@ const getOrCreateGroup = async (
   creator: Client,
   addedMembers: string[],
 ): Promise<Conversation | undefined> => {
-  const start = performance.now();
-  console.time("getOrCreateGroup");
+  try {
+    const start = performance.now();
+    console.time("getOrCreateGroup");
 
-  let group: Group;
+    let group: Group;
 
-  if (!testConfig.groupId) {
-    console.log(`Creating group with ${addedMembers.length} members`);
-    group = await creator.conversations.newGroup(addedMembers);
-    appendToEnv("GROUP_ID", group.id, testConfig.testName);
-  } else {
-    console.log(`Fetching group with ID ${testConfig.groupId}`);
-    group = (await creator.conversations.getConversationById(
-      testConfig.groupId,
-    )) as Group;
+    if (!testConfig.groupId) {
+      console.log(`Creating group with ${addedMembers.length} members`);
+      group = await creator.conversations.newGroup([]);
+      for (const member of addedMembers) {
+        try {
+          await group.addMembers([member]);
+        } catch (e) {
+          console.error(
+            `Error adding member ${member} to group ${group.id}:`,
+            e,
+          );
+        }
+      }
+      appendToEnv("GROUP_ID", group.id, testConfig.testName);
+    } else {
+      console.log(`Fetching group with ID ${testConfig.groupId}`);
+      group = (await creator.conversations.getConversationById(
+        testConfig.groupId,
+      )) as Group;
+    }
+
+    const members = await group.members();
+    console.log(`Group ${group.id} has ${members.length} members`);
+
+    const time = new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+
+    await group.updateName("Fork group " + time);
+    await group.send("Starting run for " + time);
+
+    const end = performance.now();
+    console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
+    console.timeEnd("getOrCreateGroup");
+
+    return group;
+  } catch (e) {
+    console.error(`Error creating group:`, e);
+    throw e;
   }
-
-  const members = await group.members();
-  console.log(`Group ${group.id} has ${members.length} members`);
-
-  const time = new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  await group.updateName("Fork group " + time);
-  await group.send("Starting run for " + time);
-
-  const end = performance.now();
-  console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
-  console.timeEnd("getOrCreateGroup");
-
-  return group;
 };
 
 /**

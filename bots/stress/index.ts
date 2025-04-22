@@ -55,7 +55,7 @@ interface GeneratedInbox {
 }
 
 async function initializeBot() {
-  const botWorker = await getWorkers(["bot"], testName, "message", false);
+  const botWorker = await getWorkers(["bot"], testName, "message", "gpt");
   const bot = botWorker.get("bot");
   const client = bot?.client as Client;
 
@@ -180,7 +180,7 @@ async function runStressTest(
   try {
     await conversation.send("🚀 Initializing workers...");
 
-    workers = await getWorkers(config.workerCount, testName, "message", true);
+    workers = await getWorkers(config.workerCount, testName, "message", "gpt");
     console.log(
       `Successfully initialized ${workers.getWorkers().length} workers`,
     );

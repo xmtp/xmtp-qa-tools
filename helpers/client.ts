@@ -108,16 +108,7 @@ export const regressionClient = async (
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 202) {
-    const signer = createSigner200(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey: encryptionKey,
-      dbPath,
-      env,
-    });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 203) {
+  } else if (sdkVersion > 200) {
     const signer = createSigner200(walletKey);
     // @ts-expect-error: SDK version compatibility issues
     client = await ClientClass.create(signer, {

@@ -33,6 +33,12 @@ import {
   Group as Group203,
 } from "@xmtp/node-sdk-203";
 import {
+  Client as Client204,
+  Conversation as Conversation204,
+  Dm as Dm204,
+  Group as Group204,
+} from "@xmtp/node-sdk-204";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -45,74 +51,6 @@ export type GroupMetadataContent = {
   }>;
 };
 
-// Default worker names
-const defaultNames = [
-  "bob",
-  "alice",
-  "fabri",
-  "elon",
-  "joe",
-  "charlie",
-  "dave",
-  "rosalie",
-  "eve",
-  "frank",
-  "grace",
-  "henry",
-  "ivy",
-  "jack",
-  "karen",
-  "larry",
-  "mary",
-  "nancy",
-  "oscar",
-  "paul",
-  "quinn",
-  "rachel",
-  "steve",
-  "tom",
-  "ursula",
-  "victor",
-  "wendy",
-  "xavier",
-  "yolanda",
-  "zack",
-  "adam",
-  "bella",
-  "carl",
-  "diana",
-  "eric",
-  "fiona",
-  "george",
-  "hannah",
-  "ian",
-  "julia",
-  "keith",
-  "lisa",
-  "mike",
-  "nina",
-  "oliver",
-  "penny",
-  "quentin",
-  "rosa",
-  "sam",
-  "tina",
-  "uma",
-  "vince",
-  "walt",
-  "xena",
-  "yara",
-  "zara",
-  "guada", // max 61
-];
-
-export const defaultValues = {
-  amount: 5,
-  timeout: 40000,
-  perMessageTimeout: 3000,
-  defaultNames,
-};
-
 // Logging interface
 export interface LogInfo {
   timestamp: string;
@@ -120,7 +58,7 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = [100, 105, 202, 203];
+export const sdkVersionOptions = [100, 105, 202, 203, 204];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -183,6 +121,16 @@ export const sdkVersions = {
     bindingsPackage: "node-bindings-120-2",
     sdkVersion: "2.0.3",
     libXmtpVersion: "c24af30",
+  },
+  204: {
+    Client: Client204,
+    Conversation: Conversation204,
+    Dm: Dm204,
+    Group: Group204,
+    sdkPackage: "node-sdk-204",
+    bindingsPackage: "node-bindings-120-3",
+    sdkVersion: "2.0.4",
+    libXmtpVersion: "068bb4c",
   },
 };
 
@@ -595,3 +543,71 @@ export function calculateMessageStats(
     totalExpectedMessages,
   };
 }
+
+// Default worker names
+const defaultNames = [
+  "bob",
+  "alice",
+  "fabri",
+  "elon",
+  "joe",
+  "charlie",
+  "dave",
+  "rosalie",
+  "eve",
+  "frank",
+  "grace",
+  "henry",
+  "ivy",
+  "jack",
+  "karen",
+  "larry",
+  "mary",
+  "nancy",
+  "oscar",
+  "paul",
+  "quinn",
+  "rachel",
+  "steve",
+  "tom",
+  "ursula",
+  "victor",
+  "wendy",
+  "xavier",
+  "yolanda",
+  "zack",
+  "adam",
+  "bella",
+  "carl",
+  "diana",
+  "eric",
+  "fiona",
+  "george",
+  "hannah",
+  "ian",
+  "julia",
+  "keith",
+  "lisa",
+  "mike",
+  "nina",
+  "oliver",
+  "penny",
+  "quentin",
+  "rosa",
+  "sam",
+  "tina",
+  "uma",
+  "vince",
+  "walt",
+  "xena",
+  "yara",
+  "zara",
+  "guada", // max 61
+];
+
+export const defaultValues = {
+  amount: 5,
+  timeout: 40000,
+  perMessageTimeout: 3000,
+  defaultNames,
+};
