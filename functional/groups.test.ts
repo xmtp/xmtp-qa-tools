@@ -23,6 +23,8 @@ describe(testName, () => {
   const total = 10;
   let hasFailures: boolean = false;
   let start: number;
+  // Create a mapping to store group conversations by size
+  const groupsBySize: Record<number, Conversation> = {};
 
   beforeAll(async () => {
     try {
@@ -74,16 +76,15 @@ describe(testName, () => {
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {
-    let newGroup: Conversation;
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
         console.log("Creating group with", sliced.length, "participants");
-        newGroup = await workers
+        groupsBySize[i] = await workers
           .get("henry")!
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
-        console.log("Group created", newGroup.id);
-        expect(newGroup.id).toBeDefined();
+        console.log("Group created", groupsBySize[i].id);
+        expect(groupsBySize[i].id).toBeDefined();
       } catch (e) {
         hasFailures = logError(e, expect);
         throw e;
@@ -91,8 +92,8 @@ describe(testName, () => {
     });
     it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       try {
-        await newGroup.sync();
-        const members = await newGroup.members();
+        await groupsBySize[i].sync();
+        const members = await groupsBySize[i].members();
         expect(members.length).toBe(i + 1);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -102,9 +103,9 @@ describe(testName, () => {
     it(`updateGroupName-${i}: should update the group name`, async () => {
       try {
         const newName = "Large Group";
-        await (newGroup as Group).updateName(newName);
-        await newGroup.sync();
-        const name = (newGroup as Group).name;
+        await (groupsBySize[i] as Group).updateName(newName);
+        await groupsBySize[i].sync();
+        const name = (groupsBySize[i] as Group).name;
         expect(name).toBe(newName);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -113,14 +114,15 @@ describe(testName, () => {
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       try {
-        const previousMembers = await newGroup.members();
-        await (newGroup as Group).removeMembers([
+        const previousMembers = await groupsBySize[i].members();
+        await (groupsBySize[i] as Group).removeMembers([
           previousMembers.filter(
-            (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+            (member) =>
+              member.inboxId !== (groupsBySize[i] as Group).addedByInboxId,
           )[0].inboxId,
         ]);
 
-        const members = await newGroup.members();
+        const members = await groupsBySize[i].members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -132,7 +134,7 @@ describe(testName, () => {
         const groupMessage =
           "gm-" + Math.random().toString(36).substring(2, 15);
 
-        await newGroup.send(groupMessage);
+        await groupsBySize[i].send(groupMessage);
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
@@ -142,7 +144,7 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(newGroup, workers);
+        const verifyResult = await verifyStreamAll(groupsBySize[i], workers);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);

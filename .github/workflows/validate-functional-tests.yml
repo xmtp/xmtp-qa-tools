@@ -23,6 +23,15 @@ jobs:
         env:
           XMTP_ENV: local
           RUST_BACKTRACE: 1
+          # Set this to true to help with debugging in GitHub Actions
+          GITHUB_ACTIONS: true
+          LOGGING_LEVEL: "debug"
         run: |
-          # Use the run-test.sh script to run functional tests with retry logic
+          # Use the updated run-test.sh script to run functional tests with thread pool
           bash scripts/run-test.sh functional
+      - name: Upload reports artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: functional_test_logs
+          path: logs/

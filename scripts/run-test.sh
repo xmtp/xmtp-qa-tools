@@ -17,8 +17,11 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
   
   # Run the test with npx vitest
   if [ "$TEST_NAME" = "functional" ]; then
-    npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false | grep -v "sqlcipher_mem_lock" | grep -v "SQLCIPHER_NO_MLOCK" | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+    # For functional tests, ensure we use proper isolation settings
+    echo "Running functional tests with --pool=threads and sequential execution..."
+    npx vitest run ./functional/*.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false | grep -v "sqlcipher_mem_lock" | grep -v "SQLCIPHER_NO_MLOCK" | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
   else
+    # Other tests can use the forks pool
     npx vitest run $TEST_NAME --pool=forks --fileParallelism=false | grep -v "sqlcipher_mem_lock" | grep -v "SQLCIPHER_NO_MLOCK" | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
   fi
   

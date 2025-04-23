@@ -2,7 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
-const testName = "speed";
+const testName = "ts_speed";
 loadEnv(testName);
 
 describe(testName, () => {

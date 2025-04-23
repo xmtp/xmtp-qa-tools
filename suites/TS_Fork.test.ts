@@ -125,6 +125,11 @@ const getOrCreateGroup = async (
           );
         }
       }
+
+      const name = testConfig.groupName;
+      await group.updateName(name);
+
+      console.log(`Group ${group.id} name updated to ${name}`);
       appendToEnv("GROUP_ID", group.id, testConfig.testName);
     } else {
       console.log(`Fetching group with ID ${testConfig.groupId}`);
@@ -136,16 +141,7 @@ const getOrCreateGroup = async (
     const members = await group.members();
     console.log(`Group ${group.id} has ${members.length} members`);
 
-    const time = new Date().toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-
-    const name = testConfig.groupName;
-    await group.updateName(name);
-    console.log(`Group ${group.id} name updated to ${name}`);
-    await group.send("Starting run: " + name);
+    await group.send("Starting run: " + testConfig.groupName);
 
     const end = performance.now();
     console.log(`getOrCreateGroup - Duration: ${end - start}ms`);

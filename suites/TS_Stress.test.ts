@@ -18,7 +18,7 @@ import {
   it,
 } from "vitest";
 
-const testName = "stress";
+const testName = "ts_stress";
 loadEnv(testName);
 
 const receiverInboxId =
