@@ -49,9 +49,7 @@ export async function runStressTest(
   } catch (error) {
     console.error("Error during stress test:", error);
     if (conversation) {
-      await conversation.send(
-        `❌ Stress test failed while sending DMs: ${error}`,
-      );
+      await conversation.send(`❌ Stress test failed while sending DMs`);
     }
     return false;
   }
@@ -68,9 +66,7 @@ export async function runStressTest(
   } catch (error) {
     console.error("Error during stress test:", error);
     if (conversation) {
-      await conversation.send(
-        `❌ Stress test failed while creating groups: ${error}`,
-      );
+      await conversation.send(`❌ Stress test failed while creating groups`);
     }
     return false;
   }
@@ -82,7 +78,7 @@ export async function runStressTest(
     console.error("Error during stress test:", error);
     if (conversation) {
       await conversation.send(
-        `❌ Stress test failed while creating large groups: ${error}`,
+        `❌ Stress test failed while creating large groups`,
       );
     }
     return false;
@@ -161,6 +157,7 @@ export async function handleStressCommand(
     );
     return false;
   }
+  return true;
 }
 
 async function initializeBot() {
