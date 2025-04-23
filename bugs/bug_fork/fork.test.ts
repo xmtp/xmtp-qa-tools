@@ -1,3 +1,4 @@
+import { workerData } from "node:worker_threads";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -10,14 +11,27 @@ loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  epochs: parseInt(process.env.EPOCHS as string),
-  workers: parseInt(process.env.WORKERS as string),
+  groupName:
+    "Fork group " +
+    new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+  epochs: 3,
+  workers: 10,
   manualUsers: {
-    USER_CONVOS: process.env.USER_CONVOS,
-    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
-    USER_CB_WALLET: process.env.USER_CB_WALLET,
-    USER_XMTPCHAT: process.env.USER_XMTPCHAT,
+    USER_CONVOS:
+      "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
+    USER_CONVOS_DESKTOP:
+      "54f447c03b0fe594d499e685fa390d68b85490856469657babe2c8351dbee33f",
+    USER_CB_WALLET:
+      "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
+    USER_XMTPCHAT:
+      "ac9feb1384a9092333db4d17c6981743a53277c24c57ed6f12f05bd78a81be30",
   },
+  testWorkers: ["bob", "alice", "elon", "joe"],
+  checkWorkers: ["fabri", "eve", "dave", "frank"],
   groupId: process.env.GROUP_ID,
 };
 
@@ -37,10 +51,9 @@ describe(TEST_NAME, () => {
     workers = await getWorkers(testConfig.workers, TEST_NAME, "message", "gm");
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
-    console.log("Creator is", creator.name);
     const allClientIds = [
       ...allWorkers.map((w) => w.client.inboxId),
-      ...(Object.values(testConfig.manualUsers) as string[]),
+      ...Object.values(testConfig.manualUsers),
     ];
 
     globalGroup = (await getOrCreateGroup(
@@ -49,12 +62,9 @@ describe(TEST_NAME, () => {
     )) as Group;
 
     // Perform fork check with selected workers
-    const checkWorkers = ["fabri", "eve", "dave", "frank"];
-    const testWorkers = ["bob", "alice", "elon", "joe"];
-
-    await forkCheck(globalGroup, allWorkers, checkWorkers);
+    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
     let count = 1;
-    for (const workerName of testWorkers) {
+    for (const workerName of testConfig.testWorkers) {
       const currentWorker = allWorkers.find((w) => w.name === workerName);
       if (!currentWorker || currentWorker.name === creator.name) continue;
 
@@ -133,8 +143,10 @@ const getOrCreateGroup = async (
       hour12: false,
     });
 
-    await group.updateName("Fork group " + time);
-    await group.send("Starting run for " + time);
+    const name = testConfig.groupName;
+    await group.updateName(name);
+    console.log(`Group ${group.id} name updated to ${name}`);
+    await group.send("Starting run: " + name);
 
     const end = performance.now();
     console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
