@@ -25,7 +25,7 @@ jobs:
           RUST_BACKTRACE: 1
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
-          LOGGING_LEVEL: "debug"
+          LOGGING_LEVEL: "off"
         run: |
           # Use the updated run-test.sh script to run functional tests with thread pool
           bash scripts/run-test.sh functional
