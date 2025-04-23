@@ -19,17 +19,10 @@ loadEnv(testName);
 let isStressTestRunning = false;
 
 export const HELP_TEXT = `Stress bot commands:
-/stress <size> - Start a stress test with predefined parameters
 
-Size options:
-- small: Creates a group with 20 members, 3 workers, 5 messages each
-- medium: Creates a group with 50 members, 5 workers, 10 messages each
-- large: Creates a group with 100 members, 10 workers, 15 messages each
-
-Examples:
-/stress small - Run a small test ~ 20 conversations
-/stress medium - Run a medium test ~ 50 conversations
-/stress large - Run a large test ~ 100 conversations`;
+/stress small - Run a small test: Creates a group with 20 members, 3 workers, 5 messages each
+/stress medium - Run a medium test: Creates a group with 50 members, 5 workers, 10 messages each
+/stress large - Run a large test: Creates a group with 100 members, 10 workers, 15 messages each`;
 
 /**
  * Run a complete stress test based on configuration
@@ -44,19 +37,26 @@ export async function runStressTest(
 ) {
   const startTime = Date.now();
 
-  try {
-    if (conversation) {
-      await conversation.send("🚀 Running stress test...");
-    }
+  if (conversation) {
+    await conversation.send("🚀 Running stress test...");
+  }
 
+  try {
     // Send DMs from workers to sender (if message provided)
     if (message && conversation) {
       await sendDmsFromWorkers(workers, message.senderInboxId, conversation);
     }
+  } catch (error) {
+    console.error("Error during stress test:", error);
+    if (conversation) {
+      await conversation.send(
+        `❌ Stress test failed while sending DMs: ${error}`,
+      );
+    }
+    return false;
+  }
 
-    // Create large groups
-    await createLargeGroups(config, workers, receiverInboxId, conversation);
-
+  try {
     // Create groups with workers and send messages to them
     await createGroupsWithWorkers(
       workers,
@@ -65,26 +65,33 @@ export async function runStressTest(
       message?.senderInboxId,
       conversation,
     );
-
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-
+  } catch (error) {
+    console.error("Error during stress test:", error);
     if (conversation) {
       await conversation.send(
-        `✅ Stress test completed in ${duration} seconds!`,
+        `❌ Stress test failed while creating groups: ${error}`,
       );
     }
-
-    return true;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error("Error during stress test:", errorMessage);
-
-    if (conversation) {
-      await conversation.send(`❌ Stress test failed: ${errorMessage}`);
-    }
-
     return false;
+  }
+
+  try {
+    // Create large groups
+    await createLargeGroups(config, workers, receiverInboxId, conversation);
+  } catch (error) {
+    console.error("Error during stress test:", error);
+    if (conversation) {
+      await conversation.send(
+        `❌ Stress test failed while creating large groups: ${error}`,
+      );
+    }
+    return false;
+  }
+  const endTime = Date.now();
+  const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+  if (conversation) {
+    await conversation.send(`✅ Stress test completed in ${duration} seconds!`);
   }
 }
 
@@ -139,7 +146,7 @@ export async function handleStressCommand(
   const config = TEST_CONFIGS[sizeArg];
   const receiverInboxId = message.senderInboxId;
   if (config) {
-    return await runStressTest(
+    await runStressTest(
       config,
       workers,
       client,

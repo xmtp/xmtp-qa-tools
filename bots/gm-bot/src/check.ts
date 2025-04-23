@@ -34,7 +34,6 @@ async function checkGmBot(): Promise<boolean> {
       dbPath,
       loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
     });
-    console.log("client", client.inboxId);
     return client.inboxId !== undefined;
   } catch (error) {
     console.error("Error checking GM bot:", error);

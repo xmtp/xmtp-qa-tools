@@ -127,7 +127,6 @@ export class WorkerManager {
           workersToPrint.push(
             `${baseName}-${installationId}-${currentWorker.address}-${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
           );
-          console.log(workersToPrint);
         }
       }
     } catch (error) {
