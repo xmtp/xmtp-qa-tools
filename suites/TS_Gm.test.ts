@@ -55,7 +55,7 @@ describe(testName, () => {
       await convo.send("gm");
 
       // Wait briefly for response
-      await new Promise((resolve) => setTimeout(resolve, 5000));
+      await new Promise((resolve) => setTimeout(resolve, 2000));
 
       const messages = await convo.messages();
 
