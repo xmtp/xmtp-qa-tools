@@ -46,6 +46,51 @@ export const HELP_TEXT = `Stress bot commands:
 /stress medium - Run a medium test: Creates a group with 50 members, 5 workers, 10 messages each
 /stress large - Run a large test: Creates a group with 100 members, 10 workers, 15 messages each`;
 
+// Singleton lock to prevent multiple stress tests from running concurrently
+class StressTestLock {
+  private static instance: StressTestLock;
+  private isRunning: boolean = false;
+  private runningUser: string = "";
+  private startTime: number = 0;
+
+  private constructor() {}
+
+  public static getInstance(): StressTestLock {
+    if (!StressTestLock.instance) {
+      StressTestLock.instance = new StressTestLock();
+    }
+    return StressTestLock.instance;
+  }
+
+  public acquire(userInboxId: string): boolean {
+    if (this.isRunning) {
+      return false;
+    }
+    this.isRunning = true;
+    this.runningUser = userInboxId;
+    this.startTime = Date.now();
+    return true;
+  }
+
+  public release(): void {
+    this.isRunning = false;
+    this.runningUser = "";
+  }
+
+  public getRunningUser(): string {
+    return this.runningUser;
+  }
+
+  public getRunningTime(): number {
+    if (!this.isRunning) return 0;
+    return Math.floor((Date.now() - this.startTime) / 1000);
+  }
+
+  public isTestRunning(): boolean {
+    return this.isRunning;
+  }
+}
+
 /**
  * Run a complete stress test based on configuration
  */
@@ -126,6 +171,8 @@ export async function runStressTest(
     }
   } catch (error) {
     await logAndSendError(error, conversation, "Stress test failed");
+    // Release the lock when test fails
+    StressTestLock.getInstance().release();
     return false;
   }
 
@@ -144,6 +191,9 @@ export async function runStressTest(
       conversation,
     );
   }
+
+  // Release the lock when test completes
+  StressTestLock.getInstance().release();
 }
 
 /**
@@ -169,11 +219,50 @@ export async function handleStressCommand(
     return false;
   }
 
+  // Check if a status check is requested
+  if (args[1].toLowerCase() === "status") {
+    const lock = StressTestLock.getInstance();
+    if (lock.isTestRunning()) {
+      const runningTime = lock.getRunningTime();
+      await logAndSend(
+        `🔒 A stress test is currently running for ${runningTime} seconds, started by user with inboxId: ${lock.getRunningUser().substring(0, 10)}...`,
+        conversation,
+      );
+    } else {
+      await logAndSend("✅ No stress test is currently running.", conversation);
+    }
+    return true;
+  }
+
   const sizeArg = args[1].toLowerCase();
   if (!["small", "medium", "large"].includes(sizeArg)) {
     await logAndSend(
       "⚠️ Invalid size option. Use 'small', 'medium', or 'large'.\n" +
         HELP_TEXT,
+      conversation,
+      "warn",
+    );
+    return false;
+  }
+
+  // Check if a test is already running
+  const lock = StressTestLock.getInstance();
+  if (lock.isTestRunning()) {
+    const runningUser = lock.getRunningUser();
+    const runningTime = lock.getRunningTime();
+
+    await logAndSend(
+      `⚠️ A stress test is already running for ${runningTime} seconds. Started by user with inboxId: ${runningUser.substring(0, 10)}...\nPlease try again later or check status with '/stress status'.`,
+      conversation,
+      "warn",
+    );
+    return false;
+  }
+
+  // Acquire the lock
+  if (!lock.acquire(message.senderInboxId)) {
+    await logAndSend(
+      "⚠️ Could not start stress test. Another test might have just started.",
       conversation,
       "warn",
     );
