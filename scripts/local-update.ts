@@ -32,7 +32,7 @@ async function main() {
     console.error(
       "Error: No generated inboxes found in @helpers/generated-inboxes.json",
     );
-    process.exit(1);
+    return;
   }
 
   console.log(
