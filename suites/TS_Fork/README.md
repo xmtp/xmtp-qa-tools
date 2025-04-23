@@ -61,8 +61,8 @@ yarn test fork
 
 ## Results Analysis
 
-- **Reliable Reproduction**: Coinbase Wallet consistently forks
-- **Intermittent Issues**: Convos Messenger occasionally forks
+- **Reliable Reproduction**: Coinbase Wallet consistently fails
+- **Intermittent Issues**: Convos Messenger remain stable
 - **Resilient Clients**: Web and Node SDK clients remain stable
 
 The test identifies a correlation between forking and client creation intervals approaching 1 second, suggesting timing-related vulnerabilities in the synchronization process.
