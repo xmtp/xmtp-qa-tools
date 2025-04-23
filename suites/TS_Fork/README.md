@@ -20,7 +20,7 @@ yarn install
 
 ## Configuration
 
-Create a `.env` file in the `bugs/bug_fork` directory:
+Create a `.env` file in the root directory:
 
 ```bash
 LOGGING_LEVEL="off"  # Options: debug, info, warn, error
@@ -29,8 +29,8 @@ XMTP_ENV="production"  # Options: production, dev
 # Auto-populated during testing
 GROUP_ID=""
 
-# PERSONAS
-# where rest of personas will be saved
+# WORKERS
+# where rest of workers will be saved
 ```
 
 > [!TIP]
