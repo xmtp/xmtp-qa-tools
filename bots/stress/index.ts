@@ -40,8 +40,6 @@ export const TEST_CONFIGS: Record<string, StressTestConfig> = {
 const testName = "stressbot";
 loadEnv(testName);
 
-let isStressTestRunning = false;
-
 export const HELP_TEXT = `Stress bot commands:
 
 /stress small - Run a small test: Creates a group with 20 members, 3 workers, 5 messages each
@@ -146,8 +144,6 @@ export async function runStressTest(
       conversation,
     );
   }
-
-  return true;
 }
 
 /**
@@ -157,7 +153,6 @@ export async function handleStressCommand(
   message: DecodedMessage,
   conversation: Conversation,
   client: Client,
-  isStressTestRunning: boolean,
 ): Promise<boolean> {
   const content = message.content as string;
   const args = content.split(" ");
@@ -166,17 +161,6 @@ export async function handleStressCommand(
   // Only handle /stress commands
   if (command !== "/stress") {
     await logAndSend(HELP_TEXT, conversation);
-    return false;
-  }
-
-  if (isStressTestRunning) {
-    await logAndSend(
-      "⚠️ A stress test is already running. Please either:\n" +
-        "1. Wait for it to complete, or\n" +
-        "2. Use `/stress reset` to force stop all tests",
-      conversation,
-      "warn",
-    );
     return false;
   }
 
@@ -197,33 +181,11 @@ export async function handleStressCommand(
   }
 
   const config = TEST_CONFIGS[sizeArg];
-  console.log(config);
+
   if (config) {
-    // Create a smaller number of workers to prevent overwhelming the system
-    // We'll limit to 5 workers max regardless of the config
-    const limitedWorkerCount = Math.min(5, config.workerCount);
-    await logAndSendStatus(
-      `Creating ${limitedWorkerCount} workers instead of ${config.workerCount} to prevent system overload...`,
-      conversation,
-    );
+    let workers = await getWorkers(config.workerCount, testName, "none");
 
-    let workers = await getWorkers(limitedWorkerCount, testName, "none");
-
-    // Update the config to reflect our adjusted worker count
-    const adjustedConfig = {
-      ...config,
-      workerCount: limitedWorkerCount,
-    };
-
-    await runStressTest(adjustedConfig, workers, client, message, conversation);
-  } else {
-    await logAndSend(
-      "⚠️ Invalid command format. Use /stress <size>\n" +
-        "Size options: small, medium, or large",
-      conversation,
-      "warn",
-    );
-    return false;
+    await runStressTest(config, workers, client, message, conversation);
   }
   return true;
 }
@@ -278,12 +240,7 @@ async function main() {
         // Only handle DM conversations
         if (!("peerInboxId" in conversation)) continue;
 
-        isStressTestRunning = await handleStressCommand(
-          message,
-          conversation,
-          client,
-          isStressTestRunning,
-        );
+        await handleStressCommand(message, conversation, client);
       } catch (error) {
         console.debug(error);
         console.error("Error handling message:", error);
