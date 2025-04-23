@@ -1,6 +1,7 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { verifyStreamAll } from "@helpers/streams";
+import { sdkVersionOptions } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
@@ -10,7 +11,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = ["47", "100", "105", "202", "203"];
+  const versions = sdkVersionOptions;
   afterAll(async () => {
     await closeEnv(testName, workers);
   });

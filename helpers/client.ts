@@ -76,59 +76,52 @@ export async function createClient(
   };
 }
 export const regressionClient = async (
-  sdkVersion: number,
+  sdkVersion: string | number,
   libXmtpVersion: string,
   walletKey: `0x${string}`,
-  encryptionKey: Uint8Array,
+  dbEncryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
-) => {
+): Promise<any> => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  const versionStr = String(sdkVersion);
+  const versionInt = parseInt(versionStr);
   const ClientClass =
-    sdkVersions[sdkVersion as keyof typeof sdkVersions].Client;
+    sdkVersions[versionInt as keyof typeof sdkVersions].Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
-  if (sdkVersion == 30) {
+  if (versionInt === 30) {
     throw new Error("Invalid version");
-  } else if (sdkVersion == 47) {
+  } else if (versionInt === 47) {
     const signer = createSigner47(walletKey);
     // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 100 || sdkVersion === 105) {
-    const signer = createSigner100(walletKey);
+  } else if (versionInt >= 100 && versionInt < 200) {
+    const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, encryptionKey, {
+    client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
       loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 202) {
-    const signer = createSigner200(walletKey);
+  } else if (versionInt >= 200) {
+    const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
     client = await ClientClass.create(signer, {
-      dbEncryptionKey: encryptionKey,
-      dbPath,
-      env,
-    });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (sdkVersion === 203) {
-    const signer = createSigner200(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
-    client = await ClientClass.create(signer, {
-      dbEncryptionKey: encryptionKey,
+      dbEncryptionKey,
       dbPath,
       env,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
-    console.log("Invalid version" + String(sdkVersion));
-    throw new Error("Invalid version" + String(sdkVersion));
+    console.log("Invalid version" + versionStr);
+    throw new Error("Invalid version" + versionStr);
   }
 
   if (libXmtpVersion !== libXmtpVersionAfterClient) {
@@ -137,7 +130,11 @@ export const regressionClient = async (
     );
   }
 
-  return client;
+  if (!client) {
+    throw new Error(`Failed to create client for SDK version ${versionStr}`);
+  }
+
+  return client as any;
 };
 
 // @ts-expect-error: SDK version compatibility issues
@@ -168,10 +165,7 @@ export const createSigner47 = (privateKey: `0x${string}`) => {
   };
 };
 
-export const createSigner100 = (key: `0x${string}`): Signer => {
-  return createSigner200(key);
-};
-export const createSigner200 = (key: string): Signer => {
+export const createSigner = (key: string): Signer => {
   const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
   const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
   let user: User = {
@@ -197,10 +191,6 @@ export const createSigner200 = (key: string): Signer => {
       return toBytes(signature);
     },
   };
-};
-
-export const createSigner = (key: `0x${string}`): Signer => {
-  return createSigner200(key);
 };
 
 function loadDataPath(

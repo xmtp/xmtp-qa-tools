@@ -5,18 +5,32 @@ import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
 
 // Test configuration
-const TEST_NAME = "bug_fork";
+const TEST_NAME = "ts_fork";
 loadEnv(TEST_NAME);
 
 const testConfig = {
   testName: TEST_NAME,
-  workers: 5,
+  groupName:
+    "Fork group " +
+    new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }),
+  epochs: 3,
+  workers: 10,
   manualUsers: {
-    USER_CONVOS: process.env.USER_CONVOS,
-    USER_CB_WALLET: process.env.USER_CB_WALLET,
-    USER_XMTPCHAT: process.env.USER_XMTPCHAT,
-    USER_CONVOS_DESKTOP: process.env.USER_CONVOS_DESKTOP,
+    USER_CONVOS:
+      "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
+    USER_CONVOS_DESKTOP:
+      "54f447c03b0fe594d499e685fa390d68b85490856469657babe2c8351dbee33f",
+    USER_CB_WALLET:
+      "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
+    USER_XMTPCHAT:
+      "ac9feb1384a9092333db4d17c6981743a53277c24c57ed6f12f05bd78a81be30",
   },
+  testWorkers: ["bob", "alice", "elon", "joe"],
+  checkWorkers: ["fabri", "eve", "dave", "frank"],
   groupId: process.env.GROUP_ID,
 };
 
@@ -33,13 +47,12 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME);
+    workers = await getWorkers(testConfig.workers, TEST_NAME, "message", "gm");
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
-    console.log("Creator is", creator.name);
     const allClientIds = [
       ...allWorkers.map((w) => w.client.inboxId),
-      ...(Object.values(testConfig.manualUsers) as string[]),
+      ...Object.values(testConfig.manualUsers),
     ];
 
     globalGroup = (await getOrCreateGroup(
@@ -47,17 +60,25 @@ describe(TEST_NAME, () => {
       allClientIds,
     )) as Group;
 
-    let epochs = 4;
-    for (let i = 0; i < testConfig.workers; i++) {
-      let currentWorker = allWorkers[i];
-      if (currentWorker.name === creator.name) continue;
+    // Perform fork check with selected workers
+    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+    let count = 1;
+    for (const workerName of testConfig.testWorkers) {
+      const currentWorker = allWorkers.find((w) => w.name === workerName);
+      if (!currentWorker || currentWorker.name === creator.name) continue;
 
       await sendMessageToGroup(
         currentWorker,
         globalGroup.id,
-        currentWorker.name + ":" + String(i),
+        `${currentWorker.name}:test ${count}`,
       );
-      await membershipChange(globalGroup.id, creator, currentWorker, epochs);
+      await membershipChange(
+        globalGroup.id,
+        creator,
+        currentWorker,
+        testConfig.epochs,
+      );
+      count++;
     }
 
     await globalGroup.send(creator.name + " : Done");
@@ -69,44 +90,68 @@ describe(TEST_NAME, () => {
     console.timeEnd("initialize workers and create group");
   });
 });
+// Sends messages to specific workers to check for responses
+const forkCheck = async (
+  group: Group,
+  allWorkers: Worker[],
+  testWorkers: string[],
+) => {
+  const targetWorkers = allWorkers.filter((w) => testWorkers.includes(w.name));
+  for (const worker of targetWorkers) {
+    await group.send(`hey ${worker.name}`);
+  }
+};
 
 const getOrCreateGroup = async (
   creator: Client,
   addedMembers: string[],
 ): Promise<Conversation | undefined> => {
-  const start = performance.now();
-  console.time("getOrCreateGroup");
+  try {
+    const start = performance.now();
+    console.time("getOrCreateGroup");
 
-  let group: Group;
+    let group: Group;
 
-  if (!testConfig.groupId) {
-    console.log(`Creating group with ${addedMembers.length} members`);
-    group = await creator.conversations.newGroup(addedMembers);
-    appendToEnv("GROUP_ID", group.id, testConfig.testName);
-  } else {
-    console.log(`Fetching group with ID ${testConfig.groupId}`);
-    group = (await creator.conversations.getConversationById(
-      testConfig.groupId,
-    )) as Group;
+    if (!testConfig.groupId) {
+      console.log(`Creating group with ${addedMembers.length} members`);
+      group = await creator.conversations.newGroup([]);
+      for (const member of addedMembers) {
+        try {
+          await group.addMembers([member]);
+        } catch (e) {
+          console.error(
+            `Error adding member ${member} to group ${group.id}:`,
+            e,
+          );
+        }
+      }
+
+      const name = testConfig.groupName;
+      await group.updateName(name);
+
+      console.log(`Group ${group.id} name updated to ${name}`);
+      appendToEnv("GROUP_ID", group.id, testConfig.testName);
+    } else {
+      console.log(`Fetching group with ID ${testConfig.groupId}`);
+      group = (await creator.conversations.getConversationById(
+        testConfig.groupId,
+      )) as Group;
+    }
+
+    const members = await group.members();
+    console.log(`Group ${group.id} has ${members.length} members`);
+
+    await group.send("Starting run: " + testConfig.groupName);
+
+    const end = performance.now();
+    console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
+    console.timeEnd("getOrCreateGroup");
+
+    return group;
+  } catch (e) {
+    console.error(`Error creating group:`, e);
+    throw e;
   }
-
-  const members = await group.members();
-  console.log(`Group ${group.id} has ${members.length} members`);
-
-  const time = new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  });
-
-  await group.updateName("Fork group " + time);
-  await group.send("Starting run for " + time);
-
-  const end = performance.now();
-  console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
-  console.timeEnd("getOrCreateGroup");
-
-  return group;
 };
 
 /**

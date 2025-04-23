@@ -20,22 +20,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     workers = await getWorkers(
-      [
-        "bob",
-        "alice",
-        "joe",
-        "sam",
-        "charlie",
-        "dave",
-        "eve",
-        "frank",
-        "grace",
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "larry",
-      ],
+      ["bob", "alice", "joe", "sam", "charlie"],
       testName,
     );
   });

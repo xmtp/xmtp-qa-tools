@@ -60,16 +60,6 @@ const testConfig = createTestConfig(testName, workerConfigs);
 
 Handles XMTP client creation and version mappings:
 
-```typescript
-// SDK version mappings
-export const sdkVersions = {
-  47: {},
-  105: {},
-  202: {},
-  203: {},
-};
-```
-
 ### datadog.ts
 
 Utilities for sending metrics to Datadog:

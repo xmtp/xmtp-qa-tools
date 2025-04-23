@@ -228,6 +228,71 @@ export const logError = (e: unknown, expect: ExpectStatic): boolean => {
   return true;
 };
 
+/**
+ * Log a message to the console and send it to a conversation
+ * @param message The message to log and send
+ * @param conversation The conversation to send the message to
+ * @param level The log level (default: 'info')
+ * @returns A promise that resolves when the message is sent
+ */
+export const logAndSend = async (
+  message: string,
+  conversation: any,
+  level: "info" | "warn" | "error" = "info",
+): Promise<void> => {
+  // Log to console based on level
+  switch (level) {
+    case "warn":
+      console.warn(message);
+      break;
+    case "error":
+      console.error(message);
+      break;
+    default:
+      console.log(message);
+  }
+
+  // Send to conversation if provided
+  if (conversation && typeof conversation.send === "function") {
+    await conversation.send(message);
+  }
+};
+
+/**
+ * Log an error to the console and send it to a conversation
+ * @param error The error object or string
+ * @param conversation The conversation to send the error to
+ * @param context Optional context message to prefix the error
+ * @returns A promise that resolves when the error is sent
+ */
+export const logAndSendError = async (
+  error: unknown,
+  conversation: any,
+  context: string = "Error",
+): Promise<void> => {
+  const errorMessage = error instanceof Error ? error.message : String(error);
+  return logAndSend(`⚠️ ${context}: ${errorMessage}`, conversation, "error");
+};
+
+/**
+ * Log a status update with timestamp to console and send to conversation
+ * @param message The status message
+ * @param conversation The conversation to send the status to
+ * @param emoji Optional emoji to prefix the message (default: '🔄')
+ * @returns A promise that resolves when the status is sent
+ */
+export const logAndSendStatus = async (
+  message: string,
+  conversation: any,
+  emoji: string = "🔄",
+): Promise<void> => {
+  const timestamp = new Date()
+    .toISOString()
+    .replace(/T/, " ")
+    .replace(/\..+/, "");
+  return logAndSend(`${emoji} [${timestamp}] ${message}`, conversation);
+};
+
 export const removeDB = (fileName: string) => {
   const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
   console.log("testFilePath", fileName, testFilePath);

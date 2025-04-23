@@ -11,7 +11,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import OpenAI from "openai";
-import type { typeofStream, WorkerBase } from "./manager";
+import type { typeOfResponse, typeofStream, WorkerBase } from "./manager";
 
 // Unified worker message types
 export type WorkerMessageBase = {
@@ -102,7 +102,7 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
-  private gptEnabled: boolean;
+  private typeOfResponse: typeOfResponse;
   private folder: string;
   private sdkVersion: string;
   private libXmtpVersion: string;
@@ -118,7 +118,7 @@ export class WorkerClient extends Worker {
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
-    gptEnabled: boolean,
+    typeOfResponse: typeOfResponse,
     env: XmtpEnv,
     options: WorkerOptions = {},
   ) {
@@ -128,7 +128,7 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
 
-    this.gptEnabled = gptEnabled;
+    this.typeOfResponse = typeOfResponse;
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
@@ -207,11 +207,7 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    console.log(
-      `${this.nameId}: Worker created (${this.sdkVersion}-${this.libXmtpVersion}) - ${this.address}`,
-    );
-    // Start the appropriate stream based on configuration
-    await this.startStream();
+    this.startStream();
 
     const installationId = this.client.installationId;
 
@@ -225,25 +221,18 @@ export class WorkerClient extends Worker {
   /**
    * Unified method to start the appropriate stream based on configuration
    */
-  private async startStream() {
-    if (!this.typeofStream || this.typeofStream === "none") {
-      return;
-    }
-
+  private startStream() {
     try {
       switch (this.typeofStream) {
         case "message":
-          await this.initMessageStream();
+          this.initMessageStream();
           break;
         case "conversation":
-          await this.initConversationStream();
+          this.initConversationStream();
           break;
         case "consent":
           this.initConsentStream();
           break;
-        default:
-          console.log(`[${this.nameId}] Unsupported stream type`);
-          return;
       }
     } catch (error) {
       console.error(
@@ -257,49 +246,44 @@ export class WorkerClient extends Worker {
   /**
    * Initialize and handle message stream
    */
-  private async initMessageStream() {
-    this.activeStream = await this.client.conversations.streamAllMessages();
-
+  private initMessageStream() {
     // Process messages asynchronously
     void (async () => {
-      try {
-        if (!this.activeStream) return;
+      // Make sure conversations are fully synced before starting the stream
+      await this.client.conversations.sync();
 
-        for await (const message of this.activeStream) {
-          if (this.isTerminated) break;
+      // Add a small delay to ensure sync is complete
+      await new Promise((resolve) => setTimeout(resolve, 500));
 
-          // Skip messages from self
-          if (
-            message?.senderInboxId.toLowerCase() ===
-            this.client.inboxId.toLowerCase()
-          ) {
+      const stream = await this.client.conversations.streamAllMessages();
+
+      for await (const message of stream) {
+        if (this.isTerminated) break;
+
+        // Skip messages from self
+        if (
+          message?.senderInboxId?.toLowerCase() ===
+          this.client.inboxId.toLowerCase()
+        ) {
+          continue;
+        }
+
+        if (message?.contentType?.typeId) {
+          if (this.shouldRespondToMessage(message)) {
+            await this.handleResponse(message);
             continue;
           }
 
-          // Check for GPT response triggers
-          if (this.shouldGenerateGptResponse(message as DecodedMessage)) {
-            await this.handleGptResponse(message as DecodedMessage);
-            continue;
-          }
-
-          console.time(`[${this.nameId}] Process message`);
-
+          // Create worker message
           const workerMessage: MessageStreamWorker = {
             type: "stream_message",
-            message: message as DecodedMessage,
+            message: message,
           };
 
           // Emit if any listeners are attached
           if (this.listenerCount("message") > 0) {
             this.emit("message", workerMessage);
           }
-
-          console.timeEnd(`[${this.nameId}] Process message`);
-        }
-      } catch (error) {
-        if (!this.isTerminated) {
-          console.error(`[${this.nameId}] Stream error:`, error);
-          this.emit("error", error);
         }
       }
     })();
@@ -308,8 +292,8 @@ export class WorkerClient extends Worker {
   /**
    * Check if a message should trigger a GPT response
    */
-  private shouldGenerateGptResponse(message: DecodedMessage): boolean {
-    if (!this.gptEnabled) return false;
+  private shouldRespondToMessage(message: DecodedMessage): boolean {
+    if (this.typeOfResponse === "none") return false;
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
     );
@@ -331,8 +315,8 @@ export class WorkerClient extends Worker {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleGptResponse(message: DecodedMessage) {
-    console.time(`[${this.nameId}] GPT Agent: Response`);
+  private async handleResponse(message: DecodedMessage) {
+    console.time(`[${this.nameId}] Worker response`);
 
     try {
       // Get the conversation from the message
@@ -340,44 +324,50 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
 
-      const messages = await conversation?.messages();
-      const baseName = this.name.split("-")[0].toLowerCase();
+      if (this.typeOfResponse === "gpt") {
+        const messages = await conversation?.messages();
+        const baseName = this.name.split("-")[0].toLowerCase();
+        // Generate a response using OpenAI
+        const response = await this.generateOpenAIResponse(
+          message.content as string,
+          messages ?? [],
+          baseName,
+        );
 
-      // Generate a response using OpenAI
-      const response = await this.generateOpenAIResponse(
-        message.content as string,
-        messages ?? [],
-        baseName,
-      );
+        console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
 
-      console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
-
-      // Send the response
-      await conversation?.send(response);
+        // Send the response
+        await conversation?.send(response);
+      } else {
+        await conversation?.send(this.nameId + " says: gm");
+      }
     } catch (error) {
-      console.error(`[${this.nameId}] Error generating GPT response:`, error);
+      console.error(
+        `[${this.nameId}] Error generating stream response:`,
+        error,
+      );
     } finally {
-      console.timeEnd(`[${this.nameId}] GPT Agent: Response`);
+      console.timeEnd(`[${this.nameId}] Worker response`);
     }
   }
 
   /**
    * Initialize and handle conversation stream
    */
-  private async initConversationStream() {
-    // Track initial conversations to avoid duplicates
-    const initialConversations = await this.client.conversations.list();
-    const knownConversations = new Set(initialConversations.map((c) => c.id));
-
-    console.log(
-      `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
-    );
-
-    // Use the stream method to listen for conversation updates
-    this.activeStream = this.client.conversations.stream();
-
+  private initConversationStream() {
     // Process conversations asynchronously
     void (async () => {
+      // Track initial conversations to avoid duplicates
+      const initialConversations = await this.client.conversations.list();
+      const knownConversations = new Set(initialConversations.map((c) => c.id));
+
+      console.log(
+        `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
+      );
+
+      // Use the stream method to listen for conversation updates
+      this.activeStream = this.client.conversations.stream();
+
       try {
         if (!this.activeStream) return;
 
@@ -546,18 +536,45 @@ export class WorkerClient extends Worker {
     count: number,
     timeoutMs = count * defaultValues.perMessageTimeout,
   ): Promise<MessageStreamWorker[]> {
-    return this.collectStreamEvents<MessageStreamWorker>({
-      type: "message",
-      filterFn: (msg) => {
-        if (msg.type !== "stream_message") return false;
-        const messageMsg = msg;
-        const { conversationId, contentType } = messageMsg.message;
-        return groupId === conversationId && contentType?.typeId === typeId;
-      },
-      count,
-      timeoutMs,
-      additionalInfo: { groupId, contentType: typeId },
-    });
+    // Create an async function and immediately invoke it
+    const collectMessagesAsync = async (): Promise<MessageStreamWorker[]> => {
+      try {
+        // Sync conversations to make sure we have the latest data
+        await this.client.conversations.sync();
+
+        // Verify the conversation exists in our client
+        const conversation =
+          await this.client.conversations.getConversationById(groupId);
+        if (!conversation) {
+          console.warn(
+            `[${this.nameId}] Cannot collect messages: Group ${groupId} not found`,
+          );
+        } else {
+          console.log(
+            `[${this.nameId}] Group ${groupId} found, collecting messages...`,
+          );
+        }
+
+        // Collect messages with appropriate filtering
+        return await this.collectStreamEvents<MessageStreamWorker>({
+          type: "message",
+          filterFn: (msg) => {
+            if (msg.type !== "stream_message") return false;
+            const messageMsg = msg;
+            const { conversationId, contentType } = messageMsg.message;
+            return groupId === conversationId && contentType?.typeId === typeId;
+          },
+          count,
+          timeoutMs,
+          additionalInfo: { groupId, contentType: typeId },
+        });
+      } catch (error) {
+        console.error(`[${this.nameId}] Error in collectMessages:`, error);
+        return [];
+      }
+    };
+
+    return collectMessagesAsync();
   }
 
   /**

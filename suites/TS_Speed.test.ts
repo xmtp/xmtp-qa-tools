@@ -2,7 +2,7 @@ import { closeEnv, loadEnv } from "@helpers/client";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, it } from "vitest";
 
-const testName = "speed";
+const testName = "ts_speed";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -19,7 +19,7 @@ describe(testName, () => {
 
   it("should measure response time from app", async () => {
     // Initialize workers
-    workers = await getWorkers(["alice"], testName, "none", false);
+    workers = await getWorkers(["alice"], testName, "none");
     const sender = workers.get("alice");
 
     if (!sender) {

@@ -1,12 +1,14 @@
 # XMTP QA Testing
 
-| Test suite        | Status                                                                                                                                                                                        | Run frequency |
-| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- |
-| 🚀 Performance    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)             | Every 15 min  |
-| 📬 Delivery       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)                   | Every 30 min  |
-| 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                               | Every 30 min  |
-| 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)             | Every 30 min  |
-| 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml) | Every 30 min  |
+## Workflow status
+
+| Test suite        | Status                                                                                                                                                                                        | Run frequency | Code                                                                                             |
+| ----------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------ |
+| 🚀 Performance    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml)             | Every 15 min  | [Code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)                  |
+| 📬 Delivery       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Delivery.yml)                   | Every 30 min  | [Code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)                     |
+| 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                               | Every 30 min  | [Code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)                           |
+| 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)             | Every 30 min  | [Code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Geolocation)                  |
+| 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml) | Every 30 min  | [Code](https://github.com/ephemeraHQ/xmtp-agent-examples/tree/main/examples/xmtp-stream-restart) |
 
 ## Testing scope
 
@@ -130,12 +132,12 @@ _Note: Based on data from 79 measured operations in the `us-east` region and `pr
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
 | 50   | 1152.73    | 86.01    | 78.33    | 135.36     | 138.57     | <1300ms        | ✅ On Target           |
 | 100  | 1582.43    | 88.41    | 83.48    | 144.67     | 156.86     | <1400ms        | ✅ On Target           |
-| 150  | 2650.67    | 94.55    | 120.24   | 202.64     | 189.81     | <2000ms        | ✅ On Target           |
-| 200  | 4117.80    | 93.42    | 128.73   | 193.36     | 204.78     | <3000ms        | ✅ On Target           |
-| 250  | 5740.75    | 107.76   | 154.79   | 219.17     | 236.53     | <3500ms        | ✅ On Target           |
-| 300  | 7656.24    | 97.09    | 145.75   | 244.24     | 247.22     | <5500ms        | ⚠️ Performance Concern |
-| 350  | 8272.22    | 99.20    | 155.32   | 244.24     | 270.62     | <6000ms        | ⚠️ Performance Concern |
-| 400  | 9215.61    | 101.34   | 167.90   | 263.91     | 308.01     | <7000ms        | ⚠️ Performance Concern |
+| 150  | 2650.67    | 94.55    | 120.24   | 202.64     | 189.81     | <3000ms        | ✅ On Target           |
+| 200  | 4117.80    | 93.42    | 128.73   | 193.36     | 204.78     | <4500ms        | ✅ On Target           |
+| 250  | 5740.75    | 107.76   | 154.79   | 219.17     | 236.53     | <5500ms        | ⚠️ Performance Concern |
+| 300  | 7656.24    | 97.09    | 145.75   | 244.24     | 247.22     | <6500ms        | ⚠️ Performance Concern |
+| 350  | 8272.22    | 99.20    | 155.32   | 244.24     | 270.62     | <7500ms        | ⚠️ Performance Concern |
+| 400  | 9215.61    | 101.34   | 167.90   | 263.91     | 308.01     | <8500ms        | ⚠️ Performance Concern |
 
 _Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._
 
@@ -236,3 +238,4 @@ yarn install
 - **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
+- **Loom recording:** [Loom recording](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)

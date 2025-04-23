@@ -1,9 +1,0 @@
-[2025-04-21T18:06:19.434Z] [info] Creating workers ["bob-a-203","alice-a-203","fabri-a-203","elon-a-100","joe-a-105"]
-[2025-04-21T18:06:21.842Z] [info] alice: Worker created (203-c24af30) - 0xe724103D852f6E5479Aa61185e1b250391833A79
-[2025-04-21T18:06:21.846Z] [info] fabri: Worker created (203-c24af30) - 0x4501123f56250B7C5a5fB787d4d768868a74E3D9
-[2025-04-21T18:06:21.904Z] [info] bob: Worker created (203-c24af30) - 0xaFD842255144F2B59c519562591eBB2441CB92F5
-[2025-04-21T18:06:22.025Z] [info] elon: Worker created (100-c205eec) - 0x2c64CAb779f2EeC941bDAe733b15fFF0a4E4b30D
-[2025-04-21T18:06:22.079Z] [info] joe: Worker created (105-6eb1ce4) - 0xeF8ed4de28C996CC25c4CD5CA51258F07E98d6fb
-[2025-04-21T18:06:22.502Z] [info] Creator is fabri
-[2025-04-21T18:06:22.505Z] [info] Fetching group with ID b57671a33b1108515e42f8f1faf06ecd
-[2025-04-21T18:06:22.512Z] [info] Group b57671a33b1108515e42f8f1faf06ecd has 9 members

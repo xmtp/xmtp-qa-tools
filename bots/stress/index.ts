@@ -1,393 +1,253 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import {
+  createAndSendDms,
+  createAndSendInGroup,
+  createLargeGroups,
+  type StressTestConfig,
+} from "@helpers/groups";
+import { logAndSend, logAndSendError, logAndSendStatus } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
-  Dm,
-  Group,
   type Client,
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
 
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
+export const TEST_CONFIGS: Record<string, StressTestConfig> = {
+  small: {
+    largeGroups: [50],
+    workerCount: 20,
+    messageCount: 5,
+    groupCount: 5,
+    sizeLabel: "small",
+  },
+  medium: {
+    largeGroups: [50, 100],
+    workerCount: 50,
+    messageCount: 10,
+    groupCount: 3,
+    sizeLabel: "medium",
+  },
+  large: {
+    largeGroups: [50, 100, 200],
+    workerCount: 100,
+    messageCount: 15,
+    groupCount: 5,
+    sizeLabel: "large",
+  },
+};
 
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
-
-const testName = "stress-bot";
+const testName = "stressbot";
 loadEnv(testName);
 
-// Constants
-const HELP_TEXT = `🤖 XMTP Stress Test Bot
+export const HELP_TEXT = `Stress bot commands:
 
-If working on a local environment, make sure to update the generated inboxes first:
+/stress small - Run a small test: Creates a group with 20 members, 3 workers, 5 messages each
+/stress medium - Run a medium test: Creates a group with 50 members, 5 workers, 10 messages each
+/stress large - Run a large test: Creates a group with 100 members, 10 workers, 15 messages each`;
 
-yarn script local-update
-
-Available Commands:
-/help - Show this help message
-/stress <workers> <messages> - Start a stress test
-/stress reset - Reset all workers
-
-Examples:
-/stress 5 10 - Create test with 5 workers sending 10 messages each
-/stress reset - Terminate all workers and start over`;
-
-let isStressTestRunning = false;
-let workers: WorkerManager | undefined;
-
-interface StressTestConfig {
-  workerCount: number;
-  messageCount: number;
-}
-
-// Define the type for generated inboxes
-interface GeneratedInbox {
-  accountAddress: string;
-  inboxId: string;
-  privateKey: string;
-  encryptionKey: string;
-}
-
-async function initializeBot() {
-  const botWorker = await getWorkers(["bot"], testName, "message", false);
-  const bot = botWorker.get("bot");
-  const client = bot?.client as Client;
-
-  console.log(`Agent initialized on address ${bot?.address}`);
-  console.log(`Agent initialized on inbox ${client.inboxId}`);
-
-  return client;
-}
-
-function parseStressCommand(args: string[]): StressTestConfig | null {
-  if (args.length < 2) return null;
-
-  const workerCount = parseInt(args[1]);
-  let messageCount = 5; // Default to 5 messages if not specified
-
-  if (isNaN(workerCount) || workerCount < 1 || workerCount > 100) return null;
-  if (args[2]) {
-    const parsedMessageCount = parseInt(args[2]);
-    if (!isNaN(parsedMessageCount) && parsedMessageCount > 0) {
-      messageCount = parsedMessageCount;
-    }
-  }
-
-  return { workerCount, messageCount };
-}
-
-async function sendWorkerMessagesToGroup(
-  workers: WorkerManager,
-  groupId: string,
-  messageCount: number,
-): Promise<void> {
-  for (const worker of workers.getWorkers()) {
-    console.log(
-      `Worker ${worker.name} sending ${messageCount} messages to group ${groupId}`,
-    );
-    await worker.client?.conversations.sync();
-    let messagesSent = 0;
-    const groupFromWorker =
-      await worker.client?.conversations.getConversationById(groupId);
-
-    for (let i = 0; i < messageCount; i++) {
-      await groupFromWorker?.send(
-        `Group Test ${worker.name} - ${i + 1}/${messageCount}`,
-      );
-      messagesSent++;
-    }
-
-    console.log(
-      `Worker ${worker.name} sent ${messagesSent}/${messageCount} messages to group ${groupId}`,
-    );
-  }
-}
-
-async function createLargeGroup(
-  workers: WorkerManager,
-  memberCount: number,
-  client: Client,
-  conversation: Conversation,
-  message: DecodedMessage,
-): Promise<string | undefined> {
-  if (generatedInboxes.length < memberCount) {
-    console.log(
-      `Not enough pre-generated inboxes for ${memberCount}-member group`,
-    );
-    await conversation.send(
-      `⚠️ Not enough pre-generated inboxes for ${memberCount}-member group`,
-    );
-    return undefined;
-  }
-
-  await conversation.send(`⏳ Creating group with ${memberCount} members...`);
-
-  const inboxes: string[] = generatedInboxes
-    .slice(0, memberCount)
-    .map((entry: GeneratedInbox) => entry.inboxId);
-
-  const workerInboxes = workers.getWorkers().map((w) => w.client?.inboxId);
-
-  console.log(
-    `Creating ${memberCount}-member group with ${inboxes.length} inboxes`,
-  );
-
-  try {
-    // console.log([...inboxes, client.inboxId, message.senderInboxId]);
-    const group = await client.conversations.newGroup(
-      [...inboxes, ...workerInboxes, message.senderInboxId],
-      {
-        groupName: `Large Group ${memberCount} - ${Date.now()}`,
-        groupDescription: `Large group with ${memberCount} members for stress testing`,
-      },
-    );
-
-    console.log(`Created ${memberCount}-member group with ID: ${group.id}`);
-    await conversation.send(
-      `✅ Created group with ${memberCount} members, ID: ${group.id}`,
-    );
-
-    await sendWorkerMessagesToGroup(workers, group.id, 1);
-
-    return group.id;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(
-      `Error creating ${memberCount}-member group: ${errorMessage}`,
-    );
-    await conversation.send(
-      `❌ Error creating ${memberCount}-member group: ${errorMessage}`,
-    );
-    return undefined;
-  }
-}
-
-async function runStressTest(
+/**
+ * Run a complete stress test based on configuration
+ */
+export async function runStressTest(
   config: StressTestConfig,
+  workers: WorkerManager,
+  client: Client,
   message: DecodedMessage,
   conversation: Conversation,
-  client: Client,
 ) {
   const startTime = Date.now();
-  isStressTestRunning = true;
+  await logAndSendStatus("Running stress test...", conversation, "🚀");
+  let hasErrors = false;
 
   try {
-    await conversation.send("🚀 Initializing workers...");
-
-    workers = await getWorkers(config.workerCount, testName, "message", true);
-    console.log(
-      `Successfully initialized ${workers.getWorkers().length} workers`,
+    // Send DMs from workers to sender
+    await logAndSendStatus(
+      "Sending DMs from workers to you...",
+      conversation,
+      "📩",
     );
-
-    await conversation.send(
-      `✅ Successfully initialized ${config.workerCount} workers\n` +
-        `📝 Each worker will send:\n` +
-        `- ${config.messageCount} DM messages\n` +
-        `- ${config.messageCount} group messages\n` +
-        `Total expected messages: ${config.workerCount * config.messageCount * 2}`,
-    );
-
-    const workerInboxIds = workers
-      .getWorkers()
-      .map((w) => w.client?.inboxId)
-      .filter(Boolean);
-    console.log(`Collected ${workerInboxIds.length} worker inbox IDs`);
-
-    // Create group
-    await conversation.send("⏳ Creating test group...");
-    const group = await client.conversations.newGroup(
-      [...workerInboxIds, message.senderInboxId],
-      {
-        groupName: `Stress Test Group ${Date.now()}`,
-        groupDescription: "Group for stress testing",
-      },
-    );
-    console.log(`Created test group with ID: ${group.id}`);
-
-    await conversation.send("✅ Test group created successfully");
-
-    // Create additional groups with different member counts
-    await conversation.send(
-      "⏳ Creating additional groups with pre-generated inboxes...",
-    );
-
-    console.log(`Loaded ${generatedInboxes.length} pre-generated inboxes`);
-
-    // Create groups with different member counts
-    await createLargeGroup(workers, 50, client, conversation, message);
-    await createLargeGroup(workers, 100, client, conversation, message);
-    await createLargeGroup(workers, 200, client, conversation, message);
-
-    await conversation.send("✅ Additional groups creation completed");
-
-    console.log("Starting message sending process...");
-    let messagesSent = 0;
-    const totalMessages = config.workerCount * config.messageCount * 2;
-
-    for (const worker of workers.getWorkers()) {
-      await conversation.send(`🤖 Worker ${worker.name} starting...`);
-      console.log(`Worker ${worker.name} starting message sends...`);
-
-      const dm = await worker.client?.conversations.newDm(
+    try {
+      // Use the fixed receiver inbox ID instead of sender's
+      await createAndSendDms(
+        workers,
         message.senderInboxId,
+        config.messageCount,
       );
-
-      // Send DM messages
-      for (let i = 0; i < config.messageCount; i++) {
-        await dm?.send(
-          `DM Test ${worker.name} - ${i + 1}/${config.messageCount}`,
-        );
-        messagesSent++;
-      }
-
-      // Use the new function for group messages
-      await sendWorkerMessagesToGroup(workers, group.id, config.messageCount);
-
-      console.log(`Worker ${worker.name} completed all messages`);
-      await conversation.send(
-        `✅ Worker ${worker.name} completed all messages`,
-      );
+    } catch (error) {
+      await logAndSendError(error, conversation, "Some DMs failed to send");
+      hasErrors = true;
+      // Continue with the test despite errors
     }
 
-    console.log(
-      `Test completed. Total messages sent: ${messagesSent}/${totalMessages}`,
+    // Create groups with workers
+    await logAndSendStatus(
+      `Creating ${config.groupCount} regular groups...`,
+      conversation,
+      "🔄",
     );
+    try {
+      await createAndSendInGroup(
+        workers,
+        client,
+        config.groupCount,
+        message.senderInboxId,
+      );
+    } catch (error) {
+      await logAndSendError(
+        error,
+        conversation,
+        "Some groups failed to be created",
+      );
+      hasErrors = true;
+    }
 
-    await conversation.send(
-      `🎉 Test completed successfully!\n\n` +
-        `📊 Final Statistics:\n` +
-        `- Total messages sent: ${messagesSent}\n` +
-        `- Workers used: ${config.workerCount}\n` +
-        `- Messages per worker: ${config.messageCount * 2}\n` +
-        `- Test duration: ${Math.floor((Date.now() - startTime) / 1000)}s`,
+    // Create large groups
+    await logAndSendStatus(
+      `Creating large groups with ${config.largeGroups.join(", ")} members...`,
+      conversation,
+      "📊",
     );
+    try {
+      await createLargeGroups(
+        config,
+        workers,
+        client,
+        message.senderInboxId,
+        conversation,
+      );
+    } catch (error) {
+      await logAndSendError(
+        error,
+        conversation,
+        "Large group creation had issues",
+      );
+      hasErrors = true;
+    }
   } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    await conversation.send(
-      `❌ Error during stress test:\n${errorMessage}\n\nUse /stress reset to try again.`,
+    await logAndSendError(error, conversation, "Stress test failed");
+    return false;
+  }
+
+  const endTime = Date.now();
+  const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+  if (hasErrors) {
+    await logAndSend(
+      `⚠️ Stress test completed with some errors in ${duration} seconds.`,
+      conversation,
+      "warn",
     );
-    console.error("Stress test error:", errorMessage);
-  } finally {
-    isStressTestRunning = false;
+  } else {
+    await logAndSend(
+      `✅ Stress test completed successfully in ${duration} seconds!`,
+      conversation,
+    );
   }
 }
 
-async function handleMessage(
+/**
+ * Handle message commands for the stress bot
+ */
+export async function handleStressCommand(
   message: DecodedMessage,
-  conversation: Dm | Group,
+  conversation: Conversation,
   client: Client,
-) {
-  console.log(message);
-  // Only show help text for DMs and non-commands
-  const isDM = conversation instanceof Dm;
-
+): Promise<boolean> {
   const content = message.content as string;
-  console.log(`Processing message: "${content}" from ${message.senderInboxId}`);
-
   const args = content.split(" ");
   const command = args[0].toLowerCase();
 
-  if (!command.startsWith("/") && isDM) {
-    console.log("Sending help text for non-command message in DM");
-    await conversation.send(message.senderInboxId);
-    await conversation.send(HELP_TEXT);
-    return;
+  // Only handle /stress commands
+  if (command !== "/stress") {
+    await logAndSend(HELP_TEXT, conversation);
+    return false;
   }
 
-  // Handle commands
-  console.log(`Handling command: ${command}`);
-  switch (command) {
-    case "/help":
-      if (isDM) {
-        console.log("Sending help text");
-        await conversation.send(HELP_TEXT);
-      }
-      break;
+  if (args.length < 2) {
+    await logAndSend(HELP_TEXT, conversation);
+    return false;
+  }
 
-    case "/stress": {
-      if (args[1]?.toLowerCase() === "reset") {
-        console.log("Processing stress reset command");
-        // Terminate all workers
-        try {
-          if (workers) {
-            await conversation.send("🧹 Cleaning up - terminating workers...");
-            await workers.terminateAll();
-            await conversation.send("✨ All workers terminated successfully");
-          }
-        } catch (cleanupError) {
-          console.error("Error terminating workers:", cleanupError);
-          await conversation.send(
-            "⚠️ Warning: Some workers may not have terminated properly",
-          );
-        }
-        isStressTestRunning = false;
-        await conversation.send("🔄 Reset complete. Type /help to start over.");
-        return;
-      }
+  const sizeArg = args[1].toLowerCase();
+  if (!["small", "medium", "large"].includes(sizeArg)) {
+    await logAndSend(
+      "⚠️ Invalid size option. Use 'small', 'medium', or 'large'.\n" +
+        HELP_TEXT,
+      conversation,
+      "warn",
+    );
+    return false;
+  }
 
-      if (isStressTestRunning) {
-        console.log("Stress test already in progress, rejecting new test");
-        await conversation.send(
-          "⚠️ A stress test is already running. Please either:\n" +
-            "1. Wait for it to complete, or\n" +
-            "2. Use `/stress reset` to force stop all tests",
-        );
-        return;
-      }
+  const config = TEST_CONFIGS[sizeArg];
 
-      const config = parseStressCommand(args);
-      if (config) {
-        console.log(`Starting stress test with config:`, config);
-        await runStressTest(config, message, conversation, client);
-      } else {
-        if (isDM) {
-          console.log("Invalid stress test command format");
-          await conversation.send(
-            "⚠️ Invalid command format. Type /help for usage instructions.",
-          );
-        }
-      }
-      break;
+  if (config) {
+    let workers = await getWorkers(config.workerCount, testName, "none");
+
+    await runStressTest(config, workers, client, message, conversation);
+  }
+  return true;
+}
+
+async function initializeBot() {
+  try {
+    const botWorker = await getWorkers(["bot"], testName, "message", "none");
+    const bot = botWorker.get("bot");
+
+    if (!bot) {
+      console.error("Bot worker not found");
+      process.exit(1);
     }
 
-    default:
-      if (isDM) {
-        console.log("Unknown command, sending help text");
-        await conversation.send(HELP_TEXT);
-      }
+    console.log("Bot worker:", bot.address);
+    console.log("Bot worker client:", bot.client.inboxId);
+    console.log(
+      `https://xmtp.chat/dm/${bot.address}?env=${process.env.XMTP_ENV}`,
+    );
+
+    return bot.client;
+  } catch (error) {
+    console.debug(error);
+    console.error("Error initializing bot:", error);
+    process.exit(1);
   }
 }
 
 async function main() {
   try {
     const client = await initializeBot();
+
     await client.conversations.sync();
     const stream = client.conversations.streamAllMessages();
+
     for await (const message of await stream) {
       try {
+        // Skip own messages and non-text messages
         if (
           message?.senderInboxId.toLowerCase() ===
             client.inboxId.toLowerCase() ||
           message?.contentType?.typeId !== "text"
         )
           continue;
+
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );
+
         if (!conversation) continue;
-        if (conversation instanceof Group) continue;
-        await handleMessage(message, conversation, client);
+
+        // Only handle DM conversations
+        if (!("peerInboxId" in conversation)) continue;
+
+        await handleStressCommand(message, conversation, client);
       } catch (error) {
-        console.error("Message handling error:", error);
+        console.debug(error);
+        console.error("Error handling message:", error);
       }
     }
   } catch (error) {
+    console.debug(error);
     console.error("Fatal error:", error);
     process.exit(1);
   }

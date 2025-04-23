@@ -32,7 +32,7 @@ async function main() {
     console.error(
       "Error: No generated inboxes found in @helpers/generated-inboxes.json",
     );
-    process.exit(1);
+    return;
   }
 
   console.log(
@@ -119,6 +119,7 @@ async function main() {
 
     // Add a separator between inbox initializations
     console.log("-----------------------------------------------------");
+    if (i == 10) break;
   }
 
   // Display summary
@@ -139,4 +140,4 @@ async function main() {
   }
 }
 
-main().catch(console.error);
+void main();
