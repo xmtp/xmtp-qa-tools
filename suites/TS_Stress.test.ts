@@ -1,12 +1,12 @@
 import { closeEnv, loadEnv } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
-import { logError } from "@helpers/logger";
 import {
   createAndSendDms,
   createAndSendInGroup,
   createLargeGroups,
   TEST_CONFIGS,
-} from "@helpers/stress";
+} from "@helpers/groups";
+import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   afterAll,
