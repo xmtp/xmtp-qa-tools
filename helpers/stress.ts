@@ -1,6 +1,11 @@
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import type { WorkerManager } from "@workers/manager";
-import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import {
+  type Client,
+  type Conversation,
+  type DecodedMessage,
+  type Group,
+} from "@xmtp/node-sdk";
 
 export const TEST_CONFIGS: Record<string, StressTestConfig> = {
   small: {
@@ -196,8 +201,7 @@ export async function createGroupsWithWorkers(
   workers: WorkerManager,
   client: Client,
   config: StressTestConfig,
-  senderInboxId?: string,
-  conversation?: Conversation,
+  message: DecodedMessage,
 ) {
   const workerInboxIds = workers
     .getWorkers()
@@ -208,44 +212,19 @@ export async function createGroupsWithWorkers(
     try {
       console.log(`Creating group ${i + 1} of ${config.groupCount}`);
       // First create with a subset of members (up to max batch size)
-      const initialMembers = [...workerInboxIds];
-      if (senderInboxId) {
-        initialMembers.push(senderInboxId);
-      }
-
+      const initialMembers = [...workerInboxIds, message.senderInboxId];
       // Create group with all members at once
       const group = await client.conversations.newGroup(initialMembers, {
         groupName: `Stress Test Group ${i + 1}`,
         groupDescription: `Group created for stress testing with ${workerInboxIds.length} members`,
       });
-
-      if (!group) {
-        console.error(`Failed to create group ${i + 1}`);
-        continue;
-      }
-
-      // Wait for group to sync
       await group.sync();
-
-      // Send a welcome message to the group
-      await group.send(
-        `Hello from the group ${i + 1}! This group has ${workerInboxIds.length} members.`,
-      );
-
-      console.log(
-        `Successfully created and sent message to group ${i + 1} (ID: ${group.id})`,
-      );
+      console.log(group);
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
       console.error(`Error creating group ${i + 1}: ${errorMessage}`);
     }
-  }
-
-  if (conversation) {
-    await conversation.send(
-      `✅ ${config.groupCount} groups created with ${workerInboxIds.length} members each`,
-    );
   }
 }
 

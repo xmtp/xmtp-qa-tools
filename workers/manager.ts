@@ -377,7 +377,9 @@ export async function getWorkers(
     typeOfResponse,
     env,
   );
+  console.log(descriptorsOrAmount);
   await manager.createWorkers(descriptorsOrAmount, randomVersions);
+  console.log(manager.getWorkers());
   manager.printWorkers();
   return manager;
 }
