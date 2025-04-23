@@ -1,11 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import {
-  createGroupsWithWorkers,
-  createLargeGroups,
-  sendDmsFromWorkers,
-  TEST_CONFIGS,
-  type StressTestConfig,
-} from "@helpers/stress";
+import { TEST_CONFIGS } from "@helpers/stress";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   type Client,
@@ -132,9 +126,9 @@ export async function handleStressCommand(
   const config = TEST_CONFIGS[sizeArg];
   console.log(config);
   if (config) {
-    const workers = await getWorkers(
-      TEST_CONFIGS.small.workerCount,
-      "stress",
+    let workers = await getWorkers(
+      config.workerCount,
+      testName,
       "message",
       "gm",
     );
