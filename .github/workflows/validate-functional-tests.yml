@@ -23,6 +23,10 @@ jobs:
         run: ./dev/up
       - name: Sleep for 5 seconds
         run: sleep 5s
+      - name: Wait for dev environment to be ready
+        run: yarn script local-update
+      - name: Sleep for 5 seconds
+        run: sleep 5s
       - name: Run functional tests
         env:
           XMTP_ENV: local
