@@ -54,13 +54,13 @@ describe(testName, () => {
       // Send a simple message
       await convo.send("gm");
 
-      // Wait briefly for response
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-
+      await convo.sync();
       const messages = await convo.messages();
+      await convo.sync();
 
       const messagesAfter = messages.length;
 
+      await convo.sync();
       // We should have at least 2 messages (our message and bot's response)
       expect(messagesAfter).toBe(prevMessages + 2);
       console.log("Messages before:", prevMessages, "after:", messagesAfter);
