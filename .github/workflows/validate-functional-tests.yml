@@ -26,9 +26,7 @@ jobs:
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: |
-          # Use the updated run-test.sh script to run functional tests with thread pool
-          bash scripts/run-test.sh functional
+        run: ./scripts/run-test.sh functional
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
