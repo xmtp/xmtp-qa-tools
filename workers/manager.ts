@@ -120,7 +120,6 @@ export class WorkerManager {
 
   public printWorkers() {
     try {
-      console.log(this.workers);
       let workersToPrint = [];
       for (const baseName in this.workers) {
         for (const installationId in this.workers[baseName]) {

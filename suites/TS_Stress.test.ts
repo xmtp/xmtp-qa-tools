@@ -4,10 +4,11 @@ import {
   createAndSendDms,
   createAndSendInGroup,
   createLargeGroups,
-  TEST_CONFIGS,
 } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Client } from "@xmtp/node-sdk";
+import { TEST_CONFIGS } from "bots/stress";
 import {
   afterAll,
   afterEach,
@@ -32,11 +33,14 @@ console.log(`Running ${testSize} stress test with configuration:`, config);
 describe(testName, () => {
   let workers: WorkerManager;
   let start: number;
+  let client: Client;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
-      workers = await getWorkers(config.workerCount, testName, "message", "gm");
+      let bot = await getWorkers(["bot"], testName, "message", "none");
+      client = bot.get("bot")?.client as Client;
+      workers = await getWorkers(config.workerCount, testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
     } catch (e) {
@@ -91,6 +95,7 @@ describe(testName, () => {
     try {
       const group = await createAndSendInGroup(
         workers,
+        client,
         config.groupCount,
         receiverInboxId,
       );
@@ -106,8 +111,12 @@ describe(testName, () => {
   it("createLargeGroup: should create a large group with many members", async () => {
     try {
       // Create large groups
-      const result = await createLargeGroups(config, workers, receiverInboxId);
-
+      const result = await createLargeGroups(
+        config,
+        workers,
+        client,
+        receiverInboxId,
+      );
       expect(result).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

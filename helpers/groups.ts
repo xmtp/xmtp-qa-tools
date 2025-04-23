@@ -1,11 +1,6 @@
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { type Worker, type WorkerManager } from "@workers/manager";
-import {
-  type Client,
-  type Conversation,
-  type DecodedMessage,
-  type Group,
-} from "@xmtp/node-sdk";
+import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 
 /**
  * Creates a group with specified participants and measures performance
@@ -65,30 +60,6 @@ export async function getWorkersFromGroup(
     .filter((w) => memberIds.includes(w.client.inboxId));
 }
 
-export const TEST_CONFIGS: Record<string, StressTestConfig> = {
-  small: {
-    largeGroups: [10],
-    workerCount: 20,
-    messageCount: 5,
-    groupCount: 2,
-    sizeLabel: "small",
-  },
-  medium: {
-    largeGroups: [15, 20],
-    workerCount: 50,
-    messageCount: 10,
-    groupCount: 3,
-    sizeLabel: "medium",
-  },
-  large: {
-    largeGroups: [20, 30, 40],
-    workerCount: 100,
-    messageCount: 15,
-    groupCount: 5,
-    sizeLabel: "large",
-  },
-};
-
 export interface StressTestConfig {
   largeGroups: number[];
   workerCount: number;
@@ -119,6 +90,7 @@ export async function createAndSendDms(
 
 export async function createAndSendInGroup(
   workers: WorkerManager,
+  client: Client,
   groupCount: number,
   receiverInboxId: string,
 ) {
@@ -127,9 +99,8 @@ export async function createAndSendInGroup(
     allInboxIds.push(receiverInboxId);
 
     for (let i = 0; i < groupCount; i++) {
-      let creator = workers.getWorkers()[0];
       const groupName = `Test Group ${Date.now()}`;
-      const group = await creator.client.conversations.newGroup(allInboxIds, {
+      const group = await client.conversations.newGroup(allInboxIds, {
         groupName,
         groupDescription: "Test group for stress testing",
       });
@@ -145,6 +116,7 @@ export async function createAndSendInGroup(
 
 export async function createLargeGroup(
   workers: WorkerManager,
+  client: Client,
   memberCount: number,
   receiverInboxId: string,
 ): Promise<Group | undefined> {
@@ -156,8 +128,7 @@ export async function createLargeGroup(
 
     initialMembers.push(receiverInboxId);
 
-    const creator = workers.getWorkers()[0];
-    const group = await creator.client.conversations.newGroup(initialMembers, {
+    const group = await client.conversations.newGroup(initialMembers, {
       groupName: `Large Group ${Date.now()}`,
       groupDescription: `Test group with ${memberCount} members`,
     });
@@ -185,108 +156,10 @@ export async function createLargeGroup(
   }
 }
 
-export async function sendDmsFromWorkers(
-  workers: WorkerManager,
-  senderInboxId: string,
-  conversation?: Conversation,
-) {
-  for (const worker of workers.getWorkers()) {
-    if (!worker.client) continue;
-    const dm = await worker.client.conversations.newDm(senderInboxId);
-    await dm.send(`sup! ${worker.name} here`);
-  }
-
-  if (conversation) {
-    await conversation.send(`✅ DMs sent from ${workers.getLength()} workers`);
-  }
-}
-
-export async function createGroupsWithWorkers(
-  workers: WorkerManager,
-  client: Client,
-  config: StressTestConfig,
-  receiverInboxId: string | DecodedMessage,
-) {
-  const workerInboxIds = workers
-    .getWorkers()
-    .map((w) => w.client?.inboxId)
-    .filter(Boolean);
-
-  const inboxId =
-    typeof receiverInboxId === "string"
-      ? receiverInboxId
-      : receiverInboxId.senderInboxId;
-
-  const MAX_BATCH_SIZE = 10;
-
-  for (let i = 0; i < config.groupCount; i++) {
-    try {
-      const initialMembers = workerInboxIds.slice(0, 1);
-      initialMembers.push(inboxId);
-
-      let group;
-      try {
-        group = await client.conversations.newGroup(initialMembers, {
-          groupName: `Stress Test Group ${i + 1}`,
-          groupDescription: `Stress test group created at ${new Date().toISOString()}`,
-        });
-      } catch (botClientError) {
-        const fallbackWorker = workers.getWorkers()[0];
-        if (!fallbackWorker || !fallbackWorker.client) {
-          throw new Error("No fallback worker available");
-        }
-
-        const workerInitialMembers = [client.inboxId, inboxId];
-
-        group = await fallbackWorker.client.conversations.newGroup(
-          workerInitialMembers,
-          {
-            groupName: `Stress Test Group ${i + 1} (Worker Created)`,
-            groupDescription: `Stress test group created at ${new Date().toISOString()} using worker client`,
-          },
-        );
-      }
-
-      await group.sync();
-
-      const groupMembers = await group.members();
-      const groupMemberInboxIds = groupMembers.map((m) =>
-        m.inboxId.toLowerCase(),
-      );
-
-      const remainingWorkers = workerInboxIds.filter(
-        (id) => !groupMemberInboxIds.includes(id.toLowerCase()),
-      );
-
-      if (remainingWorkers.length > 0) {
-        for (let j = 0; j < remainingWorkers.length; j += MAX_BATCH_SIZE) {
-          const batchMembers = remainingWorkers.slice(j, j + MAX_BATCH_SIZE);
-          if (batchMembers.length > 0) {
-            try {
-              await group.addMembers(batchMembers);
-              await group.sync();
-            } catch (addError) {
-              // Continue with next batch
-            }
-            await new Promise((resolve) => setTimeout(resolve, 500));
-          }
-        }
-      }
-
-      await group.send(
-        `Hello from stress test! This is group ${i + 1} of ${config.groupCount}`,
-      );
-
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    } catch (error) {
-      // Continue with next group
-    }
-  }
-}
-
 export async function createLargeGroups(
   config: StressTestConfig,
   workers: WorkerManager,
+  client: Client,
   receiverInboxId: string,
   conversation?: Conversation,
 ) {
@@ -296,7 +169,12 @@ export async function createLargeGroups(
         await conversation.send(`Creating group with ${size} members...`);
       }
 
-      const group = await createLargeGroup(workers, size, receiverInboxId);
+      const group = await createLargeGroup(
+        workers,
+        client,
+        size,
+        receiverInboxId,
+      );
 
       if (!group) {
         if (conversation) {
