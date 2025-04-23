@@ -25,17 +25,12 @@ Create a `.env` file in the `bugs/bug_fork` directory:
 ```bash
 LOGGING_LEVEL="off"  # Options: debug, info, warn, error
 XMTP_ENV="production"  # Options: production, dev
-WORKERS=8  # Number of programmatic workers
-EPOCHS=6   # Number of add/remove cycles to perform
-
-# Manual client InboxIDs
-USER_CONVOS=""
-USER_CONVOS_DESKTOP=""
-USER_CB_WALLET=""
-USER_XMTPCHAT=""
 
 # Auto-populated during testing
 GROUP_ID=""
+
+# PERSONAS
+# where rest of personas will be saved
 ```
 
 > [!TIP]

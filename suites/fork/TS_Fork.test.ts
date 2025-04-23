@@ -1,4 +1,3 @@
-import { workerData } from "node:worker_threads";
 import { closeEnv, loadEnv } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -6,7 +5,7 @@ import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
 
 // Test configuration
-const TEST_NAME = "bug_fork";
+const TEST_NAME = "ts_fork";
 loadEnv(TEST_NAME);
 
 const testConfig = {
