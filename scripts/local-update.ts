@@ -119,6 +119,7 @@ async function main() {
 
     // Add a separator between inbox initializations
     console.log("-----------------------------------------------------");
+    if (i == 10) break;
   }
 
   // Display summary
