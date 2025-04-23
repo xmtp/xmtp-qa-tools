@@ -99,7 +99,7 @@ export async function createAndSendInGroup(
     allInboxIds.push(receiverInboxId);
 
     for (let i = 0; i < groupCount; i++) {
-      const groupName = `Test Group ${Date.now()}`;
+      const groupName = `Test Group ${i} ${allInboxIds.length}`;
       const group = await client.conversations.newGroup(allInboxIds, {
         groupName,
         groupDescription: "Test group for stress testing",
@@ -115,7 +115,6 @@ export async function createAndSendInGroup(
 }
 
 export async function createLargeGroup(
-  workers: WorkerManager,
   client: Client,
   memberCount: number,
   receiverInboxId: string,
@@ -128,8 +127,9 @@ export async function createLargeGroup(
 
     initialMembers.push(receiverInboxId);
 
+    const groupName = `Large Group ${memberCount}: ${initialMembers.length}`;
     const group = await client.conversations.newGroup(initialMembers, {
-      groupName: `Large Group ${Date.now()}`,
+      groupName,
       groupDescription: `Test group with ${memberCount} members`,
     });
 
@@ -169,12 +169,7 @@ export async function createLargeGroups(
         await conversation.send(`Creating group with ${size} members...`);
       }
 
-      const group = await createLargeGroup(
-        workers,
-        client,
-        size,
-        receiverInboxId,
-      );
+      const group = await createLargeGroup(client, size, receiverInboxId);
 
       if (!group) {
         if (conversation) {
