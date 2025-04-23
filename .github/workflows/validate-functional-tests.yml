@@ -21,10 +21,6 @@ jobs:
         run: yarn
       - name: Start dev environment
         run: ./dev/up
-      - name: Sleep for 5 seconds
-        run: sleep 5s
-      - name: Sleep for 5 seconds
-        run: sleep 5s
       - name: Run functional tests
         env:
           XMTP_ENV: dev
@@ -32,7 +28,7 @@ jobs:
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: yarn test groups
+        run: ./scripts/run-test.sh functional
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
