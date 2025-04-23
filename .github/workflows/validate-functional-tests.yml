@@ -23,13 +23,11 @@ jobs:
         run: ./dev/up
       - name: Sleep for 5 seconds
         run: sleep 5s
-      - name: Updating local generated inboxes
-        run: yarn script local-update
       - name: Sleep for 5 seconds
         run: sleep 5s
       - name: Run functional tests
         env:
-          XMTP_ENV: local
+          XMTP_ENV: dev
           RUST_BACKTRACE: 1
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
