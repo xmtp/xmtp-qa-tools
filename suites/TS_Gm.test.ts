@@ -40,6 +40,7 @@ describe(testName, () => {
 
   it("gm-bot: should check if bot is alive", async () => {
     try {
+      console.log("gmBotAddress", gmBotAddress);
       // Create conversation with the bot
       convo = await workers
         .get("bob")!
@@ -49,20 +50,22 @@ describe(testName, () => {
         });
 
       await convo.sync();
-      const prevMessages = (await convo.messages()).length;
-
+      const prevMessages = await convo.messages();
+      console.log("prevMessages", prevMessages.length);
       // Send a simple message
-      await convo.send("gm");
-
+      const sentMessageId = await convo.send("gm");
+      console.log("sentMessageId", sentMessageId);
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       await convo.sync();
       const messages = await convo.messages();
-      await convo.sync();
+      console.log("messages", messages.length);
 
       const messagesAfter = messages.length;
+      console.log("messagesAfter", messagesAfter);
 
       await convo.sync();
       // We should have at least 2 messages (our message and bot's response)
-      expect(messagesAfter).toBe(prevMessages + 2);
+      expect(messagesAfter).toBe(prevMessages.length + 2);
       console.log("Messages before:", prevMessages, "after:", messagesAfter);
     } catch (e) {
       hasFailures = logError(e, expect);
