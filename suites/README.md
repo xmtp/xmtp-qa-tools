@@ -121,7 +121,8 @@ The TS_Fork test suite reproduces and investigates group conversation forking is
 ### Setup
 
 ```bash
-git clone https://github.com/xmtp/xmtp-qa-testing
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 ```

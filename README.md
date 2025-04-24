@@ -227,7 +227,8 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 ### Installation
 
 ```bash
-git clone https://github.com/xmtp/xmtp-qa-testing
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 ```
