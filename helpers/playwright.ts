@@ -141,6 +141,8 @@ export class XmtpPlaywright {
     waitForMessage: boolean = true,
   ): Promise<boolean> {
     try {
+      // Wait for GM response with a longer timeout
+      await page?.waitForTimeout(1000);
       await page.getByRole("textbox", { name: "Type a message..." }).click();
       await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
       await page.getByRole("button", { name: "Send" }).click();
