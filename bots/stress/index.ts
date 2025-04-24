@@ -42,9 +42,9 @@ loadEnv(testName);
 
 export const HELP_TEXT = `Stress bot commands:
 
-/stress small - Run a small test: Creates a group with 20 members, 3 workers, 5 messages each
-/stress medium - Run a medium test: Creates a group with 50 members, 5 workers, 10 messages each
-/stress large - Run a large test: Creates a group with 100 members, 10 workers, 15 messages each`;
+/stress small - Run a small test: Creates a group with 20 members, large groups with 50 members, 20 workers, 5 messages each
+/stress medium - Run a medium test: Creates a group with 50 members, large groups up to 100 members, 50 workers, 10 messages each
+/stress large - Run a large test: Creates a group with 100 members, large groups up to 200 members, 100 workers, 15 messages each`;
 
 // Singleton lock to prevent multiple stress tests from running concurrently
 class StressTestLock {
