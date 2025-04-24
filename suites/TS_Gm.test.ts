@@ -51,6 +51,7 @@ describe(testName, () => {
       await convo.sync();
       const messages = await convo.messages();
       const prevMessageCount = messages.length;
+      console.log("prevMessageCount", prevMessageCount);
       // Send a simple message
       const sentMessageId = await convo.send("gm");
       console.log("sentMessageId", sentMessageId);
