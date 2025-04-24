@@ -49,19 +49,26 @@ describe(testName, () => {
         });
 
       await convo.sync();
-      const prevMessages = await convo.messages();
+      const messages = await convo.messages();
+      const prevMessageCount = messages.length;
       // Send a simple message
       const sentMessageId = await convo.send("gm");
+      console.log("sentMessageId", sentMessageId);
       await new Promise((resolve) => setTimeout(resolve, 1000));
-      await convo.sync();
-      const messages = await convo.messages();
 
-      const messagesAfter = messages.length;
+      await convo.sync();
+      const messagesAfter = await convo.messages();
+      const messageAfterCount = messagesAfter.length;
 
       await convo.sync();
       // We should have at least 2 messages (our message and bot's response)
-      expect(messagesAfter).toBe(prevMessages.length + 2);
-      console.log("Messages before:", prevMessages, "after:", messagesAfter);
+      expect(messageAfterCount).toBe(prevMessageCount + 2);
+      console.log(
+        "Messages before:",
+        prevMessageCount,
+        "after:",
+        messageAfterCount,
+      );
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
