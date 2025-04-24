@@ -10,7 +10,8 @@ A lightweight toolkit for app developers to test messaging functionality against
 ### Installation
 
 ```bash
-git clone https://github.com/xmtp/xmtp-qa-testing
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 # Run the bot

@@ -13,7 +13,8 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 ## Setup
 
 ```bash
-git clone https://github.com/xmtp/xmtp-qa-testing
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 ```
