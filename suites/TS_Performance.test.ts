@@ -246,6 +246,27 @@ describe(testName, () => {
     }
   });
 
+  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
+    try {
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+      await newGroup.send(groupMessage);
+      console.log("GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+  it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
+    try {
+      const verifyResult = await verifyStreamAll(newGroup, workers);
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   it(`addMembers: should add members to a group`, async () => {
     try {
       await (newGroup as Group).addMembers([workers.get("randomguy")!.inboxId]);
@@ -265,27 +286,6 @@ describe(testName, () => {
 
       const members = await newGroup.members();
       expect(members.length).toBe(previousMembers.length - 1);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
-    try {
-      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
-
-      await newGroup.send(groupMessage);
-      console.log("GM Message sent in group", groupMessage);
-      expect(groupMessage).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-  it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
-    try {
-      const verifyResult = await verifyStreamAll(newGroup, workers);
-      expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;

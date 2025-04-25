@@ -64,15 +64,7 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = [
-  "47",
-  "100",
-  "105",
-  "202",
-  "203",
-  "204",
-  "205",
-];
+export const sdkVersionOptions = ["100", "105", "202", "203", "204", "205"];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -569,7 +561,7 @@ export function calculateMessageStats(
 }
 
 // Default worker names
-const defaultNames = [
+export const defaultNames = [
   "bob",
   "alice",
   "fabri",
