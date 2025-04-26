@@ -3,6 +3,7 @@ import { sendTestResults } from "@helpers/datadog";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
+import { defaultValues } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -55,7 +56,9 @@ describe(testName, () => {
       // Send a simple message
       const sentMessageId = await convo.send("gm");
       console.log("sentMessageId", sentMessageId);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) =>
+        setTimeout(resolve, defaultValues.streamTimeout * 2),
+      );
 
       await convo.sync();
       const messagesAfter = await convo.messages();
@@ -64,12 +67,6 @@ describe(testName, () => {
       await convo.sync();
       // We should have at least 2 messages (our message and bot's response)
       expect(messageAfterCount).toBe(prevMessageCount + 2);
-      console.log(
-        "Messages before:",
-        prevMessageCount,
-        "after:",
-        messageAfterCount,
-      );
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
