@@ -319,7 +319,6 @@ async function main() {
           message?.contentType?.typeId !== "text"
         )
           continue;
-
         const conversation = await client.conversations.getConversationById(
           message.conversationId,
         );

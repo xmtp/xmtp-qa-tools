@@ -135,7 +135,7 @@ export class WorkerClient extends Worker {
     this.libXmtpVersion = worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
-    this.nameId = worker.name;
+    this.nameId = worker.name + "-" + worker.sdkVersion;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;

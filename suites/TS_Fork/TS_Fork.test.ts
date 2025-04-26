@@ -17,17 +17,21 @@ const testConfig = {
       minute: "2-digit",
       hour12: false,
     }),
-  epochs: 3,
-  workers: 10,
+  epochs: 12,
+  workers: 14,
   manualUsers: {
     USER_CONVOS:
       "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
     USER_CONVOS_DESKTOP:
       "54f447c03b0fe594d499e685fa390d68b85490856469657babe2c8351dbee33f",
+    USER_CONVOS_DESKTOP2:
+      "ca727d8cd062271a0dab564d6be9be6254fb103bb0bcbfdec660d39f4bc16671",
     USER_CB_WALLET:
       "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
     USER_XMTPCHAT:
-      "ac9feb1384a9092333db4d17c6981743a53277c24c57ed6f12f05bd78a81be30",
+      "cfa7ffebd9d083e06bded87f0ecbcb4a19e86dcbb27c99b56980a118840cc856",
+    USER_XMTPCHAT2:
+      "d18a35dee833c7dab7ef0d89a4c7e3ad1fa914a528864d92ba856ec70731c36f",
   },
   testWorkers: ["bob", "alice", "elon", "joe"],
   checkWorkers: ["fabri", "eve", "dave", "frank"],

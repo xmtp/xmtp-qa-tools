@@ -45,6 +45,12 @@ import {
   Group as Group205,
 } from "@xmtp/node-sdk-205";
 import {
+  Client as Client206,
+  Conversation as Conversation206,
+  Dm as Dm206,
+  Group as Group206,
+} from "@xmtp/node-sdk-206";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -65,13 +71,13 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 export const sdkVersionOptions = [
-  "47",
   "100",
   "105",
   "202",
   "203",
   "204",
   "205",
+  "206",
 ];
 
 // SDK version mappings
@@ -155,6 +161,16 @@ export const sdkVersions = {
     bindingsPackage: "node-bindings-120-4",
     sdkVersion: "2.0.5",
     libXmtpVersion: "b96f93d",
+  },
+  206: {
+    Client: Client206,
+    Conversation: Conversation206,
+    Dm: Dm206,
+    Group: Group206,
+    sdkPackage: "node-sdk-206",
+    bindingsPackage: "node-bindings-120-5",
+    sdkVersion: "2.0.6",
+    libXmtpVersion: "1ab3225",
   },
 };
 
@@ -569,7 +585,7 @@ export function calculateMessageStats(
 }
 
 // Default worker names
-const defaultNames = [
+export const defaultNames = [
   "bob",
   "alice",
   "fabri",
@@ -630,6 +646,7 @@ const defaultNames = [
 
 export const defaultValues = {
   amount: 5,
+  streamTimeout: 1000,
   timeout: 40000,
   perMessageTimeout: 3000,
   defaultNames,
