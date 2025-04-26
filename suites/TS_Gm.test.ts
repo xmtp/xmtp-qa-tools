@@ -57,7 +57,7 @@ describe(testName, () => {
       const sentMessageId = await convo.send("gm");
       console.log("sentMessageId", sentMessageId);
       await new Promise((resolve) =>
-        setTimeout(resolve, defaultValues.streamTimeout * 2),
+        setTimeout(resolve, defaultValues.streamTimeout),
       );
 
       await convo.sync();
