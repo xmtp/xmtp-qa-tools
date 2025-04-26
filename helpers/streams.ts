@@ -2,6 +2,7 @@ import { getWorkersFromGroup } from "@helpers/groups";
 import type { MessageStreamWorker } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
+import { defaultValues } from "./tests";
 
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
@@ -69,7 +70,9 @@ export async function verifyStream<T extends string = string>(
   );
 
   // Give streams time to initialize before sending messages
-  await new Promise((resolve) => setTimeout(resolve, 300));
+  await new Promise((resolve) =>
+    setTimeout(resolve, defaultValues.streamTimeout),
+  );
 
   // Start collectors
   const collectPromises = receivers.map((r) =>
@@ -91,7 +94,9 @@ export async function verifyStream<T extends string = string>(
     await sender(group, sentMessages[i]);
     // Add a small delay between messages to avoid rate limiting
     if (i < count - 1) {
-      await new Promise((resolve) => setTimeout(resolve, 300));
+      await new Promise((resolve) =>
+        setTimeout(resolve, defaultValues.perMessageTimeout),
+      );
     }
   }
   console.log(`Sent ${count} messages`);

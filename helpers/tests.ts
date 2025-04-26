@@ -646,6 +646,7 @@ export const defaultNames = [
 
 export const defaultValues = {
   amount: 5,
+  streamTimeout: 1000,
   timeout: 40000,
   perMessageTimeout: 3000,
   defaultNames,
