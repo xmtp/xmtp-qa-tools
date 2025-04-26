@@ -92,12 +92,6 @@ export async function verifyStream<T extends string = string>(
   // Send the messages with delays between them
   for (let i = 0; i < count; i++) {
     await sender(group, sentMessages[i]);
-    // Add a small delay between messages to avoid rate limiting
-    if (i < count - 1) {
-      await new Promise((resolve) =>
-        setTimeout(resolve, defaultValues.perMessageTimeout),
-      );
-    }
   }
   console.log(`Sent ${count} messages`);
 
@@ -158,6 +152,11 @@ export async function verifyConversationStream(
   const createdGroup =
     await initiator.client.conversations.newGroup(participantAddresses);
   console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
+
+  // Give streams time to initialize before sending messages
+  await new Promise((resolve) =>
+    setTimeout(resolve, defaultValues.streamTimeout),
+  );
 
   // Wait for all notifications
   const results = await Promise.all(participantPromises);
