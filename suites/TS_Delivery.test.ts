@@ -39,7 +39,6 @@ describe(
         //fs.rmSync(".data", { recursive: true, force: true });
         // Use getWorkers to spin up many workers. This is resource-intensive.
         workers = await getWorkers(receiverAmount, testName);
-        await new Promise((resolve) => setTimeout(resolve, 3000));
         console.log("creating group");
         group = await workers
           .get("bob")!
