@@ -316,8 +316,8 @@ export class WorkerClient extends Worker {
     );
     const baseName = this.name.split("-")[0].toLowerCase();
     const isDm = conversation instanceof Dm;
-    const content = message.content as string;
-
+    const content = (message.content as string).toLowerCase();
+    //
     return (
       (message?.contentType?.typeId === "text" &&
         content.includes(baseName) &&
