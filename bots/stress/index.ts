@@ -272,9 +272,33 @@ export async function handleStressCommand(
   const config = TEST_CONFIGS[sizeArg];
 
   if (config) {
-    let workers = await getWorkers(config.workerCount, testName, "none");
+    try {
+      console.log(`Creating ${config.workerCount} workers for stress test...`);
+      // Generate random prefix to avoid conflicts with other tests
+      const randomPrefix = Math.random().toString(36).substring(2, 6);
+      // Create workers with numeric names to avoid conflicts
+      const workerNames = Array.from(
+        { length: config.workerCount },
+        (_, i) => `stress${randomPrefix}_${i}`,
+      );
 
-    await runStressTest(config, workers, client, message, conversation);
+      let workers = await getWorkers(workerNames, testName, "none");
+      console.log(
+        `Successfully created ${workers.getWorkers().length} workers`,
+      );
+
+      await runStressTest(config, workers, client, message, conversation);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`Error during stress test setup: ${errorMsg}`, error);
+      await logAndSend(
+        `⚠️ Error setting up stress test: ${errorMsg}`,
+        conversation,
+        "warn",
+      );
+      // Release the lock when test fails
+      StressTestLock.getInstance().release();
+    }
   }
   return true;
 }
@@ -302,56 +326,56 @@ async function initializeBot() {
     process.exit(1);
   }
 }
-const startGPTWorkers = async () => {
-  const workersGpt = await getWorkers(
-    ["sam", "tina", "walt"],
-    testName,
-    "message",
-    "gpt",
-  );
-  console.log("GPT workers:", workersGpt.getWorkers().length);
-  for (const worker of workersGpt.getWorkers()) {
-    console.log("GPT workers:", worker.name, worker.inboxId);
-  }
-};
 
 async function main() {
-  try {
-    const client = await initializeBot();
+  const client = await initializeBot();
 
-    await client.conversations.sync();
-    const stream = client.conversations.streamAllMessages();
+  console.log("GPT workers initialization disabled");
 
-    await startGPTWorkers();
-    console.log("Waiting for messages...");
-    for await (const message of await stream) {
-      try {
-        // Skip own messages and non-text messages
-        if (
-          message?.senderInboxId.toLowerCase() ===
-            client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text"
-        )
-          continue;
-        const conversation = await client.conversations.getConversationById(
-          message.conversationId,
-        );
+  while (true) {
+    try {
+      console.log("Starting message stream...");
+      console.log("✓ Syncing conversations...");
+      await client.conversations.sync();
+      const streamPromise = client.conversations.streamAllMessages();
+      const stream = await streamPromise;
 
-        if (!conversation) continue;
+      for await (const message of stream) {
+        try {
+          // Skip own messages and non-text messages
+          if (
+            message?.senderInboxId.toLowerCase() ===
+              client.inboxId.toLowerCase() ||
+            message?.contentType?.typeId !== "text"
+          )
+            continue;
+          const conversation = await client.conversations.getConversationById(
+            message.conversationId,
+          );
 
-        // Only handle DM conversations
-        if (!("peerInboxId" in conversation)) continue;
+          if (!conversation) continue;
 
-        await handleStressCommand(message, conversation, client);
-      } catch (error) {
-        console.debug(error);
-        console.error("Error handling message:", error);
+          // Only handle DM conversations
+          if (!("peerInboxId" in conversation)) continue;
+
+          await handleStressCommand(message, conversation, client);
+        } catch (error) {
+          console.error(
+            "Error handling message:",
+            error instanceof Error ? error.message : String(error),
+          );
+        }
       }
+    } catch (error) {
+      console.error(
+        "Stream error:",
+        error instanceof Error ? error.message : String(error),
+      );
+      console.error("Fatal error, restarting stream in 5 seconds...");
+      // Wait 5 seconds before restarting the stream
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      // Don't exit on stream errors, just retry
     }
-  } catch (error) {
-    console.debug(error);
-    console.error("Fatal error:", error);
-    process.exit(1);
   }
 }
 

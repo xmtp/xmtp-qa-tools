@@ -249,41 +249,44 @@ export class WorkerClient extends Worker {
   private initMessageStream() {
     // Process messages asynchronously
     void (async () => {
-      // Make sure conversations are fully synced before starting the stream
-      await this.client.conversations.sync();
+      while (true) {
+        try {
+          console.log("Starting message stream...");
+          console.log("✓ Syncing conversations...");
+          await this.client.conversations.sync();
+          const streamPromise = this.client.conversations.streamAllMessages();
+          const stream = await streamPromise;
 
-      // Add a small delay to ensure sync is complete
-      await new Promise((resolve) => setTimeout(resolve, 500));
+          for await (const message of stream) {
+            if (this.isTerminated) break;
 
-      const stream = await this.client.conversations.streamAllMessages();
+            if (
+              message?.senderInboxId.toLowerCase() ===
+                this.client.inboxId.toLowerCase() ||
+              message?.contentType?.typeId !== "text"
+            ) {
+              continue;
+            }
 
-      for await (const message of stream) {
-        if (this.isTerminated) break;
+            if (this.shouldRespondToMessage(message)) {
+              await this.handleResponse(message);
+              continue;
+            }
 
-        // Skip messages from self
-        if (
-          message?.senderInboxId?.toLowerCase() ===
-          this.client.inboxId.toLowerCase()
-        ) {
-          continue;
-        }
+            // Create worker message
+            const workerMessage: MessageStreamWorker = {
+              type: "stream_message",
+              message: message,
+            };
 
-        if (message?.contentType?.typeId) {
-          if (this.shouldRespondToMessage(message)) {
-            await this.handleResponse(message);
-            continue;
+            // Emit if any listeners are attached
+            if (this.listenerCount("message") > 0) {
+              this.emit("message", workerMessage);
+            }
           }
-
-          // Create worker message
-          const workerMessage: MessageStreamWorker = {
-            type: "stream_message",
-            message: message,
-          };
-
-          // Emit if any listeners are attached
-          if (this.listenerCount("message") > 0) {
-            this.emit("message", workerMessage);
-          }
+        } catch (error) {
+          console.debug(error);
+          console.error(`[${this.nameId}] Error in message stream`);
         }
       }
     })();
