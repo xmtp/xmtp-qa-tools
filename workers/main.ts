@@ -320,11 +320,11 @@ export class WorkerClient extends Worker {
 
     return (
       (message?.contentType?.typeId === "text" &&
-        content.includes(baseName) &&
-        !content.includes("/") &&
-        !content.includes("workers") &&
-        !content.includes("members") &&
-        !content.includes("admins")) ||
+        content.toLowerCase().includes(baseName.toLowerCase()) &&
+        !content.toLowerCase().includes("/") &&
+        !content.toLowerCase().includes("workers") &&
+        !content.toLowerCase().includes("members") &&
+        !content.toLowerCase().includes("admins")) ||
       isDm
     );
   }
