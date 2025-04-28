@@ -14,7 +14,7 @@ export const createLogger = () => {
   // Combine formats
   const combinedFormat = winston.format.combine(
     winston.format.timestamp(),
-    winston.format.colorize(), // Adds colors in console
+    winston.format.colorize(),
     prettyFormat,
   );
 
@@ -92,8 +92,9 @@ export const setupPrettyLogs = () => {
 
 // Optional: Add file logging capability
 export const addFileLogging = (filename: string) => {
-  // Make sure logs directory exists
-  const dir = path.dirname(filename);
+  const logPath = path.join(process.cwd(), "logs", filename + ".log");
+  const dir = path.dirname(logPath);
+
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
@@ -101,7 +102,7 @@ export const addFileLogging = (filename: string) => {
   // Add file transport to the logger
   logger.add(
     new winston.transports.File({
-      filename,
+      filename: logPath,
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.printf((info) => {

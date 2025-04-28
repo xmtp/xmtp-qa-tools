@@ -1,42 +1,14 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/tests";
 import {
   Dm,
   type Client,
-  type Consent,
-  type Conversation,
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import OpenAI from "openai";
 import type { typeOfResponse, typeofStream, WorkerBase } from "./manager";
-
-// Unified worker message types
-export type WorkerMessageBase = {
-  type: string;
-};
-
-export type MessageStreamWorker = WorkerMessageBase & {
-  type: "stream_message";
-  message: DecodedMessage;
-};
-
-export type ConversationStreamWorker = WorkerMessageBase & {
-  type: "stream_conversation";
-  conversation: Conversation;
-};
-
-export type ConsentStreamWorker = WorkerMessageBase & {
-  type: "stream_consent";
-  consentUpdate: Consent[] | undefined;
-};
-
-export type WorkerMessage =
-  | MessageStreamWorker
-  | ConversationStreamWorker
-  | ConsentStreamWorker;
 
 // Worker thread code as a string
 const workerThreadCode = `
@@ -65,13 +37,6 @@ parentPort.on("message", (message: { type: string; data: any }) => {
   }
 });
 
-process.on("unhandledRejection", (reason) => {
-  console.error("[Worker] Unhandled Rejection:", reason);
-});
-
-process.on("uncaughtException", (error) => {
-  console.error("[Worker] Uncaught Exception:", error);
-});
 
 // Re-export anything needed in the worker environment (if necessary)
 export type { Client };
@@ -109,11 +74,6 @@ export class WorkerClient extends Worker {
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
-  // Stream management
-  private activeStream?: AsyncIterable<any> & {
-    return: (value?: any) => Promise<any>;
-  };
-  private isTerminated = false;
 
   constructor(
     worker: WorkerBase,
@@ -218,6 +178,7 @@ export class WorkerClient extends Worker {
       installationId,
     };
   }
+
   /**
    * Unified method to start the appropriate stream based on configuration
    */
@@ -233,6 +194,7 @@ export class WorkerClient extends Worker {
         case "consent":
           this.initConsentStream();
           break;
+        // Add additional stream types as needed
       }
     } catch (error) {
       console.error(
@@ -244,66 +206,70 @@ export class WorkerClient extends Worker {
   }
 
   /**
-   * Initialize and handle message stream
+   * Initialize message stream for both regular messages and group updates
    */
   private initMessageStream() {
-    // Process messages asynchronously
     void (async () => {
       while (true) {
         try {
-          console.log("Starting message stream...");
-          console.log("✓ Syncing conversations...");
           await this.client.conversations.sync();
-          const streamPromise = this.client.conversations.streamAllMessages();
-          const stream = await streamPromise;
+          const stream = await this.client.conversations.streamAllMessages();
 
           for await (const message of stream) {
-            if (this.isTerminated) break;
-
             if (
+              !message ||
               message?.senderInboxId.toLowerCase() ===
-                this.client.inboxId.toLowerCase() ||
-              message?.contentType?.typeId !== "text"
+                this.client.inboxId.toLowerCase()
             ) {
               continue;
             }
 
+            // console.log(
+            //   message?.contentType?.typeId,
+            //   JSON.stringify(message.content),
+            // );
+            // Check if this is a group update message
+            if (message?.contentType?.typeId === "group_updated") {
+              if (this.listenerCount("message") > 0) {
+                this.emit("message", {
+                  type: "stream_group_updated",
+                  group: message,
+                });
+              }
+              continue;
+            }
+
+            // Handle auto-responses if enabled
             if (this.shouldRespondToMessage(message)) {
               await this.handleResponse(message);
               continue;
             }
 
-            // Create worker message
-            const workerMessage: MessageStreamWorker = {
-              type: "stream_message",
-              message: message,
-            };
-
-            // Emit if any listeners are attached
+            // Emit standard message
             if (this.listenerCount("message") > 0) {
-              this.emit("message", workerMessage);
+              this.emit("message", { type: "stream_message", message });
             }
           }
         } catch (error) {
-          console.debug(error);
-          console.error(`[${this.nameId}] Error in message stream`);
+          console.error(error);
         }
       }
     })();
   }
 
   /**
-   * Check if a message should trigger a GPT response
+   * Check if a message should trigger a response
    */
   private shouldRespondToMessage(message: DecodedMessage): boolean {
     if (this.typeOfResponse === "none") return false;
+
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
     );
-    // Get the base name without installation ID
     const baseName = this.name.split("-")[0].toLowerCase();
     const isDm = conversation instanceof Dm;
     const content = message.content as string;
+
     return (
       (message?.contentType?.typeId === "text" &&
         content.includes(baseName) &&
@@ -327,9 +293,15 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
 
+      if (!conversation) {
+        console.error(`[${this.nameId}] Conversation not found for response`);
+        return;
+      }
+
       if (this.typeOfResponse === "gpt") {
         const messages = await conversation?.messages();
         const baseName = this.name.split("-")[0].toLowerCase();
+
         // Generate a response using OpenAI
         const response = await this.generateOpenAIResponse(
           message.content as string,
@@ -338,190 +310,100 @@ export class WorkerClient extends Worker {
         );
 
         console.log(
-          `[${this.nameId}] GPT response: "${response.slice(0, 10)}"...`,
+          `[${this.nameId}] GPT response: "${response.slice(0, 50)}..."`,
         );
 
         // Send the response
         await conversation?.send(response);
       } else {
-        await conversation?.send(this.nameId + " says: gm");
+        await conversation?.send(`${this.nameId} says: gm`);
       }
     } catch (error) {
-      console.error(
-        `[${this.nameId}] Error generating stream response:`,
-        error,
-      );
+      console.error(`[${this.nameId}] Error generating response:`, error);
     } finally {
       console.timeEnd(`[${this.nameId}] Worker response`);
     }
   }
 
   /**
-   * Initialize and handle conversation stream
+   * Initialize conversation stream
    */
   private initConversationStream() {
-    // Process conversations asynchronously
     void (async () => {
-      // Track initial conversations to avoid duplicates
-      const initialConversations = await this.client.conversations.list();
-      const knownConversations = new Set(initialConversations.map((c) => c.id));
+      while (true) {
+        try {
+          await this.client.conversations.sync();
+          const stream = await this.client.conversations.stream();
 
-      console.log(
-        `[${this.nameId}] Initial conversations count: ${knownConversations.size}`,
-      );
+          for await (const conversation of stream) {
+            if (!conversation?.id) continue;
 
-      // Use the stream method to listen for conversation updates
-      this.activeStream = this.client.conversations.stream();
-
-      try {
-        if (!this.activeStream) return;
-
-        for await (const conversation of this.activeStream) {
-          if (this.isTerminated) break;
-
-          const convoId = conversation?.id;
-
-          if (!convoId) {
-            console.error(`[${this.nameId}] Conversation ID is undefined`);
-            continue;
-          }
-
-          // Only emit for new conversations that weren't in our initial set
-          if (!knownConversations.has(convoId as string)) {
-            console.log(
-              `[${this.nameId}] New conversation in stream: ${convoId}`,
-            );
-
-            // Add to known conversations
-            knownConversations.add(convoId as string);
-
-            // Create and emit the worker message
-            const workerMessage: ConversationStreamWorker = {
-              type: "stream_conversation",
-              conversation: conversation,
-            };
-
-            // Emit if any listeners are attached
             if (this.listenerCount("message") > 0) {
-              this.emit("message", workerMessage);
+              this.emit("message", {
+                type: "stream_conversation",
+                conversation,
+              });
             }
           }
-        }
-      } catch (error) {
-        if (!this.isTerminated) {
-          console.error(`[${this.nameId}] Conversation stream error:`, error);
-          this.emit("error", error);
+        } catch (error) {
+          console.error(error);
         }
       }
     })();
   }
 
   /**
-   * Initialize and handle consent stream
+   * Initialize consent stream
    */
   private initConsentStream() {
-    // Use the stream method to listen for consent updates
-    this.activeStream = this.client.preferences.streamConsent();
-
-    // Process consent updates asynchronously
     void (async () => {
-      try {
-        if (!this.activeStream) return;
+      while (true) {
+        try {
+          await this.client.conversations.sync();
+          const stream = await this.client.preferences.streamConsent();
 
-        for await (const consentUpdate of this.activeStream) {
-          if (this.isTerminated) break;
-
-          // Create and emit the worker message
-          const workerMessage: ConsentStreamWorker = {
-            type: "stream_consent",
-            consentUpdate: consentUpdate,
-          };
-
-          // Emit if any listeners are attached
-          if (this.listenerCount("message") > 0) {
-            this.emit("message", workerMessage);
+          for await (const consentUpdate of stream) {
+            if (this.listenerCount("message") > 0) {
+              this.emit("message", {
+                type: "stream_consent",
+                consentUpdate,
+              });
+            }
           }
-        }
-      } catch (error) {
-        if (!this.isTerminated) {
-          console.error(`[${this.nameId}] Consent stream error:`, error);
-          this.emit("error", error);
+        } catch (error) {
+          console.debug(error);
         }
       }
     })();
   }
 
   /**
-   * Unified method to collect stream events
-   * @param options Configuration for collection
-   * @returns Promise resolving with an array of WorkerMessage
+   * Collects stream events of specified type
    */
-  collectStreamEvents<T extends WorkerMessage>(options: {
-    type: "message" | "conversation" | "consent";
-    filterFn?: (msg: WorkerMessage) => boolean;
+  collectStreamEvents<T>(options: {
+    type: "message" | "conversation" | "consent" | "group_updated";
+    filterFn?: (msg: any) => boolean;
     count: number;
-    timeoutMs?: number;
     additionalInfo?: Record<string, any>;
   }): Promise<T[]> {
-    const {
-      type,
-      filterFn,
-      count,
-      timeoutMs = count * defaultValues.perMessageTimeout,
-      additionalInfo = {},
-    } = options;
-
-    const typeLabel =
-      type === "message"
-        ? "messages"
-        : type === "conversation"
-          ? "conversations"
-          : "consent updates";
-
+    const { type, filterFn, count, additionalInfo = {} } = options;
     const filterInfo = Object.entries(additionalInfo)
       .map(([key, value]) => `${key}:${value}`)
       .join(", ");
 
     console.log(
-      `[${this.nameId}] Collecting ${count} ${typeLabel}${filterInfo ? ` (${filterInfo})` : ""}`,
+      `[${this.nameId}] Collecting ${count} ${type}${filterInfo ? ` (${filterInfo})` : ""}`,
     );
 
     return new Promise((resolve) => {
       const events: T[] = [];
-      const timer = setTimeout(() => {
-        this.off("message", onMessage);
-        console.warn(
-          `[${this.nameId}] Timeout. Got ${events.length} / ${count} ${typeLabel}.`,
-        );
-        resolve(events); // partial or empty
-      }, timeoutMs);
-
-      const onMessage = (msg: WorkerMessage) => {
-        // Check if this is the right type of message
+      const onMessage = (msg: any) => {
         const isRightType = msg.type === `stream_${type}`;
-
-        // Apply additional filter if provided
         const passesFilter = !filterFn || filterFn(msg);
 
         if (isRightType && passesFilter) {
-          let logContent = "";
-          if (type === "message") {
-            logContent = (msg as MessageStreamWorker).message.content as string;
-          } else if (type === "conversation") {
-            logContent = (msg as ConversationStreamWorker).conversation.id;
-          } else {
-            logContent = JSON.stringify(
-              (msg as ConsentStreamWorker).consentUpdate,
-            );
-          }
-
-          if (!this.testName.includes("ts")) {
-            console.log(`[${this.nameId}] Received ${type}: ${logContent}`);
-          }
-
           events.push(msg as T);
           if (events.length >= count) {
-            clearTimeout(timer);
             this.off("message", onMessage);
             resolve(events);
           }
@@ -539,47 +421,32 @@ export class WorkerClient extends Worker {
     groupId: string,
     typeId: string,
     count: number,
-    timeoutMs = count * defaultValues.perMessageTimeout,
-  ): Promise<MessageStreamWorker[]> {
-    // Create an async function and immediately invoke it
-    const collectMessagesAsync = async (): Promise<MessageStreamWorker[]> => {
-      try {
-        // Sync conversations to make sure we have the latest data
-        await this.client.conversations.sync();
+  ): Promise<any[]> {
+    return this.collectStreamEvents<any>({
+      type: "message",
+      filterFn: (msg) => {
+        if (msg.type !== "stream_message") return false;
+        const { conversationId, contentType } = msg.message;
+        return groupId === conversationId && contentType?.typeId === typeId;
+      },
+      count,
+      additionalInfo: { groupId, contentType: typeId },
+    });
+  }
 
-        // Verify the conversation exists in our client
-        const conversation =
-          await this.client.conversations.getConversationById(groupId);
-        if (!conversation) {
-          console.warn(
-            `[${this.nameId}] Cannot collect messages: Group ${groupId} not found`,
-          );
-        } else {
-          console.log(
-            `[${this.nameId}] Group ${groupId} found, collecting messages...`,
-          );
-        }
-
-        // Collect messages with appropriate filtering
-        return await this.collectStreamEvents<MessageStreamWorker>({
-          type: "message",
-          filterFn: (msg) => {
-            if (msg.type !== "stream_message") return false;
-            const messageMsg = msg;
-            const { conversationId, contentType } = messageMsg.message;
-            return groupId === conversationId && contentType?.typeId === typeId;
-          },
-          count,
-          timeoutMs,
-          additionalInfo: { groupId, contentType: typeId },
-        });
-      } catch (error) {
-        console.error(`[${this.nameId}] Error in collectMessages:`, error);
-        return [];
-      }
-    };
-
-    return collectMessagesAsync();
+  /**
+   * Collect group update messages for a specific group
+   */
+  collectGroupUpdates(groupId: string, count: number): Promise<any[]> {
+    return this.collectStreamEvents<any>({
+      type: "group_updated",
+      filterFn: (msg) => {
+        if (msg.type !== "stream_group_updated") return false;
+        return groupId === msg.group.conversationId;
+      },
+      count,
+      additionalInfo: { groupId },
+    });
   }
 
   /**
@@ -588,12 +455,10 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
-    timeoutMs = count * defaultValues.perMessageTimeout,
-  ): Promise<ConversationStreamWorker[]> {
-    return this.collectStreamEvents<ConversationStreamWorker>({
+  ): Promise<any[]> {
+    return this.collectStreamEvents<any>({
       type: "conversation",
       count,
-      timeoutMs,
       additionalInfo: { fromPeerAddress },
     });
   }
@@ -601,39 +466,11 @@ export class WorkerClient extends Worker {
   /**
    * Collect consent updates
    */
-  collectConsentUpdates(
-    count: number = 1,
-    timeoutMs = count * defaultValues.timeout,
-  ): Promise<ConsentStreamWorker[]> {
-    return this.collectStreamEvents<ConsentStreamWorker>({
+  collectConsentUpdates(count: number = 1): Promise<any[]> {
+    return this.collectStreamEvents<any>({
       type: "consent",
       count,
-      timeoutMs,
     });
-  }
-
-  /**
-   * Clean up resources on termination
-   */
-  async terminate() {
-    if (this.isTerminated) {
-      return super.terminate(); // Already terminated, just call parent
-    }
-
-    console.time(`[${this.nameId}] Terminate stream`);
-    try {
-      if (this.activeStream && typeof this.activeStream.return === "function") {
-        await this.activeStream.return();
-        this.isTerminated = true;
-        //console.warn(`[${this.nameId}] Terminated stream`);
-      }
-    } catch (error) {
-      console.error(`[${this.nameId}] Error during stream cleanup:`, error);
-    }
-    console.timeEnd(`[${this.nameId}] Terminate stream`);
-
-    // Call parent terminate
-    return super.terminate();
   }
 
   /**
@@ -649,6 +486,7 @@ export class WorkerClient extends Worker {
       console.warn(
         "OPENAI_API_KEY is not set in environment variables. GPT workers may not function properly.",
       );
+      return `${workerName}: Sorry, I'm not able to generate a response right now.`;
     }
 
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
@@ -656,6 +494,7 @@ export class WorkerClient extends Worker {
     console.log(
       `[${this.nameId}] Generating OpenAI response for message: ${message}`,
     );
+
     const personalities = [
       {
         name: "sam",
@@ -672,38 +511,48 @@ export class WorkerClient extends Worker {
       },
     ];
 
-    const systemPrompt = `You are ${workerName},
+    // Find matching personality or use a default
+    const personality =
+      personalities.find((p) => p.name === workerName)?.personality ||
+      "You are a helpful assistant with a friendly personality.";
+
+    // Prepare recent message history
+    const recentHistory =
+      history
+        ?.slice(-10)
+        .map((m) => m.content as string)
+        .join("\n") || "";
+
+    const systemPrompt = `You are ${workerName}.
                      Keep your responses concise (under 100 words) and friendly. 
                      Never mention other workers in your responses. Never answer more than 1 question per response.
 
                      Personality: 
-                     ${
-                       personalities.find((p) => p.name === workerName)
-                         ?.personality
-                     }
+                     ${personality}
                      
-                     For context, these were the last 10 messages in the conversation: ${history
-                       ?.slice(0, 10)
-                       .map((m) => m.content as string)
-                       .join("\n")}`;
+                     For context, these were the last messages in the conversation: 
+                     ${recentHistory}`;
 
-    const completion = await openai.chat.completions.create({
-      messages: [
-        {
-          role: "system",
-          content: systemPrompt,
-        },
-        { role: "user", content: message },
-      ],
-      model: "gpt-4.1-mini",
-    });
-    //console.log(systemPrompt, completion.choices[0]?.message?.content);
-    return (
-      workerName +
-      ":\n" +
-      (completion.choices[0]?.message?.content ||
-        "I'm not sure how to respond to that.")
-    );
+    try {
+      const completion = await openai.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: systemPrompt,
+          },
+          { role: "user", content: message },
+        ],
+        model: "gpt-4.1-mini",
+      });
+
+      return `${workerName}:\n${
+        completion.choices[0]?.message?.content ||
+        "I'm not sure how to respond to that."
+      }`;
+    } catch (error) {
+      console.error(`[${this.nameId}] OpenAI API error:`, error);
+      return `${workerName}: Sorry, I couldn't process that request right now.`;
+    }
   }
 
   /**
@@ -714,9 +563,15 @@ export class WorkerClient extends Worker {
     const dataPath =
       getDataPath(this.testName) + "/" + this.name + "/" + this.folder;
     console.log(`[${this.nameId}] Clearing database at ${dataPath}`);
-    if (fs.existsSync(dataPath)) {
-      fs.rmSync(dataPath, { recursive: true, force: true });
+
+    try {
+      if (fs.existsSync(dataPath)) {
+        fs.rmSync(dataPath, { recursive: true, force: true });
+      }
+      return Promise.resolve(true);
+    } catch (error) {
+      console.error(`[${this.nameId}] Error clearing database:`, error);
+      return Promise.resolve(false);
     }
-    return Promise.resolve(true);
   }
 }

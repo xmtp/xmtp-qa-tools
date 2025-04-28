@@ -75,13 +75,22 @@ export async function verifyStream<T extends string = string>(
   );
 
   // Start collectors
-  const collectPromises = receivers.map((r) =>
-    r.worker
-      ?.collectMessages(conversationId, collectorType, count)
-      .then((msgs: MessageStreamWorker[]) =>
-        msgs.map((m) => m.message.content as T),
-      ),
-  );
+  let collectPromises: Promise<any>[] = [];
+  if (collectorType === "text") {
+    collectPromises = receivers.map((r) =>
+      r.worker
+        ?.collectMessages(conversationId, collectorType, count)
+        .then((msgs: MessageStreamWorker[]) =>
+          msgs.map((m) => m.message.content as T),
+        ),
+    );
+  } else if (collectorType === "group_updated") {
+    collectPromises = receivers.map((r) =>
+      r.worker
+        ?.collectGroupUpdates(conversationId, count)
+        .then((msgs: any[]) => msgs.map((m) => m.group.name)),
+    );
+  }
 
   // Generate all the messages first so we have them for recovery later
   const sentMessages: T[] = [];
