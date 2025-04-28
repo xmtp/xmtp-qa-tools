@@ -316,15 +316,15 @@ export class WorkerClient extends Worker {
     );
     const baseName = this.name.split("-")[0].toLowerCase();
     const isDm = conversation instanceof Dm;
-    const content = message.content as string;
+    const content = (message.content as string).toLowerCase();
 
     return (
       (message?.contentType?.typeId === "text" &&
-        content.toLowerCase().includes(baseName.toLowerCase()) &&
-        !content.toLowerCase().includes("/") &&
-        !content.toLowerCase().includes("workers") &&
-        !content.toLowerCase().includes("members") &&
-        !content.toLowerCase().includes("admins")) ||
+        content.includes(baseName) &&
+        !content.includes("/") &&
+        !content.includes("workers") &&
+        !content.includes("members") &&
+        !content.includes("admins")) ||
       isDm
     );
   }
