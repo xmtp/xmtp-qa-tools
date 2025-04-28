@@ -311,7 +311,7 @@ const startGPTWorkers = async () => {
   );
   console.log("GPT workers:", workersGpt.getWorkers().length);
   for (const worker of workersGpt.getWorkers()) {
-    console.log("GPT workers:", worker.name, worker.inboxId);
+    console.log("GPT workers:", worker.name, worker.address);
   }
 };
 
