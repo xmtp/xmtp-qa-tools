@@ -116,10 +116,6 @@ async function main() {
       console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);
       console.error(error instanceof Error ? error.message : String(error));
     }
-
-    // Add a separator between inbox initializations
-    console.log("-----------------------------------------------------");
-    if (i == 10) break;
   }
 
   // Display summary

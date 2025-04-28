@@ -25,7 +25,7 @@ describe(testName, () => {
     }
     console.log("names", allNames);
     workers = await getWorkers(allNames, testName);
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
     const allWorkers = workers.getWorkers();
     const creator = allWorkers[0];
@@ -45,7 +45,7 @@ describe(testName, () => {
   it(`Shoudl test the DB after upgrade`, async () => {
     for (const version of versions) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
 
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
@@ -63,7 +63,7 @@ describe(testName, () => {
   it(`Shoudl test the DB after downgrade`, async () => {
     for (const version of versions.reverse()) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await new Promise((resolve) => setTimeout(resolve, 1000));
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
       console.log("Downgraded to ", version);

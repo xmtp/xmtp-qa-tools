@@ -644,24 +644,48 @@ export class WorkerClient extends Worker {
     console.log(
       `[${this.nameId}] Generating OpenAI response for message: ${message}`,
     );
+    const personalities = [
+      {
+        name: "sam",
+        personality: "Sam personally hates GPT and AI. Its kind of a jerk.",
+      },
+      {
+        name: "walt",
+        personality: "Walt is a bit more friendly. He likes to make jokes.",
+      },
+      {
+        name: "tina",
+        personality:
+          "Tina its non-tech savvy. She doesn't know much about anything.",
+      },
+    ];
+
+    const systemPrompt = `You are ${workerName},
+                     Keep your responses concise (under 100 words) and friendly. 
+                     Never mention other workers in your responses. Never answer more than 1 question per response.
+
+                     Personality: 
+                     ${
+                       personalities.find((p) => p.name === workerName)
+                         ?.personality
+                     }
+                     
+                     For context, these were the last 10 messages in the conversation: ${history
+                       ?.slice(0, 10)
+                       .map((m) => m.content as string)
+                       .join("\n")}`;
 
     const completion = await openai.chat.completions.create({
       messages: [
         {
           role: "system",
-          content: `You are ${workerName}, a fake worker in a group chat. 
-                     Keep your responses concise (under 100 words) and friendly. 
-                     Never mention other workers in your responses. Never answer more than 1 question per response.
-                     For context, these were the last 10 messages in the conversation: ${history
-                       ?.slice(0, 10)
-                       .map((m) => m.content as string)
-                       .join("\n")}`,
+          content: systemPrompt,
         },
         { role: "user", content: message },
       ],
-      model: "gpt-4o-mini",
+      model: "gpt-4.1-mini",
     });
-
+    console.log(systemPrompt, completion.choices[0]?.message?.content);
     return (
       workerName +
       ":\n" +
