@@ -1,7 +1,7 @@
 import fs from "fs";
 import { getEnvPath } from "@helpers/client";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { type Client, type Group } from "@xmtp/node-sdk";
+import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
   Client as Client47,
   Conversation as Conversation47,
@@ -650,4 +650,50 @@ export const defaultValues = {
   timeout: 40000,
   perMessageTimeout: 3000,
   defaultNames,
+};
+
+export const personalities = [
+  {
+    name: "sam",
+    personality: "Sam personally hates GPT and AI. Its kind of a jerk.",
+  },
+  {
+    name: "walt",
+    personality: "Walt is a bit more friendly. He likes to make jokes.",
+  },
+  {
+    name: "tina",
+    personality:
+      "Tina its non-tech savvy. She doesn't know much about anything.",
+  },
+];
+
+/**
+ * Log a message to the console and send it to a conversation
+ * @param message The message to log and send
+ * @param conversation The conversation to send the message to
+ * @param level The log level (default: 'info')
+ * @returns A promise that resolves when the message is sent
+ */
+export const logAndSend = async (
+  message: string,
+  conversation: Conversation,
+  level: "info" | "warn" | "error" = "info",
+): Promise<void> => {
+  // Log to console based on level
+  switch (level) {
+    case "warn":
+      console.warn(message);
+      break;
+    case "error":
+      console.error(message);
+      break;
+    default:
+      console.log(message);
+  }
+
+  // Send to conversation if provided
+  if (conversation && typeof conversation.send === "function") {
+    await conversation.send(message);
+  }
 };

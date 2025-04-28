@@ -7,7 +7,12 @@ import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { WorkerClient } from "./main";
 
-export type typeofStream = "message" | "conversation" | "consent" | "none";
+export type typeofStream =
+  | "message"
+  | "conversation"
+  | "consent"
+  | "group_updated"
+  | "none";
 export type typeOfResponse = "gm" | "gpt" | "none";
 
 export interface WorkerBase {

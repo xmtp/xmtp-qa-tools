@@ -1,8 +1,36 @@
 import { getWorkersFromGroup } from "@helpers/groups";
-import type { MessageStreamWorker } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { defaultValues } from "./tests";
+
+// Define types for message and group update structures
+interface StreamMessage {
+  type: string;
+  message: {
+    conversationId: string;
+    content: string;
+    contentType?: {
+      typeId: string;
+    };
+  };
+}
+
+interface GroupUpdateMessage {
+  type: string;
+  group: {
+    conversationId: string;
+    name: string;
+  };
+}
+
+// Define type for conversation notification
+interface ConversationNotification {
+  type: string;
+  conversation: {
+    id: string;
+    peerAddress?: string;
+  };
+}
 
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
@@ -40,10 +68,10 @@ export async function verifyStream<T extends string = string>(
   // Use name updater for group_updated collector type
   if (collectorType === "group_updated") {
     generator = ((i: number, suffix: string) =>
-      `New name-${i + 1}-${suffix}`) as any;
+      `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
     sender = (async (g: Group, payload: string) => {
       await g.updateName(payload);
-    }) as any;
+    }) as unknown as typeof sender;
   }
 
   // Exclude group creator from receivers
@@ -56,13 +84,10 @@ export async function verifyStream<T extends string = string>(
     `Starting stream test with ${receivers.length} receivers on group ${conversationId}`,
   );
 
-  // Pre-sync: Ensure all receivers have synced the conversation before collecting messages
   await Promise.all(
     receivers.map(async (r) => {
       try {
         await r.client.conversations.sync();
-        const convo =
-          await r.client.conversations.getConversationById(conversationId);
       } catch (err) {
         console.error(`Error syncing for ${r.name}:`, err);
       }
@@ -75,13 +100,30 @@ export async function verifyStream<T extends string = string>(
   );
 
   // Start collectors
-  const collectPromises = receivers.map((r) =>
-    r.worker
-      ?.collectMessages(conversationId, collectorType, count)
-      .then((msgs: MessageStreamWorker[]) =>
-        msgs.map((m) => m.message.content as T),
-      ),
-  );
+  let collectPromises: Promise<T[]>[] = [];
+  if (collectorType === "text") {
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectMessages(conversationId, collectorType, count)
+        .then((msgs: StreamMessage[]) =>
+          msgs.map((m) => m.message.content as T),
+        );
+    });
+  } else if (collectorType === "group_updated") {
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectGroupUpdates(conversationId, count)
+        .then((msgs: GroupUpdateMessage[]) =>
+          msgs.map((m) => m.group.name as T),
+        );
+    });
+  }
 
   // Generate all the messages first so we have them for recovery later
   const sentMessages: T[] = [];
@@ -111,7 +153,7 @@ export async function verifyStream<T extends string = string>(
 
   return {
     allReceived: streamAllReceived,
-    messages: streamCollectedMessages.map((m) => m ?? []),
+    messages: streamCollectedMessages,
   };
 }
 
@@ -134,13 +176,13 @@ export async function verifyConversationStream(
   const participantPromises = participants.map((participant) => {
     if (!participant.worker) {
       console.warn(`Participant ${participant.name} has no worker`);
-      return Promise.resolve(null);
+      return Promise.resolve<ConversationNotification[] | null>(null);
     }
 
     return participant.worker.collectConversations(
       initiator.client.inboxId,
       1, // Expect one conversation
-    );
+    ) as Promise<ConversationNotification[]>;
   });
 
   // Get participant addresses and create group

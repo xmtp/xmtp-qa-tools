@@ -5,7 +5,7 @@ import {
   createLargeGroups,
   type StressTestConfig,
 } from "@helpers/groups";
-import { logAndSend, logAndSendError, logAndSendStatus } from "@helpers/logger";
+import { logAndSend } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   type Client,
@@ -102,16 +102,12 @@ export async function runStressTest(
   conversation: Conversation,
 ) {
   const startTime = Date.now();
-  await logAndSendStatus("Running stress test...", conversation, "🚀");
+  await logAndSend("Running stress test...", conversation);
   let hasErrors = false;
 
   try {
     // Send DMs from workers to sender
-    await logAndSendStatus(
-      "Sending DMs from workers to you...",
-      conversation,
-      "📩",
-    );
+    await logAndSend("Sending DMs from workers to you...", conversation);
     try {
       // Use the fixed receiver inbox ID instead of sender's
       await createAndSendDms(
@@ -120,16 +116,16 @@ export async function runStressTest(
         config.messageCount,
       );
     } catch (error) {
-      await logAndSendError(error, conversation, "Some DMs failed to send");
+      console.debug(error);
+      await logAndSend("Some DMs failed to send", conversation);
       hasErrors = true;
       // Continue with the test despite errors
     }
 
     // Create groups with workers
-    await logAndSendStatus(
+    await logAndSend(
       `Creating ${config.groupCount} regular groups...`,
       conversation,
-      "🔄",
     );
     try {
       await createAndSendInGroup(
@@ -139,19 +135,15 @@ export async function runStressTest(
         message.senderInboxId,
       );
     } catch (error) {
-      await logAndSendError(
-        error,
-        conversation,
-        "Some groups failed to be created",
-      );
+      console.debug(error);
+      await logAndSend("Some groups failed to be created", conversation);
       hasErrors = true;
     }
 
     // Create large groups
-    await logAndSendStatus(
+    await logAndSend(
       `Creating large groups with ${config.largeGroups.join(", ")} members...`,
       conversation,
-      "📊",
     );
     try {
       await createLargeGroups(
@@ -162,15 +154,13 @@ export async function runStressTest(
         conversation,
       );
     } catch (error) {
-      await logAndSendError(
-        error,
-        conversation,
-        "Large group creation had issues",
-      );
+      console.debug(error);
+      await logAndSend("Large group creation had issues", conversation);
       hasErrors = true;
     }
   } catch (error) {
-    await logAndSendError(error, conversation, "Stress test failed");
+    console.debug(error);
+    await logAndSend("Stress test failed", conversation);
     // Release the lock when test fails
     StressTestLock.getInstance().release();
     return false;
@@ -272,9 +262,33 @@ export async function handleStressCommand(
   const config = TEST_CONFIGS[sizeArg];
 
   if (config) {
-    let workers = await getWorkers(config.workerCount, testName, "none");
+    try {
+      console.log(`Creating ${config.workerCount} workers for stress test...`);
+      // Generate random prefix to avoid conflicts with other tests
+      const randomPrefix = Math.random().toString(36).substring(2, 6);
+      // Create workers with numeric names to avoid conflicts
+      const workerNames = Array.from(
+        { length: config.workerCount },
+        (_, i) => `stress${randomPrefix}_${i}`,
+      );
 
-    await runStressTest(config, workers, client, message, conversation);
+      let workers = await getWorkers(workerNames, testName, "none");
+      console.log(
+        `Successfully created ${workers.getWorkers().length} workers`,
+      );
+
+      await runStressTest(config, workers, client, message, conversation);
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      console.error(`Error during stress test setup: ${errorMsg}`, error);
+      await logAndSend(
+        `⚠️ Error setting up stress test: ${errorMsg}`,
+        conversation,
+        "warn",
+      );
+      // Release the lock when test fails
+      StressTestLock.getInstance().release();
+    }
   }
   return true;
 }
@@ -302,57 +316,92 @@ async function initializeBot() {
     process.exit(1);
   }
 }
-const startGPTWorkers = async () => {
-  const workersGpt = await getWorkers(
-    ["sam", "tina", "walt"],
-    testName,
-    "message",
-    "gpt",
-  );
-  console.log("GPT workers:", workersGpt.getWorkers().length);
-  for (const worker of workersGpt.getWorkers()) {
-    console.log("GPT workers:", worker.name, worker.inboxId);
-  }
-};
 
 async function main() {
-  try {
-    const client = await initializeBot();
+  const client = await initializeBot();
+  await startGPTWorkers();
 
-    await client.conversations.sync();
-    const stream = client.conversations.streamAllMessages();
+  await client.conversations.sync();
+  while (true) {
+    try {
+      const streamPromise = client.conversations.streamAllMessages();
+      const stream = await streamPromise;
 
-    await startGPTWorkers();
-    console.log("Waiting for messages...");
-    for await (const message of await stream) {
-      try {
-        // Skip own messages and non-text messages
-        if (
-          message?.senderInboxId.toLowerCase() ===
-            client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text"
-        )
-          continue;
-        const conversation = await client.conversations.getConversationById(
-          message.conversationId,
-        );
+      for await (const message of stream) {
+        try {
+          // Skip own messages and non-text messages
+          if (
+            message?.senderInboxId.toLowerCase() ===
+              client.inboxId.toLowerCase() ||
+            message?.contentType?.typeId !== "text"
+          )
+            continue;
+          const conversation = await client.conversations.getConversationById(
+            message.conversationId,
+          );
 
-        if (!conversation) continue;
+          if (!conversation) continue;
 
-        // Only handle DM conversations
-        if (!("peerInboxId" in conversation)) continue;
+          // Only handle DM conversations
+          if (!("peerInboxId" in conversation)) continue;
 
-        await handleStressCommand(message, conversation, client);
-      } catch (error) {
-        console.debug(error);
-        console.error("Error handling message:", error);
+          await handleStressCommand(message, conversation, client);
+        } catch (error) {
+          console.error(
+            "Error handling message:",
+            error instanceof Error ? error.message : String(error),
+          );
+        }
       }
+    } catch (error) {
+      console.error(
+        "Stream error:",
+        error instanceof Error ? error.message : String(error),
+      );
+      console.error("Fatal error, restarting stream in 5 seconds...");
+      // Wait 5 seconds before restarting the stream
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      // Don't exit on stream errors, just retry
     }
-  } catch (error) {
-    console.debug(error);
-    console.error("Fatal error:", error);
-    process.exit(1);
   }
 }
+const startGPTWorkers = async () => {
+  try {
+    // First check if OPENAI_API_KEY is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn(
+        "OPENAI_API_KEY is not set in environment variables. GPT workers may not function properly.",
+      );
+    }
+
+    console.log("Attempting to initialize GPT workers...");
+    const workersGpt = await getWorkers(
+      ["sam", "tina", "walt"],
+      testName,
+      "message",
+      "gpt",
+    );
+    console.log("GPT workers:", workersGpt.getWorkers().length);
+    for (const worker of workersGpt.getWorkers()) {
+      console.log("GPT workers:", worker.name, worker.address);
+    }
+    console.log(
+      workersGpt
+        .getWorkers()
+        .map((w) => w.address)
+        .join(", "),
+    );
+    return workersGpt;
+  } catch (error) {
+    console.error(
+      "Failed to initialize GPT workers:",
+      error instanceof Error ? error.message : String(error),
+    );
+    console.error("Error details:", error);
+    // Don't crash the whole application if GPT workers fail
+    console.log("Continuing without GPT workers");
+    return null;
+  }
+};
 
 main().catch(console.error);

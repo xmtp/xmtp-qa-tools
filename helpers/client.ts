@@ -14,7 +14,7 @@ import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { flushMetrics, initDataDog } from "./datadog";
-import { createLogger, flushLogger, overrideConsole } from "./logger";
+import { addFileLogging, setupPrettyLogs } from "./logger";
 import { sdkVersions } from "./tests";
 
 interface User {
@@ -134,7 +134,7 @@ export const regressionClient = async (
     throw new Error(`Failed to create client for SDK version ${versionStr}`);
   }
 
-  return client as any;
+  return client;
 };
 
 // @ts-expect-error: SDK version compatibility issues
@@ -273,8 +273,11 @@ export function getEnvPath(testName: string): string {
 export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
   console.log("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
-  const logger = createLogger(testName);
-  overrideConsole(logger);
+
+  setupPrettyLogs();
+
+  addFileLogging(testName);
+  //overrideConsole(logger);
 
   initDataDog(
     testName,
@@ -285,7 +288,7 @@ export function loadEnv(testName: string) {
 }
 
 export async function closeEnv(testName: string, workers?: WorkerManager) {
-  flushLogger(testName);
+  //  flushLogger(testName);
 
   await flushMetrics();
   if (workers && typeof workers.getWorkers === "function") {

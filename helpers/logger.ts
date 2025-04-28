@@ -2,219 +2,50 @@ import fs from "fs";
 import path from "path";
 import type { ExpectStatic } from "vitest";
 import winston from "winston";
-import Transport from "winston-transport";
-import type { LogInfo } from "./tests";
 
-class MemoryTransport extends Transport {
-  logs: string[] = [];
-  log(info: LogInfo, callback: () => void) {
-    // Ensure the formatted message is available
-    const formattedMessage = String(
-      info[Symbol.for("message")] ||
-        `[${info.timestamp}] [${info.level}] ${info.message}`,
-    );
-    this.logs.push(formattedMessage);
-    setImmediate(() => this.emit("logged", info));
-    callback();
-  }
-  flush(filePath: string) {
-    // Write all logs at once
-    fs.writeFileSync(filePath, this.logs.join("\n"), { flag: "w" });
-    this.logs = [];
-  }
-}
+// Create a simple logger that formats logs in a pretty way
+export const createLogger = () => {
+  // Format timestamp to match [YYYY-MM-DDThh:mm:ss.sssZ]
+  const prettyFormat = winston.format.printf((info) => {
+    return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
+  });
 
-let sharedLogger: winston.Logger | null = null;
-let memoryTransport: MemoryTransport | null = null;
-// Export a flush function to flush the memory transport logs
-export const flushLogger = (testName: string): string => {
-  if (memoryTransport) {
-    const logFilePath = getLogFilePath(testName);
-    memoryTransport.flush(logFilePath);
-    return logFilePath;
-  }
-  return "";
-};
-// Add this function to capture external process output
-export const captureProcessOutput = (
-  stdout: string,
-  stderr: string,
-  logger: winston.Logger,
-) => {
-  if (stdout) {
-    stdout.split("\n").forEach((line) => {
-      if (line.trim()) logger.log("info", `[Rust] ${line.trim()}`);
-    });
-  }
-
-  if (stderr) {
-    stderr.split("\n").forEach((line) => {
-      if (line.trim()) logger.log("error", `[Rust] ${line.trim()}`);
-    });
-  }
-};
-export const createLogger = (testName: string) => {
-  if (!sharedLogger) {
-    const logFilePath = getLogFilePath(testName);
-    // Shared format for console and memory transport
-    const sharedFormat = winston.format.combine(
-      winston.format.timestamp(),
-      winston.format.printf(({ timestamp, level, message }) => {
-        return `[${timestamp as string}] [${level}] ${message as string}`;
-      }),
-    );
-
-    const consoleTransport = new winston.transports.Console({
-      format: winston.format.combine(winston.format.colorize(), sharedFormat),
-    });
-
-    // Initialize our custom memory transport
-    memoryTransport = new MemoryTransport({
-      format: sharedFormat,
-    });
-
-    sharedLogger = winston.createLogger({
-      transports: [consoleTransport, memoryTransport],
-    });
-
-    // Optionally, catch termination signals to flush logs before exit
-    const flushAndExit = () => {
-      if (memoryTransport) {
-        memoryTransport.flush(logFilePath);
-      }
-      process.exit();
-    };
-    process.on("exit", flushAndExit);
-    process.on("SIGINT", flushAndExit);
-    process.on("SIGTERM", flushAndExit);
-  }
-
-  return sharedLogger;
-};
-
-function filterLog(args: unknown[]): string {
-  // First, check if this is a SQLCipher memory lock related log
-  const logStr = args.join(" ").toString();
-  if (
-    logStr.includes("sqlcipher_mem_lock") ||
-    logStr.includes("SQLCIPHER_NO_MLOCK")
-  ) {
-    return ""; // Skip these logs entirely
-  }
-
-  // Check for the console.time/timeEnd pattern: where args[0] is "%s: %s"
-
-  if (!process.env.CI) {
-    if (args.length >= 2 && args[0] === "%s: %s") {
-      // Join the remaining parts into one message
-      const message = args.slice(1).join(" ");
-      const timePattern = /(\d+(\.\d+)?)(ms|s)\b/;
-      const match = message.match(timePattern);
-      if (match) {
-        const timeValue = parseFloat(match[1]);
-        const unit = match[3];
-        const timeInMs = unit === "ms" ? timeValue : timeValue * 1000;
-        // Skip logs for durations less than or equal to 300ms
-        if (timeInMs <= 300) {
-          return "";
-        }
-      }
-      // Remove any "%s" placeholders from the message.
-      return message.replace(/%s/g, "").trim();
-    }
-  } else {
-    if (args.length >= 2 && args[0] === "%s: %s") {
-      return "";
-    }
-  }
-
-  return (
-    args
-      .map((arg) => {
-        if (arg === null) return "null";
-        if (arg === undefined) return "undefined";
-        if (typeof arg === "object") {
-          try {
-            return JSON.stringify(arg);
-          } catch (e: unknown) {
-            if (e instanceof Error) {
-              return e.message;
-            }
-            return "[Circular Object]";
-          }
-        }
-        return arg as string;
-      })
-      .filter(Boolean)
-      .join(" ")
-      .trim() || ""
+  // Combine formats
+  const combinedFormat = winston.format.combine(
+    winston.format.timestamp(),
+    winston.format.colorize(),
+    prettyFormat,
   );
-}
-const getLogFilePath = (testName: string): string => {
-  const logName = testName;
-  const sanitizedName = logName.replace(/[^a-zA-Z0-9-_]/g, "_");
-  const fileName = `${sanitizedName}.log`;
 
-  return testName.includes("bug")
-    ? path.join("bugs", logName, "test.log")
-    : path.join("logs", fileName);
+  // Create the logger with console transport
+  const logger = winston.createLogger({
+    format: combinedFormat,
+    transports: [new winston.transports.Console()],
+  });
+
+  // Add time and timeEnd methods to the logger
+  const timers = new Map<string, number>();
+
+  // Add custom time method
+  logger.time = (label: string) => {
+    timers.set(label, performance.now());
+    //  logger.info(${label});
+  };
+
+  // Add custom timeEnd method
+  logger.timeEnd = (label: string) => {
+    const startTime = timers.get(label);
+    if (startTime) {
+      const duration = performance.now() - startTime;
+      timers.delete(label);
+      logger.info(`${label}: ${duration.toFixed(3)}ms`);
+    } else {
+      // logger.warn(`Timer "${label}" does not exist`);
+    }
+  };
+
+  return logger;
 };
-
-export const overrideConsole = (logger: winston.Logger) => {
-  try {
-    console.log = (...args: unknown[]) => {
-      const message = filterLog(args);
-      if (message) {
-        // If this is a console.time/end log, always use warn if duration > 300ms.
-        if (args.length >= 2 && args[0] === "%s: %s") {
-          logger.log("warn", message);
-        } else {
-          logger.log("info", message);
-        }
-      }
-    };
-    console.info = (...args: unknown[]) => {
-      const message = filterLog(args);
-      if (message) {
-        // Also promote timing logs from console.info to warn.
-        if (args.length >= 2 && args[0] === "%s: %s") {
-          logger.log("warn", message);
-        } else {
-          logger.log("info", message);
-        }
-      }
-    };
-    console.warn = (...args: unknown[]) => {
-      const message = filterLog(args);
-      if (message) {
-        logger.log("warn", message);
-      }
-    };
-    console.error = (...args: unknown[]) => {
-      const message = filterLog(args);
-      if (message) {
-        logger.log("error", message);
-      }
-    };
-
-    console.debug = (...args: unknown[]) => {
-      if (!process.env.CI) {
-        // Using a specific function type for console.debug
-        const originalConsoleDebug = Function.prototype.bind.call(
-          console.constructor.prototype.debug as (...args: unknown[]) => void,
-          console,
-        );
-        originalConsoleDebug(...args);
-      }
-    };
-  } catch (error) {
-    console.error("Error overriding console", error);
-  }
-};
-
-if (!fs.existsSync("logs")) {
-  fs.mkdirSync("logs");
-}
 
 export const logError = (e: unknown, expect: ExpectStatic): boolean => {
   if (e instanceof Error) {
@@ -228,73 +59,103 @@ export const logError = (e: unknown, expect: ExpectStatic): boolean => {
   return true;
 };
 
-/**
- * Log a message to the console and send it to a conversation
- * @param message The message to log and send
- * @param conversation The conversation to send the message to
- * @param level The log level (default: 'info')
- * @returns A promise that resolves when the message is sent
- */
-export const logAndSend = async (
-  message: string,
-  conversation: any,
-  level: "info" | "warn" | "error" = "info",
-): Promise<void> => {
-  // Log to console based on level
-  switch (level) {
-    case "warn":
-      console.warn(message);
-      break;
-    case "error":
-      console.error(message);
-      break;
-    default:
-      console.log(message);
+// Extend the winston Logger type to include our custom methods
+declare module "winston" {
+  interface Logger {
+    time(label: string): void;
+    timeEnd(label: string): void;
+  }
+}
+
+// Create a global logger instance
+const logger = createLogger();
+
+// Override console methods to use the pretty logger
+export const setupPrettyLogs = () => {
+  // Store original console methods
+  const originalConsole = {
+    log: console.log,
+    info: console.info,
+    warn: console.warn,
+    error: console.error,
+    debug: console.debug,
+    time: console.time,
+    timeEnd: console.timeEnd,
+  };
+
+  // Override console.log
+  console.log = (...args) => {
+    const message = args.join(" ");
+    logger.info(message);
+  };
+
+  // Override console.info
+  console.info = (...args) => {
+    const message = args.join(" ");
+    logger.info(message);
+  };
+
+  // Override console.warn
+  console.warn = (...args) => {
+    const message = args.join(" ");
+    logger.warn(message);
+  };
+
+  // Override console.error
+  console.error = (...args) => {
+    const message = args.join(" ");
+    logger.error(message);
+  };
+
+  // Override console.debug
+  console.debug = (...args) => {
+    const message = args.join(" ");
+    logger.debug(message);
+  };
+
+  // Override console.time
+  console.time = (...args) => {
+    const message = args.join(" ");
+    logger.time(message);
+  };
+
+  // Override console.timeEnd
+  console.timeEnd = (...args) => {
+    const message = args.join(" ");
+    logger.timeEnd(message);
+  };
+
+  // Return function to restore original console if needed
+  return () => {
+    console.log = originalConsole.log;
+    console.info = originalConsole.info;
+    console.time = originalConsole.time;
+    console.timeEnd = originalConsole.timeEnd;
+    console.warn = originalConsole.warn;
+    console.error = originalConsole.error;
+    console.debug = originalConsole.debug;
+  };
+};
+
+// Optional: Add file logging capability
+export const addFileLogging = (filename: string) => {
+  const logPath = path.join(process.cwd(), "logs", filename + ".log");
+  const dir = path.dirname(logPath);
+
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
   }
 
-  // Send to conversation if provided
-  if (conversation && typeof conversation.send === "function") {
-    await conversation.send(message);
-  }
-};
-
-/**
- * Log an error to the console and send it to a conversation
- * @param error The error object or string
- * @param conversation The conversation to send the error to
- * @param context Optional context message to prefix the error
- * @returns A promise that resolves when the error is sent
- */
-export const logAndSendError = async (
-  error: unknown,
-  conversation: any,
-  context: string = "Error",
-): Promise<void> => {
-  const errorMessage = error instanceof Error ? error.message : String(error);
-  return logAndSend(`⚠️ ${context}: ${errorMessage}`, conversation, "error");
-};
-
-/**
- * Log a status update with timestamp to console and send to conversation
- * @param message The status message
- * @param conversation The conversation to send the status to
- * @param emoji Optional emoji to prefix the message (default: '🔄')
- * @returns A promise that resolves when the status is sent
- */
-export const logAndSendStatus = async (
-  message: string,
-  conversation: any,
-  emoji: string = "🔄",
-): Promise<void> => {
-  const timestamp = new Date()
-    .toISOString()
-    .replace(/T/, " ")
-    .replace(/\..+/, "");
-  return logAndSend(`${emoji} [${timestamp}] ${message}`, conversation);
-};
-
-export const removeDB = (fileName: string) => {
-  const testFilePath = fileName.split("/").slice(0, -1).join("/") + "/";
-  console.log("testFilePath", fileName, testFilePath);
-  fs.rmSync(".data", { recursive: true, force: true });
+  // Add file transport to the logger
+  logger.add(
+    new winston.transports.File({
+      filename: logPath,
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.printf((info) => {
+          return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
+        }),
+      ),
+    }),
+  );
 };
