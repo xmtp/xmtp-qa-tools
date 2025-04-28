@@ -313,45 +313,54 @@ const startGPTWorkers = async () => {
   for (const worker of workersGpt.getWorkers()) {
     console.log("GPT workers:", worker.name, worker.address);
   }
+  console.log(
+    workersGpt
+      .getWorkers()
+      .map((w) => w.address)
+      .join(", "),
+  );
 };
 
 async function main() {
-  try {
-    const client = await initializeBot();
+  const client = await initializeBot();
 
-    await client.conversations.sync();
-    const stream = client.conversations.streamAllMessages();
+  await startGPTWorkers();
+  while (true) {
+    try {
+      console.log("Starting message stream...");
+      console.log("✓ Syncing conversations...");
+      await client.conversations.sync();
+      const streamPromise = client.conversations.streamAllMessages();
+      const stream = await streamPromise;
 
-    await startGPTWorkers();
-    console.log("Waiting for messages...");
-    for await (const message of await stream) {
-      try {
-        // Skip own messages and non-text messages
-        if (
-          message?.senderInboxId.toLowerCase() ===
-            client.inboxId.toLowerCase() ||
-          message?.contentType?.typeId !== "text"
-        )
-          continue;
-        const conversation = await client.conversations.getConversationById(
-          message.conversationId,
-        );
+      for await (const message of stream) {
+        try {
+          // Skip own messages and non-text messages
+          if (
+            message?.senderInboxId.toLowerCase() ===
+              client.inboxId.toLowerCase() ||
+            message?.contentType?.typeId !== "text"
+          )
+            continue;
+          const conversation = await client.conversations.getConversationById(
+            message.conversationId,
+          );
 
-        if (!conversation) continue;
+          if (!conversation) continue;
 
-        // Only handle DM conversations
-        if (!("peerInboxId" in conversation)) continue;
+          // Only handle DM conversations
+          if (!("peerInboxId" in conversation)) continue;
 
-        await handleStressCommand(message, conversation, client);
-      } catch (error) {
-        console.debug(error);
-        console.error("Error handling message:", error);
+          await handleStressCommand(message, conversation, client);
+        } catch (error) {
+          console.debug(error);
+        }
       }
+    } catch (error) {
+      console.debug(error);
+      console.error("Fatal error:", error);
+      process.exit(1);
     }
-  } catch (error) {
-    console.debug(error);
-    console.error("Fatal error:", error);
-    process.exit(1);
   }
 }
 
