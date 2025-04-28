@@ -685,7 +685,7 @@ export class WorkerClient extends Worker {
       ],
       model: "gpt-4.1-mini",
     });
-    console.log(systemPrompt, completion.choices[0]?.message?.content);
+    //console.log(systemPrompt, completion.choices[0]?.message?.content);
     return (
       workerName +
       ":\n" +
