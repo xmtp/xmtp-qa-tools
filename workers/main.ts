@@ -337,7 +337,9 @@ export class WorkerClient extends Worker {
           baseName,
         );
 
-        console.log(`[${this.nameId}] GPT Agent: Response: "${response}"`);
+        console.log(
+          `[${this.nameId}] GPT response: "${response.slice(0, 10)}"...`,
+        );
 
         // Send the response
         await conversation?.send(response);
@@ -642,6 +644,13 @@ export class WorkerClient extends Worker {
     history: DecodedMessage[],
     workerName: string,
   ): Promise<string> {
+    // First check if OPENAI_API_KEY is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn(
+        "OPENAI_API_KEY is not set in environment variables. GPT workers may not function properly.",
+      );
+    }
+
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     console.log(
