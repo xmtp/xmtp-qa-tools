@@ -98,18 +98,41 @@ export async function createAndSendInGroup(
     const allInboxIds = workers.getWorkers().map((w) => w.client.inboxId);
     allInboxIds.push(receiverInboxId);
 
-    for (let i = 0; i < groupCount; i++) {
-      const groupName = `Test Group ${i} ${allInboxIds.length}`;
-      const group = await client.conversations.newGroup(allInboxIds, {
-        groupName,
-        groupDescription: "Test group for stress testing",
-      });
+    console.log(
+      `Creating ${groupCount} groups with ${allInboxIds.length} members in each`,
+    );
 
-      await group.send(`Hello from the group! ${i}`);
+    for (let i = 0; i < groupCount; i++) {
+      try {
+        const groupName = `Test Group ${i} ${allInboxIds.length}`;
+        console.log(
+          `Creating group "${groupName}" with ${allInboxIds.length} members...`,
+        );
+
+        const group = await client.conversations.newGroup(allInboxIds, {
+          groupName,
+          groupDescription: "Test group for stress testing",
+        });
+
+        console.log(`Successfully created group: ${group.id}`);
+        console.log(`Sending message to group ${group.id}...`);
+
+        await group.send(`Hello from the group! ${i}`);
+        console.log(`Message successfully sent to group ${group.id}`);
+      } catch (groupError) {
+        console.error(
+          `Error creating/messaging group ${i}:`,
+          groupError instanceof Error ? groupError.message : String(groupError),
+        );
+        // Continue with the next group instead of stopping completely
+      }
     }
     return true;
   } catch (error) {
-    console.error(error);
+    console.error(
+      "Error in createAndSendInGroup:",
+      error instanceof Error ? error.message : String(error),
+    );
     throw error;
   }
 }

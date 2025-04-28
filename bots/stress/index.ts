@@ -303,28 +303,62 @@ async function initializeBot() {
   }
 }
 const startGPTWorkers = async () => {
-  const workersGpt = await getWorkers(
-    ["sam", "tina", "walt"],
-    testName,
-    "message",
-    "gpt",
-  );
-  console.log("GPT workers:", workersGpt.getWorkers().length);
-  for (const worker of workersGpt.getWorkers()) {
-    console.log("GPT workers:", worker.name, worker.address);
+  try {
+    // First check if OPENAI_API_KEY is configured
+    if (!process.env.OPENAI_API_KEY) {
+      console.warn(
+        "OPENAI_API_KEY is not set in environment variables. GPT workers may not function properly.",
+      );
+    }
+
+    console.log("Attempting to initialize GPT workers...");
+    const workersGpt = await getWorkers(
+      ["sam", "tina", "walt"],
+      testName,
+      "message",
+      "gpt",
+    );
+    console.log("GPT workers:", workersGpt.getWorkers().length);
+    for (const worker of workersGpt.getWorkers()) {
+      console.log("GPT workers:", worker.name, worker.address);
+    }
+    console.log(
+      workersGpt
+        .getWorkers()
+        .map((w) => w.address)
+        .join(", "),
+    );
+    return workersGpt;
+  } catch (error) {
+    console.error(
+      "Failed to initialize GPT workers:",
+      error instanceof Error ? error.message : String(error),
+    );
+    console.error("Error details:", error);
+    // Don't crash the whole application if GPT workers fail
+    console.log("Continuing without GPT workers");
+    return null;
   }
-  console.log(
-    workersGpt
-      .getWorkers()
-      .map((w) => w.address)
-      .join(", "),
-  );
 };
 
 async function main() {
   const client = await initializeBot();
 
-  await startGPTWorkers();
+  // Check if we should skip GPT workers (useful for debugging)
+  const skipGptWorkers = process.env.SKIP_GPT_WORKERS === "true";
+
+  if (!skipGptWorkers) {
+    try {
+      console.log("Initializing GPT workers...");
+      await startGPTWorkers();
+    } catch (error) {
+      console.error("Error starting GPT workers:", error);
+      console.log("Continuing without GPT workers");
+    }
+  } else {
+    console.log("Skipping GPT workers initialization (SKIP_GPT_WORKERS=true)");
+  }
+
   while (true) {
     try {
       console.log("Starting message stream...");
@@ -353,13 +387,21 @@ async function main() {
 
           await handleStressCommand(message, conversation, client);
         } catch (error) {
-          console.debug(error);
+          console.error(
+            "Error handling message:",
+            error instanceof Error ? error.message : String(error),
+          );
         }
       }
     } catch (error) {
-      console.debug(error);
-      console.error("Fatal error:", error);
-      process.exit(1);
+      console.error(
+        "Stream error:",
+        error instanceof Error ? error.message : String(error),
+      );
+      console.error("Fatal error, restarting stream in 5 seconds...");
+      // Wait 5 seconds before restarting the stream
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      // Don't exit on stream errors, just retry
     }
   }
 }
