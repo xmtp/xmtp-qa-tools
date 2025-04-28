@@ -5,9 +5,8 @@ import winston from "winston";
 
 // Create a simple logger that formats logs in a pretty way
 export const createLogger = () => {
-  // Create a custom format that matches your desired output
+  // Format timestamp to match [YYYY-MM-DDThh:mm:ss.sssZ]
   const prettyFormat = winston.format.printf((info) => {
-    // Format timestamp to match [YYYY-MM-DDThh:mm:ss.sssZ]
     return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
   });
 
@@ -19,10 +18,33 @@ export const createLogger = () => {
   );
 
   // Create the logger with console transport
-  return winston.createLogger({
+  const logger = winston.createLogger({
     format: combinedFormat,
     transports: [new winston.transports.Console()],
   });
+
+  // Add time and timeEnd methods to the logger
+  const timers = new Map<string, number>();
+
+  // Add custom time method
+  logger.time = (label: string) => {
+    timers.set(label, performance.now());
+    //  logger.info(${label});
+  };
+
+  // Add custom timeEnd method
+  logger.timeEnd = (label: string) => {
+    const startTime = timers.get(label);
+    if (startTime) {
+      const duration = performance.now() - startTime;
+      timers.delete(label);
+      logger.info(`${label}: ${duration.toFixed(3)}ms`);
+    } else {
+      // logger.warn(`Timer "${label}" does not exist`);
+    }
+  };
+
+  return logger;
 };
 
 export const logError = (e: unknown, expect: ExpectStatic): boolean => {
@@ -36,6 +58,15 @@ export const logError = (e: unknown, expect: ExpectStatic): boolean => {
   }
   return true;
 };
+
+// Extend the winston Logger type to include our custom methods
+declare module "winston" {
+  interface Logger {
+    time(label: string): void;
+    timeEnd(label: string): void;
+  }
+}
+
 // Create a global logger instance
 const logger = createLogger();
 
@@ -48,6 +79,8 @@ export const setupPrettyLogs = () => {
     warn: console.warn,
     error: console.error,
     debug: console.debug,
+    time: console.time,
+    timeEnd: console.timeEnd,
   };
 
   // Override console.log
@@ -80,10 +113,24 @@ export const setupPrettyLogs = () => {
     logger.debug(message);
   };
 
+  // Override console.time
+  console.time = (...args) => {
+    const message = args.join(" ");
+    logger.time(message);
+  };
+
+  // Override console.timeEnd
+  console.timeEnd = (...args) => {
+    const message = args.join(" ");
+    logger.timeEnd(message);
+  };
+
   // Return function to restore original console if needed
   return () => {
     console.log = originalConsole.log;
     console.info = originalConsole.info;
+    console.time = originalConsole.time;
+    console.timeEnd = originalConsole.timeEnd;
     console.warn = originalConsole.warn;
     console.error = originalConsole.error;
     console.debug = originalConsole.debug;
