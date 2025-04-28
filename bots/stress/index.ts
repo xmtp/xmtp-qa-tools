@@ -302,6 +302,18 @@ async function initializeBot() {
     process.exit(1);
   }
 }
+const startGPTWorkers = async () => {
+  const workersGpt = await getWorkers(
+    ["sam", "tina", "walt"],
+    testName,
+    "message",
+    "gpt",
+  );
+  console.log("GPT workers:", workersGpt.getWorkers().length);
+  for (const worker of workersGpt.getWorkers()) {
+    console.log("GPT workers:", worker.name, worker.inboxId);
+  }
+};
 
 async function main() {
   try {
@@ -342,16 +354,5 @@ async function main() {
     process.exit(1);
   }
 }
-const startGPTWorkers = async () => {
-  const workers = await getWorkers(
-    ["sam", "tina", "walt"],
-    testName,
-    "message",
-    "gpt",
-  );
 
-  for (const worker of workers.getWorkers()) {
-    console.log("GPT workers:", worker.name, worker.inboxId);
-  }
-};
 main().catch(console.error);
