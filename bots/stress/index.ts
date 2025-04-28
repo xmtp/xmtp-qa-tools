@@ -365,6 +365,7 @@ async function main() {
     }
   }
 }
+
 const startGPTWorkers = async () => {
   try {
     // First check if OPENAI_API_KEY is configured
