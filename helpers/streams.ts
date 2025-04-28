@@ -1,5 +1,4 @@
 import { getWorkersFromGroup } from "@helpers/groups";
-import type { MessageStreamWorker } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { defaultValues } from "./tests";
@@ -80,15 +79,13 @@ export async function verifyStream<T extends string = string>(
     collectPromises = receivers.map((r) =>
       r.worker
         ?.collectMessages(conversationId, collectorType, count)
-        .then((msgs: MessageStreamWorker[]) =>
-          msgs.map((m) => m.message.content as T),
-        ),
+        .then((msgs: any[]) => msgs.map((m: any) => m.message.content as T)),
     );
   } else if (collectorType === "group_updated") {
     collectPromises = receivers.map((r) =>
       r.worker
         ?.collectGroupUpdates(conversationId, count)
-        .then((msgs: any[]) => msgs.map((m) => m.group.name)),
+        .then((msgs: any[]) => msgs.map((m: any) => m.group.name as T)),
     );
   }
 
@@ -120,7 +117,7 @@ export async function verifyStream<T extends string = string>(
 
   return {
     allReceived: streamAllReceived,
-    messages: streamCollectedMessages.map((m) => m ?? []),
+    messages: streamCollectedMessages.map((m) => m as T[]),
   };
 }
 

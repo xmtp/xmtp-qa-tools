@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
+import { personalities } from "@helpers/tests";
 import {
   Dm,
   type Client,
@@ -494,22 +495,6 @@ export class WorkerClient extends Worker {
     console.log(
       `[${this.nameId}] Generating OpenAI response for message: ${message}`,
     );
-
-    const personalities = [
-      {
-        name: "sam",
-        personality: "Sam personally hates GPT and AI. Its kind of a jerk.",
-      },
-      {
-        name: "walt",
-        personality: "Walt is a bit more friendly. He likes to make jokes.",
-      },
-      {
-        name: "tina",
-        personality:
-          "Tina its non-tech savvy. She doesn't know much about anything.",
-      },
-    ];
 
     // Find matching personality or use a default
     const personality =
