@@ -61,6 +61,53 @@ const workerBootstrap = /* JavaScript */ `
   workerModule(require, parentPort, workerData, process);
 `;
 
+// Define generic message types for different stream events
+interface BaseStreamMessage {
+  type: string;
+}
+
+interface StreamTextMessage extends BaseStreamMessage {
+  type: "stream_message";
+  message: {
+    conversationId: string;
+    senderInboxId: string;
+    content: string;
+    contentType?: {
+      typeId: string;
+    };
+  };
+}
+
+interface StreamGroupUpdateMessage extends BaseStreamMessage {
+  type: "stream_group_updated";
+  group: {
+    conversationId: string;
+    name: string;
+  };
+}
+
+interface StreamConversationMessage extends BaseStreamMessage {
+  type: "stream_conversation";
+  conversation: {
+    id: string;
+    peerAddress?: string;
+  };
+}
+
+interface StreamConsentMessage extends BaseStreamMessage {
+  type: "stream_consent";
+  consentUpdate: {
+    inboxId: string;
+    consentValue: boolean;
+  };
+}
+
+type StreamMessage =
+  | StreamTextMessage
+  | StreamGroupUpdateMessage
+  | StreamConversationMessage
+  | StreamConsentMessage;
+
 export class WorkerClient extends Worker {
   public name: string;
   private testName: string;
@@ -381,11 +428,11 @@ export class WorkerClient extends Worker {
   /**
    * Collects stream events of specified type
    */
-  collectStreamEvents<T>(options: {
+  collectStreamEvents<T extends StreamMessage>(options: {
     type: "message" | "conversation" | "consent" | "group_updated";
-    filterFn?: (msg: any) => boolean;
+    filterFn?: (msg: StreamMessage) => boolean;
     count: number;
-    additionalInfo?: Record<string, any>;
+    additionalInfo?: Record<string, string | number | boolean>;
   }): Promise<T[]> {
     const { type, filterFn, count, additionalInfo = {} } = options;
     const filterInfo = Object.entries(additionalInfo)
@@ -398,7 +445,7 @@ export class WorkerClient extends Worker {
 
     return new Promise((resolve) => {
       const events: T[] = [];
-      const onMessage = (msg: any) => {
+      const onMessage = (msg: StreamMessage) => {
         const isRightType = msg.type === `stream_${type}`;
         const passesFilter = !filterFn || filterFn(msg);
 
@@ -422,12 +469,14 @@ export class WorkerClient extends Worker {
     groupId: string,
     typeId: string,
     count: number,
-  ): Promise<any[]> {
-    return this.collectStreamEvents<any>({
+  ): Promise<StreamTextMessage[]> {
+    return this.collectStreamEvents<StreamTextMessage>({
       type: "message",
       filterFn: (msg) => {
         if (msg.type !== "stream_message") return false;
-        const { conversationId, contentType } = msg.message;
+        const streamMsg = msg;
+        const conversationId = streamMsg.message.conversationId;
+        const contentType = streamMsg.message.contentType;
         return groupId === conversationId && contentType?.typeId === typeId;
       },
       count,
@@ -438,12 +487,16 @@ export class WorkerClient extends Worker {
   /**
    * Collect group update messages for a specific group
    */
-  collectGroupUpdates(groupId: string, count: number): Promise<any[]> {
-    return this.collectStreamEvents<any>({
+  collectGroupUpdates(
+    groupId: string,
+    count: number,
+  ): Promise<StreamGroupUpdateMessage[]> {
+    return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: "group_updated",
       filterFn: (msg) => {
         if (msg.type !== "stream_group_updated") return false;
-        return groupId === msg.group.conversationId;
+        const streamMsg = msg;
+        return groupId === streamMsg.group.conversationId;
       },
       count,
       additionalInfo: { groupId },
@@ -456,8 +509,8 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
-  ): Promise<any[]> {
-    return this.collectStreamEvents<any>({
+  ): Promise<StreamConversationMessage[]> {
+    return this.collectStreamEvents<StreamConversationMessage>({
       type: "conversation",
       count,
       additionalInfo: { fromPeerAddress },
@@ -467,8 +520,8 @@ export class WorkerClient extends Worker {
   /**
    * Collect consent updates
    */
-  collectConsentUpdates(count: number = 1): Promise<any[]> {
-    return this.collectStreamEvents<any>({
+  collectConsentUpdates(count: number = 1): Promise<StreamConsentMessage[]> {
+    return this.collectStreamEvents<StreamConsentMessage>({
       type: "consent",
       count,
     });

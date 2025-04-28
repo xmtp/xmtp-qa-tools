@@ -23,6 +23,15 @@ interface GroupUpdateMessage {
   };
 }
 
+// Define type for conversation notification
+interface ConversationNotification {
+  type: string;
+  conversation: {
+    id: string;
+    peerAddress?: string;
+  };
+}
+
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
   allReceived: boolean;
@@ -75,13 +84,10 @@ export async function verifyStream<T extends string = string>(
     `Starting stream test with ${receivers.length} receivers on group ${conversationId}`,
   );
 
-  // Pre-sync: Ensure all receivers have synced the conversation before collecting messages
   await Promise.all(
     receivers.map(async (r) => {
       try {
         await r.client.conversations.sync();
-        const convo =
-          await r.client.conversations.getConversationById(conversationId);
       } catch (err) {
         console.error(`Error syncing for ${r.name}:`, err);
       }
@@ -170,13 +176,13 @@ export async function verifyConversationStream(
   const participantPromises = participants.map((participant) => {
     if (!participant.worker) {
       console.warn(`Participant ${participant.name} has no worker`);
-      return Promise.resolve(null);
+      return Promise.resolve<ConversationNotification[] | null>(null);
     }
 
     return participant.worker.collectConversations(
       initiator.client.inboxId,
       1, // Expect one conversation
-    );
+    ) as Promise<ConversationNotification[]>;
   });
 
   // Get participant addresses and create group
