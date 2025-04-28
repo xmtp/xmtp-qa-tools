@@ -310,6 +310,7 @@ async function main() {
     await client.conversations.sync();
     const stream = client.conversations.streamAllMessages();
 
+    await startGPTWorkers();
     for await (const message of await stream) {
       try {
         // Skip own messages and non-text messages
@@ -340,5 +341,16 @@ async function main() {
     process.exit(1);
   }
 }
+const startGPTWorkers = async () => {
+  const workers = await getWorkers(
+    ["sam", "tina", "walt"],
+    testName,
+    "message",
+    "gpt",
+  );
 
+  for (const worker of workers.getWorkers()) {
+    console.log("GPT workers:", worker.inboxId);
+  }
+};
 main().catch(console.error);
