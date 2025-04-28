@@ -8,7 +8,7 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-process.on("unhandledRejection", (reason, promise) => {
+process.on("unhandledRejection", (reason) => {
   console.error("Unhandled rejection details:", reason);
   if (reason instanceof Error) {
     console.error("Error message:", reason.message);

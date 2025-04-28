@@ -5,7 +5,7 @@ import {
   createLargeGroups,
   type StressTestConfig,
 } from "@helpers/groups";
-import { logAndSend, logAndSendError, logAndSendStatus } from "@helpers/logger";
+import { logAndSend } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   type Client,
@@ -102,16 +102,12 @@ export async function runStressTest(
   conversation: Conversation,
 ) {
   const startTime = Date.now();
-  await logAndSendStatus("Running stress test...", conversation, "🚀");
+  await logAndSend("Running stress test...", conversation);
   let hasErrors = false;
 
   try {
     // Send DMs from workers to sender
-    await logAndSendStatus(
-      "Sending DMs from workers to you...",
-      conversation,
-      "📩",
-    );
+    await logAndSend("Sending DMs from workers to you...", conversation);
     try {
       // Use the fixed receiver inbox ID instead of sender's
       await createAndSendDms(
@@ -120,16 +116,16 @@ export async function runStressTest(
         config.messageCount,
       );
     } catch (error) {
-      await logAndSendError(error, conversation, "Some DMs failed to send");
+      console.debug(error);
+      await logAndSend("Some DMs failed to send", conversation);
       hasErrors = true;
       // Continue with the test despite errors
     }
 
     // Create groups with workers
-    await logAndSendStatus(
+    await logAndSend(
       `Creating ${config.groupCount} regular groups...`,
       conversation,
-      "🔄",
     );
     try {
       await createAndSendInGroup(
@@ -139,19 +135,15 @@ export async function runStressTest(
         message.senderInboxId,
       );
     } catch (error) {
-      await logAndSendError(
-        error,
-        conversation,
-        "Some groups failed to be created",
-      );
+      console.debug(error);
+      await logAndSend("Some groups failed to be created", conversation);
       hasErrors = true;
     }
 
     // Create large groups
-    await logAndSendStatus(
+    await logAndSend(
       `Creating large groups with ${config.largeGroups.join(", ")} members...`,
       conversation,
-      "📊",
     );
     try {
       await createLargeGroups(
@@ -162,15 +154,13 @@ export async function runStressTest(
         conversation,
       );
     } catch (error) {
-      await logAndSendError(
-        error,
-        conversation,
-        "Large group creation had issues",
-      );
+      console.debug(error);
+      await logAndSend("Large group creation had issues", conversation);
       hasErrors = true;
     }
   } catch (error) {
-    await logAndSendError(error, conversation, "Stress test failed");
+    console.debug(error);
+    await logAndSend("Stress test failed", conversation);
     // Release the lock when test fails
     StressTestLock.getInstance().release();
     return false;

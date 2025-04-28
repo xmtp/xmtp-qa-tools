@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import type { ExpectStatic } from "vitest";
 import winston from "winston";
 
 // Create a simple logger that formats logs in a pretty way
@@ -24,6 +25,17 @@ export const createLogger = () => {
   });
 };
 
+export const logError = (e: unknown, expect: ExpectStatic): boolean => {
+  if (e instanceof Error) {
+    console.error(
+      `[vitest] Test failed in ${expect.getState().currentTestName}`,
+      e.message,
+    );
+  } else {
+    console.error(`Unknown error type:`, typeof e);
+  }
+  return true;
+};
 // Create a global logger instance
 const logger = createLogger();
 
@@ -98,9 +110,4 @@ export const addFileLogging = (filename: string) => {
       ),
     }),
   );
-};
-
-// Helper function to log with emoji prefixes
-export const logWithEmoji = (message: string, emoji = "✓") => {
-  console.log(`${emoji} ${message}`);
 };
