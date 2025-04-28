@@ -3,6 +3,26 @@ import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { defaultValues } from "./tests";
 
+// Define types for message and group update structures
+interface StreamMessage {
+  type: string;
+  message: {
+    conversationId: string;
+    content: string;
+    contentType?: {
+      typeId: string;
+    };
+  };
+}
+
+interface GroupUpdateMessage {
+  type: string;
+  group: {
+    conversationId: string;
+    name: string;
+  };
+}
+
 // Define the expected return type of verifyStream
 export type VerifyStreamResult = {
   allReceived: boolean;
@@ -39,10 +59,10 @@ export async function verifyStream<T extends string = string>(
   // Use name updater for group_updated collector type
   if (collectorType === "group_updated") {
     generator = ((i: number, suffix: string) =>
-      `New name-${i + 1}-${suffix}`) as any;
+      `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
     sender = (async (g: Group, payload: string) => {
       await g.updateName(payload);
-    }) as any;
+    }) as unknown as typeof sender;
   }
 
   // Exclude group creator from receivers
@@ -74,19 +94,29 @@ export async function verifyStream<T extends string = string>(
   );
 
   // Start collectors
-  let collectPromises: Promise<any>[] = [];
+  let collectPromises: Promise<T[]>[] = [];
   if (collectorType === "text") {
-    collectPromises = receivers.map((r) =>
-      r.worker
-        ?.collectMessages(conversationId, collectorType, count)
-        .then((msgs: any[]) => msgs.map((m: any) => m.message.content as T)),
-    );
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectMessages(conversationId, collectorType, count)
+        .then((msgs: StreamMessage[]) =>
+          msgs.map((m) => m.message.content as T),
+        );
+    });
   } else if (collectorType === "group_updated") {
-    collectPromises = receivers.map((r) =>
-      r.worker
-        ?.collectGroupUpdates(conversationId, count)
-        .then((msgs: any[]) => msgs.map((m: any) => m.group.name as T)),
-    );
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectGroupUpdates(conversationId, count)
+        .then((msgs: GroupUpdateMessage[]) =>
+          msgs.map((m) => m.group.name as T),
+        );
+    });
   }
 
   // Generate all the messages first so we have them for recovery later
@@ -117,7 +147,7 @@ export async function verifyStream<T extends string = string>(
 
   return {
     allReceived: streamAllReceived,
-    messages: streamCollectedMessages.map((m) => m as T[]),
+    messages: streamCollectedMessages,
   };
 }
 
