@@ -42,8 +42,20 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_performance_${{ matrix.environment }}
+          name: ts_performance_logs_${{ matrix.environment }}
           path: logs/
+      - name: Upload .env file
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ts_performance_env_${{ matrix.environment }}
+          path: .env
+      - name: Upload data folder
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ts_performance_data_${{ matrix.environment }}
+          path: .data/
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
         run: exit 1
