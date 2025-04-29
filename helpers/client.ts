@@ -117,6 +117,7 @@ export const regressionClient = async (
       dbEncryptionKey,
       dbPath,
       env,
+      loggingLevel,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
