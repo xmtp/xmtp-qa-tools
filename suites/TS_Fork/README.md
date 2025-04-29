@@ -1,8 +1,8 @@
-# XMTP Fork Testing Suite
+# XMTP Fork Testing Suite (TS_Fork)
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
-https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
+![Fork Testing Visualization](https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939)
 
 ## Test Environment
 
@@ -13,7 +13,7 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 ## Setup
 
 ```bash
-# Installation For a faster download with just the latest code
+# Installation
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
@@ -24,8 +24,8 @@ yarn install
 Create a `.env` file in the root directory:
 
 ```bash
-LOGGING_LEVEL="off"  # Options: debug, info, warn, error
-XMTP_ENV="production"  # Options: production, dev
+LOGGING_LEVEL=off  # Options: debug, info, warn, error, off
+XMTP_ENV=production  # Options: production, dev
 
 # Auto-populated during testing
 GROUP_ID=""
@@ -63,7 +63,7 @@ yarn test fork
 ## Results Analysis
 
 - **Reliable Reproduction**: Coinbase Wallet consistently fails
-- **Intermittent Issues**: Convos Messenger remain stable
+- **Intermittent Issues**: Convos Messenger remains stable
 - **Resilient Clients**: Web and Node SDK clients remain stable
 
 The test identifies a correlation between forking and client creation intervals approaching 1 second, suggesting timing-related vulnerabilities in the synchronization process.
