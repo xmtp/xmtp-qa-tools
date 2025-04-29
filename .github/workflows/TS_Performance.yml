@@ -32,7 +32,7 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - name: Ensure directories exist
         run: |
-          mkdir -p .data
+          mkdir -p .data/
           touch .env
       - run: corepack enable
       - run: yarn
@@ -55,12 +55,15 @@ jobs:
           echo "Files in root directory:"
           ls -la
           echo "Data directory exists: $(test -d '.data' && echo 'Yes' || echo 'No')"
+          echo "Data directory structure:"
+          find .data -type d | sort
           echo "Env file exists: $(test -f '.env' && echo 'Yes' || echo 'No')"
       - name: Check if .env exists
         id: check_env_file
         run: |
           if [ -f ".env" ]; then
             echo "env_exists=true" >> $GITHUB_OUTPUT
+            cat .env
           else
             echo "env_exists=false" >> $GITHUB_OUTPUT
           fi
@@ -76,6 +79,7 @@ jobs:
         run: |
           if [ -d ".data" ]; then
             echo "data_exists=true" >> $GITHUB_OUTPUT
+            ls -la .data
           else
             echo "data_exists=false" >> $GITHUB_OUTPUT
           fi
@@ -84,7 +88,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ts_performance_data_${{ matrix.environment }}
-          path: .data/
+          path: .data/**/*
           if-no-files-found: warn
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
