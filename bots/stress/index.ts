@@ -116,7 +116,7 @@ export async function runStressTest(
         config.messageCount,
       );
     } catch (error) {
-      console.debug(error);
+      console.error(error);
       await logAndSend("Some DMs failed to send", conversation);
       hasErrors = true;
       // Continue with the test despite errors
@@ -135,7 +135,7 @@ export async function runStressTest(
         message.senderInboxId,
       );
     } catch (error) {
-      console.debug(error);
+      console.error(error);
       await logAndSend("Some groups failed to be created", conversation);
       hasErrors = true;
     }
@@ -154,12 +154,12 @@ export async function runStressTest(
         conversation,
       );
     } catch (error) {
-      console.debug(error);
+      console.error(error);
       await logAndSend("Large group creation had issues", conversation);
       hasErrors = true;
     }
   } catch (error) {
-    console.debug(error);
+    console.error(error);
     await logAndSend("Stress test failed", conversation);
     // Release the lock when test fails
     StressTestLock.getInstance().release();
@@ -311,7 +311,7 @@ async function initializeBot() {
 
     return bot.client;
   } catch (error) {
-    console.debug(error);
+    console.error(error);
     console.error("Error initializing bot:", error);
     process.exit(1);
   }

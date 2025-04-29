@@ -260,7 +260,7 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         try {
-          await this.client.conversations.sync();
+          console.log("initMessageStream");
           const stream = await this.client.conversations.streamAllMessages();
 
           for await (const message of stream) {
@@ -271,12 +271,6 @@ export class WorkerClient extends Worker {
             ) {
               continue;
             }
-
-            // console.log(
-            //   message?.contentType?.typeId,
-            //   JSON.stringify(message.content),
-            // );
-            // Check if this is a group update message
             if (message?.contentType?.typeId === "group_updated") {
               if (this.listenerCount("message") > 0) {
                 this.emit("message", {
@@ -300,7 +294,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error(error);
+          console.error("maints:message " + String(error));
         }
       }
     })();
@@ -381,7 +375,6 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         try {
-          await this.client.conversations.sync();
           const stream = await this.client.conversations.stream();
 
           for await (const conversation of stream) {
@@ -395,7 +388,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error(error);
+          console.error("maints:conversation " + String(error));
         }
       }
     })();
@@ -408,7 +401,6 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         try {
-          await this.client.conversations.sync();
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
@@ -420,7 +412,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.debug(error);
+          console.error("maints:consent " + String(error));
         }
       }
     })();
