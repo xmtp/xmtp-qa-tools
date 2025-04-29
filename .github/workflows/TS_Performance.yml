@@ -44,14 +44,31 @@ jobs:
         with:
           name: ts_performance_logs_${{ matrix.environment }}
           path: logs/
+          if-no-files-found: warn
+      - name: Check if .env exists
+        id: check_env_file
+        run: |
+          if [ -f ".env" ]; then
+            echo "env_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "env_exists=false" >> $GITHUB_OUTPUT
+          fi
       - name: Upload .env file
-        if: always()
+        if: always() && steps.check_env_file.outputs.env_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ts_performance_env_${{ matrix.environment }}
           path: .env
+      - name: Check if .data directory exists
+        id: check_data_dir
+        run: |
+          if [ -d ".data" ]; then
+            echo "data_exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "data_exists=false" >> $GITHUB_OUTPUT
+          fi
       - name: Upload data folder
-        if: always()
+        if: always() && steps.check_data_dir.outputs.data_exists == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: ts_performance_data_${{ matrix.environment }}
