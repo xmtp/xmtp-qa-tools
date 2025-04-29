@@ -286,16 +286,17 @@ export class WorkerClient extends Worker {
               }
               continue;
             }
+            if (message.contentType?.typeId === "text") {
+              // Handle auto-responses if enabled
+              if (this.shouldRespondToMessage(message)) {
+                await this.handleResponse(message);
+                continue;
+              }
 
-            // Handle auto-responses if enabled
-            if (this.shouldRespondToMessage(message)) {
-              await this.handleResponse(message);
-              continue;
-            }
-
-            // Emit standard message
-            if (this.listenerCount("message") > 0) {
-              this.emit("message", { type: "stream_message", message });
+              // Emit standard message
+              if (this.listenerCount("message") > 0) {
+                this.emit("message", { type: "stream_message", message });
+              }
             }
           }
         } catch (error) {
