@@ -30,6 +30,10 @@ jobs:
           cache: "yarn"
         env:
           SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Ensure directories exist
+        run: |
+          mkdir -p .data
+          touch .env
       - run: corepack enable
       - run: yarn
       - name: Make test script executable
@@ -45,6 +49,13 @@ jobs:
           name: ts_performance_logs_${{ matrix.environment }}
           path: logs/
           if-no-files-found: warn
+      - name: Debug file paths
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Files in root directory:"
+          ls -la
+          echo "Data directory exists: $(test -d '.data' && echo 'Yes' || echo 'No')"
+          echo "Env file exists: $(test -f '.env' && echo 'Yes' || echo 'No')"
       - name: Check if .env exists
         id: check_env_file
         run: |
@@ -59,6 +70,7 @@ jobs:
         with:
           name: ts_performance_env_${{ matrix.environment }}
           path: .env
+          if-no-files-found: warn
       - name: Check if .data directory exists
         id: check_data_dir
         run: |
@@ -73,6 +85,7 @@ jobs:
         with:
           name: ts_performance_data_${{ matrix.environment }}
           path: .data/
+          if-no-files-found: warn
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
         run: exit 1
