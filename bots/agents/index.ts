@@ -25,16 +25,7 @@ async function main() {
       "message",
       "gpt",
     );
-    console.log("GPT workers:", workersGpt.getWorkers().length);
     for (const worker of workersGpt.getWorkers()) {
-      console.log(
-        "GPT worker:",
-        worker.name,
-        worker.address,
-        "inboxId:",
-        worker.inboxId,
-      );
-
       // Add sync log to track if sync causes issues
       worker.client.conversations
         .sync()

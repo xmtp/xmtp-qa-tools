@@ -303,8 +303,8 @@ async function initializeBot() {
       process.exit(1);
     }
 
-    console.log("Bot worker:", bot.address);
-    console.log("Bot worker client:", bot.client.inboxId);
+    console.log("Stress bot:", bot.address);
+    console.log("Stress bot inboxId:", bot.client.inboxId);
     console.log(
       `https://xmtp.chat/dm/${bot.address}?env=${process.env.XMTP_ENV}`,
     );
@@ -358,10 +358,6 @@ async function main() {
         "Stream error:",
         error instanceof Error ? error.message : String(error),
       );
-      console.error("Fatal error, restarting stream in 5 seconds...");
-      // Wait 5 seconds before restarting the stream
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      // Don't exit on stream errors, just retry
     }
   }
 }
@@ -384,7 +380,7 @@ const startGPTWorkers = async () => {
     );
     console.log("GPT workers:", workersGpt.getWorkers().length);
     for (const worker of workersGpt.getWorkers()) {
-      console.log("GPT workers:", worker.name, worker.address);
+      console.log("GPT workers:", worker.name, worker.address, worker.inboxId);
     }
     console.log(
       workersGpt

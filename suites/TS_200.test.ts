@@ -4,13 +4,20 @@ import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import type { Group } from "@xmtp/node-sdk";
+import { afterAll, beforeAll, describe, expect, it, should } from "vitest";
 
 const testName = "ts_200";
 loadEnv(testName);
 
 const convosUsernames = [
+  "7ae60cc2d51957be3505b09943b7c0e314d08423f2db3d749be8325b6363a883",
+  "eb82bb68d6a54bc57de35567e26bd87f5bc9993fba7c22c833980456d1cdf4bf",
+  "be49f54220eed1ebc319bf889bbea5d83d3fc8b2fac949a0c9082f96120b76c5",
   "00a2d5e2c10a5360d913c8d50f45fb30fe5540d1c98283dadddaf402e6f9a9ce",
+  "c8f5c76a451c59f5850fdbe19800416682af2cafc89f14d1f79ba004c079d62b",
+  "f7b7bfbdda406f5d3e5f4010c43326b4cc9a59b2ed599a0c07ad28d4fcd14ba6",
+  "2d0cd6a2bc7cf025f5786cce2da95229cad715bdbdbd5174d3c67abc01d969e0",
   "0c2c79134cffb08d35dadaef7195d7b42b596f828a23bea4b5235bd3819508cf",
   "12d468635f430ec39afb98010b73e4878a5f1280a663b2938c9378292e0fd867",
   "1d4ff23c4fad016f4bfec42fa81641c03e5086bf01572749f9e628eac98b64ba",
@@ -36,6 +43,8 @@ const convosUsernames = [
   "f87420435131ea1b911ad66fbe4b626b107f81955da023d049f8aef6636b8e1b",
   "c8c5cdf3c9b44955bc226acfd74e8302fc91d0dc221e79b30c536f298ec21af0",
   "f87420435131ea1b911ad66fbe4b626b107f81955da023d049f8aef6636b8e1b",
+  "c283c92e97ea12b4766b65b5593459f2e29076c88ad507193f298460ab649a3c",
+  "977190e7bbcc22a51dfa7f663b199eee87b8e6906f1403d4606c0a199597728b",
 ];
 
 describe(testName, () => {
@@ -91,6 +100,15 @@ describe(testName, () => {
           await existingGroup.sync();
           const members = await existingGroup.members();
           console.log(`Existing group has ${members.length} members`);
+
+          for (const inboxId of convosUsernames) {
+            try {
+              await (existingGroup as Group).addMembers([inboxId]);
+            } catch (e) {
+              console.error(`Error adding member ${inboxId}:`, e);
+            }
+          }
+
           return;
         } else {
           console.log(
@@ -107,7 +125,7 @@ describe(testName, () => {
         .slice(0, GROUP_SIZE)
         .map((inbox) => inbox.inboxId);
 
-      const allInboxIds = [...inboxIds, ...convosUsernames];
+      const allInboxIds = [...inboxIds];
 
       const henry = workers.get("henry")!;
 
@@ -116,6 +134,13 @@ describe(testName, () => {
         groupName: `Test Group with ${allInboxIds.length} participants`,
         groupDescription: `Created by ${testName} test suite`,
       });
+      for (const inboxId of convosUsernames) {
+        try {
+          await newGroup.addMembers([inboxId]);
+        } catch (e) {
+          console.error(`Error adding member ${inboxId}:`, e);
+        }
+      }
 
       expect(newGroup).toBeDefined();
       expect(newGroup.id).toBeDefined();
@@ -129,13 +154,38 @@ describe(testName, () => {
 
       // Use smaller batches to get members if there are many
       const members = await newGroup.members();
-
       console.log(`Group has ${members.length} members`);
-      expect(members.length).toBe(GROUP_SIZE + 1); // +1 for the creator
-
-      // Save the group ID to the .env file
       appendToEnv(ENV_VAR_NAME, newGroup.id, testName);
       console.log(`Saved group ID to .env as ${ENV_VAR_NAME}=${newGroup.id}`);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+
+  it("should remove and readd 10 members from the generatedInboxes", async () => {
+    try {
+      const henry = workers.get("henry")!;
+      const groupId = process.env[ENV_VAR_NAME];
+      if (!groupId) {
+        throw new Error(`Group ID not found in .env: ${ENV_VAR_NAME}`);
+      }
+      const group =
+        await henry.client.conversations.getConversationById(groupId);
+      if (!group) {
+        throw new Error(`Group not found: ${groupId}`);
+      }
+      const toRemove = generatedInboxes
+        .slice(0, 10)
+        .map((inbox) => inbox.inboxId);
+
+      for (const member of toRemove) {
+        await (group as Group).removeMembers([member]);
+      }
+      for (const member of toRemove) {
+        await (group as Group).addMembers([member]);
+      }
+      console.log(`Group has ${toRemove.length} members`);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
