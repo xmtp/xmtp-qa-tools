@@ -5,7 +5,7 @@ import { logError } from "@helpers/logger";
 import { appendToEnv } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it, should } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_200";
 loadEnv(testName);
