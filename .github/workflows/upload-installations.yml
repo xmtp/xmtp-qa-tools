@@ -8,21 +8,31 @@ jobs:
   test-and-upload:
     runs-on: ubuntu-latest
 
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version-file: ".node-version"
           cache: "yarn"
-
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-
-      - name: Run DM tests
-        run: yarn test:dms
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Ensure data folder exists
+        run: mkdir -p .data
+      - name: List data folder contents
+        run: ls -la .data
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        run: ./scripts/run-test.sh dms
         env:
           # Add any environment variables needed for tests
           XMTP_ENV: ${{ secrets.XMTP_ENV }}
