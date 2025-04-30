@@ -260,7 +260,6 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         try {
-          console.log("initMessageStream");
           const stream = await this.client.conversations.streamAllMessages();
 
           for await (const message of stream) {
