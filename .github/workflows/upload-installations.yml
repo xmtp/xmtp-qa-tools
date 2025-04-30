@@ -50,6 +50,4 @@ jobs:
             .env
           if-no-files-found: warn
           overwrite: true
-          follow-symlinks: true
-          exclude-hidden-directories-in-scope-walking: false
-          strict-glob: false
+          include-hidden-files: true
