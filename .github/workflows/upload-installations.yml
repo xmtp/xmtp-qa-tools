@@ -1,0 +1,61 @@
+name: Daily Test Run and Artifact Upload
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Runs at midnight UTC every day
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  test-and-upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Run DM tests
+        run: yarn test:dms
+        env:
+          # Add any environment variables needed for tests
+          XMTP_ENV: ${{ secrets.XMTP_ENV }}
+          WALLET_KEY: ${{ secrets.WALLET_KEY }}
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+
+      - name: List .data folder structure
+        run: |
+          find .data -type d | sort > data-directories.txt
+          cat data-directories.txt
+        continue-on-error: true
+
+      - name: Upload .data folder
+        uses: actions/upload-artifact@v3
+        with:
+          name: xmtp-data-folder
+          path: .data/
+          retention-days: 7
+
+      - name: Upload .env file
+        uses: actions/upload-artifact@v3
+        with:
+          name: env-file
+          path: .env
+          retention-days: 7
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-artifacts
+          path: |
+            logs/
+            *.log
+            functional/
+          retention-days: 7
