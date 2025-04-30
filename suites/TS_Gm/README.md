@@ -32,7 +32,7 @@ GM_BOT_ADDRESS=0x...  # Ethereum address of the GM bot to test against
 ## Test Execution
 
 ```bash
-yarn test gm
+yarn test ts_gm
 ```
 
 ## Test Flow

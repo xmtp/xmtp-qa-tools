@@ -33,7 +33,7 @@ DELIVERY_RECEIVERS=4  # Number of receiver clients
 ## Test Execution
 
 ```bash
-yarn test delivery
+yarn test ts_delivery
 ```
 
 ## Test Flow

@@ -114,7 +114,7 @@ describe(testName, () => {
       const status = await workers
         .get("henry")!
         .client.getKeyPackageStatusesForInstallationIds(installationIds);
-      console.log(status);
+
       // Count valid and invalid installations
       const totalInstallations = Object.keys(status).length;
       const validInstallations = Object.values(status).filter(

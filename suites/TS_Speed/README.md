@@ -30,7 +30,7 @@ CB_USER=<target_user_inbox_id>  # Inbox ID of the target user/application to tes
 ## Test Execution
 
 ```bash
-yarn test speed
+yarn test ts_speed
 ```
 
 ## Test Flow

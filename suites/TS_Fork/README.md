@@ -40,7 +40,7 @@ GROUP_ID=""
 ## Test Execution
 
 ```bash
-yarn test fork
+yarn test ts_fork
 ```
 
 ## Test Flow

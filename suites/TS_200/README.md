@@ -29,7 +29,7 @@ XMTP_ENV=production  # Options: production, dev
 ## Test Execution
 
 ```bash
-yarn test 200
+yarn test ts_200
 ```
 
 ## Test Flow

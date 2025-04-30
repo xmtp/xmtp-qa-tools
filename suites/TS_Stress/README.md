@@ -30,7 +30,7 @@ STRESS_SIZE=small  # Options: small, medium, large
 ## Test Execution
 
 ```bash
-yarn test stress
+yarn test ts_stress
 ```
 
 ## Test Flow

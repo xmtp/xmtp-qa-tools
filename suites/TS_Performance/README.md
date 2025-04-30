@@ -31,7 +31,7 @@ XMTP_ENV=production  # Options: production, dev
 ## Test Execution
 
 ```bash
-yarn test performance
+yarn test ts_performance
 ```
 
 ## Test Flow
