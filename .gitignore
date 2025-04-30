@@ -5,6 +5,7 @@ node_modules
 .yarn/
 .vscode/
 .env
+.data copy/
 # testing
 coverage
 .data/
