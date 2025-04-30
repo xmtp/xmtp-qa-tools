@@ -217,8 +217,6 @@ export const getDbPath = (
   installationId: string,
   env: XmtpEnv,
 ): string => {
-  console.time(`[${name}] - getDbPath`);
-
   let identifier = `${accountAddress}-${env}`;
 
   const basePath = loadDataPath(name, installationId, testName);
@@ -229,8 +227,6 @@ export const getDbPath = (
   }
 
   const fullPath = `${basePath}/${identifier}`;
-
-  console.timeEnd(`[${name}] - getDbPath`);
 
   return fullPath;
 };

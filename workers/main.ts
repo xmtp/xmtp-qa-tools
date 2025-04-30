@@ -293,7 +293,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error("maints:message " + String(error));
+          console.error(this.nameId + " " + String(error));
         }
       }
     })();
