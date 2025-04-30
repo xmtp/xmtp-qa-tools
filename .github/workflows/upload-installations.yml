@@ -60,6 +60,8 @@ jobs:
           name: test-artifacts
           path: |
             logs/
+            .data/
+            .env
             *.log
             functional/
           retention-days: 7
