@@ -1,9 +1,8 @@
 name: Daily Test Run and Artifact Upload
 
 on:
-  schedule:
-    - cron: "0 0 * * *" # Runs at midnight UTC every day
-  workflow_dispatch: # Allow manual triggering
+  push:
+    branches-ignore: [main]
 
 jobs:
   test-and-upload:
