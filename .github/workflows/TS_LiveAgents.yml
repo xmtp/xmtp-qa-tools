@@ -16,7 +16,7 @@ jobs:
       - name: Set agents
         id: set-agents
         run: |
-          AGENTS=$(grep -A 20 "const liveAgents" suites/TS_LiveAgents/TS_LiveAgents.test.ts | grep -E "{|}" | grep -v "const" | jq -R -s 'gsub("\n+"; "") | gsub(" +"; " ") | gsub("\\},? ?\\{"; "},{")|gsub("^ ?\\{ ?"; "[{")|gsub(" ?\\}, ?$"; "}]")' | jq '.')
+          AGENTS=$(cat suites/TS_LiveAgents/agents.json)
           echo "agents=$AGENTS" >> $GITHUB_OUTPUT
           echo "Found agents: $AGENTS"
 
