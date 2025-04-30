@@ -1,4 +1,5 @@
 name: Check agent-examples
+
 on:
   schedule:
     - cron: "0 * * * *"

@@ -1,0 +1,55 @@
+name: Upload Installations & Keys
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # Run at midnight UTC every day
+  workflow_dispatch:
+
+jobs:
+  test-and-upload:
+    runs-on: ubuntu-latest
+
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - name: Ensure data folder exists
+        run: mkdir -p .data
+      - name: List data folder contents
+        run: ls -la .data
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        run: ./scripts/run-test.sh dms
+
+      - name: List .data folder structure
+        run: |
+          find .data -type d | sort > data-directories.txt
+          cat data-directories.txt
+        continue-on-error: true
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-artifacts
+          path: |
+            logs/
+            .data/
+            .env
+          if-no-files-found: warn
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 365
