@@ -17,7 +17,8 @@ jobs:
         id: set-agents
         run: |
           AGENTS=$(cat suites/TS_LiveAgents/agents.json)
-          echo "agents=$AGENTS" >> $GITHUB_OUTPUT
+          # Use jq to properly escape the JSON for GitHub Actions output
+          echo "agents=$(echo $AGENTS | jq -c .)" >> $GITHUB_OUTPUT
           echo "Found agents: $AGENTS"
 
   test:
