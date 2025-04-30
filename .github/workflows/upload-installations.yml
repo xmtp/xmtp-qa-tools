@@ -41,21 +41,21 @@ jobs:
         continue-on-error: true
 
       - name: Upload .data folder
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: xmtp-data-folder
           path: .data/
           retention-days: 7
 
       - name: Upload .env file
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: env-file
           path: .env
           retention-days: 7
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-artifacts
           path: |
