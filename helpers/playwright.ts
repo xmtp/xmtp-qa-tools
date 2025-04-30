@@ -7,6 +7,7 @@ import {
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
+import { defaultValues } from "./tests";
 
 export class XmtpPlaywright {
   private browser: Browser | null = null;
@@ -28,17 +29,20 @@ export class XmtpPlaywright {
   /**
    * Creates a DM with deeplink and checks for GM response
    */
-  async newDmWithDeeplink(address: string): Promise<boolean> {
+  async newDmWithDeeplink(
+    address: string,
+    expectedMessage: string,
+  ): Promise<boolean> {
     const { page, browser } = await this.startPage(false, address);
     try {
       console.log("Creating DM with deeplink");
-      console.log("Sending message and waiting for GM response");
-      const response = await this.sendAndWaitForGm(page, "gm");
-      console.log("GM response:", response);
+      console.log("Sending message and waiting for response");
+      const response = await this.sendAndWaitForResponse(page, expectedMessage);
+      console.log("Agent response:", response);
       return response;
     } catch (error) {
-      console.error("Could not find 'gm' message:", error);
-      await this.takeSnapshot(page, "before-finding-gm");
+      console.error("Could not find expected message:", error);
+      await this.takeSnapshot(page, "before-finding-expected-message");
       return false;
     } finally {
       if (browser) await browser.close();
@@ -48,16 +52,13 @@ export class XmtpPlaywright {
   /**
    * Creates a group and checks for GM response
    */
-  async createGroupAndReceiveGm(
-    addresses: string[],
-    waitForMessage: boolean = true,
-  ): Promise<void> {
+  async createGroupAndReceiveGm(addresses: string[]): Promise<void> {
     const { page, browser } = await this.startPage(false);
     try {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
       console.log("Sending message and waiting for GM response");
-      const response = await this.sendAndWaitForGm(page, "gm", waitForMessage);
+      const response = await this.sendAndWaitForResponse(page, "gm");
       if (!response) {
         throw new Error("Failed to receive GM response");
       }
@@ -135,14 +136,13 @@ export class XmtpPlaywright {
   /**
    * Sends a message and optionally waits for GM response
    */
-  private async sendAndWaitForGm(
+  private async sendAndWaitForResponse(
     page: Page,
-    message: string,
-    waitForMessage: boolean = true,
+    expectedMessage: string,
   ): Promise<boolean> {
     try {
       // Wait for GM response with a longer timeout
-      await page?.waitForTimeout(1000);
+      await page?.waitForTimeout(defaultValues.streamTimeout);
       await page.getByRole("textbox", { name: "Type a message..." }).click();
       await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
       await page.getByRole("button", { name: "Send" }).click();
@@ -151,16 +151,12 @@ export class XmtpPlaywright {
       const hiMessageText = await hiMessage.textContent();
       console.log("Hi message:", hiMessageText);
 
-      if (waitForMessage) {
-        // Wait for GM response with a longer timeout
-        await page?.waitForTimeout(3000);
-        const botMessage = await page.getByText("gm");
-        const botMessageText = await botMessage.textContent();
-        console.log("Bot message:", botMessageText);
-        return botMessageText === "gm";
-      } else {
-        return hiMessageText === "hi";
-      }
+      // Wait for GM response with a longer timeout
+      await page?.waitForTimeout(defaultValues.streamTimeout);
+      const botMessage = await page.getByText(expectedMessage);
+      const botMessageText = await botMessage.textContent();
+      console.log("Agent message:", botMessageText);
+      return botMessageText === expectedMessage;
     } catch (error) {
       console.error("Error in sendAndWaitForGm:", error);
       throw error;
@@ -202,7 +198,7 @@ export class XmtpPlaywright {
     }
     console.log("Navigating to:", url);
     await this.page.goto(url);
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(defaultValues.streamTimeout);
     await this.page.getByText("Ephemeral", { exact: true }).click();
 
     return { browser: this.browser, page: this.page };
