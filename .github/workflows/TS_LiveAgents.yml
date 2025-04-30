@@ -1,0 +1,51 @@
+name: TS_LiveAgents
+description: "should verify health of live agents"
+
+on:
+  schedule:
+    - cron: "0 * * * *" # Runs at the top of every hour
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+      WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
+      ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Debug API key
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "API key is available in test job"
+          else
+            echo "API key is NOT available in test job"
+          fi
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+        env:
+          SKIP_YARN_COREPACK_CHECK: "1"
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
+      - name: Run tests with retry
+        run: ./scripts/run-test.sh TS_LiveAgents
+      - name: Upload reports and snapshots artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ts_live_agents_${{ matrix.environment }}
+          path: |
+            logs/
