@@ -1,8 +1,9 @@
-name: Daily Test Run and Artifact Upload
+name: Upload Installations & Keys
 
 on:
-  push:
-    branches-ignore: [main]
+  schedule:
+    - cron: "0 0 * * *" # Run at midnight UTC every day
+  workflow_dispatch:
 
 jobs:
   test-and-upload:
