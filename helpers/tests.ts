@@ -661,10 +661,10 @@ export const defaultNames = [
 ];
 
 export const defaultValues = {
-  amount: 5,
-  streamTimeout: 3000,
-  timeout: 40000,
-  perMessageTimeout: 3000,
+  amount: 5, // 5 messages
+  streamTimeout: 3000, // 3 seconds
+  timeout: 40000, // 40 seconds
+  perMessageTimeout: 3000, // 3 seconds
   defaultNames,
 };
 
