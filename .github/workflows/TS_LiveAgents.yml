@@ -7,11 +7,27 @@ on:
   workflow_dispatch:
 
 jobs:
+  get-agents:
+    runs-on: ubuntu-latest
+    outputs:
+      agents: ${{ steps.set-agents.outputs.agents }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set agents
+        id: set-agents
+        run: |
+          AGENTS=$(grep -A 20 "const liveAgents" suites/TS_LiveAgents/TS_LiveAgents.test.ts | grep -E "{|}" | grep -v "const" | jq -R -s 'gsub("\n+"; "") | gsub(" +"; " ") | gsub("\\},? ?\\{"; "},{")|gsub("^ ?\\{ ?"; "[{")|gsub(" ?\\}, ?$"; "}]")' | jq '.')
+          echo "agents=$AGENTS" >> $GITHUB_OUTPUT
+          echo "Found agents: $AGENTS"
+
   test:
+    needs: get-agents
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
+        agent: ${{ fromJson(needs.get-agents.outputs.agents) }}
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
@@ -21,10 +37,13 @@ jobs:
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+      TARGET_AGENT_NAME: ${{ matrix.agent.name }}
+      TARGET_AGENT_ADDRESS: ${{ matrix.agent.address }}
     steps:
       - uses: actions/checkout@v4
-      - name: Debug API key
+      - name: Debug info
         run: |
+          echo "Testing agent: ${{ matrix.agent.name }} (${{ matrix.agent.address }})"
           if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
             echo "API key is available in test job"
           else
@@ -46,6 +65,6 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_live_agents_${{ matrix.environment }}
+          name: ts_live_agents_${{ matrix.agent.name }}_${{ matrix.environment }}
           path: |
             logs/
