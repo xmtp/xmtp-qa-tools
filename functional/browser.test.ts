@@ -22,7 +22,7 @@ describe(testName, () => {
     it("should respond to a message", async () => {
       console.log("sending gm to bot", gmBotAddress);
       try {
-        const result = await xmtpTester.newDmWithDeeplink(gmBotAddress);
+        const result = await xmtpTester.newDmWithDeeplink(gmBotAddress, "gm");
         expect(result).toBe(true);
       } catch (error) {
         console.error("Error in browser test:", error);
