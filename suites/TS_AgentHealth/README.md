@@ -1,14 +1,21 @@
-# TS_AgentHealth
+# XMTP Agent Health Testing Suite (TS_AgentHealth)
 
-This test suite validates the health and responsiveness of live XMTP agents in production.
+This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
-## Overview
+## Test Environment
 
-The TS_AgentHealth suite performs automated health checks on production XMTP agents by:
+- **Client**: Single worker "bob" for interaction with various agents
+- **Agent Addresses**: Configurable via `agents.json`
+- **Testing Approach**: Programmatic testing via XMTP SDK
 
-- Sending test messages to each agent
-- Verifying that the agent responds appropriately
-- Reporting test results for monitoring purposes
+## Setup
+
+```bash
+# Installation
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
+cd xmtp-qa-testing
+yarn install
+```
 
 ## Configuration
 
@@ -58,6 +65,42 @@ Agents to be tested are defined in `agents.json`:
 
 To add a new agent for testing, simply add its details to this file.
 
+## Test Execution
+
+```bash
+yarn test ts_agenthealth
+```
+
+## Test Flow
+
+1. **Environment Setup**:
+
+   - Sets up the test environment based on configuration
+   - Creates a test client using the "bob" worker identity
+
+2. **Agent Communication**:
+
+   - Sends a test message to each target agent
+   - Waits for and validates the agent's response
+   - Records response times and success/failure status
+
+3. **Result Reporting**:
+   - Reports test results for monitoring purposes
+   - Logs detailed diagnostic information for failed tests
+
+## Performance Metrics
+
+- Agent response time
+- End-to-end message delivery performance
+- Success/failure rate across multiple agents
+
+## Key Features Tested
+
+- Agent responsiveness in direct messages
+- Agent availability across environments (dev/production)
+- Message delivery and response timing
+- Basic agent functionality through command testing
+
 ## GitHub Actions Workflow
 
 The tests are configured to run automatically:
@@ -66,17 +109,6 @@ The tests are configured to run automatically:
 - Manually via workflow dispatch
 
 The workflow configuration is in `.github/workflows/TS_AgentHealth.yml`.
-
-## Test Execution
-
-The test performs these steps:
-
-1. Sets up the test environment
-2. Creates a test client using the `bob` worker identity
-3. Sends a message to the target agent using the XMTP Playwright helper
-4. Validates that the agent responds
-
-If no specific agent is provided via environment variables, the test will default to the first agent in the `agents.json` file.
 
 ## Artifacts
 

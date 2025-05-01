@@ -34,7 +34,6 @@ export class XmtpPlaywright {
     try {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
-      console.log("Sending message and waiting for GM response");
       const response = await this.sendAndWaitForResponse(page, "hi", "gm");
       if (!response) {
         throw new Error("Failed to receive GM response");
@@ -124,8 +123,7 @@ export class XmtpPlaywright {
         .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
       await page.getByRole("button", { name: "Send" }).click();
-
-      const hiMessage = await page.getByText("hi");
+      const hiMessage = await page.getByText(sendMessage);
       const hiMessageText = await hiMessage.textContent();
       console.log("Sent message:", hiMessageText?.toLowerCase());
 
@@ -234,8 +232,6 @@ export class XmtpPlaywright {
   ): Promise<boolean> {
     const { page, browser } = await this.startPage(false, address);
     try {
-      console.log("Creating DM with deeplink");
-      console.log("Sending message and waiting for response");
       return await this.sendAndWaitForResponse(
         page,
         sendMessage,
