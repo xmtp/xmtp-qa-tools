@@ -21,7 +21,6 @@ const convosUsernames = [
   "1d4ff23c4fad016f4bfec42fa81641c03e5086bf01572749f9e628eac98b64ba",
   "268008941d4d8c768e1d894ac63f954f432535a69a4b85d214e800747e75e503",
   "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
-  "2c23f4804e73b744989e36cdfbf175f6bfdcf021ed70183eeb5a8c5a18d6ba29",
   "3da915aa62d63c37f6270bb476b6d74420bac1209184ff7bde8c232be93e43ee",
   "50158e5b0a3dc18279f6f5d16457e907ba65ea37302b00765cb7c01df41cb25a",
   "6ae29bd02a640db30d4e1505bf510419b362e8e0f59d9110db6efb3998d092b3",
@@ -137,6 +136,21 @@ describe(testName, () => {
       for (const member of toRemove) {
         await group.addMembers([member]);
         console.log("added", member);
+      }
+      console.log(`Group has ${toRemove.length} members`);
+    } catch (e) {
+      logError(e, expect);
+      throw e;
+    }
+  });
+
+  it("should remove convosUsernames 10 members from the generatedInboxes", async () => {
+    try {
+      const toRemove = convosUsernames;
+
+      for (const member of toRemove) {
+        await group.removeMembers([member]);
+        console.log("removed", member);
       }
       console.log(`Group has ${toRemove.length} members`);
     } catch (e) {
