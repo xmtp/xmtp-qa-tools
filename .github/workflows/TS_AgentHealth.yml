@@ -5,7 +5,6 @@ on:
   schedule:
     - cron: "0 * * * *" # Runs at the top of every hour
   workflow_dispatch:
-
   pull_request:
     branches:
       - main
@@ -25,7 +24,7 @@ jobs:
 
           # Create an array of agent-network pairs for the matrix
           # Add a display_name field for GitHub Actions matrix display
-          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network, display_name: (.name + " (" + $network + ")")}]')
+          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network, display_name: (.name + " (" + $network + ")")}]') 
 
           # Set the output for the matrix
           echo "agent-network-pairs=$(echo $pairs)" >> $GITHUB_OUTPUT
