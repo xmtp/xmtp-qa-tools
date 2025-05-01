@@ -1,15 +1,17 @@
+import type { Client, Conversation, DecodedMessage } from "@xmtp/node-sdk";
 import { initializeClient } from "./handler";
-import { Client, Conversation } from "@xmtp/node-sdk";
-import { DecodedMessage } from "@xmtp/node-sdk";
 
-
-
-const processMessage = async (client: Client, conversation: Conversation, message: DecodedMessage, isDm: boolean) => {
-    console.log(`Sending "gm" response...`);
-    console.log(isDm);
-    await conversation.send("gm");
-}
+const processMessage = async (
+  client: Client,
+  conversation: Conversation,
+  message: DecodedMessage,
+  isDm: boolean,
+) => {
+  console.log(`Sending "gm" response...`);
+  console.log(isDm);
+  await conversation.send("gm");
+};
 const main = async () => {
   await initializeClient(processMessage, { acceptGroups: true });
-}
+};
 main().catch(console.error);
