@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
-import liveAgents from "./agents.json";
+import agentHealth from "./agents.json";
 
 // Define the types for the agents
 interface Agent {
@@ -15,9 +15,9 @@ interface Agent {
 }
 
 // Type assertion for imported JSON
-const typedAgents = liveAgents as Agent[];
+const typedAgents = agentHealth as Agent[];
 
-const testName = "ts_live_agents";
+const testName = "ts_agent_health";
 loadEnv(testName);
 
 const targetAgentName = process.env.TARGET_AGENT_NAME;

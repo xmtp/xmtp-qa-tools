@@ -1,10 +1,10 @@
-# TS_LiveAgents
+# TS_AgentHealth
 
 This test suite validates the health and responsiveness of live XMTP agents in production.
 
 ## Overview
 
-The TS_LiveAgents suite performs automated health checks on production XMTP agents by:
+The TS_AgentHealth suite performs automated health checks on production XMTP agents by:
 
 - Sending test messages to each agent
 - Verifying that the agent responds appropriately
@@ -65,7 +65,7 @@ The tests are configured to run automatically:
 - On a scheduled basis (hourly)
 - Manually via workflow dispatch
 
-The workflow configuration is in `.github/workflows/TS_LiveAgents.yml`.
+The workflow configuration is in `.github/workflows/TS_AgentHealth.yml`.
 
 ## Test Execution
 
