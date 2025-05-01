@@ -20,7 +20,13 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      workers = await getWorkers(["bob"], testName);
+      workers = await getWorkers(
+        ["bob"],
+        testName,
+        "message",
+        "gm",
+        "production",
+      );
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(1);
     } catch (e) {
@@ -70,7 +76,7 @@ describe(testName, () => {
 
   it("should respond to a message", async () => {
     try {
-      const xmtpTester = new XmtpPlaywright(false);
+      const xmtpTester = new XmtpPlaywright(false, "production");
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
         "hi",
@@ -84,7 +90,7 @@ describe(testName, () => {
   });
   it("should create a group and send a message", async () => {
     try {
-      const xmtpTester = new XmtpPlaywright(false);
+      const xmtpTester = new XmtpPlaywright(false, "production");
       const slicedInboxes = generatedInboxes.slice(0, 4);
       await xmtpTester.createGroupAndReceiveGm([
         ...slicedInboxes.map((inbox) => inbox.accountAddress),
