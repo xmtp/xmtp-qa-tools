@@ -1,0 +1,23 @@
+[
+  {
+    "name": "key-check.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "networks": ["production"],
+    "sendMessage": "/kc",
+    "expectedMessage": "Key Check"
+  },
+  {
+    "name": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  },
+  {
+    "name": "clankerchat.base.eth",
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  }
+]

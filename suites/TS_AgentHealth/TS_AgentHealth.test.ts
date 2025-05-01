@@ -1,8 +1,10 @@
-import { loadEnv } from "@helpers/client";
+import { closeEnv, loadEnv } from "@helpers/client";
+import { sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
+import type { WorkerManager } from "@workers/manager";
 import type { XmtpEnv } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import agentHealth from "./agents.json";
 
 // Define the types for the agents
@@ -17,13 +19,24 @@ interface Agent {
 // Type assertion for imported JSON
 const typedAgents = agentHealth as Agent[];
 
-const testName = "ts_agent_health";
+const testName = "ts_agenthealth";
 loadEnv(testName);
 
 const targetAgentName = process.env.TARGET_AGENT_NAME;
 const targetAgentAddress = process.env.TARGET_AGENT_ADDRESS;
 
 describe(testName, () => {
+  let hasFailures = false;
+  let workers: WorkerManager | undefined;
+  afterAll(async () => {
+    try {
+      sendTestResults(hasFailures, testName);
+      await closeEnv(testName, workers);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
   // If specific agent is targeted by CI matrix
   if (targetAgentName && targetAgentAddress) {
     const agent = typedAgents.find(
