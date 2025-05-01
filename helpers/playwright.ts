@@ -27,32 +27,6 @@ export class XmtpPlaywright {
   }
 
   /**
-   * Creates a DM with deeplink and checks for GM response
-   */
-  async newDmWithDeeplink(
-    address: string,
-    sendMessage: string,
-    expectedMessage: string,
-  ): Promise<boolean> {
-    const { page, browser } = await this.startPage(false, address);
-    try {
-      console.log("Creating DM with deeplink");
-      console.log("Sending message and waiting for response");
-      return await this.sendAndWaitForResponse(
-        page,
-        sendMessage,
-        expectedMessage,
-      );
-    } catch (error) {
-      console.error("Could not find expected message:", error);
-      await this.takeSnapshot(page, "before-finding-expected-message");
-      return false;
-    } finally {
-      if (browser) await browser.close();
-    }
-  }
-
-  /**
    * Creates a group and checks for GM response
    */
   async createGroupAndReceiveGm(addresses: string[]): Promise<void> {
@@ -145,8 +119,6 @@ export class XmtpPlaywright {
     expectedMessage: string,
   ): Promise<boolean> {
     try {
-      // Wait for GM response with a longer timeout
-      await page?.waitForTimeout(defaultValues.streamTimeout);
       await page.getByRole("textbox", { name: "Type a message..." }).click();
       await page
         .getByRole("textbox", { name: "Type a message..." })
@@ -157,10 +129,12 @@ export class XmtpPlaywright {
       const hiMessageText = await hiMessage.textContent();
       console.log("Sent message:", hiMessageText?.toLowerCase());
 
-      // Wait for GM response with a longer timeout
-      await page?.waitForTimeout(defaultValues.streamTimeout);
-      const botMessage = await page.getByText(expectedMessage);
-      const botMessageText = await botMessage.textContent();
+      const botMessageLocator = page.getByText(expectedMessage);
+      await botMessageLocator.waitFor({
+        state: "visible",
+        timeout: defaultValues.streamTimeout,
+      });
+      const botMessageText = await botMessageLocator.textContent();
       console.log("Received message:", botMessageText?.toLowerCase());
       return (
         botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase()) ??
@@ -207,7 +181,7 @@ export class XmtpPlaywright {
     }
     console.log("Navigating to:", url);
     await this.page.goto(url);
-    await this.page.waitForTimeout(defaultValues.streamTimeout);
+    await this.page.waitForTimeout(1000);
     await this.page.getByText("Ephemeral", { exact: true }).click();
 
     return { browser: this.browser, page: this.page };
@@ -243,5 +217,31 @@ export class XmtpPlaywright {
         walletEncryptionKey: walletEncryptionKey,
       },
     );
+  }
+
+  /**
+   * Tests a DM with an agent using deeplink
+   */
+  async newDmWithDeeplink(
+    address: string,
+    sendMessage: string,
+    expectedMessage: string,
+  ): Promise<boolean> {
+    const { page, browser } = await this.startPage(false, address);
+    try {
+      console.log("Creating DM with deeplink");
+      console.log("Sending message and waiting for response");
+      return await this.sendAndWaitForResponse(
+        page,
+        sendMessage,
+        expectedMessage,
+      );
+    } catch (error) {
+      console.error("Could not find expected message:", error);
+      await this.takeSnapshot(page, "before-finding-expected-message");
+      return false;
+    } finally {
+      if (browser) await browser.close();
+    }
   }
 }
