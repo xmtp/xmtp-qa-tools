@@ -20,7 +20,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      workers = await getWorkers(["bob-a-105"], testName);
+      workers = await getWorkers(["bob"], testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(1);
     } catch (e) {
@@ -59,14 +59,9 @@ describe(testName, () => {
       await new Promise((resolve) =>
         setTimeout(resolve, defaultValues.streamTimeout),
       );
-
       await convo.sync();
       const messagesAfter = await convo.messages();
-      const messageAfterCount = messagesAfter.length;
-
-      await convo.sync();
-      // We should have at least 2 messages (our message and bot's response)
-      expect(messageAfterCount).toBe(prevMessageCount + 2);
+      expect(messagesAfter.length).toBe(prevMessageCount + 2);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -76,7 +71,11 @@ describe(testName, () => {
   it("should respond to a message", async () => {
     try {
       const xmtpTester = new XmtpPlaywright(false);
-      const result = await xmtpTester.newDmWithDeeplink(gmBotAddress, "gm");
+      const result = await xmtpTester.newDmWithDeeplink(
+        gmBotAddress,
+        "gm",
+        "gm",
+      );
       expect(result).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

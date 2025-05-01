@@ -1,4 +1,4 @@
-name: TS_LiveAgents
+name: TS_AgentHealth
 description: "should verify health of live agents"
 
 on:
@@ -7,44 +7,48 @@ on:
   workflow_dispatch:
 
 jobs:
-  get-agents:
+  get-agents-and-networks:
     runs-on: ubuntu-latest
     outputs:
-      agents: ${{ steps.set-agents.outputs.agents }}
+      agent-network-pairs: ${{ steps.set-matrix.outputs.agent-network-pairs }}
     steps:
       - uses: actions/checkout@v4
-      - name: Set agents
-        id: set-agents
+      - name: Set matrix
+        id: set-matrix
         run: |
-          AGENTS=$(cat suites/TS_LiveAgents/agents.json)
-          # Use jq to properly escape the JSON for GitHub Actions output
-          echo "agents=$(echo $AGENTS | jq -c .)" >> $GITHUB_OUTPUT
-          echo "Found agents: $AGENTS"
+          # Read the agents.json file
+          AGENTS=$(cat suites/TS_AgentHealth/agents.json)
+
+          # Create an array of agent-network pairs for the matrix
+          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network}]')
+
+          # Set the output for the matrix
+          echo "agent-network-pairs=$(echo $pairs)" >> $GITHUB_OUTPUT
+          echo "Found agent-network pairs: $pairs"
 
   test:
-    needs: get-agents
+    needs: get-agents-and-networks
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        agent: ${{ fromJson(needs.get-agents.outputs.agents) }}
-        environment: [production]
+        agent-network: ${{ fromJson(needs.get-agents-and-networks.outputs.agent-network-pairs) }}
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: ${{ matrix.agent-network.network }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
-      TARGET_AGENT_NAME: ${{ matrix.agent.name }}
-      TARGET_AGENT_ADDRESS: ${{ matrix.agent.address }}
+      TARGET_AGENT_NAME: ${{ matrix.agent-network.name }}
+      TARGET_AGENT_ADDRESS: ${{ matrix.agent-network.address }}
     steps:
       - uses: actions/checkout@v4
       - name: Debug info
         run: |
-          echo "Testing agent: ${{ matrix.agent.name }} (${{ matrix.agent.address }})"
+          echo "Testing agent: ${{ matrix.agent-network.name }} (${{ matrix.agent-network.address }}) on network: ${{ matrix.agent-network.network }}"
           if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
             echo "API key is available in test job"
           else
@@ -61,11 +65,11 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_LiveAgents
+        run: ./scripts/run-test.sh TS_AgentHealth
       - name: Upload reports and snapshots artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_live_agents_${{ matrix.agent.name }}_${{ matrix.environment }}
+          name: ${{ matrix.agent-network.name }}_${{ matrix.agent-network.network }}
           path: |
             logs/

@@ -27,29 +27,6 @@ export class XmtpPlaywright {
   }
 
   /**
-   * Creates a DM with deeplink and checks for GM response
-   */
-  async newDmWithDeeplink(
-    address: string,
-    expectedMessage: string,
-  ): Promise<boolean> {
-    const { page, browser } = await this.startPage(false, address);
-    try {
-      console.log("Creating DM with deeplink");
-      console.log("Sending message and waiting for response");
-      const response = await this.sendAndWaitForResponse(page, expectedMessage);
-      console.log("Agent response:", response);
-      return response;
-    } catch (error) {
-      console.error("Could not find expected message:", error);
-      await this.takeSnapshot(page, "before-finding-expected-message");
-      return false;
-    } finally {
-      if (browser) await browser.close();
-    }
-  }
-
-  /**
    * Creates a group and checks for GM response
    */
   async createGroupAndReceiveGm(addresses: string[]): Promise<void> {
@@ -57,8 +34,7 @@ export class XmtpPlaywright {
     try {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
-      console.log("Sending message and waiting for GM response");
-      const response = await this.sendAndWaitForResponse(page, "gm");
+      const response = await this.sendAndWaitForResponse(page, "hi", "gm");
       if (!response) {
         throw new Error("Failed to receive GM response");
       }
@@ -138,28 +114,38 @@ export class XmtpPlaywright {
    */
   private async sendAndWaitForResponse(
     page: Page,
+    sendMessage: string,
     expectedMessage: string,
   ): Promise<boolean> {
     try {
-      // Wait for GM response with a longer timeout
-      await page?.waitForTimeout(defaultValues.streamTimeout);
       await page.getByRole("textbox", { name: "Type a message..." }).click();
-      await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .fill(sendMessage);
       await page.getByRole("button", { name: "Send" }).click();
-
-      const hiMessage = await page.getByText("hi");
+      const hiMessage = await page.getByText(sendMessage);
       const hiMessageText = await hiMessage.textContent();
-      console.log("Hi message:", hiMessageText);
+      console.log("Sent message:", hiMessageText?.toLowerCase());
 
-      // Wait for GM response with a longer timeout
-      await page?.waitForTimeout(defaultValues.streamTimeout);
-      const botMessage = await page.getByText(expectedMessage);
-      const botMessageText = await botMessage.textContent();
-      console.log("Agent message:", botMessageText);
-      return botMessageText === expectedMessage;
+      const botMessageLocator = page.getByText(expectedMessage);
+      await botMessageLocator
+        .waitFor({
+          state: "visible",
+          timeout: defaultValues.streamTimeout,
+        })
+        .catch((error: unknown) => {
+          console.error("Failed to wait for bot message", error);
+          return false;
+        });
+      const botMessageText = await botMessageLocator.textContent();
+      console.log("Received message:", botMessageText?.toLowerCase());
+      return (
+        botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase()) ??
+        false
+      );
     } catch (error) {
-      console.error("Error in sendAndWaitForGm:", error);
-      throw error;
+      console.error("Error in sendAndWaitForResponse:", error);
+      return false;
     }
   }
 
@@ -198,7 +184,7 @@ export class XmtpPlaywright {
     }
     console.log("Navigating to:", url);
     await this.page.goto(url);
-    await this.page.waitForTimeout(defaultValues.streamTimeout);
+    await this.page.waitForTimeout(1000);
     await this.page.getByText("Ephemeral", { exact: true }).click();
 
     return { browser: this.browser, page: this.page };
@@ -234,5 +220,29 @@ export class XmtpPlaywright {
         walletEncryptionKey: walletEncryptionKey,
       },
     );
+  }
+
+  /**
+   * Tests a DM with an agent using deeplink
+   */
+  async newDmWithDeeplink(
+    address: string,
+    sendMessage: string,
+    expectedMessage: string,
+  ): Promise<boolean> {
+    const { page, browser } = await this.startPage(false, address);
+    try {
+      return await this.sendAndWaitForResponse(
+        page,
+        sendMessage,
+        expectedMessage,
+      );
+    } catch (error) {
+      console.error("Could not find expected message:", error);
+      await this.takeSnapshot(page, "before-finding-expected-message");
+      return false;
+    } finally {
+      if (browser) await browser.close();
+    }
   }
 }
