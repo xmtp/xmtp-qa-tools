@@ -3,7 +3,7 @@ description: "should verify health of live agents"
 
 on:
   schedule:
-    - cron: "0 * * * *" # Runs at the top of every hour
+    - cron: "*/30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
 
 jobs:
