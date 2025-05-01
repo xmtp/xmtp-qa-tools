@@ -209,6 +209,21 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
+## Test suites
+
+The XMTP QA testing framework consists of several specialized test suites designed to evaluate different aspects of the XMTP network's functionality, performance, and reliability. Each suite focuses on specific testing scenarios:
+
+- **[TS_Performance](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)**: Measures operational performance and scalability across various XMTP functions
+- **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability and correctness across multiple streams
+- **[TS_Gm](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)**: Tests basic messaging functionality and cross-version compatibility
+- **[TS_Fork](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Fork)**: Investigates group conversation forking issues through membership manipulation
+- **[TS_Stress](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Stress)**: Evaluates system behavior under high load conditions
+- **[TS_Speed](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Speed)**: Focuses on network and operation speed metrics
+- **[TS_200](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_200)**: Basic functionality tests ensuring core features work correctly
+- **[TS_AgentHealth](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth)**: Tests the health of the agent ecosystem
+
+All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
+
 ## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
@@ -216,6 +231,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
+- **Suites:** Test suites for different testing scenarios - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
 
 ## Development
 
