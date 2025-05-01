@@ -48,6 +48,7 @@ describe(testName, () => {
           expect(result).toBe(true);
         } catch (e) {
           logError(e, expect);
+          throw e;
         }
       });
     }
@@ -67,6 +68,7 @@ describe(testName, () => {
             expect(result).toBe(true);
           } catch (e) {
             logError(e, expect);
+            throw e;
           }
         });
       }

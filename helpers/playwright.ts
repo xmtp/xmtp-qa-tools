@@ -130,14 +130,15 @@ export class XmtpPlaywright {
       console.log("Sent message:", hiMessageText?.toLowerCase());
 
       const botMessageLocator = page.getByText(expectedMessage);
-      await botMessageLocator
+      const waitResult = await botMessageLocator
         .waitFor({
           state: "visible",
           timeout: defaultValues.streamTimeout,
         })
-        .catch(() => {
-          return false;
-        });
+        .catch(() => null);
+      if (!waitResult) {
+        return false;
+      }
       const botMessageText = await botMessageLocator.textContent();
       console.log("Received message:", botMessageText?.toLowerCase());
       return (

@@ -19,12 +19,39 @@ Agents to be tested are defined in `agents.json`:
 ```json
 [
   {
+    "name": "csx-concierge",
+    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
+    "networks": ["dev"],
+    "sendMessage": "hi",
+    "expectedMessage": "chat"
+  },
+  {
+    "name": "key-check.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "networks": ["production"],
+    "sendMessage": "/kc",
+    "expectedMessage": "Key Check"
+  },
+  {
+    "name": "gm-bot",
+    "address": "0x20b572be48527a770479744aec6fe5644f97678b",
+    "networks": ["production", "dev"],
+    "sendMessage": "hi",
+    "expectedMessage": "gm"
+  },
+  {
     "name": "bankr.base.eth",
-    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d"
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
   },
   {
     "name": "clankerchat.base.eth",
-    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
   }
 ]
 ```
@@ -40,20 +67,6 @@ The tests are configured to run automatically:
 
 The workflow configuration is in `.github/workflows/TS_LiveAgents.yml`.
 
-### Environment Variables
-
-The test uses the following environment variables:
-
-| Variable                   | Description                                         |
-| -------------------------- | --------------------------------------------------- |
-| `DATADOG_API_KEY`          | API key for reporting test results to Datadog       |
-| `LOGGING_LEVEL`            | Level of detail for logging                         |
-| `XMTP_ENV`                 | XMTP environment to use (defaults to `production`)  |
-| `WALLET_KEY_XMTP_CHAT`     | Private key for the test wallet                     |
-| `ENCRYPTION_KEY_XMTP_CHAT` | Encryption key for the test client's local database |
-| `TARGET_AGENT_NAME`        | Name of the specific agent to test (optional)       |
-| `TARGET_AGENT_ADDRESS`     | Address of the specific agent to test (optional)    |
-
 ## Test Execution
 
 The test performs these steps:
@@ -64,18 +77,6 @@ The test performs these steps:
 4. Validates that the agent responds
 
 If no specific agent is provided via environment variables, the test will default to the first agent in the `agents.json` file.
-
-## Running Locally
-
-To run the tests locally:
-
-```bash
-# Run against all agents
-yarn test suites/TS_LiveAgents
-
-# Run against a specific agent
-TARGET_AGENT_NAME="bankr.base.eth" TARGET_AGENT_ADDRESS="0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d" yarn test suites/TS_LiveAgents
-```
 
 ## Artifacts
 
