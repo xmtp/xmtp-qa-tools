@@ -125,7 +125,6 @@ describe(testName, () => {
       const verifyResult = await verifyStream(convo, [
         workers.get("randomguy")!,
       ]);
-      console.log(verifyResult);
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
