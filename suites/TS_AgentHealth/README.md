@@ -2,6 +2,8 @@
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
+https://github.com/user-attachments/assets/bbe94427-8fcb-463c-98fb-6417c16dd4cf
+
 ## Test Environment
 
 - **Client**: Single worker "bob" for interaction with various agents

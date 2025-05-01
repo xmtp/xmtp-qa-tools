@@ -2,7 +2,7 @@
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
-![Fork Testing Visualization](https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939)
+https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 ## Test Environment
 
