@@ -175,7 +175,7 @@ export const sdkVersions = {
     Dm: Dm206,
     Group: Group206,
     sdkPackage: "node-sdk-206",
-    bindingsPackage: "node-bindings-120-5",
+    bindingsPackage: "node-bindings-116",
     sdkVersion: "2.0.6",
     libXmtpVersion: "1ab3225",
   },
@@ -185,9 +185,9 @@ export const sdkVersions = {
     Dm: Dm208,
     Group: Group208,
     sdkPackage: "node-sdk-208",
-    bindingsPackage: "node-bindings-120-8",
+    bindingsPackage: "node-bindings-118",
     sdkVersion: "2.0.8",
-    libXmtpVersion: "7eef2ea",
+    libXmtpVersion: "bfadb76",
   },
 };
 
