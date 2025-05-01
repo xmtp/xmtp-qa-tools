@@ -231,7 +231,6 @@ All test suites provide metrics to monitoring dashboards and can be executed bot
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
-- **Suites:** Test suites for different testing scenarios - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
 
 ## Development
 
