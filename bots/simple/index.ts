@@ -5,20 +5,10 @@ import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 const testName = "test-bot";
 loadEnv(testName);
 
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason, promise) => {
-  console.error("Unhandled rejection at:", promise, "reason:", reason);
-  process.exit(1);
-});
-
 async function main() {
   // Get 20 dynamic workers
-  const workers = await getWorkers(["bob"], testName, "message", "gpt");
-  const bot = workers.get("bob");
+  const workers = await getWorkers(["bot"], testName, "message", "gpt");
+  const bot = workers.get("bot");
   const client = bot?.client as Client;
   console.log(`Agent initialized on address ${bot?.address}`);
   const env = process.env.XMTP_ENV as XmtpEnv;
