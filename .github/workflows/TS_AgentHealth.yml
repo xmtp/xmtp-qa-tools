@@ -1,56 +1,29 @@
 name: TS_AgentHealth
-description: "should verify health of live agents"
+description: "should verify health of agents"
 
 on:
   schedule:
-    - cron: "*/30 * * * *" # Runs every 30 minutes
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
+  pull_request:
+    branches:
+      - main
 
 jobs:
-  get-agents-and-networks:
-    runs-on: ubuntu-latest
-    outputs:
-      agent-network-pairs: ${{ steps.set-matrix.outputs.agent-network-pairs }}
-    steps:
-      - uses: actions/checkout@v4
-      - name: Set matrix
-        id: set-matrix
-        run: |
-          # Read the agents.json file
-          AGENTS=$(cat suites/TS_AgentHealth/agents.json)
-
-          # Create an array of agent-network pairs for the matrix
-          # Add a display_name field for GitHub Actions matrix display
-          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network, display_name: (.name + " (" + $network + ")")}]') 
-
-          # Set the output for the matrix
-          echo "agent-network-pairs=$(echo $pairs)" >> $GITHUB_OUTPUT
-          echo "Found agent-network pairs: $pairs"
-
   test:
-    needs: get-agents-and-networks
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        agent-network: ${{ fromJson(needs.get-agents-and-networks.outputs.agent-network-pairs) }}
-    name: ${{ matrix.agent-network.display_name }}
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ matrix.agent-network.network }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
-      TARGET_AGENT_NAME: ${{ matrix.agent-network.name }}
-      TARGET_AGENT_ADDRESS: ${{ matrix.agent-network.address }}
     steps:
       - uses: actions/checkout@v4
-      - name: Debug info
+      - name: Debug API key
         run: |
-          echo "Testing agent: ${{ matrix.agent-network.name }} on network: ${{ matrix.agent-network.network }}"
           if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
             echo "API key is available in test job"
           else
@@ -72,6 +45,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.agent-network.name }}_${{ matrix.agent-network.network }}
+          name: ts_agenthealth_${{ matrix.environment }}
           path: |
             logs/
+            logs/**/*.png
