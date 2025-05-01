@@ -73,7 +73,7 @@ describe(testName, () => {
       const xmtpTester = new XmtpPlaywright(false);
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
-        "gm",
+        "hi",
         "gm",
       );
       expect(result).toBe(true);
