@@ -1249,6 +1249,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/content-type-reaction@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@xmtp/content-type-reaction@npm:2.0.2"
+  dependencies:
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+  checksum: 10/704e64c79ae44fa002265d74b0f19a423ad2f7164397caafe842cd868d122d89b2b083989394bad50186b1aaf9944f632aa35cbbd2af840e9498d64cd52ad4f0
+  languageName: node
+  linkType: hard
+
 "@xmtp/content-type-text@npm:^1.0.0":
   version: 1.0.1
   resolution: "@xmtp/content-type-text@npm:1.0.1"
@@ -1332,10 +1341,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-120-8@npm:@xmtp/node-bindings@1.2.0-dev.154cca2, @xmtp/node-bindings@npm:1.2.0-dev.154cca2":
-  version: 1.2.0-dev.154cca2
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.154cca2"
-  checksum: 10/9f26ee24e519b2fa085ddfc9a615e5030bfa6c79424b4a1344653b584491d16a58773993434c11cbabc5263ed3b09b4c9e6bffbe1140cdcf31ccf4223810c42d
+"@xmtp/node-bindings-120-8@npm:@xmtp/node-bindings@1.2.0-dev.7eef2ea, @xmtp/node-bindings@npm:1.2.0-dev.7eef2ea":
+  version: 1.2.0-dev.7eef2ea
+  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.7eef2ea"
+  checksum: 10/ab50d884cc094b379ebf3590cfbdf4325906907f7e8c1e4d3a6d24e56b663890e52673ef5e3724fdd33df69c96564c5e74997cd1267385a21744360e02bb12df
   languageName: node
   linkType: hard
 
@@ -1437,16 +1446,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-208@npm:@xmtp/node-sdk@2.0.8-dev.154cca2.3, @xmtp/node-sdk@npm:2.0.8-dev.154cca2.3":
-  version: 2.0.8-dev.154cca2.3
-  resolution: "@xmtp/node-sdk@npm:2.0.8-dev.154cca2.3"
+"@xmtp/node-sdk-208@npm:@xmtp/node-sdk@2.0.8-dev.7eef2ea, @xmtp/node-sdk@npm:2.0.8-dev.7eef2ea":
+  version: 2.0.8-dev.7eef2ea
+  resolution: "@xmtp/node-sdk@npm:2.0.8-dev.7eef2ea"
   dependencies:
     "@xmtp/content-type-group-updated": "npm:^2.0.2"
     "@xmtp/content-type-primitives": "npm:^2.0.2"
     "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0-dev.154cca2"
+    "@xmtp/node-bindings": "npm:1.2.0-dev.7eef2ea"
     "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/6a1654f5b43f5a91a9e6a6e2f9e10154063c6dbfeb38c386fc00d76238a35d6b34c0014f0adad09f551e3188773209b727e5b086df74875dd206a0368ab1d4e0
+  checksum: 10/67029ace69062a4a6a8e007871e8e97e33a0b095a9a679186d4761ff33c58b74bea066d16ee09673d6f554602d8cb043b86a41d68854b33efd910018f9160072
   languageName: node
   linkType: hard
 
@@ -4706,6 +4715,7 @@ __metadata:
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^22.14.0"
     "@vitest/ui": "npm:^3.0.6"
+    "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0"
     "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3"
     "@xmtp/node-bindings-120-1": "npm:@xmtp/node-bindings@1.2.0-dev.bed98df"
@@ -4713,10 +4723,10 @@ __metadata:
     "@xmtp/node-bindings-120-3": "npm:@xmtp/node-bindings@1.2.0-dev.068bb4c"
     "@xmtp/node-bindings-120-4": "npm:@xmtp/node-bindings@1.2.0-dev.b96f93d"
     "@xmtp/node-bindings-120-5": "npm:@xmtp/node-bindings@1.1.6"
-    "@xmtp/node-bindings-120-8": "npm:@xmtp/node-bindings@1.2.0-dev.154cca2"
+    "@xmtp/node-bindings-120-8": "npm:@xmtp/node-bindings@1.2.0-dev.7eef2ea"
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41"
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9"
-    "@xmtp/node-sdk": "npm:2.0.8-dev.154cca2.3"
+    "@xmtp/node-sdk": "npm:2.0.8-dev.7eef2ea"
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0"
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5"
     "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2"
@@ -4724,7 +4734,7 @@ __metadata:
     "@xmtp/node-sdk-204": "npm:@xmtp/node-sdk@2.0.4"
     "@xmtp/node-sdk-205": "npm:@xmtp/node-sdk@2.0.5"
     "@xmtp/node-sdk-206": "npm:@xmtp/node-sdk@2.0.6"
-    "@xmtp/node-sdk-208": "npm:@xmtp/node-sdk@2.0.8-dev.154cca2.3"
+    "@xmtp/node-sdk-208": "npm:@xmtp/node-sdk@2.0.8-dev.7eef2ea"
     "@xmtp/node-sdk-47": "npm:@xmtp/node-sdk@0.0.47"
     "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13"
     axios: "npm:^1.8.2"

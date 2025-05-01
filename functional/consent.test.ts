@@ -89,7 +89,7 @@ describe(testName, () => {
     console.time("wait-for-consent-updates");
     // Wait for the consent update to be received
     const consentUpdates = await consentPromise;
-    console.log("Consent updates:", consentUpdates);
+    console.log("Consent updates:", consentUpdates?.length);
 
     expect(consentUpdates).toBeDefined();
     expect(getConsentStateUpdated).toBeDefined();

@@ -17,7 +17,7 @@ describe(testName, () => {
       );
     });
   } else {
-    const xmtpTester = new XmtpPlaywright(true, "dev");
+    const xmtpTester = new XmtpPlaywright(true, "production");
 
     it("should respond to a message", async () => {
       console.log("sending gm to bot", gmBotAddress);

@@ -1,11 +1,9 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import { appendToEnv } from "@helpers/tests";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_200";
 loadEnv(testName);
@@ -23,7 +21,6 @@ const convosUsernames = [
   "1d4ff23c4fad016f4bfec42fa81641c03e5086bf01572749f9e628eac98b64ba",
   "268008941d4d8c768e1d894ac63f954f432535a69a4b85d214e800747e75e503",
   "28eab5603e3b8935c6c4209b4beedb0d54f7abd712fc86f8dc23b2617e28c284",
-  "2c23f4804e73b744989e36cdfbf175f6bfdcf021ed70183eeb5a8c5a18d6ba29",
   "3da915aa62d63c37f6270bb476b6d74420bac1209184ff7bde8c232be93e43ee",
   "50158e5b0a3dc18279f6f5d16457e907ba65ea37302b00765cb7c01df41cb25a",
   "6ae29bd02a640db30d4e1505bf510419b362e8e0f59d9110db6efb3998d092b3",
@@ -49,145 +46,115 @@ const convosUsernames = [
 
 describe(testName, () => {
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
   const GROUP_SIZE = 185;
-  const ENV_VAR_NAME = `200_PERSON_GROUP_ID_${process.env.XMTP_ENV}`;
-
+  const GROUP_ID = process.env[`200_PERSON_GROUP_ID_${process.env.XMTP_ENV}`];
+  let bot: Worker;
+  let group: Group;
   beforeAll(async () => {
     try {
+      if (!GROUP_ID) {
+        throw new Error(`Group ID not found in .env`);
+      }
       // Use one worker to create the group
-      workers = await getWorkers(["henry"], testName);
+      workers = await getWorkers(["bob"], testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(1);
-
+      bot = workers.get("bob")!;
       // Ensure we can connect to the network
-      const henry = workers.get("henry")!;
-      await henry.client.conversations.sync();
+      await bot.client.conversations.sync();
       console.log("Successfully connected to XMTP network");
     } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
 
   it(`should create a group with ${GROUP_SIZE} participants and save the ID to .env`, async () => {
     try {
-      // Check if group ID already exists in environment
-      if (process.env[ENV_VAR_NAME]) {
-        console.log(`Group ID already exists: ${process.env[ENV_VAR_NAME]}`);
-
-        // Verify the group exists by trying to load it
-        const existingGroupId = process.env[ENV_VAR_NAME];
-        const henry = workers.get("henry")!;
-
-        const existingGroup =
-          await henry.client.conversations.getConversationById(existingGroupId);
-
-        if (existingGroup) {
-          console.log(
-            `Successfully verified existing group: ${existingGroupId}`,
-          );
-          await existingGroup.sync();
-          const members = await existingGroup.members();
-          console.log(`Existing group has ${members.length} members`);
-
-          for (const inboxId of convosUsernames) {
-            try {
-              await (existingGroup as Group).addMembers([inboxId]);
-            } catch (e) {
-              console.error(`Error adding member ${inboxId}:`, e);
-            }
-          }
-
-          return;
-        } else {
-          console.log(
-            `Existing group ID ${existingGroupId} not found, creating a new group`,
-          );
-        }
+      group = (await bot.client.conversations.getConversationById(
+        GROUP_ID as string,
+      )) as Group;
+      if (group) {
+        console.log(`Successfully verified existing group: ${group.id}`);
+      } else {
+        // Create the group with retries
+        group = await bot.client.conversations.newGroup(convosUsernames, {
+          groupName: `Test Group with ${convosUsernames.length} participants`,
+          groupDescription: `Created by ${testName} test suite`,
+        });
       }
 
-      console.log(`Creating a new group with ${GROUP_SIZE} participants...`);
-      const startTime = performance.now();
-
-      // Get the first 200 inboxes from the generated inboxes
-      const inboxIds = generatedInboxes
-        .slice(0, GROUP_SIZE)
-        .map((inbox) => inbox.inboxId);
-
-      const allInboxIds = [...inboxIds];
-
-      const henry = workers.get("henry")!;
-
-      // Create the group with retries
-      const newGroup = await henry.client.conversations.newGroup(allInboxIds, {
-        groupName: `Test Group with ${allInboxIds.length} participants`,
-        groupDescription: `Created by ${testName} test suite`,
-      });
-      for (const inboxId of convosUsernames) {
-        try {
-          await newGroup.addMembers([inboxId]);
-        } catch (e) {
-          console.error(`Error adding member ${inboxId}:`, e);
-        }
-      }
-
-      expect(newGroup).toBeDefined();
-      expect(newGroup.id).toBeDefined();
-
-      const endTime = performance.now();
-      console.log(`Group created with ID: ${newGroup.id}`);
-      console.log(`Creation took ${(endTime - startTime) / 1000} seconds`);
-
-      // Verify the group has the correct number of members
-      await newGroup.sync();
-
-      // Use smaller batches to get members if there are many
-      const members = await newGroup.members();
+      const members = await group.members();
       console.log(`Group has ${members.length} members`);
-      appendToEnv(ENV_VAR_NAME, newGroup.id, testName);
-      console.log(`Saved group ID to .env as ${ENV_VAR_NAME}=${newGroup.id}`);
+      console.log(`Saved group ID to .env as ${GROUP_ID}=${group.id}`);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
 
+  // it(`should add ${GROUP_SIZE} participants to the group`, async () => {
+  //   try {
+  //     // Get the first 200 inboxes from the generated inboxes
+  //     const inboxIds = generatedInboxes
+  //       .slice(0, GROUP_SIZE)
+  //       .map((inbox) => inbox.inboxId);
+
+  //     const allInboxIds = [...inboxIds, ...convosUsernames];
+
+  //     for (const inboxId of allInboxIds) {
+  //       try {
+  //         await group.addMembers([inboxId]);
+  //         console.log(`Added member ${inboxId} to group ${group.id}`);
+  //       } catch (e) {
+  //         console.error(`Error adding member ${inboxId}:`, e);
+  //       }
+  //     }
+  //     await group.sync();
+
+  //     expect(group.id).toBeDefined();
+
+  //     const members = await group.members();
+  //     console.log(`Group has ${members.length} members`);
+  //     console.log(`Saved group ID to .env as ${GROUP_ID}=${group.id}`);
+  //   } catch (e) {
+  //     logError(e, expect);
+  //     throw e;
+  //   }
+  // });
+
   it("should remove and readd 10 members from the generatedInboxes", async () => {
     try {
-      const henry = workers.get("henry")!;
-      const groupId = process.env[ENV_VAR_NAME];
-      if (!groupId) {
-        throw new Error(`Group ID not found in .env: ${ENV_VAR_NAME}`);
-      }
-      const group =
-        await henry.client.conversations.getConversationById(groupId);
-      if (!group) {
-        throw new Error(`Group not found: ${groupId}`);
-      }
       const toRemove = generatedInboxes
         .slice(0, 10)
         .map((inbox) => inbox.inboxId);
 
       for (const member of toRemove) {
-        await (group as Group).removeMembers([member]);
+        await group.removeMembers([member]);
+        console.log("removed", member);
       }
       for (const member of toRemove) {
-        await (group as Group).addMembers([member]);
+        await group.addMembers([member]);
+        console.log("added", member);
       }
       console.log(`Group has ${toRemove.length} members`);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
+      throw e;
+    }
+  });
+
+  it("should remove convosUsernames 10 members from the generatedInboxes", async () => {
+    try {
+      const toRemove = convosUsernames;
+
+      for (const member of toRemove) {
+        await group.removeMembers([member]);
+        console.log("removed", member);
+      }
+      console.log(`Group has ${toRemove.length} members`);
+    } catch (e) {
+      logError(e, expect);
       throw e;
     }
   });

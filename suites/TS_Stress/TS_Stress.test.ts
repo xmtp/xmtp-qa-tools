@@ -1,5 +1,4 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import {
   createAndSendDms,
   createAndSendInGroup,
@@ -9,15 +8,7 @@ import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Client } from "@xmtp/node-sdk";
 import { TEST_CONFIGS } from "bots/stress";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_stress";
 loadEnv(testName);
@@ -32,9 +23,7 @@ console.log(`Running ${testSize} stress test with configuration:`, config);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  let start: number;
   let client: Client;
-  let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
@@ -44,32 +33,7 @@ describe(testName, () => {
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
     } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -85,7 +49,7 @@ describe(testName, () => {
 
       expect(dm).toBeTruthy();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -102,7 +66,7 @@ describe(testName, () => {
 
       expect(group).toBeTruthy();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
@@ -119,7 +83,7 @@ describe(testName, () => {
       );
       expect(result).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      logError(e, expect);
       throw e;
     }
   });
