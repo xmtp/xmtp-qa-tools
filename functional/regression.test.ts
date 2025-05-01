@@ -41,7 +41,7 @@ describe(testName, () => {
       console.log("messages", verifyResult.messages.length);
     }
   });
-  //sd
+
   it(`Shoudl test the DB after upgrade`, async () => {
     for (const version of versions) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
