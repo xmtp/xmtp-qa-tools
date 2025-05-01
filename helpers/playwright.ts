@@ -31,15 +31,18 @@ export class XmtpPlaywright {
    */
   async newDmWithDeeplink(
     address: string,
+    sendMessage: string,
     expectedMessage: string,
   ): Promise<boolean> {
     const { page, browser } = await this.startPage(false, address);
     try {
       console.log("Creating DM with deeplink");
       console.log("Sending message and waiting for response");
-      const response = await this.sendAndWaitForResponse(page, expectedMessage);
-      console.log("Agent response:", response);
-      return response;
+      return await this.sendAndWaitForResponse(
+        page,
+        sendMessage,
+        expectedMessage,
+      );
     } catch (error) {
       console.error("Could not find expected message:", error);
       await this.takeSnapshot(page, "before-finding-expected-message");
@@ -58,7 +61,7 @@ export class XmtpPlaywright {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
       console.log("Sending message and waiting for GM response");
-      const response = await this.sendAndWaitForResponse(page, "gm");
+      const response = await this.sendAndWaitForResponse(page, "hi", "gm");
       if (!response) {
         throw new Error("Failed to receive GM response");
       }
@@ -138,13 +141,16 @@ export class XmtpPlaywright {
    */
   private async sendAndWaitForResponse(
     page: Page,
+    sendMessage: string,
     expectedMessage: string,
   ): Promise<boolean> {
     try {
       // Wait for GM response with a longer timeout
       await page?.waitForTimeout(defaultValues.streamTimeout);
       await page.getByRole("textbox", { name: "Type a message..." }).click();
-      await page.getByRole("textbox", { name: "Type a message..." }).fill("hi");
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .fill(sendMessage);
       await page.getByRole("button", { name: "Send" }).click();
 
       const hiMessage = await page.getByText("hi");
@@ -156,7 +162,7 @@ export class XmtpPlaywright {
       const botMessage = await page.getByText(expectedMessage);
       const botMessageText = await botMessage.textContent();
       console.log("Agent message:", botMessageText);
-      return botMessageText === expectedMessage;
+      return botMessageText?.includes(expectedMessage) ?? false;
     } catch (error) {
       console.error("Error in sendAndWaitForGm:", error);
       throw error;
