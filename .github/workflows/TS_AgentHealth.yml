@@ -13,13 +13,9 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
