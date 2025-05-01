@@ -15,7 +15,7 @@ yarn test bug_stitch
 ```typescript
 // 1. Initialize first client
 const workers = await getWorkers(
-  ["ivy-a-100"],
+  ["ivy-a-202"],
   testName,
   "message",
   false,

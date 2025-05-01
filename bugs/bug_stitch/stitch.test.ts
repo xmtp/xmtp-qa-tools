@@ -35,7 +35,7 @@ describe(testName, () => {
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers(["ivy-a-100"], testName, "message");
+          const workers = await getWorkers(["ivy-a-202"], testName, "message");
           ivy100 = workers.get("ivy", "a") as Worker;
           console.log("syncing all");
           await ivy100?.client.conversations.sync();

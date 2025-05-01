@@ -9,6 +9,7 @@ import {
   IdentifierKind,
   type Conversation,
   type Group,
+  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import {
   afterAll,
@@ -34,25 +35,19 @@ console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 describe(testName, () => {
   let dm: Conversation;
   let workers: WorkerManager;
+
   let start: number;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
     try {
       workers = await getWorkers(
-        [
-          "henry-a-203",
-          "ivy-a-100",
-          "jack-a-202",
-          "karen-a-100",
-          "randomguy-a-203",
-          "randomguy2-a-203",
-          "larry-a-100",
-          "mary-a-105",
-          "nancy-a-100",
-          "oscar-a-105",
-        ],
+        10,
         testName,
+        "message",
+        "none",
+        process.env.XMTP_ENV as XmtpEnv,
+        true,
       );
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(10);
@@ -121,10 +116,10 @@ describe(testName, () => {
       throw e;
     }
   });
-  it("inboxState: should measure inboxState of henry", async () => {
+  it("inboxState: should measure inboxState", async () => {
     try {
       const inboxState = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
@@ -135,8 +130,8 @@ describe(testName, () => {
   it("newDm: should measure creating a DM", async () => {
     try {
       dm = await workers
-        .get("henry")!
-        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+        .getWorkers()[0]
+        .client.conversations.newDm(workers.getWorkers()[1].client.inboxId);
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -148,9 +143,9 @@ describe(testName, () => {
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
     try {
       const dm2 = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.conversations.newDmWithIdentifier({
-          identifier: workers.get("randomguy2")!.address,
+          identifier: workers.getWorkers()[2].address,
           identifierKind: IdentifierKind.Ethereum,
         });
 
@@ -167,10 +162,6 @@ describe(testName, () => {
       // We'll expect this random message to appear in Joe's stream
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      console.log(
-        `[${workers.get("henry")!.name}] Creating DM with ${workers.get("randomguy")!.name} at ${workers.get("randomguy")!.client.inboxId}`,
-      );
-
       const dmId = await dm.send(message);
 
       expect(dmId).toBeDefined();
@@ -182,7 +173,7 @@ describe(testName, () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyStream(dm, [workers.get("randomguy")!]);
+      const verifyResult = await verifyStream(dm, [workers.getWorkers()[1]]);
 
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
@@ -197,7 +188,7 @@ describe(testName, () => {
     try {
       const sliced = generatedInboxes.slice(0, i);
       newGroup = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
@@ -210,7 +201,7 @@ describe(testName, () => {
     try {
       const sliced = generatedInboxes.slice(0, i);
       const newGroupByIdentifier = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.conversations.newGroupWithIdentifiers(
           sliced.map((inbox) => ({
             identifier: inbox.accountAddress,
@@ -269,7 +260,7 @@ describe(testName, () => {
   });
   it(`addMembers: should add members to a group`, async () => {
     try {
-      await (newGroup as Group).addMembers([workers.get("randomguy")!.inboxId]);
+      await (newGroup as Group).addMembers([workers.getWorkers()[2].inboxId]);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -298,7 +289,7 @@ describe(testName, () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
         newGroup = await workers
-          .get("henry")!
+          .getWorkers()[0]
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
       } catch (e) {
@@ -310,7 +301,7 @@ describe(testName, () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
         const newGroupByIdentifier = await workers
-          .get("henry")!
+          .getWorkers()[0]
           .client.conversations.newGroupWithIdentifiers(
             sliced.map((inbox) => ({
               identifier: inbox.accountAddress,

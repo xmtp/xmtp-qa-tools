@@ -49,7 +49,11 @@ describe(testName, () => {
 
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
-      console.log("Upgraded to ", version);
+      console.log(
+        "Upgraded to ",
+        "node-sdk:" + String(bob?.sdkVersion),
+        "node-bindings:" + String(bob?.libXmtpVersion),
+      );
       let convo;
       if (version === "47") {
         // @ts-expect-error: SDK version compatibility issues
@@ -66,7 +70,11 @@ describe(testName, () => {
       await new Promise((resolve) => setTimeout(resolve, 1000));
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
-      console.log("Downgraded to ", version);
+      console.log(
+        "Downgraded to ",
+        "node-sdk:" + String(bob?.sdkVersion),
+        "node-bindings:" + String(bob?.libXmtpVersion),
+      );
       let convo;
       if (version === "47") {
         // @ts-expect-error: SDK version compatibility issues
