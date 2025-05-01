@@ -84,6 +84,7 @@ export const sdkVersionOptions = [
   "204",
   "205",
   "206",
+  "208",
 ];
 
 // SDK version mappings
