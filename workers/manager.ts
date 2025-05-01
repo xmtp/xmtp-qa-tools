@@ -135,7 +135,7 @@ export class WorkerManager {
         }
       }
     } catch (error) {
-      console.error("Error printing workers:", error);
+      console.error(error);
     }
   }
   /**

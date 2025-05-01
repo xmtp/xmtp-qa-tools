@@ -293,7 +293,9 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error(this.nameId + " " + String(error));
+          console.error(
+            "Message stream error: " + this.nameId + " " + String(error),
+          );
         }
       }
     })();
