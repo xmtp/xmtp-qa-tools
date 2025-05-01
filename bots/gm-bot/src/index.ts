@@ -1,79 +1,15 @@
-import fs from "fs/promises";
-import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
-import dotenv from "dotenv";
-import { createSigner, getEncryptionKeyFromHex } from "./helper.js";
+import { initializeClient } from "./handler";
+import { Client, Conversation } from "@xmtp/node-sdk";
+import { DecodedMessage } from "@xmtp/node-sdk";
 
-dotenv.config();
 
-const { WALLET_KEY, ENCRYPTION_KEY } = process.env;
 
-if (!WALLET_KEY) {
-  throw new Error("WALLET_KEY must be set");
-}
-
-if (!ENCRYPTION_KEY) {
-  throw new Error("ENCRYPTION_KEY must be set");
-}
-
-const signer = createSigner(WALLET_KEY as `0x${string}`);
-const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
-
-const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
-
-async function main() {
-  console.log(`Creating client on the '${env}' network...`);
-  let volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  await fs.mkdir(volumePath, { recursive: true });
-
-  const identifier = await signer.getIdentifier();
-  const address = identifier.identifier;
-  const dbPath = `${volumePath}/${address}-${env}`;
-
-  const client = await Client.create(signer, {
-    dbEncryptionKey: encryptionKey,
-    env,
-    dbPath,
-    loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
-  });
-
-  console.log("Syncing conversations...");
-  await client.conversations.sync();
-
-  console.log(
-    `Agent initialized on ${address}\nSend a message on http://xmtp.chat/dm/${address}?env=${env}`,
-  );
-
-  console.log("Waiting for messages...");
-  const stream = client.conversations.streamAllMessages();
-
-  for await (const message of await stream) {
-    if (
-      message?.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
-      message?.contentType?.typeId !== "text"
-    ) {
-      continue;
-    }
-
-    console.log(
-      `Received message: ${message.content as string} by ${
-        message.senderInboxId
-      }`,
-    );
-
-    const conversation = await client.conversations.getConversationById(
-      message.conversationId,
-    );
-
-    if (!conversation) {
-      console.log("Unable to find conversation, skipping");
-      continue;
-    }
-
+const processMessage = async (client: Client, conversation: Conversation, message: DecodedMessage, isDm: boolean) => {
     console.log(`Sending "gm" response...`);
+    console.log(isDm);
     await conversation.send("gm");
-
-    console.log("Waiting for messages...");
-  }
 }
-
+const main = async () => {
+  await initializeClient(processMessage, { acceptGroups: true });
+}
 main().catch(console.error);
