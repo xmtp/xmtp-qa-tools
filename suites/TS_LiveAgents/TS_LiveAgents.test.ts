@@ -38,7 +38,7 @@ describe(testName, () => {
     for (const network of agent.networks) {
       it(`should respond to message from ${agent.name} on ${network}`, async () => {
         try {
-          console.log(`Testing on ${network}`);
+          console.log(`Testing ${agent.name} on ${network}`);
           const xmtpTester = new XmtpPlaywright(true, network as XmtpEnv);
           const result = await xmtpTester.newDmWithDeeplink(
             agent.address,
@@ -57,7 +57,7 @@ describe(testName, () => {
       for (const network of agent.networks) {
         it(`should respond to message from ${agent.name} on ${network}`, async () => {
           try {
-            console.log(`Testing on ${network}`);
+            console.log(`Testing ${agent.name} on ${network}`);
             const xmtpTester = new XmtpPlaywright(true, network as XmtpEnv);
             const result = await xmtpTester.newDmWithDeeplink(
               agent.address,
