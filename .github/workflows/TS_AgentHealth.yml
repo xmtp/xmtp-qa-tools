@@ -23,7 +23,8 @@ jobs:
           AGENTS=$(cat suites/TS_AgentHealth/agents.json)
 
           # Create an array of agent-network pairs for the matrix
-          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network}]')
+          # Add a display_name field for GitHub Actions matrix display
+          pairs=$(echo $AGENTS | jq -c '[.[] | .networks[] as $network | {name: .name, address: .address, network: $network, display_name: (.name + " " + $network)}]')
 
           # Set the output for the matrix
           echo "agent-network-pairs=$(echo $pairs)" >> $GITHUB_OUTPUT
@@ -37,6 +38,7 @@ jobs:
       fail-fast: false
       matrix:
         agent-network: ${{ fromJson(needs.get-agents-and-networks.outputs.agent-network-pairs) }}
+    name: ${{ matrix.agent-network.display_name }}
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
@@ -51,7 +53,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Debug info
         run: |
-          echo "Testing agent: ${{ matrix.agent-network.name }} (${{ matrix.agent-network.address }}) on network: ${{ matrix.agent-network.network }}"
+          echo "Testing agent: ${{ matrix.agent-network.name }} on network: ${{ matrix.agent-network.network }}"
           if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
             echo "API key is available in test job"
           else
