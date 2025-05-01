@@ -17,8 +17,8 @@ describe(testName, () => {
           const xmtpTester = new XmtpPlaywright(false, env as XmtpEnv);
           const result = await xmtpTester.newDmWithDeeplink(
             agent.address,
-            agent.sendMessage ?? "",
-            agent.expectedMessage ?? "",
+            agent.sendMessage as string,
+            agent.expectedMessage as string,
           );
           expect(result).toBe(true);
         }

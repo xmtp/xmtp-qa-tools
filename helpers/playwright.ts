@@ -155,14 +155,17 @@ export class XmtpPlaywright {
 
       const hiMessage = await page.getByText("hi");
       const hiMessageText = await hiMessage.textContent();
-      console.log("Hi message:", hiMessageText);
+      console.log("Sent message:", hiMessageText?.toLowerCase());
 
       // Wait for GM response with a longer timeout
       await page?.waitForTimeout(defaultValues.streamTimeout);
       const botMessage = await page.getByText(expectedMessage);
       const botMessageText = await botMessage.textContent();
-      console.log("Agent message:", botMessageText);
-      return botMessageText?.includes(expectedMessage) ?? false;
+      console.log("Received message:", botMessageText?.toLowerCase());
+      return (
+        botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase()) ??
+        false
+      );
     } catch (error) {
       console.error("Error in sendAndWaitForGm:", error);
       throw error;

@@ -10,8 +10,8 @@
     "name": "key-check.eth",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "env": ["production"],
-    "sendMessage": "/kc",
-    "expectedMessage": "Key Check"
+    "sendMessage": "/kc address",
+    "expectedMessage": "inboxid"
   },
   {
     "name": "bankr.base.eth",
