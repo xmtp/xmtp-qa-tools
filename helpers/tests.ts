@@ -187,7 +187,7 @@ export const sdkVersions = {
     sdkPackage: "node-sdk-208",
     bindingsPackage: "node-bindings-120-8",
     sdkVersion: "2.0.8",
-    libXmtpVersion: "154cca2",
+    libXmtpVersion: "7eef2ea",
   },
 };
 
