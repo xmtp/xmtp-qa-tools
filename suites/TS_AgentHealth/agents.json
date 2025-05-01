@@ -3,7 +3,7 @@
     "name": "csx-concierge",
     "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
     "networks": ["dev", "production"],
-    "sendMessage": "hi",
+    "sendMessage": "hola",
     "expectedMessage": "chat"
   },
 
@@ -11,14 +11,14 @@
     "name": "xmtp-gang-concierge",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "networks": ["dev", "production"],
-    "sendMessage": "hi",
+    "sendMessage": "hola",
     "expectedMessage": "chat"
   },
   {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
     "networks": ["production", "dev"],
-    "sendMessage": "hi",
+    "sendMessage": "hola",
     "expectedMessage": "gm"
   }
 ]
