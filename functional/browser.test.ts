@@ -21,7 +21,7 @@ describe(testName, () => {
       const xmtpTester = new XmtpPlaywright(true, "production");
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
-        "gm",
+        "hi",
         "gm",
       );
       expect(result).toBe(true);

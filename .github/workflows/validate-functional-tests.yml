@@ -28,6 +28,7 @@ jobs:
         env:
           XMTP_ENV: dev
           RUST_BACKTRACE: 1
+          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
