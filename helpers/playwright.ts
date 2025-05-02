@@ -135,10 +135,18 @@ export class XmtpPlaywright {
       await page
         .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
-      console.log("Sending message");
+      console.log("Sending message" + sendMessage);
+      await page.waitForTimeout(1000);
       await page.getByRole("button", { name: "Send" }).click();
-      const hiMessage = await page.getByText(sendMessage);
-      const hiMessageText = await hiMessage.textContent();
+      await page.waitForTimeout(1000);
+      const hiMessageLocator = page.getByText(sendMessage);
+      await hiMessageLocator
+        .waitFor({ state: "visible", timeout: defaultValues.streamTimeout })
+        .catch((error: unknown) => {
+          console.error("Failed to wait for hi message", error);
+          return false;
+        });
+      const hiMessageText = await hiMessageLocator.textContent();
       console.log("Sent message:", hiMessageText?.toLowerCase());
 
       const botMessageLocator = page.getByText(expectedMessage);
@@ -264,54 +272,6 @@ export class XmtpPlaywright {
     } catch (error) {
       console.error("Could not find expected message:", error);
       await this.takeSnapshot(page, "before-finding-expected-message");
-      return false;
-    } finally {
-      if (browser) await browser.close();
-    }
-  }
-
-  /**
-   * Sends a message and optionally waits for GM response
-   */
-  public async sendPassPhrase(
-    address: string,
-    sendMessage: string,
-    expectedMessage: string,
-    passPhrase: string,
-  ): Promise<boolean> {
-    const { page, browser } = await this.startPage(address);
-    try {
-      await page.getByRole("textbox", { name: "Type a message..." }).click();
-      await page
-        .getByRole("textbox", { name: "Type a message..." })
-        .fill(sendMessage);
-      await page.getByRole("button", { name: "Send" }).click();
-      const hiMessage = await page.getByText(sendMessage);
-      const hiMessageText = await hiMessage.textContent();
-      console.log("Sent message:", hiMessageText?.toLowerCase());
-
-      const botMessageLocator = page.getByText(expectedMessage);
-      await botMessageLocator.waitFor({
-        state: "visible",
-        timeout: defaultValues.streamTimeout,
-      });
-      const botMessageText = await botMessageLocator.textContent();
-      console.log("Received message:", botMessageText?.toLowerCase());
-      if (
-        botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase())
-      ) {
-        await page.getByRole("textbox", { name: "Type a message..." }).click();
-        await page
-          .getByRole("textbox", { name: "Type a message..." })
-          .fill(passPhrase);
-        await page.getByRole("button", { name: "Send" }).click();
-        const hiMessage = await page.getByText(passPhrase);
-        const hiMessageText = await hiMessage.textContent();
-        console.log("Sent message:", hiMessageText?.toLowerCase());
-      }
-      return false;
-    } catch (error) {
-      console.error("Error in sendPassPhrase:", error);
       return false;
     } finally {
       if (browser) await browser.close();
