@@ -131,6 +131,9 @@ export class XmtpPlaywright {
       console.log("Filling message");
       await page
         .getByRole("textbox", { name: "Type a message..." })
+        .waitFor({ state: "visible" });
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
       console.log("Sending message");
       await page.getByRole("button", { name: "Send" }).click();
@@ -210,11 +213,13 @@ export class XmtpPlaywright {
     walletKey: string = "",
     walletEncryptionKey: string = "",
   ): Promise<void> {
-    console.log(
-      "Setting localStorage",
-      walletKey.slice(0, 4),
-      walletEncryptionKey.slice(0, 4),
-    );
+    if (this.defaultUser) {
+      console.log(
+        "Setting localStorage",
+        walletKey.slice(0, 4) + "...",
+        walletEncryptionKey.slice(0, 4) + "...",
+      );
+    }
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
         if (walletKey !== "") console.log("Setting walletKey", walletKey);
@@ -306,8 +311,10 @@ export class XmtpPlaywright {
       }
       return false;
     } catch (error) {
-      console.error("Error in sendAndWaitForResponse:", error);
+      console.error("Error in sendPassPhrase:", error);
       return false;
+    } finally {
+      if (browser) await browser.close();
     }
   }
 }

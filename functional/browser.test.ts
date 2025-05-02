@@ -9,6 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   // Check if GM_BOT_ADDRESS environment variable is set
+  const xmtpTester = new XmtpPlaywright(true, "dev");
   const gmBotAddress = process.env.GM_BOT_ADDRESS;
 
   it("should respond to a message", async () => {
@@ -18,7 +19,6 @@ describe(testName, () => {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
 
-      const xmtpTester = new XmtpPlaywright(true, "production");
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
         "hi",
@@ -37,7 +37,6 @@ describe(testName, () => {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
 
-      const xmtpTester = new XmtpPlaywright(true, "production");
       const slicedInboxes = generatedInboxes.slice(0, 4);
       await xmtpTester.createGroupAndReceiveGm([
         ...slicedInboxes.map((inbox) => inbox.accountAddress),
