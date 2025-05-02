@@ -4,23 +4,30 @@ This document provides practical instructions for using the scripts in the `/scr
 
 ## Quick reference
 
-| Script              | Purpose                        | Key Features                   |
-| ------------------- | ------------------------------ | ------------------------------ |
-| **generateKeys.ts** | Creates new XMTP keys          | Single key generation          |
-| **generate.ts**     | Creates test data              | Test data generation           |
-| **hyperbrowser.ts** | Browser automation tool        | Headless testing, screenshots  |
-| **monitor.sh**      | System monitoring              | Service status tracking        |
-| **network.sh**      | Checks XMTP node status        | Network monitoring             |
-| **oldpackages.ts**  | Old packages creation          | Old packages creation          |
-| **packages.sh**     | Manages packages               | Package management             |
-| **railway.sh**      | Railway deployment script      | Railway management             |
-| **railway-test.ts** | Tests Railway deployments      | Railway testing                |
-| **redeploy.ts**     | Redeploys a Railway deployment | Redeploys a Railway deployment |
-| **run.ts**          | General-purpose task runner    | Configurable operations        |
-| **run-test.sh**     | Runs tests                     | Test execution                 |
-| **update.ts**       | Updates dependencies           | Dependency management          |
+| Script                     | Purpose                           | Key Features                            |
+| -------------------------- | --------------------------------- | --------------------------------------- |
+| **balances.ts**            | Checks wallet balances            | ETH/USDC balance monitoring             |
+| **bot-cli.ts**             | Command-line interface for bots   | Send XMTP messages from CLI             |
+| **createinstallations.ts** | Creates XMTP client installations | Multiple client installation creator    |
+| **generateKeys.ts**        | Creates new XMTP keys             | Single key generation                   |
+| **generate.ts**            | Creates test data                 | Test data generation                    |
+| **local-update.ts**        | Updates local inboxes             | Local environment configuration         |
+| **monitor.sh**             | System monitoring                 | Service status tracking                 |
+| **network.sh**             | Checks XMTP node status           | Network monitoring                      |
+| **oldpackages.ts**         | Old packages creation             | Old packages creation                   |
+| **packages.sh**            | Manages packages                  | Package management                      |
+| **railway.sh**             | Railway deployment script         | Railway management                      |
+| **railway-test.ts**        | Tests Railway deployments         | Railway testing                         |
+| **redeploy.ts**            | Redeploys a Railway deployment    | Redeploys a Railway deployment          |
+| **run.ts**                 | General-purpose task runner       | Configurable operations                 |
+| **run-bot.ts**             | Runs XMTP bots                    | Bot execution with arguments            |
+| **run-script.ts**          | Script execution helper           | Runs TypeScript scripts with watch mode |
+| **run-test.sh**            | Runs tests                        | Test execution                          |
+| **update.ts**              | Updates dependencies              | Dependency management                   |
+| **versions.ts**            | Manages SDK versions              | XMTP SDK version management/symlinks    |
+| **ts200.ts**               | Test 200                          | Test 200                                |
 
-## Available commands
+## Usage
 
 You can run these scripts using the yarn commands defined in package.json:
 
@@ -31,32 +38,11 @@ yarn gen:keys
 # Monitor development environment
 yarn monitor:dev
 
-# Send data to Datadog
-yarn script datadog
+# Run a specific script without the extension
+yarn script <script-name>
 
-# Generate test data
-yarn script generate
-
-# Monitor network status
-yarn script monitor
-
-# Manage old packages
-yarn script oldpackages
-
-# Manage packages
-yarn script packages
-
-# Manage Railway deployments
-yarn script railway
-
-# Record browser interactions with Playwright
-yarn script record
-
-# Redeploy services
-yarn script redeploy
-
-# Update dependencies
-yarn script update
+# Run a bot with arguments
+yarn bot <bot-name> [args]
 ```
 
 ## 🔑 Generate keys
@@ -154,6 +140,76 @@ yarn script packages
 yarn script oldpackages
 ```
 
+## 💰 Wallet balances
+
+The `balances.ts` script checks ETH and USDC balances for a list of Ethereum addresses.
+
+```bash
+# Run the script
+yarn script balances
+```
+
+**Expected result:** The script will display a table of wallet addresses with their ETH and USDC balances, calculating USD values.
+
+**Features:**
+
+- ETH balance checking
+- USDC token balance checking
+- USD value calculation
+- CSV export option
+
+## 🤖 Bot CLI
+
+The `bot-cli.ts` script provides a command-line interface for sending XMTP messages.
+
+```bash
+# Run the script
+yarn script bot-cli <target_address> <message>
+```
+
+**Expected result:** The script will send an XMTP message to the specified wallet address.
+
+**Use cases:**
+
+- Testing XMTP message delivery
+- Sending notifications from scripts
+- Command-line interaction with XMTP network
+
+## 🏗️ Create installations
+
+The `createinstallations.ts` script creates multiple XMTP client installations for the same account.
+
+```bash
+# Run the script
+yarn script createinstallations
+```
+
+**Expected result:** The script will generate multiple XMTP client installations and save their details.
+
+**Features:**
+
+- Creates multiple client instances
+- Saves installation IDs
+- Useful for testing multi-device scenarios
+
+## 🔄 Local update
+
+The `local-update.ts` script initializes and updates XMTP inboxes in a local environment.
+
+```bash
+# Run the script
+yarn script local-update
+```
+
+**Expected result:** The script will initialize XMTP clients in a local environment using generated inboxes.
+
+**Features:**
+
+- Sets up local database paths
+- Initializes XMTP clients
+- Verifies inbox IDs
+- Saves configuration for reuse
+
 ## 🚂 Railway deployment
 
 The `railway.sh`, `railway-test.ts`, and `redeploy.ts` scripts manage Railway deployments.
@@ -165,6 +221,61 @@ yarn script railway
 # Run redeploy.ts
 yarn script redeploy
 ```
+
+## 🤖 Run bot
+
+The `run-bot.ts` script executes XMTP bots with optional arguments.
+
+```bash
+# Run a bot
+yarn bot <bot-name> [args]
+
+# Example with arguments
+yarn bot stress 5
+```
+
+**Expected result:** The script will run the specified bot with any provided arguments.
+
+**Features:**
+
+- Automatic bot discovery in the bots/ directory
+- Passes command-line arguments to the bot
+- Watch mode for development
+
+## 🔄 Run script
+
+The `run-script.ts` helper executes TypeScript scripts with watch mode enabled.
+
+```bash
+# Run a script
+yarn script <script-name>
+```
+
+**Expected result:** The script will execute the specified TypeScript script with watch mode enabled.
+
+**Features:**
+
+- Automatic script discovery
+- Watch mode for development
+- Error handling for missing scripts
+
+## 📚 SDK versions
+
+The `versions.ts` script manages XMTP SDK versions and creates necessary symlinks.
+
+```bash
+# Run the script
+yarn script versions
+```
+
+**Expected result:** The script will discover installed XMTP SDK versions and create proper symlinks for their operation.
+
+**Features:**
+
+- Auto-discovers SDK packages
+- Creates symlinks for node bindings
+- Verifies package versions
+- Ensures proper SDK version resolution
 
 ## 🔄 Update dependencies
 
