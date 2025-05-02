@@ -16,11 +16,12 @@ describe(testName, () => {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
 
-      const xmtpTester = new XmtpPlaywright(true, "dev", true);
+      const xmtpTester = new XmtpPlaywright(false, "dev", true);
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
         "hi",
-        "You've been added to the Farcon group. Check your message requests in your inbox to view",
+        "passphrase",
+        //"You've been added to the Farcon group. Check your message requests in your inbox to view",
       );
       expect(result).toBe(true);
     } catch (error) {

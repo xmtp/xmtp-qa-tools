@@ -124,10 +124,15 @@ export class XmtpPlaywright {
     expectedMessage: string,
   ): Promise<boolean> {
     try {
-      await page.getByRole("textbox", { name: "Type a message..." }).click();
+      console.log("Waiting for message input to be visible");
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .waitFor({ state: "visible" });
+      console.log("Filling message");
       await page
         .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
+      console.log("Sending message");
       await page.getByRole("button", { name: "Send" }).click();
       const hiMessage = await page.getByText(sendMessage);
       const hiMessageText = await hiMessage.textContent();
@@ -190,7 +195,9 @@ export class XmtpPlaywright {
     console.log("Navigating to:", url);
     await this.page.goto(url);
     await this.page.waitForTimeout(1000);
-    await this.page.getByText("Ephemeral", { exact: true }).click();
+    if (!this.defaultUser) {
+      await this.page.getByText("Ephemeral", { exact: true }).click();
+    }
 
     return { browser: this.browser, page: this.page };
   }
@@ -203,6 +210,11 @@ export class XmtpPlaywright {
     walletKey: string = "",
     walletEncryptionKey: string = "",
   ): Promise<void> {
+    console.log(
+      "Setting localStorage",
+      walletKey.slice(0, 4),
+      walletEncryptionKey.slice(0, 4),
+    );
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
         if (walletKey !== "") console.log("Setting walletKey", walletKey);
