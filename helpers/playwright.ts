@@ -205,15 +205,17 @@ export class XmtpPlaywright {
   ): Promise<void> {
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        if (walletKey !== "")
-          // @ts-expect-error Window localStorage access in browser context
-          window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        if (walletEncryptionKey !== "")
+        if (walletKey !== "") console.log("Setting walletKey", walletKey);
+        // @ts-expect-error Window localStorage access in browser context
+        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+        if (walletEncryptionKey !== "") {
+          console.log("Setting walletEncryptionKey", walletEncryptionKey);
           // @ts-expect-error Window localStorage access in browser context
           window.localStorage.setItem(
             "XMTP_ENCRYPTION_KEY",
             walletEncryptionKey,
           );
+        }
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
         // @ts-expect-error Window localStorage access in browser context
