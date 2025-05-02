@@ -16,7 +16,12 @@ export class XmtpPlaywright {
   private env: XmtpEnv = "local";
   private walletKey: string = "";
   private encryptionKey: string = "";
-  constructor(headless: boolean = true, env: XmtpEnv | null = null) {
+  private defaultUser: boolean = false;
+  constructor(
+    headless: boolean = true,
+    env: XmtpEnv | null = null,
+    defaultUser: boolean = false,
+  ) {
     this.isHeadless =
       process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
@@ -24,13 +29,14 @@ export class XmtpPlaywright {
     this.encryptionKey = process.env.ENCRYPTION_KEY_XMTP_CHAT as string;
     this.browser = null;
     this.page = null;
+    this.defaultUser = defaultUser;
   }
 
   /**
    * Creates a group and checks for GM response
    */
   async createGroupAndReceiveGm(addresses: string[]): Promise<void> {
-    const { page, browser } = await this.startPage(false);
+    const { page, browser } = await this.startPage();
     try {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
@@ -51,7 +57,7 @@ export class XmtpPlaywright {
     groupId: string,
     messages: string[],
   ): Promise<boolean> {
-    const { page, browser } = await this.startPage(false);
+    const { page, browser } = await this.startPage();
     try {
       await page.goto(`https://xmtp.chat/group/${groupId}?env=${this.env}`);
       await this.takeSnapshot(page, "before-reading-group-messages");
@@ -118,10 +124,18 @@ export class XmtpPlaywright {
     expectedMessage: string,
   ): Promise<boolean> {
     try {
-      await page.getByRole("textbox", { name: "Type a message..." }).click();
+      console.log("Waiting for message input to be visible");
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .waitFor({ state: "visible" });
+      console.log("Filling message");
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .waitFor({ state: "visible" });
       await page
         .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
+      console.log("Sending message");
       await page.getByRole("button", { name: "Send" }).click();
       const hiMessage = await page.getByText(sendMessage);
       const hiMessageText = await hiMessage.textContent();
@@ -153,8 +167,7 @@ export class XmtpPlaywright {
    * Starts a new page with the specified options
    */
   private async startPage(
-    defaultUser: boolean = false,
-    address: string = "",
+    address?: string,
   ): Promise<{ browser: Browser; page: Page }> {
     this.browser = await chromium.launch({
       headless: this.isHeadless,
@@ -174,8 +187,8 @@ export class XmtpPlaywright {
 
     await this.setLocalStorage(
       this.page,
-      defaultUser ? this.walletKey : "",
-      defaultUser ? this.encryptionKey : "",
+      this.defaultUser ? this.walletKey : "",
+      this.defaultUser ? this.encryptionKey : "",
     );
 
     let url = "https://xmtp.chat/";
@@ -185,7 +198,9 @@ export class XmtpPlaywright {
     console.log("Navigating to:", url);
     await this.page.goto(url);
     await this.page.waitForTimeout(1000);
-    await this.page.getByText("Ephemeral", { exact: true }).click();
+    if (!this.defaultUser) {
+      await this.page.getByText("Ephemeral", { exact: true }).click();
+    }
 
     return { browser: this.browser, page: this.page };
   }
@@ -198,17 +213,26 @@ export class XmtpPlaywright {
     walletKey: string = "",
     walletEncryptionKey: string = "",
   ): Promise<void> {
+    if (this.defaultUser) {
+      console.log(
+        "Setting localStorage",
+        walletKey.slice(0, 4) + "...",
+        walletEncryptionKey.slice(0, 4) + "...",
+      );
+    }
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        if (walletKey !== "")
-          // @ts-expect-error Window localStorage access in browser context
-          window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
-        if (walletEncryptionKey !== "")
+        if (walletKey !== "") console.log("Setting walletKey", walletKey);
+        // @ts-expect-error Window localStorage access in browser context
+        window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
+        if (walletEncryptionKey !== "") {
+          console.log("Setting walletEncryptionKey", walletEncryptionKey);
           // @ts-expect-error Window localStorage access in browser context
           window.localStorage.setItem(
             "XMTP_ENCRYPTION_KEY",
             walletEncryptionKey,
           );
+        }
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
         // @ts-expect-error Window localStorage access in browser context
@@ -230,7 +254,7 @@ export class XmtpPlaywright {
     sendMessage: string,
     expectedMessage: string,
   ): Promise<boolean> {
-    const { page, browser } = await this.startPage(false, address);
+    const { page, browser } = await this.startPage(address);
     try {
       return await this.sendAndWaitForResponse(
         page,
@@ -240,6 +264,54 @@ export class XmtpPlaywright {
     } catch (error) {
       console.error("Could not find expected message:", error);
       await this.takeSnapshot(page, "before-finding-expected-message");
+      return false;
+    } finally {
+      if (browser) await browser.close();
+    }
+  }
+
+  /**
+   * Sends a message and optionally waits for GM response
+   */
+  public async sendPassPhrase(
+    address: string,
+    sendMessage: string,
+    expectedMessage: string,
+    passPhrase: string,
+  ): Promise<boolean> {
+    const { page, browser } = await this.startPage(address);
+    try {
+      await page.getByRole("textbox", { name: "Type a message..." }).click();
+      await page
+        .getByRole("textbox", { name: "Type a message..." })
+        .fill(sendMessage);
+      await page.getByRole("button", { name: "Send" }).click();
+      const hiMessage = await page.getByText(sendMessage);
+      const hiMessageText = await hiMessage.textContent();
+      console.log("Sent message:", hiMessageText?.toLowerCase());
+
+      const botMessageLocator = page.getByText(expectedMessage);
+      await botMessageLocator.waitFor({
+        state: "visible",
+        timeout: defaultValues.streamTimeout,
+      });
+      const botMessageText = await botMessageLocator.textContent();
+      console.log("Received message:", botMessageText?.toLowerCase());
+      if (
+        botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase())
+      ) {
+        await page.getByRole("textbox", { name: "Type a message..." }).click();
+        await page
+          .getByRole("textbox", { name: "Type a message..." })
+          .fill(passPhrase);
+        await page.getByRole("button", { name: "Send" }).click();
+        const hiMessage = await page.getByText(passPhrase);
+        const hiMessageText = await hiMessage.textContent();
+        console.log("Sent message:", hiMessageText?.toLowerCase());
+      }
+      return false;
+    } catch (error) {
+      console.error("Error in sendPassPhrase:", error);
       return false;
     } finally {
       if (browser) await browser.close();

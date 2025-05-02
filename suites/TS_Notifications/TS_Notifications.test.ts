@@ -20,8 +20,11 @@ describe(testName, () => {
   // Number of messages to send
   const NUM_MESSAGES = 10;
   // Target worker (receiver)
-  const receiverInboxId =
+  const addFabri =
+    "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff";
+  const convosId =
     "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b";
+  const receiverInboxId = addFabri;
   // Sender workers
   const SENDER_WORKERS = ["alice", "bob", "sam", "walt", "tina"];
 
