@@ -16,7 +16,7 @@ describe(testName, () => {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
 
-      const xmtpTester = new XmtpPlaywright(false, "production", true);
+      const xmtpTester = new XmtpPlaywright(false, "production", false);
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
         "hi",
