@@ -18,6 +18,7 @@ This directory contains functional tests for the XMTP protocol. These tests veri
 | [offline.test.ts](#offlinetestts)             | Tests offline message handling and synchronization |
 | [order.test.ts](#ordertestts)                 | Tests message ordering and delivery sequence       |
 | [regression.test.ts](#regressiontestts)       | Tests to catch and prevent regression issues       |
+| [streams.test.ts](#streamstestts)             | Tests stream speed and performance                 |
 
 ## 🔍 Module Details
 
@@ -170,4 +171,17 @@ Tests to catch and prevent regression issues:
 it("should handle previously fixed issues correctly", async () => {
   // Test regression fixes
 });
+```
+
+### streams.test.ts
+
+Tests stream speed and performance:
+
+```typescript
+const convo = await workers
+  .get("henry")!
+  .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+const verifyResult = await verifyStream(convo, [workers.get("randomguy")!]);
+expect(verifyResult.messages.length).toEqual(1);
+expect(verifyResult.allReceived).toBe(true);
 ```

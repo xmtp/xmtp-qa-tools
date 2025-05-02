@@ -18,7 +18,7 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = agentHealth as Agent[];
-
+const isGithubActions = process.env.GITHUB_ACTIONS === "true";
 const testName = "ts_agenthealth";
 loadEnv(testName);
 
@@ -54,5 +54,31 @@ describe(testName, () => {
         }
       });
     }
+  }
+
+  if (!isGithubActions) {
+    // Check if GM_BOT_ADDRESS environment variable is set
+    const gmBotAddress = "0xD75FaA8A834570b4df073500F31E3103227299ed";
+
+    it("should respond to a message", async () => {
+      console.log("sending gm to bot", gmBotAddress);
+      try {
+        if (!gmBotAddress) {
+          throw new Error("GM_BOT_ADDRESS environment variable is not set");
+        }
+
+        const xmtpTester = new XmtpPlaywright(false, "production", false);
+        const result = await xmtpTester.newDmWithDeeplink(
+          gmBotAddress,
+          "hi",
+          "added",
+          //"You've been added to the Farcon group. Check your message requests in your inbox to view",
+        );
+        expect(result).toBe(true);
+      } catch (error) {
+        console.error("Error in browser test:", error);
+        throw error;
+      }
+    });
   }
 });
