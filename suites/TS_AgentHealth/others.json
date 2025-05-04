@@ -12,7 +12,7 @@
     "networks": ["production", "dev"],
     "sendMessage": "hola",
     "expectedMessage": "gm"
-  }
+  },
   {
     "name": "clankerchat.base.eth",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
