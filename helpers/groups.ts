@@ -3,6 +3,100 @@ import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 
 /**
+ * Updates group description with a random member
+ */
+export const randomDescriptionUpdate = async (
+  group: Group,
+  workers: WorkerManager,
+): Promise<void> => updateGroupMetadata(group, workers, "description");
+/**
+ * Updates group name with a random member
+ */
+export const randomNameUpdate = async (
+  group: Group,
+  workers: WorkerManager,
+): Promise<void> => updateGroupMetadata(group, workers, "name");
+
+/**
+ * Updates group metadata with a random member
+ */
+const updateGroupMetadata = async (
+  group: Group,
+  workers: WorkerManager,
+  updateField: string,
+): Promise<void> => {
+  const members = await group.members();
+  if (members.length === 0) return;
+
+  const randomMember = members[Math.floor(Math.random() * members.length)];
+  const newValue = `Random ${updateField} ${Math.random().toString(36).substring(2, 15)}`;
+
+  const worker = workers
+    .getWorkers()
+    .find((w) => w.client.inboxId === randomMember.inboxId);
+  if (!worker) return;
+
+  const foundGroup = (await worker.client.conversations.getConversationById(
+    group.id,
+  )) as Group;
+  if (!foundGroup) return;
+
+  if (updateField === "name") {
+    await foundGroup.updateName(newValue);
+  } else if (updateField === "description") {
+    await foundGroup.updateDescription(newValue);
+  }
+
+  console.log(
+    `Group ${updateField} updated by ${randomMember.inboxId} to: ${newValue}`,
+  );
+};
+/**
+ * Removes a member from a group
+ */
+export const removeMemberByWorker = async (
+  groupId: string,
+  memberToRemove: string,
+  memberWhoRemoves: Worker,
+): Promise<void> => {
+  try {
+    if (!memberToRemove) return;
+
+    console.log(`Removing ${memberToRemove}`);
+    const group =
+      (await memberWhoRemoves.client.conversations.getConversationById(
+        groupId,
+      )) as Group;
+    if (!group) return;
+
+    await group.sync();
+    const members = await group.members();
+
+    if (
+      !members?.some(
+        (m) => m.inboxId.toLowerCase() === memberToRemove.toLowerCase(),
+      )
+    ) {
+      console.log(`Member ${memberToRemove} not in group ${groupId}`);
+      return;
+    }
+
+    // Demote if needed
+    if (group.isAdmin(memberToRemove)) {
+      await group.removeAdmin(memberToRemove);
+    }
+
+    if (group.isSuperAdmin(memberToRemove)) {
+      await group.removeSuperAdmin(memberToRemove);
+    }
+
+    await group.removeMembers([memberToRemove]);
+  } catch (error) {
+    console.error("Error removing member:", error);
+  }
+};
+
+/**
  * Creates a group with specified participants and measures performance
  */
 export async function createGroupWithBatch(

@@ -6,7 +6,7 @@ This directory contains test bots for the XMTP protocol. These bots help validat
 
 | Bot         | Purpose                     | Key Features                             |
 | ----------- | --------------------------- | ---------------------------------------- |
-| **agents/** | AI-powered personality bots | GPT integration, persistent identities   |
+| **bots/**   | AI-powered personality bots | GPT integration, persistent identities   |
 | **gm-bot/** | Simple greeting bot         | Basic response, standalone deployment    |
 | **simple/** | Diagnostics bot             | Identity info, conversation details      |
 | **stress/** | Load testing bot            | Group scaling, performance benchmarking  |
