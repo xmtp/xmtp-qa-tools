@@ -3,6 +3,7 @@ import {
   createAndSendDms,
   createAndSendInGroup,
   createLargeGroups,
+  TEST_CONFIGS,
   type StressTestConfig,
 } from "@helpers/groups";
 import { logAndSend, validateEnvironment } from "@helpers/tests";
@@ -12,31 +13,6 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
-
-// Predefined test configurations
-export const TEST_CONFIGS: Record<string, StressTestConfig> = {
-  small: {
-    largeGroups: [50],
-    workerCount: 20,
-    messageCount: 5,
-    groupCount: 5,
-    sizeLabel: "small",
-  },
-  medium: {
-    largeGroups: [50, 100],
-    workerCount: 50,
-    messageCount: 10,
-    groupCount: 3,
-    sizeLabel: "medium",
-  },
-  large: {
-    largeGroups: [50, 100, 200],
-    workerCount: 100,
-    messageCount: 15,
-    groupCount: 5,
-    sizeLabel: "large",
-  },
-};
 
 const HELP_TEXT = `Stress bot commands:
 /stress small - Run a small test: 20 workers, 5 groups, 50-member large groups, 5 messages each
@@ -90,14 +66,7 @@ const processMessage = async (
     const config = TEST_CONFIGS[sizeArg];
     console.log(`Creating ${config.workerCount} workers for stress test...`);
 
-    // Generate random prefix to avoid conflicts with other tests
-    const randomPrefix = Math.random().toString(36).substring(2, 6);
-    const workerNames = Array.from(
-      { length: config.workerCount },
-      (_, i) => `stress${randomPrefix}_${i}`,
-    );
-
-    const workers = await getWorkers(workerNames, "stressbot", "none");
+    const workers = await getWorkers(config.workerCount, "stressbot");
     console.log(`Successfully created ${workers.getWorkers().length} workers`);
 
     await runStressTest(config, workers, client, message, conversation);
@@ -134,6 +103,7 @@ async function runStressTest(
         workers,
         message.senderInboxId,
         config.messageCount,
+        conversation,
       );
     } catch (error) {
       console.error(error);
@@ -153,6 +123,7 @@ async function runStressTest(
         client,
         config.groupCount,
         message.senderInboxId,
+        conversation,
       );
     } catch (error) {
       console.error(error);

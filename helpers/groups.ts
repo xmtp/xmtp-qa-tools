@@ -162,24 +162,69 @@ export interface StressTestConfig {
   sizeLabel: string;
 }
 
+// Predefined test configurations
+export const TEST_CONFIGS: Record<string, StressTestConfig> = {
+  small: {
+    largeGroups: [50],
+    workerCount: 20,
+    messageCount: 5,
+    groupCount: 5,
+    sizeLabel: "small",
+  },
+  medium: {
+    largeGroups: [50, 100],
+    workerCount: 50,
+    messageCount: 10,
+    groupCount: 3,
+    sizeLabel: "medium",
+  },
+  large: {
+    largeGroups: [50, 100, 200],
+    workerCount: 100,
+    messageCount: 15,
+    groupCount: 5,
+    sizeLabel: "large",
+  },
+};
+
 export async function createAndSendDms(
   workers: WorkerManager,
   receiverInboxId: string,
   messageCount: number,
+  conversation: Conversation,
 ) {
-  try {
-    for (const sender of workers.getWorkers()) {
+  let successCount = 0;
+  let errorCount = 0;
+
+  for (const sender of workers.getWorkers()) {
+    try {
       await sender.client.conversations.sync();
+      console.log(
+        "sender",
+        sender.name,
+        "is going to send",
+        messageCount,
+        "messages",
+      );
       const dm = await sender.client.conversations.newDm(receiverInboxId);
       for (let i = 0; i < messageCount; i++) {
         await dm.send("hello");
       }
+      successCount++;
+      await conversation.send(
+        `✅ Successfully sent ${messageCount} DMs from ${sender.name}`,
+      );
+    } catch (error) {
+      console.error(`Error with sender ${sender.name}:`, error);
+      errorCount++;
+      // Continue with next sender instead of throwing
     }
-    return true;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
+
+  console.log(
+    `DM sending completed: ${successCount} succeeded, ${errorCount} failed`,
+  );
+  return { success: successCount > 0, successCount, errorCount };
 }
 
 export async function createAndSendInGroup(
@@ -187,25 +232,36 @@ export async function createAndSendInGroup(
   client: Client,
   groupCount: number,
   receiverInboxId: string,
+  conversation: Conversation,
 ) {
-  try {
-    const allInboxIds = workers.getWorkers().map((w) => w.client.inboxId);
-    allInboxIds.push(receiverInboxId);
+  const allInboxIds = workers.getWorkers().map((w) => w.client.inboxId);
+  allInboxIds.push(receiverInboxId);
 
-    for (let i = 0; i < groupCount; i++) {
-      const groupName = `Test Group ${i} ${allInboxIds.length}`;
+  for (let i = 0; i < groupCount; i++) {
+    try {
+      const groupName = `Test Group ${i} ${allInboxIds.length}: ${new Date().toLocaleTimeString(
+        "en-US",
+        {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        },
+      )}`;
       const group = await client.conversations.newGroup(allInboxIds, {
         groupName,
         groupDescription: "Test group for stress testing",
       });
 
       await group.send(`Hello from the group! ${i}`);
+      await conversation.send(
+        `✅ Successfully created group ${groupName} with ${allInboxIds.length} members`,
+      );
+    } catch (error) {
+      console.error(error);
+      throw error;
     }
-    return true;
-  } catch (error) {
-    console.error(error);
-    throw error;
   }
+  return true;
 }
 
 export async function createLargeGroup(
