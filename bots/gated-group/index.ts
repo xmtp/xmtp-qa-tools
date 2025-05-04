@@ -1,5 +1,3 @@
-import * as path from "path";
-import { fileURLToPath } from "url";
 import {
   Group,
   type Client,
@@ -7,23 +5,8 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import * as dotenv from "dotenv";
-import { validateEnvironment } from "../helpers/client";
 import { initializeClient, sleep } from "../helpers/xmtp-handler";
 import { config } from "./groups";
-
-// Get directory path in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load environment variables directly from the current directory first
-dotenv.config({ path: path.resolve(__dirname, ".env") });
-
-// Then use validateEnvironment for validation
-const { WALLET_KEY_CSX, PUBLIC_KEY_CSX } = validateEnvironment(
-  ["WALLET_KEY_CSX", "PUBLIC_KEY_CSX"],
-  path.resolve(__dirname, ".env"),
-);
 
 /**
  * Process an incoming message
@@ -35,14 +18,32 @@ export const processMessage = async (
   isDm: boolean,
 ): Promise<void> => {
   const groupConfig = config.find(
-    (group) => group.publicKey === client.accountIdentifier?.identifier,
+    (group) =>
+      group.publicKey.toLowerCase() ===
+      client.accountIdentifier?.identifier.toLowerCase(),
   );
   if (!groupConfig) {
     console.log("No group config found for this client");
     return;
   }
-  const envKey = client.options?.env as XmtpEnv;
+
   try {
+    const envKey = client.options?.env as XmtpEnv;
+    let group = await client.conversations.getConversationById(
+      groupConfig.groupId[envKey],
+    );
+    if (!group) {
+      console.log(`Group not found, creating new group`);
+      group = await client.conversations.newGroup([message.senderInboxId]);
+      await group.addSuperAdmin(client.inboxId);
+      await group.sync();
+      await group.updateName(groupConfig.groupName);
+      await conversation.send(groupConfig.messages.newGroupCreated);
+      await conversation.send(
+        `add this to your .env file: GROUP_ID_${envKey.toUpperCase()}_${groupConfig.id.toUpperCase()}=${group.id}`,
+      );
+      return;
+    }
     // Get all messages from this conversation
     const messages = await conversation.messages();
 
@@ -60,10 +61,8 @@ export const processMessage = async (
     // Check the message content against the secret code
     if (message.content === groupConfig.groupCode) {
       console.log(`Secret code received, adding to group`);
-      let group = await client.conversations.getConversationById(
-        groupConfig.groupId[envKey],
-      );
-      await group?.sync();
+
+      await group.sync();
       if (group instanceof Group) {
         console.log(
           `Adding member ${message.senderInboxId} to group ${groupConfig.groupId[envKey]}`,
@@ -88,10 +87,6 @@ export const processMessage = async (
           await conversation.send(groupConfig.messages.alreadyInGroup);
           return;
         }
-      } else {
-        console.log(`Group not found, skipping`);
-        await conversation.send(groupConfig.messages.groupNotFound);
-        return;
       }
     } else {
       await conversation.send(groupConfig.messages.invalid);
@@ -107,16 +102,12 @@ export const processMessage = async (
 
 async function main() {
   await initializeClient(processMessage, [
-    {
-      walletKey: WALLET_KEY_CSX,
-      networks: ["dev", "production"],
-      publicKey: PUBLIC_KEY_CSX,
-    },
-    {
-      walletKey: process.env.WALLET_KEY_GANG as string,
-      networks: ["dev", "production"],
-      publicKey: process.env.PUBLIC_KEY_GANG as string,
-    },
+    ...config.map((group) => ({
+      walletKey: group.walletKey,
+      networks: group.networks,
+      encryptionKey: group.encryptionKey,
+      publicKey: group.publicKey,
+    })),
   ]);
 }
 

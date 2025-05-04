@@ -28,14 +28,18 @@ const {
     "WALLET_KEY_GANG",
     "ENCRYPTION_KEY_GANG",
     "GROUP_CODE_GANG",
+    "PUBLIC_KEY_CSX",
+    "PUBLIC_KEY_GANG",
   ],
   path.resolve(__dirname, ".env"),
 );
 
 export type GroupConfig = {
-  name: string;
+  id: string;
+  groupName: string;
   walletKey: string;
   publicKey: string;
+  networks: string[];
   encryptionKey: string;
   groupId: {
     production: string;
@@ -48,6 +52,7 @@ export type GroupConfig = {
     success: string[];
     invalid: string;
     alreadyInGroup: string;
+    newGroupCreated: string;
     error: string;
     groupNotFound: string;
   };
@@ -55,9 +60,11 @@ export type GroupConfig = {
 
 export const config: GroupConfig[] = [
   {
-    name: "CSX Group chat - test",
+    id: "CSX",
+    groupName: "CSX Group chat - test",
     walletKey: WALLET_KEY_CSX,
     publicKey: PUBLIC_KEY_CSX,
+    networks: ["production", "dev"],
     encryptionKey: ENCRYPTION_KEY_CSX,
     groupId: {
       production: process.env[`GROUP_ID_PRODUCTION_CSX`] as string,
@@ -75,13 +82,16 @@ export const config: GroupConfig[] = [
       invalid: "Invalid code. Please try again.",
       error: "Error adding to group, please try again.",
       groupNotFound: "Invalid Group not found, skipping.",
+      newGroupCreated: "New Group created, adding you to it.",
     },
   },
   {
-    name: "Gang Group chat - test",
+    id: "GANG",
+    groupName: "Gang Group chat - test",
     walletKey: WALLET_KEY_GANG,
     publicKey: PUBLIC_KEY_GANG,
     encryptionKey: ENCRYPTION_KEY_GANG,
+    networks: ["production", "dev"],
     groupId: {
       production: process.env[`GROUP_ID_PRODUCTION_GANG`] as string,
       dev: process.env[`GROUP_ID_DEV_GANG`] as string,
@@ -98,6 +108,7 @@ export const config: GroupConfig[] = [
       alreadyInGroup: "You're already in the groupchat, sneaky!",
       error: "Error adding to group, please try again.",
       groupNotFound: "Invalid Group not found, skipping.",
+      newGroupCreated: "New Group created, adding you to it.",
     },
   },
 ];

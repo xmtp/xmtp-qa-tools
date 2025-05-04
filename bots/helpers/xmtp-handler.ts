@@ -57,6 +57,8 @@ interface AgentOptions {
   walletKey: string;
   /** Whether to accept group conversations */
   acceptGroups?: boolean;
+  /** Encryption key for the client */
+  encryptionKey: string;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
   /** Public key of the agent */
@@ -86,6 +88,7 @@ const WATCHDOG_RESTART_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
   {
     walletKey: "",
+    encryptionKey: "",
     publicKey: "",
     acceptGroups: false,
     acceptTypes: ["text"],
@@ -337,8 +340,6 @@ export const initializeClient = async (
 
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
-  let encryptionKey =
-    "ffb1b75b4b299bc876e218b1824c3a10090ff2237dc4f9272d504c0549fecdba";
 
   for (const option of options) {
     for (const env of option.networks ?? ["dev", "production"]) {
@@ -346,7 +347,7 @@ export const initializeClient = async (
         console.log(`[${env}] Initializing client...`);
 
         const signer = createSigner(option.walletKey);
-        const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
+        const dbEncryptionKey = getEncryptionKeyFromHex(option.encryptionKey);
         const loggingLevel = (process.env.LOGGING_LEVEL ?? "off") as LogLevel;
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
@@ -382,7 +383,6 @@ export const initializeClient = async (
         );
 
         streamPromises.push(streamPromise);
-        console.log(`[${env}] ✓ Client ready and listening for messages`);
       } catch (error) {
         console.error(`[${env}] Client initialization error:`, error);
       }

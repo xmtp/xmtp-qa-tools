@@ -2,7 +2,10 @@ import { validateEnvironment } from "@bots/client";
 import { initializeClient } from "@bots/xmtp-handler";
 import type { Client, Conversation, DecodedMessage } from "@xmtp/node-sdk";
 
-const { WALLET_KEY } = validateEnvironment(["WALLET_KEY"]);
+const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
+  "WALLET_KEY",
+  "ENCRYPTION_KEY",
+]);
 
 const processMessage = async (
   client: Client,
@@ -19,6 +22,7 @@ const main = async () => {
     {
       acceptGroups: true,
       walletKey: WALLET_KEY,
+      encryptionKey: ENCRYPTION_KEY,
       networks: ["dev", "production"],
     },
   ]);
