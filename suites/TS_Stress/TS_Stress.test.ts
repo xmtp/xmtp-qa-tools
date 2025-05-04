@@ -7,8 +7,8 @@ import {
 import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Client } from "@xmtp/node-sdk";
-import { TEST_CONFIGS } from "bots/stress";
 import { beforeAll, describe, expect, it } from "vitest";
+import { TEST_CONFIGS } from "../../bots/stress";
 
 const testName = "ts_stress";
 loadEnv(testName);
