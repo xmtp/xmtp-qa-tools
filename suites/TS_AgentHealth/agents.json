@@ -7,6 +7,13 @@
     "expectedMessage": "chat"
   },
   {
+    "name": "stress",
+    "address": "0x73bb05b6f1719ae0320701fc25d0be64eba59eb3",
+    "networks": ["dev", "production"],
+    "sendMessage": "hola",
+    "expectedMessage": "stress"
+  },
+  {
     "name": "gang",
     "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
     "networks": ["dev", "production"],
