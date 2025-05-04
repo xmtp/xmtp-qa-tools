@@ -15,7 +15,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import "dotenv/config";
 import * as fs from "fs";
-import { validateEnvironment } from "./tests";
+import { logAgentDetails } from "./client";
 
 export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   return fromString(hex, "hex");
@@ -56,9 +56,11 @@ export const createSigner = (key: string): Signer => {
 interface AgentOptions {
   walletKey: string;
   /** Whether to accept group conversations */
-  acceptGroups: boolean;
+  acceptGroups?: boolean;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
+  /** Public key of the agent */
+  publicKey?: string;
   /** Content types to accept (default: ['text']) */
   acceptTypes?: string[];
   /** Connection timeout in ms (default: 30000) */
@@ -84,6 +86,7 @@ const WATCHDOG_RESTART_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
   {
     walletKey: "",
+    publicKey: "",
     acceptGroups: false,
     acceptTypes: ["text"],
     networks: ["dev", "production"],
@@ -106,19 +109,6 @@ export const getDbPath = (description: string = "xmtp"): string => {
     fs.mkdirSync(volumePath, { recursive: true });
   }
   return `${volumePath}/${description}.db3`;
-};
-
-export const logAgentDetail = (client: Client): void => {
-  const address = client.accountIdentifier?.identifier ?? "";
-  const inboxId = client.inboxId;
-  const env = client.options?.env ?? "dev";
-  console.log(`
-✓ XMTP Client Ready:
-• Address: ${address}
-• InboxId: ${inboxId}
-• Network: ${env}
-• URL: http://xmtp.chat/dm/${address}?env=${env}
-    `);
 };
 
 // Helper functions
@@ -400,8 +390,16 @@ export const initializeClient = async (
   }
 
   if (clients.length > 0) {
+    console.log(`\x1b[38;2;252;76;52m
+    ██╗  ██╗███╗   ███╗████████╗██████╗ 
+    ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
+     ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
+     ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
+    ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
+    ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
+  \x1b[0m`);
     for (const client of clients) {
-      logAgentDetail(client);
+      logAgentDetails(client);
     }
   } else {
     throw new Error("No clients were successfully initialized");
