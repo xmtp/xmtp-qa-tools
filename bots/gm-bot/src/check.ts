@@ -1,7 +1,7 @@
 import fs from "fs/promises";
 import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import dotenv from "dotenv";
-import { createSigner, getEncryptionKeyFromHex } from "./helper.js";
+import { createSigner, getEncryptionKeyFromHex } from "./xmtp-handler";
 
 dotenv.config();
 

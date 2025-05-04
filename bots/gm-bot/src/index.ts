@@ -1,5 +1,5 @@
 import type { Client, Conversation, DecodedMessage } from "@xmtp/node-sdk";
-import { initializeClient } from "./handler";
+import { initializeClient } from "./xmtp-handler";
 
 const processMessage = async (
   client: Client,
