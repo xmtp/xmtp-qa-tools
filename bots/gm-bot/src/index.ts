@@ -1,12 +1,17 @@
 import "dotenv/config";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
-import { getDbPath, createSigner, getEncryptionKeyFromHex, validateEnvironment, logAgentDetails } from "./helper";
+import {
+  createSigner,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+  validateEnvironment,
+} from "./helper";
 
 const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
   "WALLET_KEY",
   "ENCRYPTION_KEY",
 ]);
-
 
 const signer = createSigner(WALLET_KEY as `0x${string}`);
 const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
@@ -19,15 +24,13 @@ async function main() {
   const client = await Client.create(signer, {
     dbEncryptionKey,
     env,
-    dbPath: getDbPath(env + "-" + signerIdentifier),  
+    dbPath: getDbPath(env + "-" + signerIdentifier),
     loggingLevel: process.env.LOGGING_LEVEL as any,
   });
   logAgentDetails(client);
-  
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
-
 
   console.log("Waiting for messages...");
   const stream = client.conversations.streamAllMessages();
@@ -43,11 +46,11 @@ async function main() {
     console.log(
       `Received message: ${message.content as string} by ${
         message.senderInboxId
-      }`
+      }`,
     );
 
     const conversation = await client.conversations.getConversationById(
-      message.conversationId
+      message.conversationId,
     );
 
     if (!conversation) {
