@@ -5,8 +5,8 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "dev": "tsx --watch index.ts",
-    "start": "tsx index.ts"
+    "dev": "tsx --watch src/index.ts",
+    "start": "tsx src/index.ts"
   },
   "dependencies": {
     "@xmtp/node-sdk": "2.0.8",
