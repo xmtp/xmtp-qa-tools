@@ -135,7 +135,7 @@ export class XmtpPlaywright {
       await page
         .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
-      console.log("Sending message" + sendMessage);
+      console.log("Sending message", sendMessage);
       await page.waitForTimeout(1000);
       await page.getByRole("button", { name: "Send" }).click();
       await page.waitForTimeout(1000);

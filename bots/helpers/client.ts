@@ -77,6 +77,14 @@ export const getDbPath = (description: string = "xmtp") => {
 };
 
 export const logAgentDetails = (client: Client): void => {
+  console.log(`\x1b[38;2;252;76;52m
+    ██╗  ██╗███╗   ███╗████████╗██████╗ 
+    ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
+     ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
+     ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
+    ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
+    ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
+  \x1b[0m`);
   const address = client.accountIdentifier?.identifier ?? "";
   const inboxId = client.inboxId;
   const env = client.options?.env ?? "dev";

@@ -1,18 +1,18 @@
 [
   {
-    "name": "xmtp-gang-concierge",
-    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-    "networks": ["dev", "production"],
-    "sendMessage": "hola",
-    "expectedMessage": "chat"
-  },
-  {
     "name": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "networks": ["production"],
     "sendMessage": "hi",
     "expectedMessage": "hey"
   },
+  {
+    "name": "gm-bot",
+    "address": "0x20b572be48527a770479744aec6fe5644f97678b",
+    "networks": ["production", "dev"],
+    "sendMessage": "hola",
+    "expectedMessage": "gm"
+  }
   {
     "name": "clankerchat.base.eth",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
