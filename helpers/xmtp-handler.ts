@@ -15,12 +15,46 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import "dotenv/config";
 import * as fs from "fs";
-import * as path from "path";
+import { validateEnvironment } from "./tests";
+
+export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
+  return fromString(hex, "hex");
+};
+
+/**
+ * Create a Signer instance from a private key
+ * @param key - The private key to create the Signer from
+ * @returns A Signer instance
+ */
+export const createSigner = (key: string): Signer => {
+  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
+  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
+
+  return {
+    type: "EOA",
+    getIdentifier: () => ({
+      identifierKind: IdentifierKind.Ethereum,
+      identifier: account.address.toLowerCase(),
+    }),
+    signMessage: async (message: string) => {
+      const signature = await createWalletClient({
+        account,
+        chain: sepolia,
+        transport: http(),
+      }).signMessage({
+        message,
+        account,
+      });
+      return toBytes(signature);
+    },
+  };
+};
 
 /**
  * Configuration options for the XMTP agent
  */
 interface AgentOptions {
+  walletKey: string;
   /** Whether to accept group conversations */
   acceptGroups: boolean;
   /** Networks to connect to (default: ['dev', 'production']) */
@@ -47,199 +81,70 @@ type MessageHandler = (
 const MAX_RETRIES = 6;
 const RETRY_DELAY_MS = 2000;
 const WATCHDOG_RESTART_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const DEFAULT_AGENT_OPTIONS: AgentOptions = {
-  acceptGroups: false,
-  acceptTypes: ["text"],
-  networks: ["dev", "production"],
-  connectionTimeout: 30000,
-  autoReconnect: true,
-};
+const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
+  {
+    walletKey: "",
+    acceptGroups: false,
+    acceptTypes: ["text"],
+    networks: ["dev", "production"],
+    connectionTimeout: 30000,
+    autoReconnect: true,
+  },
+];
 
 /**
  * Generate a new encryption key (utility function)
  */
 export const generateEncryptionKeyHex = (): string => {
   const uint8Array = getRandomValues(new Uint8Array(32));
-  return toString(uint8Array, "hex") as string;
+  return toString(uint8Array, "hex");
 };
+
+export const getDbPath = (description: string = "xmtp"): string => {
+  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
+  if (!fs.existsSync(volumePath)) {
+    fs.mkdirSync(volumePath, { recursive: true });
+  }
+  return `${volumePath}/${description}.db3`;
+};
+
+export const logAgentDetail = (client: Client): void => {
+  const address = client.accountIdentifier?.identifier ?? "";
+  const inboxId = client.inboxId;
+  const env = client.options?.env ?? "dev";
+  console.log(`
+✓ XMTP Client Ready:
+• Address: ${address}
+• InboxId: ${inboxId}
+• Network: ${env}
+• URL: http://xmtp.chat/dm/${address}?env=${env}
+    `);
+};
+
+// Helper functions
+export const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
  * Initialize XMTP clients with robust error handling
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
-  options: AgentOptions = DEFAULT_AGENT_OPTIONS,
+  options: AgentOptions[] = DEFAULT_AGENT_OPTIONS,
 ): Promise<Client[]> => {
-  // Helper functions
-  const sleep = (ms: number): Promise<void> =>
-    new Promise((resolve) => setTimeout(resolve, ms));
-
-  const validateEnvironment = (vars: string[]): Record<string, string> => {
-    const requiredVars = vars;
-    const missing = requiredVars.filter((v) => !process.env[v]);
-
-    if (missing.length > 0) {
-      console.log(
-        `Missing env vars: ${missing.join(", ")}. Trying root .env file...`,
-      );
-
-      const currentDir = process.cwd();
-      const rootDir = path.resolve(currentDir, "../..");
-      const rootEnvPath = path.join(rootDir, ".env");
-
-      if (fs.existsSync(rootEnvPath)) {
-        const envContent = fs.readFileSync(rootEnvPath, "utf-8");
-        const envVars = envContent
-          .split("\n")
-          .filter((line) => line.trim() && !line.startsWith("#"))
-          .reduce<Record<string, string>>((acc, line) => {
-            const [key, ...valueParts] = line.split("=");
-            if (key && valueParts.length) {
-              acc[key.trim()] = valueParts.join("=").trim();
-            }
-            return acc;
-          }, {});
-
-        for (const varName of missing) {
-          if (envVars[varName]) {
-            process.env[varName] = envVars[varName];
-            console.log(`Loaded ${varName} from root .env file`);
-          }
-        }
-      } else {
-        console.log("Root .env file not found.");
-      }
-    }
-
-    const stillMissing = requiredVars.filter((v) => !process.env[v]);
-    if (stillMissing.length > 0) {
-      console.error(
-        "Missing env vars after checking root .env:",
-        stillMissing.join(", "),
-      );
-      process.exit(1);
-    }
-
-    return requiredVars.reduce<Record<string, string>>((acc, key) => {
-      acc[key] = process.env[key] as string;
-      return acc;
-    }, {});
-  };
-
-  const createSigner = (key: string): Signer => {
-    const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
-    const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
-
-    return {
-      type: "EOA",
-      getIdentifier: () => ({
-        identifierKind: IdentifierKind.Ethereum,
-        identifier: account.address.toLowerCase(),
-      }),
-      signMessage: async (message: string) => {
-        const signature = await createWalletClient({
-          account,
-          chain: sepolia,
-          transport: http(),
-        }).signMessage({
-          message,
-          account,
-        });
-        return toBytes(signature);
-      },
-    };
-  };
-
-  const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
-    return fromString(hex, "hex") as Uint8Array;
-  };
-
-  const getDbPath = (description: string = "xmtp"): string => {
-    const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-    if (!fs.existsSync(volumePath)) {
-      fs.mkdirSync(volumePath, { recursive: true });
-    }
-    return `${volumePath}/${description}.db3`;
-  };
-
-  const logAgentDetails = (clients: Client[]): void => {
-    for (const client of clients) {
-      const address = client.accountIdentifier?.identifier ?? "";
-      const inboxId = client.inboxId;
-      const env = client.options?.env ?? "dev";
-      console.log(`
-✓ XMTP Client Ready:
-  • Address: ${address}
-  • InboxId: ${inboxId}
-  • Network: ${env}
-  • URL: http://xmtp.chat/dm/${address}?env=${env}
-      `);
-    }
-  };
-
   /**
    * Core message streaming function with robust error handling
    */
   const streamMessages = async (
     client: Client,
     callBack: MessageHandler,
-    options: AgentOptions = DEFAULT_AGENT_OPTIONS,
+    options: AgentOptions,
     onActivity?: () => void,
   ): Promise<void> => {
     const env = client.options?.env ?? "undefined";
     let retryCount = 0;
     const acceptTypes = options.acceptTypes || ["text"];
     let backoffTime = RETRY_DELAY_MS;
-    const autoReconnect = options.autoReconnect !== false;
-
-    // Function to handle fatal errors by recreating the client
-    const handleFatalError = async () => {
-      if (!autoReconnect) {
-        throw new Error(
-          `[${env}] Fatal error in message stream and autoReconnect is disabled`,
-        );
-      }
-
-      console.error(
-        `[${env}] Fatal error detected, attempting to recreate client...`,
-      );
-
-      try {
-        // Wait before attempting reconnection
-        await sleep(5000);
-
-        // Reload the client
-        const signer = createSigner(WALLET_KEY);
-        const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
-        const loggingLevel = (process.env.LOGGING_LEVEL ?? "off") as LogLevel;
-        const signerIdentifier = (await signer.getIdentifier()).identifier;
-
-        // Create a new client instance
-        const newClient = await Client.create(signer, {
-          dbEncryptionKey,
-          env: env as XmtpEnv,
-          loggingLevel,
-          dbPath: getDbPath(`${env}-${signerIdentifier}`),
-        });
-
-        console.log(`[${env}] ✓ Client recreated successfully`);
-        console.log(`[${env}] ✓ Syncing conversations...`);
-
-        await newClient.conversations.sync();
-        console.log(`[${env}] ✓ Conversations synced`);
-
-        // Replace the old client with the new one
-        Object.assign(client, newClient);
-
-        console.log(`[${env}] ✓ Client reconnected successfully`);
-
-        // Reset retry count
-        retryCount = 0;
-      } catch (error) {
-        console.error(`[${env}] Failed to recreate client:`, error);
-        throw error;
-      }
-    };
 
     // Main stream loop - never exits
     while (true) {
@@ -350,7 +255,9 @@ export const initializeClient = async (
           );
 
           try {
-            await handleFatalError();
+            await initializeClient(messageHandler, [
+              { ...options, networks: [env] },
+            ]);
             retryCount = 0; // Reset retry counter after recovery
             continue;
           } catch (fatalError) {
@@ -429,7 +336,7 @@ export const initializeClient = async (
             });
         }
       },
-      Math.min(WATCHDOG_RESTART_INTERVAL_MS / 10, 30000), // Check at least every 30 seconds
+      Math.min(WATCHDOG_RESTART_INTERVAL_MS), // Check every WATCHDOG_RESTART_INTERVAL_MS
     );
 
     process.on("beforeExit", () => {
@@ -438,66 +345,64 @@ export const initializeClient = async (
     return updateActivity;
   };
 
-  // Main initialization logic
-  const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
-    "WALLET_KEY",
-    "ENCRYPTION_KEY",
-  ]);
-
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
-  const mergedOptions = { ...DEFAULT_AGENT_OPTIONS, ...options };
-  const networks = mergedOptions.networks || ["dev", "production"];
+  let encryptionKey =
+    "ffb1b75b4b299bc876e218b1824c3a10090ff2237dc4f9272d504c0549fecdba";
 
-  for (const env of networks) {
-    try {
-      console.log(`[${env}] Initializing client...`);
+  for (const option of options) {
+    for (const env of option.networks ?? ["dev", "production"]) {
+      try {
+        console.log(`[${env}] Initializing client...`);
 
-      const signer = createSigner(WALLET_KEY);
-      const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
-      const loggingLevel = (process.env.LOGGING_LEVEL ?? "off") as LogLevel;
-      const signerIdentifier = (await signer.getIdentifier()).identifier;
+        const signer = createSigner(option.walletKey);
+        const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
+        const loggingLevel = (process.env.LOGGING_LEVEL ?? "off") as LogLevel;
+        const signerIdentifier = (await signer.getIdentifier()).identifier;
 
-      const client = await Client.create(signer, {
-        dbEncryptionKey,
-        env: env as XmtpEnv,
-        loggingLevel,
-        dbPath: getDbPath(`${env}-${signerIdentifier}`),
-      });
+        const client = await Client.create(signer, {
+          dbEncryptionKey,
+          env: env as XmtpEnv,
+          loggingLevel,
+          dbPath: getDbPath(`${env}-${signerIdentifier}`),
+        });
 
-      await client.conversations.sync();
-      clients.push(client);
+        await client.conversations.sync();
+        clients.push(client);
 
-      // Create restart function & watchdog
-      const restartStream = () =>
-        client.conversations
-          .sync()
-          .then(() => {
-            console.log(`[${env}] Forced re-sync completed`);
-          })
-          .catch((error: unknown) => {
-            console.error(`[${env}] Force re-sync failed:`, error);
-          });
+        // Create restart function & watchdog
+        const restartStream = () =>
+          client.conversations
+            .sync()
+            .then(() => {
+              console.log(`[${env}] Forced re-sync completed`);
+            })
+            .catch((error: unknown) => {
+              console.error(`[${env}] Force re-sync failed:`, error);
+            });
 
-      const activityTracker = setupWatchdog(client, env, restartStream);
+        const activityTracker = setupWatchdog(client, env, restartStream);
 
-      // Start message streaming
-      const streamPromise = streamMessages(
-        client,
-        messageHandler,
-        { ...mergedOptions, networks: [env] },
-        activityTracker,
-      );
+        // Start message streaming
+        const streamPromise = streamMessages(
+          client,
+          messageHandler,
+          { ...option, networks: [env] },
+          activityTracker,
+        );
 
-      streamPromises.push(streamPromise);
-      console.log(`[${env}] ✓ Client ready and listening for messages`);
-    } catch (error) {
-      console.error(`[${env}] Client initialization error:`, error);
+        streamPromises.push(streamPromise);
+        console.log(`[${env}] ✓ Client ready and listening for messages`);
+      } catch (error) {
+        console.error(`[${env}] Client initialization error:`, error);
+      }
     }
   }
 
   if (clients.length > 0) {
-    logAgentDetails(clients);
+    for (const client of clients) {
+      logAgentDetail(client);
+    }
   } else {
     throw new Error("No clients were successfully initialized");
   }

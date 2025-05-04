@@ -1,4 +1,5 @@
 import fs from "fs";
+import path from "path";
 import { getEnvPath } from "@helpers/client";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
@@ -240,100 +241,82 @@ export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
   }
 };
 
-/**
- * Updates group metadata with a random member
- */
-const updateGroupMetadata = async (
-  group: Group,
-  workers: WorkerManager,
-  updateField: string,
-): Promise<void> => {
-  const members = await group.members();
-  if (members.length === 0) return;
-
-  const randomMember = members[Math.floor(Math.random() * members.length)];
-  const newValue = `Random ${updateField} ${Math.random().toString(36).substring(2, 15)}`;
-
-  const worker = workers
-    .getWorkers()
-    .find((w) => w.client.inboxId === randomMember.inboxId);
-  if (!worker) return;
-
-  const foundGroup = (await worker.client.conversations.getConversationById(
-    group.id,
-  )) as Group;
-  if (!foundGroup) return;
-
-  if (updateField === "name") {
-    await foundGroup.updateName(newValue);
-  } else if (updateField === "description") {
-    await foundGroup.updateDescription(newValue);
-  }
-
-  console.log(
-    `Group ${updateField} updated by ${randomMember.inboxId} to: ${newValue}`,
-  );
+// Helper function to parse .env file content
+const parseEnvFile = (content: string): Record<string, string> => {
+  return content
+    .split("\n")
+    .filter((line) => line.trim() && !line.startsWith("#"))
+    .reduce<Record<string, string>>((acc, line) => {
+      const [key, ...valueParts] = line.split("=");
+      if (key && valueParts.length) {
+        acc[key.trim()] = valueParts.join("=").trim();
+      }
+      return acc;
+    }, {});
 };
 
-/**
- * Updates group name with a random member
- */
-export const randomNameUpdate = async (
-  group: Group,
-  workers: WorkerManager,
-): Promise<void> => updateGroupMetadata(group, workers, "name");
+export const validateEnvironment = (vars: string[]): Record<string, string> => {
+  const requiredVars = vars;
+  const missing = requiredVars.filter((v) => !process.env[v]);
 
-/**
- * Updates group description with a random member
- */
-export const randomDescriptionUpdate = async (
-  group: Group,
-  workers: WorkerManager,
-): Promise<void> => updateGroupMetadata(group, workers, "description");
+  if (missing.length > 0) {
+    // First try the bot's local .env file
+    const botDir = path.dirname(
+      new Error().stack?.split("\n")[2]?.match(/\((.*):\d+:\d+\)/)?.[1] || "",
+    );
+    const botEnvPath = path.join(botDir, ".env");
 
-/**
- * Removes a member from a group
- */
-export const removeMemberByWorker = async (
-  groupId: string,
-  memberToRemove: string,
-  memberWhoRemoves: Worker,
-): Promise<void> => {
-  try {
-    if (!memberToRemove) return;
+    if (fs.existsSync(botEnvPath)) {
+      const envContent = fs.readFileSync(botEnvPath, "utf-8");
+      const envVars = parseEnvFile(envContent);
 
-    console.log(`Removing ${memberToRemove}`);
-    const group =
-      (await memberWhoRemoves.client.conversations.getConversationById(
-        groupId,
-      )) as Group;
-    if (!group) return;
-
-    await group.sync();
-    const members = await group.members();
-
-    if (
-      !members?.some(
-        (m) => m.inboxId.toLowerCase() === memberToRemove.toLowerCase(),
-      )
-    ) {
-      console.log(`Member ${memberToRemove} not in group ${groupId}`);
-      return;
+      for (const varName of missing) {
+        if (envVars[varName]) {
+          process.env[varName] = envVars[varName];
+        }
+      }
     }
 
-    // Demote if needed
-    if (group.isAdmin(memberToRemove)) {
-      await group.removeAdmin(memberToRemove);
-    }
+    // If still missing variables, try the root .env
+    const stillMissingAfterLocal = requiredVars.filter((v) => !process.env[v]);
+    if (stillMissingAfterLocal.length > 0) {
+      console.log(
+        `Missing env vars: ${stillMissingAfterLocal.join(", ")}. Trying root .env file...`,
+      );
 
-    if (group.isSuperAdmin(memberToRemove)) {
-      await group.removeSuperAdmin(memberToRemove);
-    }
+      const currentDir = process.cwd();
+      const rootDir = path.resolve(currentDir, "../..");
+      const rootEnvPath = path.join(rootDir, ".env");
 
-    await group.removeMembers([memberToRemove]);
-  } catch (error) {
-    console.error("Error removing member:", error);
+      if (fs.existsSync(rootEnvPath)) {
+        const envContent = fs.readFileSync(rootEnvPath, "utf-8");
+        const envVars = parseEnvFile(envContent);
+
+        console.log(`Loaded  from root .env file`);
+        for (const varName of stillMissingAfterLocal) {
+          if (envVars[varName]) {
+            process.env[varName] = envVars[varName];
+          }
+        }
+      } else {
+        console.log("Root .env file not found.");
+      }
+    }
   }
+
+  const stillMissing = requiredVars.filter((v) => !process.env[v]);
+  if (stillMissing.length > 0) {
+    console.error(
+      "Missing env vars after checking all .env files:",
+      stillMissing.join(", "),
+    );
+    process.exit(1);
+  }
+
+  return requiredVars.reduce<Record<string, string>>((acc, key) => {
+    acc[key] = process.env[key] as string;
+    return acc;
+  }, {});
 };
 
 /**
