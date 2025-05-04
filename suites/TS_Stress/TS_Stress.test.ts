@@ -3,32 +3,36 @@ import {
   createAndSendDms,
   createAndSendInGroup,
   createLargeGroups,
+  TEST_CONFIGS,
 } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import type { Client } from "@xmtp/node-sdk";
-import { TEST_CONFIGS } from "bots/stress";
+import type { Client, Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_stress";
 loadEnv(testName);
 
 const receiverInboxId =
-  "ac9feb1384a9092333db4d17c6981743a53277c24c57ed6f12f05bd78a81be30";
+  "5dd3e3f8cd0feec31d56015629d8ad04f93979c4aa4c55af831c5bfd2afc440f";
 // Choose which test size to run
 const testSize = process.env.STRESS_SIZE || "small";
 const config = TEST_CONFIGS[testSize];
 
-console.log(`Running ${testSize} stress test with configuration:`, config);
+console.log(
+  `Running ${testSize} stress test with configuration:`,
+  JSON.stringify(config, null, 2),
+);
 
 describe(testName, () => {
   let workers: WorkerManager;
   let client: Client;
-
+  let conversation: Conversation;
   beforeAll(async () => {
     try {
       let bot = await getWorkers(["bot"], testName, "message", "none");
       client = bot.get("bot")?.client as Client;
+      conversation = await client.conversations.newDm(receiverInboxId);
       workers = await getWorkers(config.workerCount, testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
@@ -45,6 +49,7 @@ describe(testName, () => {
         workers,
         receiverInboxId,
         config.messageCount,
+        conversation,
       );
 
       expect(dm).toBeTruthy();
@@ -62,6 +67,7 @@ describe(testName, () => {
         client,
         config.groupCount,
         receiverInboxId,
+        conversation,
       );
 
       expect(group).toBeTruthy();

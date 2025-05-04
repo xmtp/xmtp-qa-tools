@@ -9,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   // Check if GM_BOT_ADDRESS environment variable is set
-  const xmtpTester = new XmtpPlaywright(true, "dev");
+  const xmtpTester = new XmtpPlaywright(true, "production");
   const gmBotAddress = process.env.GM_BOT_ADDRESS;
 
   it("should respond to a message", async () => {

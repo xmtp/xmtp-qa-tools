@@ -15,7 +15,6 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import "dotenv/config";
 import * as fs from "fs";
-import { logAgentDetails } from "./client";
 
 export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   return fromString(hex, "hex");
@@ -389,21 +388,7 @@ export const initializeClient = async (
     }
   }
 
-  if (clients.length > 0) {
-    console.log(`\x1b[38;2;252;76;52m
-    ██╗  ██╗███╗   ███╗████████╗██████╗ 
-    ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
-     ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
-     ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
-    ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
-    ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
-  \x1b[0m`);
-    for (const client of clients) {
-      logAgentDetails(client);
-    }
-  } else {
-    throw new Error("No clients were successfully initialized");
-  }
+  logAgentDetails(clients);
 
   // Handle graceful shutdowns
   process.on("SIGINT", () => {
@@ -413,4 +398,40 @@ export const initializeClient = async (
 
   await Promise.all(streamPromises);
   return clients;
+};
+export const logAgentDetails = (clients: Client[]): void => {
+  const clientsByAddress = clients.reduce<Record<string, Client[]>>(
+    (acc, client) => {
+      const address = client.accountIdentifier?.identifier ?? "";
+      if (!acc[address]) acc[address] = [];
+      acc[address].push(client);
+      return acc;
+    },
+    {},
+  );
+
+  for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
+    const firstClient = clientGroup[0];
+    const inboxId = firstClient.inboxId;
+    const environments = clientGroup
+      .map((c) => c.options?.env ?? "dev")
+      .join(", ");
+
+    const urls = [
+      `http://xmtp.chat/dm/${address}`,
+      ...(environments.includes("dev")
+        ? [`https://preview.convos.org/dm/${inboxId}`]
+        : []),
+      ...(environments.includes("production")
+        ? [`https://convos.org/dm/${inboxId}`]
+        : []),
+    ];
+
+    console.log(`
+✓ XMTP Client Ready:
+• Address: ${address}
+• InboxId: ${inboxId}
+• Networks: ${environments}
+${urls.map((url) => `• URL: ${url}`).join("\n")}`);
+  }
 };
