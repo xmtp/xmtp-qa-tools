@@ -17,6 +17,8 @@ jobs:
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+      XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
+      TEST_NAME: "TS_AgentHealth"
     steps:
       - uses: actions/checkout@v4
       - name: Debug API key
@@ -38,6 +40,13 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_AgentHealth
+      - name: Send Slack notification
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+          JOB_STATUS: ${{ job.status }}
+        run: ./scripts/notify-slack.sh
       - name: Upload reports and snapshots artifacts
         if: always()
         uses: actions/upload-artifact@v4
