@@ -17,6 +17,7 @@ describe(testName, () => {
   let convo: Conversation;
   let workers: WorkerManager;
   let hasFailures: boolean = false;
+  const xmtpTester = new XmtpPlaywright(false, "production");
 
   beforeAll(async () => {
     try {
@@ -76,7 +77,6 @@ describe(testName, () => {
 
   it("should respond to a message", async () => {
     try {
-      const xmtpTester = new XmtpPlaywright(false, "production");
       const result = await xmtpTester.newDmWithDeeplink(
         gmBotAddress,
         "hi",
@@ -90,7 +90,6 @@ describe(testName, () => {
   });
   it("should create a group and send a message", async () => {
     try {
-      const xmtpTester = new XmtpPlaywright(false, "production");
       const slicedInboxes = generatedInboxes.slice(0, 4);
       await xmtpTester.createGroupAndReceiveGm([
         ...slicedInboxes.map((inbox) => inbox.accountAddress),
