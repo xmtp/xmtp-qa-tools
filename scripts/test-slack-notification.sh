@@ -1,27 +1,28 @@
 #!/bin/bash
 
-# Test script for Slack notifications
-# This script directly sends a test notification to Slack
+# Test script for Slack notifications using Slack App credentials
+# This script sends a test notification to Slack using a bot token
 
 # Load environment variables from .env file
 if [ -f .env ]; then
   echo "Loading environment variables from .env file"
-  # Load only the SLACK_TOKEN variable
+  # Load Slack related variables
   export $(grep -v '^#' .env | grep '^SLACK_' | xargs)
 else
   echo "Error: .env file not found"
   exit 1
 fi
 
-# Check if SLACK_TOKEN is set
-if [ -z "$SLACK_TOKEN" ]; then
-  echo "Error: SLACK_TOKEN environment variable is not set."
-  echo "Please set it using: export SLACK_TOKEN=\"your-token-here\""
+# Check for required Slack credentials
+if [ -z "$SLACK_BOT_TOKEN" ]; then
+  echo "Error: SLACK_BOT_TOKEN environment variable is not set."
+  echo "Please add your Bot User OAuth Token to your .env file:"
+  echo "SLACK_BOT_TOKEN=xoxb-your-token"
   exit 1
 fi
 
 SLACK_CHANNEL=${SLACK_CHANNEL:-"general"}
-echo "SLACK_TOKEN is set. Using channel: $SLACK_CHANNEL"
+echo "Using Slack bot token with channel: $SLACK_CHANNEL"
 
 # Get hostname and current directory for context
 HOSTNAME=$(hostname)
@@ -34,7 +35,7 @@ echo "Sending message: $MESSAGE"
 # Send to Slack using the API
 echo "Sending Slack notification..."
 RESPONSE=$(curl -s -X POST https://slack.com/api/chat.postMessage \
-  -H "Authorization: Bearer $SLACK_TOKEN" \
+  -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
   -H "Content-Type: application/json" \
   --data "{\"channel\":\"$SLACK_CHANNEL\",\"text\":\"$MESSAGE\"}")
 
