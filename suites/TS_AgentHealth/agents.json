@@ -14,6 +14,13 @@
     "expectedMessage": "stress"
   },
   {
+    "name": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  },
+  {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
     "networks": ["production"],
