@@ -32,6 +32,13 @@ TEST_NAME=${TEST_NAME:-$(basename $(find suites -type d -name "TS_*" | head -1))
 XMTP_ENV=${XMTP_ENV:-"dev"}
 JOB_STATUS=${JOB_STATUS:-"unknown"}
 
+# Check if the job status indicates an error/failure
+# Only proceed with notification if it's an error
+if [[ "$JOB_STATUS" == "success" || "$JOB_STATUS" == "passed" ]]; then
+  echo "Job status is $JOB_STATUS. No need to send notification."
+  exit 0
+fi
+
 # Create workflow run URL if both repository and run ID are available
 WORKFLOW_URL=""
 if [ "$REPOSITORY" != "Unknown Repository" ] && [ "$RUN_ID" != "Unknown Run ID" ]; then
@@ -49,7 +56,7 @@ if [ -d "logs" ]; then
 fi
 
 # Create a message with GitHub context
-MESSAGE="*XMTP Test Report*
+MESSAGE="*XMTP Test Report - FAILURE*
 • *Workflow:* [${WORKFLOW_NAME}](${WORKFLOW_URL})
 • *Test Suite:* ${TEST_NAME}
 • *Network:* ${XMTP_ENV}
@@ -57,7 +64,7 @@ MESSAGE="*XMTP Test Report*
 • *Timestamp:* $(date)
 ${ERROR_LOGS}"
 
-echo "Sending message with workflow context"
+echo "Sending error notification with workflow context"
 
 # Send to Slack using the API
 echo "Sending Slack notification..."
