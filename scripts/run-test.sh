@@ -7,10 +7,6 @@ RETRY_DELAY=10
 # Get test name from command line argument or use default
 TEST_NAME=${1:-"functional"}
 
-# Slack token from environment variable
-SLACK_TOKEN=${SLACK_TOKEN:-""}
-SLACK_CHANNEL=${SLACK_CHANNEL:-"general"}
-
 echo "Starting $TEST_NAME tests with up to $MAX_ATTEMPTS attempts"
 
 for i in $(seq 1 $MAX_ATTEMPTS); do
@@ -40,27 +36,6 @@ for i in $(seq 1 $MAX_ATTEMPTS); do
   
   if [ $i -eq $MAX_ATTEMPTS ]; then
     echo "Test failed after $MAX_ATTEMPTS attempts."
-    
-    # Send Slack notification if token is provided
-    if [ -n "$SLACK_TOKEN" ]; then
-      echo "Sending Slack notification..."
-      
-      # Get hostname and current directory for context
-      HOSTNAME=$(hostname)
-      CURRENT_DIR=$(pwd)
-      
-      # Construct the message
-      MESSAGE="Test *$TEST_NAME* failed after $MAX_ATTEMPTS attempts on $HOSTNAME in directory $CURRENT_DIR"
-      
-      # Send to Slack using the API
-      curl -s -X POST https://slack.com/api/chat.postMessage \
-        -H "Authorization: Bearer $SLACK_TOKEN" \
-        -H "Content-Type: application/json" \
-        --data "{\"channel\":\"$SLACK_CHANNEL\",\"text\":\"$MESSAGE\"}"
-    else
-      echo "Slack token not set. Skipping notification."
-    fi
-    
     exit 1
   fi
   
