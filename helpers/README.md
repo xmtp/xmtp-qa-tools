@@ -143,9 +143,6 @@ const xmtpPlaywright = new XmtpPlaywright(headless, env);
 
 // Create a group and check for response
 await xmtpPlaywright.createGroupAndReceiveGm(addresses);
-
-// Read messages in a group
-const success = await xmtpPlaywright.readGroupMessages(groupId, messages);
 ```
 
 **Key features:**

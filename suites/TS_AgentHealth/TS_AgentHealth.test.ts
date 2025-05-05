@@ -18,7 +18,6 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = agentHealth as Agent[];
-const isGithubActions = process.env.GITHUB_ACTIONS === "true";
 const testName = "ts_agenthealth";
 loadEnv(testName);
 
@@ -41,7 +40,10 @@ describe(testName, () => {
       it(`${agent.name} ${network}`, async () => {
         try {
           console.log(`Testing ${agent.name} on ${network}`);
-          const xmtpTester = new XmtpPlaywright(true, network as XmtpEnv);
+          const xmtpTester = new XmtpPlaywright({
+            headless: true,
+            env: network as XmtpEnv,
+          });
           const result = await xmtpTester.newDmWithDeeplink(
             agent.address,
             agent.sendMessage,
