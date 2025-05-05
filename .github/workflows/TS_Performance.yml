@@ -38,6 +38,13 @@ jobs:
         id: test
         continue-on-error: true
         run: ./scripts/run-test.sh TS_Performance
+      - name: Send Slack notification
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+          JOB_STATUS: ${{ job.status }}
+        run: ./scripts/notify-slack.sh
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
