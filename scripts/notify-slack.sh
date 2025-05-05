@@ -50,11 +50,9 @@ fi
 
 # Create a message with GitHub context
 MESSAGE="*XMTP Test Report*
-• *Workflow:* ${WORKFLOW_NAME}
+• *Workflow:* [${WORKFLOW_NAME}](${WORKFLOW_URL})
 • *Test Suite:* ${TEST_NAME}
 • *Network:* ${XMTP_ENV}
-• *Repository:* ${REPOSITORY}
-${WORKFLOW_URL}
 • *Status:* ${JOB_STATUS}
 • *Timestamp:* $(date)
 ${ERROR_LOGS}"
