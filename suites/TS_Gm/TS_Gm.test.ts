@@ -17,7 +17,7 @@ describe(testName, () => {
   let convo: Conversation;
   let workers: WorkerManager;
   let hasFailures: boolean = false;
-  const xmtpTester = new XmtpPlaywright(false, "production");
+  const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
 
   beforeAll(async () => {
     try {
