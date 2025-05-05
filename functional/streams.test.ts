@@ -19,7 +19,7 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   let hasFailures: boolean = false;
-  let start: number;
+  let start: number | undefined;
 
   beforeAll(async () => {
     try {
@@ -35,8 +35,10 @@ describe(testName, () => {
 
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
-    start = performance.now();
     console.time(testName);
+    if (start === undefined) {
+      start = performance.now();
+    }
   });
 
   afterAll(async () => {
@@ -50,7 +52,9 @@ describe(testName, () => {
   });
   afterEach(function () {
     try {
-      sendPerformanceResult(expect, workers, start);
+      if (start !== undefined) {
+        sendPerformanceResult(expect, workers, start);
+      }
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -58,12 +62,22 @@ describe(testName, () => {
   });
   it("receiveGM: should measure receiving a gm", async () => {
     try {
+      start = undefined;
       const convo = await workers
         .get("henry")!
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
-      const verifyResult = await verifyStream(convo, [
-        workers.get("randomguy")!,
-      ]);
+      const verifyResult = await verifyStream(
+        convo,
+        [workers.get("randomguy")!],
+        "text",
+        1,
+        undefined,
+        undefined,
+        () => {
+          console.log("Message sent, starting timer now");
+          start = performance.now();
+        },
+      );
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -74,6 +88,7 @@ describe(testName, () => {
 
   it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
     try {
+      start = undefined;
       const convo = await workers
         .get("henry")!
         .client.conversations.newGroup([
@@ -82,7 +97,10 @@ describe(testName, () => {
           workers.get("alice")!.client.inboxId,
           workers.get("dave")!.client.inboxId,
         ]);
-      const verifyResult = await verifyStreamAll(convo, workers);
+      const verifyResult = await verifyStreamAll(convo, workers, 1, () => {
+        console.log("Group message sent, starting timer now");
+        start = performance.now();
+      });
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

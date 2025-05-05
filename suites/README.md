@@ -4,16 +4,15 @@ This directory contains end-to-end test suites for validating the XMTP protocol 
 
 ## Quick reference
 
-| Suite                | Purpose                                   | Key Features                                  |
-| -------------------- | ----------------------------------------- | --------------------------------------------- |
-| **TS_AgentHealth**   | Agent responsiveness monitoring           | Production bot health checks, uptime tracking |
-| **TS_Delivery**      | Message delivery reliability testing      | Delivery verification, group message testing  |
-| **TS_Fork**          | Fork detection and resolution             | Fork tolerance, conflict resolution           |
-| **TS_Gm**            | Basic messaging functionality             | Core protocol verification, simple messages   |
-| **TS_Notifications** | Push notification validation              | Multi-sender scenarios, notification timing   |
-| **TS_Performance**   | Protocol performance measurement          | Operation benchmarking, scalability testing   |
-| **TS_StreamSpeed**   | Stream performance and throughput testing | Stream latency, message rate testing          |
-| **TS_Stress**        | System load and capacity testing          | Group scaling, high message volume testing    |
+| Suite                | Purpose                              | Key Features                                  |
+| -------------------- | ------------------------------------ | --------------------------------------------- |
+| **TS_AgentHealth**   | Agent responsiveness monitoring      | Production bot health checks, uptime tracking |
+| **TS_Delivery**      | Message delivery reliability testing | Delivery verification, group message testing  |
+| **TS_Fork**          | Fork detection and resolution        | Fork tolerance, conflict resolution           |
+| **TS_Gm**            | Basic messaging functionality        | Core protocol verification, simple messages   |
+| **TS_Notifications** | Push notification validation         | Multi-sender scenarios, notification timing   |
+| **TS_Performance**   | Protocol performance measurement     | Operation benchmarking, scalability testing   |
+| **TS_Stress**        | System load and capacity testing     | Group scaling, high message volume testing    |
 
 ## Usage
 
@@ -192,29 +191,6 @@ for (let i = batchSize; i <= total; i += batchSize) {
 - Scalability testing
 - Performance benchmarking
 - Resource utilization measurement
-
-## 🌊 Stream Speed
-
-The `TS_StreamSpeed` suite tests real-time message streaming performance.
-
-```typescript
-// Test stream message delivery speed
-it("should deliver messages within performance thresholds", async () => {
-  const startTime = performance.now();
-  const result = await verifyStream(conversation, participants);
-  const endTime = performance.now();
-
-  expect(result.allReceived).toBe(true);
-  expect(endTime - startTime).toBeLessThan(STREAM_PERFORMANCE_THRESHOLD);
-});
-```
-
-**Key features:**
-
-- Stream latency measurement
-- Message delivery rate testing
-- Throughput verification
-- Performance threshold validation
 
 ## 🔥 Stress Testing
 

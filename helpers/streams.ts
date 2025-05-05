@@ -45,9 +45,18 @@ export async function verifyStreamAll(
   group: Conversation,
   participants: WorkerManager,
   count = 1,
+  onMessageSent?: () => void,
 ) {
   const allWorkers = await getWorkersFromGroup(group, participants);
-  return verifyStream(group, allWorkers, "text", count);
+  return verifyStream(
+    group,
+    allWorkers,
+    "text",
+    count,
+    undefined,
+    undefined,
+    onMessageSent,
+  );
 }
 
 /**
@@ -64,6 +73,7 @@ export async function verifyStream<T extends string = string>(
     g,
     payload,
   ) => await g.send(payload),
+  onMessageSent?: () => void,
 ): Promise<VerifyStreamResult> {
   // Use name updater for group_updated collector type
   if (collectorType === "group_updated") {
@@ -136,6 +146,11 @@ export async function verifyStream<T extends string = string>(
     await sender(group, sentMessages[i]);
   }
   console.log(`Sent ${count} messages`);
+
+  // Call the onMessageSent callback if provided
+  if (onMessageSent) {
+    onMessageSent();
+  }
 
   // Wait for collectors
   const streamCollectedMessages = await Promise.all(collectPromises);
