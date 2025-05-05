@@ -35,14 +35,21 @@ export class XmtpPlaywright {
   /**
    * Creates a group and checks for GM response
    */
-  async createGroupAndReceiveGm(addresses: string[]): Promise<void> {
+  async createGroupAndReceiveGm(
+    addresses: string[],
+    expectedResponse?: string | string[],
+  ): Promise<void> {
     const { page, browser } = await this.startPage();
     try {
       console.log("Filling addresses and creating group");
       await this.fillAddressesAndCreate(page, addresses);
-      const response = await this.sendAndWaitForResponse(page, "hi", "gm");
+      const response = await this.sendAndWaitForResponse(
+        page,
+        "hi",
+        expectedResponse || "gm",
+      );
       if (!response) {
-        throw new Error("Failed to receive GM response");
+        throw new Error("Failed to receive response");
       }
     } catch (error) {
       console.error("Error in createGroupAndReceiveGm:", error);
@@ -53,28 +60,6 @@ export class XmtpPlaywright {
     }
   }
 
-  async readGroupMessages(
-    groupId: string,
-    messages: string[],
-  ): Promise<boolean> {
-    const { page, browser } = await this.startPage();
-    try {
-      await page.goto(`https://xmtp.chat/group/${groupId}?env=${this.env}`);
-      await this.takeSnapshot(page, "before-reading-group-messages");
-      let allReceived = true;
-      for (const message of messages) {
-        // Wait for GM response with a longer timeout
-        const botMessage = await page.getByText(message);
-        const botMessageText = await botMessage.textContent();
-        if (botMessageText !== message) {
-          allReceived = false;
-        }
-      }
-      return allReceived;
-    } finally {
-      if (browser) await browser.close();
-    }
-  }
   /**
    * Takes a screenshot and saves it to the logs directory
    */
@@ -88,8 +73,6 @@ export class XmtpPlaywright {
     const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
     await page.screenshot({ path: screenshotPath, fullPage: true });
   }
-
-  // Private helper methods
 
   /**
    * Fills addresses and creates a new conversation
@@ -116,12 +99,12 @@ export class XmtpPlaywright {
   }
 
   /**
-   * Sends a message and optionally waits for GM response
+   * Sends a message and waits for response in the message list
    */
   private async sendAndWaitForResponse(
     page: Page,
     sendMessage: string,
-    expectedMessage: string,
+    expectedMessage?: string | string[],
   ): Promise<boolean> {
     try {
       console.log("Waiting for message input to be visible");
@@ -131,42 +114,92 @@ export class XmtpPlaywright {
       console.log("Filling message");
       await page
         .getByRole("textbox", { name: "Type a message..." })
-        .waitFor({ state: "visible" });
-      await page
-        .getByRole("textbox", { name: "Type a message..." })
         .fill(sendMessage);
       console.log("Sending message", sendMessage);
       await page.waitForTimeout(1000);
       await page.getByRole("button", { name: "Send" }).click();
-      await page.waitForTimeout(1000);
-      const hiMessageLocator = page.getByText(sendMessage);
-      await hiMessageLocator
-        .waitFor({ state: "visible", timeout: defaultValues.streamTimeout })
-        .catch((error: unknown) => {
-          console.error("Failed to wait for hi message", error);
-          return false;
-        });
-      const hiMessageText = await hiMessageLocator.textContent();
-      console.log("Sent message:", hiMessageText?.toLowerCase());
 
-      const botMessageLocator = page.getByText(expectedMessage);
-      await botMessageLocator
-        .waitFor({
-          state: "visible",
+      // Wait for messages to appear in the virtuoso list
+      await page.waitForSelector(
+        'div[data-testid="virtuoso-item-list"] > div',
+        {
           timeout: defaultValues.streamTimeout,
-        })
-        .catch((error: unknown) => {
-          console.error("Failed to wait for bot message", error);
-          return false;
-        });
-      const botMessageText = await botMessageLocator.textContent();
-      console.log("Received message:", botMessageText?.toLowerCase());
-      return (
-        botMessageText?.toLowerCase().includes(expectedMessage.toLowerCase()) ??
-        false
+        },
       );
+
+      // Get initial message count
+      const initialMessageCount = await page
+        .locator('div[data-testid="virtuoso-item-list"] > div')
+        .count();
+      console.log(`Initial message count: ${initialMessageCount}`);
+
+      // Wait for new message to appear
+      let messageFound = false;
+      let responseText = "";
+
+      // Convert expected message to array for consistent handling
+      const expectedPhrases = expectedMessage
+        ? Array.isArray(expectedMessage)
+          ? expectedMessage
+          : [expectedMessage]
+        : [];
+
+      // Poll for new messages
+      for (let i = 0; i < 30; i++) {
+        await page.waitForTimeout(1000);
+        const currentMessageCount = await page
+          .locator('div[data-testid="virtuoso-item-list"] > div')
+          .count();
+
+        if (currentMessageCount > initialMessageCount) {
+          // Get the latest message
+          const messageItems = await page
+            .locator('div[data-testid="virtuoso-item-list"] > div')
+            .all();
+          const latestMessageElement = messageItems[messageItems.length - 1];
+
+          responseText = (await latestMessageElement.textContent()) || "";
+          console.log(`Latest message: "${responseText}"`);
+
+          if (!expectedPhrases.length) {
+            // If no expected message, any response is valid
+            messageFound = true;
+            break;
+          } else {
+            // Check if any of the expected phrases are in the response
+            messageFound = expectedPhrases.some((phrase) =>
+              responseText.toLowerCase().includes(phrase.toLowerCase()),
+            );
+
+            if (messageFound) break;
+          }
+        }
+      }
+
+      if (messageFound) {
+        if (expectedPhrases.length) {
+          console.log(
+            `Found expected response containing one of [${expectedPhrases.join(", ")}]: "${responseText}"`,
+          );
+        } else {
+          console.log(`Received a response: "${responseText}"`);
+        }
+      } else {
+        if (expectedPhrases.length) {
+          console.log(
+            `Failed to find response containing any of [${expectedPhrases.join(", ")}]. Last message: "${responseText}"`,
+          );
+        } else {
+          console.log(
+            `Failed to receive any response. Last message: "${responseText}"`,
+          );
+        }
+      }
+
+      return messageFound;
     } catch (error) {
       console.error("Error in sendAndWaitForResponse:", error);
+      await this.takeSnapshot(page, "before-finding-expected-message");
       return false;
     }
   }
@@ -183,12 +216,7 @@ export class XmtpPlaywright {
     });
 
     const context: BrowserContext = await this.browser.newContext(
-      this.isHeadless
-        ? {
-            viewport: { width: 1920, height: 1080 },
-            deviceScaleFactor: 1,
-          }
-        : {},
+      this.isHeadless ? {} : {},
     );
 
     this.page = await context.newPage();
@@ -260,7 +288,7 @@ export class XmtpPlaywright {
   async newDmWithDeeplink(
     address: string,
     sendMessage: string,
-    expectedMessage: string,
+    expectedMessage?: string | string[],
   ): Promise<boolean> {
     const { page, browser } = await this.startPage(address);
     try {
