@@ -13,7 +13,6 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **TS_Geolocation.yml**             | Test regional network performance      | Every 30 minutes, manual     | Run tests from multiple geographic regions     |
 | **TS_Gm.yml**                      | Validate basic messaging functionality | Scheduled, manual            | Verify core protocol operations                |
 | **TS_Performance.yml**             | Measure protocol performance           | Scheduled, manual            | Benchmark operation timing and scalability     |
-| **TS_StreamSpeed.yml**             | Test message streaming performance     | Scheduled, manual            | Verify real-time message delivery performance  |
 | **test-package-compatibility.yml** | Verify package compatibility           | On main branch push, manual  | Test with different Node versions and managers |
 | **upload-installations.yml**       | Backup installation data               | Daily, manual                | Upload keys and installation data as artifacts |
 | **validate-code-quality.yml**      | Check code quality                     | On non-main branch pushes    | Enforce code quality standards                 |
