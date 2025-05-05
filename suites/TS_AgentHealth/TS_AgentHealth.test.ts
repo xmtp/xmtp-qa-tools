@@ -18,7 +18,6 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = agentHealth as Agent[];
-const isGithubActions = process.env.GITHUB_ACTIONS === "true";
 const testName = "ts_agenthealth";
 loadEnv(testName);
 
