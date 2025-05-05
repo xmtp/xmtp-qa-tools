@@ -39,6 +39,13 @@ jobs:
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Delivery
         continue-on-error: true
+      - name: Send Slack notification
+        if: always()
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
+          JOB_STATUS: ${{ job.status }}
+        run: ./scripts/notify-slack.sh
       - name: Ensure logs directory exists
         run: mkdir -p logs
       - name: Upload reports artifacts
