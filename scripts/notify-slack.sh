@@ -32,6 +32,12 @@ TEST_NAME=${TEST_NAME:-$(basename $(find suites -type d -name "TS_*" | head -1))
 XMTP_ENV=${XMTP_ENV:-"dev"}
 JOB_STATUS=${JOB_STATUS:-"unknown"}
 
+# Create workflow run URL if both repository and run ID are available
+WORKFLOW_URL=""
+if [ "$REPOSITORY" != "Unknown Repository" ] && [ "$RUN_ID" != "Unknown Run ID" ]; then
+  WORKFLOW_URL="• *Workflow URL:* https://github.com/${REPOSITORY}/actions/runs/${RUN_ID}"
+fi
+
 # Check if logs directory exists and look for error logs to add context
 ERROR_LOGS=""
 if [ -d "logs" ]; then
@@ -48,8 +54,7 @@ MESSAGE="*XMTP Test Report*
 • *Test Suite:* ${TEST_NAME}
 • *Network:* ${XMTP_ENV}
 • *Repository:* ${REPOSITORY}
-• *Run ID:* ${RUN_ID}
-• *Triggered by:* ${ACTOR}
+${WORKFLOW_URL}
 • *Status:* ${JOB_STATUS}
 • *Timestamp:* $(date)
 ${ERROR_LOGS}"
