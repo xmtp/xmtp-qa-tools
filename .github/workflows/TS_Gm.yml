@@ -42,7 +42,7 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Gm
-          - name: Send Slack notification
+      - name: Send Slack notification
         if: always()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
