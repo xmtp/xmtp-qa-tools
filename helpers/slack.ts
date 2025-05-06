@@ -158,10 +158,10 @@ async function sendSlackNotification() {
     }
 
     // Create a message with GitHub context and AI analysis
-    const message = `*XMTP Test Report - FAILURE ❌*
+    const message = `*XMTP Test Failure ❌*
+• *Test Suite:* ${testName}
 • *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
 • *URL:* ${workflowUrl}
-• *Test Suite:* ${testName}
 • *Network:* ${xmtpEnv}
 • *Status:* ${jobStatus}
 • *Branch:* ${branchName}
