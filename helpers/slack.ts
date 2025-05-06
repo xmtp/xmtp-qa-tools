@@ -61,7 +61,7 @@ if (jobStatus === "success" || jobStatus === "passed") {
 // Create workflow run URL if both repository and run ID are available
 let workflowUrl = "";
 if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
-  workflowUrl = `• *Workflow URL:* https://github.com/${repository}/actions/runs/${runId}`;
+  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 }
 
 // OpenAI API response interface

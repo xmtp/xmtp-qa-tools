@@ -6,6 +6,7 @@ import {
   type Conversation,
   type DecodedMessage,
   type Group,
+  type PermissionPolicySet,
 } from "@xmtp/node-sdk";
 import { config, type GroupConfig } from "./groups";
 
@@ -24,6 +25,7 @@ export const processMessage = async (
   conversation: Conversation,
   message: DecodedMessage,
 ): Promise<void> => {
+  console.log("Processing message", config);
   const groupConfig = config.find(
     (group: GroupConfig) =>
       group.publicKey.toLowerCase() ===
@@ -33,15 +35,20 @@ export const processMessage = async (
     console.log("No group config found for this client");
     return;
   }
-
   const content = message.content as string;
-  if (!content.includes("/admin") && !isAdmin.includes(message.senderInboxId)) {
+  if (!content.includes("/admin")) {
     console.log("non admin message detected");
     return;
-  } else {
-    console.log("admin message detected" + message.senderInboxId);
-    console.log(client.accountIdentifier?.identifier);
   }
+
+  if (!isAdmin.includes(message.senderInboxId)) {
+    console.log("non admin message detected");
+    return;
+  }
+
+  console.log("admin message detected" + message.senderInboxId);
+  console.log(client.accountIdentifier?.identifier);
+
   await client.conversations.sync();
   const env = client.options?.env ?? "local";
 
@@ -52,24 +59,58 @@ export const processMessage = async (
     console.error(`Group not found with ID: ${groupId}`);
     return;
   }
-
-  await updatePermissions(group as Group);
+  await group.sync();
+  const groupName = (group as Group).name;
+  const permissions = await updatePermissions(group as Group);
+  await conversation.send(
+    `Updated permission policy: ${JSON.stringify(permissions)}`,
+  );
   console.log("Permission update complete");
-  await conversation.send("Permission update complete");
+  await conversation.send(
+    "Permission update complete for " + groupName + " " + groupId,
+  );
 };
 
 /**
  * Update group permissions
  */
-async function updatePermissions(group: Group): Promise<void> {
+async function updatePermissions(group: Group): Promise<any> {
   try {
     await group.updatePermission(
       PermissionUpdateType.AddAdmin,
+      PermissionPolicy.Admin,
+    );
+    await group.updatePermission(
+      PermissionUpdateType.AddMember,
+      PermissionPolicy.Admin,
+    );
+    await group.updatePermission(
+      PermissionUpdateType.RemoveMember,
+      PermissionPolicy.Admin,
+    );
+    await group.updatePermission(
+      PermissionUpdateType.RemoveAdmin,
       PermissionPolicy.SuperAdmin,
     );
+    await group.updatePermission(
+      PermissionUpdateType.UpdateMetadata,
+      PermissionPolicy.Admin,
+      0, // name field
+    );
+    await group.updatePermission(
+      PermissionUpdateType.UpdateMetadata,
+      PermissionPolicy.Admin,
+      1, // description field
+    );
+    await group.updatePermission(
+      PermissionUpdateType.UpdateMetadata,
+      PermissionPolicy.Admin,
+      2, // image field
+    );
+
     await group.sync();
     const permissions = group.permissions;
-    console.log(`Updated permission policy: ${JSON.stringify(permissions)}`);
+    return permissions;
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`Error updating permissions: ${errorMessage}`);
