@@ -19,6 +19,7 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
       XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
       TEST_NAME: "TS_AgentHealth"
