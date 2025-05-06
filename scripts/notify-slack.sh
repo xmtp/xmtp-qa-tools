@@ -67,8 +67,9 @@ if [ -d "logs" ]; then
 fi
 
 # Create a message with GitHub context
-MESSAGE="*XMTP Test Report - FAILURE*
-• *Workflow:* [${WORKFLOW_NAME}](${WORKFLOW_URL})
+MESSAGE="*XMTP Test Report - FAILURE ❌*
+• *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${WORKFLOW_NAME}.yml 
+• *URL:* ${WORKFLOW_URL}
 • *Test Suite:* ${TEST_NAME}
 • *Network:* ${XMTP_ENV}
 • *Status:* ${JOB_STATUS}
