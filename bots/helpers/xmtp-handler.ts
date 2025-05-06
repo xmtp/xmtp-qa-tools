@@ -1,11 +1,4 @@
 import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPath,
-  getEncryptionKeyFromHex,
-  logAgentDetails,
-} from "@helpers/client";
-import {
   Client,
   Dm,
   type Conversation,
@@ -13,6 +6,13 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
+import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "./client";
 import "dotenv/config";
 
 /**
