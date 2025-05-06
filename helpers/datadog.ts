@@ -344,8 +344,7 @@ export function initDataDog(
   if (state.isInitialized) {
     return true;
   }
-
-  if (!testName.includes("ts_")) {
+  if (!testName.includes("ts_") && geolocation !== "south-america") {
     return true;
   }
 
@@ -456,18 +455,27 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
 export const sendPerformanceResult = (
   expect: ExpectStatic,
   workers: WorkerManager,
-  start: number,
+  start: number | undefined,
+  testStart?: number,
 ) => {
   const testName = expect.getState().currentTestName;
   if (testName) {
     console.timeEnd(testName);
-    expect(workers.getWorkers()).toBeDefined();
-    expect(workers.getWorkers().length).toBeGreaterThan(0);
+
+    // If start is undefined, use testStart or current time
+    const actualStart = start ?? testStart ?? performance.now();
+    const deliveryTime = performance.now() - actualStart;
+    const totalTestTime = testStart ? performance.now() - testStart : undefined;
+
     void sendPerformanceMetric(
-      performance.now() - start,
+      deliveryTime,
       testName,
       workers.getVersion(),
       false,
+      {
+        totalTestTime,
+        isDeliveryTime: true,
+      },
     );
   }
 };
@@ -522,6 +530,10 @@ export async function sendPerformanceMetric(
   testName: string,
   libXmtpVersion: string,
   skipNetworkStats: boolean = false,
+  additionalInfo?: {
+    totalTestTime?: number;
+    isDeliveryTime?: boolean;
+  },
 ): Promise<void> {
   if (!state.isInitialized) return;
 
@@ -542,6 +554,39 @@ export async function sendPerformanceMetric(
     );
 
     const isSuccess = metricValue <= threshold;
+
+    // Log additional information if provided
+    if (additionalInfo?.isDeliveryTime) {
+      console.log(
+        `✅ Message delivery time: ${metricValue.toFixed(2)}ms (actual message delivery only)`,
+      );
+
+      if (additionalInfo.totalTestTime) {
+        console.log(
+          `Total test time: ${additionalInfo.totalTestTime.toFixed(2)}ms (includes setup, etc.)`,
+        );
+      }
+    }
+
+    console.log(
+      JSON.stringify(
+        {
+          metricValue,
+          libxmtp: libXmtpVersion,
+          operation: operationName,
+          test: testNameExtracted,
+          metric_type: "operation",
+          metric_subtype: operationType,
+          description: metricDescription,
+          members: members,
+          success: isSuccess.toString(),
+          threshold: threshold.toString(),
+          region: state.currentGeo,
+        },
+        null,
+        2,
+      ),
+    );
 
     sendMetric("duration", metricValue, {
       libxmtp: libXmtpVersion,

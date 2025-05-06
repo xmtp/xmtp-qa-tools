@@ -15,9 +15,9 @@ import {
 } from "vitest";
 
 const testName = "dms";
+loadEnv(testName);
 
 describe(testName, () => {
-  loadEnv(testName);
   let convo: Conversation;
   let workers: WorkerManager;
   let hasFailures: boolean = false;
