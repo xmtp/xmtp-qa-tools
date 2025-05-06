@@ -41,7 +41,7 @@ jobs:
           cat data-directories.txt
         continue-on-error: true
 
-     - name: Send Slack notification
+      - name: Send Slack notification
         if: always()
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
