@@ -43,7 +43,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_AgentHealth
+        run: ./scripts/run-test.sh TS_AgentHealth 1
       - name: Send Slack notification
         if: always()
         env:
