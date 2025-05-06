@@ -110,6 +110,12 @@ ${errorLogs}`;
 
 console.log("Sending error notification with workflow context");
 
+// Type definition for Slack API response
+interface SlackApiResponse {
+  ok: boolean;
+  [key: string]: unknown;
+}
+
 // Send to Slack using the API
 async function sendSlackNotification() {
   console.log("Sending Slack notification...");
@@ -128,9 +134,9 @@ async function sendSlackNotification() {
       }),
     });
 
-    const data = await response.json();
+    const data = (await response.json()) as SlackApiResponse;
 
-    if (data.ok) {
+    if (data && data.ok) {
       console.log("✅ Slack notification sent successfully!");
     } else {
       console.error("❌ Failed to send Slack notification. Response:", data);
