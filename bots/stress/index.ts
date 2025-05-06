@@ -173,6 +173,6 @@ await initializeClient(processMessage, [
   {
     acceptGroups: true,
     walletKey: WALLET_KEY,
-    encryptionKey: ENCRYPTION_KEY,
+    dbEncryptionKey: ENCRYPTION_KEY,
   },
 ]);
