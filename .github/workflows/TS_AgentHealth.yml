@@ -47,8 +47,6 @@ jobs:
       - name: Send Slack notification
         if: always()
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
       - name: Upload reports and snapshots artifacts
