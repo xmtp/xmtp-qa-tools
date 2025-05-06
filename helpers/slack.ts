@@ -83,7 +83,7 @@ async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
         {
           role: "system",
           content:
-            "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise summary of what went wrong, potential causes, and possible solutions. Be specific and technical but make it readable.",
+            "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise, very short summary of what went wrong. Please be specific and technical. Don't propose solutions, just the facts.",
         },
         {
           role: "user",
