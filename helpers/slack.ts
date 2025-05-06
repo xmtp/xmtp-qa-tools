@@ -78,7 +78,7 @@ async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
+      model: "gpt-4.1-nano",
       messages: [
         {
           role: "system",
