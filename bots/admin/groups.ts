@@ -1,6 +1,11 @@
-import { validateEnvironment } from "../helpers/client";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { validateEnvironment } from "@bots/client";
+import dotenv from "dotenv";
 
-// Environment validation
+const envPath = path.join(path.dirname(fileURLToPath(import.meta.url)), ".env");
+dotenv.config({ path: envPath });
+// Environment validation with custom env path
 const {
   WALLET_KEY_CSX,
   PUBLIC_KEY_CSX,
@@ -10,16 +15,19 @@ const {
   PUBLIC_KEY_GANG,
   ENCRYPTION_KEY_GANG,
   GROUP_CODE_GANG,
-} = validateEnvironment([
-  "WALLET_KEY_CSX",
-  "ENCRYPTION_KEY_CSX",
-  "GROUP_CODE_CSX",
-  "WALLET_KEY_GANG",
-  "ENCRYPTION_KEY_GANG",
-  "GROUP_CODE_GANG",
-  "PUBLIC_KEY_CSX",
-  "PUBLIC_KEY_GANG",
-]);
+} = validateEnvironment(
+  [
+    "WALLET_KEY_CSX",
+    "ENCRYPTION_KEY_CSX",
+    "GROUP_CODE_CSX",
+    "WALLET_KEY_GANG",
+    "ENCRYPTION_KEY_GANG",
+    "GROUP_CODE_GANG",
+    "PUBLIC_KEY_CSX",
+    "PUBLIC_KEY_GANG",
+  ],
+  envPath,
+);
 
 export type GroupConfig = {
   id: string;

@@ -1,4 +1,11 @@
 import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@bots/client";
+import {
   Client,
   Dm,
   type Conversation,
@@ -6,13 +13,6 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPath,
-  getEncryptionKeyFromHex,
-  logAgentDetails,
-} from "./client";
 import "dotenv/config";
 
 /**
@@ -83,7 +83,6 @@ export const initializeClient = async (
     ...DEFAULT_AGENT_OPTIONS,
     ...opt,
   }));
-  console.log(mergedOptions);
 
   /**
    * Core message streaming function with robust error handling
