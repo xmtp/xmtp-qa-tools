@@ -110,11 +110,14 @@ jobs:
           echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
           echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
 
-      - name: Run client check
+      - name: Run agent
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            yarn run client-check
+          timeout 20s yarn dev | tee output.log
+          if grep -q "Waiting for messages..." output.log; then
+            echo "Success: Agent started successfully and is waiting for messages"
+            exit 0
           else
-            ${{ matrix.package-manager }} run client-check
+            echo "Error: Agent did not reach 'Waiting for messages...' state"
+            exit 1
           fi
