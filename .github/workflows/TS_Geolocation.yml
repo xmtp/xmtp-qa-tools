@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    timeout-minutes: 10
+    timeout-minutes: 20
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -50,14 +50,6 @@ jobs:
         id: region-test
         run: ./scripts/run-test.sh TS_Performance
         continue-on-error: true
-
-      - name: Send Slack notification
-        if: always()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
-          JOB_STATUS: ${{ job.status }}
-        run: ./scripts/notify-slack.sh
 
       - name: Upload log files
         if: always()

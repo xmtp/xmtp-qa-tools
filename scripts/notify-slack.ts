@@ -1,0 +1,159 @@
+#!/usr/bin/env node
+import { execSync } from "child_process";
+import * as fs from "fs";
+import * as path from "path";
+import * as dotenv from "dotenv";
+import fetch from "node-fetch";
+
+// Load environment variables from .env file if running locally
+if (fs.existsSync(".env")) {
+  console.log("Loading environment variables from .env file");
+  dotenv.config();
+} else {
+  console.log("No .env file found, assuming environment variables are set");
+}
+
+// Check for required Slack credentials
+if (!process.env.SLACK_BOT_TOKEN) {
+  console.error("Error: SLACK_BOT_TOKEN environment variable is not set.");
+  console.error(
+    "Please add your Bot User OAuth Token to your .env file or environment variables:",
+  );
+  console.error("SLACK_BOT_TOKEN=xoxb-your-token");
+  process.exit(1);
+}
+
+const slackChannel = process.env.SLACK_CHANNEL || "general";
+console.log(`Using Slack bot token with channel: ${slackChannel}`);
+
+// Get GitHub Actions context if available
+const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
+const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
+const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
+const actor = process.env.GITHUB_ACTOR || "Unknown Actor";
+const githubRef = process.env.GITHUB_REF || "Unknown Branch";
+const xmtpEnv = process.env.XMTP_ENV || "dev";
+const jobStatus = process.env.JOB_STATUS || "unknown";
+
+// Find test name from suites directory
+let testName = process.env.TEST_NAME;
+if (!testName) {
+  try {
+    const suitesDir = path.join(process.cwd(), "suites");
+    if (fs.existsSync(suitesDir)) {
+      const testDirs = fs
+        .readdirSync(suitesDir)
+        .filter(
+          (dir) =>
+            dir.startsWith("TS_") &&
+            fs.statSync(path.join(suitesDir, dir)).isDirectory(),
+        );
+
+      if (testDirs.length > 0) {
+        testName = testDirs[0];
+      }
+    }
+  } catch (error) {
+    console.error("Error finding test name:", error);
+  }
+  testName = testName || "Unknown Test";
+}
+
+// Extract branch name from GITHUB_REF
+const branchName = githubRef.replace("refs/heads/", "");
+console.log(`Current branch: ${branchName}`);
+
+// Only proceed with notification if it's an error
+if (jobStatus === "success" || jobStatus === "passed") {
+  console.log(`Job status is ${jobStatus}. No need to send notification.`);
+  process.exit(0);
+}
+
+// Create workflow run URL if both repository and run ID are available
+let workflowUrl = "";
+if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
+  workflowUrl = `• *Workflow URL:* https://github.com/${repository}/actions/runs/${runId}`;
+}
+
+// Check if logs directory exists and look for error logs to add context
+let errorLogs = "";
+if (fs.existsSync("logs")) {
+  try {
+    // Find log files and grep for errors
+    const logFiles = fs
+      .readdirSync("logs")
+      .filter((file) => file.endsWith(".log"));
+    const errorLines: string[] = [];
+
+    for (const logFile of logFiles) {
+      const logPath = path.join("logs", logFile);
+      const content = fs.readFileSync(logPath, "utf-8");
+      const lines = content.split("\n");
+
+      for (const line of lines) {
+        if (/error|fail|exception/i.test(line)) {
+          errorLines.push(line);
+          if (errorLines.length >= 5) break;
+        }
+      }
+
+      if (errorLines.length >= 5) break;
+    }
+
+    if (errorLines.length > 0) {
+      errorLogs = `\n\nError Logs:\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+    }
+  } catch (error) {
+    console.error("Error reading log files:", error);
+  }
+}
+
+// Create a message with GitHub context
+const message = `*XMTP Test Report - FAILURE ❌*
+• *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
+• *URL:* ${workflowUrl}
+• *Test Suite:* ${testName}
+• *Network:* ${xmtpEnv}
+• *Status:* ${jobStatus}
+• *Branch:* ${branchName}
+• *Timestamp:* ${new Date().toISOString()}
+${errorLogs}`;
+
+console.log("Sending error notification with workflow context");
+
+// Send to Slack using the API
+async function sendSlackNotification() {
+  console.log("Sending Slack notification...");
+
+  try {
+    const response = await fetch("https://slack.com/api/chat.postMessage", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channel: slackChannel,
+        text: message,
+        mrkdwn: true,
+      }),
+    });
+
+    const data = await response.json();
+
+    if (data.ok) {
+      console.log("✅ Slack notification sent successfully!");
+    } else {
+      console.error("❌ Failed to send Slack notification. Response:", data);
+      process.exit(1);
+    }
+  } catch (error) {
+    console.error("Error sending Slack notification:", error);
+    process.exit(1);
+  }
+}
+
+sendSlackNotification().catch((err: unknown) => {
+  console.error("Unhandled error:", err);
+  process.exit(1);
+});

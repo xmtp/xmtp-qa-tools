@@ -47,7 +47,7 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
           JOB_STATUS: ${{ job.status }}
-        run: ./scripts/notify-slack.sh
+        run: npx tsx scripts/notify-slack.ts
 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
