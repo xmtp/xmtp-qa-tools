@@ -1,17 +1,7 @@
-#!/usr/bin/env node
-import { execSync } from "child_process";
 import * as fs from "fs";
 import * as path from "path";
-import * as dotenv from "dotenv";
+import "dotenv/config";
 import fetch from "node-fetch";
-
-// Load environment variables from .env file if running locally
-if (fs.existsSync(".env")) {
-  console.log("Loading environment variables from .env file");
-  dotenv.config();
-} else {
-  console.log("No .env file found, assuming environment variables are set");
-}
 
 // Check for required Slack credentials
 if (!process.env.SLACK_BOT_TOKEN) {
@@ -30,7 +20,6 @@ console.log(`Using Slack bot token with channel: ${slackChannel}`);
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
-const actor = process.env.GITHUB_ACTOR || "Unknown Actor";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
 const xmtpEnv = process.env.XMTP_ENV || "dev";
 const jobStatus = process.env.JOB_STATUS || "unknown";
