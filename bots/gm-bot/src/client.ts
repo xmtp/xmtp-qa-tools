@@ -53,7 +53,7 @@ export const generateEncryptionKeyHex = () => {
   /* Generate a random encryption key */
   const uint8Array = getRandomValues(new Uint8Array(32));
   /* Convert the encryption key to a hex string */
-  return toString(uint8Array, "hex");
+  return toString(uint8Array, "hex") as `0x${string}`;
 };
 
 /**
@@ -63,7 +63,7 @@ export const generateEncryptionKeyHex = () => {
  */
 export const getEncryptionKeyFromHex = (hex: string) => {
   /* Convert the hex string to an encryption key */
-  return fromString(hex, "hex");
+  return fromString(hex, "hex") as `0x${string}`;
 };
 
 export const getDbPath = (description: string = "xmtp") => {
