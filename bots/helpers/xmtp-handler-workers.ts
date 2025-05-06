@@ -224,9 +224,8 @@ class WorkerManager {
     if (!WATCHDOG_RESTART_INTERVAL_MS) return undefined;
 
     let lastRestartTimestamp = Date.now();
-    let _lastActivityTimestamp = Date.now();
     const updateActivity = () => {
-      _lastActivityTimestamp = Date.now();
+      console.log("updateActivity");
     };
 
     const watchdogInterval = setInterval(
