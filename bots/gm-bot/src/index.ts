@@ -6,7 +6,7 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
   validateEnvironment,
-} from "../../helpers/client";
+} from "./client";
 
 const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
   "WALLET_KEY",
