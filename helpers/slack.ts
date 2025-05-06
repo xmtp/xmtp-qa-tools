@@ -78,12 +78,21 @@ async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
     const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
     const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-nano",
+      model: "gpt-4.1-mini",
       messages: [
         {
           role: "system",
-          content:
-            "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise, very short summary of what went wrong. Just explain what failed, dont try to understand the root cause or infer what might be wrong.",
+          content: `You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise, very short summary of what went wrong. Please be specific and technical. Don't propose solutions.
+            
+            # Example:
+            [2025-05-06T22:57:34.207Z] [[32minfo[39m] Failed to find response containing any of [commands]
+            [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
+            [2025-05-06T22:58:22.929Z] [[32minfo[39m] Failed to find response containing any of [commands]
+            [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
+            
+            # AI Analysis:
+            The test failed because \`key-check\` agent failed to respond in the expected time.
+            `,
         },
         {
           role: "user",
