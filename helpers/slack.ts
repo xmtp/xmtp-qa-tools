@@ -2,6 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
+import OpenAI from "openai";
 
 // Check for required Slack credentials
 if (!process.env.SLACK_BOT_TOKEN) {
@@ -64,16 +65,6 @@ if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
   workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 }
 
-// OpenAI API response interface
-interface OpenAIResponse {
-  choices: Array<{
-    message?: {
-      content: string;
-    };
-  }>;
-  [key: string]: unknown;
-}
-
 // Function to analyze error logs with GPT-4.1-mini
 async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
   if (!process.env.OPENAI_API_KEY) {
@@ -84,35 +75,28 @@ async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
   try {
     console.log("Analyzing error logs with GPT-4.1-mini...");
 
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "gpt-4.1-mini",
-        messages: [
-          {
-            role: "system",
-            content:
-              "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise summary of what went wrong, potential causes, and possible solutions. Be specific and technical but make it readable.",
-          },
-          {
-            role: "user",
-            content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
-          },
-        ],
-        max_tokens: 500,
-      }),
+    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+    const completion = await openai.chat.completions.create({
+      model: "gpt-4.1-mini",
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise summary of what went wrong, potential causes, and possible solutions. Be specific and technical but make it readable.",
+        },
+        {
+          role: "user",
+          content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
+        },
+      ],
+      max_tokens: 500,
     });
 
-    const data = (await response.json()) as OpenAIResponse;
-
-    if (data.choices && data.choices[0] && data.choices[0].message) {
-      return `\n\n*AI Analysis:*\n${data.choices[0].message.content}`;
+    if (completion.choices && completion.choices[0]?.message?.content) {
+      return `\n\n*AI Analysis:*\n${completion.choices[0].message.content}`;
     } else {
-      console.error("Unexpected response format from OpenAI:", data);
+      console.error("Unexpected response format from OpenAI:", completion);
       return "";
     }
   } catch (error) {
