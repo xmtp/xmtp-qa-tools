@@ -28,9 +28,20 @@ WORKFLOW_NAME=${GITHUB_WORKFLOW:-"Unknown Workflow"}
 REPOSITORY=${GITHUB_REPOSITORY:-"Unknown Repository"}
 RUN_ID=${GITHUB_RUN_ID:-"Unknown Run ID"}
 ACTOR=${GITHUB_ACTOR:-"Unknown Actor"}
+GITHUB_REF=${GITHUB_REF:-"Unknown Branch"}
 TEST_NAME=${TEST_NAME:-$(basename $(find suites -type d -name "TS_*" | head -1))}
 XMTP_ENV=${XMTP_ENV:-"dev"}
 JOB_STATUS=${JOB_STATUS:-"unknown"}
+
+# Extract branch name from GITHUB_REF
+BRANCH_NAME=$(echo $GITHUB_REF | sed -e "s/refs\/heads\///g")
+echo "Current branch: $BRANCH_NAME"
+
+# Only send notifications for main branch
+if [[ "$BRANCH_NAME" != "main" && "$BRANCH_NAME" != "master" ]]; then
+  echo "Not running on main/master branch. Skipping notification."
+  exit 0
+fi
 
 # Check if the job status indicates an error/failure
 # Only proceed with notification if it's an error
@@ -61,6 +72,7 @@ MESSAGE="*XMTP Test Report - FAILURE*
 • *Test Suite:* ${TEST_NAME}
 • *Network:* ${XMTP_ENV}
 • *Status:* ${JOB_STATUS}
+• *Branch:* ${BRANCH_NAME}
 • *Timestamp:* $(date)
 ${ERROR_LOGS}"
 

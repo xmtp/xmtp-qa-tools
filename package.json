@@ -3,6 +3,11 @@
   "version": "0.0.22",
   "private": true,
   "type": "module",
+  "workspaces": [
+    "bots/*",
+    "helpers",
+    "workers"
+  ],
   "scripts": {
     "bot": "tsx scripts/run-bot",
     "build": "tsc",
