@@ -179,7 +179,7 @@ describe(testName, () => {
   it("receiveGM: should measure receiving a gm", async () => {
     try {
       // Reset start time to ensure we're using the callback timing
-      start = undefined;
+      //start = undefined;
       const verifyResult = await verifyStream(
         dm,
         [workers.getWorkers()[1]],
@@ -189,7 +189,7 @@ describe(testName, () => {
         undefined,
         () => {
           console.log("Message sent, starting timer now");
-          start = performance.now();
+          //start = performance.now();
         },
       );
 
@@ -270,10 +270,10 @@ describe(testName, () => {
   it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
     try {
       // Reset start time to ensure we're using the callback timing
-      start = undefined;
+      //start = undefined;
       const verifyResult = await verifyStreamAll(newGroup, workers, 1, () => {
         console.log("Group message sent, starting timer now");
-        start = performance.now();
+        //start = performance.now();
       });
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -391,12 +391,12 @@ describe(testName, () => {
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         // Reset start time to ensure we're using the callback timing
-        start = undefined;
+        //start = undefined;
         const verifyResult = await verifyStreamAll(newGroup, workers, 1, () => {
           console.log(
             `Group message sent for ${i} participants, starting timer now`,
           );
-          start = performance.now();
+          //start = performance.now();
         });
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
