@@ -113,7 +113,7 @@ jobs:
       - name: Run agent
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          timeout 20s yarn dev | tee output.log
+          timeout 20s ${{ matrix.package-manager }} run dev | tee output.log
           if grep -q "Waiting for messages..." output.log; then
             echo "Success: Agent started successfully and is waiting for messages"
             exit 0
