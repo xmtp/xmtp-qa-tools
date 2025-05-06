@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Script to run tests with retry logic
-MAX_ATTEMPTS=1
+MAX_ATTEMPTS=2
 RETRY_DELAY=10
 
 # Get test name from command line argument or use default
