@@ -64,8 +64,66 @@ if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
   workflowUrl = `• *Workflow URL:* https://github.com/${repository}/actions/runs/${runId}`;
 }
 
+// OpenAI API response interface
+interface OpenAIResponse {
+  choices: Array<{
+    message?: {
+      content: string;
+    };
+  }>;
+  [key: string]: unknown;
+}
+
+// Function to analyze error logs with GPT-4.1-mini
+async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
+  if (!process.env.OPENAI_API_KEY) {
+    console.log("OpenAI API key not found. Skipping error analysis.");
+    return "";
+  }
+
+  try {
+    console.log("Analyzing error logs with GPT-4.1-mini...");
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4.1-mini",
+        messages: [
+          {
+            role: "system",
+            content:
+              "You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise summary of what went wrong, potential causes, and possible solutions. Be specific and technical but make it readable.",
+          },
+          {
+            role: "user",
+            content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
+          },
+        ],
+        max_tokens: 500,
+      }),
+    });
+
+    const data = (await response.json()) as OpenAIResponse;
+
+    if (data.choices && data.choices[0] && data.choices[0].message) {
+      return `\n\n*AI Analysis:*\n${data.choices[0].message.content}`;
+    } else {
+      console.error("Unexpected response format from OpenAI:", data);
+      return "";
+    }
+  } catch (error) {
+    console.error("Error analyzing logs with GPT:", error);
+    return "";
+  }
+}
+
 // Check if logs directory exists and look for error logs to add context
 let errorLogs = "";
+let rawErrorLogs = "";
 if (fs.existsSync("logs")) {
   try {
     // Find log files and grep for errors
@@ -82,33 +140,21 @@ if (fs.existsSync("logs")) {
       for (const line of lines) {
         if (/error|fail|exception/i.test(line)) {
           errorLines.push(line);
-          if (errorLines.length >= 5) break;
+          if (errorLines.length >= 10) break;
         }
       }
 
-      if (errorLines.length >= 5) break;
+      if (errorLines.length >= 10) break;
     }
 
     if (errorLines.length > 0) {
-      errorLogs = `\n\nError Logs:\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+      rawErrorLogs = errorLines.join("\n");
+      errorLogs = `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
   }
 }
-
-// Create a message with GitHub context
-const message = `*XMTP Test Report - FAILURE ❌*
-• *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
-• *URL:* ${workflowUrl}
-• *Test Suite:* ${testName}
-• *Network:* ${xmtpEnv}
-• *Status:* ${jobStatus}
-• *Branch:* ${branchName}
-• *Timestamp:* ${new Date().toISOString()}
-${errorLogs}`;
-
-console.log("Sending error notification with workflow context");
 
 // Type definition for Slack API response
 interface SlackApiResponse {
@@ -121,6 +167,23 @@ async function sendSlackNotification() {
   console.log("Sending Slack notification...");
 
   try {
+    // Get AI analysis of error logs if available
+    let aiAnalysis = "";
+    if (rawErrorLogs) {
+      aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
+    }
+
+    // Create a message with GitHub context and AI analysis
+    const message = `*XMTP Test Report - FAILURE ❌*
+• *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
+• *URL:* ${workflowUrl}
+• *Test Suite:* ${testName}
+• *Network:* ${xmtpEnv}
+• *Status:* ${jobStatus}
+• *Branch:* ${branchName}
+• *Timestamp:* ${new Date().toISOString()}
+${errorLogs}${aiAnalysis}`;
+
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
       headers: {

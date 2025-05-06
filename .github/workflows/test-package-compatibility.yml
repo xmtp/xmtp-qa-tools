@@ -156,4 +156,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
           JOB_STATUS: ${{ job.status }}
-        run: xmtp-qa-testing/scripts/notify-slack.sh
+        run: npx tsx helpers/slack.ts

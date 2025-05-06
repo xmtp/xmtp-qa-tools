@@ -16,6 +16,7 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **tests.ts**                 | Test configuration and utilities  | Test setup, SDK version management               |
 | **generated-inboxes.json**   | Pre-generated test identities     | Test account data for simulations                |
 | **oldpackages.json**         | Legacy package configurations     | Compatibility testing data                       |
+| **slack.ts**                 | Slack notification utilities      | Send notifications to Slack channels             |
 | **datadog-performance.json** | Performance metrics configuration | Thresholds and expectations for tests            |
 
 ## Usage

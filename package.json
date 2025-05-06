@@ -20,7 +20,6 @@
     "gm": "cd bots/gm-bot && tsx src/index.ts",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
-    "notify:slack": "ts-node scripts/notify-slack.ts",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "script": "tsx scripts/run-script",
     "start": "vitest --ui --standalone --watch ",

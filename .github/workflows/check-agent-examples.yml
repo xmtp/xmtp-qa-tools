@@ -56,4 +56,4 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
           JOB_STATUS: ${{ job.status }}
-        run: npx tsx scripts/notify-slack.ts
+        run: npx tsx helpers/slack.ts
