@@ -1,7 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { generateEncryptionKeyHex } from "../src/helper";
+import { generateEncryptionKeyHex } from "../src/client";
 
 // Check Node.js version
 const nodeVersion = process.versions.node;
