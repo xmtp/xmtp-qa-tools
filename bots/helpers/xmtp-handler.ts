@@ -1,53 +1,19 @@
-import { getRandomValues } from "node:crypto";
+import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@helpers/client";
 import {
   Client,
   Dm,
-  IdentifierKind,
   type Conversation,
   type DecodedMessage,
   type LogLevel,
-  type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import { fromString, toString } from "uint8arrays";
-import { createWalletClient, http, toBytes } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { sepolia } from "viem/chains";
 import "dotenv/config";
-import * as fs from "fs";
-
-export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
-  return fromString(hex, "hex");
-};
-
-/**
- * Create a Signer instance from a private key
- * @param key - The private key to create the Signer from
- * @returns A Signer instance
- */
-export const createSigner = (key: string): Signer => {
-  const sanitizedKey = key.startsWith("0x") ? key : `0x${key}`;
-  const account = privateKeyToAccount(sanitizedKey as `0x${string}`);
-
-  return {
-    type: "EOA",
-    getIdentifier: () => ({
-      identifierKind: IdentifierKind.Ethereum,
-      identifier: account.address.toLowerCase(),
-    }),
-    signMessage: async (message: string) => {
-      const signature = await createWalletClient({
-        account,
-        chain: sepolia,
-        transport: http(),
-      }).signMessage({
-        message,
-        account,
-      });
-      return toBytes(signature);
-    },
-  };
-};
 
 /**
  * Configuration options for the XMTP agent
@@ -57,7 +23,7 @@ interface AgentOptions {
   /** Whether to accept group conversations */
   acceptGroups?: boolean;
   /** Encryption key for the client */
-  encryptionKey: string;
+  encryptionKey?: string;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
   /** Public key of the agent */
@@ -68,6 +34,10 @@ interface AgentOptions {
   connectionTimeout?: number;
   /** Whether to auto-reconnect on fatal errors (default: true) */
   autoReconnect?: boolean;
+  /** Welcome message to send to the conversation */
+  welcomeMessage?: string;
+  /** Codecs to use */
+  codecs?: any[];
 }
 
 /**
@@ -96,22 +66,6 @@ const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
     autoReconnect: true,
   },
 ];
-
-/**
- * Generate a new encryption key (utility function)
- */
-export const generateEncryptionKeyHex = (): string => {
-  const uint8Array = getRandomValues(new Uint8Array(32));
-  return toString(uint8Array, "hex");
-};
-
-export const getDbPath = (description: string = "xmtp"): string => {
-  const volumePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? ".data/xmtp";
-  if (!fs.existsSync(volumePath)) {
-    fs.mkdirSync(volumePath, { recursive: true });
-  }
-  return `${volumePath}/${description}.db3`;
-};
 
 // Helper functions
 export const sleep = (ms: number): Promise<void> =>
@@ -146,10 +100,6 @@ export const initializeClient = async (
           backoffTime = RETRY_DELAY_MS;
         }
 
-        console.log(
-          `[${env}] Starting message stream... ${retryCount > 0 ? `(attempt ${retryCount + 1}/${MAX_RETRIES})` : ""}`,
-        );
-
         // Notify activity monitor
         if (onActivity) onActivity();
 
@@ -162,7 +112,6 @@ export const initializeClient = async (
           try {
             // Notify activity monitor on each message
             if (onActivity) onActivity();
-
             // Skip messages from self or with unsupported content types
             if (
               !message ||
@@ -187,27 +136,21 @@ export const initializeClient = async (
             );
 
             const isDm = conversation instanceof Dm;
+            if (options.welcomeMessage && isDm) {
+              const sent = await sendWelcomeMessage(
+                client,
+                conversation,
+                options.welcomeMessage,
+              );
+              if (sent) {
+                console.log(`[${env}] Welcome message sent, skipping`);
+                continue;
+              }
+            }
 
             if (isDm || options.acceptGroups) {
               try {
-                // Call the message handler and handle the returned value
-                const result = messageHandler(
-                  client,
-                  conversation,
-                  message,
-                  isDm,
-                );
-                // Check if result is a Promise before calling catch
-                if (result && typeof result.catch === "function") {
-                  result.catch((error: unknown) => {
-                    const errorMessage =
-                      error instanceof Error ? error.message : String(error);
-                    console.error(
-                      `[${env}] Message handler error:`,
-                      errorMessage,
-                    );
-                  });
-                }
+                await messageHandler(client, conversation, message, isDm);
               } catch (handlerError) {
                 console.error(
                   `[${env}] Error in message handler:`,
@@ -265,9 +208,7 @@ export const initializeClient = async (
 
         // Try to re-sync conversations before retrying
         try {
-          console.log(`[${env}] Attempting to re-sync conversations...`);
           await client.conversations.sync();
-          console.log(`[${env}] Conversations re-synced successfully`);
         } catch (syncError) {
           console.error(`[${env}] Sync error:`, syncError);
         }
@@ -346,7 +287,11 @@ export const initializeClient = async (
         console.log(`[${env}] Initializing client...`);
 
         const signer = createSigner(option.walletKey);
-        const dbEncryptionKey = getEncryptionKeyFromHex(option.encryptionKey);
+        const dbEncryptionKey = getEncryptionKeyFromHex(
+          option.encryptionKey ??
+            process.env.ENCRYPTION_KEY ??
+            generateEncryptionKeyHex(),
+        );
         const loggingLevel = (process.env.LOGGING_LEVEL ?? "off") as LogLevel;
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
@@ -355,6 +300,7 @@ export const initializeClient = async (
           env: env as XmtpEnv,
           loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
+          codecs: option.codecs,
         });
 
         await client.conversations.sync();
@@ -390,48 +336,27 @@ export const initializeClient = async (
 
   logAgentDetails(clients);
 
-  // Handle graceful shutdowns
-  process.on("SIGINT", () => {
-    console.log("\nShutting down clients...");
-    process.exit(0);
-  });
-
   await Promise.all(streamPromises);
   return clients;
 };
-export const logAgentDetails = (clients: Client[]): void => {
-  const clientsByAddress = clients.reduce<Record<string, Client[]>>(
-    (acc, client) => {
-      const address = client.accountIdentifier?.identifier ?? "";
-      if (!acc[address]) acc[address] = [];
-      acc[address].push(client);
-      return acc;
-    },
-    {},
+
+export const sendWelcomeMessage = async (
+  client: Client,
+  conversation: Conversation,
+  welcomeMessage: string,
+) => {
+  // Get all messages from this conversation
+  await conversation.sync();
+  const messages = await conversation.messages();
+  // Check if we have sent any messages in this conversation before
+  const sentMessagesBefore = messages.filter(
+    (msg) => msg.senderInboxId.toLowerCase() === client.inboxId.toLowerCase(),
   );
-
-  for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
-    const firstClient = clientGroup[0];
-    const inboxId = firstClient.inboxId;
-    const environments = clientGroup
-      .map((c) => c.options?.env ?? "dev")
-      .join(", ");
-
-    const urls = [
-      `http://xmtp.chat/dm/${address}`,
-      ...(environments.includes("dev")
-        ? [`https://preview.convos.org/dm/${inboxId}`]
-        : []),
-      ...(environments.includes("production")
-        ? [`https://convos.org/dm/${inboxId}`]
-        : []),
-    ];
-
-    console.log(`
-✓ XMTP Client Ready:
-• Address: ${address}
-• InboxId: ${inboxId}
-• Networks: ${environments}
-${urls.map((url) => `• URL: ${url}`).join("\n")}`);
+  // If we haven't sent any messages before, send a welcome message and skip validation for this message
+  if (sentMessagesBefore.length === 0) {
+    console.log(`Sending welcome message`);
+    await conversation.send(welcomeMessage);
+    return true;
   }
+  return false;
 };

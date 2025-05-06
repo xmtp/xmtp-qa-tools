@@ -14,6 +14,13 @@
     "expectedMessage": "stress"
   },
   {
+    "name": "key-check",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "networks": ["dev", "production"],
+    "sendMessage": "/kc help",
+    "expectedMessage": "commands"
+  },
+  {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
     "networks": ["production"],
