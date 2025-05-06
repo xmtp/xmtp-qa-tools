@@ -76,16 +76,18 @@ export const getDbPath = (description: string = "xmtp") => {
   return `${volumePath}/${description}.db3`;
 };
 
-export const logAgentDetails = (client: Client): void => {
-  const address = client.accountIdentifier?.identifier ?? "";
-  const inboxId = client.inboxId;
-  const env = client.options?.env ?? "dev";
-  console.log(`
+export const logAgentDetails = (clients: Client[]): void => {
+  for (const client of clients) {
+    const address = client.accountIdentifier?.identifier ?? "";
+    const inboxId = client.inboxId;
+    const env = client.options?.env ?? "dev";
+    console.log(`
 ✓ XMTP Client Ready:
 • Address: ${address}
 • InboxId: ${inboxId}
 • Network: ${env}
 • URL: http://xmtp.chat/dm/${address}?env=${env}`);
+  }
 };
 
 export function validateEnvironment(
