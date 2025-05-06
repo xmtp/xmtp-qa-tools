@@ -555,19 +555,6 @@ export async function sendPerformanceMetric(
 
     const isSuccess = metricValue <= threshold;
 
-    // Log additional information if provided
-    if (additionalInfo?.isDeliveryTime) {
-      console.log(
-        `✅ Message delivery time: ${metricValue.toFixed(2)}ms (actual message delivery only)`,
-      );
-
-      if (additionalInfo.totalTestTime) {
-        console.log(
-          `Total test time: ${additionalInfo.totalTestTime.toFixed(2)}ms (includes setup, etc.)`,
-        );
-      }
-    }
-
     console.log(
       JSON.stringify(
         {
