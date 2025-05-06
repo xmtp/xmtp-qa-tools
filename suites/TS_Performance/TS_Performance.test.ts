@@ -36,7 +36,7 @@ describe(testName, () => {
   let dm: Conversation;
   let workers: WorkerManager;
 
-  let start: number | undefined;
+  let start: number;
   let hasFailures: boolean = false;
 
   beforeAll(async () => {
@@ -58,18 +58,13 @@ describe(testName, () => {
   });
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
+    start = performance.now();
     console.time(testName);
-    // Only set start time if it hasn't been set by a callback
-    if (start === undefined) {
-      start = performance.now();
-    }
   });
 
   afterEach(function () {
     try {
-      if (start !== undefined) {
-        sendPerformanceResult(expect, workers, start);
-      }
+      sendPerformanceResult(expect, workers, start);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
