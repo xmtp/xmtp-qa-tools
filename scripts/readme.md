@@ -73,20 +73,6 @@ yarn script generate
 
 **Expected result:** The script will generate test data according to its configuration.
 
-## 🌐 Hyperbrowser
-
-The `hyperbrowser.ts` script provides a headless browser automation tool for XMTP testing.
-
-```bash
-# Run the script with a specific URL
-yarn tsx scripts/hyperbrowser.ts --url="https://example.com"
-
-# Run with additional options
-yarn tsx scripts/hyperbrowser.ts --url="https://example.com" --headless=false --screenshot=true
-```
-
-**Expected result:** The script will launch a browser session to the specified URL, perform automated actions, and optionally take screenshots.
-
 **Options:**
 
 - `--url`: Target URL to navigate to

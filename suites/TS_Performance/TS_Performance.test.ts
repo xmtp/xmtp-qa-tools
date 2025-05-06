@@ -35,9 +35,9 @@ console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
 describe(testName, () => {
   let dm: Conversation;
   let workers: WorkerManager;
-
-  let start: number;
+  let start: number | undefined;
   let hasFailures: boolean = false;
+  let testStart: number;
 
   beforeAll(async () => {
     try {
@@ -56,25 +56,27 @@ describe(testName, () => {
       throw e;
     }
   });
+
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
-    start = performance.now();
     console.time(testName);
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+    testStart = performance.now();
+    start = performance.now();
   });
 
   afterAll(async () => {
     try {
       sendTestResults(hasFailures, testName);
       await closeEnv(testName, workers);
+    } catch (e) {
+      hasFailures = logError(e, expect);
+      throw e;
+    }
+  });
+
+  afterEach(function () {
+    try {
+      sendPerformanceResult(expect, workers, start, testStart);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
@@ -173,8 +175,6 @@ describe(testName, () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      // Reset start time to ensure we're using the callback timing
-      //start = undefined;
       const verifyResult = await verifyStream(
         dm,
         [workers.getWorkers()[1]],
@@ -184,7 +184,7 @@ describe(testName, () => {
         undefined,
         () => {
           console.log("Message sent, starting timer now");
-          //start = performance.now();
+          start = performance.now();
         },
       );
 
@@ -264,11 +264,9 @@ describe(testName, () => {
   });
   it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
     try {
-      // Reset start time to ensure we're using the callback timing
-      //start = undefined;
       const verifyResult = await verifyStreamAll(newGroup, workers, 1, () => {
         console.log("Group message sent, starting timer now");
-        //start = performance.now();
+        start = performance.now();
       });
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -385,13 +383,11 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        // Reset start time to ensure we're using the callback timing
-        //start = undefined;
         const verifyResult = await verifyStreamAll(newGroup, workers, 1, () => {
           console.log(
             `Group message sent for ${i} participants, starting timer now`,
           );
-          //start = performance.now();
+          start = performance.now();
         });
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {

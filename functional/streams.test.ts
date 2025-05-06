@@ -1,5 +1,9 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import {
+  sendPerformanceMetric,
+  sendPerformanceResult,
+  sendTestResults,
+} from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -20,6 +24,7 @@ describe(testName, () => {
   let workers: WorkerManager;
   let hasFailures: boolean = false;
   let start: number | undefined;
+  let testStart: number;
 
   beforeAll(async () => {
     try {
@@ -36,9 +41,8 @@ describe(testName, () => {
   beforeEach(() => {
     const testName = expect.getState().currentTestName;
     console.time(testName);
-    if (start === undefined) {
-      start = performance.now();
-    }
+    testStart = performance.now();
+    start = undefined;
   });
 
   afterAll(async () => {
@@ -50,22 +54,22 @@ describe(testName, () => {
       throw e;
     }
   });
+
   afterEach(function () {
     try {
-      if (start !== undefined) {
-        sendPerformanceResult(expect, workers, start);
-      }
+      sendPerformanceResult(expect, workers, start, testStart);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
     }
   });
+
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      start = undefined;
       const convo = await workers
         .get("henry")!
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+
       const verifyResult = await verifyStream(
         convo,
         [workers.get("randomguy")!],
@@ -74,10 +78,11 @@ describe(testName, () => {
         undefined,
         undefined,
         () => {
-          console.log("Message sent, starting timer now");
+          console.log("DM message sent, starting timer now");
           start = performance.now();
         },
       );
+
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -88,7 +93,6 @@ describe(testName, () => {
 
   it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
     try {
-      start = undefined;
       const convo = await workers
         .get("henry")!
         .client.conversations.newGroup([
@@ -97,10 +101,12 @@ describe(testName, () => {
           workers.get("alice")!.client.inboxId,
           workers.get("dave")!.client.inboxId,
         ]);
+
       const verifyResult = await verifyStreamAll(convo, workers, 1, () => {
         console.log("Group message sent, starting timer now");
         start = performance.now();
       });
+
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect);

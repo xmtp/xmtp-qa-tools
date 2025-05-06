@@ -90,10 +90,6 @@ export async function verifyStream<T extends string = string>(
   const conversationId = group.id;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  console.log(
-    `Starting stream test with ${receivers.length} receivers on group ${conversationId}`,
-  );
-
   await Promise.all(
     receivers.map(async (r) => {
       try {
@@ -109,29 +105,32 @@ export async function verifyStream<T extends string = string>(
     setTimeout(resolve, defaultValues.streamTimeout),
   );
 
+  // Start the timer for the entire collection process
+  const collectionStartTime = performance.now();
+
   // Start collectors
   let collectPromises: Promise<T[]>[] = [];
   if (collectorType === "text") {
-    collectPromises = receivers.map((r) => {
+    collectPromises = receivers.map((r, index) => {
       if (!r.worker) {
         return Promise.resolve([]);
       }
       return r.worker
         .collectMessages(conversationId, collectorType, count)
-        .then((msgs: StreamMessage[]) =>
-          msgs.map((m) => m.message.content as T),
-        );
+        .then((msgs: StreamMessage[]) => {
+          return msgs.map((m) => m.message.content as T);
+        });
     });
   } else if (collectorType === "group_updated") {
-    collectPromises = receivers.map((r) => {
+    collectPromises = receivers.map((r, index) => {
       if (!r.worker) {
         return Promise.resolve([]);
       }
       return r.worker
         .collectGroupUpdates(conversationId, count)
-        .then((msgs: GroupUpdateMessage[]) =>
-          msgs.map((m) => m.group.name as T),
-        );
+        .then((msgs: GroupUpdateMessage[]) => {
+          return msgs.map((m) => m.group.name as T);
+        });
     });
   }
 
@@ -144,12 +143,11 @@ export async function verifyStream<T extends string = string>(
   // Send the messages with delays between them
   for (let i = 0; i < count; i++) {
     await sender(group, sentMessages[i]);
-  }
-  console.log(`Sent ${count} messages`);
 
-  // Call the onMessageSent callback if provided
-  if (onMessageSent) {
-    onMessageSent();
+    // Call the onMessageSent callback if provided - right after first message is sent
+    if (i === 0 && onMessageSent) {
+      onMessageSent();
+    }
   }
 
   // Wait for collectors
@@ -158,12 +156,6 @@ export async function verifyStream<T extends string = string>(
   // Check if all messages were received
   const streamAllReceived = streamCollectedMessages.every(
     (msgs) => msgs?.length === count,
-  );
-
-  console.log(
-    streamAllReceived
-      ? "All participants received the expected number of messages"
-      : "Not all participants received the expected number of messages",
   );
 
   return {
