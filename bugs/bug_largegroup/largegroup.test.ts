@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "largegroup";
 loadEnv(testName);
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
   let group: Conversation;
   let hasFailures: boolean = false;

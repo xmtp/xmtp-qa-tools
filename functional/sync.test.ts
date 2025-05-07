@@ -10,7 +10,7 @@ loadEnv(testName);
 // Helper function to add a delay
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
   let testGroup: Group;
 

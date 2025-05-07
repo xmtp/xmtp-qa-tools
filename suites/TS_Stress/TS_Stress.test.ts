@@ -6,7 +6,8 @@ import {
   TEST_CONFIGS,
 } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { setupTestLifecycle } from "@helpers/tests";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -24,14 +25,20 @@ console.log(
   JSON.stringify(config, null, 2),
 );
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
+  workers = await getWorkers(["bot"], testName, "message", "none");
+  let bot: Worker;
   let client: Client;
   let conversation: Conversation;
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+
   beforeAll(async () => {
     try {
-      let bot = await getWorkers(["bot"], testName, "message", "none");
-      client = bot.get("bot")?.client as Client;
+      bot = workers.get("bot")!;
+      client = bot.client;
       conversation = await client.conversations.newDm(receiverInboxId);
       workers = await getWorkers(config.workerCount, testName);
       expect(workers).toBeDefined();
@@ -42,6 +49,20 @@ describe(testName, () => {
     }
   });
 
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
+  });
   // Create a DM between two workers
   it("createAndSendDms: should create DMs and send messages", async () => {
     try {
