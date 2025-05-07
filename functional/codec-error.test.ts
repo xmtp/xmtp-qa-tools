@@ -1,27 +1,37 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   ContentTypeReaction,
   type Reaction,
 } from "@xmtp/content-type-reaction";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "stream-error";
+loadEnv(testName);
 
-describe(testName, () => {
-  loadEnv(testName);
+describe(testName, async () => {
   let workers: WorkerManager;
+  workers = await getWorkers(["henry", "ivy"], testName);
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(["henry", "ivy"], testName);
-      expect(workers).toBeDefined();
-      expect(workers.getLength()).toBe(2);
-    } catch (e) {
-      logError(e, expect);
-      throw e;
-    }
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("forceStreamError: should measure force a stream error", async () => {

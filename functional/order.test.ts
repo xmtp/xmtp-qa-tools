@@ -1,32 +1,41 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
-import { calculateMessageStats } from "@helpers/tests";
+import { calculateMessageStats, setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "order";
 loadEnv(testName);
 
-const amount = 5; // Number of messages to collect per receiver
-// 2 seconds per message, multiplied by the total number of participants
-
-describe(testName, () => {
+describe(testName, async () => {
+  const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+  workers = await getWorkers(
+    ["bob", "alice", "joe", "sam", "charlie"],
+    testName,
+  );
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  beforeAll(async () => {
-    workers = await getWorkers(
-      ["bob", "alice", "joe", "sam", "charlie"],
-      testName,
-    );
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, workers);
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("tc_stream: send the stream", async () => {

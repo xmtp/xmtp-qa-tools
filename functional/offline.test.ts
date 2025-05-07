@@ -1,37 +1,52 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { calculateMessageStats } from "@helpers/tests";
+import { calculateMessageStats, setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "recovery";
 loadEnv(testName);
 
 const amountofMessages = 10;
-const participants = ["random1", "random2", "random3"];
 const timeoutMax = 60000; // 1 minute timeout
 
 describe(
   testName,
-  () => {
-    let workers: WorkerManager;
+  async () => {
     let group: Group;
+    let workers: WorkerManager;
+    workers = await getWorkers(["random1", "random2", "random3"], testName);
     let hasFailures = false;
+    let start: number;
+    let testStart: number;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
+
+    setupTestLifecycle({
+      expect,
+      workers,
+      testName,
+      hasFailuresRef: hasFailures,
+      getStart: () => start,
+      setStart: (v) => {
+        start = v;
+      },
+      getTestStart: () => testStart,
+      setTestStart: (v) => {
+        testStart = v;
+      },
+    });
 
     beforeAll(async () => {
       try {
         // Create workers for testing
-        workers = await getWorkers(participants, testName);
         // Create a group conversation
         group = await workers
           .get("random1")!
           .client.conversations.newGroup(
             workers.getWorkers().map((p) => p.client.inboxId),
           );
-
         console.log("Group created", group.id);
       } catch (e) {
         hasFailures = logError(e, expect);
@@ -39,15 +54,6 @@ describe(
       }
     });
 
-    afterAll(async () => {
-      try {
-        await closeEnv(testName, workers);
-        console.log(hasFailures);
-      } catch (e) {
-        hasFailures = logError(e, expect);
-        throw e;
-      }
-    });
     it("tc_offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one worker to take offline

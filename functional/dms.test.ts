@@ -1,76 +1,48 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyStream } from "@helpers/streams";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { setupTestLifecycle } from "@helpers/tests";
+import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "dms";
 loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
+  const workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "randomguy2",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+  );
   let convo: Conversation;
-  let workers: WorkerManager;
   let hasFailures: boolean = false;
   let start: number;
+  let testStart: number;
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(
-        [
-          "henry",
-          "ivy",
-          "jack",
-          "karen",
-          "randomguy",
-          "randomguy2",
-          "larry",
-          "mary",
-          "nancy",
-          "oscar",
-        ],
-        testName,
-      );
-      expect(workers).toBeDefined();
-      expect(workers.getLength()).toBe(10);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("newDm: should measure creating a DM", async () => {
@@ -122,9 +94,19 @@ describe(testName, () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyStream(convo, [
-        workers.get("randomguy")!,
-      ]);
+      const verifyResult = await verifyStream(
+        convo,
+        [workers.get("randomguy")!],
+        "text",
+        1,
+        undefined,
+        undefined,
+        () => {
+          console.log("Message sent, starting timer now");
+          start = performance.now();
+        },
+      );
+
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {

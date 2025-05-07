@@ -1,9 +1,9 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { verifyStreamAll } from "@helpers/streams";
 import { defaultNames, sdkVersionOptions } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "regression";
 loadEnv(testName);
@@ -11,9 +11,6 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions;
-  afterAll(async () => {
-    await closeEnv(testName, workers);
-  });
 
   it("should create a group conversation with all workers", async () => {
     let names = defaultNames.slice(0, versions.length);
