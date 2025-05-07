@@ -116,17 +116,16 @@ async function sendSlackNotification() {
     if (rawErrorLogs) {
       aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
+    /*• *Network:* ${xmtpEnv}
+• *Status:* ${jobStatus}*/
 
     // Create a message with GitHub context and AI analysis
     const message = `*XMTP Test Failure ❌*
-• *Test Suite:* ${testName}
-• *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
-• *URL:* ${workflowUrl}
-• *Network:* ${xmtpEnv}
-• *Status:* ${jobStatus}
-• *Branch:* ${branchName}
-• *Timestamp:* ${new Date().toISOString()}
-${errorLogs}${aiAnalysis}`;
+      • *Test Suite:* ${testName}
+      • *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
+      • *URL:* ${workflowUrl}
+      • *Timestamp:* ${new Date().toISOString()}
+      ${errorLogs}${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
