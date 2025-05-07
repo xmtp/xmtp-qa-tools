@@ -544,26 +544,6 @@ export async function sendPerformanceMetric(
 
     const isSuccess = metricValue <= threshold;
 
-    console.log(
-      JSON.stringify(
-        {
-          metricValue,
-          libxmtp: libXmtpVersion,
-          operation: operationName,
-          test: testNameExtracted,
-          metric_type: "operation",
-          metric_subtype: operationType,
-          description: metricDescription,
-          members: members,
-          success: isSuccess.toString(),
-          threshold: threshold.toString(),
-          region: state.currentGeo,
-        },
-        null,
-        2,
-      ),
-    );
-
     sendMetric("duration", metricValue, {
       libxmtp: libXmtpVersion,
       operation: operationName,

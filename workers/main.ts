@@ -3,6 +3,7 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
 import {
+  ConsentState,
   Dm,
   type Client,
   type DecodedMessage,
@@ -291,9 +292,26 @@ export class WorkerClient extends Worker {
             }
             if (message?.contentType?.typeId === "group_updated") {
               if (this.listenerCount("worker_message") > 0) {
+                // Extract group name from metadata changes
+                const content = message.content as {
+                  metadataFieldChanges?: Array<{
+                    fieldName: string;
+                    oldValue: string;
+                    newValue: string;
+                  }>;
+                };
+
+                const groupName =
+                  content.metadataFieldChanges?.find(
+                    (change) => change.fieldName === "group_name",
+                  )?.newValue || "Unknown";
+
                 this.emit("worker_message", {
-                  type: "stream_group_updated",
-                  group: message,
+                  type: StreamCollectorType.GroupUpdated,
+                  group: {
+                    conversationId: message.conversationId,
+                    name: groupName,
+                  },
                 });
               }
               continue;
@@ -405,7 +423,7 @@ export class WorkerClient extends Worker {
 
             if (this.listenerCount("worker_message") > 0) {
               this.emit("worker_message", {
-                type: "stream_conversation",
+                type: StreamCollectorType.Conversation,
                 conversation,
               });
             }
@@ -427,11 +445,37 @@ export class WorkerClient extends Worker {
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
+            // Each consent update is an array of consent settings
+            console.log(
+              `[${this.nameId}] Received consent update:`,
+              JSON.stringify(consentUpdate),
+            );
             if (this.listenerCount("worker_message") > 0) {
-              this.emit("worker_message", {
-                type: StreamCollectorType.Consent,
-                consentUpdate,
-              });
+              // Process each consent setting in the array
+              if (Array.isArray(consentUpdate) && consentUpdate.length > 0) {
+                for (const consent of consentUpdate) {
+                  // Ensure we're properly formatting the event for our collectors
+                  const consentEvent = {
+                    type: StreamCollectorType.Consent,
+                    consentUpdate: {
+                      inboxId:
+                        typeof consent.entity === "string"
+                          ? consent.entity
+                          : "",
+                      consentValue: consent.state === ConsentState.Allowed, // Convert to boolean based on proper enum
+                    },
+                  };
+
+                  console.log(
+                    `[${this.nameId}] Emitting formatted consent event:`,
+                    JSON.stringify(consentEvent),
+                  );
+
+                  this.emit("worker_message", consentEvent);
+                }
+              } else {
+                console.log(`[${this.nameId}] Skipping empty consent update`);
+              }
             }
           }
         } catch (error) {
@@ -523,12 +567,34 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
   ): Promise<StreamGroupUpdateMessage[]> {
+    console.log(
+      `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
+    );
+
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
-        if (msg.type !== StreamCollectorType.GroupUpdated) return false;
+        console.log(
+          `[${this.nameId}] Filtering group update message:`,
+          JSON.stringify(msg),
+        );
+
+        if (msg.type !== StreamCollectorType.GroupUpdated) {
+          console.log(
+            `[${this.nameId}] Type mismatch: ${msg.type} !== ${StreamCollectorType.GroupUpdated}`,
+          );
+          return false;
+        }
+
         const streamMsg = msg;
-        return groupId === streamMsg.group.conversationId;
+        console.log(
+          `[${this.nameId}] Checking group ID: ${groupId} === ${streamMsg.group?.conversationId}`,
+        );
+
+        const matches = groupId === streamMsg.group?.conversationId;
+        console.log(`[${this.nameId}] Group ID match: ${matches}`);
+
+        return matches;
       },
       count,
       additionalInfo: { groupId },

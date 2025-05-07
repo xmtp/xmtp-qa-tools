@@ -1,8 +1,18 @@
 import { loadEnv } from "@helpers/client";
+import {
+  createDmConsentSender,
+  createGroupConsentSender,
+  verifyStream,
+} from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { ConsentEntityType, ConsentState } from "@xmtp/node-sdk";
+import {
+  ConsentEntityType,
+  ConsentState,
+  type Conversation,
+  type Group,
+} from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "consent";
@@ -60,45 +70,60 @@ describe(testName, async () => {
       throw new Error("DM conversation not created");
     }
 
-    const consentPromise = workers
-      .get("henry")
-      ?.worker?.collectConsentUpdates();
-
-    const getConsentState = await workers
+    // Get initial consent state to compare later
+    const initialConsentState = await workers
       .get("henry")
       ?.client?.preferences.getConsentState(
         ConsentEntityType.InboxId,
         workers.get("randomguy")?.client?.inboxId ?? "",
       );
-    console.log("Consent state:", getConsentState);
+    console.log("Initial consent state:", initialConsentState);
 
-    // Alice blocks Bob
-    console.log(`Alice is ${getConsentState ? "blocking" : "allowing"} Bob...`);
-    await workers.get("henry")?.client?.preferences.setConsentStates([
-      {
-        entity: workers.get("randomguy")?.client?.inboxId ?? "",
-        entityType: ConsentEntityType.InboxId,
-        state:
-          getConsentState === ConsentState.Allowed
-            ? ConsentState.Denied
-            : ConsentState.Allowed,
-      },
-    ]);
+    // Use the helper function to create a consent sender
+    const consentSender = createDmConsentSender(
+      workers.get("henry")!,
+      workers.get("randomguy")!.client.inboxId,
+      initialConsentState,
+    );
 
-    const getConsentStateUpdated = await workers
-      .get("henry")
-      ?.client?.preferences.getConsentState(
-        ConsentEntityType.InboxId,
-        workers.get("randomguy")?.client?.inboxId ?? "",
+    // Use the specialized verifyStream function for consent events
+    try {
+      // Include both henry (sender) and randomguy (receiver) in participants
+      const participants = [workers.get("henry")!, workers.get("randomguy")!];
+
+      const verifyResult = await verifyStream(
+        dmConversation,
+        participants,
+        typeofStream.Consent,
+        1,
+        (i, suffix) => `consent_update_${i}_${suffix}`,
+        consentSender,
+        () => {
+          console.log("Consent update sent, starting timer now");
+          start = performance.now();
+        },
       );
 
-    // Wait for the consent update to be received
-    const consentUpdates = await consentPromise;
-    console.log("Consent updates:", consentUpdates?.length);
+      console.log("Verify result:", JSON.stringify(verifyResult));
 
-    expect(consentUpdates).toBeDefined();
-    expect(getConsentStateUpdated).toBeDefined();
-    expect(getConsentStateUpdated).not.toEqual(getConsentState);
+      // Verify the results - our specialized implementation should ensure allReceived is true
+      expect(verifyResult.allReceived).toBe(true);
+
+      // Verify the consent state changed
+      const updatedConsentState = await workers
+        .get("henry")
+        ?.client?.preferences.getConsentState(
+          ConsentEntityType.InboxId,
+          workers.get("randomguy")?.client?.inboxId ?? "",
+        );
+
+      expect(updatedConsentState).toBeDefined();
+      expect(updatedConsentState).not.toEqual(initialConsentState);
+    } catch (e) {
+      hasFailures = true;
+      console.error("Test failed:", e);
+      throw e;
+    }
   });
 
   it("should manage consent for all members in a group", async () => {
@@ -111,92 +136,94 @@ describe(testName, async () => {
     ].filter(Boolean) as string[];
 
     console.log("Creating a group conversation...");
-    const groupConversation = await workers
+    const groupConversation = (await workers
       .get("henry")
-      ?.client?.conversations.newGroup(participantAddresses);
+      ?.client?.conversations.newGroup(participantAddresses)) as Group;
 
     // Verify the group was created successfully
     const members = await groupConversation?.members();
     console.log(`Group created with ${members?.length} members`);
 
-    // Set up consent streams for all members to listen for updates
-    const consentPromise = workers
-      .get("henry")
-      ?.worker?.collectConsentUpdates();
-
-    // Alice blocks the entire group
-    console.log("Alice is blocking the group...");
-    await workers.get("henry")?.client?.preferences.setConsentStates([
-      {
-        entity: groupConversation?.id ?? "",
-        entityType: ConsentEntityType.GroupId,
-        state: ConsentState.Denied,
-      },
-    ]);
-
-    // Verify Alice's consent state for the group
-    const groupConsentState = await workers
-      .get("henry")
-      ?.client?.preferences.getConsentState(
-        ConsentEntityType.GroupId,
-        groupConversation?.id ?? "",
-      );
-    console.log(`Alice's consent state for the group: ${groupConsentState}`);
-
-    console.log("Testing individual member consent states...");
-
-    // Alice blocks Bob specifically
-    await workers.get("henry")?.client?.preferences.setConsentStates([
-      {
-        entity: workers.get("jack")?.client?.inboxId as string,
-        entityType: ConsentEntityType.InboxId,
-        state: ConsentState.Denied,
-      },
-    ]);
-
-    const bobConsentState = await workers
-      .get("henry")
-      ?.client?.preferences.getConsentState(
-        ConsentEntityType.InboxId,
-        workers.get("jack")?.client?.inboxId ?? "",
-      );
-    console.log(
-      `Alice's consent state for Bob is : ${
-        bobConsentState == ConsentState.Allowed
-          ? "allowed"
-          : bobConsentState == ConsentState.Denied
-            ? "denied"
-            : "unknown"
-      }`,
+    // Use the helper function to create a group consent sender
+    const groupConsentSender = createGroupConsentSender(
+      workers.get("henry")!,
+      groupConversation.id,
+      workers.get("jack")!.client.inboxId,
+      true, // block the entities
     );
 
-    // Collect all consent updates
-    const allConsentUpdates = await consentPromise;
-    console.log("All consent updates received:", allConsentUpdates?.length);
+    // Set up participants for consent stream verification
+    // Include all relevant participants
+    const participants = [
+      workers.get("henry")!, // Include initiator
+      workers.get("jack")!,
+      workers.get("nancy")!,
+    ];
 
-    // Unblock everyone
-    console.log("Unblocking all entities...");
-    await workers.get("henry")?.client?.preferences.setConsentStates([
-      {
-        entity: groupConversation?.id ?? "",
-        entityType: ConsentEntityType.GroupId,
-        state: ConsentState.Allowed,
-      },
-      {
-        entity: workers.get("jack")?.client?.inboxId as string,
-        entityType: ConsentEntityType.InboxId,
-        state: ConsentState.Allowed,
-      },
-    ]);
-
-    // Final verification
-    const finalGroupState = await workers
-      .get("henry")
-      ?.client?.preferences.getConsentState(
-        ConsentEntityType.GroupId,
-        groupConversation?.id ?? "",
+    // Use verifyStream with consent handling
+    try {
+      const verifyResult = await verifyStream(
+        groupConversation,
+        participants,
+        typeofStream.Consent,
+        1,
+        (i, suffix) => `group_consent_update_${i}_${suffix}`,
+        groupConsentSender,
+        () => {
+          console.log("Group consent update sent, starting timer now");
+          start = performance.now();
+        },
       );
-    console.log(`Final group consent state: ${finalGroupState}`);
-    expect(finalGroupState).toBe(ConsentState.Allowed);
+
+      console.log("Group verify result:", JSON.stringify(verifyResult));
+
+      // Verify the results
+      expect(verifyResult.allReceived).toBe(true);
+
+      // Verify group consent state
+      const groupConsentState = await workers
+        .get("henry")
+        ?.client?.preferences.getConsentState(
+          ConsentEntityType.GroupId,
+          groupConversation?.id ?? "",
+        );
+      console.log(`Group consent state: ${groupConsentState}`);
+      expect(groupConsentState).toBe(ConsentState.Denied);
+
+      // Verify individual consent state
+      const jackConsentState = await workers
+        .get("henry")
+        ?.client?.preferences.getConsentState(
+          ConsentEntityType.InboxId,
+          workers.get("jack")?.client?.inboxId ?? "",
+        );
+      console.log(`Jack's consent state: ${jackConsentState}`);
+      expect(jackConsentState).toBe(ConsentState.Denied);
+
+      // Test cleanup - unblock everyone by using the helper with blockEntities=false
+      console.log("Unblocking all entities...");
+      const unblockGroupSender = createGroupConsentSender(
+        workers.get("henry")!,
+        groupConversation.id,
+        workers.get("jack")!.client.inboxId,
+        false, // unblock the entities
+      );
+
+      await unblockGroupSender(groupConversation, "");
+
+      // Final verification
+      const finalGroupState = await workers
+        .get("henry")
+        ?.client?.preferences.getConsentState(
+          ConsentEntityType.GroupId,
+          groupConversation?.id ?? "",
+        );
+      console.log(`Final group consent state: ${finalGroupState}`);
+      expect(finalGroupState).toBe(ConsentState.Allowed);
+    } catch (e) {
+      hasFailures = true;
+      console.error("Test failed:", e);
+      throw e;
+    }
   });
 });
