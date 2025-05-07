@@ -462,7 +462,18 @@ export class WorkerClient extends Worker {
     return new Promise((resolve) => {
       const events: T[] = [];
       const onMessage = (msg: StreamMessage) => {
-        const isRightType = msg.type === `stream_${type}`;
+        // Map from typeofStream to StreamCollectorType
+        const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
+          {
+            [typeofStream.Message]: StreamCollectorType.Message,
+            [typeofStream.GroupUpdated]: StreamCollectorType.GroupUpdated,
+            [typeofStream.Conversation]: StreamCollectorType.Conversation,
+            [typeofStream.Consent]: StreamCollectorType.Consent,
+            [typeofStream.None]: null,
+          };
+
+        const expectedType = streamTypeMap[type];
+        const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
         if (isRightType && passesFilter) {
