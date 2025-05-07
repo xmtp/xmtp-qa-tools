@@ -85,6 +85,45 @@ export class OpenAIService {
       return "";
     }
   }
+  async analyzeErrorLogs(errorLogs: string): Promise<string> {
+    if (!this.initialize()) {
+      console.log("OpenAI API key not found. Skipping error analysis.");
+      return "";
+    }
+
+    try {
+      console.log(`Analyzing error logs with ${this.model}...`);
+
+      if (!this.openai) {
+        return "";
+      }
+
+      const completion = await this.openai.chat.completions.create({
+        model: this.model,
+        messages: [
+          {
+            role: "system",
+            content: `You are a helpful assistant that analyzes error logs from XMTP tests. Just return the error logs but filter polish it and filter out unnecessary information.
+              
+              `,
+          },
+          {
+            role: "user",
+            content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
+          },
+        ],
+        max_tokens: 500,
+      });
+
+      const analysisContent = completion.choices[0]?.message?.content;
+      return analysisContent ? `\n\n*AI Analysis:*\n${analysisContent}` : "";
+    } catch (error: unknown) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      console.error("Error analyzing logs with GPT:", errorMessage);
+      return "";
+    }
+  }
 
   /**
    * Generate a response to a user message
