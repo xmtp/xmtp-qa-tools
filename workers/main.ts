@@ -502,10 +502,6 @@ export class WorkerClient extends Worker {
       .map(([key, value]) => `${key}:${value}`)
       .join(", ");
 
-    console.log(
-      `[${this.nameId}] Collecting ${count} ${type}${filterInfo ? ` (${filterInfo})` : ""}`,
-    );
-
     return new Promise((resolve) => {
       const events: T[] = [];
       const onMessage = (msg: StreamMessage) => {

@@ -53,7 +53,7 @@ describe(
       }
     });
 
-    it("tc_offline_recovery: verify message recovery after disconnection", async () => {
+    it("offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one worker to take offline
         const offlineWorker = workers.get("random2")!; // Second worker

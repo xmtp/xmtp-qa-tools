@@ -68,7 +68,7 @@ it("should verify message delivery in a group", async () => {
     participants.map((p) => p.client.inboxId),
   );
 
-  const result = await verifyStreamAll(group, workers);
+  const result = await verifyMessageStreamAll(group, workers);
   expect(result.allReceived).toBe(true);
 });
 ```
@@ -119,7 +119,7 @@ it("should send and receive gm message", async () => {
   const dm = await client.conversations.newDm(receiverInboxId);
   await dm.send("gm");
 
-  const verifyResult = await verifyStream(dm, [receiver]);
+  const verifyResult = await verifyMessageStream(dm, [receiver]);
   expect(verifyResult.allReceived).toBe(true);
 });
 ```
@@ -209,7 +209,7 @@ it("should handle message broadcast to large groups", async () => {
   }
 
   // Verify delivery to all members
-  const result = await verifyStreamAll(largeGroup, workers);
+  const result = await verifyMessageStreamAll(largeGroup, workers);
   expect(result.allReceived).toBe(true);
 });
 ```

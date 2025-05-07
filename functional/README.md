@@ -302,7 +302,7 @@ The `streams.test.ts` module tests message streaming functionality.
 // Test stream message delivery
 it("receiveGM: should receive a message via stream", async () => {
   const convo = await client.conversations.newDm(recipientInboxId);
-  const verifyResult = await verifyStream(convo, [recipient]);
+  const verifyResult = await verifyMessageStream(convo, [recipient]);
   expect(verifyResult.allReceived).toBe(true);
 });
 ```

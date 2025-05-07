@@ -2,13 +2,15 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
   createGroupConsentSender,
+  verifyConsentStream,
   verifyConversationStream,
-  verifyStream,
+  verifyGroupUpdateStream,
+  verifyMessageStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Conversation } from "@xmtp/node-sdk";
+import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "streams";
@@ -83,11 +85,9 @@ describe(testName, async () => {
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
       // Verify message delivery
-      const verifyResult = await verifyStream(
-        newDm,
-        [workers.get("randomguy")!],
-        typeofStream.Message,
-      );
+      const verifyResult = await verifyMessageStream(newDm, [
+        workers.get("randomguy")!,
+      ]);
 
       // Assert results
       expect(verifyResult.messages.length).toEqual(1);
@@ -101,11 +101,9 @@ describe(testName, async () => {
   it("verifyGroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      const verifyResult = await verifyStream(
-        group,
-        [workers.get("randomguy")!],
-        typeofStream.GroupUpdated,
-      );
+      const verifyResult = await verifyGroupUpdateStream(group as Group, [
+        workers.get("randomguy")!,
+      ]);
 
       // Assert results
       expect(verifyResult.messages.length).toEqual(1);
@@ -119,39 +117,24 @@ describe(testName, async () => {
   it("verifyConsentStream: manage consent for all members in a group", async () => {
     workers = await getWorkers(names, testName, typeofStream.Consent);
 
-    console.log("Initializing workers for consent test:", names.join(", "));
-    console.log(`Henry inbox ID: ${workers.get("henry")!.client.inboxId}`);
-    console.log(
-      `Randomguy inbox ID: ${workers.get("randomguy")!.client.inboxId}`,
-    );
-
-    // Use the helper function to create a group consent sender
-    // Henry is updating the consent for randomguy's inboxId and the group
-    const groupConsentSender = createGroupConsentSender(
-      workers.get("henry")!, // henry is doing the consent update
-      group.id, // for this group
-      workers.get("randomguy")!.client.inboxId, // blocking randomguy
-      true, // block the entities
-    );
-
-    // Use verifyStream with consent handling
     try {
+      const groupConsentSender = createGroupConsentSender(
+        workers.get("henry")!, // henry is doing the consent update
+        group.id, // for this group
+        workers.get("randomguy")!.client.inboxId, // blocking randomguy
+        true, // block the entities
+      );
+
+      const consentAction = async () => {
+        await groupConsentSender(group, "consent");
+      };
+
       console.log("Starting consent verification process");
 
-      // Important: Henry should be the one receiving consent events
-      // because it's the one that is updating the consent preferences
-      // in the createGroupConsentSender function
-      const verifyResult = await verifyStream(
-        group,
-        [workers.get("henry")!], // CHANGED: Listen on henry, not randomguy
-        typeofStream.Consent,
-        1,
-        (i, suffix) => `group_consent_update_${i}_${suffix}`,
-        groupConsentSender,
-        () => {
-          console.log("Group consent update sent, starting timer now");
-          start = performance.now();
-        },
+      const verifyResult = await verifyConsentStream(
+        workers.get("henry")!,
+        [workers.get("randomguy")!],
+        consentAction,
       );
 
       console.log("Group verify result:", JSON.stringify(verifyResult));

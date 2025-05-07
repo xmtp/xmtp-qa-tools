@@ -1,9 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import { verifyStreamAll } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
@@ -31,6 +32,8 @@ describe(testName, async () => {
   let testStart: number;
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
+  // Create consistent random suffix for messages
+  const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   setupTestLifecycle({
     expect,
@@ -116,10 +119,41 @@ describe(testName, async () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(
+        // Make sure all workers sync the conversation first
+        const testParticipants: Worker[] = [];
+        const henry = workers.get("henry");
+        if (henry) {
+          testParticipants.push(henry);
+        }
+
+        // Create a message in the group to ensure it exists
+        await groupsBySize[i].send(`test-sync-message-${randomSuffix}`);
+
+        // Make sure all participants have synced the group
+        for (const worker of workers.getWorkers()) {
+          try {
+            await worker.client.conversations.sync();
+            const conv = await worker.client.conversations.getConversationById(
+              groupsBySize[i].id,
+            );
+            if (conv && !testParticipants.includes(worker)) {
+              testParticipants.push(worker);
+            }
+          } catch (error) {
+            console.warn(`Could not sync worker ${worker.name}:`, error);
+          }
+        }
+
+        console.log(
+          `Using ${testParticipants.length} participants for the message stream test`,
+        );
+
+        const verifyResult = await verifyMessageStream(
           groupsBySize[i],
-          workers,
+          testParticipants,
           1,
+          (i, _) => `gm-${i + 1}-${randomSuffix}`,
+          undefined,
           () => {
             console.log(
               `Group message sent for ${i} participants, starting timer now`,

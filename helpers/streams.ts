@@ -47,7 +47,7 @@ interface ConsentUpdateMessage {
   };
 }
 
-// Define the expected return type of verifyStream
+// Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
   messages: string[][];
@@ -163,51 +163,168 @@ export function createGroupConsentSender(
 }
 
 /**
- * Verifies stream functionality for all workers in a group
+ * Prepare the participants and conversation details
  */
-export async function verifyStreamAll(
+async function prepareParticipants(
   group: Conversation,
-  participants: WorkerManager,
-  count = 1,
-  onMessageSent?: () => void,
-) {
-  const allWorkers = await getWorkersFromGroup(group, participants);
-  return verifyStream(
-    group,
-    allWorkers,
-    typeofStream.Message,
-    count,
-    undefined,
-    undefined,
-    onMessageSent,
+  participants: Worker[],
+): Promise<{
+  conversationId: string;
+  randomSuffix: string;
+  receivers: Worker[];
+}> {
+  const conversationId = group.id;
+  const randomSuffix = Math.random().toString(36).substring(2, 15);
+  const creatorId = (await group.metadata()).creatorInboxId;
+  const receivers = participants.filter((p) => p.client?.inboxId !== creatorId);
+
+  // Sync conversations for all receivers
+  await Promise.all(
+    receivers.map((r) =>
+      r.client.conversations.sync().catch((err: unknown) => {
+        console.error(`Error syncing for ${r.name}:`, err);
+      }),
+    ),
   );
+  await sleep(defaultValues.streamTimeout);
+
+  return { conversationId, randomSuffix, receivers };
 }
 
 /**
- * Helper to create a promise that times out after a specified duration
+ * Specialized function to verify message streams
  */
-function withTimeout<T>(
-  promise: Promise<T>,
-  timeoutMs: number,
-  fallbackValue: T,
-): Promise<T> {
-  let timeoutHandle: NodeJS.Timeout;
-  const timeoutPromise = new Promise<T>((resolve) => {
-    timeoutHandle = setTimeout(() => {
-      console.log(
-        `Operation timed out after ${timeoutMs}ms, using fallback value`,
-      );
-      resolve(fallbackValue);
-    }, timeoutMs);
+export async function verifyMessageStream<T extends string = string>(
+  group: Conversation,
+  participants: Worker[],
+  count = 1,
+  generator: (i: number, suffix: string) => T = (i, suffix): T =>
+    `gm-${i + 1}-${suffix}` as T,
+  sender: (group: Conversation, payload: string) => Promise<string> = async (
+    g,
+    payload,
+  ) => await g.send(payload),
+  onMessageSent?: () => void,
+): Promise<VerifyStreamResult> {
+  const { conversationId, randomSuffix, receivers } = await prepareParticipants(
+    group,
+    participants,
+  );
+
+  // Configure collectors for message streams
+  console.log(`Setting up ${receivers.length} collectors for messages`);
+  const collectPromises: Promise<T[]>[] = receivers.map((r) => {
+    console.log(
+      `Setting up collector for ${r.name} to watch ${conversationId}`,
+    );
+
+    return r.worker
+      .collectMessages(conversationId, typeofStream.Message, count)
+      .then((msgs: StreamMessage[]) => {
+        console.log(
+          `Received messages for ${r.name}:`,
+          JSON.stringify(msgs.map((m) => m.message.content)),
+        );
+        return msgs.map((m) => m.message.content as T);
+      })
+      .catch((err: unknown) => {
+        console.error(`Error collecting messages for ${r.name}:`, err);
+        return [] as T[];
+      });
   });
 
-  return Promise.race([
-    promise.then((result) => {
-      clearTimeout(timeoutHandle);
-      return result;
-    }),
-    timeoutPromise,
-  ]);
+  // Generate all messages first for consistent handling
+  const sentMessages: T[] = Array.from({ length: count }, (_, i) =>
+    generator(i, randomSuffix),
+  );
+
+  // Send messages with optional callback after first message
+  for (let i = 0; i < count; i++) {
+    await sender(group, sentMessages[i]);
+    if (i === 0 && onMessageSent) {
+      onMessageSent();
+    }
+    // Add a small delay between messages to ensure they are delivered in order
+    if (i < count - 1) {
+      await sleep(500);
+    }
+  }
+
+  // Collect and process results
+  const streamCollectedMessages = await Promise.all(collectPromises);
+  const streamAllReceived = streamCollectedMessages.every(
+    (msgs) => msgs?.length === count,
+  );
+
+  return {
+    allReceived: streamAllReceived,
+    messages: streamCollectedMessages,
+  };
+}
+
+/**
+ * Specialized function to verify group update streams
+ */
+export async function verifyGroupUpdateStream<T extends string = string>(
+  group: Group,
+  participants: Worker[],
+  count = 1,
+  generator: (i: number, suffix: string) => T = (i, suffix): T =>
+    `New name-${i + 1}-${suffix}` as T,
+  onUpdatePerformed?: () => void,
+): Promise<VerifyStreamResult> {
+  const { conversationId, randomSuffix, receivers } = await prepareParticipants(
+    group,
+    participants,
+  );
+
+  // Configure collectors for group update streams
+  console.log(`Setting up ${receivers.length} collectors for group updates`);
+  const collectPromises: Promise<T[]>[] = receivers.map((r) => {
+    console.log(
+      `Setting up collector for ${r.name} to watch ${conversationId}`,
+    );
+
+    return r.worker
+      .collectGroupUpdates(conversationId, count)
+      .then((msgs: GroupUpdateMessage[]) => {
+        console.log(
+          `Received group updates for ${r.name}:`,
+          JSON.stringify(msgs),
+        );
+        return msgs.length > 0 ? msgs.map((m) => m.group.name as T) : [];
+      })
+      .catch((err: unknown) => {
+        console.error(`Error collecting group updates for ${r.name}:`, err);
+        return [] as T[];
+      });
+  });
+
+  // Generate all update names first for consistent handling
+  const updateNames: T[] = Array.from({ length: count }, (_, i) =>
+    generator(i, randomSuffix),
+  );
+
+  // Perform group updates with optional callback after first update
+  for (let i = 0; i < count; i++) {
+    await group.updateName(updateNames[i]);
+    console.log(`Updated group name to ${updateNames[i]}`);
+
+    if (i === 0 && onUpdatePerformed) {
+      onUpdatePerformed();
+    }
+  }
+
+  // Collect and process results
+  const streamCollectedMessages = await Promise.all(collectPromises);
+  const streamAllReceived = streamCollectedMessages.every(
+    (msgs) => msgs?.length === count,
+  );
+
+  return {
+    allReceived: streamAllReceived,
+    messages: streamCollectedMessages,
+  };
 }
 
 /**
@@ -238,10 +355,7 @@ export async function verifyConsentStream(
   const consentPromise = initiator.worker
     .collectConsentUpdates(1)
     .then((updates) => {
-      console.log(
-        `[CONSENT-COLLECTOR] Collected consent updates:`,
-        JSON.stringify(updates),
-      );
+      console.log(`Collected consent updates:`, JSON.stringify(updates));
       return updates.length > 0
         ? [
             `consent:${updates[0].consentUpdate.inboxId}:${updates[0].consentUpdate.consentValue ? "allowed" : "denied"}`,
@@ -291,129 +405,6 @@ export async function verifyConsentStream(
 }
 
 /**
- * Verifies message streaming with flexible message generation and sending
- */
-export async function verifyStream<T extends string = string>(
-  group: Conversation,
-  participants: Worker[],
-  collectorType = typeofStream.Message,
-  count = 1,
-  generator: (i: number, suffix: string) => T = (i, suffix): T =>
-    `gm-${i + 1}-${suffix}` as T,
-  sender: (group: Conversation, payload: string) => Promise<string> = async (
-    g,
-    payload,
-  ) => await g.send(payload),
-  onMessageSent?: () => void,
-): Promise<VerifyStreamResult> {
-  // Special case for consent streams which need different handling
-  if (collectorType === typeofStream.Consent) {
-    // For consent events, we need to handle differently since they're not tied to conversations
-    console.log("Using specialized consent stream verification");
-
-    // For consent events, we want to use the first participant directly
-    // since it's specified explicitly in the test
-    const initiator = participants[0];
-    console.log(`Using ${initiator.name} as the initiator for consent events`);
-
-    return verifyConsentStream(
-      initiator,
-      participants.slice(1), // Other participants if any
-      async () => {
-        const randomSuffix = Math.random().toString(36).substring(2, 15);
-        const payload = generator(0, randomSuffix) as string;
-        if (onMessageSent) {
-          onMessageSent();
-        }
-        await sender(group, payload);
-      },
-    );
-  }
-
-  // Configure generator and sender based on collector type
-  if (collectorType === typeofStream.GroupUpdated) {
-    generator = ((i: number, suffix: string) =>
-      `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
-    sender = (async (g: Group, payload: string) => {
-      await g.updateName(payload);
-      console.log(`Updated group name to ${payload}`);
-    }) as unknown as typeof sender;
-  }
-
-  // Prepare the participants and conversation details
-  const conversationId = group.id;
-  const randomSuffix = Math.random().toString(36).substring(2, 15);
-  const creatorId = (await group.metadata()).creatorInboxId;
-  const receivers = participants.filter((p) => p.client?.inboxId !== creatorId);
-
-  // Sync conversations for all receivers
-  await Promise.all(
-    receivers.map((r) =>
-      r.client.conversations.sync().catch((err: unknown) => {
-        console.error(`Error syncing for ${r.name}:`, err);
-      }),
-    ),
-  );
-  await sleep(defaultValues.streamTimeout);
-
-  // Configure collectors based on the type of stream
-  console.log(`Setting up ${receivers.length} collectors for ${collectorType}`);
-  const collectPromises: Promise<T[]>[] = receivers.map((r) => {
-    console.log(
-      `Setting up collector for ${r.name} to watch ${conversationId}`,
-    );
-
-    if (collectorType === typeofStream.Message) {
-      return r.worker
-        .collectMessages(conversationId, collectorType, count)
-        .then((msgs: StreamMessage[]) =>
-          msgs.map((m) => m.message.content as T),
-        );
-    } else if (collectorType === typeofStream.GroupUpdated) {
-      return r.worker
-        .collectGroupUpdates(conversationId, count)
-        .then((msgs: GroupUpdateMessage[]) => {
-          console.log(
-            `Received group updates for ${r.name}:`,
-            JSON.stringify(msgs),
-          );
-          return msgs.length > 0 ? msgs.map((m) => m.group.name as T) : [];
-        })
-        .catch((err: unknown) => {
-          console.error(`Error collecting group updates for ${r.name}:`, err);
-          return [] as T[];
-        });
-    }
-
-    return Promise.resolve([] as T[]);
-  });
-
-  // Generate all messages first for consistent handling
-  const sentMessages: T[] = Array.from({ length: count }, (_, i) =>
-    generator(i, randomSuffix),
-  );
-
-  // Send messages with optional callback after first message
-  for (let i = 0; i < count; i++) {
-    await sender(group, sentMessages[i]);
-    if (i === 0 && onMessageSent) {
-      onMessageSent();
-    }
-  }
-
-  // Collect and process results
-  const streamCollectedMessages = await Promise.all(collectPromises);
-  const streamAllReceived = streamCollectedMessages.every(
-    (msgs) => msgs?.length === count,
-  );
-
-  return {
-    allReceived: streamAllReceived,
-    messages: streamCollectedMessages,
-  };
-}
-
-/**
  * Verifies conversation streaming functionality
  */
 export async function verifyConversationStream(
@@ -435,10 +426,15 @@ export async function verifyConversationStream(
       return Promise.resolve<ConversationNotification[] | null>(null);
     }
 
-    return participant.worker.collectConversations(
-      initiator.client.inboxId,
-      1, // Expect one conversation
-    ) as Promise<ConversationNotification[]>;
+    return participant.worker
+      .collectConversations(initiator.client.inboxId, 1)
+      .then((msgs) => {
+        console.log(
+          `Received conversations for ${participant.name}:`,
+          JSON.stringify(msgs),
+        );
+        return msgs;
+      });
   });
 
   // Get participant addresses and create group

@@ -1,9 +1,8 @@
 import { loadEnv } from "@helpers/client";
 import { getWorkersFromGroup } from "@helpers/groups";
-import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
+import { verifyMessageStream, type VerifyStreamResult } from "@helpers/streams";
 import { calculateMessageStats } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -40,7 +39,7 @@ describe(testName, async () => {
     },
   });
 
-  it("tc_stream: send the stream", async () => {
+  it("stream: send the stream", async () => {
     // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
     group = await workers
       .get("bob")!
@@ -51,18 +50,22 @@ describe(testName, async () => {
     expect(group.id).toBeDefined();
 
     // Collect messages by setting up listeners before sending and then sending known messages.
-    collectedMessages = await verifyStream(
+    collectedMessages = await verifyMessageStream(
       group,
       workers.getWorkers(),
-      typeofStream.Message,
       amount,
-      (index) => `gm-${index + 1}-${randomSuffix}`,
+      (i, _) => `gm-${i + 1}-${randomSuffix}`,
+      undefined,
+      () => {
+        console.log("Message sent, starting timer now");
+        start = performance.now();
+      },
     );
     console.log("allReceived", collectedMessages.allReceived);
     expect(collectedMessages.allReceived).toBe(true);
   });
 
-  it("tc_stream_order: verify message order when receiving via streams", () => {
+  it("stream_order: verify message order when receiving via streams", () => {
     // Group messages by worker
     const messagesByWorker: string[][] = [];
 
@@ -83,7 +86,7 @@ describe(testName, async () => {
     expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
   });
 
-  it("tc_poll: should verify message order when receiving via pull", async () => {
+  it("poll: should verify message order when receiving via pull", async () => {
     group = await workers
       .get("bob")!
       .client.conversations.newGroup([
@@ -104,7 +107,7 @@ describe(testName, async () => {
     }
   });
 
-  it("tc_poll_order: verify message order when receiving via pull", async () => {
+  it("poll_order: verify message order when receiving via pull", async () => {
     const workersFromGroup = await getWorkersFromGroup(group, workers);
     const messagesByWorker: string[][] = [];
 

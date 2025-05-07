@@ -2,10 +2,9 @@ import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
+import { verifyMessageStream, type VerifyStreamResult } from "@helpers/streams";
 import { calculateMessageStats } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -62,17 +61,17 @@ describe(testName, async () => {
     },
   });
 
-  it("tc_stream: send the stream", async () => {
+  it("stream: send the stream", async () => {
     try {
       expect(group.id).toBeDefined();
 
       // Collect messages by setting up listeners before sending and then sending known messages.
-      collectedMessages = await verifyStream(
+      collectedMessages = await verifyMessageStream(
         group,
         workers.getWorkers(),
-        typeofStream.Message,
         amountofMessages,
-        (index) => `gm-${index + 1}-${randomSuffix}`,
+        undefined,
+        undefined,
       );
       expect(collectedMessages.allReceived).toBe(true);
     } catch (e) {
@@ -81,7 +80,7 @@ describe(testName, async () => {
     }
   });
 
-  it("tc_stream_order: verify message order when receiving via streams", () => {
+  it("stream_order: verify message order when receiving via streams", () => {
     try {
       // Group messages by worker
       const messagesByWorker: string[][] = [];
@@ -124,7 +123,7 @@ describe(testName, async () => {
     }
   });
 
-  it("tc_poll_order: verify message order when receiving via pull", async () => {
+  it("poll_order: verify message order when receiving via pull", async () => {
     try {
       const workersFromGroup = await getWorkersFromGroup(group, workers);
       const messagesByWorker: string[][] = [];
@@ -183,7 +182,7 @@ describe(testName, async () => {
     }
   });
 
-  it("tc_offline_recovery: verify message recovery after disconnection", async () => {
+  it("offline_recovery: verify message recovery after disconnection", async () => {
     try {
       // Select one worker to take offline
       const offlineWorker = workers.get("bob")!; // Second worker

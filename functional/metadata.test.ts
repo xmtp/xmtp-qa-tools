@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { verifyStream } from "@helpers/streams";
+import { verifyGroupUpdateStream, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -56,11 +56,9 @@ describe(testName, async () => {
   });
 
   it("TC_ReceiveMetadata: should update group name", async () => {
-    const verifyResult = await verifyStream(
-      group,
-      [workers.get("oscar")!],
-      typeofStream.GroupUpdated,
-    );
+    const verifyResult = await verifyGroupUpdateStream(group, [
+      workers.get("oscar")!,
+    ]);
     expect(verifyResult.allReceived).toBe(true);
   });
 

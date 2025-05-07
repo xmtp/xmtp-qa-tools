@@ -23,7 +23,7 @@ describe(testName, () => {
     );
   });
 
-  it("tc_stream: send the stream", async () => {
+  it("stream: send the stream", async () => {
     group = await creatorClient.conversations.newGroup(
       workers.getWorkers().map((p) => p.client.inboxId),
     );

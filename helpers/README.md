@@ -28,7 +28,7 @@ The helper modules are designed to be imported and used in test suites:
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { verifyStream, verifyStreamAll } from "@helpers/streams";
+import { verifyMessageStream, verifyMessageStreamAll } from "@helpers/streams";
 ```
 
 ## 🔑 Client Module
@@ -178,10 +178,10 @@ The `streams.ts` module provides utilities for testing message delivery through 
 
 ```typescript
 // Verify that all participants in a group receive messages
-const result = await verifyStreamAll(group, workers, messageCount);
+const result = await verifyMessageStreamAll(group, workers, messageCount);
 
 // Verify message delivery with custom settings
-const result = await verifyStream(
+const result = await verifyMessageStream(
   group,
   participants,
   contentType,
@@ -283,10 +283,10 @@ Handles stream utilities for testing message delivery:
 
 ```typescript
 // Verify that all participants in a group receive messages
-const result = await verifyStreamAll(group, workers, messageCount);
+const result = await verifyMessageStreamAll(group, workers, messageCount);
 
 // Verify message delivery with custom settings
-const result = await verifyStream(
+const result = await verifyMessageStream(
   group,
   participants,
   contentType,

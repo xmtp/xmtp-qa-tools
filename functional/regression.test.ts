@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { verifyStreamAll } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { defaultNames, sdkVersionOptions } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -33,7 +33,7 @@ describe(testName, () => {
     const group = await creator?.client.conversations.newGroup(inboxIds);
     console.log(`Group created with id ${group?.id}`);
 
-    const verifyResult = await verifyStreamAll(group, workers);
+    const verifyResult = await verifyMessageStream(group, allWorkers);
     if (verifyResult.messages.length !== versions.length) {
       console.log("messages", verifyResult.messages.length);
     }
