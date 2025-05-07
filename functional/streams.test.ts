@@ -100,7 +100,7 @@ describe(testName, async () => {
 
   it("receiveGroupMetadata: should update group name", async () => {
     try {
-      workers = await getWorkers(names, testName, typeofStream.Message);
+      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       const verifyResult = await verifyStream(
         group,
         [workers.get("randomguy")!],
