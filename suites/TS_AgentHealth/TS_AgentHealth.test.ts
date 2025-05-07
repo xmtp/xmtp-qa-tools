@@ -37,7 +37,7 @@ describe(testName, () => {
   // For local testing, test all agents on their supported networks
   for (const agent of typedAgents) {
     for (const network of agent.networks) {
-      it(`${agent.name} ${network}`, async () => {
+      it(`Check ${agent.name} health on ${network} network`, async () => {
         try {
           console.log(`Testing ${agent.name} on ${network}`);
           const xmtpTester = new XmtpPlaywright({
