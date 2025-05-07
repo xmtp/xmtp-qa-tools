@@ -1,7 +1,12 @@
 import { getWorkersFromGroup } from "@helpers/groups";
 import { typeofStream } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { type Conversation, type Group } from "@xmtp/node-sdk";
+import {
+  ConsentState,
+  type Client,
+  type Conversation,
+  type Group,
+} from "@xmtp/node-sdk";
 import { defaultValues } from "./tests";
 
 // Define types for message and group update structures
@@ -30,6 +35,15 @@ interface ConversationNotification {
   conversation: {
     id: string;
     peerAddress?: string;
+  };
+}
+
+// Define type for consent notification
+interface ConsentNotification {
+  type: string;
+  consent: {
+    id: string;
+    value: boolean;
   };
 }
 
@@ -70,10 +84,11 @@ export async function verifyStream<T extends string = string>(
   count = 1,
   generator: (i: number, suffix: string) => T = (i, suffix): T =>
     `gm-${i + 1}-${suffix}` as T,
-  sender: (group: Conversation, payload: string) => Promise<string> = async (
-    g,
-    payload,
-  ) => await g.send(payload),
+  sender: (
+    group: Conversation,
+    payload: string,
+  ) => Promise<string> | Promise<void> = async (g, payload) =>
+    await g.send(payload),
   onMessageSent?: () => void,
 ): Promise<VerifyStreamResult> {
   // Use name updater for group_updated collector type
@@ -86,14 +101,20 @@ export async function verifyStream<T extends string = string>(
   } else if (collectorType === typeofStream.Conversation) {
     generator = ((i: number, suffix: string) =>
       `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
-    sender = (async (client: Client, payload: string) => {
-      await client.conversations.newGroup(payload);
+    sender = (async (g: Conversation, payload: string) => {
+      // Create a new conversation using the first participant's client
+      const client = participants[0]?.client;
+      if (client) {
+        await client.conversations.newGroup([payload]);
+      }
     }) as unknown as typeof sender;
   } else if (collectorType === typeofStream.Consent) {
     generator = ((i: number, suffix: string) =>
       `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
-    sender = (async (g: Group, payload: number) => {
-      await (g.updateConsentState(payload as ConsentState) as Promise<void>);
+    sender = (async (g: Group, payload: string) => {
+      // Toggle the consent state
+      const consentState = ConsentState.Denied;
+      await g.updateConsentState(consentState);
     }) as unknown as typeof sender;
   }
 
@@ -158,11 +179,9 @@ export async function verifyStream<T extends string = string>(
       if (!r.worker) {
         return Promise.resolve([]);
       }
-      return r.worker
-        .collectConsents(conversationId, count)
-        .then((msgs: ConsentNotification[]) => {
-          return msgs.map((m) => m.consent.id as T);
-        });
+      return r.worker.collectConsentUpdates(count).then((msgs: any[]) => {
+        return msgs.map((m) => (m.consentUpdate?.inboxId || "unknown") as T);
+      });
     });
   }
 
