@@ -40,8 +40,6 @@ describe(
 
     beforeAll(async () => {
       try {
-        // Create workers for testing
-        // Create a group conversation
         group = await workers
           .get("random1")!
           .client.conversations.newGroup(

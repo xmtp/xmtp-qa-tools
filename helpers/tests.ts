@@ -61,7 +61,13 @@ import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
-import { afterAll, afterEach, beforeEach, expect } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeEach,
+  expect,
+  type ExpectStatic,
+} from "vitest";
 import { sendPerformanceResult, sendTestResults } from "./datadog";
 import { logError } from "./logger";
 
@@ -468,7 +474,7 @@ export const setupTestLifecycle = ({
   setStart,
   setTestStart,
 }: {
-  expect: typeof import("vitest").expect;
+  expect: ExpectStatic;
   workers: WorkerManager;
   testName: string;
   hasFailuresRef: boolean;
@@ -478,7 +484,6 @@ export const setupTestLifecycle = ({
   setTestStart: (v: number) => void;
 }) => {
   beforeEach(() => {
-    console.log("Setting up test lifecycle");
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
     getTestStart();

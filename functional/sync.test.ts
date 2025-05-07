@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
 loadEnv(testName);
@@ -22,17 +22,7 @@ describe(testName, () => {
     "karen", // Test sync at conversation level
     "larry", // Test messages without sync
   ];
-
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(testWorkers, testName);
-      expect(workers).toBeDefined();
-      expect(workers.getLength()).toBe(testWorkers.length);
-    } catch (e) {
-      logError(e, expect);
-      throw e;
-    }
-  });
+  workers = await getWorkers(testWorkers, testName);
 
   it("should create a test group with all participants", async () => {
     try {

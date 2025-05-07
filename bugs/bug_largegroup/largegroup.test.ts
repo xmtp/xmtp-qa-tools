@@ -1,34 +1,45 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "largegroup";
 loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   let group: Conversation;
-
-  beforeAll(async () => {
-    workers = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, workers);
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+  workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+  );
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it(`createGroup-450: should create a large group of 450 participants 450`, async () => {
