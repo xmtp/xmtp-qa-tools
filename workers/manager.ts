@@ -5,15 +5,7 @@ import { generateEncryptionKeyHex } from "@helpers/client";
 import { defaultValues, sdkVersionOptions, sdkVersions } from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { WorkerClient } from "./main";
-
-export type typeofStream =
-  | "message"
-  | "conversation"
-  | "consent"
-  | "group_updated"
-  | "none";
-export type typeOfResponse = "gm" | "gpt" | "none";
+import { typeOfResponse, typeofStream, WorkerClient } from "./main";
 
 export interface WorkerBase {
   name: string;
@@ -46,8 +38,8 @@ export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private testName: string;
   private activeWorkers: WorkerClient[] = [];
-  private typeofStream: typeofStream = "message";
-  private typeOfResponse: typeOfResponse = "gm";
+  private typeofStream: typeofStream = typeofStream.Message;
+  private typeOfResponse: typeOfResponse = typeOfResponse.Gm;
   private env: XmtpEnv;
   private keysCache: Record<
     string,
@@ -59,13 +51,13 @@ export class WorkerManager {
    */
   constructor(
     testName: string,
-    typeofStream: typeofStream = "message",
-    typeOfResponse: typeOfResponse = "gm",
+    typeofStreamType: typeofStream = typeofStream.Message,
+    typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
     env: XmtpEnv,
   ) {
     this.testName = testName;
-    this.typeofStream = typeofStream;
-    this.typeOfResponse = typeOfResponse;
+    this.typeofStream = typeofStreamType;
+    this.typeOfResponse = typeOfResponseType;
     this.env = env;
     this.workers = {};
   }
@@ -371,15 +363,15 @@ export class WorkerManager {
 export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   testName: string,
-  typeofStream: typeofStream = "message",
-  typeOfResponse: typeOfResponse = "gm",
+  typeofStreamType: typeofStream = typeofStream.Message,
+  typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
   randomVersions: boolean = false,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
-    typeofStream,
-    typeOfResponse,
+    typeofStreamType,
+    typeOfResponseType,
     env,
   );
   await manager.createWorkers(descriptorsOrAmount, randomVersions);

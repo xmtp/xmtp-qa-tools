@@ -3,6 +3,7 @@ import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -33,8 +34,8 @@ describe(testName, async () => {
   workers = await getWorkers(
     10,
     testName,
-    "message",
-    "none",
+    typeofStream.Message,
+    typeOfResponse.None,
     process.env.XMTP_ENV as XmtpEnv,
     true,
   );
@@ -56,7 +57,7 @@ describe(testName, async () => {
 
   it("clientCreate: should measure creating a client", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName, "message");
+      const client = await getWorkers(["randomclient"], testName);
       expect(client).toBeDefined();
     } catch (e) {
       hasFailures = logError(e, expect.getState().currentTestName);
@@ -65,7 +66,11 @@ describe(testName, async () => {
   });
   it("canMessage: should measure canMessage", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName, "none");
+      const client = await getWorkers(
+        ["randomclient"],
+        testName,
+        typeofStream.None,
+      );
       if (!client) {
         throw new Error("Client not found");
       }
@@ -149,7 +154,7 @@ describe(testName, async () => {
       const verifyResult = await verifyStream(
         dm,
         [workers.getWorkers()[1]],
-        "text",
+        typeofStream.Message,
         1,
         undefined,
         undefined,

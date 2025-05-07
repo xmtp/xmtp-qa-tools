@@ -1,3 +1,4 @@
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type {
   Client,
@@ -14,8 +15,18 @@ async function main() {
 
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
-    const workers = await getWorkers(20, "test-bot", "message", "gpt");
-    const botWorker = await getWorkers(["bot"], "test-bot", "message", "gpt");
+    const workers = await getWorkers(
+      20,
+      "test-bot",
+      typeofStream.Message,
+      typeOfResponse.Gpt,
+    );
+    const botWorker = await getWorkers(
+      ["bot"],
+      "test-bot",
+      typeofStream.Message,
+      typeOfResponse.Gpt,
+    );
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 

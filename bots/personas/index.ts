@@ -1,3 +1,4 @@
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 
 async function main() {
@@ -6,8 +7,8 @@ async function main() {
     const workersGpt = await getWorkers(
       ["sam", "tina", "walt"],
       "test-bot",
-      "message",
-      "gpt",
+      typeofStream.Message,
+      typeOfResponse.Gpt,
     );
     for (const worker of workersGpt.getWorkers()) {
       // Add sync log to track if sync causes issues

@@ -2,6 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -41,7 +42,7 @@ describe(testName, async () => {
       const verifyResult = await verifyStream(
         convo,
         [workers.get("randomguy")!],
-        "text",
+        typeofStream.Message,
         1,
         undefined,
         undefined,

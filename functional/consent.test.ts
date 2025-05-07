@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { ConsentEntityType, ConsentState } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -26,7 +27,7 @@ describe(testName, async () => {
       "oscar",
     ],
     testName,
-    "consent",
+    typeofStream.Consent,
   );
 
   setupTestLifecycle({

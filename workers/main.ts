@@ -8,7 +8,27 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import type { typeOfResponse, typeofStream, WorkerBase } from "./manager";
+import type { WorkerBase } from "./manager";
+
+export enum typeOfResponse {
+  Gm = "gm",
+  Gpt = "gpt",
+  None = "none",
+}
+
+export enum typeofStream {
+  Message = "message",
+  GroupUpdated = "group_updated",
+  Conversation = "conversation",
+  Consent = "consent",
+  None = "none",
+}
+export enum StreamCollectorType {
+  Message = "stream_message",
+  GroupUpdated = "stream_group_updated",
+  Conversation = "stream_conversation",
+  Consent = "stream_consent",
+}
 
 // Worker thread code as a string
 const workerThreadCode = `
@@ -24,7 +44,7 @@ if (!parentPort) {
 console.log("[Worker] Started with workerData:", workerData);
 
 // Listen for messages from the parent
-parentPort.on("message", (message: { type: string; data: any }) => {
+parentPort.on("worker_message", (message: { type: string; data: any }) => {
   switch (message.type) {
     case "initialize":
       // You can add logs or do any one-time setup here.
@@ -66,7 +86,7 @@ interface BaseStreamMessage {
 }
 
 interface StreamTextMessage extends BaseStreamMessage {
-  type: "stream_message";
+  type: StreamCollectorType.Message;
   message: {
     conversationId: string;
     senderInboxId: string;
@@ -78,7 +98,7 @@ interface StreamTextMessage extends BaseStreamMessage {
 }
 
 interface StreamGroupUpdateMessage extends BaseStreamMessage {
-  type: "stream_group_updated";
+  type: StreamCollectorType.GroupUpdated;
   group: {
     conversationId: string;
     name: string;
@@ -86,7 +106,7 @@ interface StreamGroupUpdateMessage extends BaseStreamMessage {
 }
 
 interface StreamConversationMessage extends BaseStreamMessage {
-  type: "stream_conversation";
+  type: StreamCollectorType.Conversation;
   conversation: {
     id: string;
     peerAddress?: string;
@@ -94,7 +114,7 @@ interface StreamConversationMessage extends BaseStreamMessage {
 }
 
 interface StreamConsentMessage extends BaseStreamMessage {
-  type: "stream_consent";
+  type: StreamCollectorType.Consent;
   consentUpdate: {
     inboxId: string;
     consentValue: boolean;
@@ -162,7 +182,7 @@ export class WorkerClient extends Worker {
 
   private setupEventHandlers() {
     // Log messages from the Worker
-    this.on("message", (message) => {
+    this.on("worker_message", (message) => {
       console.log(`[${this.nameId}] Worker message:`, message);
     });
 
@@ -232,13 +252,13 @@ export class WorkerClient extends Worker {
   private startStream() {
     try {
       switch (this.typeofStream) {
-        case "message":
+        case typeofStream.Message:
           this.initMessageStream();
           break;
-        case "conversation":
+        case typeofStream.Conversation:
           this.initConversationStream();
           break;
-        case "consent":
+        case typeofStream.Consent:
           this.initConsentStream();
           break;
         // Add additional stream types as needed
@@ -270,8 +290,8 @@ export class WorkerClient extends Worker {
               continue;
             }
             if (message?.contentType?.typeId === "group_updated") {
-              if (this.listenerCount("message") > 0) {
-                this.emit("message", {
+              if (this.listenerCount("worker_message") > 0) {
+                this.emit("worker_message", {
                   type: "stream_group_updated",
                   group: message,
                 });
@@ -286,8 +306,11 @@ export class WorkerClient extends Worker {
               }
 
               // Emit standard message
-              if (this.listenerCount("message") > 0) {
-                this.emit("message", { type: "stream_message", message });
+              if (this.listenerCount("worker_message") > 0) {
+                this.emit("worker_message", {
+                  type: StreamCollectorType.Message,
+                  message,
+                });
               }
             }
           }
@@ -304,7 +327,7 @@ export class WorkerClient extends Worker {
    * Check if a message should trigger a response
    */
   private shouldRespondToMessage(message: DecodedMessage): boolean {
-    if (this.typeOfResponse === "none") return false;
+    if (this.typeOfResponse === typeOfResponse.None) return false;
 
     const conversation = this.client.conversations.getConversationById(
       message.conversationId,
@@ -341,7 +364,7 @@ export class WorkerClient extends Worker {
         return;
       }
 
-      if (this.typeOfResponse === "gpt") {
+      if (this.typeOfResponse === typeOfResponse.Gpt) {
         const messages = await conversation?.messages();
         const baseName = this.name.split("-")[0].toLowerCase();
 
@@ -380,8 +403,8 @@ export class WorkerClient extends Worker {
           for await (const conversation of stream) {
             if (!conversation?.id) continue;
 
-            if (this.listenerCount("message") > 0) {
-              this.emit("message", {
+            if (this.listenerCount("worker_message") > 0) {
+              this.emit("worker_message", {
                 type: "stream_conversation",
                 conversation,
               });
@@ -404,9 +427,9 @@ export class WorkerClient extends Worker {
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
-            if (this.listenerCount("message") > 0) {
-              this.emit("message", {
-                type: "stream_consent",
+            if (this.listenerCount("worker_message") > 0) {
+              this.emit("worker_message", {
+                type: StreamCollectorType.Consent,
                 consentUpdate,
               });
             }
@@ -422,7 +445,7 @@ export class WorkerClient extends Worker {
    * Collects stream events of specified type
    */
   collectStreamEvents<T extends StreamMessage>(options: {
-    type: "message" | "conversation" | "consent" | "group_updated";
+    type: typeofStream;
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
     additionalInfo?: Record<string, string | number | boolean>;
@@ -445,13 +468,13 @@ export class WorkerClient extends Worker {
         if (isRightType && passesFilter) {
           events.push(msg as T);
           if (events.length >= count) {
-            this.off("message", onMessage);
+            this.off("worker_message", onMessage);
             resolve(events);
           }
         }
       };
 
-      this.on("message", onMessage);
+      this.on("worker_message", onMessage);
     });
   }
 
@@ -464,13 +487,18 @@ export class WorkerClient extends Worker {
     count: number,
   ): Promise<StreamTextMessage[]> {
     return this.collectStreamEvents<StreamTextMessage>({
-      type: "message",
+      type: typeofStream.Message,
       filterFn: (msg) => {
-        if (msg.type !== "stream_message") return false;
+        if (msg.type !== StreamCollectorType.Message) return false;
         const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
-        return groupId === conversationId && contentType?.typeId === typeId;
+        return (
+          groupId === conversationId &&
+          (typeId === "message"
+            ? contentType?.typeId === "text"
+            : contentType?.typeId === typeId)
+        );
       },
       count,
       additionalInfo: { groupId, contentType: typeId },
@@ -485,9 +513,9 @@ export class WorkerClient extends Worker {
     count: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
-      type: "group_updated",
+      type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
-        if (msg.type !== "stream_group_updated") return false;
+        if (msg.type !== StreamCollectorType.GroupUpdated) return false;
         const streamMsg = msg;
         return groupId === streamMsg.group.conversationId;
       },
@@ -504,7 +532,7 @@ export class WorkerClient extends Worker {
     count: number = 1,
   ): Promise<StreamConversationMessage[]> {
     return this.collectStreamEvents<StreamConversationMessage>({
-      type: "conversation",
+      type: typeofStream.Conversation,
       count,
       additionalInfo: { fromPeerAddress },
     });
@@ -515,7 +543,7 @@ export class WorkerClient extends Worker {
    */
   collectConsentUpdates(count: number = 1): Promise<StreamConsentMessage[]> {
     return this.collectStreamEvents<StreamConsentMessage>({
-      type: "consent",
+      type: typeofStream.Consent,
       count,
     });
   }

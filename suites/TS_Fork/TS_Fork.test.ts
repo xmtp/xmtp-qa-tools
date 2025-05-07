@@ -51,7 +51,7 @@ describe(TEST_NAME, () => {
     console.time("initialize workers and create group");
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME, "message", "gm");
+    workers = await getWorkers(testConfig.workers, TEST_NAME);
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     const allClientIds = [

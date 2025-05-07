@@ -17,7 +17,7 @@ yarn test bug_stitch
 const workers = await getWorkers(
   ["ivy-a-202"],
   testName,
-  "message",
+  typeofStream.Message,
   false,
   undefined,
   env,
@@ -36,7 +36,7 @@ await ivy100?.worker.initialize();
 const workers = await getWorkers(
   ["ivy-b-105"],
   testName,
-  "message",
+  typeofStream.Message,
   false,
   undefined,
   env,
