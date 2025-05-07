@@ -16,6 +16,9 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
       DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -44,8 +47,6 @@ jobs:
       - name: Send Slack notification
         if: always()
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
 

@@ -21,6 +21,9 @@ jobs:
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
       - name: Debug API key
@@ -45,8 +48,6 @@ jobs:
       - name: Send Slack notification
         if: always()
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
       - name: Upload reports and snapshots artifacts
