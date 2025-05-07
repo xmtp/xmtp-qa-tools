@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { verifyConversationStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 

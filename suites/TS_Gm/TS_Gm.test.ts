@@ -2,7 +2,8 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { defaultValues, setupTestLifecycle } from "@helpers/tests";
+import { defaultValues } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -60,7 +61,7 @@ describe(testName, async () => {
       const messagesAfter = await convo.messages();
       expect(messagesAfter.length).toBe(prevMessageCount + 2);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -74,7 +75,7 @@ describe(testName, async () => {
       );
       expect(result).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -86,7 +87,7 @@ describe(testName, async () => {
         gmBotAddress,
       ]);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

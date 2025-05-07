@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type {
   Client,
@@ -8,9 +7,6 @@ import type {
 } from "@xmtp/node-sdk";
 import { CommandHandler } from "./commands";
 
-const testName = "test-bot";
-loadEnv(testName);
-
 async function main() {
   try {
     const commandHandler = new CommandHandler();
@@ -18,8 +14,8 @@ async function main() {
 
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
-    const workers = await getWorkers(20, testName, "message", "gpt");
-    const botWorker = await getWorkers(["bot"], testName, "message", "gpt");
+    const workers = await getWorkers(20, "test-bot", "message", "gpt");
+    const botWorker = await getWorkers(["bot"], "test-bot", "message", "gpt");
     const bot = botWorker.get("bot");
     const client = bot?.client as Client;
 

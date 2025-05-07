@@ -3,7 +3,8 @@ import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
-import { calculateMessageStats, setupTestLifecycle } from "@helpers/tests";
+import { calculateMessageStats } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -40,7 +41,7 @@ describe(testName, async () => {
           ...workers.getWorkers().map((p) => p.client.inboxId),
         ]);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -51,11 +52,11 @@ describe(testName, async () => {
     testName,
     hasFailuresRef: hasFailures,
     getStart: () => start,
-    setStart: (v) => {
+    setStart: (v: number) => {
       start = v;
     },
     getTestStart: () => testStart,
-    setTestStart: (v) => {
+    setTestStart: (v: number) => {
       testStart = v;
     },
   });
@@ -74,7 +75,7 @@ describe(testName, async () => {
       );
       expect(collectedMessages.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -117,7 +118,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -176,7 +177,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -260,7 +261,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

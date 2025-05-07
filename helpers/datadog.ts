@@ -2,7 +2,6 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
-import type { ExpectStatic } from "vitest";
 
 // Types definitions
 interface MemberThresholds {
@@ -453,12 +452,11 @@ export function sendTestResults(hasFailures: boolean, testName: string): void {
  * Send performance metrics for tests
  */
 export const sendPerformanceResult = (
-  expect: ExpectStatic,
+  testName: string,
   workers: WorkerManager,
   start: number | undefined,
   testStart?: number,
 ) => {
-  const testName = expect.getState().currentTestName;
   if (testName) {
     console.timeEnd(testName);
 

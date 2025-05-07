@@ -6,7 +6,7 @@ import {
   TEST_CONFIGS,
 } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -44,7 +44,7 @@ describe(testName, async () => {
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -75,7 +75,7 @@ describe(testName, async () => {
 
       expect(dm).toBeTruthy();
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -93,7 +93,7 @@ describe(testName, async () => {
 
       expect(group).toBeTruthy();
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -110,7 +110,7 @@ describe(testName, async () => {
       );
       expect(result).toBe(true);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

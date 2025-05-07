@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";

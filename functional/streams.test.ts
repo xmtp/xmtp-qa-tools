@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -54,7 +54,7 @@ describe(testName, async () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -77,7 +77,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

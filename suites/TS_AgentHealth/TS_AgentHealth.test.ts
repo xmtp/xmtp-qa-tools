@@ -37,7 +37,7 @@ describe(testName, () => {
           );
           expect(result).toBe(true);
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });

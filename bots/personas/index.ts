@@ -1,27 +1,11 @@
-import { loadEnv } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
 
-const testName = "test-bot";
-loadEnv(testName);
-process.on("uncaughtException", (error) => {
-  console.error("Uncaught exception:", error);
-  process.exit(1);
-});
-
-process.on("unhandledRejection", (reason) => {
-  console.error("Unhandled rejection details:", reason);
-  if (reason instanceof Error) {
-    console.error("Error message:", reason.message);
-    console.error("Error stack:", reason.stack);
-  }
-  process.exit(1);
-});
 async function main() {
   console.log("Attempting to initialize GPT workers...");
   try {
     const workersGpt = await getWorkers(
       ["sam", "tina", "walt"],
-      testName,
+      "test-bot",
       "message",
       "gpt",
     );
