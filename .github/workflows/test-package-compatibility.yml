@@ -30,6 +30,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
+          cache: ${{ matrix.package-manager }}
+          cache-dependency-path: xmtp-qa-testing/bots/gm-bot/package.json
 
       - name: Install npm 10.9.2
         if: matrix.package-manager == 'npm'
@@ -70,7 +72,16 @@ jobs:
         if: matrix.package-manager == 'npm'
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          npm install
+          mkdir -p node_modules
+          echo "npm version: $(npm --version)"
+          echo "node version: $(node --version)"
+          npm config set legacy-peer-deps true
+          npm install --no-fund --verbose
+          # Ensure tsx is installed globally as fallback
+          npm install -g tsx
+          echo "After installation:"
+          ls -la
+          [ -d "node_modules" ] || echo "ERROR: node_modules still not created!"
 
       - name: Install dependencies with yarn
         if: matrix.package-manager == 'yarn'
@@ -104,19 +115,27 @@ jobs:
           cd xmtp-qa-testing/bots/gm-bot
           if [ ! -d "node_modules" ]; then
             echo "node_modules directory not found, attempting to reinstall"
+            pwd
+            ls -la
             if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
               yarn install --no-immutable
             elif [ "${{ matrix.package-manager }}" = "yarn" ]; then
               yarn install --no-immutable
             elif [ "${{ matrix.package-manager }}" = "npm" ]; then
-              npm install
+              mkdir -p node_modules
+              npm install --legacy-peer-deps
+              echo "After npm reinstall:"
+              ls -la
             elif [ "${{ matrix.package-manager }}" = "pnpm" ]; then
               pnpm install
             else
               bun install
             fi
           fi
-          ls -la node_modules
+          echo "Contents of directory:"
+          ls -la
+          echo "Contents of node_modules:"
+          ls -la node_modules || echo "Failed to list node_modules"
 
       - name: Build project
         run: |
