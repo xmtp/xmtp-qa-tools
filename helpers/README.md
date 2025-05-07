@@ -18,6 +18,7 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **oldpackages.json**         | Legacy package configurations     | Compatibility testing data                       |
 | **slack.ts**                 | Slack notification utilities      | Send notifications to Slack channels             |
 | **datadog-performance.json** | Performance metrics configuration | Thresholds and expectations for tests            |
+| **ai.ts**                    | OpenAI API utilities              | Generate OpenAI responses                        |
 
 ## Usage
 

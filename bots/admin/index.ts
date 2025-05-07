@@ -6,7 +6,6 @@ import {
   type Conversation,
   type DecodedMessage,
   type Group,
-  type PermissionPolicySet,
 } from "@xmtp/node-sdk";
 import { config, type GroupConfig } from "./groups";
 
@@ -74,7 +73,7 @@ export const processMessage = async (
 /**
  * Update group permissions
  */
-async function updatePermissions(group: Group): Promise<any> {
+async function updatePermissions(group: Group): Promise<string> {
   try {
     await group.updatePermission(
       PermissionUpdateType.AddAdmin,
@@ -110,7 +109,7 @@ async function updatePermissions(group: Group): Promise<any> {
 
     await group.sync();
     const permissions = group.permissions;
-    return permissions;
+    return JSON.stringify(permissions);
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error(`Error updating permissions: ${errorMessage}`);

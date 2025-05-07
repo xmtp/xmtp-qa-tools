@@ -1,14 +1,13 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
+import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
-import { personalities } from "@helpers/tests";
 import {
   Dm,
   type Client,
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import OpenAI from "openai";
 import type { typeOfResponse, typeofStream, WorkerBase } from "./manager";
 
 // Worker thread code as a string
@@ -347,7 +346,7 @@ export class WorkerClient extends Worker {
         const baseName = this.name.split("-")[0].toLowerCase();
 
         // Generate a response using OpenAI
-        const response = await this.generateOpenAIResponse(
+        const response = await generateOpenAIResponse(
           message.content as string,
           messages ?? [],
           baseName,
@@ -519,72 +518,6 @@ export class WorkerClient extends Worker {
       type: "consent",
       count,
     });
-  }
-
-  /**
-   * Generates a response using OpenAI based on the message content.
-   */
-  private async generateOpenAIResponse(
-    message: string,
-    history: DecodedMessage[],
-    workerName: string,
-  ): Promise<string> {
-    // First check if OPENAI_API_KEY is configured
-    if (!process.env.OPENAI_API_KEY) {
-      console.warn(
-        "OPENAI_API_KEY is not set in environment variables. GPT workers may not function properly.",
-      );
-      return `${workerName}: Sorry, I'm not able to generate a response right now.`;
-    }
-
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    console.log(
-      `[${this.nameId}] Generating OpenAI response for message: ${message}`,
-    );
-
-    // Find matching personality or use a default
-    const personality =
-      personalities.find((p) => p.name === workerName)?.personality ||
-      "You are a helpful assistant with a friendly personality.";
-
-    // Prepare recent message history
-    const recentHistory =
-      history
-        ?.slice(-10)
-        .map((m) => m.content as string)
-        .join("\n") || "";
-
-    const systemPrompt = `You are ${workerName}.
-                     Keep your responses concise (under 100 words) and friendly. 
-                     Never mention other workers in your responses. Never answer more than 1 question per response.
-
-                     Personality: 
-                     ${personality}
-                     
-                     For context, these were the last messages in the conversation: 
-                     ${recentHistory}`;
-
-    try {
-      const completion = await openai.chat.completions.create({
-        messages: [
-          {
-            role: "system",
-            content: systemPrompt,
-          },
-          { role: "user", content: message },
-        ],
-        model: "gpt-4.1-mini",
-      });
-
-      return `${workerName}:\n${
-        completion.choices[0]?.message?.content ||
-        "I'm not sure how to respond to that."
-      }`;
-    } catch (error) {
-      console.error(`[${this.nameId}] OpenAI API error:`, error);
-      return `${workerName}: Sorry, I couldn't process that request right now.`;
-    }
   }
 
   /**

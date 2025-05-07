@@ -2,7 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
-import OpenAI from "openai";
+import { analyzeErrorLogsWithGPT } from "./ai";
 
 // Check for required Slack credentials
 if (!process.env.SLACK_BOT_TOKEN) {
@@ -63,55 +63,6 @@ if (jobStatus === "success" || jobStatus === "passed") {
 let workflowUrl = "";
 if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
   workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
-}
-
-// Function to analyze error logs with GPT-4.1-mini
-async function analyzeErrorLogsWithGPT(errorLogs: string): Promise<string> {
-  if (!process.env.OPENAI_API_KEY) {
-    console.log("OpenAI API key not found. Skipping error analysis.");
-    return "";
-  }
-
-  try {
-    console.log("Analyzing error logs with GPT-4.1-mini...");
-
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-    const completion = await openai.chat.completions.create({
-      model: "gpt-4.1-mini",
-      messages: [
-        {
-          role: "system",
-          content: `You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise, very short summary of what went wrong. Please be specific and technical. Don't propose solutions.
-            
-            # Example:
-            [2025-05-06T22:57:34.207Z] [[32minfo[39m] Failed to find response containing any of [commands]
-            [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
-            [2025-05-06T22:58:22.929Z] [[32minfo[39m] Failed to find response containing any of [commands]
-            [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
-            
-            # AI Analysis:
-            The test failed because \`key-check\` agent failed to respond in the expected time.
-            `,
-        },
-        {
-          role: "user",
-          content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
-        },
-      ],
-      max_tokens: 500,
-    });
-
-    if (completion.choices && completion.choices[0]?.message?.content) {
-      return `\n\n*AI Analysis:*\n${completion.choices[0].message.content}`;
-    } else {
-      console.error("Unexpected response format from OpenAI:", completion);
-      return "";
-    }
-  } catch (error) {
-    console.error("Error analyzing logs with GPT:", error);
-    return "";
-  }
 }
 
 // Check if logs directory exists and look for error logs to add context
