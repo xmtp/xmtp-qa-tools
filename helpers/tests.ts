@@ -1,6 +1,5 @@
 import fs from "fs";
 import path from "path";
-import { closeEnv, getEnvPath } from "@helpers/client";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
@@ -61,8 +60,7 @@ import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
-import { sendPerformanceResult, sendTestResults } from "./datadog";
-import { logError } from "./logger";
+import { getEnvPath } from "./client";
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{

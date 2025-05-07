@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import winston, { error } from "winston";
+import winston from "winston";
 
 // Create a simple logger that formats logs in a pretty way
 export const createLogger = () => {
