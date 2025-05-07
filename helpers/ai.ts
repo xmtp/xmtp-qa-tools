@@ -7,7 +7,7 @@ import { personalities } from "./tests";
  */
 export class OpenAIService {
   private openai: OpenAI | null = null;
-  private readonly model = "gpt-4.1-nano";
+  private readonly model = "gpt-4.1-mini";
 
   /**
    * Initialize the OpenAI client
@@ -55,9 +55,17 @@ export class OpenAIService {
               [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
               [2025-05-06T22:58:22.929Z] [[32minfo[39m] Failed to find response containing any of [commands]
               [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
-              
-              # AI Analysis:
+              ecause \`key-check\` agent failed to respond in the expected time.
+
+              # Wrong Example:
+              The tests failed because the expected true responses for health checks and commands were not received; the respective agents did not respond as expected.
+              Why:
+              - The \`key-check\` agent failed to respond in the expected time.
+              - The \`gm-bot\` agent failed to respond in the expected time.
+
+              # Good Example:
               The test failed because \`key-check\` agent failed to respond in the expected time.
+              The test failed because \`gm-bot\` agent failed to respond in the expected time.
               `,
           },
           {
