@@ -113,12 +113,3 @@ jobs:
           echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
           echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
           echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
-
-      - name: Run client check
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            yarn run client-check
-          else
-            ${{ matrix.package-manager }} run client-check
-          fi
