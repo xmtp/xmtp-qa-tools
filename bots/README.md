@@ -42,8 +42,8 @@ The `agents` bot provides AI-powered chat personalities using GPT integration.
 const workersGpt = await getWorkers(
   ["sam", "tina", "walt"],
   testName,
-  "message",
-  "gpt",
+  typeofStream.Message,
+  typeOfResponse.Gpt,
 );
 ```
 

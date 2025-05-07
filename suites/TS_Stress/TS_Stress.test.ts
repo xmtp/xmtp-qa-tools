@@ -27,7 +27,7 @@ console.log(
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(["bot"], testName, "message", "none");
+  workers = await getWorkers(["bot"], testName);
   let bot: Worker;
   let client: Client;
   let conversation: Conversation;

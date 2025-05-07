@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { verifyStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -62,7 +63,7 @@ describe(testName, async () => {
     const verifyResult = await verifyStream(
       group,
       [workers.get("oscar")!],
-      "group_updated",
+      typeofStream.GroupUpdated,
     );
     expect(verifyResult.allReceived).toBe(true);
     console.timeEnd("update group name");

@@ -79,7 +79,7 @@ const alicePhoneConversations = await alicePhone.client.conversations.list();
 
 ```typescript
 // Set up worker with message streaming
-const workers = await getWorkers(["alice", "bob"], testName, "message");
+const workers = await getWorkers(["alice", "bob"], testName);
 const alice = workers.get("alice");
 const bob = workers.get("bob");
 
@@ -103,7 +103,12 @@ console.log(`Received message: ${incomingMessages[0].message.content}`);
 
 ```typescript
 // Create workers with GPT-powered responses
-const workers = await getWorkers(["alice", "bob"], testName, "message", true);
+const workers = await getWorkers(
+  ["alice", "bob"],
+  testName,
+  typeofStream.Message,
+  typeOfResponse.Gpt,
+);
 const alice = workers.get("alice");
 const bob = workers.get("bob");
 

@@ -1,4 +1,5 @@
 import { getWorkersFromGroup } from "@helpers/groups";
+import { typeofStream } from "@workers/main";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { defaultValues } from "./tests";
@@ -51,7 +52,7 @@ export async function verifyStreamAll(
   return verifyStream(
     group,
     allWorkers,
-    "text",
+    typeofStream.Message,
     count,
     undefined,
     undefined,
@@ -65,7 +66,7 @@ export async function verifyStreamAll(
 export async function verifyStream<T extends string = string>(
   group: Conversation,
   participants: Worker[],
-  collectorType = "text",
+  collectorType = typeofStream.Message,
   count = 1,
   generator: (i: number, suffix: string) => T = (i, suffix): T =>
     `gm-${i + 1}-${suffix}` as T,
@@ -76,7 +77,7 @@ export async function verifyStream<T extends string = string>(
   onMessageSent?: () => void,
 ): Promise<VerifyStreamResult> {
   // Use name updater for group_updated collector type
-  if (collectorType === "group_updated") {
+  if (collectorType === typeofStream.GroupUpdated) {
     generator = ((i: number, suffix: string) =>
       `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
     sender = (async (g: Group, payload: string) => {
@@ -107,7 +108,7 @@ export async function verifyStream<T extends string = string>(
 
   // Start collectors
   let collectPromises: Promise<T[]>[] = [];
-  if (collectorType === "text") {
+  if (collectorType === typeofStream.Message) {
     collectPromises = receivers.map((r) => {
       if (!r.worker) {
         return Promise.resolve([]);
@@ -118,7 +119,7 @@ export async function verifyStream<T extends string = string>(
           return msgs.map((m) => m.message.content as T);
         });
     });
-  } else if (collectorType === "group_updated") {
+  } else if (collectorType === typeofStream.GroupUpdated) {
     collectPromises = receivers.map((r) => {
       if (!r.worker) {
         return Promise.resolve([]);

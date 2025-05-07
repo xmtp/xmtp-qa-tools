@@ -1,9 +1,15 @@
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 async function main() {
   // Get 20 dynamic workers
-  const workers = await getWorkers(["bot"], "test-bot", "message", "gpt");
+  const workers = await getWorkers(
+    ["bot"],
+    "test-bot",
+    typeofStream.Message,
+    typeOfResponse.Gpt,
+  );
   const bot = workers.get("bot");
   const client = bot?.client as Client;
   console.log(`Agent initialized on address ${bot?.address}`);
@@ -39,7 +45,7 @@ async function main() {
           continue;
         }
         console.log("conversation", conversation.id);
-        console.log("message", message.senderInboxId);
+        console.log("senderInboxId", message.senderInboxId);
 
         const inboxState = await client.preferences.inboxStateFromInboxIds([
           message.senderInboxId,

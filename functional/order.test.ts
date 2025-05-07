@@ -3,6 +3,7 @@ import { getWorkersFromGroup } from "@helpers/groups";
 import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
 import { calculateMessageStats } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -53,7 +54,7 @@ describe(testName, async () => {
     collectedMessages = await verifyStream(
       group,
       workers.getWorkers(),
-      "text",
+      typeofStream.Message,
       amount,
       (index) => `gm-${index + 1}-${randomSuffix}`,
     );

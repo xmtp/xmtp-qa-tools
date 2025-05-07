@@ -35,7 +35,7 @@ describe(testName, () => {
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers(["ivy-a-202"], testName, "message");
+          const workers = await getWorkers(["ivy-a-202"], testName);
           ivy100 = workers.get("ivy", "a") as Worker;
           console.log("syncing all");
           await ivy100?.client.conversations.sync();
@@ -81,7 +81,7 @@ describe(testName, () => {
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-b-105"], testName, "message");
+          const workers = await getWorkers(["ivy-b-105"], testName);
           ivy105 = workers.get("ivy", "b") as Worker;
           console.log("syncing all");
           await ivy105?.client.conversations.sync();
@@ -108,7 +108,7 @@ describe(testName, () => {
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-c-202"], testName, "message");
+          const workers = await getWorkers(["ivy-c-202"], testName);
           ivy200 = workers.get("ivy", "c") as Worker;
           console.log("syncing all");
           await ivy200?.client.conversations.sync();

@@ -4,6 +4,7 @@ import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { defaultValues } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -20,7 +21,13 @@ describe(testName, async () => {
   let start: number;
   let testStart: number;
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
-  workers = await getWorkers(["bob"], testName, "message", "gm", "production");
+  workers = await getWorkers(
+    ["bob"],
+    testName,
+    typeofStream.Message,
+    typeOfResponse.Gm,
+    "production",
+  );
 
   setupTestLifecycle({
     expect,
