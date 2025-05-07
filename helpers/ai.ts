@@ -25,66 +25,6 @@ export class OpenAIService {
     return true;
   }
 
-  /**
-   * Analyze error logs using GPT
-   * @param errorLogs The error logs to analyze
-   * @returns Analysis of the error logs
-   */
-  async analyzeErrorLogs(errorLogs: string): Promise<string> {
-    if (!this.initialize()) {
-      console.log("OpenAI API key not found. Skipping error analysis.");
-      return "";
-    }
-
-    try {
-      console.log(`Analyzing error logs with ${this.model}...`);
-
-      if (!this.openai) {
-        return "";
-      }
-
-      const completion = await this.openai.chat.completions.create({
-        model: this.model,
-        messages: [
-          {
-            role: "system",
-            content: `You are a helpful assistant that analyzes error logs from XMTP tests. Provide a concise, very short summary of what went wrong. Please be specific and technical. Don't propose solutions.
-              
-              # Example:
-              [2025-05-06T22:57:34.207Z] [[32minfo[39m] Failed to find response containing any of [commands]
-              [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
-              [2025-05-06T22:58:22.929Z] [[32minfo[39m] Failed to find response containing any of [commands]
-              [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
-              ecause \`key-check\` agent failed to respond in the expected time.
-
-              # Wrong Example:
-              The tests failed because the expected true responses for health checks and commands were not received; the respective agents did not respond as expected.
-              Why:
-              - The \`key-check\` agent failed to respond in the expected time.
-              - The \`gm-bot\` agent failed to respond in the expected time.
-
-              # Good Example:
-              The test failed because \`key-check\` agent failed to respond in the expected time.
-              The test failed because \`gm-bot\` agent failed to respond in the expected time.
-              `,
-          },
-          {
-            role: "user",
-            content: `Analyze these error logs from an XMTP test:\n\n${errorLogs}`,
-          },
-        ],
-        max_tokens: 500,
-      });
-
-      const analysisContent = completion.choices[0]?.message?.content;
-      return analysisContent ? `\n\n*AI Analysis:*\n${analysisContent}` : "";
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Error analyzing logs with GPT:", errorMessage);
-      return "";
-    }
-  }
   async analyzeErrorLogs(errorLogs: string): Promise<string> {
     if (!this.initialize()) {
       console.log("OpenAI API key not found. Skipping error analysis.");
