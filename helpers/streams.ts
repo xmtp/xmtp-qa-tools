@@ -83,6 +83,18 @@ export async function verifyStream<T extends string = string>(
     sender = (async (g: Group, payload: string) => {
       await g.updateName(payload);
     }) as unknown as typeof sender;
+  } else if (collectorType === typeofStream.Conversation) {
+    generator = ((i: number, suffix: string) =>
+      `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
+    sender = (async (client: Client, payload: string) => {
+      await client.conversations.newGroup(payload);
+    }) as unknown as typeof sender;
+  } else if (collectorType === typeofStream.Consent) {
+    generator = ((i: number, suffix: string) =>
+      `New name-${i + 1}-${suffix}`) as unknown as typeof generator;
+    sender = (async (g: Group, payload: number) => {
+      await (g.updateConsentState(payload as ConsentState) as Promise<void>);
+    }) as unknown as typeof sender;
   }
 
   // Exclude group creator from receivers
@@ -128,6 +140,28 @@ export async function verifyStream<T extends string = string>(
         .collectGroupUpdates(conversationId, count)
         .then((msgs: GroupUpdateMessage[]) => {
           return msgs.map((m) => m.group.name as T);
+        });
+    });
+  } else if (collectorType === typeofStream.Conversation) {
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectConversations(conversationId, count)
+        .then((msgs: ConversationNotification[]) => {
+          return msgs.map((m) => m.conversation.id as T);
+        });
+    });
+  } else if (collectorType === typeofStream.Consent) {
+    collectPromises = receivers.map((r) => {
+      if (!r.worker) {
+        return Promise.resolve([]);
+      }
+      return r.worker
+        .collectConsents(conversationId, count)
+        .then((msgs: ConsentNotification[]) => {
+          return msgs.map((m) => m.consent.id as T);
         });
     });
   }
