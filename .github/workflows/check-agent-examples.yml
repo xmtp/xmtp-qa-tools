@@ -49,11 +49,3 @@ jobs:
             echo "Error: Agent did not reach 'Waiting for messages...' state"
             exit 1
           fi
-
-      - name: Send Slack notification
-        if: always()
-        env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL}}
-          JOB_STATUS: ${{ job.status }}
-        run: npx tsx helpers/slack.ts

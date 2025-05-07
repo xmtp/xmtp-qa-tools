@@ -6,6 +6,10 @@ on:
     branches:
       - main
 
+  # pull_request:
+  #   branches:
+  #     - main
+
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -44,6 +48,9 @@ jobs:
         run: |
           npm install -g yarn@1.22.19
           yarn --version
+
+      - name: Navigate to gm-bot directory
+        run: cd xmtp-qa-testing/bots/gm-bot
 
       - name: Clean previous installations
         run: |
@@ -89,25 +96,6 @@ jobs:
           cd xmtp-qa-testing/bots/gm-bot
           bun install
 
-      - name: Verify node_modules
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ ! -d "node_modules" ]; then
-            echo "node_modules directory not found, attempting to reinstall"
-            if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-              yarn install --no-immutable
-            elif [ "${{ matrix.package-manager }}" = "yarn" ]; then
-              yarn install --no-immutable
-            elif [ "${{ matrix.package-manager }}" = "npm" ]; then
-              npm install
-            elif [ "${{ matrix.package-manager }}" = "pnpm" ]; then
-              pnpm install
-            else
-              bun install
-            fi
-          fi
-          ls -la node_modules
-
       - name: Build project
         run: |
           cd xmtp-qa-testing/bots/gm-bot
@@ -120,32 +108,8 @@ jobs:
       - name: Set environment variables
         run: |
           cd xmtp-qa-testing/bots/gm-bot
+          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" > .env
+          echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
           echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
           echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
-
-      - name: Generate keys
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            yarn gen:keys
-          else
-            ${{ matrix.package-manager }} run gen:keys
-          fi
-          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" >> .env
-
-      - name: Run agent
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            timeout 30s yarn run dev | tee output.log
-          else
-            timeout 30s ${{ matrix.package-manager }} run dev | tee output.log
-          fi
-          if grep -q "Waiting for messages..." output.log; then
-            echo "Success: Agent started successfully and is waiting for messages"
-            exit 0
-          else
-            echo "Error: Agent did not reach 'Waiting for messages...' state"
-            cat output.log
-            exit 1
-          fi
