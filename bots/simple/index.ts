@@ -1,13 +1,9 @@
-import { loadEnv } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 
-const testName = "test-bot";
-loadEnv(testName);
-
 async function main() {
   // Get 20 dynamic workers
-  const workers = await getWorkers(["bot"], testName, "message", "gpt");
+  const workers = await getWorkers(["bot"], "test-bot", "message", "gpt");
   const bot = workers.get("bot");
   const client = bot?.client as Client;
   console.log(`Agent initialized on address ${bot?.address}`);
