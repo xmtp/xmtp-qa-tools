@@ -22,7 +22,6 @@ const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
-const xmtpEnv = process.env.XMTP_ENV || "dev";
 const jobStatus = process.env.JOB_STATUS || "unknown";
 
 // Find test name from suites directory

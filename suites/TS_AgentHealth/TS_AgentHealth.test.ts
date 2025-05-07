@@ -1,10 +1,8 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import type { WorkerManager } from "@workers/manager";
 import type { XmtpEnv } from "@xmtp/node-sdk";
-import { afterAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import agentHealth from "./agents.json";
 
 // Define the types for the agents
@@ -22,18 +20,6 @@ const testName = "ts_agenthealth";
 loadEnv(testName);
 
 describe(testName, () => {
-  let hasFailures = false;
-  let workers: WorkerManager | undefined;
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
   // For local testing, test all agents on their supported networks
   for (const agent of typedAgents) {
     for (const network of agent.networks) {

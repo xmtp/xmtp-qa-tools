@@ -1,78 +1,50 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyStreamAll } from "@helpers/streams";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { setupTestLifecycle } from "@helpers/tests";
+import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "groups";
 loadEnv(testName);
-describe(testName, () => {
-  let workers: WorkerManager;
+describe(testName, async () => {
+  const workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+  );
   const batchSize = 5;
   const total = 10;
   let hasFailures: boolean = false;
   let start: number;
+  let testStart: number;
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(
-        [
-          "henry",
-          "ivy",
-          "jack",
-          "karen",
-          "randomguy",
-          "larry",
-          "mary",
-          "nancy",
-          "oscar",
-        ],
-        testName,
-      );
-      expect(workers).toBeDefined();
-      expect(workers.getLength()).toBe(9);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    start = performance.now();
-    console.time(testName);
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {
@@ -144,7 +116,17 @@ describe(testName, () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const verifyResult = await verifyStreamAll(groupsBySize[i], workers);
+        const verifyResult = await verifyStreamAll(
+          groupsBySize[i],
+          workers,
+          1,
+          () => {
+            console.log(
+              `Group message sent for ${i} participants, starting timer now`,
+            );
+            start = performance.now();
+          },
+        );
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect);

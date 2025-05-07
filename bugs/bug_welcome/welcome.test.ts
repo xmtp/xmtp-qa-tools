@@ -1,7 +1,7 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Client, Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "bug_welcome";
 loadEnv(testName);
@@ -21,10 +21,6 @@ describe(testName, () => {
       ["bob", "alice", "joe", "sam", "charlie"],
       testName,
     );
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, workers);
   });
 
   it("tc_stream: send the stream", async () => {

@@ -1,8 +1,8 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -11,76 +11,47 @@ import {
   type Group,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "ts_performance";
 loadEnv(testName);
 
-const batchSize = parseInt(
-  process.env.CLI_BATCH_SIZE ?? process.env.BATCH_SIZE ?? "5",
-);
-const total = parseInt(
-  process.env.CLI_GROUP_SIZE ?? process.env.MAX_GROUP_SIZE ?? "10",
-);
-console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
-
-describe(testName, () => {
+describe(testName, async () => {
+  const batchSize = parseInt(
+    process.env.CLI_BATCH_SIZE ?? process.env.BATCH_SIZE ?? "5",
+  );
+  const total = parseInt(
+    process.env.CLI_GROUP_SIZE ?? process.env.MAX_GROUP_SIZE ?? "10",
+  );
+  console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
   let dm: Conversation;
   let workers: WorkerManager;
-  let start: number | undefined;
+  let start: number;
   let hasFailures: boolean = false;
   let testStart: number;
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(
-        10,
-        testName,
-        "message",
-        "none",
-        process.env.XMTP_ENV as XmtpEnv,
-        true,
-      );
-      expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(10);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
+  workers = await getWorkers(
+    10,
+    testName,
+    "message",
+    "none",
+    process.env.XMTP_ENV as XmtpEnv,
+    true,
+  );
 
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    console.time(testName);
-    testStart = performance.now();
-    start = performance.now();
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start, testStart);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("clientCreate: should measure creating a client", async () => {

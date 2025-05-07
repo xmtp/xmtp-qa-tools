@@ -1,38 +1,47 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "clients";
 loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
-  beforeAll(async () => {
-    workers = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "bob",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
-  });
-  afterAll(async () => {
-    try {
-      await closeEnv(testName, workers);
-    } catch (e) {
-      logError(e, expect);
-      throw e;
-    }
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+  workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "bob",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+  );
+
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("clientCreate: should measure creating a client", async () => {

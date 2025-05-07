@@ -1,61 +1,63 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendDeliveryMetric, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
+import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { verifyStream, type VerifyStreamResult } from "@helpers/streams";
-import { calculateMessageStats } from "@helpers/tests";
+import { calculateMessageStats, setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "ts_delivery";
 loadEnv(testName);
 
-const amountofMessages = parseInt(
-  process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
-);
-const receiverAmount = parseInt(
-  process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
-);
+describe(testName, async () => {
+  const amountofMessages = parseInt(
+    process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
+  );
+  const receiverAmount = parseInt(
+    process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
+  );
 
-console.log(
-  `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
-);
-
-describe(testName, () => {
+  console.log(
+    `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
+  );
   let workers: WorkerManager;
+  workers = await getWorkers(receiverAmount, testName);
   let group: Group;
   let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
   let hasFailures = false;
+  let start: number;
+  let testStart: number;
+
   beforeAll(async () => {
     try {
-      //fs.rmSync(".data", { recursive: true, force: true });
-      // Use getWorkers to spin up many workers. This is resource-intensive.
-      workers = await getWorkers(receiverAmount, testName);
       console.log("creating group");
       group = await workers
         .get("bob")!
         .client.conversations.newGroup([
           ...workers.getWorkers().map((p) => p.client.inboxId),
         ]);
-
-      expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(receiverAmount);
     } catch (e) {
       hasFailures = logError(e, expect);
       throw e;
     }
   });
 
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("tc_stream: send the stream", async () => {

@@ -1,63 +1,35 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  describe,
-  expect,
-  it,
-} from "vitest";
+import { setupTestLifecycle } from "@helpers/tests";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 
 const testName = "streams";
 loadEnv(testName);
 
-describe(testName, () => {
-  let workers: WorkerManager;
+describe(testName, async () => {
   let hasFailures: boolean = false;
-  let start: number | undefined;
+  let start: number;
   let testStart: number;
+  const workers = await getWorkers(
+    ["henry", "bob", "alice", "dave", "randomguy"],
+    testName,
+  );
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(
-        ["henry", "bob", "alice", "dave", "randomguy"],
-        testName,
-      );
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  beforeEach(() => {
-    const testName = expect.getState().currentTestName;
-    console.time(testName);
-    testStart = performance.now();
-    start = undefined;
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterEach(function () {
-    try {
-      sendPerformanceResult(expect, workers, start, testStart);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("receiveGM: should measure receiving a gm", async () => {

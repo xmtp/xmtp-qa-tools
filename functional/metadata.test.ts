@@ -1,45 +1,59 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { verifyStream } from "@helpers/streams";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { setupTestLifecycle } from "@helpers/tests";
+import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";
 loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let group: Group;
-  let workers: WorkerManager;
-  beforeAll(async () => {
-    workers = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-    );
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+  const workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+  );
 
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
+  });
+
+  beforeAll(async () => {
     console.time("create group");
     group = await workers
       .get("henry")!
       .client.conversations.newGroup([
-        workers.get("nancy")?.client?.inboxId ?? "",
-        workers.get("oscar")?.client?.inboxId ?? "",
-        workers.get("jack")?.client?.inboxId ?? "",
+        workers.get("nancy")!.client.inboxId,
+        workers.get("oscar")!.client.inboxId,
+        workers.get("jack")!.client.inboxId,
       ]);
     console.log("group", group.id);
     console.timeEnd("create group");
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, workers);
   });
 
   it("TC_ReceiveMetadata: should update group name", async () => {

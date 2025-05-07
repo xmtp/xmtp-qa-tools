@@ -1,34 +1,46 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { verifyConversationStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { afterAll, beforeAll, describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "conversations";
 loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
+  workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+    "conversation",
+  );
 
-  beforeAll(async () => {
-    workers = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-      "conversation",
-    );
-  });
-
-  afterAll(async () => {
-    await closeEnv(testName, workers);
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("detects new group conversation creation with three participants", async () => {

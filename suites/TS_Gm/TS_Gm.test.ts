@@ -1,49 +1,39 @@
-import { closeEnv, loadEnv } from "@helpers/client";
-import { sendTestResults } from "@helpers/datadog";
+import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { defaultValues } from "@helpers/tests";
+import { defaultValues, setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "ts_gm";
 loadEnv(testName);
 
 const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
-describe(testName, () => {
+describe(testName, async () => {
   let convo: Conversation;
   let workers: WorkerManager;
   let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
+  workers = await getWorkers(["bob"], testName, "message", "gm", "production");
 
-  beforeAll(async () => {
-    try {
-      workers = await getWorkers(
-        ["bob"],
-        testName,
-        "message",
-        "gm",
-        "production",
-      );
-      expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(1);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    try {
-      sendTestResults(hasFailures, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailures = logError(e, expect);
-      throw e;
-    }
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("gm-bot: should check if bot is alive", async () => {

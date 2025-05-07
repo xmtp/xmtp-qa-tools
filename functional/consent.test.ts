@@ -1,34 +1,47 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
+import { setupTestLifecycle } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { ConsentEntityType, ConsentState } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "consent";
 loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
+  let hasFailures: boolean = false;
+  let start: number;
+  let testStart: number;
 
-  beforeAll(async () => {
-    workers = await getWorkers(
-      [
-        "henry",
-        "ivy",
-        "jack",
-        "karen",
-        "randomguy",
-        "larry",
-        "mary",
-        "nancy",
-        "oscar",
-      ],
-      testName,
-      "consent",
-    );
-  });
+  workers = await getWorkers(
+    [
+      "henry",
+      "ivy",
+      "jack",
+      "karen",
+      "randomguy",
+      "larry",
+      "mary",
+      "nancy",
+      "oscar",
+    ],
+    testName,
+    "consent",
+  );
 
-  afterAll(async () => {
-    await closeEnv(testName, workers);
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+    hasFailuresRef: hasFailures,
+    getStart: () => start,
+    setStart: (v) => {
+      start = v;
+    },
+    getTestStart: () => testStart,
+    setTestStart: (v) => {
+      testStart = v;
+    },
   });
 
   it("should stream consent updates when a user is blocked", async () => {
