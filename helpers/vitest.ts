@@ -31,7 +31,6 @@ export const setupTestLifecycle = ({
   });
 
   afterEach(function () {
-    console.log("After each");
     try {
       sendPerformanceResult(
         expect.getState().currentTestName ?? "",
@@ -46,7 +45,6 @@ export const setupTestLifecycle = ({
   });
 
   afterAll(async () => {
-    console.log("After all");
     try {
       sendTestResults(hasFailuresRef, testName);
       await closeEnv(testName, workers);
