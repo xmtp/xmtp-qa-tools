@@ -256,6 +256,9 @@ export class WorkerClient extends Worker {
         case typeofStream.Message:
           this.initMessageStream();
           break;
+        case typeofStream.GroupUpdated:
+          this.initMessageStream();
+          break;
         case typeofStream.Conversation:
           this.initConversationStream();
           break;

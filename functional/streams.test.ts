@@ -52,7 +52,7 @@ describe(testName, async () => {
       ]);
   });
 
-  it("receiveGroupConversation: should create a new conversation", async () => {
+  it("verifyConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
@@ -74,7 +74,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("receiveGM: should measure receiving a gm", async () => {
+  it("verifyMessageStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
@@ -98,7 +98,7 @@ describe(testName, async () => {
     }
   });
 
-  it("receiveGroupMetadata: should update group name", async () => {
+  it("verifyGroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       const verifyResult = await verifyStream(
