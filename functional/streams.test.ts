@@ -1,10 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import {
-  createDmConsentSender,
-  createGroupConsentSender,
-  verifyStream,
-} from "@helpers/streams";
+import { verifyConversationStream, verifyStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -56,183 +52,63 @@ describe(testName, async () => {
       ]);
   });
 
-  // it("receiveGM: should measure receiving a gm", async () => {
-  //   try {
-  //     workers = await getWorkers(names, testName, typeofStream.Message);
-  //     // Create direct message
-  //     const newDm = await workers
-  //       .get("henry")!
-  //       .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
-
-  //     // Verify message delivery
-  //     const verifyResult = await verifyStream(
-  //       newDm,
-  //       [workers.get("randomguy")!],
-  //       typeofStream.Message,
-  //     );
-
-  //     // Assert results
-  //     expect(verifyResult.messages.length).toEqual(1);
-  //     expect(verifyResult.allReceived).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect.getState().currentTestName);
-  //     throw e;
-  //   }
-  // });
-
-  // it("receiveGroupMetadata: should update group name", async () => {
-  //   try {
-  //     workers = await getWorkers(names, testName, typeofStream.Message);
-  //     const verifyResult = await verifyStream(
-  //       group,
-  //       [workers.get("randomguy")!],
-  //       typeofStream.GroupUpdated,
-  //     );
-
-  //     // Assert results
-  //     expect(verifyResult.messages.length).toEqual(1);
-  //     expect(verifyResult.allReceived).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect.getState().currentTestName);
-  //     throw e;
-  //   }
-  // });
-
-  // it("receiveGroupConsent: should receive group consent stream events", async () => {
-  //   try {
-  //     // Initialize workers with consent stream type
-  //     const workers = await getWorkers(names, testName, typeofStream.Consent);
-
-  //     // Create a simple consent handler that blocks the group
-  //     const consentSender = async (
-  //       conversation: Conversation,
-  //       _payload: string,
-  //     ): Promise<string> => {
-  //       // Toggle group consent state
-  //       await workers.get("henry")!.client.preferences.setConsentStates([
-  //         {
-  //           entity: group.id,
-  //           entityType: ConsentEntityType.GroupId,
-  //           state: ConsentState.Denied,
-  //         },
-  //       ]);
-  //       return "consent_updated";
-  //     };
-
-  //     // Verify that we get consent events through the stream
-  //     const verifyResult = await verifyStream(
-  //       group,
-  //       [workers.get("henry")!],
-  //       typeofStream.Consent,
-  //       1,
-  //       (i, suffix) => `consent_update_${i}_${suffix}`,
-  //       consentSender,
-  //       () => {
-  //         console.log("Group consent update initiated, starting timer");
-  //         start = performance.now();
-  //       },
-  //     );
-
-  //     // Log results for debugging
-  //     console.log(
-  //       "Received consent stream events:",
-  //       JSON.stringify(verifyResult.messages, null, 2),
-  //     );
-
-  //     // Just verify we received an event through the stream
-  //     expect(verifyResult.messages.length).toEqual(1);
-  //     expect(verifyResult.allReceived).toBe(true);
-
-  //     // Always reset consent to a known state to avoid affecting other tests
-  //     await workers.get("henry")!.client.preferences.setConsentStates([
-  //       {
-  //         entity: group.id,
-  //         entityType: ConsentEntityType.GroupId,
-  //         state: ConsentState.Allowed,
-  //       },
-  //     ]);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect.getState().currentTestName);
-  //     throw e;
-  //   }
-  // });
-
-  // it("receiveDmConsent: should receive DM consent stream events", async () => {
-  //   try {
-  //     // Initialize workers with consent stream type
-  //     const workers = await getWorkers(names, testName, typeofStream.Consent);
-
-  //     // Create a DM for testing
-  //     const dmConversation = await workers
-  //       .get("henry")!
-  //       .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
-
-  //     // Create a simple consent handler that allows DM
-  //     const dmConsentSender = async (
-  //       conversation: Conversation,
-  //       _payload: string,
-  //     ): Promise<string> => {
-  //       // Set consent state to allowed for the DM
-  //       await workers.get("henry")!.client.preferences.setConsentStates([
-  //         {
-  //           entity: workers.get("randomguy")!.client.inboxId,
-  //           entityType: ConsentEntityType.InboxId,
-  //           state: ConsentState.Allowed,
-  //         },
-  //       ]);
-  //       return "dm_consent_updated";
-  //     };
-
-  //     // Test the stream to verify it receives events
-  //     const verifyResult = await verifyStream(
-  //       dmConversation,
-  //       [workers.get("henry")!],
-  //       typeofStream.Consent,
-  //       1,
-  //       (i, suffix) => `dm_consent_update_${i}_${suffix}`,
-  //       dmConsentSender,
-  //       () => {
-  //         console.log("DM consent update initiated, starting timer");
-  //         start = performance.now();
-  //       },
-  //     );
-
-  //     // Log results for debugging
-  //     console.log(
-  //       "Received DM consent stream events:",
-  //       JSON.stringify(verifyResult.messages, null, 2),
-  //     );
-
-  //     // Just verify we received an event through the stream
-  //     expect(verifyResult.messages.length).toEqual(1);
-  //     expect(verifyResult.allReceived).toBe(true);
-  //   } catch (e) {
-  //     hasFailures = logError(e, expect.getState().currentTestName);
-  //     throw e;
-  //   }
-  // });
-
   it("receiveGroupConversation: should create a new conversation", async () => {
     try {
-      const validHexPayload = workers.get("randomguy")!.client.inboxId;
+      // Initialize fresh workers specifically for conversation stream testing
+      workers = await getWorkers(names, testName, typeofStream.Conversation);
 
+      console.log("Testing conversation stream with new DM creation");
+
+      // Use the dedicated conversation stream verification helper
+      const result = await verifyConversationStream(workers.get("henry")!, [
+        workers.get("randomguy")!,
+      ]);
+
+      console.log("Conversation stream test results:", JSON.stringify(result));
+
+      // Assert that we received the conversation notification
+      expect(result.receivedCount).toBeGreaterThan(0);
+      expect(result.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+  it("receiveGM: should measure receiving a gm", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.Message);
+      // Create direct message
+      const newDm = await workers
+        .get("henry")!
+        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+
+      // Verify message delivery
+      const verifyResult = await verifyStream(
+        newDm,
+        [workers.get("randomguy")!],
+        typeofStream.Message,
+      );
+
+      // Assert results
+      expect(verifyResult.messages.length).toEqual(1);
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("receiveGroupMetadata: should update group name", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.Message);
       const verifyResult = await verifyStream(
         group,
-        [workers.get("henry")!],
-        typeofStream.Conversation,
-        1,
-        () => validHexPayload,
+        [workers.get("randomguy")!],
+        typeofStream.GroupUpdated,
       );
 
-      console.log(
-        `[${workers.get("henry")!.name}] Received new conversation notification:`,
-      );
-      verifyResult.messages.forEach((receiverMessages) => {
-        console.log(
-          `  New conversation ID: ${JSON.stringify(receiverMessages)}`,
-        );
-      });
-
+      // Assert results
+      expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect.getState().currentTestName);
