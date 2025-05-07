@@ -6,10 +6,6 @@ on:
     branches:
       - main
 
-  pull_request:
-    branches:
-      - main
-
 jobs:
   package:
     runs-on: ubuntu-latest
@@ -30,14 +26,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: ${{ matrix.package-manager }}
-          cache-dependency-path: xmtp-qa-testing/bots/gm-bot/package.json
-
-      - name: Install npm 10.9.2
-        if: matrix.package-manager == 'npm'
-        run: |
-          npm install -g npm@10.9.2
-          npm --version
 
       - name: Install pnpm
         if: matrix.package-manager == 'pnpm'
@@ -57,6 +45,9 @@ jobs:
           npm install -g yarn@1.22.19
           yarn --version
 
+      - name: Navigate to gm-bot directory
+        run: cd xmtp-qa-testing/bots/gm-bot
+
       - name: Clean previous installations
         run: |
           cd xmtp-qa-testing/bots/gm-bot
@@ -72,16 +63,7 @@ jobs:
         if: matrix.package-manager == 'npm'
         run: |
           cd xmtp-qa-testing/bots/gm-bot
-          mkdir -p node_modules
-          echo "npm version: $(npm --version)"
-          echo "node version: $(node --version)"
-          npm config set legacy-peer-deps true
-          npm install --no-fund --verbose
-          # Ensure tsx is installed globally as fallback
-          npm install -g tsx
-          echo "After installation:"
-          ls -la
-          [ -d "node_modules" ] || echo "ERROR: node_modules still not created!"
+          npm install
 
       - name: Install dependencies with yarn
         if: matrix.package-manager == 'yarn'
@@ -110,33 +92,6 @@ jobs:
           cd xmtp-qa-testing/bots/gm-bot
           bun install
 
-      - name: Verify node_modules
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ ! -d "node_modules" ]; then
-            echo "node_modules directory not found, attempting to reinstall"
-            pwd
-            ls -la
-            if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-              yarn install --no-immutable
-            elif [ "${{ matrix.package-manager }}" = "yarn" ]; then
-              yarn install --no-immutable
-            elif [ "${{ matrix.package-manager }}" = "npm" ]; then
-              mkdir -p node_modules
-              npm install --legacy-peer-deps
-              echo "After npm reinstall:"
-              ls -la
-            elif [ "${{ matrix.package-manager }}" = "pnpm" ]; then
-              pnpm install
-            else
-              bun install
-            fi
-          fi
-          echo "Contents of directory:"
-          ls -la
-          echo "Contents of node_modules:"
-          ls -la node_modules || echo "Failed to list node_modules"
-
       - name: Build project
         run: |
           cd xmtp-qa-testing/bots/gm-bot
@@ -149,32 +104,17 @@ jobs:
       - name: Set environment variables
         run: |
           cd xmtp-qa-testing/bots/gm-bot
+          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" > .env
+          echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
+          echo "ENCRYPTION_KEY=${{ secrets.ENCRYPTION_KEY }}" >> .env
           echo "GM_BOT_ADDRESS=${{ vars.GM_BOT_ADDRESS }}" >> .env
           echo "LOGGING_LEVEL=${{ vars.LOGGING_LEVEL }}" >> .env
 
-      - name: Generate keys
+      - name: Run client check
         run: |
           cd xmtp-qa-testing/bots/gm-bot
           if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            yarn gen:keys
+            yarn run client-check
           else
-            ${{ matrix.package-manager }} run gen:keys
-          fi
-          echo "XMTP_ENV=${{ vars.XMTP_ENV }}" >> .env
-
-      - name: Run agent
-        run: |
-          cd xmtp-qa-testing/bots/gm-bot
-          if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
-            timeout 30s yarn run dev | tee output.log
-          else
-            timeout 30s ${{ matrix.package-manager }} run dev | tee output.log
-          fi
-          if grep -q "Waiting for messages..." output.log; then
-            echo "Success: Agent started successfully and is waiting for messages"
-            exit 0
-          else
-            echo "Error: Agent did not reach 'Waiting for messages...' state"
-            cat output.log
-            exit 1
+            ${{ matrix.package-manager }} run client-check
           fi
