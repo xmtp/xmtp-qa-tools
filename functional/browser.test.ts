@@ -46,7 +46,7 @@ describe(testName, () => {
         gmBotAddress,
       ]);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

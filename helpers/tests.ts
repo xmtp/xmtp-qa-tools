@@ -61,13 +61,6 @@ import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
-import {
-  afterAll,
-  afterEach,
-  beforeEach,
-  expect,
-  type ExpectStatic,
-} from "vitest";
 import { sendPerformanceResult, sendTestResults } from "./datadog";
 import { logError } from "./logger";
 
@@ -462,54 +455,6 @@ export const simulateMissingCursorMessage = async (
     `[${worker.name}] Worker reinstalled but sync intentionally skipped`,
   );
   console.log(`[${worker.name}] Simulating cursor being off by one message`);
-};
-
-export const setupTestLifecycle = ({
-  expect,
-  workers,
-  testName,
-  hasFailuresRef,
-  getStart,
-  getTestStart,
-  setStart,
-  setTestStart,
-}: {
-  expect: ExpectStatic;
-  workers: WorkerManager;
-  testName: string;
-  hasFailuresRef: boolean;
-  getStart: () => number;
-  setStart: (v: number) => void;
-  getTestStart: () => number;
-  setTestStart: (v: number) => void;
-}) => {
-  beforeEach(() => {
-    const currentTestName = expect.getState().currentTestName;
-    console.time(currentTestName);
-    getTestStart();
-    getStart();
-  });
-
-  afterEach(function () {
-    console.log("After each");
-    try {
-      sendPerformanceResult(expect, workers, getStart(), getTestStart());
-    } catch (e) {
-      hasFailuresRef = logError(e, expect);
-      throw e;
-    }
-  });
-
-  afterAll(async () => {
-    console.log("After all");
-    try {
-      sendTestResults(hasFailuresRef, testName);
-      await closeEnv(testName, workers);
-    } catch (e) {
-      hasFailuresRef = logError(e, expect);
-      throw e;
-    }
-  });
 };
 
 /**

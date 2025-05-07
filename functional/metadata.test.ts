@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { verifyStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";

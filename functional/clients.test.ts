@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -49,7 +49,7 @@ describe(testName, async () => {
       const client = await getWorkers(["randomclient"], testName, "message");
       expect(client).toBeDefined();
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -65,7 +65,7 @@ describe(testName, async () => {
       expect(client.installationId).toBeDefined();
       expect(inboxId).toBeDefined();
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -78,7 +78,7 @@ describe(testName, async () => {
       );
       expect(dm.id).toBeDefined();
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -103,7 +103,7 @@ describe(testName, async () => {
       expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -134,7 +134,7 @@ describe(testName, async () => {
         `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
       );
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -147,7 +147,7 @@ describe(testName, async () => {
       console.log(inboxState[0].inboxId);
       expect(inboxState[0].inboxId).toBe(bobInboxId);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

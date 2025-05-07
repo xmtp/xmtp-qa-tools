@@ -40,7 +40,7 @@ describe(testName, () => {
           console.log("syncing all");
           await ivy100?.client.conversations.sync();
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -54,7 +54,7 @@ describe(testName, () => {
           const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -74,7 +74,7 @@ describe(testName, () => {
           const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -86,7 +86,7 @@ describe(testName, () => {
           console.log("syncing all");
           await ivy105?.client.conversations.sync();
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -100,7 +100,7 @@ describe(testName, () => {
           const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -113,7 +113,7 @@ describe(testName, () => {
           console.log("syncing all");
           await ivy200?.client.conversations.sync();
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -127,7 +127,7 @@ describe(testName, () => {
           const message = "message 4/4\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });

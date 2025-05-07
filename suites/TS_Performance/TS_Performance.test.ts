@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyStream, verifyStreamAll } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   Client,
@@ -59,7 +59,7 @@ describe(testName, async () => {
       const client = await getWorkers(["randomclient"], testName, "message");
       expect(client).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -85,7 +85,7 @@ describe(testName, async () => {
       );
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -96,7 +96,7 @@ describe(testName, async () => {
         .client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -109,7 +109,7 @@ describe(testName, async () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -125,7 +125,7 @@ describe(testName, async () => {
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -139,7 +139,7 @@ describe(testName, async () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -162,7 +162,7 @@ describe(testName, async () => {
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -177,7 +177,7 @@ describe(testName, async () => {
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -194,7 +194,7 @@ describe(testName, async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -204,7 +204,7 @@ describe(testName, async () => {
       const members = await newGroup.members();
       expect(members.length).toBe(i + 1);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -216,7 +216,7 @@ describe(testName, async () => {
       const name = (newGroup as Group).name;
       expect(name).toBe(newName);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -229,7 +229,7 @@ describe(testName, async () => {
       console.log("GM Message sent in group", groupMessage);
       expect(groupMessage).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -241,7 +241,7 @@ describe(testName, async () => {
       });
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -249,7 +249,7 @@ describe(testName, async () => {
     try {
       await (newGroup as Group).addMembers([workers.getWorkers()[2].inboxId]);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -265,7 +265,7 @@ describe(testName, async () => {
       const members = await newGroup.members();
       expect(members.length).toBe(previousMembers.length - 1);
     } catch (e) {
-      hasFailures = logError(e, expect);
+      hasFailures = logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -280,7 +280,7 @@ describe(testName, async () => {
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         expect(newGroup.id).toBeDefined();
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -297,7 +297,7 @@ describe(testName, async () => {
           );
         expect(newGroupByIdentifier.id).toBeDefined();
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -307,7 +307,7 @@ describe(testName, async () => {
         const members = await newGroup.members();
         expect(members.length).toBe(i + 1);
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -319,7 +319,7 @@ describe(testName, async () => {
         const name = (newGroup as Group).name;
         expect(name).toBe(newName);
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -335,7 +335,7 @@ describe(testName, async () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -348,7 +348,7 @@ describe(testName, async () => {
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -362,7 +362,7 @@ describe(testName, async () => {
         });
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
-        hasFailures = logError(e, expect);
+        hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

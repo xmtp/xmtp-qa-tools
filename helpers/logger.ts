@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
-import type { ExpectStatic } from "vitest";
-import winston from "winston";
+import winston, { error } from "winston";
 
 // Create a simple logger that formats logs in a pretty way
 export const createLogger = () => {
@@ -47,12 +46,9 @@ export const createLogger = () => {
   return logger;
 };
 
-export const logError = (e: unknown, expect: ExpectStatic): boolean => {
+export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
-    console.error(
-      `[vitest] Test failed in ${expect.getState().currentTestName}`,
-      e.message,
-    );
+    console.error(`[vitest] Test failed in ${testName}`, e.message);
   } else {
     console.error(`Unknown error type:`, typeof e);
   }

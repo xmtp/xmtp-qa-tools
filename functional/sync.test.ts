@@ -54,7 +54,7 @@ describe(testName, async () => {
       // Allow time for group creation to propagate to all members
       await delay(2000);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -80,7 +80,7 @@ describe(testName, async () => {
       // Allow time for message to propagate to all members
       await delay(3000);
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -115,7 +115,7 @@ describe(testName, async () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -150,7 +150,7 @@ describe(testName, async () => {
 
       return { syncTime, messageCount: messages.length };
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -185,7 +185,7 @@ describe(testName, async () => {
 
       return { retrievalTime, messageCount: messages.length };
     } catch (e) {
-      logError(e, expect);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
