@@ -27,6 +27,12 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
+      - name: Install npm 10.9.2
+        if: matrix.package-manager == 'npm'
+        run: |
+          npm install -g npm@10.9.2
+          npm --version
+
       - name: Install pnpm
         if: matrix.package-manager == 'pnpm'
         uses: pnpm/action-setup@v3
