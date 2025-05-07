@@ -1,11 +1,14 @@
 #!/bin/bash
 
 # Script to run tests with retry logic
-MAX_ATTEMPTS=3
+DEFAULT_MAX_ATTEMPTS=3
 RETRY_DELAY=10
 
 # Get test name from command line argument or use default
 TEST_NAME=${1:-"functional"}
+
+# Get max attempts from second command line argument or use default
+MAX_ATTEMPTS=${2:-$DEFAULT_MAX_ATTEMPTS}
 
 echo "Starting $TEST_NAME tests with up to $MAX_ATTEMPTS attempts"
 

@@ -1,4 +1,11 @@
 import {
+  createSigner,
+  generateEncryptionKeyHex,
+  getDbPath,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@bots/client";
+import {
   Client,
   Dm,
   type Conversation,
@@ -6,13 +13,6 @@ import {
   type LogLevel,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import {
-  createSigner,
-  generateEncryptionKeyHex,
-  getDbPath,
-  getEncryptionKeyFromHex,
-  logAgentDetails,
-} from "./client";
 import "dotenv/config";
 
 /**
@@ -23,7 +23,7 @@ interface AgentOptions {
   /** Whether to accept group conversations */
   acceptGroups?: boolean;
   /** Encryption key for the client */
-  encryptionKey?: string;
+  dbEncryptionKey?: string;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
   /** Public key of the agent */
@@ -54,18 +54,18 @@ type MessageHandler = (
 const MAX_RETRIES = 6;
 const RETRY_DELAY_MS = 2000;
 const WATCHDOG_RESTART_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
-  {
-    walletKey: "",
-    encryptionKey: "",
-    publicKey: "",
-    acceptGroups: false,
-    acceptTypes: ["text"],
-    networks: ["dev", "production"],
-    connectionTimeout: 30000,
-    autoReconnect: true,
-  },
-];
+const DEFAULT_AGENT_OPTIONS: AgentOptions = {
+  walletKey: "",
+  dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
+  publicKey: "",
+  acceptGroups: false,
+  acceptTypes: ["text"],
+  networks: process.env.XMTP_ENV ? [process.env.XMTP_ENV] : ["dev"],
+  connectionTimeout: 30000,
+  autoReconnect: true,
+  welcomeMessage: "",
+  codecs: [],
+};
 
 // Helper functions
 export const sleep = (ms: number): Promise<void> =>
@@ -76,8 +76,14 @@ export const sleep = (ms: number): Promise<void> =>
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
-  options: AgentOptions[] = DEFAULT_AGENT_OPTIONS,
+  options: AgentOptions[],
 ): Promise<Client[]> => {
+  // Merge default options with the provided options
+  const mergedOptions = options.map((opt) => ({
+    ...DEFAULT_AGENT_OPTIONS,
+    ...opt,
+  }));
+
   /**
    * Core message streaming function with robust error handling
    */
@@ -87,7 +93,7 @@ export const initializeClient = async (
     options: AgentOptions,
     onActivity?: () => void,
   ): Promise<void> => {
-    const env = client.options?.env ?? "undefined";
+    const env = client.options?.env;
     let retryCount = 0;
     const acceptTypes = options.acceptTypes || ["text"];
     let backoffTime = RETRY_DELAY_MS;
@@ -190,9 +196,7 @@ export const initializeClient = async (
           );
 
           try {
-            await initializeClient(messageHandler, [
-              { ...options, networks: [env] },
-            ]);
+            await initializeClient(messageHandler, [{ ...options }]);
             retryCount = 0; // Reset retry counter after recovery
             continue;
           } catch (fatalError) {
@@ -281,14 +285,14 @@ export const initializeClient = async (
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
 
-  for (const option of options) {
-    for (const env of option.networks ?? ["dev", "production"]) {
+  for (const option of mergedOptions) {
+    for (const env of option.networks ?? []) {
       try {
         console.log(`[${env}] Initializing client...`);
 
         const signer = createSigner(option.walletKey);
         const dbEncryptionKey = getEncryptionKeyFromHex(
-          option.encryptionKey ??
+          option.dbEncryptionKey ??
             process.env.ENCRYPTION_KEY ??
             generateEncryptionKeyHex(),
         );
@@ -300,7 +304,7 @@ export const initializeClient = async (
           env: env as XmtpEnv,
           loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
-          codecs: option.codecs,
+          codecs: option.codecs ?? [],
         });
 
         await client.conversations.sync();
@@ -323,7 +327,7 @@ export const initializeClient = async (
         const streamPromise = streamMessages(
           client,
           messageHandler,
-          { ...option, networks: [env] },
+          { ...option },
           activityTracker,
         );
 

@@ -105,13 +105,10 @@ export async function verifyStream<T extends string = string>(
     setTimeout(resolve, defaultValues.streamTimeout),
   );
 
-  // Start the timer for the entire collection process
-  const collectionStartTime = performance.now();
-
   // Start collectors
   let collectPromises: Promise<T[]>[] = [];
   if (collectorType === "text") {
-    collectPromises = receivers.map((r, index) => {
+    collectPromises = receivers.map((r) => {
       if (!r.worker) {
         return Promise.resolve([]);
       }
@@ -122,7 +119,7 @@ export async function verifyStream<T extends string = string>(
         });
     });
   } else if (collectorType === "group_updated") {
-    collectPromises = receivers.map((r, index) => {
+    collectPromises = receivers.map((r) => {
       if (!r.worker) {
         return Promise.resolve([]);
       }

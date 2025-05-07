@@ -465,17 +465,12 @@ export const sendPerformanceResult = (
     // If start is undefined, use testStart or current time
     const actualStart = start ?? testStart ?? performance.now();
     const deliveryTime = performance.now() - actualStart;
-    const totalTestTime = testStart ? performance.now() - testStart : undefined;
 
     void sendPerformanceMetric(
       deliveryTime,
       testName,
       workers.getVersion(),
       false,
-      {
-        totalTestTime,
-        isDeliveryTime: true,
-      },
     );
   }
 };
@@ -530,10 +525,6 @@ export async function sendPerformanceMetric(
   testName: string,
   libXmtpVersion: string,
   skipNetworkStats: boolean = false,
-  additionalInfo?: {
-    totalTestTime?: number;
-    isDeliveryTime?: boolean;
-  },
 ): Promise<void> {
   if (!state.isInitialized) return;
 

@@ -5,6 +5,9 @@ on:
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
+  # pull_request:
+  #   branches:
+  #     - main
 
 jobs:
   test:
@@ -18,6 +21,9 @@ jobs:
       WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
       ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
       XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
       TEST_NAME: "TS_AgentHealth"
     steps:
       - uses: actions/checkout@v4
@@ -39,14 +45,12 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_AgentHealth
+        run: ./scripts/run-test.sh TS_AgentHealth 1
       - name: Send Slack notification
         if: always()
         env:
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
           JOB_STATUS: ${{ job.status }}
-        run: ./scripts/notify-slack.sh
+        run: npx tsx helpers/slack.ts
       - name: Upload reports and snapshots artifacts
         if: always()
         uses: actions/upload-artifact@v4
