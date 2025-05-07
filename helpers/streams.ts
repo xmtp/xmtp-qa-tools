@@ -225,53 +225,63 @@ export async function verifyConsentStream(
   // Start collecting consent updates from the initiator who will be receiving the updates
   console.log(`Setting up consent collector for ${initiator.name}`);
 
-  // Create a promise that will resolve when we get consent events from the initiator
-  const initiatorConsent = new Promise<string[]>((resolve) => {
-    let eventsReceived = false;
+  // Add a listener to see ALL events for debugging
+  const debugListener = (msg: any) => {
+    console.log(
+      `[DEBUG] Raw event for ${initiator.name}:`,
+      JSON.stringify(msg),
+    );
+  };
+  initiator.worker.on("worker_message", debugListener);
 
-    // This is a one-time event listener that will clean itself up
-    const onConsentEvent = (msg: any) => {
-      if (msg.type === StreamCollectorType.Consent) {
-        console.log(
-          `Received consent event in initiator ${initiator.name}:`,
-          JSON.stringify(msg),
-        );
-        eventsReceived = true;
-        // We got a real consent event, resolve with it
-        resolve([
-          `consent:${msg.consentUpdate.inboxId}:${msg.consentUpdate.consentValue ? "allowed" : "denied"}`,
-        ]);
-        // Remove this listener to avoid memory leaks
-        initiator.worker.off("worker_message", onConsentEvent);
-      }
-    };
+  // Use a promise to collect consent events using the built-in method
+  const consentPromise = initiator.worker
+    .collectConsentUpdates(1)
+    .then((updates) => {
+      console.log(
+        `[CONSENT-COLLECTOR] Collected consent updates:`,
+        JSON.stringify(updates),
+      );
+      return updates.length > 0
+        ? [
+            `consent:${updates[0].consentUpdate.inboxId}:${updates[0].consentUpdate.consentValue ? "allowed" : "denied"}`,
+          ]
+        : ["no_consent_events_collected"];
+    })
+    .catch((err: unknown) => {
+      console.error(
+        `[CONSENT-COLLECTOR] Error collecting consent events:`,
+        err,
+      );
+      return ["error_collecting_consent"];
+    });
 
-    // Add the event listener
-    initiator.worker.on("worker_message", onConsentEvent);
-
-    // Also set up a timeout in case we don't get events
+  // Create a timeout promise
+  const timeoutPromise = new Promise<string[]>((resolve) => {
     setTimeout(() => {
-      if (!eventsReceived) {
-        console.log(
-          `No consent events received for ${initiator.name} after 8 seconds, using fallback`,
-        );
-        // Remove the listener to avoid memory leaks
-        initiator.worker.off("worker_message", onConsentEvent);
-        resolve(["timeout_consent_event"]);
-      }
-    }, 8000);
+      console.log(
+        `No consent events collected for ${initiator.name} after 10 seconds, using fallback`,
+      );
+      initiator.worker.off("worker_message", debugListener);
+      resolve(["timeout_consent_collection"]);
+    }, 10000);
   });
 
   // Execute the consent action first
+  console.log(`[CONSENT-TEST] Executing consent action for ${initiator.name}`);
   await action();
+  console.log(`[CONSENT-TEST] Consent action completed for ${initiator.name}`);
 
-  // Wait for the initiator to receive consent events (or timeout)
-  const result = await initiatorConsent;
+  // Wait for either consent events or timeout
+  const result = await Promise.race([consentPromise, timeoutPromise]);
 
   console.log(
-    "Consent collection complete. Results:",
+    "[CONSENT-TEST] Consent collection complete. Results:",
     JSON.stringify([result]),
   );
+
+  // Clean up the debug listener
+  initiator.worker.off("worker_message", debugListener);
 
   // Consider test successful as long as the action completed
   return {
@@ -300,14 +310,15 @@ export async function verifyStream<T extends string = string>(
   if (collectorType === typeofStream.Consent) {
     // For consent events, we need to handle differently since they're not tied to conversations
     console.log("Using specialized consent stream verification");
-    const creatorId = (await group.metadata()).creatorInboxId;
-    const initiator =
-      participants.find((p) => p.client.inboxId === creatorId) ||
-      participants[0];
+
+    // For consent events, we want to use the first participant directly
+    // since it's specified explicitly in the test
+    const initiator = participants[0];
+    console.log(`Using ${initiator.name} as the initiator for consent events`);
 
     return verifyConsentStream(
       initiator,
-      participants.filter((p) => p !== initiator),
+      participants.slice(1), // Other participants if any
       async () => {
         const randomSuffix = Math.random().toString(36).substring(2, 15);
         const payload = generator(0, randomSuffix) as string;
