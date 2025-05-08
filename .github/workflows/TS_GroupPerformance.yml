@@ -1,11 +1,11 @@
-name: TS_Performance
-description: "should verify performance "
+name: TS_GroupPerformance
+description: "should verify performance of the group streams"
 
 on:
   pull_request:
     branches: [deploy]
   schedule:
-    - cron: "30 * * * *" # Runs every 30 minutes
+    - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
 
 jobs:
@@ -40,7 +40,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: ./scripts/run-test.sh TS_Performance
+        run: ./scripts/run-test.sh TS_GroupPerformance
       - name: Send Slack notification
         if: always()
         env:
@@ -50,7 +50,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_performance_${{ matrix.environment }}
+          name: ts_group_performance_${{ matrix.environment }}
           path: logs/
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'
