@@ -1,6 +1,5 @@
-import { getWorkersFromGroup } from "@helpers/groups";
-import { StreamCollectorType, typeofStream } from "@workers/main";
-import type { Worker, WorkerManager } from "@workers/manager";
+import { typeofStream } from "@workers/main";
+import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
@@ -214,17 +213,9 @@ export async function verifyMessageStream<T extends string = string>(
   // Configure collectors for message streams
   console.log(`Setting up ${receivers.length} collectors for messages`);
   const collectPromises: Promise<T[]>[] = receivers.map((r) => {
-    console.log(
-      `Setting up collector for ${r.name} to watch ${conversationId}`,
-    );
-
     return r.worker
       .collectMessages(conversationId, typeofStream.Message, count)
       .then((msgs: StreamMessage[]) => {
-        console.log(
-          `Received messages for ${r.name}:`,
-          JSON.stringify(msgs.map((m) => m.message.content)),
-        );
         return msgs.map((m) => m.message.content as T);
       })
       .catch((err: unknown) => {
@@ -342,15 +333,6 @@ export async function verifyConsentStream(
   // Start collecting consent updates from the initiator who will be receiving the updates
   console.log(`Setting up consent collector for ${initiator.name}`);
 
-  // Add a listener to see ALL events for debugging
-  const debugListener = (msg: any) => {
-    console.log(
-      `[DEBUG] Raw event for ${initiator.name}:`,
-      JSON.stringify(msg),
-    );
-  };
-  initiator.worker.on("worker_message", debugListener);
-
   // Use a promise to collect consent events using the built-in method
   const consentPromise = initiator.worker
     .collectConsentUpdates(1)
@@ -376,26 +358,14 @@ export async function verifyConsentStream(
       console.log(
         `No consent events collected for ${initiator.name} after 10 seconds, using fallback`,
       );
-      initiator.worker.off("worker_message", debugListener);
       resolve(["timeout_consent_collection"]);
     }, 10000);
   });
 
-  // Execute the consent action first
-  console.log(`[CONSENT-TEST] Executing consent action for ${initiator.name}`);
   await action();
-  console.log(`[CONSENT-TEST] Consent action completed for ${initiator.name}`);
 
   // Wait for either consent events or timeout
   const result = await Promise.race([consentPromise, timeoutPromise]);
-
-  console.log(
-    "[CONSENT-TEST] Consent collection complete. Results:",
-    JSON.stringify([result]),
-  );
-
-  // Clean up the debug listener
-  initiator.worker.off("worker_message", debugListener);
 
   // Consider test successful as long as the action completed
   return {

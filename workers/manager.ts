@@ -267,7 +267,6 @@ export class WorkerManager {
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
     };
-    //  console.debug("Worker data created", workerData);
 
     // Create and initialize the worker
     const workerClient = new WorkerClient(

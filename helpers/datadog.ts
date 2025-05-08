@@ -261,7 +261,7 @@ export function getThresholdForOperation(
     } else {
       baseThreshold =
         THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-      console.log(
+      console.debug(
         `Operation: ${operation}, members: ${members}, using core threshold: ${baseThreshold}`,
       );
     }

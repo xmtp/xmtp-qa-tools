@@ -84,8 +84,6 @@ describe(testName, () => {
       ?.client.preferences.inboxState(true);
     const davidCount = davidInitialState?.installations.length;
     const emmaCount = emmaInitialState?.installations.length;
-    console.log(names[3], davidCount);
-    console.log(names[4], emmaCount);
     expect(davidCount).toBe(2); // a + mobile
     expect(emmaCount).toBeGreaterThan(1); // a + tablet
 
@@ -97,7 +95,6 @@ describe(testName, () => {
     // Count installations after revocation
     const davidFinalState = await davidClient?.preferences.inboxState(true);
     const davidFinalCount = davidFinalState?.installations.length;
-    console.log(names[3], davidFinalCount);
     expect(davidFinalCount).toBe(1); // only a
   });
 });

@@ -60,7 +60,7 @@ describe(testName, async () => {
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
@@ -70,7 +70,7 @@ describe(testName, async () => {
         await groupsBySize[i].sync();
         const members = await groupsBySize[i].members();
         expect(members.length).toBe(i + 1);
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
@@ -82,7 +82,7 @@ describe(testName, async () => {
         await groupsBySize[i].sync();
         const name = (groupsBySize[i] as Group).name;
         expect(name).toBe(newName);
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
@@ -99,7 +99,7 @@ describe(testName, async () => {
 
         const members = await groupsBySize[i].members();
         expect(members.length).toBe(previousMembers.length - 1);
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
@@ -112,57 +112,57 @@ describe(testName, async () => {
         await groupsBySize[i].send(groupMessage);
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        // Make sure all workers sync the conversation first
-        const testParticipants: Worker[] = [];
-        const henry = workers.get("henry");
-        if (henry) {
-          testParticipants.push(henry);
-        }
-
-        // Create a message in the group to ensure it exists
-        await groupsBySize[i].send(`test-sync-message-${randomSuffix}`);
-
-        // Make sure all participants have synced the group
-        for (const worker of workers.getWorkers()) {
-          try {
-            await worker.client.conversations.sync();
-            const conv = await worker.client.conversations.getConversationById(
-              groupsBySize[i].id,
-            );
-            if (conv && !testParticipants.includes(worker)) {
-              testParticipants.push(worker);
-            }
-          } catch (error) {
-            console.warn(`Could not sync worker ${worker.name}:`, error);
-          }
-        }
+        // Create a new group specifically for this test with actual workers
+        // Use the first 5 workers (excluding henry who will be the sender)
+        const workersList = workers.getWorkers().slice(1, i + 1);
+        const inboxIds = workersList.map((worker) => worker.client.inboxId);
 
         console.log(
-          `Using ${testParticipants.length} participants for the message stream test`,
+          `Creating test group with ${inboxIds.length} worker participants`,
+        );
+        const testGroup = await workers
+          .get("henry")!
+          .client.conversations.newGroup(inboxIds, {
+            groupName: `Test Group ${i}`,
+          });
+
+        console.log(`Test group created with ID: ${testGroup.id}`);
+
+        // Sync the group for all participants
+        await Promise.all(
+          workersList.map((worker) =>
+            worker.client.conversations.sync().catch((err) => {
+              console.error(`Error syncing for ${worker.name}:`, err);
+            }),
+          ),
         );
 
+        // Wait a moment for sync to complete
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
         const verifyResult = await verifyMessageStream(
-          groupsBySize[i],
-          testParticipants,
+          testGroup,
+          workersList,
           1,
           (i, _) => `gm-${i + 1}-${randomSuffix}`,
           undefined,
           () => {
             console.log(
-              `Group message sent for ${i} participants, starting timer now`,
+              `Group message sent for ${inboxIds.length} participants, starting timer now`,
             );
             start = performance.now();
           },
         );
+
         expect(verifyResult.allReceived).toBe(true);
-      } catch (e) {
+      } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }

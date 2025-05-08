@@ -286,6 +286,9 @@ export class WorkerClient extends Worker {
           const stream = await this.client.conversations.streamAllMessages();
 
           for await (const message of stream) {
+            console.log(
+              `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
+            );
             if (
               !message ||
               message?.senderInboxId.toLowerCase() ===
@@ -336,9 +339,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error(
-            "Message stream error: " + this.nameId + " " + String(error),
-          );
+          console.error("maints:message " + String(error));
         }
       }
     })();
