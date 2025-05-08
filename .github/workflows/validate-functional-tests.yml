@@ -20,13 +20,15 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn
+      - name: Start dev environment
+        run: ./dev/up
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Print versions
         run: yarn script versions
       - name: Run functional tests
         env:
-          XMTP_ENV: dev
+          XMTP_ENV: local
           RUST_BACKTRACE: 1
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           # Set this to true to help with debugging in GitHub Actions
