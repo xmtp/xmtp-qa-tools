@@ -83,7 +83,15 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = ["202", "203", "204", "205", "206", "208"];
+export const sdkVersionOptions = [
+  "202",
+  "203",
+  "204",
+  "205",
+  "206",
+  "208",
+  "209",
+];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -470,131 +478,6 @@ export const simulateMissingCursorMessage = async (
   );
   console.log(`[${worker.name}] Simulating cursor being off by one message`);
 };
-
-/**
- * Calculates message reception and order statistics
- */
-export function calculateMessageStats(
-  workers: Worker[],
-  messagesByWorker: string[][],
-  prefix: string,
-  amount: number,
-  suffix: string,
-) {
-  // Verify message order helper
-  const verifyMessageOrder = (
-    messages: string[],
-    expectedPrefix: string = "gm-",
-    expectedCount?: number,
-  ) => {
-    if (messages.length === 0) return { inOrder: false, expectedMessages: [] };
-
-    const count = expectedCount || messages.length;
-    const expectedMessages = Array.from(
-      { length: count },
-      (_, i) => `${expectedPrefix}${i + 1}-${suffix}`,
-    );
-
-    const inOrder =
-      messages.length === expectedMessages.length &&
-      messages.every((msg, i) => msg === expectedMessages[i]);
-
-    return { inOrder, expectedMessages };
-  };
-
-  // Log discrepancies helper
-  const showDiscrepancies = (
-    workersInOrder: number,
-    workerCount: number,
-    workers: Worker[],
-  ) => {
-    if (workersInOrder >= workerCount) return;
-
-    console.log("Message order discrepancies detected:");
-
-    messagesByWorker.forEach((messages, index) => {
-      const { inOrder, expectedMessages } = verifyMessageOrder(
-        messages,
-        prefix,
-        amount,
-      );
-
-      if (!inOrder) {
-        console.log(
-          `Worker ${workers[index].name} received messages out of order or missing messages:`,
-        );
-
-        if (messages.length !== expectedMessages.length) {
-          console.log(
-            `  Expected ${expectedMessages.length} messages, received ${messages.length}`,
-          );
-        }
-
-        const discrepancies = [];
-
-        for (
-          let i = 0;
-          i < Math.max(messages.length, expectedMessages.length);
-          i++
-        ) {
-          if (i >= messages.length) {
-            discrepancies.push(`Missing: ${expectedMessages[i]}`);
-          } else if (i >= expectedMessages.length) {
-            discrepancies.push(`Unexpected: ${messages[i]}`);
-          } else if (messages[i] !== expectedMessages[i]) {
-            discrepancies.push(
-              `Expected: ${expectedMessages[i]}, Got: ${messages[i]}`,
-            );
-          }
-        }
-
-        if (discrepancies.length > 0) {
-          console.debug("Discrepancies:");
-          discrepancies.forEach((d) => {
-            console.debug(d);
-          });
-        }
-      }
-    });
-  };
-
-  // Calculate statistics
-  let totalExpectedMessages = amount * messagesByWorker.length;
-  let totalReceivedMessages = messagesByWorker.reduce(
-    (sum, msgs) => sum + msgs.length,
-    0,
-  );
-  let workersInOrder = 0;
-  const workerCount = messagesByWorker.length;
-
-  for (const messages of messagesByWorker) {
-    const { inOrder } = verifyMessageOrder(messages, prefix, amount);
-    if (inOrder) workersInOrder++;
-  }
-
-  const receptionPercentage =
-    (totalReceivedMessages / totalExpectedMessages) * 100;
-  const orderPercentage = (workersInOrder / workerCount) * 100;
-
-  console.log("Expected messages pattern:", `${prefix}[1-${amount}]-${suffix}`);
-  console.log(
-    `Reception: ${receptionPercentage.toFixed(2)}% (${totalReceivedMessages}/${totalExpectedMessages})`,
-  );
-  console.log(
-    `Order: ${orderPercentage.toFixed(2)}% (${workersInOrder}/${workerCount} workers)`,
-  );
-
-  showDiscrepancies(workersInOrder, workerCount, workers);
-
-  return {
-    receptionPercentage,
-    orderPercentage,
-    workersInOrder,
-    workerCount,
-    totalReceivedMessages,
-    totalExpectedMessages,
-  };
-}
 
 // Default worker names
 export const defaultNames = [

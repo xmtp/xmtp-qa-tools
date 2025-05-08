@@ -99,9 +99,7 @@ describe(testName, async () => {
         [workers.get("randomguy")!],
         1,
         undefined,
-        undefined,
         () => {
-          console.log("Message sent, starting timer now");
           start = performance.now();
         },
       );

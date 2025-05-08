@@ -1,7 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import { getWorkersFromGroup } from "@helpers/groups";
-import { verifyMessageStream, type VerifyStreamResult } from "@helpers/streams";
-import { calculateMessageStats } from "@helpers/tests";
+import {
+  calculateMessageStats,
+  verifyMessageStream,
+  type VerifyStreamResult,
+} from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -54,10 +57,8 @@ describe(testName, async () => {
       group,
       workers.getWorkers(),
       amount,
-      (i) => `gm-${i + 1}-${randomSuffix}`,
-      undefined,
+      "gm",
       () => {
-        console.log("Message sent, starting timer now");
         start = performance.now();
       },
     );

@@ -135,12 +135,8 @@ describe(testName, async () => {
           testGroup,
           workers.getWorkers(),
           1,
-          undefined,
-          undefined,
+          "gm",
           () => {
-            console.log(
-              `Group message sent for ${inboxIds.length} participants, starting timer now`,
-            );
             start = performance.now();
           },
         );

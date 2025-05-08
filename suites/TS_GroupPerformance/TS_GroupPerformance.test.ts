@@ -78,7 +78,6 @@ describe(testName, async () => {
     //       workers.getWorkers()[0],
     //       workers.getWorkers(),
     //       () => {
-    //         console.log("Message sent, starting timer now");
     //         start = performance.now();
     //       },
     //     );
@@ -99,7 +98,6 @@ describe(testName, async () => {
           1,
           undefined,
           () => {
-            console.log("Message sent, starting timer now");
             start = performance.now();
           },
         );
@@ -119,10 +117,8 @@ describe(testName, async () => {
           newGroup,
           workers.getWorkers(),
           1,
-          undefined,
-          undefined,
+          "gm",
           () => {
-            console.log("Message sent, starting timer now");
             start = performance.now();
           },
         );

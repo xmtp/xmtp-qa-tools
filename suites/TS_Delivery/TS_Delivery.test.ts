@@ -2,9 +2,9 @@ import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
-import { verifyMessageStream, type VerifyStreamResult } from "@helpers/streams";
-import { calculateMessageStats } from "@helpers/tests";
+import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -24,9 +24,8 @@ describe(testName, async () => {
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
   let workers: WorkerManager;
-  workers = await getWorkers(receiverAmount, testName);
+  workers = await getWorkers(receiverAmount, testName, typeofStream.Message);
   let group: Group;
-  let collectedMessages: VerifyStreamResult;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
   let hasFailures = false;
   let start: number;
@@ -61,53 +60,30 @@ describe(testName, async () => {
     },
   });
 
-  it("stream: send the stream", async () => {
+  it("stream_order: verify message order when receiving via streams", async () => {
     try {
-      collectedMessages = await verifyMessageStream(
+      const verifyResult = await verifyMessageStream(
         group,
         workers.getWorkers(),
-        amountofMessages,
-      );
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("stream_order: verify message order when receiving via streams", () => {
-    try {
-      // Group messages by worker
-      const messagesByWorker: string[][] = [];
-
-      // Normalize the collectedMessages structure to match the pull test
-      for (let i = 0; i < collectedMessages.messages.length; i++) {
-        messagesByWorker.push(collectedMessages.messages[i]);
-      }
-
-      const stats = calculateMessageStats(
-        workers.getWorkers(),
-        messagesByWorker,
-        "gm-",
         amountofMessages,
         randomSuffix,
       );
 
-      console.log(JSON.stringify(stats));
-      expect(stats.receptionPercentage).toBeGreaterThan(95);
-      expect(stats.orderPercentage).toBeGreaterThan(95);
+      expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(95);
+      expect(verifyResult.stats?.orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
-        stats.receptionPercentage,
-        workers.get("bob")!.sdkVersion,
-        workers.get("bob")!.libXmtpVersion,
+        verifyResult.stats?.receptionPercentage ?? 0,
+        workers.getWorkers()[1].sdkVersion,
+        workers.getWorkers()[1].libXmtpVersion,
         testName,
         "stream",
         "delivery",
       );
       sendDeliveryMetric(
-        stats.orderPercentage,
-        workers.get("bob")!.sdkVersion,
-        workers.get("bob")!.libXmtpVersion,
+        verifyResult.stats?.orderPercentage ?? 0,
+        workers.getWorkers()[1].sdkVersion,
+        workers.getWorkers()[1].libXmtpVersion,
         testName,
         "stream",
         "order",
@@ -152,22 +128,21 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      console.log(JSON.stringify(stats));
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
         stats.receptionPercentage,
-        workers.get("bob")!.sdkVersion,
-        workers.get("bob")!.libXmtpVersion,
+        workers.getWorkers()[1].sdkVersion,
+        workers.getWorkers()[1].libXmtpVersion,
         testName,
         "poll",
         "delivery",
       );
       sendDeliveryMetric(
         stats.orderPercentage,
-        workers.get("bob")!.sdkVersion,
-        workers.get("bob")!.libXmtpVersion,
+        workers.getWorkers()[1].sdkVersion,
+        workers.getWorkers()[1].libXmtpVersion,
         testName,
         "poll",
         "order",
@@ -236,7 +211,6 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      console.log(JSON.stringify(stats));
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
 

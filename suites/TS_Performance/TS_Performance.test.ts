@@ -152,10 +152,8 @@ describe(testName, async () => {
         dm,
         [workers.getWorkers()[1]],
         1,
-        undefined,
-        undefined,
+        "gm",
         () => {
-          console.log("Message sent, starting timer now");
           start = performance.now();
         },
       );
@@ -241,8 +239,7 @@ describe(testName, async () => {
         newGroup,
         workers.getWorkers(),
         1,
-        undefined,
-        undefined,
+        "gm",
         () => {
           console.log("Group message sent, starting timer now");
           start = performance.now();
@@ -369,8 +366,7 @@ describe(testName, async () => {
           newGroup,
           workers.getWorkers().slice(1, i + 1),
           1,
-          undefined,
-          undefined,
+          "gm",
           () => {
             console.log(
               `Group message sent for ${i} participants, starting timer now`,
