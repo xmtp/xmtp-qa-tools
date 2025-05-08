@@ -507,8 +507,9 @@ export class WorkerClient extends Worker {
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
     additionalInfo?: Record<string, string | number | boolean>;
+    timeout?: number;
   }): Promise<T[]> {
-    const { type, filterFn, count } = options;
+    const { type, filterFn, count, timeout = 10000 } = options; // Default timeout of 10 seconds
 
     return new Promise((resolve) => {
       const events: T[] = [];
@@ -531,12 +532,22 @@ export class WorkerClient extends Worker {
           events.push(msg as T);
           if (events.length >= count) {
             this.off("worker_message", onMessage);
+            clearTimeout(timeoutId);
             resolve(events);
           }
         }
       };
 
       this.on("worker_message", onMessage);
+
+      // Add timeout to prevent hanging indefinitely
+      const timeoutId = setTimeout(() => {
+        this.off("worker_message", onMessage);
+        console.log(
+          `[${this.nameId}] Stream collection timed out after ${timeout}ms. Collected ${events.length}/${count} events.`,
+        );
+        resolve(events); // Resolve with whatever events we've collected so far
+      }, timeout);
     });
   }
 
@@ -547,6 +558,7 @@ export class WorkerClient extends Worker {
     groupId: string,
     typeId: string,
     count: number,
+    timeout?: number,
   ): Promise<StreamTextMessage[]> {
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
@@ -564,6 +576,7 @@ export class WorkerClient extends Worker {
       },
       count,
       additionalInfo: { groupId, contentType: typeId },
+      timeout,
     });
   }
 
@@ -573,6 +586,7 @@ export class WorkerClient extends Worker {
   collectGroupUpdates(
     groupId: string,
     count: number,
+    timeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     console.log(
       `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
@@ -605,6 +619,7 @@ export class WorkerClient extends Worker {
       },
       count,
       additionalInfo: { groupId },
+      timeout,
     });
   }
 
@@ -614,11 +629,13 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
+    timeout?: number,
   ): Promise<StreamConversationMessage[]> {
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
       count,
       additionalInfo: { fromPeerAddress },
+      timeout,
     });
   }
 

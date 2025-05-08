@@ -1,7 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import { verifyGroupUpdateStream, verifyMessageStream } from "@helpers/streams";
+import {
+  verifyConversationGroupStream,
+  verifyGroupUpdateStream,
+  verifyMessageStream,
+} from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -49,21 +53,55 @@ describe(testName, async () => {
 
         console.log(`Adding ${workers.getWorkers().length} participants`);
 
-        await (newGroup as Group).addMembers(
-          workers.getWorkers().map((w) => w.inboxId),
-        );
-
         await newGroup.sync();
         const members = await newGroup.members();
-        const totalLength = i + workers.getWorkers().length;
-        expect(members.length).toEqual(totalLength);
-        console.log(`Group created with ${totalLength} participants`);
+        expect(members.length).toEqual(i + 1);
+        console.log(`Group created with ${i + 1} participants`);
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
 
+    it("verifyLargeConversationStream: should create a new conversation", async () => {
+      try {
+        // Initialize fresh workers specifically for conversation stream testing
+        workers = await getWorkers(10, testName, typeofStream.Conversation);
+
+        console.log("Testing conversation stream with new DM creation");
+
+        // Use the dedicated conversation stream verification helper
+        const verifyResult = await verifyConversationGroupStream(
+          newGroup as Group,
+          workers.getWorkers()[0],
+          workers.getWorkers(),
+        );
+
+        console.log("verifyResult", JSON.stringify(verifyResult));
+        expect(verifyResult.allReceived).toBe(true);
+      } catch (e) {
+        hasFailures = logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+    it("verifyLargeGroupMetadataStream: should update group name", async () => {
+      try {
+        workers = await getWorkers(10, testName, typeofStream.GroupUpdated);
+        const verifyResult = await verifyGroupUpdateStream(
+          newGroup as Group,
+          workers.getWorkers(),
+        );
+
+        console.log("verifyResult", JSON.stringify(verifyResult));
+        expect(verifyResult.messages.length).toEqual(
+          workers.getWorkers().length - 1,
+        );
+        expect(verifyResult.allReceived).toBe(true);
+      } catch (e) {
+        hasFailures = logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
     it(`receiveLargeGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         workers = await getWorkers(10, testName, typeofStream.Message);
@@ -78,25 +116,6 @@ describe(testName, async () => {
             start = performance.now();
           },
         );
-        console.log("verifyResult", JSON.stringify(verifyResult));
-        expect(verifyResult.messages.length).toEqual(
-          workers.getWorkers().length - 1,
-        );
-        expect(verifyResult.allReceived).toBe(true);
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-
-    it("verifyLargeGroupMetadataStream: should update group name", async () => {
-      try {
-        workers = await getWorkers(10, testName, typeofStream.GroupUpdated);
-        const verifyResult = await verifyGroupUpdateStream(
-          newGroup as Group,
-          workers.getWorkers(),
-        );
-
         console.log("verifyResult", JSON.stringify(verifyResult));
         expect(verifyResult.messages.length).toEqual(
           workers.getWorkers().length - 1,

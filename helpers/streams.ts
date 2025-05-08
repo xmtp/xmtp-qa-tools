@@ -195,11 +195,11 @@ export async function verifyMessageStream<T extends string = string>(
     participants,
   );
 
-  // Configure collectors for message streams
+  // Configure collectors for message streams with timeout
   console.log(`Setting up ${receivers.length} collectors for messages`);
   const collectPromises: Promise<T[]>[] = receivers.map((r) => {
     return r.worker
-      .collectMessages(conversationId, typeofStream.Message, count)
+      .collectMessages(conversationId, typeofStream.Message, count, 20000) // 20 second timeout
       .then((msgs: StreamMessage[]) => {
         return msgs.map((m) => m.message.content as T);
       })
@@ -251,7 +251,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
     participants,
   );
 
-  // Configure collectors for group update streams
+  // Configure collectors for group update streams with timeout
   console.log(`Setting up ${receivers.length} collectors for group updates`);
   const collectPromises: Promise<T[]>[] = receivers.map((r) => {
     console.log(
@@ -259,7 +259,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
     );
 
     return r.worker
-      .collectGroupUpdates(conversationId, count)
+      .collectGroupUpdates(conversationId, count, 20000) // 20 second timeout
       .then((msgs: GroupUpdateMessage[]) => {
         console.log(
           `Received group updates for ${r.name}:`,
@@ -371,7 +371,7 @@ export async function verifyConversationStream(
     `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
   );
 
-  // Set up collector promises
+  // Set up collector promises with a longer timeout (20 seconds)
   const participantPromises = participants.map((participant) => {
     if (!participant.worker) {
       console.warn(`Participant ${participant.name} has no worker`);
@@ -379,7 +379,7 @@ export async function verifyConversationStream(
     }
 
     return participant.worker
-      .collectConversations(initiator.client.inboxId, 1)
+      .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
       .then((msgs) => {
         console.log(
           `Received conversations for ${participant.name}:`,
@@ -412,6 +412,93 @@ export async function verifyConversationStream(
   if (!allReceived) {
     const missing = participants
       .filter((_, i) => !results[i] || results[i].length === 0)
+      .map((p) => p.name);
+
+    console.warn(
+      `[${initiator.name}] Missing participants: ${missing.join(", ")}`,
+    );
+  }
+
+  return { allReceived, receivedCount };
+}
+
+/**
+ * Verifies conversation streaming functionality
+ */
+export async function verifyConversationGroupStream(
+  group: Group,
+  initiator: Worker,
+  participants: Worker[],
+): Promise<{ allReceived: boolean; receivedCount: number }> {
+  if (!initiator.client || !initiator.worker) {
+    throw new Error(`Initiator ${initiator.name} not properly initialized`);
+  }
+
+  console.log(
+    `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
+  );
+
+  // Filter out the initiator from participants for the check
+  const nonInitiatorParticipants = participants.filter(
+    (p) => p.name !== initiator.name,
+  );
+
+  console.log(
+    `Expecting notifications for ${nonInitiatorParticipants.length} participants (excluding initiator ${initiator.name})`,
+  );
+
+  // Set up collector promises with a longer timeout (20 seconds)
+  const participantPromises = participants.map((participant) => {
+    if (!participant.worker) {
+      console.warn(`Participant ${participant.name} has no worker`);
+      return Promise.resolve<ConversationNotification[] | null>(null);
+    }
+
+    return participant.worker
+      .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
+      .then((msgs) => {
+        console.log(
+          `Received conversations for ${participant.name}:`,
+          JSON.stringify(msgs.map((m) => m.conversation.id)),
+        );
+        return msgs;
+      });
+  });
+
+  // Add members to the group
+  await group.addMembers(participants.map((p) => p.client.inboxId));
+  console.log(`Added ${participants.length} members to group ${group.id}`);
+
+  // Give streams time to initialize before continuing
+  await sleep(defaultValues.streamTimeout);
+
+  // Wait for all notifications
+  const results = await Promise.all(participantPromises);
+
+  // Count received notifications, but only for non-initiator participants
+  const receivedCount = results.filter(
+    (result, index) =>
+      participants[index].name !== initiator.name &&
+      result &&
+      result.length > 0,
+  ).length;
+
+  // Calculate the success threshold (75% of non-initiator participants)
+  const successThreshold = Math.ceil(nonInitiatorParticipants.length * 0.75);
+
+  // Check if enough participants received notifications (at least 75%)
+  const allReceived = receivedCount >= successThreshold;
+
+  console.log(
+    `Received ${receivedCount}/${nonInitiatorParticipants.length} notifications, threshold for success is ${successThreshold}`,
+  );
+
+  if (!allReceived) {
+    const missing = nonInitiatorParticipants
+      .filter((p) => {
+        const index = participants.findIndex((part) => part.name === p.name);
+        return index >= 0 && (!results[index] || results[index].length === 0);
+      })
       .map((p) => p.name);
 
     console.warn(

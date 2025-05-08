@@ -3,6 +3,7 @@ import { logError } from "@helpers/logger";
 import {
   createGroupConsentSender,
   verifyConsentStream,
+  verifyConversationGroupStream,
   verifyConversationStream,
   verifyGroupUpdateStream,
   verifyMessageStream,
@@ -65,6 +66,29 @@ describe(testName, async () => {
       const verifyResult = await verifyConversationStream(
         workers.get("henry")!,
         [workers.get("randomguy")!],
+      );
+
+      console.log("verifyResult", JSON.stringify(verifyResult));
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      hasFailures = logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+  it("verifyConversationGroupStream: should create a new conversation", async () => {
+    try {
+      // Initialize fresh workers specifically for conversation stream testing
+      workers = await getWorkers(names, testName, typeofStream.Conversation);
+
+      console.log("Testing conversation stream with adding members");
+      const newGroup = await workers
+        .get("henry")!
+        .client.conversations.newGroup([]);
+      // Use the dedicated conversation stream verification helper
+      const verifyResult = await verifyConversationGroupStream(
+        newGroup,
+        workers.get("henry")!,
+        workers.getWorkers(),
       );
 
       console.log("verifyResult", JSON.stringify(verifyResult));
