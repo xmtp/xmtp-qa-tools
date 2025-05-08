@@ -347,7 +347,9 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error("maints:message " + String(error));
+          console.error(
+            `[${this.nameId}] Message stream error: ${String(error)}`,
+          );
         }
       }
     })();
@@ -444,7 +446,9 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error("maints:conversation " + String(error));
+          console.error(
+            `[${this.nameId}] Conversation stream error: ${String(error)}`,
+          );
         }
       }
     })();
@@ -493,7 +497,9 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error("maints:consent " + String(error));
+          console.error(
+            `[${this.nameId}] Consent stream error: ${String(error)}`,
+          );
         }
       }
     })();
