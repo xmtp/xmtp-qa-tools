@@ -46,7 +46,7 @@ describe(testName, async () => {
   beforeAll(async () => {
     // Initialize workers
     group = await workers
-      .get("henry")!
+      .getWorkers()[0]
       .client.conversations.newGroup([
         workers.get("randomguy")!.client.inboxId,
         workers.get("bob")!.client.inboxId,
@@ -64,7 +64,7 @@ describe(testName, async () => {
 
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
-        workers.get("henry")!,
+        workers.getWorkers()[0],
         [workers.get("randomguy")!],
       );
 
@@ -82,12 +82,12 @@ describe(testName, async () => {
 
       console.log("Testing conversation stream with adding members");
       const newGroup = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.conversations.newGroup([]);
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationGroupStream(
         newGroup,
-        workers.get("henry")!,
+        workers.getWorkers()[0],
         workers.getWorkers(),
       );
 
@@ -103,7 +103,7 @@ describe(testName, async () => {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
       const newDm = await workers
-        .get("henry")!
+        .getWorkers()[0]
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
       // Verify message delivery
@@ -141,7 +141,7 @@ describe(testName, async () => {
 
     try {
       const groupConsentSender = createGroupConsentSender(
-        workers.get("henry")!, // henry is doing the consent update
+        workers.getWorkers()[0], // henry is doing the consent update
         group.id, // for this group
         workers.get("randomguy")!.client.inboxId, // blocking randomguy
         true, // block the entities
@@ -154,7 +154,7 @@ describe(testName, async () => {
       console.log("Starting consent verification process");
 
       const verifyResult = await verifyConsentStream(
-        workers.get("henry")!,
+        workers.getWorkers()[0],
         [workers.get("randomguy")!],
         consentAction,
       );

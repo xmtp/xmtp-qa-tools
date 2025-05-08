@@ -381,10 +381,6 @@ export async function verifyConversationStream(
     return participant.worker
       .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
       .then((msgs) => {
-        console.log(
-          `Received conversations for ${participant.name}:`,
-          JSON.stringify(msgs.map((m) => m.conversation.id)),
-        );
         return msgs;
       });
   });
@@ -457,10 +453,6 @@ export async function verifyConversationGroupStream(
     return participant.worker
       .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
       .then((msgs) => {
-        console.log(
-          `Received conversations for ${participant.name}:`,
-          JSON.stringify(msgs.map((m) => m.conversation.id)),
-        );
         return msgs;
       });
   });

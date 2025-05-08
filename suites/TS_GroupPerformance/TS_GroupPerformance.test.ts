@@ -63,7 +63,7 @@ describe(testName, async () => {
       }
     });
 
-    it("verifyLargeConversationStream: should create a new conversation", async () => {
+    it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
       try {
         // Initialize fresh workers specifically for conversation stream testing
         workers = await getWorkers(10, testName, typeofStream.Conversation);
@@ -84,7 +84,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it("verifyLargeGroupMetadataStream: should update group name", async () => {
+    it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
       try {
         workers = await getWorkers(10, testName, typeofStream.GroupUpdated);
         const verifyResult = await verifyGroupUpdateStream(
