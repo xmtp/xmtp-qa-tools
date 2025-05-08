@@ -1,10 +1,9 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type Worker } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
@@ -138,7 +137,7 @@ describe(testName, async () => {
         // Sync the group for all participants
         await Promise.all(
           workersList.map((worker) =>
-            worker.client.conversations.sync().catch((err) => {
+            worker.client.conversations.sync().catch((err: unknown) => {
               console.error(`Error syncing for ${worker.name}:`, err);
             }),
           ),
@@ -151,7 +150,7 @@ describe(testName, async () => {
           testGroup,
           workersList,
           1,
-          (i, _) => `gm-${i + 1}-${randomSuffix}`,
+          (i) => `gm-${i + 1}-${randomSuffix}`,
           undefined,
           () => {
             console.log(

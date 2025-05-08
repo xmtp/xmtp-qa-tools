@@ -15,7 +15,7 @@ class XmtpLogger {
     this.logFilePath = path.join(process.cwd(), filename);
   }
 
-  log(...args: any[]) {
+  log(...args: unknown[]) {
     const message = args.join(" ");
     this.logBuffer.push(message);
     console.log(message);
@@ -100,7 +100,7 @@ const fetchGroupInfo = async (
           ]);
 
           // Only show the key package dates
-          for (const [_, packageStatus] of Object.entries(status)) {
+          for (const [, packageStatus] of Object.entries(status)) {
             if (packageStatus && "lifetime" in packageStatus) {
               const { lifetime } = packageStatus;
 

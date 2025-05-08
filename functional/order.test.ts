@@ -54,7 +54,7 @@ describe(testName, async () => {
       group,
       workers.getWorkers(),
       amount,
-      (i, _) => `gm-${i + 1}-${randomSuffix}`,
+      (i) => `gm-${i + 1}-${randomSuffix}`,
       undefined,
       () => {
         console.log("Message sent, starting timer now");

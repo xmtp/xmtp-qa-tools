@@ -498,10 +498,7 @@ export class WorkerClient extends Worker {
     count: number;
     additionalInfo?: Record<string, string | number | boolean>;
   }): Promise<T[]> {
-    const { type, filterFn, count, additionalInfo = {} } = options;
-    const filterInfo = Object.entries(additionalInfo)
-      .map(([key, value]) => `${key}:${value}`)
-      .join(", ");
+    const { type, filterFn, count } = options;
 
     return new Promise((resolve) => {
       const events: T[] = [];

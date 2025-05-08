@@ -2,7 +2,6 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";

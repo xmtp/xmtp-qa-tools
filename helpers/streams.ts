@@ -37,15 +37,6 @@ interface ConversationNotification {
   };
 }
 
-// Define type for consent updates
-interface ConsentUpdateMessage {
-  type: string;
-  consentUpdate: {
-    inboxId: string;
-    consentValue: boolean;
-  };
-}
-
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
@@ -104,10 +95,7 @@ export function createDmConsentSender(
   targetInboxId: string,
   initialState?: ConsentState,
 ) {
-  return async (
-    _conversation: Conversation,
-    _payload: string,
-  ): Promise<string> => {
+  return async (): Promise<string> => {
     await toggleConsentState(
       worker,
       targetInboxId,
@@ -127,10 +115,7 @@ export function createGroupConsentSender(
   memberInboxId: string,
   blockEntities = true,
 ) {
-  return async (
-    _conversation: Conversation,
-    _payload: string,
-  ): Promise<string> => {
+  return async (): Promise<string> => {
     console.log(
       `Setting group consent to ${blockEntities ? "DENIED" : "ALLOWED"}`,
     );

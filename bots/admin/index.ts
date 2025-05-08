@@ -111,14 +111,13 @@ async function updatePermissions(group: Group): Promise<string> {
     const permissions = group.permissions;
     return JSON.stringify(permissions);
   } catch (error: unknown) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error(`Error updating permissions: ${errorMessage}`);
+    console.error(error);
     return "";
   }
 }
 
 await initializeClient(processMessage, [
-  ...config.map((groupConfig: any) => ({
+  ...config.map((groupConfig: GroupConfig) => ({
     walletKey: groupConfig.walletKey,
     networks: groupConfig.networks,
     dbEncryptionKey: groupConfig.encryptionKey,
