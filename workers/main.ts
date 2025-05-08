@@ -142,6 +142,7 @@ export class WorkerClient extends Worker {
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
+  private activeStreams: boolean = false;
 
   constructor(
     worker: WorkerBase,
@@ -171,12 +172,29 @@ export class WorkerClient extends Worker {
     this.setupEventHandlers();
   }
 
+  terminate() {
+    // Stop active streams first
+    this.stopStreams();
+    // Then terminate the worker thread
+    return super.terminate();
+  }
+
+  /**
+   * Stops all active streams without terminating the worker
+   */
+  stopStreams(): void {
+    this.activeStreams = false;
+  }
+
   /**
    * Reinstalls the worker
    */
   public async reinstall(): Promise<void> {
     console.log(`[${this.nameId}] Reinstalling worker`);
-    await this.terminate();
+    // Stop active streams first
+    this.stopStreams();
+    // Then terminate the worker thread
+    await super.terminate();
     await this.clearDB();
     await this.initialize();
   }
@@ -280,11 +298,14 @@ export class WorkerClient extends Worker {
    * Initialize message stream for both regular messages and group updates
    */
   private initMessageStream(type: typeofStream) {
+    this.activeStreams = true;
     void (async () => {
-      while (true) {
+      while (this.activeStreams) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
           for await (const message of stream) {
+            if (!this.activeStreams) break;
+
             if (
               !message ||
               message?.senderInboxId.toLowerCase() ===
@@ -427,12 +448,15 @@ export class WorkerClient extends Worker {
    * Initialize conversation stream
    */
   private initConversationStream() {
+    this.activeStreams = true;
     void (async () => {
       let retryDelay = 500; // Initial retry delay of 500ms
-      while (true) {
+      while (this.activeStreams) {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
+            if (!this.activeStreams) break;
+
             console.log(
               `[${this.nameId}] Received conversation: ${conversation?.id}`,
             );
@@ -474,8 +498,9 @@ export class WorkerClient extends Worker {
    * Initialize consent stream
    */
   private initConsentStream() {
+    this.activeStreams = true;
     void (async () => {
-      while (true) {
+      while (this.activeStreams) {
         try {
           const stream = await this.client.preferences.streamConsent();
 

@@ -75,16 +75,18 @@ export class WorkerManager {
       this.activeWorkers.length,
       this.activeWorkers,
     );
-    const terminationPromises = this.activeWorkers.map(async (worker) => {
-      try {
-        await worker.terminate();
-        if (deleteDbs) {
-          await worker.clearDB();
+    const terminationPromises = this.activeWorkers.map(
+      async (worker: WorkerClient) => {
+        try {
+          await worker.terminate();
+          if (deleteDbs) {
+            await worker.clearDB();
+          }
+        } catch (error) {
+          console.warn(`Error terminating worker:`, error);
         }
-      } catch (error) {
-        console.warn(`Error terminating worker:`, error);
-      }
-    });
+      },
+    );
 
     await Promise.all(terminationPromises);
     this.activeWorkers = [];

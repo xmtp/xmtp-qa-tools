@@ -1,4 +1,4 @@
-# XMTP Group Performance Testing Suite (TS_GroupPerformance)
+# XMTP Group Performance Testing Suite (TS_Groups)
 
 This test suite specifically focuses on measuring XMTP network performance with large groups, providing critical insights into group messaging scalability and responsiveness.
 
@@ -31,7 +31,7 @@ XMTP_ENV=production  # Options: production, dev
 ## Test Execution
 
 ```bash
-yarn test ts_group_performance
+yarn test ts_groups
 ```
 
 ## Test Flow
@@ -61,32 +61,18 @@ The test suite incrementally increases group size by the batch size (default: 50
 
 ## Performance Metrics
 
-The suite automatically records performance metrics for each operation:
+### Group Operations Performance by Size
 
-- Group creation time at different scales
-- Stream initialization performance
-- Metadata update propagation time
-- Message delivery latency in large groups
-- Scalability measurements with increasing group sizes
+| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status               |
+| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | -------------------- |
+| 50   | 3923.97    | 0.59     | 601.76   | 284.22     | 313.00     | <1400ms        | ❌ Performance Issue |
+| 100  | 6678.58    | 0.78     | 1164.88  | 207.66     | 228.00     | <1400ms        | ❌ Performance Issue |
 
-## Key Features Tested
+### Group Operations Performance - Receiver Side
 
-- Large group creation performance
-- Group conversation stream efficiency
-- Group metadata update propagation speed
-- Message delivery latency in groups of various sizes
-- SDK performance under high member count conditions
+| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status               |
+| ---- | ---------------- | -------------- | --------------- | ----------------- | ------------- | ------------ | -------------------- |
+| 50   | 601.76           | 0.59           | 880.37          | 284.22            | 51            | <100ms       | ❌ Performance Issue |
+| 100  | 1164.88          | 0.78           | 3719.41         | 207.66            | 101           | <100ms       | ❌ Performance Issue |
 
-## Monitoring
-
-Performance metrics feed into the SDK Performance Dashboard, which visualizes operation durations, network performance, and scalability indicators for large group operations.
-
-# TO-DOs
-
-- group report
-- 10 installations , 5 bad = 10
-- calculate installation success rate
-- add a test to check the group creation time
-- add a test to check the group metadata update time
-- add a test to check the group message delivery time
-- add a test to check the group scalability
+_Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._
