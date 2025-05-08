@@ -36,8 +36,6 @@ describe(testName, async () => {
     testName,
     typeofStream.Message,
     typeOfResponse.None,
-    process.env.XMTP_ENV as XmtpEnv,
-    true,
   );
 
   setupTestLifecycle({
@@ -370,7 +368,7 @@ describe(testName, async () => {
       try {
         const verifyResult = await verifyMessageStream(
           newGroup,
-          workers.getWorkers(),
+          workers.getWorkers().slice(1, i + 1),
           1,
           undefined,
           undefined,
@@ -383,7 +381,7 @@ describe(testName, async () => {
         );
         console.log("verifyResult", JSON.stringify(verifyResult));
         expect(verifyResult.messages.length).toEqual(
-          workers.getWorkers().length,
+          workers.getWorkers().length - 1,
         );
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {

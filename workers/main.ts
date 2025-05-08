@@ -430,7 +430,6 @@ export class WorkerClient extends Worker {
     void (async () => {
       while (true) {
         try {
-          await this.client.conversations.sync();
           const stream = this.client.conversations.stream();
 
           for await (const conversation of stream) {

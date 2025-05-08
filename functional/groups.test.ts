@@ -53,7 +53,7 @@ describe(testName, async () => {
         const sliced = generatedInboxes.slice(0, i);
         console.log("Creating group with", sliced.length, "participants");
         groupsBySize[i] = await workers
-          .get("henry")!
+          .getWorkers()[0]
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
@@ -116,15 +116,15 @@ describe(testName, async () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        // Use the first 5 workers (excluding henry who will be the sender)
-        const workersList = workers.getWorkers().slice(1, i + 1);
-        const inboxIds = workersList.map((worker) => worker.client.inboxId);
+        const inboxIds = workers
+          .getWorkers()
+          .map((worker) => worker.client.inboxId);
 
         console.log(
           `Creating test group with ${inboxIds.length} worker participants`,
         );
         const testGroup = await workers
-          .get("henry")!
+          .getWorkers()[0]
           .client.conversations.newGroup(inboxIds, {
             groupName: `Test Group ${i}`,
           });
@@ -133,7 +133,7 @@ describe(testName, async () => {
 
         const verifyResult = await verifyMessageStream(
           testGroup,
-          workersList,
+          workers.getWorkers(),
           1,
           undefined,
           undefined,
@@ -146,7 +146,9 @@ describe(testName, async () => {
         );
 
         console.log("verifyResult", JSON.stringify(verifyResult));
-        expect(verifyResult.messages.length).toEqual(workersList.length - 1);
+        expect(verifyResult.messages.length).toEqual(
+          workers.getWorkers().length - 1,
+        );
         expect(verifyResult.allReceived).toBe(true);
       } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);

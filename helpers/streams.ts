@@ -162,15 +162,15 @@ async function prepareParticipants(
   const creatorId = (await group.metadata()).creatorInboxId;
   const receivers = participants.filter((p) => p.client?.inboxId !== creatorId);
 
-  // Sync conversations for all receivers
-  await Promise.all(
-    receivers.map((r) =>
-      r.client.conversations.sync().catch((err: unknown) => {
-        console.error(`Error syncing for ${r.name}:`, err);
-      }),
-    ),
-  );
-  await sleep(defaultValues.streamTimeout);
+  // // Sync conversations for all receivers
+  // await Promise.all(
+  //   receivers.map((r) =>
+  //     r.client.conversations.sync().catch((err: unknown) => {
+  //       console.error(`Error syncing for ${r.name}:`, err);
+  //     }),
+  //   ),
+  // );
+  // await sleep(defaultValues.streamTimeout);
 
   return { conversationId, randomSuffix, receivers };
 }
