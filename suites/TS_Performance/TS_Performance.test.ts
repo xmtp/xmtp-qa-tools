@@ -382,7 +382,9 @@ describe(testName, async () => {
           },
         );
         console.log("verifyResult", JSON.stringify(verifyResult));
-        expect(verifyResult.messages.length).toEqual(1);
+        expect(verifyResult.messages.length).toEqual(
+          workers.getWorkers().length,
+        );
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
