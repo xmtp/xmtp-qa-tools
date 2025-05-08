@@ -85,6 +85,7 @@ describe(testName, async () => {
       }
 
       const stats = calculateMessageStats(
+        workers.getWorkers(),
         messagesByWorker,
         "gm-",
         amountofMessages,
@@ -144,6 +145,7 @@ describe(testName, async () => {
       }
 
       const stats = calculateMessageStats(
+        workers.getWorkers(),
         messagesByWorker,
         "gm-",
         amountofMessages,
@@ -227,6 +229,7 @@ describe(testName, async () => {
       messagesByWorker.push(recoveredMessages);
 
       const stats = calculateMessageStats(
+        workers.getWorkers(),
         messagesByWorker,
         "offline-msg-",
         amountofMessages,

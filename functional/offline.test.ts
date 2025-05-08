@@ -107,6 +107,7 @@ describe(
         messagesByWorker.push(recoveredMessages);
 
         const stats = calculateMessageStats(
+          workers.getWorkers(),
           messagesByWorker,
           "offline-msg-",
           amountofMessages,

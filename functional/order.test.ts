@@ -75,6 +75,7 @@ describe(testName, async () => {
     }
 
     const stats = calculateMessageStats(
+      workers.getWorkers(),
       messagesByWorker,
       "gm-",
       amount,
@@ -133,6 +134,7 @@ describe(testName, async () => {
     }
 
     const stats = calculateMessageStats(
+      workers.getWorkers(),
       messagesByWorker,
       "gm-",
       amount,

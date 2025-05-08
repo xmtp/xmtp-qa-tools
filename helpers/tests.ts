@@ -475,6 +475,7 @@ export const simulateMissingCursorMessage = async (
  * Calculates message reception and order statistics
  */
 export function calculateMessageStats(
+  workers: Worker[],
   messagesByWorker: string[][],
   prefix: string,
   amount: number,
@@ -502,7 +503,11 @@ export function calculateMessageStats(
   };
 
   // Log discrepancies helper
-  const showDiscrepancies = (workersInOrder: number, workerCount: number) => {
+  const showDiscrepancies = (
+    workersInOrder: number,
+    workerCount: number,
+    workers: Worker[],
+  ) => {
     if (workersInOrder >= workerCount) return;
 
     console.log("Message order discrepancies detected:");
@@ -516,7 +521,7 @@ export function calculateMessageStats(
 
       if (!inOrder) {
         console.log(
-          `Worker ${index + 1} received messages out of order or missing messages:`,
+          `Worker ${workers[index].name} received messages out of order or missing messages:`,
         );
 
         if (messages.length !== expectedMessages.length) {
@@ -579,7 +584,7 @@ export function calculateMessageStats(
     `Order: ${orderPercentage.toFixed(2)}% (${workersInOrder}/${workerCount} workers)`,
   );
 
-  showDiscrepancies(workersInOrder, workerCount);
+  showDiscrepancies(workersInOrder, workerCount, workers);
 
   return {
     receptionPercentage,
