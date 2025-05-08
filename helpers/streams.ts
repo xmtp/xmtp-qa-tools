@@ -207,10 +207,7 @@ export async function verifyMessageStream(
   randomSuffix: string = "gm",
   onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
-  console.log("Waiting for 1 second before starting message stream test");
-  await sleep(1000);
-  const creatorId = (await group.metadata()).creatorInboxId;
-  const receivers = participants.filter((p) => p.client?.inboxId !== creatorId);
+  const receivers = await filterReceivers(group as Group, participants);
 
   // Configure collectors for message streams with timeout
   console.log(`Setting up ${receivers.length} collectors for messages`);
@@ -378,22 +375,10 @@ export async function verifyConversationStream(
   // Set up collector promises with a longer timeout (20 seconds)
   const participantPromises: Promise<string[]>[] = participants.map(
     (participant) => {
-      if (!participant.worker) {
-        console.warn(`Participant ${participant.name} has no worker`);
-        return Promise.resolve<string[]>([]);
-      }
-
       return participant.worker
         .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
         .then((msgs: ConversationNotification[]) => {
           return msgs.map((msg) => `conversation:${msg.conversation.id}`);
-        })
-        .catch((err: unknown) => {
-          console.error(
-            `Error collecting conversations for ${participant.name}:`,
-            err,
-          );
-          return [];
         });
     },
   );
@@ -420,64 +405,33 @@ export async function verifyConversationStream(
  */
 export async function verifyConversationGroupStream(
   group: Group,
-  initiator: Worker,
   participants: Worker[],
   onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
-  console.log(
-    "Waiting for 1 second before starting conversation group stream test",
-  );
-  await sleep(1000);
-  if (!initiator.client || !initiator.worker) {
-    throw new Error(`Initiator ${initiator.name} not properly initialized`);
-  }
-
-  console.log(
-    `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
-  );
-
   // Filter out the initiator from participants for the check
-  const nonInitiatorParticipants = participants.filter(
-    (p) => p.name !== initiator.name,
-  );
-
-  console.log(
-    `Expecting notifications for ${nonInitiatorParticipants.length} participants (excluding initiator ${initiator.name})`,
-  );
-
+  const receivers = await filterReceivers(group, participants);
+  console.log(receivers.map((r) => r.name));
+  const creatorInboxId = (await group.metadata()).creatorInboxId;
   // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises: Promise<string[]>[] = participants.map(
+  const participantPromises: Promise<string[]>[] = receivers.map(
     (participant) => {
-      if (!participant.worker) {
-        console.warn(`Participant ${participant.name} has no worker`);
-        return Promise.resolve<string[]>([]);
-      }
-
       return participant.worker
-        .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
+        .collectConversations(creatorInboxId, 1, 20000) // 20 second timeout
         .then((msgs: ConversationNotification[]) => {
           return msgs.map((msg) => `conversation:${msg.conversation.id}`);
-        })
-        .catch((err: unknown) => {
-          console.error(
-            `Error collecting conversations for ${participant.name}:`,
-            err,
-          );
-          return [];
         });
     },
   );
 
-  // Add members to the group
-  await group.addMembers(participants.map((p) => p.client.inboxId));
-  console.log(`Added ${participants.length} members to group ${group.id}`);
+  await group.addMembers(receivers.map((r) => r.client?.inboxId));
+  console.log(`Added ${receivers.length} members to group ${group.id}`);
 
   if (onActionStarted) {
     onActionStarted();
   }
 
   // No randomSuffix for conversation notifications
-  return verifyAndReturnStats(participants, participantPromises, 1, "");
+  return verifyAndReturnStats(receivers, participantPromises, 1, "");
 }
 
 /**

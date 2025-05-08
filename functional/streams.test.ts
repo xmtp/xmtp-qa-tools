@@ -119,7 +119,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("verifyConversationGroupStream: should create a new conversation", async () => {
+  it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
@@ -128,10 +128,9 @@ describe(testName, async () => {
       const newGroup = await workers
         .getWorkers()[0]
         .client.conversations.newGroup([]);
-      // Use the dedicated conversation stream verification helper
+      // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyConversationGroupStream(
         newGroup,
-        workers.getWorkers()[0],
         workers.getWorkers(),
       );
 

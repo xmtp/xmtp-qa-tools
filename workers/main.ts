@@ -428,10 +428,10 @@ export class WorkerClient extends Worker {
    */
   private initConversationStream() {
     void (async () => {
+      let retryDelay = 500; // Initial retry delay of 500ms
       while (true) {
         try {
           const stream = this.client.conversations.stream();
-
           for await (const conversation of stream) {
             console.log(
               `[${this.nameId}] Received conversation: ${conversation?.id}`,
@@ -445,10 +445,26 @@ export class WorkerClient extends Worker {
               });
             }
           }
+          // Reset retry delay after successful stream connection
+          retryDelay = 500;
         } catch (error) {
+          const errorStr = String(error);
           console.error(
-            `[${this.nameId}] Conversation stream error: ${String(error)}`,
+            `[${this.nameId}] Conversation stream error: ${errorStr}`,
           );
+
+          // If a database lock is detected, wait and retry with exponential backoff
+          if (errorStr.includes("database is locked")) {
+            console.log(
+              `[${this.nameId}] Database lock detected, retrying after ${retryDelay}ms`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            // Increase delay for next retry (up to 5 seconds max)
+            retryDelay = Math.min(retryDelay * 2, 5000);
+          } else {
+            // For other errors, use a fixed delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
         }
       }
     })();
@@ -630,11 +646,26 @@ export class WorkerClient extends Worker {
     fromPeerAddress: string,
     count: number = 1,
     timeout?: number,
+    conversationId?: string,
   ): Promise<StreamConversationMessage[]> {
+    const additionalInfo: Record<string, string | number | boolean> = {
+      fromPeerAddress,
+    };
+
+    if (conversationId) {
+      additionalInfo.conversationId = conversationId;
+    }
+
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
+      filterFn: conversationId
+        ? (msg) => {
+            if (msg.type !== StreamCollectorType.Conversation) return false;
+            return msg.conversation.id === conversationId;
+          }
+        : undefined,
       count,
-      additionalInfo: { fromPeerAddress },
+      additionalInfo,
       timeout,
     });
   }
