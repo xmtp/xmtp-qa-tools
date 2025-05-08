@@ -54,7 +54,7 @@ describe(testName, async () => {
       group,
       workers.getWorkers(),
       amount,
-      undefined,
+      (i) => `gm-${i + 1}-${randomSuffix}`,
       undefined,
       () => {
         console.log("Message sent, starting timer now");
@@ -81,9 +81,9 @@ describe(testName, async () => {
       randomSuffix,
     );
 
-    // We expect all messages to be received and in order
+    console.log(JSON.stringify(stats));
     expect(stats.receptionPercentage).toBeGreaterThan(95);
-    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+    expect(stats.orderPercentage).toBeGreaterThan(95);
   });
 
   it("poll: should verify message order when receiving via pull", async () => {
@@ -139,8 +139,8 @@ describe(testName, async () => {
       randomSuffix,
     );
 
-    // We expect all messages to be received and in order
+    console.log(JSON.stringify(stats));
     expect(stats.receptionPercentage).toBeGreaterThan(95);
-    expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+    expect(stats.orderPercentage).toBeGreaterThan(95);
   });
 });

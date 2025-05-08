@@ -70,8 +70,12 @@ describe(testName, async () => {
         group,
         workers.getWorkers(),
         amountofMessages,
+        (i) => `gm-${i + 1}-${randomSuffix}`,
         undefined,
-        undefined,
+        () => {
+          console.log("Message sent, starting timer now");
+          start = performance.now();
+        },
       );
       expect(collectedMessages.allReceived).toBe(true);
     } catch (e) {
@@ -97,7 +101,7 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      // We expect all messages to be received and in order
+      console.log(JSON.stringify(stats));
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
 
@@ -156,9 +160,9 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      // We expect all messages to be received and in order
+      console.log(JSON.stringify(stats));
       expect(stats.receptionPercentage).toBeGreaterThan(95);
-      expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+      expect(stats.orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
         stats.receptionPercentage,
@@ -212,7 +216,6 @@ describe(testName, async () => {
       offlineWorker.client = client;
       await offlineWorker.client.conversations.sync();
 
-      // Verify message recovery
       const recoveredConversation =
         await offlineWorker.client.conversations.getConversationById(group.id);
       await recoveredConversation?.sync();
@@ -240,9 +243,9 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      // We expect all messages to be received and in order
+      console.log(JSON.stringify(stats));
       expect(stats.receptionPercentage).toBeGreaterThan(95);
-      expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+      expect(stats.orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
         stats.receptionPercentage,

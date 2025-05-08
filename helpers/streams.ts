@@ -386,7 +386,7 @@ export async function verifyConversationStream(
       .then((msgs) => {
         console.log(
           `Received conversations for ${participant.name}:`,
-          JSON.stringify(msgs),
+          JSON.stringify(msgs.map((m) => m.conversation.id)),
         );
         return msgs;
       });

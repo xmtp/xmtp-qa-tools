@@ -113,9 +113,9 @@ describe(
           randomSuffix,
         );
 
-        // We expect all messages to be received and in order
+        console.log(JSON.stringify(stats));
         expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+        expect(stats.orderPercentage).toBeGreaterThan(95);
 
         // Use the unified sendDeliveryMetric for delivery metrics
         sendDeliveryMetric(
