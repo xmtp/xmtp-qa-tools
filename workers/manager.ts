@@ -318,9 +318,6 @@ export class WorkerManager {
     if (typeof descriptorsOrAmount === "number") {
       const workerNames = defaultValues.defaultNames;
       descriptors = workerNames.slice(0, descriptorsOrAmount);
-      // If we need to create multiple workers with random SDK versions
-      // Generate workers with random SDK versions (100, 105, or 202)
-      // Create descriptors with random SDK versions
       descriptors = [];
       for (let i = 0; i < descriptorsOrAmount; i++) {
         const workerName =
