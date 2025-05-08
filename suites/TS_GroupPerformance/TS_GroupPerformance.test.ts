@@ -1,7 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import { verifyGroupUpdateStream, verifyMessageStream } from "@helpers/streams";
+import {
+  verifyConversationGroupStream,
+  verifyGroupUpdateStream,
+  verifyMessageStream,
+} from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -13,7 +17,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   const batchSize = 50;
-  const total = 100;
+  const total = 400;
   let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
@@ -47,10 +51,10 @@ describe(testName, async () => {
         expect(newGroup.id).toBeDefined();
         console.log(`Creating group with ${i} participants`);
 
-        console.log(`Adding ${workers.getWorkers().length} participants`);
-        await (newGroup as Group).addMembers(
-          workers.getWorkers().map((w) => w.inboxId),
-        );
+        //console.log(`Adding ${workers.getWorkers().length} participants`);
+        // await (newGroup as Group).addMembers(
+        //   workers.getWorkers().map((w) => w.inboxId),
+        // );
 
         await newGroup.sync();
         console.log(`Group created with ${i + 1} participants`);
@@ -60,29 +64,28 @@ describe(testName, async () => {
       }
     });
 
-    // it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
-    //   try {
-    //     // Initialize fresh workers specifically for conversation stream testing
-    //     workers = await getWorkers(10, testName, typeofStream.Conversation);
+    it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
+      try {
+        // Initialize fresh workers specifically for conversation stream testing
+        workers = await getWorkers(10, testName, typeofStream.Conversation);
 
-    //     console.log("Testing conversation stream with new DM creation");
+        console.log("Testing conversation stream with new DM creation");
 
-    //     // Use the dedicated conversation stream verification helper
-    //     const verifyResult = await verifyConversationGroupStream(
-    //       newGroup as Group,
-    //       workers.getWorkers()[0],
-    //       workers.getWorkers(),
-    //       () => {
-    //         start = performance.now();
-    //       },
-    //     );
+        // Use the dedicated conversation stream verification helper
+        const verifyResult = await verifyConversationGroupStream(
+          newGroup as Group,
+          workers.getWorkers(),
+          () => {
+            start = performance.now();
+          },
+        );
 
-    //expect(verifyResult.allReceived).toBe(true);
-    //   } catch (e) {
-    //     hasFailures = logError(e, expect.getState().currentTestName);
-    //     throw e;
-    //   }
-    // });
+        expect(verifyResult.allReceived).toBe(true);
+      } catch (e) {
+        hasFailures = logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
     it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
       try {
         workers = await getWorkers(10, testName, typeofStream.GroupUpdated);
