@@ -1,7 +1,7 @@
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { sleep } from "@helpers/tests";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { sleep } from "./tests";
 
 /**
  * Updates group description with a random member

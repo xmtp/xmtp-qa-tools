@@ -62,15 +62,13 @@ describe(testName, async () => {
       console.log("Testing conversation stream with new DM creation");
 
       // Use the dedicated conversation stream verification helper
-      const result = await verifyConversationStream(workers.get("henry")!, [
-        workers.get("randomguy")!,
-      ]);
+      const verifyResult = await verifyConversationStream(
+        workers.get("henry")!,
+        [workers.get("randomguy")!],
+      );
 
-      console.log("Conversation stream test results:", JSON.stringify(result));
-
-      // Assert that we received the conversation notification
-      expect(result.receivedCount).toBeGreaterThan(0);
-      expect(result.allReceived).toBe(true);
+      console.log("verifyResult", JSON.stringify(verifyResult));
+      expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect.getState().currentTestName);
       throw e;

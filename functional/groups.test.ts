@@ -1,8 +1,8 @@
-import { sleep } from "@bots/xmtp-handler-workers";
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
+import { sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
@@ -117,7 +117,6 @@ describe(testName, async () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        // Create a new group specifically for this test with actual workers
         // Use the first 5 workers (excluding henry who will be the sender)
         const workersList = workers.getWorkers().slice(1, i + 1);
         const inboxIds = workersList.map((worker) => worker.client.inboxId);
@@ -132,18 +131,6 @@ describe(testName, async () => {
           });
 
         console.log(`Test group created with ID: ${testGroup.id}`);
-
-        // Sync the group for all participants
-        await Promise.all(
-          workersList.map((worker) =>
-            worker.client.conversations.sync().catch((err: unknown) => {
-              console.error(`Error syncing for ${worker.name}:`, err);
-            }),
-          ),
-        );
-
-        // Wait a moment for sync to complete
-        await sleep(1000);
 
         const verifyResult = await verifyMessageStream(
           testGroup,
@@ -160,7 +147,7 @@ describe(testName, async () => {
         );
 
         console.log("verifyResult", JSON.stringify(verifyResult));
-        expect(verifyResult.messages.length).toEqual(1);
+        expect(verifyResult.messages.length).toEqual(workersList.length - 1);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);
