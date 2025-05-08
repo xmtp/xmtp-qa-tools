@@ -6,7 +6,6 @@ import {
   type Conversation,
   type Group,
 } from "@xmtp/node-sdk";
-import { defaultValues, sleep } from "./tests";
 
 // Define types for message and group update structures
 interface StreamMessage {
