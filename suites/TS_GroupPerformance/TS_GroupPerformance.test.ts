@@ -1,11 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
-import {
-  verifyConversationGroupStream,
-  verifyGroupUpdateStream,
-  verifyMessageStream,
-} from "@helpers/streams";
+import { verifyGroupUpdateStream, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -57,7 +53,6 @@ describe(testName, async () => {
         );
 
         await newGroup.sync();
-        const members = await newGroup.members();
         console.log(`Group created with ${i + 1} participants`);
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
@@ -82,8 +77,7 @@ describe(testName, async () => {
     //       },
     //     );
 
-    //     console.log("verifyResult", JSON.stringify(verifyResult));
-    //     expect(verifyResult.allReceived).toBe(true);
+    //expect(verifyResult.allReceived).toBe(true);
     //   } catch (e) {
     //     hasFailures = logError(e, expect.getState().currentTestName);
     //     throw e;
@@ -101,8 +95,6 @@ describe(testName, async () => {
             start = performance.now();
           },
         );
-
-        console.log("verifyResult", JSON.stringify(verifyResult));
 
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
@@ -122,8 +114,6 @@ describe(testName, async () => {
             start = performance.now();
           },
         );
-        console.log("verifyResult", JSON.stringify(verifyResult));
-
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);

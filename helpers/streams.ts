@@ -200,7 +200,7 @@ export function createGroupConsentSender(
 /**
  * Specialized function to verify message streams
  */
-export async function verifyMessageStream<T extends string = string>(
+export async function verifyMessageStream(
   group: Conversation,
   participants: Worker[],
   count = 1,
@@ -214,22 +214,22 @@ export async function verifyMessageStream<T extends string = string>(
 
   // Configure collectors for message streams with timeout
   console.log(`Setting up ${receivers.length} collectors for messages`);
-  const collectPromises: Promise<T[]>[] = receivers.map((r) => {
+  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
     return r.worker
       .collectMessages(group.id, count, 20000) // 20 second timeout
       .then((msgs: StreamMessage[]) => {
-        return msgs.map((m) => m.message.content as T);
+        return msgs.map((m) => m.message.content);
       })
       .catch((err: unknown) => {
         console.error(`Error collecting messages for ${r.name}:`, err);
-        return [] as T[];
+        return [] as string[];
       });
   });
 
   // Generate all messages first for consistent handling
-  const sentMessages: T[] = Array.from(
+  const sentMessages: string[] = Array.from(
     { length: count },
-    (_, i) => `gm-${i + 1}-${randomSuffix}` as T,
+    (_, i) => `gm-${i + 1}-${randomSuffix}`,
   );
 
   // Send messages with optional callback after first message
@@ -241,7 +241,7 @@ export async function verifyMessageStream<T extends string = string>(
     }
   }
 
-  return verifyAndReturnStats(
+  return verifyAndReturnStats<string>(
     participants,
     collectPromises,
     count,
@@ -258,7 +258,7 @@ const filterReceivers = async (group: Group, participants: Worker[]) => {
 /**
  * Specialized function to verify group update streams
  */
-export async function verifyGroupUpdateStream<T extends string = string>(
+export async function verifyGroupUpdateStream(
   group: Group,
   participants: Worker[],
   count = 1,
@@ -269,7 +269,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
 
   // Configure collectors for group update streams with timeout
   console.log(`Setting up ${receivers.length} collectors for group updates`);
-  const collectPromises: Promise<T[]>[] = receivers.map((r) => {
+  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
     console.log(`Setting up collector for ${r.name} to watch ${group.id}`);
 
     return r.worker
@@ -279,18 +279,18 @@ export async function verifyGroupUpdateStream<T extends string = string>(
           `Received group updates for ${r.name}:`,
           JSON.stringify(msgs),
         );
-        return msgs.length > 0 ? msgs.map((m) => m.group.name as T) : [];
+        return msgs.length > 0 ? msgs.map((m) => m.group.name) : [];
       })
       .catch((err: unknown) => {
         console.error(`Error collecting group updates for ${r.name}:`, err);
-        return [] as T[];
+        return [] as string[];
       });
   });
 
   // Generate all update names first for consistent handling
-  const updateNames: T[] = Array.from(
+  const updateNames: string[] = Array.from(
     { length: count },
-    (_, i) => `New name-${i + 1}-${randomSuffix}` as T,
+    (_, i) => `New name-${i + 1}-${randomSuffix}`,
   );
 
   // Perform group updates with optional callback after first update
@@ -303,7 +303,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
     }
   }
 
-  return verifyAndReturnStats(
+  return verifyAndReturnStats<string>(
     participants,
     collectPromises,
     count,
