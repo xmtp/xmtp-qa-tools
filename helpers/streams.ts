@@ -188,7 +188,7 @@ export async function verifyMessageStream<T extends string = string>(
     g,
     payload,
   ) => await g.send(payload),
-  onMessageSent?: () => void,
+  onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
   const { conversationId, randomSuffix, receivers } = await prepareParticipants(
     group,
@@ -218,8 +218,8 @@ export async function verifyMessageStream<T extends string = string>(
   for (let i = 0; i < count; i++) {
     console.log(`Sending message ${i + 1} of ${count}`);
     await sender(group, sentMessages[i]);
-    if (i === 0 && onMessageSent) {
-      onMessageSent();
+    if (i === 0 && onActionStarted) {
+      onActionStarted();
     }
   }
 
@@ -244,7 +244,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
   count = 1,
   generator: (i: number, suffix: string) => T = (i, suffix): T =>
     `New name-${i + 1}-${suffix}` as T,
-  onUpdatePerformed?: () => void,
+  onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
   const { conversationId, randomSuffix, receivers } = await prepareParticipants(
     group,
@@ -283,8 +283,8 @@ export async function verifyGroupUpdateStream<T extends string = string>(
     await group.updateName(updateNames[i]);
     console.log(`Updated group name to ${updateNames[i]}`);
 
-    if (i === 0 && onUpdatePerformed) {
-      onUpdatePerformed();
+    if (i === 0 && onActionStarted) {
+      onActionStarted();
     }
   }
 
@@ -307,6 +307,7 @@ export async function verifyConsentStream(
   initiator: Worker,
   participants: Worker[],
   action: (inboxId?: string, groupId?: string) => Promise<void>,
+  onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
   console.log(
     `Setting up ${participants.length} collectors for consent events`,
@@ -345,6 +346,9 @@ export async function verifyConsentStream(
   });
 
   await action();
+  if (onActionStarted) {
+    onActionStarted();
+  }
 
   // Wait for either consent events or timeout
   const result = await Promise.race([consentPromise, timeoutPromise]);
@@ -362,6 +366,7 @@ export async function verifyConsentStream(
 export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
+  onActionStarted?: () => void,
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} not properly initialized`);
@@ -395,10 +400,10 @@ export async function verifyConversationStream(
     await initiator.client.conversations.newGroup(participantAddresses);
   console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
 
-  // Give streams time to initialize before sending messages
-  await sleep(defaultValues.streamTimeout);
+  if (onActionStarted) {
+    onActionStarted();
+  }
 
-  // Wait for all notifications
   const results = await Promise.all(participantPromises);
   const receivedCount = results.filter(
     (result) => result && result.length > 0,
@@ -425,6 +430,7 @@ export async function verifyConversationGroupStream(
   group: Group,
   initiator: Worker,
   participants: Worker[],
+  onActionStarted?: () => void,
 ): Promise<{ allReceived: boolean; receivedCount: number }> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} not properly initialized`);
@@ -461,8 +467,9 @@ export async function verifyConversationGroupStream(
   await group.addMembers(participants.map((p) => p.client.inboxId));
   console.log(`Added ${participants.length} members to group ${group.id}`);
 
-  // Give streams time to initialize before continuing
-  await sleep(defaultValues.streamTimeout);
+  if (onActionStarted) {
+    onActionStarted();
+  }
 
   // Wait for all notifications
   const results = await Promise.all(participantPromises);

@@ -17,7 +17,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   const batchSize = 50;
-  const total = 100;
+  const total = 400;
   let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
@@ -75,6 +75,10 @@ describe(testName, async () => {
           newGroup as Group,
           workers.getWorkers()[0],
           workers.getWorkers(),
+          () => {
+            console.log("Message sent, starting timer now");
+            start = performance.now();
+          },
         );
 
         console.log("verifyResult", JSON.stringify(verifyResult));
@@ -90,6 +94,12 @@ describe(testName, async () => {
         const verifyResult = await verifyGroupUpdateStream(
           newGroup as Group,
           workers.getWorkers(),
+          1,
+          undefined,
+          () => {
+            console.log("Message sent, starting timer now");
+            start = performance.now();
+          },
         );
 
         console.log("verifyResult", JSON.stringify(verifyResult));
