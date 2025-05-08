@@ -34,9 +34,7 @@ describe(testName, () => {
     console.log(`Group created with id ${group?.id}`);
 
     const verifyResult = await verifyMessageStream(group, allWorkers);
-    if (verifyResult.messages.length !== versions.length) {
-      console.log("messages", verifyResult.messages.length);
-    }
+    console.log("verifyResult", JSON.stringify(verifyResult));
   });
 
   it(`Shoudl test the DB after upgrade`, async () => {
@@ -59,12 +57,15 @@ describe(testName, () => {
         convo = await bob?.client.conversations.newDm(inboxId);
       }
       expect(convo?.id).toBeDefined();
+      await sleep(1000);
     }
   });
   it(`Shoudl test the DB after downgrade`, async () => {
     for (const version of versions.reverse()) {
-      workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
       await sleep(1000);
+
+      workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
+
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
       console.log(
@@ -80,6 +81,7 @@ describe(testName, () => {
         convo = await bob?.client.conversations.newDm(inboxId);
       }
       expect(convo?.id).toBeDefined();
+      await sleep(1000);
     }
   });
 });
