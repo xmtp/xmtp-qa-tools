@@ -37,7 +37,7 @@ interface AgentOptions {
   /** Welcome message to send to the conversation */
   welcomeMessage?: string;
   /** Codecs to use */
-  codecs?: unknown[];
+  codecs?: [];
 }
 
 /**

@@ -89,7 +89,7 @@ describe(testName, async () => {
         workers.get("randomguy")!,
       ]);
 
-      // Assert results
+      console.log("verifyResult", JSON.stringify(verifyResult));
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -105,7 +105,7 @@ describe(testName, async () => {
         workers.get("randomguy")!,
       ]);
 
-      // Assert results
+      console.log("verifyResult", JSON.stringify(verifyResult));
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -126,7 +126,7 @@ describe(testName, async () => {
       );
 
       const consentAction = async () => {
-        await groupConsentSender(group, "consent");
+        await groupConsentSender();
       };
 
       console.log("Starting consent verification process");
@@ -137,9 +137,8 @@ describe(testName, async () => {
         consentAction,
       );
 
-      console.log("Group verify result:", JSON.stringify(verifyResult));
-
-      // Verify the results
+      console.log("verifyResult", JSON.stringify(verifyResult));
+      expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = true;

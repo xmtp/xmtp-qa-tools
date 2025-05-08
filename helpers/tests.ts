@@ -200,7 +200,7 @@ export const createRandomInstallations = async (
     console.log(`[${worker.name}] Creating installation ${i + 1}`);
     await worker.worker?.clearDB();
     await worker.worker?.initialize();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await sleep(1000);
   }
 
   const finalState = await worker.client.preferences.inboxState(true);

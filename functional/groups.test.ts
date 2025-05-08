@@ -1,3 +1,4 @@
+import { sleep } from "@bots/xmtp-handler-workers";
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
@@ -31,8 +32,6 @@ describe(testName, async () => {
   let testStart: number;
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
-  // Create consistent random suffix for messages
-  const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   setupTestLifecycle({
     expect,
@@ -144,13 +143,13 @@ describe(testName, async () => {
         );
 
         // Wait a moment for sync to complete
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        await sleep(1000);
 
         const verifyResult = await verifyMessageStream(
           testGroup,
           workersList,
           1,
-          (i) => `gm-${i + 1}-${randomSuffix}`,
+          undefined,
           undefined,
           () => {
             console.log(
@@ -160,6 +159,8 @@ describe(testName, async () => {
           },
         );
 
+        console.log("verifyResult", JSON.stringify(verifyResult));
+        expect(verifyResult.messages.length).toEqual(1);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e: unknown) {
         hasFailures = logError(e, expect.getState().currentTestName);

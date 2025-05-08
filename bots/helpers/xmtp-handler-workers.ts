@@ -40,7 +40,7 @@ interface AgentOptions {
   /** Welcome message to send to the conversation */
   welcomeMessage?: string;
   /** Codecs to use */
-  codecs?: unknown[];
+  codecs?: [];
   /** Worker name (if using worker mode) */
   workerName?: string;
 }
@@ -124,7 +124,7 @@ class WorkerManager {
       env: env as XmtpEnv,
       loggingLevel,
       dbPath: getDbPath(`${env}-${signerIdentifier}${dbPathSuffix}`),
-      codecs: options.codecs,
+      codecs: options.codecs ?? [],
     });
 
     await client.conversations.sync();

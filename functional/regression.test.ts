@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { verifyMessageStream } from "@helpers/streams";
-import { defaultNames, sdkVersionOptions } from "@helpers/tests";
+import { defaultNames, sdkVersionOptions, sleep } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -22,7 +22,7 @@ describe(testName, () => {
     }
     console.log("names", allNames);
     workers = await getWorkers(allNames, testName);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await sleep(1000);
 
     const allWorkers = workers.getWorkers();
     const creator = allWorkers[0];
@@ -42,7 +42,7 @@ describe(testName, () => {
   it(`Shoudl test the DB after upgrade`, async () => {
     for (const version of versions) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sleep(1000);
 
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
@@ -64,7 +64,7 @@ describe(testName, () => {
   it(`Shoudl test the DB after downgrade`, async () => {
     for (const version of versions.reverse()) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sleep(1000);
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
       console.log(

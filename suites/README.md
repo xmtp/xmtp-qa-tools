@@ -120,7 +120,6 @@ it("should send and receive gm message", async () => {
   await dm.send("gm");
 
   const verifyResult = await verifyMessageStream(dm, [receiver]);
-  expect(verifyResult.allReceived).toBe(true);
 });
 ```
 
@@ -150,7 +149,7 @@ it("should deliver notifications from multiple senders", async () => {
   }
 
   // Verify all messages are received
-  await new Promise((r) => setTimeout(r, TEST_DURATION + 1000));
+  await sleep(TEST_DURATION + 1000);
   await receiver.client.conversations.sync();
 
   // Count received messages

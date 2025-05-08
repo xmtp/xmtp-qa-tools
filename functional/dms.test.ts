@@ -105,7 +105,7 @@ describe(testName, async () => {
           start = performance.now();
         },
       );
-
+      console.log("verifyResult", JSON.stringify(verifyResult));
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {

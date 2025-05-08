@@ -1,6 +1,7 @@
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import { sleep } from "./tests";
 
 /**
  * Updates group description with a random member
@@ -294,7 +295,7 @@ export async function createLargeGroup(
       if (batchMembers.length > 0) {
         await group.addMembers(batchMembers);
         await group.sync();
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        await sleep(500);
       }
     }
 

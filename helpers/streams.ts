@@ -403,9 +403,7 @@ export async function verifyConversationStream(
   console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
 
   // Give streams time to initialize before sending messages
-  await new Promise((resolve) =>
-    setTimeout(resolve, defaultValues.streamTimeout),
-  );
+  await sleep(defaultValues.streamTimeout);
 
   // Wait for all notifications
   const results = await Promise.all(participantPromises);
