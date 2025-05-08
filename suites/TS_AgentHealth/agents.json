@@ -7,6 +7,13 @@
     "expectedMessage": ["chat", "invalid"]
   },
   {
+    "name": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "networks": ["production"],
+    "sendMessage": "hey there how are you?",
+    "expectedMessage": "thinking"
+  },
+  {
     "name": "key-check",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "networks": ["dev", "production"],

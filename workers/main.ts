@@ -254,10 +254,10 @@ export class WorkerClient extends Worker {
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
-          this.initMessageStream();
+          this.initMessageStream(typeofStream.Message);
           break;
         case typeofStream.GroupUpdated:
-          this.initMessageStream();
+          this.initMessageStream(typeofStream.GroupUpdated);
           break;
         case typeofStream.Conversation:
           this.initConversationStream();
@@ -279,16 +279,12 @@ export class WorkerClient extends Worker {
   /**
    * Initialize message stream for both regular messages and group updates
    */
-  private initMessageStream() {
+  private initMessageStream(type: typeofStream) {
     void (async () => {
       while (true) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
-
           for await (const message of stream) {
-            console.log(
-              `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
-            );
             if (
               !message ||
               message?.senderInboxId.toLowerCase() ===
@@ -296,7 +292,13 @@ export class WorkerClient extends Worker {
             ) {
               continue;
             }
-            if (message?.contentType?.typeId === "group_updated") {
+            if (
+              message?.contentType?.typeId === "group_updated" &&
+              type === typeofStream.GroupUpdated
+            ) {
+              console.log(
+                `[${this.nameId}] Received group updated: ${JSON.stringify(message)}`,
+              );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
                 const content = message.content as {
@@ -322,7 +324,13 @@ export class WorkerClient extends Worker {
               }
               continue;
             }
-            if (message.contentType?.typeId === "text") {
+            if (
+              message.contentType?.typeId === "text" &&
+              type === typeofStream.Message
+            ) {
+              console.log(
+                `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
+              );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);

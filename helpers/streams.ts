@@ -216,13 +216,10 @@ export async function verifyMessageStream<T extends string = string>(
 
   // Send messages with optional callback after first message
   for (let i = 0; i < count; i++) {
+    console.log(`Sending message ${i + 1} of ${count}`);
     await sender(group, sentMessages[i]);
     if (i === 0 && onMessageSent) {
       onMessageSent();
-    }
-    // Add a small delay between messages to ensure they are delivered in order
-    if (i < count - 1) {
-      await sleep(500);
     }
   }
 
