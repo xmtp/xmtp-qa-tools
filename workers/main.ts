@@ -562,7 +562,6 @@ export class WorkerClient extends Worker {
    */
   collectMessages(
     groupId: string,
-    typeId: string,
     count: number,
     timeout?: number,
   ): Promise<StreamTextMessage[]> {
@@ -573,15 +572,10 @@ export class WorkerClient extends Worker {
         const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
-        return (
-          groupId === conversationId &&
-          (typeId === "message"
-            ? contentType?.typeId === "text"
-            : contentType?.typeId === typeId)
-        );
+        return groupId === conversationId && contentType?.typeId === "text";
       },
       count,
-      additionalInfo: { groupId, contentType: typeId },
+      additionalInfo: { groupId },
       timeout,
     });
   }

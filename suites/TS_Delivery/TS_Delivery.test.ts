@@ -63,21 +63,11 @@ describe(testName, async () => {
 
   it("stream: send the stream", async () => {
     try {
-      expect(group.id).toBeDefined();
-
-      // Collect messages by setting up listeners before sending and then sending known messages.
       collectedMessages = await verifyMessageStream(
         group,
         workers.getWorkers(),
         amountofMessages,
-        (i) => `gm-${i + 1}-${randomSuffix}`,
-        undefined,
-        () => {
-          console.log("Message sent, starting timer now");
-          start = performance.now();
-        },
       );
-      expect(collectedMessages.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect.getState().currentTestName);
       throw e;

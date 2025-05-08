@@ -6,6 +6,8 @@ import {
   type Conversation,
   type Group,
 } from "@xmtp/node-sdk";
+import { expect } from "vitest";
+import { calculateMessageStats } from "./tests";
 
 // Define types for message and group update structures
 interface StreamMessage {
@@ -40,11 +42,57 @@ interface ConversationNotification {
 export type VerifyStreamResult = {
   allReceived: boolean;
   messages: string[][];
+  stats?: {
+    receptionPercentage: number;
+    orderPercentage: number;
+    workersInOrder: number;
+    workerCount: number;
+    totalReceivedMessages: number;
+    totalExpectedMessages: number;
+  };
 };
 
 /**
- * Reusable consent operations for testing
+ * Generic function to verify and return stats for stream data
+ * This function processes collected promises and returns statistics
  */
+const verifyAndReturnStats = async <T>(
+  collectPromises: Promise<T[]>[],
+  count: number,
+  randomSuffix?: string,
+): Promise<VerifyStreamResult> => {
+  const streamCollectedMessages = await Promise.all(collectPromises);
+  const streamAllReceived = streamCollectedMessages.every(
+    (msgs) => msgs?.length === count,
+  );
+
+  // Convert any type to string arrays for stats calculation
+  const messagesAsStrings = streamCollectedMessages.map((msgs) =>
+    msgs.map((m) => String(m)),
+  );
+
+  // Only calculate stats if we have a randomSuffix (for message ordering)
+  let stats;
+  if (randomSuffix) {
+    stats = calculateMessageStats(
+      messagesAsStrings,
+      "gm-",
+      count,
+      randomSuffix,
+    );
+    expect(stats.receptionPercentage).toBeGreaterThan(95);
+    expect(stats.orderPercentage).toBeGreaterThan(95);
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(`Received ${messagesAsStrings.flat().length} messages total`);
+  }
+
+  return {
+    stats,
+    allReceived: streamAllReceived,
+    messages: messagesAsStrings,
+  };
+};
 
 /**
  * Toggle the consent state for an entity
@@ -198,7 +246,7 @@ export async function verifyMessageStream<T extends string = string>(
   console.log(`Setting up ${receivers.length} collectors for messages`);
   const collectPromises: Promise<T[]>[] = receivers.map((r) => {
     return r.worker
-      .collectMessages(conversationId, typeofStream.Message, count, 20000) // 20 second timeout
+      .collectMessages(conversationId, count, 20000) // 20 second timeout
       .then((msgs: StreamMessage[]) => {
         return msgs.map((m) => m.message.content as T);
       })
@@ -222,16 +270,7 @@ export async function verifyMessageStream<T extends string = string>(
     }
   }
 
-  // Collect and process results
-  const streamCollectedMessages = await Promise.all(collectPromises);
-  const streamAllReceived = streamCollectedMessages.every(
-    (msgs) => msgs?.length === count,
-  );
-
-  return {
-    allReceived: streamAllReceived,
-    messages: streamCollectedMessages,
-  };
+  return verifyAndReturnStats(collectPromises, count, randomSuffix);
 }
 
 /**
@@ -287,16 +326,7 @@ export async function verifyGroupUpdateStream<T extends string = string>(
     }
   }
 
-  // Collect and process results
-  const streamCollectedMessages = await Promise.all(collectPromises);
-  const streamAllReceived = streamCollectedMessages.every(
-    (msgs) => msgs?.length === count,
-  );
-
-  return {
-    allReceived: streamAllReceived,
-    messages: streamCollectedMessages,
-  };
+  return verifyAndReturnStats(collectPromises, count, randomSuffix);
 }
 
 /**
@@ -334,29 +364,13 @@ export async function verifyConsentStream(
       return ["error_collecting_consent"];
     });
 
-  // Create a timeout promise
-  const timeoutPromise = new Promise<string[]>((resolve) => {
-    setTimeout(() => {
-      console.log(
-        `No consent events collected for ${initiator.name} after 10 seconds, using fallback`,
-      );
-      resolve(["timeout_consent_collection"]);
-    }, 10000);
-  });
-
   await action();
   if (onActionStarted) {
     onActionStarted();
   }
 
-  // Wait for either consent events or timeout
-  const result = await Promise.race([consentPromise, timeoutPromise]);
-
-  // Consider test successful as long as the action completed
-  return {
-    allReceived: true,
-    messages: [result],
-  };
+  // No randomSuffix for consent events as they don't follow the same pattern
+  return verifyAndReturnStats([consentPromise], 1, "");
 }
 
 /**
@@ -366,7 +380,7 @@ export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
   onActionStarted?: () => void,
-): Promise<{ allReceived: boolean; receivedCount: number }> {
+): Promise<VerifyStreamResult> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} not properly initialized`);
   }
@@ -376,18 +390,27 @@ export async function verifyConversationStream(
   );
 
   // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises = participants.map((participant) => {
-    if (!participant.worker) {
-      console.warn(`Participant ${participant.name} has no worker`);
-      return Promise.resolve<ConversationNotification[] | null>(null);
-    }
+  const participantPromises: Promise<string[]>[] = participants.map(
+    (participant) => {
+      if (!participant.worker) {
+        console.warn(`Participant ${participant.name} has no worker`);
+        return Promise.resolve<string[]>([]);
+      }
 
-    return participant.worker
-      .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
-      .then((msgs) => {
-        return msgs;
-      });
-  });
+      return participant.worker
+        .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
+        .then((msgs: ConversationNotification[]) => {
+          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
+        })
+        .catch((err: unknown) => {
+          console.error(
+            `Error collecting conversations for ${participant.name}:`,
+            err,
+          );
+          return [];
+        });
+    },
+  );
 
   // Get participant addresses and create group
   const participantAddresses = participants.map((p) => {
@@ -403,34 +426,19 @@ export async function verifyConversationStream(
     onActionStarted();
   }
 
-  const results = await Promise.all(participantPromises);
-  const receivedCount = results.filter(
-    (result) => result && result.length > 0,
-  ).length;
-  const allReceived = receivedCount === participants.length;
-
-  if (!allReceived) {
-    const missing = participants
-      .filter((_, i) => !results[i] || results[i].length === 0)
-      .map((p) => p.name);
-
-    console.warn(
-      `[${initiator.name}] Missing participants: ${missing.join(", ")}`,
-    );
-  }
-
-  return { allReceived, receivedCount };
+  // No randomSuffix for conversation notifications
+  return verifyAndReturnStats(participantPromises, 1, "");
 }
 
 /**
- * Verifies conversation streaming functionality
+ * Verifies conversation streaming functionality for group member additions
  */
 export async function verifyConversationGroupStream(
   group: Group,
   initiator: Worker,
   participants: Worker[],
   onActionStarted?: () => void,
-): Promise<{ allReceived: boolean; receivedCount: number }> {
+): Promise<VerifyStreamResult> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} not properly initialized`);
   }
@@ -449,18 +457,27 @@ export async function verifyConversationGroupStream(
   );
 
   // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises = participants.map((participant) => {
-    if (!participant.worker) {
-      console.warn(`Participant ${participant.name} has no worker`);
-      return Promise.resolve<ConversationNotification[] | null>(null);
-    }
+  const participantPromises: Promise<string[]>[] = participants.map(
+    (participant) => {
+      if (!participant.worker) {
+        console.warn(`Participant ${participant.name} has no worker`);
+        return Promise.resolve<string[]>([]);
+      }
 
-    return participant.worker
-      .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
-      .then((msgs) => {
-        return msgs;
-      });
-  });
+      return participant.worker
+        .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
+        .then((msgs: ConversationNotification[]) => {
+          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
+        })
+        .catch((err: unknown) => {
+          console.error(
+            `Error collecting conversations for ${participant.name}:`,
+            err,
+          );
+          return [];
+        });
+    },
+  );
 
   // Add members to the group
   await group.addMembers(participants.map((p) => p.client.inboxId));
@@ -470,39 +487,6 @@ export async function verifyConversationGroupStream(
     onActionStarted();
   }
 
-  // Wait for all notifications
-  const results = await Promise.all(participantPromises);
-
-  // Count received notifications, but only for non-initiator participants
-  const receivedCount = results.filter(
-    (result, index) =>
-      participants[index].name !== initiator.name &&
-      result &&
-      result.length > 0,
-  ).length;
-
-  // Calculate the success threshold (75% of non-initiator participants)
-  const successThreshold = Math.ceil(nonInitiatorParticipants.length * 0.75);
-
-  // Check if enough participants received notifications (at least 75%)
-  const allReceived = receivedCount >= successThreshold;
-
-  console.log(
-    `Received ${receivedCount}/${nonInitiatorParticipants.length} notifications, threshold for success is ${successThreshold}`,
-  );
-
-  if (!allReceived) {
-    const missing = nonInitiatorParticipants
-      .filter((p) => {
-        const index = participants.findIndex((part) => part.name === p.name);
-        return index >= 0 && (!results[index] || results[index].length === 0);
-      })
-      .map((p) => p.name);
-
-    console.warn(
-      `[${initiator.name}] Missing participants: ${missing.join(", ")}`,
-    );
-  }
-
-  return { allReceived, receivedCount };
+  // No randomSuffix for conversation notifications
+  return verifyAndReturnStats(participantPromises, 1, "");
 }

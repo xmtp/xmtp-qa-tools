@@ -80,3 +80,13 @@ The suite automatically records performance metrics for each operation:
 ## Monitoring
 
 Performance metrics feed into the SDK Performance Dashboard, which visualizes operation durations, network performance, and scalability indicators for large group operations.
+
+# TO-DOs
+
+- group report
+- 10 installations , 5 bad = 10
+- calculate installation success rate
+- add a test to check the group creation time
+- add a test to check the group metadata update time
+- add a test to check the group message delivery time
+- add a test to check the group scalability
