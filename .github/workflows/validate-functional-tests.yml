@@ -24,6 +24,8 @@ jobs:
         run: ./dev/up
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
+      - name: Print versions
+        run: yarn script versions
       - name: Run functional tests
         env:
           XMTP_ENV: dev
