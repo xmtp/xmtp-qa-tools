@@ -423,6 +423,9 @@ export class WorkerClient extends Worker {
           const stream = await this.client.conversations.stream();
 
           for await (const conversation of stream) {
+            console.log(
+              `[${this.nameId}] Received conversation: ${conversation?.id}`,
+            );
             if (!conversation?.id) continue;
 
             if (this.listenerCount("worker_message") > 0) {
@@ -449,7 +452,6 @@ export class WorkerClient extends Worker {
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
-            // Each consent update is an array of consent settings
             console.log(
               `[${this.nameId}] Received consent update:`,
               JSON.stringify(consentUpdate),
