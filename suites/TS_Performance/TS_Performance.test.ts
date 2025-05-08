@@ -10,7 +10,6 @@ import {
   IdentifierKind,
   type Conversation,
   type Group,
-  type XmtpEnv,
 } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 

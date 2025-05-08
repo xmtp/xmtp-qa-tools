@@ -64,6 +64,7 @@ function discoverPackages(): VersionConfig[] {
         );
         sdkVersion = sdkPackageJson.version || "";
       } catch (error: unknown) {
+        console.error(error);
         sdkVersion = "unknown";
       }
 
@@ -76,6 +77,7 @@ function discoverPackages(): VersionConfig[] {
         );
         libXmtpVersion = bindingsPackageJson.version || "";
       } catch (error: unknown) {
+        console.error(error);
         libXmtpVersion = "unknown";
       }
 
@@ -164,6 +166,7 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
             `${config.sdkPackage} -> ${config.bindingsPackage} (${versionData.version})`,
           );
         } catch (error: unknown) {
+          console.error(error);
           // Silent fail
         }
       }
@@ -198,7 +201,7 @@ function verifyVersions(configs: VersionConfig[]) {
           console.log(`${config.sdkPackage} -> ${config.bindingsPackage}`);
         }
       } catch (error: unknown) {
-        // Silent fail
+        console.error(error);
       }
     }
   }

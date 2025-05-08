@@ -4,7 +4,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it, should } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 
 const testName = "metadata";
 loadEnv(testName);
