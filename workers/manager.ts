@@ -2,7 +2,12 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { defaultValues, sdkVersionOptions, sdkVersions } from "@helpers/tests";
+import {
+  defaultValues,
+  sdkVersionOptions,
+  sdkVersions,
+  sleep,
+} from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, WorkerClient } from "./main";
@@ -65,6 +70,11 @@ export class WorkerManager {
    * Terminates all active workers and cleans up resources
    */
   public async terminateAll(deleteDbs: boolean = false): Promise<void> {
+    console.log(
+      "terminating all workers",
+      this.activeWorkers.length,
+      this.activeWorkers,
+    );
     const terminationPromises = this.activeWorkers.map(async (worker) => {
       try {
         await worker.terminate();
@@ -78,9 +88,8 @@ export class WorkerManager {
 
     await Promise.all(terminationPromises);
     this.activeWorkers = [];
-
-    // Clear the workers object
     this.workers = {};
+    await sleep(1000);
   }
 
   /**

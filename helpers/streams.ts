@@ -7,7 +7,7 @@ import {
   type Group,
 } from "@xmtp/node-sdk";
 import { expect } from "vitest";
-import { calculateMessageStats } from "./tests";
+import { calculateMessageStats, sleep } from "./tests";
 
 // Define types for message and group update structures
 interface StreamMessage {
@@ -243,6 +243,8 @@ export async function verifyMessageStream<T extends string = string>(
   ) => await g.send(payload),
   onActionStarted?: () => void,
 ): Promise<VerifyStreamResult> {
+  console.log("Waiting for 1 second before starting message stream test");
+  await sleep(1000);
   const { conversationId, randomSuffix, receivers } = await prepareParticipants(
     group,
     participants,

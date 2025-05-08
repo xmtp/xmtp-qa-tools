@@ -8,6 +8,7 @@ import {
   verifyGroupUpdateStream,
   verifyMessageStream,
 } from "@helpers/streams";
+import { sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
