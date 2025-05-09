@@ -139,16 +139,16 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Group stream performance
 
-| Group Size | Message (ms) | Metadata (ms) | Conversations (ms) | Sync Time (ms) | Status                 |
-| ---------- | ------------ | ------------- | ------------------ | -------------- | ---------------------- |
-| 50         | 74           | 117           | 68                 | 9.32           | ✅ On Target           |
-| 100        | 18           | 115           | 71                 | 8.94           | ✅ On Target           |
-| 150        | 62           | 203           | 178                | 8.79           | ✅ On Target           |
-| 200        | 1661         | 1568          | 1958               | 8.94           | ⚠️ Performance Concern |
-| 250        | 3834         | 3761          | 3799               | 15.23          | ⚠️ Performance Concern |
-| 300        | 6622         | 6973          | 7361               | 15.24          | ❌ Performance Issue   |
-| 350        | 9536         | 9278          | 10313              | 18.07          | ❌ Performance Issue   |
-| 400        | 11922        | 11674         | 12487              | 20             | ❌ Performance Issue   |
+| Group Size | Message (ms) | Metadata (ms) | Conversations (ms) | Status                 |
+| ---------- | ------------ | ------------- | ------------------ | ---------------------- |
+| 50         | 74           | 117           | 352                | ✅ On Target           |
+| 100        | 18           | 115           | 426                | ✅ On Target           |
+| 150        | 62           | 203           | 460                | ✅ On Target           |
+| 200        | 1661         | 1568          | 497                | ⚠️ Performance Concern |
+| 250        | 3834         | 3761          | 499                | ⚠️ Performance Concern |
+| 300        | 6622         | 6973          | 501                | ❌ Performance Issue   |
+| 350        | 9536         | 9278          | 562                | ❌ Performance Issue   |
+| 400        | 11922        | 11674         | 617                | ❌ Performance Issue   |
 
 _Note: Based on data from measured operations in the `us-east` region and `production` network._
 

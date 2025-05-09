@@ -23,7 +23,7 @@ describe(testName, async () => {
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
-  const steamsToTest = [typeofStream.Conversation];
+  const steamsToTest = [typeofStream.Message];
 
   // Hold timing metrics per group size
   interface SummaryEntry {
@@ -231,8 +231,7 @@ describe(testName, async () => {
             : "") +
           (conversationStreamTimeMs !== undefined
             ? `Conversation: ${conversationStreamTimeMs.toFixed(2)} ms; `
-            : "") +
-          (syncTimeMs !== undefined ? `Sync: ${syncTimeMs.toFixed(2)} ms` : ""),
+            : ""),
       );
     }
     console.log("==========================================\n");
