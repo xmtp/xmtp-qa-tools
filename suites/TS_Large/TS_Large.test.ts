@@ -10,21 +10,33 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 
 const testName = "TS_Large";
 loadEnv(testName);
 
 describe(testName, async () => {
   const batchSize = 50;
-  const total = 50;
+  const total = 400;
   let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
   const steamsToTest = [typeofStream.Conversation];
-  workers = await getWorkers(10, testName, typeofStream.Conversation);
+
+  // Hold timing metrics per group size
+  interface SummaryEntry {
+    groupSize: number;
+    messageStreamTimeMs?: number;
+    groupUpdatedStreamTimeMs?: number;
+    conversationStreamTimeMs?: number;
+    syncTimeMs?: number;
+  }
+
+  const summaryMap: Record<number, SummaryEntry> = {};
+
+  workers = await getWorkers(10, testName, steamsToTest[0]);
 
   setupTestLifecycle({
     expect,
@@ -95,6 +107,12 @@ describe(testName, async () => {
           );
 
           expect(verifyResult.allReceived).toBe(true);
+
+          // Save metrics
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            conversationStreamTimeMs: streamTimeMs,
+          };
         } catch (e) {
           hasFailures = logError(e, expect.getState().currentTestName);
           throw e;
@@ -120,6 +138,12 @@ describe(testName, async () => {
           );
 
           expect(verifyResult.allReceived).toBe(true);
+
+          // Save metrics
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            groupUpdatedStreamTimeMs: streamTimeMs,
+          };
         } catch (e) {
           hasFailures = logError(e, expect.getState().currentTestName);
           throw e;
@@ -144,6 +168,12 @@ describe(testName, async () => {
             `Message stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
           );
 
+          // Save metrics
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            messageStreamTimeMs: streamTimeMs,
+          };
+
           expect(verifyResult.allReceived).toBe(true);
         } catch (e) {
           hasFailures = logError(e, expect.getState().currentTestName);
@@ -154,13 +184,57 @@ describe(testName, async () => {
 
     it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
       try {
-        for (const worker of workers.getWorkers()) {
-          await worker.client.conversations.sync();
-        }
+        const syncStart = performance.now();
+        await workers.getWorkers()[0].client.conversations.sync();
+        const syncTimeMs = performance.now() - syncStart;
+
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          syncTimeMs,
+        };
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
   }
+
+  // After all tests have run, output a concise summary of all timings per group size
+  afterAll(() => {
+    if (Object.keys(summaryMap).length === 0) {
+      console.log("No timing data was collected.");
+      return;
+    }
+
+    const sorted = Object.values(summaryMap).sort(
+      (a, b) => a.groupSize - b.groupSize,
+    );
+
+    console.log("\n===== Timing Summary per Group Size =====");
+    for (const entry of sorted) {
+      const {
+        groupSize,
+        messageStreamTimeMs,
+        groupUpdatedStreamTimeMs,
+        conversationStreamTimeMs,
+        syncTimeMs,
+      } = entry;
+
+      console.log(
+        `Group ${groupSize} → ` +
+          (messageStreamTimeMs !== undefined
+            ? `Message: ${messageStreamTimeMs.toFixed(2)} ms; `
+            : "") +
+          (groupUpdatedStreamTimeMs !== undefined
+            ? `GroupUpdated: ${groupUpdatedStreamTimeMs.toFixed(2)} ms; `
+            : "") +
+          (conversationStreamTimeMs !== undefined
+            ? `Conversation: ${conversationStreamTimeMs.toFixed(2)} ms; `
+            : "") +
+          (syncTimeMs !== undefined ? `Sync: ${syncTimeMs.toFixed(2)} ms` : ""),
+      );
+    }
+    console.log("==========================================\n");
+  });
 });

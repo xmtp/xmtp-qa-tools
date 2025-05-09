@@ -44,19 +44,4 @@ The test suite incrementally increases group size by the batch size (default: 50
 
 ## Performance Metrics
 
-### Group Operations Performance by Size
-
-| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status |
-| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ------ |
-| 50 | 1242.23 | 81.43 | 34.52 | 51.98 | 57.00 | <1400ms | ✅ On Target |
-| 100 | 2944.47 | 40.27 | 48.88 | 147.22 | 162.00 | <1400ms | ❌ Performance Issue |
-
-
-
-
-### Group Operations Performance - Receiver Side
-
-| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status |
-| ---- | --------------- | -------------- | --------------- | ---------------- | ------------- | ------------ | ------ |
-| 50 | 34.52 | 81.43 | 38.93 | 51.98 | 206 | <100ms | ✅ On Target |
-| 100 | 48.88 | 40.27 | 19217.91 | 147.22 | 406 | <100ms | ✅ On Target |
+The test suite measures performance across different group sizes. Here are the observed metrics:
