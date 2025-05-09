@@ -296,12 +296,12 @@ function main() {
   if (shouldClean) {
     cleanPackageJson();
   }
-
-  // Remove node_modules folder
-  removeNodeModules();
-
-  // Run yarn install
-  runYarnInstall();
+  if (!process.env.GITHUB_ACTIONS) {
+    // Remove node_modules folder
+    removeNodeModules();
+    // Run yarn install
+    runYarnInstall();
+  }
 
   // Discover and process packages
   const configs = discoverPackages();
