@@ -57,6 +57,12 @@ import {
   Group as Group208,
 } from "@xmtp/node-sdk-208";
 import {
+  Client as Client209,
+  Conversation as Conversation209,
+  Dm as Dm209,
+  Group as Group209,
+} from "@xmtp/node-sdk-209";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -77,7 +83,15 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = ["202", "203", "204", "205", "206", "208"];
+export const sdkVersionOptions = [
+  "202",
+  "203",
+  "204",
+  "205",
+  "206",
+  "208",
+  "209",
+];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -181,6 +195,16 @@ export const sdkVersions = {
     sdkVersion: "2.0.8",
     libXmtpVersion: "bfadb76",
   },
+  209: {
+    Client: Client209,
+    Conversation: Conversation209,
+    Dm: Dm209,
+    Group: Group209,
+    sdkPackage: "node-sdk-209",
+    bindingsPackage: "node-bindings-120-5",
+    sdkVersion: "2.0.9",
+    libXmtpVersion: "ef2c57d",
+  },
 };
 
 /**
@@ -200,7 +224,7 @@ export const createRandomInstallations = async (
     console.log(`[${worker.name}] Creating installation ${i + 1}`);
     await worker.worker?.clearDB();
     await worker.worker?.initialize();
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await sleep(1000);
   }
 
   const finalState = await worker.client.preferences.inboxState(true);
@@ -454,126 +478,6 @@ export const simulateMissingCursorMessage = async (
   );
   console.log(`[${worker.name}] Simulating cursor being off by one message`);
 };
-
-/**
- * Calculates message reception and order statistics
- */
-export function calculateMessageStats(
-  messagesByWorker: string[][],
-  prefix: string,
-  amount: number,
-  suffix: string,
-) {
-  // Verify message order helper
-  const verifyMessageOrder = (
-    messages: string[],
-    expectedPrefix: string = "gm-",
-    expectedCount?: number,
-  ) => {
-    if (messages.length === 0) return { inOrder: false, expectedMessages: [] };
-
-    const count = expectedCount || messages.length;
-    const expectedMessages = Array.from(
-      { length: count },
-      (_, i) => `${expectedPrefix}${i + 1}-${suffix}`,
-    );
-
-    const inOrder =
-      messages.length === expectedMessages.length &&
-      messages.every((msg, i) => msg === expectedMessages[i]);
-
-    return { inOrder, expectedMessages };
-  };
-
-  // Log discrepancies helper
-  const showDiscrepancies = (workersInOrder: number, workerCount: number) => {
-    if (workersInOrder >= workerCount) return;
-
-    console.log("Message order discrepancies detected:");
-
-    messagesByWorker.forEach((messages, index) => {
-      const { inOrder, expectedMessages } = verifyMessageOrder(
-        messages,
-        prefix,
-        amount,
-      );
-
-      if (!inOrder) {
-        console.log(
-          `Worker ${index + 1} received messages out of order or missing messages:`,
-        );
-
-        if (messages.length !== expectedMessages.length) {
-          console.log(
-            `  Expected ${expectedMessages.length} messages, received ${messages.length}`,
-          );
-        }
-
-        const discrepancies = [];
-
-        for (
-          let i = 0;
-          i < Math.max(messages.length, expectedMessages.length);
-          i++
-        ) {
-          if (i >= messages.length) {
-            discrepancies.push(`Missing: ${expectedMessages[i]}`);
-          } else if (i >= expectedMessages.length) {
-            discrepancies.push(`Unexpected: ${messages[i]}`);
-          } else if (messages[i] !== expectedMessages[i]) {
-            discrepancies.push(
-              `Expected: ${expectedMessages[i]}, Got: ${messages[i]}`,
-            );
-          }
-        }
-
-        if (discrepancies.length > 0) {
-          console.debug("Discrepancies:");
-          discrepancies.forEach((d) => {
-            console.debug(d);
-          });
-        }
-      }
-    });
-  };
-
-  // Calculate statistics
-  let totalExpectedMessages = amount * messagesByWorker.length;
-  let totalReceivedMessages = messagesByWorker.reduce(
-    (sum, msgs) => sum + msgs.length,
-    0,
-  );
-  let workersInOrder = 0;
-  const workerCount = messagesByWorker.length;
-
-  for (const messages of messagesByWorker) {
-    const { inOrder } = verifyMessageOrder(messages, prefix, amount);
-    if (inOrder) workersInOrder++;
-  }
-
-  const receptionPercentage =
-    (totalReceivedMessages / totalExpectedMessages) * 100;
-  const orderPercentage = (workersInOrder / workerCount) * 100;
-
-  console.log("Expected messages pattern:", `${prefix}[1-${amount}]-${suffix}`);
-  console.log(
-    `Reception: ${receptionPercentage.toFixed(2)}% (${totalReceivedMessages}/${totalExpectedMessages})`,
-  );
-  console.log(
-    `Order: ${orderPercentage.toFixed(2)}% (${workersInOrder}/${workerCount} workers)`,
-  );
-
-  showDiscrepancies(workersInOrder, workerCount);
-
-  return {
-    receptionPercentage,
-    orderPercentage,
-    workersInOrder,
-    workerCount,
-    totalReceivedMessages,
-    totalExpectedMessages,
-  };
-}
 
 // Default worker names
 export const defaultNames = [

@@ -26,8 +26,8 @@ export const setupTestLifecycle = ({
   beforeEach(() => {
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
-    getTestStart();
-    getStart();
+    setTestStart(performance.now());
+    setStart(performance.now());
   });
 
   afterEach(function () {

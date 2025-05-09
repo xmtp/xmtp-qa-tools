@@ -18,6 +18,8 @@ const slackChannel = process.env.SLACK_CHANNEL || "general";
 console.log(`Using Slack bot token with channel: ${slackChannel}`);
 
 // Get GitHub Actions context if available
+const datadogUrl =
+  "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
@@ -120,9 +122,10 @@ async function sendSlackNotification() {
 
     // Create a message with GitHub context and AI analysis
     const message = `*XMTP Test Failure ❌*
-      • *Test Suite:* ${testName}
-      • *Workflow:* https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml 
-      • *URL:* ${workflowUrl}
+      • *Test Suite:* ${workflowName}
+      • *Workflow:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|View Workflow>
+      • *Run URL:* <${workflowUrl}|View Run Details>
+      • *Dashboard:* <${datadogUrl}|View in Datadog>
       • *Timestamp:* ${new Date().toISOString()}
       ${errorLogs}${aiAnalysis}`;
 

@@ -82,7 +82,7 @@ export const regressionClient = async (
   dbEncryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
-): Promise<any> => {
+): Promise<unknown> => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);

@@ -1,8 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyStream } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -95,20 +94,15 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyStream(
+      const verifyResult = await verifyMessageStream(
         convo,
         [workers.get("randomguy")!],
-        typeofStream.Message,
         1,
         undefined,
-        undefined,
         () => {
-          console.log("Message sent, starting timer now");
           start = performance.now();
         },
       );
-
-      expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       hasFailures = logError(e, expect.getState().currentTestName);

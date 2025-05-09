@@ -2,7 +2,12 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { defaultValues, sdkVersionOptions, sdkVersions } from "@helpers/tests";
+import {
+  defaultValues,
+  sdkVersionOptions,
+  sdkVersions,
+  sleep,
+} from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, WorkerClient } from "./main";
@@ -65,22 +70,28 @@ export class WorkerManager {
    * Terminates all active workers and cleans up resources
    */
   public async terminateAll(deleteDbs: boolean = false): Promise<void> {
-    const terminationPromises = this.activeWorkers.map(async (worker) => {
-      try {
-        await worker.terminate();
-        if (deleteDbs) {
-          await worker.clearDB();
+    console.log(
+      "terminating all workers",
+      this.activeWorkers.length,
+      this.activeWorkers,
+    );
+    const terminationPromises = this.activeWorkers.map(
+      async (worker: WorkerClient) => {
+        try {
+          await worker.terminate();
+          if (deleteDbs) {
+            await worker.clearDB();
+          }
+        } catch (error) {
+          console.warn(`Error terminating worker:`, error);
         }
-      } catch (error) {
-        console.warn(`Error terminating worker:`, error);
-      }
-    });
+      },
+    );
 
     await Promise.all(terminationPromises);
     this.activeWorkers = [];
-
-    // Clear the workers object
     this.workers = {};
+    await sleep(1000);
   }
 
   /**
@@ -267,7 +278,6 @@ export class WorkerManager {
       sdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
     };
-    //  console.debug("Worker data created", workerData);
 
     // Create and initialize the worker
     const workerClient = new WorkerClient(
@@ -319,9 +329,6 @@ export class WorkerManager {
     if (typeof descriptorsOrAmount === "number") {
       const workerNames = defaultValues.defaultNames;
       descriptors = workerNames.slice(0, descriptorsOrAmount);
-      // If we need to create multiple workers with random SDK versions
-      // Generate workers with random SDK versions (100, 105, or 202)
-      // Create descriptors with random SDK versions
       descriptors = [];
       for (let i = 0; i < descriptorsOrAmount; i++) {
         const workerName =

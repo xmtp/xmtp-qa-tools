@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { defaultValues } from "@helpers/tests";
+import { defaultValues, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -61,9 +61,7 @@ describe(testName, async () => {
       // Send a simple message
       const sentMessageId = await convo.send("gm");
       console.log("sentMessageId", sentMessageId);
-      await new Promise((resolve) =>
-        setTimeout(resolve, defaultValues.streamTimeout),
-      );
+      await sleep(defaultValues.streamTimeout);
       await convo.sync();
       const messagesAfter = await convo.messages();
       expect(messagesAfter.length).toBe(prevMessageCount + 2);

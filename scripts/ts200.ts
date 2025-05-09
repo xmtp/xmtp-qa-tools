@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
+import { sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
@@ -156,7 +157,7 @@ async function addMembersToGroup(group: Group): Promise<void> {
       }
 
       // Add a small delay between batches
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      await sleep(500);
     }
 
     await group.sync();

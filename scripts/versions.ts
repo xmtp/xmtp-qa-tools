@@ -18,7 +18,7 @@ function discoverPackages(): VersionConfig[] {
   const xmtpDir = path.join(rootDir, "node_modules", "@xmtp");
 
   if (!fs.existsSync(xmtpDir)) {
-    console.error("❌ @xmtp directory not found in node_modules");
+    console.error("@xmtp directory not found in node_modules");
     return configs;
   }
 
@@ -37,7 +37,7 @@ function discoverPackages(): VersionConfig[] {
   );
 
   console.log(
-    `🔍 Found ${sdkPackages.length} additional SDK packages and ${bindingsPackages.length} bindings packages`,
+    `Found ${sdkPackages.length} SDK packages and ${bindingsPackages.length} bindings packages`,
   );
 
   // Try to match SDK packages with bindings packages
@@ -65,9 +65,7 @@ function discoverPackages(): VersionConfig[] {
         sdkVersion = sdkPackageJson.version || "";
       } catch (error: unknown) {
         console.error(error);
-        console.warn(
-          `⚠️  Could not read version from ${sdkPackage}/package.json`,
-        );
+        sdkVersion = "unknown";
       }
 
       try {
@@ -80,9 +78,7 @@ function discoverPackages(): VersionConfig[] {
         libXmtpVersion = bindingsPackageJson.version || "";
       } catch (error: unknown) {
         console.error(error);
-        console.warn(
-          `⚠️  Could not read version from ${matchingBindings}/package.json`,
-        );
+        libXmtpVersion = "unknown";
       }
 
       configs.push({
@@ -96,13 +92,9 @@ function discoverPackages(): VersionConfig[] {
         Group,
       });
 
-      console.log(
-        `✅ Added auto-discovered config for ${sdkPackage} -> ${matchingBindings}`,
-      );
+      console.log(`${sdkPackage} -> ${matchingBindings}`);
     } else {
-      console.warn(
-        `⚠️  Found SDK package ${sdkPackage} but no matching bindings package`,
-      );
+      console.log(`${sdkPackage} -> no matching bindings`);
     }
   }
 
@@ -117,11 +109,11 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
   const xmtpDir = path.join(rootDir, "node_modules", "@xmtp");
 
   if (!fs.existsSync(xmtpDir)) {
-    console.error("❌ @xmtp directory not found in node_modules");
+    console.error("@xmtp directory not found in node_modules");
     return;
   }
 
-  console.log("🛠️  Creating bindings symlinks for SDK versions...");
+  console.log("Creating bindings symlinks...");
 
   for (const config of configs) {
     const sdkDir = path.join(xmtpDir, config.sdkPackage);
@@ -129,12 +121,12 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
 
     // Verify that the SDK and bindings packages exist
     if (!fs.existsSync(sdkDir)) {
-      console.error(`❌ SDK package ${config.sdkPackage} not found`);
+      console.error(`SDK package ${config.sdkPackage} not found`);
       continue;
     }
 
     if (!fs.existsSync(bindingsDir)) {
-      console.error(`❌ Bindings package ${config.bindingsPackage} not found`);
+      console.error(`Bindings package ${config.bindingsPackage} not found`);
       continue;
     }
 
@@ -145,31 +137,15 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
 
     // Remove existing node_modules if it exists
     if (fs.existsSync(sdkNodeModulesDir)) {
-      console.log(
-        `🧹 Cleaning up existing node_modules in ${config.sdkPackage}`,
-      );
-      try {
-        fs.rmSync(sdkNodeModulesDir, { recursive: true, force: true });
-      } catch (error: unknown) {
-        console.error(
-          `❌ Error removing directory: ${error instanceof Error ? error.message : String(error)}`,
-        );
-        continue;
-      }
+      fs.rmSync(sdkNodeModulesDir, { recursive: true, force: true });
     }
 
     // Create directories
-    console.log(
-      `📁 Creating node_modules directories for ${config.sdkPackage}`,
-    );
     fs.mkdirSync(sdkNodeModulesDir, { recursive: true });
     fs.mkdirSync(sdkNodeModulesXmtpDir, { recursive: true });
 
     // Create the symbolic link
     try {
-      console.log(
-        `🔗 Creating symlink: ${config.bindingsPackage} -> node-bindings for ${config.sdkPackage}`,
-      );
       // Calculate relative path for symlink
       const relativeBindingsPath = path.relative(
         sdkNodeModulesXmtpDir,
@@ -177,7 +153,7 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
       );
 
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`✅ Successfully created symlink for ${config.sdkPackage}`);
+      console.log(`Linked: ${config.sdkPackage} -> ${config.bindingsPackage}`);
 
       // Verify the version.json file is accessible
       const versionJsonPath = path.join(symlinkTarget, "dist", "version.json");
@@ -187,21 +163,16 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
             fs.readFileSync(versionJsonPath, "utf8"),
           );
           console.log(
-            `📊 ${config.sdkPackage} -> ${config.bindingsPackage} version: ${versionData.branch}@${versionData.version}`,
+            `${config.sdkPackage} -> ${config.bindingsPackage} (${versionData.version})`,
           );
         } catch (error: unknown) {
-          console.warn(
-            `⚠️  Error reading version.json: ${error instanceof Error ? error.message : String(error)}`,
-          );
+          console.error(error);
+          // Silent fail
         }
-      } else {
-        console.warn(
-          `⚠️  Warning: version.json not found at ${versionJsonPath}`,
-        );
       }
     } catch (error: unknown) {
       console.error(
-        `❌ Error creating symlink: ${error instanceof Error ? error.message : String(error)}`,
+        `Error linking ${config.sdkPackage}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -214,7 +185,7 @@ function verifyVersions(configs: VersionConfig[]) {
   const rootDir = process.cwd();
   const xmtpDir = path.join(rootDir, "node_modules", "@xmtp");
 
-  console.log("\n🔍 Verifying SDK versions...");
+  console.log("\nVerifying SDK versions...");
 
   for (const config of configs) {
     const sdkDir = path.join(xmtpDir, config.sdkPackage);
@@ -227,26 +198,11 @@ function verifyVersions(configs: VersionConfig[]) {
 
         // Check if it imports version.json from node-bindings
         if (sdkContent.includes("@xmtp/node-bindings/version.json")) {
-          console.log(
-            `ℹ️  ${config.sdkPackage} imports version from @xmtp/node-bindings/version.json`,
-          );
-
-          // This should now be redirected via our symlink
-          console.log(
-            `✅ Symlink should correctly redirect to ${config.bindingsPackage}`,
-          );
-        } else {
-          console.log(
-            `ℹ️  ${config.sdkPackage} doesn't directly import version from node-bindings`,
-          );
+          console.log(`${config.sdkPackage} -> ${config.bindingsPackage}`);
         }
       } catch (error: unknown) {
-        console.error(
-          `❌ Error reading SDK index file: ${error instanceof Error ? error.message : String(error)}`,
-        );
+        console.error(error);
       }
-    } else {
-      console.warn(`⚠️  SDK index file not found for ${config.sdkPackage}`);
     }
   }
 }
@@ -258,11 +214,11 @@ function cleanPackageJson() {
   const packageJsonPath = path.join(process.cwd(), "package.json");
 
   if (!fs.existsSync(packageJsonPath)) {
-    console.error("❌ package.json not found");
+    console.error("package.json not found");
     return;
   }
 
-  console.log('🧹 Cleaning "imports" field from package.json...');
+  console.log('Cleaning "imports" field from package.json...');
 
   try {
     // Read the package.json file
@@ -271,8 +227,6 @@ function cleanPackageJson() {
 
     // Check if there's an imports field
     if (packageJson.imports) {
-      console.log('📝 Found "imports" field in package.json');
-
       // Remove the imports field
       delete packageJson.imports;
 
@@ -283,20 +237,18 @@ function cleanPackageJson() {
         "utf8",
       );
 
-      console.log('✅ Successfully removed "imports" field from package.json');
-    } else {
-      console.log('ℹ️  No "imports" field found in package.json');
+      console.log('Removed "imports" field from package.json');
     }
   } catch (error: unknown) {
     console.error(
-      `❌ Error processing package.json: ${error instanceof Error ? error.message : String(error)}`,
+      `Error processing package.json: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }
 
 // Main function
 function main() {
-  console.log("🚀 Starting SDK Version Fixer");
+  console.log("Starting SDK Version Fixer");
 
   // Check for --clean flag
   const shouldClean = process.argv.includes("--clean");
@@ -310,7 +262,7 @@ function main() {
   createBindingsSymlinks(configs);
   verifyVersions(configs);
 
-  console.log("\n✅ Done");
+  console.log("\nDone");
 }
 
 main();

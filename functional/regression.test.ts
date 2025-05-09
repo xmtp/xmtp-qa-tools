@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { verifyStreamAll } from "@helpers/streams";
-import { defaultNames, sdkVersionOptions } from "@helpers/tests";
+import { verifyMessageStream } from "@helpers/streams";
+import { defaultNames, sdkVersionOptions, sleep } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -22,7 +22,7 @@ describe(testName, () => {
     }
     console.log("names", allNames);
     workers = await getWorkers(allNames, testName);
-    await new Promise((resolve) => setTimeout(resolve, 1000));
+    await sleep(1000);
 
     const allWorkers = workers.getWorkers();
     const creator = allWorkers[0];
@@ -33,16 +33,14 @@ describe(testName, () => {
     const group = await creator?.client.conversations.newGroup(inboxIds);
     console.log(`Group created with id ${group?.id}`);
 
-    const verifyResult = await verifyStreamAll(group, workers);
-    if (verifyResult.messages.length !== versions.length) {
-      console.log("messages", verifyResult.messages.length);
-    }
+    const verifyResult = await verifyMessageStream(group, allWorkers);
+    console.log("verifyResult", JSON.stringify(verifyResult));
   });
 
   it(`Shoudl test the DB after upgrade`, async () => {
     for (const version of versions) {
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await sleep(1000);
 
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
@@ -59,12 +57,15 @@ describe(testName, () => {
         convo = await bob?.client.conversations.newDm(inboxId);
       }
       expect(convo?.id).toBeDefined();
+      await sleep(1000);
     }
   });
   it(`Shoudl test the DB after downgrade`, async () => {
     for (const version of versions.reverse()) {
+      await sleep(1000);
+
       workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
       console.log(
@@ -80,6 +81,7 @@ describe(testName, () => {
         convo = await bob?.client.conversations.newDm(inboxId);
       }
       expect(convo?.id).toBeDefined();
+      await sleep(1000);
     }
   });
 });

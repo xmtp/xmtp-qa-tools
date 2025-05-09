@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { calculateMessageStats } from "@helpers/tests";
+import { calculateMessageStats } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -53,7 +53,7 @@ describe(
       }
     });
 
-    it("tc_offline_recovery: verify message recovery after disconnection", async () => {
+    it("offline_recovery: verify message recovery after disconnection", async () => {
       try {
         // Select one worker to take offline
         const offlineWorker = workers.get("random2")!; // Second worker
@@ -107,15 +107,16 @@ describe(
         messagesByWorker.push(recoveredMessages);
 
         const stats = calculateMessageStats(
+          workers.getWorkers(),
           messagesByWorker,
           "offline-msg-",
           amountofMessages,
           randomSuffix,
         );
 
-        // We expect all messages to be received and in order
+        console.log(JSON.stringify(stats));
         expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95); // At least some workers should have correct order
+        expect(stats.orderPercentage).toBeGreaterThan(95);
 
         // Use the unified sendDeliveryMetric for delivery metrics
         sendDeliveryMetric(

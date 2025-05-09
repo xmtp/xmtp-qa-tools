@@ -37,7 +37,7 @@ interface AgentOptions {
   /** Welcome message to send to the conversation */
   welcomeMessage?: string;
   /** Codecs to use */
-  codecs?: any[];
+  codecs?: [];
 }
 
 /**
@@ -75,7 +75,7 @@ export const sleep = (ms: number): Promise<void> =>
  * Initialize XMTP clients with robust error handling
  */
 export const initializeClient = async (
-  messageHandler: MessageHandler,
+  messageHandler: MessageHandler | undefined,
   options: AgentOptions[],
 ): Promise<Client[]> => {
   // Merge default options with the provided options
@@ -156,7 +156,7 @@ export const initializeClient = async (
 
             if (isDm || options.acceptGroups) {
               try {
-                await messageHandler(client, conversation, message, isDm);
+                await messageHandler?.(client, conversation, message, isDm);
               } catch (handlerError) {
                 console.error(
                   `[${env}] Error in message handler:`,
@@ -326,7 +326,7 @@ export const initializeClient = async (
         // Start message streaming
         const streamPromise = streamMessages(
           client,
-          messageHandler,
+          messageHandler ?? (() => {}),
           { ...option },
           activityTracker,
         );

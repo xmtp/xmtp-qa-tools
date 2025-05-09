@@ -48,7 +48,6 @@ describe(TEST_NAME, () => {
   });
   it("should initialize workers and create group", async () => {
     const start = performance.now();
-    console.time("initialize workers and create group");
 
     // Initialize workers
     workers = await getWorkers(testConfig.workers, TEST_NAME);
@@ -91,7 +90,6 @@ describe(TEST_NAME, () => {
     console.log(
       `initialize workers and create group - Duration: ${end - start}ms`,
     );
-    console.timeEnd("initialize workers and create group");
   });
 });
 // Sends messages to specific workers to check for responses
@@ -112,7 +110,6 @@ const getOrCreateGroup = async (
 ): Promise<Conversation | undefined> => {
   try {
     const start = performance.now();
-    console.time("getOrCreateGroup");
 
     let group: Group;
 
@@ -149,7 +146,6 @@ const getOrCreateGroup = async (
 
     const end = performance.now();
     console.log(`getOrCreateGroup - Duration: ${end - start}ms`);
-    console.timeEnd("getOrCreateGroup");
 
     return group;
   } catch (e) {
@@ -167,7 +163,6 @@ export const sendMessageToGroup = async (
   message: string,
 ): Promise<void> => {
   const start = performance.now();
-  console.time(`sendMessageToGroup-${worker.name}`);
 
   try {
     await worker.client.conversations.syncAll();
@@ -184,7 +179,6 @@ export const sendMessageToGroup = async (
     console.log(
       `sendMessageToGroup for ${worker.name} - Duration: ${end - start}ms`,
     );
-    console.timeEnd(`sendMessageToGroup-${worker.name}`);
   }
 };
 
@@ -195,7 +189,6 @@ const membershipChange = async (
   trys: number,
 ): Promise<void> => {
   const start = performance.now();
-  console.time(`membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`);
 
   try {
     console.log(`${memberWhoAdds.name} will add/remove ${memberToAdd.name}`);
@@ -240,9 +233,6 @@ const membershipChange = async (
     const end = performance.now();
     console.log(
       `membershipChange for ${memberWhoAdds.name} and ${memberToAdd.name} - Duration: ${end - start}ms`,
-    );
-    console.timeEnd(
-      `membershipChange-${memberWhoAdds.name}-${memberToAdd.name}`,
     );
   }
 };

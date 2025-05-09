@@ -385,7 +385,7 @@
 2025-05-01T01:21:27.844661Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xa464...9ed1 at 3559491
 2025-05-01T01:21:27.844666Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0xac87...9aee at 3558269
 2025-05-01T01:21:27.844671Z DEBUG stream_all_messages: xmtp_mls::subscriptions::stream_messages: subscribed to group 0x319e...e526 at 3559461
-stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > tc_stream: send the stream
+stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > stream: send the stream
 [2025-05-01T01:21:27.390Z] [error] Message stream error: alice-208 Error: group with welcome id 80497537 not found
 
 
@@ -480,7 +480,7 @@ stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > tc_stream: send the st
 2025-05-01T01:21:33.840764Z DEBUG stream_all_messages:query_latest_group_message{group_id="6e4c9b89c695b61d1c66a46dc7e2e75e"}: xmtp_api::mls: query latest group message group_id="6e4c9b89c695b61d1c66a46dc7e2e75e" inbox_id="cae7259b3565c2e125fd16f46721a59febb6233dc56281c3085cabdb2772c1ae"
 2025-05-01T01:21:33.868354Z DEBUG process: xmtp_mls::subscriptions::stream_messages: [cae7259b3565c2e125fd16f46721a59febb6233dc56281c3085cabdb2772c1ae]  is about to process streamed envelope for group 0xa464...9ed1 cursor_id=[3559491] inbox_id="cae7259b3565c2e125fd16f46721a59febb6233dc56281c3085cabdb2772c1ae" group_id="a464353d119afe3ac84f9d70093c9ed1" cursor_id=3559491
 2025-05-01T01:21:33.869048Z DEBUG process: xmtp_mls::subscriptions::stream_messages: epoch=1 for [cae7259b3565c2e125fd16f46721a59febb6233dc56281c3085cabdb2772c1ae] in process_stream_entry() inbox_id="cae7259b3565
-stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > tc_stream: send the stream
+stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > stream: send the stream
 [2025-05-01T01:21:33.337Z] [error] Message stream error: charlie-208 Error: group with welcome id 80497696 not found
 
 
@@ -691,11 +691,11 @@ stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > tc_stream: send the st
 2025-05-01T01:21:39.170610Z  INFO process:sync_welcomes:create_from_welcome: xmtp_mls::groups: Group membership validated
 2025-05-01T01:21:39.170623Z DEBUG process:sync_welcomes:create_from_welcome: xmtp_db::xmtp_openmls_provider: Transaction beginning
 
-stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > tc_stream: send the stream
+stdout | bugs/bug_welcome/welcome.test.ts > bug_welcome > stream: send the stream
 [2025-05-01T01:21:39.466Z] [info] Group created a464353d119afe3ac84f9d70093c9ed1
 
  ✓ bugs/bug_welcome/welcome.test.ts (1 test) 18575ms
-   ✓ bug_welcome > tc_stream: send the stream  16425ms
+   ✓ bug_welcome > stream: send the stream  16425ms
 
  Test Files  1 passed (1)
       Tests  1 passed (1)

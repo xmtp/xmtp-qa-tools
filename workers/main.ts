@@ -3,6 +3,7 @@ import { Worker, type WorkerOptions } from "node:worker_threads";
 import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
 import {
+  ConsentState,
   Dm,
   type Client,
   type DecodedMessage,
@@ -141,6 +142,7 @@ export class WorkerClient extends Worker {
   public address!: `0x${string}`;
   public client!: Client;
   private env: XmtpEnv;
+  private activeStreams: boolean = false;
 
   constructor(
     worker: WorkerBase,
@@ -170,12 +172,29 @@ export class WorkerClient extends Worker {
     this.setupEventHandlers();
   }
 
+  terminate() {
+    // Stop active streams first
+    this.stopStreams();
+    // Then terminate the worker thread
+    return super.terminate();
+  }
+
+  /**
+   * Stops all active streams without terminating the worker
+   */
+  stopStreams(): void {
+    this.activeStreams = false;
+  }
+
   /**
    * Reinstalls the worker
    */
   public async reinstall(): Promise<void> {
     console.log(`[${this.nameId}] Reinstalling worker`);
-    await this.terminate();
+    // Stop active streams first
+    this.stopStreams();
+    // Then terminate the worker thread
+    await super.terminate();
     await this.clearDB();
     await this.initialize();
   }
@@ -253,7 +272,10 @@ export class WorkerClient extends Worker {
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
-          this.initMessageStream();
+          this.initMessageStream(typeofStream.Message);
+          break;
+        case typeofStream.GroupUpdated:
+          this.initMessageStream(typeofStream.GroupUpdated);
           break;
         case typeofStream.Conversation:
           this.initConversationStream();
@@ -275,13 +297,15 @@ export class WorkerClient extends Worker {
   /**
    * Initialize message stream for both regular messages and group updates
    */
-  private initMessageStream() {
+  private initMessageStream(type: typeofStream) {
+    this.activeStreams = true;
     void (async () => {
-      while (true) {
+      while (this.activeStreams) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
-
           for await (const message of stream) {
+            if (!this.activeStreams) break;
+
             if (
               !message ||
               message?.senderInboxId.toLowerCase() ===
@@ -289,16 +313,45 @@ export class WorkerClient extends Worker {
             ) {
               continue;
             }
-            if (message?.contentType?.typeId === "group_updated") {
+            if (
+              message?.contentType?.typeId === "group_updated" &&
+              type === typeofStream.GroupUpdated
+            ) {
+              console.log(
+                `[${this.nameId}] Received group updated: ${JSON.stringify(message)}`,
+              );
               if (this.listenerCount("worker_message") > 0) {
+                // Extract group name from metadata changes
+                const content = message.content as {
+                  metadataFieldChanges?: Array<{
+                    fieldName: string;
+                    oldValue: string;
+                    newValue: string;
+                  }>;
+                };
+
+                const groupName =
+                  content.metadataFieldChanges?.find(
+                    (change) => change.fieldName === "group_name",
+                  )?.newValue || "Unknown";
+
                 this.emit("worker_message", {
-                  type: "stream_group_updated",
-                  group: message,
+                  type: StreamCollectorType.GroupUpdated,
+                  group: {
+                    conversationId: message.conversationId,
+                    name: groupName,
+                  },
                 });
               }
               continue;
             }
-            if (message.contentType?.typeId === "text") {
+            if (
+              message.contentType?.typeId === "text" &&
+              type === typeofStream.Message
+            ) {
+              console.debug(
+                `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
+              );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);
@@ -316,7 +369,7 @@ export class WorkerClient extends Worker {
           }
         } catch (error) {
           console.error(
-            "Message stream error: " + this.nameId + " " + String(error),
+            `[${this.nameId}] Message stream error: ${String(error)}`,
           );
         }
       }
@@ -395,23 +448,47 @@ export class WorkerClient extends Worker {
    * Initialize conversation stream
    */
   private initConversationStream() {
+    this.activeStreams = true;
     void (async () => {
-      while (true) {
+      let retryDelay = 500; // Initial retry delay of 500ms
+      while (this.activeStreams) {
         try {
-          const stream = await this.client.conversations.stream();
-
+          const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
+            if (!this.activeStreams) break;
+
+            console.log(
+              `[${this.nameId}] Received conversation: ${conversation?.id}`,
+            );
             if (!conversation?.id) continue;
 
             if (this.listenerCount("worker_message") > 0) {
               this.emit("worker_message", {
-                type: "stream_conversation",
+                type: StreamCollectorType.Conversation,
                 conversation,
               });
             }
           }
+          // Reset retry delay after successful stream connection
+          retryDelay = 500;
         } catch (error) {
-          console.error("maints:conversation " + String(error));
+          const errorStr = String(error);
+          console.error(
+            `[${this.nameId}] Conversation stream error: ${errorStr}`,
+          );
+
+          // If a database lock is detected, wait and retry with exponential backoff
+          if (errorStr.includes("database is locked")) {
+            console.log(
+              `[${this.nameId}] Database lock detected, retrying after ${retryDelay}ms`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, retryDelay));
+            // Increase delay for next retry (up to 5 seconds max)
+            retryDelay = Math.min(retryDelay * 2, 5000);
+          } else {
+            // For other errors, use a fixed delay
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
         }
       }
     })();
@@ -421,21 +498,49 @@ export class WorkerClient extends Worker {
    * Initialize consent stream
    */
   private initConsentStream() {
+    this.activeStreams = true;
     void (async () => {
-      while (true) {
+      while (this.activeStreams) {
         try {
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
+            console.log(
+              `[${this.nameId}] Received consent update:`,
+              JSON.stringify(consentUpdate),
+            );
             if (this.listenerCount("worker_message") > 0) {
-              this.emit("worker_message", {
-                type: StreamCollectorType.Consent,
-                consentUpdate,
-              });
+              // Process each consent setting in the array
+              if (Array.isArray(consentUpdate) && consentUpdate.length > 0) {
+                for (const consent of consentUpdate) {
+                  // Ensure we're properly formatting the event for our collectors
+                  const consentEvent = {
+                    type: StreamCollectorType.Consent,
+                    consentUpdate: {
+                      inboxId:
+                        typeof consent.entity === "string"
+                          ? consent.entity
+                          : "",
+                      consentValue: consent.state === ConsentState.Allowed, // Convert to boolean based on proper enum
+                    },
+                  };
+
+                  console.log(
+                    `[${this.nameId}] Emitting formatted consent event:`,
+                    JSON.stringify(consentEvent),
+                  );
+
+                  this.emit("worker_message", consentEvent);
+                }
+              } else {
+                console.log(`[${this.nameId}] Skipping empty consent update`);
+              }
             }
           }
         } catch (error) {
-          console.error("maints:consent " + String(error));
+          console.error(
+            `[${this.nameId}] Consent stream error: ${String(error)}`,
+          );
         }
       }
     })();
@@ -449,15 +554,9 @@ export class WorkerClient extends Worker {
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
     additionalInfo?: Record<string, string | number | boolean>;
+    timeout?: number;
   }): Promise<T[]> {
-    const { type, filterFn, count, additionalInfo = {} } = options;
-    const filterInfo = Object.entries(additionalInfo)
-      .map(([key, value]) => `${key}:${value}`)
-      .join(", ");
-
-    console.log(
-      `[${this.nameId}] Collecting ${count} ${type}${filterInfo ? ` (${filterInfo})` : ""}`,
-    );
+    const { type, filterFn, count, timeout = 10000 } = options; // Default timeout of 10 seconds
 
     return new Promise((resolve) => {
       const events: T[] = [];
@@ -480,12 +579,22 @@ export class WorkerClient extends Worker {
           events.push(msg as T);
           if (events.length >= count) {
             this.off("worker_message", onMessage);
+            clearTimeout(timeoutId);
             resolve(events);
           }
         }
       };
 
       this.on("worker_message", onMessage);
+
+      // Add timeout to prevent hanging indefinitely
+      const timeoutId = setTimeout(() => {
+        this.off("worker_message", onMessage);
+        console.log(
+          `[${this.nameId}] Stream collection timed out after ${timeout}ms. Collected ${events.length}/${count} events.`,
+        );
+        resolve(events); // Resolve with whatever events we've collected so far
+      }, timeout);
     });
   }
 
@@ -494,8 +603,8 @@ export class WorkerClient extends Worker {
    */
   collectMessages(
     groupId: string,
-    typeId: string,
     count: number,
+    timeout?: number,
   ): Promise<StreamTextMessage[]> {
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
@@ -504,15 +613,11 @@ export class WorkerClient extends Worker {
         const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
-        return (
-          groupId === conversationId &&
-          (typeId === "message"
-            ? contentType?.typeId === "text"
-            : contentType?.typeId === typeId)
-        );
+        return groupId === conversationId && contentType?.typeId === "text";
       },
       count,
-      additionalInfo: { groupId, contentType: typeId },
+      additionalInfo: { groupId },
+      timeout,
     });
   }
 
@@ -522,16 +627,40 @@ export class WorkerClient extends Worker {
   collectGroupUpdates(
     groupId: string,
     count: number,
+    timeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
+    console.log(
+      `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
+    );
+
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
-        if (msg.type !== StreamCollectorType.GroupUpdated) return false;
+        console.log(
+          `[${this.nameId}] Filtering group update message:`,
+          JSON.stringify(msg),
+        );
+
+        if (msg.type !== StreamCollectorType.GroupUpdated) {
+          console.log(
+            `[${this.nameId}] Type mismatch: ${msg.type} !== ${StreamCollectorType.GroupUpdated}`,
+          );
+          return false;
+        }
+
         const streamMsg = msg;
-        return groupId === streamMsg.group.conversationId;
+        console.log(
+          `[${this.nameId}] Checking group ID: ${groupId} === ${streamMsg.group?.conversationId}`,
+        );
+
+        const matches = groupId === streamMsg.group?.conversationId;
+        console.log(`[${this.nameId}] Group ID match: ${matches}`);
+
+        return matches;
       },
       count,
       additionalInfo: { groupId },
+      timeout,
     });
   }
 
@@ -541,11 +670,28 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
+    timeout?: number,
+    conversationId?: string,
   ): Promise<StreamConversationMessage[]> {
+    const additionalInfo: Record<string, string | number | boolean> = {
+      fromPeerAddress,
+    };
+
+    if (conversationId) {
+      additionalInfo.conversationId = conversationId;
+    }
+
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
+      filterFn: conversationId
+        ? (msg) => {
+            if (msg.type !== StreamCollectorType.Conversation) return false;
+            return msg.conversation.id === conversationId;
+          }
+        : undefined,
       count,
-      additionalInfo: { fromPeerAddress },
+      additionalInfo,
+      timeout,
     });
   }
 
