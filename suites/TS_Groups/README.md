@@ -46,14 +46,17 @@ The test suite incrementally increases group size by the batch size (default: 50
 
 ### Group Operations Performance by Size
 
-| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status               |
-| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | -------------------- |
-| 50   | 1242.08    | 9.53     | 57.56    | 32.70      | 36.00      | <1400ms        | ✅ On Target         |
-| 100  | 2987.76    | 41.76    | 23.72    | 154.93     | 170.00     | <1400ms        | ❌ Performance Issue |
+| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status |
+| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ------ |
+| 50 | 1242.23 | 81.43 | 34.52 | 51.98 | 57.00 | <1400ms | ✅ On Target |
+| 100 | 2944.47 | 40.27 | 48.88 | 147.22 | 162.00 | <1400ms | ❌ Performance Issue |
+
+
+
 
 ### Group Operations Performance - Receiver Side
 
-| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status       |
-| ---- | ---------------- | -------------- | --------------- | ----------------- | ------------- | ------------ | ------------ |
-| 50   | 57.56            | 9.53           | 13.37           | 32.70             | 206           | <100ms       | ✅ On Target |
-| 100  | 23.72            | 41.76          | 131.04          | 154.93            | 403           | <100ms       | ✅ On Target |
+| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status |
+| ---- | --------------- | -------------- | --------------- | ---------------- | ------------- | ------------ | ------ |
+| 50 | 34.52 | 81.43 | 38.93 | 51.98 | 206 | <100ms | ✅ On Target |
+| 100 | 48.88 | 40.27 | 19217.91 | 147.22 | 406 | <100ms | ✅ On Target |
