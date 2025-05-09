@@ -209,16 +209,18 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
-## Test suites
+## 🧪 XMTP Test Suites
 
-The XMTP QA testing framework consists of several specialized test suites designed to evaluate different aspects of the XMTP network's functionality, performance, and reliability. Each suite focuses on specific testing scenarios:
+Different end-to-end test suites for validating the XMTP protocol functionality, performance, and reliability.
 
-- **[TS_Performance](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)**: Measures independent operational performance
-- **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability
-- **[TS_Gm](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)**: Tests basic messaging functionality and cross-version compatibility
-- **[TS_Fork](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Fork)**: Investigates group conversation forking issues through membership manipulation
-- **[TS_Groups](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Groups)**: Tests performance of group operations
-- **[TS_AgentHealth](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth)**: Tests the health of the agent ecosystem
+| Suite              | Purpose                                                    | Link to test file                                         |
+| ------------------ | ---------------------------------------------------------- | --------------------------------------------------------- |
+| **TS_AgentHealth** | Tests the health of the agent ecosystem                    | [TS_AgentHealth](./TS_AgentHealth/TS_AgentHealth.test.ts) |
+| **TS_Delivery**    | Verifies message delivery reliability                      | [TS_Delivery](./TS_Delivery/TS_Delivery.test.ts)          |
+| **TS_Fork**        | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/TS_Fork.test.ts)                      |
+| **TS_Gm**          | Tests basic messaging and cross-version compatibility      | [TS_Gm](./TS_Gm/TS_Gm.test.ts)                            |
+| **TS_Performance** | Measures independent operational performance               | [TS_Performance](./TS_Performance/TS_Performance.test.ts) |
+| **TS_Groups**      | Tests performance of group operations                      | [TS_Groups](./TS_Groups/TS_Groups.test.ts)                |
 
 All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
 
