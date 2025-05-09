@@ -33,7 +33,7 @@ interface GroupResult {
 
 describe(testName, async () => {
   const batchSize = 50;
-  const total = 100;
+  const total = 400;
   let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
@@ -84,51 +84,6 @@ describe(testName, async () => {
         console.log(
           `Created group with ${i} participants in ${currentGroupResult.creationTimeMs.toFixed(2)}ms`,
         );
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-
-    it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
-      try {
-        // Get installation count from group members
-        const members = await (newGroup as Group).members();
-        const uniqueInstallationIds = new Set<string>();
-
-        for (const member of members) {
-          for (const installationId of member.installationIds) {
-            uniqueInstallationIds.add(String(installationId ?? ""));
-          }
-        }
-
-        const installationCount = uniqueInstallationIds.size;
-        console.log(
-          `Group with ${i} participants has ${installationCount} unique installations`,
-        );
-
-        // Measure sync time for each worker
-        for (const worker of workers.getWorkers()) {
-          const syncStart = performance.now();
-          await worker.client.conversations.syncAll();
-          const syncTime = performance.now() - syncStart;
-
-          const convoFound =
-            await worker.client.conversations.getConversationById(newGroup.id);
-          if (!convoFound) {
-            console.error(
-              `${worker.name} Conversation not found: ${newGroup.id}`,
-            );
-          } else {
-            console.log(`${worker.name} synced in ${syncTime.toFixed(2)}ms`);
-            currentGroupResult.syncResults.push({
-              groupSize: i,
-              workerName: worker.name,
-              syncTimeMs: syncTime,
-              installationCount,
-            });
-          }
-        }
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
@@ -210,6 +165,52 @@ describe(testName, async () => {
 
         // Add the results to the performance report
         performanceReport.push(currentGroupResult);
+      } catch (e) {
+        hasFailures = logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+
+    it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
+      try {
+        // Get installation count from group members
+        const members = await (newGroup as Group).members();
+        const uniqueInstallationIds = new Set<string>();
+
+        for (const member of members) {
+          for (const installationId of member.installationIds) {
+            uniqueInstallationIds.add(String(installationId ?? ""));
+          }
+        }
+
+        const installationCount = uniqueInstallationIds.size;
+        console.log(
+          `Group with ${i} participants has ${installationCount} unique installations`,
+        );
+
+        // Measure sync time for each worker
+        for (const worker of workers.getWorkers()) {
+          const syncStart = performance.now();
+          await worker.client.conversations.syncAll();
+          const syncTime = performance.now() - syncStart;
+
+          const convoFound =
+            await worker.client.conversations.getConversationById(newGroup.id);
+          if (!convoFound) {
+            console.error(
+              `${worker.name} Conversation not found: ${newGroup.id}`,
+            );
+            continue;
+          }
+
+          console.log(`${worker.name} synced in ${syncTime.toFixed(2)}ms`);
+          currentGroupResult.syncResults.push({
+            groupSize: i,
+            workerName: worker.name,
+            syncTimeMs: syncTime,
+            installationCount,
+          });
+        }
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
