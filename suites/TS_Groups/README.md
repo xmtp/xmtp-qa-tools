@@ -63,16 +63,28 @@ The test suite incrementally increases group size by the batch size (default: 50
 
 ### Group Operations Performance by Size
 
-| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status               |
-| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | -------------------- |
-| 50   | 3923.97    | 0.59     | 601.76   | 284.22     | 313.00     | <1400ms        | ❌ Performance Issue |
-| 100  | 6678.58    | 0.78     | 1164.88  | 207.66     | 228.00     | <1400ms        | ❌ Performance Issue |
+| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status |
+| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ------ |
+| 50 | 1270.55 | 5.96 | 24.48 | 54.38 | 60.00 | <1400ms | ✅ On Target |
+| 100 | 2997.06 | 14.57 | 22.64 | 144.90 | 159.00 | <1400ms | ❌ Performance Issue |
+
+
+
+
+
+
 
 ### Group Operations Performance - Receiver Side
 
-| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status               |
-| ---- | ---------------- | -------------- | --------------- | ----------------- | ------------- | ------------ | -------------------- |
-| 50   | 601.76           | 0.59           | 880.37          | 284.22            | 51            | <100ms       | ❌ Performance Issue |
-| 100  | 1164.88          | 0.78           | 3719.41         | 207.66            | 101           | <100ms       | ❌ Performance Issue |
+| Size | Receive Sync(ms) | Msg Stream(ms) | Conv Stream(ms) | Update Stream(ms) | Installations | Target(Sync) | Status |
+| ---- | --------------- | -------------- | --------------- | ---------------- | ------------- | ------------ | ------ |
+| 50 | 24.48 | 5.96 | 36.67 | 54.38 | 206 | <100ms | ✅ On Target |
+| 100 | 22.64 | 14.57 | 19352.95 | 144.90 | 406 | <100ms | ✅ On Target |
+
+
+
+
+
+
 
 _Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._

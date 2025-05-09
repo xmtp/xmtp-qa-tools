@@ -9,7 +9,7 @@
     "workers"
   ],
   "scripts": {
-    "bot": "tsx scripts/run-bot",
+    "bot": "tsx scripts/run bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/bot-cli.ts",
@@ -21,7 +21,8 @@
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "script": "tsx scripts/run-script",
+    "run": "tsx scripts/run.ts",
+    "script": "tsx scripts/run script",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest"
   },
