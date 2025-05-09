@@ -69,7 +69,7 @@ describe(testName, () => {
       const bob = workers.get("bob");
       const inboxId = generatedInboxes[0].inboxId;
       console.log(
-        "Downgraded to ",
+        "Downgraded to",
         "node-sdk:" + String(bob?.sdkVersion),
         "node-bindings:" + String(bob?.libXmtpVersion),
       );
