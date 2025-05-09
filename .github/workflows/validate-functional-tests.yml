@@ -24,8 +24,6 @@ jobs:
         run: ./dev/up
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
-      - name: Print versions
-        run: yarn script versions
       - name: Run functional tests
         env:
           XMTP_ENV: local
@@ -34,7 +32,10 @@ jobs:
           # Set this to true to help with debugging in GitHub Actions
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: ./scripts/run-test.sh functional 1
+        run: |
+          yarn script versions
+          ./scripts/run-test.sh functional 1
+
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
