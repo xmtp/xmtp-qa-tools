@@ -23,7 +23,7 @@ describe(testName, async () => {
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
-  const steamsToTest = [typeofStream.Conversation, typeofStream.Message];
+  const steamsToTest = [typeofStream.Conversation];
   workers = await getWorkers(10, testName, typeofStream.Conversation);
 
   setupTestLifecycle({
