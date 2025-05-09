@@ -213,12 +213,11 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 The XMTP QA testing framework consists of several specialized test suites designed to evaluate different aspects of the XMTP network's functionality, performance, and reliability. Each suite focuses on specific testing scenarios:
 
-- **[TS_Performance](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)**: Measures operational performance and scalability across various XMTP functions
-- **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability and correctness across multiple streams
+- **[TS_Performance](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)**: Measures independent operational performance
+- **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability
 - **[TS_Gm](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)**: Tests basic messaging functionality and cross-version compatibility
 - **[TS_Fork](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Fork)**: Investigates group conversation forking issues through membership manipulation
-- **[TS_Groups](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Groups)**: Focuses on network and operation speed metrics
-  correctly
+- **[TS_Groups](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Groups)**: Tests performance of group operations
 - **[TS_AgentHealth](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth)**: Tests the health of the agent ecosystem
 
 All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
