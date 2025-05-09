@@ -275,8 +275,6 @@ export class WorkerClient extends Worker {
    * Unified method to start the appropriate stream based on configuration
    */
   private startStream() {
-    this.startParallelStreams();
-    return;
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
