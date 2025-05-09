@@ -4,12 +4,6 @@ This test suite validates the health and responsiveness of live XMTP agents in p
 
 https://github.com/user-attachments/assets/bbe94427-8fcb-463c-98fb-6417c16dd4cf
 
-## Test Environment
-
-- **Client**: Single worker "bob" for interaction with various agents
-- **Agent Addresses**: Configurable via `agents.json`
-- **Testing Approach**: Programmatic testing via XMTP SDK
-
 ## Setup
 
 ```bash

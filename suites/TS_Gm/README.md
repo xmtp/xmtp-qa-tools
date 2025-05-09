@@ -2,12 +2,6 @@
 
 This test suite verifies the functionality and responsiveness of the XMTP GM bot in different conversation types, including both direct messages and groups.
 
-## Test Environment
-
-- **Client**: Single worker "bob" for interaction with the GM bot
-- **Bot Address**: Configurable via environment variables
-- **Testing Approaches**: Programmatic testing via SDK and UI testing via Playwright
-
 ## Setup
 
 ```bash
@@ -15,18 +9,6 @@ This test suite verifies the functionality and responsiveness of the XMTP GM bot
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
-```
-
-## Configuration
-
-Create a `.env` file in the root directory with your testing configuration:
-
-```bash
-LOGGING_LEVEL=off  # Options: debug, info, warn, error, off
-XMTP_ENV=production  # Options: production, dev
-
-# GM Bot configuration
-GM_BOT_ADDRESS=0x...  # Ethereum address of the GM bot to test against
 ```
 
 ## Test Execution

@@ -2,12 +2,6 @@
 
 This test suite validates XMTP's notification functionality by sending randomized messages from multiple senders to a target recipient within a defined time period.
 
-## Test Environment
-
-- **Client Mix**: Multiple sender clients (`alice`, `bob`, `sam`, `walt`, `tina`) and one recipient
-- **Test Duration**: 30 seconds
-- **Message Volume**: 10 messages with random timing
-
 ## Setup
 
 ```bash

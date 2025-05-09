@@ -2,13 +2,6 @@
 
 This test suite evaluates XMTP's performance and reliability under high load conditions by creating multiple conversations, large groups, and sending numerous messages simultaneously.
 
-## Test Environment
-
-- **Workers**: Configurable number of test workers (based on test size)
-- **Test Sizes**: Configurable test sizes (small, medium, large) with different parameters
-- **Target**: Fixed receiver for measuring consistent performance
-- **Metrics**: Automated performance data collection for stress scenarios
-
 ## Setup
 
 ```bash
@@ -16,15 +9,6 @@ This test suite evaluates XMTP's performance and reliability under high load con
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
-```
-
-## Configuration
-
-Create a `.env` file in the root directory with your testing configuration:
-
-```bash
-XMTP_ENV=production  # Options: production, dev
-STRESS_SIZE=small  # Options: small, medium, large
 ```
 
 ## Test Execution

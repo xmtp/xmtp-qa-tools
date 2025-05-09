@@ -2,12 +2,6 @@
 
 This test suite focuses on verifying message delivery reliability, ordering, and recovery capabilities in XMTP, providing metrics for delivery rates and message ordering.
 
-## Test Environment
-
-- **Clients**: Configurable number of workers for message sending and receiving
-- **Message Volume**: Configurable batch size for message delivery testing
-- **Test Types**: Stream-based delivery, polling-based delivery, and offline recovery
-
 ## Setup
 
 ```bash
@@ -15,19 +9,6 @@ This test suite focuses on verifying message delivery reliability, ordering, and
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
-```
-
-## Configuration
-
-Create a `.env` file in the root directory with your testing configuration:
-
-```bash
-LOGGING_LEVEL=off  # Options: debug, info, warn, error, off
-XMTP_ENV=production  # Options: production, dev
-
-# Delivery test configuration
-DELIVERY_AMOUNT=10  # Number of messages to send
-DELIVERY_RECEIVERS=4  # Number of receiver clients
 ```
 
 ## Test Execution
