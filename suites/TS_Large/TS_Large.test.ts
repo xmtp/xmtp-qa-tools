@@ -23,7 +23,7 @@ describe(testName, async () => {
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
-  const steamsToTest = [typeofStream.Message];
+  const steamsToTest = [typeofStream.GroupUpdated];
 
   // Hold timing metrics per group size
   interface SummaryEntry {
