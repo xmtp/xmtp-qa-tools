@@ -1,4 +1,4 @@
-name: TS_Groups
+name: TS_Large
 description: "should verify performance of the group streams"
 
 on:
@@ -40,7 +40,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: ./scripts/run-test.sh TS_Groups
+        run: ./scripts/run-test.sh TS_Large
       - name: Send Slack notification
         if: always()
         env:
@@ -50,7 +50,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_groups_${{ matrix.environment }}
+          name: TS_Large_${{ matrix.environment }}
           path: logs/
       - name: Fail if tests failed
         if: steps.test.outcome == 'failure'

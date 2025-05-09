@@ -220,7 +220,7 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 | **TS_Fork**        | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/TS_Fork.test.ts)                      |
 | **TS_Gm**          | Tests basic messaging and cross-version compatibility      | [TS_Gm](./TS_Gm/TS_Gm.test.ts)                            |
 | **TS_Performance** | Measures independent operational performance               | [TS_Performance](./TS_Performance/TS_Performance.test.ts) |
-| **TS_Groups**      | Tests performance of group operations                      | [TS_Groups](./TS_Groups/TS_Groups.test.ts)                |
+| **TS_Large**      | Tests performance of group operations                      | [TS_Large](./TS_Large/TS_Large.test.ts)                |
 
 All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
 

@@ -11,4 +11,4 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 | **TS_Notifications** | Validates push notification functionality                  | [TS_Notifications](./TS_Notifications/TS_Notifications.test.ts) |
 | **TS_Performance**   | Measures independent operational performance               | [TS_Performance](./TS_Performance/TS_Performance.test.ts)       |
 | **TS_Stress**        | Tests system performance under high load conditions        | [TS_Stress](./TS_Stress/TS_Stress.test.ts)                      |
-| **TS_Groups**        | Tests performance of group operations                      | [TS_Groups](./TS_Groups/TS_Groups.test.ts)                      |
+| **TS_Large**        | Tests performance of group operations                      | [TS_Large](./TS_Large/TS_Large.test.ts)                      |

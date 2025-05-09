@@ -1,4 +1,4 @@
-# XMTP Group Performance Testing Suite (TS_Groups)
+# XMTP Group Performance Testing Suite (TS_Large)
 
 This test suite specifically focuses on measuring XMTP network performance with large groups, providing critical insights into group messaging scalability and responsiveness.
 
@@ -14,7 +14,7 @@ yarn install
 ## Test Execution
 
 ```bash
-yarn test ts_groups
+yarn test TS_Large
 ```
 
 ## Test Flow
