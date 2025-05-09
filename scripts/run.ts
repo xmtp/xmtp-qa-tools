@@ -28,14 +28,14 @@ try {
     console.log(
       `Starting bot: ${name}${additionalArgs ? ` with args: ${additionalArgs}` : ""}`,
     );
-    execSync(`tsx --watch --env-file=.env ${filePath} ${additionalArgs}`, {
+    execSync(`tsx --watch ${filePath} ${additionalArgs}`, {
       stdio: "inherit",
     });
   } else {
     // For scripts, run without --watch flag
     const filePath = path.join("scripts", `${name}.ts`);
     console.log(`Running script: ${name}`);
-    execSync(`tsx --env-file=.env ${filePath} ${additionalArgs}`, {
+    execSync(`tsx ${filePath} ${additionalArgs}`, {
       stdio: "inherit",
     });
   }
