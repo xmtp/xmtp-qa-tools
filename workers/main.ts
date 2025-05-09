@@ -265,10 +265,18 @@ export class WorkerClient extends Worker {
     };
   }
 
+  private startParallelStreams() {
+    this.initMessageStream(typeofStream.Message);
+    this.initConversationStream();
+    //this.initConsentStream();
+  }
+
   /**
    * Unified method to start the appropriate stream based on configuration
    */
   private startStream() {
+    this.startParallelStreams();
+    return;
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
