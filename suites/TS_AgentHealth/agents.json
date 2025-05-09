@@ -7,6 +7,13 @@
     "expectedMessage": ["chat", "invalid"]
   },
   {
+    "name": "grouptoss",
+    "address": "0x70e25528d8b63905b455140f90a1659d743f21be",
+    "networks": ["dev", "production"],
+    "sendMessage": "@toss help",
+    "expectedMessage": ["toss"]
+  },
+  {
     "name": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "networks": ["production"],
