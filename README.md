@@ -217,9 +217,8 @@ The XMTP QA testing framework consists of several specialized test suites design
 - **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability and correctness across multiple streams
 - **[TS_Gm](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)**: Tests basic messaging functionality and cross-version compatibility
 - **[TS_Fork](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Fork)**: Investigates group conversation forking issues through membership manipulation
-- **[TS_Stress](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Stress)**: Evaluates system behavior under high load conditions
-- **[TS_Speed](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Speed)**: Focuses on network and operation speed metrics
-- **[TS_200](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_200)**: Basic functionality tests ensuring core features work correctly
+- **[TS_Groups](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Groups)**: Focuses on network and operation speed metrics
+  correctly
 - **[TS_AgentHealth](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth)**: Tests the health of the agent ecosystem
 
 All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
