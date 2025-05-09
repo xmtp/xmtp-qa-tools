@@ -450,7 +450,6 @@ export class WorkerClient extends Worker {
   private initConversationStream() {
     this.activeStreams = true;
     void (async () => {
-      let retryDelay = 500; // Initial retry delay of 500ms
       while (this.activeStreams) {
         try {
           const stream = this.client.conversations.stream();
@@ -469,26 +468,10 @@ export class WorkerClient extends Worker {
               });
             }
           }
-          // Reset retry delay after successful stream connection
-          retryDelay = 500;
         } catch (error) {
-          const errorStr = String(error);
           console.error(
-            `[${this.nameId}] Conversation stream error: ${errorStr}`,
+            `[${this.nameId}] Conversation stream error: ${String(error)}`,
           );
-
-          // If a database lock is detected, wait and retry with exponential backoff
-          if (errorStr.includes("database is locked")) {
-            console.log(
-              `[${this.nameId}] Database lock detected, retrying after ${retryDelay}ms`,
-            );
-            await new Promise((resolve) => setTimeout(resolve, retryDelay));
-            // Increase delay for next retry (up to 5 seconds max)
-            retryDelay = Math.min(retryDelay * 2, 5000);
-          } else {
-            // For other errors, use a fixed delay
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
         }
       }
     })();
