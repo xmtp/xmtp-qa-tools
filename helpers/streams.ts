@@ -282,7 +282,9 @@ export async function verifyGroupConsentStream(
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      await updateGroupConsent(participants[0].client, group);
+      for (const p of participants) {
+        await updateGroupConsent(p.client, group);
+      }
       return [{ key: "consent", sentAt }];
     },
     getKey: (ev) => (ev as { key?: string }).key ?? "consent",
