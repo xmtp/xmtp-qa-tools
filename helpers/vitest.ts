@@ -26,7 +26,9 @@ export const setupTestLifecycle = ({
     const start = getStart();
     const testName = expect.getState().currentTestName ?? "";
     const libXmtpVersion = workers.getVersion();
-    void sendPerformanceMetric(start, testName, libXmtpVersion, false);
+    const duration = performance.now() - start;
+    void sendPerformanceMetric(duration, testName, libXmtpVersion, false);
+    setStart(0);
   });
 
   afterAll(async () => {

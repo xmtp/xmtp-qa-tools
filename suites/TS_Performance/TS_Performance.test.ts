@@ -140,7 +140,6 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(dm, [
         workers.getWorkers()[1],
       ]);
-      console.log(JSON.stringify(verifyResult, null, 2));
       start = verifyResult.averageEventTiming;
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -346,10 +345,8 @@ describe(testName, async () => {
         const verifyResult = await verifyMessageStream(
           newGroup,
           workers.getWorkers(),
-          1,
         );
         start = verifyResult.averageEventTiming;
-        console.log(JSON.stringify(verifyResult, null, 2));
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
