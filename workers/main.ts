@@ -358,7 +358,7 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.debug(
+              console.log(
                 `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
               );
               // Handle auto-responses if enabled
