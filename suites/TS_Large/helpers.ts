@@ -36,7 +36,7 @@ export const ts_large_createGroup = async (
       workersInboxIds.filter((id) => id !== creator.inboxId),
     );
     console.log(
-      `Successfully added ${workersInboxIds.length} members to the group`,
+      `Successfully added ${workersInboxIds.filter((id) => id !== creator.inboxId).length} members to the group`,
     );
   }
   return newGroup;

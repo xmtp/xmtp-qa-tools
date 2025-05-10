@@ -18,8 +18,8 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-      WALLET_KEY_XMTP_CHAT: ${{ secrets.WALLET_KEY_XMTP_CHAT }}
-      ENCRYPTION_KEY_XMTP_CHAT: ${{ secrets.ENCRYPTION_KEY_XMTP_CHAT }}
+      WALLET_KEY: ${{ secrets.WALLET_KEY }}
+      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
