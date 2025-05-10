@@ -93,11 +93,9 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyMessageStream(
-        convo,
-        [workers.get("randomguy")!],
-        1,
-      );
+      const verifyResult = await verifyMessageStream(convo, [
+        workers.get("randomguy")!,
+      ]);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);

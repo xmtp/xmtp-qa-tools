@@ -8,6 +8,7 @@ import {
   verifyGroupUpdateStream,
   verifyMessageStream,
 } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -21,7 +22,7 @@ describe(testName, async () => {
   let start: number;
   let testStart: number;
   let group: Conversation;
-  const names = ["henry", "randomguy", "bob", "alice", "dave"];
+  const names = getRandomNames(5);
   let workers = await getWorkers(names, testName, typeofStream.None);
 
   // Setup test lifecycle
@@ -45,26 +46,24 @@ describe(testName, async () => {
     group = await workers
       .getWorkers()[0]
       .client.conversations.newGroup([
-        workers.get("randomguy")!.client.inboxId,
-        workers.get("bob")!.client.inboxId,
-        workers.get("alice")!.client.inboxId,
-        workers.get("dave")!.client.inboxId,
+        workers.getWorkers()[1].client.inboxId,
+        workers.getWorkers()[2].client.inboxId,
+        workers.getWorkers()[3].client.inboxId,
+        workers.getWorkers()[4].client.inboxId,
       ]);
   });
   it("verifyMessageStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
-      const newDm = await workers
-        .getWorkers()[0]
-        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+      const creator = workers.getWorkers()[0];
+      const receiver = workers.getWorkers()[1];
+      const newDm = await creator.client.conversations.newDm(
+        receiver.client.inboxId,
+      );
 
       // Verify message delivery
-      const verifyResult = await verifyMessageStream(
-        newDm,
-        [workers.get("randomguy")!],
-        10,
-      );
+      const verifyResult = await verifyMessageStream(newDm, [receiver], 10);
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -76,12 +75,14 @@ describe(testName, async () => {
   it("verifyMessageGroupStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
+      const creator = workers.getWorkers()[0];
       // Create direct message
-      const newGroup = await workers
-        .getWorkers()[0]
-        .client.conversations.newGroup(
-          workers.getWorkers().map((w) => w.client.inboxId),
-        );
+      const filterOutCreator = workers
+        .getWorkers()
+        .filter((w) => w.inboxId !== creator.inboxId);
+      const newGroup = await creator.client.conversations.newGroup(
+        filterOutCreator.map((w) => w.client.inboxId),
+      );
 
       // Verify message delivery
       const verifyResult = await verifyMessageStream(
@@ -107,7 +108,7 @@ describe(testName, async () => {
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
         workers.getWorkers()[0],
-        [workers.get("randomguy")!],
+        [workers.getWorkers()[1]],
       );
 
       expect(verifyResult.allReceived).toBe(true);
@@ -142,7 +143,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       const verifyResult = await verifyGroupUpdateStream(group as Group, [
-        workers.get("randomguy")!,
+        workers.getWorkers()[1],
       ]);
 
       expect(verifyResult.allReceived).toBe(true);
@@ -159,7 +160,7 @@ describe(testName, async () => {
       const groupConsentSender = createGroupConsentSender(
         workers.getWorkers()[0], // henry is doing the consent update
         group.id, // for this group
-        workers.get("randomguy")!.client.inboxId, // blocking randomguy
+        workers.getWorkers()[1].client.inboxId, // blocking randomguy
         true, // block the entities
       );
 
@@ -171,7 +172,7 @@ describe(testName, async () => {
 
       const verifyResult = await verifyConsentStream(
         workers.getWorkers()[0],
-        [workers.get("randomguy")!],
+        [workers.getWorkers()[1]],
         consentAction,
       );
 

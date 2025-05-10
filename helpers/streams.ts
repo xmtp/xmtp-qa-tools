@@ -205,44 +205,92 @@ export async function verifyMessageStream(
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & {
+    messageTimings: Record<string, Record<number, number>>;
+  }
+> {
   const receivers = await filterReceivers(group as Group, participants);
 
-  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
-    return r.worker
-      .collectMessages(group.id, count, 20000) // 20 second timeout
-      .then((msgs: StreamMessage[]) => {
-        return msgs.map((m) => m.message.content);
-      })
-      .catch((err: unknown) => {
-        console.error(`Error collecting messages for ${r.name}:`, err);
-        return [] as string[];
-      });
-  });
-
-  // Generate all messages first for consistent handling
-  const sentMessages: string[] = Array.from(
+  // 1. Prepare to record send times
+  const sentMessages: { content: string; sentAt: number }[] = Array.from(
     { length: count },
-    (_, i) => `gm-${i + 1}-${randomSuffix}`,
+    (_, i) => ({ content: `gm-${i + 1}-${randomSuffix}`, sentAt: 0 }),
   );
 
-  // Send messages with optional callback after first message
+  // 2. For each participant, collect messages and record receive time (start collectors BEFORE sending)
+  const collectPromises: Promise<{ content: string; receivedAt: number }[]>[] =
+    receivers.map((r) => {
+      return r.worker
+        .collectMessages(group.id, count, 20000)
+        .then((msgs: StreamMessage[]) => {
+          // For each received message, record content and receive time
+          return msgs.map((m) => ({
+            content: m.message.content,
+            receivedAt: Date.now(),
+          }));
+        })
+        .catch((err: unknown) => {
+          console.error(`Error collecting messages for ${r.name}:`, err);
+          return [] as { content: string; receivedAt: number }[];
+        });
+    });
+
+  // 3. Send messages and record send time
   for (let i = 0; i < count; i++) {
     console.log(`Sending message ${i + 1} of ${count}`);
-    await group.send(sentMessages[i]);
-    if (i === 0 && onActionStarted) {
-      onActionStarted();
-    }
+    sentMessages[i].sentAt = Date.now();
+    await group.send(sentMessages[i].content);
   }
 
-  return verifyAndReturnStats<string>(
-    participants,
-    collectPromises,
-    count,
-    randomSuffix,
+  // 4. Wait for all messages to be collected
+  const allReceived = await Promise.all(collectPromises);
+
+  // 5. Calculate timings: for each participant, for each message, duration = receivedAt - sentAt
+  const messageTimings: Record<string, Record<number, number>> = {};
+  receivers.forEach((r, idx) => {
+    const received = allReceived[idx];
+    messageTimings[r.name] = {};
+    received.forEach((msg) => {
+      // Find the sent message index by content
+      const sentIdx = sentMessages.findIndex((s) => s.content === msg.content);
+      if (sentIdx !== -1) {
+        messageTimings[r.name][sentIdx] =
+          msg.receivedAt - sentMessages[sentIdx].sentAt;
+      }
+    });
+  });
+
+  // 6. Prepare messages as strings for stats
+  const messagesAsStrings = allReceived.map((msgs) =>
+    msgs.map((m) => m.content),
   );
+
+  // 7. Calculate stats as before
+  let stats;
+  if (randomSuffix && messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      participants,
+      messagesAsStrings,
+      "gm-",
+      count,
+      randomSuffix,
+    );
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(`Received ${messagesAsStrings.flat().length} messages total`);
+  }
+  const result = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === count),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    messageTimings,
+  };
+  console.log("result", JSON.stringify(result));
+  return result;
 }
+
 const filterReceivers = async (group: Group, participants: Worker[]) => {
   console.log("Waiting for 1 second before starting stream");
   await sleep(1000);
@@ -258,48 +306,85 @@ export async function verifyGroupUpdateStream(
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & { eventTimings: Record<string, Record<number, number>> }
+> {
   const receivers = await filterReceivers(group, participants);
 
-  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
-    return r.worker
-      .collectGroupUpdates(group.id, count, 20000) // 20 second timeout
-      .then((msgs: GroupUpdateMessage[]) => {
-        console.log(
-          `Received group updates for ${r.name}:`,
-          JSON.stringify(msgs),
-        );
-        return msgs.length > 0 ? msgs.map((m) => m.group.name) : [];
-      })
-      .catch((err: unknown) => {
-        console.error(`Error collecting group updates for ${r.name}:`, err);
-        return [] as string[];
-      });
-  });
-
-  // Generate all update names first for consistent handling
-  const updateNames: string[] = Array.from(
+  // 1. Prepare to record send times
+  const updateNames: { name: string; sentAt: number }[] = Array.from(
     { length: count },
-    (_, i) => `New name-${i + 1}-${randomSuffix}`,
+    (_, i) => ({ name: `New name-${i + 1}-${randomSuffix}`, sentAt: 0 }),
   );
 
-  // Perform group updates with optional callback after first update
-  for (let i = 0; i < count; i++) {
-    await group.updateName(updateNames[i]);
-    console.log(`Updated group name to ${updateNames[i]}`);
+  // 2. Start collectors before triggering updates
+  const collectPromises: Promise<{ name: string; receivedAt: number }[]>[] =
+    receivers.map((r) => {
+      return r.worker
+        .collectGroupUpdates(group.id, count, 20000)
+        .then((msgs: GroupUpdateMessage[]) => {
+          return msgs.map((m) => ({
+            name: m.group.name,
+            receivedAt: Date.now(),
+          }));
+        })
+        .catch((err: unknown) => {
+          console.error(`Error collecting group updates for ${r.name}:`, err);
+          return [] as { name: string; receivedAt: number }[];
+        });
+    });
 
-    if (i === 0 && onActionStarted) {
-      onActionStarted();
-    }
+  // 3. Trigger group updates and record send time
+  for (let i = 0; i < count; i++) {
+    await group.updateName(updateNames[i].name);
+    console.log(`Updated group name to ${updateNames[i].name}`);
+    updateNames[i].sentAt = Date.now();
   }
 
-  return verifyAndReturnStats<string>(
-    participants,
-    collectPromises,
-    count,
-    randomSuffix,
-  );
+  // 4. Wait for all updates to be collected
+  const allReceived = await Promise.all(collectPromises);
+
+  // 5. Calculate timings
+  const eventTimings: Record<string, Record<number, number>> = {};
+  receivers.forEach((r, idx) => {
+    const received = allReceived[idx];
+    eventTimings[r.name] = {};
+    received.forEach((msg) => {
+      const sentIdx = updateNames.findIndex((s) => s.name === msg.name);
+      if (sentIdx !== -1) {
+        eventTimings[r.name][sentIdx] =
+          msg.receivedAt - updateNames[sentIdx].sentAt;
+      }
+    });
+  });
+
+  // Prepare messages as strings for stats
+  const messagesAsStrings = allReceived.map((msgs) => msgs.map((m) => m.name));
+
+  let stats;
+  if (randomSuffix && messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      participants,
+      messagesAsStrings,
+      "New name-",
+      count,
+      randomSuffix,
+    );
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(
+      `Received ${messagesAsStrings.flat().length} group updates total`,
+    );
+  }
+  const result = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === count),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    eventTimings,
+  };
+  console.log("result", JSON.stringify(result));
+  return result;
 }
 
 /**
@@ -309,37 +394,76 @@ export async function verifyConsentStream(
   initiator: Worker,
   participants: Worker[],
   action: (inboxId?: string, groupId?: string) => Promise<void>,
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & { eventTimings: Record<string, Record<number, number>> }
+> {
   console.log("Waiting for 1 second before starting consent stream test");
   await sleep(1000);
 
-  // Use a promise to collect consent events using the built-in method
+  // Start collector before triggering action
+  const startTime = Date.now();
   const consentPromise = initiator.worker
     .collectConsentUpdates(1)
     .then((updates) => {
       console.log(`Collected consent updates:`, JSON.stringify(updates));
       return updates.length > 0
         ? [
-            `consent:${updates[0].consentUpdate.inboxId}:${updates[0].consentUpdate.consentValue ? "allowed" : "denied"}`,
+            {
+              key: `consent:${updates[0].consentUpdate.inboxId}:${updates[0].consentUpdate.consentValue ? "allowed" : "denied"}`,
+              receivedAt: Date.now(),
+            },
           ]
-        : ["no_consent_events_collected"];
+        : [];
     })
     .catch((err: unknown) => {
       console.error(
         `[CONSENT-COLLECTOR] Error collecting consent events:`,
         err,
       );
-      return ["error_collecting_consent"];
+      return [] as { key: string; receivedAt: number }[];
     });
 
+  // Trigger the action and record send time
+  const actionSentAt = Date.now();
   await action();
-  if (onActionStarted) {
-    onActionStarted();
-  }
 
-  // No randomSuffix for consent events as they don't follow the same pattern
-  return verifyAndReturnStats([initiator], [consentPromise], 1, "");
+  // Wait for consent event
+  const allReceived = await Promise.all([consentPromise]);
+
+  // Calculate timings
+  const eventTimings: Record<string, Record<number, number>> = {};
+  eventTimings[initiator.name] = {};
+  allReceived[0].forEach((msg, idx) => {
+    eventTimings[initiator.name][idx] = msg.receivedAt - actionSentAt;
+  });
+
+  // Prepare messages as strings for stats
+  const messagesAsStrings = allReceived.map((msgs) => msgs.map((m) => m.key));
+
+  let stats;
+  if (messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      [initiator],
+      messagesAsStrings,
+      "consent:",
+      1,
+      "",
+    );
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(
+      `Received ${messagesAsStrings.flat().length} consent events total`,
+    );
+  }
+  const result = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === 1),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    eventTimings,
+  };
+  console.log("result", JSON.stringify(result));
+  return result;
 }
 
 /**
@@ -348,8 +472,9 @@ export async function verifyConsentStream(
 export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & { eventTimings: Record<string, Record<number, number>> }
+> {
   console.log("Waiting for 1 second before starting conversation stream test");
   await sleep(1000);
   if (!initiator.client || !initiator.worker) {
@@ -360,16 +485,18 @@ export async function verifyConversationStream(
     `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
   );
 
-  // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises: Promise<string[]>[] = participants.map(
-    (participant) => {
+  // Start collectors before creating group
+  const participantPromises: Promise<{ id: string; receivedAt: number }[]>[] =
+    participants.map((participant) => {
       return participant.worker
-        .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
+        .collectConversations(initiator.client.inboxId, 1, 20000)
         .then((msgs: ConversationNotification[]) => {
-          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
+          return msgs.map((msg) => ({
+            id: msg.conversation.id,
+            receivedAt: Date.now(),
+          }));
         });
-    },
-  );
+    });
 
   // Get participant addresses and create group
   const participantAddresses = participants.map((p) => {
@@ -377,15 +504,52 @@ export async function verifyConversationStream(
     return p.client.inboxId;
   });
 
+  // Record send time
+  const sentAt = Date.now();
   const createdGroup =
     await initiator.client.conversations.newGroup(participantAddresses);
   console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
 
-  if (onActionStarted) {
-    onActionStarted();
-  }
+  // Wait for all notifications to be collected
+  const allReceived = await Promise.all(participantPromises);
 
-  return verifyAndReturnStats(participants, participantPromises, 1, "");
+  // Calculate timings
+  const eventTimings: Record<string, Record<number, number>> = {};
+  participants.forEach((p, idx) => {
+    const received = allReceived[idx];
+    eventTimings[p.name] = {};
+    received.forEach((msg, j) => {
+      eventTimings[p.name][j] = msg.receivedAt - sentAt;
+    });
+  });
+
+  // Prepare messages as strings for stats
+  const messagesAsStrings = allReceived.map((msgs) => msgs.map((m) => m.id));
+
+  let stats;
+  if (messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      participants,
+      messagesAsStrings,
+      "conversation:",
+      1,
+      "",
+    );
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(
+      `Received ${messagesAsStrings.flat().length} conversation events total`,
+    );
+  }
+  const result = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === 1),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    eventTimings,
+  };
+  console.log("result", JSON.stringify(result));
+  return result;
 }
 
 /**
@@ -394,8 +558,9 @@ export async function verifyConversationStream(
 export async function verifyAddMembersStream(
   group: Group,
   participants: Worker[],
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & { eventTimings: Record<string, Record<number, number>> }
+> {
   // Filter out the initiator from participants for the check
   const receivers = await filterReceivers(group, participants);
   console.log(
@@ -403,26 +568,64 @@ export async function verifyAddMembersStream(
     receivers.map((r) => r.name),
   );
   const creatorInboxId = (await group.metadata()).creatorInboxId;
-  // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises: Promise<string[]>[] = receivers.map(
-    (participant) => {
+  // Start collectors before adding members
+  const participantPromises: Promise<{ id: string; receivedAt: number }[]>[] =
+    receivers.map((participant) => {
       return participant.worker
-        .collectConversations(creatorInboxId, 1, 20000) // 20 second timeout
+        .collectConversations(creatorInboxId, 1, 20000)
         .then((msgs: ConversationNotification[]) => {
-          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
+          return msgs.map((msg) => ({
+            id: msg.conversation.id,
+            receivedAt: Date.now(),
+          }));
         });
-    },
-  );
+    });
 
+  // Record send time
+  const sentAt = Date.now();
   await group.addMembers(receivers.map((r) => r.client?.inboxId));
   console.log(`Added ${receivers.length} members to group ${group.id}`);
 
-  if (onActionStarted) {
-    onActionStarted();
-  }
+  // Wait for all notifications to be collected
+  const allReceived = await Promise.all(participantPromises);
 
-  // No randomSuffix for conversation notifications
-  return verifyAndReturnStats(receivers, participantPromises, 1, "");
+  // Calculate timings
+  const eventTimings: Record<string, Record<number, number>> = {};
+  receivers.forEach((r, idx) => {
+    const received = allReceived[idx];
+    eventTimings[r.name] = {};
+    received.forEach((msg, j) => {
+      eventTimings[r.name][j] = msg.receivedAt - sentAt;
+    });
+  });
+
+  // Prepare messages as strings for stats
+  const messagesAsStrings = allReceived.map((msgs) => msgs.map((m) => m.id));
+
+  let stats;
+  if (messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      receivers,
+      messagesAsStrings,
+      "conversation:",
+      1,
+      "",
+    );
+    console.log(JSON.stringify(stats));
+  } else {
+    console.log(
+      `Received ${messagesAsStrings.flat().length} add member events total`,
+    );
+  }
+  const result = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === 1),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    eventTimings,
+  };
+  console.log("result", JSON.stringify(result));
+  return result;
 }
 
 /**

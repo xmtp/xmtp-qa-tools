@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -12,7 +13,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(["henry", "ivy"], testName);
+  workers = await getWorkers(getRandomNames(2), testName);
 
   let start: number;
   let testStart: number;
@@ -33,9 +34,11 @@ describe(testName, async () => {
 
   it("forceStreamError: should measure force a stream error", async () => {
     try {
-      const henry = workers.get("henry")!;
-      const ivy = workers.get("ivy")!;
-      const convo = await henry.client.conversations.newDm(ivy.client.inboxId);
+      const creator = workers.getWorkers()[0];
+      const receiver = workers.getWorkers()[1];
+      const convo = await creator.client.conversations.newDm(
+        receiver.client.inboxId,
+      );
       const reaction: Reaction = {
         action: "added",
         content: "smile",

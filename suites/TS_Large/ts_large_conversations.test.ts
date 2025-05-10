@@ -58,9 +58,6 @@ describe(testName, async () => {
         const verifyResult = await verifyAddMembersStream(
           newGroup,
           workers.getWorkers(),
-          () => {
-            start = performance.now();
-          },
         );
 
         const streamTimeMs = performance.now() - start;

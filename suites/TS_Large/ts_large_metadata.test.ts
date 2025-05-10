@@ -66,9 +66,6 @@ describe(testName, async () => {
           workers.getWorkers(),
           1,
           undefined,
-          () => {
-            start = performance.now();
-          },
         );
 
         const streamTimeMs = performance.now() - start;

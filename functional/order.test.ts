@@ -3,6 +3,7 @@ import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -17,10 +18,7 @@ describe(testName, async () => {
 
   let start: number;
   let testStart: number;
-  workers = await getWorkers(
-    ["bob", "alice", "joe", "sam", "charlie"],
-    testName,
-  );
+  workers = await getWorkers(getRandomNames(5), testName);
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
   beforeAll(async () => {

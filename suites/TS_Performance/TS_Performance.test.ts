@@ -147,15 +147,9 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyMessageStream(
-        dm,
-        [workers.getWorkers()[1]],
-        1,
-        "gm",
-        () => {
-          start = performance.now();
-        },
-      );
+      const verifyResult = await verifyMessageStream(dm, [
+        workers.getWorkers()[1],
+      ]);
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -238,11 +232,6 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getWorkers(),
-        1,
-        "gm",
-        () => {
-          start = performance.now();
-        },
       );
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -366,10 +355,6 @@ describe(testName, async () => {
           newGroup,
           workers.getWorkers(),
           1,
-          "gm",
-          () => {
-            start = performance.now();
-          },
         );
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {

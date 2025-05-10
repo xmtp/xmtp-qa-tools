@@ -114,9 +114,6 @@ describe(testName, async () => {
           const verifyResult = await verifyAddMembersStream(
             newGroup as Group,
             workers.getWorkers(),
-            () => {
-              start = performance.now();
-            },
           );
 
           const streamTimeMs = performance.now() - start;
@@ -147,11 +144,6 @@ describe(testName, async () => {
           const verifyResult = await verifyGroupUpdateStream(
             newGroup as Group,
             workers.getWorkers(),
-            1,
-            undefined,
-            () => {
-              start = performance.now();
-            },
           );
 
           const streamTimeMs = performance.now() - start;
@@ -182,11 +174,6 @@ describe(testName, async () => {
           const verifyResult = await verifyMessageStream(
             newGroup,
             workers.getWorkers(),
-            1,
-            "gm",
-            () => {
-              start = performance.now();
-            },
           );
 
           const streamTimeMs = performance.now() - start;
