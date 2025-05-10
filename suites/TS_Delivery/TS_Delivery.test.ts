@@ -38,9 +38,9 @@ describe(testName, async () => {
   beforeAll(async () => {
     try {
       console.log("creating group");
-      group = await creator.client.conversations.newGroup([
-        ...workers.getWorkers().map((p) => p.client.inboxId),
-      ]);
+      group = await creator.client.conversations.newGroup(
+        workers.getAllButCreator().map((p) => p.client.inboxId),
+      );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -61,26 +61,25 @@ describe(testName, async () => {
     try {
       const verifyResult = await verifyMessageStream(
         group,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
         amountofMessages,
         randomSuffix,
       );
-
       expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(95);
       expect(verifyResult.stats?.orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
         verifyResult.stats?.receptionPercentage ?? 0,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
+        workers.getCreator().sdkVersion,
+        workers.getCreator().libXmtpVersion,
         testName,
         "stream",
         "delivery",
       );
       sendDeliveryMetric(
         verifyResult.stats?.orderPercentage ?? 0,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
+        workers.getCreator().sdkVersion,
+        workers.getCreator().libXmtpVersion,
         testName,
         "stream",
         "order",
@@ -129,16 +128,16 @@ describe(testName, async () => {
 
       sendDeliveryMetric(
         stats.receptionPercentage,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
+        workers.getCreator().sdkVersion,
+        workers.getCreator().libXmtpVersion,
         testName,
         "poll",
         "delivery",
       );
       sendDeliveryMetric(
         stats.orderPercentage,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
+        workers.getCreator().sdkVersion,
+        workers.getCreator().libXmtpVersion,
         testName,
         "poll",
         "order",
@@ -152,8 +151,8 @@ describe(testName, async () => {
   it("offline_recovery: verify message recovery after disconnection", async () => {
     try {
       // Select one worker to take offline
-      const offlineWorker = workers.get("bob")!; // Second worker
-      const onlineWorker = workers.get("alice")!; // First worker
+      const offlineWorker = workers.getCreator(); // Second worker
+      const onlineWorker = workers.getReceiver(); // First worker
 
       console.log(`Taking ${offlineWorker.name} offline`);
 

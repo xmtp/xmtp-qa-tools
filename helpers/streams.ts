@@ -160,11 +160,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     timingCount > 0 ? timingSum / timingCount : 0,
   );
   const messagesAsStrings = allReceived.map((msgs) =>
-    msgs.map((m) =>
-      JSON.stringify({
-        event: m.event,
-      }),
-    ),
+    msgs.map((m) => extractContent(m.event)),
   );
   let stats;
   if (randomSuffix && messagesAsStrings.length > 0) {
@@ -176,7 +172,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     );
   }
   // Unescape messages for output
-  const unescapedMessages = unescapeMessages(messagesAsStrings);
+  const unescapedMessages = unescapeMessages(
+    allReceived.map((msgs) =>
+      msgs.map((m) => JSON.stringify({ event: m.event })),
+    ),
+  );
   // Transform eventTimings to arrays per name
   const eventTimingsArray: Record<string, number[]> = {};
   for (const [name, timingsObj] of Object.entries(eventTimings)) {
