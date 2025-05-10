@@ -128,29 +128,44 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Group Operations Performance by Size
 
-| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Status                 |
-| ---- | ---------- | -------- | -------- | ---------- | ---------- | ---------------------- |
-| 50   | 1453.51    | 86.01    | 836.39   | 135.36     | 138.57     | ⚠️ Performance Concern |
-| 100  | 1935.67    | 88.41    | 994.29   | 144.67     | 156.86     | ⚠️ Performance Concern |
-| 150  | 2556.97    | 94.55    | 1018.15  | 202.64     | 189.81     | ⚠️ Performance Concern |
-| 200  | 3512.65    | 93.42    | 1060.93  | 193.36     | 204.78     | ⚠️ Performance Concern |
-| 250  | 4787.85    | 107.76   | 1865.90  | 219.17     | 236.53     | ⚠️ Performance Concern |
-| 300  | 6010.43    | 97.09    | 1223.78  | 244.24     | 247.22     | ⚠️ Performance Concern |
-| 350  | 6294.62    | 99.20    | 1286.72  | 244.24     | 270.62     | ⚠️ Performance Concern |
-| 400  | 7015.99    | 101.34   | 1306.15  | 263.91     | 308.01     | ⚠️ Performance Concern |
+#### Group Creation & Sync Performance
+
+| Size | Create(ms) | SyncAll(ms) | Status                 |
+| ---- | ---------- | ----------- | ---------------------- |
+| 50   | 1453.51    | 65.37       | ✅ On Target           |
+| 100  | 1935.67    | 443.56      | ✅ On Target           |
+| 150  | 2556.97    | 622.56      | ✅ On Target           |
+| 200  | 3512.65    | 785.11      | ⚠️ Performance Concern |
+| 250  | 4787.85    | 1164.93     | ⚠️ Performance Concern |
+| 300  | 6010.43    | 1249.18     | ⚠️ Performance Concern |
+| 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
+| 400  | 7015.99    | 1586.66     | ⚠️ Performance Concern |
+
+#### Other Group Operations Performance
+
+| Size | Send(ms) | Update(ms) | Remove(ms) | Status                 |
+| ---- | -------- | ---------- | ---------- | ---------------------- |
+| 50   | 86.01    | 135.36     | 138.57     | ✅ On Target           |
+| 100  | 88.41    | 144.67     | 156.86     | ✅ On Target           |
+| 150  | 94.55    | 202.64     | 189.81     | ✅ On Target           |
+| 200  | 93.42    | 193.36     | 204.78     | ⚠️ Performance Concern |
+| 250  | 107.76   | 219.17     | 236.53     | ⚠️ Performance Concern |
+| 300  | 97.09    | 244.24     | 247.22     | ⚠️ Performance Concern |
+| 350  | 99.20    | 244.24     | 270.62     | ⚠️ Performance Concern |
+| 400  | 101.34   | 263.91     | 308.01     | ⚠️ Performance Concern |
 
 ### Group stream performance
 
-| Group Size | Message (ms) | Metadata (ms) | Conversations (ms) | Status                 |
-| ---------- | ------------ | ------------- | ------------------ | ---------------------- |
-| 50         | 54.41        | 277.61        | 352                | ✅ On Target           |
-| 100        | 22.50        | 200.93        | 426                | ✅ On Target           |
-| 150        | 0.82         | 277.94        | 460                | ✅ On Target           |
-| 200        | 2.29         | 1317.68       | 497                | ⚠️ Performance Concern |
-| 250        | 0.69         | 248.28        | 499                | ✅ On Target           |
-| 300        | 31.44        | 672.61        | 501                | ⚠️ Performance Concern |
-| 350        | 0.65         | 256.88        | 562                | ✅ On Target           |
-| 400        | 110.21       | 115.76        | 617                | ✅ On Target           |
+| Group Size | Message (ms) | Metadata (ms) | New Members (ms) | Status                 |
+| ---------- | ------------ | ------------- | ---------------- | ---------------------- |
+| 50         | 58.00        | 87.75         | 254.00           | ✅ On Target           |
+| 100        | 56.00        | 107.75        | 294.00           | ✅ On Target           |
+| 150        | 72.25        | 110.00        | 338.25           | ✅ On Target           |
+| 200        | 93.00        | 129.00        | 423.25           | ✅ On Target           |
+| 250        | 89.50        | 143.75        | 465.25           | ⚠️ Performance Concern |
+| 300        | 85.00        | 173.25        | 515.25           | ⚠️ Performance Concern |
+| 350        | 99.50        | 191.75        | 522.25           | ⚠️ Performance Concern |
+| 400        | 98.00        | 203.25        | 537.50           | ⚠️ Performance Concern |
 
 _Note: Based on running one type of stream at a time._
 
