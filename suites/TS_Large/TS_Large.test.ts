@@ -19,12 +19,12 @@ describe(testName, async () => {
   const workersCount = 5;
   const batchSize = 50;
   const total = 400;
+  const steamsToTest = [typeofStream.None];
   let workers: WorkerManager;
   let start: number;
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
-  const steamsToTest = [typeofStream.None];
 
   // Hold timing metrics per group size
   interface SummaryEntry {
@@ -72,10 +72,9 @@ describe(testName, async () => {
         console.log(
           `Created group with ${i} participants in ${creationTimeMs.toFixed(2)}ms`,
         );
-
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          createTimeMs: creationTimeMs,
+          createTimeMs: (summaryMap[i]?.createTimeMs ?? 0 + creationTimeMs) / 2,
         };
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);

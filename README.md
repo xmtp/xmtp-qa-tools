@@ -128,14 +128,14 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 | Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Status                 |
 | ---- | ---------- | -------- | -------- | ---------- | ---------- | ---------------------- |
-| 50   | 1152.73    | 86.01    | 78.33    | 135.36     | 138.57     | ✅ On Target           |
-| 100  | 1582.43    | 88.41    | 83.48    | 144.67     | 156.86     | ✅ On Target           |
-| 150  | 2650.67    | 94.55    | 120.24   | 202.64     | 189.81     | ✅ On Target           |
-| 200  | 4117.80    | 93.42    | 128.73   | 193.36     | 204.78     | ✅ On Target           |
-| 250  | 5740.75    | 107.76   | 154.79   | 219.17     | 236.53     | ⚠️ Performance Concern |
-| 300  | 7656.24    | 97.09    | 145.75   | 244.24     | 247.22     | ⚠️ Performance Concern |
-| 350  | 8272.22    | 99.20    | 155.32   | 244.24     | 270.62     | ⚠️ Performance Concern |
-| 400  | 9215.61    | 101.34   | 167.90   | 263.91     | 308.01     | ⚠️ Performance Concern |
+| 50   | 1453.51    | 86.01    | 836.39   | 135.36     | 138.57     | ⚠️ Performance Concern |
+| 100  | 1935.67    | 88.41    | 994.29   | 144.67     | 156.86     | ⚠️ Performance Concern |
+| 150  | 2556.97    | 94.55    | 1018.15  | 202.64     | 189.81     | ⚠️ Performance Concern |
+| 200  | 3512.65    | 93.42    | 1060.93  | 193.36     | 204.78     | ⚠️ Performance Concern |
+| 250  | 4787.85    | 107.76   | 1865.90  | 219.17     | 236.53     | ⚠️ Performance Concern |
+| 300  | 6010.43    | 97.09    | 1223.78  | 244.24     | 247.22     | ⚠️ Performance Concern |
+| 350  | 6294.62    | 99.20    | 1286.72  | 244.24     | 270.62     | ⚠️ Performance Concern |
+| 400  | 7015.99    | 101.34   | 1306.15  | 263.91     | 308.01     | ⚠️ Performance Concern |
 
 ### Group stream performance
 
