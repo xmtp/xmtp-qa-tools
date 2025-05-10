@@ -44,9 +44,9 @@ describe(testName, async () => {
   beforeAll(async () => {
     // Initialize workers
     group = await workers
-      .getWorkers()[0]
+      .getCreator()
       .client.conversations.newGroup([
-        workers.getWorkers()[1].client.inboxId,
+        workers.getCreator().client.inboxId,
         workers.getWorkers()[2].client.inboxId,
         workers.getWorkers()[3].client.inboxId,
         workers.getWorkers()[4].client.inboxId,
@@ -56,8 +56,8 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
-      const creator = workers.getWorkers()[0];
-      const receiver = workers.getWorkers()[1];
+      const creator = workers.getCreator();
+      const receiver = workers.getReceiver();
       const newDm = await creator.client.conversations.newDm(
         receiver.client.inboxId,
       );
@@ -75,7 +75,7 @@ describe(testName, async () => {
   it("verifyMessageGroupStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
-      const creator = workers.getWorkers()[0];
+      const creator = workers.getCreator();
       // Create direct message
       const filterOutCreator = workers
         .getWorkers()
@@ -107,8 +107,8 @@ describe(testName, async () => {
 
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
-        workers.getWorkers()[0],
-        [workers.getWorkers()[1]],
+        workers.getCreator(),
+        [workers.getReceiver()],
       );
 
       expect(verifyResult.allReceived).toBe(true);
@@ -124,7 +124,7 @@ describe(testName, async () => {
 
       console.log("Testing conversation stream with adding members");
       const newGroup = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.conversations.newGroup([]);
       // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyAddMembersStream(
@@ -143,7 +143,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       const verifyResult = await verifyGroupUpdateStream(group as Group, [
-        workers.getWorkers()[1],
+        workers.getReceiver(),
       ]);
 
       expect(verifyResult.allReceived).toBe(true);
@@ -158,9 +158,9 @@ describe(testName, async () => {
       workers = await getWorkers(names, testName, typeofStream.Consent);
 
       const groupConsentSender = createGroupConsentSender(
-        workers.getWorkers()[0], // henry is doing the consent update
+        workers.getCreator(), // henry is doing the consent update
         group.id, // for this group
-        workers.getWorkers()[1].client.inboxId, // blocking randomguy
+        workers.getReceiver().client.inboxId, // blocking randomguy
         true, // block the entities
       );
 
@@ -171,7 +171,7 @@ describe(testName, async () => {
       console.log("Starting consent verification process");
 
       const verifyResult = await verifyConsentStream(
-        workers.getWorkers()[0],
+        workers.getCreator(),
         [workers.getWorkers()[1]],
         consentAction,
       );

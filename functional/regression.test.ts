@@ -12,7 +12,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions;
+  const versions = sdkVersionOptions; //["202", "203", "204", "205", "206", "208", "209", "210"];
   const receiverInboxId = generatedInboxes[0].inboxId;
 
   it("should create a group conversation with all workers", async () => {
@@ -59,11 +59,7 @@ describe(testName, () => {
   it(`Should test the DB after upgrade`, async () => {
     try {
       for (const version of versions) {
-        workers = await getWorkers(
-          ["bob-" + "a" + "-" + version],
-          testName,
-          typeofStream.None,
-        );
+        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
         const bob = workers.get("bob");
         console.log(
@@ -84,11 +80,7 @@ describe(testName, () => {
   it(`Should test the DB after downgrade`, async () => {
     try {
       for (const version of versions.reverse()) {
-        workers = await getWorkers(
-          ["bob-" + "a" + "-" + version],
-          testName,
-          typeofStream.None,
-        );
+        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
         const bob = workers.get("bob");
         console.log(

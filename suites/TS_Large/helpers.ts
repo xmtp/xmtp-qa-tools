@@ -21,7 +21,7 @@ export const ts_large_createGroup = async (
   groupSize: number,
   addMembers: boolean,
 ): Promise<Group> => {
-  const creator = workers.getWorkers()[0];
+  const creator = workers.getCreator();
   const newGroup = await creator.client.conversations.newGroup(
     generatedInboxes.slice(0, groupSize).map((inbox) => inbox.inboxId),
   );

@@ -52,22 +52,18 @@ describe(testName, async () => {
     it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, false);
-        console.log("Testing conversation stream with new DM creation");
-
         // Use the dedicated conversation stream verification helper
         const verifyResult = await verifyAddMembersStream(
           newGroup,
           workers.getWorkers(),
         );
 
-        const streamTimeMs = performance.now() - start;
-
         expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          conversationStreamTimeMs: streamTimeMs,
+          conversationStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

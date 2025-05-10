@@ -93,7 +93,7 @@ describe(testName, async () => {
   it("inboxState: should measure inboxState", async () => {
     try {
       const inboxState = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
@@ -104,7 +104,7 @@ describe(testName, async () => {
   it("newDm: should measure creating a DM", async () => {
     try {
       dm = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.conversations.newDm(workers.getWorkers()[1].client.inboxId);
 
       expect(dm).toBeDefined();
@@ -117,7 +117,7 @@ describe(testName, async () => {
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
     try {
       const dm2 = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.conversations.newDmWithIdentifier({
           identifier: workers.getWorkers()[2].address,
           identifierKind: IdentifierKind.Ethereum,
@@ -163,7 +163,7 @@ describe(testName, async () => {
     try {
       const sliced = generatedInboxes.slice(0, i);
       newGroup = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.conversations.newGroup([
           ...sliced.map((inbox) => inbox.inboxId),
           ...workers.getWorkers().map((w) => w.client.inboxId),
@@ -179,7 +179,7 @@ describe(testName, async () => {
     try {
       const sliced = generatedInboxes.slice(0, i);
       const newGroupByIdentifier = await workers
-        .getWorkers()[0]
+        .getCreator()
         .client.conversations.newGroupWithIdentifiers(
           sliced.map((inbox) => ({
             identifier: inbox.accountAddress,
@@ -270,7 +270,7 @@ describe(testName, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
         newGroup = await workers
-          .getWorkers()[0]
+          .getCreator()
           .client.conversations.newGroup([
             ...sliced.map((inbox) => inbox.inboxId),
             ...workers.getWorkers().map((w) => w.client.inboxId),
@@ -285,7 +285,7 @@ describe(testName, async () => {
       try {
         const sliced = generatedInboxes.slice(0, i);
         const newGroupByIdentifier = await workers
-          .getWorkers()[0]
+          .getCreator()
           .client.conversations.newGroupWithIdentifiers(
             sliced.map((inbox) => ({
               identifier: inbox.accountAddress,

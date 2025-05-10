@@ -202,7 +202,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   let stats;
   if (randomSuffix && messagesAsStrings.length > 0) {
     stats = calculateMessageStats(
-      participantsForStats,
       messagesAsStrings,
       statsLabel,
       count,
@@ -408,7 +407,6 @@ export async function verifyAddMembersStream(
  * Calculates message reception and order statistics
  */
 export function calculateMessageStats(
-  workers: Worker[],
   messagesByWorker: string[][],
   prefix: string,
   amount: number,

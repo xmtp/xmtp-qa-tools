@@ -14,34 +14,5 @@ yarn install
 ## Test Execution
 
 ```bash
-yarn test TS_Large
+yarn large
 ```
-
-## Test Flow
-
-The test suite incrementally increases group size by the batch size (default: 50) up to the maximum size (default: 400), running the following tests for each group size:
-
-1. **Large Group Creation**:
-
-   - Creates groups with increasing numbers of participants
-   - Verifies group creation success and member count
-
-2. **Conversation Stream Testing**:
-
-   - Tests conversation stream functionality with newly created large groups
-   - Measures stream initialization and event propagation performance
-
-3. **Group Metadata Updates**:
-
-   - Tests group metadata update operations (name changes)
-   - Measures update propagation across all group members
-   - Evaluates stream performance for metadata changes
-
-4. **Group Messaging Performance**:
-   - Measures message sending in large groups
-   - Evaluates message reception across all group members
-   - Tests scalability of message delivery with increasing group sizes
-
-## Performance Metrics
-
-The test suite measures performance across different group sizes. Here are the observed metrics:

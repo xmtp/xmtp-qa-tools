@@ -64,7 +64,7 @@ describe(testName, async () => {
         // Measure creation time
         const createStart = performance.now();
         newGroup = await workers
-          .getWorkers()[0]
+          .getCreator()
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         const creationTimeMs = performance.now() - createStart;
 

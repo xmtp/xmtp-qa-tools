@@ -34,8 +34,8 @@ describe(testName, async () => {
 
   it("forceStreamError: should measure force a stream error", async () => {
     try {
-      const creator = workers.getWorkers()[0];
-      const receiver = workers.getWorkers()[1];
+      const creator = workers.getCreator();
+      const receiver = workers.getReceiver();
       const convo = await creator.client.conversations.newDm(
         receiver.client.inboxId,
       );

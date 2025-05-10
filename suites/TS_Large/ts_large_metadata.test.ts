@@ -68,17 +68,12 @@ describe(testName, async () => {
           undefined,
         );
 
-        const streamTimeMs = performance.now() - start;
-        console.log(
-          `Group metadata update stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
-        );
-
         expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          groupUpdatedStreamTimeMs: streamTimeMs,
+          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

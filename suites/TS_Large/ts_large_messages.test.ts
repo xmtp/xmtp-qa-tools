@@ -69,15 +69,10 @@ describe(testName, async () => {
           "gm",
         );
 
-        const streamTimeMs = performance.now() - start;
-        console.log(
-          `Message stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
-        );
-
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          messageStreamTimeMs: streamTimeMs,
+          messageStreamTimeMs: verifyResult.averageEventTiming,
         };
 
         expect(verifyResult.allReceived).toBe(true);
