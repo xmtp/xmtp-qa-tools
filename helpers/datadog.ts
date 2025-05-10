@@ -15,25 +15,6 @@ interface MemberThresholds {
   [key: string]: number;
 }
 
-interface ThresholdsData {
-  core: {
-    [key: string]: number;
-  };
-  network: {
-    [key: string]: number;
-  };
-  memberBasedThresholds: {
-    [memberCount: string]: MemberThresholds;
-  };
-  regionMultipliers: {
-    [region: string]: number;
-  };
-  GEO_TO_COUNTRY_CODE: {
-    [region: string]: string;
-  };
-  reliability: number;
-}
-
 interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
@@ -44,7 +25,6 @@ interface NetworkStats {
 
 interface MetricData {
   values: number[];
-  threshold: number;
   members?: string;
 }
 
@@ -57,163 +37,22 @@ interface ParsedTestName {
   members: string;
 }
 
-type OperationType = "core" | "group" | "network";
 type MetricSubType = "stream" | "poll" | "recovery";
 type MetricType = "delivery" | "order";
 
-// Constants
-const THRESHOLDS: ThresholdsData = {
-  core: {
-    clientcreate: 350,
-    inboxstate: 350,
-    newdm: 350,
-    newdmwithidentifiers: 350,
-    sendgm: 200,
-    receivegm: 200,
-    creategroup: 350,
-    creategroupbyidentifiers: 350,
-    syncgroup: 200,
-    updategroupname: 200,
-    removemembers: 250,
-    sendgroupmessage: 200,
-    receivegroupmessage: 200,
-  },
-  network: {
-    dns_lookup: 100,
-    tcp_connection: 150,
-    tls_handshake: 250,
-    processing: 100,
-    server_call: 350,
-  },
-  memberBasedThresholds: {
-    "50": {
-      creategroup: 350,
-      creategroupbyidentifiers: 350,
-      receivegroupmessage: 350,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 250,
-      addmembers: 200,
-    },
-    "100": {
-      creategroup: 400,
-      creategroupbyidentifiers: 400,
-      receivegroupmessage: 400,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "150": {
-      creategroup: 500,
-      creategroupbyidentifiers: 500,
-      receivegroupmessage: 500,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "200": {
-      creategroup: 700,
-      creategroupbyidentifiers: 700,
-      receivegroupmessage: 700,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "250": {
-      creategroup: 900,
-      creategroupbyidentifiers: 900,
-      receivegroupmessage: 900,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "300": {
-      creategroup: 1100,
-      creategroupbyidentifiers: 1100,
-      receivegroupmessage: 1100,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "350": {
-      creategroup: 1300,
-      creategroupbyidentifiers: 1300,
-      receivegroupmessage: 1300,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "400": {
-      creategroup: 1500,
-      creategroupbyidentifiers: 1500,
-      receivegroupmessage: 1500,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 500,
-      addmembers: 200,
-    },
-  },
-  regionMultipliers: {
-    "us-east": 1,
-    "us-west": 1,
-    europe: 1,
-    asia: 1.5,
-    "south-america": 3,
-  },
-  GEO_TO_COUNTRY_CODE: {
-    "us-east": "US",
-    "us-west": "US",
-    europe: "FR",
-    asia: "JP",
-    "south-america": "BR",
-  },
-  reliability: 99.9,
+const GEO_TO_COUNTRY_CODE = {
+  "us-east": "US",
+  "us-west": "US",
+  europe: "FR",
+  asia: "JP",
+  "south-america": "BR",
 };
-
 // Global state with proper initialization
 const state = {
   isInitialized: false,
   currentGeo: "",
   collectedMetrics: {} as Record<string, MetricData>,
 };
-
-// Helper functions
-/**
- * Find the appropriate member bucket for a given member count
- */
-function findMemberBucket(members: number): string {
-  if (members <= 0) return "0";
-
-  const memberBuckets = Object.keys(THRESHOLDS.memberBasedThresholds)
-    .map(Number)
-    .sort((a, b) => a - b);
-
-  // Find highest bucket <= member count
-  let applicableBucket = "0";
-  for (const bucket of memberBuckets) {
-    if (members >= bucket) {
-      applicableBucket = bucket.toString();
-    } else {
-      break;
-    }
-  }
-
-  return applicableBucket;
-}
 
 /**
  * Calculate average of numeric values
@@ -261,17 +100,6 @@ export function groupMetricsByOperation(
   >;
 }
 
-/**
- * Get country code from geolocation
- */
-function getCountryCodeFromGeo(geolocation: string): string {
-  return (
-    THRESHOLDS.GEO_TO_COUNTRY_CODE[
-      geolocation as keyof typeof THRESHOLDS.GEO_TO_COUNTRY_CODE
-    ] || "US"
-  );
-}
-
 // DataDog integration
 /**
  * Initialize DataDog metrics reporting
@@ -295,7 +123,8 @@ export function initDataDog(
   }
 
   try {
-    const countryCode = getCountryCodeFromGeo(geolocation);
+    const countryCode =
+      GEO_TO_COUNTRY_CODE[geolocation as keyof typeof GEO_TO_COUNTRY_CODE];
     state.currentGeo = geolocation;
 
     const initConfig = {
@@ -353,7 +182,6 @@ export function sendMetric(
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        threshold: Number(tags.threshold) || 0,
         members: memberCount,
       };
     }
@@ -466,7 +294,10 @@ export async function sendPerformanceMetric(
     // Network stats handling
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
-      const countryCode = getCountryCodeFromGeo(state.currentGeo);
+      const countryCode =
+        GEO_TO_COUNTRY_CODE[
+          state.currentGeo as keyof typeof GEO_TO_COUNTRY_CODE
+        ];
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const networkMetricValue = Math.round(statValue * 1000);
@@ -503,17 +334,12 @@ export function sendDeliveryMetric(
   metricSubType: MetricSubType,
   metricType: MetricType,
 ): void {
-  const threshold = THRESHOLDS.reliability;
-  const isSuccess = metricValue >= threshold;
-
   sendMetric(metricType, Math.round(metricValue), {
     libxmtp: libXmtpVersion,
     sdk: sdkVersion,
     test: testName,
     metric_type: metricType,
     metric_subtype: metricSubType,
-    success: isSuccess.toString(),
-    threshold: threshold.toString(),
   });
 }
 

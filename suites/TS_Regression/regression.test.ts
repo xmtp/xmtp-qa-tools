@@ -25,14 +25,12 @@ describe(testName, () => {
         count++;
       }
       workers = await getWorkers(allNames, testName, typeofStream.Message);
+      const creator = workers.getCreator();
+      const group = await creator.client.conversations.newGroup([]);
 
-      const group = await workers
-        .getWorkers()
-        [workers.getWorkers().length - 1].client.conversations.newGroup([]);
-
-      for (const worker of workers.getWorkers()) {
+      for (const worker of workers.getAllButCreator()) {
         try {
-          await group.addMembers([worker.inboxId]);
+          await group.addMembers([worker.client.inboxId]);
         } catch (e) {
           logError(e, expect.getState().currentTestName);
         }
