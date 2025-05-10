@@ -45,6 +45,25 @@ describe(testName, async () => {
     group = await workers.getWorkers()[0].client.conversations.newGroup([]);
   });
 
+  it("verifyConversationStream: should create a new conversation", async () => {
+    try {
+      // Initialize fresh workers specifically for conversation stream testing
+      workers = await getWorkers(names, testName, typeofStream.Conversation);
+
+      console.log("Testing conversation stream with new DM creation");
+
+      // Use the dedicated conversation stream verification helper
+      const verifyResult = await verifyConversationStream(
+        workers.getWorkers()[0],
+        [workers.get("randomguy")!],
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
   it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
@@ -87,38 +106,12 @@ describe(testName, async () => {
   it("verifyMessageGroupStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
-      // Create direct message
-      const newGroup = await workers
-        .getWorkers()[0]
-        .client.conversations.newGroup(
-          workers.getWorkers().map((w) => w.client.inboxId),
-        );
 
       // Verify message delivery
       const verifyResult = await verifyMessageStream(
-        newGroup,
+        group,
         workers.getWorkers(),
         10,
-      );
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("verifyConversationStream: should create a new conversation", async () => {
-    try {
-      // Initialize fresh workers specifically for conversation stream testing
-      workers = await getWorkers(names, testName, typeofStream.Conversation);
-
-      console.log("Testing conversation stream with new DM creation");
-
-      // Use the dedicated conversation stream verification helper
-      const verifyResult = await verifyConversationStream(
-        workers.getWorkers()[0],
-        [workers.get("randomguy")!],
       );
 
       expect(verifyResult.allReceived).toBe(true);
