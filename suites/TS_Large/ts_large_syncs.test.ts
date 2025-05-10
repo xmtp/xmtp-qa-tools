@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -25,7 +26,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE,
+    getRandomNames(TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE),
     testName,
     steamsToTest,
   );

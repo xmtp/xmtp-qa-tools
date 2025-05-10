@@ -1,3 +1,4 @@
+import { getRandomNames } from "@helpers/tests";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type {
@@ -16,7 +17,7 @@ async function main() {
     // Then create the dynamic workers
     console.log("Initializing worker workers...");
     const workers = await getWorkers(
-      20,
+      getRandomNames(20),
       "test-bot",
       typeofStream.Message,
       typeOfResponse.Gpt,

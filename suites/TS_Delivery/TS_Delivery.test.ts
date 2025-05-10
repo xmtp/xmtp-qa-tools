@@ -3,6 +3,7 @@ import { sendDeliveryMetric } from "@helpers/datadog";
 import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -23,8 +24,12 @@ describe(testName, async () => {
   console.log(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
-  let workers: WorkerManager;
-  workers = await getWorkers(receiverAmount, testName, typeofStream.Message);
+  let workers = await getWorkers(
+    getRandomNames(receiverAmount),
+    testName,
+    typeofStream.Message,
+  );
+  let creator = workers.getCreator();
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
@@ -34,11 +39,9 @@ describe(testName, async () => {
   beforeAll(async () => {
     try {
       console.log("creating group");
-      group = await workers
-        .get("bob")!
-        .client.conversations.newGroup([
-          ...workers.getWorkers().map((p) => p.client.inboxId),
-        ]);
+      group = await creator.client.conversations.newGroup([
+        ...workers.getWorkers().map((p) => p.client.inboxId),
+      ]);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

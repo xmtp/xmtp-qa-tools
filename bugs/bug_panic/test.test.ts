@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { getRandomNames } from "@helpers/tests";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -7,7 +8,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
-    const workers = await getWorkers(50, testName);
+    const workers = await getWorkers(getRandomNames(50), testName);
     const workerArray = workers.getWorkers();
     const groupByInboxIds = await workers
       .get("bob")!

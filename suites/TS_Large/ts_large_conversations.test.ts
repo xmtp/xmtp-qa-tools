@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyAddMembersStream } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -28,7 +29,11 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(TS_LARGE_WORKER_COUNT, testName, steamsToTest);
+  workers = await getWorkers(
+    getRandomNames(TS_LARGE_WORKER_COUNT),
+    testName,
+    steamsToTest,
+  );
 
   setupTestLifecycle({
     expect,
