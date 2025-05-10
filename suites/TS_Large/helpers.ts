@@ -3,6 +3,10 @@ import generatedInboxes from "@helpers/generated-inboxes.json";
 import type { WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
+export const TS_LARGE_WORKER_COUNT = 5;
+export const TS_LARGE_BATCH_SIZE = 50;
+export const TS_LARGE_TOTAL = 400;
+
 export interface SummaryEntry {
   groupSize: number;
   messageStreamTimeMs?: number;

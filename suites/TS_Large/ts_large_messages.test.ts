@@ -6,15 +6,18 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
-import { saveLog, ts_large_createGroup } from "./helpers";
+import {
+  saveLog,
+  TS_LARGE_BATCH_SIZE,
+  ts_large_createGroup,
+  TS_LARGE_TOTAL,
+  TS_LARGE_WORKER_COUNT,
+} from "./helpers";
 
 const testName = "ts_large_messages";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const workersCount = parseInt(process.env.TS_LARGE_WORKER_COUNT ?? "5");
-  const batchSize = parseInt(process.env.TS_LARGE_BATCH_SIZE ?? "50");
-  const total = parseInt(process.env.TS_LARGE_TOTAL ?? "100");
   const steamsToTest = typeofStream.Message;
   let workers: WorkerManager;
   let start: number;
@@ -34,7 +37,7 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(workersCount, testName, steamsToTest);
+  workers = await getWorkers(TS_LARGE_WORKER_COUNT, testName, steamsToTest);
 
   setupTestLifecycle({
     expect,
@@ -50,7 +53,11 @@ describe(testName, async () => {
     },
   });
 
-  for (let i = batchSize; i <= total; i += batchSize) {
+  for (
+    let i = TS_LARGE_BATCH_SIZE;
+    i <= TS_LARGE_TOTAL;
+    i += TS_LARGE_BATCH_SIZE
+  ) {
     it(`receiveLargeGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, true);
