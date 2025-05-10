@@ -232,8 +232,6 @@ export async function verifyMessageStream(
 }
 
 const filterReceivers = async (group: Group, participants: Worker[]) => {
-  console.log("Waiting for 1 second before starting stream");
-
   const creatorId = (await group.metadata()).creatorInboxId;
   return participants.filter((p) => p.client?.inboxId !== creatorId);
 };
