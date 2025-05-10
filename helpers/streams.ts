@@ -391,7 +391,7 @@ export async function verifyConversationStream(
 /**
  * Verifies conversation streaming functionality for group member additions
  */
-export async function verifyConversationGroupStream(
+export async function verifyAddMembersStream(
   group: Group,
   participants: Worker[],
   onActionStarted?: () => void,
