@@ -34,6 +34,11 @@ describe(testName, async () => {
     steamsToTest,
   );
 
+  let customDuration: number | undefined = undefined;
+  const setCustomDuration = (duration: number | undefined) => {
+    customDuration = duration;
+  };
+
   setupTestLifecycle({
     expect,
     workers,
@@ -42,8 +47,11 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
+    getCustomDuration: () => customDuration,
+    setCustomDuration: (v) => {
+      customDuration = v;
+    },
   });
-
   for (
     let i = TS_LARGE_BATCH_SIZE;
     i <= TS_LARGE_TOTAL;
@@ -58,7 +66,7 @@ describe(testName, async () => {
           undefined,
         );
 
-        start = verifyResult.averageEventTiming;
+        setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics

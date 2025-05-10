@@ -39,7 +39,6 @@ export const setupTestLifecycle = ({
       }
     }
     void sendPerformanceMetric(duration, testName, libXmtpVersion, false);
-    setStart(0);
     if (setCustomDuration) setCustomDuration(undefined); // Reset after each test if available
   });
 

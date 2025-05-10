@@ -28,11 +28,6 @@ describe(testName, async () => {
   let dm: Conversation;
   let workers: WorkerManager;
   let start: number;
-  let customDuration: number | undefined = undefined;
-  const setCustomDuration = (duration: number | undefined) => {
-    customDuration = duration;
-  };
-  const getCustomDuration = () => customDuration;
 
   workers = await getWorkers(
     getRandomNames(10),
@@ -40,16 +35,23 @@ describe(testName, async () => {
     typeofStream.Message,
   );
 
+  let customDuration: number | undefined = undefined;
+  const setCustomDuration = (duration: number | undefined) => {
+    customDuration = duration;
+  };
+
   setupTestLifecycle({
     expect,
     workers,
     testName,
     getStart: () => start,
-    setStart: (v: number) => {
+    setStart: (v) => {
       start = v;
     },
-    getCustomDuration,
-    setCustomDuration,
+    getCustomDuration: () => customDuration,
+    setCustomDuration: (v) => {
+      customDuration = v;
+    },
   });
 
   it("clientCreate: should measure creating a client", async () => {
