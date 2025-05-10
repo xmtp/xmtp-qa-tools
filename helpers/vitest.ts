@@ -30,7 +30,7 @@ export const setupTestLifecycle = ({
   afterEach(function () {
     sendPerformanceResult(
       expect.getState().currentTestName ?? "",
-      workers,
+      workers.getVersion(),
       getStart(),
       getTestStart(),
     );

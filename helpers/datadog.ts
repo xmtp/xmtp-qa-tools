@@ -433,7 +433,7 @@ export function sendMetric(
  */
 export const sendPerformanceResult = (
   testName: string,
-  workers: WorkerManager,
+  libXmtpVersion: string,
   start: number | undefined,
   testStart?: number,
 ) => {
@@ -444,12 +444,7 @@ export const sendPerformanceResult = (
     const actualStart = start ?? testStart ?? performance.now();
     const deliveryTime = performance.now() - actualStart;
 
-    void sendPerformanceMetric(
-      deliveryTime,
-      testName,
-      workers.getVersion(),
-      false,
-    );
+    void sendPerformanceMetric(deliveryTime, testName, libXmtpVersion, false);
   }
 };
 
