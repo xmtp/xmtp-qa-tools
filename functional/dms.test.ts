@@ -97,10 +97,6 @@ describe(testName, async () => {
         convo,
         [workers.get("randomguy")!],
         1,
-        undefined,
-        () => {
-          start = performance.now();
-        },
       );
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {

@@ -132,10 +132,6 @@ describe(testName, async () => {
           testGroup,
           workers.getWorkers(),
           1,
-          "gm",
-          () => {
-            start = performance.now();
-          },
         );
 
         expect(verifyResult.allReceived).toBe(true);
