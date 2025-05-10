@@ -4,7 +4,7 @@ globs:
 alwaysApply: true
 ---
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
+
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -32,7 +32,7 @@ describe(testName, async () => {
     testName,
   );
   let convo: Conversation;
-  let hasFailures: boolean = false;
+ 
   let start: number;
   let testStart: number;
 
@@ -40,7 +40,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+    
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -52,21 +52,16 @@ describe(testName, async () => {
   });
 
   it("newDm: should measure creating a DM", async () => {
-    try {
       convo = await workers
         .get("henry")!
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    
   });
 
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
-    try {
       const dm2 = await workers
         .get("henry")!
         .client.conversations.newDmWithIdentifier({
@@ -76,13 +71,9 @@ describe(testName, async () => {
 
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    
   });
   it("sendGM: should measure sending a gm", async () => {
-    try {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
       console.log(
@@ -92,14 +83,10 @@ describe(testName, async () => {
       const dmId = await convo.send(message);
 
       expect(dmId).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    try {
       const verifyResult = await verifyMessageStream(
         convo,
         [workers.get("randomguy")!],
@@ -115,9 +102,6 @@ describe(testName, async () => {
 
       expect(verifyResult.messages.length).toEqual(1);
       expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    
   });
 });

@@ -14,7 +14,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
 
@@ -38,7 +38,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;

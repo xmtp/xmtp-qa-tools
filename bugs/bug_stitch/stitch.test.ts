@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { getWorkers, type Worker } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 const users: {
   [key: string]: {
@@ -33,30 +32,21 @@ describe(testName, () => {
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers(["ivy-a-202"], testName);
-          ivy100 = workers.get("ivy", "a") as Worker;
-          console.log("syncing all");
-          await ivy100?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log(`Setting up test for ${user}`);
+        const workers = await getWorkers(["ivy-a-202"], testName);
+        ivy100 = workers.get("ivy", "a") as Worker;
+        console.log("syncing all");
+        await ivy100?.client.conversations.sync();
       });
 
       it("should create new DM and group conversations", async () => {
         const sender = ivy100?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        const newConvo = await sender.conversations.newDm(receiver);
+
+        console.log("sending message");
+        const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
       it("terminate and restart", async () => {
         // Simulate termination and restart
@@ -67,69 +57,47 @@ describe(testName, () => {
 
       it("should create new DM and group conversations", async () => {
         const sender = ivy100?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        const newConvo = await sender.conversations.newDm(receiver);
+
+        console.log("sending message");
+        const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
       it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-b-105"], testName);
-          ivy105 = workers.get("ivy", "b") as Worker;
-          console.log("syncing all");
-          await ivy105?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log(`Setting up test for ${user}]`);
+        const workers = await getWorkers(["ivy-b-105"], testName);
+        ivy105 = workers.get("ivy", "b") as Worker;
+        console.log("syncing all");
+        await ivy105?.client.conversations.sync();
       });
 
       it("should create new DM and group conversations", async () => {
         const sender = ivy105?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        const newConvo = await sender.conversations.newDm(receiver);
+
+        console.log("sending message");
+        const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
 
       it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-c-202"], testName);
-          ivy200 = workers.get("ivy", "c") as Worker;
-          console.log("syncing all");
-          await ivy200?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log(`Setting up test for ${user}]`);
+        const workers = await getWorkers(["ivy-c-202"], testName);
+        ivy200 = workers.get("ivy", "c") as Worker;
+        console.log("syncing all");
+        await ivy200?.client.conversations.sync();
       });
 
       it("should create new DM and group conversations", async () => {
         const sender = ivy200?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 4/4\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        const newConvo = await sender.conversations.newDm(receiver);
+
+        console.log("sending message");
+        const message = "message 4/4\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
     });
   }

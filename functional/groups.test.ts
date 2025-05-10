@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -26,7 +25,6 @@ describe(testName, async () => {
   );
   const batchSize = 5;
   const total = 10;
-  let hasFailures: boolean = false;
   let start: number;
   let testStart: number;
   // Create a mapping to store group conversations by size
@@ -36,7 +34,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -49,101 +47,70 @@ describe(testName, async () => {
 
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
-      try {
-        const sliced = generatedInboxes.slice(0, i);
-        console.log("Creating group with", sliced.length, "participants");
-        groupsBySize[i] = await workers
-          .getWorkers()[0]
-          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
-        console.log("Group created", groupsBySize[i].id);
-        expect(groupsBySize[i].id).toBeDefined();
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const sliced = generatedInboxes.slice(0, i);
+      console.log("Creating group with", sliced.length, "participants");
+      groupsBySize[i] = await workers
+        .getWorkers()[0]
+        .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+      console.log("Group created", groupsBySize[i].id);
+      expect(groupsBySize[i].id).toBeDefined();
     });
     it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
-      try {
-        await groupsBySize[i].sync();
-        const members = await groupsBySize[i].members();
-        expect(members.length).toBe(i + 1);
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      await groupsBySize[i].sync();
+      const members = await groupsBySize[i].members();
+      expect(members.length).toBe(i + 1);
     });
     it(`updateGroupName-${i}: should update the group name`, async () => {
-      try {
-        const newName = "Large Group";
-        await (groupsBySize[i] as Group).updateName(newName);
-        await groupsBySize[i].sync();
-        const name = (groupsBySize[i] as Group).name;
-        expect(name).toBe(newName);
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const newName = "Large Group";
+      await (groupsBySize[i] as Group).updateName(newName);
+      await groupsBySize[i].sync();
+      const name = (groupsBySize[i] as Group).name;
+      expect(name).toBe(newName);
     });
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
-      try {
-        const previousMembers = await groupsBySize[i].members();
-        await (groupsBySize[i] as Group).removeMembers([
-          previousMembers.filter(
-            (member) =>
-              member.inboxId !== (groupsBySize[i] as Group).addedByInboxId,
-          )[0].inboxId,
-        ]);
+      const previousMembers = await groupsBySize[i].members();
+      await (groupsBySize[i] as Group).removeMembers([
+        previousMembers.filter(
+          (member) =>
+            member.inboxId !== (groupsBySize[i] as Group).addedByInboxId,
+        )[0].inboxId,
+      ]);
 
-        const members = await groupsBySize[i].members();
-        expect(members.length).toBe(previousMembers.length - 1);
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const members = await groupsBySize[i].members();
+      expect(members.length).toBe(previousMembers.length - 1);
     });
     it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
-      try {
-        const groupMessage =
-          "gm-" + Math.random().toString(36).substring(2, 15);
+      const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
-        await groupsBySize[i].send(groupMessage);
-        console.log("GM Message sent in group", groupMessage);
-        expect(groupMessage).toBeDefined();
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      await groupsBySize[i].send(groupMessage);
+      console.log("GM Message sent in group", groupMessage);
+      expect(groupMessage).toBeDefined();
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
-      try {
-        const inboxIds = workers.getWorkers().map((worker) => worker.inboxId);
+      const inboxIds = workers.getWorkers().map((worker) => worker.inboxId);
 
-        console.log(
-          `Creating test group with ${inboxIds.length} worker participants`,
-        );
-        const testGroup = await workers
-          .getWorkers()[0]
-          .client.conversations.newGroup(inboxIds, {
-            groupName: `Test Group ${i}`,
-          });
+      console.log(
+        `Creating test group with ${inboxIds.length} worker participants`,
+      );
+      const testGroup = await workers
+        .getWorkers()[0]
+        .client.conversations.newGroup(inboxIds, {
+          groupName: `Test Group ${i}`,
+        });
 
-        console.log(`Test group created with ID: ${testGroup.id}`);
+      console.log(`Test group created with ID: ${testGroup.id}`);
 
-        const verifyResult = await verifyMessageStream(
-          testGroup,
-          workers.getWorkers(),
-          1,
-          "gm",
-          () => {
-            start = performance.now();
-          },
-        );
+      const verifyResult = await verifyMessageStream(
+        testGroup,
+        workers.getWorkers(),
+        1,
+        "gm",
+        () => {
+          start = performance.now();
+        },
+      );
 
-        expect(verifyResult.allReceived).toBe(true);
-      } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      expect(verifyResult.allReceived).toBe(true);
     });
   }
 });

@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { defaultValues, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -17,7 +16,7 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(testName, async () => {
   let convo: Conversation;
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
@@ -33,7 +32,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -45,55 +44,34 @@ describe(testName, async () => {
   });
 
   it("gm-bot: should check if bot is alive", async () => {
-    try {
-      // Create conversation with the bot
-      convo = await workers
-        .get("bob")!
-        .client.conversations.newDmWithIdentifier({
-          identifierKind: IdentifierKind.Ethereum,
-          identifier: gmBotAddress,
-        });
+    // Create conversation with the bot
+    convo = await workers.get("bob")!.client.conversations.newDmWithIdentifier({
+      identifierKind: IdentifierKind.Ethereum,
+      identifier: gmBotAddress,
+    });
 
-      await convo.sync();
-      const messages = await convo.messages();
-      const prevMessageCount = messages.length;
-      console.log("prevMessageCount", prevMessageCount);
-      // Send a simple message
-      const sentMessageId = await convo.send("gm");
-      console.log("sentMessageId", sentMessageId);
-      await sleep(defaultValues.streamTimeout);
-      await convo.sync();
-      const messagesAfter = await convo.messages();
-      expect(messagesAfter.length).toBe(prevMessageCount + 2);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    await convo.sync();
+    const messages = await convo.messages();
+    const prevMessageCount = messages.length;
+    console.log("prevMessageCount", prevMessageCount);
+    // Send a simple message
+    const sentMessageId = await convo.send("gm");
+    console.log("sentMessageId", sentMessageId);
+    await sleep(defaultValues.streamTimeout);
+    await convo.sync();
+    const messagesAfter = await convo.messages();
+    expect(messagesAfter.length).toBe(prevMessageCount + 2);
   });
 
   it("should respond to a message", async () => {
-    try {
-      const result = await xmtpTester.newDmWithDeeplink(
-        gmBotAddress,
-        "hi",
-        "gm",
-      );
-      expect(result).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const result = await xmtpTester.newDmWithDeeplink(gmBotAddress, "hi", "gm");
+    expect(result).toBe(true);
   });
   it("should create a group and send a message", async () => {
-    try {
-      const slicedInboxes = generatedInboxes.slice(0, 4);
-      await xmtpTester.createGroupAndReceiveGm([
-        ...slicedInboxes.map((inbox) => inbox.accountAddress),
-        gmBotAddress,
-      ]);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const slicedInboxes = generatedInboxes.slice(0, 4);
+    await xmtpTester.createGroupAndReceiveGm([
+      ...slicedInboxes.map((inbox) => inbox.accountAddress),
+      gmBotAddress,
+    ]);
   });
 });

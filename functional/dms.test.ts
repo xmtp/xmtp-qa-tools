@@ -1,5 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -26,7 +25,7 @@ describe(testName, async () => {
     testName,
   );
   let convo: Conversation;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
 
@@ -34,7 +33,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -46,67 +45,47 @@ describe(testName, async () => {
   });
 
   it("newDm: should measure creating a DM", async () => {
-    try {
-      convo = await workers
-        .get("henry")!
-        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+    convo = await workers
+      .get("henry")!
+      .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
 
-      expect(convo).toBeDefined();
-      expect(convo.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(convo).toBeDefined();
+    expect(convo.id).toBeDefined();
   });
 
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
-    try {
-      const dm2 = await workers
-        .get("henry")!
-        .client.conversations.newDmWithIdentifier({
-          identifier: workers.get("randomguy2")!.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
+    const dm2 = await workers
+      .get("henry")!
+      .client.conversations.newDmWithIdentifier({
+        identifier: workers.get("randomguy2")!.address,
+        identifierKind: IdentifierKind.Ethereum,
+      });
 
-      expect(dm2).toBeDefined();
-      expect(dm2.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dm2).toBeDefined();
+    expect(dm2.id).toBeDefined();
   });
   it("sendGM: should measure sending a gm", async () => {
-    try {
-      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+    const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      console.log(
-        `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
-      );
+    console.log(
+      `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
+    );
 
-      const dmId = await convo.send(message);
+    const dmId = await convo.send(message);
 
-      expect(dmId).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dmId).toBeDefined();
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    try {
-      const verifyResult = await verifyMessageStream(
-        convo,
-        [workers.get("randomguy")!],
-        1,
-        undefined,
-        () => {
-          start = performance.now();
-        },
-      );
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const verifyResult = await verifyMessageStream(
+      convo,
+      [workers.get("randomguy")!],
+      1,
+      undefined,
+      () => {
+        start = performance.now();
+      },
+    );
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

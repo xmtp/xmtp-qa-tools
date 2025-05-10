@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { logError } from "@helpers/logger";
 import {
   verifyConversationGroupStream,
   verifyGroupUpdateStream,
@@ -22,7 +21,7 @@ describe(testName, async () => {
   const steamsToTest = [typeofStream.None];
   let workers: WorkerManager;
   let start: number;
-  let hasFailures: boolean = false;
+
   let testStart: number;
   let newGroup: Conversation;
 
@@ -44,7 +43,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -57,29 +56,24 @@ describe(testName, async () => {
 
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`createLargeGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
-      try {
-        console.log(`Creating group with ${i} participants`);
-        const sliced = generatedInboxes.slice(0, i);
+      console.log(`Creating group with ${i} participants`);
+      const sliced = generatedInboxes.slice(0, i);
 
-        // Measure creation time
-        const createStart = performance.now();
-        newGroup = await workers
-          .getWorkers()[0]
-          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
-        const creationTimeMs = performance.now() - createStart;
+      // Measure creation time
+      const createStart = performance.now();
+      newGroup = await workers
+        .getWorkers()[0]
+        .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+      const creationTimeMs = performance.now() - createStart;
 
-        expect(newGroup.id).toBeDefined();
-        console.log(
-          `Created group with ${i} participants in ${creationTimeMs.toFixed(2)}ms`,
-        );
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          createTimeMs: (summaryMap[i]?.createTimeMs ?? 0 + creationTimeMs) / 2,
-        };
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      expect(newGroup.id).toBeDefined();
+      console.log(
+        `Created group with ${i} participants in ${creationTimeMs.toFixed(2)}ms`,
+      );
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        createTimeMs: (summaryMap[i]?.createTimeMs ?? 0 + creationTimeMs) / 2,
+      };
     });
 
     if (
@@ -88,142 +82,117 @@ describe(testName, async () => {
       steamsToTest.includes(typeofStream.None)
     ) {
       it(`addMembers-${i}: should add members to group`, async () => {
-        try {
-          console.log("Adding members to group");
-          const workersInboxIds = workers
-            .getWorkers()
-            .map((worker) => worker.inboxId);
+        console.log("Adding members to group");
+        const workersInboxIds = workers
+          .getWorkers()
+          .map((worker) => worker.inboxId);
 
-          await (newGroup as Group).addMembers(workersInboxIds);
-          console.log(
-            `Successfully added ${workersInboxIds.length} members to the group`,
-          );
-        } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        await (newGroup as Group).addMembers(workersInboxIds);
+        console.log(
+          `Successfully added ${workersInboxIds.length} members to the group`,
+        );
       });
     }
 
     if (steamsToTest.includes(typeofStream.Conversation)) {
       it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
-        try {
-          console.log("Testing conversation stream with new DM creation");
+        console.log("Testing conversation stream with new DM creation");
 
-          // Use the dedicated conversation stream verification helper
-          const verifyResult = await verifyConversationGroupStream(
-            newGroup as Group,
-            workers.getWorkers(),
-            () => {
-              start = performance.now();
-            },
-          );
+        // Use the dedicated conversation stream verification helper
+        const verifyResult = await verifyConversationGroupStream(
+          newGroup as Group,
+          workers.getWorkers(),
+          () => {
+            start = performance.now();
+          },
+        );
 
-          const streamTimeMs = performance.now() - start;
-          console.log(
-            `Conversation stream verification for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
-          );
+        const streamTimeMs = performance.now() - start;
+        console.log(
+          `Conversation stream verification for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
+        );
 
-          expect(verifyResult.allReceived).toBe(true);
+        expect(verifyResult.allReceived).toBe(true);
 
-          // Save metrics
-          summaryMap[i] = {
-            ...(summaryMap[i] ?? { groupSize: i }),
-            conversationStreamTimeMs: streamTimeMs,
-          };
-        } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          conversationStreamTimeMs: streamTimeMs,
+        };
       });
     } else if (steamsToTest.includes(typeofStream.GroupUpdated)) {
       it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
-        try {
-          workers = await getWorkers(
-            workersCount,
-            testName,
-            typeofStream.GroupUpdated,
-          );
-          const verifyResult = await verifyGroupUpdateStream(
-            newGroup as Group,
-            workers.getWorkers(),
-            1,
-            undefined,
-            () => {
-              start = performance.now();
-            },
-          );
+        workers = await getWorkers(
+          workersCount,
+          testName,
+          typeofStream.GroupUpdated,
+        );
+        const verifyResult = await verifyGroupUpdateStream(
+          newGroup as Group,
+          workers.getWorkers(),
+          1,
+          undefined,
+          () => {
+            start = performance.now();
+          },
+        );
 
-          const streamTimeMs = performance.now() - start;
-          console.log(
-            `Group metadata update stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
-          );
+        const streamTimeMs = performance.now() - start;
+        console.log(
+          `Group metadata update stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
+        );
 
-          expect(verifyResult.allReceived).toBe(true);
+        expect(verifyResult.allReceived).toBe(true);
 
-          // Save metrics
-          summaryMap[i] = {
-            ...(summaryMap[i] ?? { groupSize: i }),
-            groupUpdatedStreamTimeMs: streamTimeMs,
-          };
-        } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          groupUpdatedStreamTimeMs: streamTimeMs,
+        };
       });
     } else if (steamsToTest.includes(typeofStream.Message)) {
       it(`receiveLargeGroupMessage-${i}: should create a group and measure all streams`, async () => {
-        try {
-          workers = await getWorkers(
-            workersCount,
-            testName,
-            typeofStream.Message,
-          );
-          const verifyResult = await verifyMessageStream(
-            newGroup,
-            workers.getWorkers(),
-            1,
-            "gm",
-            () => {
-              start = performance.now();
-            },
-          );
+        workers = await getWorkers(
+          workersCount,
+          testName,
+          typeofStream.Message,
+        );
+        const verifyResult = await verifyMessageStream(
+          newGroup,
+          workers.getWorkers(),
+          1,
+          "gm",
+          () => {
+            start = performance.now();
+          },
+        );
 
-          const streamTimeMs = performance.now() - start;
-          console.log(
-            `Message stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
-          );
+        const streamTimeMs = performance.now() - start;
+        console.log(
+          `Message stream for ${i} participants took ${streamTimeMs.toFixed(2)}ms`,
+        );
 
-          // Save metrics
-          summaryMap[i] = {
-            ...(summaryMap[i] ?? { groupSize: i }),
-            messageStreamTimeMs: streamTimeMs,
-          };
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          messageStreamTimeMs: streamTimeMs,
+        };
 
-          expect(verifyResult.allReceived).toBe(true);
-        } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        expect(verifyResult.allReceived).toBe(true);
       });
     } else if (steamsToTest.includes(typeofStream.None)) {
       it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
-        try {
-          const syncStart = performance.now();
-          for (const worker of workers.getWorkers()) {
-            await worker.client.conversations.sync();
-          }
-          const syncTimeMs = performance.now() - syncStart;
-
-          // Save metrics
-          summaryMap[i] = {
-            ...(summaryMap[i] ?? { groupSize: i }),
-            syncTimeMs: (summaryMap[i]?.syncTimeMs ?? 0 + syncTimeMs) / 2,
-          };
-        } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
-          throw e;
+        const syncStart = performance.now();
+        for (const worker of workers.getWorkers()) {
+          await worker.client.conversations.sync();
         }
+        const syncTimeMs = performance.now() - syncStart;
+
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          syncTimeMs: (summaryMap[i]?.syncTimeMs ?? 0 + syncTimeMs) / 2,
+        };
       });
     }
   }

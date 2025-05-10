@@ -1,5 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
@@ -10,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   workers = await getWorkers(
@@ -33,7 +32,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -45,110 +43,80 @@ describe(testName, async () => {
   });
 
   it("clientCreate: should measure creating a client", async () => {
-    try {
-      const client = await getWorkers(["randomclient"], testName);
-      expect(client).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const client = await getWorkers(["randomclient"], testName);
+    expect(client).toBeDefined();
   });
   it("getInboxIdByAddress: should measure getInboxIdByAddress", async () => {
-    try {
-      const client = workers.get("henry")!.client;
-      const randomAddress = workers.get("ivy")!.address;
-      const inboxId = await client.getInboxIdByIdentifier({
-        identifier: randomAddress,
-        identifierKind: IdentifierKind.Ethereum,
-      });
-      console.log("installationId", client.installationId);
-      expect(client.installationId).toBeDefined();
-      expect(inboxId).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const client = workers.get("henry")!.client;
+    const randomAddress = workers.get("ivy")!.address;
+    const inboxId = await client.getInboxIdByIdentifier({
+      identifier: randomAddress,
+      identifierKind: IdentifierKind.Ethereum,
+    });
+    console.log("installationId", client.installationId);
+    expect(client.installationId).toBeDefined();
+    expect(inboxId).toBeDefined();
   });
 
   it("createDm: should measure createDm", async () => {
-    try {
-      const client = workers.get("henry")!.client;
-      const dm = await client.conversations.newDm(
-        workers.get("ivy")!.client.inboxId,
-      );
-      expect(dm.id).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const client = workers.get("henry")!.client;
+    const dm = await client.conversations.newDm(
+      workers.get("ivy")!.client.inboxId,
+    );
+    expect(dm.id).toBeDefined();
   });
 
   it("canMessage: should measure static canMessage", async () => {
-    try {
-      const randomAddress = workers.get("karen")!.address;
-      const identifier: Identifier = {
-        identifier: randomAddress,
-        identifierKind: IdentifierKind.Ethereum,
-      };
-      const staticCanMessage = await Client.canMessage(
-        [identifier],
-        workers.get("henry")!.env,
-      );
-      // Create a client to test the canMessage method
-      const henryClient = workers.get("henry")!.client;
-      const canMessage = await henryClient.canMessage([identifier]);
+    const randomAddress = workers.get("karen")!.address;
+    const identifier: Identifier = {
+      identifier: randomAddress,
+      identifierKind: IdentifierKind.Ethereum,
+    };
+    const staticCanMessage = await Client.canMessage(
+      [identifier],
+      workers.get("henry")!.env,
+    );
+    // Create a client to test the canMessage method
+    const henryClient = workers.get("henry")!.client;
+    const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
-      console.log("canMessage", Object.fromEntries(canMessage));
-      expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
-      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
+    console.log("canMessage", Object.fromEntries(canMessage));
+    expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
+    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
   });
   it("inboxState: should measure inboxState of henry", async () => {
-    try {
-      const inboxState = await workers
-        .get("henry")!
-        .client.preferences.inboxState(true);
-      expect(inboxState.installations.length).toBeGreaterThan(0);
+    const inboxState = await workers
+      .get("henry")!
+      .client.preferences.inboxState(true);
+    expect(inboxState.installations.length).toBeGreaterThan(0);
 
-      // Retrieve all the installation ids for the target
-      const installationIds = inboxState.installations.map(
-        (installation) => installation.id,
-      );
+    // Retrieve all the installation ids for the target
+    const installationIds = inboxState.installations.map(
+      (installation) => installation.id,
+    );
 
-      // Retrieve a map of installation id to KeyPackageStatus
-      const status = await workers
-        .get("henry")!
-        .client.getKeyPackageStatusesForInstallationIds(installationIds);
+    // Retrieve a map of installation id to KeyPackageStatus
+    const status = await workers
+      .get("henry")!
+      .client.getKeyPackageStatusesForInstallationIds(installationIds);
 
-      // Count valid and invalid installations
-      const totalInstallations = Object.keys(status).length;
-      const validInstallations = Object.values(status).filter(
-        (value) => !value?.validationError,
-      ).length;
-      const invalidInstallations = totalInstallations - validInstallations;
-      console.log(
-        `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
-      );
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    // Count valid and invalid installations
+    const totalInstallations = Object.keys(status).length;
+    const validInstallations = Object.values(status).filter(
+      (value) => !value?.validationError,
+    ).length;
+    const invalidInstallations = totalInstallations - validInstallations;
+    console.log(
+      `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
+    );
   });
   it("inboxStateFromInboxIds: should measure inboxState of henry", async () => {
-    try {
-      const bobInboxId = workers.get("bob")!.client.inboxId;
-      const inboxState = await workers
-        .get("henry")!
-        .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
-      console.log(inboxState[0].inboxId);
-      expect(inboxState[0].inboxId).toBe(bobInboxId);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const bobInboxId = workers.get("bob")!.client.inboxId;
+    const inboxState = await workers
+      .get("henry")!
+      .client.preferences.inboxStateFromInboxIds([bobInboxId], true);
+    console.log(inboxState[0].inboxId);
+    expect(inboxState[0].inboxId).toBe(bobInboxId);
   });
 });

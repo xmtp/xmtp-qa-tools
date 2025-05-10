@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
@@ -27,7 +26,7 @@ describe(testName, async () => {
   let dm: Conversation;
   let workers: WorkerManager;
   let start: number;
-  let hasFailures: boolean = false;
+
   let testStart: number;
 
   workers = await getWorkers(
@@ -41,7 +40,7 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -53,121 +52,157 @@ describe(testName, async () => {
   });
 
   it("clientCreate: should measure creating a client", async () => {
-    try {
-      const client = await getWorkers(["randomclient"], testName);
-      expect(client).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const client = await getWorkers(["randomclient"], testName);
+    expect(client).toBeDefined();
   });
   it("canMessage: should measure canMessage", async () => {
-    try {
-      const client = await getWorkers(
-        ["randomclient"],
-        testName,
-        typeofStream.None,
-      );
-      if (!client) {
-        throw new Error("Client not found");
-      }
-
-      const randomAddress = client.get("randomclient")!.address;
-      if (!randomAddress) {
-        throw new Error("Random client not found");
-      }
-      const canMessage = await Client.canMessage(
-        [
-          {
-            identifier: randomAddress,
-            identifierKind: IdentifierKind.Ethereum,
-          },
-        ],
-        client.get("randomclient")!.env,
-      );
-      expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
+    const client = await getWorkers(
+      ["randomclient"],
+      testName,
+      typeofStream.None,
+    );
+    if (!client) {
+      throw new Error("Client not found");
     }
+
+    const randomAddress = client.get("randomclient")!.address;
+    if (!randomAddress) {
+      throw new Error("Random client not found");
+    }
+    const canMessage = await Client.canMessage(
+      [
+        {
+          identifier: randomAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        },
+      ],
+      client.get("randomclient")!.env,
+    );
+    expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
   });
   it("inboxState: should measure inboxState", async () => {
-    try {
-      const inboxState = await workers
-        .getWorkers()[0]
-        .client.preferences.inboxState(true);
-      expect(inboxState.installations.length).toBeGreaterThan(0);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const inboxState = await workers
+      .getWorkers()[0]
+      .client.preferences.inboxState(true);
+    expect(inboxState.installations.length).toBeGreaterThan(0);
   });
   it("newDm: should measure creating a DM", async () => {
-    try {
-      dm = await workers
-        .getWorkers()[0]
-        .client.conversations.newDm(workers.getWorkers()[1].client.inboxId);
+    dm = await workers
+      .getWorkers()[0]
+      .client.conversations.newDm(workers.getWorkers()[1].client.inboxId);
 
-      expect(dm).toBeDefined();
-      expect(dm.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dm).toBeDefined();
+    expect(dm.id).toBeDefined();
   });
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
-    try {
-      const dm2 = await workers
-        .getWorkers()[0]
-        .client.conversations.newDmWithIdentifier({
-          identifier: workers.getWorkers()[2].address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
+    const dm2 = await workers
+      .getWorkers()[0]
+      .client.conversations.newDmWithIdentifier({
+        identifier: workers.getWorkers()[2].address,
+        identifierKind: IdentifierKind.Ethereum,
+      });
 
-      expect(dm2).toBeDefined();
-      expect(dm2.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dm2).toBeDefined();
+    expect(dm2.id).toBeDefined();
   });
 
   it("sendGM: should measure sending a gm", async () => {
-    try {
-      // We'll expect this random message to appear in Joe's stream
-      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+    // We'll expect this random message to appear in Joe's stream
+    const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const dmId = await dm.send(message);
+    const dmId = await dm.send(message);
 
-      expect(dmId).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dmId).toBeDefined();
   });
 
   it("receiveGM: should measure receiving a gm", async () => {
-    try {
-      const verifyResult = await verifyMessageStream(
-        dm,
-        [workers.getWorkers()[1]],
-        1,
-        "gm",
-        () => {
-          start = performance.now();
-        },
-      );
+    const verifyResult = await verifyMessageStream(
+      dm,
+      [workers.getWorkers()[1]],
+      1,
+      "gm",
+      () => {
+        start = performance.now();
+      },
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
   let i = 4;
   let newGroup: Conversation;
   it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
-    try {
+    const sliced = generatedInboxes.slice(0, i);
+    newGroup = await workers
+      .getWorkers()[0]
+      .client.conversations.newGroup([
+        ...sliced.map((inbox) => inbox.inboxId),
+        ...workers.getWorkers().map((w) => w.client.inboxId),
+      ]);
+    console.log("New group created", newGroup.id);
+    expect(newGroup.id).toBeDefined();
+  });
+  it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
+    const sliced = generatedInboxes.slice(0, i);
+    const newGroupByIdentifier = await workers
+      .getWorkers()[0]
+      .client.conversations.newGroupWithIdentifiers(
+        sliced.map((inbox) => ({
+          identifier: inbox.accountAddress,
+          identifierKind: IdentifierKind.Ethereum,
+        })),
+      );
+    expect(newGroupByIdentifier.id).toBeDefined();
+  });
+  it(`syncGroup: should sync a large group of ${i} participants ${i}`, async () => {
+    await newGroup.sync();
+    const members = await newGroup.members();
+    expect(members.length).toBe(members.length);
+  });
+  it(`updateGroupName: should update the group name`, async () => {
+    const newName = "Large Group";
+    await (newGroup as Group).updateName(newName);
+    await newGroup.sync();
+    const name = (newGroup as Group).name;
+    expect(name).toBe(newName);
+  });
+
+  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
+    const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
+
+    await newGroup.send(groupMessage);
+    console.log("GM Message sent in group", groupMessage);
+    expect(groupMessage).toBeDefined();
+  });
+  it(`receiveGroupMessage: should measure receiving a gm in a group of ${i} participants`, async () => {
+    const verifyResult = await verifyMessageStream(
+      newGroup,
+      workers.getWorkers(),
+      1,
+      "gm",
+      () => {
+        start = performance.now();
+      },
+    );
+    expect(verifyResult.allReceived).toBe(true);
+  });
+  it(`addMembers: should add members to a group`, async () => {
+    await (newGroup as Group).addMembers([workers.getWorkers()[2].inboxId]);
+  });
+  it(`removeMembers: should remove a participant from a group`, async () => {
+    const previousMembers = await newGroup.members();
+    await (newGroup as Group).removeMembers([
+      previousMembers.filter(
+        (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+      )[0].inboxId,
+    ]);
+
+    const members = await newGroup.members();
+    expect(members.length).toBe(previousMembers.length - 1);
+  });
+
+  for (let i = batchSize; i <= total; i += batchSize) {
+    let newGroup: Conversation;
+    it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = generatedInboxes.slice(0, i);
       newGroup = await workers
         .getWorkers()[0]
@@ -175,15 +210,9 @@ describe(testName, async () => {
           ...sliced.map((inbox) => inbox.inboxId),
           ...workers.getWorkers().map((w) => w.client.inboxId),
         ]);
-      console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
-    try {
+    });
+    it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       const sliced = generatedInboxes.slice(0, i);
       const newGroupByIdentifier = await workers
         .getWorkers()[0]
@@ -194,48 +223,38 @@ describe(testName, async () => {
           })),
         );
       expect(newGroupByIdentifier.id).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`syncGroup: should sync a large group of ${i} participants ${i}`, async () => {
-    try {
+    });
+    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
       await newGroup.sync();
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`updateGroupName: should update the group name`, async () => {
-    try {
+    });
+    it(`updateGroupName-${i}: should update the group name`, async () => {
       const newName = "Large Group";
       await (newGroup as Group).updateName(newName);
       await newGroup.sync();
       const name = (newGroup as Group).name;
       expect(name).toBe(newName);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+    });
+    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+      const previousMembers = await newGroup.members();
+      await (newGroup as Group).removeMembers([
+        previousMembers.filter(
+          (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+        )[0].inboxId,
+      ]);
 
-  it(`sendGroupMessage: should measure sending a gm in a group of ${i} participants`, async () => {
-    try {
+      const members = await newGroup.members();
+      expect(members.length).toBe(previousMembers.length - 1);
+    });
+    it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await newGroup.send(groupMessage);
       console.log("GM Message sent in group", groupMessage);
       expect(groupMessage).toBeDefined();
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`receiveGroupMessage: should measure receiving a gm in a group of ${i} participants`, async () => {
-    try {
+    });
+    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       const verifyResult = await verifyMessageStream(
         newGroup,
         workers.getWorkers(),
@@ -246,137 +265,6 @@ describe(testName, async () => {
         },
       );
       expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`addMembers: should add members to a group`, async () => {
-    try {
-      await (newGroup as Group).addMembers([workers.getWorkers()[2].inboxId]);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it(`removeMembers: should remove a participant from a group`, async () => {
-    try {
-      const previousMembers = await newGroup.members();
-      await (newGroup as Group).removeMembers([
-        previousMembers.filter(
-          (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
-        )[0].inboxId,
-      ]);
-
-      const members = await newGroup.members();
-      expect(members.length).toBe(previousMembers.length - 1);
-    } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  for (let i = batchSize; i <= total; i += batchSize) {
-    let newGroup: Conversation;
-    it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
-      try {
-        const sliced = generatedInboxes.slice(0, i);
-        newGroup = await workers
-          .getWorkers()[0]
-          .client.conversations.newGroup([
-            ...sliced.map((inbox) => inbox.inboxId),
-            ...workers.getWorkers().map((w) => w.client.inboxId),
-          ]);
-        expect(newGroup.id).toBeDefined();
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
-      try {
-        const sliced = generatedInboxes.slice(0, i);
-        const newGroupByIdentifier = await workers
-          .getWorkers()[0]
-          .client.conversations.newGroupWithIdentifiers(
-            sliced.map((inbox) => ({
-              identifier: inbox.accountAddress,
-              identifierKind: IdentifierKind.Ethereum,
-            })),
-          );
-        expect(newGroupByIdentifier.id).toBeDefined();
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
-      try {
-        await newGroup.sync();
-        const members = await newGroup.members();
-        expect(members.length).toBe(members.length);
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`updateGroupName-${i}: should update the group name`, async () => {
-      try {
-        const newName = "Large Group";
-        await (newGroup as Group).updateName(newName);
-        await newGroup.sync();
-        const name = (newGroup as Group).name;
-        expect(name).toBe(newName);
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
-      try {
-        const previousMembers = await newGroup.members();
-        await (newGroup as Group).removeMembers([
-          previousMembers.filter(
-            (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
-          )[0].inboxId,
-        ]);
-
-        const members = await newGroup.members();
-        expect(members.length).toBe(previousMembers.length - 1);
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
-      try {
-        const groupMessage =
-          "gm-" + Math.random().toString(36).substring(2, 15);
-
-        await newGroup.send(groupMessage);
-        console.log("GM Message sent in group", groupMessage);
-        expect(groupMessage).toBeDefined();
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
-      try {
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getWorkers(),
-          1,
-          "gm",
-          () => {
-            start = performance.now();
-          },
-        );
-        expect(verifyResult.allReceived).toBe(true);
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
     });
   }
 });

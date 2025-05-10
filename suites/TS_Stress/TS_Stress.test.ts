@@ -5,7 +5,6 @@ import {
   createLargeGroups,
   TEST_CONFIGS,
 } from "@helpers/groups";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation } from "@xmtp/node-sdk";
@@ -31,29 +30,24 @@ describe(testName, async () => {
   let bot: Worker;
   let client: Client;
   let conversation: Conversation;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
 
   beforeAll(async () => {
-    try {
-      bot = workers.get("bot")!;
-      client = bot.client;
-      conversation = await client.conversations.newDm(receiverInboxId);
-      workers = await getWorkers(config.workerCount, testName);
-      expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(config.workerCount);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    bot = workers.get("bot")!;
+    client = bot.client;
+    conversation = await client.conversations.newDm(receiverInboxId);
+    workers = await getWorkers(config.workerCount, testName);
+    expect(workers).toBeDefined();
+    expect(workers.getWorkers().length).toBe(config.workerCount);
   });
 
   setupTestLifecycle({
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
+
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -65,53 +59,38 @@ describe(testName, async () => {
   });
   // Create a DM between two workers
   it("createAndSendDms: should create DMs and send messages", async () => {
-    try {
-      const dm = await createAndSendDms(
-        workers,
-        receiverInboxId,
-        config.messageCount,
-        conversation,
-      );
+    const dm = await createAndSendDms(
+      workers,
+      receiverInboxId,
+      config.messageCount,
+      conversation,
+    );
 
-      expect(dm).toBeTruthy();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dm).toBeTruthy();
   });
 
   // Create a small group with worker members
   it("createAndSendInGroup: should create a group and send messages", async () => {
-    try {
-      const group = await createAndSendInGroup(
-        workers,
-        client,
-        config.groupCount,
-        receiverInboxId,
-        conversation,
-      );
+    const group = await createAndSendInGroup(
+      workers,
+      client,
+      config.groupCount,
+      receiverInboxId,
+      conversation,
+    );
 
-      expect(group).toBeTruthy();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(group).toBeTruthy();
   });
 
   // // Create a large group
   it("createLargeGroup: should create a large group with many members", async () => {
-    try {
-      // Create large groups
-      const result = await createLargeGroups(
-        config,
-        workers,
-        client,
-        receiverInboxId,
-      );
-      expect(result).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    // Create large groups
+    const result = await createLargeGroups(
+      config,
+      workers,
+      client,
+      receiverInboxId,
+    );
+    expect(result).toBe(true);
   });
 });

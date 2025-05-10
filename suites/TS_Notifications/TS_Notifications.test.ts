@@ -27,53 +27,45 @@ describe(testName, () => {
   let workers: WorkerManager;
 
   it(`should send ${NUM_MESSAGES} messages to ${receiverInboxId} with random delays between 3-6 seconds`, async () => {
-    try {
-      // Initialize workers for senders and target
-      workers = await getWorkers(SENDER_WORKERS, testName);
+    // Initialize workers for senders and target
+    workers = await getWorkers(SENDER_WORKERS, testName);
 
-      console.log(`Starting notification test with random delays...`);
+    console.log(`Starting notification test with random delays...`);
 
-      // Send messages sequentially
-      for (let counter = 1; counter <= NUM_MESSAGES; counter++) {
-        try {
-          // Get random sender
-          const senderName =
-            SENDER_WORKERS[Math.floor(Math.random() * SENDER_WORKERS.length)];
+    // Send messages sequentially
+    for (let counter = 1; counter <= NUM_MESSAGES; counter++) {
+      try {
+        // Get random sender
+        const senderName =
+          SENDER_WORKERS[Math.floor(Math.random() * SENDER_WORKERS.length)];
 
-          // Create message content with counter
-          const content = `${counter}/${NUM_MESSAGES}`;
+        // Create message content with counter
+        const content = `${counter}/${NUM_MESSAGES}`;
 
-          // Wait for the random delay
-          await wait();
+        // Wait for the random delay
+        await wait();
 
-          // Create DM conversation
-          const client = workers.get(senderName)?.client;
+        // Create DM conversation
+        const client = workers.get(senderName)?.client;
 
-          const conversation =
-            await client?.conversations.newDm(receiverInboxId);
+        const conversation = await client?.conversations.newDm(receiverInboxId);
 
-          if (!conversation) {
-            console.error(`Failed to create conversation for ${senderName}`);
-            return;
-          }
-
-          // Send the message
-          await conversation.send(content);
-
-          console.log(
-            `Sent message ${counter}/${NUM_MESSAGES} from ${senderName}`,
-          );
-        } catch (error) {
-          console.error(`Error sending message ${counter}:`, error);
+        if (!conversation) {
+          console.error(`Failed to create conversation for ${senderName}`);
+          return;
         }
-      }
 
-      console.log(
-        `Test completed - all ${NUM_MESSAGES} messages have been sent`,
-      );
-    } catch (e: unknown) {
-      console.error("Test error:", e);
-      throw e;
+        // Send the message
+        await conversation.send(content);
+
+        console.log(
+          `Sent message ${counter}/${NUM_MESSAGES} from ${senderName}`,
+        );
+      } catch (error) {
+        console.error(`Error sending message ${counter}:`, error);
+      }
     }
+
+    console.log(`Test completed - all ${NUM_MESSAGES} messages have been sent`);
   });
 });

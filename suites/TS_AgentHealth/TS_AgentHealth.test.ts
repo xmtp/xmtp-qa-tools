@@ -1,5 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -24,22 +23,17 @@ describe(testName, () => {
   for (const agent of typedAgents) {
     for (const network of agent.networks) {
       it(`Check ${agent.name} health on ${network} network`, async () => {
-        try {
-          console.log(`Testing ${agent.name} on ${network}`);
-          const xmtpTester = new XmtpPlaywright({
-            headless: true,
-            env: network as XmtpEnv,
-          });
-          const result = await xmtpTester.newDmWithDeeplink(
-            agent.address,
-            agent.sendMessage,
-            agent.expectedMessage,
-          );
-          expect(result).toBe(true);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log(`Testing ${agent.name} on ${network}`);
+        const xmtpTester = new XmtpPlaywright({
+          headless: true,
+          env: network as XmtpEnv,
+        });
+        const result = await xmtpTester.newDmWithDeeplink(
+          agent.address,
+          agent.sendMessage,
+          agent.expectedMessage,
+        );
+        expect(result).toBe(true);
       });
     }
   }
