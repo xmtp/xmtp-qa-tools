@@ -6,6 +6,7 @@ import {
   getEncryptionKeyFromHex,
 } from "@helpers/client";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { C } from "vitest/dist/chunks/reporters.d.DG9VKi4m.js";
 
 const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";
@@ -143,39 +144,29 @@ async function main() {
     try {
       const signer = createSigner(privateKey as `0x${string}`);
       const identifier = await signer.getIdentifier();
-      const address = identifier.identifier;
+      const accountAddress = identifier.identifier;
 
       // Generate encryption key
-      const encryptionKeyHex = generateEncryptionKeyHex();
-      const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
-
-      // Create XMTP clients for each environment
-      const clientsInfo = [];
-
+      const dbEncryptionKey = generateEncryptionKeyHex();
+      let inboxId = "";
       for (const env of environments) {
         const client = await Client.create(signer, {
-          dbEncryptionKey: encryptionKey,
-          dbPath: `${LOGPATH}${DB_PATH}/${env}-${address}`,
+          dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
+          dbPath: `${LOGPATH}${DB_PATH}/${env}-${accountAddress}`,
           env: env,
         });
-
-        // Get the inbox ID for this client
-        clientsInfo.push({
-          env,
-          inboxId: client.inboxId,
-        });
-
+        inboxId = client.inboxId;
         console.log(
-          `Created client in ${env} environment for account ${i + 1}/${numAccounts}: ${address}`,
+          `Created client in ${env} environment for account ${i + 1}/${numAccounts}: ${accountAddress}`,
         );
       }
 
       // Store the account information
       accountData.push({
-        accountAddress: address,
+        accountAddress,
         privateKey,
-        encryptionKey: encryptionKeyHex,
-        clients: clientsInfo,
+        dbEncryptionKey,
+        inboxId,
       });
 
       // Write the data to a JSON file

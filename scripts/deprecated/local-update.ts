@@ -110,7 +110,10 @@ async function main() {
       results.success++;
       results.inboxIds.push(client.inboxId);
 
-      console.log(`✅ Successfully initialized inbox: ${inbox.accountAddress}`);
+      console.log(
+        `✅ Successfully initialized address: ${inbox.accountAddress}`,
+      );
+      console.log(`✅ Successfully initialized inbox: ${client.inboxId}`);
     } catch (error) {
       results.failed++;
       console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);
