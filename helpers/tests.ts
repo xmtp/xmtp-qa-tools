@@ -495,6 +495,9 @@ export const simulateMissingCursorMessage = async (
   );
   console.log(`[${worker.name}] Simulating cursor being off by one message`);
 };
+export const getFixedNames = (count: number): string[] => {
+  return [...defaultNames].slice(0, count);
+};
 export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };

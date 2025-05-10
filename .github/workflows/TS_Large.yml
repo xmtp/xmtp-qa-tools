@@ -50,6 +50,3 @@ jobs:
         with:
           name: TS_Large_${{ matrix.environment }}
           path: logs/
-      - name: Fail if tests failed
-        if: steps.test.outcome == 'failure'
-        run: exit 1

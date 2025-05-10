@@ -1,4 +1,6 @@
 import { loadEnv } from "@helpers/client";
+import { getFixedNames, getRandomNames } from "@helpers/tests";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Client, Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -9,23 +11,25 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   let group: Group;
-  let creatorClient: Client;
 
   beforeAll(async () => {
-    const creator = await getWorkers(["bot"], testName);
-    creatorClient = creator.get("bot")?.client as Client;
-    if (!creatorClient) {
-      throw new Error("Creator not found");
-    }
-    workers = await getWorkers(
-      ["bob", "alice", "joe", "sam", "charlie"],
-      testName,
-    );
+    const names = getFixedNames(10);
+    workers = await getWorkers(names, testName, typeofStream.Message);
+    await getWorkers(names, testName, typeofStream.Conversation);
   });
 
   it("stream: send the stream", async () => {
-    group = await creatorClient.conversations.newGroup(
-      workers.getWorkers().map((p) => p.client.inboxId),
+    const creator = workers.getCreator();
+    group = await creator.client.conversations.newGroup(
+      workers.getAllButCreator().map((p) => p.client.inboxId),
+    );
+    console.log("Group created", group.id);
+    expect(group.id).toBeDefined();
+  });
+  it("stream: send the stream", async () => {
+    const creator = workers.getCreator();
+    group = await creator.client.conversations.newGroup(
+      workers.getAllButCreator().map((p) => p.client.inboxId),
     );
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
