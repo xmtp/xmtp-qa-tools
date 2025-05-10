@@ -141,18 +141,19 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
 | 400  | 7015.99    | 1586.66     | ⚠️ Performance Concern |
 
+_Note: `syncAll` is measured only as the first cold start of the client._
+
 #### Other Group Operations Performance
 
-| Size | Send(ms) | Update(ms) | Remove(ms) | Status                 |
-| ---- | -------- | ---------- | ---------- | ---------------------- |
-| 50   | 86.01    | 135.36     | 138.57     | ✅ On Target           |
-| 100  | 88.41    | 144.67     | 156.86     | ✅ On Target           |
-| 150  | 94.55    | 202.64     | 189.81     | ✅ On Target           |
-| 200  | 93.42    | 193.36     | 204.78     | ⚠️ Performance Concern |
-| 250  | 107.76   | 219.17     | 236.53     | ⚠️ Performance Concern |
-| 300  | 97.09    | 244.24     | 247.22     | ⚠️ Performance Concern |
-| 350  | 99.20    | 244.24     | 270.62     | ⚠️ Performance Concern |
-| 400  | 101.34   | 263.91     | 308.01     | ⚠️ Performance Concern |
+| Size | Send(ms) | Update(ms) | Remove(ms) | Status       |
+| ---- | -------- | ---------- | ---------- | ------------ |
+| 50   | 86.01    | 135.36     | 138.57     | ✅ On Target |
+| 100  | 88.41    | 144.67     | 156.86     | ✅ On Target |
+| 150  | 94.55    | 202.64     | 189.81     | ✅ On Target |
+| 200  | 93.42    | 193.36     | 204.78     | ✅ On Target |
+| 250  | 107.76   | 219.17     | 236.53     | ✅ On Target |
+| 300  | 97.09    | 244.24     | 247.22     | ✅ On Target |
+| 400  | 101.34   | 263.91     | 308.01     | ✅ On Target |
 
 ### Group stream performance
 
