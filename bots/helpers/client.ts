@@ -76,7 +76,9 @@ export const getDbPath = (description: string = "xmtp") => {
   return `${volumePath}/${description}.db3`;
 };
 
-export const logAgentDetails = (clients: Client | Client[]): void => {
+export const logAgentDetails = async (
+  clients: Client | Client[],
+): Promise<void> => {
   const clientsByAddress = Array.isArray(clients)
     ? clients.reduce<Record<string, Client[]>>((acc, client) => {
         const address = client.accountIdentifier?.identifier ?? "";
@@ -105,25 +107,23 @@ export const logAgentDetails = (clients: Client | Client[]): void => {
 
     const urls = [`http://xmtp.chat/dm/${address}`];
 
+    const conversations = await firstClient.conversations.list();
+
     console.log(`
     ✓ XMTP Client:
     • Address: ${address}
+    • Conversations: ${conversations.length}
     • InboxId: ${inboxId}
     • Networks: ${environments}
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
 };
-export function validateEnvironment(
-  vars: string[],
-  customEnvPath?: string,
-): Record<string, string> {
+export function validateEnvironment(vars: string[]): Record<string, string> {
   const missing = vars.filter((v) => !process.env[v]);
 
   if (missing.length) {
     try {
-      // Use the custom env path if provided, otherwise use default
-      const envPath = customEnvPath || path.resolve(process.cwd(), ".env");
-      console.log("envPath", envPath);
+      const envPath = path.resolve(process.cwd(), ".env");
       if (fs.existsSync(envPath)) {
         const envVars = fs
           .readFileSync(envPath, "utf-8")
