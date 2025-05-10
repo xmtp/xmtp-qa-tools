@@ -517,11 +517,6 @@ export class WorkerClient extends Worker {
                     },
                   };
 
-                  console.log(
-                    `[${this.nameId}] Emitting formatted consent event:`,
-                    JSON.stringify(consentEvent),
-                  );
-
                   this.emit("worker_message", consentEvent);
                 }
               } else {

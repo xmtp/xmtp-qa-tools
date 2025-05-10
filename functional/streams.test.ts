@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
-  createGroupConsentSender,
   verifyAddMembersStream,
   verifyConsentStream,
   verifyConversationStream,
@@ -157,23 +156,9 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Consent);
 
-      const groupConsentSender = createGroupConsentSender(
-        workers.getCreator(), // henry is doing the consent update
-        group.id, // for this group
-        workers.getReceiver().client.inboxId, // blocking randomguy
-        true, // block the entities
-      );
-
-      const consentAction = async () => {
-        await groupConsentSender();
-      };
-
-      console.log("Starting consent verification process");
-
       const verifyResult = await verifyConsentStream(
         workers.getCreator(),
-        [workers.getWorkers()[1]],
-        consentAction,
+        workers.getAllButCreator()[0],
       );
 
       expect(verifyResult.allReceived).toBe(true);

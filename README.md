@@ -162,7 +162,7 @@ _Note: This measurments are taken only from the sender side._
 | Group Size | Receive message (ms) | New name metadata (ms) | New added members (ms) | Status                 |
 | ---------- | -------------------- | ---------------------- | ---------------------- | ---------------------- |
 | 50         | 58.00                | 87.75                  | 254.00                 | ✅ On Target           |
-| 100        | 56.00                | 107.75                 | 294.00                 | ⚠️ Performance Concern |
+| 100        | 56.00                | 107.75                 | 294.00                 | ✅ On Target           |
 | 150        | 72.25                | 110.00                 | 338.25                 | ✅ On Target           |
 | 200        | 93.00                | 129.00                 | 423.25                 | ✅ On Target           |
 | 250        | 89.50                | 143.75                 | 465.25                 | ⚠️ Performance Concern |

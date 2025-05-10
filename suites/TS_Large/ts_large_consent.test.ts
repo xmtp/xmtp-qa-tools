@@ -1,34 +1,33 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { verifyGroupConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   saveLog,
   TS_LARGE_BATCH_SIZE,
   ts_large_createGroup,
   TS_LARGE_TOTAL,
+  TS_LARGE_WORKER_COUNT,
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "ts_large_syncs";
+const testName = "ts_large_consent";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const steamsToTest = typeofStream.None;
+  const steamsToTest = typeofStream.Consent;
   let workers: WorkerManager;
   let start: number;
-
   let testStart: number;
+  let newGroup: Conversation;
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(
-    TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE,
-    testName,
-    steamsToTest,
-  );
+  workers = await getWorkers(TS_LARGE_WORKER_COUNT, testName, steamsToTest);
 
   setupTestLifecycle({
     expect,
@@ -49,25 +48,20 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifySyncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
+    it(`verifyLargeGroupConsentStream-${i}: should update group consent`, async () => {
       try {
-        const createTime = performance.now();
-        await ts_large_createGroup(workers, i, true);
-        const createTimeMs = performance.now() - createTime;
-        // Select one worker per batch (round-robin)
-        const allWorkers = workers.getWorkers();
-        const workerIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
+        newGroup = await ts_large_createGroup(workers, i, true);
+        const verifyResult = await verifyGroupConsentStream(
+          newGroup as Group,
+          workers.getAllButCreator(),
+        );
 
-        const worker = allWorkers[workerIdx];
-        const syncStart = performance.now();
-        await worker.client.conversations.syncAll();
-        const syncTimeMs = performance.now() - syncStart;
+        expect(verifyResult.allReceived).toBe(true);
 
-        // Save metrics, including worker name/installationId
+        // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          syncTimeMs,
-          createTimeMs,
+          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);
