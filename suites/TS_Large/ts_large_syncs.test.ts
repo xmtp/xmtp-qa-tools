@@ -10,6 +10,7 @@ import {
   ts_large_createGroup,
   TS_LARGE_TOTAL,
   TS_LARGE_WORKER_COUNT,
+  type SummaryEntry,
 } from "./helpers";
 
 const testName = "ts_large_syncs";
@@ -21,16 +22,6 @@ describe(testName, async () => {
   let start: number;
 
   let testStart: number;
-
-  // Hold timing metrics per group size
-  interface SummaryEntry {
-    groupSize: number;
-    messageStreamTimeMs?: number;
-    groupUpdatedStreamTimeMs?: number;
-    conversationStreamTimeMs?: number;
-    syncTimeMs?: number;
-    createTimeMs?: number;
-  }
 
   const summaryMap: Record<number, SummaryEntry> = {};
 

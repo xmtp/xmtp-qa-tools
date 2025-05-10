@@ -163,7 +163,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     statsLabel,
     count,
     randomSuffix,
-    participantsForStats,
   } = options;
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string }[]
@@ -267,7 +266,7 @@ const filterReceivers = async (group: Group, participants: Worker[]) => {
 /**
  * Specialized function to verify group update streams
  */
-export async function verifyGroupUpdateStream(
+export async function verifyMetadataStream(
   group: Group,
   participants: Worker[],
   count = 1,
@@ -279,6 +278,73 @@ export async function verifyGroupUpdateStream(
   }
 > {
   const receivers = await filterReceivers(group, participants);
+  // Extract group name from received event
+  function extractGroupName(ev: unknown): string {
+    let obj: unknown = ev;
+    if (typeof ev === "string") {
+      try {
+        obj = JSON.parse(ev);
+      } catch {
+        return "";
+      }
+    }
+    // New event shape: { group: { name: string } }
+    if (
+      typeof obj === "object" &&
+      obj !== null &&
+      "group" in obj &&
+      typeof (obj as any).group === "object" &&
+      (obj as any).group !== null &&
+      "name" in (obj as any).group &&
+      typeof (obj as any).group.name === "string"
+    ) {
+      const groupName: unknown = (obj as any).group.name;
+      if (typeof groupName === "string") {
+        return groupName;
+      }
+    }
+    // Old event shape: { content: { metadataFieldChanges: [...] } }
+    if (
+      typeof obj === "object" &&
+      obj !== null &&
+      "content" in obj &&
+      typeof (obj as any).content === "object" &&
+      (obj as any).content !== null &&
+      "metadataFieldChanges" in (obj as any).content &&
+      Array.isArray((obj as any).content.metadataFieldChanges)
+    ) {
+      const changes: unknown[] = (obj as any).content.metadataFieldChanges;
+      for (const c of changes) {
+        if (
+          typeof c === "object" &&
+          c !== null &&
+          "fieldName" in c &&
+          (c as any).fieldName === "group_name" &&
+          "newValue" in c &&
+          typeof (c as any).newValue === "string"
+        ) {
+          const newValue: unknown = (c as any).newValue;
+          if (typeof newValue === "string") {
+            return newValue;
+          }
+        }
+      }
+      return "";
+    }
+    // Sent event shape: { name: string }
+    if (
+      typeof obj === "object" &&
+      obj !== null &&
+      "name" in obj &&
+      typeof (obj as any).name === "string"
+    ) {
+      const nameValue: unknown = (obj as any).name;
+      if (typeof nameValue === "string") {
+        return nameValue;
+      }
+    }
+    return "";
+  }
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
@@ -293,8 +359,8 @@ export async function verifyGroupUpdateStream(
       }
       return sent;
     },
-    getKey: (ev) => (ev as { name?: string }).name ?? "",
-    getMessage: (ev) => (ev as { name?: string }).name ?? "",
+    getKey: extractGroupName,
+    getMessage: extractGroupName,
     statsLabel: "New name-",
     count,
     randomSuffix,

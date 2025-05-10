@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyGroupUpdateStream } from "@helpers/streams";
+import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -12,6 +12,7 @@ import {
   ts_large_createGroup,
   TS_LARGE_TOTAL,
   TS_LARGE_WORKER_COUNT,
+  type SummaryEntry,
 } from "./helpers";
 
 const testName = "ts_large_metadata";
@@ -21,19 +22,8 @@ describe(testName, async () => {
   const steamsToTest = typeofStream.GroupUpdated;
   let workers: WorkerManager;
   let start: number;
-
   let testStart: number;
   let newGroup: Conversation;
-
-  // Hold timing metrics per group size
-  interface SummaryEntry {
-    groupSize: number;
-    messageStreamTimeMs?: number;
-    groupUpdatedStreamTimeMs?: number;
-    conversationStreamTimeMs?: number;
-    syncTimeMs?: number;
-    createTimeMs?: number;
-  }
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
@@ -61,7 +51,7 @@ describe(testName, async () => {
     it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, true);
-        const verifyResult = await verifyGroupUpdateStream(
+        const verifyResult = await verifyMetadataStream(
           newGroup as Group,
           workers.getWorkers(),
           1,

@@ -1,14 +1,11 @@
 import { loadEnv } from "@helpers/client";
-import { sendDeliveryMetric } from "@helpers/datadog";
-import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { create } from "node_modules/axios/index.cjs";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "order";
 loadEnv(testName);

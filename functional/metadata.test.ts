@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { verifyGroupUpdateStream } from "@helpers/streams";
+import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -56,7 +56,7 @@ describe(testName, async () => {
   });
 
   it("receiveMetadata", async () => {
-    const verifyResult = await verifyGroupUpdateStream(group, [
+    const verifyResult = await verifyMetadataStream(group, [
       workers.get("oscar")!,
     ]);
     expect(verifyResult.allReceived).toBe(true);

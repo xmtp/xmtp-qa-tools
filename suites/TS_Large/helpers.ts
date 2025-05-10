@@ -64,13 +64,13 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
 
     messageToLog += `Group ${groupSize} → `;
     if (conversationStreamTimeMs !== undefined) {
-      messageToLog += `New member stream: ${conversationStreamTimeMs.toFixed(2)} ms; `;
+      messageToLog += `New members: ${conversationStreamTimeMs.toFixed(2)} ms; `;
     }
     if (groupUpdatedStreamTimeMs !== undefined) {
-      messageToLog += `Group updated stream: ${groupUpdatedStreamTimeMs.toFixed(2)} ms; `;
+      messageToLog += `Metadata: ${groupUpdatedStreamTimeMs.toFixed(2)} ms; `;
     }
     if (messageStreamTimeMs !== undefined) {
-      messageToLog += `Message stream: ${messageStreamTimeMs.toFixed(2)} ms; `;
+      messageToLog += `Messages: ${messageStreamTimeMs.toFixed(2)} ms; `;
     }
     if (syncTimeMs !== undefined) {
       messageToLog += `Sync: ${syncTimeMs.toFixed(2)} ms; `;

@@ -5,8 +5,8 @@ import {
   verifyAddMembersStream,
   verifyConsentStream,
   verifyConversationStream,
-  verifyGroupUpdateStream,
   verifyMessageStream,
+  verifyMetadataStream,
 } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -142,7 +142,7 @@ describe(testName, async () => {
   it("verifyGroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      const verifyResult = await verifyGroupUpdateStream(group as Group, [
+      const verifyResult = await verifyMetadataStream(group as Group, [
         workers.getReceiver(),
       ]);
 
