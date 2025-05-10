@@ -10,7 +10,7 @@ on:
   #     - main
 
 jobs:
-  test:
+  TS_AgentHealth:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     env:
