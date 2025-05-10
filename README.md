@@ -159,16 +159,16 @@ _Note: This measurments are taken only from the sender side._
 
 ### Group stream performance
 
-| Group Size | Message (ms) | Metadata (ms) | New Members (ms) | Status                 |
-| ---------- | ------------ | ------------- | ---------------- | ---------------------- |
-| 50         | 58.00        | 87.75         | 254.00           | ✅ On Target           |
-| 100        | 56.00        | 107.75        | 294.00           | ✅ On Target           |
-| 150        | 72.25        | 110.00        | 338.25           | ✅ On Target           |
-| 200        | 93.00        | 129.00        | 423.25           | ✅ On Target           |
-| 250        | 89.50        | 143.75        | 465.25           | ⚠️ Performance Concern |
-| 300        | 85.00        | 173.25        | 515.25           | ⚠️ Performance Concern |
-| 350        | 99.50        | 191.75        | 522.25           | ⚠️ Performance Concern |
-| 400        | 98.00        | 203.25        | 537.50           | ⚠️ Performance Concern |
+| Group Size | Receive message (ms) | New name metadata (ms) | New added members (ms) | Status                 |
+| ---------- | -------------------- | ---------------------- | ---------------------- | ---------------------- |
+| 50         | 58.00                | 87.75                  | 254.00                 | ✅ On Target           |
+| 100        | 56.00                | 107.75                 | 294.00                 | ⚠️ Performance Concern |
+| 150        | 72.25                | 110.00                 | 338.25                 | ✅ On Target           |
+| 200        | 93.00                | 129.00                 | 423.25                 | ✅ On Target           |
+| 250        | 89.50                | 143.75                 | 465.25                 | ⚠️ Performance Concern |
+| 300        | 85.00                | 173.25                 | 515.25                 | ⚠️ Performance Concern |
+| 350        | 99.50                | 191.75                 | 522.25                 | ⚠️ Performance Concern |
+| 400        | 98.00                | 203.25                 | 537.50                 | ⚠️ Performance Concern |
 
 _Note: This measurements are taken only from the receiver side and type of stream at the time of testing._
 
