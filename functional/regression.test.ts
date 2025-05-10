@@ -24,8 +24,7 @@ describe(testName, () => {
         allNames.push(names[count] + "-b-" + version);
         count++;
       }
-      console.log("names", allNames);
-      workers = await getWorkers(allNames, testName);
+      workers = await getWorkers(allNames, testName, typeofStream.Message);
 
       const group = await workers
         .getWorkers()

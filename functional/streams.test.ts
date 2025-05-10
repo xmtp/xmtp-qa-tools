@@ -23,7 +23,7 @@ describe(testName, async () => {
   let testStart: number;
   let group: Conversation;
   const names = getRandomNames(5);
-  let workers = await getWorkers(names, testName, typeofStream.None);
+  let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle
   setupTestLifecycle({

@@ -30,12 +30,7 @@ describe(testName, async () => {
 
   let testStart: number;
 
-  workers = await getWorkers(
-    10,
-    testName,
-    typeofStream.Message,
-    typeOfResponse.None,
-  );
+  workers = await getWorkers(10, testName, typeofStream.Message);
 
   setupTestLifecycle({
     expect,
@@ -62,11 +57,7 @@ describe(testName, async () => {
   });
   it("canMessage: should measure canMessage", async () => {
     try {
-      const client = await getWorkers(
-        ["randomclient"],
-        testName,
-        typeofStream.None,
-      );
+      const client = await getWorkers(["randomclient"], testName);
       if (!client) {
         throw new Error("Client not found");
       }
