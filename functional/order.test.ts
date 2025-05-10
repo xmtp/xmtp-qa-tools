@@ -1,8 +1,9 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { calculateMessageStats } from "@helpers/streams";
+import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -16,7 +17,7 @@ describe(testName, async () => {
 
   let start: number;
 
-  workers = await getWorkers(getRandomNames(5), testName);
+  workers = await getWorkers(getRandomNames(5), testName, typeofStream.Message);
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
@@ -74,6 +75,25 @@ describe(testName, async () => {
 
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+  it("stream_order: verify message order when receiving via streams", async () => {
+    try {
+      const creator = workers.getCreator();
+      group = await creator.client.conversations.newGroup(
+        workers.getAllButCreator().map((p) => p.client.inboxId),
+      );
+      const verifyResult = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+        10,
+        randomSuffix,
+      );
+      expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(95);
+      expect(verifyResult.stats?.orderPercentage).toBeGreaterThan(95);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
