@@ -26,7 +26,7 @@ describe(testName, async () => {
   );
   const batchSize = 5;
   const total = 10;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   // Create a mapping to store group conversations by size
@@ -36,7 +36,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -58,7 +57,7 @@ describe(testName, async () => {
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -68,7 +67,7 @@ describe(testName, async () => {
         const members = await groupsBySize[i].members();
         expect(members.length).toBe(i + 1);
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -80,7 +79,7 @@ describe(testName, async () => {
         const name = (groupsBySize[i] as Group).name;
         expect(name).toBe(newName);
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -97,7 +96,7 @@ describe(testName, async () => {
         const members = await groupsBySize[i].members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -110,7 +109,7 @@ describe(testName, async () => {
         console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -133,15 +132,11 @@ describe(testName, async () => {
           testGroup,
           workers.getWorkers(),
           1,
-          "gm",
-          () => {
-            start = performance.now();
-          },
         );
 
         expect(verifyResult.allReceived).toBe(true);
       } catch (e: unknown) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

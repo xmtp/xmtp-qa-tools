@@ -26,7 +26,7 @@ The helper modules are designed to be imported and used in test suites:
 
 ```typescript
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { sendPerformanceResult, sendTestResults } from "@helpers/datadog";
+import { sendPerformanceResult } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream, verifyMessageStreamAll } from "@helpers/streams";
 ```
@@ -68,9 +68,6 @@ The `datadog.ts` module provides utilities for sending metrics and test results 
 ```typescript
 // Initialize Datadog metrics
 initDataDog(testName, envValue, geolocation, apiKey);
-
-// Send test results to Datadog
-sendTestResults(hasFailures, testName);
 
 // Send performance metrics
 sendPerformanceResult(expect, workers, start);
@@ -122,7 +119,7 @@ const logger = createLogger();
 setupPrettyLogs();
 
 // Log test errors and track failures
-const hasFailures = logError(error, expect);
+const logError(error, expect);
 
 // Add file logging capability
 addFileLogging(filename);
@@ -327,9 +324,6 @@ Utilities for sending metrics to Datadog:
 ```typescript
 // Send a metric to Datadog
 sendMetric(metricName, metricValue, tags);
-
-// Send a test result to Datadog
-sendTestResults(hasFailures, testName);
 
 // Send a performance metric to Datadog
 sendPerformanceMetric(metricValue, testName, libXmtpVersion, skipNetworkStats);

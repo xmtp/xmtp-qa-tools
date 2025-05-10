@@ -19,7 +19,7 @@ describe(
     let group: Group;
     let workers: WorkerManager;
     workers = await getWorkers(["random1", "random2", "random3"], testName);
-    let hasFailures = false;
+
     let start: number;
     let testStart: number;
     const randomSuffix = Math.random().toString(36).substring(2, 10);
@@ -28,7 +28,6 @@ describe(
       expect,
       workers,
       testName,
-      hasFailuresRef: hasFailures,
       getStart: () => start,
       setStart: (v) => {
         start = v;
@@ -48,7 +47,7 @@ describe(
           );
         console.log("Group created", group.id);
       } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -138,7 +137,7 @@ describe(
           "order",
         );
       } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

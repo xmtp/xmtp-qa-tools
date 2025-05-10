@@ -1,8 +1,6 @@
 import { execSync } from "child_process";
-import { sendTestResults } from "@helpers/datadog";
 
 function runTests(): void {
-  let hasFailures: boolean = false;
   // Get the test name from command line arguments or use default
   const testName = process.argv[2] || "TS_Performance";
 
@@ -27,19 +25,8 @@ function runTests(): void {
       break;
     } catch (e) {
       console.log(e);
-      if (i === 3) {
-        console.log("Test failed after 3 attempts.");
-        hasFailures = true;
-      } else {
-        console.log("Retrying in 10 seconds...");
-        // Wait 10 seconds before retrying
-        execSync("sleep 10");
-      }
     }
   }
-
-  // Report results to Datadog
-  sendTestResults(hasFailures, testName);
 }
 
 // Run tests when this script is executed

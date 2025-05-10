@@ -11,7 +11,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let group: Group;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   const workers = await getWorkers(
@@ -34,7 +34,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;

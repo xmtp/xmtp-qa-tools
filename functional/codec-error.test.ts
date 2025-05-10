@@ -14,7 +14,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(["henry", "ivy"], testName);
 
-  let hasFailures: boolean = false;
   let start: number;
   let testStart: number;
 
@@ -22,7 +21,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;

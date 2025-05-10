@@ -12,7 +12,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
-const testName = "TS_Large";
+const testName = "TS_Large_Syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -245,8 +245,6 @@ describe(testName, async () => {
         messageStreamTimeMs,
         groupUpdatedStreamTimeMs,
         conversationStreamTimeMs,
-        syncTimeMs,
-        createTimeMs,
       } = entry;
 
       console.log(
@@ -260,10 +258,6 @@ describe(testName, async () => {
           (conversationStreamTimeMs !== undefined
             ? `Conversation: ${conversationStreamTimeMs.toFixed(2)} ms; `
             : ""),
-        createTimeMs !== undefined
-          ? `Create: ${createTimeMs.toFixed(2)} ms; `
-          : "",
-        syncTimeMs !== undefined ? `Sync: ${syncTimeMs.toFixed(2)} ms; ` : "",
       );
     }
     console.log("==========================================\n");

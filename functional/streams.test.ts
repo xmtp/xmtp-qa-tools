@@ -18,8 +18,6 @@ const testName = "streams";
 loadEnv(testName);
 
 describe(testName, async () => {
-  // Test variables
-  let hasFailures = false;
   let start: number;
   let testStart: number;
   let group: Conversation;
@@ -31,7 +29,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -71,7 +68,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -95,7 +92,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -115,7 +112,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -136,7 +133,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -150,15 +147,15 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
   it("verifyConsentStream: manage consent for all members in a group", async () => {
-    workers = await getWorkers(names, testName, typeofStream.Consent);
-
     try {
+      workers = await getWorkers(names, testName, typeofStream.Consent);
+
       const groupConsentSender = createGroupConsentSender(
         workers.getWorkers()[0], // henry is doing the consent update
         group.id, // for this group
@@ -180,8 +177,7 @@ describe(testName, async () => {
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = true;
-      console.error("Test failed:", e);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

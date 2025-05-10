@@ -31,7 +31,7 @@ describe(testName, async () => {
   let bot: Worker;
   let client: Client;
   let conversation: Conversation;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
 
@@ -53,7 +53,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;

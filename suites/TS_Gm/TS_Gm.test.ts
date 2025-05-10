@@ -17,7 +17,7 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(testName, async () => {
   let convo: Conversation;
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
@@ -33,7 +33,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -66,7 +65,7 @@ describe(testName, async () => {
       const messagesAfter = await convo.messages();
       expect(messagesAfter.length).toBe(prevMessageCount + 2);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -80,7 +79,7 @@ describe(testName, async () => {
       );
       expect(result).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -92,7 +91,7 @@ describe(testName, async () => {
         gmBotAddress,
       ]);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
