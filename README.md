@@ -278,25 +278,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 </div>
 
-## 🧪 XMTP Test Suites
-
-Different end-to-end test suites for validating the XMTP protocol functionality, performance, and reliability.
-
-<div style="overflow-x: auto;">
-
-| Suite              | Purpose                                                    | Link to test file                                         |
-| ------------------ | ---------------------------------------------------------- | --------------------------------------------------------- |
-| **TS_AgentHealth** | Tests the health of the agent ecosystem                    | [TS_AgentHealth](./TS_AgentHealth/TS_AgentHealth.test.ts) |
-| **TS_Delivery**    | Verifies message delivery reliability                      | [TS_Delivery](./TS_Delivery/TS_Delivery.test.ts)          |
-| **TS_Fork**        | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/TS_Fork.test.ts)                      |
-| **TS_Gm**          | Tests basic messaging and cross-version compatibility      | [TS_Gm](./TS_Gm/TS_Gm.test.ts)                            |
-| **TS_Performance** | Measures independent operational performance               | [TS_Performance](./TS_Performance/TS_Performance.test.ts) |
-| **TS_Large**       | Tests performance of group operations                      | [TS_Large](./TS_Large/TS_Large.test.ts)                   |
-
-</div>
-
-All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
-
 ## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
@@ -304,6 +285,7 @@ All test suites provide metrics to monitoring dashboards and can be executed bot
 - **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
+- **Test suites:** See our test suites - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
 
 ## Development
 
