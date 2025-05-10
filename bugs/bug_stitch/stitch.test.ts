@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { defaultNames } from "@helpers/tests";
 import { getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -17,7 +18,7 @@ const users: {
   //
   // },
   xmtpchat: {
-    inboxId: "20163dfde797c8a9ec05991c062a1904b89dc1fe82c6fc27972fd1f46044088d",
+    inboxId: "a4e97a970fbe76a2189fc340182aa7f605e5dcb66f4ff8f22b74c489ee8b1d26",
   },
 };
 
@@ -25,30 +26,20 @@ const testName = "bug_stitch";
 loadEnv(testName);
 
 describe(testName, () => {
+  const randomName =
+    defaultNames[Math.floor(Math.random() * defaultNames.length)];
   for (const user of Object.keys(users)) {
     describe(`User: ${user}`, () => {
-      let ivy100: Worker;
-      let ivy105: Worker;
-      let ivy200: Worker;
+      let randomWorker: Worker;
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers(["ivy-a-202"], testName);
-          ivy100 = workers.get("ivy", "a") as Worker;
-          console.log("syncing all");
-          await ivy100?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
-      });
-
-      it("should create new DM and group conversations", async () => {
-        const sender = ivy100?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
+          const workers = await getWorkers([randomName], testName);
+          randomWorker = workers.get(randomName) as Worker;
+          const newConvo =
+            await randomWorker.client.conversations.newDm(receiver);
 
           console.log("sending message");
           const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
@@ -58,16 +49,13 @@ describe(testName, () => {
           throw e;
         }
       });
-      it("terminate and restart", async () => {
-        // Simulate termination and restart
-        console.warn("Ivy terminates, deletes local data, and restarts");
-        await ivy100?.worker?.clearDB();
-        await ivy100?.worker?.initialize();
-      });
 
       it("should create new DM and group conversations", async () => {
-        const sender = ivy100?.client;
         try {
+          console.log(`Setting up test for ${user}`);
+          const workers = await getWorkers([randomName + "-b"], testName);
+          randomWorker = workers.get(randomName, "b") as Worker;
+          const sender = randomWorker?.client;
           const newConvo = await sender.conversations.newDm(receiver);
 
           console.log("sending message");
@@ -78,53 +66,22 @@ describe(testName, () => {
           throw e;
         }
       });
-      it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-b-105"], testName);
-          ivy105 = workers.get("ivy", "b") as Worker;
-          console.log("syncing all");
-          await ivy105?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+      it("terminate and restart", async () => {
+        // Simulate termination and restart
+        console.warn(" terminates, deletes local data, and restarts");
+        await randomWorker?.worker?.clearDB();
+        await randomWorker?.worker?.initialize();
       });
-
       it("should create new DM and group conversations", async () => {
-        const sender = ivy105?.client;
         try {
+          console.log(`Setting up test for ${user}`);
+          const workers = await getWorkers([randomName + "-c"], testName);
+          randomWorker = workers.get(randomName, "c") as Worker;
+          const sender = randomWorker?.client;
           const newConvo = await sender.conversations.newDm(receiver);
 
           console.log("sending message");
           const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
-      });
-
-      it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}]`);
-          const workers = await getWorkers(["ivy-c-202"], testName);
-          ivy200 = workers.get("ivy", "c") as Worker;
-          console.log("syncing all");
-          await ivy200?.client.conversations.sync();
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
-      });
-
-      it("should create new DM and group conversations", async () => {
-        const sender = ivy200?.client;
-        try {
-          const newConvo = await sender.conversations.newDm(receiver);
-
-          console.log("sending message");
-          const message = "message 4/4\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
           logError(e, expect.getState().currentTestName);
