@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -20,12 +21,10 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let start: number;
 
-  let testStart: number;
-
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE,
+    getRandomNames(TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE),
     testName,
     steamsToTest,
   );
@@ -38,10 +37,6 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
   for (
@@ -49,13 +44,15 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifySyncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
+    it(`syncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
       try {
+        const createTime = performance.now();
         await ts_large_createGroup(workers, i, true);
+        const createTimeMs = performance.now() - createTime;
         // Select one worker per batch (round-robin)
         const allWorkers = workers.getWorkers();
         const workerIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
-        console.log("workerIdx", workerIdx);
+
         const worker = allWorkers[workerIdx];
         const syncStart = performance.now();
         await worker.client.conversations.syncAll();
@@ -65,7 +62,7 @@ describe(testName, async () => {
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
           syncTimeMs,
-          workerName: `${worker.name}-${worker.installationId}`,
+          createTimeMs,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

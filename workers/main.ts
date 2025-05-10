@@ -517,11 +517,6 @@ export class WorkerClient extends Worker {
                     },
                   };
 
-                  console.log(
-                    `[${this.nameId}] Emitting formatted consent event:`,
-                    JSON.stringify(consentEvent),
-                  );
-
                   this.emit("worker_message", consentEvent);
                 }
               } else {
@@ -628,11 +623,6 @@ export class WorkerClient extends Worker {
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
-        console.log(
-          `[${this.nameId}] Filtering group update message:`,
-          JSON.stringify(msg),
-        );
-
         if (msg.type !== StreamCollectorType.GroupUpdated) {
           console.log(
             `[${this.nameId}] Type mismatch: ${msg.type} !== ${StreamCollectorType.GroupUpdated}`,

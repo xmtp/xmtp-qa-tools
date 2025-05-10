@@ -6,6 +6,7 @@ import {
   TEST_CONFIGS,
 } from "@helpers/groups";
 import { logError } from "@helpers/logger";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation } from "@xmtp/node-sdk";
@@ -33,14 +34,13 @@ describe(testName, async () => {
   let conversation: Conversation;
 
   let start: number;
-  let testStart: number;
 
   beforeAll(async () => {
     try {
       bot = workers.get("bot")!;
       client = bot.client;
       conversation = await client.conversations.newDm(receiverInboxId);
-      workers = await getWorkers(config.workerCount, testName);
+      workers = await getWorkers(getRandomNames(config.workerCount), testName);
       expect(workers).toBeDefined();
       expect(workers.getWorkers().length).toBe(config.workerCount);
     } catch (e) {
@@ -56,10 +56,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
   // Create a DM between two workers

@@ -23,21 +23,19 @@ export const ts_large_createGroup = async (
   addMembers: boolean,
 ): Promise<Group> => {
   const creator = workers.getCreator();
+  console.log("Creator name: ", creator.name);
   const newGroup = await creator.client.conversations.newGroup(
     generatedInboxes.slice(0, groupSize).map((inbox) => inbox.inboxId),
   );
   console.log(`Group created with ${groupSize} participants`);
   if (addMembers) {
     console.log("Adding members to group");
-    const workersInboxIds = workers
-      .getWorkers()
-      .map((worker) => worker.inboxId);
 
     await newGroup.addMembers(
-      workersInboxIds.filter((id) => id !== creator.inboxId),
+      workers.getAllButCreator().map((worker) => worker.inboxId),
     );
     console.log(
-      `Successfully added ${workersInboxIds.filter((id) => id !== creator.inboxId).length} members to the group`,
+      `Successfully added ${workers.getAllButCreator().length} members to the group`,
     );
   }
   return newGroup;

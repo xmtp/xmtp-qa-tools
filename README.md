@@ -9,6 +9,8 @@
 | 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                               | Every 30 min  | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm.test.ts)                      |
 | 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)             | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_Geolocation.yml)       |
 | 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml) | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/check-agent-examples.yml) |
+| ⏳ Group Streams  | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml)                         | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_Large.yml)             |
+| 🚑 Agent health   | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_AgentHealth.yml)             | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_AgentHealth.yml)       |
 
 ## Testing scope
 
@@ -126,9 +128,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | sendGroupMessage         | Sending a group message                | 85.27    | <200ms | ✅ On Target           |
 | receiveGroupMessage      | Processing group message streams       | 124.00   | <200ms | ✅ On Target           |
 
-### Group Operations Performance by Size
-
-#### Group Creation & Sync Performance
+### Group Creation & SyncAll Performance
 
 | Size | Create(ms) | SyncAll(ms) | Status                 |
 | ---- | ---------- | ----------- | ---------------------- |
@@ -141,33 +141,36 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
 | 400  | 7015.99    | 1586.66     | ⚠️ Performance Concern |
 
-#### Other Group Operations Performance
+_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox)._
 
-| Size | Send(ms) | Update(ms) | Remove(ms) | Status                 |
-| ---- | -------- | ---------- | ---------- | ---------------------- |
-| 50   | 86.01    | 135.36     | 138.57     | ✅ On Target           |
-| 100  | 88.41    | 144.67     | 156.86     | ✅ On Target           |
-| 150  | 94.55    | 202.64     | 189.81     | ✅ On Target           |
-| 200  | 93.42    | 193.36     | 204.78     | ⚠️ Performance Concern |
-| 250  | 107.76   | 219.17     | 236.53     | ⚠️ Performance Concern |
-| 300  | 97.09    | 244.24     | 247.22     | ⚠️ Performance Concern |
-| 350  | 99.20    | 244.24     | 270.62     | ⚠️ Performance Concern |
-| 400  | 101.34   | 263.91     | 308.01     | ⚠️ Performance Concern |
+### Other Group Operations Performance
+
+| Size | Send message (ms) | Update name (ms) | Remove members (ms) | Status       |
+| ---- | ----------------- | ---------------- | ------------------- | ------------ |
+| 50   | 86.01             | 135.36           | 138.57              | ✅ On Target |
+| 100  | 88.41             | 144.67           | 156.86              | ✅ On Target |
+| 150  | 94.55             | 202.64           | 189.81              | ✅ On Target |
+| 200  | 93.42             | 193.36           | 204.78              | ✅ On Target |
+| 250  | 107.76            | 219.17           | 236.53              | ✅ On Target |
+| 300  | 97.09             | 244.24           | 247.22              | ✅ On Target |
+| 400  | 101.34            | 263.91           | 308.01              | ✅ On Target |
+
+_Note: This measurments are taken only from the sender side._
 
 ### Group stream performance
 
-| Group Size | Message (ms) | Metadata (ms) | New Members (ms) | Status                 |
-| ---------- | ------------ | ------------- | ---------------- | ---------------------- |
-| 50         | 58.00        | 87.75         | 254.00           | ✅ On Target           |
-| 100        | 56.00        | 107.75        | 294.00           | ✅ On Target           |
-| 150        | 72.25        | 110.00        | 338.25           | ✅ On Target           |
-| 200        | 93.00        | 129.00        | 423.25           | ✅ On Target           |
-| 250        | 89.50        | 143.75        | 465.25           | ⚠️ Performance Concern |
-| 300        | 85.00        | 173.25        | 515.25           | ⚠️ Performance Concern |
-| 350        | 99.50        | 191.75        | 522.25           | ⚠️ Performance Concern |
-| 400        | 98.00        | 203.25        | 537.50           | ⚠️ Performance Concern |
+| Group Size | Receive message (ms) | New name metadata (ms) | New added members (ms) | Status                 |
+| ---------- | -------------------- | ---------------------- | ---------------------- | ---------------------- |
+| 50         | 58.00                | 87.75                  | 254.00                 | ✅ On Target           |
+| 100        | 56.00                | 107.75                 | 294.00                 | ✅ On Target           |
+| 150        | 72.25                | 110.00                 | 338.25                 | ✅ On Target           |
+| 200        | 93.00                | 129.00                 | 423.25                 | ✅ On Target           |
+| 250        | 89.50                | 143.75                 | 465.25                 | ⚠️ Performance Concern |
+| 300        | 85.00                | 173.25                 | 515.25                 | ⚠️ Performance Concern |
+| 350        | 99.50                | 191.75                 | 522.25                 | ⚠️ Performance Concern |
+| 400        | 98.00                | 203.25                 | 537.50                 | ⚠️ Performance Concern |
 
-_Note: Based on running one type of stream at a time._
+_Note: This measurements are taken only from the receiver side (fresh inbox) and type of stream at the time of testing._
 
 ## Networks performance
 

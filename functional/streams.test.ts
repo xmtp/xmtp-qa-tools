@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
-  createGroupConsentSender,
   verifyAddMembersStream,
   verifyConsentStream,
   verifyConversationStream,
@@ -13,14 +12,14 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "streams";
 loadEnv(testName);
 
 describe(testName, async () => {
   let start: number;
-  let testStart: number;
+
   let group: Conversation;
   const names = getRandomNames(5);
   let workers = await getWorkers(names, testName);
@@ -34,23 +33,22 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
-  // Create a group before all tests
-  beforeAll(async () => {
-    // Initialize workers
-    group = await workers
-      .getCreator()
-      .client.conversations.newGroup([
-        workers.getCreator().client.inboxId,
-        workers.getWorkers()[2].client.inboxId,
-        workers.getWorkers()[3].client.inboxId,
-        workers.getWorkers()[4].client.inboxId,
-      ]);
+  it("verifyConsentStream: manage consent for all members in a group", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.Consent);
+
+      const verifyResult = await verifyConsentStream(
+        workers.getCreator(),
+        workers.getReceiver(),
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
   });
   it("verifyMessageStream: should measure receiving a gm", async () => {
     try {
@@ -76,12 +74,8 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       const creator = workers.getCreator();
-      // Create direct message
-      const filterOutCreator = workers
-        .getWorkers()
-        .filter((w) => w.inboxId !== creator.inboxId);
       const newGroup = await creator.client.conversations.newGroup(
-        filterOutCreator.map((w) => w.client.inboxId),
+        workers.getAllButCreator().map((w) => w.client.inboxId),
       );
 
       // Verify message delivery
@@ -98,12 +92,31 @@ describe(testName, async () => {
     }
   });
 
+  it("verifyGroupMetadataStream: should update group name", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
+      // Initialize workers
+      group = await workers
+        .getCreator()
+        .client.conversations.newGroup(
+          workers.getAllButCreator().map((w) => w.client.inboxId),
+        );
+
+      const verifyResult = await verifyMetadataStream(
+        group as Group,
+        workers.getWorkers(),
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
   it("verifyConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
-
-      console.log("Testing conversation stream with new DM creation");
 
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
@@ -117,63 +130,17 @@ describe(testName, async () => {
       throw e;
     }
   });
+
   it("verifyAddMembersStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
+      group = await workers.getCreator().client.conversations.newGroup([]);
 
-      console.log("Testing conversation stream with adding members");
-      const newGroup = await workers
-        .getCreator()
-        .client.conversations.newGroup([]);
       // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyAddMembersStream(
-        newGroup,
-        workers.getWorkers(),
-      );
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("verifyGroupMetadataStream: should update group name", async () => {
-    try {
-      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      const verifyResult = await verifyMetadataStream(group as Group, [
-        workers.getReceiver(),
-      ]);
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("verifyConsentStream: manage consent for all members in a group", async () => {
-    try {
-      workers = await getWorkers(names, testName, typeofStream.Consent);
-
-      const groupConsentSender = createGroupConsentSender(
-        workers.getCreator(), // henry is doing the consent update
-        group.id, // for this group
-        workers.getReceiver().client.inboxId, // blocking randomguy
-        true, // block the entities
-      );
-
-      const consentAction = async () => {
-        await groupConsentSender();
-      };
-
-      console.log("Starting consent verification process");
-
-      const verifyResult = await verifyConsentStream(
-        workers.getCreator(),
-        [workers.getWorkers()[1]],
-        consentAction,
+        group as Group,
+        workers.getAllButCreator(),
       );
 
       expect(verifyResult.allReceived).toBe(true);

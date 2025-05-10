@@ -2,6 +2,7 @@ import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
+  type Client,
   type Conversation,
   type Group,
 } from "@xmtp/node-sdk";
@@ -10,8 +11,10 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messages: string[][];
+  messages: unknown[][];
   receiverCount: number;
+  eventTimings: Record<string, number[]>;
+  averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
     orderPercentage: number;
@@ -22,90 +25,45 @@ export type VerifyStreamResult = {
   };
 };
 
-/**
- * Toggle the consent state for an entity
- */
-export async function toggleConsentState(
-  worker: Worker,
-  entity: string,
-  entityType: ConsentEntityType,
-  initialState?: ConsentState,
-): Promise<ConsentState> {
-  let currState = initialState;
-  if (currState === undefined) {
-    currState = await worker.client.preferences.getConsentState(
-      entityType,
-      entity,
-    );
-  }
-  const newState =
-    currState === ConsentState.Allowed
-      ? ConsentState.Denied
-      : ConsentState.Allowed;
-  console.log(
-    `Changing consent state to ${newState === ConsentState.Allowed ? "allowed" : "denied"}`,
-  );
-  await worker.client.preferences.setConsentStates([
+export async function updateGroupConsent(
+  client: Client,
+  group: Group,
+): Promise<void> {
+  const getState = await group.consentState;
+
+  await client.preferences.setConsentStates([
     {
-      entity,
-      entityType,
-      state: newState,
+      entity: group.id,
+      entityType: ConsentEntityType.GroupId,
+      state:
+        getState === ConsentState.Allowed
+          ? ConsentState.Denied
+          : ConsentState.Allowed,
     },
   ]);
-  return newState;
 }
-
-/**
- * Create a consent sender function for DM conversations
- */
-export function createDmConsentSender(
-  worker: Worker,
-  targetInboxId: string,
-  initialState?: ConsentState,
-) {
-  return async (): Promise<string> => {
-    await toggleConsentState(
-      worker,
-      targetInboxId,
-      ConsentEntityType.InboxId,
-      initialState,
-    );
-    return "consent_updated";
-  };
-}
-
 /**
  * Create a group consent sender that blocks both the group and a specific member
  */
-export function createGroupConsentSender(
+export async function updateInboxConsent(
   worker: Worker,
-  groupId: string,
   memberInboxId: string,
-  blockEntities = true,
-) {
-  return async (): Promise<string> => {
-    console.log(
-      `Setting group consent to ${blockEntities ? "DENIED" : "ALLOWED"}`,
-    );
-    const consentState = blockEntities
-      ? ConsentState.Denied
-      : ConsentState.Allowed;
-    await worker.client.preferences.setConsentStates([
-      {
-        entity: groupId,
-        entityType: ConsentEntityType.GroupId,
-        state: consentState,
-      },
-    ]);
-    await worker.client.preferences.setConsentStates([
-      {
-        entity: memberInboxId,
-        entityType: ConsentEntityType.InboxId,
-        state: consentState,
-      },
-    ]);
-    return "group_consent_updated";
-  };
+): Promise<void> {
+  const getState = await worker.client.preferences.getConsentState(
+    ConsentEntityType.InboxId,
+    memberInboxId,
+  );
+
+  await worker.client.preferences.setConsentStates([
+    {
+      entity: memberInboxId,
+      entityType: ConsentEntityType.InboxId,
+      state:
+        getState === ConsentState.Allowed
+          ? ConsentState.Denied
+          : ConsentState.Allowed,
+    },
+  ]);
 }
 
 // Type guard for sent event with sentAt
@@ -157,6 +115,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   randomSuffix?: string;
   participantsForStats: Worker[];
 }) {
+  await sleep(1000);
   const {
     receivers,
     startCollectors,
@@ -197,7 +156,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       }
     });
   });
-  const averageEventTiming = timingCount > 0 ? timingSum / timingCount : 0;
+  const averageEventTiming = Math.round(
+    timingCount > 0 ? timingSum / timingCount : 0,
+  );
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) =>
       JSON.stringify({
@@ -214,15 +175,27 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       randomSuffix,
     );
   }
+  // Unescape messages for output
+  const unescapedMessages = unescapeMessages(messagesAsStrings);
+  // Transform eventTimings to arrays per name
+  const eventTimingsArray: Record<string, number[]> = {};
+  for (const [name, timingsObj] of Object.entries(eventTimings)) {
+    // Convert keys to numbers and sort
+    const arr = Object.entries(timingsObj)
+      .map(([k, v]) => [parseInt(k, 10), v] as [number, number])
+      .sort((a, b) => a[0] - b[0])
+      .map(([, v]) => v);
+    eventTimingsArray[name] = arr;
+  }
   const allResults = {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
-    messages: messagesAsStrings,
-    eventTimings,
+    messages: unescapedMessages,
+    eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  console.log(JSON.stringify(allResults, null, 2));
+  //console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
@@ -234,12 +207,7 @@ export async function verifyMessageStream(
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-): Promise<
-  VerifyStreamResult & {
-    eventTimings: Record<string, Record<number, number>>;
-    averageEventTiming: number;
-  }
-> {
+): Promise<VerifyStreamResult> {
   const receivers = await filterReceivers(group as Group, participants);
   return collectAndTimeEventsWithStats({
     receivers,
@@ -265,7 +233,7 @@ export async function verifyMessageStream(
 
 const filterReceivers = async (group: Group, participants: Worker[]) => {
   console.log("Waiting for 1 second before starting stream");
-  await sleep(1000);
+
   const creatorId = (await group.metadata()).creatorInboxId;
   return participants.filter((p) => p.client?.inboxId !== creatorId);
 };
@@ -278,12 +246,7 @@ export async function verifyMetadataStream(
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-): Promise<
-  VerifyStreamResult & {
-    eventTimings: Record<string, Record<number, number>>;
-    averageEventTiming: number;
-  }
-> {
+): Promise<VerifyStreamResult> {
   const receivers = await filterReceivers(group, participants);
 
   return collectAndTimeEventsWithStats({
@@ -312,23 +275,41 @@ export async function verifyMetadataStream(
 /**
  * Specialized function to verify consent streams
  */
+export async function verifyGroupConsentStream(
+  group: Group,
+  participants: Worker[],
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers: participants,
+    startCollectors: (r) => r.worker.collectConsentUpdates(1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      for (const p of participants) {
+        await updateGroupConsent(p.client, group);
+      }
+      return [{ key: "consent", sentAt }];
+    },
+    getKey: (ev) => (ev as { key?: string }).key ?? "consent",
+    getMessage: (ev) => (ev as { key?: string }).key ?? "consent",
+    statsLabel: "consent:",
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: participants,
+  });
+}
+/**
+ * Specialized function to verify consent streams
+ */
 export async function verifyConsentStream(
   initiator: Worker,
-  participants: Worker[],
-  action: (inboxId?: string, groupId?: string) => Promise<void>,
-): Promise<
-  VerifyStreamResult & {
-    eventTimings: Record<string, Record<number, number>>;
-    averageEventTiming: number;
-  }
-> {
-  await sleep(1000);
+  receiver: Worker,
+): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
     receivers: [initiator],
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      await action();
+      await updateInboxConsent(initiator, receiver.client.inboxId);
       return [{ key: "consent", sentAt }];
     },
     getKey: (ev) => (ev as { key?: string }).key ?? "consent",
@@ -346,13 +327,7 @@ export async function verifyConsentStream(
 export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
-): Promise<
-  VerifyStreamResult & {
-    eventTimings: Record<string, Record<number, number>>;
-    averageEventTiming: number;
-  }
-> {
-  await sleep(1000);
+): Promise<VerifyStreamResult> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} has no client`);
   }
@@ -384,12 +359,7 @@ export async function verifyConversationStream(
 export async function verifyAddMembersStream(
   group: Group,
   participants: Worker[],
-): Promise<
-  VerifyStreamResult & {
-    eventTimings: Record<string, Record<number, number>>;
-    averageEventTiming: number;
-  }
-> {
+): Promise<VerifyStreamResult> {
   const receivers = await filterReceivers(group, participants);
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   return collectAndTimeEventsWithStats({
@@ -458,4 +428,11 @@ export function calculateMessageStats(
     totalExpectedMessages,
   };
   return stats;
+}
+
+// Utility to unescape a 2D array of JSON strings into objects
+export function unescapeMessages(messagesAsStrings: string[][]): unknown[][] {
+  return messagesAsStrings.map((arr) =>
+    arr.map((str) => JSON.parse(str) as unknown),
+  );
 }

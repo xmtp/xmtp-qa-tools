@@ -2,6 +2,7 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -28,21 +29,19 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let start: number;
 
-  let testStart: number;
-
-  workers = await getWorkers(10, testName, typeofStream.Message);
+  workers = await getWorkers(
+    getRandomNames(10),
+    testName,
+    typeofStream.Message,
+  );
 
   setupTestLifecycle({
     expect,
     workers,
     testName,
     getStart: () => start,
-    setStart: (v) => {
+    setStart: (v: number) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 
@@ -141,7 +140,8 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(dm, [
         workers.getWorkers()[1],
       ]);
-
+      console.log(JSON.stringify(verifyResult, null, 2));
+      start = verifyResult.averageEventTiming;
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -224,6 +224,7 @@ describe(testName, async () => {
         newGroup,
         workers.getWorkers(),
       );
+      start = verifyResult.averageEventTiming;
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -347,6 +348,8 @@ describe(testName, async () => {
           workers.getWorkers(),
           1,
         );
+        start = verifyResult.averageEventTiming;
+        console.log(JSON.stringify(verifyResult, null, 2));
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

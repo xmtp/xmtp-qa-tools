@@ -6,7 +6,11 @@ import {
   TEST_CONFIGS,
   type StressTestConfig,
 } from "@helpers/groups";
-import { logAndSend, validateEnvironment } from "@helpers/tests";
+import {
+  getRandomNames,
+  logAndSend,
+  validateEnvironment,
+} from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   type Client,
@@ -66,7 +70,10 @@ const processMessage = async (
     const config = TEST_CONFIGS[sizeArg];
     console.log(`Creating ${config.workerCount} workers for stress test...`);
 
-    const workers = await getWorkers(config.workerCount, "stressbot");
+    const workers = await getWorkers(
+      getRandomNames(config.workerCount),
+      "stressbot",
+    );
     console.log(`Successfully created ${workers.getWorkers().length} workers`);
 
     await runStressTest(config, workers, client, message, conversation);

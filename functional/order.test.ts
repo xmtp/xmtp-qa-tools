@@ -15,7 +15,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   let start: number;
-  let testStart: number;
+
   workers = await getWorkers(getRandomNames(5), testName);
 
   let group: Group;
@@ -28,10 +28,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
   it("poll_order: verify message order when receiving via pull", async () => {

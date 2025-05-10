@@ -19,7 +19,7 @@ describe(
     workers = await getWorkers(["random1", "random2", "random3"], testName);
 
     let start: number;
-    let testStart: number;
+
     const randomSuffix = Math.random().toString(36).substring(2, 10);
 
     setupTestLifecycle({
@@ -29,10 +29,6 @@ describe(
       getStart: () => start,
       setStart: (v) => {
         start = v;
-      },
-      getTestStart: () => testStart,
-      setTestStart: (v) => {
-        testStart = v;
       },
     });
 

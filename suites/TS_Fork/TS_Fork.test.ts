@@ -1,5 +1,5 @@
 import { closeEnv, loadEnv } from "@helpers/client";
-import { appendToEnv } from "@helpers/tests";
+import { appendToEnv, getRandomNames } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, it } from "vitest";
@@ -50,7 +50,7 @@ describe(TEST_NAME, () => {
     const start = performance.now();
 
     // Initialize workers
-    workers = await getWorkers(testConfig.workers, TEST_NAME);
+    workers = await getWorkers(getRandomNames(testConfig.workers), TEST_NAME);
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getWorkers();
     const allClientIds = [

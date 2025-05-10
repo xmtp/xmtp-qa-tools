@@ -2,12 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import {
-  defaultValues,
-  sdkVersionOptions,
-  sdkVersions,
-  sleep,
-} from "@helpers/tests";
+import { sdkVersionOptions, sdkVersions, sleep } from "@helpers/tests";
 import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, WorkerClient } from "./main";
@@ -331,43 +326,20 @@ export class WorkerManager {
   /**
    * Creates multiple workers at once from descriptors
    */
-  public async createWorkers(
-    descriptorsOrAmount: string[] | number,
-    randomVersions: boolean = false,
-  ): Promise<Worker[]> {
+  public async createWorkers(descriptorsOrAmount: string[]): Promise<Worker[]> {
     let descriptors: string[];
 
     const randomSdkVersionReversed =
       sdkVersionOptions[sdkVersionOptions.length - 1];
 
-    // Handle numeric input (create N default workers)
-    if (typeof descriptorsOrAmount === "number") {
-      const workerNames = defaultValues.defaultNames;
-      descriptors = workerNames.slice(0, descriptorsOrAmount);
-      descriptors = [];
-      for (let i = 0; i < descriptorsOrAmount; i++) {
-        const workerName =
-          defaultValues.defaultNames[i % defaultValues.defaultNames.length];
-        if (randomVersions) {
-          const randomSdkVersion =
-            sdkVersionOptions[
-              Math.floor(Math.random() * sdkVersionOptions.length)
-            ];
-          descriptors.push(`${workerName}-a-${randomSdkVersion}`);
-        } else {
-          descriptors.push(`${workerName}-a-${randomSdkVersionReversed}`);
-        }
-      }
-    } else {
-      descriptors = [];
-      for (const descriptor of descriptorsOrAmount) {
-        if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
-          const name = descriptor.split("-")[0];
-          const installId = descriptor.split("-")[1] ?? "a";
-          descriptors.push(`${name}-${installId}-${randomSdkVersionReversed}`);
-        } else {
-          descriptors.push(descriptor);
-        }
+    descriptors = [];
+    for (const descriptor of descriptorsOrAmount) {
+      if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
+        const name = descriptor.split("-")[0];
+        const installId = descriptor.split("-")[1] ?? "a";
+        descriptors.push(`${name}-${installId}-${randomSdkVersionReversed}`);
+      } else {
+        descriptors.push(descriptor);
       }
     }
 
@@ -383,12 +355,11 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrAmount: string[] | number,
+  descriptors: string[],
   testName: string,
   typeofStreamType: typeofStream = typeofStream.None,
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
-  randomVersions: boolean = false,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
@@ -396,7 +367,7 @@ export async function getWorkers(
     typeOfResponseType,
     env,
   );
-  await manager.createWorkers(descriptorsOrAmount, randomVersions);
+  await manager.createWorkers(descriptors);
 
   manager.printWorkers();
   return manager;
