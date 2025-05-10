@@ -338,7 +338,7 @@ export const initializeClient = async (
     }
   }
 
-  logAgentDetails(clients);
+  void logAgentDetails(clients);
 
   await Promise.all(streamPromises);
   return clients;

@@ -547,7 +547,7 @@ class WorkerManager {
       }
     }
 
-    logAgentDetails(clients);
+    void logAgentDetails(clients);
 
     return clients;
   }
