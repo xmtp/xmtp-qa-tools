@@ -1,14 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import {
-  createGroupConsentSender,
-  verifyConsentStream,
-} from "@helpers/streams";
+import { verifyConsentStream } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { ConsentEntityType } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "consent";
