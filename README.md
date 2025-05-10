@@ -141,7 +141,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
 | 400  | 7015.99    | 1586.66     | ⚠️ Performance Concern |
 
-_Note: `syncAll` is measured only as the first cold start of the client._
+_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox)._
 
 ### Other Group Operations Performance
 
@@ -170,7 +170,7 @@ _Note: This measurments are taken only from the sender side._
 | 350        | 99.50                | 191.75                 | 522.25                 | ⚠️ Performance Concern |
 | 400        | 98.00                | 203.25                 | 537.50                 | ⚠️ Performance Concern |
 
-_Note: This measurements are taken only from the receiver side and type of stream at the time of testing._
+_Note: This measurements are taken only from the receiver side (fresh inbox) and type of stream at the time of testing._
 
 ## Networks performance
 
