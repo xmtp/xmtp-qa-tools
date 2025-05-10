@@ -9,26 +9,38 @@ export const setupTestLifecycle = ({
   testName,
   getStart,
   setStart,
+  getCustomDuration,
+  setCustomDuration,
 }: {
   expect: ExpectStatic;
   workers: WorkerManager;
   testName: string;
   getStart: () => number;
   setStart: (v: number) => void;
+  getCustomDuration?: () => number | undefined;
+  setCustomDuration?: (v: number | undefined) => void;
 }) => {
   beforeEach(() => {
     const currentTestName = expect.getState().currentTestName;
     console.time(currentTestName);
     setStart(performance.now());
+    if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });
 
   afterEach(function () {
     const start = getStart();
     const testName = expect.getState().currentTestName ?? "";
     const libXmtpVersion = workers.getVersion();
-    const duration = performance.now() - start;
+    let duration = performance.now() - start;
+    if (getCustomDuration) {
+      const customDuration = getCustomDuration();
+      if (typeof customDuration === "number") {
+        duration = customDuration;
+      }
+    }
     void sendPerformanceMetric(duration, testName, libXmtpVersion, false);
     setStart(0);
+    if (setCustomDuration) setCustomDuration(undefined); // Reset after each test if available
   });
 
   afterAll(async () => {

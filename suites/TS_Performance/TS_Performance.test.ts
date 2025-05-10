@@ -28,6 +28,11 @@ describe(testName, async () => {
   let dm: Conversation;
   let workers: WorkerManager;
   let start: number;
+  let customDuration: number | undefined = undefined;
+  const setCustomDuration = (duration: number | undefined) => {
+    customDuration = duration;
+  };
+  const getCustomDuration = () => customDuration;
 
   workers = await getWorkers(
     getRandomNames(10),
@@ -43,6 +48,8 @@ describe(testName, async () => {
     setStart: (v: number) => {
       start = v;
     },
+    getCustomDuration,
+    setCustomDuration,
   });
 
   it("clientCreate: should measure creating a client", async () => {
@@ -140,7 +147,7 @@ describe(testName, async () => {
       const verifyResult = await verifyMessageStream(dm, [
         workers.getWorkers()[1],
       ]);
-      start = verifyResult.averageEventTiming;
+      setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -223,7 +230,7 @@ describe(testName, async () => {
         newGroup,
         workers.getWorkers(),
       );
-      start = verifyResult.averageEventTiming;
+      setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -346,7 +353,7 @@ describe(testName, async () => {
           newGroup,
           workers.getWorkers(),
         );
-        start = verifyResult.averageEventTiming;
+        setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
