@@ -119,24 +119,14 @@ function hasSentAt(obj: unknown): obj is { sentAt: number } {
 }
 
 function extractContent(ev: unknown): string {
-  if (typeof ev === "object" && ev !== null) {
-    if ("message" in ev) {
-      const msg = (ev as { message?: unknown }).message;
-      if (
-        typeof msg === "object" &&
-        msg !== null &&
-        "content" in msg &&
-        typeof (msg as { content?: unknown }).content === "string"
-      ) {
-        return (msg as { content: string }).content;
-      }
-    }
-    if (
-      "content" in ev &&
-      typeof (ev as { content?: unknown }).content === "string"
-    ) {
-      return (ev as { content: string }).content;
-    }
+  // Only support { content: string }
+  if (
+    typeof ev === "object" &&
+    ev !== null &&
+    "content" in ev &&
+    typeof (ev as { content: unknown }).content === "string"
+  ) {
+    return (ev as { content: string }).content;
   }
   return "";
 }
@@ -280,67 +270,32 @@ export async function verifyMetadataStream(
   const receivers = await filterReceivers(group, participants);
   // Extract group name from received event
   function extractGroupName(ev: unknown): string {
-    let obj: unknown = ev;
-    if (typeof ev === "string") {
-      try {
-        obj = JSON.parse(ev);
-      } catch {
-        return "";
-      }
-    }
-    // New event shape: { group: { name: string } }
-    if (
-      typeof obj === "object" &&
-      obj !== null &&
-      "group" in obj &&
-      typeof (obj as any).group === "object" &&
-      (obj as any).group !== null &&
-      "name" in (obj as any).group &&
-      typeof (obj as any).group.name === "string"
-    ) {
-      const groupName: unknown = (obj as any).group.name;
-      if (typeof groupName === "string") {
-        return groupName;
-      }
-    }
-    // Old event shape: { content: { metadataFieldChanges: [...] } }
-    if (
-      typeof obj === "object" &&
-      obj !== null &&
-      "content" in obj &&
-      typeof (obj as any).content === "object" &&
-      (obj as any).content !== null &&
-      "metadataFieldChanges" in (obj as any).content &&
-      Array.isArray((obj as any).content.metadataFieldChanges)
-    ) {
-      const changes: unknown[] = (obj as any).content.metadataFieldChanges;
-      for (const c of changes) {
-        if (
-          typeof c === "object" &&
-          c !== null &&
-          "fieldName" in c &&
-          (c as any).fieldName === "group_name" &&
-          "newValue" in c &&
-          typeof (c as any).newValue === "string"
-        ) {
-          const newValue: unknown = (c as any).newValue;
-          if (typeof newValue === "string") {
-            return newValue;
+    // Only support { content: { metadataFieldChanges: [{ fieldName: 'group_name', newValue: string }] } }
+    type MetadataChange = { fieldName: string; newValue: string };
+    type MetadataContent = { metadataFieldChanges: MetadataChange[] };
+    if (typeof ev === "object" && ev !== null && "content" in ev) {
+      const content = (ev as { content: unknown }).content;
+      if (
+        typeof content === "object" &&
+        content !== null &&
+        "metadataFieldChanges" in content &&
+        Array.isArray(
+          (content as { metadataFieldChanges: unknown }).metadataFieldChanges,
+        )
+      ) {
+        const changes = (content as MetadataContent).metadataFieldChanges;
+        for (const c of changes) {
+          if (
+            typeof c === "object" &&
+            c !== null &&
+            "fieldName" in c &&
+            (c as { fieldName: unknown }).fieldName === "group_name" &&
+            "newValue" in c &&
+            typeof (c as { newValue: unknown }).newValue === "string"
+          ) {
+            return c.newValue;
           }
         }
-      }
-      return "";
-    }
-    // Sent event shape: { name: string }
-    if (
-      typeof obj === "object" &&
-      obj !== null &&
-      "name" in obj &&
-      typeof (obj as any).name === "string"
-    ) {
-      const nameValue: unknown = (obj as any).name;
-      if (typeof nameValue === "string") {
-        return nameValue;
       }
     }
     return "";
