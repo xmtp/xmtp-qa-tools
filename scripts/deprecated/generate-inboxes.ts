@@ -6,7 +6,6 @@ import {
   getEncryptionKeyFromHex,
 } from "@helpers/client";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
-import { C } from "vitest/dist/chunks/reporters.d.DG9VKi4m.js";
 
 const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";

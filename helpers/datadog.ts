@@ -1,6 +1,5 @@
 import { exec } from "child_process";
 import { promisify } from "util";
-import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
 // Types definitions

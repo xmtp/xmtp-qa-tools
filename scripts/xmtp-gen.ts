@@ -161,6 +161,7 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
   try {
     generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
   } catch (e) {
+    console.log(e);
     console.error(`Error: Could not read input file: ${inputFile}`);
     return;
   }
@@ -183,7 +184,7 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
     try {
       const signer = createSigner(inbox.privateKey as `0x${string}`);
       const dbEncryptionKey = getEncryptionKeyFromHex(
-        inbox.dbEncryptionKey || inbox.encryptionKey,
+        inbox.dbEncryptionKey as string,
       );
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
       console.log(

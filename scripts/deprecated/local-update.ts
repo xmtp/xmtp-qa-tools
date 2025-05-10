@@ -70,7 +70,7 @@ async function main() {
       const signer = createSigner(inbox.privateKey as `0x${string}`);
 
       // Get encryption key from hex
-      const dbEncryptionKey = getEncryptionKeyFromHex(inbox.encryptionKey);
+      const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
 
       // Create a database path in the logs directory
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
@@ -99,7 +99,7 @@ async function main() {
         accountAddress: inbox.accountAddress,
         inboxId: client.inboxId,
         privateKey: inbox.privateKey,
-        encryptionKey: inbox.encryptionKey,
+        dbEncryptionKey: inbox.dbEncryptionKey,
         dbPath: dbPath,
       });
 
