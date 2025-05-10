@@ -110,23 +110,35 @@ export function createGroupConsentSender(
 
 // Type guard for sent event with sentAt
 function hasSentAt(obj: unknown): obj is { sentAt: number } {
-  return (
-    typeof obj === "object" &&
-    obj !== null &&
-    "sentAt" in obj &&
-    typeof obj.sentAt === "number"
-  );
+  return (obj as { sentAt: number }).sentAt !== undefined;
 }
-
+function extractGroupName(ev: unknown): string {
+  const event = ev as {
+    content?: {
+      metadataFieldChanges?: Array<{ fieldName: string; newValue: string }>;
+    };
+  };
+  const changes = event.content?.metadataFieldChanges || [];
+  const nameChange = changes.find((c) => c.fieldName === "group_name");
+  return nameChange?.newValue || "";
+}
 function extractContent(ev: unknown): string {
-  // Only support { content: string }
-  if (
-    typeof ev === "object" &&
-    ev !== null &&
-    "content" in ev &&
-    typeof (ev as { content: unknown }).content === "string"
-  ) {
-    return (ev as { content: string }).content;
+  if (typeof ev === "object" && ev !== null) {
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "content") &&
+      typeof (ev as Record<string, unknown>).content === "string"
+    ) {
+      return (ev as Record<string, string>).content;
+    }
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "message") &&
+      typeof (ev as Record<string, unknown>).message === "object" &&
+      (ev as Record<string, unknown>).message !== null &&
+      typeof (ev as { message: { content?: unknown } }).message.content ===
+        "string"
+    ) {
+      return (ev as { message: { content: string } }).message.content;
+    }
   }
   return "";
 }
@@ -155,13 +167,14 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     randomSuffix,
   } = options;
   const collectPromises: Promise<
-    { key: string; receivedAt: number; message: string }[]
+    { key: string; receivedAt: number; message: string; event: unknown }[]
   >[] = receivers.map((r) =>
     startCollectors(r).then((events) =>
       events.map((ev) => ({
         key: getKey(ev),
         receivedAt: Date.now(),
         message: getMessage(ev),
+        event: ev,
       })),
     ),
   );
@@ -186,7 +199,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   });
   const averageEventTiming = timingCount > 0 ? timingSum / timingCount : 0;
   const messagesAsStrings = allReceived.map((msgs) =>
-    msgs.map((m) => m.message),
+    msgs.map((m) =>
+      JSON.stringify({
+        event: m.event,
+      }),
+    ),
   );
   let stats;
   if (randomSuffix && messagesAsStrings.length > 0) {
@@ -268,38 +285,7 @@ export async function verifyMetadataStream(
   }
 > {
   const receivers = await filterReceivers(group, participants);
-  // Extract group name from received event
-  function extractGroupName(ev: unknown): string {
-    // Only support { content: { metadataFieldChanges: [{ fieldName: 'group_name', newValue: string }] } }
-    type MetadataChange = { fieldName: string; newValue: string };
-    type MetadataContent = { metadataFieldChanges: MetadataChange[] };
-    if (typeof ev === "object" && ev !== null && "content" in ev) {
-      const content = (ev as { content: unknown }).content;
-      if (
-        typeof content === "object" &&
-        content !== null &&
-        "metadataFieldChanges" in content &&
-        Array.isArray(
-          (content as { metadataFieldChanges: unknown }).metadataFieldChanges,
-        )
-      ) {
-        const changes = (content as MetadataContent).metadataFieldChanges;
-        for (const c of changes) {
-          if (
-            typeof c === "object" &&
-            c !== null &&
-            "fieldName" in c &&
-            (c as { fieldName: unknown }).fieldName === "group_name" &&
-            "newValue" in c &&
-            typeof (c as { newValue: unknown }).newValue === "string"
-          ) {
-            return c.newValue;
-          }
-        }
-      }
-    }
-    return "";
-  }
+
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>

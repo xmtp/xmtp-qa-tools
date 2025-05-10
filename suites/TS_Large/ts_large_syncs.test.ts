@@ -9,7 +9,6 @@ import {
   TS_LARGE_BATCH_SIZE,
   ts_large_createGroup,
   TS_LARGE_TOTAL,
-  TS_LARGE_WORKER_COUNT,
   type SummaryEntry,
 } from "./helpers";
 
@@ -25,7 +24,11 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(TS_LARGE_WORKER_COUNT, testName, steamsToTest);
+  workers = await getWorkers(
+    TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE,
+    testName,
+    steamsToTest,
+  );
 
   setupTestLifecycle({
     expect,
@@ -46,21 +49,23 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
+    it(`verifySyncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
       try {
         await ts_large_createGroup(workers, i, true);
+        // Select one worker per batch (round-robin)
+        const allWorkers = workers.getWorkers();
+        const workerIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
+        console.log("workerIdx", workerIdx);
+        const worker = allWorkers[workerIdx];
         const syncStart = performance.now();
-        let tracAll = [];
-        for (const worker of workers.getWorkers()) {
-          await worker.client.conversations.syncAll();
-          const syncTimeMs = performance.now() - syncStart;
-          tracAll.push(syncTimeMs);
-        }
+        await worker.client.conversations.syncAll();
+        const syncTimeMs = performance.now() - syncStart;
 
-        // Save metrics
+        // Save metrics, including worker name/installationId
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          syncTimeMs: tracAll.reduce((a, b) => a + b, 0) / tracAll.length,
+          syncTimeMs,
+          workerName: `${worker.name}-${worker.installationId}`,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

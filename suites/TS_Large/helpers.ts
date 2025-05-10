@@ -14,6 +14,7 @@ export interface SummaryEntry {
   conversationStreamTimeMs?: number;
   syncTimeMs?: number;
   createTimeMs?: number;
+  workerName?: string;
 }
 
 export const ts_large_createGroup = async (

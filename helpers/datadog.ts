@@ -216,63 +216,6 @@ function findMemberBucket(members: number): string {
 }
 
 /**
- * Get the appropriate threshold for an operation based on type, member count, and region
- */
-export function getThresholdForOperation(
-  operation: string,
-  operationType: OperationType,
-  members: number = 0,
-  region: string = "us-east",
-): number {
-  // Normalize inputs
-  const operationLower = operation.toLowerCase();
-  const regionNormalized = region.toLowerCase().trim();
-  const regionMultiplier =
-    THRESHOLDS.regionMultipliers[
-      regionNormalized as keyof typeof THRESHOLDS.regionMultipliers
-    ] || 1.0;
-
-  let baseThreshold = 0;
-
-  if (operationType === "network") {
-    const networkThreshold =
-      THRESHOLDS.network[operationLower as keyof typeof THRESHOLDS.network];
-    baseThreshold =
-      typeof networkThreshold === "number"
-        ? networkThreshold
-        : THRESHOLDS.network.server_call;
-  } else if (operationType === "core") {
-    baseThreshold =
-      THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-  } else if (operationType === "group" && members > 0) {
-    const applicableBucket = findMemberBucket(members);
-    const memberThresholds =
-      THRESHOLDS.memberBasedThresholds[
-        applicableBucket as keyof typeof THRESHOLDS.memberBasedThresholds
-      ];
-
-    if (memberThresholds && operationLower in memberThresholds) {
-      baseThreshold =
-        memberThresholds[operationLower as keyof typeof memberThresholds];
-      // console.log(
-      //   `Operation: ${operation}, members: ${members}, bucket: ${applicableBucket}, threshold: ${baseThreshold}`,
-      // );
-    } else {
-      baseThreshold =
-        THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-      console.log(
-        `Operation: ${operation}, members: ${members}, using core threshold: ${baseThreshold}`,
-      );
-    }
-  } else {
-    baseThreshold =
-      THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-  }
-
-  return Math.round(baseThreshold * regionMultiplier);
-}
-
-/**
  * Calculate average of numeric values
  */
 export function calculateAverage(values: number[]): number {
@@ -509,15 +452,6 @@ export async function sendPerformanceMetric(
       members,
     } = parseTestName(testName);
 
-    const threshold = getThresholdForOperation(
-      operationName,
-      operationType as OperationType,
-      parseInt(members) || 0,
-      state.currentGeo,
-    );
-
-    const isSuccess = metricValue <= threshold;
-
     sendMetric("duration", metricValue, {
       libxmtp: libXmtpVersion,
       operation: operationName,
@@ -526,8 +460,6 @@ export async function sendPerformanceMetric(
       metric_subtype: operationType,
       description: metricDescription,
       members: members,
-      success: isSuccess.toString(),
-      threshold: threshold.toString(),
       region: state.currentGeo,
     });
 
@@ -539,12 +471,6 @@ export async function sendPerformanceMetric(
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const networkMetricValue = Math.round(statValue * 1000);
         const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
-        const networkThreshold = getThresholdForOperation(
-          networkPhase,
-          "network",
-          parseInt(members) || 0,
-          state.currentGeo,
-        );
 
         sendMetric("duration", networkMetricValue, {
           libxmtp: libXmtpVersion,
@@ -554,8 +480,6 @@ export async function sendPerformanceMetric(
           network_phase: networkPhase,
           country_iso_code: countryCode,
           members: members,
-          success: networkMetricValue <= networkThreshold ? "true" : "false",
-          threshold: networkThreshold.toString(),
           region: state.currentGeo,
         });
       }
