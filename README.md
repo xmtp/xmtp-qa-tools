@@ -128,9 +128,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | sendGroupMessage         | Sending a group message                | 85.27    | <200ms | ✅ On Target           |
 | receiveGroupMessage      | Processing group message streams       | 124.00   | <200ms | ✅ On Target           |
 
-### Group Operations Performance by Size
-
-#### Group Creation & Sync Performance
+### Group Creation & SyncAll Performance
 
 | Size | Create(ms) | SyncAll(ms) | Status                 |
 | ---- | ---------- | ----------- | ---------------------- |
@@ -145,7 +143,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: `syncAll` is measured only as the first cold start of the client._
 
-#### Other Group Operations Performance
+### Other Group Operations Performance
 
 | Size | Send message (ms) | Update name (ms) | Remove members (ms) | Status       |
 | ---- | ----------------- | ---------------- | ------------------- | ------------ |
@@ -159,7 +157,7 @@ _Note: `syncAll` is measured only as the first cold start of the client._
 
 _Note: This measurments are taken only from the sender side._
 
-#### Group stream performance
+### Group stream performance
 
 | Group Size | Message (ms) | Metadata (ms) | New Members (ms) | Status                 |
 | ---------- | ------------ | ------------- | ---------------- | ---------------------- |
