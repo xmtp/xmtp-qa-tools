@@ -20,7 +20,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let start: number;
   let testStart: number;
-  let group: Conversation;
+  let group: Group;
   const names = ["henry", "randomguy", "bob", "alice", "dave"];
   let workers = await getWorkers(names, testName, typeofStream.None);
 
@@ -42,14 +42,25 @@ describe(testName, async () => {
   // Create a group before all tests
   beforeAll(async () => {
     // Initialize workers
-    group = await workers
-      .getWorkers()[0]
-      .client.conversations.newGroup([
-        workers.get("randomguy")!.client.inboxId,
-        workers.get("bob")!.client.inboxId,
-        workers.get("alice")!.client.inboxId,
-        workers.get("dave")!.client.inboxId,
-      ]);
+    group = await workers.getWorkers()[0].client.conversations.newGroup([]);
+  });
+
+  it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
+    try {
+      // Initialize fresh workers specifically for conversation stream testing
+      workers = await getWorkers(names, testName, typeofStream.Conversation);
+
+      // Use the dedicated conversation stream verification helper with 80% success threshold
+      const verifyResult = await verifyConversationGroupStream(
+        group,
+        workers.getWorkers(),
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
   });
   it("verifyMessageStream: should measure receiving a gm", async () => {
     try {
@@ -116,32 +127,11 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
-    try {
-      // Initialize fresh workers specifically for conversation stream testing
-      workers = await getWorkers(names, testName, typeofStream.Conversation);
-
-      console.log("Testing conversation stream with adding members");
-      const newGroup = await workers
-        .getWorkers()[0]
-        .client.conversations.newGroup([]);
-      // Use the dedicated conversation stream verification helper with 80% success threshold
-      const verifyResult = await verifyConversationGroupStream(
-        newGroup,
-        workers.getWorkers(),
-      );
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
 
   it("verifyGroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      const verifyResult = await verifyGroupUpdateStream(group as Group, [
+      const verifyResult = await verifyGroupUpdateStream(group, [
         workers.get("randomguy")!,
       ]);
 
