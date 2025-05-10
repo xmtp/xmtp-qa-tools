@@ -16,6 +16,7 @@ const testName = "TS_Large";
 loadEnv(testName);
 
 describe(testName, async () => {
+  const workersCount = 5;
   const batchSize = 50;
   const total = 400;
   let workers: WorkerManager;
@@ -23,7 +24,7 @@ describe(testName, async () => {
   let hasFailures: boolean = false;
   let testStart: number;
   let newGroup: Conversation;
-  const steamsToTest = [typeofStream.GroupUpdated];
+  const steamsToTest = [typeofStream.None];
 
   // Hold timing metrics per group size
   interface SummaryEntry {
@@ -32,11 +33,12 @@ describe(testName, async () => {
     groupUpdatedStreamTimeMs?: number;
     conversationStreamTimeMs?: number;
     syncTimeMs?: number;
+    createTimeMs?: number;
   }
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(10, testName, steamsToTest[0]);
+  workers = await getWorkers(workersCount, testName, steamsToTest[0]);
 
   setupTestLifecycle({
     expect,
@@ -71,21 +73,38 @@ describe(testName, async () => {
           `Created group with ${i} participants in ${creationTimeMs.toFixed(2)}ms`,
         );
 
-        if (
-          steamsToTest.includes(typeofStream.Message) ||
-          steamsToTest.includes(typeofStream.GroupUpdated)
-        ) {
-          const workersInboxIds = workers
-            .getWorkers()
-            .map((worker) => worker.inboxId);
-
-          await (newGroup as Group).addMembers(workersInboxIds);
-        }
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          createTimeMs: creationTimeMs,
+        };
       } catch (e) {
         hasFailures = logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
+
+    if (
+      steamsToTest.includes(typeofStream.Message) ||
+      steamsToTest.includes(typeofStream.GroupUpdated) ||
+      steamsToTest.includes(typeofStream.None)
+    ) {
+      it(`addMembers-${i}: should add members to group`, async () => {
+        try {
+          console.log("Adding members to group");
+          const workersInboxIds = workers
+            .getWorkers()
+            .map((worker) => worker.inboxId);
+
+          await (newGroup as Group).addMembers(workersInboxIds);
+          console.log(
+            `Successfully added ${workersInboxIds.length} members to the group`,
+          );
+        } catch (e) {
+          hasFailures = logError(e, expect.getState().currentTestName);
+          throw e;
+        }
+      });
+    }
 
     if (steamsToTest.includes(typeofStream.Conversation)) {
       it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
@@ -121,7 +140,11 @@ describe(testName, async () => {
     } else if (steamsToTest.includes(typeofStream.GroupUpdated)) {
       it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
         try {
-          workers = await getWorkers(10, testName, typeofStream.GroupUpdated);
+          workers = await getWorkers(
+            workersCount,
+            testName,
+            typeofStream.GroupUpdated,
+          );
           const verifyResult = await verifyGroupUpdateStream(
             newGroup as Group,
             workers.getWorkers(),
@@ -152,7 +175,11 @@ describe(testName, async () => {
     } else if (steamsToTest.includes(typeofStream.Message)) {
       it(`receiveLargeGroupMessage-${i}: should create a group and measure all streams`, async () => {
         try {
-          workers = await getWorkers(10, testName, typeofStream.Message);
+          workers = await getWorkers(
+            workersCount,
+            testName,
+            typeofStream.Message,
+          );
           const verifyResult = await verifyMessageStream(
             newGroup,
             workers.getWorkers(),
@@ -180,24 +207,26 @@ describe(testName, async () => {
           throw e;
         }
       });
+    } else if (steamsToTest.includes(typeofStream.None)) {
+      it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
+        try {
+          const syncStart = performance.now();
+          for (const worker of workers.getWorkers()) {
+            await worker.client.conversations.sync();
+          }
+          const syncTimeMs = performance.now() - syncStart;
+
+          // Save metrics
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            syncTimeMs: (summaryMap[i]?.syncTimeMs ?? 0 + syncTimeMs) / 2,
+          };
+        } catch (e) {
+          hasFailures = logError(e, expect.getState().currentTestName);
+          throw e;
+        }
+      });
     }
-
-    it(`verifySyncAll-${i}: should verify all streams and measure sync time per worker`, async () => {
-      try {
-        const syncStart = performance.now();
-        await workers.getWorkers()[0].client.conversations.sync();
-        const syncTimeMs = performance.now() - syncStart;
-
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          syncTimeMs,
-        };
-      } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
   }
 
   // After all tests have run, output a concise summary of all timings per group size
@@ -219,6 +248,7 @@ describe(testName, async () => {
         groupUpdatedStreamTimeMs,
         conversationStreamTimeMs,
         syncTimeMs,
+        createTimeMs,
       } = entry;
 
       console.log(
@@ -232,6 +262,10 @@ describe(testName, async () => {
           (conversationStreamTimeMs !== undefined
             ? `Conversation: ${conversationStreamTimeMs.toFixed(2)} ms; `
             : ""),
+        createTimeMs !== undefined
+          ? `Create: ${createTimeMs.toFixed(2)} ms; `
+          : "",
+        syncTimeMs !== undefined ? `Sync: ${syncTimeMs.toFixed(2)} ms; ` : "",
       );
     }
     console.log("==========================================\n");

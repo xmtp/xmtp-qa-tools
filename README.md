@@ -141,14 +141,14 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 | Group Size | Message (ms) | Metadata (ms) | Conversations (ms) | Status                 |
 | ---------- | ------------ | ------------- | ------------------ | ---------------------- |
-| 50         | 74           | 117           | 352                | ✅ On Target           |
-| 100        | 18           | 115           | 426                | ✅ On Target           |
-| 150        | 62           | 203           | 460                | ✅ On Target           |
-| 200        | 1661         | 1568          | 497                | ⚠️ Performance Concern |
-| 250        | 3834         | 3761          | 499                | ⚠️ Performance Concern |
-| 300        | 6622         | 6973          | 501                | ❌ Performance Issue   |
-| 350        | 9536         | 9278          | 562                | ❌ Performance Issue   |
-| 400        | 11922        | 11674         | 617                | ❌ Performance Issue   |
+| 50         | 54.41        | 277.61        | 352                | ✅ On Target           |
+| 100        | 22.50        | 200.93        | 426                | ✅ On Target           |
+| 150        | 0.82         | 277.94        | 460                | ✅ On Target           |
+| 200        | 2.29         | 1317.68       | 497                | ⚠️ Performance Concern |
+| 250        | 0.69         | 248.28        | 499                | ✅ On Target           |
+| 300        | 31.44        | 672.61        | 501                | ⚠️ Performance Concern |
+| 350        | 0.65         | 256.88        | 562                | ✅ On Target           |
+| 400        | 110.21       | 115.76        | 617                | ✅ On Target           |
 
 _Note: Based on data from measured operations in the `us-east` region and `production` network._
 
