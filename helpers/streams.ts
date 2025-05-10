@@ -398,7 +398,10 @@ export async function verifyAddMembersStream(
 ): Promise<VerifyStreamResult> {
   // Filter out the initiator from participants for the check
   const receivers = await filterReceivers(group, participants);
-  console.log(receivers.map((r) => r.name));
+  console.log(
+    `[${group.id}] Workers listening for conversation updates:`,
+    receivers.map((r) => r.name),
+  );
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   // Set up collector promises with a longer timeout (20 seconds)
   const participantPromises: Promise<string[]>[] = receivers.map(

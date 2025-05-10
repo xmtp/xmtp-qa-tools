@@ -86,14 +86,16 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Testing details
 
+> Baseline is `us-east` region and `production` network.
+
 - Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
 - 30-minute automated test execution intervals
 - Comprehensive data aggregation in datadog
 - Testing directly on top of SDKs for real-world scenarios
 - `dev` and `production` network covered
 - Automated testing for web app `xmtp.chat`
-- Manual testing for react native app
-- Human & agents testing for real-world simulations
+- Manual testing for react native apps
+- Simulated agent testing for real-world simulations
 
 ### TLDR: Metrics
 
@@ -150,7 +152,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | 350        | 0.65         | 256.88        | 562                | ✅ On Target           |
 | 400        | 110.21       | 115.76        | 617                | ✅ On Target           |
 
-_Note: Based on data from measured operations in the `us-east` region and `production` network._
+_Note: Based on running one type of stream at a time._
 
 ## Networks performance
 
@@ -163,8 +165,6 @@ _Note: Based on data from measured operations in the `us-east` region and `produ
 | TLS Handshake      | 124.11ms avg        | <150ms | ✅ On Target |
 | Processing         | 35.17ms avg         | <100ms | ✅ On Target |
 | Server Call        | 159.22ms avg        | <250ms | ✅ On Target |
-
-_Note: Performance metrics based on `us-east` testing on `production` network._
 
 ### Regional Network Performance
 
