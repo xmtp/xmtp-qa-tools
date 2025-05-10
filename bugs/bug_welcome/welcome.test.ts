@@ -1,8 +1,8 @@
 import { loadEnv } from "@helpers/client";
-import { getFixedNames, getRandomNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import type { Client, Group } from "@xmtp/node-sdk";
+import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "bug_welcome";
