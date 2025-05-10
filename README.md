@@ -9,7 +9,7 @@
 | 👋 Gm             | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                               | Every 30 min  | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm.test.ts)                      |
 | 🌎 Geolocation    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Geolocation.yml)             | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_Geolocation.yml)       |
 | 🔍 agent-examples | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/check-agent-examples.yml) | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/check-agent-examples.yml) |
-| 🔍 TS_Group       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Group.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Group.yml)                         | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_Group.yml)             |
+| 🔍 TS_Large       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml)                         | Every 30 min  | [Workflow](https://github.com/xmtp/xmtp-qa-testing/blob/main/.github/workflows/TS_Large.yml)             |
 
 ## Testing scope
 
