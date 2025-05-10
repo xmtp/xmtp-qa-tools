@@ -256,14 +256,14 @@ export async function sendPerformanceMetric(
       members: members,
       region: state.currentGeo,
     };
-    if (operationName.toLowerCase().includes("receive")) {
-      console.log(
-        "metricValue",
-        metricValue,
-        "values",
-        JSON.stringify(values, null, 2),
-      );
-    }
+    // if (operationName.toLowerCase().includes("receive")) {
+    //   console.log(
+    //     "metricValue",
+    //     metricValue,
+    //     "values",
+    //     JSON.stringify(values, null, 2),
+    //   );
+    // }
     sendMetric("duration", metricValue, values);
 
     // Network stats handling
