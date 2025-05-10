@@ -12,7 +12,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "streams";
 loadEnv(testName);
@@ -144,7 +144,7 @@ describe(testName, async () => {
       // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyAddMembersStream(
         group as Group,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
       );
 
       expect(verifyResult.allReceived).toBe(true);

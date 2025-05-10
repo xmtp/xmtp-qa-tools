@@ -193,7 +193,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  console.log(JSON.stringify(allResults, null, 2));
+  //console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
