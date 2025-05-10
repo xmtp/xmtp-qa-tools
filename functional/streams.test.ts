@@ -153,9 +153,9 @@ describe(testName, async () => {
   });
 
   it("verifyConsentStream: manage consent for all members in a group", async () => {
-    workers = await getWorkers(names, testName, typeofStream.Consent);
-
     try {
+      workers = await getWorkers(names, testName, typeofStream.Consent);
+
       const groupConsentSender = createGroupConsentSender(
         workers.getWorkers()[0], // henry is doing the consent update
         group.id, // for this group
