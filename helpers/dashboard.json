@@ -232,7 +232,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 1, "width": 6, "height": 4 }
+      "layout": { "x": 0, "y": 1, "width": 6, "height": 2 }
     },
     {
       "id": 4980151126779186,
@@ -241,6 +241,7 @@
         "show_legend": true,
         "legend_layout": "auto",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -249,7 +250,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members, metric_subtype:core} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members, metric_subtype:core, test:ts_performance} by {operation}"
               }
             ],
             "response_format": "timeseries",
@@ -270,68 +271,6 @@
         ]
       },
       "layout": { "x": 6, "y": 1, "width": 6, "height": 4 }
-    },
-    {
-      "id": 403905557672626,
-      "definition": {
-        "title": "Xmtp sdk performance by country",
-        "title_size": "16",
-        "title_align": "left",
-        "type": "geomap",
-        "requests": [
-          {
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call} by {country_iso_code}"
-              }
-            ],
-            "response_format": "scalar",
-            "formulas": [
-              { "alias": "Server call duration (ms)", "formula": "query1" }
-            ]
-          }
-        ],
-        "style": { "palette": "green_to_orange", "palette_flip": false },
-        "view": { "focus": "WORLD" }
-      },
-      "layout": { "x": 0, "y": 5, "width": 6, "height": 3 }
-    },
-    {
-      "id": 7177057798083011,
-      "definition": {
-        "title": "Group operations by size (Cumulative Progress)",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "formulas": [{ "formula": "cumsum(query1)" }],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members, metric_subtype:group} by {members}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "yaxis": {
-          "label": "Cumulative Duration",
-          "scale": "linear",
-          "include_zero": true
-        }
-      },
-      "layout": { "x": 6, "y": 5, "width": 6, "height": 4 }
     },
     {
       "id": 3075918014507898,
@@ -367,7 +306,131 @@
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 0, "y": 8, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 3, "width": 6, "height": 2 }
+    },
+    {
+      "id": 403905557672626,
+      "definition": {
+        "title": "Xmtp sdk performance by country",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "geomap",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.duration{metric_type:network,network_phase:server_call} by {country_iso_code}"
+              }
+            ],
+            "response_format": "scalar",
+            "formulas": [
+              { "alias": "Server call duration (ms)", "formula": "query1" }
+            ]
+          }
+        ],
+        "style": { "palette": "green_to_orange", "palette_flip": false },
+        "view": { "focus": "WORLD" }
+      },
+      "layout": { "x": 0, "y": 5, "width": 6, "height": 4 }
+    },
+    {
+      "id": 5871193681027559,
+      "definition": {
+        "title": "XMTP Delivery Rate & Order Correlation",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": {},
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [
+              { "formula": "query1", "alias": "Stream Delivery" },
+              { "formula": "query2", "alias": "Poll Delivery" },
+              { "formula": "query3", "alias": "Recovery Delivery" }
+            ],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query3",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
+              }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          },
+          {
+            "formulas": [
+              { "formula": "query4", "alias": "Stream Order" },
+              { "formula": "query5", "alias": "Poll Order" },
+              { "formula": "query6", "alias": "Recovery Order" }
+            ],
+            "queries": [
+              {
+                "name": "query4",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query5",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
+              },
+              {
+                "name": "query6",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
+              }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "dashed",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ],
+        "yaxis": {
+          "label": "Percentage (%)",
+          "include_zero": false,
+          "scale": "linear",
+          "min": "95",
+          "max": "100"
+        },
+        "markers": [
+          {
+            "label": "Target Order Correlation",
+            "value": "y = 99",
+            "display_type": "info dashed"
+          },
+          {
+            "label": "Target Delivery Rate",
+            "value": "y = 98",
+            "display_type": "warning dashed"
+          }
+        ]
+      },
+      "layout": { "x": 6, "y": 5, "width": 6, "height": 4 }
     },
     {
       "id": 1234567890123456,
@@ -395,122 +458,7 @@
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 6, "y": 9, "width": 6, "height": 4 }
-    },
-    {
-      "id": 2728971946510230,
-      "definition": {
-        "title": "Test uptime percentage",
-        "type": "treemap",
-        "requests": [
-          {
-            "response_format": "scalar",
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.workflow{$test} by {test}",
-                "aggregator": "avg"
-              }
-            ],
-            "style": { "palette": "green_to_red" },
-            "formulas": [{ "alias": "Uptime %", "formula": "query1 * 100" }]
-          }
-        ]
-      },
-      "layout": { "x": 0, "y": 11, "width": 6, "height": 2 }
-    },
-    {
-      "id": 5871193681027559,
-      "definition": {
-        "title": "Order Correlation (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "formulas": [
-              { "formula": "query1" },
-              { "formula": "query2" },
-              { "formula": "query3" }
-            ],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query2",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query3",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ]
-      },
-      "layout": { "x": 0, "y": 13, "width": 6, "height": 3 }
-    },
-    {
-      "id": 3827551407888457,
-      "definition": {
-        "title": "Stream Delivery Rate (%)",
-        "title_size": "16",
-        "title_align": "left",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "formulas": [
-              { "formula": "query1" },
-              { "formula": "query2" },
-              { "formula": "query3" }
-            ],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query2",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query3",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ]
-      },
-      "layout": { "x": 6, "y": 13, "width": 6, "height": 3 }
+      "layout": { "x": 0, "y": 9, "width": 6, "height": 3 }
     }
   ],
   "template_variables": [

@@ -124,22 +124,33 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | sendGroupMessage         | Sending a group message                | 85.27    | <200ms | ✅ On Target           |
 | receiveGroupMessage      | Processing group message streams       | 124.00   | <200ms | ✅ On Target           |
 
-_Note: Based on data from 79 measured operations in the `us-east` region and `production` network._
-
 ### Group Operations Performance by Size
 
-| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Target(Create) | Status                 |
-| ---- | ---------- | -------- | -------- | ---------- | ---------- | -------------- | ---------------------- |
-| 50   | 1152.73    | 86.01    | 78.33    | 135.36     | 138.57     | <1300ms        | ✅ On Target           |
-| 100  | 1582.43    | 88.41    | 83.48    | 144.67     | 156.86     | <1400ms        | ✅ On Target           |
-| 150  | 2650.67    | 94.55    | 120.24   | 202.64     | 189.81     | <3000ms        | ✅ On Target           |
-| 200  | 4117.80    | 93.42    | 128.73   | 193.36     | 204.78     | <4500ms        | ✅ On Target           |
-| 250  | 5740.75    | 107.76   | 154.79   | 219.17     | 236.53     | <5500ms        | ⚠️ Performance Concern |
-| 300  | 7656.24    | 97.09    | 145.75   | 244.24     | 247.22     | <6500ms        | ⚠️ Performance Concern |
-| 350  | 8272.22    | 99.20    | 155.32   | 244.24     | 270.62     | <7500ms        | ⚠️ Performance Concern |
-| 400  | 9215.61    | 101.34   | 167.90   | 263.91     | 308.01     | <8500ms        | ⚠️ Performance Concern |
+| Size | Create(ms) | Send(ms) | Sync(ms) | Update(ms) | Remove(ms) | Status                 |
+| ---- | ---------- | -------- | -------- | ---------- | ---------- | ---------------------- |
+| 50   | 1453.51    | 86.01    | 836.39   | 135.36     | 138.57     | ⚠️ Performance Concern |
+| 100  | 1935.67    | 88.41    | 994.29   | 144.67     | 156.86     | ⚠️ Performance Concern |
+| 150  | 2556.97    | 94.55    | 1018.15  | 202.64     | 189.81     | ⚠️ Performance Concern |
+| 200  | 3512.65    | 93.42    | 1060.93  | 193.36     | 204.78     | ⚠️ Performance Concern |
+| 250  | 4787.85    | 107.76   | 1865.90  | 219.17     | 236.53     | ⚠️ Performance Concern |
+| 300  | 6010.43    | 97.09    | 1223.78  | 244.24     | 247.22     | ⚠️ Performance Concern |
+| 350  | 6294.62    | 99.20    | 1286.72  | 244.24     | 270.62     | ⚠️ Performance Concern |
+| 400  | 7015.99    | 101.34   | 1306.15  | 263.91     | 308.01     | ⚠️ Performance Concern |
 
-_Note: Performance increases significantly beyond `350` members, with `400` members representing a hard limit on the protocol._
+### Group stream performance
+
+| Group Size | Message (ms) | Metadata (ms) | Conversations (ms) | Status                 |
+| ---------- | ------------ | ------------- | ------------------ | ---------------------- |
+| 50         | 54.41        | 277.61        | 352                | ✅ On Target           |
+| 100        | 22.50        | 200.93        | 426                | ✅ On Target           |
+| 150        | 0.82         | 277.94        | 460                | ✅ On Target           |
+| 200        | 2.29         | 1317.68       | 497                | ⚠️ Performance Concern |
+| 250        | 0.69         | 248.28        | 499                | ✅ On Target           |
+| 300        | 31.44        | 672.61        | 501                | ⚠️ Performance Concern |
+| 350        | 0.65         | 256.88        | 562                | ✅ On Target           |
+| 400        | 110.21       | 115.76        | 617                | ✅ On Target           |
+
+_Note: Based on data from measured operations in the `us-east` region and `production` network._
 
 ## Networks performance
 
@@ -209,18 +220,18 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
-## Test suites
+## 🧪 XMTP Test Suites
 
-The XMTP QA testing framework consists of several specialized test suites designed to evaluate different aspects of the XMTP network's functionality, performance, and reliability. Each suite focuses on specific testing scenarios:
+Different end-to-end test suites for validating the XMTP protocol functionality, performance, and reliability.
 
-- **[TS_Performance](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance)**: Measures operational performance and scalability across various XMTP functions
-- **[TS_Delivery](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Delivery)**: Verifies message delivery reliability and correctness across multiple streams
-- **[TS_Gm](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)**: Tests basic messaging functionality and cross-version compatibility
-- **[TS_Fork](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Fork)**: Investigates group conversation forking issues through membership manipulation
-- **[TS_Stress](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Stress)**: Evaluates system behavior under high load conditions
-- **[TS_Speed](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Speed)**: Focuses on network and operation speed metrics
-- **[TS_200](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_200)**: Basic functionality tests ensuring core features work correctly
-- **[TS_AgentHealth](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth)**: Tests the health of the agent ecosystem
+| Suite              | Purpose                                                    | Link to test file                                         |
+| ------------------ | ---------------------------------------------------------- | --------------------------------------------------------- |
+| **TS_AgentHealth** | Tests the health of the agent ecosystem                    | [TS_AgentHealth](./TS_AgentHealth/TS_AgentHealth.test.ts) |
+| **TS_Delivery**    | Verifies message delivery reliability                      | [TS_Delivery](./TS_Delivery/TS_Delivery.test.ts)          |
+| **TS_Fork**        | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/TS_Fork.test.ts)                      |
+| **TS_Gm**          | Tests basic messaging and cross-version compatibility      | [TS_Gm](./TS_Gm/TS_Gm.test.ts)                            |
+| **TS_Performance** | Measures independent operational performance               | [TS_Performance](./TS_Performance/TS_Performance.test.ts) |
+| **TS_Large**       | Tests performance of group operations                      | [TS_Large](./TS_Large/TS_Large.test.ts)                   |
 
 All test suites provide metrics to monitoring dashboards and can be executed both manually and through automated CI/CD workflows.
 

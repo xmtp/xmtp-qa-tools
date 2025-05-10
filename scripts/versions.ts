@@ -1,3 +1,4 @@
+import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { sdkVersions } from "@helpers/tests";
@@ -246,6 +247,45 @@ function cleanPackageJson() {
   }
 }
 
+/**
+ * Remove the node_modules folder
+ */
+function removeNodeModules() {
+  const rootDir = process.cwd();
+  const nodeModulesDir = path.join(rootDir, "node_modules");
+
+  console.log("Removing node_modules folder...");
+
+  if (fs.existsSync(nodeModulesDir)) {
+    try {
+      fs.rmSync(nodeModulesDir, { recursive: true, force: true });
+      console.log("node_modules folder removed successfully");
+    } catch (error: unknown) {
+      console.error(
+        `Error removing node_modules: ${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
+  } else {
+    console.log("node_modules folder does not exist");
+  }
+}
+
+/**
+ * Run yarn install
+ */
+function runYarnInstall() {
+  console.log("Running yarn install...");
+
+  try {
+    execSync("yarn install", { stdio: "inherit" });
+    console.log("yarn install completed successfully");
+  } catch (error: unknown) {
+    console.error(
+      `Error running yarn install: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
 // Main function
 function main() {
   console.log("Starting SDK Version Fixer");
@@ -255,6 +295,12 @@ function main() {
 
   if (shouldClean) {
     cleanPackageJson();
+  }
+  if (!process.env.GITHUB_ACTIONS) {
+    // Remove node_modules folder
+    removeNodeModules();
+    // Run yarn install
+    runYarnInstall();
   }
 
   // Discover and process packages

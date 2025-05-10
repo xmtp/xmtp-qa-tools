@@ -116,9 +116,7 @@ describe(testName, async () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const inboxIds = workers
-          .getWorkers()
-          .map((worker) => worker.client.inboxId);
+        const inboxIds = workers.getWorkers().map((worker) => worker.inboxId);
 
         console.log(
           `Creating test group with ${inboxIds.length} worker participants`,

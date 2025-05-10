@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, production]
+        environment: [production]
         region: [us-west, us-east, europe, asia]
     env:
       RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}

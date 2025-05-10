@@ -209,8 +209,6 @@ export async function verifyMessageStream(
 ): Promise<VerifyStreamResult> {
   const receivers = await filterReceivers(group as Group, participants);
 
-  // Configure collectors for message streams with timeout
-  console.log(`Setting up ${receivers.length} collectors for messages`);
   const collectPromises: Promise<string[]>[] = receivers.map((r) => {
     return r.worker
       .collectMessages(group.id, count, 20000) // 20 second timeout
@@ -264,11 +262,7 @@ export async function verifyGroupUpdateStream(
 ): Promise<VerifyStreamResult> {
   const receivers = await filterReceivers(group, participants);
 
-  // Configure collectors for group update streams with timeout
-  console.log(`Setting up ${receivers.length} collectors for group updates`);
   const collectPromises: Promise<string[]>[] = receivers.map((r) => {
-    console.log(`Setting up collector for ${r.name} to watch ${group.id}`);
-
     return r.worker
       .collectGroupUpdates(group.id, count, 20000) // 20 second timeout
       .then((msgs: GroupUpdateMessage[]) => {
@@ -319,12 +313,6 @@ export async function verifyConsentStream(
 ): Promise<VerifyStreamResult> {
   console.log("Waiting for 1 second before starting consent stream test");
   await sleep(1000);
-  console.log(
-    `Setting up ${participants.length} collectors for consent events`,
-  );
-
-  // Start collecting consent updates from the initiator who will be receiving the updates
-  console.log(`Setting up consent collector for ${initiator.name}`);
 
   // Use a promise to collect consent events using the built-in method
   const consentPromise = initiator.worker

@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-testing",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -9,19 +9,20 @@
     "workers"
   ],
   "scripts": {
-    "bot": "tsx scripts/run-bot",
+    "bot": "tsx scripts/run bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/bot-cli.ts",
     "format": "prettier -w .",
     "format:check": "prettier -c .",
     "functional": "npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false",
-    "gen:keys": "tsx scripts/generateKeys.ts",
+    "gen:keys": "tsx scripts/generate-keys.ts",
     "gm": "cd bots/gm-bot && tsx src/index.ts",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "script": "tsx scripts/run-script",
+    "run": "tsx scripts/run.ts",
+    "script": "tsx scripts/run script",
     "start": "vitest --ui --standalone --watch ",
     "test": "vitest"
   },
@@ -36,9 +37,10 @@
     "@xmtp/node-bindings-120-3": "npm:@xmtp/node-bindings@1.2.0-dev.068bb4c",
     "@xmtp/node-bindings-120-4": "npm:@xmtp/node-bindings@1.2.0-dev.b96f93d",
     "@xmtp/node-bindings-120-5": "npm:@xmtp/node-bindings@1.2.0-dev.ef2c57d",
+    "@xmtp/node-bindings-120-rc3": "npm:@xmtp/node-bindings@1.2.0-rc3",
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41",
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9",
-    "@xmtp/node-sdk": "2.0.9",
+    "@xmtp/node-sdk": "2.1.0-rc3",
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0",
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5",
     "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2",
@@ -48,6 +50,7 @@
     "@xmtp/node-sdk-206": "npm:@xmtp/node-sdk@2.0.6",
     "@xmtp/node-sdk-208": "npm:@xmtp/node-sdk@2.0.8",
     "@xmtp/node-sdk-209": "npm:@xmtp/node-sdk@2.0.9",
+    "@xmtp/node-sdk-210": "npm:@xmtp/node-sdk@2.1.0-rc3",
     "@xmtp/node-sdk-47": "npm:@xmtp/node-sdk@0.0.47",
     "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13",
     "axios": "^1.8.2",
@@ -140,6 +143,11 @@
     "@xmtp/node-sdk@2.0.9": {
       "dependencies": {
         "@xmtp/node-bindings": "1.2.0-dev.ef2c57d"
+      }
+    },
+    "@xmtp/node-sdk@2.1.0-rc3": {
+      "dependencies": {
+        "@xmtp/node-bindings": "1.2.0-rc3"
       }
     }
   }

@@ -63,6 +63,12 @@ import {
   Group as Group209,
 } from "@xmtp/node-sdk-209";
 import {
+  Client as Client210,
+  Conversation as Conversation210,
+  Dm as Dm210,
+  Group as Group210,
+} from "@xmtp/node-sdk-210";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -91,6 +97,7 @@ export const sdkVersionOptions = [
   "206",
   "208",
   "209",
+  "210",
 ];
 
 // SDK version mappings
@@ -204,6 +211,16 @@ export const sdkVersions = {
     bindingsPackage: "node-bindings-120-5",
     sdkVersion: "2.0.9",
     libXmtpVersion: "ef2c57d",
+  },
+  210: {
+    Client: Client210,
+    Conversation: Conversation210,
+    Dm: Dm210,
+    Group: Group210,
+    sdkPackage: "node-sdk-210",
+    bindingsPackage: "node-bindings-120-rc3",
+    sdkVersion: "2.1.0-rc3",
+    libXmtpVersion: "b4e982c",
   },
 };
 

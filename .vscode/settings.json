@@ -18,5 +18,9 @@
   },
   "[json]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "files.associations": {
+    "*.log": "ansi",
+    "log.log": "ansi"
   }
 }

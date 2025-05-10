@@ -100,7 +100,7 @@ The `TS_Geolocation.yml` workflow tests XMTP performance across different global
 name: TS_Geolocation
 strategy:
   matrix:
-    environment: [dev, production]
+    environment: [production]
     region: [us-west, us-east, europe, asia]
 ```
 

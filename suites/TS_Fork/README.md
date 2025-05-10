@@ -4,12 +4,6 @@ This test suite reproduces group conversation forking issues in XMTP by simulati
 
 https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
-## Test Environment
-
-- **Client Mix**: 10 programmatic workers + 4 manual clients
-- **Binding versions**: `068bb4c` across node-web and react-native
-- **Applications**: Convos.io, Convos Desktop, XMTP Chat Web, Coinbase Wallet iOS
-
 ## Setup
 
 ```bash
