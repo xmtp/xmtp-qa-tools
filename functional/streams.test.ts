@@ -116,7 +116,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
+  it("verifyAddMembersStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
