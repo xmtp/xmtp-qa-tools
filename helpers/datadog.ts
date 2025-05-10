@@ -184,27 +184,6 @@ export function sendMetric(
   }
 }
 
-// Performance tracking
-/**
- * Send performance metrics for tests
- */
-export const sendPerformanceResult = (
-  testName: string,
-  libXmtpVersion: string,
-  start: number | undefined,
-  testStart?: number,
-) => {
-  if (testName) {
-    console.timeEnd(testName);
-
-    // If start is undefined, use testStart or current time
-    const actualStart = start ?? testStart ?? performance.now();
-    const deliveryTime = performance.now() - actualStart;
-
-    void sendPerformanceMetric(deliveryTime, testName, libXmtpVersion, false);
-  }
-};
-
 /**
  * Extract operation details from test name
  */
@@ -267,7 +246,7 @@ export async function sendPerformanceMetric(
       members,
     } = parseTestName(testName);
 
-    sendMetric("duration", metricValue, {
+    const values = {
       libxmtp: libXmtpVersion,
       operation: operationName,
       test: testNameExtracted,
@@ -276,7 +255,16 @@ export async function sendPerformanceMetric(
       description: metricDescription,
       members: members,
       region: state.currentGeo,
-    });
+    };
+    if (operationName.toLowerCase().includes("receive")) {
+      console.log(
+        "metricValue",
+        metricValue,
+        "values",
+        JSON.stringify(values, null, 2),
+      );
+    }
+    sendMetric("duration", metricValue, values);
 
     // Network stats handling
     if (!skipNetworkStats) {

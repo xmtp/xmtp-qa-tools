@@ -19,7 +19,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let start: number;
-  let testStart: number;
+
   let group: Conversation;
   const names = getRandomNames(5);
   let workers = await getWorkers(names, testName);
@@ -32,10 +32,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

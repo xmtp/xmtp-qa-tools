@@ -12,7 +12,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   let start: number;
-  let testStart: number;
+
   workers = await getWorkers(
     [
       "henry",
@@ -36,10 +36,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

@@ -156,7 +156,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       }
     });
   });
-  const averageEventTiming = timingCount > 0 ? timingSum / timingCount : 0;
+  const averageEventTiming = Math.round(
+    timingCount > 0 ? timingSum / timingCount : 0,
+  );
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) =>
       JSON.stringify({

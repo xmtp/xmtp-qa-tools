@@ -24,7 +24,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let start: number;
 
-  let testStart: number;
   let newGroup: Conversation;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -43,10 +42,6 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
   for (
@@ -54,15 +49,13 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`receiveLargeGroupMessage-${i}: should create a group and measure all streams`, async () => {
+    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, true);
 
         const verifyResult = await verifyMessageStream(
           newGroup,
           workers.getWorkers(),
-          1,
-          "gm",
         );
 
         // Save metrics
@@ -71,6 +64,7 @@ describe(testName, async () => {
           messageStreamTimeMs: verifyResult.averageEventTiming,
         };
 
+        start = verifyResult.averageEventTiming;
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

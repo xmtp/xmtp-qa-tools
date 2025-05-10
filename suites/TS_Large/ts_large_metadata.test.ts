@@ -23,7 +23,7 @@ describe(testName, async () => {
   const steamsToTest = typeofStream.GroupUpdated;
   let workers: WorkerManager;
   let start: number;
-  let testStart: number;
+
   let newGroup: Conversation;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -42,10 +42,6 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
   for (
@@ -53,7 +49,7 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifyLargeGroupMetadataStream-${i}: should update group name`, async () => {
+    it(`receiveGroupMetadata-${i}: should create a group and measure all streams`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, true);
         const verifyResult = await verifyMetadataStream(
@@ -63,6 +59,7 @@ describe(testName, async () => {
           undefined,
         );
 
+        start = verifyResult.averageEventTiming;
         expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics

@@ -21,8 +21,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let start: number;
 
-  let testStart: number;
-
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
@@ -39,10 +37,6 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
   for (
@@ -50,7 +44,7 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifySyncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
+    it(`syncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
       try {
         const createTime = performance.now();
         await ts_large_createGroup(workers, i, true);

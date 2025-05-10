@@ -19,7 +19,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   let start: number;
-  let testStart: number;
+
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
   workers = await getWorkers(
     ["bob"],
@@ -36,10 +36,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

@@ -34,7 +34,6 @@ describe(testName, async () => {
   let conversation: Conversation;
 
   let start: number;
-  let testStart: number;
 
   beforeAll(async () => {
     try {
@@ -57,10 +56,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
   // Create a DM between two workers

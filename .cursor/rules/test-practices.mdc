@@ -33,7 +33,7 @@ describe(testName, async () => {
   let convo: Conversation;
 
   let start: number;
-  let testStart: number;
+
 
   setupTestLifecycle({
     expect,
@@ -43,10 +43,7 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
+    
   });
 
   it("newDm: should measure creating a DM", async () => {

@@ -24,7 +24,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   let start: number;
 
-  let testStart: number;
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -43,10 +42,6 @@ describe(testName, async () => {
     setStart: (v) => {
       start = v;
     },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
-    },
   });
 
   for (
@@ -54,7 +49,7 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`verifyLargeConversationStream-${i}: should create a new conversation`, async () => {
+    it(`receiveAddMember-${i}: should create a new conversation`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, false);
         // Use the dedicated conversation stream verification helper
@@ -63,6 +58,7 @@ describe(testName, async () => {
           workers.getWorkers(),
         );
 
+        start = verifyResult.averageEventTiming;
         expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics

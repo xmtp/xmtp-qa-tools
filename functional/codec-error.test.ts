@@ -16,7 +16,6 @@ describe(testName, async () => {
   workers = await getWorkers(getRandomNames(2), testName);
 
   let start: number;
-  let testStart: number;
 
   setupTestLifecycle({
     expect,
@@ -25,10 +24,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

@@ -34,7 +34,6 @@ describe(testName, async () => {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   let start: number;
-  let testStart: number;
 
   beforeAll(async () => {
     try {
@@ -55,10 +54,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v: number) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v: number) => {
-      testStart = v;
     },
   });
 

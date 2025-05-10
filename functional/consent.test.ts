@@ -14,7 +14,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   let start: number;
-  let testStart: number;
 
   workers = await getWorkers(getRandomNames(5), testName, typeofStream.Consent);
 
@@ -25,10 +24,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

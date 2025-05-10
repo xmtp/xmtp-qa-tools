@@ -30,7 +30,6 @@ describe(testName, async () => {
   let convo: Conversation;
 
   let start: number;
-  let testStart: number;
 
   setupTestLifecycle({
     expect,
@@ -39,10 +38,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 

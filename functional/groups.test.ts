@@ -30,7 +30,7 @@ describe(testName, async () => {
   const total = 10;
 
   let start: number;
-  let testStart: number;
+
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
 
@@ -41,10 +41,6 @@ describe(testName, async () => {
     getStart: () => start,
     setStart: (v) => {
       start = v;
-    },
-    getTestStart: () => testStart,
-    setTestStart: (v) => {
-      testStart = v;
     },
   });
 
