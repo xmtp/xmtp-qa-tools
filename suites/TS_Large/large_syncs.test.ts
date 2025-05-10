@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {
-  verifyConversationGroupStream,
+  verifyAddMembersStream,
   verifyGroupUpdateStream,
   verifyMessageStream,
 } from "@helpers/streams";
@@ -110,7 +110,7 @@ describe(testName, async () => {
           console.log("Testing conversation stream with new DM creation");
 
           // Use the dedicated conversation stream verification helper
-          const verifyResult = await verifyConversationGroupStream(
+          const verifyResult = await verifyAddMembersStream(
             newGroup as Group,
             workers.getWorkers(),
             () => {

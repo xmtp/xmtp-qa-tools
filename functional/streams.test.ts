@@ -4,7 +4,6 @@ import {
   createGroupConsentSender,
   verifyAddMembersStream,
   verifyConsentStream,
-  verifyConversationGroupStream,
   verifyConversationStream,
   verifyGroupUpdateStream,
   verifyMessageStream,
@@ -21,7 +20,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let start: number;
   let testStart: number;
-  let group: Group;
+  let group: Conversation;
   const names = ["henry", "randomguy", "bob", "alice", "dave"];
   let workers = await getWorkers(names, testName, typeofStream.None);
 
@@ -43,10 +42,16 @@ describe(testName, async () => {
   // Create a group before all tests
   beforeAll(async () => {
     // Initialize workers
-    group = await workers.getWorkers()[0].client.conversations.newGroup([]);
+    group = await workers
+      .getWorkers()[0]
+      .client.conversations.newGroup([
+        workers.get("randomguy")!.client.inboxId,
+        workers.get("bob")!.client.inboxId,
+        workers.get("alice")!.client.inboxId,
+        workers.get("dave")!.client.inboxId,
+      ]);
   });
-
-  it("verifyDmStream: should measure receiving a dm", async () => {
+  it("verifyMessageStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
@@ -68,7 +73,31 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyNewDmStream: should create a new conversation", async () => {
+  it("verifyMessageGroupStream: should measure receiving a gm", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.Message);
+      // Create direct message
+      const newGroup = await workers
+        .getWorkers()[0]
+        .client.conversations.newGroup(
+          workers.getWorkers().map((w) => w.client.inboxId),
+        );
+
+      // Verify message delivery
+      const verifyResult = await verifyMessageStream(
+        newGroup,
+        workers.getWorkers(),
+        10,
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("verifyConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
@@ -87,34 +116,19 @@ describe(testName, async () => {
       throw e;
     }
   });
-
-  it("verifyAddMembersStream: should create a add members to a conversation", async () => {
+  it("verifyConversationGroupStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
 
+      console.log("Testing conversation stream with adding members");
+      const newGroup = await workers
+        .getWorkers()[0]
+        .client.conversations.newGroup([]);
       // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyAddMembersStream(
-        group,
+        newGroup,
         workers.getWorkers(),
-      );
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("verifyGroupMessageStream: should measure receiving a gm", async () => {
-    try {
-      workers = await getWorkers(names, testName, typeofStream.Message);
-
-      // Verify message delivery
-      const verifyResult = await verifyMessageStream(
-        group,
-        workers.getWorkers(),
-        10,
       );
 
       expect(verifyResult.allReceived).toBe(true);
@@ -127,10 +141,9 @@ describe(testName, async () => {
   it("verifyGroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      const verifyResult = await verifyGroupUpdateStream(
-        group,
-        workers.getWorkers(),
-      );
+      const verifyResult = await verifyGroupUpdateStream(group as Group, [
+        workers.get("randomguy")!,
+      ]);
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -158,7 +171,7 @@ describe(testName, async () => {
 
       const verifyResult = await verifyConsentStream(
         workers.getWorkers()[0],
-        workers.getWorkers(),
+        [workers.get("randomguy")!],
         consentAction,
       );
 
