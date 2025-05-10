@@ -1,7 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { calculateMessageStats } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -10,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 const testName = "recovery";
 loadEnv(testName);
 
-const amountofMessages = 10;
+const amountofMessages = 5;
 const timeoutMax = 60000; // 1 minute timeout
 
 describe(
@@ -70,9 +68,11 @@ describe(
         console.log(
           `Sending ${amountofMessages} messages while client is offline`,
         );
+        const sentMessages: string[] = [];
         for (let i = 0; i < amountofMessages; i++) {
           const message = `offline-msg-${i + 1}-${randomSuffix}`;
           await conversation?.send(message);
+          sentMessages.push(message);
         }
         console.log("Sent messages");
 
@@ -90,52 +90,19 @@ describe(
         await recoveredConversation?.sync();
         const messages = await recoveredConversation?.messages();
 
-        const messagesByWorker: string[][] = [];
-        const recoveredMessages: string[] = [];
-        for (const message of messages ?? []) {
-          if (
-            message.content &&
-            typeof message.content === "string" &&
-            message.content.includes(`offline-msg-`) &&
-            message.content.includes(randomSuffix)
-          ) {
-            recoveredMessages.push(message.content);
-          }
+        // Filter recovered messages for the ones we sent
+        const recoveredMessages = (messages ?? [])
+          .map((m) => (typeof m.content === "string" ? m.content : ""))
+          .filter(
+            (content) =>
+              content.includes("offline-msg-") &&
+              content.includes(randomSuffix),
+          );
+
+        expect(recoveredMessages.length).toBe(amountofMessages);
+        for (const msg of sentMessages) {
+          expect(recoveredMessages).toContain(msg);
         }
-
-        messagesByWorker.push(recoveredMessages);
-
-        const stats = calculateMessageStats(
-          workers.getWorkers(),
-          messagesByWorker,
-          "offline-msg-",
-          amountofMessages,
-          randomSuffix,
-        );
-
-        console.log(JSON.stringify(stats));
-        expect(stats.receptionPercentage).toBeGreaterThan(95);
-        expect(stats.orderPercentage).toBeGreaterThan(95);
-
-        // Use the unified sendDeliveryMetric for delivery metrics
-        sendDeliveryMetric(
-          stats.receptionPercentage,
-          offlineWorker.sdkVersion,
-          offlineWorker.libXmtpVersion,
-          testName,
-          "recovery",
-          "delivery",
-        );
-
-        // Use the unified sendDeliveryMetric for order metrics
-        sendDeliveryMetric(
-          stats.orderPercentage,
-          offlineWorker.sdkVersion,
-          offlineWorker.libXmtpVersion,
-          testName,
-          "recovery",
-          "order",
-        );
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

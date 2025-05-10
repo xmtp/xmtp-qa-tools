@@ -2,6 +2,9 @@ name: TS_Large
 description: "should verify performance of the group streams"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
@@ -38,7 +41,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: ./scripts/run-test.sh TS_Large 1
+        run: ./scripts/run-test.sh large 1
       - name: Send Slack notification
         if: always()
         env:

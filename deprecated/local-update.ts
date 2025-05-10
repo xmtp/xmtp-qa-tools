@@ -70,7 +70,7 @@ async function main() {
       const signer = createSigner(inbox.privateKey as `0x${string}`);
 
       // Get encryption key from hex
-      const dbEncryptionKey = getEncryptionKeyFromHex(inbox.encryptionKey);
+      const dbEncryptionKey = getEncryptionKeyFromHex(inbox.dbEncryptionKey);
 
       // Create a database path in the logs directory
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
@@ -99,7 +99,7 @@ async function main() {
         accountAddress: inbox.accountAddress,
         inboxId: client.inboxId,
         privateKey: inbox.privateKey,
-        encryptionKey: inbox.encryptionKey,
+        dbEncryptionKey: inbox.dbEncryptionKey,
         dbPath: dbPath,
       });
 
@@ -110,7 +110,10 @@ async function main() {
       results.success++;
       results.inboxIds.push(client.inboxId);
 
-      console.log(`✅ Successfully initialized inbox: ${inbox.accountAddress}`);
+      console.log(
+        `✅ Successfully initialized address: ${inbox.accountAddress}`,
+      );
+      console.log(`✅ Successfully initialized inbox: ${client.inboxId}`);
     } catch (error) {
       results.failed++;
       console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);

@@ -7,35 +7,6 @@ import {
 } from "@xmtp/node-sdk";
 import { sleep } from "./tests";
 
-// Define types for message and group update structures
-interface StreamMessage {
-  type: string;
-  message: {
-    conversationId: string;
-    content: string;
-    contentType?: {
-      typeId: string;
-    };
-  };
-}
-
-interface GroupUpdateMessage {
-  type: string;
-  group: {
-    conversationId: string;
-    name: string;
-  };
-}
-
-// Define type for conversation notification
-interface ConversationNotification {
-  type: string;
-  conversation: {
-    id: string;
-    peerAddress?: string;
-  };
-}
-
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
@@ -52,53 +23,6 @@ export type VerifyStreamResult = {
 };
 
 /**
- * Generic function to verify and return stats for stream data
- * This function processes collected promises and returns statistics
- */
-const verifyAndReturnStats = async <T>(
-  workers: Worker[],
-  collectPromises: Promise<T[]>[],
-  count: number,
-  randomSuffix?: string,
-): Promise<VerifyStreamResult> => {
-  const streamCollectedMessages = await Promise.all(collectPromises);
-  const streamAllReceived = streamCollectedMessages.every(
-    (msgs) => msgs?.length === count,
-  );
-
-  // Convert any type to string arrays for stats calculation
-  const messagesAsStrings = streamCollectedMessages.map((msgs) =>
-    msgs.map((m) => String(m)),
-  );
-
-  // Only calculate stats if we have a randomSuffix (for message ordering)
-  // and if there are actual messages to process
-  let stats;
-  if (randomSuffix && messagesAsStrings.length > 0) {
-    stats = calculateMessageStats(
-      workers,
-      messagesAsStrings,
-      "gm-",
-      count,
-      randomSuffix,
-    );
-
-    // Only validate stats if we have actual messages
-    console.log(JSON.stringify(stats));
-  } else {
-    console.log(`Received ${messagesAsStrings.flat().length} messages total`);
-  }
-  const result = {
-    stats,
-    allReceived: streamAllReceived,
-    receiverCount: streamCollectedMessages.length,
-    messages: messagesAsStrings,
-  };
-  console.log("result", JSON.stringify(result));
-  return result;
-};
-
-/**
  * Toggle the consent state for an entity
  */
 export async function toggleConsentState(
@@ -107,7 +31,6 @@ export async function toggleConsentState(
   entityType: ConsentEntityType,
   initialState?: ConsentState,
 ): Promise<ConsentState> {
-  // If no initial state provided, get it first
   let currState = initialState;
   if (currState === undefined) {
     currState = await worker.client.preferences.getConsentState(
@@ -115,18 +38,13 @@ export async function toggleConsentState(
       entity,
     );
   }
-
-  // Toggle the state
   const newState =
     currState === ConsentState.Allowed
       ? ConsentState.Denied
       : ConsentState.Allowed;
-
   console.log(
     `Changing consent state to ${newState === ConsentState.Allowed ? "allowed" : "denied"}`,
   );
-
-  // Apply the state change
   await worker.client.preferences.setConsentStates([
     {
       entity,
@@ -134,7 +52,6 @@ export async function toggleConsentState(
       state: newState,
     },
   ]);
-
   return newState;
 }
 
@@ -170,12 +87,9 @@ export function createGroupConsentSender(
     console.log(
       `Setting group consent to ${blockEntities ? "DENIED" : "ALLOWED"}`,
     );
-
     const consentState = blockEntities
       ? ConsentState.Denied
       : ConsentState.Allowed;
-
-    // Set consent for the group
     await worker.client.preferences.setConsentStates([
       {
         entity: groupId,
@@ -183,8 +97,6 @@ export function createGroupConsentSender(
         state: consentState,
       },
     ]);
-
-    // Also set consent for the specific member
     await worker.client.preferences.setConsentStates([
       {
         entity: memberInboxId,
@@ -192,9 +104,126 @@ export function createGroupConsentSender(
         state: consentState,
       },
     ]);
-
     return "group_consent_updated";
   };
+}
+
+// Type guard for sent event with sentAt
+function hasSentAt(obj: unknown): obj is { sentAt: number } {
+  return (obj as { sentAt: number }).sentAt !== undefined;
+}
+function extractGroupName(ev: unknown): string {
+  const event = ev as {
+    content?: {
+      metadataFieldChanges?: Array<{ fieldName: string; newValue: string }>;
+    };
+  };
+  const changes = event.content?.metadataFieldChanges || [];
+  const nameChange = changes.find((c) => c.fieldName === "group_name");
+  return nameChange?.newValue || "";
+}
+function extractContent(ev: unknown): string {
+  if (typeof ev === "object" && ev !== null) {
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "content") &&
+      typeof (ev as Record<string, unknown>).content === "string"
+    ) {
+      return (ev as Record<string, string>).content;
+    }
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "message") &&
+      typeof (ev as Record<string, unknown>).message === "object" &&
+      (ev as Record<string, unknown>).message !== null &&
+      typeof (ev as { message: { content?: unknown } }).message.content ===
+        "string"
+    ) {
+      return (ev as { message: { content: string } }).message.content;
+    }
+  }
+  return "";
+}
+
+/**
+ * Generic helper to collect, time, and compute stats for any stream event.
+ */
+async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
+  receivers: Worker[];
+  startCollectors: (receiver: Worker) => Promise<TReceived[]>;
+  triggerEvents: () => Promise<TSent[]>;
+  getKey: (event: TSent | TReceived) => string;
+  getMessage: (event: TSent | TReceived) => string;
+  statsLabel: string;
+  count: number;
+  randomSuffix?: string;
+  participantsForStats: Worker[];
+}) {
+  const {
+    receivers,
+    startCollectors,
+    getKey,
+    getMessage,
+    statsLabel,
+    count,
+    randomSuffix,
+  } = options;
+  const collectPromises: Promise<
+    { key: string; receivedAt: number; message: string; event: unknown }[]
+  >[] = receivers.map((r) =>
+    startCollectors(r).then((events) =>
+      events.map((ev) => ({
+        key: getKey(ev),
+        receivedAt: Date.now(),
+        message: getMessage(ev),
+        event: ev,
+      })),
+    ),
+  );
+  const sentEvents = await options.triggerEvents();
+  const allReceived = await Promise.all(collectPromises);
+  const eventTimings: Record<string, Record<number, number>> = {};
+  let timingSum = 0;
+  let timingCount = 0;
+  receivers.forEach((r, idx) => {
+    const received = allReceived[idx];
+    eventTimings[r.name] = {};
+    received.forEach((msg) => {
+      const sentIdx = sentEvents.findIndex((s) => getKey(s) === msg.key);
+      if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
+        const duration =
+          msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
+        eventTimings[r.name][sentIdx] = duration;
+        timingSum += duration;
+        timingCount++;
+      }
+    });
+  });
+  const averageEventTiming = timingCount > 0 ? timingSum / timingCount : 0;
+  const messagesAsStrings = allReceived.map((msgs) =>
+    msgs.map((m) =>
+      JSON.stringify({
+        event: m.event,
+      }),
+    ),
+  );
+  let stats;
+  if (randomSuffix && messagesAsStrings.length > 0) {
+    stats = calculateMessageStats(
+      messagesAsStrings,
+      statsLabel,
+      count,
+      randomSuffix,
+    );
+  }
+  const allResults = {
+    stats,
+    allReceived: allReceived.every((msgs) => msgs.length === count),
+    receiverCount: allReceived.length,
+    messages: messagesAsStrings,
+    eventTimings,
+    averageEventTiming,
+  };
+  console.log(JSON.stringify(allResults, null, 2));
+  return allResults;
 }
 
 /**
@@ -205,44 +234,35 @@ export async function verifyMessageStream(
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
-  const receivers = await filterReceivers(group as Group, participants);
-
-  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
-    return r.worker
-      .collectMessages(group.id, count, 20000) // 20 second timeout
-      .then((msgs: StreamMessage[]) => {
-        return msgs.map((m) => m.message.content);
-      })
-      .catch((err: unknown) => {
-        console.error(`Error collecting messages for ${r.name}:`, err);
-        return [] as string[];
-      });
-  });
-
-  // Generate all messages first for consistent handling
-  const sentMessages: string[] = Array.from(
-    { length: count },
-    (_, i) => `gm-${i + 1}-${randomSuffix}`,
-  );
-
-  // Send messages with optional callback after first message
-  for (let i = 0; i < count; i++) {
-    console.log(`Sending message ${i + 1} of ${count}`);
-    await group.send(sentMessages[i]);
-    if (i === 0 && onActionStarted) {
-      onActionStarted();
-    }
+): Promise<
+  VerifyStreamResult & {
+    eventTimings: Record<string, Record<number, number>>;
+    averageEventTiming: number;
   }
-
-  return verifyAndReturnStats<string>(
-    participants,
-    collectPromises,
+> {
+  const receivers = await filterReceivers(group as Group, participants);
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectMessages(group.id, count, 20000),
+    triggerEvents: async () => {
+      const sent: { content: string; sentAt: number }[] = [];
+      for (let i = 0; i < count; i++) {
+        const content = `gm-${i + 1}-${randomSuffix}`;
+        const sentAt = Date.now();
+        await group.send(content);
+        sent.push({ content, sentAt });
+      }
+      return sent;
+    },
+    getKey: extractContent,
+    getMessage: extractContent,
+    statsLabel: "gm-",
     count,
     randomSuffix,
-  );
+    participantsForStats: participants,
+  });
 }
+
 const filterReceivers = async (group: Group, participants: Worker[]) => {
   console.log("Waiting for 1 second before starting stream");
   await sleep(1000);
@@ -253,53 +273,40 @@ const filterReceivers = async (group: Group, participants: Worker[]) => {
 /**
  * Specialized function to verify group update streams
  */
-export async function verifyGroupUpdateStream(
+export async function verifyMetadataStream(
   group: Group,
   participants: Worker[],
   count = 1,
   randomSuffix: string = "gm",
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
+): Promise<
+  VerifyStreamResult & {
+    eventTimings: Record<string, Record<number, number>>;
+    averageEventTiming: number;
+  }
+> {
   const receivers = await filterReceivers(group, participants);
 
-  const collectPromises: Promise<string[]>[] = receivers.map((r) => {
-    return r.worker
-      .collectGroupUpdates(group.id, count, 20000) // 20 second timeout
-      .then((msgs: GroupUpdateMessage[]) => {
-        console.log(
-          `Received group updates for ${r.name}:`,
-          JSON.stringify(msgs),
-        );
-        return msgs.length > 0 ? msgs.map((m) => m.group.name) : [];
-      })
-      .catch((err: unknown) => {
-        console.error(`Error collecting group updates for ${r.name}:`, err);
-        return [] as string[];
-      });
-  });
-
-  // Generate all update names first for consistent handling
-  const updateNames: string[] = Array.from(
-    { length: count },
-    (_, i) => `New name-${i + 1}-${randomSuffix}`,
-  );
-
-  // Perform group updates with optional callback after first update
-  for (let i = 0; i < count; i++) {
-    await group.updateName(updateNames[i]);
-    console.log(`Updated group name to ${updateNames[i]}`);
-
-    if (i === 0 && onActionStarted) {
-      onActionStarted();
-    }
-  }
-
-  return verifyAndReturnStats<string>(
-    participants,
-    collectPromises,
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) =>
+      r.worker.collectGroupUpdates(group.id, count, 20000),
+    triggerEvents: async () => {
+      const sent: { name: string; sentAt: number }[] = [];
+      for (let i = 0; i < count; i++) {
+        const name = `New name-${i + 1}-${randomSuffix}`;
+        const sentAt = Date.now();
+        await group.updateName(name);
+        sent.push({ name, sentAt });
+      }
+      return sent;
+    },
+    getKey: extractGroupName,
+    getMessage: extractGroupName,
+    statsLabel: "New name-",
     count,
     randomSuffix,
-  );
+    participantsForStats: participants,
+  });
 }
 
 /**
@@ -309,37 +316,28 @@ export async function verifyConsentStream(
   initiator: Worker,
   participants: Worker[],
   action: (inboxId?: string, groupId?: string) => Promise<void>,
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
-  console.log("Waiting for 1 second before starting consent stream test");
-  await sleep(1000);
-
-  // Use a promise to collect consent events using the built-in method
-  const consentPromise = initiator.worker
-    .collectConsentUpdates(1)
-    .then((updates) => {
-      console.log(`Collected consent updates:`, JSON.stringify(updates));
-      return updates.length > 0
-        ? [
-            `consent:${updates[0].consentUpdate.inboxId}:${updates[0].consentUpdate.consentValue ? "allowed" : "denied"}`,
-          ]
-        : ["no_consent_events_collected"];
-    })
-    .catch((err: unknown) => {
-      console.error(
-        `[CONSENT-COLLECTOR] Error collecting consent events:`,
-        err,
-      );
-      return ["error_collecting_consent"];
-    });
-
-  await action();
-  if (onActionStarted) {
-    onActionStarted();
+): Promise<
+  VerifyStreamResult & {
+    eventTimings: Record<string, Record<number, number>>;
+    averageEventTiming: number;
   }
-
-  // No randomSuffix for consent events as they don't follow the same pattern
-  return verifyAndReturnStats([initiator], [consentPromise], 1, "");
+> {
+  await sleep(1000);
+  return collectAndTimeEventsWithStats({
+    receivers: [initiator],
+    startCollectors: (r) => r.worker.collectConsentUpdates(1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await action();
+      return [{ key: "consent", sentAt }];
+    },
+    getKey: (ev) => (ev as { key?: string }).key ?? "consent",
+    getMessage: (ev) => (ev as { key?: string }).key ?? "consent",
+    statsLabel: "consent:",
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: [initiator],
+  });
 }
 
 /**
@@ -348,168 +346,95 @@ export async function verifyConsentStream(
 export async function verifyConversationStream(
   initiator: Worker,
   participants: Worker[],
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
-  console.log("Waiting for 1 second before starting conversation stream test");
+): Promise<
+  VerifyStreamResult & {
+    eventTimings: Record<string, Record<number, number>>;
+    averageEventTiming: number;
+  }
+> {
   await sleep(1000);
   if (!initiator.client || !initiator.worker) {
-    throw new Error(`Initiator ${initiator.name} not properly initialized`);
+    throw new Error(`Initiator ${initiator.name} has no client`);
   }
-
-  console.log(
-    `[${initiator.name}] Starting group conversation stream test with ${participants.length} participants`,
-  );
-
-  // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises: Promise<string[]>[] = participants.map(
-    (participant) => {
-      return participant.worker
-        .collectConversations(initiator.client.inboxId, 1, 20000) // 20 second timeout
-        .then((msgs: ConversationNotification[]) => {
-          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
-        });
+  return collectAndTimeEventsWithStats({
+    receivers: participants,
+    startCollectors: (r) =>
+      r.worker.collectConversations(initiator.client.inboxId, 1, 20000),
+    triggerEvents: async () => {
+      const participantAddresses = participants.map((p) => {
+        if (!p.client) throw new Error(`Participant ${p.name} has no client`);
+        return p.client.inboxId;
+      });
+      const sentAt = Date.now();
+      await initiator.client.conversations.newGroup(participantAddresses);
+      return [{ id: "conversation", sentAt }];
     },
-  );
-
-  // Get participant addresses and create group
-  const participantAddresses = participants.map((p) => {
-    if (!p.client) throw new Error(`Participant ${p.name} has no client`);
-    return p.client.inboxId;
+    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
+    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
+    statsLabel: "conversation:",
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: participants,
   });
-
-  const createdGroup =
-    await initiator.client.conversations.newGroup(participantAddresses);
-  console.log(`[${initiator.name}] Created group: ${createdGroup.id}`);
-
-  if (onActionStarted) {
-    onActionStarted();
-  }
-
-  return verifyAndReturnStats(participants, participantPromises, 1, "");
 }
 
 /**
  * Verifies conversation streaming functionality for group member additions
  */
-export async function verifyConversationGroupStream(
+export async function verifyAddMembersStream(
   group: Group,
   participants: Worker[],
-  onActionStarted?: () => void,
-): Promise<VerifyStreamResult> {
-  // Filter out the initiator from participants for the check
-  const receivers = await filterReceivers(group, participants);
-  console.log(receivers.map((r) => r.name));
-  const creatorInboxId = (await group.metadata()).creatorInboxId;
-  // Set up collector promises with a longer timeout (20 seconds)
-  const participantPromises: Promise<string[]>[] = receivers.map(
-    (participant) => {
-      return participant.worker
-        .collectConversations(creatorInboxId, 1, 20000) // 20 second timeout
-        .then((msgs: ConversationNotification[]) => {
-          return msgs.map((msg) => `conversation:${msg.conversation.id}`);
-        });
-    },
-  );
-
-  await group.addMembers(receivers.map((r) => r.client?.inboxId));
-  console.log(`Added ${receivers.length} members to group ${group.id}`);
-
-  if (onActionStarted) {
-    onActionStarted();
+): Promise<
+  VerifyStreamResult & {
+    eventTimings: Record<string, Record<number, number>>;
+    averageEventTiming: number;
   }
-
-  // No randomSuffix for conversation notifications
-  return verifyAndReturnStats(receivers, participantPromises, 1, "");
+> {
+  const receivers = await filterReceivers(group, participants);
+  const creatorInboxId = (await group.metadata()).creatorInboxId;
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) =>
+      r.worker.collectConversations(creatorInboxId, 1, 20000),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await group.addMembers(receivers.map((r) => r.client?.inboxId));
+      return [{ id: "conversation", sentAt }];
+    },
+    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
+    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
+    statsLabel: "conversation:",
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: participants,
+  });
 }
 
 /**
  * Calculates message reception and order statistics
  */
 export function calculateMessageStats(
-  workers: Worker[],
   messagesByWorker: string[][],
   prefix: string,
   amount: number,
   suffix: string,
 ) {
-  // Verify message order helper
   const verifyMessageOrder = (
     messages: string[],
     expectedPrefix: string = "gm-",
     expectedCount?: number,
   ) => {
     if (messages.length === 0) return { inOrder: false, expectedMessages: [] };
-
     const count = expectedCount || messages.length;
     const expectedMessages = Array.from(
       { length: count },
       (_, i) => `${expectedPrefix}${i + 1}-${suffix}`,
     );
-
     const inOrder =
       messages.length === expectedMessages.length &&
       messages.every((msg, i) => msg === expectedMessages[i]);
-
     return { inOrder, expectedMessages };
   };
-
-  // Log discrepancies helper
-  const showDiscrepancies = (
-    workersInOrder: number,
-    workerCount: number,
-    workers: Worker[],
-  ) => {
-    if (workersInOrder >= workerCount) return;
-
-    console.log("Message order discrepancies detected:");
-
-    messagesByWorker.forEach((messages, index) => {
-      const { inOrder, expectedMessages } = verifyMessageOrder(
-        messages,
-        prefix,
-        amount,
-      );
-
-      if (!inOrder) {
-        console.log(
-          `Worker ${workers[index].name} received messages out of order or missing messages:`,
-        );
-
-        if (messages.length !== expectedMessages.length) {
-          console.log(
-            `  Expected ${expectedMessages.length} messages, received ${messages.length}`,
-          );
-        }
-
-        const discrepancies = [];
-
-        for (
-          let i = 0;
-          i < Math.max(messages.length, expectedMessages.length);
-          i++
-        ) {
-          if (i >= messages.length) {
-            discrepancies.push(`Missing: ${expectedMessages[i]}`);
-          } else if (i >= expectedMessages.length) {
-            discrepancies.push(`Unexpected: ${messages[i]}`);
-          } else if (messages[i] !== expectedMessages[i]) {
-            discrepancies.push(
-              `Expected: ${expectedMessages[i]}, Got: ${messages[i]}`,
-            );
-          }
-        }
-
-        if (discrepancies.length > 0) {
-          console.debug("Discrepancies:");
-          discrepancies.forEach((d) => {
-            console.debug(d);
-          });
-        }
-      }
-    });
-  };
-
-  // Calculate statistics
   let totalExpectedMessages = amount * messagesByWorker.length;
   let totalReceivedMessages = messagesByWorker.reduce(
     (sum, msgs) => sum + msgs.length,
@@ -517,26 +442,13 @@ export function calculateMessageStats(
   );
   let workersInOrder = 0;
   const workerCount = messagesByWorker.length;
-
   for (const messages of messagesByWorker) {
     const { inOrder } = verifyMessageOrder(messages, prefix, amount);
     if (inOrder) workersInOrder++;
   }
-
   const receptionPercentage =
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
-
-  console.log("Expected messages pattern:", `${prefix}[1-${amount}]-${suffix}`);
-  console.log(
-    `Reception: ${receptionPercentage.toFixed(2)}% (${totalReceivedMessages}/${totalExpectedMessages})`,
-  );
-  console.log(
-    `Order: ${orderPercentage.toFixed(2)}% (${workersInOrder}/${workerCount} workers)`,
-  );
-
-  showDiscrepancies(workersInOrder, workerCount, workers);
-
   const stats = {
     receptionPercentage,
     orderPercentage,
@@ -545,6 +457,5 @@ export function calculateMessageStats(
     totalReceivedMessages,
     totalExpectedMessages,
   };
-  console.log("stats", JSON.stringify(stats));
   return stats;
 }

@@ -1,6 +1,5 @@
 import { exec } from "child_process";
 import { promisify } from "util";
-import type { WorkerManager } from "@workers/manager";
 import metrics from "datadog-metrics";
 
 // Types definitions
@@ -16,25 +15,6 @@ interface MemberThresholds {
   [key: string]: number;
 }
 
-interface ThresholdsData {
-  core: {
-    [key: string]: number;
-  };
-  network: {
-    [key: string]: number;
-  };
-  memberBasedThresholds: {
-    [memberCount: string]: MemberThresholds;
-  };
-  regionMultipliers: {
-    [region: string]: number;
-  };
-  GEO_TO_COUNTRY_CODE: {
-    [region: string]: string;
-  };
-  reliability: number;
-}
-
 interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
@@ -45,7 +25,6 @@ interface NetworkStats {
 
 interface MetricData {
   values: number[];
-  threshold: number;
   members?: string;
 }
 
@@ -58,220 +37,22 @@ interface ParsedTestName {
   members: string;
 }
 
-type OperationType = "core" | "group" | "network";
 type MetricSubType = "stream" | "poll" | "recovery";
 type MetricType = "delivery" | "order";
 
-// Constants
-const THRESHOLDS: ThresholdsData = {
-  core: {
-    clientcreate: 350,
-    inboxstate: 350,
-    newdm: 350,
-    newdmwithidentifiers: 350,
-    sendgm: 200,
-    receivegm: 200,
-    creategroup: 350,
-    creategroupbyidentifiers: 350,
-    syncgroup: 200,
-    updategroupname: 200,
-    removemembers: 250,
-    sendgroupmessage: 200,
-    receivegroupmessage: 200,
-  },
-  network: {
-    dns_lookup: 100,
-    tcp_connection: 150,
-    tls_handshake: 250,
-    processing: 100,
-    server_call: 350,
-  },
-  memberBasedThresholds: {
-    "50": {
-      creategroup: 350,
-      creategroupbyidentifiers: 350,
-      receivegroupmessage: 350,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 250,
-      addmembers: 200,
-    },
-    "100": {
-      creategroup: 400,
-      creategroupbyidentifiers: 400,
-      receivegroupmessage: 400,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "150": {
-      creategroup: 500,
-      creategroupbyidentifiers: 500,
-      receivegroupmessage: 500,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "200": {
-      creategroup: 700,
-      creategroupbyidentifiers: 700,
-      receivegroupmessage: 700,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 300,
-      addmembers: 200,
-    },
-    "250": {
-      creategroup: 900,
-      creategroupbyidentifiers: 900,
-      receivegroupmessage: 900,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "300": {
-      creategroup: 1100,
-      creategroupbyidentifiers: 1100,
-      receivegroupmessage: 1100,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "350": {
-      creategroup: 1300,
-      creategroupbyidentifiers: 1300,
-      receivegroupmessage: 1300,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 400,
-      addmembers: 200,
-    },
-    "400": {
-      creategroup: 1500,
-      creategroupbyidentifiers: 1500,
-      receivegroupmessage: 1500,
-      sendgroupmessage: 200,
-      syncgroup: 200,
-      updategroupname: 200,
-      removemembers: 500,
-      addmembers: 200,
-    },
-  },
-  regionMultipliers: {
-    "us-east": 1,
-    "us-west": 1,
-    europe: 1,
-    asia: 1.5,
-    "south-america": 3,
-  },
-  GEO_TO_COUNTRY_CODE: {
-    "us-east": "US",
-    "us-west": "US",
-    europe: "FR",
-    asia: "JP",
-    "south-america": "BR",
-  },
-  reliability: 99.9,
+const GEO_TO_COUNTRY_CODE = {
+  "us-east": "US",
+  "us-west": "US",
+  europe: "FR",
+  asia: "JP",
+  "south-america": "BR",
 };
-
 // Global state with proper initialization
 const state = {
   isInitialized: false,
   currentGeo: "",
   collectedMetrics: {} as Record<string, MetricData>,
 };
-
-// Helper functions
-/**
- * Find the appropriate member bucket for a given member count
- */
-function findMemberBucket(members: number): string {
-  if (members <= 0) return "0";
-
-  const memberBuckets = Object.keys(THRESHOLDS.memberBasedThresholds)
-    .map(Number)
-    .sort((a, b) => a - b);
-
-  // Find highest bucket <= member count
-  let applicableBucket = "0";
-  for (const bucket of memberBuckets) {
-    if (members >= bucket) {
-      applicableBucket = bucket.toString();
-    } else {
-      break;
-    }
-  }
-
-  return applicableBucket;
-}
-
-/**
- * Get the appropriate threshold for an operation based on type, member count, and region
- */
-export function getThresholdForOperation(
-  operation: string,
-  operationType: OperationType,
-  members: number = 0,
-  region: string = "us-east",
-): number {
-  // Normalize inputs
-  const operationLower = operation.toLowerCase();
-  const regionNormalized = region.toLowerCase().trim();
-  const regionMultiplier =
-    THRESHOLDS.regionMultipliers[
-      regionNormalized as keyof typeof THRESHOLDS.regionMultipliers
-    ] || 1.0;
-
-  let baseThreshold = 0;
-
-  if (operationType === "network") {
-    const networkThreshold =
-      THRESHOLDS.network[operationLower as keyof typeof THRESHOLDS.network];
-    baseThreshold =
-      typeof networkThreshold === "number"
-        ? networkThreshold
-        : THRESHOLDS.network.server_call;
-  } else if (operationType === "core") {
-    baseThreshold =
-      THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-  } else if (operationType === "group" && members > 0) {
-    const applicableBucket = findMemberBucket(members);
-    const memberThresholds =
-      THRESHOLDS.memberBasedThresholds[
-        applicableBucket as keyof typeof THRESHOLDS.memberBasedThresholds
-      ];
-
-    if (memberThresholds && operationLower in memberThresholds) {
-      baseThreshold =
-        memberThresholds[operationLower as keyof typeof memberThresholds];
-      // console.log(
-      //   `Operation: ${operation}, members: ${members}, bucket: ${applicableBucket}, threshold: ${baseThreshold}`,
-      // );
-    } else {
-      baseThreshold =
-        THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-      console.debug(
-        `Operation: ${operation}, members: ${members}, using core threshold: ${baseThreshold}`,
-      );
-    }
-  } else {
-    baseThreshold =
-      THRESHOLDS.core[operationLower as keyof typeof THRESHOLDS.core] || 0;
-  }
-
-  return Math.round(baseThreshold * regionMultiplier);
-}
 
 /**
  * Calculate average of numeric values
@@ -319,17 +100,6 @@ export function groupMetricsByOperation(
   >;
 }
 
-/**
- * Get country code from geolocation
- */
-function getCountryCodeFromGeo(geolocation: string): string {
-  return (
-    THRESHOLDS.GEO_TO_COUNTRY_CODE[
-      geolocation as keyof typeof THRESHOLDS.GEO_TO_COUNTRY_CODE
-    ] || "US"
-  );
-}
-
 // DataDog integration
 /**
  * Initialize DataDog metrics reporting
@@ -353,7 +123,8 @@ export function initDataDog(
   }
 
   try {
-    const countryCode = getCountryCodeFromGeo(geolocation);
+    const countryCode =
+      GEO_TO_COUNTRY_CODE[geolocation as keyof typeof GEO_TO_COUNTRY_CODE];
     state.currentGeo = geolocation;
 
     const initConfig = {
@@ -411,7 +182,6 @@ export function sendMetric(
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        threshold: Number(tags.threshold) || 0,
         members: memberCount,
       };
     }
@@ -433,7 +203,7 @@ export function sendMetric(
  */
 export const sendPerformanceResult = (
   testName: string,
-  workers: WorkerManager,
+  libXmtpVersion: string,
   start: number | undefined,
   testStart?: number,
 ) => {
@@ -444,12 +214,7 @@ export const sendPerformanceResult = (
     const actualStart = start ?? testStart ?? performance.now();
     const deliveryTime = performance.now() - actualStart;
 
-    void sendPerformanceMetric(
-      deliveryTime,
-      testName,
-      workers.getVersion(),
-      false,
-    );
+    void sendPerformanceMetric(deliveryTime, testName, libXmtpVersion, false);
   }
 };
 
@@ -515,15 +280,6 @@ export async function sendPerformanceMetric(
       members,
     } = parseTestName(testName);
 
-    const threshold = getThresholdForOperation(
-      operationName,
-      operationType as OperationType,
-      parseInt(members) || 0,
-      state.currentGeo,
-    );
-
-    const isSuccess = metricValue <= threshold;
-
     sendMetric("duration", metricValue, {
       libxmtp: libXmtpVersion,
       operation: operationName,
@@ -532,25 +288,20 @@ export async function sendPerformanceMetric(
       metric_subtype: operationType,
       description: metricDescription,
       members: members,
-      success: isSuccess.toString(),
-      threshold: threshold.toString(),
       region: state.currentGeo,
     });
 
     // Network stats handling
     if (!skipNetworkStats) {
       const networkStats = await getNetworkStats();
-      const countryCode = getCountryCodeFromGeo(state.currentGeo);
+      const countryCode =
+        GEO_TO_COUNTRY_CODE[
+          state.currentGeo as keyof typeof GEO_TO_COUNTRY_CODE
+        ];
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const networkMetricValue = Math.round(statValue * 1000);
         const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
-        const networkThreshold = getThresholdForOperation(
-          networkPhase,
-          "network",
-          parseInt(members) || 0,
-          state.currentGeo,
-        );
 
         sendMetric("duration", networkMetricValue, {
           libxmtp: libXmtpVersion,
@@ -560,8 +311,6 @@ export async function sendPerformanceMetric(
           network_phase: networkPhase,
           country_iso_code: countryCode,
           members: members,
-          success: networkMetricValue <= networkThreshold ? "true" : "false",
-          threshold: networkThreshold.toString(),
           region: state.currentGeo,
         });
       }
@@ -585,17 +334,12 @@ export function sendDeliveryMetric(
   metricSubType: MetricSubType,
   metricType: MetricType,
 ): void {
-  const threshold = THRESHOLDS.reliability;
-  const isSuccess = metricValue >= threshold;
-
   sendMetric(metricType, Math.round(metricValue), {
     libxmtp: libXmtpVersion,
     sdk: sdkVersion,
     test: testName,
     metric_type: metricType,
     metric_subtype: metricSubType,
-    success: isSuccess.toString(),
-    threshold: threshold.toString(),
   });
 }
 

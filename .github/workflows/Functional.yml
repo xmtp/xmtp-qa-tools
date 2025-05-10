@@ -5,7 +5,7 @@ on:
     branches-ignore: [main]
 
 jobs:
-  check:
+  Functional:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +27,7 @@ jobs:
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: ./scripts/run-test.sh functional 1
+        run: yarn functional
 
       - name: Upload reports artifacts
         if: always()

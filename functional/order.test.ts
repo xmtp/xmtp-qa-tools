@@ -1,12 +1,11 @@
 import { loadEnv } from "@helpers/client";
-import { sendDeliveryMetric } from "@helpers/datadog";
-import { getWorkersFromGroup } from "@helpers/groups";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "order";
 loadEnv(testName);
@@ -17,24 +16,11 @@ describe(testName, async () => {
 
   let start: number;
   let testStart: number;
-  workers = await getWorkers(
-    ["bob", "alice", "joe", "sam", "charlie"],
-    testName,
-  );
+  workers = await getWorkers(getRandomNames(5), testName);
+
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
-  beforeAll(async () => {
-    // Create a new group conversation with Bob (creator), Joe, Alice, Charlie, Dan, Eva, Frank, Grace, Henry, Ivy, and Sam.
-    group = await workers
-      .get("bob")!
-      .client.conversations.newGroup(
-        workers.getWorkers().map((p) => p.client.inboxId),
-      );
 
-    for (let i = 0; i < amount; i++) {
-      await group.send(`gm-${i + 1}-${randomSuffix}`);
-    }
-  });
   setupTestLifecycle({
     expect,
     workers,
@@ -48,35 +34,42 @@ describe(testName, async () => {
       testStart = v;
     },
   });
-
   it("poll_order: verify message order when receiving via pull", async () => {
     try {
-      const workersFromGroup = await getWorkersFromGroup(group, workers);
-      const messagesByWorker: string[][] = [];
+      const creator = workers.getCreator();
+      group = await creator.client.conversations.newGroup(
+        workers.getAllButCreator().map((p) => p.client.inboxId),
+      );
+      await group.sync();
+      console.log("group", group.id);
+      expect(group.id).toBeDefined();
 
-      for (const worker of workersFromGroup) {
-        const conversation =
-          await worker.client.conversations.getConversationById(group.id);
-        if (!conversation) {
-          throw new Error("Conversation not found");
-        }
-        const messages = await conversation.messages();
-        const filteredMessages: string[] = [];
+      await new Promise((r) => setTimeout(r, 1000)); // Allow group propagation
 
-        for (const message of messages) {
-          if (
-            message.contentType?.typeId === "text" &&
-            (message.content as string).includes(randomSuffix)
-          ) {
-            filteredMessages.push(message.content as string);
-          }
-        }
-
-        messagesByWorker.push(filteredMessages);
+      // Send test messages
+      for (let i = 0; i < amount; i++) {
+        await group.send(`gm-${i + 1}-${randomSuffix}`);
       }
 
+      // Collect messages from each worker
+      const messagesByWorker = await Promise.all(
+        workers.getAllButCreator().map(async (worker) => {
+          await worker.client.conversations.syncAll();
+          const conversation =
+            await worker.client.conversations.getConversationById(group.id);
+          if (!conversation) throw new Error("Conversation not found");
+
+          const messages = await conversation.messages();
+          return messages
+            .filter(
+              (m) =>
+                m.contentType?.typeId === "text" &&
+                (m.content as string).includes(randomSuffix),
+            )
+            .map((m) => m.content as string);
+        }),
+      );
       const stats = calculateMessageStats(
-        workers.getWorkers(),
         messagesByWorker,
         "gm-",
         amount,
@@ -85,23 +78,6 @@ describe(testName, async () => {
 
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
-
-      sendDeliveryMetric(
-        stats.receptionPercentage,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
-        testName,
-        "poll",
-        "delivery",
-      );
-      sendDeliveryMetric(
-        stats.orderPercentage,
-        workers.getWorkers()[1].sdkVersion,
-        workers.getWorkers()[1].libXmtpVersion,
-        testName,
-        "poll",
-        "order",
-      );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

@@ -141,6 +141,21 @@ export class WorkerManager {
       console.error(error);
     }
   }
+  getCreator(): Worker {
+    const workers = this.getWorkers();
+    return workers[0];
+  }
+  getReceiver(): Worker {
+    const workers = this.getWorkers();
+    const creator = this.getCreator();
+    const otherWorkers = workers.filter((worker) => worker !== creator);
+    return otherWorkers[Math.floor(Math.random() * otherWorkers.length)];
+  }
+  getAllButCreator(): Worker[] {
+    const workers = this.getWorkers();
+    const creator = this.getCreator();
+    return workers.filter((worker) => worker !== creator);
+  }
   /**
    * Gets all workers as a flat array
    */
@@ -370,8 +385,8 @@ export class WorkerManager {
 export async function getWorkers(
   descriptorsOrAmount: string[] | number,
   testName: string,
-  typeofStreamType: typeofStream = typeofStream.Message,
-  typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
+  typeofStreamType: typeofStream = typeofStream.None,
+  typeOfResponseType: typeOfResponse = typeOfResponse.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
   randomVersions: boolean = false,
 ): Promise<WorkerManager> {

@@ -15,19 +15,16 @@ const {
   PUBLIC_KEY_GANG,
   ENCRYPTION_KEY_GANG,
   GROUP_CODE_GANG,
-} = validateEnvironment(
-  [
-    "WALLET_KEY_CSX",
-    "ENCRYPTION_KEY_CSX",
-    "GROUP_CODE_CSX",
-    "WALLET_KEY_GANG",
-    "ENCRYPTION_KEY_GANG",
-    "GROUP_CODE_GANG",
-    "PUBLIC_KEY_CSX",
-    "PUBLIC_KEY_GANG",
-  ],
-  envPath,
-);
+} = validateEnvironment([
+  "WALLET_KEY_CSX",
+  "ENCRYPTION_KEY_CSX",
+  "GROUP_CODE_CSX",
+  "WALLET_KEY_GANG",
+  "ENCRYPTION_KEY_GANG",
+  "GROUP_CODE_GANG",
+  "PUBLIC_KEY_CSX",
+  "PUBLIC_KEY_GANG",
+]);
 
 export type GroupConfig = {
   id: string;

@@ -3,6 +3,7 @@ import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -23,6 +24,7 @@ describe(testName, async () => {
       "oscar",
     ],
     testName,
+    typeofStream.Message,
   );
   const batchSize = 5;
   const total = 10;
@@ -52,7 +54,7 @@ describe(testName, async () => {
         const sliced = generatedInboxes.slice(0, i);
         console.log("Creating group with", sliced.length, "participants");
         groupsBySize[i] = await workers
-          .getWorkers()[0]
+          .getCreator()
           .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
@@ -121,7 +123,7 @@ describe(testName, async () => {
           `Creating test group with ${inboxIds.length} worker participants`,
         );
         const testGroup = await workers
-          .getWorkers()[0]
+          .getCreator()
           .client.conversations.newGroup(inboxIds, {
             groupName: `Test Group ${i}`,
           });

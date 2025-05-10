@@ -305,15 +305,6 @@ export async function listInstallations(workers: WorkerManager) {
         inboxState.installations.length,
         "installations",
       );
-      //for (const installation of inboxState.installations) {
-      // console.debug(
-      //   worker.name +
-      //     "(" +
-      //     String(inboxState.installations.length) +
-      //     ")" +
-      //     installation.id,
-      // );
-      //}
     }
   }
 }

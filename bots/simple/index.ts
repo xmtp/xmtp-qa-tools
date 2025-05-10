@@ -1,6 +1,7 @@
+import { logAgentDetails } from "@bots/client";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { type Client } from "@xmtp/node-sdk";
 
 async function main() {
   // Get 20 dynamic workers
@@ -12,13 +13,10 @@ async function main() {
   );
   const bot = workers.get("bot");
   const client = bot?.client as Client;
-  console.log(`Agent initialized on address ${bot?.address}`);
-  const env = process.env.XMTP_ENV as XmtpEnv;
-  console.log(`https://xmtp.chat/dm/${bot?.address}?env=${env}`);
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
-
+  void logAgentDetails(client);
   console.log("Waiting for messages...");
   try {
     const stream = client.conversations.streamAllMessages();
@@ -68,8 +66,6 @@ async function main() {
     }
   } catch (error) {
     console.error("Error streaming messages:", error);
-    // Add more detailed error logging
-    console.error("Error details:", JSON.stringify(error, null, 2));
   }
 }
 
