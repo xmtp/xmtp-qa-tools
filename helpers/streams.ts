@@ -108,6 +108,39 @@ export function createGroupConsentSender(
   };
 }
 
+// Type guard for sent event with sentAt
+function hasSentAt(obj: unknown): obj is { sentAt: number } {
+  return (
+    typeof obj === "object" &&
+    obj !== null &&
+    "sentAt" in obj &&
+    typeof obj.sentAt === "number"
+  );
+}
+
+function extractContent(ev: unknown): string {
+  if (typeof ev === "object" && ev !== null) {
+    if ("message" in ev) {
+      const msg = (ev as { message?: unknown }).message;
+      if (
+        typeof msg === "object" &&
+        msg !== null &&
+        "content" in msg &&
+        typeof (msg as { content?: unknown }).content === "string"
+      ) {
+        return (msg as { content: string }).content;
+      }
+    }
+    if (
+      "content" in ev &&
+      typeof (ev as { content?: unknown }).content === "string"
+    ) {
+      return (ev as { content: string }).content;
+    }
+  }
+  return "";
+}
+
 /**
  * Generic helper to collect, time, and compute stats for any stream event.
  */
@@ -125,7 +158,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   const {
     receivers,
     startCollectors,
-    triggerEvents,
     getKey,
     getMessage,
     statsLabel,
@@ -153,9 +185,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     const received = allReceived[idx];
     eventTimings[r.name] = {};
     received.forEach((msg) => {
-      const sentIdx = sentEvents.findIndex((s: any) => getKey(s) === msg.key);
-      if (sentIdx !== -1) {
-        const duration = msg.receivedAt - (sentEvents[sentIdx] as any).sentAt;
+      const sentIdx = sentEvents.findIndex((s) => getKey(s) === msg.key);
+      if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
+        const duration =
+          msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
         eventTimings[r.name][sentIdx] = duration;
         timingSum += duration;
         timingCount++;
@@ -186,23 +219,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   };
   console.log(JSON.stringify(allResults, null, 2));
   return allResults;
-}
-
-function extractContent(ev: unknown): string {
-  if (typeof ev === "object" && ev !== null) {
-    if (
-      "message" in ev &&
-      typeof (ev as any).message === "object" &&
-      (ev as any).message !== null &&
-      "content" in (ev as any).message
-    ) {
-      return (ev as any).message.content ?? "";
-    }
-    if ("content" in ev) {
-      return (ev as any).content ?? "";
-    }
-  }
-  return "";
 }
 
 /**
