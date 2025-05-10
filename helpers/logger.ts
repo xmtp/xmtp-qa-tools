@@ -46,15 +46,6 @@ export const createLogger = () => {
   return logger;
 };
 
-export const logError = (e: unknown, testName: string | undefined): boolean => {
-  if (e instanceof Error) {
-    console.error(`[vitest] Test failed in ${testName}`, e.message);
-  } else {
-    console.error(`Unknown error type:`, typeof e);
-  }
-  return true;
-};
-
 // Extend the winston Logger type to include our custom methods
 declare module "winston" {
   interface Logger {

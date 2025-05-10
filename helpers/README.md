@@ -114,13 +114,7 @@ The `logger.ts` module provides logging utilities with formatting and file outpu
 // Create a formatted logger
 const logger = createLogger();
 
-// Set up pretty console log formatting
-setupPrettyLogs();
-
-// Log test errors and track failures
-const logError(error, expect);
-
-// Add file logging capability
+// // Add file logging capability
 addFileLogging(filename);
 ```
 
