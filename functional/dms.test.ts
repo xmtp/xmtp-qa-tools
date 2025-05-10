@@ -26,7 +26,7 @@ describe(testName, async () => {
     testName,
   );
   let convo: Conversation;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
 
@@ -34,7 +34,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -54,7 +53,7 @@ describe(testName, async () => {
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -71,7 +70,7 @@ describe(testName, async () => {
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -87,7 +86,7 @@ describe(testName, async () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -105,7 +104,7 @@ describe(testName, async () => {
       );
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

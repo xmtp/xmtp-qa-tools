@@ -16,7 +16,6 @@ describe(testName, () => {
   const gmBotAddress = process.env.GM_BOT_ADDRESS;
 
   it("should respond to a message", async () => {
-    console.log("sending gm to bot", gmBotAddress);
     try {
       if (!gmBotAddress) {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");

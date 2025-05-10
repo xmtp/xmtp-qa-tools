@@ -14,7 +14,7 @@ loadEnv(testName);
 describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
-  let hasFailures: boolean = false;
+
   let start: number;
   let testStart: number;
   workers = await getWorkers(
@@ -39,7 +39,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -104,7 +103,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

@@ -27,7 +27,7 @@ describe(testName, async () => {
   workers = await getWorkers(receiverAmount, testName, typeofStream.Message);
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
-  let hasFailures = false;
+
   let start: number;
   let testStart: number;
 
@@ -40,7 +40,7 @@ describe(testName, async () => {
           ...workers.getWorkers().map((p) => p.client.inboxId),
         ]);
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -49,7 +49,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v: number) => {
       start = v;
@@ -89,7 +88,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -148,7 +147,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -231,7 +230,7 @@ describe(testName, async () => {
         "order",
       );
     } catch (e) {
-      hasFailures = logError(e, expect.getState().currentTestName);
+      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

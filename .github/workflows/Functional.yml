@@ -27,9 +27,7 @@ jobs:
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: |
-          yarn script versions
-          ./scripts/run-test.sh functional 1
+        run: ./scripts/run-test.sh functional 1
 
       - name: Upload reports artifacts
         if: always()

@@ -427,26 +427,6 @@ export function sendMetric(
   }
 }
 
-/**
- * Send test results metrics
- */
-export function sendTestResults(hasFailures: boolean, testName: string): void {
-  if (!state.isInitialized) {
-    console.warn("Datadog metrics not initialized");
-    return;
-  }
-
-  try {
-    const metricValue = hasFailures ? 0 : 1;
-    sendMetric("workflow", metricValue, {
-      workflow: testName,
-      metric_type: "workflow",
-    });
-  } catch (error) {
-    console.error("Error reporting to Datadog:", error);
-  }
-}
-
 // Performance tracking
 /**
  * Send performance metrics for tests

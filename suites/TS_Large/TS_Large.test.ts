@@ -22,7 +22,7 @@ describe(testName, async () => {
   const steamsToTest = [typeofStream.None];
   let workers: WorkerManager;
   let start: number;
-  let hasFailures: boolean = false;
+
   let testStart: number;
   let newGroup: Conversation;
 
@@ -44,7 +44,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    hasFailuresRef: hasFailures,
     getStart: () => start,
     setStart: (v) => {
       start = v;
@@ -77,7 +76,7 @@ describe(testName, async () => {
           createTimeMs: (summaryMap[i]?.createTimeMs ?? 0 + creationTimeMs) / 2,
         };
       } catch (e) {
-        hasFailures = logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -99,7 +98,7 @@ describe(testName, async () => {
             `Successfully added ${workersInboxIds.length} members to the group`,
           );
         } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -132,7 +131,7 @@ describe(testName, async () => {
             conversationStreamTimeMs: streamTimeMs,
           };
         } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -167,7 +166,7 @@ describe(testName, async () => {
             groupUpdatedStreamTimeMs: streamTimeMs,
           };
         } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -202,7 +201,7 @@ describe(testName, async () => {
 
           expect(verifyResult.allReceived).toBe(true);
         } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -221,7 +220,7 @@ describe(testName, async () => {
             syncTimeMs: (summaryMap[i]?.syncTimeMs ?? 0 + syncTimeMs) / 2,
           };
         } catch (e) {
-          hasFailures = logError(e, expect.getState().currentTestName);
+          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
