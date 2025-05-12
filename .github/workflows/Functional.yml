@@ -25,6 +25,7 @@ jobs:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
           XMTP_ENV: production
           RUST_BACKTRACE: 1
+          GEOLOCATION: ${{ vars.GEOLOCATION }}
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
