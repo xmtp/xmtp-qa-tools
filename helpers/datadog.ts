@@ -104,27 +104,14 @@ export function initDataDog(
     return true;
   }
 
-  if (testName.includes("ts_large")) {
-    testName = "ts_large";
-  }
   if (!apiKey) {
     console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
     return false;
   }
 
   try {
-    const countryCode =
-      GEO_TO_COUNTRY_CODE[geolocation as keyof typeof GEO_TO_COUNTRY_CODE];
-    state.currentGeo = geolocation;
-
     const initConfig = {
       apiKey: apiKey,
-      defaultTags: [
-        `env:${envValue}`,
-        `test:${testName}`,
-        `region:${geolocation}`,
-        `country_iso_code:${countryCode}`,
-      ],
     };
 
     metrics.init(initConfig);
@@ -205,7 +192,11 @@ export function parseTestName(testName: string): ParsedTestName {
   const metricName = metricNameParts.replaceAll(" > ", ".");
   const metricDescription = testName.split(":")[1] || "";
   const operationParts = metricName.split(".");
-  const testNameExtracted = operationParts[0];
+  let testNameExtracted = operationParts[0];
+
+  if (testNameExtracted.includes("ts_large")) {
+    testNameExtracted = "ts_large";
+  }
 
   // Extract operation name and member count
   let operationName = "";
