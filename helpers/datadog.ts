@@ -134,10 +134,9 @@ export function sendMetric(
     if (!allTags.some((tag) => tag.startsWith("env:"))) {
       allTags.push(`env:${process.env.XMTP_ENV as string}`);
     }
-
-    // Add version tag if not already present
-    if (!allTags.some((tag) => tag.startsWith("xv:"))) {
-      allTags.push(`vm:${process.env.RAILWAY_SERVICE_ID || "unknown"}`);
+    // Add region tag if not already present
+    if (!allTags.some((tag) => tag.startsWith("region:"))) {
+      allTags.push(`region:${process.env.GEOLOCATION as string}`);
     }
 
     // Create a distinctive operation key that properly includes member count
@@ -296,7 +295,7 @@ export function sendDeliveryMetric(
   metricSubType: MetricSubType,
   metricType: MetricType,
 ): void {
-  sendMetric(metricType, Math.round(metricValue), {
+  sendMetric(metricType, metricValue, {
     libxmtp: libXmtpVersion,
     sdk: sdkVersion,
     test: testName,
