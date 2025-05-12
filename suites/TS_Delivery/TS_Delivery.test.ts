@@ -51,10 +51,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v: number) => {
-      start = v;
-    },
   });
 
   it("stream_order: verify message order when receiving via streams", async () => {

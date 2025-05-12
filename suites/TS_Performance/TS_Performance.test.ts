@@ -44,10 +44,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;

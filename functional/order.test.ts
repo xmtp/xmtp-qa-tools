@@ -26,10 +26,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
   it("poll_order: verify message order when receiving via pull", async () => {
     try {

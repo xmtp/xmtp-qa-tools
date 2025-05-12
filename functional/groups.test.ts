@@ -38,10 +38,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {

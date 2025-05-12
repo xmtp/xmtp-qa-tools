@@ -104,6 +104,9 @@ export function initDataDog(
     return true;
   }
 
+  if (testName.includes("ts_large")) {
+    testName = "ts_large";
+  }
   if (!apiKey) {
     console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
     return false;
@@ -174,7 +177,17 @@ export function sendMetric(
     }
 
     state.collectedMetrics[operationKey].values.push(metricValue);
-    console.debug(fullMetricName, Math.round(metricValue), allTags);
+    console.debug(
+      JSON.stringify(
+        {
+          metricName: fullMetricName,
+          metricValue: Math.round(metricValue),
+          tags: allTags,
+        },
+        null,
+        2,
+      ),
+    );
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(
@@ -256,16 +269,10 @@ export async function sendPerformanceMetric(
       members: members,
       region: state.currentGeo,
     };
-    // console.log(
-    //   "metricValue",
-    //   metricValue,
-    //   "values",
-    //   JSON.stringify(values, null, 2),
-    // );
     sendMetric("duration", metricValue, values);
 
     // Network stats handling
-    if (!skipNetworkStats) {
+    if (!skipNetworkStats && testName.includes("ts_performance")) {
       const networkStats = await getNetworkStats();
       const countryCode =
         GEO_TO_COUNTRY_CODE[

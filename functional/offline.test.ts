@@ -26,10 +26,6 @@ describe(
       expect,
       workers,
       testName,
-      getStart: () => start,
-      setStart: (v) => {
-        start = v;
-      },
     });
 
     beforeAll(async () => {

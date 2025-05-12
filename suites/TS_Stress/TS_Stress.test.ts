@@ -53,10 +53,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
   // Create a DM between two workers
   it("createAndSendDms: should create DMs and send messages", async () => {

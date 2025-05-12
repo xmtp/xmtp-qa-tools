@@ -21,10 +21,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("forceStreamError: should measure force a stream error", async () => {
