@@ -91,6 +91,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 - Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
 - 30-minute automated test execution intervals
 - Comprehensive data aggregation in datadog
+- All measurements are in `milliseconds`
 - Testing directly on top of SDKs for real-world scenarios
 - `dev` and `production` network covered
 - Automated testing for web app `xmtp.chat`
@@ -177,13 +178,13 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ### Network performance
 
-| Performance Metric | Current Performance | Target | Status       |
-| ------------------ | ------------------- | ------ | ------------ |
-| DNS Lookup         | 13                  | <50    | ✅ On Target |
-| TCP Connection     | 48                  | <70    | ✅ On Target |
-| TLS Handshake      | 124                 | <150   | ✅ On Target |
-| Processing         | 35                  | <100   | ✅ On Target |
-| Server Call        | 159                 | <250   | ✅ On Target |
+| Performance Metric | Average | Target | Status       |
+| ------------------ | ------- | ------ | ------------ |
+| DNS Lookup         | 13      | <50    | ✅ On Target |
+| TCP Connection     | 48      | <70    | ✅ On Target |
+| TLS Handshake      | 124     | <150   | ✅ On Target |
+| Processing         | 35      | <100   | ✅ On Target |
+| Server Call        | 159     | <250   | ✅ On Target |
 
 ### Regional Network Performance
 
@@ -213,31 +214,32 @@ _Note: `Production` network consistently shows better network performance across
 
 ### Message delivery testing
 
-| Test Area            | Current Performance | Target         | Status       |
-| -------------------- | ------------------- | -------------- | ------------ |
-| Stream Delivery Rate | 100% successful     | 99.9% minimum  | ✅ On Target |
-| Poll Delivery Rate   | 100% successful     | 99.9% minimum  | ✅ On Target |
-| Recovery Rate        | 100% successful     | 99.9% minimum  | ✅ On Target |
-| Stream Order         | 100% in order       | 99.9% in order | ✅ On Target |
-| Poll Order           | 100% in order       | 99.9% in order | ✅ On Target |
-| Recovery Order       | 100% in order       | 99.9% in order | ✅ On Target |
+| Test Area            | Average         | Target         | Status       |
+| -------------------- | --------------- | -------------- | ------------ |
+| Stream Delivery Rate | 100% successful | 99.9% minimum  | ✅ On Target |
+| Poll Delivery Rate   | 100% successful | 99.9% minimum  | ✅ On Target |
+| Recovery Rate        | 100% successful | 99.9% minimum  | ✅ On Target |
+| Stream Order         | 100% in order   | 99.9% in order | ✅ On Target |
+| Poll Order           | 100% in order   | 99.9% in order | ✅ On Target |
+| Recovery Order       | 100% in order   | 99.9% in order | ✅ On Target |
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
 ### Success criteria summary
 
-| Metric               | Current Performance         | Target                 | Status                 |
-| -------------------- | --------------------------- | ---------------------- | ---------------------- |
-| Core SDK Operations  | All within targets          | Meet defined targets   | ✅ On Target           |
-| Group Operations     | ≤300 members                | ≤300 members on target | ✅ On Target           |
-| Network Performance  | All metrics within target   | Meet defined targets   | ✅ On Target           |
-| Message Delivery     | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Stream Message Loss  | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Poll Message Loss    | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Message Order        | 100%                        | 100% in order          | ✅ On Target           |
-| South-america & Asia | more than 40%               | <20% difference        | ⚠️ Performance Concern |
-| US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
-| Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
+| Metric                  | Current Performance         | Target                 | Status                 |
+| ----------------------- | --------------------------- | ---------------------- | ---------------------- |
+| Core SDK Operations     | All within targets          | Meet defined targets   | ✅ On Target           |
+| Small Group Operations  | ≤300                        | ≤300 for <50 members   | ✅ On Target           |
+| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | ⚠️ Performance Concern |
+| Network Performance     | All metrics within target   | Meet defined targets   | ✅ On Target           |
+| Message Delivery        | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Stream Message Loss     | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Poll Message Loss       | 100%                        | 99.9% minimum          | ✅ On Target           |
+| Message Order           | 100%                        | 100% in order          | ✅ On Target           |
+| South-america & Asia    | more than 40%               | <20% difference        | ⚠️ Performance Concern |
+| US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target           |
+| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
 
 ## Tools & utilities
 
