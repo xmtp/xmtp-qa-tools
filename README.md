@@ -160,7 +160,7 @@ _Note: This measurments are taken only from the sender side with open streams._
 
 <div style="overflow-x: auto;">
 
-| Group Size | Sync    | New Members | Metadata | Messages | Status                 |
+| Group Size | SyncAll | New Members | Metadata | Messages | Status                 |
 | ---------- | ------- | ----------- | -------- | -------- | ---------------------- |
 | 50         | 123.31  | 687.30      | 141.60   | 131.50   | ✅ On Target           |
 | 100        | 615.72  | 746.10      | 155.40   | 117.00   | ✅ On Target           |
@@ -174,6 +174,7 @@ _Note: This measurments are taken only from the sender side with open streams._
 </div>
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox)._
+_Note: Exceptions are `syncAll` the rest meadure the stream performance._
 
 ## Networks performance
 
