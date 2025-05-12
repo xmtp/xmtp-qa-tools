@@ -157,7 +157,7 @@ _Note: This measurments are taken only from the sender side and after the group 
 | 350        | 1042             | 198      | 178      | 581         | ⚠️ Performance Concern |
 | 400        | 1192             | 214      | 173      | 609         | ⚠️ Performance Concern |
 
-_Note: This measurments are taken only from the receiver side and after the group is created. The stream is measured as the first message received._
+_Note: This measurments are taken only from the receiver side and after the group is created._
 
 #### Receiver-Side sync performance
 
@@ -172,7 +172,7 @@ _Note: This measurments are taken only from the receiver side and after the grou
 | 350  | 1322    | 1218 | 1846              | 2017           | ⚠️ Performance Concern |
 | 400  | 1292    | 1325 | 2082              | 1792           | ⚠️ Performance Concern |
 
-_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as all the previous sync operations combined._
+_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
 ## Networks performance
 
