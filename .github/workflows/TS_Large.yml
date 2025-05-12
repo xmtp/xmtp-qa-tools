@@ -38,7 +38,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: ./scripts/run-test.sh ts_large_syncs.test 1
+        run: ./scripts/run-test.sh large 1
       - name: Send Slack notification
         if: always()
         env:
