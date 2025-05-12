@@ -29,10 +29,17 @@ describe(testName, async () => {
     steamsToTest,
   );
 
+  let customDuration: number | undefined = undefined;
+  const setCustomDuration = (duration: number | undefined) => {
+    customDuration = duration;
+  };
+
   setupTestLifecycle({
     expect,
     workers,
     testName,
+    getCustomDuration: () => customDuration,
+    setCustomDuration,
   });
 
   for (
@@ -53,7 +60,7 @@ describe(testName, async () => {
         const syncStart = performance.now();
         await worker.client.conversations.syncAll();
         const syncTimeMs = performance.now() - syncStart;
-
+        setCustomDuration(syncTimeMs);
         // Save metrics, including worker name/installationId
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
