@@ -61,7 +61,12 @@ describe(testName, async () => {
         const newGroup = await creator.client.conversations.newGroup(
           generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
         );
-        await newGroup.addMembers([allWorkers[workerAIdx].inboxId]);
+        await newGroup.addMembers([
+          allWorkers[workerAIdx].inboxId,
+          allWorkers[workerBIdx].inboxId,
+          allWorkers[workerCIdx].inboxId,
+          allWorkers[workerDIdx].inboxId,
+        ]);
         const createTimeMs = performance.now() - createTime;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
