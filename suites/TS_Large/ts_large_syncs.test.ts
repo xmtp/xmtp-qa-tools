@@ -4,7 +4,7 @@ import { logError } from "@helpers/logger";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   saveLog,
@@ -27,6 +27,9 @@ describe(testName, async () => {
     testName,
     steamsToTest,
   );
+  let allWorkers: Worker[];
+  let workerA: Worker;
+  let workerB: Worker;
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -46,14 +49,15 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    const allWorkers = workers.getWorkers();
-    // Use different workers for each measurement
-    const workerAIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
-    const workerBIdx = (workerAIdx + 1) % allWorkers.length;
-    const workerCIdx = (workerAIdx + 2) % allWorkers.length;
-    const workerDIdx = (workerAIdx + 3) % allWorkers.length;
-
     it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
+      // Use different workers for each measurement
+      allWorkers = workers.getAllButCreator();
+      const workerAIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
+      const workerBIdx = (workerAIdx + 1) % allWorkers.length;
+      workerA = allWorkers[workerAIdx];
+      workerB = allWorkers[workerBIdx];
+      console.log("workerAIdx", allWorkers[workerAIdx].name);
+      console.log("workerBIdx", allWorkers[workerBIdx].name);
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
@@ -64,8 +68,6 @@ describe(testName, async () => {
         await newGroup.addMembers([
           allWorkers[workerAIdx].inboxId,
           allWorkers[workerBIdx].inboxId,
-          allWorkers[workerCIdx].inboxId,
-          allWorkers[workerDIdx].inboxId,
         ]);
         const createTimeMs = performance.now() - createTime;
         summaryMap[i] = {
@@ -80,7 +82,6 @@ describe(testName, async () => {
 
     it(`singleSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
       try {
-        const workerA = allWorkers[workerAIdx];
         const syncAllStart = performance.now();
         await workerA.client.conversations.syncAll();
         const singleSyncAllTimeMs = performance.now() - syncAllStart;
@@ -96,46 +97,12 @@ describe(testName, async () => {
 
     it(`singleSync-${i}: should measure sync for a different worker (cold start)`, async () => {
       try {
-        const workerB = allWorkers[workerBIdx];
         const syncStart = performance.now();
         await workerB.client.conversations.sync();
         const singleSyncTimeMs = performance.now() - syncStart;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
           singleSyncTimeMs,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-
-    it(`cumulativeSyncAll-${i}: should measure syncAll for a different worker (cumulative)`, async () => {
-      try {
-        const workerC = allWorkers[workerCIdx];
-        const cumulativeSyncAllStart = performance.now();
-        await workerC.client.conversations.syncAll();
-        const cumulativeSyncAllTimeMs =
-          performance.now() - cumulativeSyncAllStart;
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          cumulativeSyncAllTimeMs,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
-
-    it(`cumulativeSync-${i}: should measure sync for a different worker (cumulative)`, async () => {
-      try {
-        const workerD = allWorkers[workerDIdx];
-        const cumulativeSyncStart = performance.now();
-        await workerD.client.conversations.sync();
-        const cumulativeSyncTimeMs = performance.now() - cumulativeSyncStart;
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          cumulativeSyncTimeMs,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

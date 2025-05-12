@@ -23,9 +23,6 @@ export const setupTestLifecycle = ({
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
   let start: number;
-  beforeAll(() => {
-    console.debug("Running on Railway?", !!process.env.RAILWAY_PROJECT_ID);
-  });
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
