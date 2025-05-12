@@ -137,7 +137,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Group operations performance
 
-#### Sender-Side Performance Metrics by Group Size
+#### Sender-Side average performance
 
 <div style="overflow-x: auto;">
 
@@ -156,7 +156,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 _Note: This measurments are taken only from the sender side with open streams._
 
-#### Receiver-Side Average Timing Metrics by Group Size (in milliseconds)
+#### Receiver-Side average performance
 
 <div style="overflow-x: auto;">
 
