@@ -276,7 +276,7 @@ export function loadEnv(testName: string) {
   addFileLogging(testName);
   //overrideConsole(logger);
 
-  initDataDog(testName);
+  initDataDog();
 }
 
 export async function closeEnv(testName: string, workers?: WorkerManager) {
