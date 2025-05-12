@@ -1,5 +1,12 @@
 [
   {
+    "name": "flaunchy",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "flaunchy"
+  },
+  {
     "name": "csx",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "networks": ["dev", "production"],
@@ -14,16 +21,11 @@
     "expectedMessage": "hey"
   },
   {
-    "name": "flaunchy",
-    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
-    "networks": ["production"],
-    "sendMessage": "!"
-  },
-  {
     "name": "byte",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     "networks": ["production"],
-    "sendMessage": "!"
+    "sendMessage": "hi",
+    "expectedMessage": "!"
   },
   {
     "name": "groupt",

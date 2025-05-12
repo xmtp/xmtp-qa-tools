@@ -11,7 +11,7 @@ interface Agent {
   address: string;
   networks: string[];
   sendMessage: string;
-  expectedMessage?: string;
+  expectedMessage: string;
 }
 
 // Type assertion for imported JSON
