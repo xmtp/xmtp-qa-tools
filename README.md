@@ -148,7 +148,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 | 250  | 4787.85    | 1164.93     | ⚠️ Performance Concern |
 | 300  | 6010.43    | 1249.18     | ⚠️ Performance Concern |
 | 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
-| 400  | 7015.99    | 1586.66     | ⚠️ Performance Concern |
+| 400  | 7015.99    | 2700.66     | ⚠️ Performance Concern |
 
 </div>
 

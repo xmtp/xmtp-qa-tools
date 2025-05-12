@@ -4,21 +4,19 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## Quick reference
 
-| Module                       | Purpose                           | Key Features                                     |
-| ---------------------------- | --------------------------------- | ------------------------------------------------ |
-| **client.ts**                | XMTP client creation              | Signers, encryption keys, client versioning      |
-| **datadog.ts**               | Metrics and monitoring            | Performance tracking, test results reporting     |
-| **groups.ts**                | Group conversation management     | Group creation, batch operations, stress testing |
-| **logger.ts**                | Logging utilities                 | Formatted logging, file output, error tracking   |
-| **playwright.ts**            | Browser automation                | UI testing, group creation, message verification |
-| **railway.ts**               | Railway deployment management     | Fetch/redeploy Railway deployments               |
-| **streams.ts**               | Message streaming utilities       | Stream verification, message delivery testing    |
-| **tests.ts**                 | Test configuration and utilities  | Test setup, SDK version management               |
-| **generated-inboxes.json**   | Pre-generated test identities     | Test account data for simulations                |
-| **oldpackages.json**         | Legacy package configurations     | Compatibility testing data                       |
-| **slack.ts**                 | Slack notification utilities      | Send notifications to Slack channels             |
-| **datadog-performance.json** | Performance metrics configuration | Thresholds and expectations for tests            |
-| **ai.ts**                    | OpenAI API utilities              | Generate OpenAI responses                        |
+| Module                     | Purpose                          | Key Features                                     |
+| -------------------------- | -------------------------------- | ------------------------------------------------ |
+| **client.ts**              | XMTP client creation             | Signers, encryption keys, client versioning      |
+| **datadog.ts**             | Metrics and monitoring           | Performance tracking, test results reporting     |
+| **groups.ts**              | Group conversation management    | Group creation, batch operations, stress testing |
+| **logger.ts**              | Logging utilities                | Formatted logging, file output, error tracking   |
+| **playwright.ts**          | Browser automation               | UI testing, group creation, message verification |
+| **railway.ts**             | Railway deployment management    | Fetch/redeploy Railway deployments               |
+| **streams.ts**             | Message streaming utilities      | Stream verification, message delivery testing    |
+| **tests.ts**               | Test configuration and utilities | Test setup, SDK version management               |
+| **generated-inboxes.json** | Pre-generated test identities    | Test account data for simulations                |
+| **slack.ts**               | Slack notification utilities     | Send notifications to Slack channels             |
+| **ai.ts**                  | OpenAI API utilities             | Generate OpenAI responses                        |
 
 ## Usage
 
@@ -261,40 +259,6 @@ Configuration for legacy package versions.
 - Package name mappings
 - Version information
 - Dependency configurations
-
-### datadog-performance.json
-
-Performance metric thresholds and expectations.
-
-**Features:**
-
-- Operation thresholds
-- Network metrics
-- Regional multipliers
-- Group size thresholds
-
-## 📝 Best practices
-
-When using these helper modules, consider the following best practices:
-
-1. **Version management:** Always use the appropriate SDK version for your test
-2. **Error handling:** Properly catch and log errors using the provided utilities
-3. **Resource cleanup:** Close clients and clean up resources after tests
-4. **Metrics:** Use the datadog module to track performance metrics
-5. **Logging:** Enable appropriate logging for debugging issues
-
-## 📋 Core Modules
-
-| Module                         | Purpose                                           |
-| ------------------------------ | ------------------------------------------------- |
-| [client.ts](#clientts)         | Creates signers and manages keys for test workers |
-| [groups.ts](#groupsts)         | Creates test groups with specified participants   |
-| [streams.ts](#streamsts)       | Streams utilities for testing message delivery    |
-| [logger.ts](#loggerts)         | Logging utilities for test output                 |
-| [tests.ts](#testts)            | Test utilities for creating and managing tests    |
-| [datadog.ts](#datadogts)       | Datadog utilities for testing message delivery    |
-| [railway.ts](#railwayts)       | Railway utilities for testing message delivery    |
-| [playwright.ts](#playwrightts) | Playwright utilities for testing message delivery |
 
 ## 🔍 Module Details
 

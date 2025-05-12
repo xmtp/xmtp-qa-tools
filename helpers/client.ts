@@ -276,12 +276,7 @@ export function loadEnv(testName: string) {
   addFileLogging(testName);
   //overrideConsole(logger);
 
-  initDataDog(
-    testName,
-    process.env.XMTP_ENV ?? "",
-    process.env.GEOLOCATION ?? "",
-    process.env.DATADOG_API_KEY ?? "",
-  );
+  initDataDog();
 }
 
 export async function closeEnv(testName: string, workers?: WorkerManager) {
