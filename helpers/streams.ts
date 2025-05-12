@@ -80,6 +80,27 @@ function extractGroupName(ev: unknown): string {
   const nameChange = changes.find((c) => c.fieldName === "group_name");
   return nameChange?.newValue || "";
 }
+
+/**
+ * Extract added inbox IDs from a membership update event
+ */
+function extractAddedInboxes(ev: unknown): string {
+  if (typeof ev !== "object" || ev === null) {
+    return "";
+  }
+
+  const event = ev as {
+    content?: {
+      addedInboxes?: Array<{ inboxId: string }>;
+      initiatedByInboxId?: string;
+    };
+  };
+
+  // Return the first added inbox ID, or empty string if none
+  const addedInboxes = event.content?.addedInboxes || [];
+  return addedInboxes.length > 0 ? addedInboxes[0].inboxId : "";
+}
+
 function extractContent(ev: unknown): string {
   if (typeof ev === "object" && ev !== null) {
     if (
@@ -211,7 +232,7 @@ export async function verifyMessageStream(
   const receivers = await filterReceivers(group as Group, participants);
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, count, 20000),
+    startCollectors: (r) => r.worker.collectMessages(group.id, count),
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
@@ -249,8 +270,7 @@ export async function verifyMetadataStream(
 
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) =>
-      r.worker.collectGroupUpdates(group.id, count, 20000),
+    startCollectors: (r) => r.worker.collectGroupUpdates(group.id, count),
     triggerEvents: async () => {
       const sent: { name: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
@@ -266,6 +286,36 @@ export async function verifyMetadataStream(
     statsLabel: "New name-",
     count,
     randomSuffix,
+    participantsForStats: participants,
+  });
+}
+
+/**
+ * Specialized function to verify group membership streams
+ */
+export async function verifyMembershipStream(
+  group: Group,
+  participants: Worker[],
+  membersToAdd: string[],
+): Promise<VerifyStreamResult> {
+  const receivers = await filterReceivers(group, participants);
+
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectGroupUpdates(group.id, 1),
+    triggerEvents: async () => {
+      const sent: { inboxId: string; sentAt: number }[] = [];
+      const sentAt = Date.now();
+      await group.addMembers(membersToAdd);
+      console.log("member added", membersToAdd);
+      sent.push({ inboxId: membersToAdd[0], sentAt });
+      return sent;
+    },
+    getKey: extractAddedInboxes,
+    getMessage: extractAddedInboxes,
+    statsLabel: "member-add:",
+    count: 1,
+    randomSuffix: "",
     participantsForStats: participants,
   });
 }
@@ -332,7 +382,7 @@ export async function verifyConversationStream(
   return collectAndTimeEventsWithStats({
     receivers: participants,
     startCollectors: (r) =>
-      r.worker.collectConversations(initiator.client.inboxId, 1, 20000),
+      r.worker.collectConversations(initiator.client.inboxId, 1),
     triggerEvents: async () => {
       const participantAddresses = participants.map((p) => {
         if (!p.client) throw new Error(`Participant ${p.name} has no client`);
@@ -354,7 +404,7 @@ export async function verifyConversationStream(
 /**
  * Verifies conversation streaming functionality for group member additions
  */
-export async function verifyAddMembersStream(
+export async function verifyNewConversationStream(
   group: Group,
   participants: Worker[],
 ): Promise<VerifyStreamResult> {
@@ -362,8 +412,7 @@ export async function verifyAddMembersStream(
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) =>
-      r.worker.collectConversations(creatorInboxId, 1, 20000),
+    startCollectors: (r) => r.worker.collectConversations(creatorInboxId, 1),
     triggerEvents: async () => {
       const sentAt = Date.now();
       await group.addMembers(receivers.map((r) => r.client?.inboxId));

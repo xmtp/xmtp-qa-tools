@@ -2,6 +2,7 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
+import { defaultValues } from "@helpers/tests";
 import {
   ConsentState,
   Dm,
@@ -10,6 +11,9 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import type { WorkerBase } from "./manager";
+
+// Default timeout for stream collection in milliseconds
+const DEFAULT_STREAM_TIMEOUT_MS = defaultValues.streamTimeout; // 3 seconds
 
 export enum typeOfResponse {
   Gm = "gm",
@@ -105,6 +109,7 @@ interface StreamGroupUpdateMessage extends BaseStreamMessage {
   group: {
     conversationId: string;
     name: string;
+    addedInboxes?: Array<{ inboxId: string }>;
   };
 }
 
@@ -339,6 +344,8 @@ export class WorkerClient extends Worker {
                     oldValue: string;
                     newValue: string;
                   }>;
+                  addedInboxes?: Array<{ inboxId: string }>;
+                  initiatedByInboxId?: string;
                 };
 
                 const groupName =
@@ -351,6 +358,7 @@ export class WorkerClient extends Worker {
                   group: {
                     conversationId: message.conversationId,
                     name: groupName,
+                    addedInboxes: content.addedInboxes,
                   },
                 });
               }
@@ -540,9 +548,8 @@ export class WorkerClient extends Worker {
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
     additionalInfo?: Record<string, string | number | boolean>;
-    timeout?: number;
   }): Promise<T[]> {
-    const { type, filterFn, count, timeout = 10000 } = options; // Default timeout of 10 seconds
+    const { type, filterFn, count } = options;
 
     return new Promise((resolve) => {
       const events: T[] = [];
@@ -577,10 +584,10 @@ export class WorkerClient extends Worker {
       const timeoutId = setTimeout(() => {
         this.off("worker_message", onMessage);
         console.debug(
-          `Stream collection timed out after ${timeout}ms. Collected ${events.length}/${count} events.`,
+          `Stream collection timed out. Collected ${events.length}/${count} events.`,
         );
         resolve(events); // Resolve with whatever events we've collected so far
-      }, timeout);
+      }, DEFAULT_STREAM_TIMEOUT_MS);
     });
   }
 
@@ -590,7 +597,6 @@ export class WorkerClient extends Worker {
   collectMessages(
     groupId: string,
     count: number,
-    timeout?: number,
   ): Promise<StreamTextMessage[]> {
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
@@ -603,7 +609,6 @@ export class WorkerClient extends Worker {
       },
       count,
       additionalInfo: { groupId },
-      timeout,
     });
   }
 
@@ -613,7 +618,6 @@ export class WorkerClient extends Worker {
   collectGroupUpdates(
     groupId: string,
     count: number,
-    timeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
     console.debug(
       `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
@@ -641,7 +645,6 @@ export class WorkerClient extends Worker {
       },
       count,
       additionalInfo: { groupId },
-      timeout,
     });
   }
 
@@ -651,7 +654,6 @@ export class WorkerClient extends Worker {
   collectConversations(
     fromPeerAddress: string,
     count: number = 1,
-    timeout?: number,
     conversationId?: string,
   ): Promise<StreamConversationMessage[]> {
     const additionalInfo: Record<string, string | number | boolean> = {
@@ -672,7 +674,6 @@ export class WorkerClient extends Worker {
         : undefined,
       count,
       additionalInfo,
-      timeout,
     });
   }
 

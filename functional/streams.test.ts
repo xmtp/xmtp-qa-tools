@@ -1,11 +1,13 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {
-  verifyAddMembersStream,
   verifyConsentStream,
   verifyConversationStream,
+  verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
+  verifyNewConversationStream,
 } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -107,6 +109,29 @@ describe(testName, async () => {
       throw e;
     }
   });
+
+  it("verifyAddMembersStream: should add members to a group", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
+      // Initialize workers
+      group = await workers
+        .getCreator()
+        .client.conversations.newGroup(
+          workers.getAllButCreator().map((w) => w.client.inboxId),
+        );
+
+      const verifyResult = await verifyMembershipStream(
+        group as Group,
+        workers.getWorkers(),
+        [generatedInboxes[0].inboxId],
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
   it("verifyConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
@@ -125,14 +150,14 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyAddMembersStream: should create a add members to a conversation", async () => {
+  it("verifyNewConversationStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
       group = await workers.getCreator().client.conversations.newGroup([]);
 
       // Use the dedicated conversation stream verification helper with 80% success threshold
-      const verifyResult = await verifyAddMembersStream(
+      const verifyResult = await verifyNewConversationStream(
         group as Group,
         workers.getAllButCreator(),
       );

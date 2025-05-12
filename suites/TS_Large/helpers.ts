@@ -8,6 +8,7 @@ export interface SummaryEntry {
   groupSize: number;
   messageStreamTimeMs?: number;
   groupUpdatedStreamTimeMs?: number;
+  addMembersTimeMs?: number;
   conversationStreamTimeMs?: number;
   syncTimeMs?: number;
   createTimeMs?: number;
@@ -33,6 +34,7 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
     const {
       groupSize,
       conversationStreamTimeMs,
+      addMembersTimeMs,
       groupUpdatedStreamTimeMs,
       messageStreamTimeMs,
       syncTimeMs,
@@ -44,8 +46,12 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
     } = entry;
 
     messageToLog += `Group ${groupSize} → `;
+
     if (conversationStreamTimeMs !== undefined) {
-      messageToLog += `New members: ${conversationStreamTimeMs.toFixed(2)} ms; `;
+      messageToLog += `New Group: ${conversationStreamTimeMs.toFixed(2)} ms; `;
+    }
+    if (addMembersTimeMs !== undefined) {
+      messageToLog += `Add Members: ${addMembersTimeMs.toFixed(2)} ms; `;
     }
     if (groupUpdatedStreamTimeMs !== undefined) {
       messageToLog += `Metadata: ${groupUpdatedStreamTimeMs.toFixed(2)} ms; `;

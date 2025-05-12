@@ -20,7 +20,6 @@ const testName = "ts_large_metadata";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const steamsToTest = typeofStream.GroupUpdated;
   let workers: WorkerManager;
 
   let newGroup: Conversation;
@@ -30,7 +29,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames(TS_LARGE_WORKER_COUNT),
     testName,
-    steamsToTest,
+    typeofStream.GroupUpdated,
   );
 
   let customDuration: number | undefined = undefined;
