@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMetadataStream } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
@@ -10,7 +11,6 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   saveLog,
   TS_LARGE_BATCH_SIZE,
-  ts_large_createGroup,
   TS_LARGE_TOTAL,
   TS_LARGE_WORKER_COUNT,
   type SummaryEntry,
@@ -54,11 +54,16 @@ describe(testName, async () => {
   ) {
     it(`receiveMetadata-${i}: should create a group and measure all streams`, async () => {
       try {
-        newGroup = await ts_large_createGroup(workers, i, true);
+        const creator = workers.getCreator();
+        newGroup = await creator.client.conversations.newGroup(
+          generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
+        );
+        await (newGroup as Group).addMembers(
+          workers.getAllButCreator().map((worker) => worker.inboxId),
+        );
         const verifyResult = await verifyMetadataStream(
           newGroup as Group,
           workers.getWorkers(),
-          undefined,
         );
 
         setCustomDuration(verifyResult.averageEventTiming);

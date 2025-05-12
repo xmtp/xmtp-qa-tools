@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,7 +9,6 @@ import { afterAll, describe, expect, it } from "vitest";
 import {
   saveLog,
   TS_LARGE_BATCH_SIZE,
-  ts_large_createGroup,
   TS_LARGE_TOTAL,
   type SummaryEntry,
 } from "./helpers";
@@ -30,7 +30,6 @@ describe(testName, async () => {
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
-    console.debug("[Sync] Custom duration set to:", duration);
     customDuration = duration;
   };
 
@@ -47,25 +46,91 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`syncAll-${i}: should verify sync time for a single worker (cold start)`, async () => {
+    const allWorkers = workers.getWorkers();
+    // Use different workers for each measurement
+    const workerAIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
+    const workerBIdx = (workerAIdx + 1) % allWorkers.length;
+    const workerCIdx = (workerAIdx + 2) % allWorkers.length;
+    const workerDIdx = (workerAIdx + 3) % allWorkers.length;
+
+    it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
       try {
         const createTime = performance.now();
-        await ts_large_createGroup(workers, i, true);
+        const creator = workers.getCreator();
+        console.log("Creator name: ", creator.name);
+        const newGroup = await creator.client.conversations.newGroup(
+          generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
+        );
+        await newGroup.addMembers([allWorkers[workerAIdx].inboxId]);
         const createTimeMs = performance.now() - createTime;
-        // Select one worker per batch (round-robin)
-        const allWorkers = workers.getWorkers();
-        const workerIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
-
-        const worker = allWorkers[workerIdx];
-        const syncStart = performance.now();
-        await worker.client.conversations.syncAll();
-        const syncTimeMs = performance.now() - syncStart;
-        setCustomDuration(syncTimeMs);
-        // Save metrics, including worker name/installationId
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          syncTimeMs,
           createTimeMs,
+        };
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+
+    it(`singleSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
+      try {
+        const workerA = allWorkers[workerAIdx];
+        const syncAllStart = performance.now();
+        await workerA.client.conversations.syncAll();
+        const singleSyncAllTimeMs = performance.now() - syncAllStart;
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          singleSyncAllTimeMs,
+        };
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+
+    it(`singleSync-${i}: should measure sync for a different worker (cold start)`, async () => {
+      try {
+        const workerB = allWorkers[workerBIdx];
+        const syncStart = performance.now();
+        await workerB.client.conversations.sync();
+        const singleSyncTimeMs = performance.now() - syncStart;
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          singleSyncTimeMs,
+        };
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+
+    it(`cumulativeSyncAll-${i}: should measure syncAll for a different worker (cumulative)`, async () => {
+      try {
+        const workerC = allWorkers[workerCIdx];
+        const cumulativeSyncAllStart = performance.now();
+        await workerC.client.conversations.syncAll();
+        const cumulativeSyncAllTimeMs =
+          performance.now() - cumulativeSyncAllStart;
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          cumulativeSyncAllTimeMs,
+        };
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+
+    it(`cumulativeSync-${i}: should measure sync for a different worker (cumulative)`, async () => {
+      try {
+        const workerD = allWorkers[workerDIdx];
+        const cumulativeSyncStart = performance.now();
+        await workerD.client.conversations.sync();
+        const cumulativeSyncTimeMs = performance.now() - cumulativeSyncStart;
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          cumulativeSyncTimeMs,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -74,8 +139,6 @@ describe(testName, async () => {
     });
   }
 
-  // Aft
-  // After all tests have run, output a concise summary of all timings per group size
   afterAll(() => {
     saveLog(summaryMap);
   });
