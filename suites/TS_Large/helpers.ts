@@ -1,7 +1,4 @@
 import fs from "fs";
-import generatedInboxes from "@helpers/generated-inboxes.json";
-import type { WorkerManager } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
 
 export const TS_LARGE_WORKER_COUNT = 5;
 export const TS_LARGE_BATCH_SIZE = 50;
@@ -15,31 +12,12 @@ export interface SummaryEntry {
   syncTimeMs?: number;
   createTimeMs?: number;
   workerName?: string;
+  singleSyncAllTimeMs?: number;
+  singleSyncTimeMs?: number;
+  cumulativeSyncAllTimeMs?: number;
+  cumulativeSyncTimeMs?: number;
 }
 
-export const ts_large_createGroup = async (
-  workers: WorkerManager,
-  groupSize: number,
-  addMembers: boolean,
-): Promise<Group> => {
-  const creator = workers.getCreator();
-  console.log("Creator name: ", creator.name);
-  const newGroup = await creator.client.conversations.newGroup(
-    generatedInboxes.slice(0, groupSize).map((inbox) => inbox.inboxId),
-  );
-  console.log(`Group created with ${groupSize} participants`);
-  if (addMembers) {
-    console.log("Adding members to group");
-
-    await newGroup.addMembers(
-      workers.getAllButCreator().map((worker) => worker.inboxId),
-    );
-    console.log(
-      `Successfully added ${workers.getAllButCreator().length} members to the group`,
-    );
-  }
-  return newGroup;
-};
 export function saveLog(summaryMap: Record<number, SummaryEntry>) {
   if (Object.keys(summaryMap).length === 0) {
     console.log("No timing data was collected.");
@@ -59,6 +37,10 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
       messageStreamTimeMs,
       syncTimeMs,
       createTimeMs,
+      singleSyncAllTimeMs,
+      singleSyncTimeMs,
+      cumulativeSyncAllTimeMs,
+      cumulativeSyncTimeMs,
     } = entry;
 
     messageToLog += `Group ${groupSize} → `;
@@ -76,6 +58,18 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
     }
     if (createTimeMs !== undefined) {
       messageToLog += `Create: ${createTimeMs.toFixed(2)} ms; `;
+    }
+    if (singleSyncAllTimeMs !== undefined) {
+      messageToLog += `SingleSyncAll: ${singleSyncAllTimeMs.toFixed(2)} ms; `;
+    }
+    if (singleSyncTimeMs !== undefined) {
+      messageToLog += `SingleSync: ${singleSyncTimeMs.toFixed(2)} ms; `;
+    }
+    if (cumulativeSyncAllTimeMs !== undefined) {
+      messageToLog += `CumulativeSyncAll: ${cumulativeSyncAllTimeMs.toFixed(2)} ms; `;
+    }
+    if (cumulativeSyncTimeMs !== undefined) {
+      messageToLog += `CumulativeSync: ${cumulativeSyncTimeMs.toFixed(2)} ms; `;
     }
     messageToLog += "\n";
   }

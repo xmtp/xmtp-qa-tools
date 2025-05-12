@@ -1,5 +1,12 @@
 [
   {
+    "name": "flaunchy",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "flaunchy"
+  },
+  {
     "name": "csx",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "networks": ["dev", "production"],
@@ -7,7 +14,21 @@
     "expectedMessage": ["chat", "invalid"]
   },
   {
-    "name": "grouptoss",
+    "name": "clankerchat.base.eth",
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  },
+  {
+    "name": "byte",
+    "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "!"
+  },
+  {
+    "name": "groupt",
     "address": "0x70e25528d8b63905b455140f90a1659d743f21be",
     "networks": ["dev", "production"],
     "sendMessage": "@toss help",

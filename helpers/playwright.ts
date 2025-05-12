@@ -201,9 +201,12 @@ export class XmtpPlaywright {
         : [expectedMessage]
       : [];
 
+    const timeout = defaultValues.streamTimeout * 2;
+    let timer = 0;
     // Poll for new messages
-    for (let i = 0; i < 30; i++) {
+    while (timer < timeout) {
       await page.waitForTimeout(1000);
+      timer += 1000;
       const currentMessageCount = await page
         .locator('div[data-testid="virtuoso-item-list"] > div')
         .count();
