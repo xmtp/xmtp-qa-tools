@@ -16,21 +16,21 @@ const wait = (): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, delay));
 };
 
-describe(testName, () => {
+describe(testName, async () => {
   // Number of messages to send
   const NUM_MESSAGES = 10;
+  let groupId = "4015e815f7369e06edb294c29b1d0694";
   // Target worker (receiver)
-  const receiverInboxId = process.env.CONVOS_PROD as string;
+  const receiverInboxId = process.env.CONVOS_DEV_NOTIFS as string;
   // Sender workers
   const SENDER_WORKERS = ["alice", "bob", "sam", "walt", "tina"];
 
   let workers: WorkerManager;
+  // Initialize workers for senders and target
+  workers = await getWorkers(SENDER_WORKERS, testName);
 
   it(`should send ${NUM_MESSAGES} messages to ${receiverInboxId} with random delays between 3-6 seconds`, async () => {
     try {
-      // Initialize workers for senders and target
-      workers = await getWorkers(SENDER_WORKERS, testName);
-
       console.log(`Starting notification test with random delays...`);
 
       // Send messages sequentially
@@ -71,6 +71,41 @@ describe(testName, () => {
       console.log(
         `Test completed - all ${NUM_MESSAGES} messages have been sent`,
       );
+    } catch (e: unknown) {
+      console.error("Test error:", e);
+      throw e;
+    }
+  });
+
+  it(`should send ${workers.getAllButCreator().length} messages to ${groupId} with random delays between 3-6 seconds`, async () => {
+    try {
+      if (!groupId) {
+        const client = workers.getCreator()?.client;
+        const group = await client?.conversations.newGroup([
+          ...workers.getAllButCreator().map((w) => w.inboxId),
+          receiverInboxId,
+        ]);
+        if (!group) {
+          console.error(`Failed to create conversation for alice`);
+          return;
+        }
+        groupId = group.id;
+      }
+      let counter = 0;
+      for (const worker of workers.getAllButCreator()) {
+        const client = worker.client;
+        await client?.conversations.sync();
+        const conversation =
+          await client?.conversations.getConversationById(groupId);
+        if (!conversation) {
+          console.error(`Failed to create conversation for ${worker.name}`);
+          return;
+        }
+        await conversation.send(
+          `Hello ${counter}/${NUM_MESSAGES}, ${worker.name}!`,
+        );
+        counter++;
+      }
     } catch (e: unknown) {
       console.error("Test error:", e);
       throw e;

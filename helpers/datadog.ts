@@ -174,7 +174,7 @@ export function sendMetric(
     }
 
     state.collectedMetrics[operationKey].values.push(metricValue);
-
+    console.debug(fullMetricName, Math.round(metricValue), allTags);
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(

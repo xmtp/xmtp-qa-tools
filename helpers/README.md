@@ -73,6 +73,30 @@ initDataDog(testName, envValue, geolocation, apiKey);
 sendPerformanceResult(expect, workers, start);
 ```
 
+### Schema for Datadog metrics:
+
+```bash
+
+- `timestamp`: string, ISO8601 or log timestamp
+- `level`: string, log level (e.g., debug, info)
+- `metric_name`: string, the metric name (e.g., xmtp.sdk.duration)
+- `metric_value`: number, the value of the metric
+- `tags`: object, key-value pairs with additional context, including:
+  - `libxmtp`: string or number
+  - `operation`: string
+  - `test`: string
+  - `metric_type`: string
+  - `metric_subtype`: string
+  - `description`: string
+  - `members`: string or number
+  - `region`: string
+  - `env`: string
+  - `vm`: string
+  - `network_phase`: string (optional, for network metrics)
+  - `country_iso_code`: string (optional, for network metrics)
+  - ...any other key:value pairs present in the tags
+```
+
 **Key features:**
 
 - Performance metric tracking
