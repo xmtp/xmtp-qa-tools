@@ -18,8 +18,6 @@ const testName = "streams";
 loadEnv(testName);
 
 describe(testName, async () => {
-  let start: number;
-
   let group: Conversation;
   const names = getRandomNames(5);
   let workers = await getWorkers(names, testName);
@@ -29,10 +27,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("verifyConsentStream: manage consent for all members in a group", async () => {

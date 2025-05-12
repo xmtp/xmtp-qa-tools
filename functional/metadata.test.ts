@@ -12,8 +12,6 @@ loadEnv(testName);
 describe(testName, async () => {
   let group: Group;
 
-  let start: number;
-
   const workers = await getWorkers(
     [
       "henry",
@@ -34,10 +32,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   beforeAll(async () => {

@@ -18,18 +18,12 @@ describe(
     let workers: WorkerManager;
     workers = await getWorkers(["random1", "random2", "random3"], testName);
 
-    let start: number;
-
     const randomSuffix = Math.random().toString(36).substring(2, 10);
 
     setupTestLifecycle({
       expect,
       workers,
       testName,
-      getStart: () => start,
-      setStart: (v) => {
-        start = v;
-      },
     });
 
     beforeAll(async () => {

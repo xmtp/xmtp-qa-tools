@@ -11,8 +11,6 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  let start: number;
-
   workers = await getWorkers(
     [
       "henry",
@@ -33,10 +31,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("clientCreate: should measure creating a client", async () => {

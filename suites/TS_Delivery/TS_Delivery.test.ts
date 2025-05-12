@@ -33,8 +33,6 @@ describe(testName, async () => {
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  let start: number;
-
   beforeAll(async () => {
     try {
       console.log("creating group");
@@ -51,10 +49,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v: number) => {
-      start = v;
-    },
   });
 
   it("stream_order: verify message order when receiving via streams", async () => {

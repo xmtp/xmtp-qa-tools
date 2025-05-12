@@ -29,8 +29,6 @@ describe(testName, async () => {
   const batchSize = 5;
   const total = 10;
 
-  let start: number;
-
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
 
@@ -38,10 +36,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {

@@ -18,6 +18,7 @@ export const createLogger = () => {
 
   // Create the logger with console transport
   const logger = winston.createLogger({
+    level: process.env.LOG_LEVEL || "silly",
     format: combinedFormat,
     transports: [new winston.transports.Console()],
   });

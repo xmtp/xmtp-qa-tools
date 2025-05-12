@@ -22,7 +22,6 @@ loadEnv(testName);
 describe(testName, async () => {
   const steamsToTest = typeofStream.Conversation;
   let workers: WorkerManager;
-  let start: number;
 
   let newGroup: Group;
 
@@ -43,10 +42,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;

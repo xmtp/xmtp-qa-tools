@@ -29,16 +29,10 @@ describe(testName, async () => {
   );
   let convo: Conversation;
 
-  let start: number;
-
   setupTestLifecycle({
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("newDm: should measure creating a DM", async () => {

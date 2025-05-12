@@ -18,8 +18,6 @@ describe(testName, async () => {
   let convo: Conversation;
   let workers: WorkerManager;
 
-  let start: number;
-
   const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
   workers = await getWorkers(
     ["bob"],
@@ -33,10 +31,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("gm-bot: should check if bot is alive", async () => {

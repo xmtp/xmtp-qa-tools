@@ -19,7 +19,6 @@ loadEnv(testName);
 describe(testName, async () => {
   const steamsToTest = typeofStream.None;
   let workers: WorkerManager;
-  let start: number;
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
@@ -29,14 +28,17 @@ describe(testName, async () => {
     steamsToTest,
   );
 
+  let customDuration: number | undefined = undefined;
+  const setCustomDuration = (duration: number | undefined) => {
+    customDuration = duration;
+  };
+
   setupTestLifecycle({
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
+    getCustomDuration: () => customDuration,
+    setCustomDuration,
   });
 
   for (
@@ -57,7 +59,7 @@ describe(testName, async () => {
         const syncStart = performance.now();
         await worker.client.conversations.syncAll();
         const syncTimeMs = performance.now() - syncStart;
-
+        setCustomDuration(syncTimeMs);
         // Save metrics, including worker name/installationId
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),

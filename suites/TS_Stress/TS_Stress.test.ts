@@ -33,8 +33,6 @@ describe(testName, async () => {
   let client: Client;
   let conversation: Conversation;
 
-  let start: number;
-
   beforeAll(async () => {
     try {
       bot = workers.get("bot")!;
@@ -53,10 +51,6 @@ describe(testName, async () => {
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
   // Create a DM between two workers
   it("createAndSendDms: should create DMs and send messages", async () => {

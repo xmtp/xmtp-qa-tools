@@ -13,18 +13,12 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  let start: number;
-
   workers = await getWorkers(getRandomNames(5), testName, typeofStream.Consent);
 
   setupTestLifecycle({
     expect,
     workers,
     testName,
-    getStart: () => start,
-    setStart: (v) => {
-      start = v;
-    },
   });
 
   it("should stream consent updates when a user is blocked", async () => {
