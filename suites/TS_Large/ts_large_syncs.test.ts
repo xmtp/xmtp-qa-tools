@@ -13,7 +13,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "ts_large_syncs";
+const testName = "ts_large_cumulative_syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -23,13 +23,13 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getRandomNames(TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE),
+    getRandomNames((TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE) * 2 + 1),
     testName,
     steamsToTest,
   );
   let allWorkers: Worker[];
-  let workerA: Worker;
-  let workerB: Worker;
+  // Use different workers for each measurement
+  allWorkers = workers.getAllButCreator();
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -43,32 +43,35 @@ describe(testName, async () => {
     getCustomDuration: () => customDuration,
     setCustomDuration,
   });
-
+  let workerA: Worker;
+  let workerB: Worker;
+  let run = 0;
   for (
     let i = TS_LARGE_BATCH_SIZE;
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
     it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
-      // Use different workers for each measurement
-      allWorkers = workers.getAllButCreator();
-      const workerAIdx = (i / TS_LARGE_BATCH_SIZE - 1) % allWorkers.length;
-      const workerBIdx = (workerAIdx + 1) % allWorkers.length;
-      workerA = allWorkers[workerAIdx];
-      workerB = allWorkers[workerBIdx];
-      console.log("workerAIdx", allWorkers[workerAIdx].name);
-      console.log("workerBIdx", allWorkers[workerBIdx].name);
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
-        console.log("Creator name: ", creator.name);
+        workerA = allWorkers[run];
+        workerB = allWorkers[run + 1];
+        console.log(
+          JSON.stringify(
+            {
+              creator: creator.name,
+              workerA: workerA.name,
+              workerB: workerB.name,
+            },
+            null,
+            2,
+          ),
+        );
         const newGroup = await creator.client.conversations.newGroup(
           generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
         );
-        await newGroup.addMembers([
-          allWorkers[workerAIdx].inboxId,
-          allWorkers[workerBIdx].inboxId,
-        ]);
+        await newGroup.addMembers([workerA.inboxId, workerB.inboxId]);
         const createTimeMs = performance.now() - createTime;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
@@ -104,6 +107,7 @@ describe(testName, async () => {
           ...(summaryMap[i] ?? { groupSize: i }),
           singleSyncTimeMs,
         };
+        run += 2;
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;
