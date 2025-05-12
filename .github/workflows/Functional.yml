@@ -28,7 +28,7 @@ jobs:
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: yarn test ts_large_syncs
+        run: yarn large
 
       - name: Upload reports artifacts
         if: always()
