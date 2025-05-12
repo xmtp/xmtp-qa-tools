@@ -16,6 +16,8 @@ export const setupTestLifecycle = ({
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
+  let start: number;
+
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
