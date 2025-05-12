@@ -174,7 +174,7 @@ _Note: This measurments are taken only from the sender side with open streams._
 </div>
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox)._
-_Note: Exceptions are `syncAll` the rest meadure the stream performance._
+_Note: Except for `syncAll` the rest measurements are taken from the stream performance._
 
 ## Networks performance
 
