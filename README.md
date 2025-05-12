@@ -135,61 +135,45 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 </div>
 
-### Group Creation & SyncAll Performance
+### Group operations performance
+
+#### Sender-Side Performance Metrics by Group Size
 
 <div style="overflow-x: auto;">
 
-| Size | Create(ms) | SyncAll(ms) | Status                 |
-| ---- | ---------- | ----------- | ---------------------- |
-| 50   | 1453.51    | 65.37       | ✅ On Target           |
-| 100  | 1935.67    | 443.56      | ✅ On Target           |
-| 150  | 2556.97    | 622.56      | ✅ On Target           |
-| 200  | 3512.65    | 785.11      | ⚠️ Performance Concern |
-| 250  | 4787.85    | 1164.93     | ⚠️ Performance Concern |
-| 300  | 6010.43    | 1249.18     | ⚠️ Performance Concern |
-| 350  | 6294.62    | 2298.25     | ⚠️ Performance Concern |
-| 400  | 7015.99    | 2700.66     | ⚠️ Performance Concern |
+| Size | Send message (ms) | Update name (ms) | Remove members (ms) | Create (ms) | Status                 |
+| ---- | ----------------- | ---------------- | ------------------- | ----------- | ---------------------- |
+| 50   | 86.01             | 135.36           | 138.57              | 1329.20     | ✅ On Target           |
+| 100  | 88.41             | 144.67           | 156.86              | 1522.13     | ✅ On Target           |
+| 150  | 94.55             | 202.64           | 189.81              | 2306.10     | ✅ On Target           |
+| 200  | 93.42             | 193.36           | 204.78              | 3343.84     | ✅ On Target           |
+| 250  | 107.76            | 219.17           | 236.53              | 4276.19     | ⚠️ Performance Concern |
+| 300  | 97.09             | 244.24           | 247.22              | 5462.81     | ⚠️ Performance Concern |
+| 350  | 101.34            | 263.91           | 308.01              | 6640.68     | ⚠️ Performance Concern |
+| 400  | 111.34            | 280.00           | 320.00              | 7640.68     | ⚠️ Performance Concern |
+
+</div>
+
+_Note: This measurments are taken only from the sender side with open streams._
+
+#### Receiver-Side Average Timing Metrics by Group Size (in milliseconds)
+
+<div style="overflow-x: auto;">
+
+| Group Size | Sync    | New Members | Metadata | Messages | Status                 |
+| ---------- | ------- | ----------- | -------- | -------- | ---------------------- |
+| 50         | 123.31  | 687.30      | 141.60   | 131.50   | ✅ On Target           |
+| 100        | 615.72  | 746.10      | 155.40   | 117.00   | ✅ On Target           |
+| 150        | 798.83  | 833.60      | 163.70   | 147.20   | ✅ On Target           |
+| 200        | 1039.06 | 953.70      | 179.10   | 173.90   | ✅ On Target           |
+| 250        | 1285.81 | 1007.90     | 187.80   | 161.70   | ⚠️ Performance Concern |
+| 300        | 1514.04 | 1040.90     | 195.67   | 167.70   | ⚠️ Performance Concern |
+| 350        | 1711.04 | 1042.10     | 198.00   | 178.10   | ⚠️ Performance Concern |
+| 400        | 2514.95 | 1192.10     | 214.17   | 173.60   | ⚠️ Performance Concern |
 
 </div>
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox)._
-
-### Other Group Operations Performance
-
-<div style="overflow-x: auto;">
-
-| Size | Send message (ms) | Update name (ms) | Remove members (ms) | Status       |
-| ---- | ----------------- | ---------------- | ------------------- | ------------ |
-| 50   | 86.01             | 135.36           | 138.57              | ✅ On Target |
-| 100  | 88.41             | 144.67           | 156.86              | ✅ On Target |
-| 150  | 94.55             | 202.64           | 189.81              | ✅ On Target |
-| 200  | 93.42             | 193.36           | 204.78              | ✅ On Target |
-| 250  | 107.76            | 219.17           | 236.53              | ✅ On Target |
-| 300  | 97.09             | 244.24           | 247.22              | ✅ On Target |
-| 400  | 101.34            | 263.91           | 308.01              | ✅ On Target |
-
-</div>
-
-_Note: This measurments are taken only from the sender side._
-
-### Group stream performance
-
-<div style="overflow-x: auto;">
-
-| Size | Receive message (ms) | New name metadata (ms) | New added members (ms) | Status                 |
-| ---- | -------------------- | ---------------------- | ---------------------- | ---------------------- |
-| 50   | 58.00                | 87.75                  | 927.00                 | ⚠️ Performance Concern |
-| 100  | 56.00                | 107.75                 | 1056.00                | ⚠️ Performance Concern |
-| 150  | 72.25                | 110.00                 | 1161.00                | ⚠️ Performance Concern |
-| 200  | 93.00                | 129.00                 | 1425.00                | ⚠️ Performance Concern |
-| 250  | 89.50                | 143.75                 | 1481.00                | ⚠️ Performance Concern |
-| 300  | 85.00                | 173.25                 | 1513.00                | ⚠️ Performance Concern |
-| 350  | 120.50               | 191.75                 | 1523.00                | ⚠️ Performance Concern |
-| 400  | 140.00               | 203.25                 | 1546.00                | ⚠️ Performance Concern |
-
-</div>
-
-_Note: This measurements are taken only from the receiver side (fresh inbox) and type of stream at the time of testing._
 
 ## Networks performance
 
