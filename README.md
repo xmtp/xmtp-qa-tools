@@ -147,14 +147,14 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 | Group Size | New Members | Metadata | Messages | Status                 |
 | ---------- | ----------- | -------- | -------- | ---------------------- |
-| 50         | 687.30      | 141.60   | 131.50   | ✅ On Target           |
-| 100        | 746.10      | 155.40   | 117.00   | ✅ On Target           |
-| 150        | 833.60      | 163.70   | 147.20   | ✅ On Target           |
-| 200        | 953.70      | 179.10   | 173.90   | ✅ On Target           |
-| 250        | 1007.90     | 187.80   | 161.70   | ⚠️ Performance Concern |
-| 300        | 1040.90     | 195.67   | 167.70   | ⚠️ Performance Concern |
-| 350        | 1042.10     | 198.00   | 178.10   | ⚠️ Performance Concern |
-| 400        | 1192.10     | 214.17   | 173.60   | ⚠️ Performance Concern |
+| 50         | 687         | 141      | 131      | ✅ On Target           |
+| 100        | 746         | 155      | 117      | ✅ On Target           |
+| 150        | 833         | 163      | 147      | ✅ On Target           |
+| 200        | 953         | 179      | 173      | ✅ On Target           |
+| 250        | 1007        | 187      | 161      | ⚠️ Performance Concern |
+| 300        | 1040        | 195      | 167      | ⚠️ Performance Concern |
+| 350        | 1042        | 198      | 178      | ⚠️ Performance Concern |
+| 400        | 1192        | 214      | 173      | ⚠️ Performance Concern |
 
 _Note: This measurments are taken only from the receiver side and after the group is created. The stream is measured as the first message received._
 
