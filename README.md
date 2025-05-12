@@ -161,7 +161,7 @@ _Note: This measurments are taken only from the receiver side and after the grou
 
 #### Receiver-Side sync performance
 
-| Size | syncAll | ...  | sync | ...  | Status                 |
+| Size | syncAll |      | sync |      | Status                 |
 | ---- | ------- | ---- | ---- | ---- | ---------------------- |
 | 50   | 366     | ...  | 291  | ...  | ✅ On Target           |
 | 100  | 503     | 521  | 424  | 372  | ✅ On Target           |
