@@ -17,13 +17,13 @@
     "name": "flaunchy",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "networks": ["production"],
-    "sendMessage": "hi"
+    "sendMessage": "!"
   },
   {
     "name": "byte",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     "networks": ["production"],
-    "sendMessage": "hi"
+    "sendMessage": "!"
   },
   {
     "name": "groupt",
