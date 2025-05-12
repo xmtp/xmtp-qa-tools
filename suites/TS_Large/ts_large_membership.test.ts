@@ -29,7 +29,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames(TS_LARGE_WORKER_COUNT),
     testName,
-    typeofStream.Message,
+    typeofStream.GroupUpdated,
   );
 
   let customDuration: number | undefined = undefined;

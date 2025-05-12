@@ -109,6 +109,7 @@ interface StreamGroupUpdateMessage extends BaseStreamMessage {
   group: {
     conversationId: string;
     name: string;
+    addedInboxes?: Array<{ inboxId: string }>;
   };
 }
 
@@ -343,6 +344,8 @@ export class WorkerClient extends Worker {
                     oldValue: string;
                     newValue: string;
                   }>;
+                  addedInboxes?: Array<{ inboxId: string }>;
+                  initiatedByInboxId?: string;
                 };
 
                 const groupName =
@@ -355,6 +358,7 @@ export class WorkerClient extends Worker {
                   group: {
                     conversationId: message.conversationId,
                     name: groupName,
+                    addedInboxes: content.addedInboxes,
                   },
                 });
               }

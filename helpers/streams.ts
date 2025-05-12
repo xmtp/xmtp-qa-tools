@@ -80,6 +80,27 @@ function extractGroupName(ev: unknown): string {
   const nameChange = changes.find((c) => c.fieldName === "group_name");
   return nameChange?.newValue || "";
 }
+
+/**
+ * Extract added inbox IDs from a membership update event
+ */
+function extractAddedInboxes(ev: unknown): string {
+  if (typeof ev !== "object" || ev === null) {
+    return "";
+  }
+
+  const event = ev as {
+    content?: {
+      addedInboxes?: Array<{ inboxId: string }>;
+      initiatedByInboxId?: string;
+    };
+  };
+
+  // Return the first added inbox ID, or empty string if none
+  const addedInboxes = event.content?.addedInboxes || [];
+  return addedInboxes.length > 0 ? addedInboxes[0].inboxId : "";
+}
+
 function extractContent(ev: unknown): string {
   if (typeof ev === "object" && ev !== null) {
     if (
@@ -283,14 +304,16 @@ export async function verifyMembershipStream(
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, 1),
     triggerEvents: async () => {
-      const sent: { name: string; sentAt: number }[] = [];
+      const sent: { inboxId: string; sentAt: number }[] = [];
+      const sentAt = Date.now();
       await group.addMembers(membersToAdd);
       console.log("member added", membersToAdd);
+      sent.push({ inboxId: membersToAdd[0], sentAt });
       return sent;
     },
-    getKey: extractGroupName,
-    getMessage: extractGroupName,
-    statsLabel: "New name-",
+    getKey: extractAddedInboxes,
+    getMessage: extractAddedInboxes,
+    statsLabel: "member-add:",
     count: 1,
     randomSuffix: "",
     participantsForStats: participants,

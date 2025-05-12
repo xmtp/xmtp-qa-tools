@@ -1,8 +1,10 @@
 import { loadEnv } from "@helpers/client";
+import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import {
   verifyConsentStream,
   verifyConversationStream,
+  verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
   verifyNewConversationStream,
@@ -99,6 +101,29 @@ describe(testName, async () => {
       const verifyResult = await verifyMetadataStream(
         group as Group,
         workers.getWorkers(),
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("verifyAddMembersStream: should add members to a group", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
+      // Initialize workers
+      group = await workers
+        .getCreator()
+        .client.conversations.newGroup(
+          workers.getAllButCreator().map((w) => w.client.inboxId),
+        );
+
+      const verifyResult = await verifyMembershipStream(
+        group as Group,
+        workers.getWorkers(),
+        [generatedInboxes[0].inboxId],
       );
 
       expect(verifyResult.allReceived).toBe(true);
