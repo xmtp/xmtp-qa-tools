@@ -161,16 +161,16 @@ _Note: This measurments are taken only from the receiver side and after the grou
 
 #### Receiver-Side sync performance
 
-| Size | syncAll | sync | CumulativeSyncAll | CumulativeSync | Status                 |
-| ---- | ------- | ---- | ----------------- | -------------- | ---------------------- |
-| 50   | 366     | 291  | 482               | 266            | ✅ On Target           |
-| 100  | 503     | 424  | 521               | 372            | ✅ On Target           |
-| 150  | 665     | 522  | 727               | 622            | ✅ On Target           |
-| 200  | 854     | 653  | 1066              | 936            | ✅ On Target           |
-| 250  | 966     | 768  | 1582              | 1148           | ⚠️ Performance Concern |
-| 300  | 1225    | 861  | 1619              | 1362           | ⚠️ Performance Concern |
-| 350  | 1322    | 1218 | 1846              | 2017           | ⚠️ Performance Concern |
-| 400  | 1292    | 1325 | 2082              | 1792           | ⚠️ Performance Concern |
+| Size | syncAll | ...  | sync | ...  | Status                 |
+| ---- | ------- | ---- | ---- | ---- | ---------------------- |
+| 50   | 366     | ...  | 291  | ...  | ✅ On Target           |
+| 100  | 503     | 521  | 424  | 372  | ✅ On Target           |
+| 150  | 665     | 727  | 522  | 622  | ✅ On Target           |
+| 200  | 854     | 1066 | 653  | 936  | ✅ On Target           |
+| 250  | 966     | 1582 | 768  | 1148 | ⚠️ Performance Concern |
+| 300  | 1225    | 1619 | 861  | 1362 | ⚠️ Performance Concern |
+| 350  | 1322    | 1846 | 1218 | 2017 | ⚠️ Performance Concern |
+| 400  | 1292    | 2082 | 1325 | 1792 | ⚠️ Performance Concern |
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
