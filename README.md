@@ -146,16 +146,16 @@ _Note: This measurments are taken only from the sender side and after the group 
 
 #### Receiver-Side stream performance
 
-| Group Size | New Members | Metadata | Messages | Status                 |
-| ---------- | ----------- | -------- | -------- | ---------------------- |
-| 50         | 687         | 141      | 131      | ✅ On Target           |
-| 100        | 746         | 155      | 117      | ✅ On Target           |
-| 150        | 833         | 163      | 147      | ✅ On Target           |
-| 200        | 953         | 179      | 173      | ✅ On Target           |
-| 250        | 1007        | 187      | 161      | ⚠️ Performance Concern |
-| 300        | 1040        | 195      | 167      | ⚠️ Performance Concern |
-| 350        | 1042        | 198      | 178      | ⚠️ Performance Concern |
-| 400        | 1192        | 214      | 173      | ⚠️ Performance Concern |
+| Group Size | New conversation | Metadata | Messages | Add Members | Status                 |
+| ---------- | ---------------- | -------- | -------- | ----------- | ---------------------- |
+| 50         | 687              | 141      | 131      | 401         | ✅ On Target           |
+| 100        | 746              | 155      | 117      | 420         | ✅ On Target           |
+| 150        | 833              | 163      | 147      | 435         | ✅ On Target           |
+| 200        | 953              | 179      | 173      | 499         | ✅ On Target           |
+| 250        | 1007             | 187      | 161      | 526         | ⚠️ Performance Concern |
+| 300        | 1040             | 195      | 167      | 543         | ⚠️ Performance Concern |
+| 350        | 1042             | 198      | 178      | 581         | ⚠️ Performance Concern |
+| 400        | 1192             | 214      | 173      | 609         | ⚠️ Performance Concern |
 
 _Note: This measurments are taken only from the receiver side and after the group is created. The stream is measured as the first message received._
 
