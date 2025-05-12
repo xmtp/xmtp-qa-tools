@@ -11,7 +11,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **groups.ts**              | Group conversation management    | Group creation, batch operations, stress testing |
 | **logger.ts**              | Logging utilities                | Formatted logging, file output, error tracking   |
 | **playwright.ts**          | Browser automation               | UI testing, group creation, message verification |
-| **railway.ts**             | Railway deployment management    | Fetch/redeploy Railway deployments               |
 | **streams.ts**             | Message streaming utilities      | Stream verification, message delivery testing    |
 | **tests.ts**               | Test configuration and utilities | Test setup, SDK version management               |
 | **generated-inboxes.json** | Pre-generated test identities    | Test account data for simulations                |
@@ -172,24 +171,6 @@ await xmtpPlaywright.createGroupAndReceiveGm(addresses);
 - Group creation through UI
 - Message verification
 - Screenshot capabilities
-
-## 🚅 Railway Module
-
-The `railway.ts` module provides utilities for managing Railway deployments.
-
-```typescript
-// Get the latest deployment
-const deployment = await getLatestDeployment();
-
-// Redeploy a deployment
-const redeployedDeployment = await redeployDeployment(deploymentId);
-```
-
-**Key features:**
-
-- Fetch latest deployment information
-- Trigger redeployments
-- Access to deployment URLs
 
 ## 🔄 Streams Module
 
@@ -363,43 +344,3 @@ await page.goto("https://xmtp.chat");
 // Close the browser
 await browser.close();
 ```
-
-### railway.ts
-
-The `helpers/railway.ts` module provides utility functions for interacting with Railway deployments:
-
-### getLatestDeployment()
-
-Fetches the most recent deployment for your Railway service using the Railway GraphQL API.
-
-```typescript
-import { getLatestDeployment } from "./helpers/railway";
-
-// Get the latest deployment information
-const deployment = await getLatestDeployment();
-console.log(`Latest deployment ID: ${deployment.id}`);
-console.log(`Static URL: ${deployment.staticUrl}`);
-```
-
-### redeployDeployment(deploymentId)
-
-Triggers a redeployment of a specific deployment using the Railway GraphQL API.
-
-```typescript
-import { getLatestDeployment, redeployDeployment } from "./helpers/railway";
-
-// Get the latest deployment and then redeploy it
-const latestDeployment = await getLatestDeployment();
-const redeployedDeployment = await redeployDeployment(latestDeployment.id);
-
-console.log(`Redeployed deployment status: ${redeployedDeployment.status}`);
-```
-
-### Required environment variables
-
-To use these functions, you need to set the following environment variables:
-
-- `RAILWAY_SERVICE_ID`: The ID of your Railway service
-- `RAILWAY_API_TOKEN`: Your Railway API token
-- `RAILWAY_PROJECT_ID`: Your Railway project ID
-- `RAILWAY_ENVIRONMENT_ID`: Your Railway environment ID

@@ -21,6 +21,7 @@
     "large": "npx vitest run ./suites/TS_Large/*.test.ts --pool=forks --fileParallelism=false",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
+    "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "run": "tsx scripts/run.ts",
     "script": "tsx scripts/run script",

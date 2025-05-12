@@ -8,7 +8,6 @@ This document provides practical instructions for using the scripts in the `/scr
 | ------------------- | --------------------------------- | ------------------------------------ |
 | **xmtp-gen.ts**     | Creates XMTP client installations | Multiple client installation creator |
 | **local-update.ts** | Updates local inboxes             | Local environment configuration      |
-| **railway.sh**      | Railway deployment script         | Railway management                   |
 | **run.ts**          | General-purpose task runner       | Configurable operations              |
 | **run-test.sh**     | Runs tests                        | Test execution                       |
 | **versions.ts**     | Manages SDK versions              | XMTP SDK version management/symlinks |
