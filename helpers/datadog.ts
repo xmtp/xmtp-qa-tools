@@ -90,7 +90,7 @@ export function groupMetricsByOperation(
 /**
  * Initialize DataDog metrics reporting
  */
-export function initDataDog(testName: string): boolean {
+export function initDataDog(): boolean {
   if (state.isInitialized) {
     return true;
   }
