@@ -1,11 +1,5 @@
 import type { WorkerManager } from "@workers/manager";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  type ExpectStatic,
-} from "vitest";
+import { afterAll, afterEach, beforeEach, type ExpectStatic } from "vitest";
 import { closeEnv } from "./client";
 import { sendPerformanceMetric } from "./datadog";
 
