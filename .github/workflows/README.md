@@ -10,8 +10,8 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **Deploy.yml**                     | Handle Railway deployments             | Version bump in package.json | Auto PR creation and merging for deployments   |
 | **TS_AgentHealth.yml**             | Monitor production agent health        | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
 | **TS_Delivery.yml**                | Test message delivery reliability      | Scheduled, manual            | Verify cross-environment message delivery      |
-| **TS_Geolocation.yml**             | Test regional network performance      | Every 30 minutes, manual     | Run tests from multiple geographic regions     |
 | **TS_Gm.yml**                      | Validate basic messaging functionality | Scheduled, manual            | Verify core protocol operations                |
+| **TS_Large.yml**                   | Test large scale operations            | Scheduled, manual            | Test large scale operations                    |
 | **TS_Performance.yml**             | Measure protocol performance           | Scheduled, manual            | Benchmark operation timing and scalability     |
 | **test-package-compatibility.yml** | Verify package compatibility           | On main branch push, manual  | Test with different Node versions and managers |
 | **upload-installations.yml**       | Backup installation data               | Daily, manual                | Upload keys and installation data as artifacts |
@@ -91,70 +91,6 @@ jobs:
 - Deployment PR creation
 - Auto-merge capability
 - Deployment metadata tracking
-
-## 📊 Geographic Performance Testing
-
-The `TS_Geolocation.yml` workflow tests XMTP performance across different global regions.
-
-```yaml
-name: TS_Geolocation
-strategy:
-  matrix:
-    environment: [production]
-    region: [us-west, us-east, europe, asia]
-```
-
-**Key features:**
-
-- Multi-region testing (US, Europe, Asia)
-- Environment matrix for dev/production testing
-- Performance benchmarking by region
-- Automated artifact collection
-
-## 🧪 Functional Test Validation
-
-The `validate-functional-tests.yml` workflow ensures that functional tests pass on all PRs.
-
-```yaml
-name: Validate functional tests
-on:
-  push:
-    branches-ignore: [main]
-
-jobs:
-  check:
-    # ...
-    steps:
-      # ...
-      - name: Run functional tests
-        run: ./scripts/run-test.sh functional
-```
-
-**Key features:**
-
-- Automated test execution for PRs
-- Local development environment startup
-- Test result logging
-- Artifact collection for debugging
-
-## 📦 Package Compatibility Testing
-
-The `test-package-compatibility.yml` workflow verifies compatibility across environments.
-
-```yaml
-name: Package Compatibility
-strategy:
-  matrix:
-    node-version: [20, 21, 22, 23]
-    package-manager: [npm, yarn, yarn1, pnpm, bun]
-```
-
-**Key features:**
-
-- Node.js version matrix testing
-- Multiple package manager verification
-- Build and client check validation
-- Comprehensive environment coverage
 
 ## 💾 Installation Data Backup
 

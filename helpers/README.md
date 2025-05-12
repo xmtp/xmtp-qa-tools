@@ -64,7 +64,7 @@ The `datadog.ts` module provides utilities for sending metrics and test results 
 
 ```typescript
 // Initialize Datadog metrics
-initDataDog(testName, envValue, geolocation, apiKey);
+initDataDog();
 
 // Send performance metrics
 sendPerformanceResult(expect, workers, start);

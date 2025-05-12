@@ -1,5 +1,11 @@
 import type { WorkerManager } from "@workers/manager";
-import { afterAll, afterEach, beforeEach, type ExpectStatic } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  type ExpectStatic,
+} from "vitest";
 import { closeEnv } from "./client";
 import { sendPerformanceMetric } from "./datadog";
 
@@ -17,7 +23,9 @@ export const setupTestLifecycle = ({
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
   let start: number;
-
+  beforeAll(() => {
+    console.debug("Running on Railway?", !!process.env.RAILWAY_PROJECT_ID);
+  });
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
