@@ -11,7 +11,7 @@ interface Agent {
   address: string;
   networks: string[];
   sendMessage: string;
-  expectedMessage: string;
+  expectedMessage?: string;
 }
 
 // Type assertion for imported JSON
@@ -25,7 +25,9 @@ describe(testName, () => {
     for (const network of agent.networks) {
       it(`Check ${agent.name} health on ${network} network`, async () => {
         try {
-          console.log(`Testing ${agent.name} on ${network}`);
+          console.log(
+            `Testing ${agent.name} with address ${agent.address} on ${network}`,
+          );
           const xmtpTester = new XmtpPlaywright({
             headless: true,
             env: network as XmtpEnv,
@@ -33,7 +35,7 @@ describe(testName, () => {
           const result = await xmtpTester.newDmWithDeeplink(
             agent.address,
             agent.sendMessage,
-            agent.expectedMessage,
+            agent.expectedMessage ?? undefined,
           );
           expect(result).toBe(true);
         } catch (e) {

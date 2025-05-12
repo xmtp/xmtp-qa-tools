@@ -1,19 +1,21 @@
 [
   {
-    "name": "flaunchy",
-    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
-    "networks": ["production"],
-    "sendMessage": "hey there"
-  },
-  {
     "name": "csx",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "networks": ["dev", "production"],
-    "sendMessage": "hola"
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"]
   },
   {
     "name": "clankerchat.base.eth",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  },
+  {
+    "name": "flaunchy",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "networks": ["production"],
     "sendMessage": "hi"
   },
@@ -34,24 +36,28 @@
     "name": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "networks": ["production"],
-    "sendMessage": "hey there how are you?"
+    "sendMessage": "hey there how are you?",
+    "expectedMessage": "thinking"
   },
   {
     "name": "key-check",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "networks": ["dev", "production"],
-    "sendMessage": "/kc help"
+    "sendMessage": "/kc help",
+    "expectedMessage": "commands"
   },
   {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
     "networks": ["production"],
-    "sendMessage": "hola"
+    "sendMessage": "hola",
+    "expectedMessage": "gm"
   },
   {
     "name": "gang",
     "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
     "networks": ["dev", "production"],
-    "sendMessage": "hola"
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"]
   }
 ]

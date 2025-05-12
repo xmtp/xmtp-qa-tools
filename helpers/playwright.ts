@@ -1,4 +1,3 @@
-import crypto from "crypto";
 import fs from "fs";
 import path from "path";
 import type { XmtpEnv } from "@xmtp/node-sdk";
@@ -19,7 +18,6 @@ interface XmtpPlaywrightOptions {
   headless?: boolean;
   env?: XmtpEnv | null;
   defaultUser?: boolean;
-  testId?: string; // Add test ID for unique identification
 }
 
 export class XmtpPlaywright {
@@ -30,19 +28,16 @@ export class XmtpPlaywright {
   private readonly walletKey: string;
   private readonly encryptionKey: string;
   private readonly defaultUser: boolean;
-  private readonly testId: string;
 
   constructor(
     {
       headless = true,
       env = null,
       defaultUser = false,
-      testId = "",
     }: XmtpPlaywrightOptions = {
       headless: true,
       env: null,
       defaultUser: false,
-      testId: "",
     },
   ) {
     this.isHeadless =
@@ -52,17 +47,6 @@ export class XmtpPlaywright {
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
-    // Generate a unique test ID if not provided
-    this.testId = testId || crypto.randomUUID().substring(0, 8);
-    console.log(`Test instance ID: ${this.testId}`);
-  }
-
-  /**
-   * Resets the message tracking state
-   */
-  private resetMessageState(): void {
-    // This method is kept for compatibility with existing code
-    // but no longer needs to do anything
   }
 
   /**
@@ -72,7 +56,6 @@ export class XmtpPlaywright {
     addresses: string[],
     expectedResponse?: string | string[],
   ): Promise<void> {
-    this.resetMessageState();
     const session = await this.startPage();
     try {
       await this.fillAddressesAndCreate(session.page, addresses);
@@ -86,7 +69,7 @@ export class XmtpPlaywright {
       }
     } catch (error) {
       console.error("Error in createGroupAndReceiveGm:", error);
-      await this.takeSnapshot(session.page, `before-finding-gm-${this.testId}`);
+      await this.takeSnapshot(session.page, "before-finding-gm");
       throw error;
     } finally {
       await this.closeBrowser(session.browser);
@@ -101,7 +84,6 @@ export class XmtpPlaywright {
     sendMessage: string,
     expectedMessage?: string | string[],
   ): Promise<boolean> {
-    this.resetMessageState();
     const session = await this.startPage(address);
     try {
       return await this.sendAndWaitForResponse(
@@ -111,10 +93,7 @@ export class XmtpPlaywright {
       );
     } catch (error) {
       console.error("Could not find expected message:", error);
-      await this.takeSnapshot(
-        session.page,
-        `before-finding-expected-message-${this.testId}`,
-      );
+      await this.takeSnapshot(session.page, "before-finding-expected-message");
       return false;
     } finally {
       await this.closeBrowser(session.browser);
@@ -131,10 +110,7 @@ export class XmtpPlaywright {
     }
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const screenshotPath = path.join(
-      snapshotDir,
-      `${name}-${timestamp}-${this.testId}.png`,
-    );
+    const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
     await page.screenshot({ path: screenshotPath, fullPage: true });
   }
 
@@ -176,10 +152,7 @@ export class XmtpPlaywright {
       return await this.waitForResponse(page, expectedMessage);
     } catch (error) {
       console.error("Error in sendAndWaitForResponse:", error);
-      await this.takeSnapshot(
-        page,
-        `before-finding-expected-message-${this.testId}`,
-      );
+      await this.takeSnapshot(page, "before-finding-expected-message");
       return false;
     }
   }
@@ -210,19 +183,15 @@ export class XmtpPlaywright {
     page: Page,
     expectedMessage?: string | string[],
   ): Promise<boolean> {
-    // Reset message tracking state at the beginning
-    this.resetMessageState();
-
     // Wait for messages to appear in the virtuoso list
     await page.waitForSelector('div[data-testid="virtuoso-item-list"] > div', {
       timeout: defaultValues.streamTimeout,
     });
 
-    // Get initial message count + 1 to account for the message we just sent
-    const initialMessageCount =
-      (await page
-        .locator('div[data-testid="virtuoso-item-list"] > div')
-        .count()) + 1;
+    // Get initial message count
+    const initialMessageCount = await page
+      .locator('div[data-testid="virtuoso-item-list"] > div')
+      .count();
     console.log(`Initial message count: ${initialMessageCount}`);
 
     // Convert expected message to array for consistent handling
@@ -232,90 +201,75 @@ export class XmtpPlaywright {
         : [expectedMessage]
       : [];
 
-    // Set timeout parameters
-    const startTime = Date.now();
-    const maxWaitTime = defaultValues.streamTimeout * 2;
-    const checkInterval = 1000; // Check every 1 second
+    const timeout = defaultValues.streamTimeout;
+    // Poll for new messages
+    for (let i = 0; i < timeout / 1000; i++) {
+      await page.waitForTimeout(1000);
+      const currentMessageCount = await page
+        .locator('div[data-testid="virtuoso-item-list"] > div')
+        .count();
 
-    // Wait for response in a loop until timeout
-    while (Date.now() - startTime < maxWaitTime) {
-      await page.waitForTimeout(checkInterval);
+      if (currentMessageCount > initialMessageCount) {
+        const responseText = await this.getLatestMessageText(page);
 
-      try {
-        const currentMessageCount = await page
-          .locator('div[data-testid="virtuoso-item-list"] > div')
-          .count();
-
-        if (currentMessageCount > initialMessageCount) {
-          // Get the latest message text
-          const messageItems = await page
-            .locator('div[data-testid="virtuoso-item-list"] > div')
-            .all();
-
-          if (messageItems.length === 0) continue;
-
-          const latestMessageElement = messageItems[messageItems.length - 1];
-          const responseText = (await latestMessageElement.textContent()) || "";
-          const latestCount = messageItems.length;
-          console.log(`Latest message: "${responseText}" ${latestCount}`);
-          if (latestCount > initialMessageCount && !expectedPhrases.length) {
-            console.log(`Latest message: "${responseText}" ${latestCount}`);
-            return true;
-          }
-          // Check if any of the expected phrases are in the response
-          const messageFound = expectedPhrases.some((phrase) =>
-            responseText.toLowerCase().includes(phrase.toLowerCase()),
-          );
-
-          if (messageFound) {
-            console.log(
-              `Found expected response containing one of [${expectedPhrases.join(", ")}]: "${responseText}"`,
-            );
-            return true;
-          }
+        // If no expected message, any response is valid
+        if (!expectedPhrases.length) {
+          console.log(`Received a response: "${responseText}"`);
+          return true;
         }
-      } catch (error) {
-        console.error(
-          `Error while checking for response: ${error instanceof Error ? error.message : String(error)}`,
+
+        // Check if any of the expected phrases are in the response
+        const messageFound = expectedPhrases.some((phrase) =>
+          responseText.toLowerCase().includes(phrase.toLowerCase()),
         );
-        // Continue the loop even if there's an error
+
+        if (messageFound) {
+          console.log(
+            `Found expected response containing one of [${expectedPhrases.join(", ")}]: "${responseText}"`,
+          );
+          return true;
+        }
       }
     }
 
     console.log(
       expectedPhrases.length
-        ? `Timeout: Failed to find response containing any of [${expectedPhrases.join(", ")}] after ${maxWaitTime / 1000} seconds`
-        : `Timeout: Failed to receive any response after ${maxWaitTime / 1000} seconds`,
+        ? `Failed to find response containing any of [${expectedPhrases.join(", ")}]`
+        : "Failed to receive any response",
     );
 
     return false;
   }
 
   /**
+   * Gets the text of the latest message in the conversation
+   */
+  private async getLatestMessageText(page: Page): Promise<string> {
+    const messageItems = await page
+      .locator('div[data-testid="virtuoso-item-list"] > div')
+      .all();
+
+    if (messageItems.length === 0) return "";
+
+    const latestMessageElement = messageItems[messageItems.length - 1];
+    const responseText = (await latestMessageElement.textContent()) || "";
+    console.log(`Latest message: "${responseText}"`);
+
+    return responseText;
+  }
+
+  /**
    * Starts a new page with the specified options
    */
   private async startPage(address?: string): Promise<BrowserSession> {
-    this.resetMessageState();
-
-    // Create unique user data dir for parallel execution
-    const userDataDir = path.join(
-      process.cwd(),
-      ".playwright-data",
-      `user-data-${this.testId}`,
-    );
-    if (!fs.existsSync(userDataDir)) {
-      fs.mkdirSync(userDataDir, { recursive: true });
-    }
-
     const browser = await chromium.launch({
       headless: this.isHeadless,
       slowMo: this.isHeadless ? 0 : 100,
     });
 
-    const context: BrowserContext = await browser.newContext({
-      userAgent: `XmtpPlaywrightTest/${this.testId}`,
-      viewport: { width: 1280, height: 720 },
-    });
+    const context: BrowserContext = await browser.newContext(
+      this.isHeadless ? {} : {},
+    );
 
     const page = await context.newPage();
 
@@ -329,8 +283,6 @@ export class XmtpPlaywright {
       ? `https://xmtp.chat/dm/${address}?env=${this.env}`
       : "https://xmtp.chat/";
 
-    console.log("Address:", address);
-    console.log("Env:", this.env);
     console.log("Navigating to:", url);
     await page.goto(url);
     await page.waitForTimeout(1000);
