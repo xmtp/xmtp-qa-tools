@@ -190,23 +190,13 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 | Region        | Server Call | TLS | ~ us-east | Status                 |
 | ------------- | ----------- | --- | --------- | ---------------------- |
-| us-east       | 158         | 123 | Baseline  | ✅ On Target           |
-| us-west       | 151         | 118 | -4.3%     | ✅ On Target           |
-| europe        | 159         | 125 | +0.7%     | ✅ On Target           |
-| asia          | 152         | 119 | -3.9%     | ✅ On Target           |
-| south-america | 754         | 573 | +160.3%   | ⚠️ Performance Concern |
+| us-east       | 140         | 123 | Baseline  | ✅ On Target           |
+| us-west       | 151         | 118 | <20% ~    | ✅ On Target           |
+| europe        | 230         | 180 | <40% ~    | ✅ On Target           |
+| asia          | 450         | 350 | >100% ~   | ⚠️ Performance Concern |
+| south-america | 734         | 573 | >200% ~   | ⚠️ Performance Concern |
 
 _Note: Baseline is `us-east` region and `production` network._
-
-### Dev vs Production Network Performance Comparison
-
-| Region        | Dev | Production | Difference | Status                 |
-| ------------- | --- | ---------- | ---------- | ---------------------- |
-| us-east       | 158 | 162        | +2.7%      | ✅ Dev Better          |
-| us-west       | 151 | 188        | +24.3%     | ⚠️ Performance Concern |
-| europe        | 159 | 141        | -11.5%     | ✅ Production Better   |
-| asia          | 152 | 172        | +13.0%     | ⚠️ Performance Concern |
-| south-america | 754 | 573        | -24.1%     | ✅ Production Better   |
 
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
