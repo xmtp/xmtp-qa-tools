@@ -20,7 +20,6 @@ const testName = "ts_large_messages";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const steamsToTest = typeofStream.Message;
   let workers: WorkerManager;
 
   let newGroup: Conversation;
@@ -30,7 +29,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames(TS_LARGE_WORKER_COUNT),
     testName,
-    steamsToTest,
+    typeofStream.Message,
   );
 
   let customDuration: number | undefined = undefined;

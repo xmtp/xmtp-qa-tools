@@ -1,11 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
-  verifyAddMembersStream,
   verifyConsentStream,
   verifyConversationStream,
   verifyMessageStream,
   verifyMetadataStream,
+  verifyNewConversationStream,
 } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -125,14 +125,14 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyAddMembersStream: should create a add members to a conversation", async () => {
+  it("verifyNewConversationStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
       group = await workers.getCreator().client.conversations.newGroup([]);
 
       // Use the dedicated conversation stream verification helper with 80% success threshold
-      const verifyResult = await verifyAddMembersStream(
+      const verifyResult = await verifyNewConversationStream(
         group as Group,
         workers.getAllButCreator(),
       );

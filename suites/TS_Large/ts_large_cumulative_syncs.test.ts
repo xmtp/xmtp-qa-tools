@@ -17,7 +17,6 @@ const testName = "ts_large_cumulative_syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const steamsToTest = typeofStream.None;
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -25,7 +24,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames((TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE) * 2 + 1),
     testName,
-    steamsToTest,
+    typeofStream.None,
   );
   let allWorkers: Worker[];
   // Use different workers for each measurement
