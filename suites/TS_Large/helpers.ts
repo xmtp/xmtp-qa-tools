@@ -1,7 +1,4 @@
 import fs from "fs";
-import generatedInboxes from "@helpers/generated-inboxes.json";
-import type { Worker, WorkerManager } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
 
 export const TS_LARGE_WORKER_COUNT = 5;
 export const TS_LARGE_BATCH_SIZE = 50;
