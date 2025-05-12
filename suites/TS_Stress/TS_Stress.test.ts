@@ -33,8 +33,6 @@ describe(testName, async () => {
   let client: Client;
   let conversation: Conversation;
 
-  let start: number;
-
   beforeAll(async () => {
     try {
       bot = workers.get("bot")!;

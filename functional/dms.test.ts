@@ -29,8 +29,6 @@ describe(testName, async () => {
   );
   let convo: Conversation;
 
-  let start: number;
-
   setupTestLifecycle({
     expect,
     workers,

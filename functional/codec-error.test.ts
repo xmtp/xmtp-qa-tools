@@ -15,8 +15,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(getRandomNames(2), testName);
 
-  let start: number;
-
   setupTestLifecycle({
     expect,
     workers,

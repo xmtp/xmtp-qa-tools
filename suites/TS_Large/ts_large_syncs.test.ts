@@ -19,7 +19,6 @@ loadEnv(testName);
 describe(testName, async () => {
   const steamsToTest = typeofStream.None;
   let workers: WorkerManager;
-  let start: number;
 
   const summaryMap: Record<number, SummaryEntry> = {};
 

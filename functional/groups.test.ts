@@ -29,8 +29,6 @@ describe(testName, async () => {
   const batchSize = 5;
   const total = 10;
 
-  let start: number;
-
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
 

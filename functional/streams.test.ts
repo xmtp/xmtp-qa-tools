@@ -18,8 +18,6 @@ const testName = "streams";
 loadEnv(testName);
 
 describe(testName, async () => {
-  let start: number;
-
   let group: Conversation;
   const names = getRandomNames(5);
   let workers = await getWorkers(names, testName);

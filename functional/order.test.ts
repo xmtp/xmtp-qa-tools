@@ -15,8 +15,6 @@ describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
-  let start: number;
-
   workers = await getWorkers(getRandomNames(5), testName, typeofStream.Message);
 
   let group: Group;

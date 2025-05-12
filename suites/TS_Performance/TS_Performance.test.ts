@@ -27,7 +27,6 @@ describe(testName, async () => {
   console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
   let dm: Conversation;
   let workers: WorkerManager;
-  let start: number;
 
   workers = await getWorkers(
     getRandomNames(10),

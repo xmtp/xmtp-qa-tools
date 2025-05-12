@@ -13,8 +13,6 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  let start: number;
-
   workers = await getWorkers(getRandomNames(5), testName, typeofStream.Consent);
 
   setupTestLifecycle({

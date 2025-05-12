@@ -22,7 +22,6 @@ loadEnv(testName);
 describe(testName, async () => {
   const steamsToTest = typeofStream.Message;
   let workers: WorkerManager;
-  let start: number;
 
   let newGroup: Conversation;
 

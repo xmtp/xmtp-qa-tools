@@ -12,8 +12,6 @@ loadEnv(testName);
 describe(testName, async () => {
   let group: Group;
 
-  let start: number;
-
   const workers = await getWorkers(
     [
       "henry",
