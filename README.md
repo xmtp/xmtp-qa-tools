@@ -184,8 +184,8 @@ _Note: This measurments are taken only from the sender side._
 | 200  | 93.00                | 129.00                 | 1425.00                | ⚠️ Performance Concern |
 | 250  | 89.50                | 143.75                 | 1481.00                | ⚠️ Performance Concern |
 | 300  | 85.00                | 173.25                 | 1513.00                | ⚠️ Performance Concern |
-| 350  | 99.50                | 191.75                 | 1523.00                | ⚠️ Performance Concern |
-| 400  | 98.00                | 203.25                 | 1546.00                | ⚠️ Performance Concern |
+| 350  | 120.50               | 191.75                 | 1523.00                | ⚠️ Performance Concern |
+| 400  | 140.00               | 203.25                 | 1546.00                | ⚠️ Performance Concern |
 
 </div>
 
