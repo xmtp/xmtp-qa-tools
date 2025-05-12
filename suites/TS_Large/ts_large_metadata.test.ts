@@ -52,7 +52,7 @@ describe(testName, async () => {
     i <= TS_LARGE_TOTAL;
     i += TS_LARGE_BATCH_SIZE
   ) {
-    it(`receiveGroupMetadata-${i}: should create a group and measure all streams`, async () => {
+    it(`receiveMetadata-${i}: should create a group and measure all streams`, async () => {
       try {
         newGroup = await ts_large_createGroup(workers, i, true);
         const verifyResult = await verifyMetadataStream(

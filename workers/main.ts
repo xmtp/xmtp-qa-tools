@@ -42,18 +42,20 @@ if (!parentPort) {
 }
 
 // Optional logs to see what's being passed into the worker.
-console.log("[Worker] Started with workerData:", workerData);
+console.debug("[Worker] Started with workerData:", workerData);
 
 // Listen for messages from the parent
 parentPort.on("worker_message", (message: { type: string; data: any }) => {
   switch (message.type) {
     case "initialize":
       // You can add logs or do any one-time setup here.
-      console.log("[Worker] Received 'initialize' message:", message.data);
+      console.debug("[Worker] Received 'initialize' message:", message.data);
       break;
 
     default:
-      console.log(\`[Worker] Received unknown message type: \${message.type}\`);
+      console.debug(
+        \`[Worker] Received unknown message type: \${message.type}\`,
+      );
       break;
   }
 });
@@ -190,7 +192,7 @@ export class WorkerClient extends Worker {
    * Reinstalls the worker
    */
   public async reinstall(): Promise<void> {
-    console.log(`[${this.nameId}] Reinstalling worker`);
+    console.debug(`[${this.nameId}] Reinstalling worker`);
     // Stop active streams first
     this.stopStreams();
     // Then terminate the worker thread
@@ -202,7 +204,7 @@ export class WorkerClient extends Worker {
   private setupEventHandlers() {
     // Log messages from the Worker
     this.on("worker_message", (message) => {
-      console.log(`[${this.nameId}] Worker message:`, message);
+      console.debug(`[${this.nameId}] Worker message:`, message);
     });
 
     // Handle Worker errors
@@ -326,8 +328,8 @@ export class WorkerClient extends Worker {
               message?.contentType?.typeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
-              console.log(
-                `[${this.nameId}] Received group updated: ${JSON.stringify(message)}`,
+              console.debug(
+                `Received group updated, ${JSON.stringify(message, null, 2)}`,
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
@@ -358,8 +360,8 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.log(
-                `[${this.nameId}] Received message: ${JSON.stringify(message?.content)}`,
+              console.debug(
+                `Received message, ${JSON.stringify(message?.content, null, 2)}`,
               );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
@@ -437,9 +439,7 @@ export class WorkerClient extends Worker {
           baseName,
         );
 
-        console.log(
-          `[${this.nameId}] GPT response: "${response.slice(0, 50)}..."`,
-        );
+        console.debug(`GPT response, "${response.slice(0, 50)}..."`);
 
         // Send the response
         await conversation?.send(response);
@@ -465,9 +465,7 @@ export class WorkerClient extends Worker {
           for await (const conversation of stream) {
             if (!this.activeStreams) break;
 
-            console.log(
-              `[${this.nameId}] Received conversation: ${conversation?.id}`,
-            );
+            console.debug(`Received conversation, ${conversation?.id}`);
             if (!conversation?.id) continue;
 
             if (this.listenerCount("worker_message") > 0) {
@@ -497,9 +495,8 @@ export class WorkerClient extends Worker {
           const stream = await this.client.preferences.streamConsent();
 
           for await (const consentUpdate of stream) {
-            console.log(
-              `[${this.nameId}] Received consent update:`,
-              JSON.stringify(consentUpdate),
+            console.debug(
+              `Received consent update, ${JSON.stringify(consentUpdate, null, 2)}`,
             );
             if (this.listenerCount("worker_message") > 0) {
               // Process each consent setting in the array
@@ -520,7 +517,9 @@ export class WorkerClient extends Worker {
                   this.emit("worker_message", consentEvent);
                 }
               } else {
-                console.log(`[${this.nameId}] Skipping empty consent update`);
+                console.debug(
+                  `Skipping empty consent update, ${JSON.stringify(consentUpdate, null, 2)}`,
+                );
               }
             }
           }
@@ -577,8 +576,8 @@ export class WorkerClient extends Worker {
       // Add timeout to prevent hanging indefinitely
       const timeoutId = setTimeout(() => {
         this.off("worker_message", onMessage);
-        console.log(
-          `[${this.nameId}] Stream collection timed out after ${timeout}ms. Collected ${events.length}/${count} events.`,
+        console.debug(
+          `Stream collection timed out after ${timeout}ms. Collected ${events.length}/${count} events.`,
         );
         resolve(events); // Resolve with whatever events we've collected so far
       }, timeout);
@@ -616,7 +615,7 @@ export class WorkerClient extends Worker {
     count: number,
     timeout?: number,
   ): Promise<StreamGroupUpdateMessage[]> {
-    console.log(
+    console.debug(
       `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
     );
 
@@ -624,19 +623,19 @@ export class WorkerClient extends Worker {
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
         if (msg.type !== StreamCollectorType.GroupUpdated) {
-          console.log(
+          console.debug(
             `[${this.nameId}] Type mismatch: ${msg.type} !== ${StreamCollectorType.GroupUpdated}`,
           );
           return false;
         }
 
         const streamMsg = msg;
-        console.log(
+        console.debug(
           `[${this.nameId}] Checking group ID: ${groupId} === ${streamMsg.group?.conversationId}`,
         );
 
         const matches = groupId === streamMsg.group?.conversationId;
-        console.log(`[${this.nameId}] Group ID match: ${matches}`);
+        console.debug(`[${this.nameId}] Group ID match: ${matches}`);
 
         return matches;
       },
@@ -694,7 +693,7 @@ export class WorkerClient extends Worker {
   clearDB(): Promise<boolean> {
     const dataPath =
       getDataPath(this.testName) + "/" + this.name + "/" + this.folder;
-    console.log(`[${this.nameId}] Clearing database at ${dataPath}`);
+    console.debug(`[${this.nameId}] Clearing database at ${dataPath}`);
 
     try {
       if (fs.existsSync(dataPath)) {

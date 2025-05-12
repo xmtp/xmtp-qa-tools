@@ -37,7 +37,6 @@ const GEO_TO_COUNTRY_CODE = {
 // Global state with proper initialization
 const state = {
   isInitialized: false,
-  currentGeo: "",
   collectedMetrics: {} as Record<string, MetricData>,
 };
 
@@ -91,27 +90,19 @@ export function groupMetricsByOperation(
 /**
  * Initialize DataDog metrics reporting
  */
-export function initDataDog(
-  testName: string,
-  envValue: string,
-  geolocation: string,
-  apiKey: string,
-): boolean {
+export function initDataDog(testName: string): boolean {
   if (state.isInitialized) {
     return true;
   }
-  if (!testName.includes("ts_") && geolocation !== "south-america") {
-    return true;
-  }
 
-  if (!apiKey) {
+  if (!process.env.DATADOG_API_KEY) {
     console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
     return false;
   }
 
   try {
     const initConfig = {
-      apiKey: apiKey,
+      apiKey: process.env.DATADOG_API_KEY,
     };
 
     metrics.init(initConfig);
@@ -258,7 +249,7 @@ export async function sendPerformanceMetric(
       metric_subtype: operationType,
       description: metricDescription,
       members: members,
-      region: state.currentGeo,
+      region: process.env.GEOLOCATION ?? "",
     };
     sendMetric("duration", metricValue, values);
 
@@ -267,7 +258,7 @@ export async function sendPerformanceMetric(
       const networkStats = await getNetworkStats();
       const countryCode =
         GEO_TO_COUNTRY_CODE[
-          state.currentGeo as keyof typeof GEO_TO_COUNTRY_CODE
+          process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
         ];
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
@@ -282,7 +273,7 @@ export async function sendPerformanceMetric(
           network_phase: networkPhase,
           country_iso_code: countryCode,
           members: members,
-          region: state.currentGeo,
+          region: process.env.GEOLOCATION ?? "",
         });
       }
     }
