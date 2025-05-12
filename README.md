@@ -154,7 +154,7 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 </div>
 
-_Note: This measurments are taken only from the sender side with open streams._
+_Note: This measurments are taken only from the sender side and after the group is created._
 
 #### Receiver-Side average performance
 
