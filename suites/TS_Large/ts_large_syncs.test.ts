@@ -30,6 +30,7 @@ describe(testName, async () => {
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
+    console.debug("[Sync] Custom duration set to:", duration);
     customDuration = duration;
   };
 
