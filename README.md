@@ -2,8 +2,6 @@
 
 ## Automated workflows
 
-<div style="overflow-x: auto;">
-
 | Test suite      | Status                                                                                                                                                                            | Workflow                                                                                 | Run frequency | Networks            | Test                                                                                 |
 | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------- | ------------------- | ------------------------------------------------------------------------------------ |
 | 🚀 Performance  | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Performance.yml) | Every 30 min  | `dev`, `production` | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Performance) |
@@ -11,8 +9,6 @@
 | 👋 Gm           | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml)          | Every 30 min  | `dev`, `production` | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Gm)          |
 | ⏳ Groups       | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Large.yml)       | Every 2 hours | `production`        | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_Large)       |
 | 🚑 Agent health | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_AgentHealth.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_AgentHealth.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_AgentHealth.yml) | Every 30 min  | `dev`, `production` | [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/TS_AgentHealth) |
-
-</div>
 
 ## Testing scope
 
@@ -103,130 +99,119 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### TLDR: Metrics
 
-- **Core SDK Performance**: Direct message creation (<500ms), group operations (<200-500ms)
-- **Network Performance**: Server call (<100ms), TLS handshake (<100ms), total processing (<300ms)
-- **Group Scaling**: Supports up to 300 members efficiently (create: 9s, operations: <350ms)
+- **Core SDK Performance**: Direct message creation (<500), group operations (<200-500)
+- **Network Performance**: Server call (<100), TLS handshake (<100), total processing (<300)
+- **Group Scaling**: Supports up to 300 members efficiently (create: 9s, operations: <350)
 - **Regional Performance**: US/Europe optimal, Asia/South America higher latency (+46-160%)
 - **Message Reliability**: 100% delivery rate (target: 99.9%), perfect ordering
-- **Environments**: Production consistently outperforms Dev network by 5-9%
+- **Environments**: Production consistently outperfor Dev network by 5-9%
 
 ## Operation performance
 
 ### Core SDK Operations Performance
 
-<div style="overflow-x: auto;">
-
-| Operation                | Description                            | Avg (ms) | Target | Status                 |
-| ------------------------ | -------------------------------------- | -------- | ------ | ---------------------- |
-| clientCreate             | Creating a client                      | 588.18   | <350ms | ⚠️ Performance Concern |
-| inboxState               | Checking inbox state                   | 41.37    | <350ms | ✅ On Target           |
-| newDm                    | Creating a direct message conversation | 258.05   | <350ms | ✅ On Target           |
-| newDmWithIdentifiers     | Creating a dm by address               | 294.23   | <350ms | ✅ On Target           |
-| sendGM                   | Sending a group message                | 126.19   | <200ms | ✅ On Target           |
-| receiveGM                | Receiving a group message              | 86.82    | <200ms | ✅ On Target           |
-| createGroup              | Creating a group                       | 315.25   | <350ms | ✅ On Target           |
-| createGroupByIdentifiers | Creating a group by address            | 312.83   | <350ms | ✅ On Target           |
-| syncGroup                | Syncing group state                    | 75.96    | <200ms | ✅ On Target           |
-| updateGroupName          | Updating group metadata                | 128.86   | <200ms | ✅ On Target           |
-| removeMembers            | Removing participants from a group     | 127.06   | <250ms | ✅ On Target           |
-| sendGroupMessage         | Sending a group message                | 85.27    | <200ms | ✅ On Target           |
-| receiveGroupMessage      | Processing group message streams       | 124.00   | <200ms | ✅ On Target           |
-
-</div>
+| Operation                | Description                            | Avg | Target | Status                 |
+| ------------------------ | -------------------------------------- | --- | ------ | ---------------------- |
+| clientCreate             | Creating a client                      | 588 | <350   | ⚠️ Performance Concern |
+| inboxState               | Checking inbox state                   | 41  | <350   | ✅ On Target           |
+| newDm                    | Creating a direct message conversation | 258 | <350   | ✅ On Target           |
+| newDmWithIdentifiers     | Creating a dm by address               | 294 | <350   | ✅ On Target           |
+| sendGM                   | Sending a group message                | 126 | <200   | ✅ On Target           |
+| receiveGM                | Receiving a group message              | 87  | <200   | ✅ On Target           |
+| createGroup              | Creating a group                       | 315 | <350   | ✅ On Target           |
+| createGroupByIdentifiers | Creating a group by address            | 313 | <350   | ✅ On Target           |
+| syncGroup                | Syncing group state                    | 76  | <200   | ✅ On Target           |
+| updateGroupName          | Updating group metadata                | 129 | <200   | ✅ On Target           |
+| removeMembers            | Removing participants from a group     | 127 | <250   | ✅ On Target           |
+| sendGroupMessage         | Sending a group message                | 85  | <200   | ✅ On Target           |
+| receiveGroupMessage      | Processing group message strea         | 124 | <200   | ✅ On Target           |
 
 ### Group operations performance
 
 #### Sender-Side average performance
 
-<div style="overflow-x: auto;">
-
-| Size | Send message (ms) | Update name (ms) | Remove members (ms) | Create (ms) | Status                 |
-| ---- | ----------------- | ---------------- | ------------------- | ----------- | ---------------------- |
-| 50   | 86.01             | 135.36           | 138.57              | 1329.20     | ✅ On Target           |
-| 100  | 88.41             | 144.67           | 156.86              | 1522.13     | ✅ On Target           |
-| 150  | 94.55             | 202.64           | 189.81              | 2306.10     | ✅ On Target           |
-| 200  | 93.42             | 193.36           | 204.78              | 3343.84     | ✅ On Target           |
-| 250  | 107.76            | 219.17           | 236.53              | 4276.19     | ⚠️ Performance Concern |
-| 300  | 97.09             | 244.24           | 247.22              | 5462.81     | ⚠️ Performance Concern |
-| 350  | 101.34            | 263.91           | 308.01              | 6640.68     | ⚠️ Performance Concern |
-| 400  | 111.34            | 280.00           | 320.00              | 7640.68     | ⚠️ Performance Concern |
-
-</div>
+| Size | Send message | Update name | Remove members | Create | Status                 |
+| ---- | ------------ | ----------- | -------------- | ------ | ---------------------- |
+| 50   | 86           | 135         | 139            | 1329   | ✅ On Target           |
+| 100  | 88           | 145         | 157            | 1522   | ✅ On Target           |
+| 150  | 95           | 203         | 190            | 2306   | ✅ On Target           |
+| 200  | 93           | 193         | 205            | 3344   | ✅ On Target           |
+| 250  | 108          | 219         | 237            | 4276   | ⚠️ Performance Concern |
+| 300  | 97           | 244         | 247            | 5463   | ⚠️ Performance Concern |
+| 350  | 101          | 264         | 308            | 6641   | ⚠️ Performance Concern |
+| 400  | 111          | 280         | 320            | 7641   | ⚠️ Performance Concern |
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
-#### Receiver-Side average performance
+#### Receiver-Side stream performance
 
-<div style="overflow-x: auto;">
+| Group Size | New Members | Metadata | Messages | Status                 |
+| ---------- | ----------- | -------- | -------- | ---------------------- |
+| 50         | 687.30      | 141.60   | 131.50   | ✅ On Target           |
+| 100        | 746.10      | 155.40   | 117.00   | ✅ On Target           |
+| 150        | 833.60      | 163.70   | 147.20   | ✅ On Target           |
+| 200        | 953.70      | 179.10   | 173.90   | ✅ On Target           |
+| 250        | 1007.90     | 187.80   | 161.70   | ⚠️ Performance Concern |
+| 300        | 1040.90     | 195.67   | 167.70   | ⚠️ Performance Concern |
+| 350        | 1042.10     | 198.00   | 178.10   | ⚠️ Performance Concern |
+| 400        | 1192.10     | 214.17   | 173.60   | ⚠️ Performance Concern |
 
-| Group Size | SyncAll | New Members | Metadata | Messages | Status                 |
-| ---------- | ------- | ----------- | -------- | -------- | ---------------------- |
-| 50         | 123.31  | 687.30      | 141.60   | 131.50   | ✅ On Target           |
-| 100        | 615.72  | 746.10      | 155.40   | 117.00   | ✅ On Target           |
-| 150        | 798.83  | 833.60      | 163.70   | 147.20   | ✅ On Target           |
-| 200        | 1039.06 | 953.70      | 179.10   | 173.90   | ✅ On Target           |
-| 250        | 1285.81 | 1007.90     | 187.80   | 161.70   | ⚠️ Performance Concern |
-| 300        | 1514.04 | 1040.90     | 195.67   | 167.70   | ⚠️ Performance Concern |
-| 350        | 1711.04 | 1042.10     | 198.00   | 178.10   | ⚠️ Performance Concern |
-| 400        | 2514.95 | 1192.10     | 214.17   | 173.60   | ⚠️ Performance Concern |
+_Note: This measurments are taken only from the receiver side and after the group is created. The stream is measured as the first message received._
 
-</div>
+#### Receiver-Side sync performance
 
-_Note: Except for `syncAll` the rest measurements are taken from the stream performance. `syncAll` is measured only as the first cold start of the client (fresh inbox)._
+| Size | syncAll | sync | CumulativeSyncAll | CumulativeSync | Status                 |
+| ---- | ------- | ---- | ----------------- | -------------- | ---------------------- |
+| 50   | 366     | 291  | 482               | 266            | ✅ On Target           |
+| 100  | 503     | 424  | 521               | 372            | ✅ On Target           |
+| 150  | 665     | 522  | 727               | 622            | ✅ On Target           |
+| 200  | 854     | 653  | 1066              | 936            | ✅ On Target           |
+| 250  | 966     | 768  | 1582              | 1148           | ⚠️ Performance Concern |
+| 300  | 1225    | 861  | 1619              | 1362           | ⚠️ Performance Concern |
+| 350  | 1322    | 1218 | 1846              | 2017           | ⚠️ Performance Concern |
+| 400  | 1292    | 1325 | 2082              | 1792           | ⚠️ Performance Concern |
+
+_Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as all the previous sync operations combined._
 
 ## Networks performance
 
 ### Network performance
 
-<div style="overflow-x: auto;">
-
 | Performance Metric | Current Performance | Target | Status       |
 | ------------------ | ------------------- | ------ | ------------ |
-| DNS Lookup         | 13.65ms avg         | <50ms  | ✅ On Target |
-| TCP Connection     | 48.10ms avg         | <70ms  | ✅ On Target |
-| TLS Handshake      | 124.11ms avg        | <150ms | ✅ On Target |
-| Processing         | 35.17ms avg         | <100ms | ✅ On Target |
-| Server Call        | 159.22ms avg        | <250ms | ✅ On Target |
-
-</div>
+| DNS Lookup         | 13                  | <50    | ✅ On Target |
+| TCP Connection     | 48                  | <70    | ✅ On Target |
+| TLS Handshake      | 124                 | <150   | ✅ On Target |
+| Processing         | 35                  | <100   | ✅ On Target |
+| Server Call        | 159                 | <250   | ✅ On Target |
 
 ### Regional Network Performance
 
-<div style="overflow-x: auto;">
-
-| Region        | Server Call (ms) | TLS (ms) | ~ us-east | Status                 |
-| ------------- | ---------------- | -------- | --------- | ---------------------- |
-| us-east       | 158.70           | 123.75   | Baseline  | ✅ On Target           |
-| us-west       | 151.91           | 118.59   | -4.3%     | ✅ On Target           |
-| europe        | 159.84           | 125.04   | +0.7%     | ✅ On Target           |
-| asia          | 152.32           | 119.43   | -3.9%     | ✅ On Target           |
-| south-america | 754.6            | 573.1    | +160.3%   | ⚠️ Performance Concern |
-
-</div>
+| Region        | Server Call | TLS | ~ us-east | Status                 |
+| ------------- | ----------- | --- | --------- | ---------------------- |
+| us-east       | 158         | 123 | Baseline  | ✅ On Target           |
+| us-west       | 151         | 118 | -4.3%     | ✅ On Target           |
+| europe        | 159         | 125 | +0.7%     | ✅ On Target           |
+| asia          | 152         | 119 | -3.9%     | ✅ On Target           |
+| south-america | 754         | 573 | +160.3%   | ⚠️ Performance Concern |
 
 _Note: Baseline is `us-east` region and `production` network._
 
 ### Dev vs Production Network Performance Comparison
 
-<div style="overflow-x: auto;">
-
-| Region        | Dev (ms) | Production (ms) | Difference | Status                 |
-| ------------- | -------- | --------------- | ---------- | ---------------------- |
-| us-east       | 158.70   | 162.91          | +2.7%      | ✅ Dev Better          |
-| us-west       | 151.91   | 188.87          | +24.3%     | ⚠️ Performance Concern |
-| europe        | 159.84   | 141.36          | -11.5%     | ✅ Production Better   |
-| asia          | 152.32   | 172.09          | +13.0%     | ⚠️ Performance Concern |
-| south-america | 754.6    | 573.1           | -24.1%     | ✅ Production Better   |
-
-</div>
+| Region        | Dev | Production | Difference | Status                 |
+| ------------- | --- | ---------- | ---------- | ---------------------- |
+| us-east       | 158 | 162        | +2.7%      | ✅ Dev Better          |
+| us-west       | 151 | 188        | +24.3%     | ⚠️ Performance Concern |
+| europe        | 159 | 141        | -11.5%     | ✅ Production Better   |
+| asia          | 152 | 172        | +13.0%     | ⚠️ Performance Concern |
+| south-america | 754 | 573        | -24.1%     | ✅ Production Better   |
 
 _Note: `Production` network consistently shows better network performance across all regions, with improvements ranging from 5.5% to 9.1%._
 
 ## Message reliability
 
 ### Message delivery testing
-
-<div style="overflow-x: auto;">
 
 | Test Area            | Current Performance | Target         | Status       |
 | -------------------- | ------------------- | -------------- | ------------ |
@@ -237,13 +222,9 @@ _Note: `Production` network consistently shows better network performance across
 | Poll Order           | 100% in order       | 99.9% in order | ✅ On Target |
 | Recovery Order       | 100% in order       | 99.9% in order | ✅ On Target |
 
-</div>
-
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
 ### Success criteria summary
-
-<div style="overflow-x: auto;">
 
 | Metric               | Current Performance         | Target                 | Status                 |
 | -------------------- | --------------------------- | ---------------------- | ---------------------- |
@@ -257,8 +238,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | South-america & Asia | more than 40%               | <20% difference        | ⚠️ Performance Concern |
 | US & Europe          | less than 20% variance      | <20% difference        | ✅ On Target           |
 | Dev vs Production    | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
-
-</div>
 
 ## Tools & utilities
 
