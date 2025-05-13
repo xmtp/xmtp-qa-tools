@@ -128,74 +128,19 @@ export class XmtpPlaywright {
   /**
    * Waits for a response matching the expected message(s)
    */
-  public async waitForResponse(
-    expectedMessage?: string | string[],
-  ): Promise<boolean> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
-
-    // Wait for messages to appear in the virtuoso list
-    try {
-      await this.page.waitForSelector(
-        'div[data-testid="virtuoso-item-list"] > div',
-        { timeout: 3000 }, // Only wait up to 3 seconds for the message container
-      );
-    } catch (error) {
-      console.log("Message container not found");
-      return false;
-    }
-
-    // Get initial message count
-    const initialMessageCount = await this.page
-      .locator('div[data-testid="virtuoso-item-list"] > div')
-      .count();
-    console.log(`Initial message count: ${initialMessageCount}`);
-
-    // Convert expected message to array for consistent handling
-    const expectedPhrases = expectedMessage
-      ? Array.isArray(expectedMessage)
-        ? expectedMessage
-        : [expectedMessage]
-      : [];
-
-    // Make exactly 3 checks, one second apart
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      console.log(`Check ${attempt}/3 for new messages`);
-      await this.page.waitForTimeout(1000);
-
-      const currentMessageCount = await this.page
-        .locator('div[data-testid="virtuoso-item-list"] > div')
-        .count();
-
-      if (currentMessageCount > initialMessageCount) {
-        const responseText = await this.getLatestMessageText();
-
-        // If no expected message, any response is valid
-        if (!expectedPhrases.length) {
-          console.log(`Received a response: "${responseText}"`);
-          return true;
-        }
-
-        // Check if any of the expected phrases are in the response
-        const messageFound = expectedPhrases.some((phrase) =>
+  public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
+    if (!this.page) throw new Error("Page is not initialized");
+    for (let i = 0; i < 3; i++) {
+      await this.page.waitForTimeout(defaultValues.streamTimeout);
+      const responseText = await this.getLatestMessageText();
+      if (
+        expectedMessage.some((phrase) =>
           responseText.toLowerCase().includes(phrase.toLowerCase()),
-        );
-
-        if (messageFound) {
-          console.log(
-            `Found expected response containing one of [${expectedPhrases.join(", ")}]: "${responseText}"`,
-          );
-          return true;
-        }
+        )
+      ) {
+        return true;
       }
     }
-
-    console.log(
-      expectedPhrases.length
-        ? `Failed to find response containing any of [${expectedPhrases.join(", ")}]`
-        : "Failed to receive any response after 3 checks",
-    );
     return false;
   }
 

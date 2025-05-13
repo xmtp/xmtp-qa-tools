@@ -27,7 +27,7 @@ describe(testName, () => {
 
       await xmtpTester.newDmFromUI(gmBotAddress);
       await xmtpTester.sendMessage("hi");
-      await xmtpTester.waitForResponse("gm");
+      await xmtpTester.waitForResponse(["gm"]);
     } catch (error) {
       console.error("Error in browser test:", error);
       throw error;
@@ -45,7 +45,7 @@ describe(testName, () => {
         gmBotAddress,
       ]);
       await xmtpTester.sendMessage("hi");
-      await xmtpTester.waitForResponse("gm");
+      await xmtpTester.waitForResponse(["gm"]);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

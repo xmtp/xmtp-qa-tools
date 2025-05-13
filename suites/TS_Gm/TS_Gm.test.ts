@@ -10,7 +10,7 @@ interface Agent {
   name: string;
   address: string;
   sendMessage: string;
-  expectedMessage: string;
+  expectedMessage: string[];
 }
 
 // Type assertion for imported JSON

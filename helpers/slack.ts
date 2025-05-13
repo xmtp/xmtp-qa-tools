@@ -129,13 +129,13 @@ async function sendSlackNotification() {
 
     // Create a message with GitHub context and AI analysis
     const message = `*XMTP Test Failure ❌*
-      • *Test Suite:* ${workflowName}
-      • *Workflow:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|View Workflow>
-      • *Run URL:* <${workflowUrl}|View Run Details>
+      • *Test Suite:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
+      • *Test Run URL:* <${workflowUrl}|View Run Details>
       • *Dashboard:* <${datadogUrl}|View in Datadog>
       • *Timestamp:* ${new Date().toISOString()}
       ${customLinks}
-      ${errorLogs}${aiAnalysis}`;
+      ${errorLogs}
+      ${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
