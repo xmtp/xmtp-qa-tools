@@ -2,8 +2,6 @@ name: TS_Agents
 description: "should verify health of agents"
 
 on:
-  pull_request:
-    branches: [main]
   schedule:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
@@ -41,7 +39,6 @@ jobs:
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
         run: ./scripts/run-test.sh TS_Agents 1
-
       - name: Send Slack notification
         if: always()
         env:
@@ -54,4 +51,3 @@ jobs:
           name: TS_Agents_${{ matrix.environment }}
           path: |
             logs/
-            logs/screenshots/*.png

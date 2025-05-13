@@ -13,7 +13,7 @@ import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { flushMetrics, initDataDog } from "./datadog";
+import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 import { sdkVersions } from "./tests";
 
