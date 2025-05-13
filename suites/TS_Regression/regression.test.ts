@@ -44,7 +44,7 @@ describe(testName, () => {
       );
       const verifyResult = await verifyMessageStream(
         group,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
       );
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {

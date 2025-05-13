@@ -120,7 +120,7 @@ describe(testName, async () => {
 
         const verifyResult = await verifyMessageStream(
           testGroup,
-          workers.getWorkers(),
+          workers.getAllButCreator(),
         );
 
         expect(verifyResult.allReceived).toBe(true);

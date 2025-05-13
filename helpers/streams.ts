@@ -220,16 +220,35 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   return allResults;
 }
 
+export async function verifyDmStream(
+  group: Conversation,
+  receivers: Worker[],
+  message: string = "gm",
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+    triggerEvents: async () => {
+      await group.send(message);
+      return [{ key: "message", sentAt: Date.now() }];
+    },
+    getKey: extractContent,
+    getMessage: extractContent,
+    statsLabel: "message-",
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: receivers,
+  });
+}
 /**
  * Specialized function to verify message streams
  */
 export async function verifyMessageStream(
   group: Conversation,
-  participants: Worker[],
+  receivers: Worker[],
   count = 1,
   randomSuffix: string = "gm",
 ): Promise<VerifyStreamResult> {
-  const receivers = await filterReceivers(group as Group, participants);
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
@@ -248,26 +267,19 @@ export async function verifyMessageStream(
     statsLabel: "gm-",
     count,
     randomSuffix,
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
-
-const filterReceivers = async (group: Group, participants: Worker[]) => {
-  const creatorId = (await group.metadata()).creatorInboxId;
-  return participants.filter((p) => p.client?.inboxId !== creatorId);
-};
 
 /**
  * Specialized function to verify group update streams
  */
 export async function verifyMetadataStream(
   group: Group,
-  participants: Worker[],
+  receivers: Worker[],
   count = 1,
   randomSuffix: string = "gm",
 ): Promise<VerifyStreamResult> {
-  const receivers = await filterReceivers(group, participants);
-
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, count),
@@ -286,7 +298,7 @@ export async function verifyMetadataStream(
     statsLabel: "New name-",
     count,
     randomSuffix,
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
 
@@ -295,11 +307,9 @@ export async function verifyMetadataStream(
  */
 export async function verifyMembershipStream(
   group: Group,
-  participants: Worker[],
+  receivers: Worker[],
   membersToAdd: string[],
 ): Promise<VerifyStreamResult> {
-  const receivers = await filterReceivers(group, participants);
-
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, 1),
@@ -316,7 +326,7 @@ export async function verifyMembershipStream(
     statsLabel: "member-add:",
     count: 1,
     randomSuffix: "",
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
 
@@ -325,14 +335,14 @@ export async function verifyMembershipStream(
  */
 export async function verifyGroupConsentStream(
   group: Group,
-  participants: Worker[],
+  receivers: Worker[],
 ): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
-    receivers: participants,
+    receivers: receivers.filter((r) => r.client?.inboxId !== group.id),
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      for (const p of participants) {
+      for (const p of receivers) {
         await updateGroupConsent(p.client, group);
       }
       return [{ key: "consent", sentAt }];
@@ -342,7 +352,7 @@ export async function verifyGroupConsentStream(
     statsLabel: "consent:",
     count: 1,
     randomSuffix: "",
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
 /**
@@ -374,17 +384,17 @@ export async function verifyConsentStream(
  */
 export async function verifyConversationStream(
   initiator: Worker,
-  participants: Worker[],
+  receivers: Worker[],
 ): Promise<VerifyStreamResult> {
   if (!initiator.client || !initiator.worker) {
     throw new Error(`Initiator ${initiator.name} has no client`);
   }
   return collectAndTimeEventsWithStats({
-    receivers: participants,
+    receivers,
     startCollectors: (r) =>
       r.worker.collectConversations(initiator.client.inboxId, 1),
     triggerEvents: async () => {
-      const participantAddresses = participants.map((p) => {
+      const participantAddresses = receivers.map((p) => {
         if (!p.client) throw new Error(`Participant ${p.name} has no client`);
         return p.client.inboxId;
       });
@@ -397,7 +407,7 @@ export async function verifyConversationStream(
     statsLabel: "conversation:",
     count: 1,
     randomSuffix: "",
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
 
@@ -406,9 +416,8 @@ export async function verifyConversationStream(
  */
 export async function verifyNewConversationStream(
   group: Group,
-  participants: Worker[],
+  receivers: Worker[],
 ): Promise<VerifyStreamResult> {
-  const receivers = await filterReceivers(group, participants);
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   return collectAndTimeEventsWithStats({
     receivers,
@@ -423,7 +432,7 @@ export async function verifyNewConversationStream(
     statsLabel: "conversation:",
     count: 1,
     randomSuffix: "",
-    participantsForStats: participants,
+    participantsForStats: receivers,
   });
 }
 

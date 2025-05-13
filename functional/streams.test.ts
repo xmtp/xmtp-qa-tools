@@ -75,7 +75,7 @@ describe(testName, async () => {
       // Verify message delivery
       const verifyResult = await verifyMessageStream(
         newGroup,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
         10,
       );
 
@@ -98,7 +98,7 @@ describe(testName, async () => {
 
       const verifyResult = await verifyMetadataStream(
         group as Group,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
       );
 
       expect(verifyResult.allReceived).toBe(true);
@@ -120,7 +120,7 @@ describe(testName, async () => {
 
       const verifyResult = await verifyMembershipStream(
         group as Group,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
         [generatedInboxes[0].inboxId],
       );
 

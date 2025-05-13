@@ -1,16 +1,13 @@
-name: TS_Agents
-description: "should verify health of agents"
+name: TS_Gm
+description: "should verify performance of the library in the dev network"
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
-    - cron: "10 * * * *" # Runs at 10 minutes past each hour
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
-  TS_Agents:
+  TS_Gm:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -21,27 +18,33 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
+      - name: Debug API key
+        run: |
+          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
+            echo "API key is available in test job"
+          else
+            echo "API key is NOT available in test job"
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
           cache: "yarn"
         env:
           SKIP_YARN_COREPACK_CHECK: "1"
-      - name: Enable corepack
-        run: corepack enable
-      - name: Install dependencies
-        run: yarn
+      - run: corepack enable
+      - run: yarn
+      - name: Make test script executable
+        run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: yarn test ts_agents
+        run: ./scripts/run-test.sh TS_Gm
       - name: Send Slack notification
         if: always()
         env:
@@ -51,6 +54,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TS_Agents_${{ matrix.environment }}
+          name: ts_gm_${{ matrix.environment }}
           path: |
             logs/
+            logs/**/*.png

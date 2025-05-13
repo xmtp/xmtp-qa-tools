@@ -223,7 +223,7 @@ describe(testName, async () => {
     try {
       const verifyResult = await verifyMessageStream(
         newGroup,
-        workers.getWorkers(),
+        workers.getAllButCreator(),
       );
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
@@ -346,7 +346,7 @@ describe(testName, async () => {
       try {
         const verifyResult = await verifyMessageStream(
           newGroup,
-          workers.getWorkers(),
+          workers.getAllButCreator(),
         );
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.allReceived).toBe(true);

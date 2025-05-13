@@ -60,7 +60,7 @@ describe(testName, async () => {
         );
         const verifyResult = await verifyMetadataStream(
           newGroup as Group,
-          workers.getWorkers(),
+          workers.getAllButCreator(),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);
