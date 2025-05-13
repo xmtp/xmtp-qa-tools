@@ -25,7 +25,6 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
-      JOB_STATUS: ${{ job.status }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -45,6 +44,8 @@ jobs:
 
       - name: Send Slack notification
         if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
       - name: Upload reports and snapshots artifacts
         if: always()
