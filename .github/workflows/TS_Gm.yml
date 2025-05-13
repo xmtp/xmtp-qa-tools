@@ -14,30 +14,31 @@ jobs:
   TS_Gm:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    env:
-      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      GEOLOCATION: ${{ vars.GEOLOCATION }}
-      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-      WALLET_KEY: ${{ secrets.WALLET_KEY }}
-      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-      XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version-file: ".node-version"
           cache: "yarn"
         env:
           SKIP_YARN_COREPACK_CHECK: "1"
-      - run: corepack enable
-      - run: yarn
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
+        env:
+          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+          XMTP_ENV: production
+          RUST_BACKTRACE: 1
+          GEOLOCATION: ${{ vars.GEOLOCATION }}
+          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+          GITHUB_ACTIONS: true
+          LOGGING_LEVEL: "off"
         run: ./scripts/run-test.sh TS_Gm 1
+
       - name: Send Slack notification
         if: always()
         env:
