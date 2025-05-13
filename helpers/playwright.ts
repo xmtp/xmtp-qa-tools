@@ -106,18 +106,19 @@ export class XmtpPlaywright {
   public async sendMessage(message: string): Promise<void> {
     if (!this.page) throw new Error("Page is not initialized");
 
-    console.log("Waiting for message input to be visible");
-    await this.page
-      .getByRole("textbox", { name: "Type a message..." })
-      .waitFor({ state: "visible" });
+    // Wait for the textbox to be visible
+    const messageInput = this.page.getByRole("textbox", {
+      name: "Type a message...",
+    });
+    await messageInput.waitFor({ state: "visible" });
+
+    // Add a small delay to ensure UI is fully ready
+    await this.page.waitForTimeout(1000);
 
     console.log("Filling message");
-    await this.page
-      .getByRole("textbox", { name: "Type a message..." })
-      .fill(message);
+    await messageInput.fill(message);
 
     console.log("Sending message", message);
-    await this.page.waitForTimeout(1000);
     await this.page.getByRole("button", { name: "Send" }).click();
   }
 
