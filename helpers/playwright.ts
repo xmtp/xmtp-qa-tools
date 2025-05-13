@@ -73,18 +73,14 @@ export class XmtpPlaywright {
       throw new Error("Page is not initialized");
     }
 
-    await page
-      .getByRole("main")
-      .getByRole("button", { name: "Create a new group" })
-      .click();
-    await page.getByRole("button", { name: "Members" }).click();
+    await this.page.getByRole("button", { name: "Members" }).click();
 
     for (const address of addresses) {
-      await page.getByRole("textbox", { name: "Address" }).fill(address);
-      await page.getByRole("button", { name: "Add" }).click();
+      await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+      await this.page.getByRole("button", { name: "Add" }).click();
     }
 
-    await page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByRole("button", { name: "Create" }).click();
   }
   /**
    * Fills addresses and creates a new conversation
