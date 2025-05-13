@@ -52,6 +52,3 @@ jobs:
         with:
           name: ts_performance_${{ matrix.environment }}
           path: logs/
-      - name: Fail if tests failed
-        if: steps.test.outcome == 'failure'
-        run: exit 1

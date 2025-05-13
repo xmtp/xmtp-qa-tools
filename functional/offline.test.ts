@@ -22,8 +22,6 @@ describe(
 
     setupTestLifecycle({
       expect,
-      workers,
-      testName,
     });
 
     beforeAll(async () => {

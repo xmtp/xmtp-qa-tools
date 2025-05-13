@@ -1,4 +1,4 @@
-# XMTP Agent Health Testing Suite (TS_Gm)
+# XMTP Agent Health Testing Suite (TS_Agents)
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
@@ -64,7 +64,7 @@ To add a new agent for testing, simply add its details to this file.
 ## Test Execution
 
 ```bash
-yarn test TS_Gm
+yarn test TS_Agents
 ```
 
 ## Test Flow
@@ -104,7 +104,7 @@ The tests are configured to run automatically:
 - On a scheduled basis (hourly)
 - Manually via workflow dispatch
 
-The workflow configuration is in `.github/workflows/TS_Gm.yml`.
+The workflow configuration is in `.github/workflows/TS_Agents.yml`.
 
 ## Artifacts
 

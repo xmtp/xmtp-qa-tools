@@ -1,8 +1,8 @@
-import { closeEnv, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { appendToEnv, getRandomNames } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
-import { afterAll, describe, it } from "vitest";
+import { describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "ts_fork";
@@ -43,9 +43,6 @@ describe(TEST_NAME, () => {
   let creator: Worker | undefined;
   let globalGroup: Group | undefined;
 
-  afterAll(async () => {
-    await closeEnv(TEST_NAME);
-  });
   it("should initialize workers and create group", async () => {
     const start = performance.now();
 

@@ -47,8 +47,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   it("stream_order: verify message order when receiving via streams", async () => {

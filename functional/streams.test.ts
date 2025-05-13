@@ -27,8 +27,6 @@ describe(testName, async () => {
   // Setup test lifecycle
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   it("verifyConsentStream: manage consent for all members in a group", async () => {

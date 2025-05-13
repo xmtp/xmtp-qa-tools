@@ -279,17 +279,6 @@ export function loadEnv(testName: string) {
   initDataDog();
 }
 
-export async function closeEnv(testName: string, workers?: WorkerManager) {
-  //  flushLogger(testName);
-
-  await flushMetrics();
-  if (workers && typeof workers.getWorkers === "function") {
-    for (const worker of workers.getWorkers()) {
-      await worker.worker.terminate();
-    }
-  }
-}
-
 export async function listInstallations(workers: WorkerManager) {
   for (const worker of workers.getWorkers()) {
     const inboxState = await worker.client?.preferences.inboxState();

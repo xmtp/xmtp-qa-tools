@@ -1,4 +1,4 @@
-name: TS_Gm
+name: TS_Agents
 description: "should verify health of agents"
 
 on:
@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  TS_Gm:
+  TS_Agents:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -40,7 +40,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Gm 1
+        run: ./scripts/run-test.sh TS_Agents 1
 
       - name: Send Slack notification
         if: always()
@@ -51,7 +51,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_gm_${{ matrix.environment }}
+          name: TS_Agents_${{ matrix.environment }}
           path: |
             logs/
             logs/screenshots/*.png

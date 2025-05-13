@@ -34,8 +34,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {

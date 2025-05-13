@@ -226,11 +226,10 @@ export function parseTestName(testName: string): ParsedTestName {
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,
-  libXmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
   if (!state.isInitialized) return;
-
+  const libXmtpVersion = "latest";
   try {
     const {
       metricDescription,

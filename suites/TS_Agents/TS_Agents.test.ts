@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
@@ -14,17 +15,21 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = productionAgents as Agent[];
-const testName = "TS_Gm";
+const testName = "TS_Agents";
 loadEnv(testName);
 
 describe(testName, () => {
   let xmtpTester: XmtpPlaywright;
   beforeAll(async () => {
     xmtpTester = new XmtpPlaywright({
-      headless: true,
+      headless: false,
       env: "production",
     });
     await xmtpTester.startPage();
+  });
+
+  setupTestLifecycle({
+    expect,
   });
 
   // For local testing, test all agents on their supported networks

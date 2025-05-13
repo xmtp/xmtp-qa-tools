@@ -17,10 +17,7 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
-
   it("forceStreamError: should measure force a stream error", async () => {
     try {
       const creator = workers.getCreator();

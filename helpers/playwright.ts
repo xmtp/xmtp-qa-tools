@@ -53,9 +53,8 @@ export class XmtpPlaywright {
    * Takes a screenshot and saves it to the logs directory
    */
   async takeSnapshot(name: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     const snapshotDir = path.join(process.cwd(), "./logs/screenshots");
     if (!fs.existsSync(snapshotDir)) {
       fs.mkdirSync(snapshotDir, { recursive: true });
@@ -70,9 +69,8 @@ export class XmtpPlaywright {
    * Fills addresses and creates a new conversation
    */
   public async newGroupFromUI(addresses: string[]): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     // Target the second button with the menu popup attribute
     await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
     await this.page.getByRole("menuitem", { name: "New group" }).click();
@@ -91,9 +89,8 @@ export class XmtpPlaywright {
    * Fills addresses and creates a new conversation
    */
   public async newDmFromUI(address: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     // Target the second button with the menu popup attribute
     await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
     await this.page
@@ -107,9 +104,8 @@ export class XmtpPlaywright {
    * Sends a message in the current conversation
    */
   public async sendMessage(message: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     console.log("Waiting for message input to be visible");
     await this.page
       .getByRole("textbox", { name: "Type a message..." })
@@ -149,9 +145,8 @@ export class XmtpPlaywright {
    * Gets the text of the latest message in the conversation
    */
   private async getLatestMessageText(): Promise<string> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     const messageItems = await this.page
       .locator('div[data-testid="virtuoso-item-list"] > div')
       .all();
