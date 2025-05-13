@@ -23,14 +23,6 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
       TEST_NAME: "TS_Gm"
     steps:
-      - uses: actions/checkout@v4
-      - name: Debug API key
-        run: |
-          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
-            echo "API key is available in test job"
-          else
-            echo "API key is NOT available in test job"
-          fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"

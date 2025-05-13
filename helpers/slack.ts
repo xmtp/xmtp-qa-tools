@@ -94,7 +94,7 @@ if (fs.existsSync("logs")) {
 
     if (errorLines.length > 0) {
       rawErrorLogs = errorLines.join("\n");
-      errorLogs = `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+      errorLogs = `\n\n*Error Logs:*\n${errorLines.slice(-5).join("\n")}`;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
@@ -120,6 +120,13 @@ async function sendSlackNotification() {
     /*• *Network:* ${xmtpEnv}
 • *Status:* ${jobStatus}*/
 
+    let customLinks = "";
+    if (testName && testName.toLowerCase() === "ts_gm") {
+      customLinks = `
+        • *Agents Config:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Gm/production.json|View Agents Configuration>
+      `;
+    }
+
     // Create a message with GitHub context and AI analysis
     const message = `*XMTP Test Failure ❌*
       • *Test Suite:* ${workflowName}
@@ -127,6 +134,7 @@ async function sendSlackNotification() {
       • *Run URL:* <${workflowUrl}|View Run Details>
       • *Dashboard:* <${datadogUrl}|View in Datadog>
       • *Timestamp:* ${new Date().toISOString()}
+      ${customLinks}
       ${errorLogs}${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
