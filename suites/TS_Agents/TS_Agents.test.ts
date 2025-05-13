@@ -24,6 +24,7 @@ describe(testName, () => {
     xmtpTester = new XmtpPlaywright({
       headless: true,
       env: "production",
+      defaultUser: true,
     });
     await xmtpTester.startPage();
   });
