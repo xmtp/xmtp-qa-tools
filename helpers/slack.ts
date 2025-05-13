@@ -121,7 +121,7 @@ async function sendSlackNotification() {
 • *Status:* ${jobStatus}*/
 
     let customLinks = "";
-    if (testName && testName.toLowerCase() === "TS_Agents") {
+    if (testName && testName.toLowerCase() === "ts_agents") {
       customLinks = `
         • *Agents Config:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View Agents Configuration>
       `;
