@@ -65,13 +65,17 @@ export class XmtpPlaywright {
     const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
   }
+
   /**
    * Fills addresses and creates a new conversation
    */
-  public async fillAddressesAndCreate(addresses: string[]): Promise<void> {
+  public async newGroupFromUI(addresses: string[]): Promise<void> {
     if (!this.page) {
       throw new Error("Page is not initialized");
     }
+    // Target the second button with the menu popup attribute
+    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
+    await this.page.getByRole("menuitem", { name: "New group" }).click();
 
     await this.page.getByRole("button", { name: "Members" }).click();
 
@@ -80,20 +84,6 @@ export class XmtpPlaywright {
       await this.page.getByRole("button", { name: "Add" }).click();
     }
 
-    await this.page.getByRole("button", { name: "Create" }).click();
-  }
-  /**
-   * Fills addresses and creates a new conversation
-   */
-  public async newGroupFromUI(address: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
-    // Target the second button with the menu popup attribute
-    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
-    await this.page.getByRole("menuitem", { name: "New group" }).click();
-
-    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
     await this.page.getByRole("button", { name: "Create" }).click();
   }
 
@@ -203,8 +193,7 @@ export class XmtpPlaywright {
         ? `Failed to find response containing any of [${expectedPhrases.join(", ")}]`
         : "Failed to receive any response",
     );
-
-    throw new Error("Failed to receive any response");
+    return false;
   }
 
   /**

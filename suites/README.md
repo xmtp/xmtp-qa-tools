@@ -4,10 +4,9 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 
 | Suite                | Purpose                                                    | Link to test file                       |
 | -------------------- | ---------------------------------------------------------- | --------------------------------------- |
-| **TS_AgentHealth**   | Tests the health of the agent ecosystem                    | [TS_AgentHealth](./TS_AgentHealth/)     |
+| **TS_Gm**            | Tests the health of the agent ecosystem                    | [TS_Gm](./TS_Gm/)                       |
 | **TS_Delivery**      | Verifies message delivery reliability                      | [TS_Delivery](./TS_Delivery/)           |
 | **TS_Fork**          | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/)                   |
-| **TS_Gm**            | Tests basic messaging and cross-version compatibility      | [TS_Gm](./TS_Gm/)                       |
 | **TS_Notifications** | Validates push notification functionality                  | [TS_Notifications](./TS_Notifications/) |
 | **TS_Performance**   | Measures independent operational performance               | [TS_Performance](./TS_Performance/)     |
 | **TS_Stress**        | Tests system performance under high load conditions        | [TS_Stress](./TS_Stress/)               |

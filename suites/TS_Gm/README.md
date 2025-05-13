@@ -1,6 +1,8 @@
-# XMTP GM Bot Testing Suite (TS_Gm)
+# XMTP Agent Health Testing Suite (TS_Gm)
 
-This test suite verifies the functionality and responsiveness of the XMTP GM bot in different conversation types, including both direct messages and groups.
+This test suite validates the health and responsiveness of live XMTP agents in production environments.
+
+https://github.com/user-attachments/assets/bbe94427-8fcb-463c-98fb-6417c16dd4cf
 
 ## Setup
 
@@ -11,47 +13,99 @@ cd xmtp-qa-testing
 yarn install
 ```
 
+## Configuration
+
+### Agent List
+
+Agents to be tested are defined in `agents.json`:
+
+```json
+[
+  {
+    "name": "csx-concierge",
+    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
+    "networks": ["dev"],
+    "sendMessage": "hi",
+    "expectedMessage": "chat"
+  },
+  {
+    "name": "key-check.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "networks": ["production"],
+    "sendMessage": "/kc",
+    "expectedMessage": "Key Check"
+  },
+  {
+    "name": "gm-bot",
+    "address": "0x20b572be48527a770479744aec6fe5644f97678b",
+    "networks": ["production", "dev"],
+    "sendMessage": "hi",
+    "expectedMessage": "gm"
+  },
+  {
+    "name": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  },
+  {
+    "name": "clankerchat.base.eth",
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "networks": ["production"],
+    "sendMessage": "hi",
+    "expectedMessage": "hey"
+  }
+]
+```
+
+To add a new agent for testing, simply add its details to this file.
+
 ## Test Execution
 
 ```bash
-yarn test ts_gm
+yarn test TS_Gm
 ```
 
 ## Test Flow
 
-1. **Direct Message Testing**:
+1. **Environment Setup**:
 
-   - Creates a new DM conversation with the GM bot
-   - Sends a simple "gm" message
-   - Verifies that the bot responds correctly within a reasonable timeframe
+   - Sets up the test environment based on configuration
+   - Creates a test client using the "bob" worker identity
 
-2. **Deep Link Testing**:
+2. **Agent Communication**:
 
-   - Uses Playwright to test the web client interface
-   - Creates a new conversation with the GM bot via deep link
-   - Verifies successful creation of the conversation
+   - Sends a test message to each target agent
+   - Waits for and validates the agent's response
+   - Records response times and success/failure status
 
-3. **Group Conversation Testing**:
-   - Creates a new group with the GM bot and several generated addresses
-   - Sends messages to the group
-   - Verifies the GM bot responds in the group context
+3. **Result Reporting**:
+   - Reports test results for monitoring purposes
+   - Logs detailed diagnostic information for failed tests
 
 ## Performance Metrics
 
-- Bot response time in direct messages
-- Bot response time in group contexts
-- Web client interaction performance
-- End-to-end conversation creation time
+- Agent response time
+- End-to-end message delivery performance
+- Success/failure rate across multiple agents
 
 ## Key Features Tested
 
-- Bot responsiveness in direct messages
-- Bot responsiveness in group conversations
-- Bot discovery and conversation initiation via deep links
+- Agent responsiveness in direct messages
+- Agent availability across environments (dev/production)
 - Message delivery and response timing
-- UI interaction via automated browser testing
+- Basic agent functionality through command testing
 
-## Dependencies
+## GitHub Actions Workflow
 
-- **XmtpPlaywright**: Helper class for UI testing of XMTP interfaces
-- **Generated Inboxes**: Pre-generated testing accounts for group creation
+The tests are configured to run automatically:
+
+- On a scheduled basis (hourly)
+- Manually via workflow dispatch
+
+The workflow configuration is in `.github/workflows/TS_Gm.yml`.
+
+## Artifacts
+
+Test logs and results are stored as artifacts in GitHub Actions for diagnostic purposes.
