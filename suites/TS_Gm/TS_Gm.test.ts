@@ -22,6 +22,7 @@ describe(testName, () => {
   beforeAll(async () => {
     xmtpTester = new XmtpPlaywright({
       headless: true,
+      env: "production",
     });
     await xmtpTester.startPage();
   });

@@ -56,7 +56,7 @@ export class XmtpPlaywright {
     if (!this.page) {
       throw new Error("Page is not initialized");
     }
-    const snapshotDir = path.join(process.cwd(), "./logs");
+    const snapshotDir = path.join(process.cwd(), "./logs/screenshots");
     if (!fs.existsSync(snapshotDir)) {
       fs.mkdirSync(snapshotDir, { recursive: true });
     }
@@ -130,7 +130,7 @@ export class XmtpPlaywright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       await this.page.waitForTimeout(defaultValues.streamTimeout);
       const responseText = await this.getLatestMessageText();
       if (
@@ -140,6 +140,7 @@ export class XmtpPlaywright {
       ) {
         return true;
       }
+      console.log(`No response found after ${i + 1} checks`);
     }
     return false;
   }

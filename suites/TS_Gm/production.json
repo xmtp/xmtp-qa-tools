@@ -1,5 +1,11 @@
 [
   {
+    "name": "key-check",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "sendMessage": "/kc help",
+    "expectedMessage": ["commands"]
+  },
+  {
     "name": "flaunchy",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "hi",
@@ -24,12 +30,6 @@
     "expectedMessage": ["chat", "invalid"]
   },
   {
-    "name": "clankerchat.base.eth",
-    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-    "sendMessage": "hi",
-    "expectedMessage": ["hey"]
-  },
-  {
     "name": "byte",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     "sendMessage": "hi",
@@ -42,21 +42,21 @@
     "expectedMessage": ["toss"]
   },
   {
-    "name": "bankr.base.eth",
-    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
-    "sendMessage": "hey there how are you?",
-    "expectedMessage": ["thinking"]
-  },
-  {
-    "name": "key-check",
-    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    "sendMessage": "/kc help",
-    "expectedMessage": ["commands"]
-  },
-  {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
     "sendMessage": "hola",
     "expectedMessage": ["gm"]
+  },
+  {
+    "name": "clankerchat.base.eth",
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "sendMessage": "hi",
+    "expectedMessage": ["hey"]
+  },
+  {
+    "name": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "sendMessage": "hey there how are you?",
+    "expectedMessage": ["thinking"]
   }
 ]
