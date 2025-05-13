@@ -46,7 +46,7 @@ export class XmtpPlaywright {
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
-    console.log("Starting XmtpPlaywright with env:", this.env);
+    console.debug("Starting XmtpPlaywright with env:", this.env);
   }
 
   /**
@@ -115,10 +115,10 @@ export class XmtpPlaywright {
     });
     await messageInput.waitFor({ state: "visible" });
 
-    console.log("Filling message");
+    console.debug("Filling message");
     await messageInput.fill(message);
 
-    console.log("Sending message", message);
+    console.debug("Sending message", message);
     await this.page.getByRole("button", { name: "Send" }).click();
   }
 
@@ -137,7 +137,7 @@ export class XmtpPlaywright {
       ) {
         return true;
       }
-      console.log(`No response found after ${i + 1} checks`);
+      console.debug(`No response found after ${i + 1} checks`);
     }
     return false;
   }
@@ -156,7 +156,7 @@ export class XmtpPlaywright {
 
     const latestMessageElement = messageItems[messageItems.length - 1];
     const responseText = (await latestMessageElement.textContent()) || "";
-    console.log(`Latest message: "${responseText}"`);
+    console.debug(`Latest message: "${responseText}"`);
 
     return responseText;
   }
@@ -187,7 +187,7 @@ export class XmtpPlaywright {
 
     const url = "https://xmtp.chat/";
 
-    console.log("Navigating to:", url);
+    console.debug("Navigating to:", url);
     await page.goto(url);
     await page.waitForTimeout(1000);
 
@@ -209,7 +209,7 @@ export class XmtpPlaywright {
     walletEncryptionKey: string = "",
   ): Promise<void> {
     if (this.defaultUser) {
-      console.log(
+      console.debug(
         "Setting localStorage",
         walletKey.slice(0, 4) + "...",
         walletEncryptionKey.slice(0, 4) + "...",
@@ -218,12 +218,12 @@ export class XmtpPlaywright {
 
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        if (walletKey !== "") console.log("Setting walletKey", walletKey);
+        if (walletKey !== "") console.debug("Setting walletKey", walletKey);
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
 
         if (walletEncryptionKey !== "") {
-          console.log("Setting walletEncryptionKey", walletEncryptionKey);
+          console.debug("Setting walletEncryptionKey", walletEncryptionKey);
           // @ts-expect-error Window localStorage access in browser context
           window.localStorage.setItem(
             "XMTP_ENCRYPTION_KEY",

@@ -48,7 +48,7 @@ const updateGroupMetadata = async (
     await foundGroup.updateDescription(newValue);
   }
 
-  console.log(
+  console.debug(
     `Group ${updateField} updated by ${randomMember.inboxId} to: ${newValue}`,
   );
 };
@@ -63,7 +63,7 @@ export const removeMemberByWorker = async (
   try {
     if (!memberToRemove) return;
 
-    console.log(`Removing ${memberToRemove}`);
+    console.debug(`Removing ${memberToRemove}`);
     const group =
       (await memberWhoRemoves.client.conversations.getConversationById(
         groupId,
@@ -78,7 +78,7 @@ export const removeMemberByWorker = async (
         (m) => m.inboxId.toLowerCase() === memberToRemove.toLowerCase(),
       )
     ) {
-      console.log(`Member ${memberToRemove} not in group ${groupId}`);
+      console.debug(`Member ${memberToRemove} not in group ${groupId}`);
       return;
     }
 
@@ -128,7 +128,7 @@ export async function createGroupWithBatch(
     0,
   );
 
-  console.log(
+  console.debug(
     `Group created: ${group?.id} | Members: ${members?.length} | Installations: ${totalInstallations}`,
   );
   console.timeEnd(logLabel);
@@ -200,7 +200,7 @@ export async function createAndSendDms(
   for (const sender of workers.getWorkers()) {
     try {
       await sender.client.conversations.sync();
-      console.log(
+      console.debug(
         "sender",
         sender.name,
         "is going to send",
@@ -222,7 +222,7 @@ export async function createAndSendDms(
     }
   }
 
-  console.log(
+  console.debug(
     `DM sending completed: ${successCount} succeeded, ${errorCount} failed`,
   );
   return { success: successCount > 0, successCount, errorCount };

@@ -216,7 +216,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  //console.log(JSON.stringify(allResults, null, 2));
+  //console.debug(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
@@ -307,7 +307,7 @@ export async function verifyMembershipStream(
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       await group.addMembers(membersToAdd);
-      console.log("member added", membersToAdd);
+      console.debug("member added", membersToAdd);
       sent.push({ inboxId: membersToAdd[0], sentAt });
       return sent;
     },

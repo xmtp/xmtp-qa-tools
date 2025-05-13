@@ -15,7 +15,7 @@ if (!process.env.SLACK_BOT_TOKEN) {
 }
 
 const slackChannel = process.env.SLACK_CHANNEL || "general";
-console.log(`Using Slack bot token with channel: ${slackChannel}`);
+console.debug(`Using Slack bot token with channel: ${slackChannel}`);
 
 // Get GitHub Actions context if available
 const datadogUrl =
@@ -52,11 +52,11 @@ if (!testName) {
 
 // Extract branch name from GITHUB_REF
 const branchName = githubRef.replace("refs/heads/", "");
-console.log(`Current branch: ${branchName}`);
+console.debug(`Current branch: ${branchName}`);
 
 // Only proceed with notification if it's an error
 if (jobStatus === "success" || jobStatus === "passed") {
-  console.log(`Job status is ${jobStatus}. No need to send notification.`);
+  console.debug(`Job status is ${jobStatus}. No need to send notification.`);
   process.exit(0);
 }
 
@@ -109,7 +109,7 @@ interface SlackApiResponse {
 
 // Send to Slack using the API
 async function sendSlackNotification() {
-  console.log("Sending Slack notification...");
+  console.debug("Sending Slack notification...");
 
   try {
     // Get AI analysis of error logs if available
@@ -153,7 +153,7 @@ async function sendSlackNotification() {
     const data = (await response.json()) as SlackApiResponse;
 
     if (data && data.ok) {
-      console.log("✅ Slack notification sent successfully!");
+      console.debug("✅ Slack notification sent successfully!");
     } else {
       console.error("❌ Failed to send Slack notification. Response:", data);
       process.exit(1);

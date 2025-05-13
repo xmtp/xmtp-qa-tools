@@ -231,21 +231,21 @@ export const createRandomInstallations = async (
   count: number,
   worker: Worker,
 ): Promise<Worker | undefined> => {
-  console.log(`[${worker.name}] Creating ${count} installations`);
+  console.debug(`[${worker.name}] Creating ${count} installations`);
   const initialState = await worker.client.preferences.inboxState(true);
-  console.log(
+  console.debug(
     `[${worker.name}] Initial inbox state: ${JSON.stringify(initialState)}`,
   );
 
   for (let i = 0; i < count; i++) {
-    console.log(`[${worker.name}] Creating installation ${i + 1}`);
+    console.debug(`[${worker.name}] Creating installation ${i + 1}`);
     await worker.worker?.clearDB();
     await worker.worker?.initialize();
     await sleep(1000);
   }
 
   const finalState = await worker.client.preferences.inboxState(true);
-  console.log(
+  console.debug(
     `[${worker.name}] Created ${count} installations. Final state: ${JSON.stringify(finalState)}`,
   );
   return worker;
@@ -272,10 +272,10 @@ export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
   try {
     if (isSuperAdmin) {
       await group.addSuperAdmin(randomMember.inboxId);
-      console.log(`Added ${randomMember.inboxId} as super admin`);
+      console.debug(`Added ${randomMember.inboxId} as super admin`);
     } else {
       await group.addAdmin(randomMember.inboxId);
-      console.log(`Added ${randomMember.inboxId} as admin`);
+      console.debug(`Added ${randomMember.inboxId} as admin`);
     }
   } catch (error) {
     console.error("Error assigning admin:", error);
@@ -321,7 +321,7 @@ export const validateEnvironment = (vars: string[]): Record<string, string> => {
     // If still missing variables, try the root .env
     const stillMissingAfterLocal = requiredVars.filter((v) => !process.env[v]);
     if (stillMissingAfterLocal.length > 0) {
-      console.log(
+      console.debug(
         `Missing env vars: ${stillMissingAfterLocal.join(", ")}. Trying root .env file...`,
       );
 
@@ -333,14 +333,14 @@ export const validateEnvironment = (vars: string[]): Record<string, string> => {
         const envContent = fs.readFileSync(rootEnvPath, "utf-8");
         const envVars = parseEnvFile(envContent);
 
-        console.log(`Loaded  from root .env file`);
+        console.debug(`Loaded  from root .env file`);
         for (const varName of stillMissingAfterLocal) {
           if (envVars[varName]) {
             process.env[varName] = envVars[varName];
           }
         }
       } else {
-        console.log("Root .env file not found.");
+        console.debug("Root .env file not found.");
       }
     }
   }
@@ -367,7 +367,7 @@ export const randomReinstall = async (
   workers: WorkerManager,
 ): Promise<void> => {
   const worker = workers.getRandomWorkers(1)[0];
-  console.log(`[${worker.name}] Reinstalling worker`);
+  console.debug(`[${worker.name}] Reinstalling worker`);
   await worker.worker?.reinstall();
 };
 
@@ -423,7 +423,7 @@ export const sendInitialTestMessage = async (client: Client): Promise<void> => {
       if (!recipient) continue;
       const dm = await client.conversations.newDm(recipient);
       await dm.send("gm from bot");
-      console.log(`DM sent to ${recipient}: ${dm.id}`);
+      console.debug(`DM sent to ${recipient}: ${dm.id}`);
     }
   } catch (error) {
     console.error("Error sending initial test message:", error);
@@ -457,7 +457,7 @@ export const appendToEnv = (
     try {
       envContent = fs.readFileSync(envPath, "utf8");
     } catch {
-      console.log("Creating new .env file");
+      console.debug("Creating new .env file");
     }
 
     // Escape regex special chars
@@ -474,7 +474,7 @@ export const appendToEnv = (
     }
 
     fs.writeFileSync(envPath, envContent);
-    console.log(`Updated .env with ${key}: ${value}`);
+    console.debug(`Updated .env with ${key}: ${value}`);
   } catch (error) {
     console.error(`Failed to update .env with ${key}:`, error);
   }
@@ -486,14 +486,14 @@ export const appendToEnv = (
 export const simulateMissingCursorMessage = async (
   worker: Worker,
 ): Promise<void> => {
-  console.log(
+  console.debug(
     `[${worker.name}] Simulating backgrounded app missing cursor messages`,
   );
   await worker.worker?.reinstall();
-  console.log(
+  console.debug(
     `[${worker.name}] Worker reinstalled but sync intentionally skipped`,
   );
-  console.log(`[${worker.name}] Simulating cursor being off by one message`);
+  console.debug(`[${worker.name}] Simulating cursor being off by one message`);
 };
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
@@ -606,7 +606,7 @@ export const logAndSend = async (
       console.error(message);
       break;
     default:
-      console.log(message);
+      console.debug(message);
   }
 
   // Send to conversation if provided

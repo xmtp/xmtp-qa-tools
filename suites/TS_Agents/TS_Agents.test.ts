@@ -22,7 +22,7 @@ describe(testName, () => {
   let xmtpTester: XmtpPlaywright;
   beforeAll(async () => {
     xmtpTester = new XmtpPlaywright({
-      headless: false,
+      headless: true,
       env: "production",
     });
     await xmtpTester.startPage();
