@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
@@ -14,7 +15,7 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = productionAgents as Agent[];
-const testName = "TS_Gm";
+const testName = "TS_Agents";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -22,15 +23,20 @@ describe(testName, () => {
   beforeAll(async () => {
     xmtpTester = new XmtpPlaywright({
       headless: true,
+      env: "production",
     });
     await xmtpTester.startPage();
+  });
+
+  setupTestLifecycle({
+    expect,
   });
 
   // For local testing, test all agents on their supported networks
   for (const agent of typedAgents) {
     it(`test ${agent.name}:${agent.address} on production`, async () => {
       try {
-        console.log(`Testing ${agent.name} with address ${agent.address} `);
+        console.debug(`Testing ${agent.name} with address ${agent.address} `);
         await xmtpTester.newDmFromUI(agent.address);
         await xmtpTester.sendMessage(agent.sendMessage);
         const result = await xmtpTester.waitForResponse(agent.expectedMessage);

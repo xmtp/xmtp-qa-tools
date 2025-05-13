@@ -29,8 +29,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   it("clientCreate: should measure creating a client", async () => {

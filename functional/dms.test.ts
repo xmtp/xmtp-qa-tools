@@ -31,8 +31,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   it("newDm: should measure creating a DM", async () => {

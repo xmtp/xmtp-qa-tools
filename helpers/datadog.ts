@@ -226,11 +226,10 @@ export function parseTestName(testName: string): ParsedTestName {
 export async function sendPerformanceMetric(
   metricValue: number,
   testName: string,
-  libXmtpVersion: string,
   skipNetworkStats: boolean = false,
 ): Promise<void> {
   if (!state.isInitialized) return;
-
+  const libXmtpVersion = "latest";
   try {
     const {
       metricDescription,
@@ -250,7 +249,13 @@ export async function sendPerformanceMetric(
       members: members,
       region: process.env.GEOLOCATION ?? "",
     };
-    sendMetric("duration", metricValue, values);
+    if (
+      testName.includes("ts_performance") ||
+      testName.includes("ts_delivery") ||
+      testName.includes("ts_large")
+    ) {
+      sendMetric("duration", metricValue, values);
+    }
 
     // Network stats handling
     if (!skipNetworkStats && testName.includes("ts_performance")) {

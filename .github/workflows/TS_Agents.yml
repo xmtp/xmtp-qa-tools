@@ -1,4 +1,4 @@
-name: TS_Gm
+name: TS_Agents
 description: "should verify health of agents"
 
 on:
@@ -6,17 +6,23 @@ on:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
 
-  pull_request:
-    branches:
-      - main
-
 jobs:
-  TS_Gm:
+  TS_Agents:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
         environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,26 +38,16 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-          LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-          XMTP_ENV: ${{ matrix.environment }}
-          GEOLOCATION: ${{ vars.GEOLOCATION }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-        run: ./scripts/run-test.sh TS_Gm 1
-
+        run: ./scripts/run-test.sh TS_Agents 1
       - name: Send Slack notification
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
         run: npx tsx helpers/slack.ts
       - name: Upload reports and snapshots artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ job.name }}_${{ matrix.environment }}
+          name: TS_Agents_${{ matrix.environment }}
           path: |
             logs/
-            logs/**/*.png

@@ -39,8 +39,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;

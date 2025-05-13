@@ -13,7 +13,7 @@ import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
 import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
-import { flushMetrics, initDataDog } from "./datadog";
+import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 import { sdkVersions } from "./tests";
 
@@ -121,12 +121,12 @@ export const regressionClient = async (
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
-    console.log("Invalid version" + versionStr);
+    console.debug("Invalid version" + versionStr);
     throw new Error("Invalid version" + versionStr);
   }
 
   if (libXmtpVersion !== libXmtpVersionAfterClient) {
-    console.log(
+    console.debug(
       `libXmtpVersion mismatch: ${libXmtpVersionAfterClient} !== ${libXmtpVersion}`,
     );
   }
@@ -222,7 +222,7 @@ export const getDbPath = (
   const basePath = loadDataPath(name, installationId, testName);
 
   if (!fs.existsSync(basePath)) {
-    console.log(`[${name}] Creating directory: ${basePath}`);
+    console.debug(`[${name}] Creating directory: ${basePath}`);
     fs.mkdirSync(basePath, { recursive: true });
   }
 
@@ -258,7 +258,7 @@ export function getEnvPath(testName: string): string {
     // Create the .env file if it doesn't exist
     if (!fs.existsSync(envPath)) {
       fs.writeFileSync(envPath, `#XMTP\nLOGGING_LEVEL="off"\nXMTP_ENV="dev"\n`);
-      console.log(`Created default .env file at ${envPath}`);
+      console.debug(`Created default .env file at ${envPath}`);
     }
   }
   process.env.CURRENT_ENV_PATH = envPath;
@@ -269,7 +269,7 @@ export function getEnvPath(testName: string): string {
  */
 export function loadEnv(testName: string) {
   dotenv.config({ path: getEnvPath(testName) });
-  console.log("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
+  console.debug("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
 
   setupPrettyLogs();
 
@@ -279,22 +279,11 @@ export function loadEnv(testName: string) {
   initDataDog();
 }
 
-export async function closeEnv(testName: string, workers?: WorkerManager) {
-  //  flushLogger(testName);
-
-  await flushMetrics();
-  if (workers && typeof workers.getWorkers === "function") {
-    for (const worker of workers.getWorkers()) {
-      await worker.worker.terminate();
-    }
-  }
-}
-
 export async function listInstallations(workers: WorkerManager) {
   for (const worker of workers.getWorkers()) {
     const inboxState = await worker.client?.preferences.inboxState();
     if (inboxState) {
-      console.log(
+      console.debug(
         worker.name,
         "has",
         inboxState.installations.length,

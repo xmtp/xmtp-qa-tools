@@ -46,17 +46,16 @@ export class XmtpPlaywright {
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
-    console.log("Starting XmtpPlaywright with env:", this.env);
+    console.debug("Starting XmtpPlaywright with env:", this.env);
   }
 
   /**
    * Takes a screenshot and saves it to the logs directory
    */
   async takeSnapshot(name: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
-    const snapshotDir = path.join(process.cwd(), "./logs");
+    if (!this.page) throw new Error("Page is not initialized");
+
+    const snapshotDir = path.join(process.cwd(), "./logs/screenshots");
     if (!fs.existsSync(snapshotDir)) {
       fs.mkdirSync(snapshotDir, { recursive: true });
     }
@@ -70,9 +69,8 @@ export class XmtpPlaywright {
    * Fills addresses and creates a new conversation
    */
   public async newGroupFromUI(addresses: string[]): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     // Target the second button with the menu popup attribute
     await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
     await this.page.getByRole("menuitem", { name: "New group" }).click();
@@ -91,37 +89,36 @@ export class XmtpPlaywright {
    * Fills addresses and creates a new conversation
    */
   public async newDmFromUI(address: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     // Target the second button with the menu popup attribute
     await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
     await this.page
       .getByRole("menuitem", { name: "New direct message" })
       .click();
-
-    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+    const addressInput = this.page.getByRole("textbox", { name: "Address" });
+    await addressInput.waitFor({ state: "visible" });
+    await addressInput.fill(address);
     await this.page.getByRole("button", { name: "Create" }).click();
+    await addressInput.waitFor({ state: "hidden" });
+    return;
   }
   /**
    * Sends a message in the current conversation
    */
   public async sendMessage(message: string): Promise<void> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
-    console.log("Waiting for message input to be visible");
-    await this.page
-      .getByRole("textbox", { name: "Type a message..." })
-      .waitFor({ state: "visible" });
+    if (!this.page) throw new Error("Page is not initialized");
 
-    console.log("Filling message");
-    await this.page
-      .getByRole("textbox", { name: "Type a message..." })
-      .fill(message);
+    // Wait for the textbox to be visible
+    const messageInput = this.page.getByRole("textbox", {
+      name: "Type a message...",
+    });
+    await messageInput.waitFor({ state: "visible" });
 
-    console.log("Sending message", message);
-    await this.page.waitForTimeout(1000);
+    console.debug("Filling message");
+    await messageInput.fill(message);
+
+    console.debug("Sending message", message);
     await this.page.getByRole("button", { name: "Send" }).click();
   }
 
@@ -130,7 +127,7 @@ export class XmtpPlaywright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 2; i++) {
       await this.page.waitForTimeout(defaultValues.streamTimeout);
       const responseText = await this.getLatestMessageText();
       if (
@@ -140,6 +137,7 @@ export class XmtpPlaywright {
       ) {
         return true;
       }
+      console.debug(`No response found after ${i + 1} checks`);
     }
     return false;
   }
@@ -148,9 +146,8 @@ export class XmtpPlaywright {
    * Gets the text of the latest message in the conversation
    */
   private async getLatestMessageText(): Promise<string> {
-    if (!this.page) {
-      throw new Error("Page is not initialized");
-    }
+    if (!this.page) throw new Error("Page is not initialized");
+
     const messageItems = await this.page
       .locator('div[data-testid="virtuoso-item-list"] > div')
       .all();
@@ -159,7 +156,7 @@ export class XmtpPlaywright {
 
     const latestMessageElement = messageItems[messageItems.length - 1];
     const responseText = (await latestMessageElement.textContent()) || "";
-    console.log(`Latest message: "${responseText}"`);
+    console.debug(`Latest message: "${responseText}"`);
 
     return responseText;
   }
@@ -190,7 +187,7 @@ export class XmtpPlaywright {
 
     const url = "https://xmtp.chat/";
 
-    console.log("Navigating to:", url);
+    console.debug("Navigating to:", url);
     await page.goto(url);
     await page.waitForTimeout(1000);
 
@@ -212,7 +209,7 @@ export class XmtpPlaywright {
     walletEncryptionKey: string = "",
   ): Promise<void> {
     if (this.defaultUser) {
-      console.log(
+      console.debug(
         "Setting localStorage",
         walletKey.slice(0, 4) + "...",
         walletEncryptionKey.slice(0, 4) + "...",
@@ -221,12 +218,12 @@ export class XmtpPlaywright {
 
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
-        if (walletKey !== "") console.log("Setting walletKey", walletKey);
+        if (walletKey !== "") console.debug("Setting walletKey", walletKey);
         // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
 
         if (walletEncryptionKey !== "") {
-          console.log("Setting walletEncryptionKey", walletEncryptionKey);
+          console.debug("Setting walletEncryptionKey", walletEncryptionKey);
           // @ts-expect-error Window localStorage access in browser context
           window.localStorage.setItem(
             "XMTP_ENCRYPTION_KEY",

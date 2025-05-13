@@ -17,8 +17,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   it("should stream consent updates when a user is blocked", async () => {

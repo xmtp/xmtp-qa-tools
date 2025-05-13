@@ -30,8 +30,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({
     expect,
-    workers,
-    testName,
   });
 
   beforeAll(async () => {
