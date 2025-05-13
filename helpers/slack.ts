@@ -84,7 +84,7 @@ if (fs.existsSync("logs")) {
 
       for (const line of lines) {
         if (/error|fail|exception/i.test(line)) {
-          errorLines.push(line);
+          errorLines.push(line.split("[vitest]")[1]);
           if (errorLines.length >= 10) break;
         }
       }
