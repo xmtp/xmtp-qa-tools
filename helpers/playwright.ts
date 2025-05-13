@@ -99,6 +99,7 @@ export class XmtpPlaywright {
 
     await this.page.getByRole("textbox", { name: "Address" }).fill(address);
     await this.page.getByRole("button", { name: "Create" }).click();
+    await this.page.waitForTimeout(1000);
   }
   /**
    * Sends a message in the current conversation
