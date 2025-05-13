@@ -21,11 +21,10 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
-      TEST_NAME: "TS_Gm"
     steps:
       - uses: actions/setup-node@v4
         with:
-          node-version-file: ".node-version"
+          node-version: 20
           cache: "yarn"
         env:
           SKIP_YARN_COREPACK_CHECK: "1"
@@ -44,7 +43,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TS_Gm_${{ matrix.environment }}
+          name: ${{ job.name }}_${{ matrix.environment }}
           path: |
             logs/
             logs/**/*.png
