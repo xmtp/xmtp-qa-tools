@@ -9,7 +9,7 @@ import {
 } from "playwright-chromium";
 import { defaultValues } from "./tests";
 
-type BrowserSession = {
+export type BrowserSession = {
   browser: Browser;
   page: Page;
 };
@@ -43,67 +43,19 @@ export class XmtpPlaywright {
     this.isHeadless =
       process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
-    console.log("Starting XmtpPlaywright with env:", this.env);
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
-  }
-
-  /**
-   * Creates a group, adds the provided addresses, and tests for an expected response
-   */
-  async createGroupAndReceiveGm(
-    addresses: string[],
-    expectedResponse?: string | string[],
-  ): Promise<void> {
-    const session = await this.startPage();
-    try {
-      await this.fillAddressesAndCreate(session.page, addresses);
-      const response = await this.sendAndWaitForResponse(
-        session.page,
-        "hi",
-        expectedResponse || "gm",
-      );
-      if (!response) {
-        throw new Error("Failed to receive response");
-      }
-    } catch (error) {
-      console.error("Error in createGroupAndReceiveGm:", error);
-      await this.takeSnapshot(session.page, "before-finding-gm");
-      throw error;
-    } finally {
-      await this.closeBrowser(session.browser);
-    }
-  }
-
-  /**
-   * Tests a DM with an agent using deeplink
-   */
-  async newDmWithDeeplink(
-    address: string,
-    sendMessage: string,
-    expectedMessage?: string | string[],
-  ): Promise<boolean> {
-    const session = await this.startPage(address);
-    try {
-      return await this.sendAndWaitForResponse(
-        session.page,
-        sendMessage,
-        expectedMessage,
-      );
-    } catch (error) {
-      console.error("Could not find expected message:", error);
-      await this.takeSnapshot(session.page, "before-finding-expected-message");
-      return false;
-    } finally {
-      await this.closeBrowser(session.browser);
-    }
+    console.log("Starting XmtpPlaywright with env:", this.env);
   }
 
   /**
    * Takes a screenshot and saves it to the logs directory
    */
-  async takeSnapshot(page: Page, name: string): Promise<void> {
+  async takeSnapshot(name: string): Promise<void> {
+    if (!this.page) {
+      throw new Error("Page is not initialized");
+    }
     const snapshotDir = path.join(process.cwd(), "./logs");
     if (!fs.existsSync(snapshotDir)) {
       fs.mkdirSync(snapshotDir, { recursive: true });
@@ -111,143 +63,95 @@ export class XmtpPlaywright {
 
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
     const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
-    await page.screenshot({ path: screenshotPath, fullPage: true });
+    await this.page.screenshot({ path: screenshotPath, fullPage: true });
   }
 
   /**
    * Fills addresses and creates a new conversation
    */
-  private async fillAddressesAndCreate(
-    page: Page,
-    addresses: string[],
-  ): Promise<void> {
-    if (!page) {
+  public async newGroupFromUI(addresses: string[]): Promise<void> {
+    if (!this.page) {
       throw new Error("Page is not initialized");
     }
+    // Target the second button with the menu popup attribute
+    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
+    await this.page.getByRole("menuitem", { name: "New group" }).click();
 
-    await page
-      .getByRole("main")
-      .getByRole("button", { name: "Create a new group" })
-      .click();
-    await page.getByRole("button", { name: "Members" }).click();
+    await this.page.getByRole("button", { name: "Members" }).click();
 
     for (const address of addresses) {
-      await page.getByRole("textbox", { name: "Address" }).fill(address);
-      await page.getByRole("button", { name: "Add" }).click();
+      await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+      await this.page.getByRole("button", { name: "Add" }).click();
     }
 
-    await page.getByRole("button", { name: "Create" }).click();
+    await this.page.getByRole("button", { name: "Create" }).click();
   }
 
   /**
-   * Sends a message and waits for response in the message list
+   * Fills addresses and creates a new conversation
    */
-  private async sendAndWaitForResponse(
-    page: Page,
-    sendMessage: string,
-    expectedMessage?: string | string[],
-  ): Promise<boolean> {
-    try {
-      await this.sendMessage(page, sendMessage);
-      return await this.waitForResponse(page, expectedMessage);
-    } catch (error) {
-      console.error("Error in sendAndWaitForResponse:", error);
-      await this.takeSnapshot(page, "before-finding-expected-message");
-      return false;
+  public async newDmFromUI(address: string): Promise<void> {
+    if (!this.page) {
+      throw new Error("Page is not initialized");
     }
-  }
+    // Target the second button with the menu popup attribute
+    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
+    await this.page
+      .getByRole("menuitem", { name: "New direct message" })
+      .click();
 
+    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+    await this.page.getByRole("button", { name: "Create" }).click();
+  }
   /**
    * Sends a message in the current conversation
    */
-  private async sendMessage(page: Page, message: string): Promise<void> {
+  public async sendMessage(message: string): Promise<void> {
+    if (!this.page) {
+      throw new Error("Page is not initialized");
+    }
     console.log("Waiting for message input to be visible");
-    await page
+    await this.page
       .getByRole("textbox", { name: "Type a message..." })
       .waitFor({ state: "visible" });
 
     console.log("Filling message");
-    await page
+    await this.page
       .getByRole("textbox", { name: "Type a message..." })
       .fill(message);
 
     console.log("Sending message", message);
-    await page.waitForTimeout(1000);
-    await page.getByRole("button", { name: "Send" }).click();
+    await this.page.waitForTimeout(1000);
+    await this.page.getByRole("button", { name: "Send" }).click();
   }
 
   /**
    * Waits for a response matching the expected message(s)
    */
-  private async waitForResponse(
-    page: Page,
-    expectedMessage?: string | string[],
-  ): Promise<boolean> {
-    // Wait for messages to appear in the virtuoso list
-    await page.waitForSelector('div[data-testid="virtuoso-item-list"] > div', {
-      timeout: defaultValues.streamTimeout,
-    });
-
-    // Get initial message count
-    const initialMessageCount = await page
-      .locator('div[data-testid="virtuoso-item-list"] > div')
-      .count();
-    console.log(`Initial message count: ${initialMessageCount}`);
-
-    // Convert expected message to array for consistent handling
-    const expectedPhrases = expectedMessage
-      ? Array.isArray(expectedMessage)
-        ? expectedMessage
-        : [expectedMessage]
-      : [];
-
-    const timeout = defaultValues.streamTimeout * 2;
-    let timer = 0;
-    // Poll for new messages
-    while (timer < timeout) {
-      await page.waitForTimeout(1000);
-      timer += 1000;
-      const currentMessageCount = await page
-        .locator('div[data-testid="virtuoso-item-list"] > div')
-        .count();
-
-      if (currentMessageCount > initialMessageCount) {
-        const responseText = await this.getLatestMessageText(page);
-
-        // If no expected message, any response is valid
-        if (!expectedPhrases.length) {
-          console.log(`Received a response: "${responseText}"`);
-          return true;
-        }
-
-        // Check if any of the expected phrases are in the response
-        const messageFound = expectedPhrases.some((phrase) =>
+  public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
+    if (!this.page) throw new Error("Page is not initialized");
+    for (let i = 0; i < 3; i++) {
+      await this.page.waitForTimeout(defaultValues.streamTimeout);
+      const responseText = await this.getLatestMessageText();
+      if (
+        expectedMessage.some((phrase) =>
           responseText.toLowerCase().includes(phrase.toLowerCase()),
-        );
-
-        if (messageFound) {
-          console.log(
-            `Found expected response containing one of [${expectedPhrases.join(", ")}]: "${responseText}"`,
-          );
-          return true;
-        }
+        )
+      ) {
+        return true;
       }
     }
-
-    console.log(
-      expectedPhrases.length
-        ? `Failed to find response containing any of [${expectedPhrases.join(", ")}]`
-        : "Failed to receive any response",
-    );
-
     return false;
   }
 
   /**
    * Gets the text of the latest message in the conversation
    */
-  private async getLatestMessageText(page: Page): Promise<string> {
-    const messageItems = await page
+  private async getLatestMessageText(): Promise<string> {
+    if (!this.page) {
+      throw new Error("Page is not initialized");
+    }
+    const messageItems = await this.page
       .locator('div[data-testid="virtuoso-item-list"] > div')
       .all();
 
@@ -263,7 +167,10 @@ export class XmtpPlaywright {
   /**
    * Starts a new page with the specified options
    */
-  private async startPage(address?: string): Promise<BrowserSession> {
+  async startPage(): Promise<BrowserSession> {
+    if (this.browser && this.page) {
+      return { browser: this.browser, page: this.page };
+    }
     const browser = await chromium.launch({
       headless: this.isHeadless,
       slowMo: this.isHeadless ? 0 : 100,
@@ -281,9 +188,7 @@ export class XmtpPlaywright {
       this.defaultUser ? this.encryptionKey : "",
     );
 
-    const url = address
-      ? `https://xmtp.chat/dm/${address}?env=${this.env}`
-      : "https://xmtp.chat/";
+    const url = "https://xmtp.chat/";
 
     console.log("Navigating to:", url);
     await page.goto(url);
@@ -293,6 +198,8 @@ export class XmtpPlaywright {
       await page.getByText("Ephemeral", { exact: true }).click();
     }
 
+    this.page = page;
+    this.browser = browser;
     return { browser, page };
   }
 
@@ -343,9 +250,9 @@ export class XmtpPlaywright {
   /**
    * Safely closes the browser
    */
-  private async closeBrowser(browser: Browser): Promise<void> {
-    if (browser) {
-      await browser.close();
+  private async closeBrowser(): Promise<void> {
+    if (this.browser) {
+      await this.browser.close();
     }
   }
 }

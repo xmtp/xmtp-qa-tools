@@ -47,9 +47,9 @@ export class OpenAIService {
               
               # Example:
               [2025-05-06T22:57:34.207Z] [[32minfo[39m] Failed to find response containing any of [commands]
-              [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
+              [2025-05-06T22:57:34.246Z] [[31merror[39m] [vitest] Test failed in TS_Gm > key-check dev expected false to be true // Object.is equality
               [2025-05-06T22:58:22.929Z] [[32minfo[39m] Failed to find response containing any of [commands]
-              [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in ts_agenthealth > key-check dev expected false to be true // Object.is equality
+              [2025-05-06T22:58:22.961Z] [[31merror[39m] [vitest] Test failed in TS_Gm > key-check dev expected false to be true // Object.is equality
               ecause \`key-check\` agent failed to respond in the expected time.
 
               # Wrong Example:

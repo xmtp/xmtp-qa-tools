@@ -2,64 +2,61 @@
   {
     "name": "flaunchy",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
-    "networks": ["production"],
     "sendMessage": "hi",
-    "expectedMessage": "flaunchy"
+    "expectedMessage": ["flaunchy"]
+  },
+  {
+    "name": "elsa",
+    "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
+    "sendMessage": "hi",
+    "expectedMessage": ["elsa", "!"]
   },
   {
     "name": "csx",
+    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
+    "sendMessage": "hola",
+    "expectedMessage": ["chat", "invalid"]
+  },
+  {
+    "name": "gang",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-    "networks": ["dev", "production"],
     "sendMessage": "hola",
     "expectedMessage": ["chat", "invalid"]
   },
   {
     "name": "clankerchat.base.eth",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-    "networks": ["production"],
     "sendMessage": "hi",
-    "expectedMessage": "hey"
+    "expectedMessage": ["hey"]
   },
   {
     "name": "byte",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
-    "networks": ["production"],
     "sendMessage": "hi",
-    "expectedMessage": "!"
+    "expectedMessage": ["!"]
   },
   {
     "name": "groupt",
     "address": "0x70e25528d8b63905b455140f90a1659d743f21be",
-    "networks": ["dev", "production"],
     "sendMessage": "@toss help",
     "expectedMessage": ["toss"]
   },
   {
     "name": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
-    "networks": ["production"],
     "sendMessage": "hey there how are you?",
-    "expectedMessage": "thinking"
+    "expectedMessage": ["thinking"]
   },
   {
     "name": "key-check",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    "networks": ["dev", "production"],
     "sendMessage": "/kc help",
-    "expectedMessage": "commands"
+    "expectedMessage": ["commands"]
   },
   {
     "name": "gm-bot",
     "address": "0x20b572be48527a770479744aec6fe5644f97678b",
-    "networks": ["production"],
     "sendMessage": "hola",
-    "expectedMessage": "gm"
-  },
-  {
-    "name": "gang",
-    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
-    "networks": ["dev", "production"],
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"]
+    "expectedMessage": ["gm"]
   }
 ]

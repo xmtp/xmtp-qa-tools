@@ -1,88 +1,45 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { defaultValues, sleep } from "@helpers/tests";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import productionAgents from "./production.json";
 
-const testName = "ts_gm";
+// Define the types for the agents
+interface Agent {
+  name: string;
+  address: string;
+  sendMessage: string;
+  expectedMessage: string[];
+}
+
+// Type assertion for imported JSON
+const typedAgents = productionAgents as Agent[];
+const testName = "TS_Gm";
 loadEnv(testName);
 
-const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
-
-describe(testName, async () => {
-  let convo: Conversation;
-  let workers: WorkerManager;
-
-  const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
-  workers = await getWorkers(
-    ["bob"],
-    testName,
-    typeofStream.Message,
-    typeOfResponse.Gm,
-    "production",
-  );
-
-  setupTestLifecycle({
-    expect,
-    workers,
-    testName,
+describe(testName, () => {
+  let xmtpTester: XmtpPlaywright;
+  beforeAll(async () => {
+    xmtpTester = new XmtpPlaywright({
+      headless: true,
+    });
+    await xmtpTester.startPage();
   });
 
-  it("gm-bot: should check if bot is alive", async () => {
-    try {
-      // Create conversation with the bot
-      convo = await workers
-        .get("bob")!
-        .client.conversations.newDmWithIdentifier({
-          identifierKind: IdentifierKind.Ethereum,
-          identifier: gmBotAddress,
-        });
-
-      await convo.sync();
-      const messages = await convo.messages();
-      const prevMessageCount = messages.length;
-      console.log("prevMessageCount", prevMessageCount);
-      // Send a simple message
-      const sentMessageId = await convo.send("gm");
-      console.log("sentMessageId", sentMessageId);
-      await sleep(defaultValues.streamTimeout);
-      await convo.sync();
-      const messagesAfter = await convo.messages();
-      expect(messagesAfter.length).toBe(prevMessageCount + 2);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("should respond to a message", async () => {
-    try {
-      const result = await xmtpTester.newDmWithDeeplink(
-        gmBotAddress,
-        "hi",
-        "gm",
-      );
-      expect(result).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-  it("should create a group and send a message", async () => {
-    try {
-      const slicedInboxes = generatedInboxes.slice(0, 4);
-      await xmtpTester.createGroupAndReceiveGm([
-        ...slicedInboxes.map((inbox) => inbox.accountAddress),
-        gmBotAddress,
-      ]);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+  // For local testing, test all agents on their supported networks
+  for (const agent of typedAgents) {
+    it(`test ${agent.name}:${agent.address} on production`, async () => {
+      try {
+        console.log(`Testing ${agent.name} with address ${agent.address} `);
+        await xmtpTester.newDmFromUI(agent.address);
+        await xmtpTester.sendMessage(agent.sendMessage);
+        const result = await xmtpTester.waitForResponse(agent.expectedMessage);
+        expect(result).toBe(true);
+      } catch (error) {
+        await xmtpTester.takeSnapshot(`${agent.name}-${agent.address}`);
+        logError(error, `${agent.name}-${agent.address}`);
+        throw error;
+      }
+    });
+  }
 });

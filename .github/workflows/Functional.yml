@@ -1,8 +1,8 @@
 name: Functional
 
-on:
-  push:
-    branches-ignore: [main]
+# on:
+#   push:
+#     branches-ignore: [main]
 
 jobs:
   Functional:
@@ -29,7 +29,7 @@ jobs:
           GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
           GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
-        run: yarn large
+        run: yarn functional
 
       - name: Upload reports artifacts
         if: always()

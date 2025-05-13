@@ -4,19 +4,18 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 
 ## Quick reference
 
-| Workflow                           | Purpose                                | Trigger                      | Key Features                                   |
-| ---------------------------------- | -------------------------------------- | ---------------------------- | ---------------------------------------------- |
-| **check-agent-examples.yml**       | Validate XMTP agent examples           | Hourly, manual               | Clone, build and verify example agent startup  |
-| **Deploy.yml**                     | Handle Railway deployments             | Version bump in package.json | Auto PR creation and merging for deployments   |
-| **TS_AgentHealth.yml**             | Monitor production agent health        | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
-| **TS_Delivery.yml**                | Test message delivery reliability      | Scheduled, manual            | Verify cross-environment message delivery      |
-| **TS_Gm.yml**                      | Validate basic messaging functionality | Scheduled, manual            | Verify core protocol operations                |
-| **TS_Large.yml**                   | Test large scale operations            | Scheduled, manual            | Test large scale operations                    |
-| **TS_Performance.yml**             | Measure protocol performance           | Scheduled, manual            | Benchmark operation timing and scalability     |
-| **test-package-compatibility.yml** | Verify package compatibility           | On main branch push, manual  | Test with different Node versions and managers |
-| **upload-installations.yml**       | Backup installation data               | Daily, manual                | Upload keys and installation data as artifacts |
-| **validate-code-quality.yml**      | Check code quality                     | On non-main branch pushes    | Enforce code quality standards                 |
-| **validate-functional-tests.yml**  | Run functional test suite              | On non-main branch pushes    | Ensure tests work before merging               |
+| Workflow                           | Purpose                           | Trigger                      | Key Features                                   |
+| ---------------------------------- | --------------------------------- | ---------------------------- | ---------------------------------------------- |
+| **check-agent-examples.yml**       | Validate XMTP agent examples      | Hourly, manual               | Clone, build and verify example agent startup  |
+| **Deploy.yml**                     | Handle Railway deployments        | Version bump in package.json | Auto PR creation and merging for deployments   |
+| **TS_Gm.yml**                      | Monitor production agent health   | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
+| **TS_Delivery.yml**                | Test message delivery reliability | Scheduled, manual            | Verify cross-environment message delivery      |
+| **TS_Large.yml**                   | Test large scale operations       | Scheduled, manual            | Test large scale operations                    |
+| **TS_Performance.yml**             | Measure protocol performance      | Scheduled, manual            | Benchmark operation timing and scalability     |
+| **test-package-compatibility.yml** | Verify package compatibility      | On main branch push, manual  | Test with different Node versions and managers |
+| **upload-installations.yml**       | Backup installation data          | Daily, manual                | Upload keys and installation data as artifacts |
+| **validate-code-quality.yml**      | Check code quality                | On non-main branch pushes    | Enforce code quality standards                 |
+| **validate-functional-tests.yml**  | Run functional test suite         | On non-main branch pushes    | Ensure tests work before merging               |
 
 ## Usage
 
@@ -27,15 +26,15 @@ GitHub Actions workflows run automatically based on their triggers, but can also
 gh workflow run workflow-name.yml
 
 # Example - run the agent health check:
-gh workflow run TS_AgentHealth.yml
+gh workflow run TS_Gm.yml
 ```
 
 ## 🤖 Agent Health Monitoring
 
-The `TS_AgentHealth.yml` workflow monitors the health and responsiveness of XMTP agents in production.
+The `TS_Gm.yml` workflow monitors the health and responsiveness of XMTP agents in production.
 
 ```yaml
-name: TS_AgentHealth
+name: TS_Gm
 on:
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
@@ -47,7 +46,7 @@ jobs:
     steps:
       # ...
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_AgentHealth
+        run: ./scripts/run-test.sh TS_Gm
 ```
 
 **Key features:**
