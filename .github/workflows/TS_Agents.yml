@@ -38,7 +38,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Agents 1
+        run: ./scripts/run-test.sh yarn test ts_agents
       - name: Send Slack notification
         if: always()
         env:
