@@ -65,7 +65,27 @@ export class XmtpPlaywright {
     const screenshotPath = path.join(snapshotDir, `${name}-${timestamp}.png`);
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
   }
+  /**
+   * Fills addresses and creates a new conversation
+   */
+  public async fillAddressesAndCreate(addresses: string[]): Promise<void> {
+    if (!this.page) {
+      throw new Error("Page is not initialized");
+    }
 
+    await page
+      .getByRole("main")
+      .getByRole("button", { name: "Create a new group" })
+      .click();
+    await page.getByRole("button", { name: "Members" }).click();
+
+    for (const address of addresses) {
+      await page.getByRole("textbox", { name: "Address" }).fill(address);
+      await page.getByRole("button", { name: "Add" }).click();
+    }
+
+    await page.getByRole("button", { name: "Create" }).click();
+  }
   /**
    * Fills addresses and creates a new conversation
    */

@@ -39,6 +39,7 @@ describe(testName, () => {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
       await xmtpTester.newGroupFromUI(gmBotAddress);
+      await xmtpTester.fillAddressesAndCreate([gmBotAddress]);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse("gm");
     } catch (e) {
