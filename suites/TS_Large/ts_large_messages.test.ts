@@ -61,7 +61,7 @@ describe(testName, async () => {
         );
         const verifyResult = await verifyMessageStream(
           newGroup,
-          workers.getWorkers(),
+          workers.getAllButCreator(),
         );
 
         // Save metrics

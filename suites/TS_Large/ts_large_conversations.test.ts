@@ -59,7 +59,7 @@ describe(testName, async () => {
         // Use the dedicated conversation stream verification helper
         const verifyResult = await verifyNewConversationStream(
           newGroup,
-          workers.getWorkers(),
+          workers.getAllButCreator(),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);

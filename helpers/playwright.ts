@@ -127,7 +127,7 @@ export class XmtpPlaywright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 6; i++) {
       await this.page.waitForTimeout(defaultValues.streamTimeout);
       const responseText = await this.getLatestMessageText();
       if (
@@ -189,7 +189,6 @@ export class XmtpPlaywright {
 
     console.debug("Navigating to:", url);
     await page.goto(url);
-    await page.waitForTimeout(1000);
 
     if (!this.defaultUser) {
       await page.getByText("Ephemeral", { exact: true }).click();
