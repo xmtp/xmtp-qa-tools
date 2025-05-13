@@ -2,6 +2,9 @@ name: TS_Agents
 description: "should verify health of agents"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
@@ -38,7 +41,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh yarn test ts_agents
+        run: yarn test ts_agents
       - name: Send Slack notification
         if: always()
         env:
