@@ -43,10 +43,10 @@ export class XmtpPlaywright {
     this.isHeadless =
       process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
-    console.log("Starting XmtpPlaywright with env:", this.env);
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
+    console.log("Starting XmtpPlaywright with env:", this.env);
   }
 
   /**
