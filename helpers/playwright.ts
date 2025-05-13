@@ -127,7 +127,7 @@ export class XmtpPlaywright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       await this.page.waitForTimeout(defaultValues.streamTimeout);
       const responseText = await this.getLatestMessageText();
       if (
