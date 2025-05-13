@@ -96,10 +96,12 @@ export class XmtpPlaywright {
     await this.page
       .getByRole("menuitem", { name: "New direct message" })
       .click();
-
-    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+    const addressInput = this.page.getByRole("textbox", { name: "Address" });
+    await addressInput.waitFor({ state: "visible" });
+    await addressInput.fill(address);
     await this.page.getByRole("button", { name: "Create" }).click();
-    await this.page.waitForTimeout(1000);
+    await addressInput.waitFor({ state: "hidden" });
+    return;
   }
   /**
    * Sends a message in the current conversation
@@ -112,9 +114,6 @@ export class XmtpPlaywright {
       name: "Type a message...",
     });
     await messageInput.waitFor({ state: "visible" });
-
-    // Add a small delay to ensure UI is fully ready
-    await this.page.waitForTimeout(1000);
 
     console.log("Filling message");
     await messageInput.fill(message);
