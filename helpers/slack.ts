@@ -94,7 +94,7 @@ if (fs.existsSync("logs")) {
 
     if (errorLines.length > 0) {
       rawErrorLogs = errorLines.join("\n");
-      errorLogs = `\n\n*Error Logs:*\n${errorLines.slice(-5).join("\n")}`;
+      errorLogs = `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
