@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import type { XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
