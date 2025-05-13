@@ -131,16 +131,20 @@ export class XmtpPlaywright {
   public async waitForResponse(
     expectedMessage?: string | string[],
   ): Promise<boolean> {
-    // Wait for messages to appear in the virtuoso list
     if (!this.page) {
       throw new Error("Page is not initialized");
     }
-    await this.page.waitForSelector(
-      'div[data-testid="virtuoso-item-list"] > div',
-      {
-        timeout: defaultValues.streamTimeout,
-      },
-    );
+
+    // Wait for messages to appear in the virtuoso list
+    try {
+      await this.page.waitForSelector(
+        'div[data-testid="virtuoso-item-list"] > div',
+        { timeout: 3000 }, // Only wait up to 3 seconds for the message container
+      );
+    } catch (error) {
+      console.log("Message container not found");
+      return false;
+    }
 
     // Get initial message count
     const initialMessageCount = await this.page
@@ -155,12 +159,11 @@ export class XmtpPlaywright {
         : [expectedMessage]
       : [];
 
-    const timeout = defaultValues.streamTimeout * 2;
-    let timer = 0;
-    // Poll for new messages
-    while (timer < timeout) {
+    // Make exactly 3 checks, one second apart
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      console.log(`Check ${attempt}/3 for new messages`);
       await this.page.waitForTimeout(1000);
-      timer += 1000;
+
       const currentMessageCount = await this.page
         .locator('div[data-testid="virtuoso-item-list"] > div')
         .count();
@@ -191,7 +194,7 @@ export class XmtpPlaywright {
     console.log(
       expectedPhrases.length
         ? `Failed to find response containing any of [${expectedPhrases.join(", ")}]`
-        : "Failed to receive any response",
+        : "Failed to receive any response after 3 checks",
     );
     return false;
   }

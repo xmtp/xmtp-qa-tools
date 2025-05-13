@@ -14,6 +14,9 @@ jobs:
   TS_Gm:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -31,12 +34,14 @@ jobs:
       - name: Run tests with retry
         env:
           DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-          XMTP_ENV: production
-          RUST_BACKTRACE: 1
+          LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+          XMTP_ENV: ${{ matrix.environment }}
           GEOLOCATION: ${{ vars.GEOLOCATION }}
-          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-          GITHUB_ACTIONS: true
-          LOGGING_LEVEL: "off"
+          DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
+          DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+          SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
         run: ./scripts/run-test.sh TS_Gm 1
 
       - name: Send Slack notification
