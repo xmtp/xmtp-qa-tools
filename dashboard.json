@@ -149,7 +149,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,$env,$region,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -184,7 +184,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,$env,$region,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -373,6 +373,7 @@
         "show_legend": true,
         "legend_layout": "auto",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": {},
         "type": "timeseries",
         "requests": [
           {
@@ -381,7 +382,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,$env,$test,$libxmtp, $region}"
+                "query": "avg:xmtp.sdk.delivery{$env,$test,$libxmtp, $region}"
               }
             ],
             "response_format": "timeseries",
@@ -398,7 +399,7 @@
               {
                 "name": "query4",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,$env,$region,$test,$libxmtp}"
+                "query": "avg:xmtp.sdk.order{$env,$region,$test,$libxmtp}"
               }
             ],
             "response_format": "timeseries",
