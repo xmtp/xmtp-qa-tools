@@ -229,12 +229,17 @@ export async function verifyDmStream(
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, 1),
     triggerEvents: async () => {
-      await group.send(message);
-      return [{ key: "message", sentAt: Date.now() }];
+      const sent: { content: string; sentAt: number }[] = [];
+      for (let i = 0; i < 1; i++) {
+        const sentAt = Date.now();
+        await group.send(message);
+        sent.push({ content: message, sentAt });
+      }
+      return sent;
     },
     getKey: extractContent,
     getMessage: extractContent,
-    statsLabel: "message-",
+    statsLabel: message,
     count: 1,
     randomSuffix: "",
     participantsForStats: receivers,

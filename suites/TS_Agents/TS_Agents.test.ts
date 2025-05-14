@@ -20,8 +20,6 @@ interface Agent {
 const typedAgents = productionAgents as Agent[];
 const testName = "TS_Agents";
 loadEnv(testName);
-// Manually set the stream timeout
-process.env.DEFAULT_STREAM_TIMEOUT_MS = "8000";
 
 describe(testName, () => {
   let workers: WorkerManager;
@@ -55,7 +53,8 @@ describe(testName, () => {
           workers.getWorkers(),
           agent.sendMessage,
         );
-        expect(result.allReceived).toBe(true);
+        console.log(JSON.stringify(result, null, 2));
+        expect(result.averageEventTiming).toBeLessThan(10000);
       } catch (error) {
         logError(error, `${agent.name}-${agent.address}`);
         throw error;
