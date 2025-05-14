@@ -57,7 +57,6 @@ describe(testName, async () => {
         workers,
         receiverInboxId,
         config.messageCount,
-        conversation,
       );
 
       expect(dm).toBeTruthy();

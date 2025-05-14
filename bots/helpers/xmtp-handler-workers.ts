@@ -45,7 +45,7 @@ export interface AgentOptions {
   /** Whether to send a welcome message to the conversation */
   groupWelcomeMessage?: string;
   /** Codecs to use */
-  codecs?: unknown[];
+  codecs?: [];
   /** Worker name (if using worker mode) */
   workerName?: string;
 }
@@ -129,7 +129,7 @@ class WorkerManager {
       env: env as XmtpEnv,
       loggingLevel,
       dbPath: getDbPath(`${env}-${signerIdentifier}${dbPathSuffix}`),
-      codecs: options.codecs,
+      codecs: options.codecs ?? [],
     });
 
     await client.conversations.sync();

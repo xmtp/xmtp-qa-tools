@@ -95,12 +95,7 @@ async function runStressTest(
     conversation,
   );
   try {
-    await createAndSendDms(
-      workers,
-      message.senderInboxId,
-      config.messageCount,
-      conversation,
-    );
+    await createAndSendDms(workers, message.senderInboxId, config.messageCount);
   } catch (error) {
     console.error(error);
     await logAndSend("Some DMs failed to send", conversation);
