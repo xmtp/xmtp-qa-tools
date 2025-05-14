@@ -1,6 +1,7 @@
 import {
   Client,
   Dm,
+  Group,
   type Conversation,
   type DecodedMessage,
   type LogLevel,
@@ -14,6 +15,7 @@ import {
   logAgentDetails,
 } from "./client";
 import "dotenv/config";
+import { preMessageHandler } from "./xmtp-skills";
 
 // Get environment variable
 const XMTP_ENV = process.env.XMTP_ENV || "dev";
@@ -21,14 +23,15 @@ const XMTP_ENV = process.env.XMTP_ENV || "dev";
 /**
  * Configuration options for the XMTP agent
  */
-interface AgentOptions {
+export interface AgentOptions {
   walletKey: string;
   /** Whether to accept group conversations */
   acceptGroups?: boolean;
   /** Encryption key for the client */
-  encryptionKey?: string;
+  dbEncryptionKey?: string;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
+  loggingLevel?: LogLevel;
   /** Public key of the agent */
   publicKey?: string;
   /** Content types to accept (default: ['text']) */
@@ -39,6 +42,8 @@ interface AgentOptions {
   autoReconnect?: boolean;
   /** Welcome message to send to the conversation */
   welcomeMessage?: string;
+  /** Whether to send a welcome message to the conversation */
+  groupWelcomeMessage?: string;
   /** Codecs to use */
   codecs?: [];
   /** Worker name (if using worker mode) */
@@ -74,7 +79,7 @@ const WATCHDOG_RESTART_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
 const DEFAULT_AGENT_OPTIONS: AgentOptions[] = [
   {
     walletKey: "",
-    encryptionKey: "",
+    dbEncryptionKey: "",
     publicKey: "",
     acceptGroups: false,
     acceptTypes: ["text"],
@@ -108,7 +113,7 @@ class WorkerManager {
   ): Promise<Client> {
     const signer = createSigner(options.walletKey);
     const dbEncryptionKey = getEncryptionKeyFromHex(
-      options.encryptionKey ??
+      options.dbEncryptionKey ??
         process.env.ENCRYPTION_KEY ??
         generateEncryptionKeyHex(),
     );
@@ -225,7 +230,8 @@ class WorkerManager {
 
     let lastRestartTimestamp = Date.now();
     const updateActivity = () => {
-      console.log("updateActivity");
+      // Update timestamp when activity occurs
+      lastRestartTimestamp = Date.now();
     };
 
     const watchdogInterval = setInterval(
@@ -312,18 +318,32 @@ class WorkerManager {
 
           if (!conversation) continue;
 
+          console.debug(
+            `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
+          );
+
           const isDm = conversation instanceof Dm;
-          if (options.welcomeMessage && isDm) {
-            const sent = await sendWelcomeMessage(
-              client,
-              conversation,
-              options.welcomeMessage,
+          const isGroup = conversation instanceof Group;
+
+          const preMessageHandlerResult = await preMessageHandler(
+            client,
+            conversation,
+            message,
+            isDm,
+            options,
+          );
+          if (preMessageHandlerResult) {
+            console.debug(
+              `[${env}] Pre-message handler returned true, skipping`,
             );
-            if (sent) continue;
+            continue;
           }
 
-          if (isDm || options.acceptGroups) {
+          if (isDm || (isGroup && options.acceptGroups)) {
             try {
+              console.debug(
+                `[${env}] Processing message ${message.content as string}...`,
+              );
               await this.messageHandler(
                 client,
                 conversation,
@@ -334,6 +354,10 @@ class WorkerManager {
             } catch (handlerError) {
               console.error(`[${env}] Error in message handler:`, handlerError);
             }
+          } else {
+            console.debug(
+              `[${env}] Conversation is not a DM and acceptGroups=false, skipping`,
+            );
           }
         }
 
@@ -631,24 +655,4 @@ export const getActiveWorkers = (
   }
 
   return workerManager.getActiveWorkers(formatted);
-};
-
-export const sendWelcomeMessage = async (
-  client: Client,
-  conversation: Conversation,
-  welcomeMessage: string,
-) => {
-  // Get all messages from this conversation
-  await conversation.sync();
-  const messages = await conversation.messages();
-  // Check if we have sent any messages in this conversation before
-  const sentMessagesBefore = messages.filter(
-    (msg) => msg.senderInboxId.toLowerCase() === client.inboxId.toLowerCase(),
-  );
-  // If we haven't sent any messages before, send a welcome message and skip validation for this message
-  if (sentMessagesBefore.length === 0) {
-    await conversation.send(welcomeMessage);
-    return true;
-  }
-  return false;
 };

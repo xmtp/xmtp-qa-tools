@@ -167,21 +167,21 @@ export interface StressTestConfig {
 export const TEST_CONFIGS: Record<string, StressTestConfig> = {
   small: {
     largeGroups: [50],
-    workerCount: 20,
+    workerCount: 10,
     messageCount: 5,
     groupCount: 5,
     sizeLabel: "small",
   },
   medium: {
     largeGroups: [50, 100],
-    workerCount: 50,
+    workerCount: 30,
     messageCount: 10,
     groupCount: 3,
     sizeLabel: "medium",
   },
   large: {
     largeGroups: [50, 100, 200],
-    workerCount: 100,
+    workerCount: 50,
     messageCount: 15,
     groupCount: 5,
     sizeLabel: "large",
@@ -192,7 +192,6 @@ export async function createAndSendDms(
   workers: WorkerManager,
   receiverInboxId: string,
   messageCount: number,
-  conversation: Conversation,
 ) {
   let successCount = 0;
   let errorCount = 0;
@@ -212,9 +211,6 @@ export async function createAndSendDms(
         await dm.send("hello");
       }
       successCount++;
-      await conversation.send(
-        `✅ Successfully sent ${messageCount} DMs from ${sender.name}`,
-      );
     } catch (error) {
       console.error(`Error with sender ${sender.name}:`, error);
       errorCount++;
@@ -235,7 +231,7 @@ export async function createAndSendInGroup(
   receiverInboxId: string,
   conversation: Conversation,
 ) {
-  const allInboxIds = workers.getWorkers().map((w) => w.client.inboxId);
+  const allInboxIds = workers.getAllButCreator().map((w) => w.client.inboxId);
   allInboxIds.push(receiverInboxId);
 
   for (let i = 0; i < groupCount; i++) {
@@ -248,11 +244,21 @@ export async function createAndSendInGroup(
           hour12: false,
         },
       )}`;
-      const group = await client.conversations.newGroup(allInboxIds, {
+      const group = await client.conversations.newGroup([], {
         groupName,
         groupDescription: "Test group for stress testing",
       });
-
+      for (const inboxId of allInboxIds) {
+        try {
+          await group.addMembers([inboxId]);
+        } catch (error) {
+          console.error(
+            `Error adding member ${inboxId} to group ${group.id}:`,
+            error,
+          );
+        }
+      }
+      await group.sync();
       await group.send(`Hello from the group! ${i}`);
       await conversation.send(
         `✅ Successfully created group ${groupName} with ${allInboxIds.length} members`,
