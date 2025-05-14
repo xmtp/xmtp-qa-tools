@@ -12,6 +12,7 @@ import {
 } from "@xmtp/node-sdk";
 import type { WorkerBase } from "./manager";
 
+console.log(process.env.DEFAULT_STREAM_TIMEOUT_MS);
 // Default timeout for stream collection in milliseconds
 const DEFAULT_STREAM_TIMEOUT_MS = defaultValues.streamTimeout * 3; // 3 seconds
 
