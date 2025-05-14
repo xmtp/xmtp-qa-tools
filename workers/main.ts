@@ -586,7 +586,7 @@ export class WorkerClient extends Worker {
       // Add timeout to prevent hanging indefinitely
       const timeoutId = setTimeout(() => {
         this.off("worker_message", onMessage);
-        console.debug(
+        console.error(
           `Stream collection timed out. defaultTimeout: ${
             DEFAULT_STREAM_TIMEOUT_MS / 1000
           }s. Collected ${events.length}/${count} events.`,
