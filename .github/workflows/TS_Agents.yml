@@ -10,13 +10,10 @@ jobs:
   TS_Agents:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: production
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
