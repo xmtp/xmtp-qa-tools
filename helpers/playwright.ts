@@ -118,7 +118,7 @@ export class XmtpPlaywright {
     });
     await messageInput.waitFor({ state: "visible" });
     //Important to wait for the page to load the message input
-    await this.page.waitForTimeout(1000);
+    await this.page.waitForTimeout(1000); //!IMPORTANT
 
     console.debug("Filling message");
     await messageInput.fill(message);
