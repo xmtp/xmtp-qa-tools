@@ -20,6 +20,8 @@ interface Agent {
 const typedAgents = productionAgents as Agent[];
 const testName = "TS_Agents";
 loadEnv(testName);
+// Manually set the stream timeout
+process.env.DEFAULT_STREAM_TIMEOUT_MS = "6000";
 
 describe(testName, () => {
   let workers: WorkerManager;
