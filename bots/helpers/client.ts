@@ -118,18 +118,12 @@ export const logAgentDetails = async (
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
   }
 };
-
-export function validateEnvironment(
-  vars: string[],
-  customEnvPath?: string,
-): Record<string, string> {
+export function validateEnvironment(vars: string[]): Record<string, string> {
   const missing = vars.filter((v) => !process.env[v]);
 
   if (missing.length) {
     try {
-      // Use the custom env path if provided, otherwise use default
-      const envPath = customEnvPath || path.resolve(process.cwd(), ".env");
-      console.log("envPath", envPath);
+      const envPath = path.resolve(process.cwd(), ".env");
       if (fs.existsSync(envPath)) {
         const envVars = fs
           .readFileSync(envPath, "utf-8")
