@@ -18,7 +18,7 @@ describe(testName, () => {
   let convo: Conversation;
   let workers: WorkerManager;
 
-  const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
+  const xmtpTester = new XmtpPlaywright({ headless: true, env: "production" });
   beforeAll(async () => {
     await xmtpTester.startPage();
     workers = await getWorkers(
