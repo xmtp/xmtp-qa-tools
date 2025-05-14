@@ -11,9 +11,8 @@
   },
   {
     "name": "CONVOS_DEV_NOTIFS",
-    "inboxId": "591876a5c7f7cec9199f934e0396b5d622b555bbeca403852c01478d3fb3dcfc",
-    "network": "dev",
-    "groupId": "cf412f90edaf5c62020b6aa044aac6c8"
+    "inboxId": "f83d80e260093ac5464007254b06e8bd2b79f3e8bf62b5cb9d694b7bb4ad71aa",
+    "network": "dev"
   },
   {
     "name": "CONVOS_PROD",

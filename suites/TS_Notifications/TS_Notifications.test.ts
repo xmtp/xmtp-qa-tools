@@ -1,22 +1,39 @@
 import { loadEnv } from "@helpers/client";
 import { typeOfResponse, typeofStream } from "@workers/main";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Conversation } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 import receivers from "./receivers.json";
 
 const testName = "ts_notifications";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe(testName, () => {
+  let group: Conversation;
+  let workers: WorkerManager;
   for (const receiver of receivers.filter((r) => r.network === "dev")) {
-    console.log(JSON.stringify(receiver, null, 2));
-    let workers = await getWorkers(
-      ["alice", "bob", "sam", "walt", "tina"],
-      testName,
-      typeofStream.None,
-      typeOfResponse.None,
-      receiver.network as "production" | "dev" | "local",
-    );
+    it(`should create a group with ${receiver.name} members`, async () => {
+      console.log(JSON.stringify(receiver, null, 2));
+      workers = await getWorkers(
+        ["alice", "bob", "sam", "walt", "tina"],
+        testName,
+        typeofStream.Message,
+        typeOfResponse.Gm,
+        receiver.network as "production" | "dev" | "local",
+      );
+      const client = workers.getCreator()?.client;
+      group = await client?.conversations.newGroup([
+        ...workers.getAllButCreator().map((w) => w.inboxId),
+        receiver.inboxId,
+      ]);
+      if (!group) {
+        console.error(`Failed to create conversation for alice`);
+        return;
+      }
+      await group.send("Start group test");
+      console.log(`Created group ${group.id}`);
+    });
+
     it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
       try {
         console.log(`Starting notification test with random delays...`);
@@ -27,7 +44,6 @@ describe(testName, async () => {
             receiver.inboxId,
           );
           await conversation?.send(`Sending message ${messageCounter}!`);
-          await conversation?.send(`Hello ${messageCounter}!`);
           messageCounter++;
         }
       } catch (e: unknown) {
@@ -36,33 +52,21 @@ describe(testName, async () => {
       }
     });
 
-    it(`should create a group with ${workers.getAllButCreator().length} members with random delays between 3-6 seconds`, async () => {
+    it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
       try {
-        if (!receiver.groupId) {
-          const client = workers.getCreator()?.client;
-          const group = await client?.conversations.newGroup([
-            ...workers.getAllButCreator().map((w) => w.inboxId),
-            receiver.inboxId,
-          ]);
-          if (!group) {
-            console.error(`Failed to create conversation for alice`);
-            return;
-          }
-          console.log(`Created group ${group.id}`);
-          receiver.groupId = group.id;
-        }
         let counter = 0;
         for (const worker of workers.getAllButCreator()) {
           const client = worker.client;
           await client?.conversations.sync();
           const conversation = await client?.conversations.getConversationById(
-            receiver.groupId,
+            group.id,
           );
-          if (!conversation) {
-            console.error(`Failed to create conversation for ${worker.name}`);
+          if (conversation) {
+            await conversation.send(
+              `Second message ${counter}, ${worker.name}!`,
+            );
             return;
           }
-          await conversation.send(`Hello ${counter}, ${worker.name}!`);
           counter++;
         }
       } catch (e: unknown) {
