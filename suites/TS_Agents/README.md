@@ -2,109 +2,75 @@
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
-https://github.com/user-attachments/assets/bbe94427-8fcb-463c-98fb-6417c16dd4cf
+## What it does
+
+- Sends test messages to production XMTP agents
+- Validates agent responses against expected patterns
+- Measures response times and success rates
+- Reports health status for monitoring
 
 ## Setup
 
 ```bash
-# Installation
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
 cd xmtp-qa-testing
 yarn install
 ```
 
-## Configuration
+## Key files
 
-### Agent List
+- `production.json` - List of agents to be tested with their addresses
+- `TS_Agents.test.ts` - Test implementation that sends messages and validates responses
 
-Agents to be tested are defined in `agents.json`:
+## Test snippet
 
-```json
-[
-  {
-    "name": "csx-concierge",
-    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
-    "networks": ["dev"],
-    "sendMessage": "hi",
-    "expectedMessage": "chat"
-  },
-  {
-    "name": "key-check.eth",
-    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    "networks": ["production"],
-    "sendMessage": "/kc",
-    "expectedMessage": "Key Check"
-  },
-  {
-    "name": "gm-bot",
-    "address": "0x20b572be48527a770479744aec6fe5644f97678b",
-    "networks": ["production", "dev"],
-    "sendMessage": "hi",
-    "expectedMessage": "gm"
-  },
-  {
-    "name": "bankr.base.eth",
-    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
-    "networks": ["production"],
-    "sendMessage": "hi",
-    "expectedMessage": "hey"
-  },
-  {
-    "name": "clankerchat.base.eth",
-    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-    "networks": ["production"],
-    "sendMessage": "hi",
-    "expectedMessage": "hey"
-  }
-]
+```typescript
+// From TS_Agents.test.ts
+for (const agent of typedAgents) {
+  it(`test ${agent.name}:${agent.address} on production`, async () => {
+    try {
+      const convo = await workers
+        .get("bot")
+        ?.client.conversations.newDmWithIdentifier({
+          identifier: agent.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
+      expect(convo).toBeDefined();
+      const result = await verifyDmStream(
+        convo!,
+        workers.getWorkers(),
+        agent.sendMessage,
+      );
+      expect(result.allReceived).toBe(true);
+    } catch (error) {
+      logError(error, `${agent.name}-${agent.address}`);
+      throw error;
+    }
+  });
+}
 ```
 
-To add a new agent for testing, simply add its details to this file.
-
-## Test Execution
+## Test execution
 
 ```bash
 yarn test TS_Agents
 ```
 
-## Test Flow
+## Automation
 
-1. **Environment Setup**:
+Tests run automatically via GitHub Actions:
 
-   - Sets up the test environment based on configuration
-   - Creates a test client using the "bob" worker identity
-
-2. **Agent Communication**:
-
-   - Sends a test message to each target agent
-   - Waits for and validates the agent's response
-   - Records response times and success/failure status
-
-3. **Result Reporting**:
-   - Reports test results for monitoring purposes
-   - Logs detailed diagnostic information for failed tests
-
-## Performance Metrics
-
-- Agent response time
-- End-to-end message delivery performance
-- Success/failure rate across multiple agents
-
-## Key Features Tested
-
-- Agent responsiveness in direct messages
-- Agent availability across environments (dev/production)
-- Message delivery and response timing
-- Basic agent functionality through command testing
-
-## GitHub Actions Workflow
-
-The tests are configured to run automatically:
-
-- On a scheduled basis (hourly)
-- Manually via workflow dispatch
-
-The workflow configuration is in `.github/workflows/TS_Agents.yml`.
+```yaml
+# From TS_Agents.yml
+name: TS_Agents
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "10 * * * *" # Runs at 10 minutes past each hour
+  workflow_dispatch:
+```
 
 ## Artifacts
 
