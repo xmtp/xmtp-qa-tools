@@ -21,6 +21,7 @@ yarn install
 
 - [production.json](./production.json) - List of agents to be tested with their addresses
 - [TS_Agents.test.ts](./TS_Agents.test.ts) - Test implementation that sends messages and validates responses
+- [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Agents.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 
