@@ -117,9 +117,6 @@ async function sendSlackNotification() {
     if (rawErrorLogs) {
       aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
-    /*• *Network:* ${xmtpEnv}
-• *Status:* ${jobStatus}*/
-    //test
     let customLinks = "";
     if (testName && testName.toLowerCase() === "ts_agents") {
       customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View file>`;
