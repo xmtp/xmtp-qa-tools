@@ -66,40 +66,63 @@ if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
   workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 }
 
-// Check if logs directory exists and look for error logs to add context
-let errorLogs = "";
-let rawErrorLogs = "";
-if (fs.existsSync("logs")) {
+// Function to extract error logs from Vitest output
+function extractVitestErrorLogs(): { formatted: string; raw: string } {
+  let failedTestsOutput = "";
+  let rawErrorLogs = "";
+
   try {
-    // Find log files and grep for errors
-    const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log"));
-    const errorLines: string[] = [];
+    // Check GitHub output logs or local logs directory
+    if (
+      process.env.GITHUB_STEP_SUMMARY &&
+      fs.existsSync(process.env.GITHUB_STEP_SUMMARY)
+    ) {
+      // Read from GitHub step summary if available
+      const content = fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, "utf-8");
+      const failLines = content
+        .split("\n")
+        .filter((line) => line.trim().startsWith("FAIL"));
 
-    for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
-      const content = fs.readFileSync(logPath, "utf-8");
-      const lines = content.split("\n");
+      if (failLines.length > 0) {
+        rawErrorLogs = failLines.join("\n");
+        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failLines.join("\n")}\n\`\`\``;
+      }
+    } else if (fs.existsSync("logs")) {
+      // If GitHub logs are not available, try to find in local logs directory
+      const logFiles = fs
+        .readdirSync("logs")
+        .filter((file) => file.endsWith(".log"));
 
-      for (const line of lines) {
-        if (/error|fail|exception/i.test(line)) {
-          errorLines.push(line);
-          if (errorLines.length >= 10) break;
+      const failedTests: string[] = [];
+
+      for (const logFile of logFiles) {
+        const logPath = path.join("logs", logFile);
+        const content = fs.readFileSync(logPath, "utf-8");
+        const lines = content.split("\n");
+
+        // Extract lines that start with "FAIL" which are typically Vitest failure outputs
+        for (const line of lines) {
+          if (line.trim().startsWith("FAIL")) {
+            failedTests.push(line.trim());
+          }
         }
       }
 
-      if (errorLines.length >= 10) break;
-    }
-
-    if (errorLines.length > 0) {
-      rawErrorLogs = errorLines.join("\n");
-      errorLogs = `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+      if (failedTests.length > 0) {
+        rawErrorLogs = failedTests.join("\n");
+        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failedTests.join("\n")}\n\`\`\``;
+      }
     }
   } catch (error) {
-    console.error("Error reading log files:", error);
+    console.error("Error extracting Vitest error logs:", error);
   }
+
+  return { formatted: failedTestsOutput, raw: rawErrorLogs };
 }
+
+// Extract error logs
+const { formatted: formattedErrorLogs, raw: rawErrorLogs } =
+  extractVitestErrorLogs();
 
 // Type definition for Slack API response
 interface SlackApiResponse {
@@ -129,7 +152,7 @@ async function sendSlackNotification() {
       • *Dashboard:* <${datadogUrl}|View in Datadog>
       • *Timestamp:* ${new Date().toISOString()}
       ${customLinks}
-      ${errorLogs}
+      ${formattedErrorLogs}
       ${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
