@@ -77,12 +77,15 @@ export class XmtpPlaywright {
 
     await this.page.getByRole("button", { name: "Members" }).click();
 
+    const addressInput = this.page.getByRole("textbox", { name: "Address" });
     for (const address of addresses) {
-      await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+      await addressInput.fill(address);
       await this.page.getByRole("button", { name: "Add" }).click();
     }
 
     await this.page.getByRole("button", { name: "Create" }).click();
+    await addressInput.waitFor({ state: "hidden" });
+    return;
   }
 
   /**
@@ -114,6 +117,8 @@ export class XmtpPlaywright {
       name: "Type a message...",
     });
     await messageInput.waitFor({ state: "visible" });
+    //Important to wait for the page to load the message input
+    await this.page.waitForTimeout(1000);
 
     console.debug("Filling message");
     await messageInput.fill(message);
