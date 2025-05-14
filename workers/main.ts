@@ -337,7 +337,7 @@ export class WorkerClient extends Worker {
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
-                `Received group updated, ${JSON.stringify(message, null, 2)}`,
+                `Received group updated, ${JSON.stringify(message.content, null, 2)}`,
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
