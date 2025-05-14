@@ -34,7 +34,6 @@ const processMessage = async (
   client: Client,
   conversation: Conversation,
   message: DecodedMessage,
-  isDm: boolean,
 ): Promise<void> => {
   const content = message.content as string;
   const command = content.split(" ")[0].toLowerCase();
@@ -77,10 +76,9 @@ async function runStressTest(
   conversation: Conversation,
 ): Promise<boolean> {
   const startTime = Date.now();
-  await logAndSend("Running stress test...", conversation);
   let hasErrors = false;
   await logAndSend(
-    `Startng your tewst, the following will happen:
+    `Starting your test, the following will happen:
     - ${config.workerCount} workers will be created
     - ${config.messageCount} DMs will be sent from each worker to you
     - ${config.groupCount} groups with all workers will be created

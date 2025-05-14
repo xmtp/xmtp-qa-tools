@@ -45,7 +45,7 @@ export interface AgentOptions {
   /** Whether to send a welcome message to the conversation */
   groupWelcomeMessage?: string;
   /** Codecs to use */
-  codecs?: any[];
+  codecs?: unknown[];
   /** Worker name (if using worker mode) */
   workerName?: string;
 }
@@ -229,9 +229,9 @@ class WorkerManager {
     if (!WATCHDOG_RESTART_INTERVAL_MS) return undefined;
 
     let lastRestartTimestamp = Date.now();
-    let _lastActivityTimestamp = Date.now();
     const updateActivity = () => {
-      _lastActivityTimestamp = Date.now();
+      // Update timestamp when activity occurs
+      lastRestartTimestamp = Date.now();
     };
 
     const watchdogInterval = setInterval(
@@ -342,7 +342,7 @@ class WorkerManager {
           if (isDm || (isGroup && options.acceptGroups)) {
             try {
               console.debug(
-                `[${env}] Processing message ${message.content}...`,
+                `[${env}] Processing message ${message.content as string}...`,
               );
               await this.messageHandler(
                 client,
@@ -571,7 +571,7 @@ class WorkerManager {
       }
     }
 
-    logAgentDetails(clients);
+    void logAgentDetails(clients);
 
     return clients;
   }

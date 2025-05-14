@@ -192,7 +192,6 @@ export async function createAndSendDms(
   workers: WorkerManager,
   receiverInboxId: string,
   messageCount: number,
-  conversation: Conversation,
 ) {
   let successCount = 0;
   let errorCount = 0;

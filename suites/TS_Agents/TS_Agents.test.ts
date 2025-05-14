@@ -1,7 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
-import { defaultValues } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
