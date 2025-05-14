@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
+import { defaultValues } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -53,8 +54,10 @@ describe(testName, () => {
           workers.getWorkers(),
           agent.sendMessage,
         );
-        console.log(JSON.stringify(result, null, 2));
-        expect(result.averageEventTiming).toBeLessThan(10000);
+        expect(result.allReceived).toBe(true);
+        expect(result.averageEventTiming).toBeLessThan(
+          defaultValues.streamTimeout * 3,
+        );
       } catch (error) {
         logError(error, `${agent.name}-${agent.address}`);
         throw error;

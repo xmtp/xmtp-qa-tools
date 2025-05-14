@@ -193,6 +193,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     );
   }
   // Unescape messages for output
+  const unescapeMessages = (messagesAsStrings: string[][]): unknown[][] => {
+    return messagesAsStrings.map((arr) =>
+      arr.map((str) => JSON.parse(str) as unknown),
+    );
+  };
   const unescapedMessages = unescapeMessages(
     allReceived.map((msgs) =>
       msgs.map((m) => JSON.stringify({ event: m.event })),
@@ -216,7 +221,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  //console.debug(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
@@ -489,11 +493,4 @@ export function calculateMessageStats(
     totalExpectedMessages,
   };
   return stats;
-}
-
-// Utility to unescape a 2D array of JSON strings into objects
-export function unescapeMessages(messagesAsStrings: string[][]): unknown[][] {
-  return messagesAsStrings.map((arr) =>
-    arr.map((str) => JSON.parse(str) as unknown),
-  );
 }

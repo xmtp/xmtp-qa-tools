@@ -13,9 +13,7 @@ import {
 import type { WorkerBase } from "./manager";
 
 // Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
-  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
-  : defaultValues.streamTimeout; // 3 seconds
+const DEFAULT_STREAM_TIMEOUT_MS = defaultValues.streamTimeout * 3; // 3 seconds
 
 export enum typeOfResponse {
   Gm = "gm",
@@ -586,7 +584,9 @@ export class WorkerClient extends Worker {
       const timeoutId = setTimeout(() => {
         this.off("worker_message", onMessage);
         console.debug(
-          `Stream collection timed out. Collected ${events.length}/${count} events.`,
+          `Stream collection timed out. defaultTimeout: ${
+            DEFAULT_STREAM_TIMEOUT_MS / 60
+          }s. Collected ${events.length}/${count} events.`,
         );
         resolve(events); // Resolve with whatever events we've collected so far
       }, DEFAULT_STREAM_TIMEOUT_MS);
