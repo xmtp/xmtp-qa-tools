@@ -140,6 +140,7 @@
         "title": "Stream Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
+        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -148,7 +149,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -174,6 +175,7 @@
         "title": "Stream Order Rate (%)",
         "title_size": "16",
         "title_align": "left",
+        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -182,7 +184,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}",
+                "query": "avg:xmtp.sdk.order{metric_type:order,$env,$region,$test,$libxmtp,$members}",
                 "aggregator": "avg"
               }
             ],
@@ -335,41 +337,32 @@
       "layout": { "x": 0, "y": 5, "width": 6, "height": 4 }
     },
     {
-      "id": 8434431562138946,
+      "id": 1234567890123456,
       "definition": {
-        "title": "Group Operations",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "type": "timeseries",
+        "title": "Group Operations Table",
+        "type": "query_table",
         "requests": [
           {
-            "formulas": [{ "formula": "query1" }],
             "queries": [
               {
-                "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members,metric_subtype:group,test:ts_large} by {operation,members}"
+                "name": "query1",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members, metric_subtype:group} by {operation,members,test}"
               }
             ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
+            "response_format": "scalar",
+            "order": "desc",
+            "limit": 100,
+            "sort": {
+              "count": 500,
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
             },
-            "display_type": "line"
+            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
           }
         ],
-        "markers": [
-          {
-            "label": " Max Threshold (1s) ",
-            "value": "y = 1000",
-            "display_type": "error dashed"
-          }
-        ]
+        "has_search_bar": "auto"
       },
-      "layout": { "x": 6, "y": 5, "width": 6, "height": 4 }
+      "layout": { "x": 6, "y": 5, "width": 6, "height": 7 }
     },
     {
       "id": 5871193681027559,
@@ -383,26 +376,12 @@
         "type": "timeseries",
         "requests": [
           {
-            "formulas": [
-              { "formula": "query1", "alias": "Stream Delivery" },
-              { "formula": "query2", "alias": "Poll Delivery" },
-              { "formula": "query3", "alias": "Recovery Delivery" }
-            ],
+            "formulas": [{ "alias": "Stream Delivery", "formula": "query1" }],
             "queries": [
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query2",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query3",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.delivery{metric_type:delivery,$env,$test,$libxmtp, $region}"
               }
             ],
             "response_format": "timeseries",
@@ -414,26 +393,12 @@
             "display_type": "line"
           },
           {
-            "formulas": [
-              { "formula": "query4", "alias": "Stream Order" },
-              { "formula": "query5", "alias": "Poll Order" },
-              { "formula": "query6", "alias": "Recovery Order" }
-            ],
+            "formulas": [{ "alias": "Stream Order", "formula": "query4" }],
             "queries": [
               {
                 "name": "query4",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:stream,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query5",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:poll,$env,$region,$test,$libxmtp,$members}"
-              },
-              {
-                "name": "query6",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.order{metric_type:order,metric_subtype:recovery,$env,$region,$test,$libxmtp,$members}"
+                "query": "avg:xmtp.sdk.order{metric_type:order,$env,$region,$test,$libxmtp}"
               }
             ],
             "response_format": "timeseries",
@@ -466,34 +431,6 @@
         ]
       },
       "layout": { "x": 0, "y": 9, "width": 6, "height": 3 }
-    },
-    {
-      "id": 1234567890123456,
-      "definition": {
-        "title": "Group Operations Table",
-        "type": "query_table",
-        "requests": [
-          {
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members,metric_subtype:group} by {operation,members,test}"
-              }
-            ],
-            "response_format": "scalar",
-            "order": "desc",
-            "limit": 100,
-            "sort": {
-              "count": 500,
-              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
-            },
-            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
-          }
-        ],
-        "has_search_bar": "auto"
-      },
-      "layout": { "x": 6, "y": 9, "width": 6, "height": 7 }
     }
   ],
   "template_variables": [
