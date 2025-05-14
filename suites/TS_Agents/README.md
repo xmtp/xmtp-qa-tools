@@ -19,8 +19,8 @@ yarn install
 
 ## Key files
 
-- `production.json` - List of agents to be tested with their addresses
-- `TS_Agents.test.ts` - Test implementation that sends messages and validates responses
+- [production.json](./production.json) - List of agents to be tested with their addresses
+- [TS_Agents.test.ts](./TS_Agents.test.ts) - Test implementation that sends messages and validates responses
 
 ## Test snippet
 
