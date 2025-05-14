@@ -193,6 +193,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     );
   }
   // Unescape messages for output
+  const unescapeMessages = (messagesAsStrings: string[][]): unknown[][] => {
+    return messagesAsStrings.map((arr) =>
+      arr.map((str) => JSON.parse(str) as unknown),
+    );
+  };
   const unescapedMessages = unescapeMessages(
     allReceived.map((msgs) =>
       msgs.map((m) => JSON.stringify({ event: m.event })),
@@ -216,7 +221,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  //console.debug(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
@@ -229,12 +233,17 @@ export async function verifyDmStream(
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, 1),
     triggerEvents: async () => {
-      await group.send(message);
-      return [{ key: "message", sentAt: Date.now() }];
+      const sent: { content: string; sentAt: number }[] = [];
+      for (let i = 0; i < 1; i++) {
+        const sentAt = Date.now();
+        await group.send(message);
+        sent.push({ content: message, sentAt });
+      }
+      return sent;
     },
     getKey: extractContent,
     getMessage: extractContent,
-    statsLabel: "message-",
+    statsLabel: message,
     count: 1,
     randomSuffix: "",
     participantsForStats: receivers,
@@ -484,11 +493,4 @@ export function calculateMessageStats(
     totalExpectedMessages,
   };
   return stats;
-}
-
-// Utility to unescape a 2D array of JSON strings into objects
-export function unescapeMessages(messagesAsStrings: string[][]): unknown[][] {
-  return messagesAsStrings.map((arr) =>
-    arr.map((str) => JSON.parse(str) as unknown),
-  );
 }

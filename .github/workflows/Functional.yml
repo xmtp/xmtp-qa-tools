@@ -1,8 +1,9 @@
 name: Functional
 
-# on:
-#   push:
-#     branches-ignore: [main]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   Functional:
