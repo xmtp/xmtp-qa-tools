@@ -10,11 +10,13 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
+import "dotenv/config";
 import type { WorkerBase } from "./manager";
 
-console.log(process.env.DEFAULT_STREAM_TIMEOUT_MS);
 // Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = defaultValues.streamTimeout * 3; // 3 seconds
+const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
+  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
+  : defaultValues.streamTimeout; // 3 seconds
 
 export enum typeOfResponse {
   Gm = "gm",
@@ -586,7 +588,7 @@ export class WorkerClient extends Worker {
         this.off("worker_message", onMessage);
         console.debug(
           `Stream collection timed out. defaultTimeout: ${
-            DEFAULT_STREAM_TIMEOUT_MS / 60
+            DEFAULT_STREAM_TIMEOUT_MS / 1000
           }s. Collected ${events.length}/${count} events.`,
         );
         resolve(events); // Resolve with whatever events we've collected so far

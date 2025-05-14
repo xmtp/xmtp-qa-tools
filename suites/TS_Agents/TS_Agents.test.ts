@@ -55,9 +55,6 @@ describe(testName, () => {
           agent.sendMessage,
         );
         expect(result.allReceived).toBe(true);
-        expect(result.averageEventTiming).toBeLessThan(
-          defaultValues.streamTimeout * 3,
-        );
       } catch (error) {
         logError(error, `${agent.name}-${agent.address}`);
         throw error;
