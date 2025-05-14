@@ -58,7 +58,7 @@ yarn test TS_Agents
 
 ## Automation
 
-Tests run automatically via GitHub Actions:
+Tests run automatically via [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Agents.yml):
 
 ```yaml
 # From TS_Agents.yml
