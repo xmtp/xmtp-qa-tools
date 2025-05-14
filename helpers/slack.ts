@@ -54,9 +54,15 @@ if (!testName) {
 const branchName = githubRef.replace("refs/heads/", "");
 console.debug(`Current branch: ${branchName}`);
 
-// Only proceed with notification if it's an error
-if (jobStatus === "success" || jobStatus === "passed") {
-  console.debug(`Job status is ${jobStatus}. No need to send notification.`);
+// Only proceed with notification if it's an error and on the main branch
+if (
+  jobStatus === "success" ||
+  jobStatus === "passed" ||
+  branchName !== "main"
+) {
+  console.debug(
+    `Skipping notification: job status is ${jobStatus} or not on main branch (${branchName}).`,
+  );
   process.exit(0);
 }
 

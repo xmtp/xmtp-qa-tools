@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import generatedInboxes from "@helpers/generated-inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
-import { defaultValues, sleep } from "@helpers/tests";
+import { verifyDmStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -18,14 +18,14 @@ describe(testName, () => {
   let convo: Conversation;
   let workers: WorkerManager;
 
-  const xmtpTester = new XmtpPlaywright({ headless: true, env: "production" });
+  const xmtpTester = new XmtpPlaywright({ headless: false, env: "production" });
   beforeAll(async () => {
     await xmtpTester.startPage();
     workers = await getWorkers(
       ["bob"],
       testName,
       typeofStream.Message,
-      typeOfResponse.Gm,
+      typeOfResponse.None,
       "production",
     );
   });
@@ -43,17 +43,9 @@ describe(testName, () => {
           identifier: gmBotAddress,
         });
 
-      await convo.sync();
-      const messages = await convo.messages();
-      const prevMessageCount = messages.length;
-      console.log("prevMessageCount", prevMessageCount);
-      // Send a simple message
-      const sentMessageId = await convo.send("gm");
-      console.log("sentMessageId", sentMessageId);
-      await sleep(defaultValues.streamTimeout);
-      await convo.sync();
-      const messagesAfter = await convo.messages();
-      expect(messagesAfter.length).toBe(prevMessageCount + 2);
+      expect(convo).toBeDefined();
+      const result = await verifyDmStream(convo!, workers.getWorkers(), "gm");
+      expect(result.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
