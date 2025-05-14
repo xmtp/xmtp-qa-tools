@@ -13,7 +13,9 @@ import {
 import type { WorkerBase } from "./manager";
 
 // Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = defaultValues.streamTimeout; // 3 seconds
+const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
+  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
+  : defaultValues.streamTimeout; // 3 seconds
 
 export enum typeOfResponse {
   Gm = "gm",
