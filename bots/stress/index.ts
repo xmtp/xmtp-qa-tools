@@ -15,10 +15,16 @@ import {
   type DecodedMessage,
 } from "@xmtp/node-sdk";
 
-let workers: WorkerManager;
-
+let workersDev: WorkerManager;
+let workersProd: WorkerManager;
 const HELP_TEXT = `Stress bot commands:
-/stress - Run the stress test (20 workers, 5 groups, 50-member large groups, 5 messages each)`;
+/stress - This help will:
+- Send 5 DMs from each of 10 workers to you
+- Create 5 groups with all workers
+- Create 50-member large groups
+- Send 5 messages to each group
+- Send 5 messages to each large group
+`;
 
 const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
   "WALLET_KEY",
@@ -45,7 +51,13 @@ const processMessage = async (
   try {
     const config = TEST_CONFIGS.small;
 
-    await runStressTest(config, workers, client, message, conversation);
+    await runStressTest(
+      config,
+      client.options?.env === "dev" ? workersDev : workersProd,
+      client,
+      message,
+      conversation,
+    );
   } catch (error) {
     const errorMsg = error instanceof Error ? error.message : String(error);
     await logAndSend(
@@ -144,14 +156,24 @@ async function runStressTest(
 
   return !hasErrors;
 }
+
 const main = async () => {
-  workers = await getWorkers(
-    getFixedNames(20),
+  workersDev = await getWorkers(
+    getFixedNames(TEST_CONFIGS.small.workerCount),
     "stressbot",
     typeofStream.None,
     typeOfResponse.None,
     "dev",
   );
+
+  workersProd = await getWorkers(
+    getFixedNames(TEST_CONFIGS.small.workerCount),
+    "stressbot",
+    typeofStream.None,
+    typeOfResponse.None,
+    "production",
+  );
+
   // Initialize the client with the message processor
   await initializeClient(processMessage, [
     {
