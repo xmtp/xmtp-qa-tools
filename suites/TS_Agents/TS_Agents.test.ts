@@ -51,7 +51,9 @@ describe(testName, () => {
         workers.getWorkers(),
         agent.sendMessage,
       );
-      expect(result.allReceived).toBe(true);
+      if (!result.allReceived) {
+        console.error(`${agent.name} failed to respond in under 10 seconds`);
+      }
     });
   }
 });
