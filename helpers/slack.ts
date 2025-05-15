@@ -23,7 +23,7 @@ const datadogUrl =
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
-const jobId = process.env.GITHUB_JOB || "Unknown Job ID";
+const jobId = process.env.GITHUB_JOB_ID || "Unknown Job ID";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
 const jobStatus = process.env.JOB_STATUS || "unknown";
 
@@ -85,9 +85,9 @@ if (fs.existsSync("logs")) {
 
       for (const line of lines) {
         if (/error|fail/i.test(line)) {
-          if (line.includes(">")) {
-            errorLines.push(line.split(">")[1].trim());
-          }
+          let lineToAdd = line.split(">")[1].trim();
+          lineToAdd = lineToAdd.split("//")[0].trim();
+          errorLines.push(lineToAdd);
         }
       }
     }
