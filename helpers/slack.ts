@@ -23,6 +23,7 @@ const datadogUrl =
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
+const jobId = process.env.GITHUB_JOB || "Unknown Job ID";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
 const jobStatus = process.env.JOB_STATUS || "unknown";
 
@@ -63,7 +64,7 @@ if (jobStatus === "success" || jobStatus === "passed") {
 // Create workflow run URL if both repository and run ID are available
 let workflowUrl = "";
 if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
-  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
+  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}/job/${jobId}`;
 }
 
 // Function to extract error logs from Vitest output
@@ -72,46 +73,106 @@ function extractVitestErrorLogs(): { formatted: string; raw: string } {
   let rawErrorLogs = "";
 
   try {
-    // Check GitHub output logs or local logs directory
-    if (
-      process.env.GITHUB_STEP_SUMMARY &&
-      fs.existsSync(process.env.GITHUB_STEP_SUMMARY)
-    ) {
-      // Read from GitHub step summary if available
-      const content = fs.readFileSync(process.env.GITHUB_STEP_SUMMARY, "utf-8");
-      const failLines = content
-        .split("\n")
-        .filter((line) => line.trim().startsWith("FAIL"));
+    // Check for test errors in process.env
+    if (process.env.TEST_ERRORS) {
+      const testErrors = process.env.TEST_ERRORS;
+      rawErrorLogs = testErrors;
+      failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${testErrors}\n\`\`\``;
+      return { formatted: failedTestsOutput, raw: rawErrorLogs };
+    }
 
-      if (failLines.length > 0) {
-        rawErrorLogs = failLines.join("\n");
-        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failLines.join("\n")}\n\`\`\``;
-      }
-    } else if (fs.existsSync("logs")) {
+    // Check for logs in the logs directory
+    if (fs.existsSync("logs")) {
       // If GitHub logs are not available, try to find in local logs directory
       const logFiles = fs
         .readdirSync("logs")
         .filter((file) => file.endsWith(".log"));
 
-      const failedTests: string[] = [];
+      // First capture timeout errors and detailed test failures
+      const errorLines: string[] = [];
+      const timeoutErrors: string[] = [];
+      const failSummaryLines: string[] = [];
+      let captureDetailedFailure = false;
 
       for (const logFile of logFiles) {
         const logPath = path.join("logs", logFile);
         const content = fs.readFileSync(logPath, "utf-8");
         const lines = content.split("\n");
 
-        // Extract lines that start with "FAIL" which are typically Vitest failure outputs
-        for (const line of lines) {
-          if (line.trim().startsWith("FAIL")) {
-            failedTests.push(line.trim());
+        for (let i = 0; i < lines.length; i++) {
+          const line = lines[i].trim();
+
+          // Capture timeout errors
+          if (line.includes("Stream collection timed out")) {
+            const contextLine = lines[i - 1]?.trim() || "";
+            if (contextLine.includes("stdout |")) {
+              const testInfo = contextLine.split("stdout |")[1]?.trim();
+              if (testInfo) {
+                timeoutErrors.push(`${testInfo}\n${line}`);
+              } else {
+                timeoutErrors.push(line);
+              }
+            } else {
+              timeoutErrors.push(line);
+            }
+          }
+
+          // Capture FAIL summary lines
+          if (line.startsWith("FAIL") && line.includes("suites/")) {
+            failSummaryLines.push(line);
+          }
+
+          // Capture detailed assertion errors
+          if (line.includes("AssertionError:")) {
+            captureDetailedFailure = true;
+            errorLines.push(line);
+            continue;
+          }
+
+          if (captureDetailedFailure) {
+            errorLines.push(line);
+            if (line.includes("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")) {
+              captureDetailedFailure = false;
+            }
           }
         }
       }
 
-      if (failedTests.length > 0) {
-        rawErrorLogs = failedTests.join("\n");
-        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failedTests.join("\n")}\n\`\`\``;
+      // Now construct the raw and formatted error logs
+      if (failSummaryLines.length > 0) {
+        // Add the FAIL lines first
+        rawErrorLogs = failSummaryLines.join("\n");
+
+        // Then add timeout errors if any
+        if (timeoutErrors.length > 0) {
+          rawErrorLogs += "\n\nTimeout Errors:\n" + timeoutErrors.join("\n\n");
+        }
+
+        // Then add detailed assertion errors if any
+        if (errorLines.length > 0) {
+          rawErrorLogs += "\n\nAssertion Errors:\n" + errorLines.join("\n");
+        }
+
+        // Format the output for Slack
+        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failSummaryLines.join("\n")}\n\`\`\``;
+
+        if (timeoutErrors.length > 0 || errorLines.length > 0) {
+          failedTestsOutput += `\n\n*Error Details:*\n\`\`\`\n`;
+          if (timeoutErrors.length > 0) {
+            failedTestsOutput += `Timeout Errors:\n${timeoutErrors.slice(0, 3).join("\n\n")}\n`;
+            if (timeoutErrors.length > 3) {
+              failedTestsOutput += `...and ${timeoutErrors.length - 3} more timeout errors\n`;
+            }
+          }
+
+          if (errorLines.length > 0) {
+            failedTestsOutput += `\nAssertion Error:\n${errorLines.slice(0, 10).join("\n")}\n`;
+          }
+          failedTestsOutput += `\`\`\``;
+        }
       }
+    } else {
+      console.log("No logs directory found");
     }
   } catch (error) {
     console.error("Error extracting Vitest error logs:", error);
@@ -150,7 +211,7 @@ async function sendSlackNotification() {
       • *Test Suite:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
       • *Test Run URL:* <${workflowUrl}|View Run Details>
       • *Dashboard:* <${datadogUrl}|View in Datadog>
-      • *Timestamp:* ${new Date().toISOString()}
+      • *Timestamp:* ${new Date().toLocaleString()}
       ${customLinks}
       ${formattedErrorLogs}
       ${aiAnalysis}`;
