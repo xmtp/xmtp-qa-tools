@@ -67,123 +67,37 @@ if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
   workflowUrl = `https://github.com/${repository}/actions/runs/${runId}/job/${jobId}`;
 }
 
-// Function to extract error logs from Vitest output
-function extractVitestErrorLogs(): { formatted: string; raw: string } {
-  let failedTestsOutput = "";
-  let rawErrorLogs = "";
-
+// Check if logs directory exists and look for error logs to add context
+let errorLogs = "";
+let rawErrorLogs = "";
+if (fs.existsSync("logs")) {
   try {
-    // Check for test errors in process.env
-    if (process.env.TEST_ERRORS) {
-      const testErrors = process.env.TEST_ERRORS;
-      rawErrorLogs = testErrors;
-      failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${testErrors}\n\`\`\``;
-      return { formatted: failedTestsOutput, raw: rawErrorLogs };
+    // Find log files and grep for errors
+    const logFiles = fs
+      .readdirSync("logs")
+      .filter((file) => file.endsWith(".log"));
+    const errorLines: string[] = [];
+
+    for (const logFile of logFiles) {
+      const logPath = path.join("logs", logFile);
+      const content = fs.readFileSync(logPath, "utf-8");
+      const lines = content.split("\n");
+
+      for (const line of lines) {
+        if (/fail/i.test(line)) {
+          errorLines.push(line);
+        }
+      }
     }
 
-    // Check for logs in the logs directory
-    if (fs.existsSync("logs")) {
-      // If GitHub logs are not available, try to find in local logs directory
-      const logFiles = fs
-        .readdirSync("logs")
-        .filter((file) => file.endsWith(".log"));
-
-      // First capture timeout errors and detailed test failures
-      const errorLines: string[] = [];
-      const timeoutErrors: string[] = [];
-      const failSummaryLines: string[] = [];
-      let captureDetailedFailure = false;
-
-      for (const logFile of logFiles) {
-        const logPath = path.join("logs", logFile);
-        const content = fs.readFileSync(logPath, "utf-8");
-        const lines = content.split("\n");
-
-        for (let i = 0; i < lines.length; i++) {
-          const line = lines[i].trim();
-
-          // Capture timeout errors
-          if (line.includes("Stream collection timed out")) {
-            const contextLine = lines[i - 1]?.trim() || "";
-            if (contextLine.includes("stdout |")) {
-              const testInfo = contextLine.split("stdout |")[1]?.trim();
-              if (testInfo) {
-                timeoutErrors.push(`${testInfo}\n${line}`);
-              } else {
-                timeoutErrors.push(line);
-              }
-            } else {
-              timeoutErrors.push(line);
-            }
-          }
-
-          // Capture FAIL summary lines
-          if (line.startsWith("FAIL") && line.includes("suites/")) {
-            failSummaryLines.push(line);
-          }
-
-          // Capture detailed assertion errors
-          if (line.includes("AssertionError:")) {
-            captureDetailedFailure = true;
-            errorLines.push(line);
-            continue;
-          }
-
-          if (captureDetailedFailure) {
-            errorLines.push(line);
-            if (line.includes("⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯")) {
-              captureDetailedFailure = false;
-            }
-          }
-        }
-      }
-
-      // Now construct the raw and formatted error logs
-      if (failSummaryLines.length > 0) {
-        // Add the FAIL lines first
-        rawErrorLogs = failSummaryLines.join("\n");
-
-        // Then add timeout errors if any
-        if (timeoutErrors.length > 0) {
-          rawErrorLogs += "\n\nTimeout Errors:\n" + timeoutErrors.join("\n\n");
-        }
-
-        // Then add detailed assertion errors if any
-        if (errorLines.length > 0) {
-          rawErrorLogs += "\n\nAssertion Errors:\n" + errorLines.join("\n");
-        }
-
-        // Format the output for Slack
-        failedTestsOutput = `\n\n*Failed Tests:*\n\`\`\`\n${failSummaryLines.join("\n")}\n\`\`\``;
-
-        if (timeoutErrors.length > 0 || errorLines.length > 0) {
-          failedTestsOutput += `\n\n*Error Details:*\n\`\`\`\n`;
-          if (timeoutErrors.length > 0) {
-            failedTestsOutput += `Timeout Errors:\n${timeoutErrors.slice(0, 3).join("\n\n")}\n`;
-            if (timeoutErrors.length > 3) {
-              failedTestsOutput += `...and ${timeoutErrors.length - 3} more timeout errors\n`;
-            }
-          }
-
-          if (errorLines.length > 0) {
-            failedTestsOutput += `\nAssertion Error:\n${errorLines.slice(0, 10).join("\n")}\n`;
-          }
-          failedTestsOutput += `\`\`\``;
-        }
-      }
-    } else {
-      console.log("No logs directory found");
+    if (errorLines.length > 0) {
+      rawErrorLogs = errorLines.join("\n");
+      errorLogs = `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
     }
   } catch (error) {
-    console.error("Error extracting Vitest error logs:", error);
+    console.error("Error reading log files:", error);
   }
-
-  return { formatted: failedTestsOutput, raw: rawErrorLogs };
 }
-
-// Extract error logs
-const { formatted: formattedErrorLogs, raw: rawErrorLogs } =
-  extractVitestErrorLogs();
 
 // Type definition for Slack API response
 interface SlackApiResponse {
@@ -201,19 +115,22 @@ async function sendSlackNotification() {
     if (rawErrorLogs) {
       aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
+    /*• *Network:* ${xmtpEnv}
+• *Status:* ${jobStatus}*/
+    //test
     let customLinks = "";
     if (testName && testName.toLowerCase() === "ts_agents") {
-      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View file>`;
+      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View agents>`;
     }
 
     // Create a message with GitHub context and AI analysis
     const message = `*XMTP Test Failure ❌*
       • *Test Suite:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
       • *Test Run URL:* <${workflowUrl}|View Run Details>
-      • *Dashboard:* <${datadogUrl}|View in Datadog>
       • *Timestamp:* ${new Date().toLocaleString()}
+      • *Dashboard:* <${datadogUrl}|View all datadog metrics>
       ${customLinks}
-      ${formattedErrorLogs}
+      ${errorLogs}
       ${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
