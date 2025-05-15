@@ -83,13 +83,10 @@ if (fs.existsSync("logs")) {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/error|fail|exception/i.test(line)) {
+        if (/fail/i.test(line)) {
           errorLines.push(line);
-          if (errorLines.length >= 10) break;
         }
       }
-
-      if (errorLines.length >= 10) break;
     }
 
     if (errorLines.length > 0) {
