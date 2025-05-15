@@ -85,7 +85,9 @@ if (fs.existsSync("logs")) {
 
       for (const line of lines) {
         if (/error|fail/i.test(line)) {
-          errorLines.push(line.split(">")[1].trim());
+          if (line.includes(">")) {
+            errorLines.push(line.split(">")[1].trim());
+          }
         }
       }
     }
