@@ -64,7 +64,7 @@ if (jobStatus === "success" || jobStatus === "passed") {
 // Create workflow run URL if both repository and run ID are available
 let workflowUrl = "";
 if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
-  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}/job/${jobId}`;
+  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}/job/${jobId}/`;
 }
 
 // Check if logs directory exists and look for error logs to add context
