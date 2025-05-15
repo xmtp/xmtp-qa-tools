@@ -83,13 +83,12 @@ if (fs.existsSync("logs")) {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/error|fail|exception/i.test(line)) {
-          errorLines.push(line);
-          if (errorLines.length >= 10) break;
+        if (/error|fail/i.test(line)) {
+          let lineToAdd = line.split(">")[1].trim();
+          lineToAdd = lineToAdd.split("//")[0].trim();
+          errorLines.push(lineToAdd);
         }
       }
-
-      if (errorLines.length >= 10) break;
     }
 
     if (errorLines.length > 0) {
