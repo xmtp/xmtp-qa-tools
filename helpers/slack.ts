@@ -83,7 +83,7 @@ if (fs.existsSync("logs")) {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/fail/i.test(line)) {
+        if (/error|fail/i.test(line)) {
           errorLines.push(line);
         }
       }
