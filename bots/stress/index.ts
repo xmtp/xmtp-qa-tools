@@ -6,11 +6,7 @@ import {
   TEST_CONFIGS,
   type StressTestConfig,
 } from "@helpers/groups";
-import {
-  getRandomNames,
-  logAndSend,
-  validateEnvironment,
-} from "@helpers/tests";
+import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/tests";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -18,6 +14,8 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
+
+let workers: WorkerManager;
 
 const HELP_TEXT = `Stress bot commands:
 /stress - Run the stress test (20 workers, 5 groups, 50-member large groups, 5 messages each)`;
@@ -46,13 +44,6 @@ const processMessage = async (
 
   try {
     const config = TEST_CONFIGS.small;
-    const workers = await getWorkers(
-      getRandomNames(config.workerCount),
-      "stressbot",
-      typeofStream.None,
-      typeOfResponse.None,
-      client.options?.env ?? "dev",
-    );
 
     await runStressTest(config, workers, client, message, conversation);
   } catch (error) {
@@ -153,13 +144,23 @@ async function runStressTest(
 
   return !hasErrors;
 }
+const main = async () => {
+  workers = await getWorkers(
+    getFixedNames(20),
+    "stressbot",
+    typeofStream.None,
+    typeOfResponse.None,
+    "dev",
+  );
+  // Initialize the client with the message processor
+  await initializeClient(processMessage, [
+    {
+      acceptGroups: true,
+      walletKey: WALLET_KEY,
+      networks: ["dev", "production"],
+      dbEncryptionKey: ENCRYPTION_KEY,
+    },
+  ]);
+};
 
-// Initialize the client with the message processor
-await initializeClient(processMessage, [
-  {
-    acceptGroups: true,
-    walletKey: WALLET_KEY,
-    networks: ["dev", "production"],
-    dbEncryptionKey: ENCRYPTION_KEY,
-  },
-]);
+void main();
