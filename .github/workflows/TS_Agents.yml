@@ -2,6 +2,9 @@ name: TS_Agents
 description: "should verify health of agents"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
