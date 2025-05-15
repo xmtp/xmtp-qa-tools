@@ -23,7 +23,6 @@ const datadogUrl =
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
-const jobId = process.env.GITHUB_JOB_ID || "Unknown Job ID";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
 const jobStatus = process.env.JOB_STATUS || "unknown";
 
@@ -64,7 +63,7 @@ if (jobStatus === "success" || jobStatus === "passed") {
 // Create workflow run URL if both repository and run ID are available
 let workflowUrl = "";
 if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
-  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}/job/${jobId}/`;
+  workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
 }
 
 // Check if logs directory exists and look for error logs to add context
