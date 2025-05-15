@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
@@ -38,21 +39,24 @@ describe(testName, () => {
   // For local testing, test all agents on their supported networks
   for (const agent of typedAgents) {
     it(`test ${agent.name}:${agent.address} on production`, async () => {
-      console.debug(`Testing ${agent.name} with address ${agent.address} `);
-      const convo = await workers
-        .get("bot")
-        ?.client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
-      expect(convo).toBeDefined();
-      const result = await verifyDmStream(
-        convo!,
-        workers.getWorkers(),
-        agent.sendMessage,
-      );
-      if (!result.allReceived) {
-        console.error(`${agent.name} failed to respond in under 10 seconds`);
+      try {
+        console.debug(`Testing ${agent.name} with address ${agent.address} `);
+        const convo = await workers
+          .get("bot")
+          ?.client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+        expect(convo).toBeDefined();
+        const result = await verifyDmStream(
+          convo!,
+          workers.getWorkers(),
+          agent.sendMessage,
+        );
+        expect(result.allReceived).toBe(true);
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
       }
     });
   }
