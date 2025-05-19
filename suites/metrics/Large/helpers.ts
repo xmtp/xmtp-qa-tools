@@ -1,8 +1,8 @@
 import fs from "fs";
 
-export const TS_LARGE_WORKER_COUNT = 5;
-export const TS_LARGE_BATCH_SIZE = 50;
-export const TS_LARGE_TOTAL = 400;
+export const m_large_WORKER_COUNT = 5;
+export const m_large_BATCH_SIZE = 50;
+export const m_large_TOTAL = 400;
 
 export interface SummaryEntry {
   groupSize: number;
@@ -83,5 +83,5 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
   messageToLog += "==========================================\n";
   console.log(messageToLog);
   // save file in ./large.log
-  fs.appendFileSync("logs/ts_large.log", messageToLog);
+  fs.appendFileSync("logs/m_large.log", messageToLog);
 }

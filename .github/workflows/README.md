@@ -9,8 +9,8 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **check-agent-examples.yml**       | Validate XMTP agent examples      | Hourly, manual               | Clone, build and verify example agent startup  |
 | **Deploy.yml**                     | Handle Railway deployments        | Version bump in package.json | Auto PR creation and merging for deployments   |
 | **TS_Agents.yml**                  | Monitor production agent health   | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
-| **TS_Delivery.yml**                | Test message delivery reliability | Scheduled, manual            | Verify cross-environment message delivery      |
-| **TS_Large.yml**                   | Test large scale operations       | Scheduled, manual            | Test large scale operations                    |
+| **m_delivery.yml**                 | Test message delivery reliability | Scheduled, manual            | Verify cross-environment message delivery      |
+| **m_large.yml**                    | Test large scale operations       | Scheduled, manual            | Test large scale operations                    |
 | **m_performance.yml**              | Measure protocol performance      | Scheduled, manual            | Benchmark operation timing and scalability     |
 | **test-package-compatibility.yml** | Verify package compatibility      | On main branch push, manual  | Test with different Node versions and managers |
 | **upload-installations.yml**       | Backup installation data          | Daily, manual                | Upload keys and installation data as artifacts |

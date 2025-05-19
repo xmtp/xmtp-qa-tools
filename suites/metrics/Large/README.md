@@ -1,24 +1,24 @@
-# XMTP Group Performance Testing Suite (`TS_Large`)
+# XMTP Group Performance Testing Suite (`m_large`)
 
 This suite benchmarks XMTP network performance and scalability with large group conversations. It measures group creation, message delivery, metadata updates, and sync operations across varying group sizes.
 
 ## Directory Contents
 
-- **ts_large_conversations.test.ts**  
+- **m_large_conversations.test.ts**  
   Measures the time to add members to large groups and verifies member addition events via conversation streams.
 
-- **ts_large_messages.test.ts**  
+- **m_large_messages.test.ts**  
   Benchmarks message delivery latency and reliability in large groups, using message streams to verify receipt.
 
-- **ts_large_metadata.test.ts**  
+- **m_large_metadata.test.ts**  
   Tests group metadata update propagation (e.g., name changes) and measures event delivery time to all members.
 
-- **ts_large_syncs.test.ts**  
+- **m_large_syncs.test.ts**  
   Evaluates sync performance for large groups, including cold start sync times and group creation timing.
 
 - **helpers.ts**  
   Shared utilities/constants for group creation, logging, and test parameterization (e.g., batch size, total group size).
-  - Exports: `TS_LARGE_WORKER_COUNT`, `TS_LARGE_BATCH_SIZE`, `TS_LARGE_TOTAL`, `ts_large_createGroup`, `saveLog`, and `SummaryEntry` type.
+  - Exports: `m_large_WORKER_COUNT`, `m_large_BATCH_SIZE`, `m_large_TOTAL`, `m_large_createGroup`, `saveLog`, and `SummaryEntry` type.
 
 ## Setup
 
@@ -34,7 +34,7 @@ yarn install
 yarn large
 ```
 
-- Results and timing summaries are appended to `logs/ts_large.log` after each run.
+- Results and timing summaries are appended to `logs/m_large.log` after each run.
 
 ## Requirements
 

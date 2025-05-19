@@ -1,4 +1,4 @@
-name: TS_Delivery
+name: m_delivery
 description: "should verify message loss when receiving via 200 streams"
 
 on:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  TS_Delivery:
+  m_delivery:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -40,7 +40,7 @@ jobs:
       - name: Make test script executable
         run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Delivery
+        run: ./scripts/run-test.sh m_delivery
         continue-on-error: true
       - name: Send Slack notification
         if: always()
@@ -53,5 +53,5 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: ts_delivery_${{ matrix.environment }}
+          name: m_delivery_${{ matrix.environment }}
           path: logs/

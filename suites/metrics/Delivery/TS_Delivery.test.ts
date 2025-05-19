@@ -10,7 +10,7 @@ import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "ts_delivery";
+const testName = "m_delivery";
 loadEnv(testName);
 
 describe(testName, async () => {

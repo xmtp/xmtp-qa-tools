@@ -16,5 +16,3 @@ XMTP_ENV=local
 ```
 
 - 4. Debug with [xmtp.chat](https://xmtp.chat/)
-
-![](../media/chat.png)

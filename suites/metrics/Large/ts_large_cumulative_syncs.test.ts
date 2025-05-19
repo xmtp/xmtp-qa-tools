@@ -7,13 +7,13 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, expect, it } from "vitest";
 import {
+  m_large_BATCH_SIZE,
+  m_large_TOTAL,
   saveLog,
-  TS_LARGE_BATCH_SIZE,
-  TS_LARGE_TOTAL,
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "ts_large_cumulative_syncs";
+const testName = "m_large_cumulative_syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -22,7 +22,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getRandomNames((TS_LARGE_TOTAL / TS_LARGE_BATCH_SIZE) * 2 + 1),
+    getRandomNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
     testName,
     typeofStream.None,
   );
@@ -43,9 +43,9 @@ describe(testName, async () => {
 
   let run = 0;
   for (
-    let i = TS_LARGE_BATCH_SIZE;
-    i <= TS_LARGE_TOTAL;
-    i += TS_LARGE_BATCH_SIZE
+    let i = m_large_BATCH_SIZE;
+    i <= m_large_TOTAL;
+    i += m_large_BATCH_SIZE
   ) {
     it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
       try {

@@ -9,14 +9,14 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
+  m_large_BATCH_SIZE,
+  m_large_TOTAL,
+  m_large_WORKER_COUNT,
   saveLog,
-  TS_LARGE_BATCH_SIZE,
-  TS_LARGE_TOTAL,
-  TS_LARGE_WORKER_COUNT,
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "ts_large_messages";
+const testName = "m_large_messages";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -27,7 +27,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getRandomNames(TS_LARGE_WORKER_COUNT),
+    getRandomNames(m_large_WORKER_COUNT),
     testName,
     typeofStream.Message,
   );
@@ -46,9 +46,9 @@ describe(testName, async () => {
   });
 
   for (
-    let i = TS_LARGE_BATCH_SIZE;
-    i <= TS_LARGE_TOTAL;
-    i += TS_LARGE_BATCH_SIZE
+    let i = m_large_BATCH_SIZE;
+    i <= m_large_TOTAL;
+    i += m_large_BATCH_SIZE
   ) {
     it(`receiveMessage-${i}: should create a group and measure all streams`, async () => {
       try {

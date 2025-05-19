@@ -1,4 +1,4 @@
-name: TS_Large
+name: m_large
 description: "should verify performance of the group streams"
 
 on:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  TS_Large:
+  m_large:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -48,5 +48,5 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: TS_Large_${{ matrix.environment }}
+          name: m_large_${{ matrix.environment }}
           path: logs/
