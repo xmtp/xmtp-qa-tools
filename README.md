@@ -261,3 +261,13 @@ yarn install
 - **Helpers:** Utility functions in the [helpers section](/helpers/)
 - **Scripts:** Automation scripts in the [scripts section](/scripts/)
 - **Loom recording:** [Loom recording](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
+
+### Test coverage
+
+Generate a coverage report for the entire monorepo:
+
+```bash
+yarn coverage
+```
+
+The report will be saved in the `coverage` directory and summarized in the terminal output.

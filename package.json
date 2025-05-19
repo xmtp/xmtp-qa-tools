@@ -24,7 +24,8 @@
     "retry": "yarn cli retry",
     "script": "yarn cli script",
     "start": "vitest --ui --standalone --watch ",
-    "test": "vitest"
+    "test": "vitest",
+    "coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",
