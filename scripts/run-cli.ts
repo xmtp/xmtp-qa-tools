@@ -2,7 +2,10 @@ import { execSync } from "child_process";
 import path from "path";
 
 function showUsageAndExit() {
-  console.error("Usage: cli <command_type> <name_or_path> [args...]");
+  console.error("Usage: yarn cli <command_type> <name_or_path> [args...]");
+  console.error(
+    "   or (if alias 'cli' is set up): cli <command_type> <name_or_path> [args...]",
+  );
   console.error("");
   console.error("Command Types:");
   console.error(
@@ -26,11 +29,11 @@ function showUsageAndExit() {
   );
   console.error("");
   console.error("Examples:");
-  console.error("  cli bot gm-bot");
-  console.error("  cli bot stress 5");
-  console.error("  cli script generate-keys");
-  console.error("  cli test functional --max-attempts 2");
-  console.error("  cli test ./suites/automated/Gm/gm.test.ts --watch");
+  console.error("  yarn cli bot gm-bot");
+  console.error("  yarn cli bot stress 5");
+  console.error("  yarn cli script generate-keys");
+  console.error("  yarn cli test functional --max-attempts 2");
+  console.error("  yarn cli test ./suites/automated/Gm/gm.test.ts --watch");
   process.exit(1);
 }
 
