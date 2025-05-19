@@ -135,18 +135,15 @@ const workers = await getWorkers(4, testName);
 
 ## 🧰 Available Methods
 
-| Method                                                            | Description                              |
-| ----------------------------------------------------------------- | ---------------------------------------- |
-| `getWorkers(descriptors, testName, streamType?, gptEnabled?)`     | Creates and initializes worker instances |
-| `workers.get(name, installationId?)`                              | Retrieves a specific worker              |
-| `workers.getCreator()`                                            | Returns the worker creator               |
-| `workers.getAll()`                                                | Returns all workers                      |
-| `workers.createGroup(groupName, workerNames)`                     | Creates a group of workers               |
-| `workers.getLength()`                                             | Returns the total number of workers      |
-| `workers.getRandomWorkers(count)`                                 | Gets a random subset of workers          |
-| `worker.worker.collectMessages(groupId, typeId, count, timeout?)` | Collects message stream events           |
-| `worker.worker.collectConversations(fromPeer, count?, timeout?)`  | Collects conversation stream events      |
-| `worker.worker.collectConsentUpdates(count?, timeout?)`           | Collects consent stream events           |
+| Method                                                        | Description                              |
+| ------------------------------------------------------------- | ---------------------------------------- |
+| `getWorkers(descriptors, testName, streamType?, gptEnabled?)` | Creates and initializes worker instances |
+| `workers.get(name, installationId?)`                          | Retrieves a specific worker              |
+| `workers.getCreator()`                                        | Returns the worker creator               |
+| `workers.getAll()`                                            | Returns all workers                      |
+| `workers.createGroup(groupName, workerNames)`                 | Creates a group of workers               |
+| `workers.getLength()`                                         | Returns the total number of workers      |
+| `workers.getRandomWorkers(count)`                             | Gets a random subset of workers          |
 
 ## 📚 Available names for workers
 
