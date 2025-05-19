@@ -4,13 +4,13 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 ## Automated workflows
 
-| Test suite     | Status                                                                                                                                                                      | Resources                                                                                                                                                                         | Run frequency | Networks         |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
-| 🚀 Performance | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
-| 📬 Delivery    | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
-| ⏳ Groups      | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
-| 🤖 Agents      | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
-| 🤖 GM          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
+| Test suite     | Performance                                                                                                                                                                      | Resources                                                                                                                                                                         | Run frequency | Networks         |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
+| 🚀 Performance | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
+| 📬 Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
+| ⏳ Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
+| 🤖 Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
+| 🤖 GM          | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
 
 ## Architecture
 
@@ -109,66 +109,66 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 ### Core SDK Operations Performance
 
-| Operation                | Description                            | Avg | Target | Status                 |
-| ------------------------ | -------------------------------------- | --- | ------ | ---------------------- |
-| clientCreate             | Creating a client                      | 588 | <350   | ⚠️ Performance Concern |
-| inboxState               | Checking inbox state                   | 41  | <350   | ✅ On Target           |
-| newDm                    | Creating a direct message conversation | 258 | <350   | ✅ On Target           |
-| newDmWithIdentifiers     | Creating a dm by address               | 294 | <350   | ✅ On Target           |
-| sendGM                   | Sending a group message                | 126 | <200   | ✅ On Target           |
-| receiveGM                | Receiving a group message              | 87  | <200   | ✅ On Target           |
-| createGroup              | Creating a group                       | 315 | <350   | ✅ On Target           |
-| createGroupByIdentifiers | Creating a group by address            | 313 | <350   | ✅ On Target           |
-| syncGroup                | Syncing group state                    | 76  | <200   | ✅ On Target           |
-| updateGroupName          | Updating group metadata                | 129 | <200   | ✅ On Target           |
-| removeMembers            | Removing participants from a group     | 127 | <250   | ✅ On Target           |
-| sendGroupMessage         | Sending a group message                | 85  | <200   | ✅ On Target           |
-| receiveGroupMessage      | Processing group message strea         | 124 | <200   | ✅ On Target           |
+| Operation                | Description                            | Avg | Target | Performance  |
+| ------------------------ | -------------------------------------- | --- | ------ | ------------ |
+| clientCreate             | Creating a client                      | 588 | <350   | ⚠️ Concern   |
+| inboxState               | Checking inbox state                   | 41  | <350   | ✅ On Target |
+| newDm                    | Creating a direct message conversation | 258 | <350   | ✅ On Target |
+| newDmWithIdentifiers     | Creating a dm by address               | 294 | <350   | ✅ On Target |
+| sendGM                   | Sending a group message                | 126 | <200   | ✅ On Target |
+| receiveGM                | Receiving a group message              | 87  | <200   | ✅ On Target |
+| createGroup              | Creating a group                       | 315 | <350   | ✅ On Target |
+| createGroupByIdentifiers | Creating a group by address            | 313 | <350   | ✅ On Target |
+| syncGroup                | Syncing group state                    | 76  | <200   | ✅ On Target |
+| updateGroupName          | Updating group metadata                | 129 | <200   | ✅ On Target |
+| removeMembers            | Removing participants from a group     | 127 | <250   | ✅ On Target |
+| sendGroupMessage         | Sending a group message                | 85  | <200   | ✅ On Target |
+| receiveGroupMessage      | Processing group message strea         | 124 | <200   | ✅ On Target |
 
 ### Group operations performance
 
 #### Sender-Side average performance
 
-| Size | Send message | Update name | Remove members | Create | Status                 |
-| ---- | ------------ | ----------- | -------------- | ------ | ---------------------- |
-| 50   | 86           | 135         | 139            | 1329   | ✅ On Target           |
-| 100  | 88           | 145         | 157            | 1522   | ✅ On Target           |
-| 150  | 95           | 203         | 190            | 2306   | ✅ On Target           |
-| 200  | 93           | 193         | 205            | 3344   | ✅ On Target           |
-| 250  | 108          | 219         | 237            | 4276   | ⚠️ Performance Concern |
-| 300  | 97           | 244         | 247            | 5463   | ⚠️ Performance Concern |
-| 350  | 101          | 264         | 308            | 6641   | ⚠️ Performance Concern |
-| 400  | 111          | 280         | 320            | 7641   | ⚠️ Performance Concern |
+| Size | Send message | Update name | Remove members | Create | Performance  |
+| ---- | ------------ | ----------- | -------------- | ------ | ------------ |
+| 50   | 86           | 135         | 139            | 1329   | ✅ On Target |
+| 100  | 88           | 145         | 157            | 1522   | ✅ On Target |
+| 150  | 95           | 203         | 190            | 2306   | ✅ On Target |
+| 200  | 93           | 193         | 205            | 3344   | ✅ On Target |
+| 250  | 108          | 219         | 237            | 4276   | ⚠️ Concern   |
+| 300  | 97           | 244         | 247            | 5463   | ⚠️ Concern   |
+| 350  | 101          | 264         | 308            | 6641   | ⚠️ Concern   |
+| 400  | 111          | 280         | 320            | 7641   | ⚠️ Concern   |
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
 #### Receiver-Side stream performance
 
-| Group Size | New conversation | Metadata | Messages | Add Members | Status                 |
-| ---------- | ---------------- | -------- | -------- | ----------- | ---------------------- |
-| 50         | 687              | 141      | 131      | 401         | ✅ On Target           |
-| 100        | 746              | 155      | 117      | 420         | ✅ On Target           |
-| 150        | 833              | 163      | 147      | 435         | ✅ On Target           |
-| 200        | 953              | 179      | 173      | 499         | ✅ On Target           |
-| 250        | 1007             | 187      | 161      | 526         | ⚠️ Performance Concern |
-| 300        | 1040             | 195      | 167      | 543         | ⚠️ Performance Concern |
-| 350        | 1042             | 198      | 178      | 581         | ⚠️ Performance Concern |
-| 400        | 1192             | 214      | 173      | 609         | ⚠️ Performance Concern |
+| Group Size | New conversation | Metadata | Messages | Add Members | Performance  |
+| ---------- | ---------------- | -------- | -------- | ----------- | ------------ |
+| 50         | 687              | 141      | 131      | 401         | ✅ On Target |
+| 100        | 746              | 155      | 117      | 420         | ✅ On Target |
+| 150        | 833              | 163      | 147      | 435         | ✅ On Target |
+| 200        | 953              | 179      | 173      | 499         | ✅ On Target |
+| 250        | 1007             | 187      | 161      | 526         | ⚠️ Concern   |
+| 300        | 1040             | 195      | 167      | 543         | ⚠️ Concern   |
+| 350        | 1042             | 198      | 178      | 581         | ⚠️ Concern   |
+| 400        | 1192             | 214      | 173      | 609         | ⚠️ Concern   |
 
 _Note: This measurments are taken only from the receiver side and after the group is created._
 
 #### Receiver-Side sync performance
 
-| Size | syncAll |      | sync |      | Status                 |
-| ---- | ------- | ---- | ---- | ---- | ---------------------- |
-| 50   | 366     | ...  | 291  | ...  | ✅ On Target           |
-| 100  | 503     | 521  | 424  | 372  | ✅ On Target           |
-| 150  | 665     | 727  | 522  | 622  | ✅ On Target           |
-| 200  | 854     | 1066 | 653  | 936  | ✅ On Target           |
-| 250  | 966     | 1582 | 768  | 1148 | ⚠️ Performance Concern |
-| 300  | 1225    | 1619 | 861  | 1362 | ⚠️ Performance Concern |
-| 350  | 1322    | 1846 | 1218 | 2017 | ⚠️ Performance Concern |
-| 400  | 1292    | 2082 | 1325 | 1792 | ⚠️ Performance Concern |
+| Size | syncAll |      | sync |      | Performance  |
+| ---- | ------- | ---- | ---- | ---- | ------------ |
+| 50   | 366     | ...  | 291  | ...  | ✅ On Target |
+| 100  | 503     | 521  | 424  | 372  | ✅ On Target |
+| 150  | 665     | 727  | 522  | 622  | ✅ On Target |
+| 200  | 854     | 1066 | 653  | 936  | ✅ On Target |
+| 250  | 966     | 1582 | 768  | 1148 | ⚠️ Concern   |
+| 300  | 1225    | 1619 | 861  | 1362 | ⚠️ Concern   |
+| 350  | 1322    | 1846 | 1218 | 2017 | ⚠️ Concern   |
+| 400  | 1292    | 2082 | 1325 | 1792 | ⚠️ Concern   |
 
 _Note: `syncAll` is measured only as the first cold start of the client (fresh inbox). Cumulative sync is measured as the first time all the groups are sync for the first time._
 
@@ -176,7 +176,7 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ### Network performance
 
-| Performance Metric | Average | Target | Status       |
+| Performance Metric | Average | Target | Performance  |
 | ------------------ | ------- | ------ | ------------ |
 | DNS Lookup         | 13      | <50    | ✅ On Target |
 | TCP Connection     | 48      | <70    | ✅ On Target |
@@ -186,13 +186,13 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ### Regional Network Performance
 
-| Region        | Server Call | TLS | ~ us-east | Status                 |
-| ------------- | ----------- | --- | --------- | ---------------------- |
-| us-east       | 140         | 123 | Baseline  | ✅ On Target           |
-| us-west       | 151         | 118 | <20% ~    | ✅ On Target           |
-| europe        | 230         | 180 | <40% ~    | ✅ On Target           |
-| asia          | 450         | 350 | >100% ~   | ⚠️ Performance Concern |
-| south-america | 734         | 573 | >200% ~   | ⚠️ Performance Concern |
+| Region        | Server Call | TLS | ~ us-east | Performance  |
+| ------------- | ----------- | --- | --------- | ------------ |
+| us-east       | 140         | 123 | Baseline  | ✅ On Target |
+| us-west       | 151         | 118 | <20% ~    | ✅ On Target |
+| europe        | 230         | 180 | <40% ~    | ✅ On Target |
+| asia          | 450         | 350 | >100% ~   | ⚠️ Concern   |
+| south-america | 734         | 573 | >200% ~   | ⚠️ Concern   |
 
 _Note: Baseline is `us-east` region and `production` network._
 
@@ -202,7 +202,7 @@ _Note: `Production` network consistently shows better network performance across
 
 ### Message delivery testing
 
-| Test Area            | Average         | Target         | Status       |
+| Test Area            | Average         | Target         | Performance  |
 | -------------------- | --------------- | -------------- | ------------ |
 | Stream Delivery Rate | 100% successful | 99.9% minimum  | ✅ On Target |
 | Poll Delivery Rate   | 100% successful | 99.9% minimum  | ✅ On Target |
@@ -215,28 +215,28 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ### Success criteria summary
 
-| Metric                  | Current Performance         | Target                 | Status                 |
-| ----------------------- | --------------------------- | ---------------------- | ---------------------- |
-| Core SDK Operations     | All within targets          | Meet defined targets   | ✅ On Target           |
-| Small Group Operations  | ≤300                        | ≤300 for <50 members   | ✅ On Target           |
-| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | ⚠️ Performance Concern |
-| Network Performance     | All metrics within target   | Meet defined targets   | ✅ On Target           |
-| Message Delivery        | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Stream Message Loss     | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Poll Message Loss       | 100%                        | 99.9% minimum          | ✅ On Target           |
-| Message Order           | 100%                        | 100% in order          | ✅ On Target           |
-| South-america & Asia    | more than 40%               | <20% difference        | ⚠️ Performance Concern |
-| US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target           |
-| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target           |
+| Metric                  | Current Performance         | Target                 | Performance  |
+| ----------------------- | --------------------------- | ---------------------- | ------------ |
+| Core SDK Operations     | All within targets          | Meet defined targets   | ✅ On Target |
+| Small Group Operations  | ≤300                        | ≤300 for <50 members   | ✅ On Target |
+| Medium Group Operations | ≤1000                       | ≤1000 for <400 members | ⚠️ Concern   |
+| Network Performance     | All metrics within target   | Meet defined targets   | ✅ On Target |
+| Message Delivery        | 100%                        | 99.9% minimum          | ✅ On Target |
+| Stream Message Loss     | 100%                        | 99.9% minimum          | ✅ On Target |
+| Poll Message Loss       | 100%                        | 99.9% minimum          | ✅ On Target |
+| Message Order           | 100%                        | 100% in order          | ✅ On Target |
+| South-america & Asia    | more than 40%               | <20% difference        | ⚠️ Concern   |
+| US & Europe             | less than 20% variance      | <20% difference        | ✅ On Target |
+| Dev vs Production       | Production 4.5-16.1% better | Production ≥ Dev       | ✅ On Target |
 
 ## Tools & utilities
 
 - **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
-- **Workflows:** See our CI/CD pipeline configuration - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
-- **Vitest:** We use Vitest for running tests with an interactive UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
-- **Railway:** Visit our Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
+- **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
+- **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
+- **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
-- **Test suites:** See our test suites - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
+- **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
 
 ## Development
 
@@ -256,8 +256,8 @@ yarn install
 
 ### Resources
 
-- **Local:** Work in local network with [dev section](/dev/)
-- **Workers:** Predefined workers like `bob`, `alice`, `randomguy` with [workers](/workers/)
-- **Helpers:** Utility functions in the [helpers section](/helpers/)
-- **Scripts:** Automation scripts in the [scripts section](/scripts/)
+- **Local:** Work in local network -- [see section](/dev/)
+- **Workers:** Worker for testing -- [see section](/workers/)
+- **Helpers:** Coding helpers -- [see section](/helpers/)
+- **Scripts:** Monorepo scripts -- [see section](/scripts/)
 - **Loom recording:** [Loom recording](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
