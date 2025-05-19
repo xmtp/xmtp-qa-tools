@@ -4,23 +4,23 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 
 ## Automated test suites
 
-| Suite         | Purpose                                 | Link to test file         |
-| ------------- | --------------------------------------- | ------------------------- |
-| **at_agents** | Tests the health of the agent ecosystem | [at_agents](./at_agents/) |
-| **at_gm**     | Tests the GM browser and bot            | [at_gm](./at_gm/)         |
+| Suite         | Purpose                                 | Link to test file                |
+| ------------- | --------------------------------------- | -------------------------------- |
+| **at_agents** | Tests the health of the agent ecosystem | [at_agents](./automated/agents/) |
+| **at_gm**     | Tests the GM browser and bot            | [at_gm](./automated/gm/)         |
 
 ## Manual test suites
 
-| Suite                | Purpose                                                    | Link to test file                       |
-| -------------------- | ---------------------------------------------------------- | --------------------------------------- |
-| **TS_Fork**          | Investigates group conversation forking through membership | [TS_Fork](./TS_Fork/)                   |
-| **TS_Notifications** | Validates push notification functionality                  | [TS_Notifications](./TS_Notifications/) |
-| **TS_Stress**        | Tests system performance under high load conditions        | [TS_Stress](./TS_Stress/)               |
+| Suite                | Purpose                                                    | Link to test file                           |
+| -------------------- | ---------------------------------------------------------- | ------------------------------------------- |
+| **ts_fork**          | Investigates group conversation forking through membership | [ts_fork](./manual/fork/)                   |
+| **ts_notifications** | Validates push notification functionality                  | [ts_notifications](./manual/notifications/) |
+| **ts_stress**        | Tests system performance under high load conditions        | [ts_stress](./manual/stress/)               |
 
 ## Metrics test suites
 
-| Suite           | Purpose                                      | Link to test file                       |
-| --------------- | -------------------------------------------- | --------------------------------------- |
-| **Delivery**    | Verifies message delivery reliability        | [M_delivery](./metrics/delivery/)       |
-| **Performance** | Measures independent operational performance | [M_performance](./metrics/performance/) |
-| **Large**       | Tests performance of group operations        | [M_large](./metrics/large/)             |
+| Suite             | Purpose                                      | Link to test file                       |
+| ----------------- | -------------------------------------------- | --------------------------------------- |
+| **m_delivery**    | Verifies message delivery reliability        | [m_delivery](./metrics/delivery/)       |
+| **m_performance** | Measures independent operational performance | [m_performance](./metrics/performance/) |
+| **m_large**       | Tests performance of group operations        | [m_large](./metrics/large/)             |
