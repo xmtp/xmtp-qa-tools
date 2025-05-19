@@ -1,4 +1,4 @@
-name: m_delivery
+name: Delivery
 description: "should verify message loss when receiving via 200 streams"
 
 on:
@@ -37,10 +37,8 @@ jobs:
         run: ls -la .data
       - run: corepack enable
       - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh m_delivery
+        run: yarn cli test m_delivery
         continue-on-error: true
       - name: Send Slack notification
         if: always()

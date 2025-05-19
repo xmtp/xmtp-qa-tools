@@ -4,14 +4,11 @@ This document provides practical instructions for using the scripts in the `/scr
 
 ## Quick reference
 
-| Script              | Purpose                           | Key Features                         |
-| ------------------- | --------------------------------- | ------------------------------------ |
-| **xmtp-gen.ts**     | Creates XMTP client installations | Multiple client installation creator |
-| **local-update.ts** | Updates local inboxes             | Local environment configuration      |
-| **run.ts**          | General-purpose task runner       | Configurable operations              |
-| **run-test.sh**     | Runs tests                        | Test execution                       |
-| **versions.ts**     | Manages SDK versions              | XMTP SDK version management/symlinks |
-| **ts200.ts**        | Test 200                          | Test 200                             |
+| Script          | Purpose                           | Key Features                         |
+| --------------- | --------------------------------- | ------------------------------------ |
+| **gen.ts**      | Creates XMTP client installations | Multiple client installation creator |
+| **run-cli.ts**  | General-purpose task runner       | Configurable operations              |
+| **versions.ts** | Manages SDK versions              | XMTP SDK version management/symlinks |
 
 ## Usage
 

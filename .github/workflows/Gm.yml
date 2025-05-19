@@ -1,4 +1,4 @@
-name: TS_Gm
+name: Gm
 description: "should verify performance of the library in the dev network"
 
 on:
@@ -41,10 +41,8 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Gm
+        run: yarn cli test TS_Gm
       - name: Send Slack notification
         if: always()
         env:

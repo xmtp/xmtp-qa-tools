@@ -1,4 +1,4 @@
-name: TS_Agents
+name: Agents
 description: "should verify health of agents"
 
 on:
@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn test ts_agents
+        run: yarn cli test ts_agents
       - name: Send Slack notification
         if: always()
         env:
