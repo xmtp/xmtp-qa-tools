@@ -29,9 +29,10 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-
-      - run: corepack enable
-      - run: yarn
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
       - name: Run tests with retry
         run: yarn cli test m_large
       - name: Send Slack notification

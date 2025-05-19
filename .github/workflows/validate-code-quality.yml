@@ -13,9 +13,13 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-
-      - run: corepack enable
-      - run: yarn
-      - run: yarn format
-      - run: yarn build
-      - run: yarn lint
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
+      - name: Format code
+        run: yarn format
+      - name: Build
+        run: yarn build
+      - name: Lint
+        run: yarn lint
