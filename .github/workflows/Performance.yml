@@ -1,4 +1,4 @@
-name: m_performance
+name: Performance
 description: "should verify performance "
 
 on:

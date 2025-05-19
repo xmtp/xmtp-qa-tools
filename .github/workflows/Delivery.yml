@@ -1,4 +1,4 @@
-name: m_delivery
+name: Delivery
 description: "should verify message loss when receiving via 200 streams"
 
 on:

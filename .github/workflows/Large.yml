@@ -1,4 +1,4 @@
-name: m_large
+name: Large
 description: "should verify performance of the group streams"
 
 on:

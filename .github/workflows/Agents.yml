@@ -1,4 +1,4 @@
-name: TS_Agents
+name: Agents
 description: "should verify health of agents"
 
 on:
