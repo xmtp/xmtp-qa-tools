@@ -52,7 +52,7 @@ if (!parentPort) {
 console.debug("[Worker] Started with workerData:", workerData);
 
 // Listen for messages from the parent
-parentPort.on("message", (message: { type: string; data: any }) => {
+parentPort.on("worker_message", (message: { type: string; data: any }) => {
   switch (message.type) {
     case "initialize":
       // You can add logs or do any one-time setup here.

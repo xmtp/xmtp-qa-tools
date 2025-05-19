@@ -1,14 +1,12 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { sleep } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
 loadEnv(testName);
-
-// Helper function to add a delay
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 describe(testName, async () => {
   let workers: WorkerManager;
@@ -52,7 +50,7 @@ describe(testName, async () => {
       expect(members.length).toBe(testWorkers.length);
 
       // Allow time for group creation to propagate to all members
-      await delay(2000);
+      await sleep(2000);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -78,7 +76,7 @@ describe(testName, async () => {
       console.log("Test message sent to group:", testMessage);
 
       // Allow time for message to propagate to all members
-      await delay(3000);
+      await sleep(3000);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
