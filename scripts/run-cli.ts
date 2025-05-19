@@ -32,8 +32,8 @@ function showUsageAndExit() {
   console.error("  yarn cli bot gm-bot");
   console.error("  yarn cli bot stress 5");
   console.error("  yarn cli script generate-keys");
-  console.error("  yarn cli test functional --max-attempts 2");
-  console.error("  yarn cli test ./suites/automated/Gm/gm.test.ts --watch");
+  console.error("  yarn retry functional --max-attempts 2");
+  console.error("  yarn retry ./suites/automated/Gm/gm.test.ts --watch");
   process.exit(1);
 }
 

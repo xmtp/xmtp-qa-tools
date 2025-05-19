@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn cli test dms 1
+        run: yarn retry dms 1
       - name: List .data folder structure
         run: |
           find .data -type d | sort > data-directories.txt

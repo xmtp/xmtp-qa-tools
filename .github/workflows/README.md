@@ -46,7 +46,7 @@ jobs:
     steps:
       # ...
       - name: Run tests with retry
-        run: yarn cli test at_agents
+        run: yarn retry at_agents
 ```
 
 **Key features:**

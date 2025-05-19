@@ -38,7 +38,7 @@ jobs:
       - name: Run tests with retry
         id: test
         continue-on-error: true
-        run: yarn cli test m_performance
+        run: yarn retry m_performance
       - name: Send Slack notification
         if: always()
         env:
