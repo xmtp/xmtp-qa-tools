@@ -14,12 +14,8 @@ const testName = "m_delivery";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const amountofMessages = parseInt(
-    process.env.CLI_DELIVERY_AMOUNT ?? process.env.DELIVERY_AMOUNT ?? "10",
-  );
-  const receiverAmount = parseInt(
-    process.env.CLI_DELIVERY_RECEIVERS ?? process.env.DELIVERY_RECEIVERS ?? "4",
-  );
+  const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
+  const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
   console.log(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
@@ -29,16 +25,13 @@ describe(testName, async () => {
     testName,
     typeofStream.Message,
   );
-  let creator = workers.getCreator();
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   beforeAll(async () => {
     try {
       console.log("creating group");
-      group = await creator.client.conversations.newGroup(
-        workers.getAllButCreator().map((p) => p.client.inboxId),
-      );
+      group = await workers.createGroup();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

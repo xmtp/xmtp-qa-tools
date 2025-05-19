@@ -21,11 +21,7 @@ describe(testName, () => {
         typeOfResponse.Gm,
         receiver.network as "production" | "dev" | "local",
       );
-      const client = workers.getCreator()?.client;
-      group = await client?.conversations.newGroup([
-        ...workers.getAllButCreator().map((w) => w.inboxId),
-        receiver.inboxId,
-      ]);
+      group = await workers.createGroup();
       if (!group) {
         console.error(`Failed to create conversation for alice`);
         return;

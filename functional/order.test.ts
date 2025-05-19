@@ -25,10 +25,7 @@ describe(testName, async () => {
   });
   it("poll_order: verify message order when receiving via pull", async () => {
     try {
-      const creator = workers.getCreator();
-      group = await creator.client.conversations.newGroup(
-        workers.getAllButCreator().map((p) => p.client.inboxId),
-      );
+      group = await workers.createGroup();
       await group.sync();
       console.log("group", group.id);
       expect(group.id).toBeDefined();
@@ -74,10 +71,7 @@ describe(testName, async () => {
   });
   it("stream_order: verify message order when receiving via streams", async () => {
     try {
-      const creator = workers.getCreator();
-      group = await creator.client.conversations.newGroup(
-        workers.getAllButCreator().map((p) => p.client.inboxId),
-      );
+      group = await workers.createGroup();
       const verifyResult = await verifyMessageStream(
         group,
         workers.getAllButCreator(),

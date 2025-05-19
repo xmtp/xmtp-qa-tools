@@ -67,10 +67,7 @@ describe(testName, async () => {
   it("verifyMessageGroupStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
-      const creator = workers.getCreator();
-      const newGroup = await creator.client.conversations.newGroup(
-        workers.getAllButCreator().map((w) => w.client.inboxId),
-      );
+      const newGroup = await workers.createGroup();
 
       // Verify message delivery
       const verifyResult = await verifyMessageStream(
@@ -90,11 +87,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
-      group = await workers
-        .getCreator()
-        .client.conversations.newGroup(
-          workers.getAllButCreator().map((w) => w.client.inboxId),
-        );
+      group = await workers.createGroup();
 
       const verifyResult = await verifyMetadataStream(
         group as Group,
@@ -112,11 +105,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
-      group = await workers
-        .getCreator()
-        .client.conversations.newGroup(
-          workers.getAllButCreator().map((w) => w.client.inboxId),
-        );
+      group = await workers.createGroup();
 
       const verifyResult = await verifyMembershipStream(
         group as Group,

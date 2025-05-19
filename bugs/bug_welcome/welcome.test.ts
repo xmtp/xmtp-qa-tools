@@ -19,18 +19,12 @@ describe(testName, () => {
   });
 
   it("stream: send the stream", async () => {
-    const creator = workers.getCreator();
-    group = await creator.client.conversations.newGroup(
-      workers.getAllButCreator().map((p) => p.client.inboxId),
-    );
+    group = await workers.createGroup();
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
   });
   it("stream: send the stream", async () => {
-    const creator = workers.getCreator();
-    group = await creator.client.conversations.newGroup(
-      workers.getAllButCreator().map((p) => p.client.inboxId),
-    );
+    group = await workers.createGroup();
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
   });
