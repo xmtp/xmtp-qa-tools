@@ -118,7 +118,7 @@ async function sendSlackNotification() {
     }
     let customLinks = "";
     if (testName && testName.toLowerCase().includes("agents")) {
-      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View file>`;
+      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/at_agents/production.json|View file>`;
     }
 
     // Create a message with GitHub context and AI analysis

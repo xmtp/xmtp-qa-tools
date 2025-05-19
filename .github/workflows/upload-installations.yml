@@ -25,8 +25,7 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
+
       - name: Ensure data folder exists
         run: mkdir -p .data
       - name: List data folder contents

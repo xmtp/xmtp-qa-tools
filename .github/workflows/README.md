@@ -8,7 +8,7 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | ---------------------------------- | --------------------------------- | ---------------------------- | ---------------------------------------------- |
 | **check-agent-examples.yml**       | Validate XMTP agent examples      | Hourly, manual               | Clone, build and verify example agent startup  |
 | **Deploy.yml**                     | Handle Railway deployments        | Version bump in package.json | Auto PR creation and merging for deployments   |
-| **TS_Agents.yml**                  | Monitor production agent health   | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
+| **at_agents.yml**                  | Monitor production agent health   | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
 | **m_delivery.yml**                 | Test message delivery reliability | Scheduled, manual            | Verify cross-environment message delivery      |
 | **m_large.yml**                    | Test large scale operations       | Scheduled, manual            | Test large scale operations                    |
 | **m_performance.yml**              | Measure protocol performance      | Scheduled, manual            | Benchmark operation timing and scalability     |
@@ -26,15 +26,15 @@ GitHub Actions workflows run automatically based on their triggers, but can also
 gh workflow run workflow-name.yml
 
 # Example - run the agent health check:
-gh workflow run TS_Agents.yml
+gh workflow run at_agents.yml
 ```
 
 ## 🤖 Agent Health Monitoring
 
-The `TS_Agents.yml` workflow monitors the health and responsiveness of XMTP agents in production.
+The `at_agents.yml` workflow monitors the health and responsiveness of XMTP agents in production.
 
 ```yaml
-name: TS_Agents
+name: at_agents
 on:
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
@@ -46,7 +46,7 @@ jobs:
     steps:
       # ...
       - name: Run tests with retry
-        run: yarn cli test TS_Agents
+        run: yarn cli test at_agents
 ```
 
 **Key features:**

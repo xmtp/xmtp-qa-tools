@@ -1,4 +1,4 @@
-# XMTP Agent Health Testing Suite (TS_Agents)
+# XMTP Agent Health Testing Suite (at_agents)
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
@@ -20,13 +20,13 @@ yarn install
 ## Key files
 
 - [production.json](./production.json) - List of agents to be tested with their addresses
-- [TS_Agents.test.ts](./TS_Agents.test.ts) - Test implementation that sends messages and validates responses
+- [at_agents.test.ts](./at_agents.test.ts) - Test implementation that sends messages and validates responses
 - [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 
 ```typescript
-// From TS_Agents.test.ts
+// From at_agents.test.ts
 for (const agent of typedAgents) {
   it(`test ${agent.name}:${agent.address} on production`, async () => {
     try {
@@ -54,7 +54,7 @@ for (const agent of typedAgents) {
 ## Test execution
 
 ```bash
-yarn test TS_Agents
+yarn test at_agents
 ```
 
 ## Automation
@@ -62,8 +62,8 @@ yarn test TS_Agents
 Tests run automatically via [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml):
 
 ```yaml
-# From TS_Agents.yml
-name: TS_Agents
+# From at_agents.yml
+name: at_agents
 on:
   pull_request:
     branches:
