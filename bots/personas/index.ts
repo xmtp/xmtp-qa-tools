@@ -10,7 +10,7 @@ async function main() {
       typeofStream.Message,
       typeOfResponse.Gpt,
     );
-    for (const worker of workersGpt.getWorkers()) {
+    for (const worker of workersGpt.getAll()) {
       // Add sync log to track if sync causes issues
       worker.client.conversations
         .sync()
@@ -24,7 +24,7 @@ async function main() {
 
     console.log(
       workersGpt
-        .getWorkers()
+        .getAll()
         .map((w) => w.address)
         .join(", "),
     );

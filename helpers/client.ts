@@ -280,7 +280,7 @@ export function loadEnv(testName: string) {
 }
 
 export async function listInstallations(workers: WorkerManager) {
-  for (const worker of workers.getWorkers()) {
+  for (const worker of workers.getAll()) {
     const inboxState = await worker.client?.preferences.inboxState();
     if (inboxState) {
       console.debug(

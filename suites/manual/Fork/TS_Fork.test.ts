@@ -49,7 +49,7 @@ describe(TEST_NAME, () => {
     // Initialize workers
     workers = await getWorkers(getRandomNames(testConfig.workers), TEST_NAME);
     creator = workers.get("fabri") as Worker;
-    const allWorkers = workers.getWorkers();
+    const allWorkers = workers.getAll();
     const allClientIds = [
       ...allWorkers.map((w) => w.client.inboxId),
       ...Object.values(testConfig.manualUsers),

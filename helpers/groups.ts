@@ -33,7 +33,7 @@ const updateGroupMetadata = async (
   const newValue = `Random ${updateField} ${Math.random().toString(36).substring(2, 15)}`;
 
   const worker = workers
-    .getWorkers()
+    .getAll()
     .find((w) => w.client.inboxId === randomMember.inboxId);
   if (!worker) return;
 
@@ -117,7 +117,7 @@ export async function createGroupWithBatch(
 
   const group = await creator.client?.conversations.newGroup(
     allWorkers
-      .getWorkers()
+      .getAll()
       .map((w) => w.client.inboxId)
       .slice(0, batchSize),
   );
@@ -150,9 +150,7 @@ export async function getWorkersFromGroup(
 ): Promise<Worker[]> {
   await group.sync();
   const memberIds = (await group.members()).map((m) => m.inboxId);
-  return workers
-    .getWorkers()
-    .filter((w) => memberIds.includes(w.client.inboxId));
+  return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
 }
 
 export interface StressTestConfig {
@@ -196,7 +194,7 @@ export async function createAndSendDms(
   let successCount = 0;
   let errorCount = 0;
 
-  for (const sender of workers.getWorkers()) {
+  for (const sender of workers.getAll()) {
     try {
       await sender.client.conversations.sync();
       console.debug(

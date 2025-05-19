@@ -104,7 +104,7 @@ export class WorkerManager {
    * Gets a random subset of workers
    */
   public getRandomWorkers(count: number): Worker[] {
-    const allWorkers = this.getWorkers();
+    const allWorkers = this.getAll();
     return allWorkers.sort(() => 0.5 - Math.random()).slice(0, count);
   }
 
@@ -137,11 +137,11 @@ export class WorkerManager {
     }
   }
   getCreator(): Worker {
-    const workers = this.getWorkers();
+    const workers = this.getAll();
     return workers[0];
   }
   getReceiver(): Worker {
-    const workers = this.getWorkers();
+    const workers = this.getAll();
     const creator = this.getCreator();
     const otherWorkers = workers.filter((worker) => worker !== creator);
     return otherWorkers[Math.floor(Math.random() * otherWorkers.length)];
@@ -159,14 +159,14 @@ export class WorkerManager {
     return group;
   }
   getAllButCreator(): Worker[] {
-    const workers = this.getWorkers();
+    const workers = this.getAll();
     const creator = this.getCreator();
     return workers.filter((worker) => worker !== creator);
   }
   /**
    * Gets all workers as a flat array
    */
-  public getWorkers(): Worker[] {
+  public getAll(): Worker[] {
     const allWorkers: Worker[] = [];
     for (const baseName in this.workers) {
       for (const installationId in this.workers[baseName]) {

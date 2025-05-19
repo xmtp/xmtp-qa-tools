@@ -106,7 +106,7 @@ describe(testName, async () => {
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         console.log(
-          `Creating test group with ${workers.getWorkers().length} worker participants`,
+          `Creating test group with ${workers.getAll().length} worker participants`,
         );
 
         const testGroup = await workers.createGroup();
