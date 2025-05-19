@@ -117,7 +117,7 @@ async function sendSlackNotification() {
       //aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
     let customLinks = "";
-    if (testName && testName.toLowerCase() === "ts_agents") {
+    if (testName && testName.toLowerCase().includes("agents")) {
       customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View file>`;
     }
 

@@ -1,4 +1,4 @@
-name: Check agent-examples
+name: Agent Examples Repo
 
 on:
   schedule:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  run-agent:
+  agent-examples-repo:
     runs-on: ubuntu-latest
 
     steps: # sd
