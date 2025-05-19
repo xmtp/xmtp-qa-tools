@@ -9,24 +9,21 @@
     "workers"
   ],
   "scripts": {
-    "bot": "tsx scripts/run bot",
+    "bot": "yarn cli bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
-    "cli": "tsx scripts/bot-cli.ts",
+    "cli": "tsx scripts/run-cli.ts",
     "format": "prettier -w .",
-    "format:check": "prettier -c .",
     "functional": "npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false",
     "gen:keys": "tsx scripts/generate-keys.ts",
-    "gm": "cd bots/gm-bot && tsx src/index.ts",
-    "large": "npx vitest run ./suites/TS_Large/*.test.ts --pool=forks --fileParallelism=false",
+    "large": "npx vitest run ./suites/metrics/Large/*.test.ts --pool=forks --fileParallelism=false",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
-    "run": "tsx scripts/run.ts",
-    "script": "tsx scripts/run script",
+    "script": "yarn cli script",
     "start": "vitest --ui --standalone --watch ",
-    "test": "vitest"
+    "test": "yarn cli test"
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",

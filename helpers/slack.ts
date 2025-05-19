@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
-import { analyzeErrorLogsWithGPT } from "./ai";
 
 // Check for required Slack credentials
 if (!process.env.SLACK_BOT_TOKEN) {
@@ -86,6 +85,7 @@ if (fs.existsSync("logs")) {
         if (/error|fail/i.test(line)) {
           let lineToAdd = line.split(">")[1].trim();
           lineToAdd = lineToAdd.split("//")[0].trim();
+          lineToAdd = lineToAdd.replace("expected false to be true", "failed");
           errorLines.push(lineToAdd);
         }
       }
@@ -114,10 +114,10 @@ async function sendSlackNotification() {
     // Get AI analysis of error logs if available
     let aiAnalysis = "";
     if (rawErrorLogs) {
-      aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
+      //aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
     let customLinks = "";
-    if (testName && testName.toLowerCase() === "ts_agents") {
+    if (testName && testName.toLowerCase().includes("agents")) {
       customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/TS_Agents/production.json|View file>`;
     }
 

@@ -105,16 +105,11 @@ describe(testName, async () => {
     });
     it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
       try {
-        const inboxIds = workers.getWorkers().map((worker) => worker.inboxId);
-
         console.log(
-          `Creating test group with ${inboxIds.length} worker participants`,
+          `Creating test group with ${workers.getWorkers().length} worker participants`,
         );
-        const testGroup = await workers
-          .getCreator()
-          .client.conversations.newGroup(inboxIds, {
-            groupName: `Test Group ${i}`,
-          });
+
+        const testGroup = await workers.createGroup();
 
         console.log(`Test group created with ID: ${testGroup.id}`);
 

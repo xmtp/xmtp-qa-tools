@@ -251,7 +251,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members,metric_subtype:core,test:ts_performance} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members,metric_subtype:core,test:m_performance} by {operation}"
               }
             ],
             "response_format": "timeseries",
@@ -504,21 +504,21 @@
       "name": "asia",
       "template_variables": [
         { "name": "region", "value": "asia" },
-        { "name": "test", "value": "ts_performance" }
+        { "name": "test", "value": "m_performance" }
       ]
     },
     {
       "name": "eu",
       "template_variables": [
         { "name": "region", "value": "europe" },
-        { "name": "test", "value": "ts_performance" }
+        { "name": "test", "value": "m_performance" }
       ]
     },
     {
       "name": "us",
       "template_variables": [
         { "name": "region", "value": "us-east" },
-        { "name": "test", "value": "ts_performance" }
+        { "name": "test", "value": "m_performance" }
       ]
     }
   ],

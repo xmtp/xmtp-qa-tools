@@ -3,7 +3,7 @@ import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
 import { sdkVersionOptions, sdkVersions, sleep } from "@helpers/tests";
-import { type Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, WorkerClient } from "./main";
 
@@ -145,6 +145,18 @@ export class WorkerManager {
     const creator = this.getCreator();
     const otherWorkers = workers.filter((worker) => worker !== creator);
     return otherWorkers[Math.floor(Math.random() * otherWorkers.length)];
+  }
+  async createGroup(
+    groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
+  ): Promise<Group> {
+    const creator = this.getCreator();
+    const group = await creator.client.conversations.newGroup(
+      this.getAllButCreator().map((worker) => worker.client.inboxId),
+      {
+        groupName: groupName,
+      },
+    );
+    return group;
   }
   getAllButCreator(): Worker[] {
     const workers = this.getWorkers();

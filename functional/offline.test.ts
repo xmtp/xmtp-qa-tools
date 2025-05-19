@@ -26,11 +26,7 @@ describe(
 
     beforeAll(async () => {
       try {
-        group = await workers
-          .get("random1")!
-          .client.conversations.newGroup(
-            workers.getWorkers().map((p) => p.client.inboxId),
-          );
+        group = await workers.createGroup();
         console.log("Group created", group.id);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

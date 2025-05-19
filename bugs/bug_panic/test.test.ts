@@ -10,11 +10,7 @@ describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
     const workers = await getWorkers(getRandomNames(50), testName);
     const workerArray = workers.getWorkers();
-    const groupByInboxIds = await workers
-      .get("bob")!
-      .client.conversations.newGroup(
-        workers.getWorkers().map((worker) => worker.client.inboxId),
-      );
+    const groupByInboxIds = await workers.createGroup();
     for (const worker of workerArray) {
       await worker.worker?.terminate();
     }

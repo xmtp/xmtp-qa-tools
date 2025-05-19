@@ -184,8 +184,8 @@ export function parseTestName(testName: string): ParsedTestName {
   const operationParts = metricName.split(".");
   let testNameExtracted = operationParts[0];
 
-  if (testNameExtracted.includes("ts_large")) {
-    testNameExtracted = "ts_large";
+  if (testNameExtracted.includes("m_large")) {
+    testNameExtracted = "m_large";
   }
 
   // Extract operation name and member count
@@ -249,16 +249,12 @@ export async function sendPerformanceMetric(
       members: members,
       region: process.env.GEOLOCATION ?? "",
     };
-    if (
-      testName.includes("ts_performance") ||
-      testName.includes("ts_delivery") ||
-      testName.includes("ts_large")
-    ) {
+    if (testName.includes("m_")) {
       sendMetric("duration", metricValue, values);
     }
 
     // Network stats handling
-    if (!skipNetworkStats && testName.includes("ts_performance")) {
+    if (!skipNetworkStats && testName.includes("m_performance")) {
       const networkStats = await getNetworkStats();
       const countryCode =
         GEO_TO_COUNTRY_CODE[
