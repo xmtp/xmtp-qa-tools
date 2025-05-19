@@ -9,7 +9,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "ts_gm";
+const testName = "at_gm";
 loadEnv(testName);
 
 const gmBotAddress = process.env.GM_BOT_ADDRESS as string;

@@ -52,7 +52,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_gm_${{ matrix.environment }}
+          name: logs_${{ matrix.environment }}
           path: |
             logs/
             logs/**/*.png
