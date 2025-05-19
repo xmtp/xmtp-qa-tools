@@ -83,5 +83,5 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
   messageToLog += "==========================================\n";
   console.log(messageToLog);
   // save file in ./large.log
-  fs.appendFileSync("logs/m_large.log", messageToLog);
+  fs.appendFileSync("logs/large.log", messageToLog);
 }

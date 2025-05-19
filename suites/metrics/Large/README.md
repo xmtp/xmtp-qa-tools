@@ -34,7 +34,7 @@ yarn install
 yarn large
 ```
 
-- Results and timing summaries are appended to `logs/m_large.log` after each run.
+- Results and timing summaries are appended to `logs/large.log` after each run.
 
 ## Requirements
 
