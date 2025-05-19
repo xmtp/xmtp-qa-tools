@@ -126,7 +126,7 @@ async function sendSlackNotification() {
       • *Test Suite:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
       • *Test Run URL:* <${workflowUrl}|View>
       • *Dashboard:* <${datadogUrl}|View>
-      • *Timestamp:* ${new Date().toTimeString()}
+      • *Timestamp:* ${new Date().toLocaleString()}
       ${customLinks}
       ${errorLogs}
       ${aiAnalysis}`;

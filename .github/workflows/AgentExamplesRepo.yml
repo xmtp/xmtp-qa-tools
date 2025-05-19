@@ -1,4 +1,4 @@
-name: Agent Examples Repo
+name: Check agent-examples
 
 on:
   schedule:
@@ -6,15 +6,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  test:
-    timeout-minutes: 10
+  run-agent:
     runs-on: ubuntu-latest
-    env:
-      XMTP_ENV: local
-      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-      GITHUB_ACTIONS: true
-      LOGGING_LEVEL: "off"
-    steps:
+
+    steps: # sd
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -28,6 +23,13 @@ jobs:
         with:
           node-version: "20"
           cache: "yarn"
+          cache-dependency-path: "xmtp-agent-examples/yarn.lock"
+        env:
+          XMTP_ENV: local
+          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+          GITHUB_ACTIONS: true
+          LOGGING_LEVEL: "off"
+
       - name: Install dependencies
         run: |
           cd xmtp-agent-examples
