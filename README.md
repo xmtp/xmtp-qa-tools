@@ -256,8 +256,8 @@ yarn install
 
 ### Resources
 
-- **Local:** Work in local network -- [see section](/dev/)
-- **Workers:** Worker for testing -- [see section](/workers/)
-- **Helpers:** Coding helpers -- [see section](/helpers/)
-- **Scripts:** Monorepo scripts -- [see section](/scripts/)
-- **Loom recording:** [Loom recording](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
+- **Local:** Work in local network - [see section](/dev/)
+- **Workers:** Worker for testing - [see section](/workers/)
+- **Helpers:** Coding helpers - [see section](/helpers/)
+- **Scripts:** Monorepo scripts - [see section](/scripts/)
+- **Introduction:** Walkthrough of the monorepo - [see video](https://www.loom.com/share/f447b9a602e44093bce5412243e53664)
