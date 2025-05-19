@@ -6,10 +6,15 @@ on:
   workflow_dispatch:
 
 jobs:
-  agent-examples-repo:
+  test:
+    timeout-minutes: 10
     runs-on: ubuntu-latest
-
-    steps: # sd
+    env:
+      XMTP_ENV: local
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+      GITHUB_ACTIONS: true
+      LOGGING_LEVEL: "off"
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v3
 
@@ -23,15 +28,6 @@ jobs:
         with:
           node-version: "20"
           cache: "yarn"
-          cache-dependency-path: "xmtp-agent-examples/yarn.lock"
-
-          XMTP_ENV: local
-          RUST_BACKTRACE: 1
-          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-          # Set this to true to help with debugging in GitHub Actions
-          GITHUB_ACTIONS: true
-          LOGGING_LEVEL: "off"
-
       - name: Install dependencies
         run: |
           cd xmtp-agent-examples
