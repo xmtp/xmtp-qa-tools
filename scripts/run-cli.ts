@@ -12,7 +12,7 @@ function showUsageAndExit() {
     "  bot <bot_name> [bot_args...]        - Runs a bot (e.g., gm-bot)",
   );
   console.error(
-    "  script <script_name> [script_args...] - Runs a script (e.g., generate-keys)",
+    "  script <script_name> [script_args...] - Runs a script (e.g., gen)",
   );
   console.error(
     "  retry [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
@@ -31,7 +31,7 @@ function showUsageAndExit() {
   console.error("Examples:");
   console.error("  yarn cli bot gm-bot");
   console.error("  yarn cli bot stress 5");
-  console.error("  yarn cli script generate-keys");
+  console.error("  yarn cli script gen");
   console.error("  yarn retry functional --max-attempts 2");
   console.error("  yarn retry ./suites/automated/Gm/gm.test.ts --watch");
   process.exit(1);
