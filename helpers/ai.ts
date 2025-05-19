@@ -43,7 +43,7 @@ export class OpenAIService {
         messages: [
           {
             role: "system",
-            content: `You are a an assistant that analyzes error logs from XMTP tests. Provide a concise, very short bullet point summary of what went wrong. Please be specific and technical. Don't propose solutions.
+            content: `You are an assistant that analyzes error logs from XMTP tests. Provide a concise, very short bullet point summary of what went wrong. Please be specific and technical. Don't propose solutions.
               
               # Example:
               [2025-05-06T22:57:34.207Z] [[32minfo[39m] Failed to find response containing any of [commands]
