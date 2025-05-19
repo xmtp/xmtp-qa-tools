@@ -2,7 +2,6 @@ import * as fs from "fs";
 import * as path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
-import { analyzeErrorLogsWithGPT } from "./ai";
 
 // Check for required Slack credentials
 if (!process.env.SLACK_BOT_TOKEN) {
