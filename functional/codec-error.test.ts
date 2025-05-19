@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { logError } from "@helpers/logger";
 import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -18,7 +19,7 @@ describe(testName, async () => {
   setupTestLifecycle({
     expect,
   });
-  it("forceStreamError: should measure force a stream error", async () => {
+  it("codec-error: should measure force a stream error", async () => {
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();
@@ -32,9 +33,11 @@ describe(testName, async () => {
         schema: "shortcode",
       };
 
-      await convo.send(reaction, ContentTypeReaction);
+      const result = await convo.send(reaction, ContentTypeReaction);
+      expect(result).toBeDefined();
     } catch (e) {
-      expect(e).toBeDefined();
+      logError(e, expect.getState().currentTestName);
+      throw e;
     }
   });
 });
