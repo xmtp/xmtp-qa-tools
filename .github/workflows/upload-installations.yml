@@ -42,11 +42,10 @@ jobs:
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: test-artifacts
+          name: logs
           path: |
             logs/
             .data/
