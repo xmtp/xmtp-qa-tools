@@ -33,12 +33,8 @@ jobs:
           SKIP_YARN_COREPACK_CHECK: "1"
       - run: corepack enable
       - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
       - name: Run tests with retry
-        id: test
-        continue-on-error: true
-        run: ./scripts/run-test.sh large 1
+        run: yarn cli test m_large
       - name: Send Slack notification
         if: always()
         env:

@@ -46,7 +46,7 @@ jobs:
     steps:
       # ...
       - name: Run tests with retry
-        run: ./scripts/run-test.sh TS_Agents
+        run: yarn cli test TS_Agents
 ```
 
 **Key features:**
