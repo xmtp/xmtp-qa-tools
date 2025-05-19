@@ -25,14 +25,6 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
-      - uses: actions/checkout@v4
-      - name: Debug API key
-        run: |
-          if [ -n "${{ secrets.DATADOG_API_KEY }}" ]; then
-            echo "API key is available in test job"
-          else
-            echo "API key is NOT available in test job"
-          fi
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
@@ -42,17 +34,21 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn cli test at_gm
+        run: yarn cli test at_gm 1
       - name: Send Slack notification
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-      - name: Upload reports and snapshots artifacts
-        if: always()
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
           name: logs_${{ matrix.environment }}
           path: |
             logs/
-            logs/**/*.png
+            .data/
+            .env
+          if-no-files-found: warn
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 365
