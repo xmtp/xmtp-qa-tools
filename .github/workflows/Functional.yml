@@ -9,6 +9,11 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    env:
+      XMTP_ENV: local
+      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
+      GITHUB_ACTIONS: true
+      LOGGING_LEVEL: "off"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,14 +25,6 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run functional tests
-        env:
-          DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-          XMTP_ENV: production
-          RUST_BACKTRACE: 1
-          GEOLOCATION: ${{ vars.GEOLOCATION }}
-          GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-          GITHUB_ACTIONS: true
-          LOGGING_LEVEL: "off"
         run: yarn functional
       - name: Upload reports artifacts
         if: always()
