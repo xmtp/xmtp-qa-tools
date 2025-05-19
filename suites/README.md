@@ -6,8 +6,8 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 
 | Suite         | Purpose                                 | Link to test file         |
 | ------------- | --------------------------------------- | ------------------------- |
-| **TS_Agents** | Tests the health of the agent ecosystem | [TS_Agents](./TS_Agents/) |
-| **TS_Gm**     | Tests the GM browser and bot            | [TS_Gm](./TS_Gm/)         |
+| **at_agents** | Tests the health of the agent ecosystem | [at_agents](./at_agents/) |
+| **at_gm**     | Tests the GM browser and bot            | [at_gm](./at_gm/)         |
 
 ## Manual test suites
 

@@ -51,6 +51,14 @@ describe(testName, () => {
     it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
       try {
         let counter = 0;
+        const group = await workers.createGroup();
+        await group.addMembers([receiver.inboxId]);
+        if (!group) {
+          console.error(`Failed to create conversation for alice`);
+          return;
+        }
+        console.log(`Created group ${group.id}`);
+
         for (const worker of workers.getAllButCreator()) {
           const client = worker.client;
           await client?.conversations.sync();

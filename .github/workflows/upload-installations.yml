@@ -25,19 +25,12 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - name: Ensure data folder exists
-        run: mkdir -p .data
-      - name: List data folder contents
-        run: ls -la .data
-      - run: corepack enable
-      - run: yarn
-      - name: Make test script executable
-        run: chmod +x ./scripts/run-test.sh
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
       - name: Run tests with retry
-        run: ./scripts/run-test.sh dms
-
+        run: yarn cli test dms 1
       - name: List .data folder structure
         run: |
           find .data -type d | sort > data-directories.txt

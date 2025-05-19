@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  TS_Gm:
+  at_gm:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -37,12 +37,12 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-        env:
-          SKIP_YARN_COREPACK_CHECK: "1"
-      - run: corepack enable
-      - run: yarn
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
       - name: Run tests with retry
-        run: yarn cli test TS_Gm
+        run: yarn cli test at_gm
       - name: Send Slack notification
         if: always()
         env:
@@ -52,7 +52,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ts_gm_${{ matrix.environment }}
+          name: logs_${{ matrix.environment }}
           path: |
             logs/
             logs/**/*.png

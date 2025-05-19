@@ -1,4 +1,4 @@
-# XMTP GM Bot Testing Suite (TS_Gm)
+# XMTP GM Bot Testing Suite (at_gm)
 
 This test suite validates the functionality and responsiveness of the XMTP GM bot in production environments.
 
@@ -19,13 +19,13 @@ yarn install
 
 ## Key files
 
-- [TS_Gm.test.ts](./TS_Gm.test.ts) - Test implementation that sends messages and validates GM bot responses
+- [at_gm.test.ts](./at_gm.test.ts) - Test implementation that sends messages and validates GM bot responses
 - [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 
 ```typescript
-// From TS_Gm.test.ts
+// From at_gm.test.ts
 it("gm-bot: should check if bot is alive", async () => {
   try {
     // Create conversation with the bot
@@ -48,7 +48,7 @@ it("gm-bot: should check if bot is alive", async () => {
 ## Test execution
 
 ```bash
-yarn test TS_Gm
+yarn test at_gm
 ```
 
 ## Automation
@@ -56,8 +56,8 @@ yarn test TS_Gm
 Tests run automatically via GitHub Actions:
 
 ```yaml
-# From TS_Gm.yml
-name: TS_Gm
+# From at_gm.yml
+name: at_gm
 on:
   pull_request:
     branches:

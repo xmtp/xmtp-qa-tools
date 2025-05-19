@@ -4,7 +4,7 @@ import { verifyDmStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
@@ -18,11 +18,12 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = productionAgents as Agent[];
-const testName = "TS_Agents";
+const testName = "at_agents";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
+  let convo: Conversation;
   beforeAll(async () => {
     workers = await getWorkers(
       ["bot"],
@@ -41,15 +42,15 @@ describe(testName, () => {
     it(`test ${agent.name}:${agent.address} on production`, async () => {
       try {
         console.debug(`Testing ${agent.name} with address ${agent.address} `);
-        const convo = await workers
+        convo = (await workers
           .get("bot")
           ?.client.conversations.newDmWithIdentifier({
             identifier: agent.address,
             identifierKind: IdentifierKind.Ethereum,
-          });
+          })) as Conversation;
         expect(convo).toBeDefined();
         const result = await verifyDmStream(
-          convo!,
+          convo,
           workers.getAll(),
           agent.sendMessage,
         );
