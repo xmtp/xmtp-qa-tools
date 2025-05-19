@@ -47,4 +47,3 @@ jobs:
           name: logs_${{ matrix.environment }}
           path: |
             logs/
-            logs/**/*.png
