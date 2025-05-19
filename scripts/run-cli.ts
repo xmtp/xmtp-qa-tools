@@ -146,7 +146,7 @@ try {
           console.log("Tests passed successfully!");
           process.exit(0); // Success
         } catch (error) {
-          console.error(`Attempt ${attempt} failed.`);
+          console.error(`Attempt ${attempt} failed.`, error);
           if (attempt === maxAttempts) {
             console.error(`Test failed after ${maxAttempts} attempts.`);
             process.exit(1); // Final failure
