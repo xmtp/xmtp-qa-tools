@@ -86,6 +86,7 @@ if (fs.existsSync("logs")) {
         if (/error|fail/i.test(line)) {
           let lineToAdd = line.split(">")[1].trim();
           lineToAdd = lineToAdd.split("//")[0].trim();
+          lineToAdd = lineToAdd.replace("expected false to be true", "failed");
           errorLines.push(lineToAdd);
         }
       }
@@ -114,7 +115,7 @@ async function sendSlackNotification() {
     // Get AI analysis of error logs if available
     let aiAnalysis = "";
     if (rawErrorLogs) {
-      aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
+      //aiAnalysis = await analyzeErrorLogsWithGPT(rawErrorLogs);
     }
     let customLinks = "";
     if (testName && testName.toLowerCase() === "ts_agents") {

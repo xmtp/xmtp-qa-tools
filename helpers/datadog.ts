@@ -250,7 +250,7 @@ export async function sendPerformanceMetric(
       region: process.env.GEOLOCATION ?? "",
     };
     if (
-      testName.includes("ts_performance") ||
+      testName.includes("m_performance") ||
       testName.includes("ts_delivery") ||
       testName.includes("ts_large")
     ) {
@@ -258,7 +258,7 @@ export async function sendPerformanceMetric(
     }
 
     // Network stats handling
-    if (!skipNetworkStats && testName.includes("ts_performance")) {
+    if (!skipNetworkStats && testName.includes("m_performance")) {
       const networkStats = await getNetworkStats();
       const countryCode =
         GEO_TO_COUNTRY_CODE[

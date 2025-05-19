@@ -1,4 +1,4 @@
-# XMTP Performance Testing Suite (TS_Performance)
+# XMTP Performance Testing Suite (m_performance)
 
 This test suite comprehensively measures XMTP network performance across various operations, providing critical insights into system scalability and responsiveness.
 
@@ -14,7 +14,7 @@ yarn install
 ## Test Execution
 
 ```bash
-yarn test ts_performance
+yarn test m_performance
 ```
 
 ## Test Flow

@@ -11,7 +11,7 @@ This directory contains GitHub Actions workflows for automating testing, deploym
 | **TS_Agents.yml**                  | Monitor production agent health   | Every 30 minutes, manual     | Verify agent responsiveness and uptime         |
 | **TS_Delivery.yml**                | Test message delivery reliability | Scheduled, manual            | Verify cross-environment message delivery      |
 | **TS_Large.yml**                   | Test large scale operations       | Scheduled, manual            | Test large scale operations                    |
-| **TS_Performance.yml**             | Measure protocol performance      | Scheduled, manual            | Benchmark operation timing and scalability     |
+| **m_performance.yml**              | Measure protocol performance      | Scheduled, manual            | Benchmark operation timing and scalability     |
 | **test-package-compatibility.yml** | Verify package compatibility      | On main branch push, manual  | Test with different Node versions and managers |
 | **upload-installations.yml**       | Backup installation data          | Daily, manual                | Upload keys and installation data as artifacts |
 | **validate-code-quality.yml**      | Check code quality                | On non-main branch pushes    | Enforce code quality standards                 |

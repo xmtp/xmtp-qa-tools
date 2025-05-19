@@ -14,7 +14,7 @@ import {
 } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "ts_performance";
+const testName = "m_performance";
 loadEnv(testName);
 
 describe(testName, async () => {
