@@ -34,7 +34,7 @@ describe(testName, () => {
       try {
         console.log(`Starting notification test with random delays...`);
         let messageCounter = 0;
-        for (const worker of workers.getWorkers()) {
+        for (const worker of workers.getAll()) {
           const client = worker.client;
           const conversation = await client?.conversations.newDm(
             receiver.inboxId,

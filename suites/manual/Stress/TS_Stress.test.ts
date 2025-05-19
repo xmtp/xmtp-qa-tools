@@ -40,7 +40,7 @@ describe(testName, async () => {
       conversation = await client.conversations.newDm(receiverInboxId);
       workers = await getWorkers(getRandomNames(config.workerCount), testName);
       expect(workers).toBeDefined();
-      expect(workers.getWorkers().length).toBe(config.workerCount);
+      expect(workers.getAll().length).toBe(config.workerCount);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

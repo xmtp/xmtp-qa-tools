@@ -9,7 +9,7 @@ loadEnv(testName);
 describe(testName, () => {
   it("createGroupByInboxIds: should measure creating a group with inbox ids", async () => {
     const workers = await getWorkers(getRandomNames(50), testName);
-    const workerArray = workers.getWorkers();
+    const workerArray = workers.getAll();
     const groupByInboxIds = await workers.createGroup();
     for (const worker of workerArray) {
       await worker.worker?.terminate();

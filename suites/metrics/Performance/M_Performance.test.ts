@@ -97,7 +97,7 @@ describe(testName, async () => {
     try {
       dm = await workers
         .getCreator()
-        .client.conversations.newDm(workers.getWorkers()[1].client.inboxId);
+        .client.conversations.newDm(workers.getAll()[1].client.inboxId);
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -111,7 +111,7 @@ describe(testName, async () => {
       const dm2 = await workers
         .getCreator()
         .client.conversations.newDmWithIdentifier({
-          identifier: workers.getWorkers()[2].address,
+          identifier: workers.getAll()[2].address,
           identifierKind: IdentifierKind.Ethereum,
         });
 
@@ -139,9 +139,7 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyMessageStream(dm, [
-        workers.getWorkers()[1],
-      ]);
+      const verifyResult = await verifyMessageStream(dm, [workers.getAll()[1]]);
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -158,7 +156,7 @@ describe(testName, async () => {
         .getCreator()
         .client.conversations.newGroup([
           ...sliced.map((inbox) => inbox.inboxId),
-          ...workers.getWorkers().map((w) => w.client.inboxId),
+          ...workers.getAll().map((w) => w.client.inboxId),
         ]);
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
@@ -234,7 +232,7 @@ describe(testName, async () => {
   });
   it(`addMembers: should add members to a group`, async () => {
     try {
-      await (newGroup as Group).addMembers([workers.getWorkers()[2].inboxId]);
+      await (newGroup as Group).addMembers([workers.getAll()[2].inboxId]);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -266,7 +264,7 @@ describe(testName, async () => {
           .getCreator()
           .client.conversations.newGroup([
             ...sliced.map((inbox) => inbox.inboxId),
-            ...workers.getWorkers().map((w) => w.client.inboxId),
+            ...workers.getAll().map((w) => w.client.inboxId),
           ]);
         expect(newGroup.id).toBeDefined();
       } catch (e) {

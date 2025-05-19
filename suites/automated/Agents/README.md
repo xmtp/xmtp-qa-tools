@@ -39,7 +39,7 @@ for (const agent of typedAgents) {
       expect(convo).toBeDefined();
       const result = await verifyDmStream(
         convo!,
-        workers.getWorkers(),
+        workers.getAll(),
         agent.sendMessage,
       );
       expect(result.allReceived).toBe(true);

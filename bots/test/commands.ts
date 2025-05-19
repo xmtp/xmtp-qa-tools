@@ -53,7 +53,7 @@ export class CommandHandler {
     );
     await conversation?.send(
       `Workers:\n${workers
-        .getWorkers()
+        .getAll()
         .map((p) => p.name)
         .join("\n")}`,
     );
@@ -380,7 +380,7 @@ export class CommandHandler {
 
       const memberDetails = members.map((member) => {
         const worker = workers
-          .getWorkers()
+          .getAll()
           .find((p) => p.client?.inboxId === member.inboxId);
         return worker?.name || this.processOthers(member.inboxId);
       });
@@ -419,7 +419,7 @@ export class CommandHandler {
       const allAdmins = [...admins, ...superAdmins];
       const adminDetails = allAdmins.map((admin) => {
         const worker = workers
-          .getWorkers()
+          .getAll()
           .find((p: Worker) => p.client?.inboxId === admin);
         return worker?.name || this.processOthers(admin);
       });
@@ -505,7 +505,7 @@ export class CommandHandler {
 
       await conversation?.send(`🔊 Blasting message: ${blastMessage}`);
       for (let i = 0; i < repeatCount; i++) {
-        for (const worker of workers.getWorkers().slice(0, countOfWorkers)) {
+        for (const worker of workers.getAll().slice(0, countOfWorkers)) {
           const workerGroup = await worker.client?.conversations.newDm(
             message.senderInboxId,
           );

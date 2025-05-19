@@ -380,7 +380,7 @@ export const randomSyncs = async (testConfig: {
 }): Promise<void> => {
   const { workers, groupId } = testConfig;
 
-  for (const worker of workers.getWorkers()) {
+  for (const worker of workers.getAll()) {
     const syncType = Math.floor(Math.random() * 3); // 0: sync, 1: syncAll, 2: group sync
 
     if (syncType === 0) {
@@ -401,7 +401,7 @@ export const randomSyncs = async (testConfig: {
 export const randomlyRemoveDb = async (
   workers: WorkerManager,
 ): Promise<void> => {
-  for (const worker of workers.getWorkers()) {
+  for (const worker of workers.getAll()) {
     if (Math.random() < 0.5) {
       console.warn(
         `${worker.name} terminates, deletes local data, and restarts`,
