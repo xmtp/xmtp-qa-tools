@@ -53,4 +53,4 @@ jobs:
           if-no-files-found: warn
           overwrite: true
           include-hidden-files: true
-          retention-days: 365
+          retention-days: 90
