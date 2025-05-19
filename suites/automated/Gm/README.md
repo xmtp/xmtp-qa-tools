@@ -20,7 +20,7 @@ yarn install
 ## Key files
 
 - [TS_Gm.test.ts](./TS_Gm.test.ts) - Test implementation that sends messages and validates GM bot responses
-- [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/TS_Gm.yml) - Workflow configuration for running the tests
+- [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 
