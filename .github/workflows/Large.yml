@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  m_large:
+  test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
@@ -40,15 +40,9 @@ jobs:
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-      - name: Upload test artifacts
+      - name: Upload reports artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: logs_${{ matrix.environment }}
-          path: |
-            logs/
-            .data/
-            .env
-          if-no-files-found: warn
-          overwrite: true
-          include-hidden-files: true
-          retention-days: 365
+          path: logs/

@@ -140,7 +140,6 @@
         "title": "Stream Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
-        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -175,7 +174,6 @@
         "title": "Stream Order Rate (%)",
         "title_size": "16",
         "title_align": "left",
-        "time": {},
         "type": "query_value",
         "requests": [
           {
@@ -373,7 +371,6 @@
         "show_legend": true,
         "legend_layout": "auto",
         "legend_columns": ["avg", "min", "max", "value", "sum"],
-        "time": {},
         "type": "timeseries",
         "requests": [
           {
