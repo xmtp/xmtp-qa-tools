@@ -15,7 +15,7 @@
     "cli": "tsx scripts/run-cli.ts",
     "format": "prettier -w .",
     "functional": "npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false",
-    "gen:keys": "tsx scripts/generate-keys.ts",
+    "gen:keys": "tsx scripts/gen.ts",
     "large": "npx vitest run ./suites/metrics/Large/*.test.ts --pool=forks --fileParallelism=false",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
