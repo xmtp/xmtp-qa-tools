@@ -92,8 +92,6 @@ await conversation.send("Testing stream collection");
 const incomingMessages = await bob.worker.collectMessages(
   conversationId,
   "text",
-  1, // number of messages to collect
-  5000, // timeout in ms
 );
 
 console.log(`Received message: ${incomingMessages[0].message.content}`);

@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getRandomNames, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -30,7 +30,7 @@ describe(testName, async () => {
       console.log("group", group.id);
       expect(group.id).toBeDefined();
 
-      await new Promise((r) => setTimeout(r, 1000)); // Allow group propagation
+      await sleep(1000); // Allow group propagation
 
       // Send test messages
       for (let i = 0; i < amount; i++) {

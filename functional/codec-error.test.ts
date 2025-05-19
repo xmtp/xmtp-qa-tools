@@ -18,7 +18,8 @@ describe(testName, async () => {
   setupTestLifecycle({
     expect,
   });
-  it("forceStreamError: should trigger a stream error", async () => {
+  it("codec-error: should trigger a stream error", async () => {
+
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();
