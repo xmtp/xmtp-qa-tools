@@ -1,5 +1,7 @@
 # XMTP QA Testing
 
+This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
+
 ## Automated workflows
 
 | Test suite     | Status                                                                                                                                                                      | Resources                                                                                                                                                                         | Run frequency | Networks         |
@@ -10,11 +12,7 @@
 | 🤖 Agents      | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
 | 🤖 GM          | [![Status](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
 
-## Testing scope
-
-This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
-
-### Architecture
+## Architecture
 
 This flowchart illustrates the XMTP protocol's layered architecture and testing scope:
 
@@ -84,7 +82,7 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-### Testing details
+## Testing details
 
 > Baseline is `us-east` region and `production` network.
 

@@ -17,7 +17,7 @@ function showHelp() {
 XMTP Generator Utility
 
 Usage:
-  yarn xmtp-gen --mode <mode> [options]
+  yarn gen --mode <mode> [options]
 
 Modes:
   --mode generate-inboxes         Generate new XMTP inboxes
