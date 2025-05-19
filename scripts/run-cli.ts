@@ -15,7 +15,7 @@ function showUsageAndExit() {
     "  script <script_name> [script_args...] - Runs a script (e.g., generate-keys)",
   );
   console.error(
-    "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
+    "  retry [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
   console.error("    Test options:");
   console.error(
@@ -81,7 +81,7 @@ try {
       break;
     }
 
-    case "test": {
+    case "retry": {
       let testName = "functional"; // Default test name
       let maxAttempts = 3;
       let retryDelay = 10; // seconds

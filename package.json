@@ -21,9 +21,10 @@
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
+    "retry": "yarn cli test",
     "script": "yarn cli script",
     "start": "vitest --ui --standalone --watch ",
-    "test": "yarn cli test"
+    "test": "vitest"
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",
