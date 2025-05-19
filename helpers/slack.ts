@@ -21,6 +21,7 @@ const datadogUrl =
   "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
 const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
 const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
+const jobDescription = process.env.JOB_DESCRIPTION || "Unknown Job Description";
 const runId = process.env.GITHUB_RUN_ID || "Unknown Run ID";
 const githubRef = process.env.GITHUB_REF || "Unknown Branch";
 const jobStatus = process.env.JOB_STATUS || "unknown";
@@ -122,14 +123,15 @@ async function sendSlackNotification() {
     }
 
     // Create a message with GitHub context and AI analysis
-    const message = `*XMTP Test Failure ❌*
-      • *Test Suite:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
-      • *Test Run URL:* <${workflowUrl}|View>
-      • *Dashboard:* <${datadogUrl}|View>
-      • *Timestamp:* ${new Date().toLocaleString()}
-      ${customLinks}
-      ${errorLogs}
-      ${aiAnalysis}`;
+    const message = `Test Failure ❌
+    *Test:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
+    *Description:* ${jobDescription}
+    *Test Run URL:* <${workflowUrl}|View>
+    *Dashboard:* <${datadogUrl}|View>
+    *Timestamp:* ${new Date().toLocaleString()}
+    ${customLinks}
+    ${errorLogs}
+    ${aiAnalysis}`;
 
     const response = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
