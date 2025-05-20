@@ -14,7 +14,7 @@ export type VerifyStreamResult = {
   allReceived: boolean;
   messageReceivedCount: number;
   receiverCount: number;
-  eventTimings: Record<string, number[]>;
+  eventTimings: string;
   averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
@@ -208,22 +208,27 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       msgs.map((m) => JSON.stringify({ event: m.event })),
     ),
   );
-  // Transform eventTimings to arrays per name
-  const eventTimingsArray: Record<string, number[]> = {};
-  for (const [name, timingsObj] of Object.entries(eventTimings)) {
-    // Convert keys to numbers and sort
-    const arr = Object.entries(timingsObj)
+  // Transform eventTimings to a single flat array
+  const flatEventTimingsList: number[] = [];
+  // Iterate over workers by sorted name for deterministic output
+  const sortedWorkerNames = Object.keys(eventTimings).sort();
+
+  for (const name of sortedWorkerNames) {
+    const timingsObj = eventTimings[name];
+    // Convert keys to numbers, sort by original send order, and extract values
+    const workerSortedTimings = Object.entries(timingsObj)
       .map(([k, v]) => [parseInt(k, 10), v] as [number, number])
       .sort((a, b) => a[0] - b[0])
       .map(([, v]) => v);
-    eventTimingsArray[name] = arr;
+    flatEventTimingsList.push(...workerSortedTimings);
   }
+
   const allResults = {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
     messageReceivedCount: unescapedMessages.length,
-    eventTimings: eventTimingsArray,
+    eventTimings: flatEventTimingsList.join(","),
     averageEventTiming,
   };
   console.log(JSON.stringify(allResults, null, 2));
