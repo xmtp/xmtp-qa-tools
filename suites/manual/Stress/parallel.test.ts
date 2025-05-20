@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getRandomNames, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -37,34 +37,35 @@ describe(testName, () => {
         typeOfResponse.Gm,
       );
 
-      // Create conversations and send messages for each worker in parallel
-      const results = await Promise.all(
-        workers.getAll().map(async (worker) => {
-          // Create a DM conversation with the GM bot
-          const conversation =
-            await worker.client.conversations.newDmWithIdentifier({
-              identifier: gmBotAddress,
-              identifierKind: IdentifierKind.Ethereum,
-            });
+      // Create conversations and send messages for each worker sequentially
+      const results = [];
+      for (const worker of workers.getAll()) {
+        // Create a DM conversation with the GM bot
+        const conversation =
+          await worker.client.conversations.newDmWithIdentifier({
+            identifier: gmBotAddress,
+            identifierKind: IdentifierKind.Ethereum,
+          });
 
-          console.log(
-            `Created conversation for ${worker.name} with the GM bot`,
-          );
+        console.log(`Created conversation for ${worker.name} with the GM bot`);
 
-          // Verify that the worker received responses from the GM bot
-          const verifyResult = await verifyDmStream(
-            conversation,
-            [worker],
-            "gm",
-            messageCount,
-          );
-          console.log(worker.name, verifyResult.stats?.receptionPercentage);
-          return {
-            name: worker.name,
-            percentage: verifyResult.stats?.receptionPercentage,
-          };
-        }),
-      );
+        // Verify that the worker received responses from the GM bot
+        const verifyResult = await verifyDmStream(
+          conversation,
+          [worker],
+          "gm",
+          messageCount,
+        );
+        console.log(worker.name, verifyResult.stats?.receptionPercentage);
+        results.push({
+          name: worker.name,
+          percentage: verifyResult.stats?.receptionPercentage,
+        });
+        // Add a delay before the next worker starts its test
+        // This makes the core send/receive test sequential per worker.
+        console.log(`Delaying before next worker's test...`);
+        await sleep(2000); // 2-second delay
+      }
       expect(
         results.every((percentage) => percentage.percentage ?? 0 > 0),
       ).toBe(true);
