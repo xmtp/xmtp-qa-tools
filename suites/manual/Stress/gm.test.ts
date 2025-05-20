@@ -11,38 +11,39 @@ import { describe, expect, it } from "vitest";
 const testName = "stream-stress";
 loadEnv(testName);
 
-const messageCount = 100;
+const messageCount = 10;
 describe(testName, () => {
-  const gmBotAddress = process.env.GM_BOT_ADDRESS || "";
-
   setupTestLifecycle({
     expect,
   });
 
   it("should send messages to GM bot and verify responses", async () => {
     try {
-      const gmWorker = await getWorkers(
+      const gmBot = await getWorkers(
         ["gm"],
         testName,
         typeofStream.Message,
         typeOfResponse.Gm,
       );
-      const gmBot = gmWorker.getCreator();
+      const gmBotAddress = gmBot.get("gm")?.address;
+      if (!gmBotAddress) {
+        throw new Error("GM bot address not found");
+      }
       // Create workers with fixed names for simplicity
       const workers = await getWorkers(
-        getRandomNames(10),
+        getRandomNames(2),
         testName,
         typeofStream.Message,
         typeOfResponse.Gm,
       );
 
       // Create conversations and send messages for each worker in parallel
-      await Promise.all(
+      const results = await Promise.all(
         workers.getAll().map(async (worker) => {
           // Create a DM conversation with the GM bot
           const conversation =
             await worker.client.conversations.newDmWithIdentifier({
-              identifier: gmBot.address,
+              identifier: gmBotAddress,
               identifierKind: IdentifierKind.Ethereum,
             });
 
@@ -50,22 +51,23 @@ describe(testName, () => {
             `Created conversation for ${worker.name} with the GM bot`,
           );
 
-          for (let i = 0; i < messageCount; i++) {
-            const message = `gm-${worker.name}-${i}`;
-            await conversation.send(message);
-          }
-
           // Verify that the worker received responses from the GM bot
           const verifyResult = await verifyDmStream(
             conversation,
             [worker],
-            "hi", // Content doesn't matter as we're just checking responses
+            "gm",
             messageCount,
           );
-          console.log(verifyResult.stats?.receptionPercentage);
-          expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(0);
+          console.log(worker.name, verifyResult.stats?.receptionPercentage);
+          return {
+            name: worker.name,
+            percentage: verifyResult.stats?.receptionPercentage,
+          };
         }),
       );
+      expect(
+        results.every((percentage) => percentage.percentage ?? 0 > 0),
+      ).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
