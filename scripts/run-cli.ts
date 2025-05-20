@@ -83,7 +83,7 @@ try {
 
     case "retry": {
       let testName = "functional"; // Default test name
-      let maxAttempts = 3;
+      let maxAttempts = 1;
       let retryDelay = 10; // seconds
       const vitestPassthroughArgs = [];
 
