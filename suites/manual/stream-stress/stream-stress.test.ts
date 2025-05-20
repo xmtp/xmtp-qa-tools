@@ -56,12 +56,12 @@ describe(testName, () => {
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();
 
-      // Send just 1 message to verify timing is working
+      // Send 5 messages to verify timing is working
       const result = await verifyDmStream(
         convo,
         [workers.getCreator()],
         "hi",
-        1,
+        5,
       );
 
       // Log timing results to verify they're being captured
