@@ -12,7 +12,7 @@
     "bot": "yarn cli bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
-    "cli": "tsx scripts/run-cli.ts",
+    "cli": "tsx scripts/cli.ts",
     "format": "prettier -w .",
     "functional": "npx vitest run ./functional/*.test.ts --pool=forks --fileParallelism=false",
     "gen": "tsx scripts/gen.ts",

@@ -7,7 +7,7 @@ This document provides practical instructions for using the scripts in the `/scr
 | Script          | Purpose                           | Key Features                         |
 | --------------- | --------------------------------- | ------------------------------------ |
 | **gen.ts**      | Creates XMTP client installations | Multiple client installation creator |
-| **run-cli.ts**  | General-purpose task runner       | Configurable operations              |
+| **cli.ts**      | General-purpose task runner       | Configurable operations              |
 | **versions.ts** | Manages SDK versions              | XMTP SDK version management/symlinks |
 
 ## Usage
