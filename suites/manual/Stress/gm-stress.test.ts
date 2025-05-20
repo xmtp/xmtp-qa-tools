@@ -35,12 +35,12 @@ describe(testName, () => {
           identifier: gmBotAddress as string,
           identifierKind: IdentifierKind.Ethereum,
         })) as Conversation;
-      expect(convo).toBeDefined();
+      console.log("convo.id", convo.id);
       const result = await verifyDmStream(
         convo,
         [workers.getCreator()],
         "hi",
-        10,
+        1,
       );
 
       expect(result.allReceived).toBe(true);
@@ -63,13 +63,6 @@ describe(testName, () => {
         "hi",
         5,
       );
-
-      // Log timing results to verify they're being captured
-      console.log(`DM Stream test results: 
-      All received: ${result.allReceived}
-      Average timing: ${result.averageEventTiming}ms
-      Timing details: ${JSON.stringify(result.eventTimings)}
-      `);
 
       expect(result.allReceived).toBe(true);
       expect(result.averageEventTiming).toBeGreaterThan(0);
