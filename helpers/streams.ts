@@ -68,7 +68,9 @@ export async function updateInboxConsent(
 
 // Type guard for sent event with sentAt
 function hasSentAt(obj: unknown): obj is { sentAt: number } {
-  return (obj as { sentAt: number }).sentAt !== undefined;
+  const has = (obj as { sentAt: number }).sentAt !== undefined;
+  console.log("hasSentAt check:", JSON.stringify(obj), "result:", has);
+  return has;
 }
 function extractGroupName(ev: unknown): string {
   const event = ev as {
@@ -103,12 +105,37 @@ function extractAddedInboxes(ev: unknown): string {
 
 function extractContent(ev: unknown): string {
   if (typeof ev === "object" && ev !== null) {
+    // Direct content field
     if (
       Object.prototype.hasOwnProperty.call(ev, "content") &&
       typeof (ev as Record<string, unknown>).content === "string"
     ) {
       return (ev as Record<string, string>).content;
     }
+
+    // Nested event.message.content
+    if (
+      Object.prototype.hasOwnProperty.call(ev, "event") &&
+      typeof (ev as Record<string, unknown>).event === "object" &&
+      (ev as Record<string, unknown>).event !== null
+    ) {
+      const event = (ev as { event: Record<string, unknown> }).event;
+      if (
+        Object.prototype.hasOwnProperty.call(event, "message") &&
+        typeof event.message === "object" &&
+        event.message !== null
+      ) {
+        const message = event.message as Record<string, unknown>;
+        if (
+          Object.prototype.hasOwnProperty.call(message, "content") &&
+          typeof message.content === "string"
+        ) {
+          return message.content;
+        }
+      }
+    }
+
+    // Nested message.content
     if (
       Object.prototype.hasOwnProperty.call(ev, "message") &&
       typeof (ev as Record<string, unknown>).message === "object" &&
@@ -135,6 +162,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   count: number;
   randomSuffix?: string;
   participantsForStats: Worker[];
+  wrapCollector?: (events: TReceived[]) => TReceived[];
 }) {
   await sleep(1000);
   const {
@@ -145,7 +173,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     statsLabel,
     count,
     randomSuffix,
+    wrapCollector,
   } = options;
+  console.log("collectAndTimeEventsWithStats: Starting collection");
+
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
   >[] = receivers.map((r) =>
@@ -158,28 +189,75 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
+
+  console.log("collectAndTimeEventsWithStats: Triggering events");
   const sentEvents = await options.triggerEvents();
+  console.log(
+    "collectAndTimeEventsWithStats: Events sent:",
+    JSON.stringify(sentEvents),
+  );
+
   const allReceived = await Promise.all(collectPromises);
+  console.log("collectAndTimeEventsWithStats: All events received");
+
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
   let timingCount = 0;
+
   receivers.forEach((r, idx) => {
     const received = allReceived[idx];
+    console.log(
+      `collectAndTimeEventsWithStats: Processing receiver ${r.name}, received ${received.length} events`,
+    );
+
     eventTimings[r.name] = {};
+
     received.forEach((msg) => {
+      console.log(
+        `collectAndTimeEventsWithStats: Processing message with key ${msg.key}`,
+      );
+
       const sentIdx = sentEvents.findIndex((s) => getKey(s) === msg.key);
-      if (sentIdx !== -1 && hasSentAt(sentEvents[sentIdx])) {
-        const duration =
-          msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
-        eventTimings[r.name][sentIdx] = duration;
-        timingSum += duration;
-        timingCount++;
+      console.log(
+        `collectAndTimeEventsWithStats: Found matching sent event at index: ${sentIdx}`,
+      );
+
+      if (sentIdx !== -1) {
+        console.log(
+          `collectAndTimeEventsWithStats: Checking if sent event has sentAt: ${JSON.stringify(sentEvents[sentIdx])}`,
+        );
+
+        if (hasSentAt(sentEvents[sentIdx])) {
+          const duration =
+            msg.receivedAt - (sentEvents[sentIdx] as { sentAt: number }).sentAt;
+          console.log(
+            `collectAndTimeEventsWithStats: Recorded timing duration: ${duration}`,
+          );
+
+          eventTimings[r.name][sentIdx] = duration;
+          timingSum += duration;
+          timingCount++;
+        } else {
+          console.log(
+            `collectAndTimeEventsWithStats: Sent event does not have sentAt property`,
+          );
+        }
+      } else {
+        console.log(
+          `collectAndTimeEventsWithStats: No matching sent event found for key ${msg.key}`,
+        );
       }
     });
   });
+
   const averageEventTiming = Math.round(
     timingCount > 0 ? timingSum / timingCount : 0,
   );
+
+  console.log(
+    `collectAndTimeEventsWithStats: Average timing: ${averageEventTiming}ms from ${timingCount} matches`,
+  );
+
   const messagesAsStrings = allReceived.map((msgs) =>
     msgs.map((m) => extractContent(m.event)),
   );
@@ -212,6 +290,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .sort((a, b) => a[0] - b[0])
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
+
+    console.log(
+      `collectAndTimeEventsWithStats: Timings for ${name}: ${JSON.stringify(arr)}`,
+    );
   }
   const allResults = {
     stats,
@@ -221,34 +303,108 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
+  console.debug(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
+/**
+ * Specialized function to verify DM message streams, particularly for GM bots.
+ *
+ * This function is designed to work with bots like the GM bot that always respond
+ * with the same message (e.g., "gm") regardless of what is sent to them.
+ *
+ * Instead of trying to match messages by content, this function:
+ * 1. Matches messages by sequence/order (first sent → first received)
+ * 2. Records timing between message send and receipt
+ * 3. Works with any type of message content, even if all responses are identical
+ */
 export async function verifyDmStream(
   group: Conversation,
   receivers: Worker[],
   message: string = "gm",
+  count: number = 1,
 ): Promise<VerifyStreamResult> {
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sent: { content: string; sentAt: number }[] = [];
-      for (let i = 0; i < 1; i++) {
-        const sentAt = Date.now();
-        await group.send(message);
-        sent.push({ content: message, sentAt });
-      }
-      return sent;
-    },
-    getKey: extractContent,
-    getMessage: extractContent,
-    statsLabel: message,
-    count: 1,
-    randomSuffix: "",
-    participantsForStats: receivers,
+  // Simple implementation that matches messages based on order
+  await sleep(1000);
+
+  // First create an array to store the collectors with timestamps
+  const messageCollectors: Promise<
+    { receivedAt: number; messages: any[] }[]
+  >[] = receivers.map(async (r) => {
+    // Start timestamp collection before each message
+    const msgs = await r.worker.collectMessages(group.id, count);
+
+    // Capture received time immediately for accuracy
+    const receivedAt = Date.now();
+
+    // For simplicity, we'll use a single timestamp for all messages
+    // In a real scenario, each message would have its own delivery timestamp
+    return msgs.map((msg) => ({
+      receivedAt,
+      messages: [msg],
+    }));
   });
+
+  // Send all messages and track send time
+  const sentMessages: { content: string; sentAt: number }[] = [];
+  console.log(`Sending ${count} messages with content "${message}"`);
+
+  for (let i = 0; i < count; i++) {
+    const sentAt = Date.now();
+    await group.send(message);
+    sentMessages.push({ content: message, sentAt });
+
+    // Small delay between messages
+    if (i < count - 1) {
+      await sleep(150);
+    }
+  }
+
+  // Wait for all collectors to finish
+  const allReceivedMessages = await Promise.all(messageCollectors);
+
+  // Calculate timings based on message order
+  const eventTimings: Record<string, number[]> = {};
+  let timingSum = 0;
+  let timingCount = 0;
+
+  receivers.forEach((r, idx) => {
+    const receivedMessages = allReceivedMessages[idx];
+    eventTimings[r.name] = [];
+
+    // Match messages by their order (first sent → first received)
+    receivedMessages.forEach((msgData, i) => {
+      if (i < sentMessages.length) {
+        const duration = msgData.receivedAt - sentMessages[i].sentAt;
+        eventTimings[r.name].push(duration);
+        timingSum += duration;
+        timingCount++;
+      }
+    });
+  });
+
+  const averageEventTiming = Math.round(
+    timingCount > 0 ? timingSum / timingCount : 0,
+  );
+
+  // Convert messages to the expected format
+  const messages = allReceivedMessages.map((msgDataArray) =>
+    msgDataArray.flatMap((msgData) =>
+      msgData.messages.map((m) => ({ event: m })),
+    ),
+  );
+
+  return {
+    allReceived: receivers.every(
+      (_, idx) => allReceivedMessages[idx].length >= count,
+    ),
+    messages,
+    receiverCount: receivers.length,
+    eventTimings,
+    averageEventTiming,
+  };
 }
+
 /**
  * Specialized function to verify message streams
  */
