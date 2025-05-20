@@ -65,7 +65,7 @@ export class WorkerManager {
    * Terminates all active workers and cleans up resources
    */
   public async terminateAll(deleteDbs: boolean = false): Promise<void> {
-    console.log(
+    console.debug(
       "terminating all workers",
       this.activeWorkers.length,
       this.activeWorkers,
@@ -218,7 +218,7 @@ export class WorkerManager {
     const baseName = name.split("-")[0];
 
     if (baseName in this.keysCache) {
-      console.log(`Using cached keys for ${baseName}`);
+      console.debug(`Using cached keys for ${baseName}`);
       return this.keysCache[baseName];
     }
 
@@ -239,7 +239,7 @@ export class WorkerManager {
     }
 
     // Keys don't exist, generate new ones
-    console.log(`Generating new keys for ${baseName}`);
+    console.debug(`Generating new keys for ${baseName}`);
     const walletKey = generatePrivateKey();
     const account = privateKeyToAccount(walletKey);
     const encryptionKey = generateEncryptionKeyHex();
@@ -277,7 +277,7 @@ export class WorkerManager {
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
     // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
-      console.log(`Reusing existing worker for ${descriptor}`);
+      console.debug(`Reusing existing worker for ${descriptor}`);
       return this.workers[baseName][providedInstallId];
     }
 

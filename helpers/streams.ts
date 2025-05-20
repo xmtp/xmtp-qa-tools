@@ -11,7 +11,7 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messages: unknown[][];
+  messageReceivedCount: number;
   receiverCount: number;
   eventTimings: Record<string, number[]>;
   averageEventTiming: number;
@@ -217,10 +217,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
-    messages: unescapedMessages,
+    messageReceivedCount: unescapedMessages.length,
     eventTimings: eventTimingsArray,
     averageEventTiming,
   };
+  console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
@@ -228,24 +229,55 @@ export async function verifyDmStream(
   group: Conversation,
   receivers: Worker[],
   message: string = "gm",
+  count: number = 1,
 ): Promise<VerifyStreamResult> {
+  const randomSuffix = Date.now().toString().slice(-6);
+
+  // Track sent messages with timestamps for timing calculations
+  const sentMessages: { content: string; sentAt: number; index: number }[] = [];
+
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+    startCollectors: async (r) => {
+      const events = await r.worker.collectMessages(group.id, count);
+      // Add receivedIndex to each event
+      return events.map((ev, idx) => ({ ...ev, receivedIndex: idx }));
+    },
     triggerEvents: async () => {
-      const sent: { content: string; sentAt: number }[] = [];
-      for (let i = 0; i < 1; i++) {
+      for (let i = 0; i < count; i++) {
         const sentAt = Date.now();
         await group.send(message);
-        sent.push({ content: message, sentAt });
+        sentMessages.push({ content: message, sentAt, index: i });
+        // Small delay to ensure message ordering
+        if (i < count - 1) await sleep(100);
       }
-      return sent;
+      return sentMessages;
     },
-    getKey: extractContent,
+    // Use sequence number to match sent and received messages
+    getKey: (ev) => {
+      if (typeof ev === "object" && ev !== null) {
+        // For sent messages from our trigger
+        if (
+          "index" in ev &&
+          typeof (ev as { index: number }).index === "number"
+        ) {
+          return String((ev as { index: number }).index);
+        }
+
+        // For received messages, use their sequence in the received array
+        if (
+          "receivedIndex" in ev &&
+          typeof (ev as { receivedIndex: number }).receivedIndex === "number"
+        ) {
+          return String((ev as { receivedIndex: number }).receivedIndex);
+        }
+      }
+      return "";
+    },
     getMessage: extractContent,
     statsLabel: message,
-    count: 1,
-    randomSuffix: "",
+    count,
+    randomSuffix,
     participantsForStats: receivers,
   });
 }
