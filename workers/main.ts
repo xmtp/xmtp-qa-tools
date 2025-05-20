@@ -426,6 +426,16 @@ export class WorkerClient extends Worker {
    * Handle generating and sending GPT responses
    */
   private async handleResponse(message: DecodedMessage) {
+    // Filter out messages from the same client
+    if (message.senderInboxId === this.client.inboxId) {
+      return;
+    }
+    console.log(
+      `[${this.nameId}] GM Bot received message from ${message.senderInboxId} in conversation ${message.conversationId}: "${message.content as string}"`,
+    );
+
+    let responseContent = "";
+
     console.time(`[${this.nameId}] Worker response`);
 
     try {
