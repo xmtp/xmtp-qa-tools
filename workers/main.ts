@@ -275,15 +275,6 @@ export class WorkerClient extends Worker {
     };
   }
 
-  // private startParallelStreams() {
-  //   void Promise.all([
-  //     this.initMessageStream(typeofStream.Message),
-  //     this.initMessageStream(typeofStream.GroupUpdated),
-  //     this.initConversationStream(),
-  //     this.initConsentStream(),
-  //   ]);
-  // }
-
   /**
    * Unified method to start the appropriate stream based on configuration
    */
@@ -371,20 +362,16 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.debug(
-                `Received message, ${JSON.stringify(message?.content, null, 2)}`,
-              );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);
-                continue;
               }
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
-                  message,
+                  message, // This is the DecodedMessage object
                 });
               }
             }
@@ -430,11 +417,6 @@ export class WorkerClient extends Worker {
     if (message.senderInboxId === this.client.inboxId) {
       return;
     }
-    console.log(
-      `[${this.nameId}] GM Bot received message from ${message.senderInboxId} in conversation ${message.conversationId}: "${message.content as string}"`,
-    );
-
-    let responseContent = "";
 
     console.time(`[${this.nameId}] Worker response`);
 
@@ -617,13 +599,18 @@ export class WorkerClient extends Worker {
       type: typeofStream.Message,
       filterFn: (msg) => {
         if (msg.type !== StreamCollectorType.Message) return false;
-        const streamMsg = msg;
+        const streamMsg = msg; // Type assertion is fine after the check
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
-        return groupId === conversationId && contentType?.typeId === "text";
+        const idsMatch = groupId === conversationId;
+        const typeIsText = contentType?.typeId === "text";
+        return idsMatch && typeIsText;
       },
       count,
-      additionalInfo: { groupId },
+      additionalInfo: {
+        collector: "collectMessages",
+        expectedGroupId: groupId,
+      }, // Pass groupId for better logging
     });
   }
 
@@ -634,10 +621,6 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
   ): Promise<StreamGroupUpdateMessage[]> {
-    console.debug(
-      `[${this.nameId}] Starting to collect ${count} group updates for group ${groupId}`,
-    );
-
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {

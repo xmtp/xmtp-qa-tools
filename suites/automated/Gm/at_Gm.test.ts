@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { verifyDmStream } from "@helpers/streams";
@@ -48,7 +48,11 @@ describe(testName, () => {
 
       expect(convo).toBeDefined();
       console.log("convo", convo.id);
-      const result = await verifyDmStream(convo!, workers.getAll(), "hi");
+      const result = await verifyDmStream(
+        [workers.getCreator()],
+        gmBotAddress,
+        "hi",
+      );
       expect(result.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);

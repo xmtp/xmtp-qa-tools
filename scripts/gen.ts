@@ -30,7 +30,7 @@ Options for generate-inboxes:
   --output <file>                 Output file (default: logs/db-generated-...)
 
 Options for local-update:
-  --input <file>                  Input JSON file (default: @helpers/generated-inboxes.json)
+  --input <file>                  Input JSON file (default: @helpers/inboxes.json)
   --env <env>                     Environment (default: local)
 
 Options for generate-installations:
@@ -104,7 +104,7 @@ async function generateInboxes(opts: {
   }
   const accountData = [];
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const outputFile = output || `${LOGPATH}/generated-inboxes-${timestamp}.json`;
+  const outputFile = output || `${LOGPATH}/inboxes-${timestamp}.json`;
 
   for (let i = 0; i < count; i++) {
     const privateKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
@@ -150,9 +150,9 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
   } else {
     // Use require.resolve only if it returns a string
     try {
-      inputFile = require.resolve("@helpers/generated-inboxes.json");
+      inputFile = require.resolve("@helpers/inboxes.json");
     } catch {
-      inputFile = "helpers/generated-inboxes.json";
+      inputFile = "helpers/inboxes.json";
     }
   }
   const ENV: XmtpEnv = opts.env || "local";
