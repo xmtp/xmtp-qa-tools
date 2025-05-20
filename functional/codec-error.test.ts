@@ -19,7 +19,6 @@ describe(testName, async () => {
     expect,
   });
   it("codec-error: should trigger a stream error", async () => {
-
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();

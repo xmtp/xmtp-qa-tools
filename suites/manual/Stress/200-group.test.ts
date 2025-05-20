@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import generatedInboxes from "@helpers/inboxes.json";
 import { sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";

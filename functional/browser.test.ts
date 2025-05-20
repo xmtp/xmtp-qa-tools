@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -10,7 +10,7 @@ loadEnv(testName);
 describe(testName, () => {
   // Check if GM_BOT_ADDRESS environment variable is set
   const xmtpTester = new XmtpPlaywright({
-    headless: false,
+    headless: true,
     env: "production",
   });
   const gmBotAddress = process.env.GM_BOT_ADDRESS;

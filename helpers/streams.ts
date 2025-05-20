@@ -2,6 +2,7 @@ import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
+  IdentifierKind,
   type Client,
   type Conversation,
   type Group,
@@ -11,9 +12,9 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messages: unknown[][];
+  messageReceivedCount: number;
   receiverCount: number;
-  eventTimings: Record<string, number[]>;
+  eventTimings: string;
   averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
@@ -127,7 +128,7 @@ function extractContent(ev: unknown): string {
  */
 async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   receivers: Worker[];
-  startCollectors: (receiver: Worker) => Promise<TReceived[]>;
+  startCollectors: (receiver: Worker, index?: number) => Promise<TReceived[]>;
   triggerEvents: () => Promise<TSent[]>;
   getKey: (event: TSent | TReceived) => string;
   getMessage: (event: TSent | TReceived) => string;
@@ -148,8 +149,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   } = options;
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
-  >[] = receivers.map((r) =>
-    startCollectors(r).then((events) =>
+  >[] = receivers.map((r, idx) =>
+    startCollectors(r, idx).then((events) =>
       events.map((ev) => ({
         key: getKey(ev),
         receivedAt: Date.now(),
@@ -158,6 +159,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
+
+  // Add a small delay to ensure all collectors are set up before triggering events
+  await sleep(3000); // Increased delay to 3000ms
+
   const sentEvents = await options.triggerEvents();
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
@@ -203,52 +208,146 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       msgs.map((m) => JSON.stringify({ event: m.event })),
     ),
   );
-  // Transform eventTimings to arrays per name
-  const eventTimingsArray: Record<string, number[]> = {};
-  for (const [name, timingsObj] of Object.entries(eventTimings)) {
-    // Convert keys to numbers and sort
-    const arr = Object.entries(timingsObj)
+  // Transform eventTimings to a single flat array
+  const flatEventTimingsList: number[] = [];
+  // Iterate over workers by sorted name for deterministic output
+  const sortedWorkerNames = Object.keys(eventTimings).sort();
+
+  for (const name of sortedWorkerNames) {
+    const timingsObj = eventTimings[name];
+    // Convert keys to numbers, sort by original send order, and extract values
+    const workerSortedTimings = Object.entries(timingsObj)
       .map(([k, v]) => [parseInt(k, 10), v] as [number, number])
       .sort((a, b) => a[0] - b[0])
       .map(([, v]) => v);
-    eventTimingsArray[name] = arr;
+    flatEventTimingsList.push(...workerSortedTimings);
   }
+
   const allResults = {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
-    messages: unescapedMessages,
-    eventTimings: eventTimingsArray,
+    messageReceivedCount: unescapedMessages.length,
+    eventTimings: flatEventTimingsList.join(","),
     averageEventTiming,
   };
+  console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
 export async function verifyDmStream(
-  group: Conversation,
-  receivers: Worker[],
-  message: string = "gm",
+  senders: Worker[],
+  receiver: string,
+  messagePrefix: string = "gm",
+  count: number = 1,
 ): Promise<VerifyStreamResult> {
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sent: { content: string; sentAt: number }[] = [];
-      for (let i = 0; i < 1; i++) {
-        const sentAt = Date.now();
-        await group.send(message);
-        sent.push({ content: message, sentAt });
+  const randomSuffix = Date.now().toString().slice(-6);
+
+  // 1. Create all DM conversations beforehand
+  const dmConversations: Conversation[] = [];
+  for (let i = 0; i < senders.length; i++) {
+    const sender = senders[i];
+    if (!sender.client) {
+      throw new Error(`Sender ${sender.name} has no client`);
+    }
+    const dm = await sender.client.conversations.newDmWithIdentifier({
+      identifier: receiver,
+      identifierKind: IdentifierKind.Ethereum,
+    });
+    dmConversations.push(dm);
+  }
+
+  return collectAndTimeEventsWithStats<
+    { dmId: string; content: string; sentAt: number; originalIndex: number },
+    { receivedIndex: number; conversationId: string; event: unknown }
+  >({
+    receivers: senders,
+    startCollectors: async (receiverWorker: Worker, receiverIndex?: number) => {
+      if (typeof receiverIndex !== "number") {
+        throw new Error(
+          "Receiver index is undefined in startCollectors for verifyDmStream",
+        );
       }
-      return sent;
+      const dmConversation = dmConversations[receiverIndex];
+      if (!dmConversation) {
+        throw new Error(
+          `DM conversation not found for receiver index ${receiverIndex}`,
+        );
+      }
+
+      if (receiverWorker.client) {
+        await receiverWorker.client.conversations.sync();
+      } else {
+        console.warn(
+          `Receiver worker ${receiverWorker.name} has no client to sync.`,
+        );
+      }
+
+      const events = await receiverWorker.worker.collectMessages(
+        dmConversation.id,
+        count,
+      );
+      return events.map((ev, idx) => ({
+        ...ev,
+        event: ev,
+        receivedIndex: idx,
+        conversationId: dmConversation.id,
+      }));
     },
-    getKey: extractContent,
+    triggerEvents: async () => {
+      const sentMessagesPromises = dmConversations.map(
+        async (dmConversation) => {
+          const dmSpecificSentMessages: {
+            dmId: string;
+            content: string;
+            sentAt: number;
+            originalIndex: number;
+          }[] = [];
+
+          for (let j = 0; j < count; j++) {
+            const messageContent = `${messagePrefix}-${j}-${randomSuffix}`;
+            const sentAt = Date.now();
+            await dmConversation.send(messageContent);
+            dmSpecificSentMessages.push({
+              dmId: dmConversation.id,
+              content: messageContent,
+              sentAt,
+              originalIndex: j,
+            });
+            if (j < count - 1) {
+              await sleep(100);
+            }
+          }
+          return dmSpecificSentMessages;
+        },
+      );
+
+      const results = await Promise.all(sentMessagesPromises);
+      return results.flat();
+    },
+    getKey: (ev: {
+      dmId?: string;
+      originalIndex?: number;
+      conversationId?: string;
+      receivedIndex?: number;
+    }) => {
+      if (ev.dmId && typeof ev.originalIndex === "number") {
+        return `${ev.dmId}_${ev.originalIndex}`;
+      }
+      if (ev.conversationId && typeof ev.receivedIndex === "number") {
+        return `${ev.conversationId}_${ev.receivedIndex}`;
+      }
+      console.warn("getKey: Unexpected event structure in verifyDmStream", ev);
+      return String(Math.random());
+    },
     getMessage: extractContent,
-    statsLabel: message,
-    count: 1,
-    randomSuffix: "",
-    participantsForStats: receivers,
+    statsLabel: messagePrefix,
+    count: count,
+    randomSuffix,
+    participantsForStats: senders,
   });
 }
+
 /**
  * Specialized function to verify message streams
  */

@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
 import { getRandomNames } from "@helpers/tests";

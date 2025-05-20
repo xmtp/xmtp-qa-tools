@@ -154,7 +154,7 @@ import { defaultNames } from "@xmtp/node-sdk";
 // "bob", "alice", "fabri", "bot", "elon", "joe", "charlie"...
 ```
 
-> 💡 **Tip**: Access our repository of 600 dummy wallets with inboxIds in the `generated-inboxes.json` file
+> 💡 **Tip**: Access our repository of 600 dummy wallets with inboxIds in the `inboxes.json` file
 
 ## 🧹 Cleanup
 

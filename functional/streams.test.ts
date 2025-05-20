@@ -1,17 +1,18 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/generated-inboxes.json";
+import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import {
   verifyConsentStream,
   verifyConversationStream,
+  verifyDmStream,
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
   verifyNewConversationStream,
 } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getFixedNames, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -29,6 +30,25 @@ describe(testName, async () => {
     expect,
   });
 
+  it("verifyAddMembersStream: should add members to a group", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
+      // Initialize workers
+      group = await workers.createGroup();
+
+      const verifyResult = await verifyMembershipStream(
+        group as Group,
+        workers.getAllButCreator(),
+        [generatedInboxes[0].inboxId],
+      );
+
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
   it("verifyConsentStream: manage consent for all members in a group", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Consent);
@@ -39,6 +59,36 @@ describe(testName, async () => {
       );
 
       expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("verifyDmStream: should send messages to GM bot and verify responses", async () => {
+    try {
+      const messageCount = 10;
+      const workerCount = 1;
+      // Create workers with fixed names for simplicity
+      const names = ["gm", ...getFixedNames(workerCount)];
+      const workers = await getWorkers(
+        names,
+        testName,
+        typeofStream.Message,
+        typeOfResponse.Gm,
+      );
+      await Promise.all(
+        workers.getAllButCreator().map(async (worker) => {
+          const verifyResult = await verifyDmStream(
+            [worker], // Senders: The current worker
+            workers.get("gm")!.address, // Receivers: The GM bot
+            "gm", // messagePrefix
+            messageCount,
+          );
+          return verifyResult;
+        }),
+      );
+      //expect(results.every((result) => result.allReceived)).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -101,24 +151,6 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyAddMembersStream: should add members to a group", async () => {
-    try {
-      workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
-      // Initialize workers
-      group = await workers.createGroup();
-
-      const verifyResult = await verifyMembershipStream(
-        group as Group,
-        workers.getAllButCreator(),
-        [generatedInboxes[0].inboxId],
-      );
-
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
   it("verifyConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing

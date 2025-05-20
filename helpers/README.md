@@ -4,18 +4,18 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## Quick reference
 
-| Module                     | Purpose                          | Key Features                                     |
-| -------------------------- | -------------------------------- | ------------------------------------------------ |
-| **client.ts**              | XMTP client creation             | Signers, encryption keys, client versioning      |
-| **datadog.ts**             | Metrics and monitoring           | Performance tracking, test results reporting     |
-| **groups.ts**              | Group conversation management    | Group creation, batch operations, stress testing |
-| **logger.ts**              | Logging utilities                | Formatted logging, file output, error tracking   |
-| **playwright.ts**          | Browser automation               | UI testing, group creation, message verification |
-| **streams.ts**             | Message streaming utilities      | Stream verification, message delivery testing    |
-| **tests.ts**               | Test configuration and utilities | Test setup, SDK version management               |
-| **generated-inboxes.json** | Pre-generated test identities    | Test account data for simulations                |
-| **slack.ts**               | Slack notification utilities     | Send notifications to Slack channels             |
-| **ai.ts**                  | OpenAI API utilities             | Generate OpenAI responses                        |
+| Module            | Purpose                          | Key Features                                     |
+| ----------------- | -------------------------------- | ------------------------------------------------ |
+| **client.ts**     | XMTP client creation             | Signers, encryption keys, client versioning      |
+| **datadog.ts**    | Metrics and monitoring           | Performance tracking, test results reporting     |
+| **groups.ts**     | Group conversation management    | Group creation, batch operations, stress testing |
+| **logger.ts**     | Logging utilities                | Formatted logging, file output, error tracking   |
+| **playwright.ts** | Browser automation               | UI testing, group creation, message verification |
+| **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing    |
+| **tests.ts**      | Test configuration and utilities | Test setup, SDK version management               |
+| **inboxes.json**  | Pre-generated test identities    | Test account data for simulations                |
+| **slack.ts**      | Slack notification utilities     | Send notifications to Slack channels             |
+| **ai.ts**         | OpenAI API utilities             | Generate OpenAI responses                        |
 
 ## Usage
 
@@ -220,7 +220,7 @@ const { streamTimeout, messageCount } = defaultValues;
 
 ## 📁 Data Files
 
-### generated-inboxes.json
+### inboxes.json
 
 Pre-generated XMTP identities for testing.
 
