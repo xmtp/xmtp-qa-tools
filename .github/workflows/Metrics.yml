@@ -1,0 +1,54 @@
+name: Large
+description: "should verify performance of the group streams"
+
+on:
+  schedule:
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
+      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests with retry
+        run: yarn retry m_large
+      - name: Run delivery tests
+        run: yarn retry m_delivery
+      - name: Run gm tests
+        run: yarn retry m_gm
+      - name: Run performance tests
+        run: yarn retry m_performance
+      - name: Send Slack notification
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: npx tsx helpers/slack.ts
+      - name: Upload reports artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_${{ matrix.environment }}
+          path: logs/
