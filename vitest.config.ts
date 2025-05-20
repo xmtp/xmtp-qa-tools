@@ -25,12 +25,6 @@ export default defineConfig({
       host: "0.0.0.0",
       port: 51204,
     },
-    coverage: {
-      provider: "c8",
-      reporter: ["text", "lcov"],
-      reportsDirectory: "./coverage",
-    },
-    // Add this to suppress unhandled errors at the end
     dangerouslyIgnoreUnhandledErrors: true,
   },
 });
