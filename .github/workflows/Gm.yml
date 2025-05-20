@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn retry at_gm --max-attempts 1
+        run: yarn retry at_gm
       - name: Send Slack notification
         if: always()
         env:
