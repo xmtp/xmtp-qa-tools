@@ -233,9 +233,6 @@ export async function verifyDmStream(
 ): Promise<VerifyStreamResult> {
   const randomSuffix = Date.now().toString().slice(-6);
 
-  // Track sent messages with timestamps for timing calculations
-  const sentMessages: { content: string; sentAt: number; index: number }[] = [];
-
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: async (r) => {
@@ -244,9 +241,13 @@ export async function verifyDmStream(
       return events.map((ev, idx) => ({ ...ev, receivedIndex: idx }));
     },
     triggerEvents: async () => {
+      // Track sent messages with timestamps for timing calculations
+      const sentMessages: { content: string; sentAt: number; index: number }[] =
+        [];
       for (let i = 0; i < count; i++) {
         const sentAt = Date.now();
         await group.send(message);
+        console.debug(`Sent message ${i + 1} of ${count}`);
         sentMessages.push({ content: message, sentAt, index: i });
         // Small delay to ensure message ordering
         if (i < count - 1) await sleep(100);

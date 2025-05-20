@@ -108,6 +108,11 @@ export class WorkerManager {
     return allWorkers.sort(() => 0.5 - Math.random()).slice(0, count);
   }
 
+  public getRandomWorker(): Worker {
+    const allWorkers = this.getAll();
+    return allWorkers[Math.floor(Math.random() * allWorkers.length)];
+  }
+
   /**
    * Gets the version of the first worker (as a representative version)
    */

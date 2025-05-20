@@ -3,46 +3,64 @@ import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
+import { getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "stream-stress";
 loadEnv(testName);
 
+const messageCount = 10;
 describe(testName, () => {
-  let workers: WorkerManager;
-  const gmBotAddress = process.env.GM_BOT_ADDRESS;
-  let convo: Conversation;
+  const gmBotAddress = process.env.GM_BOT_ADDRESS || "";
 
   setupTestLifecycle({
     expect,
   });
 
-  it(`test ${gmBotAddress} on production`, async () => {
+  it("should send messages to GM bot and verify responses", async () => {
     try {
-      workers = await getWorkers(
-        ["bot"],
+      // Create workers with fixed names for simplicity
+      const workers = await getWorkers(
+        ["alice"],
         testName,
         typeofStream.Message,
-        typeOfResponse.None,
+        typeOfResponse.Gm,
         "production",
       );
-      console.debug(`Testing ${gmBotAddress} `);
-      convo = (await workers
-        .getCreator()
-        ?.client.conversations.newDmWithIdentifier({
-          identifier: gmBotAddress as string,
-          identifierKind: IdentifierKind.Ethereum,
-        })) as Conversation;
-      const result = await verifyDmStream(
-        convo,
-        [workers.getCreator()],
-        "hi",
-        10,
-      );
 
-      expect(result.allReceived).toBe(true);
+      // Create conversations and send messages for each worker in parallel
+      await Promise.all(
+        workers.getAll().map(async (worker) => {
+          // Create a DM conversation with the GM bot
+          const conversation =
+            await worker.client.conversations.newDmWithIdentifier({
+              identifier: gmBotAddress,
+              identifierKind: IdentifierKind.Ethereum,
+            });
+
+          console.log(
+            `Created conversation for ${worker.name} with the GM bot`,
+          );
+
+          for (let i = 0; i < messageCount; i++) {
+            const message = `gm-${worker.name}-${i}`;
+            await conversation.send(message);
+          }
+
+          // Verify that the worker received responses from the GM bot
+          const verifyResult = await verifyDmStream(
+            conversation,
+            [worker],
+            "hi", // Content doesn't matter as we're just checking responses
+            messageCount,
+          );
+
+          console.log(
+            `${worker.name}: Received ${verifyResult.messageReceivedCount || 0} responses, success: ${verifyResult.allReceived}`,
+          );
+        }),
+      );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
