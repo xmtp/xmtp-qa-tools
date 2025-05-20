@@ -40,7 +40,7 @@
     "@xmtp/node-bindings-120-rc3": "npm:@xmtp/node-bindings@1.2.0-rc3",
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41",
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9",
-    "@xmtp/node-sdk": "2.1.0-rc3",
+    "@xmtp/node-sdk": "2.0.8",
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0",
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5",
     "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2",

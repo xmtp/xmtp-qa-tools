@@ -249,8 +249,6 @@ export async function verifyDmStream(
         await group.send(message);
         console.debug(`Sent message ${i + 1} of ${count}`);
         sentMessages.push({ content: message, sentAt, index: i });
-        // Small delay to ensure message ordering
-        if (i < count - 1) await sleep(100);
       }
       return sentMessages;
     },

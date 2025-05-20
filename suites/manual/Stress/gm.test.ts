@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyDmStream } from "@helpers/streams";
+import { getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -10,7 +11,7 @@ import { describe, expect, it } from "vitest";
 const testName = "stream-stress";
 loadEnv(testName);
 
-const messageCount = 10;
+const messageCount = 100;
 describe(testName, () => {
   const gmBotAddress = process.env.GM_BOT_ADDRESS || "";
 
@@ -20,13 +21,19 @@ describe(testName, () => {
 
   it("should send messages to GM bot and verify responses", async () => {
     try {
-      // Create workers with fixed names for simplicity
-      const workers = await getWorkers(
-        ["alice"],
+      const gmWorker = await getWorkers(
+        ["gm"],
         testName,
         typeofStream.Message,
         typeOfResponse.Gm,
-        "production",
+      );
+      const gmBot = gmWorker.getCreator();
+      // Create workers with fixed names for simplicity
+      const workers = await getWorkers(
+        getRandomNames(10),
+        testName,
+        typeofStream.Message,
+        typeOfResponse.Gm,
       );
 
       // Create conversations and send messages for each worker in parallel
@@ -35,7 +42,7 @@ describe(testName, () => {
           // Create a DM conversation with the GM bot
           const conversation =
             await worker.client.conversations.newDmWithIdentifier({
-              identifier: gmBotAddress,
+              identifier: gmBot.address,
               identifierKind: IdentifierKind.Ethereum,
             });
 
@@ -55,10 +62,8 @@ describe(testName, () => {
             "hi", // Content doesn't matter as we're just checking responses
             messageCount,
           );
-
-          console.log(
-            `${worker.name}: Received ${verifyResult.messageReceivedCount || 0} responses, success: ${verifyResult.allReceived}`,
-          );
+          console.log(verifyResult.stats?.receptionPercentage);
+          expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(0);
         }),
       );
     } catch (e) {
