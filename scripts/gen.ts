@@ -81,7 +81,8 @@ async function askForEnvironments(): Promise<XmtpEnv[]> {
   );
   if (validEnvs.length === 0) {
     console.log("No valid environments provided. Using 'local' as default.");
-    return ["local"];
+
+    return ["local", "dev", "production"] as XmtpEnv[];
   }
   return validEnvs as XmtpEnv[];
 }
