@@ -27,8 +27,6 @@ jobs:
           node-version: "20"
           cache: "yarn"
           cache-dependency-path: "xmtp-agent-examples/yarn.lock"
-        env:
-          XMTP_ENV: dev
 
       - name: Install dependencies
         run: |
