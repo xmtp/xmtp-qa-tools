@@ -4,6 +4,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
@@ -43,7 +44,11 @@ describe(testName, () => {
 
         const conversation = await workers
           .getCreator()
-          .client.conversations.newDm(agent.address);
+          .client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+
         const result = await verifyMessageStream(
           conversation,
           [workers.getCreator()],
