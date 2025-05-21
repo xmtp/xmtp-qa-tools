@@ -55,56 +55,6 @@ describe(TEST_NAME, () => {
   let globalGroup: Group | undefined;
   let syncIntervalId: NodeJS.Timeout;
 
-  async function syncAllWorkers() {
-    const allWorkers = workers.getAll();
-    console.log(`Running periodic sync for all ${allWorkers.length} workers`);
-
-    for (const worker of allWorkers) {
-      try {
-        const syncStart = performance.now();
-
-        // Use syncAll which is more thorough than just sync
-        await worker.client.conversations.syncAll();
-
-        // Update metrics
-        if (!syncMetrics[worker.name]) {
-          syncMetrics[worker.name] = {
-            totalSyncs: 0,
-            syncErrors: 0,
-            lastSyncTime: 0,
-            initialMessageCount: 0,
-            finalMessageCount: 0,
-            totalGroups: 0,
-          };
-
-          // First sync - capture initial message count
-          const allConversations = await worker.client.conversations.list();
-          let messageCount = 0;
-
-          for (const convo of allConversations) {
-            const messages = await convo.messages();
-            messageCount += messages.length;
-          }
-
-          syncMetrics[worker.name].initialMessageCount = messageCount;
-          syncMetrics[worker.name].totalGroups = allConversations.length;
-        }
-
-        syncMetrics[worker.name].totalSyncs++;
-        syncMetrics[worker.name].lastSyncTime = performance.now() - syncStart;
-
-        console.log(
-          `Sync for ${worker.name} completed in ${syncMetrics[worker.name].lastSyncTime}ms`,
-        );
-      } catch (e) {
-        console.error(`Error syncing ${worker.name}:`, e);
-        if (syncMetrics[worker.name]) {
-          syncMetrics[worker.name].syncErrors++;
-        }
-      }
-    }
-  }
-
   it("should initialize workers and create group", async () => {
     const start = performance.now();
 
@@ -115,115 +65,58 @@ describe(TEST_NAME, () => {
       typeofStream.Message,
       typeOfResponse.Gm,
     );
-
-    // Initial sync for all workers
-    await syncAllWorkers();
-
-    // Start periodic sync
-    syncIntervalId = setInterval(() => {
-      void syncAllWorkers(); // Use void to ignore the promise
-    }, testConfig.syncInterval);
-
-    creator = workers.get("fabri") as Worker;
-    const allWorkers = workers.getAllButCreator();
-    const allClientIds = [
-      ...allWorkers.map((w) => w.client.inboxId),
-      ...Object.values(testConfig.manualUsers),
-    ];
-
-    // Make sure creator is fully synced before creating group
-    await creator.client.conversations.syncAll();
-
-    globalGroup = (await getOrCreateGroup(
-      creator.client,
-      allClientIds,
-    )) as Group;
-
-    // Force sync after group creation for all workers
-    await syncAllWorkers();
-
-    // Perform fork check with selected workers
-    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
-    // Verify message delivery
-    await verifyMessageStream(
-      globalGroup,
-      allWorkers,
-      1,
-      "Hi " + allWorkers.map((w) => w.name).join(", "),
-    );
-
-    // Sync after fork check
-    await syncAllWorkers();
-
-    let count = 1;
-    for (const workerName of testConfig.testWorkers) {
-      const currentWorker = allWorkers.find((w) => w.name === workerName);
-      if (!currentWorker || currentWorker.name === creator.name) continue;
-
-      // Sync before sending message
-      await currentWorker.client.conversations.syncAll();
-
-      await sendMessageToGroup(
-        currentWorker,
-        globalGroup.id,
-        `${currentWorker.name}:test ${count}`,
-      );
-
-      // Sync after sending message
-      await currentWorker.client.conversations.syncAll();
-
-      await membershipChange(
-        globalGroup.id,
-        creator,
-        currentWorker,
-        testConfig.epochs,
-      );
-      count++;
-
-      // Sync after membership change
-      await syncAllWorkers();
-    }
-    // Verify message delivery
-    await verifyMessageStream(
-      globalGroup,
-      allWorkers,
-      1,
-      "Hi " + allWorkers.map((w) => w.name).join(", "),
-    );
-
-    await globalGroup.send(creator.name + " : Done");
-
-    // Final sync for all workers
-    await syncAllWorkers();
-
-    // Stop periodic sync
-    clearInterval(syncIntervalId);
-
-    // Collect final metrics
-    await collectFinalMetrics(allWorkers);
-
-    // Verify that all workers have consistent state
-    await verifyConsistentState(allWorkers, globalGroup.id);
-    // Verify message delivery
-    await verifyMessageStream(
-      globalGroup,
-      allWorkers,
-      1,
-      "Hi " + allWorkers.map((w) => w.name).join(", "),
-    );
-
-    // Perform fork check with selected workers
-    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
-
-    const end = performance.now();
-    console.log(
-      `initialize workers and create group - Duration: ${end - start}ms`,
-    );
-
-    // Log sync metrics
-    console.log("Sync Metrics:", JSON.stringify(syncMetrics, null, 2));
   });
 });
+
+async function syncAllWorkers(workers: WorkerManager) {
+  const allWorkers = workers.getAllButCreator();
+  console.log(`Running periodic sync for all ${allWorkers.length} workers`);
+
+  for (const worker of allWorkers) {
+    try {
+      const syncStart = performance.now();
+
+      // Use syncAll which is more thorough than just sync
+      await worker.client.conversations.syncAll();
+
+      // Update metrics
+      if (!syncMetrics[worker.name]) {
+        syncMetrics[worker.name] = {
+          totalSyncs: 0,
+          syncErrors: 0,
+          lastSyncTime: 0,
+          initialMessageCount: 0,
+          finalMessageCount: 0,
+          totalGroups: 0,
+        };
+
+        // First sync - capture initial message count
+        const allConversations = await worker.client.conversations.list();
+        let messageCount = 0;
+
+        for (const convo of allConversations) {
+          const messages = await convo.messages();
+          messageCount += messages.length;
+        }
+
+        syncMetrics[worker.name].initialMessageCount = messageCount;
+        syncMetrics[worker.name].totalGroups = allConversations.length;
+      }
+
+      syncMetrics[worker.name].totalSyncs++;
+      syncMetrics[worker.name].lastSyncTime = performance.now() - syncStart;
+
+      console.log(
+        `Sync for ${worker.name} completed in ${syncMetrics[worker.name].lastSyncTime}ms`,
+      );
+    } catch (e) {
+      console.error(`Error syncing ${worker.name}:`, e);
+      if (syncMetrics[worker.name]) {
+        syncMetrics[worker.name].syncErrors++;
+      }
+    }
+  }
+}
 
 async function collectFinalMetrics(allWorkers: Worker[]) {
   console.log("Collecting final metrics...");
@@ -312,7 +205,6 @@ async function verifyConsistentState(allWorkers: Worker[], groupId: string) {
   expect(messagesConsistent).toBe(true);
 }
 
-// Sends messages to specific workers to check for responses
 const forkCheck = async (
   group: Group,
   allWorkers: Worker[],
@@ -414,9 +306,6 @@ const getOrCreateGroup = async (
   }
 };
 
-/**
- * Sends a message from a worker with name and count
- */
 export const sendMessageToGroup = async (
   worker: Worker,
   groupId: string,
