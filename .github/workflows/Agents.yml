@@ -13,6 +13,9 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
