@@ -30,7 +30,7 @@ const testConfig = {
     USER_XMTPCHAT:
       "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
   },
-  testWorkers: ["bob", "alice", "elon", "joe"],
+  testWorkers: ["bot", "bob", "alice", "elon", "joe"],
   checkWorkers: ["fabri", "eve", "dave", "frank"],
   groupId: process.env.GROUP_ID,
 };
