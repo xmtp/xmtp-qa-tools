@@ -14,13 +14,13 @@ export type BrowserSession = {
   page: Page;
 };
 
-interface XmtpPlaywrightOptions {
+interface playwrightOptions {
   headless?: boolean;
   env?: XmtpEnv | null;
   defaultUser?: boolean;
 }
 
-export class XmtpPlaywright {
+export class playwright {
   private browser: Browser | null = null;
   private page: Page | null = null;
   private readonly isHeadless: boolean;
@@ -30,11 +30,7 @@ export class XmtpPlaywright {
   private readonly defaultUser: boolean;
 
   constructor(
-    {
-      headless = true,
-      env = null,
-      defaultUser = false,
-    }: XmtpPlaywrightOptions = {
+    { headless = true, env = null, defaultUser = false }: playwrightOptions = {
       headless: true,
       env: null,
       defaultUser: false,
@@ -46,7 +42,7 @@ export class XmtpPlaywright {
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser;
-    console.debug("Starting XmtpPlaywright with env:", this.env);
+    console.debug("Starting playwright with env:", this.env);
   }
 
   /**

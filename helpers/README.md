@@ -159,7 +159,7 @@ The `playwright.ts` module provides browser automation for testing XMTP in web a
 
 ```typescript
 // Create a new Playwright instance
-const xmtpPlaywright = new XmtpPlaywright(headless, env);
+const xmtpPlaywright = new playwright(headless, env);
 
 // Create a group and check for response
 await xmtpPlaywright.createGroupAndReceiveGm(addresses);
