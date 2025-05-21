@@ -1,10 +1,10 @@
-name: Agents
-description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
+name: Fork
+description: Check that fork is working correctly. If it fails notify the team.
 
 on:
   pull_request:
     branches:
-      - fork
+      - main
   schedule:
     - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
