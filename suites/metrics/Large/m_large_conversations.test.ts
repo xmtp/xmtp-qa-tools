@@ -1,8 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -53,9 +52,7 @@ describe(testName, async () => {
     it(`newGroup-${i}: should create a new conversation`, async () => {
       try {
         const creator = workers.getCreator();
-        newGroup = await creator.client.conversations.newGroup(
-          generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
-        );
+        newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
         // Use the dedicated conversation stream verification helper
         const verifyResult = await verifyNewConversationStream(
           newGroup,

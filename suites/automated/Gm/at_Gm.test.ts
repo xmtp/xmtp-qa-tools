@@ -1,8 +1,8 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
 import { verifyDmStream } from "@helpers/streams";
+import { getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -75,10 +75,7 @@ describe(testName, () => {
   });
   it("should create a group and send a message", async () => {
     try {
-      await xmtpTester.newGroupFromUI([
-        ...generatedInboxes.slice(0, 4).map((inbox) => inbox.accountAddress),
-        gmBotAddress,
-      ]);
+      await xmtpTester.newGroupFromUI([...getInboxIds(4), gmBotAddress]);
       await xmtpTester.sendMessage("hi");
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);

@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
-import { sleep } from "@helpers/tests";
+import { getInboxIds, sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
@@ -133,9 +132,7 @@ async function createOrVerifyGroup(worker: Worker): Promise<Group> {
 async function addMembersToGroup(group: Group): Promise<void> {
   try {
     // Get the first X inboxes from the generated inboxes
-    const inboxIds = generatedInboxes
-      .slice(0, GROUP_SIZE)
-      .map((inbox) => inbox.inboxId);
+    const inboxIds = getInboxIds(GROUP_SIZE);
 
     const allInboxIds = [...inboxIds, ...convosUsernames];
     const batchSize = 10;
@@ -176,9 +173,7 @@ async function testMemberManagement(group: Group): Promise<void> {
   try {
     // Test removing and re-adding 10 members from generated inboxes
     console.log("Testing member removal and re-addition...");
-    const toRemove = generatedInboxes
-      .slice(0, 10)
-      .map((inbox) => inbox.inboxId);
+    const toRemove = getInboxIds(10);
 
     console.log(`Removing ${toRemove.length} members...`);
     for (const member of toRemove) {

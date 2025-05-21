@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
+import { getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -39,11 +39,11 @@ describe(testName, async () => {
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = generatedInboxes.slice(0, i);
+        const sliced = getInboxIds(i);
         console.log("Creating group with", sliced.length, "participants");
         groupsBySize[i] = await workers
           .getCreator()
-          .client.conversations.newGroup(sliced.map((inbox) => inbox.inboxId));
+          .client.conversations.newGroup(sliced);
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
       } catch (e: unknown) {

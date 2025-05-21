@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
-import { getRandomNames } from "@helpers/tests";
+import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -53,7 +52,7 @@ describe(testName, async () => {
         const creator = workers.getCreator();
         console.log("Creator name: ", creator.name);
         const newGroup = await creator.client.conversations.newGroup(
-          generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
+          getInboxIds(i),
         );
         await newGroup.addMembers(allWorkers.map((worker) => worker.inboxId));
         const createTimeMs = performance.now() - createTime;

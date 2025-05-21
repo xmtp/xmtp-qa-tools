@@ -425,7 +425,6 @@ export async function verifyMembershipStream(
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       await group.addMembers(membersToAdd);
-      console.debug("member added", membersToAdd);
       sent.push({ inboxId: membersToAdd[0], sentAt });
       return sent;
     },

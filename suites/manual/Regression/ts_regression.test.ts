@@ -1,8 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { defaultNames, sdkVersionOptions } from "@helpers/tests";
+import { defaultNames, getInboxIds, sdkVersionOptions } from "@helpers/tests";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -12,8 +11,8 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions; //["202", "203", "204", "205", "206", "208", "209", "210"];
-  const receiverInboxId = generatedInboxes[0].inboxId;
+  const versions = sdkVersionOptions;
+  const receiverInboxId = getInboxIds(1);
 
   it("should create a group conversation with all workers", async () => {
     try {
@@ -64,7 +63,7 @@ describe(testName, () => {
           "node-sdk:" + String(bob?.sdkVersion),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
 
         expect(convo?.id).toBeDefined();
       }
@@ -85,7 +84,7 @@ describe(testName, () => {
           "node-sdk:" + String(bob?.sdkVersion),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
 
         expect(convo?.id).toBeDefined();
       }

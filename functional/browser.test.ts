@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { XmtpPlaywright } from "@helpers/playwright";
+import { getInboxIds } from "@helpers/tests";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
@@ -39,11 +39,8 @@ describe(testName, () => {
       if (!gmBotAddress) {
         throw new Error("GM_BOT_ADDRESS environment variable is not set");
       }
-      const slicedInboxes = generatedInboxes.slice(0, 4);
-      await xmtpTester.newGroupFromUI([
-        ...slicedInboxes.map((inbox) => inbox.accountAddress),
-        gmBotAddress,
-      ]);
+      const slicedInboxes = getInboxIds(4);
+      await xmtpTester.newGroupFromUI([...slicedInboxes, gmBotAddress]);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
     } catch (e) {

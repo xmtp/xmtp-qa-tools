@@ -8,7 +8,7 @@ import {
 } from "@xmtp/content-type-reaction";
 import { describe, expect, it } from "vitest";
 
-const testName = "codec-error";
+const testName = "codec";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -18,7 +18,7 @@ describe(testName, async () => {
   setupTestLifecycle({
     expect,
   });
-  it("codec-error: should trigger a stream error", async () => {
+  it("codec: should trigger a stream error", async () => {
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();

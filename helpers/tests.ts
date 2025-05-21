@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import oldInboxes from "@helpers/old.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
@@ -435,6 +436,10 @@ export const sendInitialTestMessage = async (client: Client): Promise<void> => {
 export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+
+export function getInboxIds(count: number) {
+  return oldInboxes.slice(0, count).map((inbox) => inbox.inboxId);
+}
 
 /**
  * Appends a variable to the .env file
