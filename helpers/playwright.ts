@@ -128,7 +128,7 @@ export class playwright {
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
     for (let i = 0; i < 6; i++) {
-      await this.page.waitForTimeout(defaultValues.streamTimeout);
+      await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestMessageText();
       if (
         expectedMessage.some((phrase) =>
