@@ -1,19 +1,17 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import { getInboxIds } from "@helpers/tests";
+import { getInboxIds, GM_BOT_ADDRESS } from "@helpers/tests";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
 loadEnv(testName);
 
 describe(testName, () => {
-  // Check if GM_BOT_ADDRESS environment variable is set
   const xmtpTester = new playwright({
     headless: true,
     env: "production",
   });
-  const gmBotAddress = process.env.GM_BOT_ADDRESS;
 
   beforeAll(async () => {
     await xmtpTester.startPage();
@@ -21,11 +19,7 @@ describe(testName, () => {
 
   it("should respond to a message", async () => {
     try {
-      if (!gmBotAddress) {
-        throw new Error("GM_BOT_ADDRESS environment variable is not set");
-      }
-
-      await xmtpTester.newDmFromUI(gmBotAddress);
+      await xmtpTester.newDmFromUI(GM_BOT_ADDRESS);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
     } catch (error) {
@@ -36,11 +30,8 @@ describe(testName, () => {
 
   it("should create a group and send a message", async () => {
     try {
-      if (!gmBotAddress) {
-        throw new Error("GM_BOT_ADDRESS environment variable is not set");
-      }
       const slicedInboxes = getInboxIds(4);
-      await xmtpTester.newGroupFromUI([...slicedInboxes, gmBotAddress]);
+      await xmtpTester.newGroupFromUI([...slicedInboxes, GM_BOT_ADDRESS]);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
     } catch (e) {

@@ -510,6 +510,7 @@ export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
   //return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
+export const GM_BOT_ADDRESS = "0x20b572be48527a770479744aec6fe5644f97678b";
 // Default worker names
 export const defaultNames = [
   "bob",
