@@ -1,6 +1,7 @@
 import { getRandomValues } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
+import { getDataPath } from "@helpers/client";
 import { IdentifierKind, type Client, type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -78,6 +79,7 @@ export const getDbPath = (description: string = "xmtp") => {
 
 export const logAgentDetails = async (
   clients: Client | Client[],
+  testName?: string,
 ): Promise<void> => {
   const clientsByAddress = Array.isArray(clients)
     ? clients.reduce<Record<string, Client[]>>((acc, client) => {
@@ -113,6 +115,7 @@ export const logAgentDetails = async (
     ✓ XMTP Client:
     • Address: ${address}
     • Conversations: ${conversations.length}
+   ${testName ? `• Test Name: ${getDataPath(testName)}` : ""}  
     • InboxId: ${inboxId}
     • Networks: ${environments}
     ${urls.map((url) => `• URL: ${url}`).join("\n")}`);

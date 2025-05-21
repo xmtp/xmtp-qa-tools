@@ -251,11 +251,14 @@ export function getEnvPath(testName: string): string {
   let envPath = path.join(".env");
   if (testName.includes("bug")) {
     envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
+  } else if (testName.includes("bot")) {
+    envPath = path.resolve(
+      process.cwd(),
+      "bots/" + testName.split("_")[1] + "/.env",
+    );
   }
   if (!fs.existsSync(envPath)) {
-    // Create the directory structure for the env file
     fs.mkdirSync(path.dirname(envPath), { recursive: true });
-    // Create the .env file if it doesn't exist
     if (!fs.existsSync(envPath)) {
       fs.writeFileSync(envPath, `#XMTP\nLOGGING_LEVEL="off"\nXMTP_ENV="dev"\n`);
       console.debug(`Created default .env file at ${envPath}`);
@@ -268,14 +271,11 @@ export function getEnvPath(testName: string): string {
  * Loads environment variables from the specified test's .env file
  */
 export function loadEnv(testName: string) {
-  dotenv.config({ path: getEnvPath(testName) });
-  console.debug("Env path:", getEnvPath(testName), process.env.XMTP_ENV);
-
+  const envPath = getEnvPath(testName);
+  dotenv.config({ path: envPath });
+  console.debug("Env path:", envPath, process.env.XMTP_ENV);
   setupPrettyLogs();
-
   addFileLogging(testName);
-  //overrideConsole(logger);
-
   initDataDog();
 }
 

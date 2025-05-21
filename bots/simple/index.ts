@@ -1,13 +1,16 @@
 import { logAgentDetails } from "@bots/client";
+import { loadEnv } from "@helpers/client";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Client } from "@xmtp/node-sdk";
 
+const testName = "bot_simple";
+loadEnv(testName);
 async function main() {
   // Get 20 dynamic workers
   const workers = await getWorkers(
     ["bot"],
-    "test-bot",
+    testName,
     typeofStream.Message,
     typeOfResponse.Gpt,
   );
@@ -16,7 +19,7 @@ async function main() {
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
-  void logAgentDetails(client);
+  void logAgentDetails(client, testName);
   console.log("Waiting for messages...");
   try {
     const stream = client.conversations.streamAllMessages();

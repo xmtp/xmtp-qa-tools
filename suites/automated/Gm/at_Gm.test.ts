@@ -6,7 +6,6 @@ import { getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "at_gm";
@@ -15,7 +14,6 @@ loadEnv(testName);
 const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 
 describe(testName, () => {
-  let convo: Conversation;
   let workers: WorkerManager;
 
   const xmtpTester = new XmtpPlaywright({
@@ -24,7 +22,7 @@ describe(testName, () => {
   });
   beforeAll(async () => {
     workers = await getWorkers(
-      ["bob"],
+      ["bot"],
       testName,
       typeofStream.Message,
       typeOfResponse.None,
@@ -38,16 +36,6 @@ describe(testName, () => {
 
   it("gm-bot: should check if bot is alive", async () => {
     try {
-      // Create conversation with the bot
-      convo = await workers
-        .get("bob")!
-        .client.conversations.newDmWithIdentifier({
-          identifierKind: IdentifierKind.Ethereum,
-          identifier: gmBotAddress,
-        });
-
-      expect(convo).toBeDefined();
-      console.log("convo", convo.id);
       const result = await verifyDmStream(
         [workers.getCreator()],
         gmBotAddress,
