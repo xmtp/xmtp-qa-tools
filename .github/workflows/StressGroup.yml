@@ -70,12 +70,28 @@ jobs:
           mkdir -p logs
           # Define log file path
           LOG_FILE="logs/stress-group-$(date +%Y%m%d-%H%M%S).log"
-          # Run tests, filter out noise, and save only to file (not terminal)
-          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" > $LOG_FILE
+          TEMP_LOG="logs/temp_output.log"
+
+          # Run tests, filter out noise, and save to temporary file
+          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" > $TEMP_LOG
           # Preserve the exit code from the test command
           exit_code=${PIPESTATUS[0]}
-          # Display a simple summary message to the terminal
-          echo "Test completed. Logs saved to $LOG_FILE"
+
+          # Copy the full log to the permanent log file
+          cp $TEMP_LOG $LOG_FILE
+
+          # Display test status and summary
+          echo "============= TEST RESULTS ============="
+          if [ $exit_code -eq 0 ]; then
+            echo "✅ PASSED: StressGroup tests completed successfully"
+          else
+            echo "❌ FAILED: StressGroup tests failed with exit code $exit_code"
+            echo "------------ LAST 10 LINES OF OUTPUT ------------"
+            tail -n 10 $TEMP_LOG
+            echo "------------------------------------------------"
+          fi
+
+          echo "Full logs saved to $LOG_FILE"
           exit $exit_code
       - name: Send Slack notification
         if: always()

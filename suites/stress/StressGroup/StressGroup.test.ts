@@ -53,11 +53,11 @@ describe(TEST_NAME, () => {
   let workers: WorkerManager;
   let creator: Worker | undefined;
   let globalGroup: Group | undefined;
+  let allClientIds: string[] = [];
+  let allWorkers: Worker[] = [];
   let syncIntervalId: NodeJS.Timeout;
 
-  it("should initialize workers and create group", async () => {
-    const start = performance.now();
-
+  it("setup", async () => {
     // Initialize workers
     workers = await getWorkers(
       getFixedNames(testConfig.workers),
@@ -65,38 +65,44 @@ describe(TEST_NAME, () => {
       typeofStream.Message,
       typeOfResponse.Gm,
     );
+    creator = workers.get("fabri") as Worker;
+    const allWorkers = workers.getAllButCreator();
+    allClientIds = [
+      ...allWorkers.map((w) => w.client.inboxId),
+      ...Object.values(testConfig.manualUsers),
+    ];
+  });
 
-    // Initial sync for all workers
-    await syncAllWorkers(workers);
-
+  it("periodic sync", () => {
     // Start periodic sync
     syncIntervalId = setInterval(() => {
       void syncAllWorkers(workers); // Use void to ignore the promise
     }, testConfig.syncInterval);
+  });
 
-    creator = workers.get("fabri") as Worker;
-    const allWorkers = workers.getAllButCreator();
-    const allClientIds = [
-      ...allWorkers.map((w) => w.client.inboxId),
-      ...Object.values(testConfig.manualUsers),
-    ];
-
+  it("create group", async () => {
     // Make sure creator is fully synced before creating group
-    await creator.client.conversations.syncAll();
-
+    await creator?.client.conversations.syncAll();
+    if (!creator) {
+      throw new Error("Creator not found");
+    }
     globalGroup = (await getOrCreateGroup(
       creator.client,
       allClientIds,
     )) as Group;
-
+  });
+  it("sync", async () => {
     // Force sync after group creation for all workers
     await syncAllWorkers(workers);
 
     // Perform fork check with selected workers
-    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+    await forkCheck(globalGroup!, allWorkers, testConfig.checkWorkers);
+  });
+
+  it("verify message delivery", async () => {
     // Verify message delivery
     await verifyMessageStream(
-      globalGroup,
+      globalGroup!,
       allWorkers,
       1,
       "Hi " + allWorkers.map((w) => w.name).join(", "),
@@ -104,18 +110,20 @@ describe(TEST_NAME, () => {
 
     // Sync after fork check
     await syncAllWorkers(workers);
+  });
 
+  it("fork check", async () => {
     let count = 1;
     for (const workerName of testConfig.testWorkers) {
       const currentWorker = allWorkers.find((w) => w.name === workerName);
-      if (!currentWorker || currentWorker.name === creator.name) continue;
+      if (!currentWorker || currentWorker.name === creator!.name) continue;
 
       // Sync before sending message
       await currentWorker.client.conversations.syncAll();
 
       await sendMessageToGroup(
         currentWorker,
-        globalGroup.id,
+        globalGroup!.id,
         `${currentWorker.name}:test ${count}`,
       );
 
@@ -123,8 +131,8 @@ describe(TEST_NAME, () => {
       await currentWorker.client.conversations.syncAll();
 
       await membershipChange(
-        globalGroup.id,
-        creator,
+        globalGroup!.id,
+        creator!,
         currentWorker,
         testConfig.epochs,
       );
@@ -133,15 +141,20 @@ describe(TEST_NAME, () => {
       // Sync after membership change
       await syncAllWorkers(workers);
     }
+  });
+
+  it("verify message delivery", async () => {
     // Verify message delivery
     await verifyMessageStream(
-      globalGroup,
+      globalGroup!,
       allWorkers,
       1,
       "Hi " + allWorkers.map((w) => w.name).join(", "),
     );
+  });
 
-    await globalGroup.send(creator.name + " : Done");
+  it("finalize", async () => {
+    await globalGroup!.send(creator!.name + " : Done");
 
     // Final sync for all workers
     await syncAllWorkers(workers);
@@ -153,17 +166,7 @@ describe(TEST_NAME, () => {
     await collectFinalMetrics(allWorkers);
 
     // Verify that all workers have consistent state
-    await verifyConsistentState(allWorkers, globalGroup.id);
-    // Verify message delivery
-    await verifyMessageStream(
-      globalGroup,
-      allWorkers,
-      1,
-      "Hi " + allWorkers.map((w) => w.name).join(", "),
-    );
-
-    // Perform fork check with selected workers
-    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+    await verifyConsistentState(allWorkers, globalGroup!.id);
 
     const end = performance.now();
     console.log(
