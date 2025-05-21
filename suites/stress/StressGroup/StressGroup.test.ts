@@ -51,6 +51,7 @@ const syncMetrics: Record<string, SyncMetrics> = {};
 
 describe(TEST_NAME, () => {
   let workers: WorkerManager;
+  let start: number;
   let creator: Worker | undefined;
   let globalGroup: Group | undefined;
   let allClientIds: string[] = [];
@@ -58,6 +59,7 @@ describe(TEST_NAME, () => {
   let syncIntervalId: NodeJS.Timeout;
 
   it("setup", async () => {
+    start = performance.now();
     // Initialize workers
     workers = await getWorkers(
       getFixedNames(testConfig.workers),
