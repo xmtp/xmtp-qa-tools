@@ -2,6 +2,9 @@ name: Gm
 description: "should verify performance of the library in the dev network"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:

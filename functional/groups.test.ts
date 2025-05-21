@@ -55,7 +55,7 @@ describe(testName, async () => {
       try {
         await groupsBySize[i].sync();
         const members = await groupsBySize[i].members();
-        expect(members.length).toBe(i);
+        expect(members.length).toBe(i + 1);
       } catch (e: unknown) {
         logError(e, expect.getState().currentTestName);
         throw e;
