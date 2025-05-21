@@ -65,7 +65,12 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with filtered output
-        run: yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+        run: |
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
       - name: Send Slack notification
         if: always()
         env:
