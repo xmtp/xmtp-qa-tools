@@ -37,18 +37,18 @@ jobs:
         id: data-cache
         with:
           path: .data
-          key: data-folder
+          key: stress-group-data-folder
           restore-keys: |
-            data-folder
+            stress-group-data-folder
 
       - name: Restore .env cache
         uses: actions/cache@v3
         id: env-cache
         with:
           path: .env
-          key: env-file
+          key: stress-group-env-file
           restore-keys: |
-            env-file
+            stress-group-env-file
 
       - uses: actions/setup-node@v4
         with:
