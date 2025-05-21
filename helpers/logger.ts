@@ -12,11 +12,9 @@ export const createLogger = () => {
   // Create filter to exclude SQLCipher mlock errors
   const sqlCipherFilter = winston.format((info) => {
     // Skip SQLCipher mlock memory errors completely
-    if (
-      typeof info.message === "string" &&
-      (info.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12") ||
-        info.message.includes("MEMORY sqlcipher_mlock"))
-    ) {
+    if (typeof info.message === 'string' && 
+        (info.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12") ||
+         info.message.includes("MEMORY sqlcipher_mlock"))) {
       return false; // Returning false filters out the message
     }
     return info;
@@ -48,32 +46,25 @@ export const createLogger = () => {
 
   // Add custom timeEnd method
   logger.timeEnd = (label: string) => {
-    const startTime = timers.get(label);
-    if (startTime) {
-      const duration = performance.now() - startTime;
-      timers.delete(label);
+    const startTime = get(label);
+ (startTime) {
+      const duration = performance.now() - startTime;  timers.delete(label);
       logger.info(`${label}: ${duration.toFixed(3)}ms`);
     } else {
       // logger.warn(`Timer "${label}" does not exist`);
-    }
-  };
-
-  return logger;
+    }  return logger;
 };
 
-// Create SQLCipher filter available to the entire module
-const createSqlCipherFilter = () =>
-  winston.format((info) => {
-    // Skip SQLCipher mlock memory errors completely
-    if (
-      typeof info.message === "string" &&
+//  SQLCipher filter available to the entire module
+const creatipherFilter = () => winston.format((info) => {
+  // Skip SQLCipher mlock memory errors completely
+  if (typeof info.message === 'string' && 
       (info.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12") ||
-        info.message.includes("MEMORY sqlcipher_mlock"))
-    ) {
-      return false; // Returning false filters out the message
-    }
-    return info;
-  });
+       info.message.includes("MEMORY sqlcipher_mlock"))) {
+    return false; // Returning false filters out the message
+  }
+  return info;
+});
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
@@ -125,10 +116,7 @@ export const setupPrettyLogs = () => {
   console.log = (...args) => {
     const message = args.join(" ");
     // Skip SQLCipher mlock memory errors
-    if (
-      message.includes("sqlcipher_mlock") ||
-      message.includes("MEMORY sqlcipher_mlock")
-    ) {
+    if (message.includes("sqlcipher_mlock") || message.includes("MEMORY sqlcipher_mlock")) {
       return;
     }
     logger.info(message);

@@ -27,6 +27,10 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
+      - name: Increase locked memory limits
+        run: |
+          sudo sysctl -w vm.max_map_count=262144
+          sudo sysctl -w kernel.memlock=64000
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
