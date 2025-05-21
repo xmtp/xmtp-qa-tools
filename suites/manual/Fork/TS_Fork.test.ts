@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { appendToEnv, getFixedNames } from "@helpers/tests";
+import { appendToEnv, getFixedNames, sleep } from "@helpers/tests";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";

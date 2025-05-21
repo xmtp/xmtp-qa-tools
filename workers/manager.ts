@@ -386,6 +386,9 @@ export async function getWorkers(
   );
   await manager.createWorkers(descriptors);
 
+  if (typeofStreamType !== typeofStream.None) {
+    await sleep(4000);
+  }
   manager.printWorkers();
   return manager;
 }

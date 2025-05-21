@@ -14,15 +14,11 @@ export type VerifyStreamResult = {
   allReceived: boolean;
   messageReceivedCount: number;
   receiverCount: number;
-  eventTimings: string;
+  eventTimings: number[];
   averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
     orderPercentage: number;
-    workersInOrder: number;
-    workerCount: number;
-    totalReceivedMessages: number;
-    totalExpectedMessages: number;
   };
 };
 
@@ -228,10 +224,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
     messageReceivedCount: unescapedMessages.length,
-    eventTimings: flatEventTimingsList.join(","),
+    eventTimings: flatEventTimingsList, // Use the new flat list
     averageEventTiming,
   };
-  console.log(JSON.stringify(allResults, null, 2));
+  console.log(JSON.stringify(allResults));
   return allResults;
 }
 
@@ -425,6 +421,7 @@ export async function verifyMembershipStream(
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       await group.addMembers(membersToAdd);
+      console.debug("member added", membersToAdd);
       sent.push({ inboxId: membersToAdd[0], sentAt });
       return sent;
     },
@@ -585,10 +582,6 @@ export function calculateMessageStats(
   const stats = {
     receptionPercentage,
     orderPercentage,
-    workersInOrder,
-    workerCount,
-    totalReceivedMessages,
-    totalExpectedMessages,
   };
   return stats;
 }
