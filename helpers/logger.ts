@@ -9,20 +9,8 @@ export const createLogger = () => {
     return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
   });
 
-  // Create filter to exclude SQLCipher mlock errors
-  const sqlCipherFilter = winston.format((info) => {
-    // Skip SQLCipher mlock memory errors completely
-    if (typeof info.message === 'string' && 
-        (info.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12") ||
-         info.message.includes("MEMORY sqlcipher_mlock"))) {
-      return false; // Returning false filters out the message
-    }
-    return info;
-  });
-
   // Combine formats
   const combinedFormat = winston.format.combine(
-    sqlCipherFilter(),
     winston.format.timestamp(),
     winston.format.colorize(),
     prettyFormat,
@@ -46,43 +34,23 @@ export const createLogger = () => {
 
   // Add custom timeEnd method
   logger.timeEnd = (label: string) => {
-    const startTime = get(label);
- (startTime) {
-      const duration = performance.now() - startTime;  timers.delete(label);
+    const startTime = timers.get(label);
+    if (startTime) {
+      const duration = performance.now() - startTime;
+      timers.delete(label);
       logger.info(`${label}: ${duration.toFixed(3)}ms`);
     } else {
       // logger.warn(`Timer "${label}" does not exist`);
-    }  return logger;
-};
+    }
+  };
 
-//  SQLCipher filter available to the entire module
-const creatipherFilter = () => winston.format((info) => {
-  // Skip SQLCipher mlock memory errors completely
-  if (typeof info.message === 'string' && 
-      (info.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12") ||
-       info.message.includes("MEMORY sqlcipher_mlock"))) {
-    return false; // Returning false filters out the message
-  }
-  return info;
-});
+  return logger;
+};
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
-    // Skip SQLCipher mlock errors related to memory limitations
-    if (
-      e.message &&
-      e.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12")
-    ) {
-      return true; // Return true but don't log the error
-    }
     console.error(`[vitest] Test failed in ${testName}`, e.message);
   } else {
-    if (
-      typeof e === "string" &&
-      e.includes("sqlcipher_mlock: mlock() returned -1 errno=12")
-    ) {
-      return true; // Skip SQLCipher mlock errors
-    }
     console.error(`Unknown error type:`, typeof e);
   }
   return true;
@@ -115,10 +83,6 @@ export const setupPrettyLogs = () => {
   // Override console.log
   console.log = (...args) => {
     const message = args.join(" ");
-    // Skip SQLCipher mlock memory errors
-    if (message.includes("sqlcipher_mlock") || message.includes("MEMORY sqlcipher_mlock")) {
-      return;
-    }
     logger.info(message);
   };
 
@@ -137,10 +101,6 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    // Skip SQLCipher mlock memory errors
-    if (message.includes("sqlcipher_mlock: mlock() returned -1 errno=12")) {
-      return;
-    }
     logger.error(message);
   };
 
@@ -188,7 +148,6 @@ export const addFileLogging = (filename: string) => {
     new winston.transports.File({
       filename: logPath,
       format: winston.format.combine(
-        createSqlCipherFilter()(), // Use the SQLCipher filter for file logging
         winston.format.timestamp(),
         winston.format.printf((info) => {
           return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
