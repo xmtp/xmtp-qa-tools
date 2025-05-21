@@ -1,8 +1,8 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import { verifyDmStream } from "@helpers/streams";
-import { getAddresses, getInboxIds } from "@helpers/tests";
+import { verifyMessageStream } from "@helpers/streams";
+import { getAddresses } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -36,11 +36,12 @@ describe(testName, () => {
 
   it("gm-bot: should check if bot is alive", async () => {
     try {
-      const result = await verifyDmStream(
-        [workers.getCreator()],
-        gmBotAddress,
-        "hi",
-      );
+      const conversation = await workers
+        .getCreator()
+        .client.conversations.newDm(gmBotAddress);
+      const result = await verifyMessageStream(conversation, [
+        workers.getCreator(),
+      ]);
       expect(result.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);

@@ -2,7 +2,6 @@ import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
-  IdentifierKind,
   type Client,
   type Conversation,
   type Group,
@@ -232,71 +231,23 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
 }
 
 /**
- * Specialized function to verify DM streams
- */
-export async function verifyDmStream(
-  senders: Worker[],
-  receiver: string,
-  messagePrefix: string = "gm",
-  count: number = 1,
-): Promise<VerifyStreamResult> {
-  const randomSuffix = Date.now().toString().slice(-6);
-  const dmConversations = await Promise.all(
-    senders.map((sender) =>
-      sender.client.conversations.newDmWithIdentifier({
-        identifier: receiver,
-        identifierKind: IdentifierKind.Ethereum,
-      }),
-    ),
-  );
-
-  return collectAndTimeEventsWithStats({
-    receivers: senders,
-    startCollectors: (r, index) => {
-      const dmId = dmConversations[index as number]?.id;
-      if (!dmId) throw new Error(`No DM conversation for index ${index}`);
-      return r.worker.collectMessages(dmId, count);
-    },
-    triggerEvents: async () => {
-      const sent = [];
-      for (const dm of dmConversations) {
-        for (let i = 0; i < count; i++) {
-          const content = `${messagePrefix}-${i}-${randomSuffix}`;
-          const sentAt = Date.now();
-          await dm.send(content);
-          sent.push({ content, sentAt });
-          if (i < count - 1) await sleep(100);
-        }
-      }
-      return sent;
-    },
-    getKey: extractContent,
-    getMessage: extractContent,
-    statsLabel: messagePrefix,
-    count,
-    randomSuffix,
-    participantsForStats: senders,
-  });
-}
-
-/**
  * Specialized function to verify message streams
  */
 export async function verifyMessageStream(
-  group: Conversation,
+  conversation: Conversation,
   receivers: Worker[],
   count = 1,
   randomSuffix: string = "gm",
 ): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, count),
+    startCollectors: (r) => r.worker.collectMessages(conversation.id, count),
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
         const content = `gm-${i + 1}-${randomSuffix}`;
         const sentAt = Date.now();
-        await group.send(content);
+        await conversation.send(content);
         sent.push({ content, sentAt });
       }
       return sent;

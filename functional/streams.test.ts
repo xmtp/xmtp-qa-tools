@@ -3,15 +3,14 @@ import { logError } from "@helpers/logger";
 import {
   verifyConsentStream,
   verifyConversationStream,
-  verifyDmStream,
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
   verifyNewConversationStream,
 } from "@helpers/streams";
-import { getFixedNames, getInboxIds, getRandomNames } from "@helpers/tests";
+import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -64,35 +63,6 @@ describe(testName, async () => {
     }
   });
 
-  it("DmStream: should send messages to GM bot and verify responses", async () => {
-    try {
-      const messageCount = 10;
-      const workerCount = 1;
-      // Create workers with fixed names for simplicity
-      const names = ["gm", ...getFixedNames(workerCount)];
-      const workers = await getWorkers(
-        names,
-        testName,
-        typeofStream.Message,
-        typeOfResponse.Gm,
-      );
-      await Promise.all(
-        workers.getAllButCreator().map(async (worker) => {
-          const verifyResult = await verifyDmStream(
-            [worker], // Senders: The current worker
-            workers.get("gm")!.address, // Receivers: The GM bot
-            "gm", // messagePrefix
-            messageCount,
-          );
-          return verifyResult;
-        }),
-      );
-      //expect(results.every((result) => result.allReceived)).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
   it("MessageStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
