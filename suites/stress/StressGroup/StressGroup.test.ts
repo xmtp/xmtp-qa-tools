@@ -6,6 +6,8 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
+const names = getFixedNames(14);
+
 // Test configuration
 const TEST_NAME = "ts_fork";
 loadEnv(TEST_NAME);
@@ -26,8 +28,8 @@ const testConfig = {
     USER_XMTPCHAT:
       "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
   },
-  testWorkers: ["bot", "bob", "alice", "elon", "joe"],
-  checkWorkers: ["fabri", "eve", "dave", "frank"],
+  testWorkers: names.slice(1, 10),
+  checkWorkers: names.slice(10, 14),
   groupId: process.env.GROUP_ID,
 };
 
@@ -82,7 +84,7 @@ describe(TEST_NAME, () => {
   it("setup", async () => {
     start = performance.now();
     workers = await getWorkers(
-      getFixedNames(testConfig.workers),
+      ["bot", ...names],
       TEST_NAME,
       typeofStream.Message,
       typeOfResponse.Gm,
