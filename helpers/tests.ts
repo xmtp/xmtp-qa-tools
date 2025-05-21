@@ -440,6 +440,9 @@ export const sleep = (ms: number = 1000): Promise<void> => {
 export function getInboxIds(count: number) {
   return oldInboxes.slice(0, count).map((inbox) => inbox.inboxId);
 }
+export function getAddresses(count: number) {
+  return oldInboxes.slice(0, count).map((inbox) => inbox.accountAddress);
+}
 
 /**
  * Appends a variable to the .env file
