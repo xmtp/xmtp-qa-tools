@@ -14,7 +14,7 @@ export type VerifyStreamResult = {
   allReceived: boolean;
   messageReceivedCount: number;
   receiverCount: number;
-  eventTimings: number[];
+  eventTimings: string;
   averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
@@ -222,12 +222,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   const allResults = {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
-    receiverCount: allReceived.length,
     messageReceivedCount: unescapedMessages.length,
-    eventTimings: flatEventTimingsList, // Use the new flat list
+    eventTimings: flatEventTimingsList.join(","), // Use the new flat list
     averageEventTiming,
   };
-  console.log(JSON.stringify(allResults));
+  console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 

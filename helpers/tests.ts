@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import oldInboxes from "@helpers/old.json";
+import oldInboxes from "@helpers/inboxes.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import {
