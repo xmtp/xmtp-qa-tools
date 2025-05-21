@@ -38,8 +38,11 @@ jobs:
         run: yarn
       - name: Run tests with filtered output
         run: |
-          # Run the test command and filter out SQLCipher mlock errors
-          yarn retry m_delivery 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" || true
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn retry m_delivery 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
       - name: Send Slack notification
         if: always()
         env:
