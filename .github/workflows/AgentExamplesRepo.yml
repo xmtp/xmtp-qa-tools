@@ -26,7 +26,6 @@ jobs:
           cache-dependency-path: "xmtp-agent-examples/yarn.lock"
         env:
           XMTP_ENV: local
-          GITHUB_ACTIONS: true
           LOGGING_LEVEL: "off"
 
       - name: Install dependencies

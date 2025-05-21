@@ -12,7 +12,6 @@ jobs:
     env:
       XMTP_ENV: local
       GM_BOT_ADDRESS: "0x20b572be48527a770479744aec6fe5644f97678b"
-      GITHUB_ACTIONS: true
       LOGGING_LEVEL: "off"
     steps:
       - uses: actions/checkout@v4
