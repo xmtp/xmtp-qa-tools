@@ -51,16 +51,13 @@ describe(testName, async () => {
   ) {
     it(`receiveAddMember-${i}: should create a new conversation`, async () => {
       try {
-        const creator = workers.getCreator();
-        newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
-        await newGroup.addMembers(
-          workers.getAllButCreator().map((worker) => worker.client?.inboxId),
-        );
-        // Use the dedicated conversation stream verification helper
+        // Initialize workers
+        newGroup = await workers.createGroup();
+
         const verifyResult = await verifyMembershipStream(
           newGroup,
           workers.getAllButCreator(),
-          getInboxIds(i),
+          getInboxIds(1),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);

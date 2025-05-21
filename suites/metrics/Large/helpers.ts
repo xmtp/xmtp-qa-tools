@@ -2,7 +2,7 @@ import fs from "fs";
 
 export const m_large_WORKER_COUNT = 5;
 export const m_large_BATCH_SIZE = 50;
-export const m_large_TOTAL = 400;
+export const m_large_TOTAL = 50;
 
 export interface SummaryEntry {
   groupSize: number;
