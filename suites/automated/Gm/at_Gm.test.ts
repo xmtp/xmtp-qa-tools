@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { verifyDmStream } from "@helpers/streams";
-import { getInboxIds } from "@helpers/tests";
+import { getAddresses, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -17,7 +17,7 @@ describe(testName, () => {
   let workers: WorkerManager;
 
   const xmtpTester = new playwright({
-    headless: true,
+    headless: false,
     env: "production",
   });
   beforeAll(async () => {
@@ -63,7 +63,7 @@ describe(testName, () => {
   });
   it("should create a group and send a message", async () => {
     try {
-      await xmtpTester.newGroupFromUI([...getInboxIds(4), gmBotAddress]);
+      await xmtpTester.newGroupFromUI([...getAddresses(4), gmBotAddress]);
       await xmtpTester.sendMessage("hi");
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
