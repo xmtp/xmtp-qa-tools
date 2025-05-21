@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
-import { appendToEnv, getRandomNames } from "@helpers/tests";
+import { appendToEnv, getFixedNames, getRandomNames } from "@helpers/tests";
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
@@ -23,15 +24,11 @@ const testConfig = {
     USER_CONVOS:
       "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
     USER_CONVOS_DESKTOP:
-      "54f447c03b0fe594d499e685fa390d68b85490856469657babe2c8351dbee33f",
-    USER_CONVOS_DESKTOP2:
-      "ca727d8cd062271a0dab564d6be9be6254fb103bb0bcbfdec660d39f4bc16671",
+      "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
     USER_CB_WALLET:
-      "705c87a99e87097ee2044aec0bdb4617634e015db73900453ad56a7da80157ff",
+      "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
     USER_XMTPCHAT:
-      "cfa7ffebd9d083e06bded87f0ecbcb4a19e86dcbb27c99b56980a118840cc856",
-    USER_XMTPCHAT2:
-      "d18a35dee833c7dab7ef0d89a4c7e3ad1fa914a528864d92ba856ec70731c36f",
+      "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
   },
   testWorkers: ["bob", "alice", "elon", "joe"],
   checkWorkers: ["fabri", "eve", "dave", "frank"],
@@ -47,7 +44,12 @@ describe(TEST_NAME, () => {
     const start = performance.now();
 
     // Initialize workers
-    workers = await getWorkers(getRandomNames(testConfig.workers), TEST_NAME);
+    workers = await getWorkers(
+      getFixedNames(testConfig.workers),
+      TEST_NAME,
+      typeofStream.Message,
+      typeOfResponse.Gm,
+    );
     creator = workers.get("fabri") as Worker;
     const allWorkers = workers.getAll();
     const allClientIds = [
