@@ -19,7 +19,7 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
-      XMTP_ENV: production
+      XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
