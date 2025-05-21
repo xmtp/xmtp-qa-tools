@@ -49,8 +49,21 @@ export const createLogger = () => {
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
+    // Skip SQLCipher mlock errors related to memory limitations
+    if (
+      e.message &&
+      e.message.includes("sqlcipher_mlock: mlock() returned -1 errno=12")
+    ) {
+      return true; // Return true but don't log the error
+    }
     console.error(`[vitest] Test failed in ${testName}`, e.message);
   } else {
+    if (
+      typeof e === "string" &&
+      e.includes("sqlcipher_mlock: mlock() returned -1 errno=12")
+    ) {
+      return true; // Skip SQLCipher mlock errors
+    }
     console.error(`Unknown error type:`, typeof e);
   }
   return true;
@@ -101,6 +114,10 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
+    // Skip SQLCipher mlock memory errors
+    if (message.includes("sqlcipher_mlock: mlock() returned -1 errno=12")) {
+      return;
+    }
     logger.error(message);
   };
 
