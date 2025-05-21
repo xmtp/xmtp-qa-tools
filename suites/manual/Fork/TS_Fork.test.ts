@@ -124,7 +124,7 @@ describe(TEST_NAME, () => {
     }, testConfig.syncInterval);
 
     creator = workers.get("fabri") as Worker;
-    const allWorkers = workers.getAll();
+    const allWorkers = workers.getAllButCreator();
     const allClientIds = [
       ...allWorkers.map((w) => w.client.inboxId),
       ...Object.values(testConfig.manualUsers),
@@ -463,7 +463,6 @@ const membershipChange = async (
 
     // Sync before getting members
     await group.sync();
-    const member = await group.members();
     console.log(`Member ${memberInboxId} found`);
 
     for (let i = 0; i <= trys; i++) {

@@ -96,7 +96,6 @@ describe(testName, async () => {
           "gm-" + Math.random().toString(36).substring(2, 15);
 
         await groupsBySize[i].send(groupMessage);
-        console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e: unknown) {
         logError(e, expect.getState().currentTestName);

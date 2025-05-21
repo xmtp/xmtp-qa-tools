@@ -2,6 +2,9 @@ name: Agents
 description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
 
 on:
+  pull_request:
+    branches:
+      - fork
   schedule:
     - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
