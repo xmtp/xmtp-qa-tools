@@ -98,9 +98,15 @@ jobs:
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-      - name: Upload reports artifacts
-        if: always()
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs_${{ matrix.environment }}
-          path: logs/
+          name: logs
+          path: |
+            logs/
+            .data/
+            .env
+          if-no-files-found: warn
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90
