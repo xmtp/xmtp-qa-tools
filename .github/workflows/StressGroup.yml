@@ -37,18 +37,18 @@ jobs:
         id: data-cache
         with:
           path: .data
-          key: ${{ runner.os }}-data-${{ matrix.environment }}-${{ hashFiles('.env.example') }}
+          key: data-folder
           restore-keys: |
-            ${{ runner.os }}-data-${{ matrix.environment }}
+            data-folder
 
       - name: Restore .env cache
         uses: actions/cache@v3
         id: env-cache
         with:
           path: .env
-          key: ${{ runner.os }}-env-${{ matrix.environment }}-${{ hashFiles('.env.example') }}
+          key: env-file
           restore-keys: |
-            ${{ runner.os }}-env-${{ matrix.environment }}
+            env-file
 
       - uses: actions/setup-node@v4
         with:
