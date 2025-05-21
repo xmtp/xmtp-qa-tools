@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getInboxIds, getRandomNames } from "@helpers/tests";
+import { getAddresses, getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -166,12 +166,12 @@ describe(testName, async () => {
   });
   it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
     try {
-      const sliced = getInboxIds(i);
+      const sliced = getAddresses(i);
       const newGroupByIdentifier = await workers
         .getCreator()
         .client.conversations.newGroupWithIdentifiers(
-          sliced.map((inbox) => ({
-            identifier: inbox,
+          sliced.map((address) => ({
+            identifier: address,
             identifierKind: IdentifierKind.Ethereum,
           })),
         );
@@ -273,12 +273,12 @@ describe(testName, async () => {
     });
     it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = getInboxIds(i);
+        const sliced = getAddresses(i);
         const newGroupByIdentifier = await workers
           .getCreator()
           .client.conversations.newGroupWithIdentifiers(
-            sliced.map((inbox) => ({
-              identifier: inbox,
+            sliced.map((address) => ({
+              identifier: address,
               identifierKind: IdentifierKind.Ethereum,
             })),
           );
