@@ -118,6 +118,13 @@ const getOrCreateGroup = async (
       for (const member of addedMembers) {
         try {
           await group.addMembers([member]);
+          if (Object.values(testConfig.manualUsers).includes(member)) {
+            await group.addSuperAdmin(
+              testConfig.manualUsers[
+                member as keyof typeof testConfig.manualUsers
+              ],
+            );
+          }
         } catch (e) {
           console.error(
             `Error adding member ${member} to group ${group.id}:`,
