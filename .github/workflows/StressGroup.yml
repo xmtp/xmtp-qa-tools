@@ -65,34 +65,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with filtered output
-        run: |
-          # Create logs directory
-          mkdir -p logs
-          # Define log file path
-          LOG_FILE="logs/stress-group-$(date +%Y%m%d-%H%M%S).log"
-          TEMP_LOG="logs/temp_output.log"
-
-          # Run tests, filter out noise, and save to temporary file
-          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" > $TEMP_LOG
-          # Preserve the exit code from the test command
-          exit_code=${PIPESTATUS[0]}
-
-          # Copy the full log to the permanent log file
-          cp $TEMP_LOG $LOG_FILE
-
-          # Display test status and summary
-          echo "============= TEST RESULTS ============="
-          if [ $exit_code -eq 0 ]; then
-            echo "✅ PASSED: StressGroup tests completed successfully"
-          else
-            echo "❌ FAILED: StressGroup tests failed with exit code $exit_code"
-            echo "------------ LAST 10 LINES OF OUTPUT ------------"
-            tail -n 10 $TEMP_LOG
-            echo "------------------------------------------------"
-          fi
-
-          echo "Full logs saved to $LOG_FILE"
-          exit $exit_code
+        run: yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
       - name: Send Slack notification
         if: always()
         env:
