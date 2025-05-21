@@ -69,7 +69,7 @@ jobs:
           # Save original exit code while filtering output
           set -o pipefail
           mkdir -p logs
-          yarn retry StressGroup 2>&1 | tee logs/stress-group-$(date +%Y%m%d-%H%M%S).log
+          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" | tee logs/stress-group-$(date +%Y%m%d-%H%M%S).log
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification

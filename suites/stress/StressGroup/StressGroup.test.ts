@@ -65,6 +65,113 @@ describe(TEST_NAME, () => {
       typeofStream.Message,
       typeOfResponse.Gm,
     );
+
+    // Initial sync for all workers
+    await syncAllWorkers(workers);
+
+    // Start periodic sync
+    syncIntervalId = setInterval(() => {
+      void syncAllWorkers(workers); // Use void to ignore the promise
+    }, testConfig.syncInterval);
+
+    creator = workers.get("fabri") as Worker;
+    const allWorkers = workers.getAllButCreator();
+    const allClientIds = [
+      ...allWorkers.map((w) => w.client.inboxId),
+      ...Object.values(testConfig.manualUsers),
+    ];
+
+    // Make sure creator is fully synced before creating group
+    await creator.client.conversations.syncAll();
+
+    globalGroup = (await getOrCreateGroup(
+      creator.client,
+      allClientIds,
+    )) as Group;
+
+    // Force sync after group creation for all workers
+    await syncAllWorkers(workers);
+
+    // Perform fork check with selected workers
+    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
+
+    // Sync after fork check
+    await syncAllWorkers(workers);
+
+    let count = 1;
+    for (const workerName of testConfig.testWorkers) {
+      const currentWorker = allWorkers.find((w) => w.name === workerName);
+      if (!currentWorker || currentWorker.name === creator.name) continue;
+
+      // Sync before sending message
+      await currentWorker.client.conversations.syncAll();
+
+      await sendMessageToGroup(
+        currentWorker,
+        globalGroup.id,
+        `${currentWorker.name}:test ${count}`,
+      );
+
+      // Sync after sending message
+      await currentWorker.client.conversations.syncAll();
+
+      await membershipChange(
+        globalGroup.id,
+        creator,
+        currentWorker,
+        testConfig.epochs,
+      );
+      count++;
+
+      // Sync after membership change
+      await syncAllWorkers(workers);
+    }
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
+
+    await globalGroup.send(creator.name + " : Done");
+
+    // Final sync for all workers
+    await syncAllWorkers(workers);
+
+    // Stop periodic sync
+    clearInterval(syncIntervalId);
+
+    // Collect final metrics
+    await collectFinalMetrics(allWorkers);
+
+    // Verify that all workers have consistent state
+    await verifyConsistentState(allWorkers, globalGroup.id);
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
+
+    // Perform fork check with selected workers
+    await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+
+    const end = performance.now();
+    console.log(
+      `initialize workers and create group - Duration: ${end - start}ms`,
+    );
+
+    // Log sync metrics
+    console.log("Sync Metrics:", JSON.stringify(syncMetrics, null, 2));
   });
 });
 
