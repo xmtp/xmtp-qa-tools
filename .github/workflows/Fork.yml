@@ -1,0 +1,56 @@
+name: Agents
+description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
+
+on:
+  schedule:
+    - cron: "0 */2 * * *" # Runs every 2 hours
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      WALLET_KEY: ${{ secrets.WALLET_KEY }}
+      GROUP_ID: 376c0cd8dc326d38dd3e26eacb05f153
+      WALLET_KEY_BOT: 0x9e30e21fab8102a344b3c8db3a52e417a3985b626c865f596f0462840180533a
+      ENCRYPTION_KEY_BOT: aafac8e206e6abe09ad0b696dfd86977edd25cfc04578b793c0e912b742d1462
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests with retry
+      - name: Run tests with filtered output
+        run: |
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn retry fork 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
+      - name: Send Slack notification
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: npx tsx helpers/slack.ts
+      - name: Upload reports artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs_${{ matrix.environment }}
+          path: logs/
