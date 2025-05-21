@@ -66,11 +66,16 @@ jobs:
         run: yarn
       - name: Run tests with filtered output
         run: |
-          # Save original exit code while filtering output
-          set -o pipefail
+          # Create logs directory
           mkdir -p logs
-          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" | tee logs/stress-group-$(date +%Y%m%d-%H%M%S).log
-          exit_code=$?
+          # Define log file path
+          LOG_FILE="logs/stress-group-$(date +%Y%m%d-%H%M%S).log"
+          # Run tests, filter out noise, and save only to file (not terminal)
+          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12" > $LOG_FILE
+          # Preserve the exit code from the test command
+          exit_code=${PIPESTATUS[0]}
+          # Display a simple summary message to the terminal
+          echo "Test completed. Logs saved to $LOG_FILE"
           exit $exit_code
       - name: Send Slack notification
         if: always()
