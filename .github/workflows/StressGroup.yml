@@ -39,7 +39,7 @@ jobs:
           path: .data
           key: ${{ runner.os }}-data-${{ matrix.environment }}-${{ hashFiles('.env.example') }}
           restore-keys: |
-            ${{ runner.os }}-data-${{ matrix.environment }}-
+            ${{ runner.os }}-data-${{ matrix.environment }}
 
       - name: Restore .env cache
         uses: actions/cache@v3
@@ -48,16 +48,7 @@ jobs:
           path: .env
           key: ${{ runner.os }}-env-${{ matrix.environment }}-${{ hashFiles('.env.example') }}
           restore-keys: |
-            ${{ runner.os }}-env-${{ matrix.environment }}-
-
-      - name: Create .env file if not cached
-        if: steps.env-cache.outputs.cache-hit != 'true'
-        run: |
-          cp .env.example .env
-          echo "WALLET_KEY=${{ secrets.WALLET_KEY }}" >> .env
-          echo "ENCRYPTION_KEY_BOT=${{ env.ENCRYPTION_KEY_BOT }}" >> .env
-          echo "WALLET_KEY_BOT=${{ env.WALLET_KEY_BOT }}" >> .env
-          echo "XMTP_ENV=${{ matrix.environment }}" >> .env
+            ${{ runner.os }}-env-${{ matrix.environment }}
 
       - uses: actions/setup-node@v4
         with:
