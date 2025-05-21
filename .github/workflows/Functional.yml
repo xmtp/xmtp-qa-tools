@@ -29,8 +29,13 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn
-      - name: Run functional tests
-        run: yarn functional
+      - name: Run tests with filtered output
+        run: |
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn functional 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
