@@ -91,13 +91,9 @@ export function groupMetricsByOperation(
  * Initialize DataDog metrics reporting
  */
 export function initDataDog(): boolean {
+  if (!process.env.DATADOG_API_KEY) return false;
   if (state.isInitialized) {
     return true;
-  }
-
-  if (!process.env.DATADOG_API_KEY) {
-    console.warn("⚠️ DATADOG_API_KEY not found. Metrics will not be sent.");
-    return false;
   }
 
   try {
