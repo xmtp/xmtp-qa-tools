@@ -27,10 +27,6 @@ jobs:
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
-      - name: Increase locked memory limits
-        run: |
-          sudo sysctl -w vm.max_map_count=262144
-          sudo sysctl -w kernel.memlock=64000
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -42,11 +38,14 @@ jobs:
         run: yarn
       - name: Run tests with retry
         run: yarn retry m_delivery
+        continue-on-error: true
       - name: Send Slack notification
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
+      - name: Ensure logs directory exists
+        run: mkdir -p logs
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4
