@@ -2,7 +2,7 @@ name: Agents
 description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
 
 on:
-  push:
+  pull_request:
     branches:
       - main
   schedule:
