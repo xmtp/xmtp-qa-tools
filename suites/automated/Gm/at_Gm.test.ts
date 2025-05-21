@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { XmtpPlaywright } from "@helpers/playwright";
+import { playwright } from "@helpers/playwright";
 import { verifyDmStream } from "@helpers/streams";
 import { getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -16,7 +16,7 @@ const gmBotAddress = process.env.GM_BOT_ADDRESS as string;
 describe(testName, () => {
   let workers: WorkerManager;
 
-  const xmtpTester = new XmtpPlaywright({
+  const xmtpTester = new playwright({
     headless: true,
     env: "production",
   });

@@ -50,11 +50,16 @@ describe(testName, async () => {
         amountofMessages,
         randomSuffix,
       );
-      expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(95);
-      expect(verifyResult.stats?.orderPercentage).toBeGreaterThan(95);
+      const receptionPercentage = verifyResult.stats?.receptionPercentage;
+      const orderPercentage = verifyResult.stats?.orderPercentage;
+      if (!receptionPercentage || !orderPercentage) {
+        throw new Error("No stats found");
+      }
+      expect(receptionPercentage).toBeGreaterThan(95);
+      expect(orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
-        verifyResult.stats?.receptionPercentage ?? 0,
+        receptionPercentage,
         workers.getCreator().sdkVersion,
         workers.getCreator().libXmtpVersion,
         testName,
@@ -62,7 +67,7 @@ describe(testName, async () => {
         "delivery",
       );
       sendDeliveryMetric(
-        verifyResult.stats?.orderPercentage ?? 0,
+        orderPercentage,
         workers.getCreator().sdkVersion,
         workers.getCreator().libXmtpVersion,
         testName,
@@ -108,11 +113,13 @@ describe(testName, async () => {
         randomSuffix,
       );
 
-      expect(stats.receptionPercentage).toBeGreaterThan(95);
-      expect(stats.orderPercentage).toBeGreaterThan(95);
+      const receptionPercentage = stats.receptionPercentage;
+      const orderPercentage = stats.orderPercentage;
+      expect(receptionPercentage).toBeGreaterThan(95);
+      expect(orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
-        stats.receptionPercentage,
+        receptionPercentage,
         workers.getCreator().sdkVersion,
         workers.getCreator().libXmtpVersion,
         testName,
@@ -120,7 +127,7 @@ describe(testName, async () => {
         "delivery",
       );
       sendDeliveryMetric(
-        stats.orderPercentage,
+        orderPercentage,
         workers.getCreator().sdkVersion,
         workers.getCreator().libXmtpVersion,
         testName,
@@ -189,12 +196,16 @@ describe(testName, async () => {
         amountofMessages,
         randomSuffix,
       );
-
-      expect(stats.receptionPercentage).toBeGreaterThan(95);
-      expect(stats.orderPercentage).toBeGreaterThan(95);
+      const receptionPercentage = stats.receptionPercentage;
+      const orderPercentage = stats.orderPercentage;
+      if (!receptionPercentage || !orderPercentage) {
+        throw new Error("No stats found");
+      }
+      expect(receptionPercentage).toBeGreaterThan(95);
+      expect(orderPercentage).toBeGreaterThan(95);
 
       sendDeliveryMetric(
-        stats.receptionPercentage,
+        receptionPercentage,
         offlineWorker.sdkVersion,
         offlineWorker.libXmtpVersion,
         testName,
@@ -202,7 +213,7 @@ describe(testName, async () => {
         "delivery",
       );
       sendDeliveryMetric(
-        stats.orderPercentage,
+        orderPercentage,
         offlineWorker.sdkVersion,
         offlineWorker.libXmtpVersion,
         testName,

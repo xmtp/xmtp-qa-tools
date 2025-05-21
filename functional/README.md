@@ -42,7 +42,7 @@ The `browser.test.ts` module tests XMTP in browser environments.
 
 ```typescript
 // Create a new Playwright instance for browser testing
-const xmtpPlaywright = new XmtpPlaywright(headless, env);
+const xmtpPlaywright = new playwright(headless, env);
 
 // Test group creation and messaging in browser
 await xmtpPlaywright.createGroupAndReceiveGm(addresses);
