@@ -150,19 +150,19 @@ export function sendMetric(
     }
 
     state.collectedMetrics[operationKey].values.push(metricValue);
-    if (process.env.GITHUB_ACTIONS === undefined) {
-      console.debug(
-        JSON.stringify(
-          {
-            metricName: fullMetricName,
-            metricValue: Math.round(metricValue),
-            tags: allTags,
-          },
-          null,
-          2,
-        ),
-      );
-    }
+
+    console.debug(
+      JSON.stringify(
+        {
+          metricName: fullMetricName,
+          metricValue: Math.round(metricValue),
+          tags: allTags,
+        },
+        null,
+        2,
+      ),
+    );
+
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
     console.error(
