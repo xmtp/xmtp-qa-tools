@@ -53,29 +53,29 @@ describe(testName, () => {
     }
   });
 
-  // it("should respond to a message", async () => {
-  //   try {
-  //     await xmtpTester.startPage();
-  //     await xmtpTester.newDmFromUI(gmBotAddress);
-  //     await xmtpTester.sendMessage("hi");
-  //     const result = await xmtpTester.waitForResponse(["gm"]);
-  //     expect(result).toBe(true);
-  //   } catch (error) {
-  //     await xmtpTester.takeSnapshot("gm-dm");
-  //     logError(error, gmBotAddress);
-  //     throw error;
-  //   }
-  // });
-  // it("should create a group and send a message", async () => {
-  //   try {
-  //     await xmtpTester.newGroupFromUI([...getAddresses(4), gmBotAddress]);
-  //     await xmtpTester.sendMessage("hi");
-  //     const result = await xmtpTester.waitForResponse(["gm"]);
-  //     expect(result).toBe(true);
-  //   } catch (e) {
-  //     await xmtpTester.takeSnapshot("gm-group");
-  //     logError(e, expect.getState().currentTestName);
-  //     throw e;
-  //   }
-  // });
+  it("should respond to a message", async () => {
+    try {
+      await xmtpTester.startPage();
+      await xmtpTester.newDmFromUI(gmBotAddress);
+      await xmtpTester.sendMessage("hi");
+      const result = await xmtpTester.waitForResponse(["gm"]);
+      expect(result).toBe(true);
+    } catch (error) {
+      await xmtpTester.takeSnapshot("gm-dm");
+      logError(error, gmBotAddress);
+      throw error;
+    }
+  });
+  it("should create a group and send a message", async () => {
+    try {
+      await xmtpTester.newGroupFromUI([...getAddresses(4), gmBotAddress]);
+      await xmtpTester.sendMessage("hi");
+      const result = await xmtpTester.waitForResponse(["gm"]);
+      expect(result).toBe(true);
+    } catch (e) {
+      await xmtpTester.takeSnapshot("gm-group");
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
 });
