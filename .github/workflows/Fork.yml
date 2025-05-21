@@ -38,7 +38,6 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn
-      - name: Run tests with retry
       - name: Run tests with filtered output
         run: |
           # Save original exit code while filtering output
