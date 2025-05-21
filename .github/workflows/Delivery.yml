@@ -19,7 +19,6 @@ jobs:
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}

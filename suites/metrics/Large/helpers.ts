@@ -1,8 +1,8 @@
 import fs from "fs";
 
-export const m_large_WORKER_COUNT = 5;
-export const m_large_BATCH_SIZE = 50;
-export const m_large_TOTAL = 50;
+export const m_large_WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
+export const m_large_BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
+export const m_large_TOTAL = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
 
 export interface SummaryEntry {
   groupSize: number;

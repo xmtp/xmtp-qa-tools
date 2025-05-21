@@ -18,8 +18,8 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
-      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 400
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
