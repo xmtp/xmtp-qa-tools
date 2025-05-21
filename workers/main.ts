@@ -328,7 +328,7 @@ export class WorkerClient extends Worker {
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
-                `Received group updated, ${JSON.stringify(message.content, null, 2)}`,
+                `Received group updated ${JSON.stringify(message.content, null, 2)}`,
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
@@ -362,9 +362,9 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.debug(
-                `[${this.nameId}] Received message, ${message.content as string}`,
-              );
+              // console.debug(
+              //   `[${this.nameId}] Received message, ${message.content as string}`,
+              // );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);
@@ -635,9 +635,6 @@ export class WorkerClient extends Worker {
         }
 
         const streamMsg = msg;
-        console.debug(
-          `[${this.nameId}] Checking group ID: ${groupId} === ${streamMsg.group?.conversationId}`,
-        );
 
         const matches = groupId === streamMsg.group?.conversationId;
         console.debug(`[${this.nameId}] Group ID match: ${matches}`);

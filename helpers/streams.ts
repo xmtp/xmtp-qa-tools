@@ -2,7 +2,6 @@ import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
   ConsentState,
-  IdentifierKind,
   type Client,
   type Conversation,
   type Group,
@@ -12,13 +11,17 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messageReceivedCount: number;
+  messages: unknown[][];
   receiverCount: number;
-  eventTimings: string;
+  eventTimings: Record<string, number[]>;
   averageEventTiming: number;
   stats?: {
     receptionPercentage: number;
     orderPercentage: number;
+    workersInOrder: number;
+    workerCount: number;
+    totalReceivedMessages: number;
+    totalExpectedMessages: number;
   };
 };
 
@@ -124,7 +127,7 @@ function extractContent(ev: unknown): string {
  */
 async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   receivers: Worker[];
-  startCollectors: (receiver: Worker, index?: number) => Promise<TReceived[]>;
+  startCollectors: (receiver: Worker) => Promise<TReceived[]>;
   triggerEvents: () => Promise<TSent[]>;
   getKey: (event: TSent | TReceived) => string;
   getMessage: (event: TSent | TReceived) => string;
@@ -145,8 +148,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   } = options;
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
-  >[] = receivers.map((r, idx) =>
-    startCollectors(r, idx).then((events) =>
+  >[] = receivers.map((r) =>
+    startCollectors(r).then((events) =>
       events.map((ev) => ({
         key: getKey(ev),
         receivedAt: Date.now(),
@@ -155,10 +158,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
-
-  // Add a small delay to ensure all collectors are set up before triggering events
-  await sleep(3000); // Increased delay to 3000ms
-
   const sentEvents = await options.triggerEvents();
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
@@ -204,81 +203,52 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       msgs.map((m) => JSON.stringify({ event: m.event })),
     ),
   );
-  // Transform eventTimings to a single flat array
-  const flatEventTimingsList: number[] = [];
-  // Iterate over workers by sorted name for deterministic output
-  const sortedWorkerNames = Object.keys(eventTimings).sort();
-
-  for (const name of sortedWorkerNames) {
-    const timingsObj = eventTimings[name];
-    // Convert keys to numbers, sort by original send order, and extract values
-    const workerSortedTimings = Object.entries(timingsObj)
+  // Transform eventTimings to arrays per name
+  const eventTimingsArray: Record<string, number[]> = {};
+  for (const [name, timingsObj] of Object.entries(eventTimings)) {
+    // Convert keys to numbers and sort
+    const arr = Object.entries(timingsObj)
       .map(([k, v]) => [parseInt(k, 10), v] as [number, number])
       .sort((a, b) => a[0] - b[0])
       .map(([, v]) => v);
-    flatEventTimingsList.push(...workerSortedTimings);
+    eventTimingsArray[name] = arr;
   }
-
   const allResults = {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
-    messageReceivedCount: unescapedMessages.length,
-    receiverCount: receivers.length,
-    eventTimings: flatEventTimingsList.join(","), // Use the new flat list
+    receiverCount: allReceived.length,
+    messages: unescapedMessages,
+    eventTimings: eventTimingsArray,
     averageEventTiming,
   };
-  console.log(JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
-/**
- * Specialized function to verify DM streams
- */
 export async function verifyDmStream(
-  senders: Worker[],
-  receiver: string,
-  messagePrefix: string = "gm",
-  count: number = 1,
+  group: Conversation,
+  receivers: Worker[],
+  message: string = "gm",
 ): Promise<VerifyStreamResult> {
-  const randomSuffix = Date.now().toString().slice(-6);
-  const dmConversations = await Promise.all(
-    senders.map((sender) =>
-      sender.client.conversations.newDmWithIdentifier({
-        identifier: receiver,
-        identifierKind: IdentifierKind.Ethereum,
-      }),
-    ),
-  );
-
   return collectAndTimeEventsWithStats({
-    receivers: senders,
-    startCollectors: (r, index) => {
-      const dmId = dmConversations[index as number]?.id;
-      if (!dmId) throw new Error(`No DM conversation for index ${index}`);
-      return r.worker.collectMessages(dmId, count);
-    },
+    receivers,
+    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
     triggerEvents: async () => {
-      const sent = [];
-      for (const dm of dmConversations) {
-        for (let i = 0; i < count; i++) {
-          const content = `${messagePrefix}-${i}-${randomSuffix}`;
-          const sentAt = Date.now();
-          await dm.send(content);
-          sent.push({ content, sentAt });
-          if (i < count - 1) await sleep(100);
-        }
+      const sent: { content: string; sentAt: number }[] = [];
+      for (let i = 0; i < 1; i++) {
+        const sentAt = Date.now();
+        await group.send(message);
+        sent.push({ content: message, sentAt });
       }
       return sent;
     },
     getKey: extractContent,
     getMessage: extractContent,
-    statsLabel: messagePrefix,
-    count,
-    randomSuffix,
-    participantsForStats: senders,
+    statsLabel: message,
+    count: 1,
+    randomSuffix: "",
+    participantsForStats: receivers,
   });
 }
-
 /**
  * Specialized function to verify message streams
  */
@@ -356,7 +326,6 @@ export async function verifyMembershipStream(
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       await group.addMembers(membersToAdd);
-      console.debug("member added", membersToAdd);
       sent.push({ inboxId: membersToAdd[0], sentAt });
       return sent;
     },
@@ -517,6 +486,10 @@ export function calculateMessageStats(
   const stats = {
     receptionPercentage,
     orderPercentage,
+    workersInOrder,
+    workerCount,
+    totalReceivedMessages,
+    totalExpectedMessages,
   };
   return stats;
 }

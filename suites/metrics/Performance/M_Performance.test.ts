@@ -17,12 +17,8 @@ const testName = "m_performance";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const batchSize = parseInt(
-    process.env.CLI_BATCH_SIZE ?? process.env.BATCH_SIZE ?? "5",
-  );
-  const total = parseInt(
-    process.env.CLI_GROUP_SIZE ?? process.env.MAX_GROUP_SIZE ?? "10",
-  );
+  const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
+  const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
   console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
   let dm: Conversation;
   let workers: WorkerManager;

@@ -2,8 +2,6 @@ name: Performance
 description: "should verify performance "
 
 on:
-  pull_request:
-    branches: [deploy]
   schedule:
     - cron: "30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
@@ -20,8 +18,8 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: ${{ vars.BATCH_SIZE }}
-      MAX_GROUP_SIZE: ${{ vars.MAX_GROUP_SIZE }}
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 400
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
@@ -36,8 +34,6 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        id: test
-        continue-on-error: true
         run: yarn retry m_performance
       - name: Send Slack notification
         if: always()

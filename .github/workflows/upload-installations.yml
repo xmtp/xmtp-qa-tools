@@ -14,8 +14,6 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DELIVERY_AMOUNT: ${{ vars.DELIVERY_AMOUNT }}
-      DELIVERY_RECEIVERS: ${{ vars.DELIVERY_RECEIVERS }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
@@ -30,13 +28,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn retry dms 1
-      - name: List .data folder structure
-        run: |
-          find .data -type d | sort > data-directories.txt
-          cat data-directories.txt
-        continue-on-error: true
-
+        run: yarn retry dms
       - name: Send Slack notification
         if: always()
         env:

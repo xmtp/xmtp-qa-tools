@@ -1,18 +1,23 @@
 name: Functional
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+  schedule:
+    - cron: "0 * * * *"
+  workflow_dispatch:
 
 jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
     env:
-      XMTP_ENV: local
-      GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
-      GITHUB_ACTIONS: true
+      XMTP_ENV: ${{ matrix.environment }}
+      GM_BOT_ADDRESS: "0x20b572be48527a770479744aec6fe5644f97678b"
       LOGGING_LEVEL: "off"
     steps:
       - uses: actions/checkout@v4
@@ -24,8 +29,13 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         run: yarn
-      - name: Run functional tests
-        run: yarn functional
+      - name: Run tests with filtered output
+        run: |
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn functional 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
       - name: Upload reports artifacts
         if: always()
         uses: actions/upload-artifact@v4

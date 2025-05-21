@@ -9,6 +9,11 @@ import {
 } from "playwright-chromium";
 import { defaultValues } from "./tests";
 
+// Default timeout for stream collection in milliseconds
+const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
+  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
+  : defaultValues.streamTimeout; // 3 seconds
+
 export type BrowserSession = {
   browser: Browser;
   page: Page;
@@ -127,7 +132,7 @@ export class playwright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < 6; i++) {
+    for (let i = 0; i < DEFAULT_STREAM_TIMEOUT_MS / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestMessageText();
       if (

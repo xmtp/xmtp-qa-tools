@@ -1,9 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyDmStream } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
@@ -41,9 +42,17 @@ describe(testName, () => {
       try {
         console.debug(`Testing ${agent.name} with address ${agent.address} `);
 
-        const result = await verifyDmStream(
+        const conversation = await workers
+          .getCreator()
+          .client.conversations.newDmWithIdentifier({
+            identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          });
+
+        const result = await verifyMessageStream(
+          conversation,
           [workers.getCreator()],
-          agent.address,
+          1,
           agent.sendMessage,
         );
         expect(result.allReceived).toBe(true);

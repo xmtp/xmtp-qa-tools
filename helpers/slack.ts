@@ -53,9 +53,15 @@ if (!testName) {
 const branchName = githubRef.replace("refs/heads/", "");
 console.debug(`Current branch: ${branchName}`);
 
-// Only proceed with notification if it's an error
-if (jobStatus === "success" || jobStatus === "passed") {
-  console.debug(`Job status is ${jobStatus}. No need to send notification.`);
+// Only proceed with notification if it's an error AND on the main branch
+if (
+  jobStatus === "success" ||
+  jobStatus === "passed" ||
+  branchName !== "main"
+) {
+  console.debug(
+    `Job status is ${jobStatus}, branch is ${branchName}. No need to send notification.`,
+  );
   process.exit(0);
 }
 
@@ -124,7 +130,7 @@ async function sendSlackNotification() {
     // Create a message with GitHub context and AI analysis
     const message = `Test Failure ❌
     *Test:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
-    *Test Run URL:* <${workflowUrl}|View>
+    *Test log:* <${workflowUrl}|View url>
     *Dashboard:* <${datadogUrl}|View>
     *Timestamp:* ${new Date().toLocaleString()}
     ${customLinks}

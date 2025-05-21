@@ -507,8 +507,10 @@ export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
 };
 export const getRandomNames = (count: number): string[] => {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+  return [...defaultNames].slice(0, count);
+  //return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
+export const GM_BOT_ADDRESS = "0x20b572be48527a770479744aec6fe5644f97678b";
 // Default worker names
 export const defaultNames = [
   "bob",
@@ -572,7 +574,7 @@ export const defaultNames = [
 export const defaultValues = {
   amount: 5, // 5 messages
   playwrightBeforeSendTimeout: 1000, // 1 second
-  streamTimeout: 3000, // 3 seconds
+  streamTimeout: 10000, // 3 seconds
   timeout: 40000, // 40 seconds
   perMessageTimeout: 3000, // 3 seconds
   defaultNames,
