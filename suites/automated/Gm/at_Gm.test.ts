@@ -19,7 +19,7 @@ describe(testName, () => {
   let workers: WorkerManager;
 
   const xmtpTester = new XmtpPlaywright({
-    headless: false,
+    headless: true,
     env: "production",
   });
   beforeAll(async () => {
