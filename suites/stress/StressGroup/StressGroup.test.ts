@@ -4,7 +4,7 @@ import { appendToEnv, getFixedNames } from "@helpers/tests";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 // Test configuration
 const TEST_NAME = "ts_fork";
