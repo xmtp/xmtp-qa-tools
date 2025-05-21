@@ -29,7 +29,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("verifyAddMembersStream: should add members to a group", async () => {
+  it("AddMembersStream: should add members to a group", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
@@ -48,7 +48,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyConsentStream: manage consent for all members in a group", async () => {
+  it("ConsentStream: manage consent for all members in a group", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Consent);
 
@@ -64,7 +64,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyDmStream: should send messages to GM bot and verify responses", async () => {
+  it("DmStream: should send messages to GM bot and verify responses", async () => {
     try {
       const messageCount = 10;
       const workerCount = 1;
@@ -93,7 +93,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("verifyMessageStream: should measure receiving a gm", async () => {
+  it("MessageStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
@@ -113,7 +113,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyMessageGroupStream: should measure receiving a gm", async () => {
+  it("MessageGroupStream: should measure receiving a gm", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       const newGroup = await workers.createGroup();
@@ -132,7 +132,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyGroupMetadataStream: should update group name", async () => {
+  it("GroupMetadataStream: should update group name", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
@@ -150,7 +150,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyConversationStream: should create a new conversation", async () => {
+  it("ConversationStream: should create a new conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
@@ -168,7 +168,7 @@ describe(testName, async () => {
     }
   });
 
-  it("verifyNewConversationStream: should create a add members to a conversation", async () => {
+  it("NewConversationStream: should create a add members to a conversation", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
