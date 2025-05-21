@@ -1,7 +1,6 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
-import { sdkVersionOptions } from "@helpers/tests";
+import { getInboxIds, sdkVersionOptions } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -10,8 +9,8 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions; //["202", "203", "204", "205", "206", "208", "209", "210"];
-  const receiverInboxId = generatedInboxes[0].inboxId;
+  const versions = sdkVersionOptions;
+  const receiverInboxId = getInboxIds(1)[0];
 
   it(`Should test the DB after downgrade`, async () => {
     try {

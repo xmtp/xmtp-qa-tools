@@ -1,5 +1,4 @@
-import generatedInboxes from "@helpers/inboxes.json";
-import { sleep } from "@helpers/tests";
+import { getInboxIds, sleep } from "@helpers/tests";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 
@@ -276,9 +275,7 @@ export async function createLargeGroup(
 ): Promise<Group | undefined> {
   try {
     const MAX_BATCH_SIZE = 10;
-    const initialMembers = generatedInboxes
-      .slice(0, 1)
-      .map((entry) => entry.inboxId);
+    const initialMembers = getInboxIds(1);
 
     initialMembers.push(receiverInboxId);
 
@@ -292,9 +289,7 @@ export async function createLargeGroup(
 
     for (let i = 1; i < memberCount; i += MAX_BATCH_SIZE) {
       const endIdx = Math.min(i + MAX_BATCH_SIZE, memberCount);
-      const batchMembers = generatedInboxes
-        .slice(i, endIdx)
-        .map((entry) => entry.inboxId);
+      const batchMembers = getInboxIds(endIdx - i);
 
       if (batchMembers.length > 0) {
         await group.addMembers(batchMembers);

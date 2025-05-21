@@ -1,8 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMetadataStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -52,9 +51,7 @@ describe(testName, async () => {
     it(`receiveMetadata-${i}: should create a group and measure all streams`, async () => {
       try {
         const creator = workers.getCreator();
-        newGroup = await creator.client.conversations.newGroup(
-          generatedInboxes.slice(0, i).map((inbox) => inbox.inboxId),
-        );
+        newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
         await (newGroup as Group).addMembers(
           workers.getAllButCreator().map((worker) => worker.inboxId),
         );

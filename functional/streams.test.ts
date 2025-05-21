@@ -1,5 +1,4 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import {
   verifyConsentStream,
@@ -10,7 +9,7 @@ import {
   verifyMetadataStream,
   verifyNewConversationStream,
 } from "@helpers/streams";
-import { getFixedNames, getRandomNames } from "@helpers/tests";
+import { getFixedNames, getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -39,7 +38,7 @@ describe(testName, async () => {
       const verifyResult = await verifyMembershipStream(
         group as Group,
         workers.getAllButCreator(),
-        [generatedInboxes[0].inboxId],
+        getInboxIds(1),
       );
 
       expect(verifyResult.allReceived).toBe(true);

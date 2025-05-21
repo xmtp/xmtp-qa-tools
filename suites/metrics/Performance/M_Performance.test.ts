@@ -1,8 +1,7 @@
 import { loadEnv } from "@helpers/client";
-import generatedInboxes from "@helpers/inboxes.json";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -151,11 +150,11 @@ describe(testName, async () => {
   let newGroup: Conversation;
   it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
     try {
-      const sliced = generatedInboxes.slice(0, i);
+      const sliced = getInboxIds(i);
       newGroup = await workers
         .getCreator()
         .client.conversations.newGroup([
-          ...sliced.map((inbox) => inbox.inboxId),
+          ...sliced,
           ...workers.getAll().map((w) => w.client.inboxId),
         ]);
       console.log("New group created", newGroup.id);
@@ -167,12 +166,12 @@ describe(testName, async () => {
   });
   it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
     try {
-      const sliced = generatedInboxes.slice(0, i);
+      const sliced = getInboxIds(i);
       const newGroupByIdentifier = await workers
         .getCreator()
         .client.conversations.newGroupWithIdentifiers(
           sliced.map((inbox) => ({
-            identifier: inbox.accountAddress,
+            identifier: inbox,
             identifierKind: IdentifierKind.Ethereum,
           })),
         );
@@ -259,11 +258,11 @@ describe(testName, async () => {
     let newGroup: Conversation;
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = generatedInboxes.slice(0, i);
+        const sliced = getInboxIds(i);
         newGroup = await workers
           .getCreator()
           .client.conversations.newGroup([
-            ...sliced.map((inbox) => inbox.inboxId),
+            ...sliced,
             ...workers.getAll().map((w) => w.client.inboxId),
           ]);
         expect(newGroup.id).toBeDefined();
@@ -274,12 +273,12 @@ describe(testName, async () => {
     });
     it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = generatedInboxes.slice(0, i);
+        const sliced = getInboxIds(i);
         const newGroupByIdentifier = await workers
           .getCreator()
           .client.conversations.newGroupWithIdentifiers(
             sliced.map((inbox) => ({
-              identifier: inbox.accountAddress,
+              identifier: inbox,
               identifierKind: IdentifierKind.Ethereum,
             })),
           );
