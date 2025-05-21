@@ -1,4 +1,5 @@
 import { loadEnv } from "@helpers/client";
+import { verifyMessageStream } from "@helpers/streams";
 import { appendToEnv, getFixedNames } from "@helpers/tests";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -143,6 +144,13 @@ describe(TEST_NAME, () => {
 
     // Perform fork check with selected workers
     await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
 
     // Sync after fork check
     await syncAllWorkers();
@@ -175,6 +183,13 @@ describe(TEST_NAME, () => {
       // Sync after membership change
       await syncAllWorkers();
     }
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
 
     await globalGroup.send(creator.name + " : Done");
 
@@ -189,6 +204,13 @@ describe(TEST_NAME, () => {
 
     // Verify that all workers have consistent state
     await verifyConsistentState(allWorkers, globalGroup.id);
+    // Verify message delivery
+    await verifyMessageStream(
+      globalGroup,
+      allWorkers,
+      1,
+      "Hi " + allWorkers.map((w) => w.name).join(", "),
+    );
 
     // Perform fork check with selected workers
     await forkCheck(globalGroup, allWorkers, testConfig.checkWorkers);
