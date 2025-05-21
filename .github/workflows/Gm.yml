@@ -21,6 +21,7 @@ jobs:
       LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DEFAULT_STREAM_TIMEOUT_MS: 9000
       GM_BOT_ADDRESS: ${{ vars.GM_BOT_ADDRESS }}
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
