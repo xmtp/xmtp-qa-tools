@@ -18,7 +18,7 @@ jobs:
     env:
       XMTP_ENV: ${{ matrix.environment }}
       GM_BOT_ADDRESS: "0x20b572be48527a770479744aec6fe5644f97678b"
-      LOGGING_LEVEL: "debug"
+      LOGGING_LEVEL: "off"
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
