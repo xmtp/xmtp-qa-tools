@@ -3,6 +3,9 @@ description: "should verify performance "
 
 on:
   pull_request:
+    branches:
+      - main
+  pull_request:
     branches: [deploy]
   schedule:
     - cron: "30 * * * *" # Runs every 30 minutes
