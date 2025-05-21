@@ -18,7 +18,7 @@ jobs:
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
+      LOGGING_LEVEL: "debug"
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -62,7 +62,7 @@ jobs:
         run: |
           # Save original exit code while filtering output
           set -o pipefail
-          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          yarn retry StressGroup 2>&1 | tee logs/stress-group-$(date +%Y%m%d-%H%M%S).log
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification
