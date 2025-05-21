@@ -36,10 +36,6 @@ jobs:
         id: date
         run: echo "date=$(date +%Y-%U)" >> $GITHUB_OUTPUT
 
-      # Ensure .data directory exists
-      - name: Ensure .data directory exists
-        run: mkdir -p .data
-
       # Restore cached .data folder with date-based key
       - name: Restore .data cache
         uses: actions/cache@v3
@@ -49,10 +45,6 @@ jobs:
           key: stress-group-data-${{ steps.date.outputs.date }}
           restore-keys: |
             stress-group-data-
-
-      # Create .env file if it doesn't exist
-      - name: Ensure .env file exists
-        run: touch .env
 
       # Restore .env cache with date-based key
       - name: Restore .env cache
@@ -74,9 +66,9 @@ jobs:
         run: yarn
       - name: Run tests with filtered output
         run: |
-          mkdir -p logs
           # Save original exit code while filtering output
           set -o pipefail
+          mkdir -p logs
           yarn retry StressGroup 2>&1 | tee logs/stress-group-$(date +%Y%m%d-%H%M%S).log
           exit_code=$?
           exit $exit_code
