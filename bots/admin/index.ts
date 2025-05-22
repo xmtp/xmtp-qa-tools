@@ -7,17 +7,10 @@ import {
   type DecodedMessage,
   type Group,
 } from "@xmtp/node-sdk";
+import manualUsers from "../../helpers/manualusers.json";
 import { config, type GroupConfig } from "./groups";
 
-const isAdmin = [
-  "7c700cd57fe7a5c05b9dae39da6bdc7adfe73f0ec02ad82aa65de879004166f3", //xmtpchat
-  "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b", //convos
-  "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5", //convos
-];
-
-/**
- * Initialize XMTP client for admin operations
- */
+const isAdmin = manualUsers.map((user) => user.inboxId);
 
 export const processMessage = async (
   client: Client,

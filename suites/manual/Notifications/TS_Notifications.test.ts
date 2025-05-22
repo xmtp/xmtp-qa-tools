@@ -3,7 +3,7 @@ import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
-import receivers from "./receivers.json";
+import manualUsers from "../../../helpers/manualusers.json";
 
 const testName = "ts_notifications";
 loadEnv(testName);
@@ -11,7 +11,9 @@ loadEnv(testName);
 describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
-  for (const receiver of receivers.filter((r) => r.network === "dev")) {
+  for (const receiver of manualUsers.filter(
+    (r) => r.app === "convos" && r.network === process.env.XMTP_ENV,
+  )) {
     it(`should create a group with ${receiver.name} members`, async () => {
       console.log(JSON.stringify(receiver, null, 2));
       workers = await getWorkers(

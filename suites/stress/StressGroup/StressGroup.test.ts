@@ -5,6 +5,7 @@ import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
+import manualUsers from "../../../helpers/manualusers.json";
 
 // ============================================================
 // Configuration
@@ -28,16 +29,6 @@ const testConfig = {
   testWorkers: names.slice(1, 10),
   checkWorkers: names.slice(10, 14),
   groupId: process.env.GROUP_ID,
-  manualUsers: {
-    USER_CONVOS:
-      "83fb0946cc3a716293ba9c282543f52050f0639c9574c21d597af8916ec96208",
-    USER_CONVOS_DESKTOP:
-      "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
-    USER_CB_WALLET:
-      "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
-    USER_XMTPCHAT:
-      "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
-  },
 };
 
 // ============================================================
@@ -121,16 +112,6 @@ async function createNewGroup(
     try {
       await group.addMembers([member]);
       await group.sync();
-
-      // Add super admin privileges to manual users
-      if (Object.values(testConfig.manualUsers).includes(member)) {
-        const key = Object.keys(testConfig.manualUsers).find(
-          (k) =>
-            testConfig.manualUsers[k as keyof typeof testConfig.manualUsers] ===
-            member,
-        );
-        if (key) await group.addSuperAdmin(member);
-      }
     } catch (e) {
       console.error(`Error adding member ${member}:`, e);
     }
@@ -254,10 +235,12 @@ describe(TEST_NAME, () => {
     await creator.client.conversations.syncAll();
 
     allWorkers = workers.getAllButCreator();
-    allClientIds = [
-      ...allWorkers.map((w) => w.client.inboxId),
-      ...Object.values(testConfig.manualUsers),
-    ];
+    allClientIds = manualUsers
+      .filter(
+        (user) =>
+          user.app === "convos" && user.network === process.env.XMTP_ENV,
+      )
+      .map((user) => user.inboxId);
 
     // Start periodic sync
     syncIntervalId = setInterval(
