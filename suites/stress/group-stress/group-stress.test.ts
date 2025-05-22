@@ -49,7 +49,6 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let globalGroup: Group;
   let allWorkers: Worker[] = [];
-  let allClientIds: string[] = [];
   let syncIntervalId: NodeJS.Timeout;
   let testStartTime: number;
 
