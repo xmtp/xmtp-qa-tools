@@ -35,7 +35,7 @@ const testConfig = {
   syncInterval: 10000,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
   checkWorkers: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
-  groupId: process.env.GROUP_ID,
+  groupId: process.env.GROUP_ID as string,
 } as const;
 
 loadEnv(TEST_NAME);
@@ -79,13 +79,11 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        [
-          ...manualUsers
-            .filter((user) => user.network === "production")
-            .map((user) => user.inboxId),
-          ...workers.getAllButCreator().map((w) => w.client.inboxId),
-        ],
-        testConfig.groupId as string,
+        manualUsers
+          .filter((user) => user.network === "production")
+          .map((user) => user.inboxId),
+        workers.getAllButCreator().map((w) => w.client.inboxId),
+        testConfig.groupId,
         TEST_NAME,
       );
 
