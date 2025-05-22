@@ -167,6 +167,10 @@ export class WorkerManager {
     );
     return group;
   }
+  getAllBut(excludeName: string): Worker[] {
+    const workers = this.getAll();
+    return workers.filter((worker) => worker.name !== excludeName);
+  }
   getAllButCreator(): Worker[] {
     const workers = this.getAll();
     const creator = this.getCreator();

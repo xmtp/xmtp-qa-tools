@@ -1,6 +1,6 @@
 import { logAgentDetails } from "@helpers/client";
-import { appendToEnv } from "@helpers/tests";
-import { type Worker } from "@workers/manager";
+import { appendToEnv, type TestConfig } from "@helpers/tests";
+import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 
 // ============================================================
@@ -99,15 +99,18 @@ export async function testMembershipChanges(
 }
 
 export async function verifyGroupConsistency(
-  groupId: string,
-  workers: Worker[],
-): Promise<Record<string, { members: number; messages: number }>> {
+  globalGroup: Group,
+  workers: WorkerManager,
+  testConfig: TestConfig,
+): Promise<void> {
   const counts: Record<string, { members: number; messages: number }> = {};
-
-  for (const worker of workers) {
+  const creator = workers.get("bot");
+  if (!creator) throw new Error("Creator not found");
+  const allWorkers = workers.getAllButCreator();
+  for (const worker of allWorkers) {
     try {
       const group = (await worker.client.conversations.getConversationById(
-        groupId,
+        globalGroup.id,
       )) as Group;
       if (!group) continue;
 
@@ -122,6 +125,15 @@ export async function verifyGroupConsistency(
       console.error(`Error verifying state for ${worker.name}:`, e);
     }
   }
+  const countsString = JSON.stringify(counts, null, 2);
+  const summary = `Summary:
+    - Creator: ${creator.name}
+    - Test workers: ${allWorkers.length}
+    - Group ID: ${globalGroup.id}
+    - Sync interval: ${testConfig.syncInterval}ms
+    - Group consistency counts: ${countsString}
+    `;
 
-  return counts;
+  await globalGroup.send(summary);
+  console.log(summary);
 }

@@ -1,6 +1,7 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
+import { getTime } from "@helpers/logger";
 
 function expandGlobPattern(pattern: string): string[] {
   // Simple glob expansion for *.test.ts patterns
@@ -178,7 +179,7 @@ try {
           const cleanTestName = path
             .basename(testName)
             .replace(/\.test\.ts$/, "");
-          logFileName = `raw-${cleanTestName}.log`;
+          logFileName = `raw-${cleanTestName}-${getTime()}.log`;
         }
         const logPath = path.join(logsDir, logFileName);
 

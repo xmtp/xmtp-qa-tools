@@ -1,12 +1,12 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
+import { getTime, logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import manualUsers from "../../../helpers/manualusers.json";
 import {
   createOrGetNewGroup,
@@ -23,11 +23,7 @@ const WORKER_NAMES = getFixedNames(14);
 
 const testConfig = {
   testName: TEST_NAME,
-  groupName: `NotForked ${new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-  })}`,
+  groupName: `NotForked ${getTime()}`,
   epochs: 4,
   network: "production",
   totalWorkers: 14,
@@ -70,7 +66,7 @@ describe(TEST_NAME, () => {
       );
 
       creator = workers.get("bot") as Worker;
-
+      allWorkers = workers.getAllBut("bot");
       if (!creator) {
         throw new Error(`Creator worker 'bot' not found`);
       }
@@ -81,7 +77,7 @@ describe(TEST_NAME, () => {
         manualUsers
           .filter((user) => user.network === "production")
           .map((user) => user.inboxId),
-        workers.getAllButCreator().map((w) => w.client.inboxId),
+        workers.getAllBut("bot").map((w) => w.client.inboxId),
         testConfig.groupId,
         TEST_NAME,
       );
@@ -101,39 +97,15 @@ describe(TEST_NAME, () => {
     }
   });
 
-  afterAll(async () => {
-    try {
-      // Send final test completion message
-      if (globalGroup?.id) {
-        await globalGroup.send(`Test completed: ${testConfig.groupName}`);
-      }
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Error during test cleanup:", errorMessage);
-    }
-  });
-
   // ============================================================
   // Test Cases
   // ============================================================
 
-  it("should setup test environment", () => {
+  it("should setup test environment", async () => {
     try {
       testStartTime = performance.now();
 
-      // Get all workers except the creator
-      allWorkers = workers.getAllButCreator();
-
-      if (allWorkers.length === 0) {
-        throw new Error("No workers available for testing");
-      }
-
-      console.log(`Test environment setup complete:
-        - Creator: ${creator.name}
-        - Test workers: ${allWorkers.length}
-        - Group ID: ${globalGroup.id}
-        - Sync interval: ${testConfig.syncInterval}ms`);
+      await verifyGroupConsistency(globalGroup, workers, testConfig);
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
       throw error;
@@ -162,7 +134,7 @@ describe(TEST_NAME, () => {
       // Send test messages from each check worker
       for (const worker of checkWorkers) {
         await globalGroup.sync();
-        const testMessage = `Message from ${worker.name} at ${Date.now()}`;
+        const testMessage = `Message from ${worker.name} at ${getTime()}`;
         await globalGroup.send(testMessage);
       }
 
@@ -249,19 +221,13 @@ describe(TEST_NAME, () => {
         "Final consistency check",
       );
 
-      // Verify group state consistency across all workers
-      const consistencyCounts = await verifyGroupConsistency(
-        globalGroup.id,
-        allWorkers,
-      );
+      await verifyGroupConsistency(globalGroup, workers, testConfig);
 
       // Log test results
       const testDuration = performance.now() - testStartTime;
 
       console.log("=== Test Results ===");
       console.log(`Test duration: ${Math.round(testDuration)}ms`);
-      console.log("Group consistency counts:");
-      console.log(JSON.stringify(consistencyCounts, null, 2));
       console.log("✓ Final state consistency verified");
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
