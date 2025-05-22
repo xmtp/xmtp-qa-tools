@@ -35,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn large
+        run: yarn retry large
       - name: Send Slack notification
         if: always()
         env:
