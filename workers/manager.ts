@@ -86,7 +86,7 @@ export class WorkerManager {
     await Promise.all(terminationPromises);
     this.activeWorkers = [];
     this.workers = {};
-    await sleep(1000);
+    await sleep(500);
   }
 
   /**
@@ -386,9 +386,6 @@ export async function getWorkers(
   );
   await manager.createWorkers(descriptors);
 
-  if (typeofStreamType !== typeofStream.None) {
-    await sleep(4000);
-  }
   manager.printWorkers();
   return manager;
 }

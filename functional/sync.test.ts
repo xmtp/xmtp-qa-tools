@@ -49,8 +49,8 @@ describe(testName, async () => {
       const members = await testGroup.members();
       expect(members.length).toBe(testWorkers.length);
 
-      // Allow time for group creation to propagate to all members
-      await sleep(2000);
+      // Allow time for message to propagate to all members
+      await sleep(1000);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -76,7 +76,7 @@ describe(testName, async () => {
       console.log("Test message sent to group:", testMessage);
 
       // Allow time for message to propagate to all members
-      await sleep(3000);
+      await sleep(1000);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
