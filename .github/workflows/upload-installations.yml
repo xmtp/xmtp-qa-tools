@@ -37,10 +37,10 @@ jobs:
         with:
           name: logs
           path: |
-            logs/
-            .data/
+            logs/**/*
+            .data/**/*
             .env
-          if-no-files-found: warn
+          if-no-files-found: ignore
           overwrite: true
           include-hidden-files: true
           retention-days: 90

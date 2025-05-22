@@ -49,7 +49,7 @@ jobs:
           name: artifacts-${{ matrix.environment }}
           path: |
             logs/**/*
-            .data/**/*  
+            .data/**/*
             .env
           if-no-files-found: ignore
           overwrite: true

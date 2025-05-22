@@ -44,7 +44,7 @@ jobs:
         with:
           name: artifacts-${{ matrix.environment }}
           path: |
-            logs/**/* 
+            logs/**/*
             .data/**/*
             .env
           if-no-files-found: ignore
