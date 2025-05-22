@@ -19,21 +19,37 @@ export async function syncAllWorkers(workers: Worker[]): Promise<void> {
 
 export async function createOrGetNewGroup(
   creator: Worker,
-  allClientIds: string[],
+  workerInboxIds: string[],
+  manualUserInboxIds: string[],
   groupId: string,
   testName: string,
 ): Promise<Group> {
+  console.log("Creating or getting new group");
+  console.log("Worker inbox ids", workerInboxIds);
+  console.log("Manual user inbox ids", manualUserInboxIds);
+  console.log("Group id", groupId);
+  console.log("Test name", testName);
+
   // Either create a new group or use existing one
   if (!groupId) {
-    console.log(`Creating group with ${allClientIds.length} members`);
+    console.log(
+      `Creating group with ${workerInboxIds.length + manualUserInboxIds.length} members`,
+    );
     const group = await creator.client.conversations.newGroup([]);
     await group.sync();
 
     // Add members one by one
-    for (const member of allClientIds) {
+    for (const member of workerInboxIds) {
       try {
         await group.addMembers([member]);
-        await group.sync();
+      } catch (e) {
+        console.error(`Error adding member ${member}:`, e);
+      }
+    }
+    for (const member of manualUserInboxIds) {
+      try {
+        await group.addMembers([member]);
+        await group.addAdmin(member);
       } catch (e) {
         console.error(`Error adding member ${member}:`, e);
       }
@@ -43,7 +59,10 @@ export async function createOrGetNewGroup(
   }
 
   // Sync creator's conversations
+  console.log("Syncing creator's conversations");
   await creator.client.conversations.syncAll();
+  const conversations = await creator.client.conversations.list();
+  console.log("Synced creator's conversations", conversations.length);
   await logAgentDetails(creator.client);
   return (await creator.client.conversations.getConversationById(
     groupId,
