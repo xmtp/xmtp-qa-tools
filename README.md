@@ -1,16 +1,16 @@
-# XMTP QA Testing
+# XMTP QA Tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
 ## Automated workflows
 
-| Test suite     | Performance                                                                                                                                                                      | Resources                                                                                                                                                                         | Run frequency | Networks         |
-| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
-| 🚀 Performance | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
-| 📬 Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
-| ⏳ Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
-| 🤖 Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
-| 🤖 GM          | [![Performance](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
+| Test suite     | Performance                                                                                                                                                                  | Resources                                                                                                                                                                     | Run frequency | Networks         |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
+| 🚀 Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
+| 📬 Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
+| ⏳ Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
+| 🤖 Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
+| 🤖 GM          | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
 
 ## Architecture
 
@@ -231,12 +231,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Tools & utilities
 
-- **Repository:** [xmtp-qa-testing](https://github.com/xmtp/xmtp-qa-testing): This monorepo contains multiple tools for testing and monitoring
-- **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/.github/workflows)
-- **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-testingus-east-production.up.railway.app/__vitest__/#/)
+- **Repository:** [xmtp-qa-tools](https://github.com/xmtp/xmtp-qa-tools): This monorepo contains multiple tools for testing and monitoring
+- **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
+- **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-toolsus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
-- **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/bots/)
-- **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-testing/tree/main/suites/)
+- **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
+- **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
 ## Development
 
@@ -249,8 +249,8 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ```bash
 # Installation For a faster download with just the latest code
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn install
 ```
 

@@ -12,8 +12,8 @@ This test suite validates the health and responsiveness of live XMTP agents in p
 ## Setup
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn install
 ```
 
@@ -21,7 +21,7 @@ yarn install
 
 - [production.json](./production.json) - List of agents to be tested with their addresses
 - [at_agents.test.ts](./at_agents.test.ts) - Test implementation that sends messages and validates responses
-- [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml) - Workflow configuration for running the tests
+- [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 
@@ -59,7 +59,7 @@ yarn test at_agents
 
 ## Automation
 
-Tests run automatically via [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Agents.yml):
+Tests run automatically via [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml):
 
 ```yaml
 # From at_agents.yml

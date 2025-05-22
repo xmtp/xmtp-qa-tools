@@ -12,15 +12,15 @@ This test suite validates the functionality and responsiveness of the XMTP GM bo
 ## Setup
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn install
 ```
 
 ## Key files
 
 - [at_gm.test.ts](./at_gm.test.ts) - Test implementation that sends messages and validates GM bot responses
-- [GitHub Actions](https://github.com/xmtp/xmtp-qa-testing/actions/workflows/Gm.yml) - Workflow configuration for running the tests
+- [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 

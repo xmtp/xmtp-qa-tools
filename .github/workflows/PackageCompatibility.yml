@@ -19,8 +19,8 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          repository: xmtp/xmtp-qa-testing
-          path: xmtp-qa-testing
+          repository: xmtp/xmtp-qa-tools
+          path: xmtp-qa-tools
 
       - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
@@ -46,11 +46,11 @@ jobs:
           yarn --version
 
       - name: Navigate to gm-bot directory
-        run: cd xmtp-qa-testing/bots/gm-bot
+        run: cd xmtp-qa-tools/bots/gm-bot
 
       - name: Clean previous installations
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           rm -rf node_modules
           rm -rf dist
           rm -rf .yarn
@@ -62,39 +62,39 @@ jobs:
       - name: Install dependencies with npm
         if: matrix.package-manager == 'npm'
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           npm install
 
       - name: Install dependencies with yarn
         if: matrix.package-manager == 'yarn'
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           touch yarn.lock
           yarn install --no-immutable
 
       - name: Install dependencies with yarn 1
         if: matrix.package-manager == 'yarn1'
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           touch yarn.lock
           yarn install --no-immutable
 
       - name: Install dependencies with pnpm
         if: matrix.package-manager == 'pnpm'
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           pnpm install
           pnpm add @xmtp/node-bindings
 
       - name: Install dependencies with bun
         if: matrix.package-manager == 'bun'
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           bun install
 
       - name: Build project
         run: |
-          cd xmtp-qa-testing/bots/gm-bot
+          cd xmtp-qa-tools/bots/gm-bot
           if [ "${{ matrix.package-manager }}" = "yarn1" ]; then
             yarn run build
           else

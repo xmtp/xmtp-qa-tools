@@ -86,7 +86,7 @@ export class WorkerManager {
     await Promise.all(terminationPromises);
     this.activeWorkers = [];
     this.workers = {};
-    await sleep(1000);
+    await sleep(500);
   }
 
   /**
@@ -133,10 +133,11 @@ export class WorkerManager {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
           workersToPrint.push(
-            `${baseName}-${installationId}-${currentWorker.address}-${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
           );
         }
       }
+      console.debug(JSON.stringify(workersToPrint, null, 2));
     } catch (error) {
       console.error(error);
     }
@@ -386,9 +387,6 @@ export async function getWorkers(
   );
   await manager.createWorkers(descriptors);
 
-  if (typeofStreamType !== typeofStream.None) {
-    await sleep(4000);
-  }
   manager.printWorkers();
   return manager;
 }

@@ -273,7 +273,6 @@ export function getEnvPath(testName: string): string {
 export function loadEnv(testName: string) {
   const envPath = getEnvPath(testName);
   dotenv.config({ path: envPath });
-  console.debug("Env path:", envPath, process.env.XMTP_ENV);
   setupPrettyLogs();
   addFileLogging(testName);
   initDataDog();

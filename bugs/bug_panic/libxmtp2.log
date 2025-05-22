@@ -586,4 +586,4 @@ inbox_id="1fb9a3b73c183cba47cbb3ccd59d0bbfc90dfbac5049e62817f477e26ac9972f" inst
 thread 'tokio-runtime-worker' panicked at /Users/runner/work/libxmtp/libxmtp/xmtp_mls/src/subscriptions/stream_messages.rs:211:73:
 `async fn` resumed after completion
 note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
-fabrizioguespe@fabrizios-MacBook-Pro xmtp-qa-testing % 
+fabrizioguespe@fabrizios-MacBook-Pro xmtp-qa-tools % 

@@ -124,12 +124,12 @@ async function sendSlackNotification() {
     }
     let customLinks = "";
     if (testName && testName.toLowerCase().includes("agents")) {
-      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-testing/blob/main/suites/at_agents/production.json|View file>`;
+      customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>`;
     }
 
     // Create a message with GitHub context and AI analysis
     const message = `Test Failure ❌
-    *Test:* <https://github.com/xmtp/xmtp-qa-testing/actions/workflows/${workflowName}.yml|${workflowName}>
+    *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${workflowName}.yml|${workflowName}>
     *Test log:* <${workflowUrl}|View url>
     *Dashboard:* <${datadogUrl}|View>
     *Timestamp:* ${new Date().toLocaleString()}

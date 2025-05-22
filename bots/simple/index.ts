@@ -19,7 +19,7 @@ async function main() {
 
   console.log("Syncing conversations...");
   await client.conversations.sync();
-  void logAgentDetails(client, testName);
+  void logAgentDetails(client);
   console.log("Waiting for messages...");
   try {
     const stream = client.conversations.streamAllMessages();

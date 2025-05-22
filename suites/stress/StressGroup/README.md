@@ -8,8 +8,8 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 ```bash
 # Installation
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn install
 ```
 
