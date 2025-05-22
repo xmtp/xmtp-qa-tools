@@ -1,4 +1,5 @@
-import { execSync } from "child_process";
+import { execSync, spawn } from "child_process";
+import fs from "fs";
 import path from "path";
 
 function showUsageAndExit() {
@@ -23,6 +24,12 @@ function showUsageAndExit() {
   );
   console.error(
     "      --retry-delay <S>   Delay in seconds between retries (default: 10)",
+  );
+  console.error(
+    "      --log / --no-log    Enable/disable logging to file (default: enabled)",
+  );
+  console.error(
+    "      --log-file <name>   Custom log file name (default: auto-generated)",
   );
   console.error(
     "      [vitest_options...] Other options passed directly to vitest",
@@ -84,7 +91,10 @@ try {
     case "retry": {
       let testName = "functional"; // Default test name
       let maxAttempts = 1;
+      let loggingLevel = "debug";
       let retryDelay = 10; // seconds
+      let enableLogging = true;
+      let customLogFile: string | undefined;
       const vitestPassthroughArgs = [];
 
       let currentArgs = nameOrPath
@@ -118,15 +128,122 @@ try {
             console.warn(`Invalid value for --retry-delay: ${nextArg}`);
           }
           i++; // consume value
+        } else if (arg === "--log") {
+          enableLogging = true;
+        } else if (arg === "--no-log") {
+          enableLogging = false;
+        } else if (arg === "--log-file" && nextArg) {
+          customLogFile = nextArg;
+          i++; // consume value
         } else {
           vitestPassthroughArgs.push(arg);
         }
       }
 
+      // Setup logging
+      let logStream: fs.WriteStream | undefined;
+      if (enableLogging) {
+        // Ensure logs directory exists
+        const logsDir = "logs";
+        if (!fs.existsSync(logsDir)) {
+          fs.mkdirSync(logsDir, { recursive: true });
+        }
+
+        // Generate log file name
+        const timestamp = new Date()
+          .toISOString()
+          .replace(/[:.]/g, "-")
+          .replace("T", "-")
+          .split(".")[0];
+
+        // Extract clean test name for log file (remove path and extension)
+        let logFileName: string;
+        if (customLogFile) {
+          logFileName = customLogFile;
+        } else {
+          const cleanTestName = path
+            .basename(testName)
+            .replace(/\.test\.ts$/, "");
+          logFileName = `raw-${cleanTestName}.log`;
+        }
+        const logPath = path.join(logsDir, logFileName);
+
+        logStream = fs.createWriteStream(logPath, { flags: "w" });
+        console.log(`Logging to: ${logPath}`);
+      }
+
+      // Filter patterns to exclude from output
+      const FILTER_PATTERNS = [
+        /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+      ];
+
+      function filterOutput(data: string): string {
+        let filtered = data;
+        for (const pattern of FILTER_PATTERNS) {
+          filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
+        }
+        return filtered;
+      }
+
+      function runCommand(
+        command: string,
+        env: Record<string, string>,
+      ): Promise<number> {
+        return new Promise((resolve) => {
+          const [cmd, ...args] = command.split(" ");
+          const child = spawn(cmd, args, {
+            env,
+            stdio: ["pipe", "pipe", "pipe"],
+          });
+
+          let hasOutput = false;
+
+          const processOutput = (data: Buffer, isError = false) => {
+            const text = data.toString();
+            const filtered = filterOutput(text);
+
+            if (filtered.trim()) {
+              hasOutput = true;
+              // Write to console
+              if (isError) {
+                process.stderr.write(filtered);
+              } else {
+                process.stdout.write(filtered);
+              }
+
+              // Write to log file if enabled
+              if (logStream) {
+                logStream.write(filtered);
+              }
+            }
+          };
+
+          child.stdout?.on("data", (data: Buffer) => {
+            processOutput(data, false);
+          });
+          child.stderr?.on("data", (data: Buffer) => {
+            processOutput(data, true);
+          });
+
+          child.on("close", (code) => {
+            resolve(code || 0);
+          });
+
+          child.on("error", (error) => {
+            console.error(`Failed to start command: ${error.message}`);
+            resolve(1);
+          });
+        });
+      }
+
       console.log(
         `Starting test suite: "${testName}" with up to ${maxAttempts} attempts, delay ${retryDelay}s.`,
       );
-      const env = { ...process.env, RUST_BACKTRACE: "1" };
+      const env = {
+        ...process.env,
+        RUST_BACKTRACE: "1",
+        LOGGING_LEVEL: loggingLevel,
+      };
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
         console.log(`Attempt ${attempt} of ${maxAttempts}...`);
@@ -136,19 +253,48 @@ try {
         if (testName === "functional") {
           command = `npx vitest run ./functional/*.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
         } else {
-          command = `npx vitest run "${testName}" --pool=forks --fileParallelism=false ${vitestArgsString}`;
+          // Check if there's a corresponding npm script
+          const packageJsonPath = path.join(process.cwd(), "package.json");
+          let useNpmScript = false;
+          try {
+            const packageJson = JSON.parse(
+              fs.readFileSync(packageJsonPath, "utf8"),
+            );
+            if (packageJson.scripts && packageJson.scripts[testName]) {
+              useNpmScript = true;
+            }
+          } catch (error) {
+            console.error(`Error reading package.json`, error);
+          }
+
+          if (useNpmScript) {
+            command = `yarn ${testName} ${vitestArgsString}`;
+          } else {
+            command = `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
+          }
         }
         command = command.trim().replace(/\s{2,}/g, " "); // Clean up command string
 
         try {
           console.log(`Executing: ${command}`);
-          execSync(command, { stdio: "inherit", env });
-          console.log("Tests passed successfully!");
-          process.exit(0); // Success
+          const exitCode = await runCommand(command, env);
+
+          if (exitCode === 0) {
+            console.log("Tests passed successfully!");
+            if (logStream) {
+              logStream.end();
+            }
+            process.exit(0); // Success
+          } else {
+            throw new Error(`Command exited with code ${exitCode}`);
+          }
         } catch (error) {
           console.error(`Attempt ${attempt} failed.`, error);
           if (attempt === maxAttempts) {
             console.error(`Test failed after ${maxAttempts} attempts.`);
+            if (logStream) {
+              logStream.end();
+            }
             process.exit(1); // Final failure
           }
           if (retryDelay > 0) {

@@ -15,7 +15,6 @@ jobs:
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: "debug"
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       WORKER_COUNT: 5
@@ -33,12 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with filtered output
-        run: |
-          # Save original exit code while filtering output
-          set -o pipefail
-          yarn large 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
-          exit_code=$?
-          exit $exit_code
+        run: yarn retry large
       - name: Send Slack notification
         if: always()
         env:

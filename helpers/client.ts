@@ -4,6 +4,7 @@ import path from "node:path";
 import type { WorkerManager } from "@workers/manager";
 import {
   IdentifierKind,
+  type Client,
   type LogLevel,
   type Signer,
   type XmtpEnv,
@@ -290,4 +291,85 @@ export async function listInstallations(workers: WorkerManager) {
       );
     }
   }
+}
+
+export const logAgentDetails = async (
+  clients: Client | Client[],
+): Promise<void> => {
+  const clientsByAddress = Array.isArray(clients)
+    ? clients.reduce<Record<string, Client[]>>((acc, client) => {
+        const address = client.accountIdentifier?.identifier ?? "";
+        acc[address] = acc[address] ?? [];
+        acc[address].push(client);
+        return acc;
+      }, {})
+    : {
+        [clients.accountIdentifier?.identifier ?? ""]: [clients],
+      };
+
+  for (const [address, clientGroup] of Object.entries(clientsByAddress)) {
+    const firstClient = clientGroup[0];
+    const inboxId = firstClient.inboxId;
+    const environments = clientGroup
+      .map((c) => c.options?.env ?? "dev")
+      .join(", ");
+    console.log(`\x1b[38;2;252;76;52m
+        ██╗  ██╗███╗   ███╗████████╗██████╗ 
+        ╚██╗██╔╝████╗ ████║╚══██╔══╝██╔══██╗
+         ╚███╔╝ ██╔████╔██║   ██║   ██████╔╝
+         ██╔██╗ ██║╚██╔╝██║   ██║   ██╔═══╝ 
+        ██╔╝ ██╗██║ ╚═╝ ██║   ██║   ██║     
+        ╚═╝  ╚═╝╚═╝     ╚═╝   ╚═╝   ╚═╝     
+      \x1b[0m`);
+
+    const urls = [`http://xmtp.chat/dm/${address}`];
+
+    const conversations = await firstClient.conversations.list();
+
+    console.log(`
+    ✓ XMTP Client:
+    • Address: ${address}
+    • Conversations: ${conversations.length}
+    • InboxId: ${inboxId}
+    • Networks: ${environments}
+    ${urls.map((url) => `• URL: ${url}`).join("\n")}`);
+  }
+};
+export function validateEnvironment(vars: string[]): Record<string, string> {
+  const missing = vars.filter((v) => !process.env[v]);
+
+  if (missing.length) {
+    try {
+      const envPath = path.resolve(process.cwd(), ".env");
+      if (fs.existsSync(envPath)) {
+        const envVars = fs
+          .readFileSync(envPath, "utf-8")
+          .split("\n")
+          .filter((line) => line.trim() && !line.startsWith("#"))
+          .reduce<Record<string, string>>((acc, line) => {
+            const [key, ...val] = line.split("=");
+            if (key && val.length) acc[key.trim()] = val.join("=").trim();
+            return acc;
+          }, {});
+
+        missing.forEach((v) => {
+          if (envVars[v]) process.env[v] = envVars[v];
+        });
+      }
+    } catch (e) {
+      console.error(e);
+      /* ignore errors */
+    }
+
+    const stillMissing = vars.filter((v) => !process.env[v]);
+    if (stillMissing.length) {
+      console.error("Missing env vars:", stillMissing.join(", "));
+      process.exit(1);
+    }
+  }
+
+  return vars.reduce<Record<string, string>>((acc, key) => {
+    acc[key] = process.env[key] as string;
+    return acc;
+  }, {});
 }

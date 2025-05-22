@@ -11,7 +11,6 @@ jobs:
 
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: ${{ vars.LOGGING_LEVEL }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -37,10 +36,10 @@ jobs:
         with:
           name: logs
           path: |
-            logs/
-            .data/
+            logs/**/*
+            .data/**/*
             .env
-          if-no-files-found: warn
+          if-no-files-found: ignore
           overwrite: true
           include-hidden-files: true
           retention-days: 90

@@ -1,72 +1,16 @@
+import { logAgentDetails } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
 import { type Worker } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 
 // ============================================================
-// Metrics Tracking
-// ============================================================
-
-interface SyncMetrics {
-  totalSyncs: number;
-  syncErrors: number;
-  messageCount: number;
-}
-
-const syncMetrics: Record<string, SyncMetrics> = {};
-
-export function initializeMetrics(workerName: string): void {
-  if (!syncMetrics[workerName]) {
-    syncMetrics[workerName] = {
-      totalSyncs: 0,
-      syncErrors: 0,
-      messageCount: 0,
-    };
-  }
-}
-
-export function incrementSyncCount(workerName: string): void {
-  syncMetrics[workerName].totalSyncs++;
-}
-
-export function incrementErrorCount(workerName: string): void {
-  if (syncMetrics[workerName]) {
-    syncMetrics[workerName].syncErrors++;
-  }
-}
-
-export async function updateMessageCount(worker: Worker): Promise<void> {
-  const conversations = await worker.client.conversations.list();
-  syncMetrics[worker.name].messageCount = (
-    await Promise.all(conversations.map((c) => c.messages()))
-  ).flat().length;
-}
-
-// ============================================================
 // Worker Synchronization
 // ============================================================
 
-export async function syncWorker(
-  worker: Worker,
-  trackMetrics = true,
-): Promise<void> {
-  try {
-    await worker.client.conversations.syncAll();
-
-    if (trackMetrics) {
-      if (!syncMetrics[worker.name]) {
-        initializeMetrics(worker.name);
-        await updateMessageCount(worker);
-      }
-      incrementSyncCount(worker.name);
-    }
-  } catch (e) {
-    console.error(`Error syncing ${worker.name}:`, e);
-    incrementErrorCount(worker.name);
-  }
-}
-
 export async function syncAllWorkers(workers: Worker[]): Promise<void> {
-  await Promise.all(workers.map((w) => syncWorker(w)));
+  for (const worker of workers) {
+    await worker.client.conversations.syncAll();
+  }
 }
 
 // ============================================================
@@ -94,15 +38,13 @@ export async function createOrGetNewGroup(
         console.error(`Error adding member ${member}:`, e);
       }
     }
-
-    // Set group name
-    await group.updateName("Test group");
     appendToEnv("GROUP_ID", group.id, testName);
     return group;
   }
 
   // Sync creator's conversations
   await creator.client.conversations.syncAll();
+  await logAgentDetails(creator.client);
   return (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;

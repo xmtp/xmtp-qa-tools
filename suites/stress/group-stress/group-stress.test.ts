@@ -2,6 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -29,6 +30,7 @@ const testConfig = {
     hour12: false,
   })}`,
   epochs: 4,
+  network: "production",
   totalWorkers: 14,
   syncInterval: 10000,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
@@ -55,6 +57,9 @@ describe(TEST_NAME, () => {
   // Test Lifecycle Setup
   // ============================================================
 
+  setupTestLifecycle({
+    expect,
+  });
   beforeAll(async () => {
     try {
       // Initialize workers with creator and test workers
@@ -63,14 +68,13 @@ describe(TEST_NAME, () => {
         TEST_NAME,
         typeofStream.Message,
         typeOfResponse.Gm,
+        testConfig.network,
       );
 
-      // Set creator as the first worker (more reliable than hardcoded name)
-      const creatorName = WORKER_NAMES[0];
-      creator = workers.get(creatorName) as Worker;
+      creator = workers.get("bot") as Worker;
 
       if (!creator) {
-        throw new Error(`Creator worker '${creatorName}' not found`);
+        throw new Error(`Creator worker 'bot' not found`);
       }
 
       // Get all manual user client IDs for the current environment
@@ -85,7 +89,7 @@ describe(TEST_NAME, () => {
       globalGroup = await createOrGetNewGroup(
         creator,
         allClientIds,
-        testConfig.groupId || "",
+        testConfig.groupId as string,
         TEST_NAME,
       );
 

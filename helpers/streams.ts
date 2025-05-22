@@ -264,7 +264,10 @@ export async function verifyMessageStream(
     triggerEvents: async () => {
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        const content = `gm-${i + 1}-${randomSuffix}`;
+        let content = `gm-${i + 1}-${randomSuffix}`;
+        if (count === 1) {
+          content = randomSuffix;
+        }
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
