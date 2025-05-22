@@ -10,7 +10,6 @@ import manualUsers from "../../../helpers/manualusers.json";
 import {
   createOrGetNewGroup,
   syncAllWorkers,
-  syncWorker,
   testMembershipChanges,
   verifyGroupConsistency,
 } from "./helper";
@@ -71,7 +70,7 @@ describe(TEST_NAME, () => {
   });
 
   // Setup test environment
-  it("setup test environment", async () => {
+  it("setup test environment", () => {
     try {
       start = performance.now();
 
