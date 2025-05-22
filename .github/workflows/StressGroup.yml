@@ -2,6 +2,8 @@ name: GroupStress
 description: Check that group stress testing is working correctly. If it fails notify the team.
 
 on:
+  schedule:
+    - cron: "0 * * * *" # every hour
   pull_request:
     branches:
       - main
@@ -69,12 +71,6 @@ jobs:
             .data
             logs
           key: stress-group-data-${{ matrix.environment }}
-
-      - name: Send Slack notification
-        if: always()
-        env:
-          JOB_STATUS: ${{ job.status }}
-        run: npx tsx helpers/slack.ts
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:

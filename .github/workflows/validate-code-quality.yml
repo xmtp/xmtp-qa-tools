@@ -1,9 +1,5 @@
 name: Validate code quality
 
-on:
-  push:
-    branches-ignore: [main]
-
 jobs:
   check:
     runs-on: ubuntu-latest

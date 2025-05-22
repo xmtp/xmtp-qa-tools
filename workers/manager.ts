@@ -5,7 +5,7 @@ import { generateEncryptionKeyHex } from "@helpers/client";
 import { sdkVersionOptions, sdkVersions, sleep } from "@helpers/tests";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { typeOfResponse, typeofStream, WorkerClient } from "./main";
+import { typeOfResponse, typeofStream, typeOfSync, WorkerClient } from "./main";
 
 export interface WorkerBase {
   name: string;
@@ -40,6 +40,7 @@ export class WorkerManager {
   private activeWorkers: WorkerClient[] = [];
   private typeofStream: typeofStream = typeofStream.Message;
   private typeOfResponse: typeOfResponse = typeOfResponse.Gm;
+  private typeOfSync: typeOfSync = typeOfSync.None;
   private env: XmtpEnv;
   private keysCache: Record<
     string,
@@ -53,11 +54,13 @@ export class WorkerManager {
     testName: string,
     typeofStreamType: typeofStream = typeofStream.Message,
     typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
+    typeOfSyncType: typeOfSync = typeOfSync.None,
     env: XmtpEnv,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStreamType;
     this.typeOfResponse = typeOfResponseType;
+    this.typeOfSync = typeOfSyncType;
     this.env = env;
     this.workers = {};
   }
@@ -312,6 +315,7 @@ export class WorkerManager {
       workerData,
       this.typeofStream,
       this.typeOfResponse,
+      this.typeOfSync,
       this.env,
     );
 
@@ -377,12 +381,14 @@ export async function getWorkers(
   testName: string,
   typeofStreamType: typeofStream = typeofStream.None,
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
+  typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
     typeofStreamType,
     typeOfResponseType,
+    typeOfSyncType,
     env,
   );
   await manager.createWorkers(descriptors);

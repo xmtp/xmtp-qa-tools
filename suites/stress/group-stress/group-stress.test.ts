@@ -3,14 +3,13 @@ import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import manualUsers from "../../../helpers/manualusers.json";
 import {
   createOrGetNewGroup,
-  syncAllWorkers,
   testMembershipChanges,
   verifyGroupConsistency,
 } from "./helper";
@@ -35,7 +34,7 @@ const testConfig = {
   syncInterval: 10000,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
   checkWorkers: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
-  groupId: process.env.GROUP_ID,
+  groupId: process.env.GROUP_ID as string,
 } as const;
 
 loadEnv(TEST_NAME);
@@ -49,7 +48,6 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let globalGroup: Group;
   let allWorkers: Worker[] = [];
-  let syncIntervalId: NodeJS.Timeout;
   let testStartTime: number;
 
   // ============================================================
@@ -67,6 +65,7 @@ describe(TEST_NAME, () => {
         TEST_NAME,
         typeofStream.Message,
         typeOfResponse.Gm,
+        typeOfSync.Both,
         testConfig.network,
       );
 
@@ -79,13 +78,11 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        [
-          ...manualUsers
-            .filter((user) => user.network === "production")
-            .map((user) => user.inboxId),
-          ...workers.getAllButCreator().map((w) => w.client.inboxId),
-        ],
-        testConfig.groupId as string,
+        manualUsers
+          .filter((user) => user.network === "production")
+          .map((user) => user.inboxId),
+        workers.getAllButCreator().map((w) => w.client.inboxId),
+        testConfig.groupId,
         TEST_NAME,
       );
 
@@ -106,11 +103,6 @@ describe(TEST_NAME, () => {
 
   afterAll(async () => {
     try {
-      // Clean up periodic sync interval
-      if (syncIntervalId) {
-        clearInterval(syncIntervalId);
-      }
-
       // Send final test completion message
       if (globalGroup?.id) {
         await globalGroup.send(`Test completed: ${testConfig.groupName}`);
@@ -137,12 +129,6 @@ describe(TEST_NAME, () => {
         throw new Error("No workers available for testing");
       }
 
-      // Start periodic synchronization of all workers
-      syncIntervalId = setInterval(
-        () => void syncAllWorkers(allWorkers),
-        testConfig.syncInterval,
-      );
-
       console.log(`Test environment setup complete:
         - Creator: ${creator.name}
         - Test workers: ${allWorkers.length}
@@ -159,9 +145,6 @@ describe(TEST_NAME, () => {
       if (!globalGroup?.id) {
         throw new Error("Global group is not initialized");
       }
-
-      // Ensure all workers are synchronized
-      await syncAllWorkers(allWorkers);
 
       // Get workers designated for checking message delivery
       const checkWorkers = allWorkers.filter((worker) =>
@@ -229,7 +212,7 @@ describe(TEST_NAME, () => {
           )) as Group;
 
         if (workerGroup) {
-          await workerGroup.send(`${worker.name}: pre-membership-test`);
+          await workerGroup.send(`${worker.name}: sup`);
         }
 
         // Perform multiple cycles of membership changes
@@ -239,9 +222,6 @@ describe(TEST_NAME, () => {
           worker,
           testConfig.epochs,
         );
-
-        // Sync all workers after membership changes
-        await syncAllWorkers(allWorkers);
 
         console.log(
           `✓ Completed ${testConfig.epochs} membership cycles for ${worker.name}`,
@@ -260,9 +240,6 @@ describe(TEST_NAME, () => {
       }
 
       console.log("Verifying final state consistency...");
-
-      // Final sync of all workers
-      await syncAllWorkers(allWorkers);
 
       // Verify final message delivery across all workers
       await verifyMessageStream(

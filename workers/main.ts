@@ -23,7 +23,12 @@ export enum typeOfResponse {
   Gpt = "gpt",
   None = "none",
 }
-
+export enum typeOfSync {
+  SyncAll = "sync_all",
+  Sync = "sync_conversation",
+  Both = "both",
+  None = "none",
+}
 export enum typeofStream {
   Message = "message",
   GroupUpdated = "group_updated",
@@ -145,6 +150,7 @@ export class WorkerClient extends Worker {
   private walletKey: string;
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
+  private typeofSync: typeOfSync;
   private typeOfResponse: typeOfResponse;
   private folder: string;
   private sdkVersion: string;
@@ -158,6 +164,7 @@ export class WorkerClient extends Worker {
     worker: WorkerBase,
     typeofStream: typeofStream,
     typeOfResponse: typeOfResponse,
+    typeofSync: typeOfSync,
     env: XmtpEnv,
     options: WorkerOptions = {},
   ) {
@@ -166,7 +173,7 @@ export class WorkerClient extends Worker {
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
-
+    this.typeofSync = typeofSync;
     this.typeOfResponse = typeOfResponse;
     this.typeofStream = typeofStream;
     this.name = worker.name;
@@ -264,6 +271,7 @@ export class WorkerClient extends Worker {
     this.address = address;
 
     this.startStream();
+    this.startSyncs();
 
     const installationId = this.client.installationId;
 
@@ -273,6 +281,32 @@ export class WorkerClient extends Worker {
       address: address,
       installationId,
     };
+  }
+
+  /**
+   * Starts a periodic sync of all conversations
+   * @param interval - The interval in milliseconds to sync
+   */
+  private startSyncs(interval: number = 10000) {
+    if (this.typeofSync !== typeOfSync.None) {
+      void (async () => {
+        while (this.activeStreams) {
+          console.debug(
+            `[${this.nameId}] Syncing ${this.typeofSync} every ${interval}ms`,
+          );
+          if (this.typeofSync === typeOfSync.SyncAll) {
+            await this.client.conversations.syncAll();
+          } else if (this.typeofSync === typeOfSync.Sync) {
+            await this.client.conversations.sync();
+          } else if (this.typeofSync === typeOfSync.Both) {
+            await this.client.conversations.syncAll();
+            await this.client.conversations.sync();
+          }
+
+          await new Promise((resolve) => setTimeout(resolve, interval));
+        }
+      })();
+    }
   }
 
   /**
