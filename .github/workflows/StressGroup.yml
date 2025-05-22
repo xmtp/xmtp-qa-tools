@@ -65,7 +65,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry group-stress
+        run: yarn test group-stress
       - name: Save .data cache
         uses: actions/cache/save@v4
         if: always()
