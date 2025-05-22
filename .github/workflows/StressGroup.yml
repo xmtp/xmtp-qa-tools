@@ -28,12 +28,10 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
-
       # Create cache date key - refresh cache weekly
       - name: Get date for cache key
         id: date
         run: echo "date=$(date +%Y-%U)" >> $GITHUB_OUTPUT
-
       # Restore cached .data folder with date-based key
       - name: Restore .data cache
         uses: actions/cache@v3
@@ -42,7 +40,7 @@ jobs:
           path: .data
           key: stress-group-data-${{ steps.date.outputs.date }}
           restore-keys: |
-            stress-group-data-
+            stress-group-data-${{ steps.date.outputs.date }}
 
       - uses: actions/setup-node@v4
         with:
