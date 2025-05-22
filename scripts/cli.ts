@@ -91,6 +91,7 @@ try {
     case "retry": {
       let testName = "functional"; // Default test name
       let maxAttempts = 1;
+      let loggingLevel = "off";
       let retryDelay = 10; // seconds
       let enableLogging = true;
       let customLogFile: string | undefined;
@@ -241,7 +242,7 @@ try {
       const env = {
         ...process.env,
         RUST_BACKTRACE: "1",
-        LOGGING_LEVEL: "debug",
+        LOGGING_LEVEL: loggingLevel,
       };
 
       for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -263,7 +264,7 @@ try {
               useNpmScript = true;
             }
           } catch (error) {
-            // Fallback to direct vitest if package.json can't be read
+            console.error(`Error reading package.json`, error);
           }
 
           if (useNpmScript) {

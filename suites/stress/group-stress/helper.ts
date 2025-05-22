@@ -1,3 +1,4 @@
+import { logAgentDetails } from "@helpers/client";
 import { appendToEnv } from "@helpers/tests";
 import { type Worker } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -103,6 +104,7 @@ export async function createOrGetNewGroup(
 
   // Sync creator's conversations
   await creator.client.conversations.syncAll();
+  await logAgentDetails(creator.client);
   return (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;
