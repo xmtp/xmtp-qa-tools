@@ -4,16 +4,6 @@ import { type Worker } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 
 // ============================================================
-// Worker Synchronization
-// ============================================================
-
-export async function syncAllWorkers(workers: Worker[]): Promise<void> {
-  for (const worker of workers) {
-    await worker.client.conversations.syncAll();
-  }
-}
-
-// ============================================================
 // Group Management
 // ============================================================
 

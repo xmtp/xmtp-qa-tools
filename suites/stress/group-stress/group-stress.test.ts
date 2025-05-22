@@ -10,7 +10,6 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import manualUsers from "../../../helpers/manualusers.json";
 import {
   createOrGetNewGroup,
-  syncAllWorkers,
   testMembershipChanges,
   verifyGroupConsistency,
 } from "./helper";
@@ -67,7 +66,7 @@ describe(TEST_NAME, () => {
         TEST_NAME,
         typeofStream.Message,
         typeOfResponse.Gm,
-        typeOfSync.None,
+        typeOfSync.Both,
         testConfig.network,
       );
 
@@ -136,12 +135,6 @@ describe(TEST_NAME, () => {
         throw new Error("No workers available for testing");
       }
 
-      // Start periodic synchronization of all workers
-      syncIntervalId = setInterval(
-        () => void syncAllWorkers(allWorkers),
-        testConfig.syncInterval,
-      );
-
       console.log(`Test environment setup complete:
         - Creator: ${creator.name}
         - Test workers: ${allWorkers.length}
@@ -158,9 +151,6 @@ describe(TEST_NAME, () => {
       if (!globalGroup?.id) {
         throw new Error("Global group is not initialized");
       }
-
-      // Ensure all workers are synchronized
-      await syncAllWorkers(allWorkers);
 
       // Get workers designated for checking message delivery
       const checkWorkers = allWorkers.filter((worker) =>
@@ -239,9 +229,6 @@ describe(TEST_NAME, () => {
           testConfig.epochs,
         );
 
-        // Sync all workers after membership changes
-        await syncAllWorkers(allWorkers);
-
         console.log(
           `✓ Completed ${testConfig.epochs} membership cycles for ${worker.name}`,
         );
@@ -259,9 +246,6 @@ describe(TEST_NAME, () => {
       }
 
       console.log("Verifying final state consistency...");
-
-      // Final sync of all workers
-      await syncAllWorkers(allWorkers);
 
       // Verify final message delivery across all workers
       await verifyMessageStream(
