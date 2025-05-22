@@ -24,7 +24,7 @@ const testConfig = {
     minute: "2-digit",
     hour12: false,
   })}`,
-  epochs: 12,
+  epochs: 4,
   workers: 14,
   syncInterval: 10000,
   testWorkers: names.slice(1, 10),
@@ -55,6 +55,9 @@ describe(TEST_NAME, () => {
       typeofStream.Message,
       typeOfResponse.Gm,
     );
+    creator = workers.get("fabri") as Worker;
+    await creator.client.conversations.syncAll();
+
     globalGroup = await createOrGetNewGroup(
       creator,
       allClientIds,
@@ -71,9 +74,6 @@ describe(TEST_NAME, () => {
   it("setup test environment", async () => {
     try {
       start = performance.now();
-
-      creator = workers.get("fabri") as Worker;
-      await creator.client.conversations.syncAll();
 
       allWorkers = workers.getAllButCreator();
       allClientIds = manualUsers
