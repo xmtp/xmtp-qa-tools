@@ -2,7 +2,7 @@
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
-## Automated workflow
+## Automated workflows
 
 | Test suite     | Performance                                                                                                                                                                  | Resources                                                                                                                                                                     | Run frequency | Networks         |
 | -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
