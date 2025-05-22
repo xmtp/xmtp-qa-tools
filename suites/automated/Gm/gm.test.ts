@@ -4,7 +4,7 @@ import { playwright } from "@helpers/playwright";
 import { verifyMessageStream } from "@helpers/streams";
 import { getAddresses, GM_BOT_ADDRESS } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -25,6 +25,7 @@ describe(testName, () => {
       testName,
       typeofStream.Message,
       typeOfResponse.None,
+      typeOfSync.None,
       "production",
     );
   });

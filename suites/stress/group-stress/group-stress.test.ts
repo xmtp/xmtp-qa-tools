@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
@@ -67,6 +67,7 @@ describe(TEST_NAME, () => {
         TEST_NAME,
         typeofStream.Message,
         typeOfResponse.Gm,
+        typeOfSync.None,
         testConfig.network,
       );
 

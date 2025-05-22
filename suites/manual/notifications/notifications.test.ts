@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
@@ -19,6 +19,7 @@ describe(testName, () => {
         testName,
         typeofStream.Message,
         typeOfResponse.Gm,
+        typeOfSync.None,
         receiver.network as "production" | "dev" | "local",
       );
       group = await workers.createGroup();

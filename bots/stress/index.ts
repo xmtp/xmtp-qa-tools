@@ -7,7 +7,7 @@ import {
   type StressTestConfig,
 } from "@helpers/groups";
 import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/tests";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   type Client,
@@ -163,6 +163,7 @@ const main = async () => {
     "stressbot",
     typeofStream.None,
     typeOfResponse.None,
+    typeOfSync.None,
     "dev",
   );
 
@@ -171,6 +172,7 @@ const main = async () => {
     "stressbot",
     typeofStream.None,
     typeOfResponse.None,
+    typeOfSync.None,
     "production",
   );
 
