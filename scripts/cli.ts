@@ -190,10 +190,11 @@ try {
         env: Record<string, string>,
       ): Promise<number> {
         return new Promise((resolve) => {
-          const [cmd, ...args] = command.split(" ");
-          const child = spawn(cmd, args, {
+          // Use shell to handle glob patterns properly
+          const child = spawn(command, {
             env,
             stdio: ["pipe", "pipe", "pipe"],
+            shell: true,
           });
 
           let hasOutput = false;
