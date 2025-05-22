@@ -33,7 +33,7 @@ jobs:
         run: |
           # Save original exit code while filtering output
           set -o pipefail
-          yarn retry delivery 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          yarn retry delivery
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification

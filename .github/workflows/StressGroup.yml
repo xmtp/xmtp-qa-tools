@@ -66,7 +66,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry suites/stress/group-stress/group-stress.test.ts
+        run: yarn retry group-stress
 
       # Debug what was created during test run
       - name: Show created data

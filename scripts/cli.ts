@@ -252,7 +252,25 @@ try {
         if (testName === "functional") {
           command = `npx vitest run ./functional/*.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
         } else {
-          command = `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
+          // Check if there's a corresponding npm script
+          const packageJsonPath = path.join(process.cwd(), "package.json");
+          let useNpmScript = false;
+          try {
+            const packageJson = JSON.parse(
+              fs.readFileSync(packageJsonPath, "utf8"),
+            );
+            if (packageJson.scripts && packageJson.scripts[testName]) {
+              useNpmScript = true;
+            }
+          } catch (error) {
+            // Fallback to direct vitest if package.json can't be read
+          }
+
+          if (useNpmScript) {
+            command = `yarn ${testName} ${vitestArgsString}`;
+          } else {
+            command = `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
+          }
         }
         command = command.trim().replace(/\s{2,}/g, " "); // Clean up command string
 
