@@ -16,7 +16,7 @@ jobs:
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      LOGGING_LEVEL: "off"
+      LOGGING_LEVEL: "debug"
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
@@ -72,6 +72,27 @@ jobs:
           yarn retry group-stress 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
           exit_code=$?
           exit $exit_code
+
+      # Debug what was created during test run
+      - name: Show created data
+        if: always()
+        run: |
+          echo "=== Data directories created during test ==="
+          if [ -d ".data" ]; then
+            echo "Contents of .data directory:"
+            find .data -type f | head -20
+            echo "Directory sizes:"
+            du -sh .data/* 2>/dev/null || echo "No subdirectories in .data"
+          else
+            echo "No .data directory created"
+          fi
+
+          if [ -d "logs" ]; then
+            echo "Contents of logs directory:"
+            find logs -type f | head -10
+          else
+            echo "No logs directory created"
+          fi
 
       # Save cache explicitly (in case job fails)
       - name: Save .data cache
