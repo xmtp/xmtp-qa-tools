@@ -67,8 +67,6 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn retry group-stress
-
-      # Save cache explicitly (in case job fails)
       - name: Save .data cache
         uses: actions/cache/save@v4
         if: always()

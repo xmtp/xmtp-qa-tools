@@ -34,7 +34,7 @@ jobs:
           cache: "yarn"
       - name: Install dependencies
         run: yarn
-      - name: Run tests with filtered output
+      - name: Run tests
         run: yarn large
       - name: Send Slack notification
         if: always()
