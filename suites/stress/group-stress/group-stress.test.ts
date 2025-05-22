@@ -80,7 +80,10 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        manualUsers.map((user) => user.inboxId),
+        [
+          ...manualUsers.map((user) => user.inboxId),
+          ...workers.getAllButCreator().map((w) => w.client.inboxId),
+        ],
         testConfig.groupId as string,
         TEST_NAME,
       );

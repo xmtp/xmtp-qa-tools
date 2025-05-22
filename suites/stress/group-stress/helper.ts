@@ -74,18 +74,15 @@ export async function testMembershipChanges(
       );
 
       if (memberExists) {
-        // Remove and add back the member
         await group.removeMembers([memberInboxId]);
-        await group.sync();
         await group.addMembers([memberInboxId]);
-        await group.sync();
         console.log(`Cycle ${i}: Removed and re-added ${member.name}`);
       } else {
         // Just add the member if not present
         await group.addMembers([memberInboxId]);
-        await group.sync();
         console.log(`Cycle ${i}: Added missing member ${member.name}`);
       }
+      await group.sync();
     } catch (e) {
       console.error(`Error in membership cycle ${i}:`, e);
     }
