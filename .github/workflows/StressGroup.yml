@@ -65,13 +65,8 @@ jobs:
           cache: "yarn"
       - name: Install dependencies
         run: yarn
-      - name: Run tests with filtered output
-        run: |
-          # Save original exit code while filtering output
-          set -o pipefail
-          yarn retry group-stress 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
-          exit_code=$?
-          exit $exit_code
+      - name: Run tests
+        run: yarn retry suites/stress/group-stress/group-stress.test.ts
 
       # Debug what was created during test run
       - name: Show created data
