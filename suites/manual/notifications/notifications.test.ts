@@ -5,7 +5,7 @@ import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 import { getManualUsers } from "../../../helpers/tests";
 
-const testName = "ts_notifications";
+const testName = "notifications";
 loadEnv(testName);
 
 describe(testName, () => {

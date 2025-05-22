@@ -1,4 +1,4 @@
-# XMTP Stress Group Testing Suite (ts_stressgroup)
+# XMTP Group Stress Testing Suite
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
@@ -34,7 +34,7 @@ GROUP_ID=""
 ## Test Execution
 
 ```bash
-yarn test ts_stressgroup
+yarn test group-stress
 ```
 
 ## Test Flow
