@@ -9,7 +9,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "at_gm";
+const testName = "gm";
 loadEnv(testName);
 
 describe(testName, () => {

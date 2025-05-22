@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMembershipStream } from "@helpers/streams";
+import { verifyNewConversationStream } from "@helpers/streams";
 import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_membership";
+const testName = "large-conversations";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -28,7 +28,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames(m_large_WORKER_COUNT),
     testName,
-    typeofStream.GroupUpdated,
+    typeofStream.Conversation,
   );
 
   let customDuration: number | undefined = undefined;
@@ -49,15 +49,14 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveAddMember-${i}: should create a new conversation`, async () => {
+    it(`newGroup-${i}: should create a new conversation`, async () => {
       try {
-        // Initialize workers
-        newGroup = await workers.createGroup();
-
-        const verifyResult = await verifyMembershipStream(
+        const creator = workers.getCreator();
+        newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
+        // Use the dedicated conversation stream verification helper
+        const verifyResult = await verifyNewConversationStream(
           newGroup,
           workers.getAllButCreator(),
-          getInboxIds(1),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);
@@ -66,7 +65,7 @@ describe(testName, async () => {
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          addMembersTimeMs: verifyResult.averageEventTiming,
+          conversationStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);

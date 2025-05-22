@@ -35,7 +35,7 @@ jobs:
         run: |
           # Save original exit code while filtering output
           set -o pipefail
-          yarn retry m_performance 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          yarn retry performance 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification
@@ -43,9 +43,15 @@ jobs:
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-      - name: Upload reports artifacts
-        if: always()
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs_${{ matrix.environment }}
-          path: logs/
+          name: artifacts-${{ matrix.environment }}
+          path: |
+            logs/**/*
+            .data/**/*  
+            .env
+          if-no-files-found: ignore
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90

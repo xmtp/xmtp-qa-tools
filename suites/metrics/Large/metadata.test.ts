@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
+import { verifyMetadataStream } from "@helpers/streams";
 import { getInboxIds, getRandomNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_messages";
+const testName = "large-metadata";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -28,7 +28,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getRandomNames(m_large_WORKER_COUNT),
     testName,
-    typeofStream.Message,
+    typeofStream.GroupUpdated,
   );
 
   let customDuration: number | undefined = undefined;
@@ -43,32 +43,31 @@ describe(testName, async () => {
       customDuration = v;
     },
   });
-
   for (
     let i = m_large_BATCH_SIZE;
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveMessage-${i}: should create a group and measure all streams`, async () => {
+    it(`receiveMetadata-${i}: should create a group and measure all streams`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
         await (newGroup as Group).addMembers(
           workers.getAllButCreator().map((worker) => worker.inboxId),
         );
-        const verifyResult = await verifyMessageStream(
-          newGroup,
+        const verifyResult = await verifyMetadataStream(
+          newGroup as Group,
           workers.getAllButCreator(),
         );
+
+        setCustomDuration(verifyResult.averageEventTiming);
+        expect(verifyResult.allReceived).toBe(true);
 
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          messageStreamTimeMs: verifyResult.averageEventTiming,
+          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
         };
-
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

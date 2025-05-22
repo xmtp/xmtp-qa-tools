@@ -12,7 +12,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_cumulative_syncs";
+const testName = "large-cumulative-syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -39,8 +39,7 @@ describe(testName, async () => {
     getCustomDuration: () => customDuration,
     setCustomDuration,
   });
-  let workerA: Worker;
-  let workerB: Worker;
+
   let run = 0;
   for (
     let i = m_large_BATCH_SIZE;
@@ -51,23 +50,11 @@ describe(testName, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
-        workerA = allWorkers[run];
-        workerB = allWorkers[run + 1];
-        console.log(
-          JSON.stringify(
-            {
-              creator: creator.name,
-              workerA: workerA.name,
-              workerB: workerB.name,
-            },
-            null,
-            2,
-          ),
-        );
+        console.log("Creator name: ", creator.name);
         const newGroup = await creator.client.conversations.newGroup(
           getInboxIds(i),
         );
-        await newGroup.addMembers([workerA.inboxId, workerB.inboxId]);
+        await newGroup.addMembers(allWorkers.map((worker) => worker.inboxId));
         const createTimeMs = performance.now() - createTime;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
@@ -79,14 +66,14 @@ describe(testName, async () => {
       }
     });
 
-    it(`singleSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
+    it(`cumulativeSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
       try {
         const syncAllStart = performance.now();
-        await workerA.client.conversations.syncAll();
-        const singleSyncAllTimeMs = performance.now() - syncAllStart;
+        await allWorkers[run].client.conversations.syncAll();
+        const cumulativeSyncAllTimeMs = performance.now() - syncAllStart;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          singleSyncAllTimeMs,
+          cumulativeSyncAllTimeMs,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -94,14 +81,14 @@ describe(testName, async () => {
       }
     });
 
-    it(`singleSync-${i}: should measure sync for a different worker (cold start)`, async () => {
+    it(`cumulativeSync-${i}: should measure sync for a different worker (cold start)`, async () => {
       try {
         const syncStart = performance.now();
-        await workerB.client.conversations.sync();
-        const singleSyncTimeMs = performance.now() - syncStart;
+        await allWorkers[run + 1].client.conversations.sync();
+        const cumulativeSyncTimeMs = performance.now() - syncStart;
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          singleSyncTimeMs,
+          cumulativeSyncTimeMs,
         };
         run += 2;
       } catch (e) {

@@ -12,7 +12,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "ts_stress";
+const testName = "bot-stress";
 loadEnv(testName);
 
 const receiverInboxId =

@@ -33,15 +33,21 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn retry at_agents
+        run: yarn retry agents
       - name: Send Slack notification
         if: always()
         env:
           JOB_STATUS: ${{ job.status }}
         run: npx tsx helpers/slack.ts
-      - name: Upload reports artifacts
-        if: always()
+      - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs_${{ matrix.environment }}
-          path: logs/
+          name: artifacts-${{ matrix.environment }}
+          path: |
+            logs/**/* 
+            .data/**/*
+            .env
+          if-no-files-found: ignore
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90

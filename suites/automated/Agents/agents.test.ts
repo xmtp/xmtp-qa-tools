@@ -18,7 +18,7 @@ interface Agent {
 
 // Type assertion for imported JSON
 const typedAgents = productionAgents as Agent[];
-const testName = "at_agents";
+const testName = "agents";
 loadEnv(testName);
 
 describe(testName, () => {
