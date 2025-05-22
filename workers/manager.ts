@@ -133,10 +133,11 @@ export class WorkerManager {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
           workersToPrint.push(
-            `${baseName}-${installationId}-${currentWorker.address}-${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
           );
         }
       }
+      console.debug(JSON.stringify(workersToPrint, null, 2));
     } catch (error) {
       console.error(error);
     }

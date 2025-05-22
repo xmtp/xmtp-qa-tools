@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import type { Conversation } from "@xmtp/node-sdk";
+import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 import { getManualUsers } from "../../../helpers/tests";
 
@@ -26,6 +26,10 @@ describe(testName, () => {
         console.error(`Failed to create conversation for alice`);
         return;
       }
+      await (group as Group).addMembers([receiver.inboxId]);
+      await (group as Group).addSuperAdmin(receiver.inboxId);
+      console.debug("added super admin", receiver.inboxId);
+      await group.sync();
       await group.send("Start group test");
       console.log(`Created group ${group.id}`);
     });
@@ -51,8 +55,7 @@ describe(testName, () => {
     it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
       try {
         let counter = 0;
-        const group = await workers.createGroup();
-        await group.addMembers([receiver.inboxId]);
+
         if (!group) {
           console.error(`Failed to create conversation for alice`);
           return;
