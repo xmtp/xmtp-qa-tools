@@ -2,6 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -56,6 +57,9 @@ describe(TEST_NAME, () => {
   // Test Lifecycle Setup
   // ============================================================
 
+  setupTestLifecycle({
+    expect,
+  });
   beforeAll(async () => {
     try {
       // Initialize workers with creator and test workers
@@ -85,7 +89,7 @@ describe(TEST_NAME, () => {
       globalGroup = await createOrGetNewGroup(
         creator,
         allClientIds,
-        testConfig.groupId || "",
+        testConfig.groupId as string,
         TEST_NAME,
       );
 
