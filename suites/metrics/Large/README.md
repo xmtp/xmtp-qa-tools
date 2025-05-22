@@ -23,8 +23,8 @@ This suite benchmarks XMTP network performance and scalability with large group 
 ## Setup
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn install
 ```
 

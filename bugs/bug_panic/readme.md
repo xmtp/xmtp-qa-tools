@@ -2,8 +2,8 @@
 
 ```bash
 # Installation For a faster download with just the latest code
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-testing
-cd xmtp-qa-testing
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
 yarn
 yarn test bug_panic
 ```

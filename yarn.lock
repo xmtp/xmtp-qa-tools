@@ -5164,9 +5164,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"xmtp-qa-testing@workspace:.":
+"xmtp-qa-tools@workspace:.":
   version: 0.0.0-use.local
-  resolution: "xmtp-qa-testing@workspace:."
+  resolution: "xmtp-qa-tools@workspace:."
   dependencies:
     "@eslint/compat": "npm:^1.2.6"
     "@eslint/js": "npm:^9.19.0"
