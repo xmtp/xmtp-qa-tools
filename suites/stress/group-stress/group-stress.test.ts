@@ -24,7 +24,7 @@ const WORKER_NAMES = getFixedNames(14);
 
 const testConfig = {
   testName: TEST_NAME,
-  groupName: `Fork group ${new Date().toLocaleTimeString("en-US", {
+  groupName: `NotForked ${new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
