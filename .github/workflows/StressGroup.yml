@@ -44,16 +44,6 @@ jobs:
           restore-keys: |
             stress-group-data-
 
-      # Restore .env cache with date-based key
-      - name: Restore .env cache
-        uses: actions/cache@v3
-        id: env-cache
-        with:
-          path: .env
-          key: stress-group-env-${{ steps.date.outputs.date }}
-          restore-keys: |
-            stress-group-env-
-
       - uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
