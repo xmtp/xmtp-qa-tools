@@ -77,18 +77,10 @@ describe(TEST_NAME, () => {
         throw new Error(`Creator worker 'bot' not found`);
       }
 
-      // Get all manual user client IDs for the current environment
-      allClientIds = manualUsers
-        .filter(
-          (user) =>
-            user.app === "convos" && user.network === process.env.XMTP_ENV,
-        )
-        .map((user) => user.inboxId);
-
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        allClientIds,
+        manualUsers.map((user) => user.inboxId),
         testConfig.groupId as string,
         TEST_NAME,
       );
@@ -186,7 +178,7 @@ describe(TEST_NAME, () => {
         await globalGroup.send(testMessage);
       }
 
-      // Verify all workers receive the test message
+      // Verify all workers refceive the test message
       const verificationMessage = `Verification: Hi ${allWorkers.map((w) => w.name).join(", ")}`;
       await verifyMessageStream(
         globalGroup,
@@ -263,9 +255,6 @@ describe(TEST_NAME, () => {
       }
 
       console.log("Verifying final state consistency...");
-
-      // Send completion message
-      await globalGroup.send(`${creator.name}: Test sequence completed`);
 
       // Final sync of all workers
       await syncAllWorkers(allWorkers);

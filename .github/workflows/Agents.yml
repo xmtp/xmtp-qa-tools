@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn retry agents
+        run: yarn test agents
       - name: Send Slack notification
         if: always()
         env:
