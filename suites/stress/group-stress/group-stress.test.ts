@@ -24,7 +24,7 @@ const WORKER_NAMES = getFixedNames(14);
 
 const testConfig = {
   testName: TEST_NAME,
-  groupName: `Fork group ${new Date().toLocaleTimeString("en-US", {
+  groupName: `NotForked ${new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -49,7 +49,6 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let globalGroup: Group;
   let allWorkers: Worker[] = [];
-  let allClientIds: string[] = [];
   let syncIntervalId: NodeJS.Timeout;
   let testStartTime: number;
 
@@ -77,18 +76,15 @@ describe(TEST_NAME, () => {
         throw new Error(`Creator worker 'bot' not found`);
       }
 
-      // Get all manual user client IDs for the current environment
-      allClientIds = manualUsers
-        .filter(
-          (user) =>
-            user.app === "convos" && user.network === process.env.XMTP_ENV,
-        )
-        .map((user) => user.inboxId);
-
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        allClientIds,
+        [
+          ...manualUsers
+            .filter((user) => user.network === "production")
+            .map((user) => user.inboxId),
+          ...workers.getAllButCreator().map((w) => w.client.inboxId),
+        ],
         testConfig.groupId as string,
         TEST_NAME,
       );
@@ -99,6 +95,7 @@ describe(TEST_NAME, () => {
 
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
+      await globalGroup.updateName(testConfig.groupName);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
@@ -186,7 +183,7 @@ describe(TEST_NAME, () => {
         await globalGroup.send(testMessage);
       }
 
-      // Verify all workers receive the test message
+      // Verify all workers refceive the test message
       const verificationMessage = `Verification: Hi ${allWorkers.map((w) => w.name).join(", ")}`;
       await verifyMessageStream(
         globalGroup,
@@ -263,9 +260,6 @@ describe(TEST_NAME, () => {
       }
 
       console.log("Verifying final state consistency...");
-
-      // Send completion message
-      await globalGroup.send(`${creator.name}: Test sequence completed`);
 
       // Final sync of all workers
       await syncAllWorkers(allWorkers);

@@ -29,13 +29,8 @@ jobs:
           cache: "yarn"
       - name: Install dependencies
         run: yarn
-      - name: Run tests with filtered output
-        run: |
-          # Save original exit code while filtering output
-          set -o pipefail
-          yarn retry delivery
-          exit_code=$?
-          exit $exit_code
+      - name: Run tests
+        run: yarn retry delivery
       - name: Send Slack notification
         if: always()
         env:

@@ -31,8 +31,8 @@ jobs:
           cache: "yarn"
       - name: Install dependencies
         run: yarn
-      - name: Run tests with retry
-        run: yarn retry agents
+      - name: Run tests
+        run: yarn test agents
       - name: Send Slack notification
         if: always()
         env:
