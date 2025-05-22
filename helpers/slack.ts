@@ -88,7 +88,7 @@ if (fs.existsSync("logs")) {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/error|fail/i.test(line)) {
+        if (/fail/i.test(line)) {
           let lineToAdd = line.split(">")[1]?.trim();
           lineToAdd = lineToAdd?.split("//")[0]?.trim();
           lineToAdd = lineToAdd?.replace("expected false to be true", "failed");
