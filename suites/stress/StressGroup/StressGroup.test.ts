@@ -73,9 +73,6 @@ describe(TEST_NAME, () => {
         throw new Error(`Creator worker '${creatorName}' not found`);
       }
 
-      // Sync creator's conversations
-      await creator.client.conversations.syncAll();
-
       // Get all manual user client IDs for the current environment
       allClientIds = manualUsers
         .filter(

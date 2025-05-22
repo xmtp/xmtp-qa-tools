@@ -101,6 +101,8 @@ export async function createOrGetNewGroup(
     return group;
   }
 
+  // Sync creator's conversations
+  await creator.client.conversations.syncAll();
   return (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;
