@@ -5,8 +5,6 @@ on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: "*/30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
 
 jobs:
