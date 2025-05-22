@@ -48,7 +48,6 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let globalGroup: Group;
   let allWorkers: Worker[] = [];
-  let syncIntervalId: NodeJS.Timeout;
   let testStartTime: number;
 
   // ============================================================
@@ -104,11 +103,6 @@ describe(TEST_NAME, () => {
 
   afterAll(async () => {
     try {
-      // Clean up periodic sync interval
-      if (syncIntervalId) {
-        clearInterval(syncIntervalId);
-      }
-
       // Send final test completion message
       if (globalGroup?.id) {
         await globalGroup.send(`Test completed: ${testConfig.groupName}`);
@@ -218,7 +212,7 @@ describe(TEST_NAME, () => {
           )) as Group;
 
         if (workerGroup) {
-          await workerGroup.send(`${worker.name}: pre-membership-test`);
+          await workerGroup.send(`${worker.name}: sup`);
         }
 
         // Perform multiple cycles of membership changes

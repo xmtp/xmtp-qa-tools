@@ -170,13 +170,6 @@ try {
           fs.mkdirSync(logsDir, { recursive: true });
         }
 
-        // Generate log file name
-        const timestamp = new Date()
-          .toISOString()
-          .replace(/[:.]/g, "-")
-          .replace("T", "-")
-          .split(".")[0];
-
         // Extract clean test name for log file (remove path and extension)
         let logFileName: string;
         if (customLogFile) {
@@ -218,14 +211,11 @@ try {
             shell: true,
           });
 
-          let hasOutput = false;
-
           const processOutput = (data: Buffer, isError = false) => {
             const text = data.toString();
             const filtered = filterOutput(text);
 
             if (filtered.trim()) {
-              hasOutput = true;
               // Write to console
               if (isError) {
                 process.stderr.write(filtered);

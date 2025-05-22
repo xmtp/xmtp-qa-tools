@@ -291,7 +291,9 @@ export class WorkerClient extends Worker {
     if (this.typeofSync !== typeOfSync.None) {
       void (async () => {
         while (this.activeStreams) {
-          console.debug(`[${this.nameId}] Syncing all conversations`);
+          console.debug(
+            `[${this.nameId}] Syncing ${this.typeofSync} every ${interval}ms`,
+          );
           if (this.typeofSync === typeOfSync.SyncAll) {
             await this.client.conversations.syncAll();
           } else if (this.typeofSync === typeOfSync.Sync) {
