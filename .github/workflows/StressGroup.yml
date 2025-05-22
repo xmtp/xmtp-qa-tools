@@ -22,7 +22,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
-      GROUP_ID: 376c0cd8dc326d38dd3e26eacb05f153
+      GROUP_ID: 029c35abe0ad7554727194af1c46fbb9
       WALLET_KEY_BOT: "0x9e30e21fab8102a344b3c8db3a52e417a3985b626c865f596f0462840180533a"
       ENCRYPTION_KEY_BOT: "aafac8e206e6abe09ad0b696dfd86977edd25cfc04578b793c0e912b742d1462"
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
@@ -67,26 +67,6 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn retry group-stress
-      # Debug what was created during test run
-      - name: Show created data
-        if: always()
-        run: |
-          echo "=== Data directories created during test ==="
-          if [ -d ".data" ]; then
-            echo "Contents of .data directory:"
-            find .data -type f | head -20
-            echo "Directory sizes:"
-            du -sh .data/* 2>/dev/null || echo "No subdirectories in .data"
-          else
-            echo "No .data directory created"
-          fi
-
-          if [ -d "logs" ]; then
-            echo "Contents of logs directory:"
-            find logs -type f | head -10
-          else
-            echo "No logs directory created"
-          fi
 
       # Save cache explicitly (in case job fails)
       - name: Save .data cache

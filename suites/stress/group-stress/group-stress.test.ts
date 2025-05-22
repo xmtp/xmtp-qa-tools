@@ -81,7 +81,9 @@ describe(TEST_NAME, () => {
       globalGroup = await createOrGetNewGroup(
         creator,
         [
-          ...manualUsers.map((user) => user.inboxId),
+          ...manualUsers
+            .filter((user) => user.network === "production")
+            .map((user) => user.inboxId),
           ...workers.getAllButCreator().map((w) => w.client.inboxId),
         ],
         testConfig.groupId as string,
