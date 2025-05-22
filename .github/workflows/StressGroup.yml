@@ -28,19 +28,36 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
     steps:
       - uses: actions/checkout@v4
-      # Create cache date key - refresh cache weekly
+      # Create cache date key - refresh cache monthly
       - name: Get date for cache key
         id: date
-        run: echo "date=$(date +%Y-%U)" >> $GITHUB_OUTPUT
-      # Restore cached .data folder with date-based key
+        run: echo "date=$(date +%Y-%m)" >> $GITHUB_OUTPUT
+
+      # Restore cached .data folder with better fallback strategy
       - name: Restore .data cache
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         id: data-cache
         with:
-          path: .data
-          key: stress-group-data-${{ steps.date.outputs.date }}
+          path: |
+            .data
+            logs
+          key: stress-group-data-${{ matrix.environment }}-${{ steps.date.outputs.date }}-${{ github.run_id }}
           restore-keys: |
-            stress-group-data-${{ steps.date.outputs.date }}
+            stress-group-data-${{ matrix.environment }}-${{ steps.date.outputs.date }}-
+            stress-group-data-${{ matrix.environment }}-
+            stress-group-data-
+
+      # Debug cache status
+      - name: Check cache status
+        run: |
+          echo "Cache hit: ${{ steps.data-cache.outputs.cache-hit }}"
+          echo "Cache primary key: stress-group-data-${{ matrix.environment }}-${{ steps.date.outputs.date }}-${{ github.run_id }}"
+          if [ -d ".data" ]; then
+            echo "Found existing .data directory:"
+            find .data -type f | head -10
+          else
+            echo "No .data directory found - will be created fresh"
+          fi
 
       - uses: actions/setup-node@v4
         with:
@@ -55,6 +72,17 @@ jobs:
           yarn retry group-stress 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
           exit_code=$?
           exit $exit_code
+
+      # Save cache explicitly (in case job fails)
+      - name: Save .data cache
+        uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: |
+            .data
+            logs
+          key: stress-group-data-${{ matrix.environment }}-${{ steps.date.outputs.date }}-${{ github.run_id }}
+
       - name: Send Slack notification
         if: always()
         env:
