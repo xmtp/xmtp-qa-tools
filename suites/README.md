@@ -1,4 +1,4 @@
-# �� XMTP Test Suites
+# Test Suites
 
 Comprehensive end-to-end test suites for validating XMTP protocol functionality, performance, and reliability across different scenarios and environments.
 

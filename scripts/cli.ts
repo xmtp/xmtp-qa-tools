@@ -91,7 +91,7 @@ try {
     case "retry": {
       let testName = "functional"; // Default test name
       let maxAttempts = 1;
-      let loggingLevel = "off";
+      let loggingLevel = "debug";
       let retryDelay = 10; // seconds
       let enableLogging = true;
       let customLogFile: string | undefined;
