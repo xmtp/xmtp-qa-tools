@@ -1,4 +1,4 @@
-# XMTP Message Delivery Testing Suite (m_delivery)
+# XMTP Message Delivery Testing Suite
 
 This test suite focuses on verifying message delivery reliability, ordering, and recovery capabilities in XMTP, providing metrics for delivery rates and message ordering.
 
@@ -14,7 +14,7 @@ yarn install
 ## Test Execution
 
 ```bash
-yarn test m_delivery
+yarn test delivery
 ```
 
 ## Test Flow

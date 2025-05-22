@@ -3,7 +3,7 @@ import { getInboxIds, sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
-const scriptName = "ts_200";
+const scriptName = "large-group";
 loadEnv(scriptName);
 
 // List of inbox IDs to use in the group

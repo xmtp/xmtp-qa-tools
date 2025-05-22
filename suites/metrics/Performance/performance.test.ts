@@ -13,7 +13,7 @@ import {
 } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "m_performance";
+const testName = "performance";
 loadEnv(testName);
 
 describe(testName, async () => {

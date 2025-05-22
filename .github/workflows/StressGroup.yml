@@ -1,5 +1,5 @@
-name: StressGroup
-description: Check that StressGroup is working correctly. If it fails notify the team.
+name: GroupStress
+description: Check that group stress testing is working correctly. If it fails notify the team.
 
 on:
   pull_request:
@@ -52,7 +52,7 @@ jobs:
         run: |
           # Save original exit code while filtering output
           set -o pipefail
-          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          yarn retry group-stress 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification

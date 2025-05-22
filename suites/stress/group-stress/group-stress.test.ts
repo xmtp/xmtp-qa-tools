@@ -18,7 +18,7 @@ import {
 // Test Configuration
 // ============================================================
 
-const TEST_NAME = "ts_fork";
+const TEST_NAME = "group-stress";
 const WORKER_NAMES = getFixedNames(14);
 
 const testConfig = {

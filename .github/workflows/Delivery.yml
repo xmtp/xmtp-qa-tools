@@ -2,6 +2,9 @@ name: Delivery
 description: "should verify message loss when receiving via 200 streams"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
@@ -34,7 +37,7 @@ jobs:
         run: |
           # Save original exit code while filtering output
           set -o pipefail
-          yarn retry m_delivery 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          yarn retry delivery 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
           exit_code=$?
           exit $exit_code
       - name: Send Slack notification

@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_membership";
+const testName = "large-membership";
 loadEnv(testName);
 
 describe(testName, async () => {
