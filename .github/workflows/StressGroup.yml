@@ -67,7 +67,6 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn retry group-stress
-
       # Debug what was created during test run
       - name: Show created data
         if: always()
