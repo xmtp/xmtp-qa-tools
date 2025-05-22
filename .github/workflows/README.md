@@ -1,6 +1,6 @@
 # 🔄 GitHub Workflows
 
-This directory contains GitHub Actions workflows for automating testing, deployment, and maintenance processes for the XMTP testing framework.
+This directory contains GitHub Actions workflows for automating testing, deployment, and maintenance processes for the XMTP testing framework. These workflows provide continuous monitoring, performance testing, and quality assurance for XMTP protocol functionality.
 
 ## Quick reference
 
@@ -139,7 +139,17 @@ Workflow results are accessible through multiple channels:
 1. **GitHub Actions UI**: Real-time execution logs and status
 2. **Artifacts**: Uploaded test reports and debug information
 3. **Datadog**: Performance metrics and test results
-4. **Email Notifications**: Configurable for workflow failures
+4. **Slack Notifications**: Real-time workflow status updates
+5. **Email Notifications**: Configurable for workflow failures
+
+### Test Categories
+
+The workflows are organized into logical categories:
+
+- **🤖 Automated Tests**: `Agents.yml`, `Gm.yml` - Continuous monitoring
+- **📊 Metrics Tests**: `Delivery.yml`, `Large.yml`, `Performance.yml` - Performance measurement
+- **🚨 Stress Tests**: `GroupStress.yml` - High-load scenario testing
+- **🔧 Infrastructure**: `Deploy.yml`, `PackageCompatibility.yml` - Deployment and compatibility
 
 ## 📝 Best practices
 
@@ -150,3 +160,18 @@ When working with these workflows, consider the following best practices:
 3. **Artifact cleanup**: Configure appropriate retention policies
 4. **Concurrency limits**: Avoid excessive parallel executions
 5. **Timeout configuration**: Set appropriate timeouts to prevent hung jobs
+
+## 🔄 Recent Changes
+
+The workflows have been updated to use standardized naming conventions:
+
+| Old Name            | New Name          | Test Command              |
+| ------------------- | ----------------- | ------------------------- |
+| `at_agents.yml`     | `Agents.yml`      | `yarn retry agents`       |
+| `at_gm.yml`         | `Gm.yml`          | `yarn retry gm`           |
+| `m_delivery.yml`    | `Delivery.yml`    | `yarn retry delivery`     |
+| `m_performance.yml` | `Performance.yml` | `yarn retry performance`  |
+| `m_large.yml`       | `Large.yml`       | `yarn large`              |
+| `StressGroup.yml`   | `GroupStress.yml` | `yarn retry group-stress` |
+
+All test suites now follow consistent kebab-case naming conventions for better organization and maintainability.

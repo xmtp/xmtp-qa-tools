@@ -42,7 +42,7 @@ jobs:
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: logs-${{ matrix.environment }}
+          name: artifacts-${{ matrix.environment }}
           path: |
             logs/
             .data/
