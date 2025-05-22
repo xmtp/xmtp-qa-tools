@@ -2,6 +2,27 @@ import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 
+function expandGlobPattern(pattern: string): string[] {
+  // Simple glob expansion for *.test.ts patterns
+  if (pattern.includes("*")) {
+    const dir = path.dirname(pattern);
+    const baseName = path.basename(pattern);
+
+    if (!fs.existsSync(dir)) {
+      return [];
+    }
+
+    const files = fs.readdirSync(dir);
+    const regex = new RegExp(baseName.replace(/\*/g, ".*"));
+
+    return files
+      .filter((file) => regex.test(file))
+      .map((file) => path.join(dir, file));
+  }
+
+  return [pattern];
+}
+
 function showUsageAndExit() {
   console.error("Usage: yarn cli <command_type> <name_or_path> [args...]");
   console.error(
@@ -252,24 +273,56 @@ try {
         const vitestArgsString = vitestPassthroughArgs.join(" ");
 
         if (testName === "functional") {
-          command = `npx vitest run ./functional/*.test.ts --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
+          // Expand glob pattern for functional tests
+          const expandedFiles = expandGlobPattern("./functional/*.test.ts");
+          if (expandedFiles.length === 0) {
+            console.error("No functional test files found");
+            throw new Error("No test files found");
+          }
+          command = `npx vitest run ${expandedFiles.join(" ")} --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
         } else {
           // Check if there's a corresponding npm script
           const packageJsonPath = path.join(process.cwd(), "package.json");
           let useNpmScript = false;
+          let packageJsonScript = "";
           try {
             const packageJson = JSON.parse(
               fs.readFileSync(packageJsonPath, "utf8"),
             );
             if (packageJson.scripts && packageJson.scripts[testName]) {
               useNpmScript = true;
+              packageJsonScript = packageJson.scripts[testName];
             }
           } catch (error) {
             console.error(`Error reading package.json`, error);
           }
 
           if (useNpmScript) {
-            command = `yarn ${testName} ${vitestArgsString}`;
+            // Parse the script to expand any glob patterns
+            if (packageJsonScript.includes("*.test.ts")) {
+              // Extract the glob pattern from the script
+              const globMatch = packageJsonScript.match(/([^\s]+\*\.test\.ts)/);
+              if (globMatch) {
+                const globPattern = globMatch[1];
+                const expandedFiles = expandGlobPattern(globPattern);
+                if (expandedFiles.length === 0) {
+                  console.error(
+                    `No test files found for pattern: ${globPattern}`,
+                  );
+                  throw new Error("No test files found");
+                }
+                // Replace the glob pattern with expanded files
+                command =
+                  packageJsonScript.replace(
+                    globPattern,
+                    expandedFiles.join(" "),
+                  ) + ` ${vitestArgsString}`;
+              } else {
+                command = `yarn ${testName} ${vitestArgsString}`;
+              }
+            } else {
+              command = `yarn ${testName} ${vitestArgsString}`;
+            }
           } else {
             command = `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
           }
