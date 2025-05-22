@@ -205,7 +205,6 @@ describe(testName, async () => {
       const groupMessage = "gm-" + Math.random().toString(36).substring(2, 15);
 
       await newGroup.send(groupMessage);
-      console.log("GM Message sent in group", groupMessage);
       expect(groupMessage).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -328,7 +327,6 @@ describe(testName, async () => {
           "gm-" + Math.random().toString(36).substring(2, 15);
 
         await newGroup.send(groupMessage);
-        console.log("GM Message sent in group", groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
         logError(e, expect.getState().currentTestName);

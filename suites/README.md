@@ -13,7 +13,7 @@ Different end-to-end test suites for validating the XMTP protocol functionality,
 
 | Suite                | Purpose                                                    | Link to test file                           |
 | -------------------- | ---------------------------------------------------------- | ------------------------------------------- |
-| **ts_fork**          | Investigates group conversation forking through membership | [ts_fork](./manual/fork/)                   |
+| **ts_stressgroup**   | Investigates group conversation forking through membership | [ts_stressgroup](./manual/fork/)            |
 | **ts_notifications** | Validates push notification functionality                  | [ts_notifications](./manual/notifications/) |
 | **ts_stress**        | Tests system performance under high load conditions        | [ts_stress](./manual/stress/)               |
 

@@ -1,0 +1,88 @@
+name: StressGroup
+description: Check that StressGroup is working correctly. If it fails notify the team.
+
+on:
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: "*/30 * * * *" # Runs every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      LOGGING_LEVEL: "off"
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      WALLET_KEY: ${{ secrets.WALLET_KEY }}
+      GROUP_ID: 376c0cd8dc326d38dd3e26eacb05f153
+      WALLET_KEY_BOT: "0x9e30e21fab8102a344b3c8db3a52e417a3985b626c865f596f0462840180533a"
+      ENCRYPTION_KEY_BOT: "aafac8e206e6abe09ad0b696dfd86977edd25cfc04578b793c0e912b742d1462"
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      # Create cache date key - refresh cache weekly
+      - name: Get date for cache key
+        id: date
+        run: echo "date=$(date +%Y-%U)" >> $GITHUB_OUTPUT
+
+      # Restore cached .data folder with date-based key
+      - name: Restore .data cache
+        uses: actions/cache@v3
+        id: data-cache
+        with:
+          path: .data
+          key: stress-group-data-${{ steps.date.outputs.date }}
+          restore-keys: |
+            stress-group-data-
+
+      # Restore .env cache with date-based key
+      - name: Restore .env cache
+        uses: actions/cache@v3
+        id: env-cache
+        with:
+          path: .env
+          key: stress-group-env-${{ steps.date.outputs.date }}
+          restore-keys: |
+            stress-group-env-
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests with filtered output
+        run: |
+          # Save original exit code while filtering output
+          set -o pipefail
+          yarn retry StressGroup 2>&1 | grep -v "ERROR MEMORY sqlcipher_mlock: mlock() returned -1 errno=12"
+          exit_code=$?
+          exit $exit_code
+      - name: Send Slack notification
+        if: always()
+        env:
+          JOB_STATUS: ${{ job.status }}
+        run: npx tsx helpers/slack.ts
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs
+          path: |
+            logs/
+            .data/
+            .env
+          if-no-files-found: warn
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90

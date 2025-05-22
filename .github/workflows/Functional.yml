@@ -1,9 +1,6 @@
 name: Functional
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 * * * *"
   workflow_dispatch:
@@ -25,8 +22,6 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
-      - name: Enable corepack
-        run: corepack enable
       - name: Install dependencies
         run: yarn
       - name: Run tests with filtered output

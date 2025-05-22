@@ -1,4 +1,4 @@
-# XMTP Fork Testing Suite (TS_Fork)
+# XMTP Stress Group Testing Suite (ts_stressgroup)
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
@@ -34,13 +34,13 @@ GROUP_ID=""
 ## Test Execution
 
 ```bash
-yarn test ts_fork
+yarn test ts_stressgroup
 ```
 
 ## Test Flow
 
 1. **Group Creation**: Initializes workers and creates a test group
-2. **Fork Check**: Targeted messages sent to specific workers to check response
+2. **Stress Check**: Targeted messages sent to specific workers to check response
 3. **Message Exchange**: Each test worker sends an identified message
 4. **Membership Cycling**: Creator performs multiple add/remove cycles (defined by EPOCHS)
    - Each cycle: `removeMembers()` → `addMembers()`
