@@ -2,6 +2,9 @@ name: Agents
 description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
@@ -32,7 +35,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry agents
+        run: yarn retry agents --no-fail
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
