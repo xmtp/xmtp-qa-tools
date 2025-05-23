@@ -394,9 +394,9 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.debug(
-                `[${this.nameId}] Received message, ${message.content as string}`,
-              );
+              // console.debug(
+              //   `[${this.nameId}] Received message, ${message.content as string}`,
+              // );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);
@@ -453,8 +453,6 @@ export class WorkerClient extends Worker {
       return;
     }
 
-    console.time(`[${this.nameId}] Worker response`);
-
     try {
       // Get the conversation from the message
       const conversation = await this.client.conversations.getConversationById(
@@ -486,8 +484,6 @@ export class WorkerClient extends Worker {
       }
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
-    } finally {
-      console.timeEnd(`[${this.nameId}] Worker response`);
     }
   }
 

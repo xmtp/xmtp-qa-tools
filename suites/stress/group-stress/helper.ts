@@ -132,12 +132,14 @@ export async function verifyGroupConsistency(
       console.error(`Error verifying state for ${worker.name}:`, e);
     }
   }
+  const members = await globalGroup.members();
+  const memberCount = members.length;
   const countsString = JSON.stringify(counts, null, 2);
   let icon = "✅";
-  if (allWorkers.length !== countsString.length) {
+  if (allWorkers.length !== Object.keys(counts).length) {
     icon = "❌";
   }
-  const summary = `Group ${icon} consistency summary:\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${countsString.length}\nGroup ID: ${globalGroup.id}\nGroup consistency counts: ${countsString}`;
+  const summary = `Group ${icon} consistency summary:\n\nMember count: ${memberCount}\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${Object.keys(counts).length}\nGroup ID: ${globalGroup.id}\nGroup consistency counts: ${countsString}`;
   await globalGroup.send(summary);
   console.debug(summary);
 }

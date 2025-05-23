@@ -133,10 +133,8 @@ export class WorkerManager {
     for (const worker of this.getAll()) {
       const installations = await worker.client.preferences.inboxState();
       const totalInstallations = installations.installations.length;
-      if (totalInstallations > 1) {
-        console.debug(
-          `[${worker.name}] Package details: ${totalInstallations}`,
-        );
+      if (totalInstallations > 10) {
+        console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
       }
       for (const installation of installations.installations) {
         // Convert nanoseconds to milliseconds for Date constructor
@@ -150,7 +148,7 @@ export class WorkerManager {
         const greenCheck = diffDays < 90 ? " ✅" : "❌";
 
         if (diffDays > 90) {
-          console.debug(
+          console.warn(
             `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
           );
         }
