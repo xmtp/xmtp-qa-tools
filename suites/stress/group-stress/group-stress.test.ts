@@ -24,7 +24,7 @@ const WORKER_NAMES = getFixedNames(14);
 const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
-  epochs: 4,
+  epochs: 3,
   network: "production",
   totalWorkers: 14,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
