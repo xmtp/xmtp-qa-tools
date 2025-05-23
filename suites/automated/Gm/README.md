@@ -36,7 +36,7 @@ it("gm-bot: should check if bot is alive", async () => {
 
     expect(convo).toBeDefined();
     console.log("convo", convo.id);
-    const result = await verifyDmStream(convo!, workers.getAll(), "hi");
+    const result = await verifyMessageStream(convo!, workers.getAll(), "hi");
     expect(result.allReceived).toBe(true);
   } catch (e) {
     logError(e, expect.getState().currentTestName);

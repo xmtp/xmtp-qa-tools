@@ -394,9 +394,9 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              // console.debug(
-              //   `[${this.nameId}] Received message, ${message.content as string}`,
-              // );
+              console.debug(
+                `[${this.nameId}] Received message, ${message.content as string}`,
+              );
               // Handle auto-responses if enabled
               if (this.shouldRespondToMessage(message)) {
                 await this.handleResponse(message);
@@ -610,9 +610,9 @@ export class WorkerClient extends Worker {
       const timeoutId = setTimeout(() => {
         this.off("worker_message", onMessage);
         console.debug(
-          `Stream collection timed out. defaultTimeout: ${
+          `[${this.nameId}] Stream collection timed out. ${
             DEFAULT_STREAM_TIMEOUT_MS / 1000
-          }s. Collected ${events.length}/${count} events.`,
+          }s.`,
         );
         resolve(events); // Resolve with whatever events we've collected so far
       }, DEFAULT_STREAM_TIMEOUT_MS);

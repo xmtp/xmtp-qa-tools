@@ -11,18 +11,12 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messages: unknown[][];
   receiverCount: number;
-  eventTimings: Record<string, number[]>;
+  messages: string;
+  eventTimings: string;
   averageEventTiming: number;
-  stats?: {
-    receptionPercentage: number;
-    orderPercentage: number;
-    workersInOrder: number;
-    workerCount: number;
-    totalReceivedMessages: number;
-    totalExpectedMessages: number;
-  };
+  receptionPercentage: number;
+  orderPercentage: number;
 };
 
 export async function updateGroupConsent(
@@ -192,17 +186,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       randomSuffix,
     );
   }
-  // Unescape messages for output
-  const unescapeMessages = (messagesAsStrings: string[][]): unknown[][] => {
-    return messagesAsStrings.map((arr) =>
-      arr.map((str) => JSON.parse(str) as unknown),
-    );
-  };
-  const unescapedMessages = unescapeMessages(
-    allReceived.map((msgs) =>
-      msgs.map((m) => JSON.stringify({ event: m.event })),
-    ),
-  );
   // Transform eventTimings to arrays per name
   const eventTimingsArray: Record<string, number[]> = {};
   for (const [name, timingsObj] of Object.entries(eventTimings)) {
@@ -214,41 +197,20 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimingsArray[name] = arr;
   }
   const allResults = {
-    stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
-    messages: unescapedMessages,
-    eventTimings: eventTimingsArray,
+    messages: messagesAsStrings.join(","),
+    eventTimings: Object.entries(eventTimingsArray)
+      .map(([k, v]) => `${k}: ${v.join(",")}`)
+      .join(","),
     averageEventTiming,
+    receptionPercentage: stats?.receptionPercentage ?? 0,
+    orderPercentage: stats?.orderPercentage ?? 0,
   };
+  console.debug("allResults", JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
-export async function verifyDmStream(
-  group: Conversation,
-  receivers: Worker[],
-  message: string = "gm",
-): Promise<VerifyStreamResult> {
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sent: { content: string; sentAt: number }[] = [];
-      for (let i = 0; i < 1; i++) {
-        const sentAt = Date.now();
-        await group.send(message);
-        sent.push({ content: message, sentAt });
-      }
-      return sent;
-    },
-    getKey: extractContent,
-    getMessage: extractContent,
-    statsLabel: message,
-    count: 1,
-    randomSuffix: "",
-    participantsForStats: receivers,
-  });
-}
 /**
  * Specialized function to verify message streams
  */
@@ -262,12 +224,14 @@ export async function verifyMessageStream(
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
     triggerEvents: async () => {
+      console.warn("triggerEvents", count);
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
         let content = `gm-${i + 1}-${randomSuffix}`;
         if (count === 1) {
           content = randomSuffix;
         }
+        console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
@@ -486,13 +450,5 @@ export function calculateMessageStats(
   const receptionPercentage =
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
-  const stats = {
-    receptionPercentage,
-    orderPercentage,
-    workersInOrder,
-    workerCount,
-    totalReceivedMessages,
-    totalExpectedMessages,
-  };
-  return stats;
+  return { receptionPercentage, orderPercentage };
 }

@@ -28,7 +28,9 @@ describe(testName, async () => {
     testName,
     typeofStream.Message,
   );
-
+  const creator = workers.getCreator();
+  console.warn("creator is:", creator.name);
+  const creatorClient = creator.client;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
     customDuration = duration;
@@ -79,9 +81,7 @@ describe(testName, async () => {
   });
   it("inboxState: should measure inboxState", async () => {
     try {
-      const inboxState = await workers
-        .getCreator()
-        .client.preferences.inboxState(true);
+      const inboxState = await creatorClient.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -90,9 +90,9 @@ describe(testName, async () => {
   });
   it("newDm: should measure creating a DM", async () => {
     try {
-      dm = await workers
-        .getCreator()
-        .client.conversations.newDm(workers.getAll()[1].client.inboxId);
+      dm = await creatorClient.conversations.newDm(
+        workers.getAll()[1].client.inboxId,
+      );
 
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
@@ -103,12 +103,10 @@ describe(testName, async () => {
   });
   it("newDmWithIdentifiers: should measure creating a DM", async () => {
     try {
-      const dm2 = await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: workers.getAll()[2].address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
+      const dm2 = await creatorClient.conversations.newDmWithIdentifier({
+        identifier: workers.getAll()[2].address,
+        identifierKind: IdentifierKind.Ethereum,
+      });
 
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
@@ -147,12 +145,10 @@ describe(testName, async () => {
   it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
     try {
       const sliced = getInboxIds(i);
-      newGroup = await workers
-        .getCreator()
-        .client.conversations.newGroup([
-          ...sliced,
-          ...workers.getAll().map((w) => w.client.inboxId),
-        ]);
+      newGroup = await creatorClient.conversations.newGroup([
+        ...sliced,
+        ...workers.getAll().map((w) => w.client.inboxId),
+      ]);
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     } catch (e) {
@@ -163,9 +159,8 @@ describe(testName, async () => {
   it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
     try {
       const sliced = getAddresses(i);
-      const newGroupByIdentifier = await workers
-        .getCreator()
-        .client.conversations.newGroupWithIdentifiers(
+      const newGroupByIdentifier =
+        await creatorClient.conversations.newGroupWithIdentifiers(
           sliced.map((address) => ({
             identifier: address,
             identifierKind: IdentifierKind.Ethereum,
@@ -254,12 +249,10 @@ describe(testName, async () => {
     it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getInboxIds(i);
-        newGroup = await workers
-          .getCreator()
-          .client.conversations.newGroup([
-            ...sliced,
-            ...workers.getAll().map((w) => w.client.inboxId),
-          ]);
+        newGroup = await creatorClient.conversations.newGroup([
+          ...sliced,
+          ...workers.getAll().map((w) => w.client.inboxId),
+        ]);
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -269,9 +262,8 @@ describe(testName, async () => {
     it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getAddresses(i);
-        const newGroupByIdentifier = await workers
-          .getCreator()
-          .client.conversations.newGroupWithIdentifiers(
+        const newGroupByIdentifier =
+          await creatorClient.conversations.newGroupWithIdentifiers(
             sliced.map((address) => ({
               identifier: address,
               identifierKind: IdentifierKind.Ethereum,

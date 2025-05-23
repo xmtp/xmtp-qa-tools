@@ -166,6 +166,8 @@ export class WorkerManager {
           );
         }
       }
+
+      console.info("env", this.env);
       console.debug(JSON.stringify(workersToPrint, null, 2));
     } catch (error) {
       console.error(error);

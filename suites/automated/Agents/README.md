@@ -37,7 +37,7 @@ for (const agent of typedAgents) {
           identifierKind: IdentifierKind.Ethereum,
         });
       expect(convo).toBeDefined();
-      const result = await verifyDmStream(
+      const result = await verifyMessageStream(
         convo!,
         workers.getAll(),
         agent.sendMessage,
