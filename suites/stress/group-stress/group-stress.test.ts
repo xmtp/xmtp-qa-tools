@@ -27,7 +27,6 @@ const testConfig = {
   epochs: 4,
   network: "production",
   totalWorkers: 14,
-  syncInterval: 10000,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
   checkWorkers: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
   groupId: process.env.GROUP_ID as string,
@@ -105,7 +104,7 @@ describe(TEST_NAME, () => {
     try {
       testStartTime = performance.now();
 
-      await verifyGroupConsistency(globalGroup, workers, testConfig);
+      await verifyGroupConsistency(globalGroup, workers);
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
       throw error;
@@ -221,7 +220,7 @@ describe(TEST_NAME, () => {
         "Final consistency check",
       );
 
-      await verifyGroupConsistency(globalGroup, workers, testConfig);
+      await verifyGroupConsistency(globalGroup, workers);
 
       // Log test results
       const testDuration = performance.now() - testStartTime;

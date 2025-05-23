@@ -1,5 +1,5 @@
 import { logAgentDetails } from "@helpers/client";
-import { appendToEnv, type TestConfig } from "@helpers/tests";
+import { appendToEnv } from "@helpers/tests";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 
@@ -101,7 +101,6 @@ export async function testMembershipChanges(
 export async function verifyGroupConsistency(
   globalGroup: Group,
   workers: WorkerManager,
-  testConfig: TestConfig,
 ): Promise<void> {
   const counts: Record<string, { members: number; messages: number }> = {};
   const creator = workers.get("bot");
@@ -130,7 +129,6 @@ export async function verifyGroupConsistency(
     - Creator: ${creator.name}
     - Test workers: ${allWorkers.length}
     - Group ID: ${globalGroup.id}
-    - Sync interval: ${testConfig.syncInterval}ms
     - Group consistency counts: ${countsString}
     `;
 
