@@ -289,14 +289,9 @@ export class WorkerClient extends Worker {
    */
   private startSyncs(interval: number = 10000) {
     if (this.typeofSync !== typeOfSync.None) {
-      console.debug(
-        `[${this.nameId}] Starting ${this.typeofSync} sync every ${interval}ms`,
-      );
+      console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
       void (async () => {
-        while (this.activeStreams) {
-          console.debug(
-            `[${this.nameId}] Syncing ${this.typeofSync} every ${interval}ms`,
-          );
+        while (true) {
           if (this.typeofSync === typeOfSync.SyncAll) {
             await this.client.conversations.syncAll();
           } else if (this.typeofSync === typeOfSync.Sync) {

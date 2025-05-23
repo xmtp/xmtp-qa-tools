@@ -11,6 +11,7 @@ interface RetryOptions {
   enableLogging: boolean;
   customLogFile?: string;
   vitestArgs: string[];
+  noFail: boolean;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -64,6 +65,9 @@ function showUsageAndExit(): never {
     "      --log-file <name>   Custom log file name (default: auto-generated)",
   );
   console.error(
+    "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
+  );
+  console.error(
     "      [vitest_options...] Other options passed directly to vitest",
   );
   console.error("");
@@ -73,6 +77,9 @@ function showUsageAndExit(): never {
   console.error("  yarn cli script gen");
   console.error("  yarn retry functional --max-attempts 2");
   console.error("  yarn retry ./suites/automated/Gm/gm.test.ts --watch");
+  console.error(
+    "  yarn retry functional --no-fail  # Won't fail CI even on test failures",
+  );
   process.exit(1);
 }
 
@@ -108,6 +115,7 @@ function parseRetryArgs(args: string[]): {
     retryDelay: 10,
     enableLogging: true,
     vitestArgs: [],
+    noFail: false,
   };
 
   let currentArgs = [...args];
@@ -154,6 +162,9 @@ function parseRetryArgs(args: string[]): {
           options.customLogFile = nextArg;
           i++;
         }
+        break;
+      case "--no-fail":
+        options.noFail = true;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -311,7 +322,11 @@ async function runRetryTests(
         });
 
         logger.close();
-        process.exit(1);
+        if (options.noFail) {
+          process.exit(0);
+        } else {
+          process.exit(1);
+        }
       }
 
       if (options.retryDelay > 0) {
