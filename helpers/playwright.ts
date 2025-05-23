@@ -196,7 +196,9 @@ export class playwright {
     await page.goto(url);
 
     if (!this.defaultUser) {
-      await page.getByText("Ephemeral", { exact: true }).click();
+      await page.goto("https://xmtp.chat/welcome");
+      await page.getByRole("button", { name: "Connect" }).click();
+      await page.getByText("Ephemeral wallet").click();
     }
 
     this.page = page;
