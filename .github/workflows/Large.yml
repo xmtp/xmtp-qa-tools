@@ -36,11 +36,6 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn retry large
-      - name: Send Slack notification
-        if: always()
-        env:
-          JOB_STATUS: ${{ job.status }}
-        run: npx tsx helpers/slack.ts
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
