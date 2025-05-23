@@ -266,6 +266,7 @@ export function getEnvPath(testName: string): string {
     }
   }
   process.env.CURRENT_ENV_PATH = envPath;
+  console.debug("envPath", envPath);
   return envPath;
 }
 /**

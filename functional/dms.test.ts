@@ -91,12 +91,4 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("Fail on purpose", () => {
-    try {
-      expect(true).toBe(false);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
 });

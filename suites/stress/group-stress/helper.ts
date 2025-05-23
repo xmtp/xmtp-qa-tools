@@ -49,11 +49,13 @@ export async function createOrGetNewGroup(
   }
 
   // Sync creator's conversations
-  console.log("Syncing creator's conversations");
-  await creator.client.conversations.syncAll();
+  console.log(`Syncing creator's ${creator.address} conversations`);
+  await creator.client.conversations.sync();
   const conversations = await creator.client.conversations.list();
+  if (conversations.length === 0) throw new Error("No conversations found");
   console.log("Synced creator's conversations", conversations.length);
   await logAgentDetails(creator.client);
+
   return (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;
