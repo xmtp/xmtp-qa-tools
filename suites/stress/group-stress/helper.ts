@@ -13,6 +13,7 @@ export async function createOrGetNewGroup(
   manualUserInboxIds: string[],
   groupId: string,
   testName: string,
+  groupName: string,
 ): Promise<Group> {
   console.log("Creating or getting new group");
   console.log("Worker inbox ids", workerInboxIds);
@@ -55,9 +56,15 @@ export async function createOrGetNewGroup(
   console.log("Synced creator's conversations", conversations.length);
   await logAgentDetails(creator.client);
 
-  return (await creator.client.conversations.getConversationById(
+  const globalGroup = (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;
+  if (!globalGroup) throw new Error("Group not found");
+
+  // Send initial test message
+  await globalGroup.send(`Starting stress test: ${groupName}`);
+  await globalGroup.updateName(groupName);
+  return globalGroup;
 }
 
 export async function testMembershipChanges(

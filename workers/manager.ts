@@ -129,6 +129,34 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
+  public async packageDetails() {
+    for (const worker of this.getAll()) {
+      const installations = await worker.client.preferences.inboxState();
+      const totalInstallations = installations.installations.length;
+      if (totalInstallations > 1) {
+        console.debug(
+          `[${worker.name}] Package details: ${totalInstallations}`,
+        );
+      }
+      for (const installation of installations.installations) {
+        // Convert nanoseconds to milliseconds for Date constructor
+        const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
+        const installationDate = new Date(timestampMs);
+        const now = new Date();
+        const diffMs = now.getTime() - installationDate.getTime();
+        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+        const daysText = diffDays === 1 ? "day" : "days";
+        const greenCheck = diffDays < 90 ? " ✅" : "❌";
+
+        if (diffDays > 90) {
+          console.debug(
+            `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+          );
+        }
+      }
+    }
+  }
   public printWorkers() {
     try {
       let workersToPrint = [];
@@ -396,7 +424,6 @@ export async function getWorkers(
     env,
   );
   await manager.createWorkers(descriptors);
-
   manager.printWorkers();
   return manager;
 }

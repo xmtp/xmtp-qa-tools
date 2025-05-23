@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getFixedNames, getManualUsers } from "@helpers/tests";
+import { getFixedNames, getManualUsers, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -79,16 +79,14 @@ describe(TEST_NAME, () => {
         getManualUsers(["fabri"]).map((user) => user.inboxId),
         workers.getAllBut("bot").map((w) => w.client.inboxId),
         testConfig.groupId,
-        TEST_NAME,
+        testConfig.testName,
+        testConfig.groupName,
       );
+      await workers.packageDetails();
 
       if (!globalGroup?.id) {
         throw new Error("Failed to create or retrieve global group");
       }
-
-      // Send initial test message
-      await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
-      await globalGroup.updateName(testConfig.groupName);
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
