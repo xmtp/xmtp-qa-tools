@@ -97,16 +97,20 @@ export async function sendSlackNotification(
     options.testName &&
     options.testName.toLowerCase().includes("agents")
   ) {
-    customLinks = `• *Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>`;
+    customLinks = `*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>`;
+  }
+  let url = "";
+  if (githubContext.workflowUrl) {
+    url = `*Test log:* <${githubContext.workflowUrl}|View url>`;
   }
 
   // Create message with error logs
   const message = `Test Failure ❌
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${options.testName}>
-*Test log:* <${githubContext.workflowUrl}|View url>
-*Dashboard:* <${datadogUrl}|View>
+*General dashboard:* <${datadogUrl}|View>
 *Timestamp:* ${new Date().toLocaleString()}
 ${customLinks}
+${url}
 ${options.errorLogs || ""}`;
 
   try {
