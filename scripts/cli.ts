@@ -2,6 +2,8 @@ import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
 import { createTestLogger, type TestLogOptions } from "@helpers/logger";
+import { extractErrorLogs, sendSlackNotification } from "@helpers/slack";
+import "dotenv/config";
 
 interface RetryOptions {
   maxAttempts: number;
@@ -301,14 +303,12 @@ async function runRetryTests(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        // Provide helpful debugging info
-        console.error("\n🔍 Debugging tips:");
-        console.error("  • Check the full logs for detailed error information");
-        console.error("  • Verify your environment variables (.env file)");
-        console.error("  • Ensure all required services are running");
-        console.error(
-          `  • Try running manually: ${buildTestCommand(testName, options.vitestArgs)}`,
-        );
+        // Extract and send Slack notification with error logs
+        const errorLogs = extractErrorLogs();
+        await sendSlackNotification({
+          testName,
+          errorLogs,
+        });
 
         logger.close();
         process.exit(1);
