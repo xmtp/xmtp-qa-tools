@@ -233,6 +233,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 - **Repository:** [xmtp-qa-tools](https://github.com/xmtp/xmtp-qa-tools): This monorepo contains multiple tools for testing and monitoring
 - **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
+- **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-toolsus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
