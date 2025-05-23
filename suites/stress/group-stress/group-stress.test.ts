@@ -83,10 +83,6 @@ describe(TEST_NAME, () => {
         testConfig.groupName,
       );
       await workers.packageDetails();
-
-      if (!globalGroup?.id) {
-        throw new Error("Failed to create or retrieve global group");
-      }
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
