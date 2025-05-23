@@ -73,12 +73,11 @@ jobs:
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ github.workflow }}-${{ matrix.environment }}
+          name: artifacts-${{ matrix.environment }}
           path: |
             logs/**/*
             .data/**/*
             .env
           if-no-files-found: ignore
-          overwrite: true
           include-hidden-files: true
           retention-days: 90
