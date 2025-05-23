@@ -414,12 +414,12 @@ export const randomlyRemoveDb = async (
   }
 };
 
-export const getManualUsers = (filterByName: string[]) =>
+export const getManualUsers = (filterByName: string[] = ["fabri"]) =>
   manualUsers.filter(
     (r) =>
       r.app === "convos" &&
       r.network === process.env.XMTP_ENV &&
-      filterByName.includes(r.name),
+      (filterByName?.length === 0 || filterByName?.includes(r.name)),
   );
 /**
  * Sends an initial test message to the bot
