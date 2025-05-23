@@ -1,7 +1,6 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
-import type { WorkerManager } from "@workers/manager";
 import {
   IdentifierKind,
   type Client,
@@ -278,20 +277,6 @@ export function loadEnv(testName: string) {
   setupPrettyLogs();
   addFileLogging(testName);
   initDataDog();
-}
-
-export async function listInstallations(workers: WorkerManager) {
-  for (const worker of workers.getAll()) {
-    const inboxState = await worker.client?.preferences.inboxState();
-    if (inboxState) {
-      console.debug(
-        worker.name,
-        "has",
-        inboxState.installations.length,
-        "installations",
-      );
-    }
-  }
 }
 
 export const logAgentDetails = async (

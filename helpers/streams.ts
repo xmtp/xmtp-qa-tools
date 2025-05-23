@@ -192,17 +192,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       randomSuffix,
     );
   }
-  // Unescape messages for output
-  const unescapeMessages = (messagesAsStrings: string[][]): unknown[][] => {
-    return messagesAsStrings.map((arr) =>
-      arr.map((str) => JSON.parse(str) as unknown),
-    );
-  };
-  const unescapedMessages = unescapeMessages(
-    allReceived.map((msgs) =>
-      msgs.map((m) => JSON.stringify({ event: m.event })),
-    ),
-  );
   // Transform eventTimings to arrays per name
   const eventTimingsArray: Record<string, number[]> = {};
   for (const [name, timingsObj] of Object.entries(eventTimings)) {
@@ -217,38 +206,16 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
-    messages: unescapedMessages,
-    eventTimings: eventTimingsArray,
+    messages: messagesAsStrings.join(","),
+    eventTimings: Object.entries(eventTimingsArray)
+      .map(([k, v]) => `${k}: ${v.join(",")}`)
+      .join(","),
     averageEventTiming,
   };
+  console.debug("allResults", JSON.stringify(allResults, null, 2));
   return allResults;
 }
 
-export async function verifyDmStream(
-  group: Conversation,
-  receivers: Worker[],
-  message: string = "gm",
-): Promise<VerifyStreamResult> {
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sent: { content: string; sentAt: number }[] = [];
-      for (let i = 0; i < 1; i++) {
-        const sentAt = Date.now();
-        await group.send(message);
-        sent.push({ content: message, sentAt });
-      }
-      return sent;
-    },
-    getKey: extractContent,
-    getMessage: extractContent,
-    statsLabel: message,
-    count: 1,
-    randomSuffix: "",
-    participantsForStats: receivers,
-  });
-}
 /**
  * Specialized function to verify message streams
  */
