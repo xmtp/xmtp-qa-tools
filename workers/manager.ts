@@ -174,7 +174,7 @@ export class WorkerManager {
   getAllButCreator(): Worker[] {
     const workers = this.getAll();
     const creator = this.getCreator();
-    return workers.filter((worker) => worker !== creator);
+    return workers.filter((worker) => worker.name !== creator.name);
   }
   /**
    * Gets all workers as a flat array
