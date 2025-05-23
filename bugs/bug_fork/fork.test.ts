@@ -68,18 +68,15 @@ describe(TEST_NAME, () => {
     }
     await aliceGroup.send("hi from alice1");
     await sleep(1000);
-    await aliceGroup.send("hi from alice2");
-    await sleep(1000);
-    await aliceGroup.send("hi from alice3");
-    await sleep(1000);
-  });
-
-  it("bot B is created", async () => {
     secondWorkers = await getWorkers(["bob-b"], TEST_NAME);
     const botB = secondWorkers.get("bob-b");
     if (!botB) {
       throw new Error("Bot B worker not found");
     }
+    await aliceGroup.send("hi from alice2");
+    await sleep(1000);
+    await aliceGroup.send("hi from alice3");
+    await sleep(1000);
     await sleep(1000);
     await sleep(1000);
     await sleep(1000);
