@@ -18,7 +18,6 @@ export async function createOrGetNewGroup(
   console.log("Worker inbox ids", workerInboxIds);
   console.log("Manual user inbox ids", manualUserInboxIds);
   console.log("Group id", groupId);
-  console.log("Test name", testName);
 
   // Either create a new group or use existing one
   if (!groupId) {

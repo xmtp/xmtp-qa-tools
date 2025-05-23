@@ -76,7 +76,7 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        getManualUsers(["bot", ...WORKER_NAMES]).map((user) => user.inboxId),
+        getManualUsers(["fabri"]).map((user) => user.inboxId),
         workers.getAllBut("bot").map((w) => w.client.inboxId),
         testConfig.groupId,
         TEST_NAME,
