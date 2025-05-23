@@ -1,7 +1,15 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { getTime } from "@helpers/logger";
+import { createTestLogger, type TestLogOptions } from "@helpers/logger";
+
+interface RetryOptions {
+  maxAttempts: number;
+  retryDelay: number;
+  enableLogging: boolean;
+  customLogFile?: string;
+  vitestArgs: string[];
+}
 
 function expandGlobPattern(pattern: string): string[] {
   // Simple glob expansion for *.test.ts patterns
@@ -24,7 +32,7 @@ function expandGlobPattern(pattern: string): string[] {
   return [pattern];
 }
 
-function showUsageAndExit() {
+function showUsageAndExit(): never {
   console.error("Usage: yarn cli <command_type> <name_or_path> [args...]");
   console.error(
     "   or (if alias 'cli' is set up): cli <command_type> <name_or_path> [args...]",
@@ -66,309 +74,270 @@ function showUsageAndExit() {
   process.exit(1);
 }
 
-const commandType = process.argv[2];
-const nameOrPath = process.argv[3];
-const additionalArgsRaw = process.argv.slice(4);
-
-if (!commandType) {
-  showUsageAndExit();
+function runBot(botName: string, args: string[]): void {
+  const botFilePath = path.join("bots", botName, "index.ts");
+  const botArgs = args.join(" ");
+  console.log(
+    `Starting bot: ${botName}${botArgs ? ` with args: ${botArgs}` : ""}`,
+  );
+  execSync(`tsx --watch ${botFilePath} ${botArgs}`, {
+    stdio: "inherit",
+  });
 }
 
-try {
-  switch (commandType) {
-    case "bot": {
-      if (!nameOrPath) {
-        console.error("Error: Bot name is required for 'bot' command type.");
-        showUsageAndExit();
-      }
-      const botFilePath = path.join("bots", nameOrPath, "index.ts");
-      const botArgs = additionalArgsRaw.join(" ");
-      console.log(
-        `Starting bot: ${nameOrPath}${botArgs ? ` with args: ${botArgs}` : ""}`,
-      );
-      execSync(`tsx --watch ${botFilePath} ${botArgs}`, {
-        stdio: "inherit",
-      });
-      break;
-    }
+function runScript(scriptName: string, args: string[]): void {
+  const scriptFilePath = path.join("scripts", `${scriptName}.ts`);
+  const scriptArgs = args.join(" ");
+  console.log(
+    `Running script: ${scriptName}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`,
+  );
+  execSync(`tsx ${scriptFilePath} ${scriptArgs}`, {
+    stdio: "inherit",
+  });
+}
 
-    case "script": {
-      if (!nameOrPath) {
-        console.error(
-          "Error: Script name is required for 'script' command type.",
-        );
-        showUsageAndExit();
-      }
-      const scriptFilePath = path.join("scripts", `${nameOrPath}.ts`);
-      const scriptArgs = additionalArgsRaw.join(" ");
-      console.log(
-        `Running script: ${nameOrPath}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`,
-      );
-      execSync(`tsx ${scriptFilePath} ${scriptArgs}`, {
-        stdio: "inherit",
-      });
-      break;
-    }
+function parseRetryArgs(args: string[]): {
+  testName: string;
+  options: RetryOptions;
+} {
+  let testName = "functional";
+  const options: RetryOptions = {
+    maxAttempts: 1,
+    retryDelay: 10,
+    enableLogging: true,
+    vitestArgs: [],
+  };
 
-    case "retry": {
-      let testName = "functional"; // Default test name
-      let maxAttempts = 1;
-      let loggingLevel = "debug";
-      let retryDelay = 10; // seconds
-      let enableLogging = true;
-      let customLogFile: string | undefined;
-      const vitestPassthroughArgs = [];
+  let currentArgs = [...args];
+  if (currentArgs.length > 0 && !currentArgs[0].startsWith("--")) {
+    const shiftedArg = currentArgs.shift();
+    testName = shiftedArg || "functional";
+  }
 
-      let currentArgs = nameOrPath
-        ? [nameOrPath, ...additionalArgsRaw]
-        : [...additionalArgsRaw];
+  for (let i = 0; i < currentArgs.length; i++) {
+    const arg = currentArgs[i];
+    const nextArg = currentArgs[i + 1];
 
-      if (currentArgs.length > 0 && !currentArgs[0].startsWith("--")) {
-        const shiftedArg = currentArgs.shift();
-        if (shiftedArg !== undefined) {
-          testName = shiftedArg;
-        }
-      }
-
-      for (let i = 0; i < currentArgs.length; i++) {
-        const arg = currentArgs[i];
-        const nextArg = currentArgs[i + 1];
-
-        if (arg === "--max-attempts" && nextArg) {
+    switch (arg) {
+      case "--max-attempts":
+        if (nextArg) {
           const val = parseInt(nextArg, 10);
           if (!isNaN(val) && val > 0) {
-            maxAttempts = val;
+            options.maxAttempts = val;
           } else {
             console.warn(`Invalid value for --max-attempts: ${nextArg}`);
           }
-          i++; // consume value
-        } else if (arg === "--retry-delay" && nextArg) {
+          i++;
+        }
+        break;
+      case "--retry-delay":
+        if (nextArg) {
           const val = parseInt(nextArg, 10);
           if (!isNaN(val) && val >= 0) {
-            retryDelay = val;
+            options.retryDelay = val;
           } else {
             console.warn(`Invalid value for --retry-delay: ${nextArg}`);
           }
-          i++; // consume value
-        } else if (arg === "--log") {
-          enableLogging = true;
-        } else if (arg === "--no-log") {
-          enableLogging = false;
-        } else if (arg === "--log-file" && nextArg) {
-          customLogFile = nextArg;
-          i++; // consume value
-        } else {
-          vitestPassthroughArgs.push(arg);
+          i++;
+        }
+        break;
+      case "--log":
+        options.enableLogging = true;
+        break;
+      case "--no-log":
+        options.enableLogging = false;
+        break;
+      case "--log-file":
+        if (nextArg) {
+          options.customLogFile = nextArg;
+          i++;
+        }
+        break;
+      default:
+        options.vitestArgs.push(arg);
+    }
+  }
+
+  return { testName, options };
+}
+
+function buildTestCommand(testName: string, vitestArgs: string[]): string {
+  const vitestArgsString = vitestArgs.join(" ");
+
+  if (testName === "functional") {
+    const expandedFiles = expandGlobPattern("./functional/*.test.ts");
+    if (expandedFiles.length === 0) {
+      throw new Error("No functional test files found");
+    }
+    return `npx vitest run ${expandedFiles.join(" ")} --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
+  }
+
+  // Check for npm script
+  const packageJsonPath = path.join(process.cwd(), "package.json");
+  try {
+    const packageJsonContent = fs.readFileSync(packageJsonPath, "utf8");
+    const packageJson = JSON.parse(packageJsonContent) as {
+      scripts?: Record<string, string>;
+    };
+    if (packageJson.scripts?.[testName]) {
+      const script = packageJson.scripts[testName];
+
+      // Handle glob patterns in scripts
+      if (script.includes("*.test.ts")) {
+        const globMatch = script.match(/([^\s]+\*\.test\.ts)/);
+        if (globMatch) {
+          const expandedFiles = expandGlobPattern(globMatch[1]);
+          if (expandedFiles.length === 0) {
+            throw new Error(`No test files found for pattern: ${globMatch[1]}`);
+          }
+          return `${script.replace(globMatch[1], expandedFiles.join(" "))} ${vitestArgsString}`;
         }
       }
+      return `yarn ${testName} ${vitestArgsString}`;
+    }
+  } catch (error: unknown) {
+    console.error("Error reading package.json:", error);
+  }
 
-      // Setup logging
-      let logStream: fs.WriteStream | undefined;
-      if (enableLogging) {
-        // Ensure logs directory exists
-        const logsDir = "logs";
-        if (!fs.existsSync(logsDir)) {
-          fs.mkdirSync(logsDir, { recursive: true });
-        }
+  return `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
+}
 
-        // Extract clean test name for log file (remove path and extension)
-        let logFileName: string;
-        if (customLogFile) {
-          logFileName = customLogFile;
-        } else {
-          const cleanTestName = path
-            .basename(testName)
-            .replace(/\.test\.ts$/, "");
-          logFileName = `raw-${cleanTestName}-${getTime()}.log`;
-        }
-        const logPath = path.join(logsDir, logFileName);
+async function runCommand(
+  command: string,
+  env: Record<string, string>,
+  logger: ReturnType<typeof createTestLogger>,
+): Promise<number> {
+  return new Promise((resolve) => {
+    const child = spawn(command, {
+      env,
+      stdio: ["pipe", "pipe", "pipe"],
+      shell: true,
+    });
 
-        logStream = fs.createWriteStream(logPath, { flags: "w" });
-        console.log(`Logging to: ${logPath}`);
-        console.log(
-          `Test output will be hidden from terminal and logged to file only.`,
+    child.stdout?.on("data", logger.processOutput);
+    child.stderr?.on("data", logger.processOutput);
+
+    child.on("close", (code) => {
+      resolve(code || 0);
+    });
+    child.on("error", (error) => {
+      console.error(`Failed to start command: ${error.message}`);
+      resolve(1);
+    });
+  });
+}
+
+async function runRetryTests(
+  testName: string,
+  options: RetryOptions,
+): Promise<void> {
+  const logger = createTestLogger({
+    enableLogging: options.enableLogging,
+    customLogFile: options.customLogFile,
+    testName,
+  });
+
+  console.log(
+    `Starting test suite: "${testName}" with up to ${options.maxAttempts} attempts, delay ${options.retryDelay}s.`,
+  );
+
+  const env = {
+    ...process.env,
+    RUST_BACKTRACE: "1",
+    LOGGING_LEVEL: "debug",
+  };
+
+  for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
+    console.log(`Attempt ${attempt} of ${options.maxAttempts}...`);
+
+    try {
+      const command = buildTestCommand(testName, options.vitestArgs);
+      console.log(`Executing: ${command}`);
+
+      const exitCode = await runCommand(command, env, logger);
+
+      if (exitCode === 0) {
+        console.log("Tests passed successfully!");
+        logger.close();
+        process.exit(0);
+      } else {
+        throw new Error(`Command exited with code ${exitCode}`);
+      }
+    } catch (error) {
+      console.error(`Attempt ${attempt} failed:`, error);
+
+      if (attempt === options.maxAttempts) {
+        console.error(`Test failed after ${options.maxAttempts} attempts.`);
+        logger.close();
+        process.exit(1);
+      }
+
+      if (options.retryDelay > 0) {
+        console.log(`Retrying in ${options.retryDelay} seconds...`);
+        Atomics.wait(
+          new Int32Array(new SharedArrayBuffer(4)),
+          0,
+          0,
+          options.retryDelay * 1000,
         );
       } else {
-        console.log(
-          `Warning: Logging is disabled. Test output will not be visible anywhere.`,
-        );
-        console.log(`Consider using --log to enable file logging.`);
+        console.log("No retry delay, retrying immediately.");
       }
-
-      // Filter patterns to exclude from output
-      const FILTER_PATTERNS = [
-        /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-      ];
-
-      function filterOutput(data: string): string {
-        let filtered = data;
-        for (const pattern of FILTER_PATTERNS) {
-          filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
-        }
-        return filtered;
-      }
-
-      function runCommand(
-        command: string,
-        env: Record<string, string>,
-      ): Promise<number> {
-        return new Promise((resolve) => {
-          // Use shell to handle glob patterns properly
-          const child = spawn(command, {
-            env,
-            stdio: ["pipe", "pipe", "pipe"],
-            shell: true,
-          });
-
-          const processOutput = (data: Buffer, isError = false) => {
-            const text = data.toString();
-            const filtered = filterOutput(text);
-
-            if (filtered.trim()) {
-              // Write to log file if enabled (no console output)
-              if (logStream) {
-                logStream.write(filtered);
-              }
-            }
-          };
-
-          child.stdout?.on("data", (data: Buffer) => {
-            processOutput(data, false);
-          });
-          child.stderr?.on("data", (data: Buffer) => {
-            processOutput(data, true);
-          });
-
-          child.on("close", (code) => {
-            resolve(code || 0);
-          });
-
-          child.on("error", (error) => {
-            console.error(`Failed to start command: ${error.message}`);
-            resolve(1);
-          });
-        });
-      }
-
-      console.log(
-        `Starting test suite: "${testName}" with up to ${maxAttempts} attempts, delay ${retryDelay}s.`,
-      );
-      const env = {
-        ...process.env,
-        RUST_BACKTRACE: "1",
-        LOGGING_LEVEL: loggingLevel,
-      };
-
-      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
-        console.log(`Attempt ${attempt} of ${maxAttempts}...`);
-        let command;
-        const vitestArgsString = vitestPassthroughArgs.join(" ");
-
-        if (testName === "functional") {
-          // Expand glob pattern for functional tests
-          const expandedFiles = expandGlobPattern("./functional/*.test.ts");
-          if (expandedFiles.length === 0) {
-            console.error("No functional test files found");
-            throw new Error("No test files found");
-          }
-          command = `npx vitest run ${expandedFiles.join(" ")} --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
-        } else {
-          // Check if there's a corresponding npm script
-          const packageJsonPath = path.join(process.cwd(), "package.json");
-          let useNpmScript = false;
-          let packageJsonScript = "";
-          try {
-            const packageJson = JSON.parse(
-              fs.readFileSync(packageJsonPath, "utf8"),
-            );
-            if (packageJson.scripts && packageJson.scripts[testName]) {
-              useNpmScript = true;
-              packageJsonScript = packageJson.scripts[testName];
-            }
-          } catch (error) {
-            console.error(`Error reading package.json`, error);
-          }
-
-          if (useNpmScript) {
-            // Parse the script to expand any glob patterns
-            if (packageJsonScript.includes("*.test.ts")) {
-              // Extract the glob pattern from the script
-              const globMatch = packageJsonScript.match(/([^\s]+\*\.test\.ts)/);
-              if (globMatch) {
-                const globPattern = globMatch[1];
-                const expandedFiles = expandGlobPattern(globPattern);
-                if (expandedFiles.length === 0) {
-                  console.error(
-                    `No test files found for pattern: ${globPattern}`,
-                  );
-                  throw new Error("No test files found");
-                }
-                // Replace the glob pattern with expanded files
-                command =
-                  packageJsonScript.replace(
-                    globPattern,
-                    expandedFiles.join(" "),
-                  ) + ` ${vitestArgsString}`;
-              } else {
-                command = `yarn ${testName} ${vitestArgsString}`;
-              }
-            } else {
-              command = `yarn ${testName} ${vitestArgsString}`;
-            }
-          } else {
-            command = `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
-          }
-        }
-        command = command.trim().replace(/\s{2,}/g, " "); // Clean up command string
-
-        try {
-          console.log(`Executing: ${command}`);
-          const exitCode = await runCommand(command, env);
-
-          if (exitCode === 0) {
-            console.log("Tests passed successfully!");
-            if (logStream) {
-              logStream.end();
-            }
-            process.exit(0); // Success
-          } else {
-            throw new Error(`Command exited with code ${exitCode}`);
-          }
-        } catch (error) {
-          console.error(`Attempt ${attempt} failed.`, error);
-          if (attempt === maxAttempts) {
-            console.error(`Test failed after ${maxAttempts} attempts.`);
-            if (logStream) {
-              logStream.end();
-            }
-            process.exit(1); // Final failure
-          }
-          if (retryDelay > 0) {
-            console.log(`Retrying in ${retryDelay} seconds...`);
-            Atomics.wait(
-              new Int32Array(new SharedArrayBuffer(4)),
-              0,
-              0,
-              retryDelay * 1000,
-            );
-          } else {
-            console.log("No retry delay, retrying immediately.");
-          }
-        }
-      }
-      break;
-    }
-
-    default: {
-      console.error(`Error: Unknown command type "${commandType}"`);
-      showUsageAndExit();
     }
   }
-} catch (error) {
-  if (error instanceof Error) {
-    console.error(`Failed to run command: ${error.message}`);
-  } else {
-    console.error("An unexpected error occurred:", error);
-  }
-  process.exit(1);
 }
+
+async function main(): Promise<void> {
+  const [commandType, nameOrPath, ...additionalArgs] = process.argv.slice(2);
+
+  if (!commandType) {
+    showUsageAndExit();
+  }
+
+  try {
+    switch (commandType) {
+      case "bot": {
+        if (!nameOrPath) {
+          console.error("Error: Bot name is required for 'bot' command type.");
+          showUsageAndExit();
+        }
+        runBot(nameOrPath, additionalArgs);
+        break;
+      }
+
+      case "script": {
+        if (!nameOrPath) {
+          console.error(
+            "Error: Script name is required for 'script' command type.",
+          );
+          showUsageAndExit();
+        }
+        runScript(nameOrPath, additionalArgs);
+        break;
+      }
+
+      case "retry": {
+        const allArgs = nameOrPath
+          ? [nameOrPath, ...additionalArgs]
+          : additionalArgs;
+        const { testName, options } = parseRetryArgs(allArgs);
+        await runRetryTests(testName, options);
+        break;
+      }
+
+      default: {
+        console.error(`Error: Unknown command type "${commandType}"`);
+        showUsageAndExit();
+      }
+    }
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error(`Failed to run command: ${message}`);
+    process.exit(1);
+  }
+}
+
+main().catch((error: unknown) => {
+  console.error("Unexpected error:", error);
+  process.exit(1);
+});
