@@ -134,9 +134,21 @@ export const setupPrettyLogs = () => {
   };
 };
 
+export const getTime = () => {
+  return new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
 // Optional: Add file logging capability
 export const addFileLogging = (filename: string) => {
-  const logPath = path.join(process.cwd(), "logs", filename + ".log");
+  const logPath = path.join(
+    process.cwd(),
+    "logs",
+    filename + getTime() + ".log",
+  );
   const dir = path.dirname(logPath);
 
   if (!fs.existsSync(dir)) {
