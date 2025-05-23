@@ -183,7 +183,7 @@ export function extractErrorLogs(testName: string): string {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/fail/i.test(line)) {
+        if (/vitest/i.test(line)) {
           let lineToAdd = line;
           lineToAdd = lineToAdd?.split(">")[1]?.trim();
           lineToAdd = lineToAdd?.split("//")[0]?.trim();
