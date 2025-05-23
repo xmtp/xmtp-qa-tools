@@ -20,7 +20,7 @@ jobs:
       DELIVERY_AMOUNT: 100
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL  }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

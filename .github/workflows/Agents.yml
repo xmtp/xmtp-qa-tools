@@ -2,9 +2,6 @@ name: Agents
 description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "10 * * * *" # Runs at 10 minutes past each hour
   workflow_dispatch:
@@ -25,7 +22,7 @@ jobs:
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       DEFAULT_STREAM_TIMEOUT_MS: 8000
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL  }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
