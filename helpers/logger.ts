@@ -135,11 +135,12 @@ export const setupPrettyLogs = () => {
 };
 
 export const getTime = () => {
-  return new Date().toLocaleTimeString("en-US", {
+  const time = new Date().toLocaleTimeString("en-US", {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
   });
+  return time.replace(/:/g, "-");
 };
 
 // Optional: Add file logging capability
