@@ -206,7 +206,7 @@ async function runCommand(
   command: string,
   env: Record<string, string>,
   logger: ReturnType<typeof createTestLogger>,
-): Promise<number> {
+): Promise<{ exitCode: number; errorOutput: string }> {
   return new Promise((resolve) => {
     const child = spawn(command, {
       env,
@@ -214,15 +214,25 @@ async function runCommand(
       shell: true,
     });
 
-    child.stdout?.on("data", logger.processOutput);
-    child.stderr?.on("data", logger.processOutput);
+    let errorOutput = "";
+
+    child.stdout?.on("data", (data: Buffer) => {
+      logger.processOutput(data);
+    });
+
+    child.stderr?.on("data", (data: Buffer) => {
+      const errorText = data.toString();
+      errorOutput += errorText;
+      logger.processOutput(data);
+    });
 
     child.on("close", (code) => {
-      resolve(code || 0);
+      resolve({ exitCode: code || 0, errorOutput });
     });
+
     child.on("error", (error) => {
       console.error(`Failed to start command: ${error.message}`);
-      resolve(1);
+      resolve({ exitCode: 1, errorOutput: error.message });
     });
   });
 }
@@ -254,26 +264,58 @@ async function runRetryTests(
       const command = buildTestCommand(testName, options.vitestArgs);
       console.log(`Executing: ${command}`);
 
-      const exitCode = await runCommand(command, env, logger);
+      const { exitCode, errorOutput } = await runCommand(command, env, logger);
 
       if (exitCode === 0) {
         console.log("Tests passed successfully!");
         logger.close();
         process.exit(0);
       } else {
-        throw new Error(`Command exited with code ${exitCode}`);
+        // Extract meaningful error information
+        const errorLines = errorOutput
+          .split("\n")
+          .filter((line) => line.trim())
+          .slice(-10); // Get last 10 non-empty lines
+
+        const errorMessage =
+          errorLines.length > 0
+            ? `Command failed with exit code ${exitCode}:\n${errorLines.join("\n")}`
+            : `Command exited with code ${exitCode}`;
+
+        throw new Error(errorMessage);
       }
     } catch (error) {
-      console.error(`Attempt ${attempt} failed:`, error);
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+
+      console.error(`Attempt ${attempt} failed:`);
+      console.error(errorMessage);
+
+      // Log additional context if available
+      if (options.enableLogging) {
+        console.error(`\nFull logs are being written to the log file`);
+      }
 
       if (attempt === options.maxAttempts) {
-        console.error(`Test failed after ${options.maxAttempts} attempts.`);
+        console.error(
+          `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
+        );
+
+        // Provide helpful debugging info
+        console.error("\n🔍 Debugging tips:");
+        console.error("  • Check the full logs for detailed error information");
+        console.error("  • Verify your environment variables (.env file)");
+        console.error("  • Ensure all required services are running");
+        console.error(
+          `  • Try running manually: ${buildTestCommand(testName, options.vitestArgs)}`,
+        );
+
         logger.close();
         process.exit(1);
       }
 
       if (options.retryDelay > 0) {
-        console.log(`Retrying in ${options.retryDelay} seconds...`);
+        console.log(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
         Atomics.wait(
           new Int32Array(new SharedArrayBuffer(4)),
           0,
@@ -281,7 +323,7 @@ async function runRetryTests(
           options.retryDelay * 1000,
         );
       } else {
-        console.log("No retry delay, retrying immediately.");
+        console.log("\n🔄 Retrying immediately...");
       }
     }
   }
