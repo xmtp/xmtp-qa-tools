@@ -415,9 +415,7 @@ export const randomlyRemoveDb = async (
 };
 
 export const getManualUsers = (filterByName: string[] = []) =>
-  manualUsers.filter(
-    (r) => r.network === process.env.XMTP_ENV && filterByName?.includes(r.name),
-  );
+  manualUsers.filter((r) => filterByName.includes(r.name));
 /**
  * Sends an initial test message to the bot
  */

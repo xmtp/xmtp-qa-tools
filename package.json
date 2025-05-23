@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",
+    "@xmtp/node-bindings": "1.2.0-rc4",
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0",
     "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3",
     "@xmtp/node-bindings-116": "npm:@xmtp/node-bindings@1.1.6",
