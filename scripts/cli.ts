@@ -1,8 +1,8 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createTestLogger, type TestLogOptions } from "@helpers/logger";
-import { extractErrorLogs, sendSlackNotification } from "@helpers/slack";
+import { createTestLogger, extractErrorLogs } from "@helpers/logger";
+import { sendSlackNotification } from "@helpers/slack";
 import "dotenv/config";
 
 interface RetryOptions {
@@ -304,7 +304,7 @@ async function runRetryTests(
         );
 
         // Extract and send Slack notification with error logs
-        const errorLogs = extractErrorLogs();
+        const errorLogs = extractErrorLogs(logger.logFileName);
         await sendSlackNotification({
           testName,
           errorLogs,

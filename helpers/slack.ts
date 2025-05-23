@@ -1,38 +1,8 @@
-/**
- * Slack Notification Helper
- *
- * This module provides reusable Slack notification functionality for the XMTP QA tools.
- * It can be used both as an importable module and as a standalone script.
- *
- * Usage as a module:
- * ```typescript
- * import { sendSlackNotification, extractErrorLogs } from "@helpers/slack";
- *
- * const errorLogs = extractErrorLogs();
- * await sendSlackNotification({
- *   testName: "functional",
- *   errorLogs,
- *   jobStatus: "failed"
- * });
- * ```
- *
- * Usage as standalone script:
- * ```bash
- * SLACK_BOT_TOKEN=your_token npx tsx helpers/slack.ts
- * ```
- *
- * Environment variables:
- * - SLACK_BOT_TOKEN: Required Slack bot token
- * - SLACK_CHANNEL: Slack channel name (default: "general")
- * - GITHUB_WORKFLOW, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_REF: GitHub Actions context
- * - JOB_STATUS: Job status for filtering notifications (default: "failed")
- * - TEST_NAME: Test name override
- */
-
 import * as fs from "fs";
 import * as path from "path";
 import "dotenv/config";
 import fetch from "node-fetch";
+import { extractErrorLogs } from "./logger";
 
 // Type definitions
 interface SlackApiResponse {
@@ -55,47 +25,6 @@ interface GitHubContext {
   githubRef: string;
   branchName: string;
   workflowUrl: string;
-}
-
-// Extract error logs from log files
-export function extractErrorLogs(): string {
-  if (!fs.existsSync("logs")) {
-    return "";
-  }
-
-  try {
-    const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log"));
-    const errorLines: string[] = [];
-
-    for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
-      const content = fs.readFileSync(logPath, "utf-8");
-      const lines = content.split("\n");
-
-      for (const line of lines) {
-        if (/fail/i.test(line)) {
-          let lineToAdd = line;
-          lineToAdd = lineToAdd?.split(">")[1]?.trim();
-          lineToAdd = lineToAdd?.split("//")[0]?.trim();
-          lineToAdd = lineToAdd?.replace("expected false to be true", "failed");
-          if (lineToAdd) {
-            errorLines.push(lineToAdd);
-          }
-        }
-      }
-    }
-
-    console.log(errorLines);
-    if (errorLines.length > 0) {
-      return `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
-    }
-  } catch (error) {
-    console.error("Error reading log files:", error);
-  }
-
-  return "";
 }
 
 // Get GitHub Actions context
@@ -249,7 +178,7 @@ export async function runStandaloneNotification(): Promise<void> {
   }
 
   const testName = findTestName();
-  const errorLogs = extractErrorLogs();
+  const errorLogs = extractErrorLogs(testName);
   const jobStatus = process.env.JOB_STATUS || "unknown";
 
   await sendSlackNotification({
