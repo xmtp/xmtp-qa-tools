@@ -2,9 +2,6 @@ name: GroupStress
 description: Check that group stress testing is working correctly. If it fails notify the team.
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 * * * *" # every hour
   workflow_dispatch:
