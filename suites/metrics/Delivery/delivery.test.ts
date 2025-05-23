@@ -50,15 +50,15 @@ describe(testName, async () => {
         amountofMessages,
         randomSuffix,
       );
-      const receptionPercentage = verifyResult.stats?.receptionPercentage ?? 0;
-      const orderPercentage = verifyResult.stats?.orderPercentage ?? 0;
+      const receptionPercentage = verifyResult.receptionPercentage ?? 0;
+      const orderPercentage = verifyResult.orderPercentage ?? 0;
 
       console.log(
         `Stream reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
       );
 
       // Don't fail if stats are missing or incomplete, just log and continue
-      if (!verifyResult.stats) {
+      if (!verifyResult.receptionPercentage || !verifyResult.orderPercentage) {
         console.log("Warning: No stats were generated for stream verification");
       }
 

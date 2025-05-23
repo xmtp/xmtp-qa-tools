@@ -11,18 +11,12 @@ import { sleep } from "./tests";
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
-  messages: unknown[][];
   receiverCount: number;
-  eventTimings: Record<string, number[]>;
+  messages: string;
+  eventTimings: string;
   averageEventTiming: number;
-  stats?: {
-    receptionPercentage: number;
-    orderPercentage: number;
-    workersInOrder: number;
-    workerCount: number;
-    totalReceivedMessages: number;
-    totalExpectedMessages: number;
-  };
+  receptionPercentage: number;
+  orderPercentage: number;
 };
 
 export async function updateGroupConsent(
@@ -203,7 +197,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     eventTimingsArray[name] = arr;
   }
   const allResults = {
-    stats,
     allReceived: allReceived.every((msgs) => msgs.length === count),
     receiverCount: allReceived.length,
     messages: messagesAsStrings.join(","),
@@ -211,6 +204,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([k, v]) => `${k}: ${v.join(",")}`)
       .join(","),
     averageEventTiming,
+    receptionPercentage: stats?.receptionPercentage ?? 0,
+    orderPercentage: stats?.orderPercentage ?? 0,
   };
   console.debug("allResults", JSON.stringify(allResults, null, 2));
   return allResults;
@@ -453,13 +448,5 @@ export function calculateMessageStats(
   const receptionPercentage =
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
-  const stats = {
-    receptionPercentage,
-    orderPercentage,
-    workersInOrder,
-    workerCount,
-    totalReceivedMessages,
-    totalExpectedMessages,
-  };
-  return stats;
+  return { receptionPercentage, orderPercentage };
 }

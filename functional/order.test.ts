@@ -78,8 +78,8 @@ describe(testName, async () => {
         10,
         randomSuffix,
       );
-      expect(verifyResult.stats?.receptionPercentage).toBeGreaterThan(95);
-      expect(verifyResult.stats?.orderPercentage).toBeGreaterThan(95);
+      expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+      expect(verifyResult.orderPercentage).toBeGreaterThan(95);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
