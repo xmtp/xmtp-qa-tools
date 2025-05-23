@@ -1,5 +1,11 @@
 name: Validate code quality
 
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
 jobs:
   check:
     runs-on: ubuntu-latest
