@@ -70,6 +70,7 @@ jobs:
           path: |
             .data
             logs
+            .env
           key: stress-group-data-${{ matrix.environment }}
       - name: Upload test artifacts
         if: always()
