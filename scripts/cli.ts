@@ -185,6 +185,14 @@ try {
 
         logStream = fs.createWriteStream(logPath, { flags: "w" });
         console.log(`Logging to: ${logPath}`);
+        console.log(
+          `Test output will be hidden from terminal and logged to file only.`,
+        );
+      } else {
+        console.log(
+          `Warning: Logging is disabled. Test output will not be visible anywhere.`,
+        );
+        console.log(`Consider using --log to enable file logging.`);
       }
 
       // Filter patterns to exclude from output
@@ -217,14 +225,7 @@ try {
             const filtered = filterOutput(text);
 
             if (filtered.trim()) {
-              // Write to console
-              if (isError) {
-                process.stderr.write(filtered);
-              } else {
-                process.stdout.write(filtered);
-              }
-
-              // Write to log file if enabled
+              // Write to log file if enabled (no console output)
               if (logStream) {
                 logStream.write(filtered);
               }
