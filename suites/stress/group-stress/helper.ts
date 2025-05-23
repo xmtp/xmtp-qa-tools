@@ -133,13 +133,11 @@ export async function verifyGroupConsistency(
     }
   }
   const countsString = JSON.stringify(counts, null, 2);
-  const summary = `Summary:
-    - Creator: ${creator.name}
-    - Test workers: ${allWorkers.length}
-    - Group ID: ${globalGroup.id}
-    - Group consistency counts: ${countsString}
-    `;
-
+  let icon = "✅";
+  if (allWorkers.length !== countsString.length) {
+    icon = "❌";
+  }
+  const summary = `Group ${icon} consistency summary:\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${countsString.length}\nGroup ID: ${globalGroup.id}\nGroup consistency counts: ${countsString}`;
   await globalGroup.send(summary);
-  console.log(summary);
+  console.debug(summary);
 }

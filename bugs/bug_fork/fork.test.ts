@@ -41,6 +41,7 @@ describe(TEST_NAME, () => {
         workers.getAllBut("bob").map((w) => w.client.inboxId),
         "d612811411d8aba6741a7c67cf8a8001",
         TEST_NAME,
+        "NotForked",
       );
 
       if (!globalGroup?.id) {
