@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getFixedNames, getManualUsers, sleep } from "@helpers/tests";
+import { getFixedNames, getManualUsers } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";

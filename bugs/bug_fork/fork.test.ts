@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { getTime } from "@helpers/logger";
-import { getManualUsers, sleep } from "@helpers/tests";
+import { getManualUsers } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";

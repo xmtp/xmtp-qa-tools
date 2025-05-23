@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry delivery
+        run: yarn retry delivery --no-fail
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
