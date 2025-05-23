@@ -60,7 +60,7 @@ describe(TEST_NAME, () => {
         TEST_NAME,
         typeofStream.Message,
         typeOfResponse.Gm,
-        typeOfSync.None,
+        typeOfSync.Both,
         testConfig.network,
       );
 
