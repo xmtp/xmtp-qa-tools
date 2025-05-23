@@ -1,13 +1,12 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getFixedNames } from "@helpers/tests";
+import { getFixedNames, getManualUsers } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import manualUsers from "../../../helpers/manualusers.json";
 import {
   createOrGetNewGroup,
   testMembershipChanges,
@@ -25,6 +24,9 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
   epochs: 3,
+  typeofStream: typeofStream.Message,
+  typeOfResponse: typeOfResponse.Gm,
+  typeOfSync: typeOfSync.Both,
   network: "production",
   totalWorkers: 14,
   testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
@@ -52,15 +54,16 @@ describe(TEST_NAME, () => {
   setupTestLifecycle({
     expect,
   });
+
   beforeAll(async () => {
     try {
       // Initialize workers with creator and test workers
       workers = await getWorkers(
         ["bot", ...WORKER_NAMES],
-        TEST_NAME,
-        typeofStream.Message,
-        typeOfResponse.Gm,
-        typeOfSync.Both,
+        testConfig.testName,
+        testConfig.typeofStream,
+        testConfig.typeOfResponse,
+        testConfig.typeOfSync,
         testConfig.network,
       );
 
@@ -73,9 +76,7 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        manualUsers
-          .filter((user) => user.network === "production")
-          .map((user) => user.inboxId),
+        getManualUsers(["bot", ...WORKER_NAMES]).map((user) => user.inboxId),
         workers.getAllBut("bot").map((w) => w.client.inboxId),
         testConfig.groupId,
         TEST_NAME,

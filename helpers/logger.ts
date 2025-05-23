@@ -139,7 +139,7 @@ export const getTime = () => {
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
-    timeZone: "America/New_York",
+    timeZone: "America/Buenos_Aires",
   });
   return time.replace(/:/g, "-");
 };
