@@ -65,7 +65,9 @@ describe(TEST_NAME, () => {
       }
 
       // Send initial test message
-      await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
+      await globalGroup.send(
+        `Starting stress test: ${testConfig.groupName} frpm ${process.env.CURRENT_ENV_PATH}]`,
+      );
       await globalGroup.updateName(testConfig.groupName);
     } catch (error: unknown) {
       const errorMessage =

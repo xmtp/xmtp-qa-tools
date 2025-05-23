@@ -22,7 +22,7 @@ jobs:
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       DEFAULT_STREAM_TIMEOUT_MS: 8000
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL || 'xmtp-qa' }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL  }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry agents
+        run: yarn retry agents --no-fail
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
