@@ -143,6 +143,124 @@ export const getTime = () => {
   return time.replace(/:/g, "-");
 };
 
+// Log filtering utilities
+const LOG_FILTER_PATTERNS = [
+  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+  // Add more patterns here as needed
+];
+
+export const filterLogOutput = (data: string): string => {
+  let filtered = data;
+  for (const pattern of LOG_FILTER_PATTERNS) {
+    filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
+  }
+  return filtered;
+};
+
+export interface TestLogOptions {
+  enableLogging: boolean;
+  customLogFile?: string;
+  testName: string;
+  logFileName?: string;
+}
+
+// Extract error logs from log files
+export function extractErrorLogs(testName: string): string {
+  if (!fs.existsSync("logs")) {
+    return "";
+  }
+  console.log("testName", testName);
+
+  try {
+    const logFiles = fs
+      .readdirSync("logs")
+      .filter((file) => file.endsWith(".log") && file.includes(testName));
+    const errorLines: string[] = [];
+
+    for (const logFile of logFiles) {
+      const logPath = path.join("logs", logFile);
+      const content = fs.readFileSync(logPath, "utf-8");
+      const lines = content.split("\n");
+
+      for (const line of lines) {
+        if (/vitest/i.test(line)) {
+          let lineToAdd = line;
+          lineToAdd = lineToAdd?.split(">")[1]?.trim();
+          lineToAdd = lineToAdd?.split("//")[0]?.trim();
+          lineToAdd = lineToAdd?.replace("expected false to be true", "failed");
+          if (lineToAdd) {
+            errorLines.push(lineToAdd);
+          }
+        }
+      }
+    }
+
+    console.log(errorLines);
+    if (errorLines.length > 0) {
+      return `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+    }
+  } catch (error) {
+    console.error("Error reading log files:", error);
+  }
+
+  return "";
+}
+export const createTestLogger = (options: TestLogOptions) => {
+  let logStream: fs.WriteStream | undefined;
+  // Extract clean test name for log file (remove path and extension)
+  let logFileName: string = "";
+
+  if (options.enableLogging) {
+    // Ensure logs directory exists
+    const logsDir = "logs";
+    if (!fs.existsSync(logsDir)) {
+      fs.mkdirSync(logsDir, { recursive: true });
+    }
+
+    if (options.customLogFile) {
+      logFileName = options.customLogFile;
+    } else {
+      const cleanTestName = path
+        .basename(options.testName)
+        .replace(/\.test\.ts$/, "");
+      logFileName = `raw-${cleanTestName}-${getTime()}.log`;
+    }
+    const logPath = path.join(logsDir, logFileName);
+
+    logStream = fs.createWriteStream(logPath, { flags: "w" });
+    console.log(`Logging to: ${logPath}`);
+    console.log(
+      "Test output will be hidden from terminal and logged to file only.",
+    );
+  } else {
+    console.log(
+      "Warning: Logging is disabled. Test output will not be visible anywhere.",
+    );
+    console.log("Consider using --log to enable file logging.");
+  }
+
+  const processOutput = (data: Buffer) => {
+    const text = data.toString();
+    const filtered = filterLogOutput(text);
+
+    if (filtered.trim() && logStream) {
+      logStream.write(filtered);
+    }
+  };
+
+  const close = () => {
+    if (logStream) {
+      logStream.end();
+    }
+  };
+
+  return {
+    processOutput,
+    close,
+    logFileName,
+  };
+};
+
 // Optional: Add file logging capability
 export const addFileLogging = (filename: string) => {
   const logPath = path.join(
