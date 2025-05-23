@@ -13,12 +13,12 @@ export async function createOrGetNewGroup(
   manualUserInboxIds: string[],
   groupId: string,
   testName: string,
+  groupName: string,
 ): Promise<Group> {
   console.log("Creating or getting new group");
   console.log("Worker inbox ids", workerInboxIds);
   console.log("Manual user inbox ids", manualUserInboxIds);
   console.log("Group id", groupId);
-  console.log("Test name", testName);
 
   // Either create a new group or use existing one
   if (!groupId) {
@@ -56,9 +56,15 @@ export async function createOrGetNewGroup(
   console.log("Synced creator's conversations", conversations.length);
   await logAgentDetails(creator.client);
 
-  return (await creator.client.conversations.getConversationById(
+  const globalGroup = (await creator.client.conversations.getConversationById(
     groupId,
   )) as Group;
+  if (!globalGroup) throw new Error("Group not found");
+
+  // Send initial test message
+  await globalGroup.send(`Starting stress test: ${groupName}`);
+  await globalGroup.updateName(groupName);
+  return globalGroup;
 }
 
 export async function testMembershipChanges(
@@ -126,14 +132,14 @@ export async function verifyGroupConsistency(
       console.error(`Error verifying state for ${worker.name}:`, e);
     }
   }
+  const members = await globalGroup.members();
+  const memberCount = members.length;
   const countsString = JSON.stringify(counts, null, 2);
-  const summary = `Summary:
-    - Creator: ${creator.name}
-    - Test workers: ${allWorkers.length}
-    - Group ID: ${globalGroup.id}
-    - Group consistency counts: ${countsString}
-    `;
-
+  let icon = "✅";
+  if (allWorkers.length !== Object.keys(counts).length) {
+    icon = "❌";
+  }
+  const summary = `Group ${icon} consistency summary:\n\nMember count: ${memberCount}\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${Object.keys(counts).length}\nGroup ID: ${globalGroup.id}\nGroup consistency counts: ${countsString}`;
   await globalGroup.send(summary);
-  console.log(summary);
+  console.debug(summary);
 }

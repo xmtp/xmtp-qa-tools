@@ -76,19 +76,13 @@ describe(TEST_NAME, () => {
       // Create or get the global test group
       globalGroup = await createOrGetNewGroup(
         creator,
-        getManualUsers(["bot", ...WORKER_NAMES]).map((user) => user.inboxId),
+        getManualUsers(["fabri"]).map((user) => user.inboxId),
         workers.getAllBut("bot").map((w) => w.client.inboxId),
         testConfig.groupId,
-        TEST_NAME,
+        testConfig.testName,
+        testConfig.groupName,
       );
-
-      if (!globalGroup?.id) {
-        throw new Error("Failed to create or retrieve global group");
-      }
-
-      // Send initial test message
-      await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
-      await globalGroup.updateName(testConfig.groupName);
+      await workers.packageDetails();
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
