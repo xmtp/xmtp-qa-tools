@@ -38,6 +38,7 @@ jobs:
           path: |
             .data
             logs
+            .env
           key: stress-group-data-${{ matrix.environment }}
           restore-keys: |
             stress-group-data-${{ matrix.environment }}
