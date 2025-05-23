@@ -224,12 +224,14 @@ export async function verifyMessageStream(
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
     triggerEvents: async () => {
+      console.warn("triggerEvents", count);
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
         let content = `gm-${i + 1}-${randomSuffix}`;
         if (count === 1) {
           content = randomSuffix;
         }
+        console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
