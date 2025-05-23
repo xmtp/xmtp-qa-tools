@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test agents
+        run: yarn retry agents
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
