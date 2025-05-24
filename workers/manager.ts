@@ -425,6 +425,7 @@ export async function getWorkers(
   );
   await manager.createWorkers(descriptors);
   manager.printWorkers();
+  await manager.packageDetails();
   return manager;
 }
 
