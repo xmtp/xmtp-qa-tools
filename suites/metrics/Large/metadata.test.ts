@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "large-metadata";
+const testName = "m_large_metadata";
 loadEnv(testName);
 
 describe(testName, async () => {

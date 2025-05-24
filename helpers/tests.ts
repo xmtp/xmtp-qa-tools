@@ -450,13 +450,9 @@ export function getAddresses(count: number) {
 /**
  * Appends a variable to the .env file
  */
-export const appendToEnv = (
-  key: string,
-  value: string,
-  testName: string = "",
-): void => {
+export const appendToEnv = (key: string, value: string): void => {
   try {
-    const envPath = getEnvPath(testName);
+    const envPath = getEnvPath();
 
     // Update process.env
     if (key in process.env) {

@@ -44,7 +44,7 @@ export async function createOrGetNewGroup(
         console.error(`Error adding member ${member}:`, e);
       }
     }
-    appendToEnv("GROUP_ID", group.id, testName);
+    appendToEnv("GROUP_ID", group.id);
     return group;
   }
 

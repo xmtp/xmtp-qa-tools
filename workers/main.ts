@@ -718,8 +718,7 @@ export class WorkerClient extends Worker {
    * @returns true if the database was cleared, false otherwise
    */
   clearDB(): Promise<boolean> {
-    const dataPath =
-      getDataPath(this.testName) + "/" + this.name + "/" + this.folder;
+    const dataPath = getDataPath() + "/" + this.name + "/" + this.folder;
     console.debug(`[${this.nameId}] Clearing database at ${dataPath}`);
 
     try {

@@ -12,7 +12,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "large-syncs";
+const testName = "m_large_syncs";
 loadEnv(testName);
 
 describe(testName, async () => {
