@@ -1,0 +1,93 @@
+[2025-05-24T00:26:10.336Z] [[32minfo[39m] env local
+[2025-05-24T00:26:10.337Z] [[34mdebug[39m] [
+  "elon-a 0x59064e0CB9Dd7f71eC29797c4cCb236be5590d63 210-46e9b60",
+  "charlie-a 0xFE34c24986b362634f221aDb09b92076a688d456 210-46e9b60",
+  "frank-a 0xA30D6Afa606ba365102aae245966F3522297569C 210-46e9b60",
+  "alice-a 0x41fF513DFD7448d10bF78783bcb2Ecd02C4DcBf7 210-46e9b60",
+  "eve-a 0x0a03958b0FDF7159aBBa5D2F2b431427b6eAb22C 210-46e9b60",
+  "dave-a 0xc68618B34BDA0b2a231409Fc391191FF2bBfAb2b 210-46e9b60",
+  "joe-a 0xd6bea3e4dbC76fA5cF2Dea21ba24D0B3De7Ab133 210-46e9b60",
+  "bob-a 0xe43652e14E6d8C8D9Bb1677B53e59EbfdFE6953f 210-46e9b60",
+  "fabri-a 0xb95ba281EF527ADd2096cadD8FaDbc0A1F8271E7 210-46e9b60",
+  "grace-a 0x0cFd90D57Bd78b16f411217eCD0D8d81FFAA40dC 210-46e9b60"
+]
+[2025-05-24T00:26:10.416Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.429Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.451Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.459Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.460Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.464Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.466Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.466Z] [[32minfo[39m] env local
+[2025-05-24T00:26:10.467Z] [[34mdebug[39m] [
+  "alice-a 0x41fF513DFD7448d10bF78783bcb2Ecd02C4DcBf7 210-46e9b60",
+  "charlie-a 0xFE34c24986b362634f221aDb09b92076a688d456 210-46e9b60",
+  "fabri-a 0xb95ba281EF527ADd2096cadD8FaDbc0A1F8271E7 210-46e9b60",
+  "bob-a 0xe43652e14E6d8C8D9Bb1677B53e59EbfdFE6953f 210-46e9b60",
+  "frank-a 0xA30D6Afa606ba365102aae245966F3522297569C 210-46e9b60",
+  "eve-a 0x0a03958b0FDF7159aBBa5D2F2b431427b6eAb22C 210-46e9b60",
+  "dave-a 0xc68618B34BDA0b2a231409Fc391191FF2bBfAb2b 210-46e9b60",
+  "elon-a 0x59064e0CB9Dd7f71eC29797c4cCb236be5590d63 210-46e9b60",
+  "joe-a 0xd6bea3e4dbC76fA5cF2Dea21ba24D0B3De7Ab133 210-46e9b60",
+  "grace-a 0x0cFd90D57Bd78b16f411217eCD0D8d81FFAA40dC 210-46e9b60"
+]
+[2025-05-24T00:26:10.467Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.469Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.472Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.472Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.477Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.478Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.480Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.484Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.487Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.489Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.490Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.492Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.494Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.495Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.498Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.500Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.502Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.504Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.505Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.506Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.512Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.515Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.515Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.519Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.522Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.528Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.532Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.534Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.540Z] [[31merror[39m] [fabri-210] Conversation stream error: Error: group with welcome id 35649 not found
+[2025-05-24T00:26:10.543Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.543Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.543Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.561Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.561Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.566Z] [[32minfo[39m] Group created 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.569Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.573Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.573Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.576Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.576Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.583Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.584Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.594Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.595Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.596Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.602Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.603Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.605Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.609Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.612Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.619Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.636Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.644Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.653Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.667Z] [[31merror[39m] [bob-210] Conversation stream error: Error: group with welcome id 35676 not found
+[2025-05-24T00:26:10.668Z] [[34mdebug[39m] Received conversation, 996bcd810060f41a572df3508e37a5ad
+[2025-05-24T00:26:10.670Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
+[2025-05-24T00:26:10.684Z] [[32minfo[39m] Group created c56b7ec8764a1513a148da398a0c58ac
+[2025-05-24T00:26:10.687Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35463 not found
+[2025-05-24T00:26:10.688Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35572 not found
