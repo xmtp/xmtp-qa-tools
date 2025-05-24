@@ -505,10 +505,10 @@ export const simulateMissingCursorMessage = async (
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
 };
-export function removeDataFolder(): void {
+export async function removeDataFolder(): Promise<void> {
   const dataPath = path.join(process.cwd(), ".data");
   if (fs.existsSync(dataPath)) {
-    fs.rmSync(dataPath, { recursive: true, force: true });
+    await fs.promises.rm(dataPath, { recursive: true, force: true });
   }
 }
 export function getMultiVersion(count: number): string[] {
