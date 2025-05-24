@@ -376,33 +376,6 @@ export class WorkerManager {
 
     return worker;
   }
-
-  /**
-   * Creates multiple workers at once from descriptors
-   */
-  public async createWorkers(descriptorsOrAmount: string[]): Promise<Worker[]> {
-    let descriptors: string[];
-
-    const randomSdkVersionReversed =
-      sdkVersionOptions[sdkVersionOptions.length - 1];
-
-    descriptors = [];
-    for (const descriptor of descriptorsOrAmount) {
-      if (!sdkVersionOptions.includes(descriptor.split("-")[2])) {
-        const name = descriptor.split("-")[0];
-        const installId = descriptor.split("-")[1] ?? "a";
-        descriptors.push(`${name}-${installId}-${randomSdkVersionReversed}`);
-      } else {
-        descriptors.push(descriptor);
-      }
-    }
-
-    // Process descriptors in parallel
-    const workerPromises = descriptors.map((descriptor) =>
-      this.createWorker(descriptor),
-    );
-    return Promise.all(workerPromises);
-  }
 }
 
 /**
@@ -423,7 +396,11 @@ export async function getWorkers(
     typeOfSyncType,
     env,
   );
-  await manager.createWorkers(descriptors);
+  // Process descriptors in parallel
+  const workerPromises = descriptors.map((descriptor) =>
+    manager.createWorker(descriptor),
+  );
+  await Promise.all(workerPromises);
   manager.printWorkers();
   await manager.packageDetails();
   return manager;

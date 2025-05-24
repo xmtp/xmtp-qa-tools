@@ -1,7 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getFixedNames, getManualUsers } from "@helpers/tests";
+import {
+  getManualUsers,
+  getMultiVersion,
+  removeDataFolder,
+} from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -18,8 +22,7 @@ import {
 // ============================================================
 
 const TEST_NAME = "group-stress";
-const WORKER_NAMES = getFixedNames(14);
-
+const WORKER_NAMES = getMultiVersion(14);
 const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
@@ -29,9 +32,11 @@ const testConfig = {
   typeOfSync: typeOfSync.Both,
   network: "production",
   totalWorkers: 14,
-  testWorkers: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
-  checkWorkers: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
+  allWorkersNames: WORKER_NAMES,
+  testWorkersNames: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
+  checkWorkersNames: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
   groupId: process.env.GROUP_ID as string,
+  freshInstalls: true, // more installs
 } as const;
 
 loadEnv(TEST_NAME);
@@ -57,6 +62,8 @@ describe(TEST_NAME, () => {
 
   beforeAll(async () => {
     try {
+      if (testConfig.freshInstalls) await removeDataFolder();
+
       // Initialize workers with creator and test workers
       workers = await getWorkers(
         ["bot", ...WORKER_NAMES],
@@ -113,10 +120,11 @@ describe(TEST_NAME, () => {
 
       // Get workers designated for checking message delivery
       const checkWorkers = allWorkers.filter((worker) =>
-        testConfig.checkWorkers.includes(worker.name),
+        testConfig.checkWorkersNames.includes(worker.name),
       );
 
       if (checkWorkers.length === 0) {
+        console.log(testConfig.checkWorkersNames);
         throw new Error("No check workers available");
       }
 
@@ -154,11 +162,11 @@ describe(TEST_NAME, () => {
       }
 
       console.log(
-        `Testing membership changes with ${testConfig.testWorkers.length} workers`,
+        `Testing membership changes with ${testConfig.testWorkersNames.length} workers`,
       );
 
       // Test membership changes for each designated test worker
-      for (const workerName of testConfig.testWorkers) {
+      for (const workerName of testConfig.testWorkersNames) {
         const worker = allWorkers.find((w) => w.name === workerName);
 
         if (!worker || worker.name === creator.name) {

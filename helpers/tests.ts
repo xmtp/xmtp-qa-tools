@@ -505,6 +505,22 @@ export const simulateMissingCursorMessage = async (
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
 };
+export function removeDataFolder(): void {
+  const dataPath = path.join(process.cwd(), ".data");
+  if (fs.existsSync(dataPath)) {
+    fs.rmSync(dataPath, { recursive: true, force: true });
+  }
+}
+export function getMultiVersion(count: number): string[] {
+  const descriptors: string[] = [];
+  for (const descriptor of getFixedNames(count)) {
+    const randomSdkVersion =
+      sdkVersionOptions[Math.floor(Math.random() * sdkVersionOptions.length)];
+    descriptors.push(`${descriptor}-a-${randomSdkVersion}`);
+  }
+
+  return descriptors;
+}
 export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
   //return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);

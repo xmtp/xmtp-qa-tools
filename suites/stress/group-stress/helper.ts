@@ -49,7 +49,10 @@ export async function createOrGetNewGroup(
   }
 
   // Sync creator's conversations
-  console.log(`Syncing creator's ${creator.address} conversations`);
+  console.log(`Syncing creator's ${creator.name} conversations`);
+  await creator.client.conversations.syncAll();
+  await creator.client.conversations.sync();
+  await creator.client.conversations.syncAll();
   await creator.client.conversations.sync();
   const conversations = await creator.client.conversations.list();
   if (conversations.length === 0) throw new Error("No conversations found");
@@ -134,12 +137,12 @@ export async function verifyGroupConsistency(
   }
   const members = await globalGroup.members();
   const memberCount = members.length;
-  const countsString = JSON.stringify(counts, null, 2);
+
   let icon = "✅";
   if (allWorkers.length !== Object.keys(counts).length) {
     icon = "❌";
   }
-  const summary = `Group ${icon} consistency summary:\n\nMember count: ${memberCount}\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${Object.keys(counts).length}\nGroup ID: ${globalGroup.id}\nGroup consistency counts: ${countsString}`;
+  const summary = `Group ${icon} consistency summary:\n\nMember count: ${memberCount}\nCreator: ${creator.name}\nTest workers: ${allWorkers.length} / ${Object.keys(counts).length}\nGroup ID: ${globalGroup.id}`;
   await globalGroup.send(summary);
   console.debug(summary);
 }
