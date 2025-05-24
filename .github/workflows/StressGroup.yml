@@ -4,9 +4,6 @@ description: Check that group stress testing is working correctly. If it fails n
 on:
   schedule:
     - cron: "*/30 * * * *" # Runs every 30 minutes
-  pull_request:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
