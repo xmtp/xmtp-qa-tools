@@ -55,7 +55,7 @@ export interface AgentOptions {
  */
 interface WorkerInstance {
   name: string;
-  client: Client;
+  client: Client<any>;
   options: AgentOptions;
   isActive: boolean;
   cleanupHandler?: () => void;
@@ -110,7 +110,7 @@ class WorkerManager {
    */
   private async createClientFromOptions(
     options: AgentOptions,
-  ): Promise<Client> {
+  ): Promise<Client<any>> {
     const signer = createSigner(options.walletKey);
     const dbEncryptionKey = getEncryptionKeyFromHex(
       options.dbEncryptionKey ??
@@ -142,8 +142,8 @@ class WorkerManager {
   async addWorker(
     name: string,
     options: AgentOptions,
-    client?: Client,
-  ): Promise<Client> {
+    client?: Client<any>,
+  ): Promise<Client<any>> {
     // Create the client if not provided
     const xmtpClient = client || (await this.createClientFromOptions(options));
 

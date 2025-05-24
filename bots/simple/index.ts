@@ -1,6 +1,6 @@
 import { logAgentDetails } from "@bots/client";
 import { loadEnv } from "@helpers/client";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Client } from "@xmtp/node-sdk";
 
@@ -13,6 +13,8 @@ async function main() {
     testName,
     typeofStream.Message,
     typeOfResponse.Gpt,
+    typeOfSync.None,
+    "production",
   );
   const bot = workers.get("bot");
   const client = bot?.client as Client;

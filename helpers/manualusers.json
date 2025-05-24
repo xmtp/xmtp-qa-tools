@@ -3,19 +3,19 @@
     "app": "convos",
     "inboxId": "e35852b0fd1bfc0eefeea76e6685c13b1695fa22dac650d733d06f8cbe91e1cf",
     "network": "production",
-    "name": "fabri-run1"
+    "name": "prod-testing"
   },
   {
     "app": "tba",
     "inboxId": "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
     "network": "production",
-    "name": "fabri"
+    "name": "prod-testing"
   },
   {
     "app": "xmtpchat",
     "inboxId": "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
     "network": "production",
-    "name": "fabri"
+    "name": "prod-testing"
   },
   {
     "app": "convos",
@@ -28,7 +28,7 @@
     "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
     "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
     "network": "production",
-    "name": "fabri"
+    "name": "prod-testing"
   },
   {
     "app": "convos",

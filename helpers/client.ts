@@ -194,20 +194,13 @@ export const createSigner = (key: string): Signer => {
   };
 };
 
-function loadDataPath(
-  name: string,
-  installationId: string,
-  testName: string,
-): string {
+function loadDataPath(name: string, installationId: string): string {
   // Extract the base name without installation ID for folder structure
   const baseName = name.toLowerCase().split("-")[0];
   const preBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH ?? process.cwd();
   // Use baseName for the parent folder, not the full name
   let basePath = `${preBasePath}/.data/${baseName}/${installationId}`;
 
-  if (testName.includes("bug")) {
-    basePath = basePath.replace("/.data/", `/bugs/${testName}/.data/`);
-  }
   return basePath;
 }
 export const getDbPath = (
@@ -219,7 +212,7 @@ export const getDbPath = (
 ): string => {
   let identifier = `${accountAddress}-${env}`;
 
-  const basePath = loadDataPath(name, installationId, testName);
+  const basePath = loadDataPath(name, installationId);
 
   if (!fs.existsSync(basePath)) {
     console.debug(`[${name}] Creating directory: ${basePath}`);
@@ -240,23 +233,13 @@ export const getEncryptionKeyFromHex = (hex: string): Uint8Array => {
   return fromString(hex, "hex");
 };
 
-export function getDataPath(testName: string): string {
+export function getDataPath(): string {
   let dataPath = path.join(".data");
-  if (testName.includes("bug")) {
-    dataPath = path.resolve(process.cwd(), "bugs/" + testName + "/.data");
-  }
   return dataPath;
 }
-export function getEnvPath(testName: string): string {
+export function getEnvPath(): string {
   let envPath = path.join(".env");
-  if (testName.includes("bug")) {
-    envPath = path.resolve(process.cwd(), "bugs/" + testName + "/.env");
-  } else if (testName.includes("bot")) {
-    envPath = path.resolve(
-      process.cwd(),
-      "bots/" + testName.split("_")[1] + "/.env",
-    );
-  }
+
   if (!fs.existsSync(envPath)) {
     fs.mkdirSync(path.dirname(envPath), { recursive: true });
     if (!fs.existsSync(envPath)) {
@@ -272,7 +255,7 @@ export function getEnvPath(testName: string): string {
  * Loads environment variables from the specified test's .env file
  */
 export function loadEnv(testName: string) {
-  const envPath = getEnvPath(testName);
+  const envPath = getEnvPath();
   dotenv.config({ path: envPath });
   setupPrettyLogs();
   addFileLogging(testName);

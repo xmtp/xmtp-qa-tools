@@ -1,0 +1,66 @@
+[2025-05-24T00:29:17.510Z] [[34mdebug[39m] [bob] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/bob/a
+[2025-05-24T00:29:17.513Z] [[34mdebug[39m] [alice] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/alice/a
+[2025-05-24T00:29:17.514Z] [[34mdebug[39m] [fabri] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/fabri/a
+[2025-05-24T00:29:17.515Z] [[34mdebug[39m] [elon] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/elon/a
+[2025-05-24T00:29:17.516Z] [[34mdebug[39m] [joe] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/joe/a
+[2025-05-24T00:29:17.517Z] [[34mdebug[39m] [charlie] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/charlie/a
+[2025-05-24T00:29:17.518Z] [[34mdebug[39m] [dave] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/dave/a
+[2025-05-24T00:29:17.519Z] [[34mdebug[39m] [eve] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/eve/a
+[2025-05-24T00:29:17.520Z] [[34mdebug[39m] [frank] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/frank/a
+[2025-05-24T00:29:17.522Z] [[34mdebug[39m] [grace] Creating directory: /Users/fabrizioguespe/DevRel/xmtp-qa-tools/bugs/bug_welcome/.data/grace/a
+[2025-05-24T00:29:18.015Z] [[32minfo[39m] env local
+[2025-05-24T00:29:18.015Z] [[34mdebug[39m] [
+  "bob-a 0x0B88799c76EE4728a301D29FcD6247f09189c22a 210-46e9b60",
+  "fabri-a 0x611B6D32895fff9CB3a6760382168f69779141A5 210-46e9b60",
+  "dave-a 0xB795Ac91Ae1d198982414D8cdf53f7F33522DE02 210-46e9b60",
+  "eve-a 0x3b5dE5FAa97ab40f579b1cB19168D7EF8f2ac113 210-46e9b60",
+  "grace-a 0x40e5681c3CA97E97c66eF3797Aec5C36AcFBaf2b 210-46e9b60",
+  "charlie-a 0xF1E82FEAe88b88A2aE2d632F23d94c18f8FDae8A 210-46e9b60",
+  "joe-a 0x3767dd135A5056aB822eA965fe7b74aDf88A36ad 210-46e9b60",
+  "frank-a 0x0A9bA4468259ca5Be817fB4420d3f6e0008CabA6 210-46e9b60",
+  "elon-a 0x20170b9D95822Ba1a2C76BbCAc25ecf934B164Cb 210-46e9b60",
+  "alice-a 0x5a0F2477166aC8E99Dcc68DfD246fF8CF5435a38 210-46e9b60"
+]
+[2025-05-24T00:29:23.114Z] [[32minfo[39m] Group created 9d11b796013f15242237d0f42b3d412c
+[2025-05-24T00:29:23.150Z] [[32minfo[39m] Group created b212fddfe23a116659a94846169d10ad
+[2025-05-24T00:29:36.457Z] [[32minfo[39m] env local
+[2025-05-24T00:29:36.458Z] [[34mdebug[39m] [
+  "fabri-a 0x611B6D32895fff9CB3a6760382168f69779141A5 210-46e9b60",
+  "eve-a 0x3b5dE5FAa97ab40f579b1cB19168D7EF8f2ac113 210-46e9b60",
+  "joe-a 0x3767dd135A5056aB822eA965fe7b74aDf88A36ad 210-46e9b60",
+  "alice-a 0x5a0F2477166aC8E99Dcc68DfD246fF8CF5435a38 210-46e9b60",
+  "frank-a 0x0A9bA4468259ca5Be817fB4420d3f6e0008CabA6 210-46e9b60",
+  "bob-a 0x0B88799c76EE4728a301D29FcD6247f09189c22a 210-46e9b60",
+  "dave-a 0xB795Ac91Ae1d198982414D8cdf53f7F33522DE02 210-46e9b60",
+  "charlie-a 0xF1E82FEAe88b88A2aE2d632F23d94c18f8FDae8A 210-46e9b60",
+  "grace-a 0x40e5681c3CA97E97c66eF3797Aec5C36AcFBaf2b 210-46e9b60",
+  "elon-a 0x20170b9D95822Ba1a2C76BbCAc25ecf934B164Cb 210-46e9b60"
+]
+[2025-05-24T00:29:36.577Z] [[32minfo[39m] env local
+[2025-05-24T00:29:36.577Z] [[34mdebug[39m] [
+  "alice-a 0x5a0F2477166aC8E99Dcc68DfD246fF8CF5435a38 210-46e9b60",
+  "grace-a 0x40e5681c3CA97E97c66eF3797Aec5C36AcFBaf2b 210-46e9b60",
+  "dave-a 0xB795Ac91Ae1d198982414D8cdf53f7F33522DE02 210-46e9b60",
+  "frank-a 0x0A9bA4468259ca5Be817fB4420d3f6e0008CabA6 210-46e9b60",
+  "fabri-a 0x611B6D32895fff9CB3a6760382168f69779141A5 210-46e9b60",
+  "charlie-a 0xF1E82FEAe88b88A2aE2d632F23d94c18f8FDae8A 210-46e9b60",
+  "elon-a 0x20170b9D95822Ba1a2C76BbCAc25ecf934B164Cb 210-46e9b60",
+  "bob-a 0x0B88799c76EE4728a301D29FcD6247f09189c22a 210-46e9b60",
+  "eve-a 0x3b5dE5FAa97ab40f579b1cB19168D7EF8f2ac113 210-46e9b60",
+  "joe-a 0x3767dd135A5056aB822eA965fe7b74aDf88A36ad 210-46e9b60"
+]
+[2025-05-24T00:29:36.613Z] [[32minfo[39m] Group created 814ccb4981be7ec05d324c02ffe861b9
+[2025-05-24T00:29:36.620Z] [[31merror[39m] [eve-210] Conversation stream error: Error: group with welcome id 35749 not found
+[2025-05-24T00:29:36.623Z] [[31merror[39m] [charlie-210] Conversation stream error: Error: group with welcome id 35757 not found
+[2025-05-24T00:29:36.626Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35761 not found
+[2025-05-24T00:29:36.626Z] [[31merror[39m] [bob-210] Conversation stream error: Error: group with welcome id 35763 not found
+[2025-05-24T00:29:36.627Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35764 not found
+[2025-05-24T00:29:36.642Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found
+[2025-05-24T00:29:36.644Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found
+[2025-05-24T00:29:36.646Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found
+[2025-05-24T00:29:36.649Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found
+[2025-05-24T00:29:36.656Z] [[31merror[39m] [frank-210] Conversation stream error: Error: group with welcome id 35771 not found
+[2025-05-24T00:29:36.656Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found
+[2025-05-24T00:29:36.656Z] [[32minfo[39m] Group created cee025f6033d34aaa3f5889099103db8
+[2025-05-24T00:29:36.658Z] [[31merror[39m] [bob-210] Conversation stream error: Error: group with welcome id 35775 not found
+[2025-05-24T00:29:36.660Z] [[31merror[39m] [alice-210] Conversation stream error: Error: group with welcome id 35769 not found

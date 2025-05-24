@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "large-conversations";
+const testName = "m_large_conversations";
 loadEnv(testName);
 
 describe(testName, async () => {
