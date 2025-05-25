@@ -24,30 +24,18 @@ describe(testName, async () => {
     expect,
   });
 
-  it("setup: should get target inbox for all workers to message", () => {
-    try {
-      // Use ivy as the target that everyone will message
-      targetInboxId = workers.get("ivy")!.client.inboxId;
-      expect(targetInboxId).toBeDefined();
-      console.log(`🎯 Target inbox: ${targetInboxId}`);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
   it("massiveBurstFromWorkerThreads: should use actual worker threads to send messages in parallel", async () => {
     try {
+      // Use ivy as the target that everyone will message
+      targetInboxId = workers.getCreator().client.inboxId;
+      expect(targetInboxId).toBeDefined();
       const messagesPerWorker = 5000; // Each worker thread sends 500 messages
       const allWorkers = workers
-        .getAll()
+        .getAllButCreator()
         .filter((w) => w.client.inboxId !== targetInboxId); // Exclude target
 
       console.log(
         `🚀 LAUNCHING ${allWorkers.length} WORKER THREADS EACH SENDING ${messagesPerWorker} MESSAGES!`,
-      );
-      console.log(
-        `📊 Total messages: ${allWorkers.length * messagesPerWorker}`,
       );
       console.log(`🧵 Each worker runs in its own thread for TRUE parallelism`);
 
@@ -65,7 +53,7 @@ describe(testName, async () => {
           const dm = await worker.client.conversations.newDm(targetInboxId);
 
           for (let i = 0; i < messagesPerWorker; i++) {
-            const message = `THREAD-BURST-${worker.name}-${i}-${Date.now()}-${Math.random()}`;
+            const message = `${worker.name}-${i}-${Date.now()}-${Math.random()}`;
             await dm.send(message);
             console.debug(i);
           }
@@ -76,7 +64,8 @@ describe(testName, async () => {
 
       await Promise.all(workerPromises);
     } catch (e) {
-      console.error(e);
+      logError(e, expect.getState().currentTestName);
+      throw e;
     }
   });
 });
