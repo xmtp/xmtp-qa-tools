@@ -1,5 +1,7 @@
 # XMTP Group Stress Testing Suite
 
+> For details see deployment: https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792
+
 - [x] Time factor (30 min recurring)
 - [x] Old packages
 - [x] Multi-sdk
