@@ -1,17 +1,59 @@
 # XMTP Group Stress Testing Suite
 
-> For details see [deployment](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
-
-- [x] Time factor (2 hours recurring)
-- [x] Multi sdk versions (>2.0.4 post fix)
-- [x] 3 bindings (web, mobile node, desktop node)
-- [x] 10 second sync strategy
-- [x] 2 types of streams (metadata and messages)
-- [x] Membership change cycles (10 epochs)
-
-This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
+This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges across multiple SDK versions and client types.
 
 https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
+
+> For details see [deployment](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
+
+## XMTP Features Under Test
+
+### Core XMTP SDK Features
+
+- [x] **Multi-SDK Version Compatibility** (>2.0.4 post-fix)
+- [x] **Cross-Platform Client Support** (web, mobile node, desktop node)
+- [x] **Database Encryption** (local encrypted storage)
+- [x] **Installation Management** (multiple installations per inbox)
+
+### Group Conversation Features
+
+- [x] **Group Creation** (`client.conversations.newGroup()`)
+- [x] **Group Membership Management** (`group.addMembers()`, `group.removeMembers()`)
+- [x] **Group Metadata Updates** (`group.updateName()`, `group.updateDescription()`)
+- [x] **Group State Synchronization** (`group.sync()`, `client.conversations.sync()`)
+- [x] **Group Admin Permissions** (creator admin privileges)
+
+### Message Streaming & Delivery
+
+- [x] **Message Streams** (`client.conversations.streamAllMessages()`)
+- [x] **Group Update Streams** (membership and metadata change events)
+- [x] **Conversation Streams** (new conversation detection)
+- [x] **Consent Streams** (consent state change events)
+- [x] **Message Content Validation** (text content type filtering)
+- [x] **Message Ordering** (sequential delivery verification)
+
+### Synchronization Strategies
+
+- [x] **Conversation Sync** (`conversation.sync()`)
+- [x] **Global Sync** (`client.conversations.syncAll()`)
+- [x] **Combined Sync Strategy** (both conversation and global sync)
+- [x] **10-Second Sync Intervals** (periodic state synchronization)
+
+### Worker Management & Testing
+
+- [x] **Multi-Worker Architecture** (14 concurrent workers)
+- [x] **Worker Thread Isolation** (separate Node.js worker threads)
+- [x] **Database Path Management** (unique DB per worker)
+- [x] **Worker Lifecycle Management** (initialization, termination, cleanup)
+- [x] **Stream Collection** (event aggregation across workers)
+
+### Stress Testing Scenarios
+
+- [x] **Membership Change Cycles** (10 epochs of remove/add operations)
+- [x] **High-Frequency Operations** (rapid membership changes)
+- [x] **Fork Detection** (conversation state consistency verification)
+- [x] **Message Delivery Verification** (cross-worker message reception)
+- [x] **State Consistency Checks** (final group state validation)
 
 ## Test Overview
 
