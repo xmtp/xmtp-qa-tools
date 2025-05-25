@@ -231,7 +231,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Tools & utilities
 
-- **Repository:** [xmtp-qa-tools](https://github.com/xmtp/xmtp-qa-tools): This monorepo contains multiple tools for testing and monitoring
 - **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
 - **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-toolsus-east-production.up.railway.app/__vitest__/#/)
