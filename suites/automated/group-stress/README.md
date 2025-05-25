@@ -1,15 +1,13 @@
 # XMTP Group Stress Testing Suite
 
-> For details see deployment: https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792
+> For details see [deployment](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
 
-- [x] Time factor (30 min recurring)
-- [x] Old packages
-- [x] Multi-sdk
+- [x] Time factor (2 hours recurring)
+- [x] Multi sdk versions (>2.0.4 post fix)
+- [x] 3 bindings (web, mobile node, desktop node)
 - [x] 10 second sync strategy
-- [x] Package expiration details
-- [x] 2 types of streams (conversations and messages)
-- [x] Membership change cycles
-- [x] Final state consistency
+- [x] 2 types of streams (metadata and messages)
+- [x] Membership change cycles (10 epochs)
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
