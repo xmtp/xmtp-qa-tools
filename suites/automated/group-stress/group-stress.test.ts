@@ -231,6 +231,8 @@ describe(TEST_NAME, () => {
           .map((w) => w.name)
           .join(", ")}`,
       );
+
+      await globalGroup.send("Test ended");
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
       throw error;
