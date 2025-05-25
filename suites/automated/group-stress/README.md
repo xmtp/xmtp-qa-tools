@@ -45,28 +45,3 @@ GROUP_ID=""
 ```bash
 yarn test group-stress
 ```
-
-## Test Flow
-
-1. **Group Creation**: Initializes workers and creates a test group
-2. **Stress Check**: Targeted messages sent to specific workers to check response
-3. **Message Exchange**: Each test worker sends an identified message
-4. **Membership Cycling**: Creator performs multiple add/remove cycles (defined by EPOCHS)
-   - Each cycle: `removeMembers()` → `addMembers()`
-   - Full sync performed between operations
-
-## Performance Metrics
-
-- The test records execution time for key operations:
-  - Group creation/initialization
-  - Message sending
-  - Membership change operations
-  - Individual epoch durations
-
-## Results Analysis
-
-- **Reliable Reproduction**: Coinbase Wallet consistently fails
-- **Intermittent Issues**: Convos Messenger remains stable
-- **Resilient Clients**: Web and Node SDK clients remain stable
-
-The test identifies a correlation between forking and client creation intervals approaching 1 second, suggesting timing-related vulnerabilities in the synchronization process.

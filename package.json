@@ -29,7 +29,6 @@
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",
-    "@xmtp/node-bindings": "1.2.0-rc4",
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0",
     "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3",
     "@xmtp/node-bindings-116": "npm:@xmtp/node-bindings@1.1.6",
@@ -39,10 +38,10 @@
     "@xmtp/node-bindings-120-3": "npm:@xmtp/node-bindings@1.2.0-dev.068bb4c",
     "@xmtp/node-bindings-120-4": "npm:@xmtp/node-bindings@1.2.0-dev.b96f93d",
     "@xmtp/node-bindings-120-5": "npm:@xmtp/node-bindings@1.2.0-dev.ef2c57d",
-    "@xmtp/node-bindings-120-rc4": "npm:@xmtp/node-bindings@1.2.0-rc4",
+    "@xmtp/node-bindings-120-rc3": "npm:@xmtp/node-bindings@1.2.0-rc3",
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41",
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9",
-    "@xmtp/node-sdk": "2.1.0-rc4",
+    "@xmtp/node-sdk": "2.0.9",
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0",
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5",
     "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2",
@@ -52,7 +51,7 @@
     "@xmtp/node-sdk-206": "npm:@xmtp/node-sdk@2.0.6",
     "@xmtp/node-sdk-208": "npm:@xmtp/node-sdk@2.0.8",
     "@xmtp/node-sdk-209": "npm:@xmtp/node-sdk@2.0.9",
-    "@xmtp/node-sdk-210": "npm:@xmtp/node-sdk@2.1.0-rc4",
+    "@xmtp/node-sdk-210": "npm:@xmtp/node-sdk@2.1.0-rc3",
     "@xmtp/node-sdk-47": "npm:@xmtp/node-sdk@0.0.47",
     "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13",
     "axios": "^1.8.2",
@@ -145,9 +144,9 @@
         "@xmtp/node-bindings": "1.2.0-dev.ef2c57d"
       }
     },
-    "@xmtp/node-sdk@2.1.0-rc4": {
+    "@xmtp/node-sdk@2.1.0-rc3": {
       "dependencies": {
-        "@xmtp/node-bindings": "1.2.0-rc4"
+        "@xmtp/node-bindings": "1.2.0-rc3"
       }
     }
   }
