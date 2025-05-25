@@ -18,7 +18,7 @@ jobs:
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DEFAULT_STREAM_TIMEOUT_MS: 9000
-      GM_BOT_ADDRESS: "0x20b572be48527a770479744aec6fe5644f97678b"
+      GM_BOT_ADDRESS: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0"
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
