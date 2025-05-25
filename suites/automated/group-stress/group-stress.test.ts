@@ -1,7 +1,13 @@
-import { loadEnv } from "@helpers/client";
+import { loadEnv, logAgentDetails } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
 import {
+  verifyMembershipStream,
+  verifyMessageStream,
+  verifyMetadataStream,
+} from "@helpers/streams";
+import {
+  appendToEnv,
+  getInboxIds,
   getManualUsers,
   getMultiVersion,
   removeDataFolder,
@@ -11,11 +17,6 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  createOrGetNewGroup,
-  testMembershipChanges,
-  verifyGroupConsistency,
-} from "./helper";
 
 // ============================================================
 // Test Configuration
@@ -50,6 +51,8 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let globalGroup: Group;
   let allWorkers: Worker[] = [];
+  let testWorkers: Worker[] = [];
+  let checkWorkers: Worker[] = [];
   let testStartTime: number;
 
   // ============================================================
@@ -76,6 +79,13 @@ describe(TEST_NAME, () => {
 
       creator = workers.get("bot") as Worker;
       allWorkers = workers.getAllBut("bot");
+      testWorkers = allWorkers.filter((worker) =>
+        testConfig.testWorkersNames.includes(worker.name),
+      );
+      checkWorkers = allWorkers.filter((worker) =>
+        testConfig.checkWorkersNames.includes(worker.name),
+      );
+
       if (!creator) {
         throw new Error(`Creator worker 'bot' not found`);
       }
@@ -97,55 +107,13 @@ describe(TEST_NAME, () => {
     }
   });
 
-  // ============================================================
-  // Test Cases
-  // ============================================================
-
-  it("should setup test environment", async () => {
-    try {
-      testStartTime = performance.now();
-
-      await verifyGroupConsistency(globalGroup, workers);
-    } catch (error: unknown) {
-      logError(error, expect.getState().currentTestName);
-      throw error;
-    }
-  });
-
   it("should verify fork-free message delivery", async () => {
     try {
-      if (!globalGroup?.id) {
-        throw new Error("Global group is not initialized");
-      }
-
-      // Get workers designated for checking message delivery
-      const checkWorkers = allWorkers.filter((worker) =>
-        testConfig.checkWorkersNames.includes(worker.name),
-      );
-
-      if (checkWorkers.length === 0) {
-        console.log(testConfig.checkWorkersNames);
-        throw new Error("No check workers available");
-      }
-
-      console.log(
-        `Testing message delivery with ${checkWorkers.length} check workers`,
-      );
-
-      // Send test messages from each check worker
-      for (const worker of checkWorkers) {
-        await globalGroup.sync();
-        const testMessage = `Message from ${worker.name} at ${getTime()}`;
-        await globalGroup.send(testMessage);
-      }
-
-      // Verify all workers refceive the test message
-      const verificationMessage = `Verification: Hi ${allWorkers.map((w) => w.name).join(", ")}`;
       await verifyMessageStream(
         globalGroup,
-        allWorkers,
+        checkWorkers,
         1,
-        verificationMessage,
+        `Verification: Hi ${checkWorkers.map((w) => w.name).join(", ")}`,
       );
 
       console.log("✓ Fork-free message delivery verified");
@@ -155,38 +123,33 @@ describe(TEST_NAME, () => {
     }
   });
 
+  it("should verify fork-free membership delivery", async () => {
+    try {
+      await verifyMembershipStream(globalGroup, checkWorkers, getInboxIds(1));
+
+      console.log("✓ Fork-free membership delivery verified");
+    } catch (error: unknown) {
+      logError(error, expect.getState().currentTestName);
+      throw error;
+    }
+  });
+
+  it("should verify fork-free metadata delivery", async () => {
+    try {
+      await verifyMetadataStream(globalGroup, checkWorkers);
+
+      console.log("✓ Fork-free metadata delivery verified");
+    } catch (error: unknown) {
+      logError(error, expect.getState().currentTestName);
+      throw error;
+    }
+  });
+
   it("should perform membership change cycles", async () => {
     try {
-      if (!globalGroup?.id) {
-        throw new Error("Global group is not initialized");
-      }
-
-      console.log(
-        `Testing membership changes with ${testConfig.testWorkersNames.length} workers`,
-      );
-
       // Test membership changes for each designated test worker
-      for (const workerName of testConfig.testWorkersNames) {
-        const worker = allWorkers.find((w) => w.name === workerName);
-
-        if (!worker || worker.name === creator.name) {
-          console.log(
-            `Skipping worker: ${workerName} (not found or is creator)`,
-          );
-          continue;
-        }
-
+      for (const worker of testWorkers) {
         console.log(`Testing membership changes for worker: ${worker.name}`);
-
-        // Send a test message before membership changes
-        const workerGroup =
-          (await worker.client.conversations.getConversationById(
-            globalGroup.id,
-          )) as Group;
-
-        if (workerGroup) {
-          await workerGroup.send(`${worker.name}: sup`);
-        }
 
         // Perform multiple cycles of membership changes
         await testMembershipChanges(
@@ -208,31 +171,115 @@ describe(TEST_NAME, () => {
 
   it("should verify final state consistency", async () => {
     try {
-      if (!globalGroup?.id) {
-        throw new Error("Global group is not initialized");
-      }
-
-      console.log("Verifying final state consistency...");
-
       // Verify final message delivery across all workers
       await verifyMessageStream(
         globalGroup,
-        allWorkers,
+        checkWorkers,
         1,
-        "Final consistency check",
+        `Verification: Hi ${checkWorkers.map((w) => w.name).join(", ")}`,
       );
-
-      await verifyGroupConsistency(globalGroup, workers);
-
-      // Log test results
-      const testDuration = performance.now() - testStartTime;
-
-      console.log("=== Test Results ===");
-      console.log(`Test duration: ${Math.round(testDuration)}ms`);
-      console.log("✓ Final state consistency verified");
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
       throw error;
     }
   });
 });
+
+export async function createOrGetNewGroup(
+  creator: Worker,
+  workerInboxIds: string[],
+  manualUserInboxIds: string[],
+  groupId: string,
+  testName: string,
+  groupName: string,
+): Promise<Group> {
+  console.log("Creating or getting new group");
+  console.log("Worker inbox ids", workerInboxIds);
+  console.log("Manual user inbox ids", manualUserInboxIds);
+  console.log("Group id", groupId);
+
+  // Either create a new group or use existing one
+  if (!groupId) {
+    console.log(
+      `Creating group with ${workerInboxIds.length + manualUserInboxIds.length} members`,
+    );
+    const group = await creator.client.conversations.newGroup([]);
+    await group.sync();
+
+    // Add members one by one
+    for (const member of workerInboxIds) {
+      try {
+        await group.addMembers([member]);
+      } catch (e) {
+        console.error(`Error adding member ${member}:`, e);
+      }
+    }
+    for (const member of manualUserInboxIds) {
+      try {
+        await group.addMembers([member]);
+        await group.addAdmin(member);
+      } catch (e) {
+        console.error(`Error adding member ${member}:`, e);
+      }
+    }
+    appendToEnv("GROUP_ID", group.id);
+    return group;
+  }
+
+  // Sync creator's conversations
+  console.log(`Syncing creator's ${creator.name} conversations`);
+  await creator.client.conversations.syncAll();
+  const conversations = await creator.client.conversations.list();
+  if (conversations.length === 0) throw new Error("No conversations found");
+  console.log("Synced creator's conversations", conversations.length);
+  await logAgentDetails(creator.client);
+
+  const globalGroup = (await creator.client.conversations.getConversationById(
+    groupId,
+  )) as Group;
+  if (!globalGroup) throw new Error("Group not found");
+
+  // Send initial test message
+  await globalGroup.send(`Starting stress test: ${groupName}`);
+  await globalGroup.updateName(groupName);
+  return globalGroup;
+}
+
+export async function testMembershipChanges(
+  groupId: string,
+  admin: Worker,
+  member: Worker,
+  cycles: number,
+): Promise<void> {
+  console.log(`Testing membership changes: ${admin.name} with ${member.name}`);
+
+  const group = (await admin.client.conversations.getConversationById(
+    groupId,
+  )) as Group;
+  if (!group) throw new Error(`Group ${groupId} not found`);
+
+  const memberInboxId = member.client.inboxId;
+
+  for (let i = 0; i <= cycles; i++) {
+    try {
+      // Get current members to check if target exists
+      const members = await group.members();
+      const memberExists = members.some(
+        (m) => m.inboxId.toLowerCase() === memberInboxId.toLowerCase(),
+      );
+
+      if (memberExists) {
+        await group.removeMembers([memberInboxId]);
+        await group.addMembers([memberInboxId]);
+        console.log(`Cycle ${i}: Removed and re-added ${member.name}`);
+      } else {
+        // Just add the member if not present
+        await group.addMembers([memberInboxId]);
+        console.log(`Cycle ${i}: Added missing member ${member.name}`);
+      }
+      await group.sync();
+    } catch (e) {
+      console.error(`Error in membership cycle ${i}:`, e);
+    }
+  }
+}

@@ -2,7 +2,8 @@
 
 - [x] Time factor (30 min recurring)
 - [x] Old packages
-- [x] Sync strategy enum
+- [x] Multi-sdk
+- [x] 10 second sync strategy
 - [x] Package expiration details
 - [x] 2 types of streams (conversations and messages)
 - [x] Membership change cycles
