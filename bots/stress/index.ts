@@ -1,11 +1,4 @@
 import { initializeClient } from "@bots/xmtp-handler";
-import {
-  createAndSendDms,
-  createAndSendInGroup,
-  createLargeGroups,
-  TEST_CONFIGS,
-  type StressTestConfig,
-} from "@helpers/groups";
 import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/tests";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -14,6 +7,13 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
+import {
+  createAndSendDms,
+  createAndSendInGroup,
+  createLargeGroups,
+  TEST_CONFIGS,
+  type StressTestConfig,
+} from "suites/manual/stress-bot/helper";
 
 let workersDev: WorkerManager;
 let workersProd: WorkerManager;

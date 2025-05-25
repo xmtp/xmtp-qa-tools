@@ -8,7 +8,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | ----------------- | -------------------------------- | ------------------------------------------------ |
 | **client.ts**     | XMTP client creation             | Signers, encryption keys, client versioning      |
 | **datadog.ts**    | Metrics and monitoring           | Performance tracking, test results reporting     |
-| **groups.ts**     | Group conversation management    | Group creation, batch operations, stress testing |
 | **logger.ts**     | Logging utilities                | Formatted logging, file output, error tracking   |
 | **playwright.ts** | Browser automation               | UI testing, group creation, message verification |
 | **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing    |
@@ -100,33 +99,6 @@ sendPerformanceResult(expect, workers, start);
 - Test result reporting
 - Network statistics
 - Operation thresholds based on group size
-
-## 👥 Groups Module
-
-The `groups.ts` module provides utilities for creating and managing test groups.
-
-```typescript
-// Create a group with participants in batches
-const result = await createGroupWithBatch(
-  creator,
-  allWorkers,
-  batchSize,
-  installationsPerUser,
-);
-
-// Get workers that are members of a group
-const groupMembers = await getWorkersFromGroup(group, workers);
-
-// Create a large test group with many members
-const largeGroup = await createLargeGroup(client, memberCount, receiverInboxId);
-```
-
-**Key features:**
-
-- Batch member addition
-- Performance measurement for group operations
-- Large group creation utilities
-- Stress testing configurations
 
 ## 📝 Logger Module
 

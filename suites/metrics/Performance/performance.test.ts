@@ -156,7 +156,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it(`createGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
+  it(`newGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
     try {
       const sliced = getAddresses(i);
       const newGroupByIdentifier =
@@ -259,7 +259,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`createGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getAddresses(i);
         const newGroupByIdentifier =

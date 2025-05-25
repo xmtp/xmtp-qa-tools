@@ -127,7 +127,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   getMessage: (event: TSent | TReceived) => string;
   statsLabel: string;
   count: number;
-  randomSuffix?: string;
+  messageTemplate?: string;
   participantsForStats: Worker[];
 }) {
   await sleep(1000);
@@ -138,7 +138,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     getMessage,
     statsLabel,
     count,
-    randomSuffix,
+    messageTemplate,
   } = options;
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
@@ -178,12 +178,12 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     msgs.map((m) => extractContent(m.event)),
   );
   let stats;
-  if (randomSuffix && messagesAsStrings.length > 0) {
+  if (messageTemplate && messagesAsStrings.length > 0) {
     stats = calculateMessageStats(
       messagesAsStrings,
       statsLabel,
       count,
-      randomSuffix,
+      messageTemplate,
     );
   }
   // Transform eventTimings to arrays per name
@@ -218,7 +218,7 @@ export async function verifyMessageStream(
   group: Conversation,
   receivers: Worker[],
   count = 1,
-  randomSuffix: string = "gm",
+  messageTemplate: string = "gm-{i}-{messageTemplate}",
 ): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
     receivers,
@@ -227,10 +227,8 @@ export async function verifyMessageStream(
       console.warn("triggerEvents", count);
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        let content = `gm-${i + 1}-${randomSuffix}`;
-        if (count === 1) {
-          content = randomSuffix;
-        }
+        let content = messageTemplate;
+        content = content.replace("{i}", `${i + 1}`);
         console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
@@ -242,7 +240,7 @@ export async function verifyMessageStream(
     getMessage: extractContent,
     statsLabel: "gm-",
     count,
-    randomSuffix,
+    messageTemplate,
     participantsForStats: receivers,
   });
 }
@@ -254,7 +252,7 @@ export async function verifyMetadataStream(
   group: Group,
   receivers: Worker[],
   count = 1,
-  randomSuffix: string = "gm",
+  messageTemplate: string = "gm-{i}-${messageTemplate}",
 ): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
     receivers,
@@ -262,7 +260,8 @@ export async function verifyMetadataStream(
     triggerEvents: async () => {
       const sent: { name: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
-        const name = `New name-${i + 1}-${randomSuffix}`;
+        let name = messageTemplate;
+        name = name.replace("{i}", `${i + 1}`);
         const sentAt = Date.now();
         await group.updateName(name);
         sent.push({ name, sentAt });
@@ -273,7 +272,7 @@ export async function verifyMetadataStream(
     getMessage: extractGroupName,
     statsLabel: "New name-",
     count,
-    randomSuffix,
+    messageTemplate,
     participantsForStats: receivers,
   });
 }
@@ -300,7 +299,7 @@ export async function verifyMembershipStream(
     getMessage: extractAddedInboxes,
     statsLabel: "member-add:",
     count: 1,
-    randomSuffix: "",
+    messageTemplate: "",
     participantsForStats: receivers,
   });
 }
@@ -326,7 +325,7 @@ export async function verifyGroupConsentStream(
     getMessage: (ev) => (ev as { key?: string }).key ?? "consent",
     statsLabel: "consent:",
     count: 1,
-    randomSuffix: "",
+    messageTemplate: "",
     participantsForStats: receivers,
   });
 }
@@ -349,7 +348,7 @@ export async function verifyConsentStream(
     getMessage: (ev) => (ev as { key?: string }).key ?? "consent",
     statsLabel: "consent:",
     count: 1,
-    randomSuffix: "",
+    messageTemplate: "",
     participantsForStats: [initiator],
   });
 }
@@ -381,7 +380,7 @@ export async function verifyConversationStream(
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
     statsLabel: "conversation:",
     count: 1,
-    randomSuffix: "",
+    messageTemplate: "",
     participantsForStats: receivers,
   });
 }
@@ -406,7 +405,7 @@ export async function verifyNewConversationStream(
     getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
     statsLabel: "conversation:",
     count: 1,
-    randomSuffix: "",
+    messageTemplate: "",
     participantsForStats: receivers,
   });
 }
