@@ -26,7 +26,7 @@ const WORKER_NAMES = getMultiVersion(14);
 const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
-  epochs: 3,
+  epochs: 4,
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,

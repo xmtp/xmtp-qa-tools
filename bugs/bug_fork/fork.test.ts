@@ -4,7 +4,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { createOrGetNewGroup } from "suites/stress/group-stress/helper";
+import { createOrGetNewGroup } from "suites/automated/group-stress/helper";
 import { describe, expect, it } from "vitest";
 
 const TEST_NAME = "bug_fork";
