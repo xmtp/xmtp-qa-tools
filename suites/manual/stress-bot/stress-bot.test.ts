@@ -1,13 +1,15 @@
-import { getInboxIds, loadEnv } from "@helpers/client";
-import type { StressTestConfig } from "./helper";
-import { createAndSendDms, TEST_CONFIGS } from "./helper";
-import { getRandomNames } from "@helpers/tests";
-import { sleep } from "@helpers/utils";
+import { loadEnv } from "@helpers/client";
+import { logError } from "@helpers/logger";
+import { getInboxIds, getRandomNames, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Client, Conversation } from "@xmtp/node-sdk";
+import type { Client, Conversation, Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import { createAndSendDms, TEST_CONFIGS } from "./helper";
+import {
+  createAndSendDms,
+  TEST_CONFIGS,
+  type StressTestConfig,
+} from "./helper";
 
 const testName = "bot-stress";
 loadEnv(testName);
@@ -150,7 +152,7 @@ export async function createLargeGroup(
   client: Client,
   memberCount: number,
   receiverInboxId: string,
-): Promise<Group | undefined> {
+): Promise<Group> {
   try {
     const MAX_BATCH_SIZE = 10;
     const initialMembers = getInboxIds(1);
