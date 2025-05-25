@@ -239,6 +239,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
+### Deployed bots:
+
+- [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
+- [`stress-bot.eth`](https://xmtp.chat/dm/0x73BB05B6f1719ae0320701fC25d0bE64EBA59EB3): Stress test group operations
+- [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
+
 ## Development
 
 ### Prerequisites
