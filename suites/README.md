@@ -15,40 +15,40 @@ This directory contains four main categories of test suites:
 
 Tests that run automatically on CI/CD pipelines to monitor production systems.
 
-| Test Suite | Purpose                                      | Status    | Documentation                                    |
-| ---------- | -------------------------------------------- | --------- | ------------------------------------------------ |
-| **agents** | Health monitoring of production XMTP agents  | ✅ Active | [agents/README.md](./automated/agents/README.md) |
-| **gm**     | Validation of GM bot and browser integration | ✅ Active | [gm/README.md](./automated/gm/README.md)         |
+| Test Suite       | Purpose                                             | Documentation                                                |
+| ---------------- | --------------------------------------------------- | ------------------------------------------------------------ |
+| **agents**       | Health monitoring of production XMTP agents         | [agents/README.md](./automated/agents/README.md)             |
+| **gm**           | Validation of GM bot and browser integration        | [gm/README.md](./automated/gm/README.md)                     |
+| **group-stress** | Group membership and message forking stress testing | [group-stress/README.md](./automated/group-stress/README.md) |
 
 ## 🔧 Manual Test Suites
 
 Human-operated tests for investigating specific issues or running regression tests.
 
-| Test Suite        | Purpose                                      | Status    | Documentation                                               |
-| ----------------- | -------------------------------------------- | --------- | ----------------------------------------------------------- |
-| **notifications** | Push notification functionality validation   | ⚠️ Manual | [notifications/README.md](./manual/notifications/README.md) |
-| **regression**    | Historical bug reproduction and verification | ⚠️ Manual | [regression/README.md](./manual/regression/README.md)       |
+| Test Suite        | Purpose                                      | Documentation                                               |
+| ----------------- | -------------------------------------------- | ----------------------------------------------------------- |
+| **notifications** | Push notification functionality validation   | [notifications/README.md](./manual/notifications/README.md) |
+| **regression**    | Historical bug reproduction and verification | [regression/README.md](./manual/regression/README.md)       |
 
 ## 📊 Metrics Test Suites
 
 Performance measurement and reliability testing with detailed metrics collection.
 
-| Test Suite      | Purpose                                   | Status     | Documentation                                            |
-| --------------- | ----------------------------------------- | ---------- | -------------------------------------------------------- |
-| **delivery**    | Message delivery reliability and ordering | 📈 Metrics | [delivery/README.md](./metrics/delivery/README.md)       |
-| **large**       | Large-scale group operations performance  | 📈 Metrics | [large/README.md](./metrics/large/README.md)             |
-| **performance** | End-to-end operational performance        | 📈 Metrics | [performance/README.md](./metrics/performance/README.md) |
+| Test Suite      | Purpose                                   | Documentation                                            |
+| --------------- | ----------------------------------------- | -------------------------------------------------------- |
+| **delivery**    | Message delivery reliability and ordering | [delivery/README.md](./metrics/delivery/README.md)       |
+| **large**       | Large-scale group operations performance  | [large/README.md](./metrics/large/README.md)             |
+| **performance** | End-to-end operational performance        | [performance/README.md](./metrics/performance/README.md) |
 
 ## 🚨 Stress Test Suites
 
 High-load testing and edge-case scenario validation.
 
-| Test Suite       | Purpose                                             | Status    | Documentation                                                    |
-| ---------------- | --------------------------------------------------- | --------- | ---------------------------------------------------------------- |
-| **group-stress** | Group membership and message forking stress testing | 🔥 Stress | [stress/group-stress/README.md](./stress/group-stress/README.md) |
-| **rate-limited** | Rate limiting behavior validation                   | 🔥 Stress | Direct test file                                                 |
-| **bot-stress**   | Bot performance under high load                     | 🔥 Stress | Direct test file                                                 |
-| **large-group**  | 200+ member group operations                        | 🔥 Stress | Direct test file                                                 |
+| Test Suite       | Purpose                           | Documentation    |
+| ---------------- | --------------------------------- | ---------------- |
+| **rate-limited** | Rate limiting behavior validation | Direct test file |
+| **bot-stress**   | Bot performance under high load   | Direct test file |
+| **large-group**  | 200+ member group operations      | Direct test file |
 
 ## 🏃‍♂️ Quick Start
 
