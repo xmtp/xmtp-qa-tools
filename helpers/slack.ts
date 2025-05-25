@@ -22,6 +22,8 @@ interface GitHubContext {
   githubRef: string;
   branchName: string;
   workflowUrl: string;
+  matrix?: string;
+  environment?: string;
 }
 
 // Get GitHub Actions context
@@ -37,6 +39,13 @@ function getGitHubContext(): GitHubContext {
     workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
   }
 
+  // Get matrix values from environment variables
+  // GitHub Actions sets these as individual env vars for each matrix key
+  const matrixKeys = Object.keys(process.env)
+    .filter((key) => key.startsWith("MATRIX_"))
+    .map((key) => `${key.replace("MATRIX_", "")}: ${process.env[key]}`)
+    .join(", ");
+
   return {
     workflowName,
     repository,
@@ -44,6 +53,8 @@ function getGitHubContext(): GitHubContext {
     githubRef,
     branchName,
     workflowUrl,
+    matrix: matrixKeys || undefined,
+    environment: process.env.ENVIRONMENT || process.env.NODE_ENV || undefined,
   };
 }
 
@@ -107,6 +118,7 @@ export async function sendSlackNotification(
   // Create message with error logs
   const message = `Test Failure ❌
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${options.testName}>
+${githubContext.environment ? `*Environment:* ${githubContext.environment}` : ""}
 *General dashboard:* <${datadogUrl}|View>
 *Timestamp:* ${new Date().toLocaleString()}
 ${customLinks}

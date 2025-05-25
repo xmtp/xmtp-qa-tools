@@ -1,5 +1,14 @@
 # XMTP Group Stress Testing Suite
 
+- [x] Time factor (30 min recurring)
+- [x] Old packages
+- [x] Multi-sdk
+- [x] 10 second sync strategy
+- [x] Package expiration details
+- [x] 2 types of streams (conversations and messages)
+- [x] Membership change cycles
+- [x] Final state consistency
+
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges.
 
 https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
