@@ -28,16 +28,16 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
   epochs: 4,
-  typeofStream: typeofStream.Message,
-  typeOfResponse: typeOfResponse.Gm,
-  typeOfSync: typeOfSync.Both,
   network: "production",
   totalWorkers: 14,
   allWorkersNames: WORKER_NAMES,
-  testWorkersNames: WORKER_NAMES.slice(1, 10), // Workers to test membership changes
-  checkWorkersNames: WORKER_NAMES.slice(10, 14), // Workers to verify message delivery
+  testWorkersNames: WORKER_NAMES.slice(1, WORKER_NAMES.length / 2),
+  checkWorkersNames: WORKER_NAMES.slice(
+    WORKER_NAMES.length / 2,
+    WORKER_NAMES.length - 1,
+  ), // Workers to verify message delivery
   groupId: process.env.GROUP_ID as string,
-  freshInstalls: true, // more installs
+  freshInstalls: false, // more installs
 } as const;
 
 loadEnv(TEST_NAME);
@@ -50,10 +50,8 @@ describe(TEST_NAME, () => {
   let workers: WorkerManager;
   let creator: Worker;
   let globalGroup: Group;
-  let allWorkers: Worker[] = [];
-  let testWorkers: Worker[] = [];
-  let checkWorkers: Worker[] = [];
-  let testStartTime: number;
+  let testWorkers: WorkerManager;
+  let checkWorkers: WorkerManager;
 
   // ============================================================
   // Test Lifecycle Setup
@@ -71,23 +69,28 @@ describe(TEST_NAME, () => {
       workers = await getWorkers(
         ["bot", ...WORKER_NAMES],
         testConfig.testName,
-        testConfig.typeofStream,
-        testConfig.typeOfResponse,
-        testConfig.typeOfSync,
+        typeofStream.Message,
+        typeOfResponse.Gm,
+        typeOfSync.Both,
         testConfig.network,
       );
-
       creator = workers.get("bot") as Worker;
-      allWorkers = workers.getAllBut("bot");
-      testWorkers = allWorkers.filter((worker) =>
-        testConfig.testWorkersNames.includes(worker.name),
-      );
-      checkWorkers = allWorkers.filter((worker) =>
-        testConfig.checkWorkersNames.includes(worker.name),
+
+      testWorkers = await getWorkers(
+        testConfig.checkWorkersNames,
+        testConfig.testName,
       );
 
-      if (!creator) {
-        throw new Error(`Creator worker 'bot' not found`);
+      checkWorkers = await getWorkers(
+        testConfig.checkWorkersNames,
+        testConfig.testName,
+        typeofStream.Message,
+        typeOfResponse.Gm,
+        typeOfSync.Both,
+      );
+
+      if (!creator || !testWorkers || !checkWorkers) {
+        throw new Error(`Worker not found: ${creator?.name}`);
       }
 
       // Create or get the global test group
@@ -111,9 +114,12 @@ describe(TEST_NAME, () => {
     try {
       await verifyMessageStream(
         globalGroup,
-        checkWorkers,
+        checkWorkers.getAll(),
         1,
-        `Verification: Hi ${checkWorkers.map((w) => w.name).join(", ")}`,
+        `Verification: Hi ${checkWorkers
+          .getAll()
+          .map((w) => w.name)
+          .join(", ")}`,
       );
 
       console.log("✓ Fork-free message delivery verified");
@@ -125,7 +131,11 @@ describe(TEST_NAME, () => {
 
   it("should verify fork-free membership delivery", async () => {
     try {
-      await verifyMembershipStream(globalGroup, checkWorkers, getInboxIds(1));
+      await verifyMembershipStream(
+        globalGroup,
+        checkWorkers.getAll(),
+        getInboxIds(1),
+      );
 
       console.log("✓ Fork-free membership delivery verified");
     } catch (error: unknown) {
@@ -136,7 +146,7 @@ describe(TEST_NAME, () => {
 
   it("should verify fork-free metadata delivery", async () => {
     try {
-      await verifyMetadataStream(globalGroup, checkWorkers);
+      await verifyMetadataStream(globalGroup, checkWorkers.getAll());
 
       console.log("✓ Fork-free metadata delivery verified");
     } catch (error: unknown) {
@@ -148,7 +158,7 @@ describe(TEST_NAME, () => {
   it("should perform membership change cycles", async () => {
     try {
       // Test membership changes for each designated test worker
-      for (const worker of testWorkers) {
+      for (const worker of testWorkers.getAll()) {
         console.log(`Testing membership changes for worker: ${worker.name}`);
 
         // Perform multiple cycles of membership changes
@@ -174,9 +184,12 @@ describe(TEST_NAME, () => {
       // Verify final message delivery across all workers
       await verifyMessageStream(
         globalGroup,
-        checkWorkers,
+        checkWorkers.getAll(),
         1,
-        `Verification: Hi ${checkWorkers.map((w) => w.name).join(", ")}`,
+        `Verification: Hi ${checkWorkers
+          .getAll()
+          .map((w) => w.name)
+          .join(", ")}`,
       );
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
