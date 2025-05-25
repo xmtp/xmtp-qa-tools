@@ -383,6 +383,7 @@
               }
             ],
             "response_format": "timeseries",
+            "on_right_yaxis": true,
             "style": {
               "palette": "dog_classic",
               "line_type": "solid",
@@ -401,9 +402,10 @@
             ],
             "response_format": "timeseries",
             "style": {
-              "palette": "dog_classic",
-              "line_type": "dashed",
-              "line_width": "normal"
+              "palette": "blue",
+              "order_reverse": true,
+              "line_type": "solid",
+              "line_width": "thick"
             },
             "display_type": "line"
           }
@@ -417,13 +419,8 @@
         },
         "markers": [
           {
-            "label": "Target Order Correlation",
+            "label": " Tresshold ",
             "value": "y = 99",
-            "display_type": "info dashed"
-          },
-          {
-            "label": "Target Delivery Rate",
-            "value": "y = 98",
             "display_type": "warning dashed"
           }
         ]
