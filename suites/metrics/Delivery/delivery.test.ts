@@ -48,7 +48,7 @@ describe(testName, async () => {
         group,
         workers.getAllButCreator(),
         amountofMessages,
-        randomSuffix,
+        `gm-{i}-${randomSuffix}`,
       );
       const receptionPercentage = verifyResult.receptionPercentage ?? 0;
       const orderPercentage = verifyResult.orderPercentage ?? 0;

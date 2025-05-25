@@ -146,7 +146,12 @@ describe(TEST_NAME, () => {
 
   it("should verify fork-free metadata delivery", async () => {
     try {
-      await verifyMetadataStream(globalGroup, checkWorkers.getAll());
+      await verifyMetadataStream(
+        globalGroup,
+        checkWorkers.getAll(),
+        1,
+        testConfig.groupName,
+      );
 
       console.log("✓ Fork-free metadata delivery verified");
     } catch (error: unknown) {
