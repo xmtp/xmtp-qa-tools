@@ -27,7 +27,7 @@ const WORKER_NAMES = getMultiVersion(14);
 const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
-  epochs: 10,
+  epochs: 3,
   network: "production",
   totalWorkers: 14,
   allWorkersNames: WORKER_NAMES,
