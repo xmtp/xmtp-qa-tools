@@ -92,7 +92,6 @@ describe(TEST_NAME, () => {
       if (!creator || !testWorkers || !checkWorkers) {
         throw new Error(`Worker not found: ${creator?.name}`);
       }
-
       console.log("Creating or getting new group");
       console.log("Worker inbox ids", testConfig.testWorkersNames);
       console.log("Manual user inbox ids", testConfig.checkWorkersNames);
@@ -121,7 +120,8 @@ describe(TEST_NAME, () => {
           }
         }
         appendToEnv("GROUP_ID", group.id);
-        return group;
+        console.warn(`Group created: ${group.id}, aborting test`);
+        return;
       }
 
       // Sync creator's conversations
