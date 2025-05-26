@@ -16,7 +16,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ============================================================
 // Test Configuration
@@ -59,6 +59,25 @@ describe(TEST_NAME, () => {
 
   setupTestLifecycle({
     expect,
+  });
+
+  // Add cleanup after all tests complete
+  afterAll(async () => {
+    try {
+      console.log("Cleaning up workers...");
+      if (workers) {
+        await workers.terminateAll();
+      }
+      if (testWorkers) {
+        await testWorkers.terminateAll();
+      }
+      if (checkWorkers) {
+        await checkWorkers.terminateAll();
+      }
+      console.log("✓ Workers cleaned up successfully");
+    } catch (error) {
+      console.warn("Error during cleanup:", error);
+    }
   });
 
   beforeAll(async () => {
