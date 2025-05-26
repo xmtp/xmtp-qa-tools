@@ -151,17 +151,19 @@ export function sendMetric(
 
     state.collectedMetrics[operationKey].values.push(metricValue);
 
-    console.debug(
-      JSON.stringify(
-        {
-          metricName: fullMetricName,
-          metricValue: Math.round(metricValue),
-          tags: allTags,
-        },
-        null,
-        2,
-      ),
-    );
+    if (tags.metric_type !== "network") {
+      console.debug(
+        JSON.stringify(
+          {
+            metricName: fullMetricName,
+            metricValue: Math.round(metricValue),
+            tags: allTags,
+          },
+          null,
+          2,
+        ),
+      );
+    }
 
     metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
   } catch (error) {
@@ -206,7 +208,7 @@ export function parseTestName(testName: string): ParsedTestName {
     }
   }
 
-  const operationType = parseInt(members) >= 5 ? "group" : "core";
+  const operationType = parseInt(members) > 5 ? "group" : "core";
 
   return {
     metricName,
