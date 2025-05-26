@@ -194,8 +194,8 @@ export function extractErrorLogs(testName: string): string {
           if (cleanLine.includes("ERROR")) {
             cleanLine = cleanLine.split("ERROR")[1];
           }
-          if (cleanLine.includes("vitest")) {
-            cleanLine = cleanLine.split("vitest")[1];
+          if (cleanLine.includes("[vitest]")) {
+            cleanLine = cleanLine.split("[vitest]")[1];
           }
           errorLines.add(cleanLine);
         }
