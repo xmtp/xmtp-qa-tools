@@ -1,0 +1,47 @@
+name: Large
+description: "should verify performance of the group streams"
+
+on:
+  schedule:
+    - cron: "0 */2 * * *" # Runs every 2 hours
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      WORKER_COUNT: 5
+      BATCH_SIZE: 50
+      MAX_GROUP_SIZE: 200
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          cache: "yarn"
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests
+        run: yarn retry group-stress large  --no-fail
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.environment }}
+          path: |
+            logs/**/*
+            .data/**/*
+            .env
+          if-no-files-found: ignore
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90
