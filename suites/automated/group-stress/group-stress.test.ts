@@ -120,6 +120,8 @@ describe(TEST_NAME, () => {
             console.error(`Error adding member ${inboxId}:`, e);
           }
         }
+        for (const manualUser of manualUsers)
+          await globalGroup.addSuperAdmin(manualUser.inboxId);
 
         appendToEnv("GROUP_ID", globalGroup.id);
       }
@@ -136,9 +138,6 @@ describe(TEST_NAME, () => {
         testConfig.groupId,
       )) as Group;
       if (!globalGroup) throw new Error("Group not found");
-
-      for (const manualUser of manualUsers)
-        await globalGroup.addSuperAdmin(manualUser.inboxId);
 
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
