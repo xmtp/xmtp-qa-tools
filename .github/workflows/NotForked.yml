@@ -69,6 +69,8 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
+      - name: Create .data directory
+        run: mkdir -p .data
       - name: Cache XMTP data
         uses: actions/cache@v4
         with:
