@@ -1,40 +1,39 @@
 [
   {
-    "app": "convos",
-    "inboxId": "e35852b0fd1bfc0eefeea76e6685c13b1695fa22dac650d733d06f8cbe91e1cf",
+    "app": "fabri-convos",
+    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "tba",
+    "app": "fabri-tba",
     "inboxId": "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "xmtpchat",
+    "app": "fabri-xmtpchat",
     "inboxId": "e7950aec8714e774f63d74bed69b75b88593c5f6a477e61128afd92b98f11293",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "convos",
+    "app": "fabri-convos",
     "inboxId": "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
     "network": "dev",
-    "name": "fabri"
+    "name": "dev-testing"
   },
   {
-    "app": "convos-desktop",
+    "app": "fabri-convos-desktop",
     "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
     "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "convos",
-    "address": "0x5c2d8d286bdaf8a51f1bce8dfec5f5b7faa25245",
-    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
-    "network": "production",
-    "name": "fabri-old"
+    "app": "fabri-convos",
+    "inboxId": "36c9f8353b05c0728d4f976549f4d6e2374722c43a5f628f66e6b52634a5843c",
+    "network": "dev",
+    "name": "one-off"
   }
 ]

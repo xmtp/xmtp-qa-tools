@@ -11,7 +11,7 @@ loadEnv(testName);
 describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
-  const filterByName = ["fabri-run1"];
+  const filterByName = ["one-off"];
   for (const receiver of getManualUsers(filterByName)) {
     it(`should create a group with ${receiver.name} members`, async () => {
       workers = await getWorkers(
@@ -35,17 +35,18 @@ describe(testName, () => {
       console.log(`Created group ${group.id}`);
     });
 
-    it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
+    it(`should send messages to ${receiver.inboxId}`, async () => {
       try {
+        let counter = 0;
         console.log(`Starting notification test with random delays...`);
-        let messageCounter = 0;
         for (const worker of workers.getAll()) {
           const client = worker.client;
           const conversation = await client?.conversations.newDm(
             receiver.inboxId,
           );
-          await conversation?.send(`Sending message ${messageCounter}!`);
-          messageCounter++;
+          for (let i = 0; i < 5; i++) {
+            await conversation?.send(`Sending message ${i}-${counter}!`);
+          }
         }
       } catch (e: unknown) {
         console.error("Test error:", e);
@@ -53,7 +54,7 @@ describe(testName, () => {
       }
     });
 
-    it(`should send messages to ${receiver.inboxId} with random delays between 3-6 seconds`, async () => {
+    it(`should send messages to ${receiver.inboxId}`, async () => {
       try {
         let counter = 0;
 
@@ -70,10 +71,11 @@ describe(testName, () => {
             group.id,
           );
           if (conversation) {
-            await conversation.send(
-              `Second message ${counter}, ${worker.name}!`,
-            );
-            return;
+            for (let i = 0; i < 5; i++) {
+              await conversation.send(
+                `Second message ${i}-${counter}, ${worker.name}!`,
+              );
+            }
           }
           counter++;
         }

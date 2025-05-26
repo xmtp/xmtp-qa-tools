@@ -176,7 +176,7 @@ export function extractErrorLogs(testName: string): string {
     const logFiles = fs
       .readdirSync("logs")
       .filter((file) => file.endsWith(".log") && file.includes(testName));
-    const errorLines: string[] = [];
+    const errorLines: Set<string> = new Set();
 
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
@@ -184,21 +184,27 @@ export function extractErrorLogs(testName: string): string {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/vitest/i.test(line)) {
-          let lineToAdd = line;
-          lineToAdd = lineToAdd?.split(">")[1]?.trim();
-          lineToAdd = lineToAdd?.split("//")[0]?.trim();
-          lineToAdd = lineToAdd?.replace("expected false to be true", "failed");
-          if (lineToAdd) {
-            errorLines.push(lineToAdd);
+        if (/ERROR/.test(line) || /vitest/i.test(line)) {
+          //remove ansi codes
+          const ansiRegex = new RegExp(
+            `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,
+            "g",
+          );
+          let cleanLine = line.replace(ansiRegex, "");
+          if (cleanLine.includes("ERROR")) {
+            cleanLine = cleanLine.split("ERROR")[1];
           }
+          if (cleanLine.includes("[vitest]")) {
+            cleanLine = cleanLine.split("[vitest]")[1];
+          }
+          errorLines.add(cleanLine);
         }
       }
     }
 
     console.log(errorLines);
-    if (errorLines.length > 0) {
-      return `\n\n*Error Logs:*\n\`\`\`\n${errorLines.slice(-5).join("\n")}\n\`\`\``;
+    if (errorLines.size > 0) {
+      return `\n\n*Error Logs:*\n\`\`\`\n${Array.from(errorLines).join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);

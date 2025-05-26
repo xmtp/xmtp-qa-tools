@@ -8,79 +8,17 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 ## XMTP Features Under Test
 
-### Core XMTP SDK Features
-
-- [x] **Multi-SDK Version Compatibility** (>2.0.4 post-fix)
-- [x] **Cross-Platform Client Support** (web, mobile node, desktop node)
-- [x] **Database Encryption** (local encrypted storage)
-- [x] **Installation Management** (multiple installations per inbox)
-
-### Group Conversation Features
-
-- [x] **Group Creation** (`client.conversations.newGroup()`)
-- [x] **Group Membership Management** (`group.addMembers()`, `group.removeMembers()`)
-- [x] **Group Metadata Updates** (`group.updateName()`, `group.updateDescription()`)
-- [x] **Group State Synchronization** (`group.sync()`, `client.conversations.sync()`)
-- [x] **Group Admin Permissions** (creator admin privileges)
-
-### Message Streaming & Delivery
-
-- [x] **Message Streams** (`client.conversations.streamAllMessages()`)
-- [x] **Group Update Streams** (membership and metadata change events)
-- [x] **Conversation Streams** (new conversation detection)
-- [x] **Consent Streams** (consent state change events)
-- [x] **Message Content Validation** (text content type filtering)
-- [x] **Message Ordering** (sequential delivery verification)
-
-### Synchronization Strategies
-
-- [x] **Conversation Sync** (`conversation.sync()`)
-- [x] **Global Sync** (`client.conversations.syncAll()`)
-- [x] **Combined Sync Strategy** (both conversation and global sync)
-- [x] **10-Second Sync Intervals** (periodic state synchronization)
-
-### Worker Management & Testing
-
-- [x] **Multi-Worker Architecture** (14 concurrent workers)
-- [x] **Worker Thread Isolation** (separate Node.js worker threads)
-- [x] **Database Path Management** (unique DB per worker)
-- [x] **Worker Lifecycle Management** (initialization, termination, cleanup)
-- [x] **Stream Collection** (event aggregation across workers)
-
-### Stress Testing Scenarios
-
-- [x] **Membership Change Cycles** (10 epochs of remove/add operations)
-- [x] **High-Frequency Operations** (rapid membership changes)
-- [x] **Fork Detection** (conversation state consistency verification)
-- [x] **Message Delivery Verification** (cross-worker message reception)
-- [x] **State Consistency Checks** (final group state validation)
-
-## Test Overview
-
-The stress test creates a group with **14 multi-version workers** and performs:
-
-1. **Fork-free message delivery** - Verifies messages reach all participants without conversation forks
-2. **Fork-free membership delivery** - Tests member addition/removal propagation across clients
-3. **Fork-free metadata delivery** - Validates group name and metadata updates sync correctly
-4. **Membership change cycles** - Performs 10 epochs of rapid member remove/add operations per worker
-5. **Final state consistency** - Confirms all workers maintain synchronized group state
-
-### Worker Configuration
-
-- **Total workers**: 14 (multi-version XMTP clients)
-- **Test workers**: 7 (perform membership changes)
-- **Check workers**: 6 (verify message/membership delivery)
-- **Creator**: 1 bot (group admin)
-
-### Test Cycles
-
-Each test worker undergoes **10 membership cycles** where they are:
-
-- Removed from the group
-- Re-added to the group
-- Group state is synced
-
-This simulates real-world scenarios where users frequently join/leave groups.
+- [x] **Multi-SDK Version Compatibility** (>2.0.4)
+- [x] **Cross-Platform Client Support** (web, mobile, desktop)
+- [x] **Membership Change Cycles** (10 cycles remove/add)
+- [x] **Group Metadata Updates** (`updateName()`)
+- [x] **Group State Synchronization** (`sync()`, `syncAll()`)
+- [x] **Group Admin Permissions**
+- [x] **Message & Update Streams**
+- [x] **Multi-Worker** (14 concurrent workers)
+- [x] **Worker Lifecycle Management**
+- [x] **Stream Event Aggregation**
+- [x] **Rate Limiting** (message throttling, API call limits)
 
 ## Setup
 
