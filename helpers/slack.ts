@@ -104,6 +104,11 @@ export async function sendSlackNotification(
   const datadogUrl =
     "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
 
+  let upperCaseTestName = "";
+  if (options.testName) {
+    upperCaseTestName =
+      options.testName[0].toUpperCase() + options.testName.slice(1);
+  }
   // Generate custom links if needed
   let customLinks = options.customLinks || "";
   if (
@@ -134,11 +139,11 @@ export async function sendSlackNotification(
 
   // Create message with error logs
   const message = `Test Failure ❌
-*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${options.testName}>
+*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${githubContext.environment}\`
 *General dashboard:* <${datadogUrl}|View>
 *Geolocation:* \`${githubContext.region || "Unknown Region"}\`
-*Timestamp:* ${new Date().toLocaleString()}
+*Timestamp:* \`${new Date().toLocaleString()}\`
 ${url}
 ${customLinks}
 ${options.errorLogs || ""}`;
