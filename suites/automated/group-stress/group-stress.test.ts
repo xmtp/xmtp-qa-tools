@@ -104,11 +104,11 @@ describe(TEST_NAME, () => {
         );
         const group = await creator.client.conversations.newGroup([]);
         await group.sync();
-
+        const manualUsers = getManualUsers(["prod-testing"]);
         const allInboxIds = [
           ...checkWorkers.getAll().map((w) => w.client.inboxId),
           ...testWorkers.getAll().map((w) => w.client.inboxId),
-          ...getManualUsers(["prod-testing"]).map((u) => u.inboxId),
+          ...manualUsers.map((u) => u.inboxId),
         ];
 
         // Add members one by one
@@ -120,6 +120,9 @@ describe(TEST_NAME, () => {
             console.error(`Error adding member ${inboxId}:`, e);
           }
         }
+        for (const manualUser of manualUsers)
+          await group.addSuperAdmin(manualUser.inboxId);
+
         appendToEnv("GROUP_ID", group.id);
         console.warn(`Group created: ${group.id}, aborting test`);
         throw new Error("Group created, aborting test");
