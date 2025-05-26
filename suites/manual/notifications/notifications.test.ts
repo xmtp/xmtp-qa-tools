@@ -11,7 +11,7 @@ loadEnv(testName);
 describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
-  const filterByName = ["fabri-run1"];
+  const filterByName = ["fabri"];
   for (const receiver of getManualUsers(filterByName)) {
     it(`should create a group with ${receiver.name} members`, async () => {
       workers = await getWorkers(
