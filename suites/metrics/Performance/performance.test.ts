@@ -142,7 +142,7 @@ describe(testName, async () => {
   });
   let i = 4;
   let newGroup: Conversation;
-  it(`createGroup: should create a large group of ${i} participants ${i}`, async () => {
+  it(`newGroup: should create a large group of ${i} participants ${i}`, async () => {
     try {
       const sliced = getInboxIds(i);
       newGroup = await creatorClient.conversations.newGroup([
@@ -206,7 +206,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it(`receiveGroupMessage: should measure receiving a gm in a group of ${i} participants`, async () => {
+  it(`receiveGroupMessage: should create a group and measure all streams`, async () => {
     try {
       const verifyResult = await verifyMessageStream(
         newGroup,
@@ -246,7 +246,7 @@ describe(testName, async () => {
 
   for (let i = batchSize; i <= total; i += batchSize) {
     let newGroup: Conversation;
-    it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getInboxIds(i);
         newGroup = await creatorClient.conversations.newGroup([

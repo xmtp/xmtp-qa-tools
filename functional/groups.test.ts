@@ -37,7 +37,7 @@ describe(testName, async () => {
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {
-    it(`createGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getInboxIds(i);
         console.log("Creating group with", sliced.length, "participants");

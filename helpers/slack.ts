@@ -116,30 +116,30 @@ export async function sendSlackNotification(
   let url = "";
   if (githubContext.workflowUrl) {
     url = `*Test log:* <${githubContext.workflowUrl}|View url>`;
-  }
-  let serviceId = "";
-  if (githubContext.region == "europe") {
-    serviceId = "c05a415c-23a6-46b9-ae8c-1935a219bae1";
-  } else if (githubContext.region == "us-east") {
-    serviceId = "d92446b3-7ee4-43c9-a2ec-ceac87082970";
-  } else if (githubContext.region == "us-west") {
-    serviceId = "00a6919a-a123-496b-b072-a149798099f9";
-  } else if (githubContext.region == "asia") {
-    serviceId = "cc97c743-1be5-4ca3-a41d-0109e41ca1fd";
   } else {
-    serviceId = "";
+    let serviceId = "";
+    if (githubContext.region == "europe") {
+      serviceId = "c05a415c-23a6-46b9-ae8c-1935a219bae1";
+    } else if (githubContext.region == "us-east") {
+      serviceId = "d92446b3-7ee4-43c9-a2ec-ceac87082970";
+    } else if (githubContext.region == "us-west") {
+      serviceId = "00a6919a-a123-496b-b072-a149798099f9";
+    } else if (githubContext.region == "asia") {
+      serviceId = "cc97c743-1be5-4ca3-a41d-0109e41ca1fd";
+    } else {
+      serviceId = "";
+    }
+    if (serviceId) {
+      url = `*Test log:* <https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792|View url>`;
+    }
   }
 
-  let regionUrl = "";
-  if (serviceId) {
-    regionUrl = `*Geolocation:* <https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792|${githubContext.region}>`;
-  }
   // Create message with error logs
   const message = `Test Failure ❌
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${options.testName}>
 ${githubContext.environment ? `*Environment:* ${githubContext.environment}` : ""}
 *General dashboard:* <${datadogUrl}|View>
-${regionUrl}
+*Geolocation:* ${githubContext.region || "Unknown Region"}
 *Timestamp:* ${new Date().toLocaleString()}
 ${customLinks}
 ${url}

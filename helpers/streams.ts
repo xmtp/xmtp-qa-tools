@@ -126,7 +126,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   getKey: (event: TSent | TReceived) => string;
   getMessage: (event: TSent | TReceived) => string;
   statsLabel: string;
-  count: number;
+  count?: number;
   messageTemplate?: string;
   participantsForStats: Worker[];
 }) {
@@ -182,7 +182,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     stats = calculateMessageStats(
       messagesAsStrings,
       statsLabel,
-      count,
+      count ?? 1,
       messageTemplate,
     );
   }
@@ -218,18 +218,19 @@ export async function verifyMessageStream(
   group: Conversation,
   receivers: Worker[],
   count = 1,
-  messageTemplate: string = "gm-{i}-{messageTemplate}",
+  messageTemplate: string = "gm-{i}-{randomSuffix}",
 ): Promise<VerifyStreamResult> {
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
     triggerEvents: async () => {
-      console.warn("triggerEvents", count);
+      const randomSuffix = Math.random().toString(36).substring(2, 15);
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
         let content = messageTemplate;
         content = content.replace("{i}", `${i + 1}`);
-        console.warn("sending message", content);
+        content = content.replace("{randomSuffix}", randomSuffix);
+        //console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
@@ -252,8 +253,9 @@ export async function verifyMetadataStream(
   group: Group,
   receivers: Worker[],
   count = 1,
-  messageTemplate: string = "gm-{i}-${messageTemplate}",
+  messageTemplate: string = "gm-{i}-{randomSuffix}",
 ): Promise<VerifyStreamResult> {
+  const randomSuffix = Math.random().toString(36).substring(2, 15);
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, count),
@@ -262,6 +264,7 @@ export async function verifyMetadataStream(
       for (let i = 0; i < count; i++) {
         let name = messageTemplate;
         name = name.replace("{i}", `${i + 1}`);
+        name = name.replace("{randomSuffix}", randomSuffix);
         const sentAt = Date.now();
         await group.updateName(name);
         sent.push({ name, sentAt });
@@ -298,8 +301,6 @@ export async function verifyMembershipStream(
     getKey: extractAddedInboxes,
     getMessage: extractAddedInboxes,
     statsLabel: "member-add:",
-    count: 1,
-    messageTemplate: "",
     participantsForStats: receivers,
   });
 }
