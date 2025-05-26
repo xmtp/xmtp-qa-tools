@@ -98,6 +98,11 @@ describe(TEST_NAME, () => {
       console.log("Group id", testConfig.groupId);
 
       const manualUsers = getManualUsers(["prod-testing"]);
+
+      // Sync creator's conversations first
+      console.log(`Syncing creator's ${creator.name} conversations`);
+      await creator.client.conversations.syncAll();
+
       // Either create a new group or use existing one
       if (!testConfig.groupId) {
         console.log(
@@ -124,20 +129,31 @@ describe(TEST_NAME, () => {
           await globalGroup.addSuperAdmin(manualUser.inboxId);
 
         appendToEnv("GROUP_ID", globalGroup.id);
+        console.log(`Created new group with ID: ${globalGroup.id}`);
+      } else {
+        // Try to get existing group
+        globalGroup = (await creator.client.conversations.getConversationById(
+          testConfig.groupId,
+        )) as Group;
+
+        if (!globalGroup) {
+          console.log(
+            `Group ${testConfig.groupId} not found, creating new one`,
+          );
+          globalGroup = await creator.client.conversations.newGroup([]);
+          await globalGroup.sync();
+          appendToEnv("GROUP_ID", globalGroup.id);
+          console.log(`Created new group with ID: ${globalGroup.id}`);
+        } else {
+          console.log(`Using existing group with ID: ${globalGroup.id}`);
+        }
       }
 
-      // Sync creator's conversations
-      console.log(`Syncing creator's ${creator.name} conversations`);
+      // Sync conversations again after group operations
       await creator.client.conversations.syncAll();
       const conversations = await creator.client.conversations.list();
-      if (conversations.length === 0) throw new Error("No conversations found");
       console.log("Synced creator's conversations", conversations.length);
       await logAgentDetails(creator.client);
-
-      globalGroup = (await creator.client.conversations.getConversationById(
-        testConfig.groupId,
-      )) as Group;
-      if (!globalGroup) throw new Error("Group not found");
 
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);

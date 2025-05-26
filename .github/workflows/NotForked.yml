@@ -15,7 +15,6 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: "e9dc0f90fadf5793b735cd35d4148a31"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
@@ -75,21 +74,49 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}
+          key: not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-${{ github.run_id }}
           restore-keys: |
-            not-forked-${{ matrix.environment }}
+            not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-
+            not-forked-${{ matrix.environment }}-
       - name: Install dependencies
         run: yarn
+      - name: Set SQLCipher environment variables
+        run: |
+          echo "SQLITE_TMPDIR=/tmp" >> $GITHUB_ENV
+          echo "PRAGMA_MLOCK=0" >> $GITHUB_ENV
+      - name: Debug environment
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Data directory contents:"
+          ls -la .data/ || echo "No .data directory found"
+          if [ -d ".data" ]; then
+            echo "Subdirectories in .data:"
+            find .data -type d -maxdepth 2 | head -20
+            echo "Files in .data:"
+            find .data -type f | head -10
+          fi
+          echo "Environment variables:"
+          env | grep -E "(GROUP_ID|XMTP_ENV)" || echo "No GROUP_ID or XMTP_ENV found"
+      - name: Clean corrupted cache if needed
+        run: |
+          # Check for version mismatch logs and clean if needed
+          if [ -d ".data" ] && [ "$(find .data -name "*.db" | wc -l)" -gt 0 ]; then
+            echo "Found existing database files, checking for compatibility..."
+            # If we detect potential version issues, we could clean here
+            # For now, just log what we found
+            find .data -name "*.db" -exec ls -la {} \;
+          fi
       - name: Run tests
         run: yarn test group-stress
+        env:
+          SQLITE_TMPDIR: /tmp
+          PRAGMA_MLOCK: 0
       - name: Save cache
         if: always()
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}
-          restore-keys: |
-            not-forked-${{ matrix.environment }}
+          key: not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-${{ github.run_id }}
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
