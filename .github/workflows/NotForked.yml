@@ -1,4 +1,4 @@
-name: Group Stress
+name: NotForked
 description: "should verify performance of the group streams"
 
 on:
