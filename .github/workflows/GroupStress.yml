@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        environment: [dev, production]
+        environment: [production]
     env:
       GROUP_ID: "f4b9542616f2b58d143e3fac74152571"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
