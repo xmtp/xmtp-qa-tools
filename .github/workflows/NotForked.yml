@@ -81,6 +81,7 @@ jobs:
       - name: Run tests
         run: yarn test group-stress
       - name: Save cache
+        if: always()
         uses: actions/cache@v4
         with:
           path: .data
