@@ -258,6 +258,19 @@ cd xmtp-qa-tools
 yarn install
 ```
 
+### Running tests
+
+To get started set up the environment variables in [./env.example](./env.example) and run the tests with:
+
+```bash
+### simple dms test
+yarn test dms
+### full functional test
+yarn test functional
+### performance test example
+yarn test performance
+```
+
 ### Resources
 
 - **Local:** Work in local network - [see section](/dev/)

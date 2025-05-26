@@ -249,7 +249,7 @@
               {
                 "name": "query1",
                 "data_source": "metrics",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members,metric_subtype:core,test:m_performance} by {operation}"
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$operation,$env,$region,$test,$libxmtp,$members,metric_subtype:core, test:m_performance} by {operation,members,test}"
               }
             ],
             "response_format": "timeseries",
