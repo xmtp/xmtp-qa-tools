@@ -75,7 +75,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .data
-          key: xmtp-data-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}
+          key: xmtp-data-${{ matrix.environment }}-v1
           restore-keys: |
             xmtp-data-${{ matrix.environment }}-
             xmtp-data-
@@ -117,7 +117,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .data
-          key: xmtp-data-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}
+          key: xmtp-data-${{ matrix.environment }}-v1
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
