@@ -1,12 +1,10 @@
-name: Large
+name: Group Stress  
 description: "should verify performance of the group streams"
 
 on:
   pull_request:
     branches:
       - main
-  schedule:
-    - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
 
 jobs:
