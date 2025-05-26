@@ -190,7 +190,13 @@ export function extractErrorLogs(testName: string): string {
             `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,
             "g",
           );
-          const cleanLine = line.replace(ansiRegex, "");
+          let cleanLine = line.replace(ansiRegex, "");
+          if (cleanLine.includes("ERROR")) {
+            cleanLine = cleanLine.split("ERROR")[1];
+          }
+          if (cleanLine.includes("vitest")) {
+            cleanLine = cleanLine.split("vitest")[1];
+          }
           errorLines.add(cleanLine);
         }
       }
