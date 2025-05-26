@@ -97,14 +97,14 @@ describe(TEST_NAME, () => {
       console.log("Manual user inbox ids", testConfig.checkWorkersNames);
       console.log("Group id", testConfig.groupId);
 
+      const manualUsers = getManualUsers(["prod-testing"]);
       // Either create a new group or use existing one
       if (!testConfig.groupId) {
         console.log(
           `Creating group with ${testConfig.testWorkersNames.length + testConfig.checkWorkersNames.length} members`,
         );
-        const group = await creator.client.conversations.newGroup([]);
-        await group.sync();
-        const manualUsers = getManualUsers(["prod-testing"]);
+        globalGroup = await creator.client.conversations.newGroup([]);
+        await globalGroup.sync();
         const allInboxIds = [
           ...checkWorkers.getAll().map((w) => w.client.inboxId),
           ...testWorkers.getAll().map((w) => w.client.inboxId),
@@ -114,18 +114,14 @@ describe(TEST_NAME, () => {
         // Add members one by one
         for (const inboxId of allInboxIds) {
           try {
-            await group.addMembers([inboxId]);
+            await globalGroup.addMembers([inboxId]);
             console.log(`Added member ${inboxId}`);
           } catch (e) {
             console.error(`Error adding member ${inboxId}:`, e);
           }
         }
-        for (const manualUser of manualUsers)
-          await group.addSuperAdmin(manualUser.inboxId);
 
-        appendToEnv("GROUP_ID", group.id);
-        console.warn(`Group created: ${group.id}, aborting test`);
-        throw new Error("Group created, aborting test");
+        appendToEnv("GROUP_ID", globalGroup.id);
       }
 
       // Sync creator's conversations
@@ -140,6 +136,9 @@ describe(TEST_NAME, () => {
         testConfig.groupId,
       )) as Group;
       if (!globalGroup) throw new Error("Group not found");
+
+      for (const manualUser of manualUsers)
+        await globalGroup.addSuperAdmin(manualUser.inboxId);
 
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
