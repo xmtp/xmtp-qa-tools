@@ -118,6 +118,7 @@ jobs:
           path: .data
           key: not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-${{ github.run_id }}
       - name: Upload test artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-${{ matrix.environment }}
