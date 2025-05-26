@@ -56,7 +56,7 @@ function getGitHubContext(): GitHubContext {
     branchName,
     workflowUrl,
     matrix: matrixKeys || undefined,
-    environment: process.env.ENVIRONMENT || process.env.NODE_ENV || undefined,
+    environment: process.env.ENVIRONMENT || process.env.XMTP_ENV || undefined,
     region,
   };
 }
@@ -104,6 +104,11 @@ export async function sendSlackNotification(
   const datadogUrl =
     "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
 
+  let upperCaseTestName = "";
+  if (options.testName) {
+    upperCaseTestName =
+      options.testName[0].toUpperCase() + options.testName.slice(1);
+  }
   // Generate custom links if needed
   let customLinks = options.customLinks || "";
   if (
@@ -126,8 +131,6 @@ export async function sendSlackNotification(
       serviceId = "00a6919a-a123-496b-b072-a149798099f9";
     } else if (githubContext.region == "asia") {
       serviceId = "cc97c743-1be5-4ca3-a41d-0109e41ca1fd";
-    } else {
-      serviceId = "";
     }
     if (serviceId) {
       url = `*Test log:* <https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792|View url>`;
@@ -136,13 +139,13 @@ export async function sendSlackNotification(
 
   // Create message with error logs
   const message = `Test Failure ❌
-*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${options.testName}>
-${githubContext.environment ? `*Environment:* ${githubContext.environment}` : ""}
+*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
+*Environment:* \`${githubContext.environment}\`
 *General dashboard:* <${datadogUrl}|View>
-*Geolocation:* ${githubContext.region || "Unknown Region"}
-*Timestamp:* ${new Date().toLocaleString()}
-${customLinks}
+*Geolocation:* \`${githubContext.region || "Unknown Region"}\`
+*Timestamp:* \`${new Date().toLocaleString()}\`
 ${url}
+${customLinks}
 ${options.errorLogs || ""}`;
 
   try {
