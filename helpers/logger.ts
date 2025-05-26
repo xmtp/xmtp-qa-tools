@@ -193,10 +193,14 @@ export function extractErrorLogs(testName: string): string {
           let cleanLine = line.replace(ansiRegex, "");
           if (cleanLine.includes("ERROR")) {
             cleanLine = cleanLine.split("ERROR")[1];
-          }
-          if (cleanLine.includes("[vitest]")) {
+          } else if (cleanLine.includes("[vitest]")) {
             cleanLine = cleanLine.split("[vitest]")[1];
           }
+
+          if (cleanLine.includes("//")) {
+            cleanLine = cleanLine.split("//")[0]?.trim();
+          }
+          cleanLine = cleanLine?.replace("expected false to be true", "failed");
           errorLines.add(cleanLine);
         }
       }
