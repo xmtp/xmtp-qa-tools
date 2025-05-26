@@ -15,7 +15,7 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: b1d2590b44839aecde71a4cd90a57906
+      GROUP_ID: "b1d2590b44839aecde71a4cd90a57906"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
@@ -75,10 +75,10 @@ jobs:
         uses: actions/cache@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-${{ github.run_id }}
+          key: xmtp-data-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}
           restore-keys: |
-            not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-
-            not-forked-${{ matrix.environment }}-
+            xmtp-data-${{ matrix.environment }}-
+            xmtp-data-
       - name: Install dependencies
         run: yarn
       - name: Set SQLCipher environment variables
@@ -117,7 +117,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}-${{ github.run_id }}
+          key: xmtp-data-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
