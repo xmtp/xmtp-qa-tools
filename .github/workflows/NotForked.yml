@@ -50,6 +50,14 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
+      - name: Cache XMTP data
+        uses: actions/cache@v4
+        with:
+          path: .data
+          key: xmtp-data-${{ matrix.environment }}-${{ hashFiles('package.json', 'yarn.lock') }}
+          restore-keys: |
+            xmtp-data-${{ matrix.environment }}-
+            xmtp-data-
       - name: Install dependencies
         run: yarn
       - name: Run tests
