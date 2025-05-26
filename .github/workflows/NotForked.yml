@@ -15,7 +15,7 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: "f4b9542616f2b58d143e3fac74152571"
+      GROUP_ID: "8736d94a46efa0032431a5da11139007"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
@@ -25,7 +25,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-      WALLET_KEY_BOT: "0xa136b6e8891fc3516f8c8d249b39a782c837ebc27c8d534fff44de0e0c81947a"
+      WALLET_KEY_BOT: "0x63e6382e98b29e695fa892b35ebc7204df7999608b63c47481243508f0b66348"
       WALLET_KEY_HENRY: "0xe3d9386b3b1a6af7ba492f467cf5ccd23d44319f7f5c71f6921765eeaa6ae631"
       WALLET_KEY_IVY: "0x3baaf15c8b824f1ea8233915b790d40eb1aa177f92b62f84d47cf7e57d115096"
       WALLET_KEY_JACK: "0x3c38dc4f1c424152e95689dfb0a785f155c5382b92be30ef95553a20e27c3ba7"

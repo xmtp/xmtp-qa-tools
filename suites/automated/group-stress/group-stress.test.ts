@@ -115,13 +115,14 @@ describe(TEST_NAME, () => {
         for (const inboxId of allInboxIds) {
           try {
             await group.addMembers([inboxId]);
+            console.log(`Added member ${inboxId}`);
           } catch (e) {
             console.error(`Error adding member ${inboxId}:`, e);
           }
         }
         appendToEnv("GROUP_ID", group.id);
         console.warn(`Group created: ${group.id}, aborting test`);
-        return;
+        throw new Error("Group created, aborting test");
       }
 
       // Sync creator's conversations
