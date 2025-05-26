@@ -56,7 +56,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn retry group-stress   --no-fail
+        run: yarn test group-stress 
       - name: Upload test artifacts
         uses: actions/upload-artifact@v4
         with:
