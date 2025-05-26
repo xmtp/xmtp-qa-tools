@@ -8,6 +8,7 @@ import {
 import {
   appendToEnv,
   getInboxIds,
+  getManualUsers,
   getMultiVersion,
   removeDataFolder,
 } from "@helpers/tests";
@@ -105,15 +106,18 @@ describe(TEST_NAME, () => {
         const group = await creator.client.conversations.newGroup([]);
         await group.sync();
 
+        const allInboxIds = [
+          ...checkWorkers.getAll().map((w) => w.client.inboxId),
+          ...testWorkers.getAll().map((w) => w.client.inboxId),
+          ...getManualUsers(["prod-testing"]).map((u) => u.inboxId),
+        ];
+
         // Add members one by one
-        for (const member of [
-          ...checkWorkers.getAll(),
-          ...testWorkers.getAll(),
-        ]) {
+        for (const inboxId of allInboxIds) {
           try {
-            await group.addMembers([member.client.inboxId]);
+            await group.addMembers([inboxId]);
           } catch (e) {
-            console.error(`Error adding member ${member.client.inboxId}:`, e);
+            console.error(`Error adding member ${inboxId}:`, e);
           }
         }
         appendToEnv("GROUP_ID", group.id);
@@ -263,15 +267,11 @@ export async function testMembershipChanges(
         (m) => m.inboxId.toLowerCase() === memberInboxId.toLowerCase(),
       );
 
-      if (memberExists) {
-        await group.removeMembers([memberInboxId]);
-        await group.addMembers([memberInboxId]);
-        console.log(`Cycle ${i}: Removed and re-added ${member.name}`);
-      } else {
-        // Just add the member if not present
-        await group.addMembers([memberInboxId]);
-        console.log(`Cycle ${i}: Added missing member ${member.name}`);
-      }
+      if (memberExists) await group.removeMembers([memberInboxId]);
+
+      // Just add the member if not present
+      await group.addMembers([memberInboxId]);
+      console.log(`Cycle ${i}: Membership update: ${member.name}`);
       await group.sync();
     } catch (e) {
       console.error(`Error in membership cycle ${i}:`, e);
