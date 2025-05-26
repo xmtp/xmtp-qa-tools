@@ -46,7 +46,6 @@ jobs:
       WALLET_KEY_CHARLIE=0x7cdb36e46f0d5e390ac3cedfcf79df4a5ee675a6cede2e3e23e7b3d6380ac684
       WALLET_KEY_FRANK=0x67ec1cf818db023d0eaa3b9caddebae0daa816f554e12c8e8f42f0f314ca8dce
       WALLET_KEY_GRACE=0x18fc66495754096e6ef1b97ca350e31c8adc4c1e4fd44969289a34310a79cff8
-
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
