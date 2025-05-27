@@ -129,12 +129,21 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
-  public async packageDetails() {
+  public async checkInstallations() {
     for (const worker of this.getAll()) {
       const installations = await worker.client.preferences.inboxState();
-      const totalInstallations = installations.installations.length;
-      if (totalInstallations > 10) {
-        console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
+      if (installations.installations.length > 10) {
+        await worker.client.revokeAllOtherInstallations();
+        const installations = await worker.client.preferences.inboxState(true);
+        if (installations.installations.length > 10) {
+          throw new Error(
+            `[${worker.name}] Max installation reached: ${installations.installations.length}`,
+          );
+        } else {
+          console.warn(
+            `[${worker.name}] Package details: ${installations.installations.length}`,
+          );
+        }
       }
       for (const installation of installations.installations) {
         // Convert nanoseconds to milliseconds for Date constructor
@@ -402,7 +411,7 @@ export async function getWorkers(
   );
   await Promise.all(workerPromises);
   manager.printWorkers();
-  await manager.packageDetails();
+  await manager.checkInstallations();
   return manager;
 }
 

@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { getRandomNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -13,7 +13,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(getRandomNames(2), testName);
+  workers = await getWorkers(getFixedNames(2), testName);
 
   setupTestLifecycle({
     expect,

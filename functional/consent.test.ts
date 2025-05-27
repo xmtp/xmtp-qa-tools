@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -13,7 +13,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(getRandomNames(5), testName, typeofStream.Consent);
+  workers = await getWorkers(getFixedNames(5), testName, typeofStream.Consent);
 
   setupTestLifecycle({
     expect,

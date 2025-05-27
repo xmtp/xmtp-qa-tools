@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getInboxIds, getRandomNames } from "@helpers/tests";
+import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -21,7 +21,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getRandomNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
+    getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
     testName,
     typeofStream.None,
   );

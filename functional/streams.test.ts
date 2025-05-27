@@ -8,7 +8,7 @@ import {
   verifyMetadataStream,
   verifyNewConversationStream,
 } from "@helpers/streams";
-import { getInboxIds, getRandomNames } from "@helpers/tests";
+import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -20,7 +20,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let group: Conversation;
-  const names = getRandomNames(5);
+  const names = getFixedNames(5);
   let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle

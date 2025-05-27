@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { getRandomNames, sleep } from "@helpers/tests";
+import { getFixedNames, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -15,7 +15,7 @@ describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
-  workers = await getWorkers(getRandomNames(5), testName, typeofStream.Message);
+  workers = await getWorkers(getFixedNames(5), testName, typeofStream.Message);
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);

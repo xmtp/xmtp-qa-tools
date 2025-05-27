@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { getRandomNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -21,7 +21,7 @@ describe(testName, async () => {
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
   let workers = await getWorkers(
-    getRandomNames(receiverAmount),
+    getFixedNames(receiverAmount),
     testName,
     typeofStream.Message,
   );

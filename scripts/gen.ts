@@ -163,11 +163,11 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
     generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
   } catch (e) {
     console.log(e);
-    console.error(`Error: Could not read input file: ${inputFile}`);
+    console.error(`Could not read input file: ${inputFile}`);
     return;
   }
   if (!generatedInboxes || generatedInboxes.length === 0) {
-    console.error("Error: No generated inboxes found in input file");
+    console.error("No generated inboxes found in input file");
     return;
   }
   const folderName = `db-generated-${generatedInboxes.length}-${ENV}`;

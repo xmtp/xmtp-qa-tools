@@ -32,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test large  --no-fail --log
+        run: yarn test large  --no-fail --debug
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
