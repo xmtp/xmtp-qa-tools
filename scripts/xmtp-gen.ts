@@ -1,4 +1,5 @@
 import * as fs from "fs";
+import * as crypto from "crypto";
 import * as readline from "readline";
 import {
   createSigner,
