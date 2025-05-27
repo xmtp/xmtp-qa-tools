@@ -80,6 +80,8 @@ jobs:
             xmtp-data-${{ matrix.environment }}-
             xmtp-data-
       - name: Install dependencies
+        run: yarn
+      - name: Install dependencies for versions
         run: yarn script versions
       - name: Set SQLCipher environment variables
         run: |
