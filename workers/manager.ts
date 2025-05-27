@@ -135,10 +135,16 @@ export class WorkerManager {
       const totalInstallations = installations.installations.length;
       if (totalInstallations > 25) {
         await worker.client.revokeAllOtherInstallations();
-        throw new Error(
-          `[${worker.name}] Max installation reached: ${totalInstallations}`,
-        );
-        // console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
+        const installations = await worker.client.preferences.inboxState(true);
+        if (installations.installations.length > 25) {
+          throw new Error(
+            `[${worker.name}] Max installation reached: ${totalInstallations}`,
+          );
+        } else {
+          console.warn(
+            `[${worker.name}] Package details: ${totalInstallations}`,
+          );
+        }
       }
       for (const installation of installations.installations) {
         // Convert nanoseconds to milliseconds for Date constructor
