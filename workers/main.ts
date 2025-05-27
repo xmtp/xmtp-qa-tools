@@ -412,9 +412,7 @@ export class WorkerClient extends Worker {
             }
           }
         } catch (error) {
-          console.error(
-            `[${this.nameId}] Message stream error: ${String(error)}`,
-          );
+          console.error(`[${this.nameId}] message stream: ${String(error)}`);
         }
       }
     })();
@@ -511,7 +509,7 @@ export class WorkerClient extends Worker {
           }
         } catch (error) {
           console.error(
-            `[${this.nameId}] Conversation stream error: ${String(error)}`,
+            `[${this.nameId}] conversation stream error: ${String(error)}`,
           );
         }
       }
@@ -559,7 +557,7 @@ export class WorkerClient extends Worker {
           }
         } catch (error) {
           console.error(
-            `[${this.nameId}] Consent stream error: ${String(error)}`,
+            `[${this.nameId}] consent stream error: ${String(error)}`,
           );
         }
       }

@@ -7,7 +7,7 @@ import { generateEncryptionKeyHex } from "../src/client";
 const nodeVersion = process.versions.node;
 const [major] = nodeVersion.split(".").map(Number);
 if (major < 20) {
-  console.error("Error: Node.js version 20 or higher is required");
+  console.error("Node.js version 20 or higher is required");
   process.exit(1);
 }
 

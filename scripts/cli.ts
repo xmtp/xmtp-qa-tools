@@ -409,7 +409,7 @@ async function main(): Promise<void> {
     switch (commandType) {
       case "bot": {
         if (!nameOrPath) {
-          console.error("Error: Bot name is required for 'bot' command type.");
+          console.error("bot name is required for 'bot' command type.");
           showUsageAndExit();
         }
         runBot(nameOrPath, additionalArgs);
@@ -418,9 +418,7 @@ async function main(): Promise<void> {
 
       case "script": {
         if (!nameOrPath) {
-          console.error(
-            "Error: Script name is required for 'script' command type.",
-          );
+          console.error("Script name is required for 'script' command type.");
           showUsageAndExit();
         }
         runScript(nameOrPath, additionalArgs);
@@ -446,7 +444,7 @@ async function main(): Promise<void> {
       }
 
       default: {
-        console.error(`Error: Unknown command type "${commandType}"`);
+        console.error(`Unknown command type "${commandType}"`);
         showUsageAndExit();
       }
     }
