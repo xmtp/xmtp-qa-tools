@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -25,7 +25,7 @@
     "retry": "yarn cli retry",
     "script": "yarn cli script",
     "start": "vitest --ui --standalone --watch ",
-    "test": "vitest"
+    "test": "yarn cli test"
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",

@@ -208,7 +208,9 @@ export function extractErrorLogs(testName: string): string {
 
     console.log(errorLines);
     if (errorLines.size > 0) {
-      return `\n\n*Error Logs:*\n\`\`\`\n${Array.from(errorLines).join("\n")}\n\`\`\``;
+      return `\n\n*Error Logs:*\n\`\`\`\n${Array.from(errorLines)
+        .slice(0, 10)
+        .join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);

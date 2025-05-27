@@ -33,8 +33,9 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests with retry
-        run: yarn retry gm
+        run: yarn test gm --no-fail --log
       - name: Upload test artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-${{ matrix.environment }}

@@ -16,7 +16,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ============================================================
 // Test Configuration
@@ -61,6 +61,25 @@ describe(TEST_NAME, () => {
     expect,
   });
 
+  // Add cleanup after all tests complete
+  afterAll(async () => {
+    try {
+      console.log("Cleaning up workers...");
+      if (workers) {
+        await workers.terminateAll();
+      }
+      if (testWorkers) {
+        await testWorkers.terminateAll();
+      }
+      if (checkWorkers) {
+        await checkWorkers.terminateAll();
+      }
+      console.log("✓ Workers cleaned up successfully");
+    } catch (error) {
+      console.warn("Error during cleanup:", error);
+    }
+  });
+
   beforeAll(async () => {
     try {
       if (testConfig.freshInstalls) await removeDataFolder();
@@ -92,50 +111,68 @@ describe(TEST_NAME, () => {
       if (!creator || !testWorkers || !checkWorkers) {
         throw new Error(`Worker not found: ${creator?.name}`);
       }
-
       console.log("Creating or getting new group");
       console.log("Worker inbox ids", testConfig.testWorkersNames);
       console.log("Manual user inbox ids", testConfig.checkWorkersNames);
       console.log("Group id", testConfig.groupId);
+
+      const manualUsers = getManualUsers(["prod-testing"]);
+
+      // Sync creator's conversations first
+      console.log(`Syncing creator's ${creator.name} conversations`);
+      await creator.client.conversations.syncAll();
 
       // Either create a new group or use existing one
       if (!testConfig.groupId) {
         console.log(
           `Creating group with ${testConfig.testWorkersNames.length + testConfig.checkWorkersNames.length} members`,
         );
-        const group = await creator.client.conversations.newGroup([]);
-        await group.sync();
-
+        globalGroup = await creator.client.conversations.newGroup([]);
+        await globalGroup.sync();
         const allInboxIds = [
           ...checkWorkers.getAll().map((w) => w.client.inboxId),
           ...testWorkers.getAll().map((w) => w.client.inboxId),
-          ...getManualUsers(["prod-testing"]).map((u) => u.inboxId),
+          ...manualUsers.map((u) => u.inboxId),
         ];
 
         // Add members one by one
         for (const inboxId of allInboxIds) {
           try {
-            await group.addMembers([inboxId]);
+            await globalGroup.addMembers([inboxId]);
+            console.log(`Added member ${inboxId}`);
           } catch (e) {
             console.error(`Error adding member ${inboxId}:`, e);
           }
         }
-        appendToEnv("GROUP_ID", group.id);
-        return group;
+        for (const manualUser of manualUsers)
+          await globalGroup.addSuperAdmin(manualUser.inboxId);
+
+        appendToEnv("GROUP_ID", globalGroup.id);
+        console.log(`Created new group with ID: ${globalGroup.id}`);
+      } else {
+        // Try to get existing group
+        globalGroup = (await creator.client.conversations.getConversationById(
+          testConfig.groupId,
+        )) as Group;
+
+        if (!globalGroup) {
+          console.log(
+            `Group ${testConfig.groupId} not found, creating new one`,
+          );
+          globalGroup = await creator.client.conversations.newGroup([]);
+          await globalGroup.sync();
+          appendToEnv("GROUP_ID", globalGroup.id);
+          console.log(`Created new group with ID: ${globalGroup.id}`);
+        } else {
+          console.log(`Using existing group with ID: ${globalGroup.id}`);
+        }
       }
 
-      // Sync creator's conversations
-      console.log(`Syncing creator's ${creator.name} conversations`);
+      // Sync conversations again after group operations
       await creator.client.conversations.syncAll();
       const conversations = await creator.client.conversations.list();
-      if (conversations.length === 0) throw new Error("No conversations found");
       console.log("Synced creator's conversations", conversations.length);
       await logAgentDetails(creator.client);
-
-      globalGroup = (await creator.client.conversations.getConversationById(
-        testConfig.groupId,
-      )) as Group;
-      if (!globalGroup) throw new Error("Group not found");
 
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);

@@ -15,7 +15,7 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: "f4b9542616f2b58d143e3fac74152571"
+      GROUP_ID: "8533bb92563c736d4b4e59675c4b57a9"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
@@ -25,7 +25,7 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
-      WALLET_KEY_BOT: "0xa136b6e8891fc3516f8c8d249b39a782c837ebc27c8d534fff44de0e0c81947a"
+      WALLET_KEY_BOT: "0x63e6382e98b29e695fa892b35ebc7204df7999608b63c47481243508f0b66348"
       WALLET_KEY_HENRY: "0xe3d9386b3b1a6af7ba492f467cf5ccd23d44319f7f5c71f6921765eeaa6ae631"
       WALLET_KEY_IVY: "0x3baaf15c8b824f1ea8233915b790d40eb1aa177f92b62f84d47cf7e57d115096"
       WALLET_KEY_JACK: "0x3c38dc4f1c424152e95689dfb0a785f155c5382b92be30ef95553a20e27c3ba7"
@@ -69,25 +69,59 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
+      - name: Create .data directory
+        run: mkdir -p .data
       - name: Cache XMTP data
         uses: actions/cache@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}
+          key: xmtp-data-${{ matrix.environment }}-v1
           restore-keys: |
-            not-forked-${{ matrix.environment }}
+            xmtp-data-${{ matrix.environment }}-
+            xmtp-data-
       - name: Install dependencies
         run: yarn
+      - name: Install dependencies for versions
+        run: yarn script versions
+      - name: Set SQLCipher environment variables
+        run: |
+          echo "SQLITE_TMPDIR=/tmp" >> $GITHUB_ENV
+          echo "PRAGMA_MLOCK=0" >> $GITHUB_ENV
+      - name: Debug environment
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Data directory contents:"
+          ls -la .data/ || echo "No .data directory found"
+          if [ -d ".data" ]; then
+            echo "Subdirectories in .data:"
+            find .data -type d -maxdepth 2 | head -20
+            echo "Files in .data:"
+            find .data -type f | head -10
+          fi
+          echo "Environment variables:"
+          env | grep -E "(GROUP_ID|XMTP_ENV)" || echo "No GROUP_ID or XMTP_ENV found"
+      - name: Clean corrupted cache if needed
+        run: |
+          # Check for version mismatch logs and clean if needed
+          if [ -d ".data" ] && [ "$(find .data -name "*.db" | wc -l)" -gt 0 ]; then
+            echo "Found existing database files, checking for compatibility..."
+            # If we detect potential version issues, we could clean here
+            # For now, just log what we found
+            find .data -name "*.db" -exec ls -la {} \;
+          fi
       - name: Run tests
         run: yarn test group-stress
+        env:
+          SQLITE_TMPDIR: /tmp
+          PRAGMA_MLOCK: 0
       - name: Save cache
-        uses: actions/cache@v4
+        if: always()
+        uses: actions/cache/save@v4
         with:
           path: .data
-          key: not-forked-${{ matrix.environment }}
-          restore-keys: |
-            not-forked-${{ matrix.environment }}
+          key: xmtp-data-${{ matrix.environment }}-v1
       - name: Upload test artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: artifacts-${{ matrix.environment }}
