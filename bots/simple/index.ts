@@ -14,10 +14,7 @@ async function main() {
     typeofStream.Message,
     typeOfResponse.Gpt,
     typeOfSync.None,
-    ["dev", "production", "local"][Math.floor(Math.random() * 3)] as
-      | "dev"
-      | "production"
-      | "local",
+    "dev",
   );
   const bot = workers.get("bot");
   const client = bot?.client as Client;
