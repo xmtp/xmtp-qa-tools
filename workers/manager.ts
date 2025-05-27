@@ -134,6 +134,7 @@ export class WorkerManager {
       const installations = await worker.client.preferences.inboxState();
       const totalInstallations = installations.installations.length;
       if (totalInstallations > 25) {
+        await worker.client.revokeAllOtherInstallations();
         throw new Error(
           `[${worker.name}] Max installation reached: ${totalInstallations}`,
         );
