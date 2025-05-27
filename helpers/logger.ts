@@ -49,7 +49,7 @@ export const createLogger = () => {
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
-    console.error(`[vitest] Test failed in ${testName}`, e.message);
+    console.error(`Test failed in ${testName}`, e.message);
   } else {
     console.error(`Unknown error type:`, typeof e);
   }
@@ -184,7 +184,7 @@ export function extractErrorLogs(testName: string): string {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/ERROR/.test(line) || /vitest/i.test(line)) {
+        if (/ERROR/.test(line)) {
           //remove ansi codes
           const ansiRegex = new RegExp(
             `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,
@@ -192,9 +192,7 @@ export function extractErrorLogs(testName: string): string {
           );
           let cleanLine = line.replace(ansiRegex, "");
           if (cleanLine.includes("ERROR")) {
-            cleanLine = cleanLine.split("ERROR")[1];
-          } else if (cleanLine.includes("[vitest]")) {
-            cleanLine = cleanLine.split("[vitest]")[1];
+            cleanLine = cleanLine.split("ERROR")[1].trim();
           }
 
           if (cleanLine.includes("//")) {
