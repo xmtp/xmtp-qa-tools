@@ -1,11 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getFixedNames, getFixedNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind, type Group } from "@xmtp/node-sdk";
+import { IdentifierKind } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "bug_welcome";
