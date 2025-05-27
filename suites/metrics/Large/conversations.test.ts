@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
-import { getInboxIds, getRandomNames } from "@helpers/tests";
+import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -26,7 +26,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getRandomNames(m_large_WORKER_COUNT),
+    getFixedNames(m_large_WORKER_COUNT),
     testName,
     typeofStream.Conversation,
   );

@@ -135,7 +135,7 @@ export class WorkerManager {
       const totalInstallations = installations.installations.length;
       if (totalInstallations > 25) {
         throw new Error(
-          `[${worker.name}] Package details: ${totalInstallations}`,
+          `[${worker.name}] Max installation reached: ${totalInstallations}`,
         );
         // console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
       }

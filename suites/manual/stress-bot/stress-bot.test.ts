@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getInboxIds, getRandomNames, sleep } from "@helpers/tests";
+import { getFixedNames, getInboxIds, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Conversation, Group } from "@xmtp/node-sdk";
@@ -37,7 +37,7 @@ describe(testName, async () => {
       bot = workers.get("bot")!;
       client = bot.client;
       conversation = await client.conversations.newDm(receiverInboxId);
-      workers = await getWorkers(getRandomNames(config.workerCount), testName);
+      workers = await getWorkers(getFixedNames(config.workerCount), testName);
       expect(workers).toBeDefined();
       expect(workers.getAll().length).toBe(config.workerCount);
     } catch (e) {

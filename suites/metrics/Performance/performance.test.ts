@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getAddresses, getInboxIds, getRandomNames } from "@helpers/tests";
+import { getAddresses, getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -23,11 +23,7 @@ describe(testName, async () => {
   let dm: Conversation;
   let workers: WorkerManager;
 
-  workers = await getWorkers(
-    getRandomNames(10),
-    testName,
-    typeofStream.Message,
-  );
+  workers = await getWorkers(getFixedNames(10), testName, typeofStream.Message);
   const creator = workers.getCreator();
   console.warn("creator is:", creator.name);
   const creatorClient = creator.client;
