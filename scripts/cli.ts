@@ -67,10 +67,10 @@ function showUsageAndExit(): never {
     "      --retry-delay <S>   Delay in seconds between retries (default: 10)",
   );
   console.error(
-    "      --log / --no-log    Enable/disable logging to file (default: enabled)",
+    "      --debug / --no-log    Enable/disable logging to file (default: enabled)",
   );
   console.error(
-    "      --log-file <name>   Custom log file name (default: auto-generated)",
+    "      --debug-file <name>   Custom log file name (default: auto-generated)",
   );
   console.error(
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
@@ -120,9 +120,9 @@ function hasRetryOptions(args: string[]): boolean {
   const retrySpecificOptions = [
     "--max-attempts",
     "--retry-delay",
-    "--log",
+    "--debug",
     "--no-log",
-    "--log-file",
+    "--debug-file",
     "--no-fail",
   ];
 
@@ -133,15 +133,15 @@ function runSimpleVitest(testName: string, args: string[]): void {
   const command = buildTestCommand(testName, args);
   console.log(`Running vitest: ${command}`);
 
-  // Check if --log was explicitly passed
-  const explicitLogFlag = args.includes("--log");
+  // Check if --debug was explicitly passed
+  const explicitLogFlag = args.includes("--debug");
 
   const env: Record<string, string> = {
     ...process.env,
     RUST_BACKTRACE: "1",
   };
 
-  // Only set debug logging if --log was explicitly passed
+  // Only set debug logging if --debug was explicitly passed
   if (explicitLogFlag) {
     env.LOGGING_LEVEL = "debug";
   }
@@ -199,7 +199,7 @@ function parseTestArgs(args: string[]): {
           i++;
         }
         break;
-      case "--log":
+      case "--debug":
         options.enableLogging = true;
         options.explicitLogFlag = true;
         break;
@@ -207,7 +207,7 @@ function parseTestArgs(args: string[]): {
         options.enableLogging = false;
         options.explicitLogFlag = false;
         break;
-      case "--log-file":
+      case "--debug-file":
         if (nextArg) {
           options.customLogFile = nextArg;
           i++;
@@ -319,7 +319,7 @@ async function runRetryTests(
     RUST_BACKTRACE: "1",
   };
 
-  // Only set debug logging if --log was explicitly passed
+  // Only set debug logging if --debug was explicitly passed
   if (options.explicitLogFlag) {
     env.LOGGING_LEVEL = "debug";
   }

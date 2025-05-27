@@ -275,19 +275,19 @@ yarn test performance
 
 ```bash
 # Advanced retry mode (when retry options are present)
-yarn cli test functional --max-attempts 3 --log --no-fail
+yarn cli test functional --max-attempts 3 --debug --no-fail
 ```
 
 - `--max-attempts <N>` - Number of retry attempts (default: 3)
 - `--retry-delay <S>` - Delay between retries in seconds (default: 10)
-- `--log` - Enable debug logging and file output
+- `--debug` - Enable debug logging and file output
 - `--no-fail` - Exit successfully even on test failures
-- `--log-file <name>` - Custom log file name
+- `--debug-file <name>` - Custom log file name
 
 ### Logging Behavior
 
-- With `--log`: Sets `LOGGING_LEVEL=debug` and saves logs to `logs/` directory (no terminal verbosity)
-- Without `--log`: Uses `LOGGING_LEVEL` from `.env` file
+- With `--debug`: Sets `LOGGING_LEVEL=debug` and saves logs to `logs/` directory (no terminal verbosity)
+- Without `--debug`: Uses `LOGGING_LEVEL` from `.env` file
 
 ### Resources
 

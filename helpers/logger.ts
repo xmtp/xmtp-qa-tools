@@ -249,7 +249,7 @@ export const createTestLogger = (options: TestLogOptions) => {
     console.log(
       "Warning: Logging is disabled. Test output will not be visible anywhere.",
     );
-    console.log("Consider using --log to enable file logging.");
+    console.log("Consider using --debug to enable file logging.");
   }
 
   const processOutput = (data: Buffer) => {
