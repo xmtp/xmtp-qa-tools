@@ -133,8 +133,11 @@ export class WorkerManager {
     for (const worker of this.getAll()) {
       const installations = await worker.client.preferences.inboxState();
       const totalInstallations = installations.installations.length;
-      if (totalInstallations > 10) {
-        console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
+      if (totalInstallations > 25) {
+        throw new Error(
+          `[${worker.name}] Package details: ${totalInstallations}`,
+        );
+        // console.warn(`[${worker.name}] Package details: ${totalInstallations}`);
       }
       for (const installation of installations.installations) {
         // Convert nanoseconds to milliseconds for Date constructor
