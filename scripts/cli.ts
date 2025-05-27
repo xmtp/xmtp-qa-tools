@@ -12,6 +12,7 @@ interface RetryOptions {
   customLogFile?: string;
   vitestArgs: string[];
   noFail: boolean;
+  explicitLogFlag: boolean;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -49,9 +50,16 @@ function showUsageAndExit(): never {
     "  script <script_name> [script_args...] - Runs a script (e.g., gen)",
   );
   console.error(
-    "  retry [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
+    "  test [suite_name_or_path] [options...] - Runs tests (e.g., functional)",
   );
-  console.error("    Test options:");
+  console.error("    Simple vitest execution (default):");
+  console.error(
+    "      yarn cli test functional         - Runs vitest directly",
+  );
+  console.error(
+    "      yarn cli test ./path/to/test.ts  - Runs specific test file",
+  );
+  console.error("    Retry mode (when retry options are present):");
   console.error(
     "      --max-attempts <N>  Max number of attempts for tests (default: 3)",
   );
@@ -75,10 +83,13 @@ function showUsageAndExit(): never {
   console.error("  yarn cli bot gm-bot");
   console.error("  yarn cli bot stress 5");
   console.error("  yarn cli script gen");
-  console.error("  yarn retry functional --max-attempts 2");
-  console.error("  yarn retry ./suites/automated/Gm/gm.test.ts --watch");
+  console.error("  yarn cli test functional");
+  console.error("  yarn cli test ./suites/automated/Gm/gm.test.ts --watch");
   console.error(
-    "  yarn retry functional --no-fail  # Won't fail CI even on test failures",
+    "  yarn cli test functional --max-attempts 2  # Uses retry mode",
+  );
+  console.error(
+    "  yarn cli test functional --no-fail        # Uses retry mode",
   );
   process.exit(1);
 }
@@ -105,7 +116,43 @@ function runScript(scriptName: string, args: string[]): void {
   });
 }
 
-function parseRetryArgs(args: string[]): {
+function hasRetryOptions(args: string[]): boolean {
+  const retrySpecificOptions = [
+    "--max-attempts",
+    "--retry-delay",
+    "--log",
+    "--no-log",
+    "--log-file",
+    "--no-fail",
+  ];
+
+  return args.some((arg) => retrySpecificOptions.includes(arg));
+}
+
+function runSimpleVitest(testName: string, args: string[]): void {
+  const command = buildTestCommand(testName, args);
+  console.log(`Running vitest: ${command}`);
+
+  // Check if --log was explicitly passed
+  const explicitLogFlag = args.includes("--log");
+
+  const env: Record<string, string> = {
+    ...process.env,
+    RUST_BACKTRACE: "1",
+  };
+
+  // Only set debug logging if --log was explicitly passed
+  if (explicitLogFlag) {
+    env.LOGGING_LEVEL = "debug";
+  }
+
+  execSync(command, {
+    stdio: "inherit",
+    env,
+  });
+}
+
+function parseTestArgs(args: string[]): {
   testName: string;
   options: RetryOptions;
 } {
@@ -116,6 +163,7 @@ function parseRetryArgs(args: string[]): {
     enableLogging: true,
     vitestArgs: [],
     noFail: false,
+    explicitLogFlag: false,
   };
 
   let currentArgs = [...args];
@@ -153,9 +201,11 @@ function parseRetryArgs(args: string[]): {
         break;
       case "--log":
         options.enableLogging = true;
+        options.explicitLogFlag = true;
         break;
       case "--no-log":
         options.enableLogging = false;
+        options.explicitLogFlag = false;
         break;
       case "--log-file":
         if (nextArg) {
@@ -264,11 +314,15 @@ async function runRetryTests(
     `Starting test suite: "${testName}" with up to ${options.maxAttempts} attempts, delay ${options.retryDelay}s.`,
   );
 
-  const env = {
+  const env: Record<string, string> = {
     ...process.env,
     RUST_BACKTRACE: "1",
-    LOGGING_LEVEL: "debug",
   };
+
+  // Only set debug logging if --log was explicitly passed
+  if (options.explicitLogFlag) {
+    env.LOGGING_LEVEL = "debug";
+  }
 
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
     console.log(`Attempt ${attempt} of ${options.maxAttempts}...`);
@@ -373,12 +427,21 @@ async function main(): Promise<void> {
         break;
       }
 
-      case "retry": {
+      case "test": {
         const allArgs = nameOrPath
           ? [nameOrPath, ...additionalArgs]
           : additionalArgs;
-        const { testName, options } = parseRetryArgs(allArgs);
-        await runRetryTests(testName, options);
+
+        // Check if retry-specific options are present
+        if (hasRetryOptions(allArgs)) {
+          // Use retry logic with multiple attempts, logging, etc.
+          const { testName, options } = parseTestArgs(allArgs);
+          await runRetryTests(testName, options);
+        } else {
+          // Run vitest directly for simple test execution
+          const testName = nameOrPath || "functional";
+          runSimpleVitest(testName, additionalArgs);
+        }
         break;
       }
 
