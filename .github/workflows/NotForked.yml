@@ -80,7 +80,7 @@ jobs:
             xmtp-data-${{ matrix.environment }}-
             xmtp-data-
       - name: Install dependencies
-        run: yarn
+        run: yarn script versions
       - name: Set SQLCipher environment variables
         run: |
           echo "SQLITE_TMPDIR=/tmp" >> $GITHUB_ENV
