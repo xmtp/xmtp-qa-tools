@@ -2,8 +2,11 @@ name: Not Forked
 description: "should verify that the code is not forked"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
-    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 jobs:
@@ -14,7 +17,6 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: "8533bb92563c736d4b4e59675c4b57a9"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
@@ -96,9 +98,6 @@ jobs:
             find .data -type d -maxdepth 2 | head -20
             echo "Files in .data:"
             find .data -type f | head -10
-          fi
-          echo "Environment variables:"
-          env | grep -E "(GROUP_ID|XMTP_ENV)" || echo "No GROUP_ID or XMTP_ENV found"
       - name: Clean corrupted cache if needed
         run: |
           # Check for version mismatch logs and clean if needed
