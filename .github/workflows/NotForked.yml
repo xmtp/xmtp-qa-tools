@@ -88,16 +88,6 @@ jobs:
         run: |
           echo "SQLITE_TMPDIR=/tmp" >> $GITHUB_ENV
           echo "PRAGMA_MLOCK=0" >> $GITHUB_ENV
-      - name: Debug environment
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Data directory contents:"
-          ls -la .data/ || echo "No .data directory found"
-          if [ -d ".data" ]; then
-            echo "Subdirectories in .data:"
-            find .data -type d -maxdepth 2 | head -20
-            echo "Files in .data:"
-            find .data -type f | head -10
       - name: Clean corrupted cache if needed
         run: |
           # Check for version mismatch logs and clean if needed
