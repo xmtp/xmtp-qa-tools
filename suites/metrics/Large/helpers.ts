@@ -21,7 +21,6 @@ export interface SummaryEntry {
 
 export function saveLog(summaryMap: Record<number, SummaryEntry>) {
   if (Object.keys(summaryMap).length === 0) {
-    console.log("No timing data was collected.");
     return;
   }
 
