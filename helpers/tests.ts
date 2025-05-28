@@ -414,8 +414,10 @@ export const randomlyRemoveDb = async (
   }
 };
 
-export const getManualUsers = (filterByName: string[] = []) =>
-  manualUsers.filter((r) => filterByName.includes(r.name));
+export const getManualUsers = (filterBy: string[] = []) =>
+  manualUsers.filter(
+    (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
+  );
 /**
  * Sends an initial test message to the bot
  */

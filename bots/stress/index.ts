@@ -183,6 +183,9 @@ const main = async () => {
       walletKey: WALLET_KEY,
       networks: ["dev", "production"],
       dbEncryptionKey: ENCRYPTION_KEY,
+      welcomeMessage: " Send /stress help",
+      commandPrefix: "/stress",
+      allowedCommands: ["help"],
     },
   ]);
 };

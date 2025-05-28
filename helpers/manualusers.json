@@ -14,7 +14,7 @@
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "04b83f4af2a2e8325cd7e326f2392fd8bb16a50d223f40a54a39d11fce97e05f",
+    "inboxId": "62ec40c1c55e46f55a7a8ae9b05f1ddac7d1a74b1fae1ccc8fb4d43bcb2dea8e",
     "network": "production",
     "name": "prod-testing"
   },
@@ -32,8 +32,8 @@
     "name": "prod-testing"
   },
   {
-    "app": "fabri-convos",
-    "inboxId": "36c9f8353b05c0728d4f976549f4d6e2374722c43a5f628f66e6b52634a5843c",
+    "app": "fabri-convos-dev",
+    "inboxId": "2c5aed1e0568531f9bb5c8eb46727433363d40b75222c1b97d78bd9c870cd080",
     "network": "dev",
     "name": "one-off"
   }
