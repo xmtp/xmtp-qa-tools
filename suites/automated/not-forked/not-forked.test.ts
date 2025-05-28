@@ -22,7 +22,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 // Test Configuration
 // ============================================================
 
-const TEST_NAME = "group-stress";
+const TEST_NAME = "not-forked";
 const WORKER_NAMES = getMultiVersion(14);
 const testConfig = {
   testName: TEST_NAME,

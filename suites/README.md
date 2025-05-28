@@ -15,11 +15,11 @@ This directory contains four main categories of test suites:
 
 Tests that run automatically on CI/CD pipelines to monitor production systems.
 
-| Test Suite       | Purpose                                             | Documentation                                                |
-| ---------------- | --------------------------------------------------- | ------------------------------------------------------------ |
-| **agents**       | Health monitoring of production XMTP agents         | [agents/README.md](./automated/agents/README.md)             |
-| **gm**           | Validation of GM bot and browser integration        | [gm/README.md](./automated/gm/README.md)                     |
-| **group-stress** | Group membership and message forking stress testing | [group-stress/README.md](./automated/group-stress/README.md) |
+| Test Suite     | Purpose                                             | Documentation                                            |
+| -------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| **agents**     | Health monitoring of production XMTP agents         | [agents/README.md](./automated/agents/README.md)         |
+| **gm**         | Validation of GM bot and browser integration        | [gm/README.md](./automated/gm/README.md)                 |
+| **not-forked** | Group membership and message forking stress testing | [not-forked/README.md](./automated/not-forked/README.md) |
 
 ## 🔧 Manual Test Suites
 
@@ -77,7 +77,7 @@ yarn test large
 yarn test performance
 
 # Stress tests
-yarn test group-stress
+yarn test not-forked
 yarn test rate-limited
 yarn test bot-stress
 yarn test large-group
@@ -90,7 +90,7 @@ yarn test large-group
 - **Automated**: `{suite-name}.test.ts` (e.g., `agents.test.ts`)
 - **Manual**: `{suite-name}.test.ts` (e.g., `notifications.test.ts`)
 - **Metrics**: `{suite-name}.test.ts` (e.g., `delivery.test.ts`)
-- **Stress**: `{descriptive-name}.test.ts` (e.g., `group-stress.test.ts`)
+- **Stress**: `{descriptive-name}.test.ts` (e.g., `not-forked.test.ts`)
 
 ### Test Names
 
@@ -113,7 +113,7 @@ suites/
 │   ├── large/
 │   └── performance/
 └── stress/           # High-load testing
-    ├── group-stress/
+    ├── not-forked/
     ├── rate-limited.test.ts
     ├── bot-stress.test.ts
     └── large-group.test.ts
