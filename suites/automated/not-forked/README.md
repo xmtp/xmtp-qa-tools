@@ -47,5 +47,5 @@ GROUP_ID=""
 ## Test Execution
 
 ```bash
-yarn test group-stress
+yarn test not-forked
 ```

@@ -165,13 +165,13 @@ When working with these workflows, consider the following best practices:
 
 The workflows have been updated to use standardized naming conventions:
 
-| Old Name            | New Name          | Test Command              |
-| ------------------- | ----------------- | ------------------------- |
-| `at_agents.yml`     | `Agents.yml`      | `yarn retry agents`       |
-| `at_gm.yml`         | `Gm.yml`          | `yarn retry gm`           |
-| `m_delivery.yml`    | `Delivery.yml`    | `yarn retry delivery`     |
-| `m_performance.yml` | `Performance.yml` | `yarn retry performance`  |
-| `m_large.yml`       | `Large.yml`       | `yarn large`              |
-| `StressGroup.yml`   | `GroupStress.yml` | `yarn retry group-stress` |
+| Old Name            | New Name          | Test Command             |
+| ------------------- | ----------------- | ------------------------ |
+| `at_agents.yml`     | `Agents.yml`      | `yarn retry agents`      |
+| `at_gm.yml`         | `Gm.yml`          | `yarn retry gm`          |
+| `m_delivery.yml`    | `Delivery.yml`    | `yarn retry delivery`    |
+| `m_performance.yml` | `Performance.yml` | `yarn retry performance` |
+| `m_large.yml`       | `Large.yml`       | `yarn large`             |
+| `StressGroup.yml`   | `GroupStress.yml` | `yarn retry not-forked`  |
 
 All test suites now follow consistent kebab-case naming conventions for better organization and maintainability.
