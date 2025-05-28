@@ -15,7 +15,6 @@ jobs:
       matrix:
         environment: [production]
     env:
-      GROUP_ID: "e394589c45fff65b95657e11b5459216"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
