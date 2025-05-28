@@ -29,7 +29,7 @@ const testConfig = {
   epochs: 3,
   network: "production",
   workerNames: getMultiVersion(2),
-  groupId: process.env.GROUP_ID as string,
+  groupId: "d7074eaca9fa5b324eb144cf84b0a79e",
   freshInstalls: false, // more installs
 } as const;
 
@@ -128,7 +128,7 @@ describe(TEST_NAME, () => {
           );
           globalGroup = await creator.client.conversations.newGroup([]);
           await globalGroup.sync();
-          appendToEnv("GROUP_ID", globalGroup.id);
+
           console.log(`Created new group with ID: ${globalGroup.id}`);
         } else {
           console.log(`Using existing group with ID: ${globalGroup.id}`);
