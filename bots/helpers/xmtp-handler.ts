@@ -47,7 +47,7 @@ export interface AgentOptions {
   /** Whether to send a welcome message to the conversation */
   groupWelcomeMessage?: string;
   /** Codecs to use */
-  codecs?: unknown[];
+  codecs?: any[];
   /** Allowed commands that the agent will respond to */
   allowedCommands?: string[];
   /** Command prefix (default: "@toss") */
