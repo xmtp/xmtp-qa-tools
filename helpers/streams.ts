@@ -84,14 +84,35 @@ function extractAddedInboxes(ev: unknown): string {
   }
 
   const event = ev as {
+    inboxId?: string; // For sent events
+    addedInboxes?: Array<{ inboxId: string }>; // For direct events
+    group?: {
+      addedInboxes?: Array<{ inboxId: string }>; // For stream events
+    };
     content?: {
-      addedInboxes?: Array<{ inboxId: string }>;
-      initiatedByInboxId?: string;
+      addedInboxes?: Array<{ inboxId: string }>; // Legacy format
     };
   };
 
+  // If this is a sent event with inboxId directly
+  if (event.inboxId) {
+    return event.inboxId;
+  }
+
+  // Try top-level first (current format)
+  let addedInboxes = event.addedInboxes || [];
+
+  // Try group structure (stream events)
+  if (addedInboxes.length === 0 && event.group?.addedInboxes) {
+    addedInboxes = event.group.addedInboxes;
+  }
+
+  // Fallback to content structure (legacy format)
+  if (addedInboxes.length === 0 && event.content?.addedInboxes) {
+    addedInboxes = event.content.addedInboxes;
+  }
+
   // Return the first added inbox ID, or empty string if none
-  const addedInboxes = event.content?.addedInboxes || [];
   return addedInboxes.length > 0 ? addedInboxes[0].inboxId : "";
 }
 
@@ -175,7 +196,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     timingCount > 0 ? timingSum / timingCount : 0,
   );
   const messagesAsStrings = allReceived.map((msgs) =>
-    msgs.map((m) => extractContent(m.event)),
+    msgs.map((m) => getMessage(m.event as TReceived)),
   );
   let stats;
   if (messageTemplate && messagesAsStrings.length > 0) {
@@ -301,6 +322,7 @@ export async function verifyMembershipStream(
     getKey: extractAddedInboxes,
     getMessage: extractAddedInboxes,
     statsLabel: "member-add:",
+    count: 1,
     participantsForStats: receivers,
   });
 }
