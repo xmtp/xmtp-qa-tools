@@ -184,7 +184,11 @@ export function extractErrorLogs(testName: string): string {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (/ERROR/.test(line)) {
+        if (
+          /ERROR/.test(line) ||
+          /forked/.test(line) ||
+          /Message cursor/.test(line)
+        ) {
           //remove ansi codes
           const ansiRegex = new RegExp(
             `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,

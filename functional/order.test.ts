@@ -76,7 +76,6 @@ describe(testName, async () => {
         group,
         workers.getAllButCreator(),
         10,
-        randomSuffix,
       );
       expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
       expect(verifyResult.orderPercentage).toBeGreaterThan(95);

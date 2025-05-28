@@ -2,9 +2,8 @@ name: Not Forked
 description: "should verify that the code is not forked"
 
 on:
-  pull_request:
-    branches:
-      - main
+  schedule:
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:

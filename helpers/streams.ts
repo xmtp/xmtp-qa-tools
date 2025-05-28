@@ -241,11 +241,11 @@ export async function verifyMessageStream(
   count = 1,
   messageTemplate: string = "gm-{i}-{randomSuffix}",
 ): Promise<VerifyStreamResult> {
+  const randomSuffix = Math.random().toString(36).substring(2, 15);
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
     triggerEvents: async () => {
-      const randomSuffix = Math.random().toString(36).substring(2, 15);
       const sent: { content: string; sentAt: number }[] = [];
       for (let i = 0; i < count; i++) {
         let content = messageTemplate;
@@ -262,7 +262,7 @@ export async function verifyMessageStream(
     getMessage: extractContent,
     statsLabel: "gm-",
     count,
-    messageTemplate,
+    messageTemplate: randomSuffix,
     participantsForStats: receivers,
   });
 }
