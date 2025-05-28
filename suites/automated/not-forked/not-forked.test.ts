@@ -29,7 +29,7 @@ const testConfig = {
   epochs: 3,
   network: "production",
   workerNames: getMultiVersion(2),
-  groupId: process.env.GROUP_ID ?? "d7074eaca9fa5b324eb144cf84b0a79e",
+  groupId: "d7074eaca9fa5b324eb144cf84b0a79e",
   freshInstalls: false, // more installs
 } as const;
 
