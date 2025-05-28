@@ -8,16 +8,14 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 ## XMTP Features Under Test
 
-- [x] **Multi-SDK Version Compatibility** (>2.0.4)
-- [x] **Cross-Platform Client Support** (web, mobile, desktop)
-- [x] **Membership Change Cycles** (10 cycles remove/add)
+- [x] **Multi libxtmp versions** (>2.0.4)
+- [x] **Multi binding** (web, mobile, desktop)
+- [x] **Membership Change Cycles** (cycles remove/add)
 - [x] **Group Metadata Updates** (`updateName()`)
 - [x] **Group State Synchronization** (`sync()`, `syncAll()`)
 - [x] **Group Admin Permissions**
 - [x] **Message & Update Streams**
 - [x] **Multi-Worker** (14 concurrent workers)
-- [x] **Worker Lifecycle Management**
-- [x] **Stream Event Aggregation**
 - [x] **Rate Limiting** (message throttling, API call limits)
 
 ## Setup
