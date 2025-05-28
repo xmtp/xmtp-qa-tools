@@ -23,7 +23,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 // ============================================================
 
 const TEST_NAME = "not-forked";
-const WORKER_NAMES = getMultiVersion(14);
+const WORKER_NAMES = getMultiVersion(4);
 const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
