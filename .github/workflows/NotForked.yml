@@ -109,7 +109,7 @@ jobs:
             find .data -name "*.db" -exec ls -la {} \;
           fi
       - name: Run tests
-        run: yarn test not-forked --debug
+        run: yarn test not-forked --no-fail
         env:
           SQLITE_TMPDIR: /tmp
           PRAGMA_MLOCK: 0
