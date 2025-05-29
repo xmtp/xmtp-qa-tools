@@ -2,12 +2,13 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/tests";
+import { checkIfGroupForked, defaultValues } from "@helpers/tests";
 import {
   ConsentState,
   Dm,
   type Client,
   type DecodedMessage,
+  type Group,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import "dotenv/config";
@@ -398,9 +399,7 @@ export class WorkerClient extends Worker {
               //   `[${this.nameId}] Received message, ${message.content as string}`,
               // );
               // Handle auto-responses if enabled
-              if (this.shouldRespondToMessage(message)) {
-                await this.handleResponse(message);
-              }
+              await this.handleResponse(message);
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
@@ -419,48 +418,37 @@ export class WorkerClient extends Worker {
   }
 
   /**
-   * Check if a message should trigger a response
-   */
-  private shouldRespondToMessage(message: DecodedMessage): boolean {
-    if (this.typeOfResponse === typeOfResponse.None) return false;
-
-    const conversation = this.client.conversations.getConversationById(
-      message.conversationId,
-    );
-    const baseName = this.name.split("-")[0].toLowerCase();
-    const isDm = conversation instanceof Dm;
-    const content = (message.content as string).toLowerCase();
-    //
-    return (
-      (message?.contentType?.typeId === "text" &&
-        content.includes(baseName) &&
-        !content.includes("/") &&
-        !content.includes("workers") &&
-        !content.includes("members") &&
-        !content.includes("admins")) ||
-      isDm
-    );
-  }
-
-  /**
    * Handle generating and sending GPT responses
    */
   private async handleResponse(message: DecodedMessage) {
-    // Filter out messages from the same client
-    if (message.senderInboxId === this.client.inboxId) {
-      return;
-    }
-
     try {
-      // Get the conversation from the message
+      // Filter out messages from the same client
+      if (message.senderInboxId === this.client.inboxId) {
+        return;
+      }
+      if (this.typeOfResponse === typeOfResponse.None) return;
+
       const conversation = await this.client.conversations.getConversationById(
         message.conversationId,
       );
-
-      if (!conversation) {
-        console.error(`[${this.nameId}] Conversation not found for response`);
-        return;
+      if (!conversation) return;
+      await checkIfGroupForked(conversation as Group);
+      const baseName = this.name.split("-")[0].toLowerCase();
+      const isDm = conversation instanceof Dm;
+      const content = (message.content as string).toLowerCase();
+      let shouldRespond = false;
+      if (
+        (message?.contentType?.typeId === "text" &&
+          content.includes(baseName) &&
+          !content.includes("/") &&
+          !content.includes("workers") &&
+          !content.includes("members") &&
+          !content.includes("admins")) ||
+        isDm
+      ) {
+        shouldRespond = true;
       }
+      if (!shouldRespond) return;
 
       if (this.typeOfResponse === typeOfResponse.Gpt) {
         const messages = await conversation?.messages();

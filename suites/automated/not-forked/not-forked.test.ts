@@ -7,6 +7,7 @@ import {
 } from "@helpers/streams";
 import {
   appendToEnv,
+  checkIfGroupForked,
   getFixedNames,
   getInboxIds,
   getManualUsers,
@@ -124,6 +125,7 @@ describe(TEST_NAME, () => {
           testConfig.groupId,
         )) as Group;
 
+        await checkIfGroupForked(globalGroup);
         if (!globalGroup) {
           console.log(
             `Group ${testConfig.groupId} not found, creating new one`,
@@ -263,7 +265,7 @@ export async function testMembershipChanges(
   const group = (await admin.client.conversations.getConversationById(
     groupId,
   )) as Group;
-  if (!group) throw new Error(`Group ${groupId} not found`);
+  await checkIfGroupForked(group);
 
   const memberInboxId = member.client.inboxId;
 

@@ -252,6 +252,16 @@ export const createRandomInstallations = async (
   );
   return worker;
 };
+export const checkIfGroupForked = async (
+  group: Group | undefined,
+): Promise<void> => {
+  if (!group) throw new Error(`Group not found`);
+  if ((await group.debugInfo()).maybeForked) {
+    console.error("Group may have forked, skipping test");
+    console.error(JSON.stringify(await group.debugInfo(), null, 2));
+    throw new Error("Group may have forked");
+  }
+};
 
 /**
  * Gets a random version from the versions array
@@ -392,6 +402,7 @@ export const randomSyncs = async (testConfig: {
     } else {
       const group =
         await worker.client.conversations.getConversationById(groupId);
+      await checkIfGroupForked(group as Group);
       await group?.sync();
     }
   }
