@@ -175,23 +175,3 @@ it("should recover properly from corrupted sync state", async () => {
 | Group Operations | Semi-automated | Weekly    | High     |
 | Client State     | Manual         | Monthly   | Medium   |
 | Performance      | Automated      | Daily     | Medium   |
-
-## 🤝 Contributing
-
-When adding new regression tests:
-
-1. **Document the original issue** with clear reproduction steps
-2. **Create focused test cases** that isolate the specific problem
-3. **Include both positive and negative test cases**
-4. **Add proper test metadata** (version affected, fix version, etc.)
-5. **Update the regression matrix** with new test information
-
-## 📋 Regression Checklist
-
-Before marking a regression test as complete:
-
-- [ ] Original issue can be reproduced in affected version
-- [ ] Fix is verified in current version
-- [ ] Test covers edge cases mentioned in original report
-- [ ] No new regressions introduced by the fix
-- [ ] Test is documented and added to automated suite where possible
