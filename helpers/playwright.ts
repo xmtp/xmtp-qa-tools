@@ -176,7 +176,7 @@ export class playwright {
     });
 
     const context: BrowserContext = await browser.newContext(
-      this.isHeadless ? {} : { viewport: { width: 1920, height: 1080 } },
+      this.isHeadless ? {} : { viewport: { width: 1280, height: 720 } },
     );
 
     const page = await context.newPage();
