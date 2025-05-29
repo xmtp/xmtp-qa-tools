@@ -176,12 +176,6 @@ it("should recover properly from corrupted sync state", async () => {
 | Client State     | Manual         | Monthly   | Medium   |
 | Performance      | Automated      | Daily     | Medium   |
 
-## 📚 Related Documentation
-
-- [Bug Report Archive](../../../docs/bug-reports.md)
-- [Version Compatibility Matrix](../../../docs/compatibility.md)
-- [Testing Environment Setup](../../../docs/test-setup.md)
-
 ## 🤝 Contributing
 
 When adding new regression tests:
