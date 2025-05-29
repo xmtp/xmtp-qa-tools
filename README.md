@@ -4,14 +4,13 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 ## Automated workflows
 
-| Test suite  | Performance                                                                                                                                                                  | Resources                                                                                                                                                                                                                                                                        | Run frequency | Networks         |
-| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
-| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance)                                                                                                    | Every 30 min  | `dev,production` |
-| Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)                                                                                                          | Every 30 min  | `dev,production` |
-| Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)                                                                                                                | Every 2 hours | `production`     |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/agents)                                                                                                            | Every 30 min  | `production`     |
-| GM          | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/gm)                                                                                                                    | Every 30 min  | `production`     |
-| Not Forked  | [![Not Forked](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/NotForked.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/NotForked.yml)      | [Workflow](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/not-forked) | Every 30 min  | `production`     |
+| Test suite  | Performance                                                                                                                                                                  | Resources                                                                                                                                                                     | Run frequency | Networks         |
+| ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
+| Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
+| Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
+| Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
+| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
+| GM          | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
 
 ## Architecture
 
@@ -275,19 +274,12 @@ yarn test performance
 
 ```bash
 # Advanced retry mode (when retry options are present)
-yarn cli test functional --max-attempts 3 --debug --no-fail
+yarn test functional --debug --no-fail
 ```
 
 - `--max-attempts <N>` - Number of retry attempts (default: 3)
-- `--retry-delay <S>` - Delay between retries in seconds (default: 10)
-- `--debug` - Enable debug logging and file output
+- `--debug` - Enable debug logging and file output a saves logs to `logs/` directory (no terminal verbosity)
 - `--no-fail` - Exit successfully even on test failures
-- `--debug-file <name>` - Custom log file name
-
-### Logging Behavior
-
-- With `--debug`: Sets `LOGGING_LEVEL=debug` and saves logs to `logs/` directory (no terminal verbosity)
-- Without `--debug`: Uses `LOGGING_LEVEL` from `.env` file
 
 ### Resources
 

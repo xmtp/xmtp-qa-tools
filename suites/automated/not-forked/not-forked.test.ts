@@ -30,7 +30,7 @@ const testConfig = {
   epochs: 3,
   network: "production",
   workerNames: getFixedNames(10),
-  groupId: "d7074eaca9fa5b324eb144cf84b0a79e",
+  groupId: undefined,
   freshInstalls: false, // more installs
 } as const;
 
@@ -83,7 +83,6 @@ describe(TEST_NAME, () => {
 
       console.log("Creating or getting new group");
       console.log("Worker inbox ids", testConfig.workerNames);
-      console.log("Group id", testConfig.groupId);
 
       const manualUsers = getManualUsers(["prod-testing"]);
 
@@ -100,6 +99,7 @@ describe(TEST_NAME, () => {
           [],
         )) as Group;
         await globalGroup.sync();
+        console.log("Group id", globalGroup.id);
         const allInboxIds = [
           ...workers.getAllBut("bot").map((w) => w.client.inboxId),
           ...manualUsers.map((u) => u.inboxId),
@@ -120,25 +120,10 @@ describe(TEST_NAME, () => {
         appendToEnv("GROUP_ID", globalGroup.id);
         console.log(`Created new group with ID: ${globalGroup.id}`);
       } else {
-        // Try to get existing group
         globalGroup = (await creator.client.conversations.getConversationById(
           testConfig.groupId,
         )) as Group;
-
         await checkIfGroupForked(globalGroup);
-        if (!globalGroup) {
-          console.log(
-            `Group ${testConfig.groupId} not found, creating new one`,
-          );
-          globalGroup = (await creator.client.conversations.newGroup(
-            [],
-          )) as Group;
-          await globalGroup.sync();
-
-          console.log(`Created new group with ID: ${globalGroup.id}`);
-        } else {
-          console.log(`Using existing group with ID: ${globalGroup.id}`);
-        }
       }
 
       // Sync conversations again after group operations
