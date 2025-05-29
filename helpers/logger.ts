@@ -163,6 +163,7 @@ export interface TestLogOptions {
   customLogFile?: string;
   testName: string;
   logFileName?: string;
+  verboseLogging?: boolean;
 }
 
 // Extract error logs from log files
@@ -244,9 +245,16 @@ export const createTestLogger = (options: TestLogOptions) => {
 
     logStream = fs.createWriteStream(logPath, { flags: "w" });
     console.log(`Logging to: ${logPath}`);
-    console.log(
-      "Test output will be hidden from terminal and logged to file only.",
-    );
+
+    if (options.verboseLogging) {
+      console.log(
+        "Verbose logging enabled: output will be shown in terminal AND logged to file.",
+      );
+    } else {
+      console.log(
+        "Test output will be hidden from terminal and logged to file only.",
+      );
+    }
   } else {
     console.log(
       "Warning: Logging is disabled. Test output will not be visible anywhere.",
@@ -258,8 +266,16 @@ export const createTestLogger = (options: TestLogOptions) => {
     const text = data.toString();
     const filtered = filterLogOutput(text);
 
-    if (filtered.trim() && logStream) {
-      logStream.write(filtered);
+    if (filtered.trim()) {
+      // Write to file if logging is enabled
+      if (logStream) {
+        logStream.write(filtered);
+      }
+
+      // Also write to terminal if verbose logging is enabled
+      if (options.verboseLogging) {
+        process.stdout.write(filtered);
+      }
     }
   };
 
