@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -17,7 +17,7 @@
     "functional": "npx vitest run functional --pool=forks --fileParallelism=false",
     "gen": "tsx scripts/gen.ts",
     "gen:keys": "tsx scripts/gen.ts",
-    "large": "npx vitest run suites/metrics/large --pool=forks --fileParallelism=false",
+    "large": "npx vitest run suites/large --pool=forks --fileParallelism=false",
     "lint": "eslint .",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "railway": "railway run yarn test ",
