@@ -15,7 +15,7 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 // ============================================================
@@ -95,7 +95,9 @@ describe(TEST_NAME, () => {
         console.log(
           `Creating group with ${testConfig.workerNames.length} members`,
         );
-        globalGroup = await creator.client.conversations.newGroup([]);
+        globalGroup = (await creator.client.conversations.newGroup(
+          [],
+        )) as Group;
         await globalGroup.sync();
         const allInboxIds = [
           ...workers.getAllBut("bot").map((w) => w.client.inboxId),
@@ -126,7 +128,9 @@ describe(TEST_NAME, () => {
           console.log(
             `Group ${testConfig.groupId} not found, creating new one`,
           );
-          globalGroup = await creator.client.conversations.newGroup([]);
+          globalGroup = (await creator.client.conversations.newGroup(
+            [],
+          )) as Group;
           await globalGroup.sync();
 
           console.log(`Created new group with ID: ${globalGroup.id}`);

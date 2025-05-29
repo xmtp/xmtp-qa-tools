@@ -220,9 +220,9 @@ export const sdkVersions = {
     Dm: Dm210,
     Group: Group210,
     sdkPackage: "node-sdk-210",
-    bindingsPackage: "node-bindings-120-rc4",
-    sdkVersion: "2.1.0-rc4",
-    libXmtpVersion: "46e9b60",
+    bindingsPackage: "node-bindings-120-rc5",
+    sdkVersion: "2.1.0-rc5",
+    libXmtpVersion: "d990224",
   },
 };
 
@@ -414,8 +414,10 @@ export const randomlyRemoveDb = async (
   }
 };
 
-export const getManualUsers = (filterByName: string[] = []) =>
-  manualUsers.filter((r) => filterByName.includes(r.name));
+export const getManualUsers = (filterBy: string[] = []) =>
+  manualUsers.filter(
+    (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
+  );
 /**
  * Sends an initial test message to the bot
  */

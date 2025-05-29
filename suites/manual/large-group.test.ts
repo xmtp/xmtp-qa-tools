@@ -106,13 +106,13 @@ async function createOrVerifyGroup(worker: Worker): Promise<Group> {
       console.log(
         `Creating a new group with ${convosUsernames.length} initial participants...`,
       );
-      group = await worker.client.conversations.newGroup(convosUsernames, {
+      group = (await worker.client.conversations.newGroup(convosUsernames, {
         groupName: `Large Group with ${convosUsernames.length} participants`,
         groupDescription: `Created by ${scriptName} script`,
-      });
-      console.log(`New group created with ID: ${group.id}`);
+      })) as Group;
+      console.log(`New group created with ID: ${group?.id}`);
       console.log(
-        `Add this to your .env file: 200_PERSON_GROUP_ID_${process.env.XMTP_ENV}=${group.id}`,
+        `Add this to your .env file: 200_PERSON_GROUP_ID_${process.env.XMTP_ENV}=${group?.id}`,
       );
     }
 

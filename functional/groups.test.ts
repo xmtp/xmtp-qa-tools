@@ -41,9 +41,9 @@ describe(testName, async () => {
       try {
         const sliced = getInboxIds(i);
         console.log("Creating group with", sliced.length, "participants");
-        groupsBySize[i] = await workers
+        groupsBySize[i] = (await workers
           .getCreator()
-          .client.conversations.newGroup(sliced);
+          .client.conversations.newGroup(sliced)) as Group;
         console.log("Group created", groupsBySize[i].id);
         expect(groupsBySize[i].id).toBeDefined();
       } catch (e: unknown) {

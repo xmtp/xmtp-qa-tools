@@ -161,7 +161,7 @@ export async function createLargeGroup(
     }
 
     await group.send(`Hello from the group with ${memberCount} members`);
-    return group;
+    return group as Group;
   } catch (error) {
     console.error(error);
     throw error;

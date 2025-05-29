@@ -4,7 +4,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Conversation } from "@xmtp/node-sdk";
+import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "dms";
@@ -27,7 +27,7 @@ describe(testName, async () => {
     testName,
     typeofStream.Message,
   );
-  let convo: Conversation;
+  let convo: Dm;
 
   setupTestLifecycle({
     expect,
@@ -35,9 +35,11 @@ describe(testName, async () => {
 
   it("newDm: should measure creating a DM", async () => {
     try {
-      convo = await workers
+      convo = (await workers
         .get("henry")!
-        .client.conversations.newDm(workers.get("randomguy")!.client.inboxId);
+        .client.conversations.newDm(
+          workers.get("randomguy")!.client.inboxId,
+        )) as Dm;
 
       expect(convo).toBeDefined();
       expect(convo.id).toBeDefined();

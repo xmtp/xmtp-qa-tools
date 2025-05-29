@@ -70,7 +70,7 @@ export interface MessageContext {
  * Message handler callback type
  */
 type MessageHandler = (
-  client: Client,
+  client: Client<any>,
   conversation: Conversation,
   message: DecodedMessage,
   messageContext: MessageContext,
@@ -116,7 +116,7 @@ export const initializeClient = async (
    * Core message streaming function with robust error handling
    */
   const streamMessages = async (
-    client: Client,
+    client: Client<any>,
     callBack: MessageHandler,
     options: AgentOptions,
   ): Promise<void> => {
@@ -166,7 +166,7 @@ export const initializeClient = async (
 
             const preMessageHandlerResult = await preMessageHandler(
               client,
-              conversation,
+              conversation as Conversation,
               message,
               isDm,
               options,
@@ -202,7 +202,7 @@ export const initializeClient = async (
 
                 await messageHandler(
                   client,
-                  conversation,
+                  conversation as Conversation,
                   message,
                   messageContext,
                 );
@@ -263,7 +263,7 @@ export const initializeClient = async (
     }
   };
 
-  const clients: Client[] = [];
+  const clients: Client<any>[] = [];
   const streamPromises: Promise<void>[] = [];
 
   for (const option of mergedOptions) {
