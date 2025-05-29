@@ -13,6 +13,7 @@ interface RetryOptions {
   vitestArgs: string[];
   noFail: boolean;
   explicitLogFlag: boolean;
+  verboseLogging: boolean;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -70,6 +71,9 @@ function showUsageAndExit(): never {
     "      --debug / --no-log    Enable/disable logging to file (default: enabled)",
   );
   console.error(
+    "      --debug-verbose     Enable logging to both file AND terminal output",
+  );
+  console.error(
     "      --debug-file <name>   Custom log file name (default: auto-generated)",
   );
   console.error(
@@ -87,6 +91,9 @@ function showUsageAndExit(): never {
   console.error("  yarn cli test ./suites/automated/Gm/gm.test.ts --watch");
   console.error(
     "  yarn cli test functional --max-attempts 2  # Uses retry mode",
+  );
+  console.error(
+    "  yarn cli test functional --debug-verbose   # Shows output in terminal AND logs to file",
   );
   console.error(
     "  yarn cli test functional --no-fail        # Uses retry mode",
@@ -124,6 +131,7 @@ function hasRetryOptions(args: string[]): boolean {
     "--no-log",
     "--debug-file",
     "--no-fail",
+    "--debug-verbose",
   ];
 
   return args.some((arg) => retrySpecificOptions.includes(arg));
@@ -164,6 +172,7 @@ function parseTestArgs(args: string[]): {
     vitestArgs: [],
     noFail: false,
     explicitLogFlag: false,
+    verboseLogging: false,
   };
 
   let currentArgs = [...args];
@@ -203,6 +212,11 @@ function parseTestArgs(args: string[]): {
         options.enableLogging = true;
         options.explicitLogFlag = true;
         break;
+      case "--debug-verbose":
+        options.enableLogging = true;
+        options.explicitLogFlag = true;
+        options.verboseLogging = true;
+        break;
       case "--no-log":
         options.enableLogging = false;
         options.explicitLogFlag = false;
@@ -215,6 +229,9 @@ function parseTestArgs(args: string[]): {
         break;
       case "--no-fail":
         options.noFail = true;
+        break;
+      case "--verbose-logging":
+        options.verboseLogging = true;
         break;
       default:
         options.vitestArgs.push(arg);
@@ -308,6 +325,7 @@ async function runRetryTests(
     enableLogging: options.enableLogging,
     customLogFile: options.customLogFile,
     testName,
+    verboseLogging: options.verboseLogging,
   });
 
   console.log(
@@ -444,13 +462,13 @@ async function main(): Promise<void> {
       }
 
       default: {
-        console.error(`Unknown command type "${commandType}"`);
+        console.error(`Unknown command type: ${commandType}`);
         showUsageAndExit();
       }
     }
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error(`Failed to run command: ${message}`);
+    console.error(`Error executing command: ${message}`);
     process.exit(1);
   }
 }
