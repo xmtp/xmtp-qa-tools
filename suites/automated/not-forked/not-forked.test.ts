@@ -30,7 +30,7 @@ const testConfig = {
   epochs: 3,
   network: "production",
   workerNames: getFixedNames(10),
-  groupId: undefined,
+  groupId: process.env.GROUP_ID || undefined,
   freshInstalls: false, // more installs
 } as const;
 
