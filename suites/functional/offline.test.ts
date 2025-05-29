@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { checkIfGroupForked } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -39,7 +40,7 @@ describe(testName, async () => {
       // Send messages from an online worker
       const conversation =
         await onlineWorker.client.conversations.getConversationById(group.id);
-
+      await checkIfGroupForked(conversation as Group);
       console.log(
         `Sending ${amountofMessages} messages while client is offline`,
       );
@@ -60,6 +61,7 @@ describe(testName, async () => {
       // Verify message recovery
       const recoveredConversation =
         await offlineWorker.client.conversations.getConversationById(group.id);
+      await checkIfGroupForked(recoveredConversation as Group);
       await recoveredConversation?.sync();
       const messages = await recoveredConversation?.messages();
 

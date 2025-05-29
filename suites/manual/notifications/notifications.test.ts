@@ -3,7 +3,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
-import { getManualUsers } from "../../../helpers/tests";
+import { checkIfGroupForked, getManualUsers } from "../../../helpers/tests";
 
 const testName = "notifications";
 loadEnv(testName);
@@ -69,6 +69,8 @@ describe(testName, () => {
           const conversation = await client?.conversations.getConversationById(
             group.id,
           );
+
+          await checkIfGroupForked(conversation as Group);
           if (conversation) {
             for (let i = 0; i < 5; i++) {
               await conversation.send(

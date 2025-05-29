@@ -73,9 +73,7 @@ export class playwright {
     if (!this.page) throw new Error("Page is not initialized");
 
     // Target the second button with the menu popup attribute
-    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
-    await this.page.getByRole("menuitem", { name: "New group" }).click();
-
+    await this.page.goto("https://xmtp.chat/conversations/new-group");
     await this.page.getByRole("button", { name: "Members" }).click();
 
     const addressInput = this.page.getByRole("textbox", { name: "Address" });
@@ -94,15 +92,14 @@ export class playwright {
    */
   public async newDmFromUI(address: string): Promise<void> {
     if (!this.page) throw new Error("Page is not initialized");
-
-    // Target the second button with the menu popup attribute
-    await this.page.locator('button[aria-haspopup="menu"]').nth(0).click();
-    await this.page
-      .getByRole("menuitem", { name: "New direct message" })
-      .click();
+    console.debug("Navigating to new DM");
+    await this.page.goto("https://xmtp.chat/conversations/new-dm");
+    console.debug("Filling address");
     const addressInput = this.page.getByRole("textbox", { name: "Address" });
     await addressInput.waitFor({ state: "visible" });
+    console.debug("Filled address");
     await addressInput.fill(address);
+    console.debug("Clicked create");
     await this.page.getByRole("button", { name: "Create" }).click();
     await addressInput.waitFor({ state: "hidden" });
     return;
@@ -179,7 +176,7 @@ export class playwright {
     });
 
     const context: BrowserContext = await browser.newContext(
-      this.isHeadless ? {} : {},
+      this.isHeadless ? {} : { viewport: { width: 1280, height: 720 } },
     );
 
     const page = await context.newPage();
@@ -194,13 +191,20 @@ export class playwright {
 
     console.debug("Navigating to:", url);
     await page.goto(url);
-
+    console.debug("Navigated to:", url);
     if (!this.defaultUser) {
+      console.debug("Navigating to welcome");
       await page.goto("https://xmtp.chat/welcome");
-      await page.getByRole("button", { name: "Connect" }).click();
-      await page.getByText("Ephemeral wallet").click();
-    }
+      console.debug("Clicked connect");
 
+      // await page.getByRole("button", { name: "Connect" }).click();
+      // console.debug("Clicked ephemeral wallet");
+      // await page.getByText("Ephemeral wallet").click();
+      // console.debug("Clicked ephemeral wallet");
+    }
+    console.debug("Waiting for title");
+    await page.waitForSelector(".mantine-Title-root");
+    console.debug("Navigated to welcome");
     this.page = page;
     this.browser = browser;
     return { browser, page };
