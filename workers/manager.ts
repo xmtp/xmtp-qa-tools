@@ -167,12 +167,11 @@ export class WorkerManager {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
           workersToPrint.push(
-            `${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
           );
         }
       }
 
-      console.info("env", this.env);
       console.debug(JSON.stringify(workersToPrint, null, 2));
     } catch (error) {
       console.error(error);
