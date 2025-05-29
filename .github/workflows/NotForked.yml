@@ -2,11 +2,6 @@ name: Not Forked
 description: "should verify that the code is not forked"
 
 on:
-  pull_request:
-    branches:
-      - main
-  schedule:
-    - cron: "*/15 * * * *"
   workflow_dispatch:
 
 jobs:
