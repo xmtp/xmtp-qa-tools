@@ -5,12 +5,7 @@ import { getAddresses, getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import {
-  Client,
-  IdentifierKind,
-  type Conversation,
-  type Group,
-} from "@xmtp/node-sdk";
+import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "m_performance";
@@ -20,7 +15,7 @@ describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
   console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
-  let dm: Conversation;
+  let dm: Dm | undefined;
   let workers: WorkerManager;
 
   workers = await getWorkers(getFixedNames(10), testName, typeofStream.Message);
@@ -86,10 +81,9 @@ describe(testName, async () => {
   });
   it("newDm: should measure creating a DM", async () => {
     try {
-      dm = await creatorClient.conversations.newDm(
+      dm = (await creatorClient.conversations.newDm(
         workers.getAll()[1].client.inboxId,
-      );
-
+      )) as Dm;
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     } catch (e) {
@@ -117,7 +111,7 @@ describe(testName, async () => {
       // We'll expect this random message to appear in Joe's stream
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      const dmId = await dm.send(message);
+      const dmId = await dm!.send(message);
 
       expect(dmId).toBeDefined();
     } catch (e) {
@@ -128,7 +122,9 @@ describe(testName, async () => {
 
   it("receiveGM: should measure receiving a gm", async () => {
     try {
-      const verifyResult = await verifyMessageStream(dm, [workers.getAll()[1]]);
+      const verifyResult = await verifyMessageStream(dm!, [
+        workers.getAll()[1],
+      ]);
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -137,14 +133,14 @@ describe(testName, async () => {
     }
   });
   let i = 4;
-  let newGroup: Conversation;
+  let newGroup: Group;
   it(`newGroup: should create a large group of ${i} participants ${i}`, async () => {
     try {
       const sliced = getInboxIds(i);
-      newGroup = await creatorClient.conversations.newGroup([
+      newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
         ...workers.getAll().map((w) => w.client.inboxId),
-      ]);
+      ])) as Group;
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     } catch (e) {
@@ -181,9 +177,9 @@ describe(testName, async () => {
   it(`updateGroupName: should update the group name`, async () => {
     try {
       const newName = "Large Group";
-      await (newGroup as Group).updateName(newName);
+      await newGroup.updateName(newName);
       await newGroup.sync();
-      const name = (newGroup as Group).name;
+      const name = newGroup.name;
       expect(name).toBe(newName);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -217,7 +213,7 @@ describe(testName, async () => {
   });
   it(`addMembers: should add members to a group`, async () => {
     try {
-      await (newGroup as Group).addMembers([workers.getAll()[2].inboxId]);
+      await newGroup.addMembers([workers.getAll()[2].inboxId]);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -226,9 +222,9 @@ describe(testName, async () => {
   it(`removeMembers: should remove a participant from a group`, async () => {
     try {
       const previousMembers = await newGroup.members();
-      await (newGroup as Group).removeMembers([
+      await newGroup.removeMembers([
         previousMembers.filter(
-          (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+          (member) => member.inboxId !== newGroup.addedByInboxId,
         )[0].inboxId,
       ]);
 
@@ -241,14 +237,14 @@ describe(testName, async () => {
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {
-    let newGroup: Conversation;
+    let newGroup: Group;
     it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
         const sliced = getInboxIds(i);
-        newGroup = await creatorClient.conversations.newGroup([
+        newGroup = (await creatorClient.conversations.newGroup([
           ...sliced,
           ...workers.getAll().map((w) => w.client.inboxId),
-        ]);
+        ])) as Group;
         expect(newGroup.id).toBeDefined();
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -284,9 +280,9 @@ describe(testName, async () => {
     it(`updateGroupName-${i}: should update the group name`, async () => {
       try {
         const newName = "Large Group";
-        await (newGroup as Group).updateName(newName);
+        await newGroup.updateName(newName);
         await newGroup.sync();
-        const name = (newGroup as Group).name;
+        const name = newGroup.name;
         expect(name).toBe(newName);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -296,9 +292,9 @@ describe(testName, async () => {
     it(`removeMembers-${i}: should remove a participant from a group`, async () => {
       try {
         const previousMembers = await newGroup.members();
-        await (newGroup as Group).removeMembers([
+        await newGroup.removeMembers([
           previousMembers.filter(
-            (member) => member.inboxId !== (newGroup as Group).addedByInboxId,
+            (member) => member.inboxId !== newGroup.addedByInboxId,
           )[0].inboxId,
         ]);
 

@@ -32,7 +32,7 @@ describe(testName, async () => {
         schema: "shortcode",
       };
 
-      await convo.send(reaction, ContentTypeReaction);
+      await convo.send(reaction as unknown as string, ContentTypeReaction);
     } catch (e) {
       expect(e).toBeDefined();
     }

@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { getFixedNames, getInboxIds, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Client, Conversation, Group } from "@xmtp/node-sdk";
+import type { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   createAndSendDms,
@@ -30,13 +30,13 @@ describe(testName, async () => {
   workers = await getWorkers(["bot"], testName);
   let bot: Worker;
   let client: Client;
-  let conversation: Conversation;
+  let conversation: Dm;
 
   beforeAll(async () => {
     try {
       bot = workers.get("bot")!;
       client = bot.client;
-      conversation = await client.conversations.newDm(receiverInboxId);
+      conversation = (await client.conversations.newDm(receiverInboxId)) as Dm;
       workers = await getWorkers(getFixedNames(config.workerCount), testName);
       expect(workers).toBeDefined();
       expect(workers.getAll().length).toBe(config.workerCount);
@@ -106,7 +106,7 @@ export async function createAndSendInGroup(
   client: Client,
   groupCount: number,
   receiverInboxId: string,
-  conversation: Conversation,
+  conversation: Dm,
 ) {
   const allInboxIds = workers.getAllButCreator().map((w) => w.client.inboxId);
   allInboxIds.push(receiverInboxId);
@@ -179,7 +179,7 @@ export async function createLargeGroup(
     }
 
     await group.send(`Hello from the group with ${memberCount} members`);
-    return group;
+    return group as Group;
   } catch (error) {
     console.error(error);
     throw error;
@@ -191,7 +191,7 @@ export async function createLargeGroups(
   workers: WorkerManager,
   client: Client,
   receiverInboxId: string,
-  conversation?: Conversation,
+  conversation?: Dm,
 ) {
   for (const size of config.largeGroups) {
     try {

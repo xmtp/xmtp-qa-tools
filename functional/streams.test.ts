@@ -12,14 +12,14 @@ import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type Conversation, type Group } from "@xmtp/node-sdk";
+import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "streams";
 loadEnv(testName);
 
 describe(testName, async () => {
-  let group: Conversation;
+  let group: Group;
   const names = getFixedNames(5);
   let workers = await getWorkers(names, testName);
 
@@ -35,7 +35,7 @@ describe(testName, async () => {
       group = await workers.createGroup();
 
       const verifyResult = await verifyMembershipStream(
-        group as Group,
+        group,
         workers.getAllButCreator(),
         getInboxIds(1),
       );
@@ -74,7 +74,11 @@ describe(testName, async () => {
       );
 
       // Verify message delivery
-      const verifyResult = await verifyMessageStream(newDm, [receiver], 10);
+      const verifyResult = await verifyMessageStream(
+        newDm as Dm,
+        [receiver],
+        10,
+      );
 
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
@@ -109,7 +113,7 @@ describe(testName, async () => {
       group = await workers.createGroup();
 
       const verifyResult = await verifyMetadataStream(
-        group as Group,
+        group,
         workers.getAllButCreator(),
       );
 
@@ -142,11 +146,13 @@ describe(testName, async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
-      group = await workers.getCreator().client.conversations.newGroup([]);
+      group = (await workers
+        .getCreator()
+        .client.conversations.newGroup([])) as Group;
 
       // Use the dedicated conversation stream verification helper with 80% success threshold
       const verifyResult = await verifyNewConversationStream(
-        group as Group,
+        group,
         workers.getAllButCreator(),
       );
 

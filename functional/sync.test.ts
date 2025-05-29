@@ -34,12 +34,12 @@ describe(testName, async () => {
         memberInboxIds.length,
         "participants",
       );
-      testGroup = await workers
+      testGroup = (await workers
         .get("henry")!
         .client.conversations.newGroup(memberInboxIds, {
           groupName: "Sync Test Group",
           groupDescription: "Group for testing sync methods",
-        });
+        })) as Group;
 
       console.log("Group created", testGroup.id);
       expect(testGroup.id).toBeDefined();

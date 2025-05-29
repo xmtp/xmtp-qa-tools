@@ -33,13 +33,13 @@ describe(testName, async () => {
   });
 
   beforeAll(async () => {
-    group = await workers
+    group = (await workers
       .get("henry")!
       .client.conversations.newGroup([
         workers.get("nancy")!.client.inboxId,
         workers.get("oscar")!.client.inboxId,
         workers.get("jack")!.client.inboxId,
-      ]);
+      ])) as Group;
     console.log("group", group.id);
   });
 

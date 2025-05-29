@@ -6,7 +6,7 @@ import { getAddresses, GM_BOT_ADDRESS } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "gm";
@@ -41,7 +41,7 @@ describe(testName, () => {
           identifier: GM_BOT_ADDRESS,
           identifierKind: IdentifierKind.Ethereum,
         });
-      const result = await verifyMessageStream(conversation, [
+      const result = await verifyMessageStream(conversation as Dm, [
         workers.getCreator(),
       ]);
       expect(result.allReceived).toBe(true);

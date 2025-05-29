@@ -5,14 +5,15 @@ import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "bug_welcome";
+const testName = "bug_kpke";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
+  let conversation: Dm;
 
   beforeAll(async () => {
     workers = await getWorkers(
@@ -31,12 +32,12 @@ describe(testName, () => {
       console.log("syncing all");
       await workers.getCreator().client.conversations.syncAll();
       const targetAddress = "0x6461bf53ddb33b525c84bf60d6bb31fa10828474";
-      const conversation = await workers
+      conversation = (await workers
         .getCreator()
         .client.conversations.newDmWithIdentifier({
           identifier: targetAddress,
           identifierKind: IdentifierKind.Ethereum,
-        });
+        })) as Dm;
       console.log("syncing all");
       await workers.getCreator().client.conversations.syncAll();
       await verifyMessageStream(conversation, [workers.getCreator()], 1);

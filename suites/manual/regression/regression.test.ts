@@ -4,6 +4,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { defaultNames, getInboxIds, sdkVersionOptions } from "@helpers/tests";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "regression";
@@ -25,7 +26,7 @@ describe(testName, () => {
       }
       workers = await getWorkers(allNames, testName, typeofStream.Message);
       const creator = workers.getCreator();
-      const group = await creator.client.conversations.newGroup([]);
+      const group = (await creator.client.conversations.newGroup([])) as Group;
 
       for (const worker of workers.getAllButCreator()) {
         try {

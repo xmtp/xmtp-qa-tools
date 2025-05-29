@@ -5,7 +5,7 @@ import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type Conversation, type Group } from "@xmtp/node-sdk";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
@@ -20,8 +20,7 @@ loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
-
-  let newGroup: Conversation;
+  let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
@@ -52,10 +51,14 @@ describe(testName, async () => {
     it(`receiveMessage-${i}: should create a group and measure all streams`, async () => {
       try {
         const creator = workers.getCreator();
-        newGroup = await creator.client.conversations.newGroup(getInboxIds(i));
-        await (newGroup as Group).addMembers(
-          workers.getAllButCreator().map((worker) => worker.inboxId),
+        newGroup = (await creator.client.conversations.newGroup(
+          getInboxIds(i),
+        )) as Group;
+        await newGroup.sync();
+        await newGroup.addMembers(
+          workers.getAllButCreator().map((worker) => worker.client.inboxId),
         );
+        await newGroup.sync();
         const verifyResult = await verifyMessageStream(
           newGroup,
           workers.getAllButCreator(),

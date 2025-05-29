@@ -198,7 +198,7 @@ export class WorkerManager {
         groupName: groupName,
       },
     );
-    return group;
+    return group as Group;
   }
   getAllBut(excludeName: string): Worker[] {
     const workers = this.getAll();
