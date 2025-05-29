@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { getFixedNames, getInboxIds, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
+import type { Client, Dm, Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   createAndSendDms,

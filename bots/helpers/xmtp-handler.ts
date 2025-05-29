@@ -70,7 +70,7 @@ export interface MessageContext {
  * Message handler callback type
  */
 type MessageHandler = (
-  client: Client,
+  client: Client<any>,
   conversation: Conversation,
   message: DecodedMessage,
   messageContext: MessageContext,
