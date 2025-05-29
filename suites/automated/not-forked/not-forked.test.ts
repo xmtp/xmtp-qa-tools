@@ -7,9 +7,9 @@ import {
 } from "@helpers/streams";
 import {
   appendToEnv,
+  getFixedNames,
   getInboxIds,
   getManualUsers,
-  getMultiVersion,
   removeDataFolder,
 } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -28,7 +28,7 @@ const testConfig = {
   groupName: `NotForked ${getTime()}`,
   epochs: 3,
   network: "production",
-  workerNames: getMultiVersion(2),
+  workerNames: getFixedNames(10),
   groupId: "d7074eaca9fa5b324eb144cf84b0a79e",
   freshInstalls: false, // more installs
 } as const;

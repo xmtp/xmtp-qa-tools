@@ -167,7 +167,7 @@ export class WorkerManager {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
           workersToPrint.push(
-            `${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
           );
         }
       }
