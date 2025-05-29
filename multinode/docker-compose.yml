@@ -1,0 +1,134 @@
+services:
+  node1:
+    image: xmtp/node-go:latest
+    platform: linux/amd64
+    environment:
+      - GOWAKU-NODEKEY=8a30dcb604b0b53627a5adc054dbf434b446628d4bd1eccc681d223f0550ce67
+    command:
+      - --store.enable
+      - --store.db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --store.reader-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --mls-store.db-connection-string=postgres://postgres:xmtp@mlsdb:5432/postgres?sslmode=disable
+      - --mls-validation.grpc-address=validation:50051
+      - --api.enable-mls
+      - --ws
+      - --ws-port=6001
+      - --wait-for-db=30s
+      - --api.authn.enable
+      - --static-node=/dns4/node2/tcp/6001/ws/p2p/16Uiu2HAmPexvM9XDgoac3i3V4PHGHpk11ZoYpNjG5TsuGfeQy79R
+      - --static-node=/dns4/node3/tcp/6001/ws/p2p/16Uiu2HAmRFvBjrt91Xcyi9QVz9mH7G2D1wrDifa3Z2C8azGr3edr
+      - --static-node=/dns4/node4/tcp/6001/ws/p2p/16Uiu2HAmD8P5wpT3nfQauUDiMj9eUpiWU2KrR1ZfVGu7qLjGZVua
+    ports:
+      - 5555:5555
+      - 5556:5556
+    depends_on:
+      - db
+      - mlsdb
+      - validation
+
+  node2:
+    image: xmtp/node-go:latest
+    platform: linux/amd64
+    environment:
+      - GOWAKU-NODEKEY=5757057f3daac3fa80e43a06d24edf15fcaba11eb16ede5fd53b78ba68ef1436
+    command:
+      - --store.enable
+      - --store.db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --store.reader-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --mls-store.db-connection-string=postgres://postgres:xmtp@mlsdb:5432/postgres?sslmode=disable
+      - --mls-validation.grpc-address=validation:50051
+      - --api.enable-mls
+      - --ws
+      - --ws-port=6001
+      - --wait-for-db=30s
+      - --api.authn.enable
+      - --static-node=/dns4/node1/tcp/6001/ws/p2p/16Uiu2HAmNCxLZCkXNbpVPBpSSnHj9iq4HZQj7fxRzw2kj1kKSHHA
+      - --static-node=/dns4/node3/tcp/6001/ws/p2p/16Uiu2HAmRFvBjrt91Xcyi9QVz9mH7G2D1wrDifa3Z2C8azGr3edr
+      - --static-node=/dns4/node4/tcp/6001/ws/p2p/16Uiu2HAmD8P5wpT3nfQauUDiMj9eUpiWU2KrR1ZfVGu7qLjGZVua
+    ports:
+      - 6555:5555
+      - 6556:5556
+    depends_on:
+      - node1
+      - db
+      - mlsdb
+      - validation
+
+  node3:
+    image: xmtp/node-go:latest
+    platform: linux/amd64
+    environment:
+      - GOWAKU-NODEKEY=f643b771ad9e1bc9519d4dc754370c4ff32dd7a9f76f6026b5a6448289212fd7
+    command:
+      - --store.enable
+      - --store.db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --store.reader-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --mls-store.db-connection-string=postgres://postgres:xmtp@mlsdb:5432/postgres?sslmode=disable
+      - --mls-validation.grpc-address=validation:50051
+      - --api.enable-mls
+      - --ws
+      - --ws-port=6001
+      - --wait-for-db=30s
+      - --api.authn.enable
+      - --static-node=/dns4/node1/tcp/6001/ws/p2p/16Uiu2HAmNCxLZCkXNbpVPBpSSnHj9iq4HZQj7fxRzw2kj1kKSHHA
+      - --static-node=/dns4/node2/tcp/6001/ws/p2p/16Uiu2HAmPexvM9XDgoac3i3V4PHGHpk11ZoYpNjG5TsuGfeQy79R
+      - --static-node=/dns4/node4/tcp/6001/ws/p2p/16Uiu2HAmD8P5wpT3nfQauUDiMj9eUpiWU2KrR1ZfVGu7qLjGZVua
+    ports:
+      - 7555:5555
+      - 7556:5556
+    depends_on:
+      - node1
+      - node2
+      - db
+      - mlsdb
+      - validation
+
+  node4:
+    image: xmtp/node-go:latest
+    platform: linux/amd64
+    environment:
+      - GOWAKU-NODEKEY=3ec2707fdd0584ad441fabcfbe928966378f797f929b3293ac8dc6a37206f3da
+    command:
+      - --store.enable
+      - --store.db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --store.reader-db-connection-string=postgres://postgres:xmtp@db:5432/postgres?sslmode=disable
+      - --mls-store.db-connection-string=postgres://postgres:xmtp@mlsdb:5432/postgres?sslmode=disable
+      - --mls-validation.grpc-address=validation:50051
+      - --api.enable-mls
+      - --ws
+      - --ws-port=6001
+      - --wait-for-db=30s
+      - --api.authn.enable
+      - --static-node=/dns4/node1/tcp/6001/ws/p2p/16Uiu2HAmNCxLZCkXNbpVPBpSSnHj9iq4HZQj7fxRzw2kj1kKSHHA
+      - --static-node=/dns4/node2/tcp/6001/ws/p2p/16Uiu2HAmPexvM9XDgoac3i3V4PHGHpk11ZoYpNjG5TsuGfeQy79R
+      - --static-node=/dns4/node3/tcp/6001/ws/p2p/16Uiu2HAmRFvBjrt91Xcyi9QVz9mH7G2D1wrDifa3Z2C8azGr3edr
+    ports:
+      - 8555:5555
+      - 8556:5556
+    depends_on:
+      - node1
+      - node2
+      - node3
+      - db
+      - mlsdb
+      - validation
+
+  validation:
+    image: ghcr.io/xmtp/mls-validation-service:main
+    platform: linux/amd64
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: xmtp
+
+  mlsdb:
+    image: postgres:13
+    environment:
+      POSTGRES_PASSWORD: xmtp
+
+  upload-service:
+    build: ./uploadService
+    ports:
+      - 3000:3000
+
