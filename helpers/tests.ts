@@ -256,9 +256,15 @@ export const checkIfGroupForked = async (
   group: Group | undefined,
 ): Promise<void> => {
   if (!group) throw new Error(`Group not found`);
-  if ((await group.debugInfo()).maybeForked) {
+  const debugInfo = await group.debugInfo();
+  const objectToPrint = {
+    maybeForked: debugInfo.maybeForked,
+    forkDetails: debugInfo.forkDetails,
+    epoch: debugInfo.epoch,
+  };
+  if (debugInfo.maybeForked) {
     console.error("Group may have forked, skipping test");
-    console.error(JSON.stringify(await group.debugInfo(), null, 2));
+    console.error(JSON.stringify(objectToPrint, null, 2));
     throw new Error("Group may have forked");
   }
 };
