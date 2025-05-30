@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { checkIfGroupForked, getFixedNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -101,7 +101,6 @@ describe(testName, async () => {
         const conversation =
           await worker.client.conversations.getConversationById(group.id);
 
-        await checkIfGroupForked(conversation as Group);
         const messages = await conversation?.messages();
         if (!messages) throw new Error("Messages not found");
         const filteredMessages: string[] = [];
@@ -176,7 +175,6 @@ describe(testName, async () => {
       // Send messages from an online worker
       const conversation =
         await onlineWorker.client.conversations.getConversationById(group.id);
-      await checkIfGroupForked(conversation as Group);
       console.log(
         `Sending ${amountofMessages} messages while client is offline`,
       );
@@ -194,7 +192,6 @@ describe(testName, async () => {
 
       const recoveredConversation =
         await offlineWorker.client.conversations.getConversationById(group.id);
-      await checkIfGroupForked(recoveredConversation as Group);
       await recoveredConversation?.sync();
       const messages = await recoveredConversation?.messages();
 

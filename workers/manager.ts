@@ -125,6 +125,21 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
+  public async checkIfGroupForked(groupId: string): Promise<void> {
+    for (const worker of this.getAll()) {
+      const group =
+        await worker.client.conversations.getConversationById(groupId);
+      if (!group) continue;
+      const debugInfo = await group.debugInfo();
+      console.debug(
+        `${worker.name} is on epoch ${debugInfo.epoch} and ${debugInfo.maybeForked}`,
+      );
+      if (debugInfo.maybeForked) {
+        throw new Error("Stopping test, group may have forked");
+      }
+    }
+  }
+
   public async checkInstallations() {
     for (const worker of this.getAll()) {
       const installations = await worker.client.preferences.inboxState();

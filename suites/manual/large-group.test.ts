@@ -1,5 +1,5 @@
 import { loadEnv } from "@helpers/client";
-import { checkIfGroupForked, getInboxIds, sleep } from "@helpers/tests";
+import { getInboxIds, sleep } from "@helpers/tests";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
@@ -95,8 +95,6 @@ async function createOrVerifyGroup(worker: Worker): Promise<Group> {
       group = (await worker.client.conversations.getConversationById(
         GROUP_ID,
       )) as Group;
-
-      await checkIfGroupForked(group);
     }
 
     // If we don't have a group yet, create a new one

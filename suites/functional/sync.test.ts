@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { checkIfGroupForked, sleep } from "@helpers/tests";
+import { sleep } from "@helpers/tests";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -66,7 +66,6 @@ describe(testName, async () => {
       const groupForIvy = (await ivyClient.conversations.getConversationById(
         testGroup.id,
       )) as Group;
-      await checkIfGroupForked(groupForIvy);
       expect(groupForIvy).toBeDefined();
 
       // Ensure the group is properly synced
@@ -100,7 +99,6 @@ describe(testName, async () => {
       const group = await jackClient.conversations.getConversationById(
         testGroup.id,
       );
-      await checkIfGroupForked(group as Group);
       expect(group).toBeDefined();
 
       // Ensure the group is fully synced
@@ -131,7 +129,6 @@ describe(testName, async () => {
       const group = await karenClient.conversations.getConversationById(
         testGroup.id,
       );
-      await checkIfGroupForked(group as Group);
       expect(group).toBeDefined();
 
       // Measure time to sync just this conversation
@@ -168,7 +165,6 @@ describe(testName, async () => {
       const group = await larryClient.conversations.getConversationById(
         testGroup.id,
       );
-      await checkIfGroupForked(group as Group);
       expect(group).toBeDefined();
 
       // Try to retrieve messages without any sync
