@@ -16,27 +16,6 @@ export class DockerContainer {
         this.veth = this.getVeth();
     }
 
-    private sh(cmd: string, expectFailure: boolean = false): string {
-        console.log(`[sh] Executing: ${cmd}`);
-        try {
-            const output = execSync(cmd, { stdio: ['inherit', 'pipe', 'pipe'] }).toString().trim();
-            //console.log(`[sh] Output: ${output}`);
-            return output;
-        } catch (e) {
-            if (expectFailure) {
-                console.log(`[sh] Shell command failed as expected: ${cmd}`);
-                return "";
-            }
-    
-            if (e instanceof Error && 'stderr' in e) {
-                const stderr = (e as any).stderr?.toString().trim();
-                console.error(`[sh] Error output: ${stderr}`);
-            }
-    
-            throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
-        }
-    }
-
     private getIP(): string {
         return this.sh(`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${this.name}`);
     }
@@ -63,6 +42,27 @@ export class DockerContainer {
             return iface;
         } catch (e) {
             throw new Error(`[sh] getVeth() failed for ${this.name}: ${e instanceof Error ? e.message : String(e)}`);
+        }
+    }
+
+    sh(cmd: string, expectFailure: boolean = false): string {
+        console.log(`[sh] Executing: ${cmd}`);
+        try {
+            const output = execSync(cmd, { stdio: ['inherit', 'pipe', 'pipe'] }).toString().trim();
+            //console.log(`[sh] Output: ${output}`);
+            return output;
+        } catch (e) {
+            if (expectFailure) {
+                console.log(`[sh] Shell command failed as expected: ${cmd}`);
+                return "";
+            }
+    
+            if (e instanceof Error && 'stderr' in e) {
+                const stderr = (e as any).stderr?.toString().trim();
+                console.error(`[sh] Error output: ${stderr}`);
+            }
+    
+            throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
         }
     }
 
