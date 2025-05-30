@@ -264,7 +264,14 @@ export const checkIfGroupForked = async (
   };
   if (debugInfo.maybeForked) {
     console.error("Group may have forked, skipping test");
-    console.error(JSON.stringify(objectToPrint, null, 2));
+    console.error(
+      JSON.stringify(
+        objectToPrint,
+        (key: string, value: unknown) =>
+          typeof value === "bigint" ? value.toString() : value,
+        2,
+      ),
+    );
     throw new Error("Group may have forked");
   }
 };
