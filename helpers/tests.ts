@@ -466,6 +466,12 @@ export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+export function getRandomInboxIds(count: number) {
+  return newInboxes
+    .sort(() => Math.random() - 0.5)
+    .slice(0, count)
+    .map((inbox) => inbox.inboxId);
+}
 export function getInboxIds(count: number) {
   return newInboxes.slice(0, count).map((inbox) => inbox.inboxId);
 }
