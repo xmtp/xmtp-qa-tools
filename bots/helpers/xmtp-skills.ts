@@ -6,7 +6,7 @@ import {
 import type { AgentOptions } from "./xmtp-handler";
 
 export const sendWelcomeMessage = async (
-  client: Client<any>,
+  client: Client,
   conversation: Conversation,
   message: string,
 ) => {
@@ -168,7 +168,7 @@ export function shouldProcessMessage(
 }
 
 export const preMessageHandler = async (
-  client: Client<any>,
+  client: Client,
   conversation: Conversation,
   message: DecodedMessage,
   isDm: boolean,
