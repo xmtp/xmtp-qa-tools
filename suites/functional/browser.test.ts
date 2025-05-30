@@ -9,7 +9,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   const xmtpTester = new playwright({
-    headless: false,
+    headless: true,
     env: "production",
   });
 

@@ -220,9 +220,9 @@ export const sdkVersions = {
     Dm: Dm210,
     Group: Group210,
     sdkPackage: "node-sdk-210",
-    bindingsPackage: "node-bindings-120-rc5",
-    sdkVersion: "2.1.0-rc5",
-    libXmtpVersion: "d990224",
+    bindingsPackage: "node-bindings-120",
+    sdkVersion: "2.1.0",
+    libXmtpVersion: "7b9b4d0",
   },
 };
 

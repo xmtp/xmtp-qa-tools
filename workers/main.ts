@@ -463,7 +463,6 @@ export class WorkerClient extends Worker {
 
         console.debug(`GPT response, "${response.slice(0, 50)}..."`);
 
-        // Send the response
         await conversation?.send(response);
       } else {
         await conversation?.send(`${this.nameId} says: gm`);
