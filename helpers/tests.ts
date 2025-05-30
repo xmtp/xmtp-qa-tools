@@ -252,6 +252,7 @@ export const createRandomInstallations = async (
   );
   return worker;
 };
+
 export const checkIfGroupForked = async (
   group: Group | undefined,
 ): Promise<void> => {

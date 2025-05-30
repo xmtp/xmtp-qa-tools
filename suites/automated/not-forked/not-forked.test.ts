@@ -12,7 +12,6 @@ import {
   getManualUsers,
   getRandomInboxIds,
   removeDataFolder,
-  sleep,
 } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -29,7 +28,6 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `NotForked ${getTime()}`,
   epochs: 3,
-  totalTests: 20,
   network: "production",
   workerNames: getFixedNames(10),
   groupId: process.env.GROUP_ID || undefined,
@@ -141,89 +139,109 @@ describe(TEST_NAME, () => {
     }
   });
 
-  for (let i = 0; i < testConfig.totalTests; i++) {
-    it(`should verify fork-free message delivery ${i}`, async () => {
-      try {
-        await sleep(600); // wait 600 seconds between tests ( 10 minutes  )
-        const debugInfo = await globalGroup.debugInfo();
-        // Send initial test message
-        await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
-        await globalGroup.updateName(
-          testConfig.groupName + `-${i}:${debugInfo.epoch}`,
-        );
-        await verifyMessageStream(
-          globalGroup,
-          workers.getAllBut("bot"),
-          1,
-          `Verification from epoch ${debugInfo.epoch}: Hi ${workers
-            .getAllBut("bot")
-            .map((w) => w.name)
-            .join(", ")}`,
-        );
-        await verifyMembershipStream(
-          globalGroup,
-          workers.getAllBut("bot"),
-          getRandomInboxIds(1),
-        );
-        // Perform multiple cycles of membership changes
-        await testMembershipChanges(
-          workers,
-          getRandomInboxIds(1),
-          globalGroup.id,
-        );
-        await verifyMetadataStream(
-          globalGroup,
-          workers.getAllBut("bot"),
-          1,
-          testConfig.groupName,
-        );
-        await verifyMessageStream(
-          globalGroup,
-          workers.getAllBut("bot"),
-          1,
-          `Verification from epoch ${debugInfo.epoch}: Hi ${workers
-            .getAllBut("bot")
-            .map((w) => w.name)
-            .join(", ")}`,
-        );
-      } catch (error: unknown) {
-        logError(error, expect.getState().currentTestName);
-        throw error;
-      }
-    });
-  }
+  it(`should verify fork-free message delivery`, async () => {
+    try {
+      const debugInfo = await globalGroup.debugInfo();
+      // Send initial test message
+      await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      await globalGroup.updateName(
+        testConfig.groupName + ` epoch:${debugInfo.epoch}`,
+      );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      await verifyMessageStream(
+        globalGroup,
+        workers.getAllBut("bot"),
+        1,
+        `Verification from epoch ${debugInfo.epoch}: Hi ${workers
+          .getAllBut("bot")
+          .map((w) => w.name)
+          .join(", ")}`,
+      );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      await verifyMembershipStream(
+        globalGroup,
+        workers.getAllBut("bot"),
+        getRandomInboxIds(1),
+      );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      // Perform multiple cycles of membership changes
+      await testMembershipChanges(workers, globalGroup.id);
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      await verifyMetadataStream(
+        globalGroup,
+        workers.getAllBut("bot"),
+        1,
+        testConfig.groupName,
+      );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+      await verifyMessageStream(
+        globalGroup,
+        workers.getAllBut("bot"),
+        1,
+        `Verification from epoch ${debugInfo.epoch}: Hi ${workers
+          .getAllBut("bot")
+          .map((w) => w.name)
+          .join(", ")}`,
+      );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
+    } catch (error: unknown) {
+      logError(error, expect.getState().currentTestName);
+      throw error;
+    }
+  });
 });
 
 export async function testMembershipChanges(
   workers: WorkerManager,
-  members: string[],
   groupId: string,
 ): Promise<void> {
-  const cantAdmins = 4;
   const cantCylcesPerAdmin = testConfig.epochs;
-  for (const admin of workers.getAllBut("bot").slice(0, cantAdmins)) {
-    const group = (await admin.client.conversations.getConversationById(
+  for (let i = 0; i < cantCylcesPerAdmin; i++) {
+    const randomAdmin =
+      workers.getAllBut("bot")[
+        Math.floor(Math.random() * workers.getAllBut("bot").length)
+      ];
+    const group = (await randomAdmin.client.conversations.getConversationById(
       groupId,
     )) as Group;
+
     await checkIfGroupForked(group);
 
-    const memberInboxId = members[0];
-
-    for (let i = 0; i <= cantCylcesPerAdmin; i++) {
+    for (const member of getRandomInboxIds(5)) {
       try {
-        // Get current members to check if target exists
-        const members = await group.members();
-        const memberExists = members.some(
-          (m) => m.inboxId.toLowerCase() === memberInboxId.toLowerCase(),
-        );
-
-        if (memberExists) await group.removeMembers([memberInboxId]);
-        await group.addMembers([memberInboxId]);
-        console.log(`Cycle ${i}: Membership update: ${admin.name}`);
+        await group.removeMembers([member]);
+        await group.addMembers([member]);
+        console.log(`Membership update: ${member}`);
         await group.sync();
       } catch (e) {
         console.error(`Error in membership cycle ${i}:`, e);
       }
     }
   }
+}
+
+export async function checkEpochs(
+  workers: WorkerManager,
+  groupId: string,
+  creatorEpoch: bigint,
+): Promise<void> {
+  let result = [];
+  for (const worker of workers.getAllBut("bot")) {
+    const group = (await worker.client.conversations.getConversationById(
+      groupId,
+    )) as Group;
+    const debugInfo = await group.debugInfo();
+    result.push({
+      name: worker.name,
+      epoch: debugInfo.epoch,
+      creatorEpoch,
+    });
+    if (debugInfo.epoch !== creatorEpoch) {
+      throw new Error(
+        `Epoch mismatch for ${worker.name}: ${debugInfo.epoch} !== ${creatorEpoch}`,
+      );
+    }
+  }
+  console.log(JSON.stringify(result, null, 2));
 }
