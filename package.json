@@ -14,6 +14,7 @@
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
     "format": "prettier -w .",
+    "functional": "yarn test suites/functional",
     "gen": "tsx scripts/gen.ts",
     "gen:keys": "tsx scripts/gen.ts",
     "large": "yarn test suites/large",
