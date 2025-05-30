@@ -254,26 +254,17 @@ export const createRandomInstallations = async (
 };
 
 export const checkIfGroupForked = async (
-  group: Group | undefined,
+  workers: WorkerManager,
+  groupId: string,
 ): Promise<void> => {
-  if (!group) throw new Error(`Group not found`);
+  const worker = workers.getRandomWorkers(1)[0];
+  const group = await worker.client.conversations.getConversationById(groupId);
+  if (!group) throw new Error(`Group ${groupId} not found`);
   const debugInfo = await group.debugInfo();
 
   if (debugInfo.maybeForked) {
-    const objectToPrint = {
-      maybeForked: debugInfo.maybeForked,
-      forkDetails: debugInfo.forkDetails,
-      epoch: debugInfo.epoch,
-    };
-    console.error(
-      JSON.stringify(
-        objectToPrint,
-        (key: string, value: unknown) =>
-          typeof value === "bigint" ? value.toString() : value,
-        2,
-      ),
-    );
-    throw new Error("Stopping test, group may have forked");
+    console.error(`Group ${groupId} may have forked`);
+    throw new Error(`Group ${groupId} may have forked`);
   }
 };
 
@@ -395,31 +386,6 @@ export const randomReinstall = async (
   const worker = workers.getRandomWorkers(1)[0];
   console.debug(`[${worker.name}] Reinstalling worker`);
   await worker.worker?.reinstall();
-};
-
-/**
- * Performs random syncs on workers
- */
-export const randomSyncs = async (testConfig: {
-  workers: WorkerManager;
-  groupId: string;
-}): Promise<void> => {
-  const { workers, groupId } = testConfig;
-
-  for (const worker of workers.getAll()) {
-    const syncType = Math.floor(Math.random() * 3); // 0: sync, 1: syncAll, 2: group sync
-
-    if (syncType === 0) {
-      await worker.client.conversations.sync();
-    } else if (syncType === 1) {
-      await worker.client.conversations.syncAll();
-    } else {
-      const group =
-        await worker.client.conversations.getConversationById(groupId);
-      await checkIfGroupForked(group as Group);
-      await group?.sync();
-    }
-  }
 };
 
 /**

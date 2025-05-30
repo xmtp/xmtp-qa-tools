@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { checkIfGroupForked, getFixedNames, sleep } from "@helpers/tests";
+import { getFixedNames, sleep } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -43,7 +43,6 @@ describe(testName, async () => {
           await worker.client.conversations.syncAll();
           const conversation =
             await worker.client.conversations.getConversationById(group.id);
-          await checkIfGroupForked(conversation as Group);
           const messages = await conversation?.messages();
           if (!messages) throw new Error("Messages not found");
           return messages

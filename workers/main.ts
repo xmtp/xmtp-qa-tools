@@ -2,13 +2,12 @@ import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
-import { checkIfGroupForked, defaultValues } from "@helpers/tests";
+import { defaultValues } from "@helpers/tests";
 import {
   ConsentState,
   Dm,
   type Client,
   type DecodedMessage,
-  type Group,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import "dotenv/config";
@@ -432,7 +431,6 @@ export class WorkerClient extends Worker {
         message.conversationId,
       );
       if (!conversation) return;
-      await checkIfGroupForked(conversation as Group);
       const baseName = this.name.split("-")[0].toLowerCase();
       const isDm = conversation instanceof Dm;
       const content = (message.content as string).toLowerCase();
