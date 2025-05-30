@@ -257,13 +257,13 @@ export const checkIfGroupForked = async (
 ): Promise<void> => {
   if (!group) throw new Error(`Group not found`);
   const debugInfo = await group.debugInfo();
-  const objectToPrint = {
-    maybeForked: debugInfo.maybeForked,
-    forkDetails: debugInfo.forkDetails,
-    epoch: debugInfo.epoch,
-  };
+
   if (debugInfo.maybeForked) {
-    console.error("Group may have forked, skipping test");
+    const objectToPrint = {
+      maybeForked: debugInfo.maybeForked,
+      forkDetails: debugInfo.forkDetails,
+      epoch: debugInfo.epoch,
+    };
     console.error(
       JSON.stringify(
         objectToPrint,
@@ -272,7 +272,7 @@ export const checkIfGroupForked = async (
         2,
       ),
     );
-    throw new Error("Group may have forked");
+    throw new Error("Stopping test, group may have forked");
   }
 };
 

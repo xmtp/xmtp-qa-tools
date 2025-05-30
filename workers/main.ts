@@ -465,7 +465,10 @@ export class WorkerClient extends Worker {
 
         await conversation?.send(response);
       } else {
-        await conversation?.send(`${this.nameId} says: gm`);
+        const debugInfo = await conversation?.debugInfo();
+        await conversation?.send(
+          `${this.nameId} says: gm from epoch ${debugInfo?.epoch}`,
+        );
       }
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
