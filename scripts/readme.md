@@ -4,11 +4,12 @@ This document provides practical instructions for using the scripts in the `/scr
 
 ## Quick reference
 
-| Script          | Purpose                           | Key Features                         |
-| --------------- | --------------------------------- | ------------------------------------ |
-| **gen.ts**      | Creates XMTP client installations | Multiple client installation creator |
-| **cli.ts**      | General-purpose task runner       | Configurable operations              |
-| **versions.ts** | Manages SDK versions              | XMTP SDK version management/symlinks |
+| Script            | Purpose                            | Key Features                         |
+| ----------------- | ---------------------------------- | ------------------------------------ |
+| **gen.ts**        | Creates XMTP client installations  | Multiple client installation creator |
+| **cli.ts**        | General-purpose task runner        | Configurable operations              |
+| **parse-ansi.ts** | Parses ANSI escape codes from logs | Removes ANSI escape codes from logs  |
+| **versions.ts**   | Manages SDK versions               | XMTP SDK version management/symlinks |
 
 ## Usage
 
