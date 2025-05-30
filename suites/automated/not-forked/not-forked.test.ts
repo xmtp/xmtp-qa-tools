@@ -144,9 +144,11 @@ describe(TEST_NAME, () => {
       const debugInfo = await globalGroup.debugInfo();
       // Send initial test message
       await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       await globalGroup.updateName(
         testConfig.groupName + ` epoch:${debugInfo.epoch}`,
       );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       await verifyMessageStream(
         globalGroup,
         workers.getAllBut("bot"),
@@ -156,19 +158,23 @@ describe(TEST_NAME, () => {
           .map((w) => w.name)
           .join(", ")}`,
       );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       await verifyMembershipStream(
         globalGroup,
         workers.getAllBut("bot"),
         getRandomInboxIds(1),
       );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       // Perform multiple cycles of membership changes
       await testMembershipChanges(workers, globalGroup.id);
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       await verifyMetadataStream(
         globalGroup,
         workers.getAllBut("bot"),
         1,
         testConfig.groupName,
       );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
       await verifyMessageStream(
         globalGroup,
         workers.getAllBut("bot"),
@@ -178,6 +184,7 @@ describe(TEST_NAME, () => {
           .map((w) => w.name)
           .join(", ")}`,
       );
+      await checkEpochs(workers, globalGroup.id, debugInfo.epoch);
     } catch (error: unknown) {
       logError(error, expect.getState().currentTestName);
       throw error;
@@ -212,4 +219,29 @@ export async function testMembershipChanges(
       }
     }
   }
+}
+
+export async function checkEpochs(
+  workers: WorkerManager,
+  groupId: string,
+  creatorEpoch: bigint,
+): Promise<void> {
+  let result = [];
+  for (const worker of workers.getAllBut("bot")) {
+    const group = (await worker.client.conversations.getConversationById(
+      groupId,
+    )) as Group;
+    const debugInfo = await group.debugInfo();
+    result.push({
+      name: worker.name,
+      epoch: debugInfo.epoch,
+      creatorEpoch,
+    });
+    if (debugInfo.epoch !== creatorEpoch) {
+      throw new Error(
+        `Epoch mismatch for ${worker.name}: ${debugInfo.epoch} !== ${creatorEpoch}`,
+      );
+    }
+  }
+  console.log(JSON.stringify(result, null, 2));
 }
