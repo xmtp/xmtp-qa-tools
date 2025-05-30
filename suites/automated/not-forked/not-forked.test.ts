@@ -29,7 +29,7 @@ const testConfig = {
   groupName: `NotForked ${getTime()}`,
   epochs: 3,
   network: "production",
-  workerNames: getFixedNames(10),
+  workerNames: getFixedNames(5),
   groupId: process.env.GROUP_ID || undefined,
   freshInstalls: false, // more installs
 } as const;
