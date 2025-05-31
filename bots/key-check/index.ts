@@ -11,7 +11,7 @@ import { validateEnvironment } from "../helpers/client";
 import { initializeClient } from "../helpers/xmtp-handler";
 import type { MessageContext } from "../helpers/xmtp-skills";
 
-const { WALLET_KEY, ENCRYPTION_KEY, XMTP_ENV } = validateEnvironment([
+const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
   "WALLET_KEY",
   "ENCRYPTION_KEY",
   "XMTP_ENV",
@@ -55,8 +55,7 @@ const processMessage = async (
       "/kc version - Show XMTP SDK version information\n" +
       "/kc uptime - Show when the bot started and how long it has been running\n" +
       "/kc debug - Show debug information for the key-check bot\n" +
-      "/kc help - Show this help message\n" +
-      "Note: You can use /kc as a shorthand for all commands (e.g., /kc help)";
+      "/kc help - Show this help message";
 
     await conversation.send(helpText);
     console.log("Sent help information");
