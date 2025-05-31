@@ -82,7 +82,7 @@ export class DockerContainer {
             if (expectFailure) {
                 console.log("[iptables] Ping failed as expected");
             } else {
-                console.error(`[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : e}`);
+                console.error(`[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`);
             }
         }
     }

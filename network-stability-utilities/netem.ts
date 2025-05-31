@@ -1,7 +1,7 @@
 import type { DockerContainer } from "./container";
 
-export class Netem {
-    static applyLatency(container: DockerContainer, latencyMs: number): void {
+export namespace Netem {
+    export function applyLatency(container: DockerContainer, latencyMs: number): void {
         console.log(`[netem] Clearing any existing qdisc on ${container.veth} (ok if none exists)...`);
         container.sh(`sudo tc qdisc del dev ${container.veth} root`, true);
 
@@ -9,23 +9,23 @@ export class Netem {
         container.sh(`sudo tc qdisc add dev ${container.veth} root netem delay ${latencyMs}ms`);
     }
 
-    static applyJitter(container: DockerContainer, delay: number, jitter: number): void {
-        Netem.clear(container);
+    export function applyJitter(container: DockerContainer, delay: number, jitter: number): void {
+        clear(container);
         container.sh(`sudo tc qdisc add dev ${container.veth} root netem delay ${delay}ms ${jitter}ms`);
     }
 
-    static applyLoss(container: DockerContainer, percent: number): void {
-        Netem.clear(container);
+    export function applyLoss(container: DockerContainer, percent: number): void {
+        clear(container);
         container.sh(`sudo tc qdisc add dev ${container.veth} root netem loss ${percent}%`);
     }
 
-    static clear(container: DockerContainer): void {
+    export function clear(container: DockerContainer): void {
         console.log(`[netem] Clearing latency from ${container.veth} (ok if already cleared)...`);
         container.sh(`sudo tc qdisc del dev ${container.veth} root`, true);
     }
 
-    static applyBidirectionalLatency(a: DockerContainer, b: DockerContainer, ms: number): void {
-        Netem.applyLatency(a, ms);
-        Netem.applyLatency(b, ms);
+    export function applyBidirectionalLatency(a: DockerContainer, b: DockerContainer, ms: number): void {
+        applyLatency(a, ms);
+        applyLatency(b, ms);
     }
 }
