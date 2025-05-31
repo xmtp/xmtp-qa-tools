@@ -1,6 +1,6 @@
 import { execSync, execFileSync } from "child_process";
-import { Netem } from "./netem";
-import { Iptables } from "./iptables";
+import * as Netem from "./netem";
+import * as Iptables from "./iptables";
 
 export class DockerContainer {
     name: string;
@@ -40,40 +40,37 @@ export class DockerContainer {
 
             const iface = vethLine.split(":")[1].trim().split("@")[0];
             return iface;
-        } catch (e) {
-            throw new Error(`[sh] getVeth() failed for ${this.name}: ${e instanceof Error ? e.message : String(e)}`);
+        } catch (err) {
+            throw new Error(`[sh] getVeth() failed for ${this.name}: ${err instanceof Error ? err.message : String(err)}`);
         }
     }
 
-    sh(cmd: string, expectFailure: boolean = false): string {
+    sh(cmd: string, expectFailure = false): string {
         console.log(`[sh] Executing: ${cmd}`);
         try {
-            const output = execSync(cmd, { stdio: ['inherit', 'pipe', 'pipe'] }).toString().trim();
+            const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] }).toString().trim();
             return output;
-        } catch (e) {
+        } catch (e: unknown) {
             if (expectFailure) {
                 console.log(`[sh] Shell command failed as expected: ${cmd}`);
                 return "";
             }
-            if (e instanceof Error && "stderr" in e) {
-                const stderr = (e as any).stderr?.toString().trim();
-                console.error(`[sh] Error output: ${stderr}`);
-            }
+
+            const stderr = (e as { stderr?: Buffer }).stderr?.toString().trim();
+            if (stderr) console.error(`[sh] Error output: ${stderr}`);
             throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
         }
     }
 
-    ping(target: DockerContainer, count: number = 3, expectFailure: boolean = false): void {
+    ping(target: DockerContainer, count = 3, expectFailure = false): void {
         console.log(`[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`);
         try {
-            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, {
-                stdio: "pipe"
-            }).toString();
+            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, { stdio: "pipe" }).toString();
             const summary = output.split("\n").find(line => line.includes("rtt") || line.includes("round-trip"));
             console.log(`[sh] ${summary || output}`);
-        } catch (e) {
+        } catch (e: unknown) {
             if (expectFailure) {
-                console.log(`[iptables] Ping failed as expected`);
+                console.log("[iptables] Ping failed as expected");
             } else {
                 console.error(`[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : e}`);
             }
@@ -147,7 +144,7 @@ export class DockerContainer {
 
     static listByNamePrefix(prefix: string): DockerContainer[] {
         const output = execSync(
-            `docker ps --format "{{.Names}}" | grep ^${prefix} || true`
+            `docker ps --format "{{.Names}}" | grep ^${String(prefix)} || true`
         ).toString().trim();
         if (!output) return [];
         return output.split("\n").map(name => new DockerContainer(name));

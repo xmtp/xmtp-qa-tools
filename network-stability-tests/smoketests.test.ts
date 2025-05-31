@@ -6,7 +6,7 @@ describe("Basic Network Fault Tests", () => {
     const node2 = new DockerContainer("multinode-node2-1");
     const node4 = new DockerContainer("multinode-node4-1");
 
-    it("should add and remove 200ms latency between node1 and node2", async () => {
+    it("should add and remove 200ms latency between node1 and node2", () => {
         console.log("[netem] Clearing existing qdisc (ok if already absent)...");
         node1.clearLatency();
 
