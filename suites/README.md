@@ -17,11 +17,11 @@ This directory contains six main categories of test suites:
 
 Tests that run automatically on CI/CD pipelines to monitor production systems.
 
-| Test Suite                                | Purpose                                             | Documentation                                 |
-| ----------------------------------------- | --------------------------------------------------- | --------------------------------------------- |
-| **[agents](./automated/agents/)**         | Health monitoring of production XMTP agents         | [README.md](./automated/agents/README.md)     |
-| **[gm](./automated/gm/)**                 | Validation of GM bot and browser integration        | [README.md](./automated/gm/README.md)         |
-| **[not-forked](./automated/not-forked/)** | Group membership and message forking stress testing | [README.md](./automated/not-forked/README.md) |
+| Test Suite                        | Purpose                                             | Documentation                             |
+| --------------------------------- | --------------------------------------------------- | ----------------------------------------- |
+| **[agents](./automated/agents/)** | Health monitoring of production XMTP agents         | [README.md](./automated/agents/README.md) |
+| **[gm](./automated/gm/)**         | Validation of GM bot and browser integration        | [README.md](./automated/gm/README.md)     |
+| **[group ](./automated/group/)**  | Group membership and message forking stress testing | [README.md](./automated/group/README.md)  |
 
 ## ⚙️ Functional Test Suites
 

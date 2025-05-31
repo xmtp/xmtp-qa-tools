@@ -253,21 +253,6 @@ export const createRandomInstallations = async (
   return worker;
 };
 
-export const checkIfGroupForked = async (
-  workers: WorkerManager,
-  groupId: string,
-): Promise<void> => {
-  const worker = workers.getRandomWorkers(1)[0];
-  const group = await worker.client.conversations.getConversationById(groupId);
-  if (!group) throw new Error(`Group ${groupId} not found`);
-  const debugInfo = await group.debugInfo();
-
-  if (debugInfo.maybeForked) {
-    console.error(`Group ${groupId} may have forked`);
-    throw new Error(`Group ${groupId} may have forked`);
-  }
-};
-
 /**
  * Gets a random version from the versions array
  */

@@ -46,5 +46,5 @@ GROUP_ID=""
 ## Test Execution
 
 ```bash
-yarn test not-forked
+yarn test group
 ```

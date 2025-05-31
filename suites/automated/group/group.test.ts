@@ -18,17 +18,13 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
-// ============================================================
-// Test Configuration
-// ============================================================
-
-const TEST_NAME = "not-forked";
+const TEST_NAME = "group";
 const testConfig = {
   testName: TEST_NAME,
-  groupName: `NotForked ${getTime()}`,
+  groupName: `Group ${getTime()}`,
   epochs: 3,
   network: "production",
-  workerNames: getFixedNames(10),
+  workerNames: getFixedNames(40),
   groupId: process.env.GROUP_ID || undefined,
   freshInstalls: false, // more installs
 } as const;
@@ -205,7 +201,7 @@ export async function testMembershipChanges(
       groupId,
     )) as Group;
 
-    for (const member of getRandomInboxIds(5)) {
+    for (const member of getRandomInboxIds(6)) {
       try {
         await group.removeMembers([member]);
         await group.addMembers([member]);
