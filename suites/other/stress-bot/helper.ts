@@ -1,4 +1,4 @@
-import { getInboxIds, sleep } from "@helpers/tests";
+import { getInboxIds, sleep } from "@helpers/utils";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
 

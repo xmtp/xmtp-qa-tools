@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getFixedNames, getInboxIds, sleep } from "@helpers/tests";
+import { getFixedNames, getInboxIds, sleep } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Dm, Group } from "@xmtp/node-sdk";

@@ -19,7 +19,6 @@ jobs:
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       BATCH_SIZE: 50
       MAX_GROUP_SIZE: 200
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:

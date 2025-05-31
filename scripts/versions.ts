@@ -1,7 +1,7 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { sdkVersions } from "@helpers/tests";
+import { sdkVersions } from "@helpers/utils";
 import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 
 type VersionConfig = (typeof sdkVersions)[keyof typeof sdkVersions];

@@ -15,7 +15,7 @@ import { privateKeyToAccount } from "viem/accounts";
 import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
-import { sdkVersions } from "./tests";
+import { sdkVersions } from "./utils";
 
 interface User {
   key: `0x${string}`;

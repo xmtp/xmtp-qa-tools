@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { defaultNames, getInboxIds, sdkVersionOptions } from "@helpers/tests";
+import { defaultNames, getInboxIds, sdkVersionOptions } from "@helpers/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";

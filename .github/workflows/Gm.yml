@@ -21,7 +21,6 @@ jobs:
       GM_BOT_ADDRESS: "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0"
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:

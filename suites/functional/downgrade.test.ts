@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getInboxIds, sdkVersionOptions } from "@helpers/tests";
+import { getInboxIds, sdkVersionOptions } from "@helpers/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 

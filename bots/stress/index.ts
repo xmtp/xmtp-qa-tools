@@ -1,5 +1,5 @@
 import { initializeClient } from "@bots/xmtp-handler";
-import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/tests";
+import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -13,7 +13,7 @@ import {
   createLargeGroups,
   TEST_CONFIGS,
   type StressTestConfig,
-} from "suites/manual/stress-bot/helper";
+} from "suites/other/stress-bot/helper";
 
 let workersDev: WorkerManager;
 let workersProd: WorkerManager;

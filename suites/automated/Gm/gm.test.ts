@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { verifyMessageStream } from "@helpers/streams";
-import { getAddresses, GM_BOT_ADDRESS } from "@helpers/tests";
+import { getAddresses, GM_BOT_ADDRESS } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";

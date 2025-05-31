@@ -2,6 +2,92 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 
+/**
+ * Remove ANSI escape codes from text
+ * This regex matches all ANSI escape sequences including:
+ * - Color codes (\x1b[31m, \x1b[0m, etc.)
+ * - Cursor movement codes
+ * - Other terminal control sequences
+ */
+export function stripAnsi(text: string): string {
+  // ANSI escape code regex pattern
+  // eslint-disable-next-line no-control-regex
+  const ansiRegex = /\x1b\[[0-9;]*[a-zA-Z]/g;
+
+  // Also handle some common ANSI sequences that might be encoded differently
+  // eslint-disable-next-line no-control-regex
+  const ansiRegex2 = /\u001b\[[0-9;]*[a-zA-Z]/g;
+
+  return (
+    text
+      .replace(ansiRegex, "")
+      .replace(ansiRegex2, "")
+      // Remove any remaining control characters
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f-\x9f]/g, (char) => {
+        // Keep newlines, tabs, and carriage returns
+        if (char === "\n" || char === "\t" || char === "\r") {
+          return char;
+        }
+        return "";
+      })
+  );
+}
+
+/**
+ * Process a single log file to remove ANSI codes
+ */
+export async function processLogFile(
+  inputPath: string,
+  outputPath: string,
+): Promise<void> {
+  const content = await fs.promises.readFile(inputPath, "utf-8");
+  const cleanedContent = stripAnsi(content);
+  await fs.promises.writeFile(outputPath, cleanedContent, "utf-8");
+}
+
+/**
+ * Clean all raw-parse-*.log files by removing ANSI codes
+ */
+export async function cleanAllRawLogs(): Promise<void> {
+  const logsDir = path.join(process.cwd(), "logs");
+  const outputDir = path.join(logsDir, "cleaned");
+
+  if (!fs.existsSync(logsDir)) {
+    console.log("No logs directory found");
+    return;
+  }
+
+  if (!fs.existsSync(outputDir)) {
+    await fs.promises.mkdir(outputDir, { recursive: true });
+  }
+
+  const files = await fs.promises.readdir(logsDir);
+  const rawLogFiles = files.filter(
+    (file) => file.startsWith("raw-parse-") && file.endsWith(".log"),
+  );
+
+  if (rawLogFiles.length === 0) {
+    console.log("No raw-parse-*.log files found to clean");
+    return;
+  }
+
+  console.log(`Found ${rawLogFiles.length} raw log files to clean`);
+
+  for (const file of rawLogFiles) {
+    const inputPath = path.join(logsDir, file);
+    const outputFileName = file.replace("raw-parse-", "cleaned-parse-");
+    const outputPath = path.join(outputDir, outputFileName);
+
+    try {
+      await processLogFile(inputPath, outputPath);
+      console.log(`Cleaned: ${file} -> ${outputFileName}`);
+    } catch (error) {
+      console.error(`Failed to clean ${file}:`, error);
+    }
+  }
+}
+
 // Create a simple logger that formats logs in a pretty way
 export const createLogger = () => {
   // Format timestamp to match [YYYY-MM-DDThh:mm:ss.sssZ]
@@ -190,12 +276,9 @@ export function extractErrorLogs(testName: string): string {
           /forked/.test(line) ||
           /Message cursor/.test(line)
         ) {
-          //remove ansi codes
-          const ansiRegex = new RegExp(
-            `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,
-            "g",
-          );
-          let cleanLine = line.replace(ansiRegex, "");
+          // Use the comprehensive stripAnsi function instead of simple regex
+          let cleanLine = stripAnsi(line);
+
           if (cleanLine.includes("ERROR")) {
             cleanLine = cleanLine.split("ERROR")[1].trim();
           }
@@ -221,6 +304,7 @@ export function extractErrorLogs(testName: string): string {
 
   return "";
 }
+
 export const createTestLogger = (options: TestLogOptions) => {
   let logStream: fs.WriteStream | undefined;
   // Extract clean test name for log file (remove path and extension)
