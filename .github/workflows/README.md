@@ -118,7 +118,6 @@ Workflows are configured using GitHub repository secrets and variables:
 ### Secrets
 
 - `DATADOG_API_KEY`: API key for metrics reporting
-- `OPENAI_API_KEY`: OpenAI API key for AI-powered testing
 - `SLACK_BOT_TOKEN`: Slack bot token for notifications
 - `WALLET_KEY`: XMTP wallet private key for testing
 - `ENCRYPTION_KEY`: XMTP encryption key for database

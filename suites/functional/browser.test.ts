@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import { getInboxIds, GM_BOT_ADDRESS } from "@helpers/tests";
+import { getInboxIds, GM_BOT_ADDRESS } from "@helpers/utils";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";

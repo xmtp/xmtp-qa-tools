@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { sleep } from "@helpers/tests";
+import { sleep } from "@helpers/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";

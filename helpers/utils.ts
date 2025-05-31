@@ -2,7 +2,7 @@ import fs from "fs";
 import path from "path";
 import newInboxes from "@helpers/inboxes.json";
 import type { Worker, WorkerManager } from "@workers/manager";
-import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import { type Conversation } from "@xmtp/node-sdk";
 import {
   Client as Client47,
   Conversation as Conversation47,
@@ -259,31 +259,6 @@ export const createRandomInstallations = async (
 export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
 
-/**
- * Randomly assigns admin privileges to a group member
- */
-export const randomlyAsignAdmins = async (group: Group): Promise<void> => {
-  await group.sync();
-  const members = await group.members();
-
-  if (members.length === 0) return;
-
-  const randomMember = members[Math.floor(Math.random() * members.length)];
-  const isSuperAdmin = Math.random() > 0.5;
-
-  try {
-    if (isSuperAdmin) {
-      await group.addSuperAdmin(randomMember.inboxId);
-      console.debug(`Added ${randomMember.inboxId} as super admin`);
-    } else {
-      await group.addAdmin(randomMember.inboxId);
-      console.debug(`Added ${randomMember.inboxId} as admin`);
-    }
-  } catch (error) {
-    console.error("Error assigning admin:", error);
-  }
-};
-
 // Helper function to parse .env file content
 const parseEnvFile = (content: string): Record<string, string> => {
   return content
@@ -394,23 +369,7 @@ export const getManualUsers = (filterBy: string[] = []) =>
   manualUsers.filter(
     (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
   );
-/**
- * Sends an initial test message to the bot
- */
-export const sendInitialTestMessage = async (client: Client): Promise<void> => {
-  try {
-    const recipients = [process.env.CONVOS_USER, process.env.CB_USER];
 
-    for (const recipient of recipients) {
-      if (!recipient) continue;
-      const dm = await client.conversations.newDm(recipient);
-      await dm.send("gm from bot");
-      console.debug(`DM sent to ${recipient}: ${dm.id}`);
-    }
-  } catch (error) {
-    console.error("Error sending initial test message:", error);
-  }
-};
 /**
  * Sleep utility function
  */
@@ -471,21 +430,6 @@ export const appendToEnv = (key: string, value: string): void => {
   }
 };
 
-/**
- * Simulates a client missing cursor messages
- */
-export const simulateMissingCursorMessage = async (
-  worker: Worker,
-): Promise<void> => {
-  console.debug(
-    `[${worker.name}] Simulating backgrounded app missing cursor messages`,
-  );
-  await worker.worker?.reinstall();
-  console.debug(
-    `[${worker.name}] Worker reinstalled but sync intentionally skipped`,
-  );
-  console.debug(`[${worker.name}] Simulating cursor being off by one message`);
-};
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
 };

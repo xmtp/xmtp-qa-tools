@@ -9,6 +9,7 @@
     "workers"
   ],
   "scripts": {
+    "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bot": "yarn cli bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
@@ -22,7 +23,6 @@
     "lint": "eslint .",
     "medium": "yarn test suites/medium",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
-    "parse-ansi": "tsx scripts/parse-ansi.ts",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "script": "yarn cli script",
@@ -63,7 +63,6 @@
     "datadog-metrics": "^0.12.1",
     "dotenv": "^16.4.5",
     "node-fetch": "^3.3.0",
-    "openai": "latest",
     "rimraf": "^6.0.1",
     "uint8arrays": "^5.1.0",
     "viem": "^2",

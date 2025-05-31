@@ -1,8 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { generateOpenAIResponse } from "@helpers/ai";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/tests";
+import { defaultValues } from "@helpers/utils";
 import {
   ConsentState,
   Dm,
@@ -448,26 +447,10 @@ export class WorkerClient extends Worker {
       }
       if (!shouldRespond) return;
 
-      if (this.typeOfResponse === typeOfResponse.Gpt) {
-        const messages = await conversation?.messages();
-        const baseName = this.name.split("-")[0].toLowerCase();
-
-        // Generate a response using OpenAI
-        const response = await generateOpenAIResponse(
-          message.content as string,
-          messages ?? [],
-          baseName,
-        );
-
-        console.debug(`GPT response, "${response.slice(0, 50)}..."`);
-
-        await conversation?.send(response);
-      } else {
-        const debugInfo = await conversation?.debugInfo();
-        await conversation?.send(
-          `${this.nameId} says: gm from epoch ${debugInfo?.epoch}`,
-        );
-      }
+      const debugInfo = await conversation?.debugInfo();
+      await conversation?.send(
+        `${this.nameId} says: gm from epoch ${debugInfo?.epoch}`,
+      );
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }

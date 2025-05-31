@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { defaultNames } from "@helpers/tests";
+import { defaultNames } from "@helpers/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 

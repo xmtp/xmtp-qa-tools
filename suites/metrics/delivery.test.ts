@@ -2,12 +2,12 @@ import { loadEnv } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
-import { getFixedNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { getWorkersFromGroup } from "suites/manual/stress-bot/helper";
+import { getWorkersFromGroup } from "suites/other/stress-bot/helper";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";

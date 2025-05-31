@@ -11,7 +11,7 @@ import {
   getManualUsers,
   getRandomInboxIds,
   removeDataFolder,
-} from "@helpers/tests";
+} from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";

@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getInboxIds } from "@helpers/tests";
+import { getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";

@@ -3,7 +3,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
-import { getManualUsers } from "../../../helpers/tests";
+import { getManualUsers } from "../../../helpers/utils";
 
 const testName = "notifications";
 loadEnv(testName);
