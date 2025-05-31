@@ -1,4 +1,5 @@
 import { execSync } from "child_process";
+import type { DockerContainer } from "./container";
 import { Netem } from "./netem";
 import { Iptables } from "./iptables";
 
@@ -17,7 +18,9 @@ export class DockerContainer {
     }
 
     private getIP(): string {
-        return this.sh(`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${this.name}`);
+        return this.sh(
+            `docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${this.name}`
+        );
     }
 
     private getPID(): string {
@@ -29,54 +32,68 @@ export class DockerContainer {
             const pid = this.pid;
             const ifLine = this.sh(`sudo nsenter -t ${pid} -n ip link show eth0`);
             const match = ifLine.match(/eth0@if(\d+):/);
-            if (!match) throw new Error(`Could not extract ifindex from: ${ifLine}`);
+            if (!match) {
+                throw new Error(`Could not extract ifindex from: ${ifLine}`);
+            }
 
             const ifIndex = parseInt(match[1], 10);
             const linksOutput = this.sh(`ip -o link`);
             const lines = linksOutput.split("\n");
 
-            const vethLine = lines.find(line => line.startsWith(`${ifIndex}: `));
-            if (!vethLine) throw new Error(`Could not find host veth interface for ifindex ${ifIndex}`);
+            const vethLine = lines.find((line) => line.startsWith(`${ifIndex}: `));
+            if (!vethLine) {
+                throw new Error(`Could not find host veth interface for ifindex ${ifIndex}`);
+            }
 
             const iface = vethLine.split(":")[1].trim().split("@")[0];
             return iface;
-        } catch (e) {
-            throw new Error(`[sh] getVeth() failed for ${this.name}: ${e instanceof Error ? e.message : String(e)}`);
+        } catch (err) {
+            throw new Error(
+                `[sh] getVeth() failed for ${this.name}: ${err instanceof Error ? err.message : String(err)
+                }`
+            );
         }
     }
 
-    sh(cmd: string, expectFailure: boolean = false): string {
+    sh(cmd: string, expectFailure = false): string {
         console.log(`[sh] Executing: ${cmd}`);
         try {
-            const output = execSync(cmd, { stdio: ['inherit', 'pipe', 'pipe'] }).toString().trim();
-            //console.log(`[sh] Output: ${output}`);
+            const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] })
+                .toString()
+                .trim();
             return output;
-        } catch (e) {
+        } catch (err) {
             if (expectFailure) {
                 console.log(`[sh] Shell command failed as expected: ${cmd}`);
                 return "";
             }
-    
-            if (e instanceof Error && 'stderr' in e) {
-                const stderr = (e as any).stderr?.toString().trim();
+
+            if (err instanceof Error && "stderr" in err) {
+                const stderr = (err as any).stderr?.toString().trim();
                 console.error(`[sh] Error output: ${stderr}`);
             }
-    
-            throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
+
+            throw new Error(
+                `Command failed: ${cmd}\n${err instanceof Error ? err.message : String(err)}`
+            );
         }
     }
 
-    ping(target: DockerContainer, count: number = 3, expectFailure: boolean = false): void {
+    ping(target: DockerContainer, count = 3, expectFailure = false): void {
         console.log(`[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`);
         try {
-            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, { stdio: "pipe" }).toString();
-            const summary = output.split("\n").find(line => line.includes("rtt") || line.includes("round-trip"));
+            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, {
+                stdio: "pipe"
+            }).toString();
+            const summary = output.split("\n").find((line) =>
+                line.includes("rtt") || line.includes("round-trip")
+            );
             console.log(`[sh] ${summary || output}`);
-        } catch (e) {
+        } catch (err) {
             if (expectFailure) {
                 console.log(`[iptables] Ping failed as expected`);
             } else {
-                console.error(`[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : e}`);
+                console.error(`[sh] Ping failed unexpectedly: ${err instanceof Error ? err.message : err}`);
             }
         }
     }
@@ -130,26 +147,33 @@ export class DockerContainer {
     }
 
     static listRunningXmtpNodes(): DockerContainer[] {
-        const output = execSync(`docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`).toString().trim();
+        const output = execSync(
+            `docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`
+        )
+            .toString()
+            .trim();
         if (!output) return [];
-        return output.split("\n").map(name => new DockerContainer(name));
+        return output.split("\n").map((name) => new DockerContainer(name));
     }
 
     static validateDependencies(): void {
         const dependencies = ["docker", "iptables", "tc"];
-    
         for (const cmd of dependencies) {
             try {
                 execSync(`command -v ${cmd}`, { stdio: "ignore" });
-            } catch (e) {
+            } catch {
                 throw new Error(`Dependency not found - please install: ${cmd}`);
             }
         }
     }
 
     static listByNamePrefix(prefix: string): DockerContainer[] {
-        const output = execSync(`docker ps --format "{{.Names}}" | grep ^${prefix}`).toString().trim();
+        const output = execSync(
+            `docker ps --format "{{.Names}}" | grep ^${prefix}`
+        )
+            .toString()
+            .trim();
         if (!output) return [];
-        return output.split("\n").map(name => new DockerContainer(name));
+        return output.split("\n").map((name) => new DockerContainer(name));
     }
 }

@@ -1,4 +1,4 @@
-import { DockerContainer } from "./container";
+import type { DockerContainer } from "./container";
 
 export class Netem {
     static applyLatency(container: DockerContainer, latencyMs: number): void {
@@ -11,7 +11,9 @@ export class Netem {
 
     static applyJitter(container: DockerContainer, delay: number, jitter: number): void {
         Netem.clear(container);
-        container.sh(`sudo tc qdisc add dev ${container.veth} root netem delay ${delay}ms ${jitter}ms`);
+        container.sh(
+            `sudo tc qdisc add dev ${container.veth} root netem delay ${delay}ms ${jitter}ms`
+        );
     }
 
     static applyLoss(container: DockerContainer, percent: number): void {

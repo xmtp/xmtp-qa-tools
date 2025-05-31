@@ -1,5 +1,5 @@
 import { execSync } from "child_process";
-import { DockerContainer } from "./container";
+import type { DockerContainer } from "./container";
 
 export class Iptables {
     static blockOutboundTraffic(from: DockerContainer, to: DockerContainer): void {
@@ -11,8 +11,11 @@ export class Iptables {
         console.log(`[iptables] Restoring outbound traffic from ${from.name} to ${to.name}...`);
         try {
             execSync(`sudo nsenter -t ${from.pid} -n iptables -D OUTPUT -d ${to.ip} -j DROP`);
-        } catch (e) {
-            console.warn(`[iptables] Could not delete iptables rule: ${e instanceof Error ? e.message : e}`);
+        } catch (err) {
+            console.warn(
+                `[iptables] Could not delete iptables rule: ${err instanceof Error ? err.message : err
+                }`
+            );
         }
     }
 }
