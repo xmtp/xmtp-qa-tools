@@ -175,3 +175,95 @@ for await (const message of stream) {
 - Message deletion by sender
 - Moderator message removal
 - Content moderation tools
+
+I'll help you plan comprehensive white hat security testing for XMTP. Let me first examine what you already have in the spam test, then propose a comprehensive attack testing plan.
+
+Read file: suites/manual/spam/spam.test.ts
+
+Based on your existing spam test and the security document, here's a comprehensive white hat attack testing plan:
+
+## 🎯 **Attack Testing Plan**
+
+### **Phase 1: Volume-Based Attacks** (Current + Enhanced)
+
+**1.1 Infinite Welcome Messages Attack** ✅ _Already Testing_
+
+- **Current**: 1000 groups → 1 receiver
+- **Enhancements**:
+  - Measure sync time degradation
+  - Test iOS storage limits (Core Data/SQLite)
+  - Measure app launch time impact
+  - Test conversation list performance
+
+**1.2 Conversation Flooding**
+
+```typescript
+// Test: Create maximum conversations per rate limit window
+- 500 conversations every 5 minutes
+- Measure: Sync timeout thresholds
+- Target: Make app unusable via sync timeouts
+```
+
+**1.3 Message Volume Attack**
+
+```typescript
+// Test: Flood existing conversations with messages
+- Send 1000+ messages per conversation
+- Target: Conversation history loading
+- Measure: Message retrieval performance
+```
+
+### **Phase 2: Storage & Resource Attacks**
+
+**2.1 iOS Local Database Bombing**
+
+- **Target**: Fill device storage via XMTP database
+- **Method**: Create groups with large metadata, descriptions, names
+- **Measure**: Database file size growth rate
+- **Goal**: Trigger iOS storage warnings
+
+**2.2 Memory Exhaustion**
+
+- **Target**: Cause app crashes via memory pressure
+- **Method**: Create conversations with maximum member counts
+- **Measure**: Memory usage during sync operations
+
+### **Phase 3: Privacy & Reputation Attacks**
+
+**3.1 Involuntary Association Attack**
+
+```typescript
+// Test: Add target to inappropriate/harmful groups
+- Create groups with offensive names
+- Add legitimate users as members
+- Measure: Reputation damage potential
+- Goal: Demonstrate privacy violation
+```
+
+**3.2 Surveillance Agent Attack**
+
+```typescript
+// Test: Deploy monitoring bots in conversations
+- Join existing conversations as "helpful" agents
+- Record all messages for analysis
+- Demonstrate: Complete conversation access
+```
+
+### **Phase 4: Deception & Social Engineering**
+
+**4.1 Group Spoofing Attack**
+
+```typescript
+// Test: Create misleading group invites
+- Create groups that appear legitimate
+- Change metadata after user joins
+- Measure: User confusion/deception rate
+```
+
+**4.2 Identity Confusion**
+
+```typescript
+// Test: Similar usernames/addresses
+- Create addresses similar to legitimate users
+- Send messages that appear from trusted sources
+```

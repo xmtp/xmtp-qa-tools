@@ -9,7 +9,7 @@
     "workers"
   ],
   "scripts": {
-    "ansi": "tsx -e \"import { cleanAllRawLogs } from './helpers/logger.js'; await cleanAllRawLogs();\"",
+    "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bot": "yarn cli bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",

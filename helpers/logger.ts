@@ -47,7 +47,7 @@ export async function processLogFile(
 }
 
 /**
- * Clean all raw-parse-*.log files by removing ANSI codes
+ * Clean all raw-*.log files by removing ANSI codes
  */
 export async function cleanAllRawLogs(): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
@@ -64,11 +64,11 @@ export async function cleanAllRawLogs(): Promise<void> {
 
   const files = await fs.promises.readdir(logsDir);
   const rawLogFiles = files.filter(
-    (file) => file.startsWith("raw-parse-") && file.endsWith(".log"),
+    (file) => file.startsWith("raw-") && file.endsWith(".log"),
   );
 
   if (rawLogFiles.length === 0) {
-    console.log("No raw-parse-*.log files found to clean");
+    console.log("No raw-*.log files found to clean");
     return;
   }
 
@@ -76,7 +76,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 
   for (const file of rawLogFiles) {
     const inputPath = path.join(logsDir, file);
-    const outputFileName = file.replace("raw-parse-", "cleaned-parse-");
+    const outputFileName = file.replace("raw-", "cleaned-");
     const outputPath = path.join(outputDir, outputFileName);
 
     try {
