@@ -131,4 +131,3 @@ services:
     build: ./uploadService
     ports:
       - 3000:3000
-

@@ -1,99 +1,44 @@
-import {
-  Client,
-  Dm,
-  Group,
-  type Conversation,
-  type DecodedMessage,
-  type LogLevel,
-  type XmtpEnv,
-} from "@xmtp/node-sdk";
+import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
+import "dotenv/config";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
   logAgentDetails,
-} from "./client";
-import "dotenv/config";
+} from "../helpers/client";
 import {
-  getCommandConfig,
-  preMessageHandler,
-  processMessageCommands,
-} from "./xmtp-skills";
+  DEFAULT_SKILL_OPTIONS,
+  processMessage,
+  type MessageHandler,
+  type SkillOptions,
+} from "../helpers/xmtp-skills";
 
 /**
- * Configuration options for the XMTP agent
+ * Core options for XMTP client initialization that includes skill options
  */
-export interface AgentOptions {
+export interface ClientOptions extends SkillOptions {
   walletKey: string;
-  /** Whether to accept group conversations */
-  acceptGroups?: boolean;
   /** Encryption key for the client */
   dbEncryptionKey?: string;
   /** Networks to connect to (default: ['dev', 'production']) */
   networks?: string[];
   /** Logging level */
   loggingLevel?: LogLevel;
-  /** Public key of the agent */
-  publicKey?: string;
-  /** Content types to accept (default: ['text']) */
-  acceptTypes?: string[];
-  /** Connection timeout in ms (default: 30000) */
-  connectionTimeout?: number;
-  /** Whether to auto-reconnect on fatal errors (default: true) */
-  autoReconnect?: boolean;
-  /** Welcome message to send to the conversation */
-  welcomeMessage?: string;
-  /** Whether to send a welcome message to the conversation */
-  groupWelcomeMessage?: string;
-  /** Codecs to use */
-  codecs?: any[];
-  /** Allowed commands that the agent will respond to */
-  allowedCommands?: string[];
-  /** Command prefix (default: "@toss") */
-  commandPrefix?: string;
 }
 
-/**
- * Message context with analysis results
- */
-export interface MessageContext {
-  isDm: boolean;
-  options: AgentOptions;
-  isTransaction: boolean;
-  command: string;
-  hasCommand: boolean;
-  commandData: { name: string; args: string[] };
-}
-
-/**
- * Message handler callback type
- */
-type MessageHandler = (
-  client: Client,
-  conversation: Conversation,
-  message: DecodedMessage,
-  messageContext: MessageContext,
-) => Promise<void> | void;
+// Default options
+export const DEFAULT_CORE_OPTIONS: ClientOptions = {
+  walletKey: "",
+  dbEncryptionKey: process.env.ENCRYPTION_KEY,
+  loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
+  networks: ["dev"],
+  ...DEFAULT_SKILL_OPTIONS,
+};
 
 // Constants
 const MAX_RETRIES = 6;
 const RETRY_DELAY_MS = 2000;
-const DEFAULT_AGENT_OPTIONS: AgentOptions = {
-  walletKey: "",
-  dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
-  publicKey: "",
-  loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
-  acceptGroups: false,
-  acceptTypes: ["text"],
-  networks: ["dev"],
-  connectionTimeout: 30000,
-  autoReconnect: true,
-  welcomeMessage: "",
-  codecs: [],
-  allowedCommands: ["help"],
-  commandPrefix: "@toss",
-};
 
 // Helper functions
 export const sleep = (ms: number): Promise<void> =>
@@ -104,12 +49,13 @@ export const sleep = (ms: number): Promise<void> =>
  */
 export const initializeClient = async (
   messageHandler: MessageHandler,
-  options: AgentOptions[],
+  coreOptions: ClientOptions[],
 ): Promise<Client[]> => {
   // Merge default options with the provided options
-  const mergedOptions = options.map((opt) => ({
-    ...DEFAULT_AGENT_OPTIONS,
+  const mergedCoreOptions = coreOptions.map((opt) => ({
+    ...DEFAULT_CORE_OPTIONS,
     ...opt,
+    dbEncryptionKey: opt.dbEncryptionKey ?? generateEncryptionKeyHex(),
   }));
 
   /**
@@ -118,17 +64,15 @@ export const initializeClient = async (
   const streamMessages = async (
     client: Client,
     callBack: MessageHandler,
-    options: AgentOptions,
+    skillOpts: SkillOptions,
   ): Promise<void> => {
     const env = client.options?.env;
     let retryCount = 0;
-    const acceptTypes = options.acceptTypes || ["text"];
     let backoffTime = RETRY_DELAY_MS;
 
-    // Main stream loop - never exits
-    while (true) {
+    // Start stream with limited retries
+    while (retryCount < MAX_RETRIES) {
       try {
-        // Reset backoff time if we've been running successfully
         if (retryCount === 0) {
           backoffTime = RETRY_DELAY_MS;
         }
@@ -136,90 +80,17 @@ export const initializeClient = async (
         console.debug(`[${env}] Waiting for messages...`);
         const streamPromise = client.conversations.streamAllMessages();
         const stream = await streamPromise;
+
         for await (const message of stream) {
-          try {
-            // Skip messages from self or with unsupported content types
-            if (
-              !message ||
-              message.senderInboxId.toLowerCase() ===
-                client.inboxId.toLowerCase() ||
-              !acceptTypes.includes(message.contentType?.typeId ?? "text")
-            ) {
-              continue;
-            }
-
-            const conversation = await client.conversations.getConversationById(
-              message.conversationId,
-            );
-
-            if (!conversation) {
-              console.debug(`[${env}] Unable to find conversation, skipping`);
-              continue;
-            }
-
-            console.debug(
-              `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
-            );
-
-            const isDm = conversation instanceof Dm;
-            const isGroup = conversation instanceof Group;
-
-            const preMessageHandlerResult = await preMessageHandler(
+          if (message) {
+            console.debug("option", JSON.stringify(skillOpts, null, 2));
+            await processMessage(
               client,
-              conversation as Conversation,
               message,
-              isDm,
-              options,
+              callBack,
+              skillOpts,
+              env || "unknown",
             );
-            if (preMessageHandlerResult) {
-              console.debug(
-                `[${env}] Pre-message handler returned true, skipping`,
-              );
-              continue;
-            }
-
-            if (isDm || (isGroup && options.acceptGroups)) {
-              try {
-                console.debug(
-                  `[${env}] Processing message ${message.content as string}...`,
-                );
-
-                // Get command configuration and analyze message
-                const commandConfig = getCommandConfig(options);
-                const analysis = processMessageCommands(
-                  message,
-                  commandConfig.prefix,
-                );
-
-                const messageContext: MessageContext = {
-                  isDm,
-                  options,
-                  isTransaction: analysis.isTransaction,
-                  command: analysis.command || "",
-                  hasCommand: analysis.hasCommand,
-                  commandData: analysis.commandData || { name: "", args: [] },
-                };
-
-                await messageHandler(
-                  client,
-                  conversation as Conversation,
-                  message,
-                  messageContext,
-                );
-              } catch (handlerError) {
-                console.error(
-                  `[${env}] Error in message handler:`,
-                  handlerError,
-                );
-              }
-            } else {
-              console.debug(
-                `[${env}] Conversation is not a DM and acceptGroups=false, skipping`,
-              );
-            }
-          } catch (error) {
-            // Handle errors within message processing without breaking the stream
-            console.error(`[${env}] Error processing message:`, error);
           }
         }
 
@@ -236,7 +107,7 @@ export const initializeClient = async (
           );
 
           try {
-            await initializeClient(messageHandler, [{ ...options }]);
+            await initializeClient(messageHandler, coreOptions);
             retryCount = 0; // Reset retry counter after recovery
             continue;
           } catch (fatalError) {
@@ -266,29 +137,43 @@ export const initializeClient = async (
   const clients: Client[] = [];
   const streamPromises: Promise<void>[] = [];
 
-  for (const option of mergedOptions) {
+  for (const option of mergedCoreOptions) {
     for (const env of option.networks ?? []) {
       try {
         const signer = createSigner(option.walletKey);
-        const dbEncryptionKey = getEncryptionKeyFromHex(
-          option.dbEncryptionKey as string,
-        );
+        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
         const signerIdentifier = (await signer.getIdentifier()).identifier;
+
+        // Extract skill options from the client options
+        const skillOptions: SkillOptions = {
+          acceptGroups: option.acceptGroups,
+          publicKey: option.publicKey,
+          acceptTypes: option.acceptTypes,
+          welcomeMessage: option.welcomeMessage,
+          groupWelcomeMessage: option.groupWelcomeMessage,
+          allowedCommands: option.allowedCommands,
+          commandPrefix: option.commandPrefix,
+          strictCommandFiltering: option.strictCommandFiltering,
+          codecs: option.codecs,
+        };
 
         const client = await Client.create(signer, {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
-          codecs: option.codecs ?? [],
+          codecs: skillOptions.codecs ?? [],
         });
 
-        clients.push(client as Client);
+        // @ts-expect-error - TODO: fix this
+        clients.push(client);
 
-        // Start message streaming
-        const streamPromise = streamMessages(client as Client, messageHandler, {
-          ...option,
-        });
+        const streamPromise = streamMessages(
+          // @ts-expect-error - TODO: fix this
+          client,
+          messageHandler,
+          skillOptions,
+        );
 
         streamPromises.push(streamPromise);
       } catch (error) {

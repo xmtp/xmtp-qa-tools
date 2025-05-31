@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { existsSync } from "fs";
 import { mkdir, readdir, readFile, writeFile } from "fs/promises";
-import { basename, extname, join } from "path";
+import { basename, join } from "path";
 import { fileURLToPath } from "url";
 
 /**
