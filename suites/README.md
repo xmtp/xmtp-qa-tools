@@ -16,23 +16,44 @@ Tests that run automatically on CI/CD pipelines to monitor production systems.
 
 Core XMTP protocol functionality validation with comprehensive test coverage.
 
-[View all functional tests →](./functional/)
+| Test Suite                      | Purpose                                       | Documentation                       |
+| ------------------------------- | --------------------------------------------- | ----------------------------------- |
+| **[functional](./functional/)** | Complete protocol functionality testing suite | [README.md](./functional/README.md) |
 
-## 🔧 Manual Test Suites
+Includes: browser testing, client management, codec error handling, consent management, conversations, DMs, groups, installations, metadata, offline capabilities, message ordering, regression testing, streams, and sync performance.
 
-Human-operated tests for investigating specific issues or running regression tests.
+## 🚀 Performance & Scale Test Suites
 
-| Test Suite                                  | Purpose                                      | Documentation                                |
-| ------------------------------------------- | -------------------------------------------- | -------------------------------------------- |
-| **[notifications](./other/notifications/)** | Push notification functionality validation   | [README.md](./other/notifications/README.md) |
-| **[regression](./other/regression/)**       | Historical bug reproduction and verification | [README.md](./other/regression/README.md)    |
-| **[spam](./other/spam/)**                   | Spam detection and filtering testing         | [View tests →](./other/spam/)                |
+Performance measurement, scalability testing, and reliability validation with detailed metrics collection.
 
-## 📊 Metrics Test Suites
+| Test Suite                                | Purpose                                         | Documentation                                |
+| ----------------------------------------- | ----------------------------------------------- | -------------------------------------------- |
+| **[large](./large/)**                     | Large group performance and scalability testing | [README.md](./large/README.md)               |
+| **[delivery](./metrics/delivery/)**       | Message delivery reliability and ordering       | [README.md](./metrics/delivery/README.md)    |
+| **[performance](./metrics/performance/)** | End-to-end operational performance              | [README.md](./metrics/performance/README.md) |
 
-Performance measurement and reliability testing with detailed metrics collection.
+## 🔒 Security Test Suites
 
-| Test Suite                                | Purpose                                   | Documentation                                |
-| ----------------------------------------- | ----------------------------------------- | -------------------------------------------- |
-| **[delivery](./metrics/delivery/)**       | Message delivery reliability and ordering | [README.md](./metrics/delivery/README.md)    |
-| **[performance](./metrics/performance/)** | End-to-end operational performance        | [README.md](./metrics/performance/README.md) |
+Security validation and threat testing for XMTP protocol implementations.
+
+| Test Suite                  | Purpose                              | Documentation               |
+| --------------------------- | ------------------------------------ | --------------------------- |
+| **[security](./security/)** | Spam testing and security validation | [View tests →](./security/) |
+
+## 🐛 Bug Documentation & Regression
+
+Historical bug tracking, reproduction tests, and regression prevention.
+
+| Test Suite                      | Purpose                                      | Documentation                       |
+| ------------------------------- | -------------------------------------------- | ----------------------------------- |
+| **[bugs](./bugs/)**             | Bug documentation and reproduction tests     | [README.md](./bugs/README.md)       |
+| **[regression](./regression/)** | Historical bug reproduction and verification | [README.md](./regression/README.md) |
+
+## 🔧 Other Test Suites
+
+Additional manual and specialized testing suites for specific use cases.
+
+| Test Suite                                  | Purpose                                    | Documentation                                |
+| ------------------------------------------- | ------------------------------------------ | -------------------------------------------- |
+| **[notifications](./other/notifications/)** | Push notification functionality validation | [README.md](./other/notifications/README.md) |
+| **[other](./other/)**                       | Miscellaneous and specialized test cases   | [View tests →](./other/)                     |
