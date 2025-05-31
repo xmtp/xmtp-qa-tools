@@ -129,16 +129,16 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 #### Sender-Side average performance
 
-| Size | Send message | Update name | Remove members | Create | Performance  |
-| ---- | ------------ | ----------- | -------------- | ------ | ------------ |
-| 50   | 86           | 135         | 139            | 1329   | ✅ On Target |
-| 100  | 88           | 145         | 157            | 1522   | ✅ On Target |
-| 150  | 95           | 203         | 190            | 2306   | ✅ On Target |
-| 200  | 93           | 193         | 205            | 3344   | ✅ On Target |
-| 250  | 108          | 219         | 237            | 4276   | ⚠️ Concern   |
-| 300  | 97           | 244         | 247            | 5463   | ⚠️ Concern   |
-| 350  | 101          | 264         | 308            | 6641   | ⚠️ Concern   |
-| 400  | 111          | 280         | 320            | 7641   | ⚠️ Concern   |
+| Size | Send message | Update name | Remove members | Create  | Performance  |
+| ---- | ------------ | ----------- | -------------- | ------- | ------------ |
+| 50   | 86           | 135         | 139            | 1329    | ✅ On Target |
+| 100  | 88           | 145         | 157            | 1522    | ✅ On Target |
+| 150  | 95           | 203         | 190            | 2306    | ✅ On Target |
+| 200  | 93           | 193         | 205            | ⚠️ 3344 | ✅ On Target |
+| 250  | 108          | 219         | 237            | ⚠️ 4276 | ✅ On Target |
+| 300  | 97           | 244         | 247            | ⚠️ 5463 | ✅ On Target |
+| 350  | 101          | 264         | 308            | ⚠️ 6641 | ✅ On Target |
+| 400  | 111          | 280         | 320            | ⚠️ 7641 | ✅ On Target |
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
