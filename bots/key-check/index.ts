@@ -244,7 +244,8 @@ const processMessage = async (
 await initializeClient(processMessage, [
   {
     walletKey: WALLET_KEY,
+    networks: ["local", "dev", "production"],
     dbEncryptionKey: ENCRYPTION_KEY,
-    networks: [XMTP_ENV],
+    welcomeMessage: " Send /kc help",
   },
 ]);
