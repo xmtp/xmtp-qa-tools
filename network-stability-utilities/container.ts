@@ -41,9 +41,8 @@ export class DockerContainer {
             const iface = vethLine.split(":")[1].trim().split("@")[0];
             return iface;
         } catch (err) {
-            throw new Error(
-                `[sh] getVeth() failed for ${this.name}: ${err instanceof Error ? err.message : String(err)}`
-            );
+            const msg = err instanceof Error ? err.message : String(err);
+            throw new Error(`[sh] getVeth() failed for ${this.name}: ${msg}`);
         }
     }
 
@@ -59,7 +58,7 @@ export class DockerContainer {
             }
 
             if (e instanceof Error && "stderr" in e) {
-                const stderr = (e as any).stderr?.toString().trim();
+                const stderr = (e as { stderr?: Buffer }).stderr?.toString().trim();
                 console.error(`[sh] Error output: ${stderr}`);
             }
 
@@ -74,7 +73,11 @@ export class DockerContainer {
                 stdio: "pipe"
             }).toString();
             const summary = output.split("\n").find((line) => line.includes("rtt") || line.includes("round-trip"));
-            console.log(`[sh] ${summary || output}`);
+            if (summary) {
+                console.log(`[sh] ${summary}`);
+            } else {
+                console.log(`[sh] ${output}`);
+            }
         } catch (e) {
             if (expectFailure) {
                 console.log("[iptables] Ping failed as expected");
