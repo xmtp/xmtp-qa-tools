@@ -91,9 +91,9 @@ async function main(): Promise<void> {
     // Read all files in logs directory
     const files = await readdir(logsDir);
 
-    // Filter for raw-*.log files
+    // Filter for raw-parse-*.log files
     const rawLogFiles = files.filter(
-      (file) => file.startsWith("raw-") && file.endsWith(".log"),
+      (file) => file.startsWith("raw-parse-") && file.endsWith(".log"),
     );
 
     if (rawLogFiles.length === 0) {
@@ -114,7 +114,7 @@ async function main(): Promise<void> {
 
     for (const file of rawLogFiles) {
       const inputPath = join(logsDir, file);
-      const outputFileName = file.replace("raw-", "cleaned-");
+      const outputFileName = file.replace("raw-parse-", "cleaned-parse-");
       const outputPath = join(outputDir, outputFileName);
 
       const stats = await readFile(inputPath);
