@@ -73,7 +73,7 @@ export class DockerContainer {
                 stdio: "pipe"
             }).toString();
             const summary = output.split("\n").find((line) => line.includes("rtt") || line.includes("round-trip"));
-            if (summary) {
+            if (summary !== undefined) {
                 console.log(`[sh] ${summary}`);
             } else {
                 console.log(`[sh] ${output}`);
