@@ -261,11 +261,11 @@ yarn install
 To get started set up the environment variables in [./env.example](./env.example) and run the tests with:
 
 ```bash
-### simple dms test
+# Simple dms test
 yarn test dms
-### full functional test
+# Full functional test
 yarn test functional
-### performance test example
+# Performance test example
 yarn test performance
 ```
 
