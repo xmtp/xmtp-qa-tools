@@ -1,6 +1,6 @@
 import { execSync, execFileSync } from "child_process";
-import * as Netem from "./netem";
-import * as Iptables from "./iptables";
+import { Netem } from "./netem";
+import { Iptables } from "./iptables";
 
 export class DockerContainer {
     name: string;
@@ -32,16 +32,18 @@ export class DockerContainer {
             if (!match) throw new Error(`Could not extract ifindex from: ${ifLine}`);
 
             const ifIndex = parseInt(match[1], 10);
-            const linksOutput = this.sh(`ip -o link`);
+            const linksOutput = this.sh("ip -o link");
             const lines = linksOutput.split("\n");
 
-            const vethLine = lines.find(line => line.startsWith(`${ifIndex}: `));
+            const vethLine = lines.find((line) => line.startsWith(`${ifIndex}: `));
             if (!vethLine) throw new Error(`Could not find host veth interface for ifindex ${ifIndex}`);
 
             const iface = vethLine.split(":")[1].trim().split("@")[0];
             return iface;
         } catch (err) {
-            throw new Error(`[sh] getVeth() failed for ${this.name}: ${err instanceof Error ? err.message : String(err)}`);
+            throw new Error(
+                `[sh] getVeth() failed for ${this.name}: ${err instanceof Error ? err.message : String(err)}`
+            );
         }
     }
 
@@ -50,14 +52,17 @@ export class DockerContainer {
         try {
             const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] }).toString().trim();
             return output;
-        } catch (e: unknown) {
+        } catch (e) {
             if (expectFailure) {
                 console.log(`[sh] Shell command failed as expected: ${cmd}`);
                 return "";
             }
 
-            const stderr = (e as { stderr?: Buffer }).stderr?.toString().trim();
-            if (stderr) console.error(`[sh] Error output: ${stderr}`);
+            if (e instanceof Error && "stderr" in e) {
+                const stderr = (e as any).stderr?.toString().trim();
+                console.error(`[sh] Error output: ${stderr}`);
+            }
+
             throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
         }
     }
@@ -65,10 +70,12 @@ export class DockerContainer {
     ping(target: DockerContainer, count = 3, expectFailure = false): void {
         console.log(`[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`);
         try {
-            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, { stdio: "pipe" }).toString();
-            const summary = output.split("\n").find(line => line.includes("rtt") || line.includes("round-trip"));
+            const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, {
+                stdio: "pipe"
+            }).toString();
+            const summary = output.split("\n").find((line) => line.includes("rtt") || line.includes("round-trip"));
             console.log(`[sh] ${summary || output}`);
-        } catch (e: unknown) {
+        } catch (e) {
             if (expectFailure) {
                 console.log("[iptables] Ping failed as expected");
             } else {
@@ -78,6 +85,9 @@ export class DockerContainer {
     }
 
     addLatency(ms: number): void {
+        if (!Netem?.applyLatency) {
+            throw new Error("Netem module not available.");
+        }
         Netem.applyLatency(this, ms);
     }
 
@@ -126,9 +136,11 @@ export class DockerContainer {
     }
 
     static listRunningXmtpNodes(): DockerContainer[] {
-        const output = execSync(`docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`).toString().trim();
+        const output = execSync(
+            `docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`
+        ).toString().trim();
         if (!output) return [];
-        return output.split("\n").map(name => new DockerContainer(name));
+        return output.split("\n").map((name) => new DockerContainer(name));
     }
 
     static validateDependencies(): void {
@@ -144,9 +156,9 @@ export class DockerContainer {
 
     static listByNamePrefix(prefix: string): DockerContainer[] {
         const output = execSync(
-            `docker ps --format "{{.Names}}" | grep ^${String(prefix)} || true`
+            `docker ps --format "{{.Names}}" | grep ^${prefix} || true`
         ).toString().trim();
         if (!output) return [];
-        return output.split("\n").map(name => new DockerContainer(name));
+        return output.split("\n").map((name) => new DockerContainer(name));
     }
 }
