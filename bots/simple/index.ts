@@ -14,7 +14,7 @@ async function main() {
     typeofStream.Message,
     typeOfResponse.Gpt,
     typeOfSync.None,
-    "dev",
+    "production",
   );
   const bot = workers.get("bot");
   const client = bot?.client as Client;

@@ -8,7 +8,8 @@
   },
   {
     "app": "fabri-tba",
-    "inboxId": "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
+    "address": "0xdb61a3c6a863459f53c38418cbed3af23b6c0358",
+    "inboxId": "f4e45cdf358dd939be3912cb55b104582fa66d4d5d2e93f1dfbde3a08de9b36b",
     "network": "production",
     "name": "prod-testing"
   },
@@ -33,7 +34,8 @@
   },
   {
     "app": "fabri-convos-dev",
-    "inboxId": "ea82e98279a62e5166287441aa32a6f8c8c54707f2e95cac4af41ef6d803f9ab",
+    "address": "0xd0b95a312a948558c7a2a03b2fdd1ae521bcdd2c",
+    "inboxId": "19562d0449436ff09cfbfbe997b54550ac129a5167e7164fe004ddff12a18115",
     "network": "dev",
     "name": "one-off"
   }
