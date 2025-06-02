@@ -11,6 +11,6 @@ export function unblockOutboundTraffic(from: DockerContainer, to: DockerContaine
     try {
         execSync(`sudo nsenter -t ${from.pid} -n iptables -D OUTPUT -d ${to.ip} -j DROP`);
     } catch (e) {
-        console.warn(`[iptables] Could not delete rule: ${e instanceof Error ? e.message : e}`);
+        console.warn(`[iptables] Could not delete rule: ${e instanceof Error ? e.message : String(e)}`);
     }
 }
