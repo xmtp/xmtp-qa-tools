@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import manualUsers from "@helpers/manualusers.json";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -8,17 +9,18 @@ import { describe, expect, it } from "vitest";
 const testName = "spam";
 loadEnv(testName);
 
+const timeout = 300000000;
 describe(testName, () => {
   let workers: WorkerManager;
-  const receiver =
-    "938ce0ff99ac3d0cbc68ac50db3376dc37b29b8062b223759f19b9d635b5434a";
 
   setupTestLifecycle({
     expect,
   });
 
-  it(`should create groups and send messages to ${receiver}`, async () => {
-    try {
+  it(
+    `should create groups and send messages to dev-testing`,
+    async () => {
+      const receivers = manualUsers.filter((r) => r.app === "fabri-tba");
       workers = await getWorkers(
         ["bot"],
         testName,
@@ -27,25 +29,28 @@ describe(testName, () => {
         typeOfSync.None,
         "dev",
       );
+      try {
+        const totalCount = 1000;
+        for (const receiver of receivers) {
+          for (let batch = 0; batch < totalCount; batch++) {
+            const group = await workers
+              .get("bot")
+              ?.client.conversations.newGroup([receiver.inboxId]);
 
-      const totalCount = 1000;
+            if (!group) {
+              throw new Error("Failed to create group");
+            }
 
-      for (let batch = 0; batch < totalCount; batch++) {
-        const group = await workers
-          .get("bot")
-          ?.client.conversations.newGroup([receiver]);
+            await group.send(`Spam test message`);
 
-        if (!group) {
-          throw new Error("Failed to create group");
+            console.log(`✓ Completed ${batch + 1}/${totalCount} groups`);
+          }
         }
-
-        await group.send(`Spam test message`);
-
-        console.log(`✓ Completed ${batch + 1}/${totalCount} groups`);
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
       }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  }, 300000000); // 5 minutes timeout
+    },
+    timeout,
+  ); // 5 minutes timeout
 });
