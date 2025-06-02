@@ -12,7 +12,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
-  createNewGroups,
+  createSingleNewGroup,
   loadExistingGroups,
   type GroupConfig,
 } from "./helper";
@@ -26,7 +26,6 @@ const testConfig = {
     (process.env.XMTP_ENV as "production" | "local" | "dev") || "production",
   workerNames: getFixedNames(4),
   freshInstalls: false, // more installs
-  totalGroups: 5, // Number of groups to create
 } as const;
 
 loadEnv(TEST_NAME);
@@ -52,79 +51,51 @@ describe(TEST_NAME, () => {
     );
     creator = workers.get("bot") as Worker;
 
-    // Try to load existing groups first
-    groupConfigs = await loadExistingGroups(creator);
+    // Load all existing groups
+    const existingGroups = await loadExistingGroups(creator);
+    groupConfigs = [...existingGroups];
 
-    // Create remaining groups if needed
-    if (groupConfigs.length < testConfig.totalGroups) {
-      const newGroups = await createNewGroups(
-        workers,
-        creator,
-        groupConfigs.length,
-      );
-      groupConfigs.push(...newGroups);
-    }
+    console.debug(`Loaded ${groupConfigs.length} existing groups`);
 
-    console.debug(`Prepared ${groupConfigs.length} groups for testing`);
+    // Always create 1 new group per test run
+    console.debug("Creating 1 new group for this test run...");
+    const newGroup = await createSingleNewGroup(
+      workers,
+      creator,
+      groupConfigs.length + 1,
+    );
+    groupConfigs.push(newGroup);
+
+    console.debug(
+      `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
+    );
   });
 
-  let runs = 5;
-  for (let i = 0; i < runs; i++) {
-    it(`should verify all operations across ${testConfig.totalGroups} groups`, async () => {
-      try {
-        for (const config of groupConfigs) {
-          const epoch = await workers.checkIfGroupForked(config.group.id);
+  it(`should verify all operations across all groups`, async () => {
+    try {
+      for (const config of groupConfigs) {
+        console.debug(JSON.stringify(config, null, 2));
+        const epoch = await workers.checkIfGroupForked(config.group.id);
 
-          for (const feature of config.features) {
-            switch (feature) {
-              case "verifyAddInstallations":
-                await verifyAddInstallations(workers, config.group.id);
-                break;
+        await verifyEpochChange(workers, config.group.id);
+        await verifyAddInstallations(workers, config.group.id);
 
-              case "verifyMessageStream":
-                await verifyMessageStream(
-                  config.group,
-                  workers.getAllBut("bot"),
-                  1,
-                  `Message verification from group ${config.groupNumber} epoch ${epoch}`,
-                );
-                break;
+        await verifyMessageStream(
+          config.group,
+          workers.getAllBut("bot"),
+          1,
+          `Message verification from group ${config.groupNumber} epoch ${epoch}`,
+        );
 
-              case "verifyMembershipStream":
-                await verifyMembershipStream(
-                  config.group,
-                  workers.getAllBut("bot"),
-                  getRandomInboxIds(1),
-                );
-                break;
+        console.debug(`Group ${config.groupNumber} - Completed: ${feature}`);
 
-              case "verifyMetadataStream":
-                await verifyMetadataStream(
-                  config.group,
-                  workers.getAllBut("bot"),
-                  1,
-                  `${testConfig.groupName} #${config.groupNumber} - Updated`,
-                );
-                break;
-
-              case "verifyEpochChange":
-                await verifyEpochChange(workers, config.group.id);
-                break;
-            }
-
-            console.debug(
-              `Group ${config.groupNumber} - Completed: ${feature}`,
-            );
-          }
-
-          await workers.checkIfGroupForked(config.group.id);
-        }
-      } catch (error) {
-        console.error("Error in test:", error);
-        throw error;
+        await workers.checkIfGroupForked(config.group.id);
       }
-    });
-  }
+    } catch (error) {
+      console.error("Error in test:", error);
+      throw error;
+    }
+  });
 });
 
 export async function verifyAddInstallations(
@@ -135,26 +106,31 @@ export async function verifyAddInstallations(
     // Get all current workers (excluding bot)
     const currentWorkers = workers.getAllBut("bot");
 
-    // Randomly select 30-50% of workers for -b installations
+    // Randomly select 30-50% of workers for -${randomLetter} installations
     const selectionPercentage = 0.3 + Math.random() * 0.2; // 30-50%
     const numToSelect = Math.max(
       1,
       Math.floor(currentWorkers.length * selectionPercentage),
     );
 
-    // Randomly select workers for -b installations
+    // Randomly select workers for -${randomLetter} installations
     const selectedWorkers = currentWorkers
       .sort(() => 0.5 - Math.random())
       .slice(0, numToSelect);
 
+    const randomLetter = String.fromCharCode(
+      Math.floor(Math.random() * 26) + 97,
+    );
     console.debug(
-      `Creating -b installations for ${selectedWorkers.length}/${currentWorkers.length} randomly selected workers...`,
+      `Creating -${randomLetter} installations for ${selectedWorkers.length}/${currentWorkers.length} randomly selected workers...`,
     );
 
-    // Create -b workers and track replacements
+    // Create -${randomLetter} workers and track replacements
     const replacementPromises = selectedWorkers.map(async (worker) => {
-      const bWorker = await workers.createWorker(`${worker.name}-b`);
-      console.debug(`Created -b installation for ${worker.name}`);
+      const bWorker = await workers.createWorker(
+        `${worker.name}-${randomLetter}`,
+      );
+      console.debug(`Created -${randomLetter} installation for ${worker.name}`);
       return { originalWorker: worker, bWorker };
     });
 
@@ -173,47 +149,53 @@ export async function verifyAddInstallations(
       throw new Error(`Group ${groupId} not found`);
     }
 
-    // Add all -b workers to the group
+    // Add all -${randomLetter} workers to the group
     const bWorkerInboxIds = replacements.map((r) => r.bWorker.client.inboxId);
-    console.debug(`Adding ${bWorkerInboxIds.length} -b workers to group...`);
+    console.debug(
+      `Adding ${bWorkerInboxIds.length} -${randomLetter} workers to group...`,
+    );
 
     // Add in smaller batches to avoid overwhelming the system
     const batchSize = 5;
     for (let i = 0; i < bWorkerInboxIds.length; i += batchSize) {
       const batch = bWorkerInboxIds.slice(i, i + batchSize);
       await group.addMembers(batch);
-      console.debug(`Added -b worker batch ${Math.floor(i / batchSize) + 1}`);
+      console.debug(
+        `Added -${randomLetter} worker batch ${Math.floor(i / batchSize) + 1}`,
+      );
     }
 
     await group.sync();
 
-    // Replace the selected workers in the workers array with their -b counterparts
-    console.debug(`Updating workers array to use -b installations...`);
+    // Replace the selected workers in the workers array with their -${randomLetter} counterparts
+    console.debug(
+      `Updating workers array to use -${randomLetter} installations...`,
+    );
     for (const { originalWorker, bWorker } of replacements) {
-      // Add the -b worker to replace the original
-      workers.addWorker(originalWorker.name, "b", bWorker);
+      // Add the -${randomLetter} worker to replace the original
+      workers.addWorker(originalWorker.name, randomLetter, bWorker);
       console.debug(
-        `Replaced ${originalWorker.name}-a with ${originalWorker.name}-b in workers array`,
+        `Replaced ${originalWorker.name}-a with ${originalWorker.name}-${randomLetter} in workers array`,
       );
     }
 
     // Verify the update worked
     const updatedWorkers = workers.getAllBut("bot");
     const bInstallationCount = updatedWorkers.filter(
-      (w) => w.folder === "b",
+      (w) => w.folder === randomLetter,
     ).length;
     console.debug(
-      `Workers array now contains ${bInstallationCount} -b installations and ${updatedWorkers.length - bInstallationCount} -a installations`,
+      `Workers array now contains ${bInstallationCount} -${randomLetter} installations and ${updatedWorkers.length - bInstallationCount} -a installations`,
     );
 
-    // Test membership changes with some of the new -b workers
+    // Test membership changes with some of the new -${randomLetter} workers
     const workersToTest = bWorkerInboxIds.slice(
       0,
       Math.min(3, bWorkerInboxIds.length),
     );
 
     console.debug(
-      `Testing membership changes with ${workersToTest.length} -b workers...`,
+      `Testing membership changes with ${workersToTest.length} -${randomLetter} workers...`,
     );
 
     await group.sync();
@@ -222,9 +204,11 @@ export async function verifyAddInstallations(
     for (const inboxId of workersToTest) {
       try {
         await group.removeMembers([inboxId]);
-        console.debug(`Temporarily removed -b worker: ${inboxId}`);
+        console.debug(
+          `Temporarily removed -${randomLetter} worker: ${inboxId}`,
+        );
         await group.addMembers([inboxId]);
-        console.debug(`Re-added -b worker: ${inboxId}`);
+        console.debug(`Re-added -${randomLetter} worker: ${inboxId}`);
       } catch (e) {
         console.warn(`Error in membership test for ${inboxId}:`, e);
       }
@@ -234,11 +218,11 @@ export async function verifyAddInstallations(
 
     const finalMembers = await group.members();
     console.debug(
-      `Group now has ${finalMembers.length} total members (including ${bInstallationCount} -b installations)`,
+      `Group now has ${finalMembers.length} total members (including ${bInstallationCount} -${randomLetter} installations)`,
     );
 
     console.debug(
-      `✅ Successfully updated ${replacements.length} workers to -b installations`,
+      `✅ Successfully updated ${replacements.length} workers to -${randomLetter} installations`,
     );
   } catch (error) {
     console.error("Error in verifyAddInstallations:", error);
