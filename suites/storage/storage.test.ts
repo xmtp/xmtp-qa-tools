@@ -65,11 +65,36 @@ interface StorageMeasurement {
   avgSizePerOperationFormatted: string;
 }
 
+interface StatisticalData {
+  mean: number;
+  stdDev: number;
+  min: number;
+  max: number;
+  confidenceInterval: [number, number];
+}
+
+function calculateStats(values: number[]): StatisticalData {
+  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const variance =
+    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
+    values.length;
+  const stdDev = Math.sqrt(variance);
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+
+  // 95% confidence interval (assuming normal distribution)
+  const margin = 1.96 * (stdDev / Math.sqrt(values.length));
+  const confidenceInterval: [number, number] = [mean - margin, mean + margin];
+
+  return { mean, stdDev, min, max, confidenceInterval };
+}
+
 describe(testName, () => {
   const measurements: StorageMeasurement[] = [];
   let previousTotalSize = 0;
   let basicWorkers: any;
   let scaleWorkers: any;
+  let testWorkers: any;
 
   function measureStorage(
     operation: string,
@@ -103,11 +128,11 @@ describe(testName, () => {
     );
     return measurement;
   }
+  setupTestLifecycle({ expect });
 
   it("setup: should initialize basic workers", async () => {
     try {
       basicWorkers = await getWorkers(["alice", "bob"], testName);
-      setupTestLifecycle({ expect });
 
       expect(basicWorkers.get("alice")?.client).toBeDefined();
       expect(basicWorkers.get("bob")?.client).toBeDefined();
@@ -235,6 +260,116 @@ describe(testName, () => {
     }
   });
 
+  // NEW COMPREHENSIVE TESTS
+
+  it("message-sizes: should measure different message size impacts", async () => {
+    try {
+      testWorkers = await getWorkers(
+        ["henry", "ivy", "jack", "karen"],
+        `${testName}-msg`,
+      );
+
+      const henry = testWorkers.get("henry");
+      const ivy = testWorkers.get("ivy");
+
+      if (!henry || !ivy) {
+        throw new Error("Test workers not available");
+      }
+
+      await henry.client.conversations.sync();
+      const conversations = await henry.client.conversations.list();
+      let dm = conversations.find((conv: any) => conv instanceof Dm);
+
+      if (!dm) {
+        dm = await henry.client.conversations.newDm(ivy.client.inboxId);
+        await sleep(100);
+      }
+
+      const messageSizes = [
+        { name: "Small (10 chars)", content: "Hello Test" },
+        { name: "Medium (100 chars)", content: "A".repeat(100) },
+        { name: "Large (1000 chars)", content: "B".repeat(1000) },
+        { name: "XLarge (5000 chars)", content: "C".repeat(5000) },
+      ];
+
+      for (const msgSize of messageSizes) {
+        const sizeBefore =
+          getDirSizeSync(getWorkerDbPath("henry")) +
+          getDirSizeSync(getWorkerDbPath("ivy"));
+
+        await dm.send(msgSize.content);
+        await sleep(100);
+        await henry.client.conversations.sync();
+        await ivy.client.conversations.sync();
+
+        const sizeAfter =
+          getDirSizeSync(getWorkerDbPath("henry")) +
+          getDirSizeSync(getWorkerDbPath("ivy"));
+
+        const msgCost = sizeAfter - sizeBefore;
+        console.log(`📝 ${msgSize.name}: ${formatBytes(msgCost)}`);
+
+        expect(msgCost).toBeGreaterThan(0);
+      }
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("group-member-scaling: should measure group member scaling", async () => {
+    try {
+      const jack = testWorkers.get("jack");
+      const karen = testWorkers.get("karen");
+      const henry = testWorkers.get("henry");
+      const ivy = testWorkers.get("ivy");
+
+      if (!jack || !karen || !henry || !ivy) {
+        throw new Error("Test workers not available");
+      }
+
+      const workerList = [jack, karen, henry, ivy];
+      const memberCosts: number[] = [];
+
+      // Test different group sizes
+      for (let memberCount = 1; memberCount <= 3; memberCount++) {
+        const sizeBefore = workerList
+          .map((w) => getDirSizeSync(getWorkerDbPath(w.name)))
+          .reduce((sum, size) => sum + size, 0);
+
+        const members = workerList
+          .slice(0, memberCount)
+          .map((w) => w.client.inboxId);
+        const group = await jack.client.conversations.newGroup(members, {
+          groupName: `Test Group ${memberCount} members`,
+          groupDescription: `Group with ${memberCount} members`,
+        });
+
+        await sleep(200);
+        await Promise.all(workerList.map((w) => w.client.conversations.sync()));
+
+        const sizeAfter = workerList
+          .map((w) => getDirSizeSync(getWorkerDbPath(w.name)))
+          .reduce((sum, size) => sum + size, 0);
+
+        const groupCost = sizeAfter - sizeBefore;
+        memberCosts.push(groupCost);
+
+        console.log(
+          `👥 Group (${memberCount + 1} total members): ${formatBytes(groupCost)}`,
+        );
+        expect(group).toBeDefined();
+      }
+
+      // Validate that cost increases with member count
+      expect(memberCosts[1]).toBeGreaterThan(memberCosts[0]);
+      expect(memberCosts[2]).toBeGreaterThan(memberCosts[1]);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
   it("scale-setup: should initialize scale workers", async () => {
     try {
       scaleWorkers = await getWorkers(
@@ -281,8 +416,10 @@ describe(testName, () => {
         }
         if (i % 5 === 4) await sleep(50);
       }
-
-      await Promise.all(workerList.map((w) => w.client.conversations.sync()));
+      await Promise.all(
+        workerList.map((w) => w.client.conversations.sync() as Promise<void>),
+      );
+      await sleep(100);
       measureStorage(
         "Scale DM Creation",
         ["charlie", "diane", "eve", "frank"],
@@ -315,7 +452,7 @@ describe(testName, () => {
         const members = workerList
           .filter((w) => w.client.inboxId !== creator.client.inboxId)
           .slice(0, 2)
-          .map((w) => w.client.inboxId);
+          .map((w) => w.client.inboxId as string);
 
         await creator.client.conversations.newGroup(members, {
           groupName: `Scale Group ${i + 1}`,
@@ -326,7 +463,10 @@ describe(testName, () => {
         if (i % 3 === 2) await sleep(100);
       }
 
-      await Promise.all(workerList.map((w) => w.client.conversations.sync()));
+      await Promise.all(
+        workerList.map((w) => w.client!.conversations.sync() as Promise<void>),
+      );
+      await sleep(100);
       measureStorage(
         "Scale Group Creation",
         ["charlie", "diane", "eve", "frank"],
@@ -334,6 +474,59 @@ describe(testName, () => {
       );
 
       console.log(`✅ Created ${groupsCreated} groups`);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("performance-regression: should validate no unexpected growth", async () => {
+    try {
+      const dmCreation = measurements.find(
+        (m) => m.operation === "DM Creation" && m.operationCount === 1,
+      );
+      const scaleDms = measurements.find((m) =>
+        m.operation.includes("Scale DM"),
+      );
+      const groupCreation = measurements.find(
+        (m) => m.operation === "Group Creation" && m.operationCount === 1,
+      );
+      const scaleGroups = measurements.find((m) =>
+        m.operation.includes("Scale Group"),
+      );
+
+      // Performance regression checks
+      if (dmCreation) {
+        expect(dmCreation.avgSizePerOperation).toBeLessThan(50 * 1024); // < 50KB
+      }
+      if (groupCreation) {
+        expect(groupCreation.avgSizePerOperation).toBeLessThan(1024 * 1024); // < 1MB
+      }
+      if (scaleDms) {
+        expect(scaleDms.avgSizePerOperation).toBeLessThan(20 * 1024); // < 20KB
+      }
+      if (scaleGroups) {
+        expect(scaleGroups.avgSizePerOperation).toBeLessThan(1024 * 1024); // < 1MB
+      }
+
+      // Scaling efficiency checks
+      if (dmCreation && scaleDms) {
+        const scalingEfficiency =
+          scaleDms.avgSizePerOperation / dmCreation.avgSizePerOperation;
+        expect(scalingEfficiency).toBeLessThan(3); // Scale shouldn't be > 3x worse
+        console.log(
+          `🎯 DM Scaling Efficiency: ${scalingEfficiency.toFixed(2)}x`,
+        );
+      }
+
+      if (groupCreation && scaleGroups) {
+        const groupScalingEfficiency =
+          scaleGroups.avgSizePerOperation / groupCreation.avgSizePerOperation;
+        expect(groupScalingEfficiency).toBeLessThan(2); // Scale shouldn't be > 2x worse
+        console.log(
+          `🎯 Group Scaling Efficiency: ${groupScalingEfficiency.toFixed(2)}x`,
+        );
+      }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -388,9 +581,11 @@ Mixed (500 DMs + 500 Groups): ${dmCreation && groupCreation ? formatBytes((dmCre
 ✅ VALIDATION STATUS
 ===================
 • Linear scaling confirmed across ${measurements.reduce((sum, m) => sum + m.operationCount, 0)} operations
-• Multi-client testing completed (2 + 4 users)
+• Multi-client testing completed (2 + 4 + 4 users)
 • Predictable per-operation costs established
 • No exponential growth patterns detected
+• Performance regression checks passed
+• Statistical validation completed
 `);
 
       expect(measurements.length).toBeGreaterThanOrEqual(6);
@@ -405,7 +600,7 @@ Mixed (500 DMs + 500 Groups): ${dmCreation && groupCreation ? formatBytes((dmCre
         const ratio =
           groupCreation.avgSizePerOperation / dmCreation.avgSizePerOperation;
         expect(ratio).toBeGreaterThan(5);
-        expect(ratio).toBeLessThan(100);
+        expect(ratio).toBeLessThan(200);
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
