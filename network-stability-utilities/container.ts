@@ -107,7 +107,7 @@ export class DockerContainer {
         }
     }
 
-    async addFixedLatencyTo(other: DockerContainer, latencyMs: number): Promise<void> {
+    addFixedLatencyTo(other: DockerContainer, latencyMs: number): void {
         netem.applyBidirectionalLatency(this, other, latencyMs);
     }
 
