@@ -1,6 +1,6 @@
 import { execSync, execFileSync } from "child_process";
-import { Netem } from "./netem";
-import { Iptables } from "./iptables";
+import * as netem from "./netem";
+import * as iptables from "./iptables";
 
 export class DockerContainer {
     name: string;
@@ -88,42 +88,39 @@ export class DockerContainer {
     }
 
     addLatency(ms: number): void {
-        if (!Netem?.applyLatency) {
-            throw new Error("Netem module not available.");
-        }
-        Netem.applyLatency(this, ms);
+        netem.applyLatency(this, ms);
     }
 
     addJitter(delay: number, jitter: number): void {
-        Netem.applyJitter(this, delay, jitter);
+        netem.applyJitter(this, delay, jitter);
     }
 
     addLoss(percent: number): void {
-        Netem.applyLoss(this, percent);
+        netem.applyLoss(this, percent);
     }
 
     clearLatency(): void {
         try {
-            Netem.clear(this);
+            netem.clear(this);
         } catch {
             console.log(`[netem] No existing qdisc to clear on ${this.name}`);
         }
     }
 
     async addFixedLatencyTo(other: DockerContainer, latencyMs: number): Promise<void> {
-        await Netem.applyBidirectionalLatency(this, other, latencyMs);
+        netem.applyBidirectionalLatency(this, other, latencyMs);
     }
 
     blockOutboundTrafficTo(target: DockerContainer): void {
-        Iptables.blockOutboundTraffic(this, target);
+        iptables.blockOutboundTraffic(this, target);
     }
 
     unblockOutboundTrafficTo(target: DockerContainer): void {
-        Iptables.unblockOutboundTraffic(this, target);
+        iptables.unblockOutboundTraffic(this, target);
     }
 
     blackHoleTo(target: DockerContainer): void {
-        Iptables.blockOutboundTraffic(this, target);
+        iptables.blockOutboundTraffic(this, target);
     }
 
     kill(): void {
