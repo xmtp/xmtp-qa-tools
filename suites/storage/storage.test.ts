@@ -65,14 +65,6 @@ interface StorageMeasurement {
   avgSizePerOperationFormatted: string;
 }
 
-interface StatisticalData {
-  mean: number;
-  stdDev: number;
-  min: number;
-  max: number;
-  confidenceInterval: [number, number];
-}
-
 describe(testName, () => {
   const measurements: StorageMeasurement[] = [];
   let previousTotalSize = 0;

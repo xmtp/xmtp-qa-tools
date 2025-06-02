@@ -8,8 +8,8 @@
   },
   {
     "app": "fabri-tba",
-    "address": "0xdb61a3c6a863459f53c38418cbed3af23b6c0358",
-    "inboxId": "f4e45cdf358dd939be3912cb55b104582fa66d4d5d2e93f1dfbde3a08de9b36b",
+    "address": "0x3176b56fc0e75e438116d6b4dc38dee9635a2234",
+    "inboxId": "264df87d201a5fab9b246ae559ee3b27caddb2f3dd7b3017a8f77582486e0bf4",
     "network": "production",
     "name": "prod-testing"
   },
