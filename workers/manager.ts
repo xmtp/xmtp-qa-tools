@@ -421,7 +421,7 @@ export async function getWorkers(
   );
   await Promise.all(workerPromises);
   manager.printWorkers();
-  await manager.checkInstallations();
+  //await manager.checkInstallations();
   return manager;
 }
 

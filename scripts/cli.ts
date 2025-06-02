@@ -139,7 +139,6 @@ function hasRetryOptions(args: string[]): boolean {
     "--debug-file",
     "--no-fail",
     "--debug-verbose",
-    "--parallel",
   ];
 
   return args.some((arg) => retrySpecificOptions.includes(arg));
@@ -309,8 +308,10 @@ function buildTestCommand(
     console.error("Error reading package.json:", error);
   }
 
-  const defaultThreadingOptions = parallel ? "--pool=forks" : "--pool=forks";
-  return `npx vitest run ${testName} ${defaultThreadingOptions} --fileParallelism=false ${vitestArgsString}`.trim();
+  const defaultThreadingOptions = parallel
+    ? "--pool=forks"
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+  return `npx vitest run ${testName} ${defaultThreadingOptions} ${vitestArgsString}`.trim();
 }
 
 async function runCommand(

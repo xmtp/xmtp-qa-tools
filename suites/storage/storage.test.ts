@@ -4,8 +4,8 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { sleep } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
-import { Dm, Group, type Conversation } from "@xmtp/node-sdk";
+import { getWorkers, type WorkerManager } from "@workers/manager";
+import { Dm, Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "storage";
@@ -73,28 +73,12 @@ interface StatisticalData {
   confidenceInterval: [number, number];
 }
 
-function calculateStats(values: number[]): StatisticalData {
-  const mean = values.reduce((sum, val) => sum + val, 0) / values.length;
-  const variance =
-    values.reduce((sum, val) => sum + Math.pow(val - mean, 2), 0) /
-    values.length;
-  const stdDev = Math.sqrt(variance);
-  const min = Math.min(...values);
-  const max = Math.max(...values);
-
-  // 95% confidence interval (assuming normal distribution)
-  const margin = 1.96 * (stdDev / Math.sqrt(values.length));
-  const confidenceInterval: [number, number] = [mean - margin, mean + margin];
-
-  return { mean, stdDev, min, max, confidenceInterval };
-}
-
 describe(testName, () => {
   const measurements: StorageMeasurement[] = [];
   let previousTotalSize = 0;
-  let basicWorkers: any;
-  let scaleWorkers: any;
-  let testWorkers: any;
+  let basicWorkers: WorkerManager;
+  let scaleWorkers: WorkerManager;
+  let testWorkers: WorkerManager;
 
   function measureStorage(
     operation: string,
@@ -416,9 +400,7 @@ describe(testName, () => {
         }
         if (i % 5 === 4) await sleep(50);
       }
-      await Promise.all(
-        workerList.map((w) => w.client.conversations.sync() as Promise<void>),
-      );
+      await Promise.all(workerList.map((w) => w.client.conversations.sync()));
       await sleep(100);
       measureStorage(
         "Scale DM Creation",
@@ -452,7 +434,7 @@ describe(testName, () => {
         const members = workerList
           .filter((w) => w.client.inboxId !== creator.client.inboxId)
           .slice(0, 2)
-          .map((w) => w.client.inboxId as string);
+          .map((w) => w.client.inboxId);
 
         await creator.client.conversations.newGroup(members, {
           groupName: `Scale Group ${i + 1}`,
@@ -463,9 +445,7 @@ describe(testName, () => {
         if (i % 3 === 2) await sleep(100);
       }
 
-      await Promise.all(
-        workerList.map((w) => w.client!.conversations.sync() as Promise<void>),
-      );
+      await Promise.all(workerList.map((w) => w.client.conversations.sync()));
       await sleep(100);
       measureStorage(
         "Scale Group Creation",
@@ -480,7 +460,7 @@ describe(testName, () => {
     }
   });
 
-  it("performance-regression: should validate no unexpected growth", async () => {
+  it("performance-regression: should validate no unexpected growth", () => {
     try {
       const dmCreation = measurements.find(
         (m) => m.operation === "DM Creation" && m.operationCount === 1,
