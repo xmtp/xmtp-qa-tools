@@ -155,10 +155,14 @@ export class DockerContainer {
     }
 
     static listByNamePrefix(prefix: string): DockerContainer[] {
-        const output = execSync(
-            `docker ps --format "{{.Names}}" | grep ^${prefix} || true`
-        ).toString().trim();
+        const output = execSync(`docker ps --format "{{.Names}}"`)
+            .toString()
+            .trim();
         if (!output) return [];
-        return output.split("\n").map((name) => new DockerContainer(name));
+        return output
+            .split("\n")
+            .filter((name) => name.startsWith(prefix))
+            .map((name) => new DockerContainer(name));
     }
+
 }
