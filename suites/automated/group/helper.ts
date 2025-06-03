@@ -91,50 +91,6 @@ export async function loadExistingGroups(
   return groupConfigs;
 }
 
-export async function createNewGroups(
-  workers: WorkerManager,
-  creator: Worker,
-  startIndex: number,
-): Promise<GroupConfig[]> {
-  const groupsToCreate = 5 - startIndex;
-  console.debug(`Creating ${groupsToCreate} new groups`);
-
-  await creator.client.conversations.syncAll();
-  const manualUsers = getManualUsers(["fabri-tba"]);
-  const allInboxIds = [
-    ...workers.getAllBut("bot").map((w) => w.client.inboxId),
-    manualUsers[0].inboxId,
-    ...getRandomInboxIds(60),
-  ];
-
-  const groupConfigs: GroupConfig[] = [];
-  for (let i = startIndex; i < 5; i++) {
-    const groupName = `Group ${getTime()} #${i + 1}`;
-
-    const group = (await creator.client.conversations.newGroup([], {
-      groupName: groupName,
-      groupDescription: `Test group ${i + 1} of 5`,
-    })) as Group;
-
-    await group.sync();
-    saveGroupToEnv(group.id);
-
-    try {
-      await group.addMembers(allInboxIds);
-      await group.addSuperAdmin(manualUsers[0].inboxId);
-    } catch (e) {
-      console.error(`Error setting up group ${i + 1}:`, e);
-    }
-
-    groupConfigs.push({
-      group,
-      features: getRandomFeatures(),
-      groupNumber: i + 1,
-    });
-  }
-  return groupConfigs;
-}
-
 export async function createSingleNewGroup(
   creator: Worker,
   groupNumber: number,
@@ -154,11 +110,17 @@ export async function createSingleNewGroup(
   await group.sync();
   saveGroupToEnv(group.id);
 
-  try {
-    await group.addMembers(allInboxIds);
-    await group.addSuperAdmin(manualUsers[0].inboxId);
-  } catch (e) {
-    console.error(`Error adding members to new group ${groupNumber}:`, e);
+  for (const inboxId of allInboxIds) {
+    try {
+      await group.addMembers([inboxId]);
+      await group.addAdmin(inboxId);
+      await group.sync();
+    } catch (e) {
+      console.error(
+        `Error adding member ${inboxId} to group ${groupNumber}:`,
+        e,
+      );
+    }
   }
 
   return {
