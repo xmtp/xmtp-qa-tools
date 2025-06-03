@@ -10,8 +10,8 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
-import { verifyEpochChange, type GroupConfig } from "./helper";
+import { beforeAll, describe, expect } from "vitest";
+import { type GroupConfig } from "./helper";
 
 const TEST_NAME = "group";
 const testConfig = {
@@ -22,11 +22,11 @@ const testConfig = {
   network: "local",
   preInstallations: 10,
   randomInboxIds: 60,
-  typeofStream: typeofStream.Message,
-  typeOfResponse: typeOfResponse.Gm,
+  typeofStream: typeofStream.None,
+  typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(40),
-  freshInstalls: false, // more installs
+  freshInstalls: false,
 } as const;
 
 loadEnv(TEST_NAME);

@@ -272,7 +272,7 @@ export class WorkerManager {
     for (const installId of newIds) {
       try {
         const descriptor = `${baseName}-${installId}`;
-        const newWorker = await this.createWorker(descriptor);
+        await this.createWorker(descriptor);
         console.log(`[${baseName}] Created installation: ${installId}`);
       } catch (error) {
         console.error(
@@ -531,7 +531,7 @@ export async function getWorkers(
     manager.createWorker(descriptor),
   );
   await Promise.all(workerPromises);
-  manager.printWorkers();
+  await manager.printWorkers();
   await manager.checkInstallations(installationCount);
   return manager;
 }

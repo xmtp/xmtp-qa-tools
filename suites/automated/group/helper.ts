@@ -1,6 +1,5 @@
-import { getTime } from "@helpers/logger";
-import { appendToEnv, getRandomInboxIds } from "@helpers/utils";
-import { type Worker, type WorkerManager } from "@workers/manager";
+import { getRandomInboxIds } from "@helpers/utils";
+import { type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
 export type TestFeature =
