@@ -122,7 +122,7 @@ export async function createSingleNewGroup(
     await group.addMembers(allInboxIds);
     await group.addSuperAdmin(manualUsers[0].inboxId);
   } catch (e) {
-    console.error(`Error setting up new group ${groupNumber}:`, e);
+    console.error(`Error adding members to new group ${groupNumber}:`, e);
   }
 
   return {

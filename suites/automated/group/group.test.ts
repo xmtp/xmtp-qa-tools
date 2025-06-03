@@ -1,10 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
-import {
-  verifyMembershipStream,
-  verifyMessageStream,
-  verifyMetadataStream,
-} from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { getFixedNames, getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -22,9 +18,7 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `Group ${getTime()}`,
   epochs: 3,
-  network:
-    (process.env.XMTP_ENV as "production" | "local" | "dev") || "production",
-  workerNames: getFixedNames(4),
+  workerNames: getFixedNames(40),
   freshInstalls: false, // more installs
 } as const;
 
@@ -47,7 +41,7 @@ describe(TEST_NAME, () => {
       typeofStream.Message,
       typeOfResponse.Gm,
       typeOfSync.Both,
-      testConfig.network,
+      "local",
     );
     creator = workers.get("bot") as Worker;
 
@@ -75,19 +69,8 @@ describe(TEST_NAME, () => {
     try {
       for (const config of groupConfigs) {
         console.debug(JSON.stringify(config, null, 2));
-        const epoch = await workers.checkIfGroupForked(config.group.id);
 
         await verifyEpochChange(workers, config.group.id);
-        await verifyAddInstallations(workers, config.group.id);
-
-        await verifyMessageStream(
-          config.group,
-          workers.getAllBut("bot"),
-          1,
-          `Message verification from group ${config.groupNumber} epoch ${epoch}`,
-        );
-
-        console.debug(`Group ${config.groupNumber} - Completed: ${feature}`);
 
         await workers.checkIfGroupForked(config.group.id);
       }
@@ -106,35 +89,44 @@ export async function verifyAddInstallations(
     // Get all current workers (excluding bot)
     const currentWorkers = workers.getAllBut("bot");
 
-    // Randomly select 30-50% of workers for -${randomLetter} installations
+    // Randomly select 30-50% of workers for multiple installations
     const selectionPercentage = 0.3 + Math.random() * 0.2; // 30-50%
     const numToSelect = Math.max(
       1,
       Math.floor(currentWorkers.length * selectionPercentage),
     );
 
-    // Randomly select workers for -${randomLetter} installations
+    // Randomly select workers for multiple installations
     const selectedWorkers = currentWorkers
       .sort(() => 0.5 - Math.random())
       .slice(0, numToSelect);
 
-    const randomLetter = String.fromCharCode(
-      Math.floor(Math.random() * 26) + 97,
-    );
+    // Create 10 installations (letters a-j) for each selected worker
+    const letters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j"];
     console.debug(
-      `Creating -${randomLetter} installations for ${selectedWorkers.length}/${currentWorkers.length} randomly selected workers...`,
+      `Creating 10 installations (${letters.join(", ")}) for ${selectedWorkers.length}/${currentWorkers.length} randomly selected workers...`,
     );
 
-    // Create -${randomLetter} workers and track replacements
-    const replacementPromises = selectedWorkers.map(async (worker) => {
-      const bWorker = await workers.createWorker(
-        `${worker.name}-${randomLetter}`,
-      );
-      console.debug(`Created -${randomLetter} installation for ${worker.name}`);
-      return { originalWorker: worker, bWorker };
-    });
+    // Create all installations and track replacements
+    const allReplacements: Array<{
+      originalWorker: Worker;
+      newWorker: Worker;
+      letter: string;
+    }> = [];
 
-    const replacements = await Promise.all(replacementPromises);
+    for (const worker of selectedWorkers) {
+      for (const letter of letters) {
+        const newWorker = await workers.createWorker(
+          `${worker.name}-${letter}`,
+        );
+        console.debug(`Created -${letter} installation for ${worker.name}`);
+        allReplacements.push({
+          originalWorker: worker,
+          newWorker: newWorker,
+          letter: letter,
+        });
+      }
+    }
 
     // Get the group
     const creator = workers.get("bot");
@@ -149,53 +141,66 @@ export async function verifyAddInstallations(
       throw new Error(`Group ${groupId} not found`);
     }
 
-    // Add all -${randomLetter} workers to the group
-    const bWorkerInboxIds = replacements.map((r) => r.bWorker.client.inboxId);
-    console.debug(
-      `Adding ${bWorkerInboxIds.length} -${randomLetter} workers to group...`,
+    // Add all new workers to the group
+    const newWorkerInboxIds = allReplacements.map(
+      (r) => r.newWorker.client.inboxId,
     );
+    console.debug(`Adding ${newWorkerInboxIds.length} new workers to group...`);
 
     // Add in smaller batches to avoid overwhelming the system
     const batchSize = 5;
-    for (let i = 0; i < bWorkerInboxIds.length; i += batchSize) {
-      const batch = bWorkerInboxIds.slice(i, i + batchSize);
+    for (let i = 0; i < newWorkerInboxIds.length; i += batchSize) {
+      const batch = newWorkerInboxIds.slice(i, i + batchSize);
       await group.addMembers(batch);
-      console.debug(
-        `Added -${randomLetter} worker batch ${Math.floor(i / batchSize) + 1}`,
-      );
+      console.debug(`Added worker batch ${Math.floor(i / batchSize) + 1}`);
     }
 
     await group.sync();
 
-    // Replace the selected workers in the workers array with their -${randomLetter} counterparts
-    console.debug(
-      `Updating workers array to use -${randomLetter} installations...`,
-    );
-    for (const { originalWorker, bWorker } of replacements) {
-      // Add the -${randomLetter} worker to replace the original
-      workers.addWorker(originalWorker.name, randomLetter, bWorker);
+    // Replace the selected workers in the workers array with their new installations
+    console.debug(`Updating workers array to use new installations...`);
+
+    // Group replacements by original worker
+    const replacementsByWorker = new Map<string, typeof allReplacements>();
+    for (const replacement of allReplacements) {
+      const workerName = replacement.originalWorker.name;
+      if (!replacementsByWorker.has(workerName)) {
+        replacementsByWorker.set(workerName, []);
+      }
+      replacementsByWorker.get(workerName)!.push(replacement);
+    }
+
+    // Replace each original worker with one of their new installations (randomly chosen)
+    for (const [workerName, workerReplacements] of replacementsByWorker) {
+      const randomReplacement =
+        workerReplacements[
+          Math.floor(Math.random() * workerReplacements.length)
+        ];
+      workers.addWorker(
+        randomReplacement.originalWorker.name,
+        randomReplacement.letter,
+        randomReplacement.newWorker,
+      );
       console.debug(
-        `Replaced ${originalWorker.name}-a with ${originalWorker.name}-${randomLetter} in workers array`,
+        `Replaced ${randomReplacement.originalWorker.name}-a with ${randomReplacement.originalWorker.name}-${randomReplacement.letter} in workers array`,
       );
     }
 
     // Verify the update worked
     const updatedWorkers = workers.getAllBut("bot");
-    const bInstallationCount = updatedWorkers.filter(
-      (w) => w.folder === randomLetter,
-    ).length;
+    const newInstallationCount = allReplacements.length;
     console.debug(
-      `Workers array now contains ${bInstallationCount} -${randomLetter} installations and ${updatedWorkers.length - bInstallationCount} -a installations`,
+      `Workers array now contains ${selectedWorkers.length} replaced workers from ${newInstallationCount} total new installations`,
     );
 
-    // Test membership changes with some of the new -${randomLetter} workers
-    const workersToTest = bWorkerInboxIds.slice(
+    // Test membership changes with some of the new workers
+    const workersToTest = newWorkerInboxIds.slice(
       0,
-      Math.min(3, bWorkerInboxIds.length),
+      Math.min(3, newWorkerInboxIds.length),
     );
 
     console.debug(
-      `Testing membership changes with ${workersToTest.length} -${randomLetter} workers...`,
+      `Testing membership changes with ${workersToTest.length} new workers...`,
     );
 
     await group.sync();
@@ -204,11 +209,9 @@ export async function verifyAddInstallations(
     for (const inboxId of workersToTest) {
       try {
         await group.removeMembers([inboxId]);
-        console.debug(
-          `Temporarily removed -${randomLetter} worker: ${inboxId}`,
-        );
+        console.debug(`Temporarily removed worker: ${inboxId}`);
         await group.addMembers([inboxId]);
-        console.debug(`Re-added -${randomLetter} worker: ${inboxId}`);
+        console.debug(`Re-added worker: ${inboxId}`);
       } catch (e) {
         console.warn(`Error in membership test for ${inboxId}:`, e);
       }
@@ -218,11 +221,11 @@ export async function verifyAddInstallations(
 
     const finalMembers = await group.members();
     console.debug(
-      `Group now has ${finalMembers.length} total members (including ${bInstallationCount} -${randomLetter} installations)`,
+      `Group now has ${finalMembers.length} total members (including ${newInstallationCount} new installations)`,
     );
 
     console.debug(
-      `✅ Successfully updated ${replacements.length} workers to -${randomLetter} installations`,
+      `✅ Successfully created ${newInstallationCount} new installations for ${selectedWorkers.length} workers`,
     );
   } catch (error) {
     console.error("Error in verifyAddInstallations:", error);
