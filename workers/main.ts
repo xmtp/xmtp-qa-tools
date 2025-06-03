@@ -288,7 +288,7 @@ export class WorkerClient extends Worker {
    */
   private startSyncs(interval: number = 10000) {
     if (this.typeofSync !== typeOfSync.None) {
-      console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
+      //console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
       void (async () => {
         while (true) {
           if (this.typeofSync === typeOfSync.SyncAll) {
