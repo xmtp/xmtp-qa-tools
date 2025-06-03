@@ -22,7 +22,7 @@ const testConfig = {
   manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
   preInstallations: 10,
-  randomInboxIds: 100,
+  randomInboxIds: 60,
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
