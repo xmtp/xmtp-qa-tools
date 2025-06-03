@@ -3,6 +3,7 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
+rm -rf logs
 
 while true; do
     echo "Starting test cycle at $(date)"

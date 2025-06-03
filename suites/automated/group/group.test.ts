@@ -1,6 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
+import {
+  verifyMembershipStream,
+  verifyMessageStream,
+  verifyMetadataStream,
+} from "@helpers/streams";
 import {
   appendToEnv,
   getFixedNames,
@@ -12,7 +16,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import { type GroupConfig } from "./helper";
+import { verifyEpochChange, type GroupConfig } from "./helper";
 
 const TEST_NAME = "group";
 const testConfig = {
@@ -21,7 +25,7 @@ const testConfig = {
   epochs: 3,
   manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
-  preInstallations: 10,
+  preInstallations: 20,
   randomInboxIds: 60,
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
@@ -107,10 +111,54 @@ describe(TEST_NAME, () => {
       `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
     );
   });
+
   it(`should verify all operations across all groups`, async () => {
     try {
       for (const config of groupConfigs) {
-        await verifyMessageStream(config.group, workers.getAllBut("bot"), 10);
+        console.debug(JSON.stringify(config, null, 2));
+        const epoch = await workers.checkIfGroupForked(config.group.id);
+
+        for (const feature of config.features) {
+          switch (feature) {
+            case "verifyMessageStream":
+              await verifyMessageStream(
+                config.group,
+                workers.getAllBut("bot"),
+                1,
+                `Message verification from group ${config.groupNumber} epoch ${epoch}`,
+              );
+              break;
+
+            case "verifyMembershipStream":
+              await verifyMembershipStream(
+                config.group,
+                workers.getAllBut("bot"),
+                getRandomInboxIds(1),
+              );
+              break;
+
+            case "verifyMetadataStream":
+              await verifyMetadataStream(
+                config.group,
+                workers.getAllBut("bot"),
+                1,
+                `${testConfig.groupName} #${config.groupNumber} - Updated`,
+              );
+              break;
+
+            case "verifyEpochChange":
+              await verifyEpochChange(
+                workers,
+                config.group.id,
+                testConfig.epochs,
+              );
+              break;
+          }
+
+          console.debug(`Group ${config.groupNumber} - Completed: ${feature}`);
+        }
+
+        await workers.checkIfGroupForked(config.group.id);
       }
     } catch (error) {
       console.error("Error in test:", error);
