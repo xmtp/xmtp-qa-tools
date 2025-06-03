@@ -1,5 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
 import {
   appendToEnv,
   getFixedNames,
@@ -10,7 +11,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 import { type GroupConfig } from "./helper";
 
 const TEST_NAME = "group";
@@ -19,9 +20,9 @@ const testConfig = {
   groupName: `Group ${getTime()}`,
   epochs: 3,
   manualUsers: getManualUsers(["fabri-tba"]),
-  network: "local",
+  network: "production",
   preInstallations: 10,
-  randomInboxIds: 60,
+  randomInboxIds: 100,
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
@@ -105,5 +106,15 @@ describe(TEST_NAME, () => {
     console.debug(
       `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
     );
+  });
+  it(`should verify all operations across all groups`, async () => {
+    try {
+      for (const config of groupConfigs) {
+        await verifyMessageStream(config.group, workers.getAllBut("bot"), 10);
+      }
+    } catch (error) {
+      console.error("Error in test:", error);
+      throw error;
+    }
   });
 });
