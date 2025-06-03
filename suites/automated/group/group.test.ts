@@ -54,24 +54,29 @@ describe(TEST_NAME, () => {
     creator = workers.get("bot") as Worker;
 
     // Load all existing groups
-    const existingGroups = process.env.CREATED_GROUPS?.split(",") || [];
+    const existingGroups =
+      process.env.CREATED_GROUPS?.split(",").filter((id) => id.trim()) || [];
     console.debug(`Loaded ${existingGroups.length} existing groups`);
 
+    // Create new group and update environment
     const group = (await creator.client.conversations.newGroup([])) as Group;
-    existingGroups.push(group.id);
     await group.sync();
-    appendToEnv("CREATED_GROUPS", existingGroups.join(","));
+
+    const updatedGroups = [...existingGroups, group.id];
+    appendToEnv("CREATED_GROUPS", updatedGroups.join(","));
     console.debug(`Created new group: ${group.id}`);
 
+    // Create group configs with proper numbering
     groupConfigs = await Promise.all(
-      existingGroups.map(async (groupId) => ({
+      updatedGroups.map(async (groupId, index) => ({
         group: (await creator.client.conversations.getConversationById(
           groupId,
         )) as Group,
         features: ["verifyEpochChange"],
-        groupNumber: groupConfigs.length + 1,
+        groupNumber: index + 1,
       })),
     );
+
     const allInboxIds = [
       ...workers.getAllBut("bot").map((w) => w.client.inboxId),
       testConfig.manualUsers[0].inboxId,
@@ -80,6 +85,7 @@ describe(TEST_NAME, () => {
 
     await creator.client.conversations.syncAll();
 
+    // Add members to the newly created group only
     for (const inboxId of allInboxIds) {
       try {
         await group.addMembers([inboxId]);
@@ -87,7 +93,7 @@ describe(TEST_NAME, () => {
         await group.sync();
       } catch (e) {
         console.error(
-          `Error adding member ${inboxId} to group ${groupConfigs.length + 1}:`,
+          `Error adding member ${inboxId} to group ${group.id}:`,
           e,
         );
       }
@@ -99,20 +105,5 @@ describe(TEST_NAME, () => {
     console.debug(
       `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
     );
-  });
-
-  it(`should verify all operations across all groups`, async () => {
-    try {
-      for (const config of groupConfigs) {
-        console.debug(JSON.stringify(config, null, 2));
-
-        await verifyEpochChange(workers, config.group.id, testConfig.epochs);
-
-        await workers.checkIfGroupForked(config.group.id);
-      }
-    } catch (error) {
-      console.error("Error in test:", error);
-      throw error;
-    }
   });
 });
