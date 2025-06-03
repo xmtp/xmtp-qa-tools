@@ -396,6 +396,8 @@ export function getAddresses(count: number) {
 export const appendToEnv = (key: string, value: string): void => {
   try {
     const envPath = getEnvPath();
+    console.debug(`[appendToEnv] Env path resolved to: ${envPath}`);
+    console.debug(`[appendToEnv] File exists: ${fs.existsSync(envPath)}`);
 
     // Update process.env
     if (key in process.env) {
@@ -406,24 +408,46 @@ export const appendToEnv = (key: string, value: string): void => {
     let envContent = "";
     try {
       envContent = fs.readFileSync(envPath, "utf8");
-    } catch {
-      console.debug("Creating new .env file");
+      console.debug(
+        `[appendToEnv] Read existing .env content (${envContent.length} chars)`,
+      );
+    } catch (error: unknown) {
+      console.debug(
+        `[appendToEnv] Creating new .env file, error reading: ${error instanceof Error ? error.message : String(error)}`,
+      );
     }
 
     // Escape regex special chars
     const escapedKey = key.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&");
+    console.debug(`[appendToEnv] Escaped key: ${escapedKey}`);
 
     // Update or add the key
     if (envContent.includes(`${key}=`)) {
+      console.debug(`[appendToEnv] Key ${key} already exists, updating`);
       envContent = envContent.replace(
         new RegExp(`${escapedKey}=.*(\\r?\\n|$)`, "g"),
         `${key}="${value}"$1`,
       );
     } else {
+      console.debug(`[appendToEnv] Key ${key} does not exist, appending`);
       envContent += `\n${key}="${value}"\n`;
     }
 
+    console.debug(`[appendToEnv] About to write to file: ${envPath}`);
+    console.debug(
+      `[appendToEnv] New content length: ${envContent.length} chars`,
+    );
+
     fs.writeFileSync(envPath, envContent);
+    console.debug(`[appendToEnv] Successfully wrote to file`);
+
+    // Verify the write
+    const verifyContent = fs.readFileSync(envPath, "utf8");
+    const hasOurKey = verifyContent.includes(`${key}=`);
+    console.debug(
+      `[appendToEnv] Verification - file contains ${key}: ${hasOurKey}`,
+    );
+
     console.debug(`Updated .env with ${key}: ${value}`);
   } catch (error) {
     console.error(`Failed to update .env with ${key}:`, error);

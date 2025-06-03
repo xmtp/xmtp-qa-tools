@@ -14,6 +14,7 @@ interface RetryOptions {
   noFail: boolean;
   explicitLogFlag: boolean;
   verboseLogging: boolean;
+  parallel: boolean;
 }
 
 function expandGlobPattern(pattern: string): string[] {
@@ -68,6 +69,9 @@ function showUsageAndExit(): never {
     "      --retry-delay <S>   Delay in seconds between retries (default: 10)",
   );
   console.error(
+    "      --parallel          Run tests in parallel (default: consecutive)",
+  );
+  console.error(
     "      --debug / --no-log    Enable/disable logging to file (default: enabled)",
   );
   console.error(
@@ -91,6 +95,9 @@ function showUsageAndExit(): never {
   console.error("  yarn cli test ./suites/automated/Gm/gm.test.ts --watch");
   console.error(
     "  yarn cli test functional --max-attempts 2  # Uses retry mode",
+  );
+  console.error(
+    "  yarn cli test functional --parallel       # Runs tests in parallel",
   );
   console.error(
     "  yarn cli test functional --debug-verbose   # Shows output in terminal AND logs to file",
@@ -138,7 +145,16 @@ function hasRetryOptions(args: string[]): boolean {
 }
 
 function runSimpleVitest(testName: string, args: string[]): void {
-  const command = buildTestCommand(testName, args);
+  // Check if --parallel flag is present
+  const parallelIndex = args.indexOf("--parallel");
+  const isParallel = parallelIndex !== -1;
+
+  // Remove --parallel from args since it's not a vitest option
+  const filteredArgs = isParallel
+    ? args.filter((_, index) => index !== parallelIndex)
+    : args;
+
+  const command = buildTestCommand(testName, filteredArgs, isParallel);
   console.log(`Running vitest: ${command}`);
 
   // Check if --debug was explicitly passed
@@ -173,6 +189,7 @@ function parseTestArgs(args: string[]): {
     noFail: false,
     explicitLogFlag: false,
     verboseLogging: false,
+    parallel: false,
   };
 
   let currentArgs = [...args];
@@ -233,6 +250,9 @@ function parseTestArgs(args: string[]): {
       case "--verbose-logging":
         options.verboseLogging = true;
         break;
+      case "--parallel":
+        options.parallel = true;
+        break;
       default:
         options.vitestArgs.push(arg);
     }
@@ -241,15 +261,24 @@ function parseTestArgs(args: string[]): {
   return { testName, options };
 }
 
-function buildTestCommand(testName: string, vitestArgs: string[]): string {
+function buildTestCommand(
+  testName: string,
+  vitestArgs: string[],
+  parallel: boolean = false,
+): string {
   const vitestArgsString = vitestArgs.join(" ");
+
+  // Base threading options for consecutive execution
+  const threadingOptions = parallel
+    ? ""
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
 
   if (testName === "functional") {
     const expandedFiles = expandGlobPattern("./functional/*.test.ts");
     if (expandedFiles.length === 0) {
       throw new Error("No functional test files found");
     }
-    return `npx vitest run ${expandedFiles.join(" ")} --pool=threads --poolOptions.singleThread=true --fileParallelism=false ${vitestArgsString}`;
+    return `npx vitest run ${expandedFiles.join(" ")} ${threadingOptions} ${vitestArgsString}`.trim();
   }
 
   // Check for npm script
@@ -270,16 +299,19 @@ function buildTestCommand(testName: string, vitestArgs: string[]): string {
           if (expandedFiles.length === 0) {
             throw new Error(`No test files found for pattern: ${globMatch[1]}`);
           }
-          return `${script.replace(globMatch[1], expandedFiles.join(" "))} ${vitestArgsString}`;
+          return `${script.replace(globMatch[1], expandedFiles.join(" "))} ${vitestArgsString}`.trim();
         }
       }
-      return `yarn ${testName} ${vitestArgsString}`;
+      return `yarn ${testName} ${vitestArgsString}`.trim();
     }
   } catch (error: unknown) {
     console.error("Error reading package.json:", error);
   }
 
-  return `npx vitest run ${testName} --pool=forks --fileParallelism=false ${vitestArgsString}`;
+  const defaultThreadingOptions = parallel
+    ? "--pool=forks"
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+  return `npx vitest run ${testName} ${defaultThreadingOptions} ${vitestArgsString}`.trim();
 }
 
 async function runCommand(
@@ -346,7 +378,11 @@ async function runRetryTests(
     console.log(`Attempt ${attempt} of ${options.maxAttempts}...`);
 
     try {
-      const command = buildTestCommand(testName, options.vitestArgs);
+      const command = buildTestCommand(
+        testName,
+        options.vitestArgs,
+        options.parallel,
+      );
       console.log(`Executing: ${command}`);
 
       const { exitCode, errorOutput } = await runCommand(command, env, logger);

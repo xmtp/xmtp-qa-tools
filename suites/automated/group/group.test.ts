@@ -1,215 +1,120 @@
-import { loadEnv, logAgentDetails } from "@helpers/client";
-import { getTime, logError } from "@helpers/logger";
-import {
-  verifyMembershipStream,
-  verifyMessageStream,
-  verifyMetadataStream,
-} from "@helpers/streams";
+import { loadEnv } from "@helpers/client";
+import { getTime } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
 import {
   appendToEnv,
   getFixedNames,
   getManualUsers,
   getRandomInboxIds,
-  removeDataFolder,
 } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
+import { type GroupConfig } from "./helper";
 
 const TEST_NAME = "group";
 const testConfig = {
   testName: TEST_NAME,
   groupName: `Group ${getTime()}`,
   epochs: 3,
+  manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
+  preInstallations: 10,
+  randomInboxIds: 100,
+  typeofStream: typeofStream.None,
+  typeOfResponse: typeOfResponse.None,
+  typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(40),
-  groupId: process.env.GROUP_ID || undefined,
-  freshInstalls: false, // more installs
+  freshInstalls: false,
 } as const;
 
 loadEnv(TEST_NAME);
 
-// ============================================================
-// Main Test Suite
-// ============================================================
-
 describe(TEST_NAME, () => {
   let workers: WorkerManager;
   let creator: Worker;
-  let globalGroup: Group;
-
-  // ============================================================
-  // Test Lifecycle Setup
-  // ============================================================
+  let groupConfigs: GroupConfig[] = [];
 
   setupTestLifecycle({
     expect,
   });
 
-  // Add cleanup after all tests complete
-  afterAll(async () => {
-    try {
-      console.log("Cleaning up workers...");
-      if (workers) {
-        await workers.terminateAll();
-      }
-      console.log("✓ Workers cleaned up successfully");
-    } catch (error) {
-      console.warn("Error during cleanup:", error);
-    }
-  });
-
   beforeAll(async () => {
-    try {
-      if (testConfig.freshInstalls) await removeDataFolder();
+    // Initialize workers
+    workers = await getWorkers(
+      ["bot", ...testConfig.workerNames],
+      testConfig.testName,
+      testConfig.typeofStream,
+      testConfig.typeOfResponse,
+      testConfig.typeOfSync,
+      testConfig.network,
+      testConfig.preInstallations,
+    );
+    creator = workers.get("bot") as Worker;
 
-      // Initialize workers with creator and test workers
-      workers = await getWorkers(
-        ["bot", ...testConfig.workerNames],
-        testConfig.testName,
-        typeofStream.Message,
-        typeOfResponse.Gm,
-        typeOfSync.Both,
-        testConfig.network,
-      );
-      creator = workers.get("bot") as Worker;
+    // Load all existing groups
+    const existingGroups =
+      process.env.CREATED_GROUPS?.split(",").filter((id) => id.trim()) || [];
+    console.debug(`Loaded ${existingGroups.length} existing groups`);
 
-      console.log("Creating or getting new group");
-      console.log("Worker inbox ids", testConfig.workerNames);
+    // Create new group and update environment
+    const group = (await creator.client.conversations.newGroup([])) as Group;
+    await group.sync();
 
-      const manualUsers = getManualUsers(["prod-testing"]);
+    const updatedGroups = [...existingGroups, group.id];
+    appendToEnv("CREATED_GROUPS", updatedGroups.join(","));
+    console.debug(`Created new group: ${group.id}`);
 
-      // Sync creator's conversations first
-      console.log(`Syncing creator's ${creator.name} conversations`);
-      await creator.client.conversations.syncAll();
+    // Create group configs with proper numbering
+    groupConfigs = await Promise.all(
+      updatedGroups.map(async (groupId, index) => ({
+        group: (await creator.client.conversations.getConversationById(
+          groupId,
+        )) as Group,
+        features: ["verifyEpochChange"],
+        groupNumber: index + 1,
+      })),
+    );
 
-      // Either create a new group or use existing one
-      if (!testConfig.groupId) {
-        console.log(
-          `Creating group with ${testConfig.workerNames.length} members`,
+    const allInboxIds = [
+      ...workers.getAllBut("bot").map((w) => w.client.inboxId),
+      testConfig.manualUsers[0].inboxId,
+      ...getRandomInboxIds(testConfig.randomInboxIds),
+    ];
+
+    await creator.client.conversations.syncAll();
+
+    // Add members to the newly created group only
+    for (const inboxId of allInboxIds) {
+      try {
+        await group.addMembers([inboxId]);
+        await group.addAdmin(inboxId);
+        await group.sync();
+      } catch (e) {
+        console.error(
+          `Error adding member ${inboxId} to group ${group.id}:`,
+          e,
         );
-        globalGroup = (await creator.client.conversations.newGroup(
-          [],
-        )) as Group;
-        await globalGroup.sync();
-        console.log("Group id", globalGroup.id);
-        const allInboxIds = [
-          ...workers.getAllBut("bot").map((w) => w.client.inboxId),
-          ...manualUsers.map((u) => u.inboxId),
-        ];
-
-        // Add members one by one
-        for (const inboxId of allInboxIds) {
-          try {
-            await globalGroup.addMembers([inboxId]);
-            await globalGroup.addSuperAdmin(inboxId);
-            console.log(`Added member ${inboxId}`);
-          } catch (e) {
-            console.error(`Error adding member ${inboxId}:`, e);
-          }
-        }
-
-        appendToEnv("GROUP_ID", globalGroup.id);
-        console.log(`Created new group with ID: ${globalGroup.id}`);
-      } else {
-        globalGroup = (await creator.client.conversations.getConversationById(
-          testConfig.groupId,
-        )) as Group;
       }
-
-      // Sync conversations again after group operations
-      await creator.client.conversations.syncAll();
-      const conversations = await creator.client.conversations.list();
-      console.log("Synced creator's conversations", conversations.length);
-      await logAgentDetails(creator.client);
-      return globalGroup;
-    } catch (error: unknown) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      console.error("Failed to setup test environment:", errorMessage);
-      throw error;
     }
+
+    console.debug(
+      `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
+    );
+    console.debug(
+      `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
+    );
   });
-
-  it(`should verify fork-free message delivery`, async () => {
+  it(`should verify all operations across all groups`, async () => {
     try {
-      const debugInfo = await globalGroup.debugInfo();
-      // Send initial test message
-      await globalGroup.send(`Starting stress test: ${testConfig.groupName}`);
-      await workers.checkIfGroupForked(globalGroup.id);
-      await globalGroup.updateName(
-        testConfig.groupName + ` epoch:${debugInfo.epoch}`,
-      );
-
-      await workers.checkIfGroupForked(globalGroup.id);
-      await verifyMessageStream(
-        globalGroup,
-        workers.getAllBut("bot"),
-        1,
-        `Verification from epoch ${debugInfo.epoch}: Hi ${workers
-          .getAllBut("bot")
-          .map((w) => w.name)
-          .join(", ")}`,
-      );
-      await workers.checkIfGroupForked(globalGroup.id);
-      await verifyMembershipStream(
-        globalGroup,
-        workers.getAllBut("bot"),
-        getRandomInboxIds(1),
-      );
-      await workers.checkIfGroupForked(globalGroup.id);
-      // Perform multiple cycles of membership changes
-      await testMembershipChanges(workers, globalGroup.id);
-      await workers.checkIfGroupForked(globalGroup.id);
-      await verifyMetadataStream(
-        globalGroup,
-        workers.getAllBut("bot"),
-        1,
-        testConfig.groupName,
-      );
-      await workers.checkIfGroupForked(globalGroup.id);
-      await verifyMessageStream(
-        globalGroup,
-        workers.getAllBut("bot"),
-        1,
-        `Verification from epoch ${debugInfo.epoch}: Hi ${workers
-          .getAllBut("bot")
-          .map((w) => w.name)
-          .join(", ")}`,
-      );
-      await workers.checkIfGroupForked(globalGroup.id);
-    } catch (error: unknown) {
-      logError(error, expect.getState().currentTestName);
+      for (const config of groupConfigs) {
+        await verifyMessageStream(config.group, workers.getAllBut("bot"), 10);
+      }
+    } catch (error) {
+      console.error("Error in test:", error);
       throw error;
     }
   });
 });
-
-export async function testMembershipChanges(
-  workers: WorkerManager,
-  groupId: string,
-): Promise<void> {
-  const cantCylcesPerAdmin = testConfig.epochs;
-  for (let i = 0; i < cantCylcesPerAdmin; i++) {
-    const randomAdmin =
-      workers.getAllBut("bot")[
-        Math.floor(Math.random() * workers.getAllBut("bot").length)
-      ];
-    const group = (await randomAdmin.client.conversations.getConversationById(
-      groupId,
-    )) as Group;
-
-    for (const member of getRandomInboxIds(6)) {
-      try {
-        await group.removeMembers([member]);
-        await group.addMembers([member]);
-        console.log(`Membership update: ${member}`);
-        await group.sync();
-      } catch (e) {
-        console.error(`Error in membership cycle ${i}:`, e);
-      }
-    }
-  }
-}

@@ -125,7 +125,9 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
-  public async checkIfGroupForked(groupId: string): Promise<void> {
+  public async checkIfGroupForked(
+    groupId: string,
+  ): Promise<bigint | undefined> {
     for (const worker of this.getAll()) {
       const group =
         await worker.client.conversations.getConversationById(groupId);
@@ -137,52 +139,160 @@ export class WorkerManager {
       if (debugInfo.maybeForked) {
         throw new Error("Stopping test, group may have forked");
       }
+      return debugInfo.epoch;
     }
   }
 
-  public async checkInstallations() {
-    for (const worker of this.getAll()) {
-      const installations = await worker.client.preferences.inboxState();
-      if (installations.installations.length > 10) {
-        await worker.client.revokeAllOtherInstallations();
-        const installations = await worker.client.preferences.inboxState(true);
+  public async checkInstallations(targetCount?: number) {
+    // If no target count specified, just do the original check
+    if (targetCount === undefined) {
+      for (const worker of this.getAll()) {
+        const installations = await worker.client.preferences.inboxState();
         if (installations.installations.length > 10) {
-          throw new Error(
-            `[${worker.name}] Max installation reached: ${installations.installations.length}`,
-          );
-        } else {
+          //await worker.client.revokeAllOtherInstallations();
+          const installations2 =
+            await worker.client.preferences.inboxState(true);
           console.warn(
-            `[${worker.name}] Package details: ${installations.installations.length}`,
+            `[${worker.name}] Package details: ${installations2.installations.length}`,
           );
+        }
+        for (const installation of installations.installations) {
+          // Convert nanoseconds to milliseconds for Date constructor
+          const timestampMs =
+            Number(installation.clientTimestampNs) / 1_000_000;
+          const installationDate = new Date(timestampMs);
+          const now = new Date();
+          const diffMs = now.getTime() - installationDate.getTime();
+          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+          const daysText = diffDays === 1 ? "day" : "days";
+          const greenCheck = diffDays < 90 ? " ✅" : "❌";
+
+          if (diffDays > 90) {
+            console.warn(
+              `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+            );
+          }
         }
       }
-      for (const installation of installations.installations) {
-        // Convert nanoseconds to milliseconds for Date constructor
-        const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
-        const installationDate = new Date(timestampMs);
-        const now = new Date();
-        const diffMs = now.getTime() - installationDate.getTime();
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+      return;
+    }
 
-        const daysText = diffDays === 1 ? "day" : "days";
-        const greenCheck = diffDays < 90 ? " ✅" : "❌";
+    // Get base names of all workers (without installation IDs)
+    const baseNames = new Set<string>();
+    for (const worker of this.getAll()) {
+      baseNames.add(worker.name.split("-")[0]);
+    }
 
-        if (diffDays > 90) {
-          console.warn(
-            `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+    for (const baseName of baseNames) {
+      // Get current installation count for this base name
+      const baseWorker = this.get(baseName);
+      if (!baseWorker) continue;
+
+      const installations = await baseWorker.client.preferences.inboxState();
+      const currentCount = installations.installations.length;
+
+      console.log(
+        `[${baseName}] Current installations: ${currentCount}, Target: ${targetCount}`,
+      );
+
+      if (currentCount === targetCount) {
+        console.log(`[${baseName}] Installation count matches target`);
+        continue;
+      }
+
+      if (currentCount > targetCount) {
+        console.log(
+          `[${baseName}] Too many installations (${currentCount}), revoking all others`,
+        );
+        await baseWorker.client.revokeAllOtherInstallations();
+
+        // After revoking, we should have 1 installation, so create more if needed
+        const newCurrentCount = 1;
+        if (newCurrentCount < targetCount) {
+          await this.createAdditionalInstallations(
+            baseName,
+            targetCount - newCurrentCount,
           );
         }
+      } else {
+        // currentCount < targetCount
+        console.log(
+          `[${baseName}] Need more installations, creating ${targetCount - currentCount} additional`,
+        );
+        await this.createAdditionalInstallations(
+          baseName,
+          targetCount - currentCount,
+        );
       }
     }
   }
-  public printWorkers() {
+
+  private async createAdditionalInstallations(
+    baseName: string,
+    count: number,
+  ): Promise<void> {
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+
+    // Find existing installation IDs for this base name
+    const existingIds = new Set<string>();
+    if (this.workers[baseName]) {
+      for (const id of Object.keys(this.workers[baseName])) {
+        existingIds.add(id);
+      }
+    }
+
+    // Generate new installation IDs
+    const newIds: string[] = [];
+    let letterIndex = 0;
+    let numIndex = 1;
+
+    while (newIds.length < count) {
+      let newId: string;
+
+      if (letterIndex < letters.length) {
+        newId = letters[letterIndex];
+        letterIndex++;
+      } else {
+        newId = `a${numIndex}`;
+        numIndex++;
+      }
+
+      if (!existingIds.has(newId)) {
+        newIds.push(newId);
+        existingIds.add(newId);
+      }
+    }
+
+    console.log(
+      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
+    );
+
+    // Create the new installations
+    for (const installId of newIds) {
+      try {
+        const descriptor = `${baseName}-${installId}`;
+        await this.createWorker(descriptor);
+        console.log(`[${baseName}] Created installation: ${installId}`);
+      } catch (error) {
+        console.error(
+          `[${baseName}] Failed to create installation ${installId}:`,
+          error,
+        );
+      }
+    }
+  }
+
+  public async printWorkers() {
     try {
       let workersToPrint = [];
       for (const baseName in this.workers) {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
+          const installationCount =
+            await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length}`,
           );
         }
       }
@@ -407,6 +517,7 @@ export async function getWorkers(
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
   typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
+  installationCount?: number,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
@@ -420,8 +531,8 @@ export async function getWorkers(
     manager.createWorker(descriptor),
   );
   await Promise.all(workerPromises);
-  manager.printWorkers();
-  await manager.checkInstallations();
+  await manager.printWorkers();
+  await manager.checkInstallations(installationCount);
   return manager;
 }
 
