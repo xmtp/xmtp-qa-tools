@@ -1,5 +1,5 @@
 import { getTime } from "@helpers/logger";
-import { appendToEnv, getManualUsers, getRandomInboxIds } from "@helpers/utils";
+import { appendToEnv, getRandomInboxIds } from "@helpers/utils";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
@@ -167,7 +167,15 @@ export const getExistingGroupIds = (): string[] => {
  */
 export const saveGroupToEnv = (groupId: string): void => {
   try {
+    console.debug(`[saveGroupToEnv] Attempting to save group ID: ${groupId}`);
+    console.debug(
+      `[saveGroupToEnv] Current working directory: ${process.cwd()}`,
+    );
+
     const existingIds = getExistingGroupIds();
+    console.debug(
+      `[saveGroupToEnv] Existing group IDs: ${JSON.stringify(existingIds)}`,
+    );
 
     // Add new group ID if it doesn't already exist
     if (!existingIds.includes(groupId)) {
@@ -176,12 +184,21 @@ export const saveGroupToEnv = (groupId: string): void => {
           ? `${existingIds.join(",")},${groupId}`
           : groupId;
 
+      console.debug(`[saveGroupToEnv] New groups string: ${newGroupsString}`);
+
       appendToEnv("CREATED_GROUPS", newGroupsString);
+      console.debug(
+        `[saveGroupToEnv] Called appendToEnv with CREATED_GROUPS=${newGroupsString}`,
+      );
+
       console.debug(`Saved group ID ${groupId} to .env`);
       console.debug(`Total groups now: ${existingIds.length + 1}`);
 
       // Update process.env for immediate use in same process
       process.env.CREATED_GROUPS = newGroupsString;
+      console.debug(
+        `[saveGroupToEnv] Updated process.env.CREATED_GROUPS: ${process.env.CREATED_GROUPS}`,
+      );
     } else {
       console.debug(`Group ID ${groupId} already exists in .env`);
     }
