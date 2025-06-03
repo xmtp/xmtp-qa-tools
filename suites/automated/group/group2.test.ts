@@ -271,15 +271,6 @@ describe("E2E: Installation syncing", () => {
         }),
       );
       console.log("=================================================");
-
-      // verify sync counts
-      // let extraCount = CHAOS_INSTALLATIONS;
-      // syncs.forEach((sync) => {
-      //   expect(Number(sync)).toBe(TOTAL_GROUPS + extraCount);
-      //   extraCount--;
-      // });
-
-      // verify installation groups, members, and messages
       await Promise.all(
         installations.map(async (installation) => {
           const groups = await installation.conversations.list();
