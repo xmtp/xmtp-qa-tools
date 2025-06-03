@@ -136,19 +136,13 @@ export async function createNewGroups(
 }
 
 export async function createSingleNewGroup(
-  workers: WorkerManager,
   creator: Worker,
   groupNumber: number,
+  allInboxIds: string[],
 ): Promise<GroupConfig> {
   console.debug(`Creating 1 new group (${groupNumber})`);
 
   await creator.client.conversations.syncAll();
-  const manualUsers = getManualUsers(["fabri-tba"]);
-  const allInboxIds = [
-    ...workers.getAllBut("bot").map((w) => w.client.inboxId),
-    manualUsers[0].inboxId,
-    ...getRandomInboxIds(60),
-  ];
 
   const groupName = `Group ${getTime()} #${groupNumber}`;
 
@@ -186,6 +180,7 @@ function getRandomFeatures(): TestFeature[] {
   const shuffled = allFeatures.sort(() => 0.5 - Math.random());
   return shuffled.slice(0, numFeatures);
 }
+
 export const getExistingGroupIds = (): string[] => {
   try {
     const groupsString = process.env.CREATED_GROUPS;
@@ -193,8 +188,9 @@ export const getExistingGroupIds = (): string[] => {
       return [];
     }
 
-    // Parse comma-separated group IDs
-    return groupsString
+    // Remove surrounding quotes if they exist and parse comma-separated group IDs
+    const cleanedString = groupsString.replace(/^"(.*)"$/, "$1");
+    return cleanedString
       .split(",")
       .map((id) => id.trim())
       .filter((id) => id.length > 0);
@@ -209,19 +205,21 @@ export const getExistingGroupIds = (): string[] => {
  */
 export const saveGroupToEnv = (groupId: string): void => {
   try {
-    const existingGroupsString = process.env.CREATED_GROUPS || "";
-    const existingIds = existingGroupsString
-      .split(",")
-      .map((id) => id.trim())
-      .filter((id) => id.length > 0);
+    const existingIds = getExistingGroupIds();
 
     // Add new group ID if it doesn't already exist
     if (!existingIds.includes(groupId)) {
       const newGroupsString =
-        existingIds.length > 0 ? `${existingGroupsString},${groupId}` : groupId;
+        existingIds.length > 0
+          ? `${existingIds.join(",")},${groupId}`
+          : groupId;
 
       appendToEnv("CREATED_GROUPS", newGroupsString);
       console.debug(`Saved group ID ${groupId} to .env`);
+      console.debug(`Total groups now: ${existingIds.length + 1}`);
+
+      // Update process.env for immediate use in same process
+      process.env.CREATED_GROUPS = newGroupsString;
     } else {
       console.debug(`Group ID ${groupId} already exists in .env`);
     }

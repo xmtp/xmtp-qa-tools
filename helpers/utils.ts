@@ -567,29 +567,3 @@ export const logAndSend = async (
     await conversation.send(message);
   }
 };
-
-/**
- * Saves a group ID to the .env file as comma-separated values
- */
-export const saveGroupToEnv = (groupId: string): void => {
-  try {
-    const existingGroupsString = process.env.CREATED_GROUPS || "";
-    const existingIds = existingGroupsString
-      .split(",")
-      .map((id) => id.trim())
-      .filter((id) => id.length > 0);
-
-    // Add new group ID if it doesn't already exist
-    if (!existingIds.includes(groupId)) {
-      const newGroupsString =
-        existingIds.length > 0 ? `${existingGroupsString},${groupId}` : groupId;
-
-      appendToEnv("CREATED_GROUPS", newGroupsString);
-      console.debug(`Saved group ID ${groupId} to .env`);
-    } else {
-      console.debug(`Group ID ${groupId} already exists in .env`);
-    }
-  } catch (error) {
-    console.error("Failed to save group to .env:", error);
-  }
-};

@@ -1,6 +1,10 @@
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
-import { getFixedNames } from "@helpers/utils";
+import {
+  getFixedNames,
+  getManualUsers,
+  getRandomInboxIds,
+} from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -17,8 +21,10 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `Group ${getTime()}`,
   epochs: 3,
+  manualUsers: getManualUsers(["fabri-tba"]),
   network: "local",
   preInstallations: 10,
+  randomInboxIds: 60,
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
@@ -55,18 +61,30 @@ describe(TEST_NAME, () => {
     groupConfigs = [...existingGroups];
 
     console.debug(`Loaded ${groupConfigs.length} existing groups`);
-
+    if (groupConfigs.length > 0) {
+      console.debug(
+        `Existing group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
+      );
+    }
+    const allInboxIds = [
+      ...workers.getAllBut("bot").map((w) => w.client.inboxId),
+      testConfig.manualUsers[0].inboxId,
+      ...getRandomInboxIds(testConfig.randomInboxIds),
+    ];
     // Always create 1 new group per test run
     console.debug("Creating 1 new group for this test run...");
     const newGroup = await createSingleNewGroup(
-      workers,
       creator,
       groupConfigs.length + 1,
+      allInboxIds,
     );
     groupConfigs.push(newGroup);
 
     console.debug(
       `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
+    );
+    console.debug(
+      `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
     );
   });
 

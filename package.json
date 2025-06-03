@@ -61,7 +61,7 @@
     "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13",
     "axios": "^1.8.2",
     "datadog-metrics": "^0.12.1",
-    "dotenv": "^16.4.5",
+    "dotenv": "^16.5.0",
     "node-fetch": "^3.3.0",
     "rimraf": "^6.0.1",
     "uint8arrays": "^5.1.0",

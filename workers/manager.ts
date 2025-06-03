@@ -283,14 +283,16 @@ export class WorkerManager {
     }
   }
 
-  public printWorkers() {
+  public async printWorkers() {
     try {
       let workersToPrint = [];
       for (const baseName in this.workers) {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
+          const installationCount =
+            await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length}`,
           );
         }
       }
