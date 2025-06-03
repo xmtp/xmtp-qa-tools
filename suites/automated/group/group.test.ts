@@ -11,11 +11,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  getExistingGroupIds,
-  verifyEpochChange,
-  type GroupConfig,
-} from "./helper";
+import { verifyEpochChange, type GroupConfig } from "./helper";
 
 const TEST_NAME = "group";
 const testConfig = {
@@ -58,7 +54,18 @@ describe(TEST_NAME, () => {
     creator = workers.get("bot") as Worker;
 
     // Load all existing groups
-    const existingGroups = getExistingGroupIds();
+    const existingGroups = process.env.CREATED_GROUPS?.split(",") || [];
+    console.debug(`Loaded ${existingGroups.length} existing groups`);
+    if (existingGroups.length > 0) {
+      console.debug(`Existing group IDs: ${existingGroups.join(", ")}`);
+    }
+
+    const group = (await creator.client.conversations.newGroup([])) as Group;
+    existingGroups.push(group.id);
+    await group.sync();
+    appendToEnv("CREATED_GROUPS", `"${existingGroups.join(",")}"`);
+    console.debug(`Created new group: ${group.id}`);
+
     groupConfigs = await Promise.all(
       existingGroups.map(async (groupId) => ({
         group: (await creator.client.conversations.getConversationById(
@@ -68,27 +75,13 @@ describe(TEST_NAME, () => {
         groupNumber: groupConfigs.length + 1,
       })),
     );
-
-    console.debug(`Loaded ${groupConfigs.length} existing groups`);
-    if (groupConfigs.length > 0) {
-      console.debug(
-        `Existing group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
-      );
-    }
     const allInboxIds = [
       ...workers.getAllBut("bot").map((w) => w.client.inboxId),
       testConfig.manualUsers[0].inboxId,
       ...getRandomInboxIds(testConfig.randomInboxIds),
     ];
-    // Always create 1 new group per test run
-    console.debug("Creating 1 new group for this test run...");
 
     await creator.client.conversations.syncAll();
-
-    const group = (await creator.client.conversations.newGroup([])) as Group;
-
-    await group.sync();
-    appendToEnv(group.id);
 
     for (const inboxId of allInboxIds) {
       try {
