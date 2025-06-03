@@ -20,9 +20,7 @@ describe(testName, async () => {
 
   let targetInboxId: string;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("massiveBurstFromWorkerThreads: should use actual worker threads to send messages in parallel", async () => {
     try {

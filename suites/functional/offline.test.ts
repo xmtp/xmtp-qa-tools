@@ -17,9 +17,7 @@ describe(testName, async () => {
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("offline_recovery: verify message recovery after disconnection", async () => {
     try {

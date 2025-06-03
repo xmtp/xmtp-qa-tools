@@ -20,9 +20,7 @@ describe(testName, async () => {
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
   it("poll_order: verify message order when receiving via pull", async () => {
     try {
       group = await workers.createGroup();

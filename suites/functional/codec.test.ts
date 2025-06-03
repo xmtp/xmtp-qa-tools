@@ -15,9 +15,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(getFixedNames(2), testName);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
   it("codec: should trigger a stream error", async () => {
     try {
       const creator = workers.getCreator();

@@ -28,9 +28,7 @@ describe(testName, async () => {
     typeofStream.GroupUpdated,
   );
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   beforeAll(async () => {
     group = (await workers

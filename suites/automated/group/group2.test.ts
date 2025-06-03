@@ -210,9 +210,7 @@ const startInstallationChaos = async (
 };
 
 describe("E2E: Installation syncing", () => {
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it(
     "should sync groups and messages across multiple installations",

@@ -23,9 +23,7 @@ describe(testName, () => {
     );
   });
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("should send message to specific address", async () => {
     try {

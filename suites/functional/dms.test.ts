@@ -29,9 +29,7 @@ describe(testName, async () => {
   );
   let convo: Dm;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("newDm: should measure creating a DM", async () => {
     try {

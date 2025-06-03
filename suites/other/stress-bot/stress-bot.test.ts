@@ -46,9 +46,7 @@ describe(testName, async () => {
     }
   });
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
   // Create a DM between two workers
   it("createAndSendDms: should create DMs and send messages", async () => {
     try {

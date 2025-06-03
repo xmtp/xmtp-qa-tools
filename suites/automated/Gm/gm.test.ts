@@ -29,9 +29,7 @@ describe(testName, () => {
       "production",
     );
   });
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("gm-bot: should check if bot is alive", async () => {
     try {

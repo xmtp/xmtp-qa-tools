@@ -45,9 +45,7 @@ describe(TEST_NAME, () => {
   let creator: Worker;
   let groupConfigs: GroupConfig[] = [];
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   beforeAll(async () => {
     // Initialize workers
@@ -94,8 +92,16 @@ describe(TEST_NAME, () => {
 
     await creator.client.conversations.syncAll();
 
-    await group.addMembers(allInboxIds as string[]);
-    await group.sync();
+    // Add members in slices of 5
+    for (let i = 0; i < allInboxIds.length; i += 5) {
+      const slice = allInboxIds.slice(i, i + 5);
+      try {
+        await group.addMembers(slice as string[]);
+        await group.sync();
+      } catch (e) {
+        console.error(`Error adding members to group ${group.id}:`, e);
+      }
+    }
 
     await group.addAdmin(testConfig.manualUsers[0].inboxId);
     await group.sync();

@@ -33,9 +33,7 @@ describe(testName, () => {
       "production",
     );
   });
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   // For local testing, test all agents on their supported networks
   for (const agent of typedAgents) {

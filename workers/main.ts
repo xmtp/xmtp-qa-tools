@@ -1,4 +1,5 @@
 import fs from "node:fs";
+import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
 import { defaultValues } from "@helpers/utils";
@@ -158,7 +159,8 @@ export class WorkerClient extends Worker {
   public client!: Client;
   private env: XmtpEnv;
   private activeStreams: boolean = false;
-
+  public dbPath!: string;
+  public installationId!: string;
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
@@ -200,6 +202,45 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+  }
+
+  /**
+   * Get the size of a directory in bytes
+   */
+  // Helper function to get SQLite file sizes
+  getSQLiteFileSizes() {
+    const dbPath = this.dbPath;
+    // Get the directory containing the database file
+    const dbDir = path.dirname(dbPath);
+    const dbFileName = path.basename(dbPath);
+
+    const files = fs.readdirSync(dbDir);
+    const sizes = {
+      dbFile: 0,
+      walFile: 0,
+      shmFile: 0,
+    };
+
+    for (const file of files) {
+      const filePath = path.join(dbDir, file);
+
+      // Only consider files that start with our database name
+      if (!file.startsWith(dbFileName)) {
+        continue;
+      }
+
+      const stats = fs.statSync(filePath);
+
+      if (file === dbFileName) {
+        sizes.dbFile = stats.size;
+      } else if (file.endsWith("-wal")) {
+        sizes.walFile = stats.size;
+      } else if (file.endsWith("-shm")) {
+        sizes.shmFile = stats.size;
+      }
+    }
+
+    return sizes;
   }
 
   /**
@@ -266,6 +307,7 @@ export class WorkerClient extends Worker {
       this.env,
     );
 
+    this.dbPath = dbPath;
     this.client = client as Client;
     this.address = address;
 
@@ -273,7 +315,7 @@ export class WorkerClient extends Worker {
     this.startSyncs();
 
     const installationId = this.client.installationId;
-
+    this.installationId = installationId;
     return {
       client: this.client,
       dbPath,

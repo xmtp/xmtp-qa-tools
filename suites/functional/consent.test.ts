@@ -15,9 +15,7 @@ describe(testName, async () => {
 
   workers = await getWorkers(getFixedNames(5), testName, typeofStream.Consent);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("should stream consent updates when a user is blocked", async () => {
     try {

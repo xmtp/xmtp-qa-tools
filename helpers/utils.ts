@@ -376,6 +376,16 @@ export const getManualUsers = (filterBy: string[] = []) =>
 export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
+/**
+ * Format bytes to human readable format
+ */
+export function formatBytes(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const k = 1024;
+  const sizes = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
+}
 
 export function getRandomInboxIds(count: number) {
   return newInboxes

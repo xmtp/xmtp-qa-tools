@@ -24,9 +24,7 @@ describe(testName, async () => {
   let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({ expect });
 
   it("AddMembersStream: should add members to a group", async () => {
     try {
