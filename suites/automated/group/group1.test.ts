@@ -16,7 +16,11 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import { verifyEpochChange, type GroupConfig } from "./helper";
+import {
+  getRandomFeatures,
+  verifyEpochChange,
+  type GroupConfig,
+} from "./helper";
 
 const TEST_NAME = "group";
 const testConfig = {
@@ -25,7 +29,7 @@ const testConfig = {
   epochs: 3,
   manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
-  preInstallations: 20,
+  preInstallations: 10,
   randomInboxIds: 60,
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
@@ -77,39 +81,24 @@ describe(TEST_NAME, () => {
         group: (await creator.client.conversations.getConversationById(
           groupId,
         )) as Group,
-        features: ["verifyEpochChange"],
+        features: getRandomFeatures(Math.floor(Math.random() * 4) + 1),
         groupNumber: index + 1,
       })),
     );
 
     const allInboxIds = [
       ...workers.getAllBut("bot").map((w) => w.client.inboxId),
-      testConfig.manualUsers[0].inboxId,
+      testConfig.manualUsers.flatMap((u) => u.inboxId),
       ...getRandomInboxIds(testConfig.randomInboxIds),
     ];
 
     await creator.client.conversations.syncAll();
 
-    // Add members to the newly created group only
-    for (const inboxId of allInboxIds) {
-      try {
-        await group.addMembers([inboxId]);
-        await group.addAdmin(inboxId);
-        await group.sync();
-      } catch (e) {
-        console.error(
-          `Error adding member ${inboxId} to group ${group.id}:`,
-          e,
-        );
-      }
-    }
+    await group.addMembers(allInboxIds as string[]);
+    await group.sync();
 
-    console.debug(
-      `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
-    );
-    console.debug(
-      `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
-    );
+    await group.addAdmin(testConfig.manualUsers[0].inboxId);
+    await group.sync();
   });
 
   it(`should verify all operations across all groups`, async () => {

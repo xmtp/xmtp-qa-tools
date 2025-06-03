@@ -8,6 +8,19 @@ export type TestFeature =
   | "verifyMetadataStream"
   | "verifyEpochChange";
 
+export function getRandomFeatures(count: number): TestFeature[] {
+  const features = [
+    "verifyMessageStream",
+    "verifyMembershipStream",
+    "verifyMetadataStream",
+    "verifyEpochChange",
+  ];
+  return Array.from(
+    { length: count },
+    () => features[Math.floor(Math.random() * features.length)] as TestFeature,
+  );
+}
+
 export interface GroupConfig {
   group: Group;
   features: TestFeature[];
