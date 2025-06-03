@@ -116,7 +116,7 @@ describe(TEST_NAME, () => {
     try {
       for (const config of groupConfigs) {
         console.debug(JSON.stringify(config, null, 2));
-        const epoch = await workers.checkIfGroupForked(config.group.id);
+        await workers.checkForks();
 
         for (const feature of config.features) {
           switch (feature) {
@@ -125,7 +125,7 @@ describe(TEST_NAME, () => {
                 config.group,
                 workers.getAllBut("bot"),
                 1,
-                `Message verification from group ${config.groupNumber} epoch ${epoch}`,
+                `Message verification from group ${config.groupNumber}`,
               );
               break;
 
@@ -158,7 +158,7 @@ describe(TEST_NAME, () => {
           console.debug(`Group ${config.groupNumber} - Completed: ${feature}`);
         }
 
-        await workers.checkIfGroupForked(config.group.id);
+        await workers.checkForks();
       }
     } catch (error) {
       console.error("Error in test:", error);

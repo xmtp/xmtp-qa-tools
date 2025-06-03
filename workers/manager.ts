@@ -125,21 +125,18 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
-  public async checkIfGroupForked(
-    groupId: string,
-  ): Promise<bigint | undefined> {
+  public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
-      const group =
-        await worker.client.conversations.getConversationById(groupId);
-      if (!group) continue;
-      const debugInfo = await group.debugInfo();
-      console.debug(
-        `${worker.name} is on epoch ${debugInfo.epoch} and ${debugInfo.maybeForked}`,
+      const groups = await worker.client.conversations.list();
+      const maybeForked = await Promise.all(
+        groups.flat().map(async (g) => {
+          const debugInfo = await g.debugInfo();
+          return debugInfo.maybeForked;
+        }),
       );
-      if (debugInfo.maybeForked) {
+      if (maybeForked.some((fork) => fork)) {
         throw new Error("Stopping test, group may have forked");
       }
-      return debugInfo.epoch;
     }
   }
 
@@ -454,7 +451,16 @@ export class WorkerManager {
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
 
-    const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
+    // Find SDK version - should be a valid SDK version from parts, or use latest version
+    let sdkVersion = getLatestVersion();
+    const validVersions = Object.keys(sdkVersions);
+    for (let i = parts.length - 1; i >= 2; i--) {
+      if (/^\d+$/.test(parts[i]) && validVersions.includes(parts[i])) {
+        sdkVersion = parts[i];
+        break;
+      }
+    }
+
     const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
@@ -565,6 +571,14 @@ export function getLatestVersion(): string {
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
-  return sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
-    .libXmtpVersion;
+  const versionKey = Number(sdkVersion) as keyof typeof sdkVersions;
+  const versionInfo = sdkVersions[versionKey];
+
+  if (!versionInfo) {
+    throw new Error(
+      `Unknown SDK version: ${sdkVersion}. Available versions: ${Object.keys(sdkVersions).join(", ")}`,
+    );
+  }
+
+  return versionInfo.libXmtpVersion;
 }

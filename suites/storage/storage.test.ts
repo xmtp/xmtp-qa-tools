@@ -154,7 +154,7 @@ describe(testName, () => {
 
       await alice.client.conversations.sync();
       const conversations = await alice.client.conversations.list();
-      const dm = conversations.find((conv: any) => conv instanceof Dm);
+      const dm = conversations.find((conv) => conv instanceof Dm);
 
       if (dm) {
         await dm.send("Test message 1");
@@ -214,9 +214,7 @@ describe(testName, () => {
 
       await alice.client.conversations.sync();
       const conversations = await alice.client.conversations.list();
-      const group = conversations.find(
-        (conv: any) => conv instanceof Group,
-      ) as Group;
+      const group = conversations.find((conv) => conv instanceof Group);
 
       if (group) {
         await group.send("Group message 1");
@@ -254,7 +252,7 @@ describe(testName, () => {
 
       await henry.client.conversations.sync();
       const conversations = await henry.client.conversations.list();
-      let dm = conversations.find((conv: any) => conv instanceof Dm);
+      let dm = conversations.find((conv) => conv instanceof Dm);
 
       if (!dm) {
         dm = await henry.client.conversations.newDm(ivy.client.inboxId);
