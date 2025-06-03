@@ -77,51 +77,6 @@ export const getExistingGroupIds = (): string[] => {
   }
 };
 
-/**
- * Saves a group ID to the .env file as comma-separated values
- */
-export const saveGroupToEnv = (groupId: string): void => {
-  try {
-    console.debug(`[saveGroupToEnv] Attempting to save group ID: ${groupId}`);
-    console.debug(
-      `[saveGroupToEnv] Current working directory: ${process.cwd()}`,
-    );
-
-    const existingIds = getExistingGroupIds();
-    console.debug(
-      `[saveGroupToEnv] Existing group IDs: ${JSON.stringify(existingIds)}`,
-    );
-
-    // Add new group ID if it doesn't already exist
-    if (!existingIds.includes(groupId)) {
-      const newGroupsString =
-        existingIds.length > 0
-          ? `${existingIds.join(",")},${groupId}`
-          : groupId;
-
-      console.debug(`[saveGroupToEnv] New groups string: ${newGroupsString}`);
-
-      appendToEnv("CREATED_GROUPS", newGroupsString);
-      console.debug(
-        `[saveGroupToEnv] Called appendToEnv with CREATED_GROUPS=${newGroupsString}`,
-      );
-
-      console.debug(`Saved group ID ${groupId} to .env`);
-      console.debug(`Total groups now: ${existingIds.length + 1}`);
-
-      // Update process.env for immediate use in same process
-      process.env.CREATED_GROUPS = newGroupsString;
-      console.debug(
-        `[saveGroupToEnv] Updated process.env.CREATED_GROUPS: ${process.env.CREATED_GROUPS}`,
-      );
-    } else {
-      console.debug(`Group ID ${groupId} already exists in .env`);
-    }
-  } catch (error) {
-    console.error("Failed to save group to .env:", error);
-  }
-};
-
 // it(`should verify all operations across all groups`, async () => {
 //   try {
 //     for (const config of groupConfigs) {

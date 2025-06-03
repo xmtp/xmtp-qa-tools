@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
+  appendToEnv,
   getFixedNames,
   getManualUsers,
   getRandomInboxIds,
@@ -12,7 +13,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   getExistingGroupIds,
-  saveGroupToEnv,
   verifyEpochChange,
   type GroupConfig,
 } from "./helper";
@@ -88,7 +88,7 @@ describe(TEST_NAME, () => {
     const group = (await creator.client.conversations.newGroup([])) as Group;
 
     await group.sync();
-    saveGroupToEnv(group.id);
+    appendToEnv(group.id);
 
     for (const inboxId of allInboxIds) {
       try {
