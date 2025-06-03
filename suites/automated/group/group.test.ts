@@ -8,10 +8,11 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
-  createSingleNewGroup,
-  loadExistingGroups,
+  getExistingGroupIds,
+  saveGroupToEnv,
   verifyEpochChange,
   type GroupConfig,
 } from "./helper";
@@ -57,8 +58,16 @@ describe(TEST_NAME, () => {
     creator = workers.get("bot") as Worker;
 
     // Load all existing groups
-    const existingGroups = await loadExistingGroups(creator);
-    groupConfigs = [...existingGroups];
+    const existingGroups = getExistingGroupIds();
+    groupConfigs = await Promise.all(
+      existingGroups.map(async (groupId) => ({
+        group: (await creator.client.conversations.getConversationById(
+          groupId,
+        )) as Group,
+        features: ["verifyEpochChange"],
+        groupNumber: groupConfigs.length + 1,
+      })),
+    );
 
     console.debug(`Loaded ${groupConfigs.length} existing groups`);
     if (groupConfigs.length > 0) {
@@ -73,12 +82,26 @@ describe(TEST_NAME, () => {
     ];
     // Always create 1 new group per test run
     console.debug("Creating 1 new group for this test run...");
-    const newGroup = await createSingleNewGroup(
-      creator,
-      groupConfigs.length + 1,
-      allInboxIds,
-    );
-    groupConfigs.push(newGroup);
+
+    await creator.client.conversations.syncAll();
+
+    const group = (await creator.client.conversations.newGroup([])) as Group;
+
+    await group.sync();
+    saveGroupToEnv(group.id);
+
+    for (const inboxId of allInboxIds) {
+      try {
+        await group.addMembers([inboxId]);
+        await group.addAdmin(inboxId);
+        await group.sync();
+      } catch (e) {
+        console.error(
+          `Error adding member ${inboxId} to group ${groupConfigs.length + 1}:`,
+          e,
+        );
+      }
+    }
 
     console.debug(
       `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
