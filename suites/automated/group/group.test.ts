@@ -56,14 +56,11 @@ describe(TEST_NAME, () => {
     // Load all existing groups
     const existingGroups = process.env.CREATED_GROUPS?.split(",") || [];
     console.debug(`Loaded ${existingGroups.length} existing groups`);
-    if (existingGroups.length > 0) {
-      console.debug(`Existing group IDs: ${existingGroups.join(", ")}`);
-    }
 
     const group = (await creator.client.conversations.newGroup([])) as Group;
     existingGroups.push(group.id);
     await group.sync();
-    appendToEnv("CREATED_GROUPS", `"${existingGroups.join(",")}"`);
+    appendToEnv("CREATED_GROUPS", existingGroups.join(","));
     console.debug(`Created new group: ${group.id}`);
 
     groupConfigs = await Promise.all(
