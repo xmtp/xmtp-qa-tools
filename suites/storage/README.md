@@ -13,5 +13,5 @@
 
 _Note: 100-member groups are 5.4x more efficient than 2-member groups._
 
-<img src="convos.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
-<img src="cb.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
+<img src="./convos.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
+<img src="./cb.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
