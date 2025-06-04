@@ -1,15 +1,17 @@
 ## Storage
 
-### Storage by Group Size (50MB target)
+## Storage Efficiency by Group Size
 
-| Total Size | Number of Groups | Members per Group | Size Group size (MB) | Member size(MB) |
-| ---------- | ---------------- | ----------------- | -------------------- | --------------- |
-| 5 MB       | 239              | 2                 | 0.021035             | 0.010517        |
-| 5 MB       | 109              | 10                | 0.048201             | 0.004820        |
-| 6 MB       | 32               | 50                | 0.173218             | 0.003464        |
-| 5 MB       | 17               | 100               | 0.311581             | 0.003116        |
-| 6 MB       | 13               | 150               | 0.482272             | 0.003215        |
-| 5 MB       | 8                | 200               | 0.627930             | 0.003140        |
+## Storage Efficiency by Group Size
+
+| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
+| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
+| 10 MB      | 489              | 2                 | 0.020674            | 0.010337             |
+| 10 MB      | 213              | 10                | 0.047187            | 0.004719             |
+| 10 MB      | 60               | 50                | 0.169857            | 0.003397             |
+| 11 MB      | 34               | 100               | 0.317210            | 0.003172             |
+| 10 MB      | 22               | 150               | 0.473899            | 0.003159             |
+| 11 MB      | 18               | 200               | 0.598741            | 0.002994             |
 
 _Note: 100-member groups are 5.4x more efficient than 2-member groups._
 
