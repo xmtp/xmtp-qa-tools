@@ -13,8 +13,8 @@ interface StorageMetrics {
   costPerMemberMB: number;
 }
 
-const memberCounts = [2, 10, 50, 100, 150, 200];
-const targetSizeMB = 5;
+const memberCounts = [2];
+const targetSizeMB = 50;
 const timeOut = 300000000;
 const testName = "storage";
 loadEnv(testName);
@@ -32,27 +32,27 @@ describe(
           console.time(`Testing ${memberCount}-member groups...`);
           console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
-          const senderName = `sender-${memberCount}`;
+          const name = `sender-${memberCount}`;
           const receiverName = `receiver-${memberCount}`;
-          const sender = await getWorkers([senderName], testName);
-          const receiver = await getWorkers([receiverName], testName);
-          const senderWorker = sender.get(senderName);
-          const receiverWorker = receiver.get(receiverName);
+          const workers = await getWorkers([name, receiverName], testName);
+          const creator = workers.get(name);
+          const receiver = workers.get(receiverName);
 
-          const memberInboxIds = getRandomInboxIds(memberCount - 1); // -1 because creator is included
+          const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
           let groupCount = 0;
-          let currentTotalSize =
-            await senderWorker?.worker.getSQLiteFileSizes();
+          let currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
           while (
             currentTotalSize?.total &&
             currentTotalSize.total < targetSizeMB * 1024 * 1024
           ) {
-            const group =
-              await senderWorker?.client.conversations.newGroup(memberInboxIds);
+            await creator?.client.conversations.newGroup([
+              ...memberInboxIds,
+              receiver?.inboxId as string,
+            ]);
             //await group?.send("hi");
             groupCount++;
-            currentTotalSize = await senderWorker?.worker.getSQLiteFileSizes();
+            currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
             console.debug(
               `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(

@@ -30,9 +30,10 @@ describe(
           "production",
         );
         const creator = workers.get(name);
-
+        const receiverInboxes = receiver.map((r) => r.inboxId);
+        console.log(receiverInboxes);
         const memberInboxIds = [
-          ...receiver.map((r) => r.inboxId),
+          ...receiverInboxes,
           ...getRandomInboxIds(memberCounts - 1),
         ];
 
