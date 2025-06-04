@@ -1,42 +1,33 @@
 [
   {
-    "app": "fabri-convos",
-    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
-    "address": "0x5c2d8d286bdaf8a51f1bce8dfec5f5b7faa25245",
+    "app": "fabri-convos-desktop",
+    "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
+    "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
     "network": "production",
-    "name": "prod-testing2"
+    "name": "prod-testing"
   },
   {
     "app": "fabri-tba",
-    "address": "0x3176b56fc0e75e438116d6b4dc38dee9635a2234",
-    "inboxId": "264df87d201a5fab9b246ae559ee3b27caddb2f3dd7b3017a8f77582486e0bf4",
+    "inboxId": "15382c5ffa645d217e17395c97ff0603781441fe9881610e7a7236704cb90181",
     "network": "production",
     "name": "prod-testing"
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "ae0f44e62e2fa9c8fd8cc42dd33858cc604f383dd2353708e4c2f7ee46e3e0bc",
+    "inboxId": "bd01c67801f8333df4e9404d7d3ba10b31aa5fc05b3c5e02fb94ab5e6aaf24b7",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "fabri-convos",
-    "inboxId": "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
-    "network": "dev",
-    "name": "dev-testing"
-  },
-  {
-    "app": "fabri-convos-desktop",
-    "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
-    "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
+    "app": "fabri-convos-oneoff",
+    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
     "network": "production",
-    "name": "prod-testing2"
+    "name": "prod-oneoff"
   },
   {
     "app": "fabri-convos-dev",
-    "address": "0xd0b95a312a948558c7a2a03b2fdd1ae521bcdd2c",
-    "inboxId": "19562d0449436ff09cfbfbe997b54550ac129a5167e7164fe004ddff12a18115",
+    "inboxId": "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
     "network": "dev",
-    "name": "one-off"
+    "name": "dev-oneoff"
   }
 ]
