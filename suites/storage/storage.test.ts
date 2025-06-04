@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { formatBytes, getRandomInboxIds } from "@helpers/utils";
+import { getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -29,7 +29,6 @@ describe(
 
       try {
         for (const memberCount of memberCounts) {
-          console.time(`Testing ${memberCount}-member groups...`);
           console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
           const name = `fabri-${memberCount}`;
@@ -46,12 +45,12 @@ describe(
           ) {
             const group =
               await creator?.client.conversations.newGroup(memberInboxIds);
-            await group?.send("hi");
+            //await group?.send("hi");
             groupCount++;
             currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
             console.debug(
-              `  Created ${groupCount} groups, ${memberCount} members, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
+              `  Created ${groupCount} groups, size: ${currentTotalSize?.total ?? 0}`,
             );
           }
 
@@ -70,7 +69,6 @@ describe(
           console.log(
             `✅ ${memberCount}-member groups: ${groupCount} groups, ${finalSizeMB.toFixed(2)} MB total`,
           );
-          console.timeEnd(`Testing ${memberCount}-member groups...`);
         }
 
         // Build complete output string

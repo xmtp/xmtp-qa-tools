@@ -88,7 +88,7 @@ export type GroupMetadataContent = {
 export type ManualUser = {
   name: string;
   app: string;
-  [key: string]: any;
+  [key: string]: string;
 };
 
 // Logging interface

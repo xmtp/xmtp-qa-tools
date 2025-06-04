@@ -6,7 +6,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const memberCounts = 10;
+const memberCounts = 1;
 const targetSizeMB = 50;
 const receiver = getManualUsers(["prod-testing"]);
 const timeOut = 300000000;
@@ -32,7 +32,7 @@ describe(
         const creator = workers.get(name);
 
         const memberInboxIds = [
-          ...receiver.map((r) => r.inboxId as string),
+          ...receiver.map((r) => r.inboxId),
           ...getRandomInboxIds(memberCounts - 1),
         ];
 
@@ -43,7 +43,6 @@ describe(
           currentTotalSize?.total &&
           currentTotalSize.total < targetSizeMB * 1024 * 1024
         ) {
-          console.log(memberInboxIds);
           const group =
             await creator?.client.conversations.newGroup(memberInboxIds);
           await group?.send("hi");
@@ -52,7 +51,7 @@ describe(
           currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
           console.log(
-            `  Created ${groupCount} groups, ${memberCounts} members, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
+            `  Created ${groupCount} groups of ${memberCounts} members, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
           );
         }
       } catch (e) {
