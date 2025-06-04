@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/utils";
+import { defaultValues, formatBytes } from "@helpers/utils";
 import {
   ConsentState,
   Dm,
@@ -10,6 +10,7 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import "dotenv/config";
+import path from "node:path";
 import type { WorkerBase } from "./manager";
 
 // Default timeout for stream collection in milliseconds
@@ -158,6 +159,7 @@ export class WorkerClient extends Worker {
   public client!: Client;
   private env: XmtpEnv;
   private activeStreams: boolean = false;
+  public dbPath!: string;
 
   constructor(
     worker: WorkerBase,
@@ -184,7 +186,6 @@ export class WorkerClient extends Worker {
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
-
     this.setupEventHandlers();
   }
 
@@ -200,6 +201,55 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+  }
+  async getSQLiteFileSizes() {
+    const dbPath = this.dbPath;
+    // Get the directory containing the database file
+    const dbDir = path.dirname(dbPath);
+    const dbFileName = path.basename(dbPath);
+
+    const files = fs.readdirSync(dbDir);
+    const sizes = {
+      dbFile: 0,
+      walFile: 0,
+      shmFile: 0,
+      total: 0,
+      conversations: 0,
+    };
+    for (const file of files) {
+      const filePath = path.join(dbDir, file);
+
+      // Only consider files that start with our database name
+      if (!file.startsWith(dbFileName)) {
+        continue;
+      }
+
+      const stats = fs.statSync(filePath);
+
+      const conversations = await this.client.conversations.list();
+      sizes.conversations = conversations.length;
+      if (file === dbFileName) {
+        sizes.dbFile = stats.size;
+      } else if (file.endsWith("-wal")) {
+        sizes.walFile = stats.size;
+      } else if (file.endsWith("-shm")) {
+        sizes.shmFile = stats.size;
+      }
+      sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
+    }
+
+    const formattedSizes = {
+      dbFile: formatBytes(sizes.dbFile),
+      walFile: formatBytes(sizes.walFile),
+      shmFile: formatBytes(sizes.shmFile),
+      conversations: sizes.conversations,
+      total: formatBytes(sizes.total),
+    };
+
+    console.debug(
+      `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
+    );
+    return sizes;
   }
 
   /**
@@ -266,6 +316,7 @@ export class WorkerClient extends Worker {
       this.env,
     );
 
+    this.dbPath = dbPath;
     this.client = client as Client;
     this.address = address;
 

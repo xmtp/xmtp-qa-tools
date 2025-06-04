@@ -1,58 +1,64 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getManualUsers } from "@helpers/utils";
+import { formatBytes, getManualUsers, getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
+const memberCounts = 1;
+const targetSizeMB = 50;
+const receiver = getManualUsers(["prod-testing"]);
+const timeOut = 300000000;
 const testName = "spam";
 loadEnv(testName);
 
-const timeout = 300000000;
-describe(testName, () => {
-  let workers: WorkerManager;
+describe(
+  testName,
+  () => {
+    setupTestLifecycle({ expect });
 
-  setupTestLifecycle({
-    expect,
-  });
-
-  it(
-    `should create groups and send messages to dev-testing`,
-    async () => {
+    it("should generate storage efficiency table for different group sizes", async () => {
       try {
-        const receiver = getManualUsers(["fabri-tba"]);
-        console.log(JSON.stringify(receiver, null, 2));
-        workers = await getWorkers(
-          ["bot"],
+        const name = `fabri-${memberCounts}`;
+        const workers = await getWorkers(
+          [name],
           testName,
           typeofStream.None,
           typeOfResponse.None,
           typeOfSync.None,
-          receiver[0].network as "production" | "dev" | "local",
+          "production",
         );
-        const totalCount = 1000;
-        for (let batch = 0; batch < totalCount; batch++) {
-          const group = await workers
-            .get("bot")
-            ?.client.conversations.newGroup([receiver[0].inboxId], {
-              groupName: `Spam test group ${batch}`,
-              groupDescription: `Spam test group description ${batch}`,
-            });
+        const creator = workers.get(name);
 
-          if (!group) {
-            throw new Error("Failed to create group");
-          }
+        const memberInboxIds = [
+          ...receiver.map((r) => r.inboxId),
+          ...getRandomInboxIds(memberCounts - 1),
+        ];
 
-          await group.send(`Spam test message`);
+        let groupCount = 0;
+        let currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
-          console.log(`✓ Completed ${batch + 1}/${totalCount} groups`);
+        while (
+          currentTotalSize?.total &&
+          currentTotalSize.total < targetSizeMB * 1024 * 1024
+        ) {
+          const group =
+            await creator?.client.conversations.newGroup(memberInboxIds);
+          await group?.send("hi");
+
+          groupCount++;
+          currentTotalSize = await creator?.worker.getSQLiteFileSizes();
+
+          console.log(
+            `  Created ${groupCount} groups of ${memberCounts} members, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
+          );
         }
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
+        logError(e, expect.getState().currentTestName || "unknown test");
         throw e;
       }
-    },
-    timeout,
-  ); // 5 minutes timeout
-});
+    });
+  },
+  timeOut,
+);
