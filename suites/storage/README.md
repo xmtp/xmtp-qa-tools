@@ -1,19 +1,39 @@
-## Storage
+# Storage Test Suite
 
-## Storage Efficiency by Group Size
+Measures storage efficiency by creating groups of different sizes until reaching a target storage threshold, then analyzing the storage cost per member and efficiency gains compared to baseline configurations.
 
-## Storage Efficiency by Group Size
+- Analyzes storage efficiency across different group sizes (2, 10, 50, 100, 150, 200 members)
+- Creates groups until reaching ~5MB of storage per configuration
+- Measures total storage, groups created, average group size, and cost per member
+- Calculates efficiency gains compared to 2-member baseline groups
+- Provides detailed analysis of storage scaling patterns
 
-| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
-| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
-| 10 MB      | 489              | 2                 | 0.020674            | 0.010337             |
-| 10 MB      | 213              | 10                | 0.047187            | 0.004719             |
-| 10 MB      | 60               | 50                | 0.169857            | 0.003397             |
-| 11 MB      | 34               | 100               | 0.317210            | 0.003172             |
-| 10 MB      | 22               | 150               | 0.473899            | 0.003159             |
-| 11 MB      | 18               | 200               | 0.598741            | 0.002994             |
+## How to Run
 
-_Note: 100-member groups are 5.4x more efficient than 2-member groups._
+```bash
+# Run storage efficiency tests
+yarn test suites/storage
 
-<img src="./convos.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
-<img src="./cb.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
+# Run with custom target size
+TARGET_SIZE_MB=10 yarn test suites/storage/storage.test.ts
+```
+
+### Environment Variables
+
+**Storage Tests:**
+
+- `TARGET_SIZE_MB` - Target storage size in MB for testing (default: 5)
+- `MEMBER_COUNTS` - Comma-separated list of member counts to test (default: "2,10,50,100,150,200")
+
+## Latest Results
+
+### Detailed Analysis
+
+| Group Size  | Groups | Total Storage | Avg Group Size | Cost per Member | Efficiency Gain |
+| ----------- | ------ | ------------- | -------------- | --------------- | --------------- |
+| 2 members   | 239    | 5.0 MB        | 0.021 MB       | 0.01 MB         | baseline        |
+| 10 members  | 108    | 5.2 MB        | 0.048 MB       | 0.00 MB         | 2.2× better     |
+| 50 members  | 32     | 5.5 MB        | 0.173 MB       | 0.00 MB         | 3.0× better     |
+| 100 members | 17     | 5.3 MB        | 0.311 MB       | 0.00 MB         | 3.4× better     |
+| 150 members | 13     | 6.3 MB        | 0.482 MB       | 0.00 MB         | 3.3× better     |
+| 200 members | 8      | 5.0 MB        | 0.625 MB       | 0.00 MB         | 3.4× better     |
