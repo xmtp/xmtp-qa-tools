@@ -1,6 +1,6 @@
-import { getDbPath, loadEnv } from "@helpers/client";
+import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { formatBytes, getDirSizeSync, getManualUsers } from "@helpers/utils";
+import { formatBytes, getManualUsers } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -58,7 +58,8 @@ describe(testName, () => {
         );
 
         // Measure initial storage
-        const initialSize = workers.get("bot")?.worker.getDirSize() ?? 0;
+        const initialSize =
+          workers.get("bot")?.worker.getSQLiteFileSizes().dbFile ?? 0;
         console.log(`📏 Initial storage: ${formatBytes(initialSize)}`);
 
         let groupsCreated = 0;
@@ -99,7 +100,8 @@ describe(testName, () => {
             nextMeasurementIndex < measurementIntervals.length &&
             groupsCreated === measurementIntervals[nextMeasurementIndex]
           ) {
-            currentSize = workers.get("bot")?.worker.getDirSize() ?? 0;
+            currentSize =
+              workers.get("bot")?.worker.getSQLiteFileSizes().dbFile ?? 0;
             const totalStorageIncrease = currentSize - initialSize;
             const storageIncreaseSinceLastMeasurement =
               currentSize - previousSize;
@@ -149,7 +151,8 @@ describe(testName, () => {
         }
 
         // Final measurement and analysis
-        const finalSize = workers.get("bot")?.worker.getDirSize() ?? 0;
+        const finalSize =
+          workers.get("bot")?.worker.getSQLiteFileSizes().dbFile ?? 0;
         const totalStorageIncrease = finalSize - initialSize;
         const finalAvgPerGroup = totalStorageIncrease / groupsCreated;
 

@@ -1,11 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import {
-  formatBytes,
-  getInboxIds,
-  getRandomInboxIds,
-  sleep,
-} from "@helpers/utils";
+import { formatBytes, getRandomInboxIds, sleep } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -81,12 +76,8 @@ describe(testName, () => {
 
       // Print table of results
       console.log("\n📊 Storage Test Results:");
-      console.log(
-        "Members | DB Size | WAL Size | SHM Size | Conversations | Final Size",
-      );
-      console.log(
-        "--------|---------|----------|----------|---------------|----------",
-      );
+      console.log("Members | DB Size | WAL Size | Conversations | Final Size");
+      console.log("--------|---------|----------|---------------|----------");
 
       for (const group of groups) {
         const dbSize = formatBytes(group.sizes.dbFile);
