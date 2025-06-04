@@ -10,11 +10,12 @@ interface StorageMetrics {
   numberOfGroups: number;
   membersPerGroup: number;
   sizePerGroupMB: number;
+  receiverSizeMB: number;
   costPerMemberMB: number;
 }
 
-const memberCounts = [2];
-const targetSizeMB = 50;
+const memberCounts = [2, 10, 50, 100, 150, 200];
+const targetSizeMB = 5;
 const timeOut = 300000000;
 const testName = "storage";
 loadEnv(testName);
@@ -28,12 +29,13 @@ describe(
       const results: StorageMetrics[] = [];
 
       try {
+        const randomSuffix = Math.random().toString(36).substring(2, 15);
         for (const memberCount of memberCounts) {
           console.time(`Testing ${memberCount}-member groups...`);
           console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
-          const name = `sender-${memberCount}`;
-          const receiverName = `receiver-${memberCount}`;
+          const name = `sender${randomSuffix}-${memberCount}`;
+          const receiverName = `receiver${randomSuffix}-${memberCount}`;
           const workers = await getWorkers([name, receiverName], testName);
           const creator = workers.get(name);
           const receiver = workers.get(receiverName);
@@ -43,8 +45,8 @@ describe(
           let currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
           while (
-            currentTotalSize?.total &&
-            currentTotalSize.total < targetSizeMB * 1024 * 1024
+            currentTotalSize?.dbFile &&
+            currentTotalSize.dbFile < targetSizeMB * 1024 * 1024
           ) {
             await creator?.client.conversations.newGroup([
               ...memberInboxIds,
@@ -53,23 +55,26 @@ describe(
             //await group?.send("hi");
             groupCount++;
             currentTotalSize = await creator?.worker.getSQLiteFileSizes();
-
             console.debug(
               `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
-                currentTotalSize?.total as number,
+                currentTotalSize?.dbFile as number,
               )}`,
             );
           }
 
-          const finalSizeMB = (currentTotalSize?.total ?? 0) / (1024 * 1024);
+          const finalSizeMB = (currentTotalSize?.dbFile ?? 0) / (1024 * 1024);
           const sizePerGroupMB = finalSizeMB / groupCount;
           const costPerMemberMB = sizePerGroupMB / memberCount;
+          await receiver?.client.conversations.syncAll();
+          await creator?.client.conversations.syncAll();
+          const receiverSizeMB = await receiver?.worker.getSQLiteFileSizes();
           const metrics: StorageMetrics = {
             totalSizeMB: finalSizeMB,
             numberOfGroups: groupCount,
             membersPerGroup: memberCount,
             sizePerGroupMB,
             costPerMemberMB,
+            receiverSizeMB: receiverSizeMB?.dbFile ?? 0,
           };
 
           results.push(metrics);
