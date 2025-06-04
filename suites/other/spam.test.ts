@@ -37,7 +37,6 @@ describe(testName, () => {
             .get("bot")
             ?.client.conversations.newGroup([receiver[0].inboxId], {
               groupName: `Spam test group ${batch}`,
-              groupDescription: `Spam test group description ${batch}`,
             });
 
           if (!group) {

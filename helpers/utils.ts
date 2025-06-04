@@ -84,6 +84,13 @@ export type GroupMetadataContent = {
   }>;
 };
 
+// Add type definition for manual users
+export type ManualUser = {
+  name: string;
+  app: string;
+  [key: string]: any;
+};
+
 // Logging interface
 export interface LogInfo {
   timestamp: string;
@@ -365,10 +372,11 @@ export const randomlyRemoveDb = async (
   }
 };
 
-export const getManualUsers = (filterBy: string[] = []) =>
-  manualUsers.filter(
+export const getManualUsers = (filterBy: string[] = []): ManualUser[] => {
+  return (manualUsers as ManualUser[]).filter(
     (r) => filterBy.includes(r.name) || filterBy.includes(r.app),
   );
+};
 
 /**
  * Sleep utility function
