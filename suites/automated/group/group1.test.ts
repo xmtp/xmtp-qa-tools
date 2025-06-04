@@ -1,20 +1,20 @@
-import { loadEnv } from "@helpers/client";
-import { getTime } from "@helpers/logger";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { getTime } from "dev/helpers/logger";
 import {
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
-} from "@helpers/streams";
+} from "dev/helpers/streams";
 import {
   appendToEnv,
   getFixedNames,
   getManualUsers,
   getRandomInboxIds,
-} from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Group } from "@xmtp/node-sdk";
+} from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 import {
   getRandomFeatures,

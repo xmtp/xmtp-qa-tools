@@ -1,6 +1,6 @@
-import { loadEnv } from "@helpers/client";
-import { getFixedNames } from "@helpers/utils";
 import { getWorkers } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { getFixedNames } from "dev/helpers/utils";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_panic";

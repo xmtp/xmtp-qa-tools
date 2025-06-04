@@ -1,7 +1,7 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { defaultNames } from "@helpers/utils";
 import { getWorkers, type Worker } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { defaultNames } from "dev/helpers/utils";
 import { describe, expect, it } from "vitest";
 
 const users: {

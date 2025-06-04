@@ -1,8 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/utils";
 import {
   ConsentState,
   Dm,
@@ -10,6 +8,8 @@ import {
   type DecodedMessage,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
+import { createClient, getDataPath } from "dev/helpers/client";
+import { defaultValues, formatBytes } from "dev/helpers/utils";
 import "dotenv/config";
 import type { WorkerBase } from "./manager";
 
@@ -208,7 +208,7 @@ export class WorkerClient extends Worker {
    * Get the size of a directory in bytes
    */
   // Helper function to get SQLite file sizes
-  getSQLiteFileSizes() {
+  async getSQLiteFileSizes() {
     const dbPath = this.dbPath;
     // Get the directory containing the database file
     const dbDir = path.dirname(dbPath);
@@ -219,8 +219,9 @@ export class WorkerClient extends Worker {
       dbFile: 0,
       walFile: 0,
       shmFile: 0,
+      total: 0,
+      conversations: 0,
     };
-
     for (const file of files) {
       const filePath = path.join(dbDir, file);
 
@@ -231,6 +232,8 @@ export class WorkerClient extends Worker {
 
       const stats = fs.statSync(filePath);
 
+      const conversations = await this.client.conversations.list();
+      sizes.conversations = conversations.length;
       if (file === dbFileName) {
         sizes.dbFile = stats.size;
       } else if (file.endsWith("-wal")) {
@@ -238,8 +241,20 @@ export class WorkerClient extends Worker {
       } else if (file.endsWith("-shm")) {
         sizes.shmFile = stats.size;
       }
+      sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
     }
 
+    const formattedSizes = {
+      dbFile: formatBytes(sizes.dbFile),
+      walFile: formatBytes(sizes.walFile),
+      shmFile: formatBytes(sizes.shmFile),
+      conversations: sizes.conversations,
+      total: formatBytes(sizes.total),
+    };
+
+    console.debug(
+      `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
+    );
     return sizes;
   }
 

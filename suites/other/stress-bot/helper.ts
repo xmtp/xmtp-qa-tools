@@ -1,6 +1,6 @@
-import { getInboxIds, sleep } from "@helpers/utils";
 import { type Worker, type WorkerManager } from "@workers/manager";
 import { type Client, type Conversation, type Group } from "@xmtp/node-sdk";
+import { getInboxIds, sleep } from "dev/helpers/utils";
 
 /**
  * Gets workers that are members of a group

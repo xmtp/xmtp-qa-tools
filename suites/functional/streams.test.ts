@@ -1,5 +1,8 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
+import { typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import { type Dm, type Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
 import {
   verifyConsentStream,
   verifyConversationStream,
@@ -7,12 +10,9 @@ import {
   verifyMessageStream,
   verifyMetadataStream,
   verifyNewConversationStream,
-} from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
-import { getWorkers } from "@workers/manager";
-import { type Dm, type Group } from "@xmtp/node-sdk";
+} from "dev/helpers/streams";
+import { getFixedNames, getInboxIds } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
 const testName = "streams";

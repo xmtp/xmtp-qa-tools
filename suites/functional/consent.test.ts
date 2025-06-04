@@ -1,10 +1,10 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { verifyConsentStream } from "@helpers/streams";
-import { getFixedNames } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { verifyConsentStream } from "dev/helpers/streams";
+import { getFixedNames } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
 const testName = "consent";

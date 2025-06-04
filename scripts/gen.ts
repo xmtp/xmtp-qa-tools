@@ -1,13 +1,13 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as readline from "readline";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getEncryptionKeyFromHex,
   loadEnv,
-} from "@helpers/client";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+} from "dev/helpers/client";
 
 const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";

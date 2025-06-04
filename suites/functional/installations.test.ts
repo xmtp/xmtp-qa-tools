@@ -1,5 +1,5 @@
-import { loadEnv } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
 import { describe, expect, it } from "vitest";
 
 const testName = "installations";

@@ -1,98 +1,132 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { formatBytes, getRandomInboxIds, sleep } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { formatBytes, getRandomInboxIds } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
+interface StorageMetrics {
+  totalSizeMB: number;
+  numberOfGroups: number;
+  membersPerGroup: number;
+  sizePerGroupMB: number;
+  costPerMemberMB: number;
+}
+
+const memberCounts = [2, 10, 50, 100];
+const targetSizeMB = 50;
+const timeOut = 300000000;
 const testName = "storage";
 loadEnv(testName);
 
-describe(testName, () => {
-  let workers: WorkerManager;
+describe(
+  testName,
+  () => {
+    setupTestLifecycle({ expect });
 
-  setupTestLifecycle({ expect });
+    it("should generate storage efficiency table for different group sizes", async () => {
+      const results: StorageMetrics[] = [];
 
-  it("should create groups with different member counts", async () => {
-    try {
-      let groups: {
-        memberCount: number;
-        sizes: { dbFile: number; walFile: number; shmFile: number };
-        conversationCount: number;
-      }[] = [];
-      const suffix = Math.random().toString(36).substring(2, 15);
-      workers = await getWorkers(["random" + suffix], testName);
-      const creator = workers.get("random" + suffix);
+      try {
+        for (const memberCount of memberCounts) {
+          console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
-      if (!creator) {
-        throw new Error("Creator worker not found");
-      }
+          const name = `fabri-${memberCount}`;
+          const workers = await getWorkers([name], testName);
+          const creator = workers.get(name);
 
-      // Initial measurement
-      const initialSizes = creator.worker.getSQLiteFileSizes();
-      await creator.client.conversations.sync();
-      const initialConversations = await creator.client.conversations.list();
-      groups.push({
-        memberCount: 0,
-        sizes: initialSizes,
-        conversationCount: initialConversations.length,
-      });
-      console.log(
-        `Initial state: ${initialConversations.length} conversations, WAL: ${formatBytes(initialSizes.walFile)}`,
-      );
+          const memberInboxIds = getRandomInboxIds(memberCount - 1); // -1 because creator is included
+          let groupCount = 0;
+          let currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
-      const memberCounts = [2, 50, 100, 150, 200];
+          while (
+            currentTotalSize?.total &&
+            currentTotalSize.total < targetSizeMB * 1024 * 1024
+          ) {
+            await creator?.client.conversations.newGroup(memberInboxIds);
+            groupCount++;
+            currentTotalSize = await creator?.worker.getSQLiteFileSizes();
 
-      for (const memberCount of memberCounts) {
-        console.log(`Creating group with ${memberCount} members...`);
+            // Log progress every 10 groups for larger group sizes, every 100 for smaller
+            const logInterval = memberCount >= 50 ? 10 : 100;
+            if (groupCount % logInterval === 0) {
+              console.log(
+                `  Created ${groupCount} groups, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
+              );
+            }
+          }
 
-        const memberInboxIds = getRandomInboxIds(memberCount);
-        const group =
-          await creator.client.conversations.newGroup(memberInboxIds);
-        console.log(`✓ Group created with ID: ${group.id}`);
+          const finalSizeMB = (currentTotalSize?.total ?? 0) / (1024 * 1024);
+          const sizePerGroupMB = finalSizeMB / groupCount;
+          const costPerMemberMB = sizePerGroupMB / memberCount;
 
-        await creator.client.conversations.sync();
+          const metrics: StorageMetrics = {
+            totalSizeMB: finalSizeMB,
+            numberOfGroups: groupCount,
+            membersPerGroup: memberCount,
+            sizePerGroupMB,
+            costPerMemberMB,
+          };
 
-        // Measure before potential checkpointing
-        const preSizes = creator.worker.getSQLiteFileSizes();
-        console.log(`Pre-checkpoint WAL: ${formatBytes(preSizes.walFile)}`);
+          results.push(metrics);
 
-        await sleep(100);
+          console.log(
+            `✅ ${memberCount}-member groups: ${groupCount} groups, ${finalSizeMB.toFixed(2)} MB total`,
+          );
+        }
 
-        // Measure after sleep
-        const postSizes = creator.worker.getSQLiteFileSizes();
-        const conversations = await creator.client.conversations.list();
+        // Generate and display the efficiency table
+        console.log("\n" + "=".repeat(80));
+        console.log("📊 STORAGE EFFICIENCY ANALYSIS");
+        console.log("=".repeat(80));
 
+        console.log("\n## Storage Efficiency by Group Size");
         console.log(
-          `Post-sleep WAL: ${formatBytes(postSizes.walFile)}, Conversations: ${conversations.length}`,
-        );
-
-        groups.push({
-          memberCount,
-          sizes: postSizes,
-          conversationCount: conversations.length,
-        });
-      }
-
-      // Print table of results
-      console.log("\n📊 Storage Test Results:");
-      console.log("Members | DB Size | WAL Size | Conversations | Final Size");
-      console.log("--------|---------|----------|---------------|----------");
-
-      for (const group of groups) {
-        const dbSize = formatBytes(group.sizes.dbFile);
-        const walSize = formatBytes(group.sizes.walFile);
-        const shmSize = formatBytes(group.sizes.shmFile);
-        const finalSize = formatBytes(
-          group.sizes.walFile * 0.82 + group.sizes.dbFile,
+          "| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |",
         );
         console.log(
-          `${group.memberCount.toString().padStart(7)} | ${dbSize.padStart(7)} | ${walSize.padStart(8)} | ${shmSize.padStart(8)} | ${group.conversationCount.toString().padStart(13)} | ${finalSize.padStart(8)}`,
+          "|------------|------------------|-------------------|--------------------|--------------------|",
         );
+
+        for (const result of results) {
+          console.log(
+            `| ${result.totalSizeMB.toFixed(0)} MB      | ${result.numberOfGroups.toLocaleString()}           | ${result.membersPerGroup}                 | ${result.sizePerGroupMB.toFixed(6)}           | ${result.costPerMemberMB.toFixed(6)}          |`,
+          );
+        }
+
+        // Calculate and display efficiency insights
+        const baseline = results[0]; // 2-member groups as baseline
+        console.log("\n*Key insights:");
+
+        for (let i = 1; i < results.length; i++) {
+          const current = results[i];
+          const efficiency = baseline.costPerMemberMB / current.costPerMemberMB;
+          console.log(
+            `${current.membersPerGroup}-member groups are ${efficiency.toFixed(1)}x more efficient than ${baseline.membersPerGroup}-member groups.`,
+          );
+        }
+
+        // Compare adjacent group sizes
+        for (let i = 1; i < results.length; i++) {
+          const current = results[i];
+          const previous = results[i - 1];
+          const efficiency = previous.costPerMemberMB / current.costPerMemberMB;
+          console.log(
+            `${current.membersPerGroup}-member groups are ${efficiency.toFixed(1)}x more efficient than ${previous.membersPerGroup}-member groups.`,
+          );
+        }
+        console.log("\n" + "=".repeat(80));
+
+        // Verify we have results for all member counts
+        expect(results).toHaveLength(memberCounts.length);
+        expect(results.every((r) => r.totalSizeMB >= targetSizeMB * 0.9)).toBe(
+          true,
+        ); // Allow 10% under target
+      } catch (e) {
+        logError(e, expect.getState().currentTestName || "unknown test");
+        throw e;
       }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName || "unknown test");
-      throw e;
-    }
-  });
-});
+    });
+  },
+  timeOut,
+);

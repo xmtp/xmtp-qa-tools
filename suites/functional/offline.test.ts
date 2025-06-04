@@ -1,8 +1,8 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
 const testName = "recovery";

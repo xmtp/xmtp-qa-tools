@@ -1,10 +1,10 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { verifyMessageStream } from "dev/helpers/streams";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 

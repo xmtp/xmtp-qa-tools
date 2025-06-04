@@ -1,5 +1,4 @@
 import { initializeClient } from "@bots/xmtp-handler";
-import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -7,6 +6,11 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
+import {
+  getFixedNames,
+  logAndSend,
+  validateEnvironment,
+} from "dev/helpers/utils";
 import {
   createAndSendDms,
   createAndSendInGroup,

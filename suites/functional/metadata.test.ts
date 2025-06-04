@@ -1,9 +1,9 @@
-import { loadEnv } from "@helpers/client";
-import { verifyMetadataStream } from "@helpers/streams";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { verifyMetadataStream } from "dev/helpers/streams";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";

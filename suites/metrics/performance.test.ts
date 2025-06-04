@@ -1,11 +1,11 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
-import { getAddresses, getFixedNames, getInboxIds } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { verifyMessageStream } from "dev/helpers/streams";
+import { getAddresses, getFixedNames, getInboxIds } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
 const testName = "m_performance";

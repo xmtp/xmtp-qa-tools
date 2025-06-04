@@ -213,7 +213,20 @@ _Note: `Production` network consistently shows better network performance across
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-### Success criteria summary
+## Storage
+
+### Storage by Group Size
+
+| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
+| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
+| 50 MB      | 772              | 2                 | 0.065152            | 0.032576             |
+| 50 MB      | 278              | 10                | 0.180418            | 0.018042             |
+| 51 MB      | 153              | 50                | 0.331398            | 0.006628             |
+| 50 MB      | 83               | 100               | 0.603562            | 0.006036             |
+
+_Note: 100-member groups are 5.4x more efficient than 2-member groups._
+
+## Success criteria summary
 
 | Metric                  | Current Performance         | Target                 | Performance  |
 | ----------------------- | --------------------------- | ---------------------- | ------------ |

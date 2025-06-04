@@ -1,7 +1,7 @@
-import { loadEnv } from "@helpers/client";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import type { Client, Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { describe, expect, it } from "vitest";
 
 const CHAOS_GROUPS = 20;

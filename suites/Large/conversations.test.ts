@@ -1,11 +1,11 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { verifyNewConversationStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { verifyNewConversationStream } from "dev/helpers/streams";
+import { getFixedNames, getInboxIds } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,

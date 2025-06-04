@@ -1,9 +1,9 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { getFixedNames, getInboxIds } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,

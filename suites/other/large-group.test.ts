@@ -1,7 +1,7 @@
-import { loadEnv } from "@helpers/client";
-import { getInboxIds, sleep } from "@helpers/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { getInboxIds, sleep } from "dev/helpers/utils";
 
 const scriptName = "m_large_group";
 loadEnv(scriptName);

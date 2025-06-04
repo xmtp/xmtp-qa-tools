@@ -1,8 +1,8 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { sleep } from "@helpers/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { sleep } from "dev/helpers/utils";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";

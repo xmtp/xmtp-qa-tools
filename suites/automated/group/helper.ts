@@ -1,6 +1,6 @@
-import { getRandomInboxIds } from "@helpers/utils";
 import { type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
+import { getRandomInboxIds } from "dev/helpers/utils";
 
 export type TestFeature =
   | "verifyMessageStream"

@@ -1,8 +1,8 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createTestLogger, extractErrorLogs } from "@helpers/logger";
-import { sendSlackNotification } from "@helpers/slack";
+import { createTestLogger, extractErrorLogs } from "dev/helpers/logger";
+import { sendSlackNotification } from "dev/helpers/slack";
 import "dotenv/config";
 
 interface RetryOptions {

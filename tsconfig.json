@@ -19,7 +19,7 @@
     "target": "ESNext",
     "types": ["node", "vitest"],
     "paths": {
-      "@helpers/*": ["./helpers/*"],
+      "@helpers/*": ["dev/helpers/*"],
       "@scripts/*": ["./scripts/*"],
       "@workers/*": ["./workers/*"],
       "@bots/*": ["./bots/helpers/*"]

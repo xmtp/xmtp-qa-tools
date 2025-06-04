@@ -1,7 +1,7 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { getInboxIds, sdkVersionOptions } from "@helpers/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { getInboxIds, sdkVersionOptions } from "dev/helpers/utils";
 import { describe, expect, it } from "vitest";
 
 const testName = "regression";

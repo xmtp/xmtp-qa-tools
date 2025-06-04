@@ -1,8 +1,8 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { sdkVersions } from "@helpers/utils";
 import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
+import { sdkVersions } from "dev/helpers/utils";
 
 type VersionConfig = (typeof sdkVersions)[keyof typeof sdkVersions];
 const staticConfigs = Object.values(sdkVersions).map((version) => ({

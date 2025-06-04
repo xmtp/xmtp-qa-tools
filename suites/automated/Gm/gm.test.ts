@@ -1,12 +1,12 @@
-import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
-import { playwright } from "@helpers/playwright";
-import { verifyMessageStream } from "@helpers/streams";
-import { getAddresses, GM_BOT_ADDRESS } from "@helpers/utils";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
+import { logError } from "dev/helpers/logger";
+import { playwright } from "dev/helpers/playwright";
+import { verifyMessageStream } from "dev/helpers/streams";
+import { getAddresses, GM_BOT_ADDRESS } from "dev/helpers/utils";
+import { setupTestLifecycle } from "dev/helpers/vitest";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "gm";

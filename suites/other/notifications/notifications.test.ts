@@ -1,9 +1,9 @@
-import { loadEnv } from "@helpers/client";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
+import { loadEnv } from "dev/helpers/client";
 import { describe, it } from "vitest";
-import { getManualUsers } from "../../../helpers/utils";
+import { getManualUsers } from "../../../dev/helpers/utils";
 
 const testName = "notifications";
 loadEnv(testName);
