@@ -1,39 +1,17 @@
-# XMTP Storage Testing Suite
+## Storage
 
-Comprehensive storage analysis for XMTP applications with validated measurements and production projections.
+### Storage by Group Size (50MB target)
 
-## Core Storage Metrics (Validated)
+| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
+| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
+| 50 MB      | 772              | 2                 | 0.065152            | 0.032576             |
+| 50 MB      | 278              | 10                | 0.180418            | 0.018042             |
+| 50 MB      | 153              | 50                | 0.331398            | 0.006628             |
+| 50 MB      | 150              | 100               | 0.334457            | 0.003345             |
+| 51 MB      | 101              | 150               | 0.501870            | 0.003346             |
+| 50 MB      | 77               | 200               | 0.655048            | 0.003275             |
 
-| Operation           | Storage Cost | Scale Factor | Target | Performance  |
-| ------------------- | ------------ | ------------ | ------ | ------------ |
-| **Initial Setup**   | 608.38 KB    | Front-loaded | <1 MB  | ✅ On Target |
-| **DM Creation**     | 8.05 KB      | 1x baseline  | <50 KB | ✅ On Target |
-| **Group Creation**  | 635.70 KB    | **79x DMs**  | <1 MB  | ✅ On Target |
-| **Scale DM Avg**    | 3.62 KB      | 0.45x single | <50 KB | ✅ On Target |
-| **Scale Group Avg** | 745.95 KB    | **93x DMs**  | <1 MB  | ✅ On Target |
+_Note: 100-member groups are 5.4x more efficient than 2-member groups._
 
-## Production Scaling Projections
-
-| Scale Type           | Configuration         | Storage/User | Performance  |
-| -------------------- | --------------------- | ------------ | ------------ |
-| **Small Scale**      | 1K DMs + 100 Groups   | ~71.4 MB     | ✅ On Target |
-| **Medium Scale**     | 10K DMs + 1K Groups   | ~699 MB      | ✅ On Target |
-| **Enterprise Scale** | 100K DMs + 10K Groups | ~6.99 GB     | ⚠️ Monitor   |
-
-## Real-World Usage Scenarios
-
-| Use Case               | Daily Activity     | Annual Storage | Performance  |
-| ---------------------- | ------------------ | -------------- | ------------ |
-| **Consumer App**       | 100 DMs + 5 Groups | ~6.4 MB/user   | ✅ On Target |
-| **Business Comms**     | 50 DMs + 20 Groups | ~15.1 MB/user  | ✅ On Target |
-| **Community Platform** | 20 DMs + 50 Groups | ~32.0 MB/user  | ✅ On Target |
-
-### Running Tests
-
-```bash
-# Complete storage analysis (recommended)
-yarn test suites/storage/storage.test.ts
-
-# All storage tests
-yarn test suites/storage/
-```
+<img src="convos.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
+<img src="cb.PNG" alt="Storage Analysis" width="40%" style="margin-left: 20px;" height="600px">
