@@ -215,16 +215,16 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Storage
 
-### Storage by Group Size (50MB target)
+### Storage by Group Size
 
-| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
-| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
-| 50 MB      | 772              | 2                 | 0.065152            | 0.032576             |
-| 50 MB      | 278              | 10                | 0.180418            | 0.018042             |
-| 50 MB      | 153              | 50                | 0.331398            | 0.006628             |
-| 50 MB      | 150              | 100               | 0.334457            | 0.003345             |
-| 51 MB      | 101              | 150               | 0.501870            | 0.003346             |
-| 50 MB      | 77               | 200               | 0.655048            | 0.003275             |
+| Group Size  | Groups | Total Storage | Avg Group Size | Efficiency Gain |
+| ----------- | ------ | ------------- | -------------- | --------------- |
+| 2 members   | 239    | 5.0 MB        | 0.021 MB       | baseline        |
+| 10 members  | 110    | 5.3 MB        | 0.048 MB       | 2.2× better     |
+| 50 members  | 32     | 5.5 MB        | 0.173 MB       | 3.0× better     |
+| 100 members | 17     | 5.3 MB        | 0.311 MB       | 3.4× better     |
+| 150 members | 13     | 6.3 MB        | 0.482 MB       | 3.3× better     |
+| 200 members | 8      | 5.0 MB        | 0.627 MB       | 3.3× better     |
 
 _Note: 100-member groups are 5.4x more efficient than 2-member groups._
 

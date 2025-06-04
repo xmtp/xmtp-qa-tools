@@ -69,6 +69,7 @@ describe(testName, () => {
           membersPerGroup: memberCount,
           sizePerGroupMB,
           receiverSizeMB: receiverSizeMB?.dbFile ?? 0,
+          costPerMemberMB: (sizePerGroupMB / memberCount) * 1000,
         };
 
         results.push(metrics);

@@ -2,7 +2,7 @@ import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
 import { generateEncryptionKeyHex } from "@helpers/client";
-import { sdkVersions, sleep } from "@helpers/utils";
+import { formatBytes, sdkVersions, sleep } from "@helpers/utils";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, typeOfSync, WorkerClient } from "./main";
@@ -150,7 +150,7 @@ export class WorkerManager {
           const installations2 =
             await worker.client.preferences.inboxState(true);
           console.warn(
-            `[${worker.name}] Package details: ${installations2.installations.length}`,
+            `[${worker.name}] Installations: ${installations2.installations.length}`,
           );
         }
         for (const installation of installations.installations) {
@@ -289,7 +289,9 @@ export class WorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+              (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
+            )}`,
           );
         }
       }
