@@ -17,13 +17,15 @@ import {
 
 let workersDev: WorkerManager;
 let workersProd: WorkerManager;
+
+const config = TEST_CONFIGS.large;
 const HELP_TEXT = `Stress bot commands:
 /stress - This help will:
-- Send 5 DMs from each of 10 workers to you
-- Create 5 groups with all workers
-- Create 50-member large groups
-- Send 5 messages to each group
-- Send 5 messages to each large group
+- Send ${config.messageCount} DMs from each of ${config.workerCount} workers to you
+- Create ${config.groupCount} groups with all workers
+- Create ${config.largeGroups.join(", ")}-member large groups
+- Send ${config.messageCount} messages to each group
+- Send ${config.messageCount} messages to each large group
 `;
 
 /**
@@ -44,8 +46,6 @@ const processMessage = async (
   }
 
   try {
-    const config = TEST_CONFIGS.small;
-
     await runStressTest(
       config,
       client.options?.env === "dev" ? workersDev : workersProd,
@@ -154,7 +154,7 @@ async function runStressTest(
 
 const main = async () => {
   workersDev = await getWorkers(
-    getFixedNames(TEST_CONFIGS.small.workerCount),
+    getFixedNames(config.workerCount),
     "stressbot",
     typeofStream.None,
     typeOfResponse.None,
@@ -163,7 +163,7 @@ const main = async () => {
   );
 
   workersProd = await getWorkers(
-    getFixedNames(TEST_CONFIGS.small.workerCount),
+    getFixedNames(config.workerCount),
     "stressbot",
     typeofStream.None,
     typeOfResponse.None,

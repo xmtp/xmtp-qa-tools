@@ -9,7 +9,7 @@ import {
   createAndSendDms,
   TEST_CONFIGS,
   type StressTestConfig,
-} from "./helper";
+} from "../other/helper";
 
 const testName = "bot-stress";
 loadEnv(testName);
