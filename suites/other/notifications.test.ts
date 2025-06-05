@@ -1,9 +1,9 @@
 import { loadEnv } from "@helpers/client";
+import { getManualUsers } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
-import { getManualUsers } from "../../../helpers/utils";
 
 const testName = "notifications";
 loadEnv(testName);
@@ -11,7 +11,7 @@ loadEnv(testName);
 describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
-  for (const receiver of getManualUsers(["fabri-convos-dev"])) {
+  for (const receiver of getManualUsers(["fabri-convos"])) {
     it(`should create a group with ${receiver.name} members`, async () => {
       workers = await getWorkers(
         ["alice", "bob", "sam", "walt", "tina"],

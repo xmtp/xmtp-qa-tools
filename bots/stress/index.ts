@@ -13,7 +13,7 @@ import {
   createLargeGroups,
   TEST_CONFIGS,
   type StressTestConfig,
-} from "suites/other/stress-bot/helper";
+} from "suites/other/helper";
 
 let workersDev: WorkerManager;
 let workersProd: WorkerManager;
