@@ -215,18 +215,16 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Storage
 
-### Storage by Group Size (50MB target)
+### Storage by Group Size
 
-| Total Size | Number of Groups | Members per Group | Size per Group (MB) | Cost per Member (MB) |
-| ---------- | ---------------- | ----------------- | ------------------- | -------------------- |
-| 50 MB      | 772              | 2                 | 0.065152            | 0.032576             |
-| 50 MB      | 278              | 10                | 0.180418            | 0.018042             |
-| 50 MB      | 153              | 50                | 0.331398            | 0.006628             |
-| 50 MB      | 150              | 100               | 0.334457            | 0.003345             |
-| 51 MB      | 101              | 150               | 0.501870            | 0.003346             |
-| 50 MB      | 77               | 200               | 0.655048            | 0.003275             |
-
-_Note: 100-member groups are 5.4x more efficient than 2-member groups._
+| Group Size  | Groups | Total Storage | Avg Group Size | Efficiency Gain |
+| ----------- | ------ | ------------- | -------------- | --------------- |
+| 2 members   | 239    | 5.0 MB        | 0.021 MB       | baseline        |
+| 10 members  | 110    | 5.3 MB        | 0.048 MB       | 2.2× better     |
+| 50 members  | 32     | 5.5 MB        | 0.173 MB       | 3.0× better     |
+| 100 members | 17     | 5.3 MB        | 0.311 MB       | 3.4× better     |
+| 150 members | 13     | 6.3 MB        | 0.482 MB       | 3.3× better     |
+| 200 members | 8      | 5.0 MB        | 0.627 MB       | 3.3× better     |
 
 ## Success criteria summary
 
@@ -251,7 +249,6 @@ _Note: 100-member groups are 5.4x more efficient than 2-member groups._
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
   - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
-  - [`stress-bot.eth`](https://xmtp.chat/dm/0x73BB05B6f1719ae0320701fC25d0bE64EBA59EB3): Stress test group operations
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 

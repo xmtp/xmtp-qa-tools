@@ -43,11 +43,6 @@
     "sendMessage": "@toss help"
   },
   {
-    "name": "stress-bot",
-    "address": "0x73bb05b6f1719ae0320701fc25d0be64eba59eb3",
-    "sendMessage": "hola"
-  },
-  {
     "name": "gm-bot",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     "sendMessage": "hola"
