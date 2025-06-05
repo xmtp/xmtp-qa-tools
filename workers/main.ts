@@ -246,9 +246,9 @@ export class WorkerClient extends Worker {
       total: formatBytes(sizes.total),
     };
 
-    // console.debug(
-    //   `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
-    // );
+    console.debug(
+      `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
+    );
     return sizes;
   }
 

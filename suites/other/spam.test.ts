@@ -6,7 +6,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const memberCounts = [2];
+const memberCounts = [200];
 const targetSizeMB = 5;
 const spamUsers = getManualUsers(["fabri-convos-oneoff"]);
 const testName = "spam";
@@ -27,9 +27,9 @@ describe(testName, () => {
         const workers = await getWorkers(
           [senderName, receiverName],
           testName,
-          typeofStream.None,
+          typeofStream.Conversation,
           typeOfResponse.None,
-          typeOfSync.None,
+          typeOfSync.Both,
           spamUsers[0].network as "local" | "dev" | "production",
         );
         const creator = workers.get(senderName);
@@ -48,7 +48,6 @@ describe(testName, () => {
             ...memberInboxIds,
             ...spamUsers.map((r) => r.inboxId),
           ];
-          console.debug("allInboxIds", allInboxIds);
           const group =
             await creator?.client.conversations.newGroup(allInboxIds);
           await group?.send("hi");

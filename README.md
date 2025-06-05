@@ -249,7 +249,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
   - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
-  - [`stress-bot.eth`](https://xmtp.chat/dm/0x73BB05B6f1719ae0320701fC25d0bE64EBA59EB3): Stress test group operations
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 

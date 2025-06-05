@@ -1,7 +1,8 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { formatBytes, getRandomInboxIds, sleep } from "@helpers/utils";
+import { formatBytes, getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -33,42 +34,46 @@ describe(testName, () => {
 
         const name = `sender${randomSuffix}-${memberCount}`;
         const receiverName = `receiver${randomSuffix}-${memberCount}`;
-        const workers = await getWorkers([name, receiverName], testName);
+        const workers = await getWorkers(
+          [name, receiverName],
+          testName,
+          typeofStream.None,
+          typeOfResponse.None,
+          typeOfSync.None,
+        );
         const creator = workers.get(name);
         const receiver = workers.get(receiverName);
-        await sleep(1000);
         const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
         let groupCount = 0;
         let installationSize = await creator?.worker.getSQLiteFileSizes();
         let currentTotalSize = installationSize?.dbFile ?? 0;
         while (currentTotalSize < targetSizeMB * 1024 * 1024) {
-          await creator?.client.conversations.newGroup([
+          const group = await creator?.client.conversations.newGroup([
             ...memberInboxIds,
             receiver?.inboxId as string,
           ]);
-          //await group?.send("hi");
+          void group?.send("hi");
           groupCount++;
-          let sizes = await creator?.worker.getSQLiteFileSizes();
+          let senderSizes = await creator?.worker.getSQLiteFileSizes();
+          let receiverSizes = await receiver?.worker.getSQLiteFileSizes();
           currentTotalSize =
-            (sizes?.dbFile ?? 0) - (installationSize?.dbFile ?? 0);
+            (senderSizes?.dbFile ?? 0) - (installationSize?.dbFile ?? 0);
           console.debug(
             `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
               currentTotalSize,
-            )}`,
+            )} and receiver size: ${formatBytes(receiverSizes?.dbFile ?? 0)}`,
           );
         }
-
+        await workers.checkForks();
         const finalSizeMB = currentTotalSize / (1024 * 1024);
         const sizePerGroupMB = finalSizeMB / groupCount;
-        await receiver?.client.conversations.syncAll();
-        await creator?.client.conversations.syncAll();
-        const receiverSizeMB = await receiver?.worker.getSQLiteFileSizes();
+        const finalReceiverSizes = await receiver?.worker.getSQLiteFileSizes();
         const metrics: StorageMetrics = {
           totalSizeMB: finalSizeMB,
           numberOfGroups: groupCount,
           membersPerGroup: memberCount,
           sizePerGroupMB,
-          receiverSizeMB: receiverSizeMB?.dbFile ?? 0,
+          receiverSizeMB: (finalReceiverSizes?.dbFile ?? 0) / (1024 * 1024),
           costPerMemberMB: (sizePerGroupMB / memberCount) * 1000,
         };
 
@@ -82,9 +87,9 @@ describe(testName, () => {
       // Build complete output string
       let output = "\n## Detailed Analysis\n";
       output +=
-        "| Group Size | Groups | Total Storage | Avg Group Size | Efficiency Gain |\n";
+        "| Group Size | Groups | Sender storage | Avg Group Size | Receiver storage | Efficiency Gain |\n";
       output +=
-        "|------------|--------|---------------|----------------|-----------------|";
+        "|------------|--------|---------------|----------------|-----------------|-----------------|";
 
       // Calculate baseline (2 members) for efficiency comparison
       const baseline = results.find((r) => r.membersPerGroup === 2);
@@ -96,7 +101,7 @@ describe(testName, () => {
             ? "baseline"
             : `${(baselineCostPerMember / result.costPerMemberMB).toFixed(1)}× better`;
 
-        output += `\n| ${result.membersPerGroup} members | ${result.numberOfGroups} | ${result.totalSizeMB.toFixed(1)} MB | ${result.sizePerGroupMB.toFixed(3)} MB | ${efficiencyGain} |`;
+        output += `\n| ${result.membersPerGroup} members | ${result.numberOfGroups} | ${result.totalSizeMB.toFixed(1)} MB | ${result.sizePerGroupMB.toFixed(3)} MB | ${result.receiverSizeMB.toFixed(3)} MB | ${efficiencyGain} |`;
       }
       output += "\n\n" + "=".repeat(80);
       console.log(output);
