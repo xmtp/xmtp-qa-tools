@@ -1,5 +1,5 @@
 import { initializeClient } from "@bots/xmtp-handler";
-import { getFixedNames, logAndSend, validateEnvironment } from "@helpers/utils";
+import { getFixedNames, logAndSend } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -25,11 +25,6 @@ const HELP_TEXT = `Stress bot commands:
 - Send 5 messages to each group
 - Send 5 messages to each large group
 `;
-
-const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
-  "WALLET_KEY",
-  "ENCRYPTION_KEY",
-]);
 
 /**
  * Process incoming messages and handle stress test commands
@@ -180,9 +175,7 @@ const main = async () => {
   await initializeClient(processMessage, [
     {
       acceptGroups: true,
-      walletKey: WALLET_KEY,
       networks: ["dev", "production"],
-      dbEncryptionKey: ENCRYPTION_KEY,
       welcomeMessage: " Send /stress help",
       commandPrefix: "/stress",
       allowedCommands: ["help"],

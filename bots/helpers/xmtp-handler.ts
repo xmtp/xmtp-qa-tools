@@ -1,5 +1,6 @@
 import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import "dotenv/config";
+import { generatePrivateKey } from "viem/accounts";
 import {
   createSigner,
   generateEncryptionKeyHex,
@@ -18,7 +19,7 @@ import {
  * Core options for XMTP client initialization that includes skill options
  */
 export interface ClientOptions extends SkillOptions {
-  walletKey: string;
+  walletKey?: `0x${string}`;
   /** Encryption key for the client */
   dbEncryptionKey?: string;
   /** Networks to connect to (default: ['dev', 'production']) */
@@ -29,8 +30,9 @@ export interface ClientOptions extends SkillOptions {
 
 // Default options
 export const DEFAULT_CORE_OPTIONS: ClientOptions = {
-  walletKey: "",
-  dbEncryptionKey: process.env.ENCRYPTION_KEY,
+  walletKey: (process.env.WALLET_KEY as `0x${string}`) ?? generatePrivateKey(),
+  dbEncryptionKey:
+    (process.env.ENCRYPTION_KEY as string) ?? generateEncryptionKeyHex(),
   loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
   networks: ["dev"],
   ...DEFAULT_SKILL_OPTIONS,
@@ -55,7 +57,6 @@ export const initializeClient = async (
   const mergedCoreOptions = coreOptions.map((opt) => ({
     ...DEFAULT_CORE_OPTIONS,
     ...opt,
-    dbEncryptionKey: opt.dbEncryptionKey ?? generateEncryptionKeyHex(),
   }));
 
   /**

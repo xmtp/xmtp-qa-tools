@@ -7,15 +7,8 @@ import {
   type GroupMember,
   type KeyPackageStatus,
 } from "@xmtp/node-sdk";
-import { validateEnvironment } from "../helpers/client";
 import { initializeClient } from "../helpers/xmtp-handler";
 import type { MessageContext } from "../helpers/xmtp-skills";
-
-const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
-  "WALLET_KEY",
-  "ENCRYPTION_KEY",
-  "XMTP_ENV",
-]);
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -242,9 +235,7 @@ const processMessage = async (
 
 await initializeClient(processMessage, [
   {
-    walletKey: WALLET_KEY,
     networks: ["dev", "production"],
-    dbEncryptionKey: ENCRYPTION_KEY,
     welcomeMessage: " Send /kc help",
     commandPrefix: "/kc",
   },
