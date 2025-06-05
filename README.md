@@ -226,8 +226,6 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 | 150 members | 13     | 6.3 MB        | 0.482 MB       | 3.3× better     |
 | 200 members | 8      | 5.0 MB        | 0.627 MB       | 3.3× better     |
 
-_Note: 100-member groups are 5.4x more efficient than 2-member groups._
-
 ## Success criteria summary
 
 | Metric                  | Current Performance         | Target                 | Performance  |
