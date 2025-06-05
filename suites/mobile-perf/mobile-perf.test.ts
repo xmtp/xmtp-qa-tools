@@ -1,6 +1,11 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getFixedNames, getInboxIds, sleep } from "@helpers/utils";
+import {
+  getFixedNames,
+  getInboxIds,
+  getManualUsers,
+  sleep,
+} from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Client, Dm, Group } from "@xmtp/node-sdk";
@@ -14,8 +19,7 @@ import {
 const testName = "bot-stress";
 loadEnv(testName);
 
-const receiverInboxId =
-  "5dd3e3f8cd0feec31d56015629d8ad04f93979c4aa4c55af831c5bfd2afc440f";
+const receiverInboxId = getManualUsers(["convos-prod"])[0].inboxId;
 // Choose which test size to run
 const testSize = process.env.STRESS_SIZE || "small";
 const config = TEST_CONFIGS[testSize];
