@@ -5,16 +5,14 @@ import {
   getDbPath,
   getEncryptionKeyFromHex,
   logAgentDetails,
-  validateEnvironment,
 } from "./client";
 
-const { WALLET_KEY, ENCRYPTION_KEY } = validateEnvironment([
-  "WALLET_KEY",
-  "ENCRYPTION_KEY",
-]);
+const walletKey = process.env.WALLET_KEY as `0x${string}`;
 
-const signer = createSigner(WALLET_KEY as `0x${string}`);
-const dbEncryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
+const signer = createSigner(walletKey);
+const dbEncryptionKey = getEncryptionKeyFromHex(
+  process.env.ENCRYPTION_KEY as string,
+);
 
 const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
 
