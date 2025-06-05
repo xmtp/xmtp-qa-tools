@@ -8,7 +8,9 @@ import { describe, expect, it } from "vitest";
 
 const memberCounts = [2];
 const targetSizeMB = 10;
-const spamUsers = getManualUsers(["fabri-convos-dev"]);
+const spamInboxIds = [
+  "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
+];
 const testName = "spam";
 loadEnv(testName);
 
@@ -23,7 +25,7 @@ describe(testName, () => {
         typeofStream.None,
         typeOfResponse.None,
         typeOfSync.None,
-        spamUsers[0].network as "local" | "dev" | "production",
+        "dev",
       );
       const creator = workers.get("bot");
 
@@ -39,10 +41,7 @@ describe(testName, () => {
           installationSize?.dbFile &&
           installationSize.dbFile < targetSizeMB * 1024 * 1024
         ) {
-          const allInboxIds = [
-            ...memberInboxIds,
-            ...spamUsers.map((r) => r.inboxId),
-          ];
+          const allInboxIds = [...memberInboxIds, ...spamInboxIds];
           const group =
             await creator?.client.conversations.newGroup(allInboxIds);
           await group?.send("hi");
