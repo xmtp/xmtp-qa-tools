@@ -25,7 +25,7 @@ TARGET_SIZE_MB=10 yarn test suites/storage/storage.test.ts
 - `TARGET_SIZE_MB` - Target storage size in MB for testing (default: 5)
 - `MEMBER_COUNTS` - Comma-separated list of member counts to test (default: "2,10,50,100,150,200")
 
-### Detailed Analysis
+### Details
 
 | Group Size  | Groups | Total Storage | Avg Group Size | Efficiency Gain |
 | ----------- | ------ | ------------- | -------------- | --------------- |
