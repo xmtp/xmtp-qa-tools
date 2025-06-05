@@ -63,7 +63,10 @@ describe(testName, () => {
           console.debug(
             `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
               currentTotalSize,
-            )} and receiver size: ${formatBytes(receiverSizes?.dbFile ?? 0)}`,
+            )} and receiver size: ${formatBytes(
+              (receiverSizes?.dbFile ?? 0) -
+                (receiverInstallationSize?.dbFile ?? 0),
+            )}`,
           );
         }
         await workers.checkForks();
@@ -78,7 +81,9 @@ describe(testName, () => {
           numberOfGroups: groupCount,
           membersPerGroup: memberCount,
           sizePerGroupMB,
-          receiverSizeMB: (finalReceiverSizes?.dbFile ?? 0) / (1024 * 1024),
+          receiverSizeMB:
+            (finalReceiverSizes?.dbFile ?? 0) -
+            (receiverInstallationSize?.dbFile ?? 0) / (1024 * 1024),
           costPerMemberMB: (sizePerGroupMB / memberCount) * 1000,
         };
 
@@ -106,7 +111,7 @@ describe(testName, () => {
             ? "baseline"
             : `${(baselineCostPerMember / result.costPerMemberMB).toFixed(1)}× better`;
 
-        output += `\n| ${result.membersPerGroup} members | ${result.numberOfGroups} | ${result.totalSizeMB.toFixed(1)} MB | ${result.sizePerGroupMB.toFixed(3)} MB | ${result.receiverSizeMB.toFixed(3)} MB | ${efficiencyGain} |`;
+        output += `\n| ${result.membersPerGroup} members | ${result.numberOfGroups} | ${result.totalSizeMB.toFixed(1)} MB | ${result.sizePerGroupMB.toFixed(3)} MB | ${formatBytes(result.receiverSizeMB)} | ${efficiencyGain} |`;
       }
       output += "\n\n" + "=".repeat(80);
       console.log(output);
