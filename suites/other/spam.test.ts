@@ -6,60 +6,65 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const memberCounts = 1;
-const targetSizeMB = 50;
-const receiver = getManualUsers(["prod-testing"]);
-const timeOut = 300000000;
+const memberCounts = [2];
+const targetSizeMB = 5;
+const spamUsers = getManualUsers(["fabri-convos-oneoff"]);
 const testName = "spam";
 loadEnv(testName);
 
-describe(
-  testName,
-  () => {
-    setupTestLifecycle({ expect });
+describe(testName, () => {
+  setupTestLifecycle({ expect });
 
-    it("should generate storage efficiency table for different group sizes", async () => {
-      try {
-        const name = `fabri-${memberCounts}`;
+  it("should generate storage efficiency table for different group sizes", async () => {
+    try {
+      const randomSuffix = Math.random().toString(36).substring(2, 15);
+      for (const memberCount of memberCounts) {
+        console.time(`Testing ${memberCount}-member groups...`);
+        console.log(`\n🔄 Testing ${memberCount}-member groups...`);
+
+        const senderName = `sender${randomSuffix}-${memberCount}`;
+        const receiverName = `receiver${randomSuffix}-${memberCount}`;
         const workers = await getWorkers(
-          [name],
+          [senderName, receiverName],
           testName,
           typeofStream.None,
           typeOfResponse.None,
           typeOfSync.None,
-          "production",
+          spamUsers[0].network as "local" | "dev" | "production",
         );
-        const creator = workers.get(name);
-        const receiverInboxes = receiver.map((r) => r.inboxId);
-        console.log(receiverInboxes);
-        const memberInboxIds = [
-          ...receiverInboxes,
-          ...getRandomInboxIds(memberCounts - 1),
-        ];
+        const creator = workers.get(senderName);
+        const receiver = workers.get(receiverName);
 
+        const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
         let groupCount = 0;
-        let currentTotalSize = await creator?.worker.getSQLiteFileSizes();
+        let installationSize = await creator?.worker.getSQLiteFileSizes();
 
         while (
-          currentTotalSize?.total &&
-          currentTotalSize.total < targetSizeMB * 1024 * 1024
+          installationSize?.dbFile &&
+          installationSize.dbFile < targetSizeMB * 1024 * 1024
         ) {
+          const allInboxIds = [
+            receiver?.inboxId as string,
+            ...memberInboxIds,
+            ...spamUsers.map((r) => r.inboxId),
+          ];
+          console.debug("allInboxIds", allInboxIds);
           const group =
-            await creator?.client.conversations.newGroup(memberInboxIds);
+            await creator?.client.conversations.newGroup(allInboxIds);
           await group?.send("hi");
-
           groupCount++;
-          currentTotalSize = await creator?.worker.getSQLiteFileSizes();
-
-          console.log(
-            `  Created ${groupCount} groups of ${memberCounts} members, size: ${formatBytes(currentTotalSize?.total ?? 0)}`,
+          installationSize = await creator?.worker.getSQLiteFileSizes();
+          console.debug(
+            `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
+              installationSize?.dbFile ?? 0,
+            )}`,
           );
         }
-      } catch (e) {
-        logError(e, expect.getState().currentTestName || "unknown test");
-        throw e;
+        console.timeEnd(`Testing ${memberCount}-member groups...`);
       }
-    });
-  },
-  timeOut,
-);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName || "unknown test");
+      throw e;
+    }
+  });
+});

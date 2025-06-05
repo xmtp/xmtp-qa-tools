@@ -27,13 +27,11 @@ TARGET_SIZE_MB=10 yarn test suites/storage/storage.test.ts
 
 ### Detailed Analysis
 
-### Storage by Group Size
-
-| Group Size  | Groups | Total Storage | Avg Group Size | Efficiency Gain |
-| ----------- | ------ | ------------- | -------------- | --------------- |
-| 2 members   | 239    | 5.0 MB        | 0.021 MB       | baseline        |
-| 10 members  | 110    | 5.3 MB        | 0.048 MB       | 2.2× better     |
-| 50 members  | 32     | 5.5 MB        | 0.173 MB       | 3.0× better     |
-| 100 members | 17     | 5.3 MB        | 0.311 MB       | 3.4× better     |
-| 150 members | 13     | 6.3 MB        | 0.482 MB       | 3.3× better     |
-| 200 members | 8      | 5.0 MB        | 0.627 MB       | 3.3× better     |
+| Group Size  | Groups | Total Storage | Avg Group Size | Cost per Member | Efficiency Gain |
+| ----------- | ------ | ------------- | -------------- | --------------- | --------------- |
+| 2 members   | 239    | 5.0 MB        | 0.021 MB       | 0.01 MB         | baseline        |
+| 10 members  | 108    | 5.2 MB        | 0.048 MB       | 0.00 MB         | 2.2× better     |
+| 50 members  | 32     | 5.5 MB        | 0.173 MB       | 0.00 MB         | 3.0× better     |
+| 100 members | 17     | 5.3 MB        | 0.311 MB       | 0.00 MB         | 3.4× better     |
+| 150 members | 13     | 6.3 MB        | 0.482 MB       | 0.00 MB         | 3.3× better     |
+| 200 members | 8      | 5.0 MB        | 0.625 MB       | 0.00 MB         | 3.4× better     |
