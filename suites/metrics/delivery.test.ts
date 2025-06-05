@@ -7,7 +7,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { getWorkersFromGroup } from "suites/other/stress-bot/helper";
+import { getWorkersFromGroup } from "suites/other/helper";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
