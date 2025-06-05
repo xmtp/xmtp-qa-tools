@@ -41,23 +41,30 @@ export const TEST_CONFIGS: Record<string, StressTestConfig> = {
 yarn test stress
 ```
 
-## Convos rating
+## Mobile Performance Rating
 
-| Configuration | Total Load                      | Workers | Stars      | Label                            | Est. Storage |
-| ------------- | ------------------------------- | ------- | ---------- | -------------------------------- | ------------ |
-| **Small**     | ~250 participants, 50 messages  | 10      | ⭐⭐⭐⭐⭐ | Excellent performance, no issues | 10-20 MB     |
-| **Medium**    | ~450 participants, 300 messages | 30      | ⭐⭐⭐⭐   | Good performance, minor delays   | 30-90 MB     |
-| **Large**     | ~875 participants, 750 messages | 50      | ⭐⭐⭐     | Acceptable, noticeable delays    | 100-300 MB   |
-| **Spam**      | ~875 participants, 750 messages | 50      | ⭐⭐⭐     | Acceptable, noticeable delays    | 100-300 MB   |
+| Configuration | Total Load                      | Workers | Stars      | App Launch | Conversation Rendering | Message Display | Transitions | Est. Storage |
+| ------------- | ------------------------------- | ------- | ---------- | ---------- | ---------------------- | --------------- | ----------- | ------------ |
+| **Small**     | ~250 participants, 50 messages  | 10      | ⭐⭐⭐⭐⭐ | Instant    | Instant                | Instant         | Smooth      | 10-20 MB     |
+| **Medium**    | ~450 participants, 300 messages | 30      | ⭐⭐⭐⭐   | Fast       | Fast                   | Fast            | Responsive  | 30-90 MB     |
+| **Large**     | ~875 participants, 750 messages | 50      | ⭐⭐⭐     | Noticeable | Noticeable             | Delayed         | Sluggish    | 100-300 MB   |
+| **Spam**      | ~875 participants, 750 messages | 50      | ⭐⭐⭐     | Noticeable | Noticeable             | Delayed         | Sluggish    | 100-300 MB   |
 
-### Levels
+### Performance Metrics
 
-⭐⭐⭐⭐⭐ - Excellent performance, no issues
+**App Launch Speed** - Time from app icon tap to conversation list display
+**Conversation Rendering** - Time to load and display conversation list in chronological order
+**Message Display** - Time for individual messages to appear when opening a conversation
+**Transitions** - Speed of navigation between screens and UI state changes
 
-⭐⭐⭐⭐ - Good performance, minor delays
+### Rating Scale
 
-⭐⭐⭐ - Acceptable performance, noticeable delays
+⭐⭐⭐⭐⭐ - **Instant** - All interactions feel immediate and responsive
 
-⭐⭐ - Poor performance, significant delays
+⭐⭐⭐⭐ - **Fast** - Minor delays but still feels snappy
 
-⭐ - Unusable, system failure
+⭐⭐⭐ - **Acceptable** - Noticeable delays but usable
+
+⭐⭐ - **Slow** - Significant delays affecting user experience
+
+⭐ - **Unusable** - Severe delays causing user frustration

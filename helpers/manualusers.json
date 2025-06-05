@@ -19,14 +19,14 @@
     "name": "prod-"
   },
   {
-    "app": "fabri-convos-oneoff",
-    "inboxId": "512543aeb5a1bd62e20b62b6ca72bdff24b7e222c8a766a74cc766181106a91d",
+    "app": "fabri-convos",
+    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "fabri-convos",
-    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
+    "app": "fabri-convos-oneoff",
+    "inboxId": "8ead225d8b47683a9370c88c7d25a539f4589833483cc7bf965aa00981ef8c80",
     "network": "production",
     "name": "prod-testing"
   },

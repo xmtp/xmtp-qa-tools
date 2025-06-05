@@ -7,97 +7,101 @@ import {
   sleep,
 } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import type { Client, Dm, Group } from "@xmtp/node-sdk";
+import type { Client, Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import {
-  createAndSendDms,
-  TEST_CONFIGS,
-  type StressTestConfig,
-} from "../other/helper";
+import { TEST_CONFIGS } from "../other/helper";
 
 const testName = "bot-stress";
 loadEnv(testName);
 
-const receiverInboxId = getManualUsers(["convos-prod"])[0].inboxId;
+const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
+const receiverInboxId = receiverObj.inboxId;
 // Choose which test size to run
-const testSize = process.env.STRESS_SIZE || "small";
-const config = TEST_CONFIGS[testSize];
+const config = TEST_CONFIGS.medium;
+const HELP_TEXT = `Starting:
+- Send ${config.messageCount} DMs from each of ${config.workerCount} workers to you
+- Create ${config.groupCount} groups with all workers
+- Create ${config.largeGroups.join(", ")}-member large groups
+- Send ${config.messageCount} messages to each group
+`;
+console.warn(HELP_TEXT);
 
-console.log(
-  `Running ${testSize} stress test with configuration:`,
-  JSON.stringify(config, null, 2),
-);
-
-describe(testName, async () => {
+describe(testName, () => {
   let workers: WorkerManager;
-  workers = await getWorkers(["bot"], testName);
   let bot: Worker;
-  let client: Client;
-  let conversation: Dm;
-
-  beforeAll(async () => {
-    try {
-      bot = workers.get("bot")!;
-      client = bot.client;
-      conversation = (await client.conversations.newDm(receiverInboxId)) as Dm;
-      workers = await getWorkers(getFixedNames(config.workerCount), testName);
-      expect(workers).toBeDefined();
-      expect(workers.getAll().length).toBe(config.workerCount);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
 
   setupTestLifecycle({
     expect,
   });
-  // Create a DM between two workers
+  beforeAll(async () => {
+    try {
+      workers = await getWorkers(
+        [...getFixedNames(config.workerCount), "bot"],
+        testName,
+        typeofStream.None,
+        typeOfResponse.None,
+        typeOfSync.None,
+        receiverObj.network as "local" | "dev" | "production",
+      );
+      bot = workers.get("bot")!;
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  // Create DMs (groups of size 2)
   it("createAndSendDms: should create DMs and send messages", async () => {
     try {
-      const dm = await createAndSendDms(
-        workers,
-        receiverInboxId,
+      const result = await createGroupsWithSize(
+        2,
         config.messageCount,
+        workers,
+        bot.client,
+        receiverInboxId,
       );
 
-      expect(dm).toBeTruthy();
+      expect(result).toBeTruthy();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  // Create a small group with worker members
+  // Create small groups
   it("createAndSendInGroup: should create a group and send messages", async () => {
     try {
-      const group = await createAndSendInGroup(
+      const result = await createGroupsWithSize(
+        workers.getAllButCreator().length + 1, // groupSize (all workers + receiver)
+        config.groupCount, // groupCount
         workers,
-        client,
-        config.groupCount,
+        bot.client,
         receiverInboxId,
-        conversation,
       );
 
-      expect(group).toBeTruthy();
+      expect(result).toBeTruthy();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  // // Create a large group
+  // Create large groups
   it("createLargeGroup: should create a large group with many members", async () => {
     try {
-      // Create large groups
-      const result = await createLargeGroups(
-        config,
-        workers,
-        client,
-        receiverInboxId,
-      );
-      expect(result).toBe(true);
+      // Create large groups for each size in config
+      for (const size of config.largeGroups) {
+        const result = await createGroupsWithSize(
+          size, // groupSize
+          1, // groupCount (one group per size)
+          workers,
+          bot.client,
+          receiverInboxId,
+        );
+        expect(result).toBe(true);
+      }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -105,19 +109,24 @@ describe(testName, async () => {
   });
 });
 
-export async function createAndSendInGroup(
+export async function createGroupsWithSize(
+  groupSize: number,
+  groupCount: number,
   workers: WorkerManager,
   client: Client,
-  groupCount: number,
   receiverInboxId: string,
-  conversation: Dm,
 ) {
-  const allInboxIds = workers.getAllButCreator().map((w) => w.client.inboxId);
-  allInboxIds.push(receiverInboxId);
+  // Get all available worker inbox IDs
+  const allWorkerInboxIds = workers
+    .getAllButCreator()
+    .map((w) => w.client.inboxId);
+
+  // Always include receiver as a member
+  const availableMembers = [receiverInboxId, ...allWorkerInboxIds];
 
   for (let i = 0; i < groupCount; i++) {
     try {
-      const groupName = `Test Group ${i} ${allInboxIds.length}: ${new Date().toLocaleTimeString(
+      const groupName = `Test Group ${i} (${groupSize} members): ${new Date().toLocaleTimeString(
         "en-US",
         {
           hour: "2-digit",
@@ -125,108 +134,71 @@ export async function createAndSendInGroup(
           hour12: false,
         },
       )}`;
-      const group = await client.conversations.newGroup([], {
-        groupName,
-        groupDescription: "Test group for stress testing",
-      });
-      for (const inboxId of allInboxIds) {
-        try {
-          await group.addMembers([inboxId]);
-        } catch (error) {
-          console.error(
-            `Error adding member ${inboxId} to group ${group.id}:`,
-            error,
-          );
+
+      // Select members for this group
+      let groupMembers: string[] = [];
+
+      if (groupSize <= availableMembers.length) {
+        // Use subset of available members
+        groupMembers = availableMembers.slice(0, groupSize);
+      } else {
+        // Need more members than available, so cycle through them
+        for (let j = 0; j < groupSize; j++) {
+          groupMembers.push(availableMembers[j % availableMembers.length]);
+        }
+        // Remove duplicates
+        groupMembers = [...new Set(groupMembers)];
+
+        // If we still need more members, get additional inbox IDs
+        if (groupMembers.length < groupSize) {
+          const additionalNeeded = groupSize - groupMembers.length;
+          const additionalInboxIds = getInboxIds(additionalNeeded);
+          groupMembers.push(...additionalInboxIds);
         }
       }
-      await group.sync();
-      await group.send(`Hello from the group! ${i}`);
-      await conversation.send(
-        `✅ Successfully created group ${groupName} with ${allInboxIds.length} members`,
-      );
+
+      // Create group with first member, then add the rest
+      const initialMember = groupMembers[0];
+      const remainingMembers = groupMembers.slice(1);
+
+      const group = await client.conversations.newGroup([initialMember], {
+        groupName,
+        groupDescription: `Test group with ${groupSize} members`,
+      });
+
+      // Add remaining members in batches for large groups
+      if (remainingMembers.length > 0) {
+        const MAX_BATCH_SIZE = 10;
+
+        for (let j = 0; j < remainingMembers.length; j += MAX_BATCH_SIZE) {
+          const endIdx = Math.min(j + MAX_BATCH_SIZE, remainingMembers.length);
+          const batchMembers = remainingMembers.slice(j, endIdx);
+
+          try {
+            await group.addMembers(batchMembers);
+            await group.sync();
+
+            // Add small delay for large batches
+            if (batchMembers.length === MAX_BATCH_SIZE) {
+              await sleep(500);
+            }
+          } catch (error) {
+            console.error(
+              `Error adding batch of members to group ${group.id}:`,
+              error,
+            );
+          }
+        }
+      }
+
+      // Send test message
+      await group.send(`Hello from group ${i} with ${groupSize} members!`);
     } catch (error) {
-      console.error(error);
+      console.error(`Error creating group ${i}:`, error);
+
       throw error;
     }
   }
-  return true;
-}
 
-export async function createLargeGroup(
-  client: Client,
-  memberCount: number,
-  receiverInboxId: string,
-): Promise<Group> {
-  try {
-    const MAX_BATCH_SIZE = 10;
-    const initialMembers = getInboxIds(1);
-
-    initialMembers.push(receiverInboxId);
-
-    const groupName = `Large Group ${memberCount}: ${initialMembers.length}`;
-    const group = await client.conversations.newGroup(initialMembers, {
-      groupName,
-      groupDescription: `Test group with ${memberCount} members`,
-    });
-
-    await group.sync();
-
-    for (let i = 1; i < memberCount; i += MAX_BATCH_SIZE) {
-      const endIdx = Math.min(i + MAX_BATCH_SIZE, memberCount);
-      const batchMembers = getInboxIds(endIdx - i);
-
-      if (batchMembers.length > 0) {
-        await group.addMembers(batchMembers);
-        await group.sync();
-        await sleep(500);
-      }
-    }
-
-    await group.send(`Hello from the group with ${memberCount} members`);
-    return group as Group;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
-
-export async function createLargeGroups(
-  config: StressTestConfig,
-  workers: WorkerManager,
-  client: Client,
-  receiverInboxId: string,
-  conversation?: Dm,
-) {
-  for (const size of config.largeGroups) {
-    try {
-      if (conversation) {
-        await conversation.send(`Creating group with ${size} members...`);
-      }
-
-      const group = await createLargeGroup(client, size, receiverInboxId);
-
-      if (!group) {
-        if (conversation) {
-          await conversation.send(
-            `❌ Failed to create group with ${size} members`,
-          );
-        }
-        continue;
-      }
-
-      if (conversation) {
-        await conversation.send(
-          `✅ Successfully created group with ${size} members (ID: ${group.id})`,
-        );
-        await conversation.send(`📨 Sending messages to group ${group.id}...`);
-      }
-    } catch (error) {
-      if (conversation) {
-        await conversation.send(
-          `❌ Error creating group with ${size} members: ${error instanceof Error ? error.message : String(error)}`,
-        );
-      }
-    }
-  }
   return true;
 }
