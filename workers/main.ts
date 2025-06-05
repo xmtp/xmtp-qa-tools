@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues, formatBytes } from "@helpers/utils";
+import { defaultValues } from "@helpers/utils";
 import {
   ConsentState,
   Dm,
@@ -238,13 +238,13 @@ export class WorkerClient extends Worker {
       sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
     }
 
-    const formattedSizes = {
-      dbFile: formatBytes(sizes.dbFile),
-      walFile: formatBytes(sizes.walFile),
-      shmFile: formatBytes(sizes.shmFile),
-      conversations: sizes.conversations,
-      total: formatBytes(sizes.total),
-    };
+    // const formattedSizes = {
+    //   dbFile: formatBytes(sizes.dbFile),
+    //   walFile: formatBytes(sizes.walFile),
+    //   shmFile: formatBytes(sizes.shmFile),
+    //   conversations: sizes.conversations,
+    //   total: formatBytes(sizes.total),
+    // };
 
     // console.debug(
     //   `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
