@@ -33,7 +33,7 @@ export const TEST_CONFIGS: Record<
 };
 
 const config = TEST_CONFIGS.medium;
-let HELP_TEXT = `Starting:`;
+let HELP_TEXT = `Starting:\n`;
 for (const groupConfig of config) {
   HELP_TEXT += `- Send ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} DMs from each of ${groupConfig.size} workers to you\n`;
 }
