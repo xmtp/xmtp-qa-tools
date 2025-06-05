@@ -1,5 +1,5 @@
 import { initializeClient } from "@bots/xmtp-handler";
-import { getFixedNames, logAndSend } from "@helpers/utils";
+import { getFixedNames, getInboxIds, logAndSend } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -8,12 +8,9 @@ import {
   type DecodedMessage,
 } from "@xmtp/node-sdk";
 import {
-  createAndSendDms,
-  createAndSendInGroup,
-  createLargeGroups,
+  createGroupsWithSize,
   TEST_CONFIGS,
-  type StressTestConfig,
-} from "suites/other/helper";
+} from "suites/mobile-perf/mobile-perf.test";
 
 let workersDev: WorkerManager;
 let workersProd: WorkerManager;
@@ -25,7 +22,6 @@ const HELP_TEXT = `Stress bot commands:
 - Create ${config.groupCount} groups with all workers
 - Create ${config.largeGroups.join(", ")}-member large groups
 - Send ${config.messageCount} messages to each group
-- Send ${config.messageCount} messages to each large group
 `;
 
 /**
@@ -67,7 +63,13 @@ const processMessage = async (
  * Run a complete stress test based on configuration
  */
 async function runStressTest(
-  config: StressTestConfig,
+  config: {
+    largeGroups: number[];
+    workerCount: number;
+    messageCount: number;
+    groupCount: number;
+    sizeLabel: string;
+  },
   workers: WorkerManager,
   client: Client,
   message: DecodedMessage,
@@ -93,7 +95,13 @@ async function runStressTest(
     conversation,
   );
   try {
-    await createAndSendDms(workers, message.senderInboxId, config.messageCount);
+    await createGroupsWithSize(
+      2,
+      config.messageCount,
+      getInboxIds(2),
+      client,
+      message.senderInboxId,
+    );
   } catch (error) {
     console.error(error);
     await logAndSend("Some DMs failed to send", conversation);
@@ -107,12 +115,13 @@ async function runStressTest(
     conversation,
   );
   try {
-    await createAndSendInGroup(
-      workers,
-      client,
+    // TODO: get worker inbox ids
+    await createGroupsWithSize(
+      10,
       config.groupCount,
+      getInboxIds(10),
+      client,
       message.senderInboxId,
-      conversation,
     );
   } catch (error) {
     console.error(error);
@@ -126,12 +135,12 @@ async function runStressTest(
     conversation,
   );
   try {
-    await createLargeGroups(
-      config,
+    await createGroupsWithSize(
+      config.largeGroups.length,
+      config.messageCount,
       workers,
       client,
       message.senderInboxId,
-      conversation,
     );
   } catch (error) {
     console.error(error);

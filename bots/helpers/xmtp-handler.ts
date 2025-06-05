@@ -84,7 +84,7 @@ export const initializeClient = async (
 
         for await (const message of stream) {
           if (message) {
-            console.debug("option", JSON.stringify(skillOpts, null, 2));
+            //console.debug("option", JSON.stringify(skillOpts, null, 2));
             await processMessage(
               client,
               message,
