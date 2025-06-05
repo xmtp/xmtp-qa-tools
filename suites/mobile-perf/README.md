@@ -1,4 +1,4 @@
-# Stress Test Suite
+# Mobile Performance Test Suite
 
 Measures application performance degradation ("slugishness") under increasing load conditions using different group sizes and worker counts to quantify performance at scale.
 
