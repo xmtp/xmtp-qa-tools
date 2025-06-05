@@ -1,5 +1,4 @@
-import { logAgentDetails } from "@bots/client";
-import { loadEnv } from "@helpers/client";
+import { loadEnv, logAgentDetails } from "@helpers/client";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Client } from "@xmtp/node-sdk";

@@ -1,13 +1,13 @@
 import { Client, type LogLevel, type XmtpEnv } from "@xmtp/node-sdk";
 import "dotenv/config";
-import { generatePrivateKey } from "viem/accounts";
 import {
   createSigner,
   generateEncryptionKeyHex,
   getDbPath,
   getEncryptionKeyFromHex,
   logAgentDetails,
-} from "../helpers/client";
+} from "@helpers/client";
+import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
   processMessage,
@@ -141,8 +141,10 @@ export const initializeClient = async (
   for (const option of mergedCoreOptions) {
     for (const env of option.networks ?? []) {
       try {
-        const signer = createSigner(option.walletKey);
-        const dbEncryptionKey = getEncryptionKeyFromHex(option.dbEncryptionKey);
+        const signer = createSigner(option.walletKey as string);
+        const dbEncryptionKey = getEncryptionKeyFromHex(
+          option.dbEncryptionKey as string,
+        );
         const signerIdentifier = (await signer.getIdentifier()).identifier;
 
         // Extract skill options from the client options
