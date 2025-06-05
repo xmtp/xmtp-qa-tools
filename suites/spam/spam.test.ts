@@ -6,7 +6,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const memberCounts = [2];
+const groupMemberSize = [2];
 const targetSizeMB = 10;
 const spamInboxIds = [
   "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
@@ -29,7 +29,7 @@ describe(testName, () => {
       );
       const creator = workers.get("bot");
 
-      for (const memberCount of memberCounts) {
+      for (const memberCount of groupMemberSize) {
         console.time(`Testing ${memberCount}-member groups...`);
         console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
