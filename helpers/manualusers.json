@@ -14,8 +14,8 @@
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "bd01c67801f8333df4e9404d7d3ba10b31aa5fc05b3c5e02fb94ab5e6aaf24b7",
-    "network": "production",
+    "inboxId": "4e9a79326f013ed23e6c0e3b0a885fa2e9f68357a03e04898c912baf277b4e70",
+    "network": "local",
     "name": "prod-"
   },
   {

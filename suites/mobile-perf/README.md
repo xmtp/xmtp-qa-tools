@@ -4,9 +4,9 @@ Measures application performance degradation ("slugishness") under increasing lo
 
 ## Configurations
 
-- **Small** ~15 groups, 15 messages ~ 2 MB
-- **Medium** ~50 groups with 50 messages ~ 5 MB
-- **Large** ~90 groups with 15 messages ~ 10 MB
+- **Small** ~20 groups, 15 messages ~ 2 MB
+- **Medium** ~50 groups of various sizes with 50 messages ~ 5 MB
+- **Large** ~100 groups with 15 messages ~ 10 MB
 - **XL** ~200 groups with 20 messages ~ 5 MB
 
 ## How to Run
@@ -22,19 +22,19 @@ yarn test stress
 
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
-| **Small**     | 4      | 4        | 3        | 3                | 4           | 3      | ⭐️⭐️⭐️ (2.83) |
+| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️ (2.83) |
 | **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️⭐️        |
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
 | **XL**        | 1      | 1        | 1        | 3                | 4           | 1      | ⭐️              |
 
 ### Mobile Performance Rating v304
 
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating    |
-| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------- |
-| **Small**     | 4      | 4        | 3        | 3                | 4           | 3      | ⭐️⭐️⭐️ |
-| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3      | ⭐️⭐️    |
-| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️       |
-| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️       |
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
+| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️ (2.83) |
+| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3      | ⭐️⭐️           |
+| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
+| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
 
 ### Performance Metrics
 
