@@ -2,13 +2,18 @@
 
 • **Repro**:
 
-- Create group with Node.js + XMTP Chat users
-- Add new Node.js member
-- New member only uses `conversation.stream()` before being added
-- Stream never receives the group conversation but an error `create group from welcome: welcome with cursor`
+Repro test
 
-• **Works**: All Node.js users only ✅
-• **Fails**: Mixed Node.js + XMTP Chat users ❌
+- Create group with with an [xmtp.chat](https://xmtp.chat/conversations/5ef738ad0a9b61bcc294a3bf621779e6) user
+- Start new node member with `conversation.stream()`
+- Add member on the already created group
+
+Other:
+
+- Only happens with addMember , not newGroup
+- Doesn't happen in node-only
+- Happens when the member is added from browser or RN
+- Happens with 2 xmtp chat windows opened
 
 ## Description
 
