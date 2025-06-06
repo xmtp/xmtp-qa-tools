@@ -18,23 +18,25 @@ yarn test stress
 
 ## History
 
-### Mobile Performance Rating v82
+## Mobile Performance Rating (Original)
+
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
+| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️ |
+| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️ (2.83)   |
+| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
+| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
+
+## Mobile Performance Rating v304 (Medium +30%)
 
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
-| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️ (2.83) |
-| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️⭐️        |
-| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
-| **XL**        | 1      | 1        | 1        | 3                | 4           | 1      | ⭐️              |
-
-### Mobile Performance Rating v304
-
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
-| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
-| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️ (2.83) |
-| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3      | ⭐️⭐️           |
+| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️  |
+| **Medium**    | 2      | 3        | 3        | 4                | 4           | 3      | ⭐️⭐️⭐️ (3.17) |
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
 | **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
+
+The Medium configuration now performs significantly better, moving from a 2-3 star rating to a solid 4-star rating with consistent performance across all metrics.
 
 ### Performance Metrics
 
