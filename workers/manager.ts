@@ -128,15 +128,14 @@ export class WorkerManager {
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
-      const maybeForked = await Promise.all(
+      await Promise.all(
         groups.flat().map(async (g) => {
           const debugInfo = await g.debugInfo();
-          return debugInfo.maybeForked;
+          if (debugInfo.maybeForked) {
+            throw new Error(`Stopping test, group id ${g.id} may have forked`);
+          }
         }),
       );
-      if (maybeForked.some((fork) => fork)) {
-        throw new Error("Stopping test, group may have forked");
-      }
     }
   }
 
