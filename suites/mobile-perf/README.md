@@ -20,19 +20,19 @@ yarn test stress
 
 ### Mobile Performance Rating v82
 
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
-| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
-| **Small**     | 4      | 4        | 3        | 2                | 1           | 2      | ⭐️⭐️⭐️⭐️⭐️ |
-| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️⭐️⭐️⭐️ |
-| **Large**     | 2      | 1        | 1        | 3                | 4           | 1      | ⭐️⭐️⭐️⭐️⭐️ |
-| **XL**        | 1      | 1        | 1        | 3                | 4           | 3      | ⭐️⭐️⭐️⭐️⭐️ |
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
+| **Small**     | 4      | 4        | 3        | 3                | 4           | 3      | ⭐️⭐️⭐️ (2.83) |
+| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️⭐️        |
+| **Large**     | 2      | 1        | 1        | 3                | 4           | 1      | ⭐️⭐️⭐️⭐️⭐️  |
+| **XL**        | 1      | 1        | 1        | 3                | 4           | 3      | ⭐️⭐️⭐️⭐️⭐️  |
 
 ### Mobile Performance Rating v303
 
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
-| **Small**     | 4      | 4        | 3        | 2                | 1           | 2      | ⭐️⭐️⭐️⭐️⭐️ |
-| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3      | ⭐️⭐️⭐️⭐️⭐️ |
+| **Small**     | 4      | 4        | 3        | 3                | 4           | 3      | ⭐️⭐️⭐️       |
+| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3      | ⭐️⭐️          |
 | **Large**     | 2      | 1        | 1        | 3                | 4           | 1      | ⭐️⭐️⭐️⭐️⭐️ |
 | **XL**        | 1      | 1        | 1        | 3                | 4           | 1      | ⭐️⭐️⭐️⭐️⭐️ |
 

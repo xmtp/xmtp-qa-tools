@@ -7,7 +7,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 import { TEST_CONFIGS } from "../../bots/stress/index";
 
-const config = TEST_CONFIGS.medium;
+const config = TEST_CONFIGS.large;
 let HELP_TEXT = `Starting:\n`;
 for (const groupConfig of config) {
   HELP_TEXT += `- Send ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} DMs from each of ${groupConfig.size} workers to you\n`;

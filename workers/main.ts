@@ -694,6 +694,26 @@ export class WorkerClient extends Worker {
     });
   }
 
+  collectAddedMembers(
+    groupId: string,
+    count: number = 1,
+  ): Promise<StreamConversationMessage[]> {
+    const additionalInfo: Record<string, string | number | boolean> = {
+      groupId,
+    };
+
+    return this.collectStreamEvents<StreamConversationMessage>({
+      type: typeofStream.Conversation,
+      filterFn: (msg) => {
+        if (msg.type !== StreamCollectorType.Conversation) return false;
+        const streamMsg = msg;
+        const matches = groupId === streamMsg.conversation.id;
+        return matches;
+      },
+      count,
+      additionalInfo,
+    });
+  }
   /**
    * Collect conversations
    */

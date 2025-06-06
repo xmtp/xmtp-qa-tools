@@ -1,10 +1,10 @@
-import { initializeClient } from "@bots/xmtp-handler";
 import { getInboxIds, logAndSend } from "@helpers/utils";
 import {
   type Client,
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
+import { initializeClient } from "../helpers/xmtp-handler";
 
 export const TEST_CONFIGS: Record<
   string,
@@ -95,7 +95,5 @@ await initializeClient(processMessage, [
     acceptGroups: true,
     networks: ["dev", "production"],
     welcomeMessage: " Send /stress help",
-    commandPrefix: "/stress",
-    allowedCommands: ["help"],
   },
 ]);
