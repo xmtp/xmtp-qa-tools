@@ -23,7 +23,7 @@ yarn test stress
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
 | **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️ |
-| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3      | ⭐️⭐️ (2.83)   |
+| **Medium**    | 2      | 3        | 2        | 2                | 3           | 3      | ⭐️⭐️ (2.5)    |
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 | **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 
