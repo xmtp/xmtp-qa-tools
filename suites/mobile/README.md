@@ -40,12 +40,13 @@ The Medium configuration now performs significantly better, moving from a 2-3 st
 
 ### Performance Metrics
 
-- **Log in** - Time from app icon tap to conversation list display
-- **On notif** - Time for individual messages to appear when opening a conversation.
-- **Messages** - How quickly UI buttons respond to user taps and interactions.
-- **Button Responses** - Time to open app from push notification after being closed/backgrounded.
-- **Transitions** - Speed of navigation between screens and UI state changes.
-- **Scroll** - How quickly UI scrolls to the bottom of the conversation
+- **Log in** - Time from login to full display of conversation list
+- **On notif** - Time for individual notification to open a conversation.
+- **Messages** - How quickly messages render in a message list
+- **Button Responses** - How quickly UI buttons respond to user taps and interactions
+- **Transitions** - Speed of navigation between screens (conversation and messages)
+- **Scroll** - How quickly UI scrolls to the bottom of the conversation list or top for message history
+- **Rating** - Overall rating of the application's performance based on the above metrics
 
 ### Rating Scale
 
