@@ -5,36 +5,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
-
-export const TEST_CONFIGS: Record<
-  string,
-  { size: number; count: number; messages: number }[]
-> = {
-  small: [
-    { size: 2, count: 5, messages: 5 },
-    { size: 10, count: 5, messages: 5 },
-    { size: 50, count: 5, messages: 5 },
-  ],
-  medium: [
-    { size: 2, count: 10, messages: 50 },
-    { size: 10, count: 10, messages: 50 },
-    { size: 50, count: 10, messages: 50 },
-    { size: 100, count: 10, messages: 50 },
-    { size: 150, count: 10, messages: 50 },
-  ],
-  large: [
-    { size: 2, count: 15, messages: 100 },
-    { size: 10, count: 15, messages: 100 },
-    { size: 100, count: 15, messages: 100 },
-    { size: 150, count: 15, messages: 100 },
-    { size: 100, count: 15, messages: 100 },
-    { size: 200, count: 15, messages: 100 },
-  ],
-  xl: [
-    { size: 2, count: 100, messages: 20 },
-    { size: 10, count: 100, messages: 20 },
-  ],
-};
+import { TEST_CONFIGS } from "../../bots/stress/index";
 
 const config = TEST_CONFIGS.medium;
 let HELP_TEXT = `Starting:\n`;

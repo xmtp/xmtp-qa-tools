@@ -7,7 +7,7 @@ import { describe, it } from "vitest";
 
 const testName = "notifications";
 loadEnv(testName);
-const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
+const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
 describe(testName, () => {
