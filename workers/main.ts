@@ -777,4 +777,74 @@ export class WorkerClient extends Worker {
       return Promise.resolve(false);
     }
   }
+
+  /**
+   * Checks and manages installations for this specific worker
+   * @param targetCount - Target number of installations for this worker
+   * @returns Current installation count after operations
+   */
+  async checkAndManageInstallations(targetCount: number): Promise<number> {
+    const installations = await this.client.preferences.inboxState();
+    const currentCount = installations.installations.length;
+
+    console.log(
+      `[${this.name}] Current installations: ${currentCount}, Target: ${targetCount}`,
+    );
+
+    if (currentCount === targetCount) {
+      console.log(`[${this.name}] Installation count matches target`);
+      return currentCount;
+    }
+
+    if (currentCount > targetCount) {
+      console.log(
+        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
+      );
+      await this.client.revokeAllOtherInstallations();
+      return 1; // After revoking, we should have 1 installation
+    }
+
+    return currentCount;
+  }
+
+  /**
+   * Checks installation age and warns about old installations
+   */
+  async checkInstallationAge(): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+
+    for (const installation of installations.installations) {
+      // Convert nanoseconds to milliseconds for Date constructor
+      const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
+      const installationDate = new Date(timestampMs);
+      const now = new Date();
+      const diffMs = now.getTime() - installationDate.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      const daysText = diffDays === 1 ? "day" : "days";
+      const greenCheck = diffDays < 90 ? " ✅" : "❌";
+
+      if (diffDays > 90) {
+        console.warn(
+          `[${this.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+        );
+      }
+    }
+  }
+
+  /**
+   * Revokes installations above a threshold count
+   * @param threshold - Maximum number of installations allowed
+   */
+  async revokeExcessInstallations(threshold: number = 10): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+    if (installations.installations.length > threshold) {
+      await this.client.revokeAllOtherInstallations();
+      const updatedInstallations =
+        await this.client.preferences.inboxState(true);
+      console.warn(
+        `[${this.name}] Installations after revocation: ${updatedInstallations.installations.length}`,
+      );
+    }
+  }
 }

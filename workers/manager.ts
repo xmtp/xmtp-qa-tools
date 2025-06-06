@@ -140,36 +140,11 @@ export class WorkerManager {
   }
 
   public async checkInstallations(targetCount?: number) {
-    // If no target count specified, just do the original check
+    // If no target count specified, just do basic checks
     if (targetCount === undefined) {
       for (const worker of this.getAll()) {
-        const installations = await worker.client.preferences.inboxState();
-        if (installations.installations.length > (targetCount ?? 10)) {
-          await worker.client.revokeAllOtherInstallations();
-          const installations2 =
-            await worker.client.preferences.inboxState(true);
-          console.warn(
-            `[${worker.name}] Installations: ${installations2.installations.length}`,
-          );
-        }
-        for (const installation of installations.installations) {
-          // Convert nanoseconds to milliseconds for Date constructor
-          const timestampMs =
-            Number(installation.clientTimestampNs) / 1_000_000;
-          const installationDate = new Date(timestampMs);
-          const now = new Date();
-          const diffMs = now.getTime() - installationDate.getTime();
-          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-          const daysText = diffDays === 1 ? "day" : "days";
-          const greenCheck = diffDays < 90 ? " ✅" : "❌";
-
-          if (diffDays > 90) {
-            console.warn(
-              `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
-            );
-          }
-        }
+        await worker.worker.revokeExcessInstallations();
+        await worker.worker.checkInstallationAge();
       }
       return;
     }
@@ -181,38 +156,13 @@ export class WorkerManager {
     }
 
     for (const baseName of baseNames) {
-      // Get current installation count for this base name
       const baseWorker = this.get(baseName);
       if (!baseWorker) continue;
 
-      const installations = await baseWorker.client.preferences.inboxState();
-      const currentCount = installations.installations.length;
+      const currentCount =
+        await baseWorker.worker.checkAndManageInstallations(targetCount);
 
-      console.log(
-        `[${baseName}] Current installations: ${currentCount}, Target: ${targetCount}`,
-      );
-
-      if (currentCount === targetCount) {
-        console.log(`[${baseName}] Installation count matches target`);
-        continue;
-      }
-
-      if (currentCount > targetCount) {
-        console.log(
-          `[${baseName}] Too many installations (${currentCount}), revoking all others`,
-        );
-        await baseWorker.client.revokeAllOtherInstallations();
-
-        // After revoking, we should have 1 installation, so create more if needed
-        const newCurrentCount = 1;
-        if (newCurrentCount < targetCount) {
-          await this.createAdditionalInstallations(
-            baseName,
-            targetCount - newCurrentCount,
-          );
-        }
-      } else {
-        // currentCount < targetCount
+      if (currentCount < targetCount) {
         console.log(
           `[${baseName}] Need more installations, creating ${targetCount - currentCount} additional`,
         );
@@ -228,6 +178,34 @@ export class WorkerManager {
     baseName: string,
     count: number,
   ): Promise<void> {
+    const newIds = this.generateInstallationIds(baseName, count);
+
+    console.log(
+      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
+    );
+
+    // Create the new installations in parallel
+    const createPromises = newIds.map(async (installId) => {
+      try {
+        const descriptor = `${baseName}-${installId}`;
+        await this.createWorker(descriptor);
+        console.log(`[${baseName}] Created installation: ${installId}`);
+      } catch (error) {
+        console.error(
+          `[${baseName}] Failed to create installation ${installId}:`,
+          error,
+        );
+        throw error;
+      }
+    });
+
+    await Promise.all(createPromises);
+  }
+
+  /**
+   * Generates unique installation IDs for a base name
+   */
+  private generateInstallationIds(baseName: string, count: number): string[] {
     const letters = "abcdefghijklmnopqrstuvwxyz";
 
     // Find existing installation IDs for this base name
@@ -260,23 +238,7 @@ export class WorkerManager {
       }
     }
 
-    console.log(
-      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
-    );
-
-    // Create the new installations
-    for (const installId of newIds) {
-      try {
-        const descriptor = `${baseName}-${installId}`;
-        await this.createWorker(descriptor);
-        console.log(`[${baseName}] Created installation: ${installId}`);
-      } catch (error) {
-        console.error(
-          `[${baseName}] Failed to create installation ${installId}:`,
-          error,
-        );
-      }
-    }
+    return newIds;
   }
 
   public async printWorkers() {
