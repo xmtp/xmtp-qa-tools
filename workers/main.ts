@@ -202,6 +202,13 @@ export class WorkerClient extends Worker {
   stopStreams(): void {
     this.activeStreams = false;
   }
+
+  /**
+   * Gets the current folder identifier for this worker
+   */
+  get currentFolder(): string {
+    return this.folder;
+  }
   async getSQLiteFileSizes() {
     const dbPath = this.dbPath;
     // Get the directory containing the database file
@@ -846,5 +853,68 @@ export class WorkerClient extends Worker {
         `[${this.name}] Installations after revocation: ${updatedInstallations.installations.length}`,
       );
     }
+  }
+
+  /**
+   * Adds a new installation to this worker, replacing the existing one
+   * This will stop current streams, create a fresh client installation, and restart all services
+   * @returns The new installation details
+   */
+  async addNewInstallation(): Promise<{
+    client: Client;
+    dbPath: string;
+    installationId: string;
+    address: `0x${string}`;
+  }> {
+    console.log(
+      `[${this.nameId}] Adding new installation and replacing current one`,
+    );
+
+    // Stop current streams and clear resources
+    this.stopStreams();
+
+    // Store old installation ID for logging
+    const oldInstallationId = this.client?.installationId;
+
+    // Generate a new unique folder identifier for the new installation
+    const timestamp = Date.now().toString(36);
+    const randomSuffix = Math.random().toString(36).substring(2, 8);
+    const newFolder = `${this.folder}-new-${timestamp}-${randomSuffix}`;
+
+    // Create a fresh client with new installation using a different folder
+    const { client, dbPath, address } = await createClient(
+      this.walletKey as `0x${string}`,
+      this.encryptionKeyHex,
+      {
+        sdkVersion: this.sdkVersion,
+        name: this.name,
+        testName: this.testName,
+        folder: newFolder, // Use new folder to ensure new database/installation
+      },
+      this.env,
+    );
+
+    // Update worker properties with new client and folder
+    this.dbPath = dbPath;
+    this.client = client as Client;
+    this.address = address;
+    this.folder = newFolder; // Update folder reference
+
+    // Restart streams and syncs with new installation
+    this.startStream();
+    this.startSyncs();
+
+    const newInstallationId = this.client.installationId;
+
+    console.log(
+      `[${this.nameId}] Successfully replaced installation ${oldInstallationId} with ${newInstallationId}`,
+    );
+
+    return {
+      client: this.client,
+      dbPath,
+      address: address,
+      installationId: newInstallationId,
+    };
   }
 }

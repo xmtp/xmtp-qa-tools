@@ -241,6 +241,46 @@ export class WorkerManager {
     return newIds;
   }
 
+  /**
+   * Adds a new installation to an existing worker, replacing the current one
+   * @param baseName - The base name of the worker
+   * @param installationId - The installation ID (optional, defaults to "a")
+   * @returns Updated worker with new installation
+   */
+  public async addNewInstallationToWorker(
+    baseName: string,
+    installationId: string = "a",
+  ): Promise<Worker> {
+    const worker = this.get(baseName, installationId);
+    if (!worker) {
+      throw new Error(`Worker ${baseName}-${installationId} not found`);
+    }
+
+    console.log(`[${baseName}] Adding new installation to replace current one`);
+
+    // Create new installation on the existing worker
+    const newInstallationDetails = await worker.worker.addNewInstallation();
+
+    // Update the worker object with new installation details
+    const updatedWorker: Worker = {
+      ...worker,
+      client: newInstallationDetails.client,
+      dbPath: newInstallationDetails.dbPath,
+      installationId: newInstallationDetails.installationId,
+      address: newInstallationDetails.address,
+      folder: worker.worker.currentFolder, // Use the updated folder from the worker
+    };
+
+    // Update in our internal storage
+    this.workers[baseName][installationId] = updatedWorker;
+
+    console.log(
+      `[${baseName}] Successfully updated worker with new installation: ${newInstallationDetails.installationId}`,
+    );
+
+    return updatedWorker;
+  }
+
   public async printWorkers() {
     try {
       let workersToPrint = [];
