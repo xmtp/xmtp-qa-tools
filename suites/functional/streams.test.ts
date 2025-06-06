@@ -1,6 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
+  verifyAddMemberStream,
   verifyConsentStream,
   verifyConversationStream,
   verifyMembershipStream,
@@ -80,6 +81,29 @@ describe(testName, async () => {
         10,
       );
 
+      expect(verifyResult.allReceived).toBe(true);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("addMemberStream: should measure adding a member to a group", async () => {
+    try {
+      workers = await getWorkers(names, testName, typeofStream.Conversation);
+      const creator = workers.getCreator();
+      const receiver = workers.getReceiver();
+      // Create group with alice as the creator
+      group = (await creator.client.conversations.newGroup(
+        getInboxIds(2),
+      )) as Group;
+      console.log("Group created", group.id);
+
+      const verifyResult = await verifyAddMemberStream(
+        group,
+        [receiver],
+        [receiver.client.inboxId],
+      );
       expect(verifyResult.allReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);

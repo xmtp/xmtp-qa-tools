@@ -33,7 +33,7 @@ describe(testName, async () => {
     try {
       // Create group with alice as the creator
       group = (await creator.client.conversations.newGroup(
-        getInboxIds(2),
+        getInboxIds(1),
       )) as Group;
       console.log("Group created", group.id);
 

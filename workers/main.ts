@@ -517,16 +517,22 @@ export class WorkerClient extends Worker {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
-            if (!this.activeStreams) break;
+            try {
+              if (!this.activeStreams) break;
 
-            console.debug(`Received conversation, ${conversation?.id}`);
-            if (!conversation?.id) continue;
+              console.debug(`Received conversation, ${conversation?.id}`);
+              if (!conversation?.id) continue;
 
-            if (this.listenerCount("worker_message") > 0) {
-              this.emit("worker_message", {
-                type: StreamCollectorType.Conversation,
-                conversation,
-              });
+              if (this.listenerCount("worker_message") > 0) {
+                this.emit("worker_message", {
+                  type: StreamCollectorType.Conversation,
+                  conversation,
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[${this.nameId}] conversation stream error: ${String(error)}`,
+              );
             }
           }
         } catch (error) {
