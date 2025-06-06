@@ -26,6 +26,9 @@ This directory contains functional tests for the XMTP protocol. These tests veri
 The functional tests are designed to be run with Vitest:
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
 # Run all functional tests
 yarn test functional
 

@@ -12,8 +12,11 @@ Measures application performance degradation ("slugishness") under increasing lo
 ## How to Run
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
 # Run individual configurations
-yarn test stress
+yarn test mobile
 ```
 
 ## Mobile Performance Rating

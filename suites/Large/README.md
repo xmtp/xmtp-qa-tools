@@ -26,17 +26,13 @@ This suite benchmarks XMTP network performance and scalability with large group 
   Shared utilities/constants for group creation, logging, and test parameterization (e.g., batch size, total group size).
   - Exports: `m_large_WORKER_COUNT`, `m_large_BATCH_SIZE`, `m_large_TOTAL`, `m_large_createGroup`, `saveLog`, and `SummaryEntry` type.
 
-## Setup
+## Running the Suite
 
 ```bash
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
 cd xmtp-qa-tools
 yarn install
-```
 
-## Running the Suite
-
-```bash
 yarn test large
 ```
 
