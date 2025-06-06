@@ -39,16 +39,3 @@ const spamInboxIds = [
 ```
 
 ### Details
-
-The spam test creates groups containing:
-
-- Random inbox IDs (based on member count - 2)
-- Predefined spam inbox IDs
-- The bot creator
-
-Groups are created continuously until the database reaches the target storage size, allowing analysis of:
-
-- Storage growth patterns from spam groups
-- Number of spam groups created before reaching threshold
-- Storage efficiency impact of spam conversations
-- Database size progression during spam scenarios
