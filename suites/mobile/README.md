@@ -29,12 +29,12 @@ yarn test stress
 
 ## Mobile Performance Rating v304 (Medium +30%)
 
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating           |
-| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | ---------------- |
-| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️  |
-| **Medium**    | 2      | 3        | 3        | 4                | 4           | 3      | ⭐️⭐️⭐️ (3.17) |
-| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
-| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️              |
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
+| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️ |
+| **Medium**    | 3      | 4        | 3        | 4                | 4           | 3      | ⭐️⭐️⭐️ (3.5) |
+| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
+| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 
 The Medium configuration now performs significantly better, moving from a 2-3 star rating to a solid 4-star rating with consistent performance across all metrics.
 
