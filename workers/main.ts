@@ -856,6 +856,45 @@ export class WorkerClient extends Worker {
   }
 
   /**
+   * Gets the next alphabetical folder name for this worker
+   */
+  private getNextAlphabeticalFolder(): string {
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const baseName = this.name.split("-")[0];
+    const dataPath = getDataPath() + "/" + baseName;
+
+    // Find existing folders for this worker
+    const existingFolders = new Set<string>();
+    if (fs.existsSync(dataPath)) {
+      const folders = fs.readdirSync(dataPath);
+      folders.forEach((folder) => {
+        // Only consider single letter folders (a, b, c, etc.) and numbered variants (a1, a2, etc.)
+        if (/^[a-z](\d+)?$/.test(folder)) {
+          existingFolders.add(folder);
+        }
+      });
+    }
+
+    // Find the next available letter
+    for (let i = 0; i < letters.length; i++) {
+      const letter = letters[i];
+      if (!existingFolders.has(letter)) {
+        return letter;
+      }
+    }
+
+    // If all letters are taken, start with numbered variants
+    let numIndex = 1;
+    while (true) {
+      const newId = `a${numIndex}`;
+      if (!existingFolders.has(newId)) {
+        return newId;
+      }
+      numIndex++;
+    }
+  }
+
+  /**
    * Adds a new installation to this worker, replacing the existing one
    * This will stop current streams, create a fresh client installation, and restart all services
    * @returns The new installation details
@@ -876,10 +915,8 @@ export class WorkerClient extends Worker {
     // Store old installation ID for logging
     const oldInstallationId = this.client?.installationId;
 
-    // Generate a new unique folder identifier for the new installation
-    const timestamp = Date.now().toString(36);
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
-    const newFolder = `${this.folder}-new-${timestamp}-${randomSuffix}`;
+    // Generate the next alphabetical folder name for the new installation
+    const newFolder = this.getNextAlphabeticalFolder();
 
     // Create a fresh client with new installation using a different folder
     const { client, dbPath, address } = await createClient(

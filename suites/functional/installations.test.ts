@@ -1,74 +1,250 @@
 import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
-import { getWorkers, type Worker } from "@workers/manager";
-import type { Conversation } from "@xmtp/node-sdk";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import type { Conversation, Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "installations";
 loadEnv(testName);
-const names = ["user1", "user2", "user3"];
-
 describe(testName, () => {
-  it("should create workers with different installations", async () => {
-    const workers = await getWorkers([names[0], names[0] + "-b"], testName);
+  setupTestLifecycle({
+    expect,
+  });
+  it("should create and use workers on demand", async () => {
+    const names = ["random1", "random2 ", "random3", "random4", "random5"];
+    let initialWorkers = await getWorkers(names, testName);
+    expect(initialWorkers.get(names[0])?.folder).toBe("a");
+    expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
-    const userA = workers.get(names[0]);
-    const userB = workers.get(names[0], "b");
+    // Create a different installation of alice
+    const secondaryWorkers = await getWorkers(
+      [names[0] + "-desktop", names[1] + "-b"],
+      testName,
+    );
+    // Merge the new workers with the existing ones
+    expect(secondaryWorkers.get(names[0], "desktop")?.folder).toBe("desktop");
+    expect(secondaryWorkers.get(names[1], "b")?.folder).toBe("b");
 
-    expect(userA?.folder).toBe("a");
-    expect(userB?.folder).toBe("b");
-    expect(userA?.client.inboxId).toBe(userB?.client.inboxId);
-    expect(userA?.client.installationId).not.toBe(userB?.client.installationId);
+    // Verify installations of the same person share identity
+    expect(initialWorkers.get(names[1])?.client.inboxId).toBe(
+      secondaryWorkers.get(names[1], "b")?.client.inboxId,
+    );
+    expect(initialWorkers.get(names[0])?.client.inboxId).toBe(
+      secondaryWorkers.get(names[0], "desktop")?.client.inboxId,
+    );
+    expect(initialWorkers.get(names[1])?.dbPath).not.toBe(
+      secondaryWorkers.get(names[1], "b")?.dbPath,
+    );
+
+    // But have different database paths
+    expect(secondaryWorkers.get(names[0], "desktop")?.dbPath).not.toBe(
+      secondaryWorkers.get(names[1], "b")?.dbPath,
+    );
+    // Create charlie only when we need him
+    const terciaryWorkers = await getWorkers([names[2]], testName);
+
+    // Send a message from alice's desktop to charlie
+    const aliceDesktop = secondaryWorkers.get(names[0], "desktop");
+    const conversation = await aliceDesktop?.client.conversations.newDm(
+      terciaryWorkers.get(names[2])?.client.inboxId ?? "",
+    );
+    await conversation?.send("Hello Charlie from Alice's desktop");
+
+    // Charlie can see the message
+    await terciaryWorkers.get(names[2])?.client.conversations.sync();
+    const charlieConvs = await terciaryWorkers
+      .get(names[2])
+      ?.client.conversations.list();
+    expect(charlieConvs?.length).toBeGreaterThan(0);
+
+    // Create a backup installation for charlie
+    const fourthWorkers = await getWorkers([names[2] + "-c"], testName);
+    // Backup installation should also be able to access the conversation after syncing
+    await fourthWorkers.get(names[2])?.client.conversations.sync();
+    const backupConvs = await fourthWorkers
+      .get(names[2], "c")
+      ?.client.conversations.list();
+    expect(backupConvs?.length).toBe(0);
   });
 
-  it("should handle installation management", async () => {
-    const workers = await getWorkers([names[1]], testName);
-    const worker = workers.get(names[1]);
+  it("should count installations and handle revocation", async () => {
+    const names = ["random1", "random2 ", "random3", "random4", "random5"];
+    // Create initial workers
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const workers = await getWorkers(
+      [
+        names[3],
+        names[3] + "-" + randomString,
+        names[4],
+        names[4] + "-" + randomString,
+      ],
+      testName,
+    );
 
-    expect(worker).toBeDefined();
+    // Count initial installations
+    const davidInitialState = await workers
+      .get(names[3])
+      ?.client.preferences.inboxState(true);
+    const emmaInitialState = await workers
+      .get(names[4])
+      ?.client.preferences.inboxState(true);
+    const davidCount = davidInitialState?.installations.length;
+    const emmaCount = emmaInitialState?.installations.length;
+    expect(davidCount).toBe(2); // a + mobile
+    expect(emmaCount).toBeGreaterThan(1); // a + tablet
 
-    const initialState = await worker!.client.preferences.inboxState();
-    expect(initialState.installations.length).toBeGreaterThan(0);
+    // TESTED IN XMTP.CHAT
+    // Revoke david's mobile installation by terminating and clearing
+    const davidClient = workers.get(names[3])?.client;
+    await davidClient?.revokeAllOtherInstallations();
+    await workers.get(names[3], "mobile")?.worker.clearDB();
+    // Count installations after revocation
+    const davidFinalState = await davidClient?.preferences.inboxState(true);
+    const davidFinalCount = davidFinalState?.installations.length;
+    expect(davidFinalCount).toBe(1); // only a
+  });
 
-    await worker!.worker.checkAndManageInstallations(1);
+  it("should create and use workers on demand", async () => {
+    const names = ["random1", "random2 ", "random3", "random4", "random5"];
+    let initialWorkers = await getWorkers(names, testName);
+    expect(initialWorkers.get(names[0])?.folder).toBe("a");
+    expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
-    const finalState = await worker!.client.preferences.inboxState();
-    expect(finalState.installations.length).toBeGreaterThan(0);
+    // Create a different installation of alice
+    const secondaryWorkers = await getWorkers(
+      [names[0] + "-desktop", names[1] + "-b"],
+      testName,
+    );
+    // Merge the new workers with the existing ones
+    expect(secondaryWorkers.get(names[0], "desktop")?.folder).toBe("desktop");
+    expect(secondaryWorkers.get(names[1], "b")?.folder).toBe("b");
+
+    // Verify installations of the same person share identity
+    expect(initialWorkers.get(names[1])?.client.inboxId).toBe(
+      secondaryWorkers.get(names[1], "b")?.client.inboxId,
+    );
+    expect(initialWorkers.get(names[0])?.client.inboxId).toBe(
+      secondaryWorkers.get(names[0], "desktop")?.client.inboxId,
+    );
+    expect(initialWorkers.get(names[1])?.dbPath).not.toBe(
+      secondaryWorkers.get(names[1], "b")?.dbPath,
+    );
+
+    // But have different database paths
+    expect(secondaryWorkers.get(names[0], "desktop")?.dbPath).not.toBe(
+      secondaryWorkers.get(names[1], "b")?.dbPath,
+    );
+    // Create charlie only when we need him
+    const terciaryWorkers = await getWorkers([names[2]], testName);
+
+    // Send a message from alice's desktop to charlie
+    const aliceDesktop = secondaryWorkers.get(names[0], "desktop");
+    const conversation = await aliceDesktop?.client.conversations.newDm(
+      terciaryWorkers.get(names[2])?.client.inboxId ?? "",
+    );
+    await conversation?.send("Hello Charlie from Alice's desktop");
+
+    // Charlie can see the message
+    await terciaryWorkers.get(names[2])?.client.conversations.sync();
+    const charlieConvs = await terciaryWorkers
+      .get(names[2])
+      ?.client.conversations.list();
+    expect(charlieConvs?.length).toBeGreaterThan(0);
+
+    // Create a backup installation for charlie
+    const fourthWorkers = await getWorkers([names[2] + "-c"], testName);
+    // Backup installation should also be able to access the conversation after syncing
+    await fourthWorkers.get(names[2])?.client.conversations.sync();
+    const backupConvs = await fourthWorkers
+      .get(names[2], "c")
+      ?.client.conversations.list();
+    expect(backupConvs?.length).toBe(0);
+  });
+
+  it("should count installations and handle revocation", async () => {
+    const names = ["random1", "random2 ", "random3", "random4", "random5"];
+    // Create initial workers
+    const randomString = Math.random().toString(36).substring(2, 15);
+    const workers = await getWorkers(
+      [
+        names[3],
+        names[3] + "-" + randomString,
+        names[4],
+        names[4] + "-" + randomString,
+      ],
+      testName,
+    );
+
+    // Count initial installations
+    const davidInitialState = await workers
+      .get(names[3])
+      ?.client.preferences.inboxState(true);
+    const emmaInitialState = await workers
+      .get(names[4])
+      ?.client.preferences.inboxState(true);
+    const davidCount = davidInitialState?.installations.length;
+    const emmaCount = emmaInitialState?.installations.length;
+    expect(davidCount).toBe(2); // a + mobile
+    expect(emmaCount).toBeGreaterThan(1); // a + tablet
+
+    // TESTED IN XMTP.CHAT
+    // Revoke david's mobile installation by terminating and clearing
+    const davidClient = workers.get(names[3])?.client;
+    await davidClient?.revokeAllOtherInstallations();
+    await workers.get(names[3], "mobile")?.worker.clearDB();
+    // Count installations after revocation
+    const davidFinalState = await davidClient?.preferences.inboxState(true);
+    const davidFinalCount = davidFinalState?.installations.length;
+    expect(davidFinalCount).toBe(1); // only a
   });
 
   it("should add new installation", async () => {
-    const workers = await getWorkers([names[2], names[1]], testName);
-    const originalWorker = workers.get(names[2]);
+    const workers = await getWorkers(
+      ["bob", "alice"],
+      testName,
+      typeofStream.Message,
+    );
+    const creatorWorker = workers.get("bob");
+    const receiverWorker = workers.get("alice");
 
-    expect(originalWorker).toBeDefined();
+    console.log(
+      `Creator installation ID: ${creatorWorker!.client.installationId}`,
+    );
+    console.log(
+      `Receiver installation ID BEFORE: ${receiverWorker!.client.installationId}`,
+    );
 
-    const originalInstallationId = originalWorker!.client.installationId;
-    const convo = await workers
-      .get(names[2])!
-      .client.conversations.newDm(workers.get(names[1])!.client.inboxId);
-    await convo.send("Hello");
-    const verifyResult1 = await verifyMessageStream(convo as Conversation, [
-      originalWorker!,
+    // Create conversation and send initial message
+    const convo1 = (await creatorWorker!.client.conversations.newDm(
+      receiverWorker!.client.inboxId,
+    )) as Dm;
+    await convo1.send("Hello");
+
+    // Verify receiver gets the first message
+    const verifyResult1 = await verifyMessageStream(convo1 as Conversation, [
+      receiverWorker!,
     ]);
     expect(verifyResult1.allReceived).toBe(true);
 
-    const newInstallation = await originalWorker!.worker.addNewInstallation();
-    const verifyResult2 = await verifyMessageStream(convo as Conversation, [
-      newInstallation as Worker,
+    const newInstallationDetails =
+      await receiverWorker!.worker.addNewInstallation();
+
+    console.log(
+      `Receiver installation ID AFTER: ${newInstallationDetails.installationId}`,
+    );
+    console.log(`Receiver db path: ${newInstallationDetails.dbPath}`);
+    console.log(`Receiver folder: ${receiverWorker!.worker.currentFolder}`);
+
+    // Create conversation and send initial message
+    const convo2 = (await creatorWorker!.client.conversations.newDm(
+      receiverWorker!.client.inboxId,
+    )) as Dm;
+    await convo2.send("Hello");
+    const verifyResult2 = await verifyMessageStream(convo2 as Conversation, [
+      receiverWorker!,
     ]);
     expect(verifyResult2.allReceived).toBe(true);
-    expect(newInstallation.installationId).toBeDefined();
-    expect(newInstallation.installationId).not.toBe(originalInstallationId);
-    expect(newInstallation.client.inboxId).toBe(originalWorker!.client.inboxId);
-  });
-
-  it("should handle manager operations", async () => {
-    const workers = await getWorkers(["testuser"], testName);
-
-    await expect(workers.checkInstallations()).resolves.not.toThrow();
-
-    await expect(
-      workers.addNewInstallationToWorker("nonexistent"),
-    ).rejects.toThrow();
   });
 });

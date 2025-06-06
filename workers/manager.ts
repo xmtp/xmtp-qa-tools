@@ -324,6 +324,15 @@ export class WorkerManager {
     );
     return group as Group;
   }
+  async addInstallationsRandomly() {
+    const workers = this.getAll();
+    for (const worker of workers) {
+      const isRandom = Math.random() < 0.5;
+      if (isRandom) {
+        await worker.worker.addNewInstallation();
+      }
+    }
+  }
   getAllBut(excludeName: string): Worker[] {
     const workers = this.getAll();
     return workers.filter((worker) => worker.name !== excludeName);

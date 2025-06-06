@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMetadataStream } from "@helpers/streams";
+import { verifyMessageStream, verifyMetadataStream } from "@helpers/streams";
 import { getFixedNames, getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -38,6 +38,14 @@ describe(TEST_NAME, () => {
           groupIndex <= testConfig.groupsPerIteration;
           groupIndex++
         ) {
+          for (const worker of workers.getAllBut("bot")) {
+            const newInstallationDetails =
+              await worker.worker.addNewInstallation();
+            console.log(
+              `Worker ${worker.name} installation ID AFTER: ${newInstallationDetails.installationId}`,
+            );
+          }
+
           const creator = workers.get("bot");
           const allInboxIds = [
             ...getRandomInboxIds(10),
@@ -50,12 +58,8 @@ describe(TEST_NAME, () => {
             `Hello from iteration ${iteration}, group ${groupIndex}!`,
           );
 
-          await verifyMetadataStream(
-            group as Group,
-            workers.getAllBut("bot"),
-            1,
-            `Group #${groupIndex} - Updated`,
-          );
+          await verifyMessageStream(group as Group, workers.getAllBut("bot"));
+          await verifyMetadataStream(group as Group, workers.getAllBut("bot"));
 
           await verifyEpochChange(workers, group.id, testConfig.epochs);
         }
