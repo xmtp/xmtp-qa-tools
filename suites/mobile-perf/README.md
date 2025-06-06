@@ -32,6 +32,10 @@ export const TEST_CONFIGS: Record<
     { size: 100, count: 15, messages: 15 },
     { size: 200, count: 15, messages: 15 },
   ],
+  xl: [
+    { size: 2, count: 100, messages: 20 },
+    { size: 10, count: 100, messages: 20 },
+  ],
 };
 ```
 
@@ -42,23 +46,32 @@ export const TEST_CONFIGS: Record<
 yarn test stress
 ```
 
-## Mobile Performance Rating
+## Mobile Performance Rating v82
 
-| Configuration | Log in | Time to sync | On notif | Messages | Button Responses | Transitions | Scroll | Average | Est. Storage |
-| ------------- | ------ | ------------ | -------- | -------- | ---------------- | ----------- | ------ | ------- | ------------ |
-| **Small**     | 1      | 1            | 2        | 1        | 2                | 1           | 2      | 1       | ~2 MB        |
-| **Medium**    | 1      | 3            | 3        | 3        | 3                | 3           | 3      | 3       | ~5 MB        |
-| **Large**     | 1      | 3            | 3        | 3        | 3                | 3           | 4      | 3       | ~10 MB       |
-| **Spam**      | 1      | 3            | 3        | 3        | 3                | 4           | 3      | 4       | ~5 MB        |
-| **Dead**      | 1      | 3            | 3        | 4        | 3                | 4           | 3      | 3.3     | ~10 MB       |
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll          | Rating          |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | --------------- | --------------- |
+| **Small**     | 4      | 4        | 3        | 2                | 1           | 2               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Medium**    | 1      | 1        | 1        | 2                | 3           | 3               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Large**     | 2      | 1        | 1        | 3                | 4           | ⭐️⭐️⭐️⭐️⭐️ |
+| **Spam**      | 1      | 1        | 1        | 3                | 4           | 3               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Dead**      | 1      | 1        | 1        | 4                | 3           | ⭐️⭐️⭐️⭐️⭐️ |
+
+## Mobile Performance Rating v83
+
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll          | Rating          |
+| ------------- | ------ | -------- | -------- | ---------------- | ----------- | --------------- | --------------- |
+| **Small**     | 4      | 4        | 3        | 2                | 1           | 2               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Medium**    | 2      | 3        | 3        | 3                | 3           | 3               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Large**     | 2      | 1        | 1        | 3                | 4           | ⭐️⭐️⭐️⭐️⭐️ |
+| **Spam**      | 1      | 1        | 1        | 3                | 4           | 3               | ⭐️⭐️⭐️⭐️⭐️ |
+| **Dead**      | 1      | 1        | 1        | 4                | 3           | ⭐️⭐️⭐️⭐️⭐️ |
 
 ### Configurations
 
-**Small** ~15 groups, 15 messages  
-**Medium** ~50 groups with 50 messages
-**Large** ~90 groups with 15 messages
-**Spam** ~200 dms with 1 messages  
-**Dead** ~400 dms with 1 messages
+**Small** ~15 groups, 15 messages ~ 2 MB
+**Medium** ~50 groups with 50 messages ~ 5 MB
+**Large** ~90 groups with 15 messages ~ 10 MB
+**XL** ~200 groups with 20 messages ~ 5 MB
 
 ### Performance Metrics
 
@@ -70,16 +83,15 @@ yarn test stress
 **Transitions** - Speed of navigation between screens and UI state changes
 **Scroll** - How quickly UI scrolls to the bottom of the conversation
 **Average** - Average of all metrics
-**Est. Storage** - Estimated storage usage for the test
 
 ### Rating Scale
 
-**1** - **Instant** - All interactions feel immediate and responsive
+⭐️⭐️⭐️⭐️⭐️ - **Instant** - All interactions feel immediate and responsive
 
-**2** - **Fast** - Minor delays but still feels snappy
+⭐️⭐️⭐️⭐️ - **Fast** - Minor delays but still feels snappy
 
-**3** - **Acceptable** - Noticeable delays but usable
+⭐️⭐️⭐️ - **Acceptable** - Noticeable delays but usable
 
-**4** - **Slow** - Significant delays affecting user experience
+⭐️⭐️ - **Slow** - Significant delays affecting user experience
 
-**5** - **Unusable** - Severe delays causing user frustration
+⭐️ - **Unusable** - Severe delays causing user frustration
