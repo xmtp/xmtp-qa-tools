@@ -16,9 +16,9 @@ Measures application performance degradation ("slugishness") under increasing lo
 yarn test stress
 ```
 
-## History
+## Mobile Performance Rating
 
-## Mobile Performance Rating (Original)
+#### Prod v82
 
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
@@ -27,7 +27,7 @@ yarn test stress
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 | **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 
-## Mobile Performance Rating v304 (Medium +30%)
+#### Prod v304 (Medium +40%)
 
 | Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
