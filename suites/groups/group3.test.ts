@@ -1,6 +1,6 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
-import { getFixedNames, getManualUsers } from "@helpers/utils";
+import { getFixedNames } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -11,7 +11,6 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `Group ${getTime()}`,
   epochs: 3,
-  manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
   preInstallations: 20,
   randomInboxIds: 60,
@@ -56,7 +55,6 @@ describe(TEST_NAME, () => {
           testConfig.typeOfResponse,
           testConfig.typeOfSync,
           testConfig.network,
-          testConfig.preInstallations,
         );
         // Create X groups in this iteration
         for (
