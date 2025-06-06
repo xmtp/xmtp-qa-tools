@@ -5,7 +5,32 @@ import {
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
-import { TEST_CONFIGS } from "suites/mobile-perf/mobile-perf.test";
+
+export const TEST_CONFIGS: Record<
+  string,
+  { size: number; count: number; messages: number }[]
+> = {
+  small: [
+    { size: 2, count: 5, messages: 5 },
+    { size: 10, count: 5, messages: 5 },
+    { size: 50, count: 5, messages: 5 },
+  ],
+  medium: [
+    { size: 2, count: 10, messages: 10 },
+    { size: 10, count: 10, messages: 10 },
+    { size: 50, count: 10, messages: 10 },
+    { size: 100, count: 10, messages: 10 },
+    { size: 150, count: 10, messages: 10 },
+  ],
+  large: [
+    { size: 2, count: 15, messages: 15 },
+    { size: 10, count: 15, messages: 15 },
+    { size: 100, count: 15, messages: 15 },
+    { size: 150, count: 15, messages: 15 },
+    { size: 100, count: 15, messages: 15 },
+    { size: 200, count: 15, messages: 15 },
+  ],
+};
 
 const processMessage = async (
   client: Client,
