@@ -11,6 +11,9 @@ Measures storage efficiency by creating groups of different sizes until reaching
 ## How to Run
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
 # Run storage efficiency tests
 yarn test suites/storage
 

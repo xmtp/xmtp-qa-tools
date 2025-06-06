@@ -23,6 +23,7 @@ yarn install
 Create a `.env` file in the root directory:
 
 ```bash
+
 LOGGING_LEVEL=info  # Options: debug, info, warn, error, off
 XMTP_ENV=production  # Options: production, dev
 
@@ -37,6 +38,10 @@ HISTORICAL_DATA_PATH=""       # Path to historical test data
 ## 🏃‍♂️ Test Execution
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
+
 yarn test regression
 ```
 

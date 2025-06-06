@@ -11,6 +11,9 @@ Tests spam scenarios by creating groups with predefined spam inbox IDs and measu
 ## How to Run
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
 # Run spam tests
 yarn test suites/spam
 

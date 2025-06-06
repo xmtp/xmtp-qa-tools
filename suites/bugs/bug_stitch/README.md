@@ -7,6 +7,10 @@ Tests XMTP conversation stitching across client restarts and multiple instances.
 ## Run the test
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
+
 yarn test bug_stitch
 ```
 

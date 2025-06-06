@@ -40,6 +40,9 @@ Benchmarks the execution time of core XMTP operations including client managemen
 ## How to Run
 
 ```bash
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
 # Run all metrics tests
 yarn test suites/metrics
 
