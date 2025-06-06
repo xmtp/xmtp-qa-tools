@@ -36,8 +36,6 @@ yarn test stress
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 | **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 
-The Medium configuration now performs significantly better, moving from a 2-3 star rating to a solid 4-star rating with consistent performance across all metrics.
-
 ### Performance Metrics
 
 - **Log in** - Time from login to full display of conversation list
