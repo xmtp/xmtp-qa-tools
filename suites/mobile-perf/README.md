@@ -62,13 +62,15 @@ yarn test stress
 
 ### Performance Metrics
 
-**App Launch Speed** - Time from app icon tap to conversation list display
-**Login & Sync** - Time to authenticate and sync all conversations/messages from network
-**Conversation Rendering** - Time to load and display conversation list in chronological order
-**Message Display** - Time for individual messages to appear when opening a conversation
-**Button Response** - How quickly UI buttons respond to user taps and interactions
-**Notification Open** - Time to open app from push notification after being closed/backgrounded
+**Log in** - Time from app icon tap to conversation list display
+**Time to sync** - Time to authenticate and sync all conversations/messages from network
+**On notif** - Time for individual messages to appear when opening a conversation
+**Messages** - How quickly UI buttons respond to user taps and interactions
+**Button Responses** - Time to open app from push notification after being closed/backgrounded
 **Transitions** - Speed of navigation between screens and UI state changes
+**Scroll** - How quickly UI scrolls to the bottom of the conversation
+**Average** - Average of all metrics
+**Est. Storage** - Estimated storage usage for the test
 
 ### Rating Scale
 
