@@ -21,7 +21,7 @@ for (const groupConfig of config) {
 HELP_TEXT += `Total groups to create: ${totalGroups}`;
 console.log(HELP_TEXT);
 
-const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
+const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
 const testName = "bot-stress";
