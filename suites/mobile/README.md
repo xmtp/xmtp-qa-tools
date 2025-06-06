@@ -13,7 +13,7 @@ Measures application performance degradation ("slugishness") under increasing lo
 
 ```bash
 # Run individual configurations
-yarn test stress
+yarn test mobile
 ```
 
 ## Mobile Performance Rating
