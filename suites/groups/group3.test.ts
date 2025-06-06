@@ -1,13 +1,9 @@
 import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
-import {
-  getFixedNames,
-  getManualUsers,
-  getRandomInboxIds,
-} from "@helpers/utils";
+import { getFixedNames, getManualUsers } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const TEST_NAME = "group";
@@ -24,48 +20,52 @@ const testConfig = {
   typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(40),
   freshInstalls: false,
+  groupsPerIteration: 5,
+  iterations: 3,
+  numberOfWorkers: 10,
 } as const;
-
-const numberOfWorkers = 10;
-const groupsPerIteration = 5; // Variable X
-const iterations = 3;
 
 loadEnv(TEST_NAME);
 
 describe(TEST_NAME, () => {
+  let workers: WorkerManager;
   setupTestLifecycle({ expect });
 
   it("should create multiple groups with new installations per iteration", async () => {
     try {
-      for (let iteration = 1; iteration <= iterations; iteration++) {
-        console.log(`\n🔄 Starting iteration ${iteration}/${iterations}...`);
+      for (let iteration = 1; iteration <= testConfig.iterations; iteration++) {
+        console.log(
+          `\n🔄 Starting iteration ${iteration}/${testConfig.iterations}...`,
+        );
 
         // Create new workers (new installations) for this iteration
         const randomSuffix = Math.random().toString(36).substring(2, 15);
         const workerNames = Array.from(
-          { length: numberOfWorkers },
+          { length: testConfig.numberOfWorkers },
           (_, i) => `worker${i}-${randomSuffix}-iter${iteration}`,
         );
 
         console.log(
-          `Creating ${numberOfWorkers} workers with new installations...`,
+          `Creating ${testConfig.numberOfWorkers} workers with new installations...`,
         );
-        const workers = await getWorkers(
-          workerNames,
-          TEST_NAME,
-          typeofStream.None,
-          typeOfResponse.None,
-          typeOfSync.None,
+        // Initialize workers
+        workers = await getWorkers(
+          ["bot", ...testConfig.workerNames],
+          testConfig.testName,
+          testConfig.typeofStream,
+          testConfig.typeOfResponse,
+          testConfig.typeOfSync,
+          testConfig.network,
+          testConfig.preInstallations,
         );
-
         // Create X groups in this iteration
         for (
           let groupIndex = 1;
-          groupIndex <= groupsPerIteration;
+          groupIndex <= testConfig.groupsPerIteration;
           groupIndex++
         ) {
           console.log(
-            `  Creating group ${groupIndex}/${groupsPerIteration} in iteration ${iteration}...`,
+            `  Creating group ${groupIndex}/${testConfig.groupsPerIteration} in iteration ${iteration}...`,
           );
 
           // Use first worker as group creator, add some other workers as members
@@ -102,12 +102,12 @@ describe(TEST_NAME, () => {
 
         await workers.checkForks();
         console.log(
-          `✅ Iteration ${iteration} completed: ${groupsPerIteration} groups created`,
+          `✅ Iteration ${iteration} completed: ${testConfig.groupsPerIteration} groups created`,
         );
       }
 
       console.log(
-        `\n🎉 Test completed: ${iterations} iterations × ${groupsPerIteration} groups = ${iterations * groupsPerIteration} total groups created`,
+        `\n🎉 Test completed: ${testConfig.iterations} iterations × ${testConfig.groupsPerIteration} groups = ${testConfig.iterations * testConfig.groupsPerIteration} total groups created`,
       );
     } catch (e) {
       logError(e, expect.getState().currentTestName || "unknown test");
