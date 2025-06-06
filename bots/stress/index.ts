@@ -16,24 +16,23 @@ export const TEST_CONFIGS: Record<
     { size: 50, count: 5, messages: 50 },
   ],
   medium: [
-    { size: 2, count: 5, messages: 10 },
-    { size: 10, count: 5, messages: 10 },
+    { size: 2, count: 10, messages: 10 },
+    { size: 10, count: 10, messages: 10 },
     { size: 50, count: 5, messages: 10 },
     { size: 100, count: 10, messages: 20 },
     { size: 150, count: 15, messages: 20 },
   ],
   large: [
-    { size: 2, count: 5, messages: 10 },
-    { size: 10, count: 5, messages: 10 },
-    { size: 50, count: 5, messages: 10 },
+    { size: 2, count: 30, messages: 10 },
+    { size: 10, count: 20, messages: 10 },
+    { size: 50, count: 10, messages: 10 },
     { size: 100, count: 10, messages: 20 },
     { size: 150, count: 15, messages: 20 },
-    { size: 100, count: 15, messages: 100 },
     { size: 200, count: 15, messages: 100 },
   ],
   xl: [
-    { size: 2, count: 100, messages: 20 },
-    { size: 10, count: 100, messages: 20 },
+    { size: 2, count: 200, messages: 20 },
+    { size: 10, count: 200, messages: 20 },
   ],
 };
 

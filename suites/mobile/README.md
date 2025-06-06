@@ -4,10 +4,10 @@ Measures application performance degradation ("slugishness") under increasing lo
 
 ## Configurations
 
-- **Small** ~20 groups, 15 messages ~ 2 MB
-- **Medium** ~50 groups of various sizes with 50 messages ~ 5 MB
-- **Large** ~100 groups with 15 messages ~ 10 MB
-- **XL** ~200 groups with 20 messages ~ 5 MB
+- **Small** ~15 groups, 10,20 messages
+- **Medium** ~50 groups of various sizes with 10,20 messages
+- **Large** ~100 groups with 10,20,100 messages
+- **XL** ~400 groups with 20 messages
 
 ## How to Run
 
