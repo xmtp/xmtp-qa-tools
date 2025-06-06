@@ -14,7 +14,7 @@
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
-    "forked": "./suites/automated/group/run.sh",
+    "forked": "./suites/group/run.sh",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx scripts/gen.ts",

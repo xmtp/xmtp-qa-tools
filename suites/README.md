@@ -25,9 +25,9 @@ Includes: browser testing, client management, codec error handling, consent mana
 
 Specialized testing for group conversations, membership management, and conversation forking scenarios.
 
-| Test Suite              | Purpose                                             | Documentation                   |
-| ----------------------- | --------------------------------------------------- | ------------------------------- |
-| **[groups](./groups/)** | Group conversation forking and stress testing suite | [README.md](./groups/README.md) |
+| Test Suite            | Purpose                                             | Documentation                  |
+| --------------------- | --------------------------------------------------- | ------------------------------ |
+| **[group](./group/)** | Group conversation forking and stress testing suite | [README.md](./group/README.md) |
 
 Features: Multi-version testing, membership change cycles, group metadata updates, admin permissions, message streams, concurrent workers, and rate limiting validation.
 
