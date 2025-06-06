@@ -10,7 +10,7 @@ Repro test
 
 Other:
 
-- Only happens with addMember , not newGroup
+- Only happens with `addMember` , not `newGroup`
 - Doesn't happen in node-only
 - Happens when the member is added from browser or RN
 - Happens with 2 xmtp chat windows opened

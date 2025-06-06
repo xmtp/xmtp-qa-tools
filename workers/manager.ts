@@ -146,7 +146,7 @@ export class WorkerManager {
       for (const worker of this.getAll()) {
         const installations = await worker.client.preferences.inboxState();
         if (installations.installations.length > (targetCount ?? 10)) {
-          //await worker.client.revokeAllOtherInstallations();
+          await worker.client.revokeAllOtherInstallations();
           const installations2 =
             await worker.client.preferences.inboxState(true);
           console.warn(
