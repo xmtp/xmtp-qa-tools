@@ -128,49 +128,23 @@ export class WorkerManager {
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
-      const maybeForked = await Promise.all(
+      await Promise.all(
         groups.flat().map(async (g) => {
           const debugInfo = await g.debugInfo();
-          return debugInfo.maybeForked;
+          if (debugInfo.maybeForked) {
+            throw new Error(`Stopping test, group id ${g.id} may have forked`);
+          }
         }),
       );
-      if (maybeForked.some((fork) => fork)) {
-        throw new Error("Stopping test, group may have forked");
-      }
     }
   }
 
   public async checkInstallations(targetCount?: number) {
-    // If no target count specified, just do the original check
+    // If no target count specified, just do basic checks
     if (targetCount === undefined) {
       for (const worker of this.getAll()) {
-        const installations = await worker.client.preferences.inboxState();
-        if (installations.installations.length > (targetCount ?? 10)) {
-          await worker.client.revokeAllOtherInstallations();
-          const installations2 =
-            await worker.client.preferences.inboxState(true);
-          console.warn(
-            `[${worker.name}] Installations: ${installations2.installations.length}`,
-          );
-        }
-        for (const installation of installations.installations) {
-          // Convert nanoseconds to milliseconds for Date constructor
-          const timestampMs =
-            Number(installation.clientTimestampNs) / 1_000_000;
-          const installationDate = new Date(timestampMs);
-          const now = new Date();
-          const diffMs = now.getTime() - installationDate.getTime();
-          const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-          const daysText = diffDays === 1 ? "day" : "days";
-          const greenCheck = diffDays < 90 ? " ✅" : "❌";
-
-          if (diffDays > 90) {
-            console.warn(
-              `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
-            );
-          }
-        }
+        await worker.worker.revokeExcessInstallations();
+        await worker.worker.checkInstallationAge();
       }
       return;
     }
@@ -182,38 +156,13 @@ export class WorkerManager {
     }
 
     for (const baseName of baseNames) {
-      // Get current installation count for this base name
       const baseWorker = this.get(baseName);
       if (!baseWorker) continue;
 
-      const installations = await baseWorker.client.preferences.inboxState();
-      const currentCount = installations.installations.length;
+      const currentCount =
+        await baseWorker.worker.checkAndManageInstallations(targetCount);
 
-      console.log(
-        `[${baseName}] Current installations: ${currentCount}, Target: ${targetCount}`,
-      );
-
-      if (currentCount === targetCount) {
-        console.log(`[${baseName}] Installation count matches target`);
-        continue;
-      }
-
-      if (currentCount > targetCount) {
-        console.log(
-          `[${baseName}] Too many installations (${currentCount}), revoking all others`,
-        );
-        await baseWorker.client.revokeAllOtherInstallations();
-
-        // After revoking, we should have 1 installation, so create more if needed
-        const newCurrentCount = 1;
-        if (newCurrentCount < targetCount) {
-          await this.createAdditionalInstallations(
-            baseName,
-            targetCount - newCurrentCount,
-          );
-        }
-      } else {
-        // currentCount < targetCount
+      if (currentCount < targetCount) {
         console.log(
           `[${baseName}] Need more installations, creating ${targetCount - currentCount} additional`,
         );
@@ -229,6 +178,34 @@ export class WorkerManager {
     baseName: string,
     count: number,
   ): Promise<void> {
+    const newIds = this.generateInstallationIds(baseName, count);
+
+    console.log(
+      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
+    );
+
+    // Create the new installations in parallel
+    const createPromises = newIds.map(async (installId) => {
+      try {
+        const descriptor = `${baseName}-${installId}`;
+        await this.createWorker(descriptor);
+        console.log(`[${baseName}] Created installation: ${installId}`);
+      } catch (error) {
+        console.error(
+          `[${baseName}] Failed to create installation ${installId}:`,
+          error,
+        );
+        throw error;
+      }
+    });
+
+    await Promise.all(createPromises);
+  }
+
+  /**
+   * Generates unique installation IDs for a base name
+   */
+  private generateInstallationIds(baseName: string, count: number): string[] {
     const letters = "abcdefghijklmnopqrstuvwxyz";
 
     // Find existing installation IDs for this base name
@@ -261,23 +238,47 @@ export class WorkerManager {
       }
     }
 
+    return newIds;
+  }
+
+  /**
+   * Adds a new installation to an existing worker, replacing the current one
+   * @param baseName - The base name of the worker
+   * @param installationId - The installation ID (optional, defaults to "a")
+   * @returns Updated worker with new installation
+   */
+  public async addNewInstallationToWorker(
+    baseName: string,
+    installationId: string = "a",
+  ): Promise<Worker> {
+    const worker = this.get(baseName, installationId);
+    if (!worker) {
+      throw new Error(`Worker ${baseName}-${installationId} not found`);
+    }
+
+    console.log(`[${baseName}] Adding new installation to replace current one`);
+
+    // Create new installation on the existing worker
+    const newInstallationDetails = await worker.worker.addNewInstallation();
+
+    // Update the worker object with new installation details
+    const updatedWorker: Worker = {
+      ...worker,
+      client: newInstallationDetails.client,
+      dbPath: newInstallationDetails.dbPath,
+      installationId: newInstallationDetails.installationId,
+      address: newInstallationDetails.address,
+      folder: worker.worker.currentFolder, // Use the updated folder from the worker
+    };
+
+    // Update in our internal storage
+    this.workers[baseName][installationId] = updatedWorker;
+
     console.log(
-      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
+      `[${baseName}] Successfully updated worker with new installation: ${newInstallationDetails.installationId}`,
     );
 
-    // Create the new installations
-    for (const installId of newIds) {
-      try {
-        const descriptor = `${baseName}-${installId}`;
-        await this.createWorker(descriptor);
-        console.log(`[${baseName}] Created installation: ${installId}`);
-      } catch (error) {
-        console.error(
-          `[${baseName}] Failed to create installation ${installId}:`,
-          error,
-        );
-      }
-    }
+    return updatedWorker;
   }
 
   public async printWorkers() {
@@ -322,6 +323,15 @@ export class WorkerManager {
       },
     );
     return group as Group;
+  }
+  async addInstallationsRandomly() {
+    const workers = this.getAll();
+    for (const worker of workers) {
+      const isRandom = Math.random() < 0.5;
+      if (isRandom) {
+        await worker.worker.addNewInstallation();
+      }
+    }
   }
   getAllBut(excludeName: string): Worker[] {
     const workers = this.getAll();

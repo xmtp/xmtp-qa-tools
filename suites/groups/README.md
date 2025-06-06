@@ -16,6 +16,8 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 - [x] **Group Admin Permissions**
 - [x] **30 min recurring changes**
 - [x] **Message & Update Streams**
+- [x] **New installations created on run-time**
+- [x] **Minimum required installations** (10)
 - [x] **Multi-Worker** (14 concurrent workers)
 - [x] **Rate Limiting** (message throttling, API call limits)
 

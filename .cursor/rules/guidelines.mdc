@@ -1,0 +1,208 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# XMTP Testing Worker Framework
+
+## Core Rules for Using Worker Testing Framework
+
+1. **Always use `getWorkers()` for test initialization**:
+
+   ```typescript
+   // CORRECT: Initialize workers for testing
+   const workers = await getWorkers(["alice", "bob"], testName);
+
+   // INCORRECT: Don't create clients manually in tests
+   const client = await Client.create(signer, options);
+   ```
+
+2. **Use predefined worker names from the 61 available names**:
+
+   ```typescript
+   // CORRECT: Use predefined names
+   const workers = await getWorkers(
+     ["alice", "bob", "fabri", "charlie"],
+     testName,
+   );
+
+   // AVAILABLE NAMES: "bob", "alice", "fabri", "bot", "elon", "joe", "charlie"...
+   // Access full list via: import { defaultNames } from "@xmtp/node-sdk";
+   ```
+
+3. **Always access workers using `.get()` method**:
+
+   ```typescript
+   // CORRECT: Access workers by name
+   const alice = workers.get("alice");
+   const bob = workers.get("bob");
+
+   // CORRECT: Access specific installation
+   const aliceDesktop = workers.get("alice", "desktop");
+   ```
+
+4. **Import `getWorkers` from the correct path**:
+
+   ```typescript
+   // CORRECT:
+   import { getWorkers } from "@workers/manager";
+
+   // INCORRECT:
+   import { getWorkers } from "./workers/manager";
+   ```
+
+5. **Always include `setupTestLifecycle` for proper cleanup**:
+
+   ```typescript
+   // CORRECT: Include cleanup setup
+   setupTestLifecycle({
+     expect,
+     workers,
+     testName,
+   });
+   ```
+
+6. **Use `loadEnv()` for test environment setup**:
+
+   ```typescript
+   // CORRECT: Load environment for tests
+   import { loadEnv } from "@helpers/client";
+
+   const testName = "my-test";
+   loadEnv(testName);
+   ```
+
+7. **For multi-device testing, create separate worker sets**:
+
+   ```typescript
+   // CORRECT: Multi-device scenario
+   const primaryWorkers = await getWorkers(["alice", "bob"], testName);
+   const secondaryWorkers = await getWorkers(
+     ["alice-desktop", "bob-mobile"],
+     testName,
+   );
+
+   const alicePhone = primaryWorkers.get("alice");
+   const aliceDesktop = secondaryWorkers.get("alice", "desktop");
+   ```
+
+8. **Use stream collection for message verification**:
+
+   ```typescript
+   // CORRECT: Collect messages for verification
+   const incomingMessages = await bob.worker.collectMessages(
+     conversationId,
+     "text",
+   );
+   ```
+
+9. **Enable GPT responses when needed**:
+
+   ```typescript
+   // CORRECT: Enable GPT responses for automated testing
+   const workers = await getWorkers(
+     ["alice", "bob"],
+     testName,
+     typeofStream.Message,
+     typeOfResponse.Gpt,
+   );
+   ```
+
+10. **Use available worker utility methods**:
+
+    ```typescript
+    // CORRECT: Use built-in utility methods
+    workers.getCreator(); // Returns the worker creator
+    workers.getAll(); // Returns all workers
+    workers.createGroup(groupName, workerNames); // Creates a group
+    workers.getLength(); // Returns total number of workers
+    workers.getRandomWorkers(count); // Gets random subset
+    ```
+
+11. **Always clean up workers after tests**:
+
+    ```typescript
+    // CORRECT: Cleanup in afterAll
+    afterAll(async () => {
+      await closeEnv(testName, allWorkers);
+    });
+    ```
+
+12. **For numerical worker creation, use count parameter**:
+
+    ```typescript
+    // CORRECT: Create multiple workers with count
+    const workers = await getWorkers(4, testName);
+    // This creates workers for the first 4 names in defaultNames
+    ```
+
+13. **Structure test files following the pattern**:
+
+    ```typescript
+    import { loadEnv } from "@helpers/client";
+    import { logError } from "@helpers/logger";
+    import { verifyMessageStream } from "@helpers/streams";
+    import { setupTestLifecycle } from "@helpers/vitest";
+    import { getWorkers } from "@workers/manager";
+    import { describe, expect, it } from "vitest";
+
+    const testName = "your-test-name";
+    loadEnv(testName);
+
+    describe(testName, async () => {
+      const workers = await getWorkers(["alice", "bob"], testName);
+
+      setupTestLifecycle({
+        expect,
+        workers,
+        testName,
+      });
+
+      it("should test something", async () => {
+        try {
+          // Test logic here
+        } catch (e) {
+          logError(e, expect.getState().currentTestName);
+          throw e;
+        }
+      });
+    });
+    ```
+
+14. **Use `verifyMessageStream` for message verification**:
+
+    ```typescript
+    // CORRECT: Verify message delivery
+    const verifyResult = await verifyMessageStream(
+      conversation,
+      [workers.get("bob")!],
+      messageCount,
+    );
+    expect(verifyResult.allReceived).toBe(true);
+    ```
+
+15. **Access worker properties correctly**:
+    ```typescript
+    // CORRECT: Access worker properties
+    const worker = workers.get("alice");
+    worker.client; // XMTP client instance
+    worker.worker; // Worker thread instance
+    worker.name; // Worker name
+    worker.address; // Ethereum address
+    ```
+
+## Key Features to Remember
+
+- **Identity Management**: Keys are automatically created and persisted between test runs
+- **Multi-Device Support**: Simulate different installations (desktop, mobile, etc.)
+- **Separate Storage**: Each installation gets independent database paths
+- **Stream Handling**: Built-in support for message, conversation, and consent streams
+- **GPT Integration**: Optional AI-powered responses for automated scenarios
+
+## Implementation Notes
+
+- Worker instances use Node.js worker threads for parallel processing
+- Keys are stored in `.env` files (except "random" workers which use memory only)
+- Database paths follow structured format to avoid test conflicts
+- Access to 600 dummy wallets available in `inboxes.json`
+- Support for message streams, conversation streams, and consent streams

@@ -202,6 +202,13 @@ export class WorkerClient extends Worker {
   stopStreams(): void {
     this.activeStreams = false;
   }
+
+  /**
+   * Gets the current folder identifier for this worker
+   */
+  get currentFolder(): string {
+    return this.folder;
+  }
   async getSQLiteFileSizes() {
     const dbPath = this.dbPath;
     // Get the directory containing the database file
@@ -776,5 +783,175 @@ export class WorkerClient extends Worker {
       console.error(`[${this.nameId}] Error clearing database:`, error);
       return Promise.resolve(false);
     }
+  }
+
+  /**
+   * Checks and manages installations for this specific worker
+   * @param targetCount - Target number of installations for this worker
+   * @returns Current installation count after operations
+   */
+  async checkAndManageInstallations(targetCount: number): Promise<number> {
+    const installations = await this.client.preferences.inboxState();
+    const currentCount = installations.installations.length;
+
+    console.log(
+      `[${this.name}] Current installations: ${currentCount}, Target: ${targetCount}`,
+    );
+
+    if (currentCount === targetCount) {
+      console.log(`[${this.name}] Installation count matches target`);
+      return currentCount;
+    }
+
+    if (currentCount > targetCount) {
+      console.log(
+        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
+      );
+      await this.client.revokeAllOtherInstallations();
+      return 1; // After revoking, we should have 1 installation
+    }
+
+    return currentCount;
+  }
+
+  /**
+   * Checks installation age and warns about old installations
+   */
+  async checkInstallationAge(): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+
+    for (const installation of installations.installations) {
+      // Convert nanoseconds to milliseconds for Date constructor
+      const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
+      const installationDate = new Date(timestampMs);
+      const now = new Date();
+      const diffMs = now.getTime() - installationDate.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      const daysText = diffDays === 1 ? "day" : "days";
+      const greenCheck = diffDays < 90 ? " ✅" : "❌";
+
+      if (diffDays > 90) {
+        console.warn(
+          `[${this.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+        );
+      }
+    }
+  }
+
+  /**
+   * Revokes installations above a threshold count
+   * @param threshold - Maximum number of installations allowed
+   */
+  async revokeExcessInstallations(threshold: number = 10): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+    if (installations.installations.length > threshold) {
+      await this.client.revokeAllOtherInstallations();
+      const updatedInstallations =
+        await this.client.preferences.inboxState(true);
+      console.warn(
+        `[${this.name}] Installations after revocation: ${updatedInstallations.installations.length}`,
+      );
+    }
+  }
+
+  /**
+   * Gets the next alphabetical folder name for this worker
+   */
+  private getNextAlphabeticalFolder(): string {
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const baseName = this.name.split("-")[0];
+    const dataPath = getDataPath() + "/" + baseName;
+
+    // Find existing folders for this worker
+    const existingFolders = new Set<string>();
+    if (fs.existsSync(dataPath)) {
+      const folders = fs.readdirSync(dataPath);
+      folders.forEach((folder) => {
+        // Only consider single letter folders (a, b, c, etc.) and numbered variants (a1, a2, etc.)
+        if (/^[a-z](\d+)?$/.test(folder)) {
+          existingFolders.add(folder);
+        }
+      });
+    }
+
+    // Find the next available letter
+    for (let i = 0; i < letters.length; i++) {
+      const letter = letters[i];
+      if (!existingFolders.has(letter)) {
+        return letter;
+      }
+    }
+
+    // If all letters are taken, start with numbered variants
+    let numIndex = 1;
+    while (true) {
+      const newId = `a${numIndex}`;
+      if (!existingFolders.has(newId)) {
+        return newId;
+      }
+      numIndex++;
+    }
+  }
+
+  /**
+   * Adds a new installation to this worker, replacing the existing one
+   * This will stop current streams, create a fresh client installation, and restart all services
+   * @returns The new installation details
+   */
+  async addNewInstallation(): Promise<{
+    client: Client;
+    dbPath: string;
+    installationId: string;
+    address: `0x${string}`;
+  }> {
+    console.log(
+      `[${this.nameId}] Adding new installation and replacing current one`,
+    );
+
+    // Stop current streams and clear resources
+    this.stopStreams();
+
+    // Store old installation ID for logging
+    const oldInstallationId = this.client?.installationId;
+
+    // Generate the next alphabetical folder name for the new installation
+    const newFolder = this.getNextAlphabeticalFolder();
+
+    // Create a fresh client with new installation using a different folder
+    const { client, dbPath, address } = await createClient(
+      this.walletKey as `0x${string}`,
+      this.encryptionKeyHex,
+      {
+        sdkVersion: this.sdkVersion,
+        name: this.name,
+        testName: this.testName,
+        folder: newFolder, // Use new folder to ensure new database/installation
+      },
+      this.env,
+    );
+
+    // Update worker properties with new client and folder
+    this.dbPath = dbPath;
+    this.client = client as Client;
+    this.address = address;
+    this.folder = newFolder; // Update folder reference
+
+    // Restart streams and syncs with new installation
+    this.startStream();
+    this.startSyncs();
+
+    const newInstallationId = this.client.installationId;
+
+    console.log(
+      `[${this.nameId}] Successfully replaced installation ${oldInstallationId} with ${newInstallationId}`,
+    );
+
+    return {
+      client: this.client,
+      dbPath,
+      address: address,
+      installationId: newInstallationId,
+    };
   }
 }

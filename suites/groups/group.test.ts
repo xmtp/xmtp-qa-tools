@@ -40,6 +40,7 @@ describe(TEST_NAME, () => {
   let workers: WorkerManager;
   let creator: Worker;
   let groupConfigs: GroupConfig[] = [];
+  let allInboxIds: string[] = [];
 
   setupTestLifecycle({
     expect,
@@ -82,7 +83,7 @@ describe(TEST_NAME, () => {
       })),
     );
 
-    const allInboxIds = [
+    allInboxIds = [
       ...workers.getAllBut("bot").map((w) => w.client.inboxId),
       testConfig.manualUsers[0].inboxId,
       ...getRandomInboxIds(testConfig.randomInboxIds),
@@ -120,6 +121,16 @@ describe(TEST_NAME, () => {
 
         for (const feature of config.features) {
           switch (feature) {
+            case "addInstallationsRandomly":
+              await workers.addInstallationsRandomly();
+              break;
+            case "createGroup": {
+              const newGroup = (await creator.client.conversations.newGroup(
+                allInboxIds,
+              )) as Group;
+              await newGroup.sync();
+              break;
+            }
             case "verifyMessageStream":
               await verifyMessageStream(
                 config.group,

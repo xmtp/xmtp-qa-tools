@@ -6,7 +6,9 @@ export type TestFeature =
   | "verifyMessageStream"
   | "verifyMembershipStream"
   | "verifyMetadataStream"
-  | "verifyEpochChange";
+  | "verifyEpochChange"
+  | "addInstallationsRandomly"
+  | "createGroup";
 
 export interface GroupConfig {
   group: Group;
