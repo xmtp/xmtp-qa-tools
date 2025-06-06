@@ -315,8 +315,10 @@ export async function verifyMembershipStream(
     triggerEvents: async () => {
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
-      await group.addMembers(membersToAdd);
-      sent.push({ inboxId: membersToAdd[0], sentAt });
+      for (const member of membersToAdd) {
+        await group.addMembers([member]);
+        sent.push({ inboxId: member, sentAt });
+      }
       return sent;
     },
     getKey: extractAddedInboxes,
@@ -397,6 +399,28 @@ export async function verifyConversationStream(
       });
       const sentAt = Date.now();
       await initiator.client.conversations.newGroup(participantAddresses);
+      return [{ id: "conversation", sentAt }];
+    },
+    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
+    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
+    statsLabel: "conversation:",
+    count: 1,
+    messageTemplate: "",
+    participantsForStats: receivers,
+  });
+}
+
+export async function verifyAddMemberStream(
+  group: Group,
+  receivers: Worker[],
+  membersToAdd: string[],
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectAddedMembers(group.id, 1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await group.addMembers(membersToAdd);
       return [{ id: "conversation", sentAt }];
     },
     getKey: (ev) => (ev as { id?: string }).id ?? "conversation",

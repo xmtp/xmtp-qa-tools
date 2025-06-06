@@ -17,9 +17,3 @@ yarn test bug_panic
 ### Logs
 
 - [libxmtp](./libxmtp.log) log
-- [test logs](./test.log) log
-
-### Environment
-
-- [./data](/.data/) folder
-- [.env](/.env) file

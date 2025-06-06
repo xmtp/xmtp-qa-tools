@@ -266,20 +266,6 @@ export const createRandomInstallations = async (
 export const getRandomVersion = (versions: string[]): string =>
   versions[Math.floor(Math.random() * versions.length)];
 
-// Helper function to parse .env file content
-const parseEnvFile = (content: string): Record<string, string> => {
-  return content
-    .split("\n")
-    .filter((line) => line.trim() && !line.startsWith("#"))
-    .reduce<Record<string, string>>((acc, line) => {
-      const [key, ...valueParts] = line.split("=");
-      if (key && valueParts.length) {
-        acc[key.trim()] = valueParts.join("=").trim();
-      }
-      return acc;
-    }, {});
-};
-
 /**
  * Randomly reinstalls a worker
  */

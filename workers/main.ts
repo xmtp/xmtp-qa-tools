@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
 import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues, formatBytes } from "@helpers/utils";
+import { defaultValues } from "@helpers/utils";
 import {
   ConsentState,
   Dm,
@@ -238,13 +238,13 @@ export class WorkerClient extends Worker {
       sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
     }
 
-    const formattedSizes = {
-      dbFile: formatBytes(sizes.dbFile),
-      walFile: formatBytes(sizes.walFile),
-      shmFile: formatBytes(sizes.shmFile),
-      conversations: sizes.conversations,
-      total: formatBytes(sizes.total),
-    };
+    // const formattedSizes = {
+    //   dbFile: formatBytes(sizes.dbFile),
+    //   walFile: formatBytes(sizes.walFile),
+    //   shmFile: formatBytes(sizes.shmFile),
+    //   conversations: sizes.conversations,
+    //   total: formatBytes(sizes.total),
+    // };
 
     // console.debug(
     //   `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
@@ -517,16 +517,22 @@ export class WorkerClient extends Worker {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
-            if (!this.activeStreams) break;
+            try {
+              if (!this.activeStreams) break;
 
-            console.debug(`Received conversation, ${conversation?.id}`);
-            if (!conversation?.id) continue;
+              console.debug(`Received conversation, ${conversation?.id}`);
+              if (!conversation?.id) continue;
 
-            if (this.listenerCount("worker_message") > 0) {
-              this.emit("worker_message", {
-                type: StreamCollectorType.Conversation,
-                conversation,
-              });
+              if (this.listenerCount("worker_message") > 0) {
+                this.emit("worker_message", {
+                  type: StreamCollectorType.Conversation,
+                  conversation,
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[${this.nameId}] conversation stream error: ${String(error)}`,
+              );
             }
           }
         } catch (error) {
@@ -694,6 +700,26 @@ export class WorkerClient extends Worker {
     });
   }
 
+  collectAddedMembers(
+    groupId: string,
+    count: number = 1,
+  ): Promise<StreamConversationMessage[]> {
+    const additionalInfo: Record<string, string | number | boolean> = {
+      groupId,
+    };
+
+    return this.collectStreamEvents<StreamConversationMessage>({
+      type: typeofStream.Conversation,
+      filterFn: (msg) => {
+        if (msg.type !== StreamCollectorType.Conversation) return false;
+        const streamMsg = msg;
+        const matches = groupId === streamMsg.conversation.id;
+        return matches;
+      },
+      count,
+      additionalInfo,
+    });
+  }
   /**
    * Collect conversations
    */

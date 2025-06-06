@@ -1,6 +1,5 @@
 import { getRandomValues } from "node:crypto";
 import fs from "node:fs";
-import path from "node:path";
 import { IdentifierKind, type Client, type Signer } from "@xmtp/node-sdk";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";

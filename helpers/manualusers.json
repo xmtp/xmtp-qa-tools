@@ -14,15 +14,9 @@
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "bd01c67801f8333df4e9404d7d3ba10b31aa5fc05b3c5e02fb94ab5e6aaf24b7",
-    "network": "production",
+    "inboxId": "4e9a79326f013ed23e6c0e3b0a885fa2e9f68357a03e04898c912baf277b4e70",
+    "network": "local",
     "name": "prod-"
-  },
-  {
-    "app": "fabri-convos-oneoff",
-    "inboxId": "512543aeb5a1bd62e20b62b6ca72bdff24b7e222c8a766a74cc766181106a91d",
-    "network": "production",
-    "name": "prod-testing"
   },
   {
     "app": "fabri-convos",
@@ -31,8 +25,14 @@
     "name": "prod-testing"
   },
   {
+    "app": "fabri-convos-oneoff",
+    "inboxId": "8ead225d8b47683a9370c88c7d25a539f4589833483cc7bf965aa00981ef8c80",
+    "network": "production",
+    "name": "prod-testing"
+  },
+  {
     "app": "fabri-convos-dev",
-    "inboxId": "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
+    "inboxId": "f7b09782a8eef68bb2df3a2b4b68801ed337ccb3255b0a6f27c0d5393919a0bd",
     "network": "dev",
     "name": "dev-oneoff"
   }

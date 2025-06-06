@@ -5,13 +5,24 @@ import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { getFixedNames } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { getWorkersFromGroup } from "suites/other/helper";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
 loadEnv(testName);
+
+/**
+ * Gets workers that are members of a group
+ */
+export async function getWorkersFromGroup(
+  group: Group,
+  workers: WorkerManager,
+): Promise<Worker[]> {
+  await group.sync();
+  const memberIds = (await group.members()).map((m) => m.inboxId);
+  return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
+}
 
 describe(testName, async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
