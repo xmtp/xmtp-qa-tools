@@ -2,19 +2,14 @@ import { getRandomInboxIds } from "@helpers/utils";
 import { type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 
-export type TestFeature =
-  | "verifyMessageStream"
-  | "verifyMembershipStream"
-  | "verifyMetadataStream"
-  | "verifyEpochChange"
-  | "addInstallationsRandomly"
-  | "createGroup";
-
-export interface GroupConfig {
-  group: Group;
-  features: TestFeature[];
-  groupNumber: number;
-}
+export const features = [
+  "verifyMessageStream",
+  "verifyMembershipStream",
+  "verifyMetadataStream",
+  "verifyEpochChange",
+  "addInstallationsRandomly",
+  "createGroup",
+];
 
 export async function verifyEpochChange(
   workers: WorkerManager,

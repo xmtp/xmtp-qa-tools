@@ -9,7 +9,7 @@ while true; do
     echo "Starting test cycle at $(date)"
     for i in {1..10}; do
         echo "Running test iteration $i of 10"
-        yarn test suites/group/group.test.ts --debug-verbose --parallel
+        yarn test suites/group/group.test.ts
         
         # Check if the test command was interrupted
         if [ $? -ne 0 ] && [ $? -ne 1 ]; then
