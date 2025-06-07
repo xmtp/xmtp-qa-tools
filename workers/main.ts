@@ -832,12 +832,20 @@ export class WorkerClient extends Worker {
     if (currentCount === targetCount) {
       console.debug(`[${this.name}] Installation count matches target`);
       return currentCount;
-    }
-
-    if (currentCount > targetCount) {
-      // console.debug(
-      //   `[${this.name}] Too many installations (${currentCount}), revoking all others`,
-      // );
+    } else if (currentCount > targetCount) {
+      console.debug(
+        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
+      );
+      await this.addNewInstallation();
+      return currentCount + 1;
+    } else if (currentCount < targetCount) {
+      console.debug(
+        `[${this.name}] Not enough installations (${currentCount}), adding new installation`,
+      );
+      for (let i = 0; i < targetCount - currentCount; i++) {
+        await this.addNewInstallation();
+      }
+      return targetCount;
     }
 
     return currentCount;
