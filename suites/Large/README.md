@@ -94,6 +94,14 @@ _Note: `syncAll` is measured only as the first cold start of the client (fresh i
 
 ## Chart 1: Installation Count Impact on Add Member Processing
 
+```bash
+
+MAX_GROUP_SIZE=220
+BATCH_SIZE=55
+WORKER_COUNT=5
+CHECK_INSTALLATIONS=2,5,10,15,20,25
+```
+
 **"How installation count affects existing members processing new member commits"**
 
 | Installations per Member | Total Devices | Existing Member Processing Time (ms) | New Member Processing Time (ms) | Performance |
@@ -144,3 +152,7 @@ _Note: Using fewer actual members with more installations to simulate larger gro
 4. **Recommendation**: Set max 5 installations per member for good performance
 
 These charts directly answer: **"What should our installation limit be?"** Answer: **5 installations per member maximum.**
+
+```
+
+```

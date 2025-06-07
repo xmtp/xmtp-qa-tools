@@ -9,6 +9,7 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
+  m_large_CHECK_INSTALLATIONS,
   m_large_TOTAL,
   m_large_WORKER_COUNT,
   saveLog,
@@ -32,7 +33,7 @@ describe(testName, async () => {
     typeOfResponse.None,
     typeOfSync.None,
     undefined,
-    2,
+    m_large_CHECK_INSTALLATIONS,
   );
 
   let customDuration: number | undefined = undefined;
