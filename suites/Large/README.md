@@ -117,19 +117,6 @@ _Base: 220 members, measuring time for existing member B to process "Z was added
 
 ---
 
-## Chart 2: Installation Scaling Recommendations
-
-**"Sweet spot analysis for maximum installations per member"**
-
-| Installation Limit | Realistic Group Size | Total Devices | Processing Time | Recommendation     |
-| ------------------ | -------------------- | ------------- | --------------- | ------------------ |
-| 3                  | 220 members          | 660           | ~200ms          | ✅ **Recommended** |
-| 5                  | 220 members          | 1,100         | ~270ms          | ✅ **Acceptable**  |
-| 10                 | 220 members          | 2,200         | ~450ms          | ⚠️ **Max Limit**   |
-| 15+                | 220 members          | 3,300+        | >650ms          | ❌ **Too Slow**    |
-
----
-
 ## Chart 3: Enterprise Group Scaling
 
 **"How installation limits affect large enterprise groups"**
@@ -142,8 +129,6 @@ _Base: 220 members, measuring time for existing member B to process "Z was added
 
 _Note: Using fewer actual members with more installations to simulate larger groups_
 
----
-
 ## Key Insights These Charts Would Provide:
 
 1. **Sweet Spot**: 3-5 installations per member keeps processing under 300ms
@@ -152,7 +137,3 @@ _Note: Using fewer actual members with more installations to simulate larger gro
 4. **Recommendation**: Set max 5 installations per member for good performance
 
 These charts directly answer: **"What should our installation limit be?"** Answer: **5 installations per member maximum.**
-
-```
-
-```
