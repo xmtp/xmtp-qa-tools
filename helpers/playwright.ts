@@ -142,13 +142,13 @@ export class playwright {
   /**
    * Waits for a response matching the expected message(s)
    */
-  public async waitForNewConversation(): Promise<boolean> {
+  public async waitForNewConversation(groupName: string): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
     for (let i = 0; i < DEFAULT_STREAM_TIMEOUT_MS / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestGroupFromList();
       console.debug(`Latest group: "${responseText}"`);
-      if (responseText.length > 0) {
+      if (responseText.includes(groupName)) {
         return true;
       }
       console.debug(`No response found after ${i + 1} checks`);
