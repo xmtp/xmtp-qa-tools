@@ -468,6 +468,7 @@ export class WorkerClient extends Worker {
           }
         } catch (error) {
           console.error(`[${this.nameId}] message stream: ${String(error)}`);
+          throw error;
         }
       }
     })();
@@ -540,12 +541,14 @@ export class WorkerClient extends Worker {
               console.error(
                 `[${this.nameId}] conversation stream error: ${String(error)}`,
               );
+              throw error;
             }
           }
         } catch (error) {
           console.error(
             `[${this.nameId}] conversation stream error: ${String(error)}`,
           );
+          throw error;
         }
       }
     })();
@@ -584,9 +587,10 @@ export class WorkerClient extends Worker {
                   this.emit("worker_message", consentEvent);
                 }
               } else {
-                console.debug(
+                console.error(
                   `Skipping empty consent update, ${JSON.stringify(consentUpdate, null, 2)}`,
                 );
+                throw new Error("Empty consent update");
               }
             }
           }

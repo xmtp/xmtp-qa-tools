@@ -1,12 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import {
-  getFixedNames,
-  getInbox,
-  getInboxIds,
-  GM_BOT_ADDRESS,
-} from "@helpers/utils";
+import { getInbox, getInboxIds, GM_BOT_ADDRESS, sleep } from "@helpers/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -15,7 +10,6 @@ const testName = "browser";
 loadEnv(testName);
 
 describe(testName, () => {
-  const headless = false;
   const network = "production";
   // it("should test added to group ", async () => {
   //try {
@@ -64,9 +58,30 @@ describe(testName, () => {
   //   }
   // });
 
+  let groupId: string;
+  const inbox = getInbox(1)[0];
+  const xmtpTester = new playwright({
+    headless: false,
+    env: network,
+    defaultUser: inbox,
+  });
   it("should create a group and send a message", async () => {
     try {
-      const inbox = getInbox(1)[0];
+      await xmtpTester.startPage();
+      const slicedInboxes = getInboxIds(4);
+      groupId = await xmtpTester.newGroupFromUI([
+        ...slicedInboxes,
+        GM_BOT_ADDRESS,
+      ]);
+      await xmtpTester.sendMessage("hi");
+      await xmtpTester.waitForResponse(["gm"]);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+  it("add member to group", async () => {
+    try {
       const workers = await getWorkers(
         ["bot"],
         testName,
@@ -75,24 +90,12 @@ describe(testName, () => {
         typeOfSync.None,
         "production",
       );
-      const xmtpTester = new playwright({
-        headless,
-        env: network,
-        defaultUser: inbox,
-      });
-      await xmtpTester.startPage();
-      const slicedInboxes = getInboxIds(4);
-      const groupId = await xmtpTester.newGroupFromUI([
-        ...slicedInboxes,
-        GM_BOT_ADDRESS,
-      ]);
-      console.debug(groupId);
-      await xmtpTester.sendMessage("hi");
-      await xmtpTester.waitForResponse(["gm"]);
+
       await xmtpTester.addMemberToGroup(
         groupId,
         workers.get("bot")?.inboxId ?? "",
       );
+      await sleep(2000);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
