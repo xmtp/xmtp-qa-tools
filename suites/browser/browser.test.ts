@@ -21,13 +21,14 @@ describe(testName, () => {
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
+  const inbox = getInbox(1)[0];
   beforeAll(async () => {
-    const inbox = getInbox(1)[0];
     xmtpTester = new playwright({
       headless,
       env: network,
       defaultUser: inbox,
     });
+    await xmtpTester.startPage();
     const convoStreamBot = await getWorkers(
       ["bob"],
       testName,
@@ -36,22 +37,17 @@ describe(testName, () => {
       typeOfSync.None,
       "production",
     );
+    const gmAliceBot = await getWorkers(["alice"], testName);
 
     creator = convoStreamBot.get("bob") as Worker;
-    const gmAliceBot = await getWorkers(["alice"], testName);
     gmBot = gmAliceBot.get("alice") as Worker;
   });
 
   it("should test added to group ", async () => {
     try {
-      const inbox = getInbox(1)[0];
-
-      await xmtpTester.startPage();
-
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
       );
-      console.debug(JSON.stringify(inbox, null, 2));
       await newGroup.send("hi");
       await newGroup.addMembers([inbox.inboxId]);
       await newGroup.addMembers([inbox.inboxId]);
@@ -63,28 +59,10 @@ describe(testName, () => {
     }
   });
 
-  it("should respond to a message", async () => {
-    try {
-      const xmtpTester = new playwright({
-        headless,
-        env: network,
-      });
-      await xmtpTester.startPage();
-
-      await xmtpTester.newDmFromUI(gmBot.address);
-      await xmtpTester.sendMessage("hi");
-      await xmtpTester.waitForResponse(["gm"]);
-    } catch (error) {
-      console.error("Error in browser test:", error);
-      throw error;
-    }
-  });
   it("should create a group and send a message", async () => {
     try {
-      await xmtpTester.startPage();
-      const slicedInboxes = getInboxIds(4);
       groupId = await xmtpTester.newGroupFromUI([
-        ...slicedInboxes,
+        ...getInboxIds(4),
         gmBot.address,
       ]);
       await xmtpTester.sendMessage("hi");
@@ -98,21 +76,29 @@ describe(testName, () => {
   });
   it("add member to group", async () => {
     try {
-      const workers = await getWorkers(
-        ["bot"],
-        testName,
-        typeofStream.Conversation,
-      );
-
-      await xmtpTester.addMemberToGroup(
-        groupId,
-        workers.get("bot")?.inboxId ?? "",
-      );
+      await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
       await sleep(2000);
     } catch (e) {
       await xmtpTester.takeSnapshot("gm-group");
       logError(e, expect.getState().currentTestName);
       throw e;
+    }
+  });
+
+  it("should respond to a message", async () => {
+    try {
+      const xmtpNewTester = new playwright({
+        headless,
+        env: network,
+      });
+      await xmtpNewTester.startPage();
+
+      await xmtpNewTester.newDmFromUI(gmBot.address);
+      await xmtpNewTester.sendMessage("hi");
+      await xmtpNewTester.waitForResponse(["gm"]);
+    } catch (error) {
+      console.error("Error in browser test:", error);
+      throw error;
     }
   });
 });

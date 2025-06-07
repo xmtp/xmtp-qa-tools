@@ -92,6 +92,8 @@ export class playwright {
     await this.page.getByRole("textbox", { name: "Address" }).fill(address);
     await this.page.getByRole("button", { name: "Add" }).click();
     await this.page.getByRole("button", { name: "Save" }).click();
+    console.debug("Added member to group");
+    return;
   }
 
   public async newGroupFromUI(addresses: string[]): Promise<string> {
@@ -179,10 +181,10 @@ export class playwright {
       .all();
 
     if (messageItems.length === 0) return "";
-
+    console.debug(`Found ${messageItems.length} conversation items`);
     const latestMessageElement = messageItems[messageItems.length - 1];
     const responseText = (await latestMessageElement.textContent()) || "";
-    console.debug(`Latest message: "${responseText}"`);
+    console.debug(`Latest conversation: "${responseText}"`);
 
     return responseText;
   }
