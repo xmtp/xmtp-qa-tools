@@ -22,7 +22,12 @@ export type BrowserSession = {
 interface playwrightOptions {
   headless?: boolean;
   env?: XmtpEnv | null;
-  defaultUser?: boolean;
+  defaultUser?: {
+    walletKey: string;
+    accountAddress: string;
+    dbEncryptionKey: string;
+    inboxId: string;
+  };
 }
 
 export class playwright {
@@ -32,13 +37,22 @@ export class playwright {
   private readonly env: XmtpEnv;
   private readonly walletKey: string;
   private readonly encryptionKey: string;
-  private readonly defaultUser: boolean;
+  private readonly defaultUser: {
+    walletKey: string;
+    accountAddress: string;
+    dbEncryptionKey: string;
+    inboxId: string;
+  };
 
   constructor(
-    { headless = true, env = null, defaultUser = false }: playwrightOptions = {
+    {
+      headless = true,
+      env = null,
+      defaultUser = undefined,
+    }: playwrightOptions = {
       headless: true,
       env: null,
-      defaultUser: false,
+      defaultUser: undefined,
     },
   ) {
     this.isHeadless =
@@ -46,7 +60,12 @@ export class playwright {
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
     this.walletKey = process.env.WALLET_KEY as string;
     this.encryptionKey = process.env.ENCRYPTION_KEY as string;
-    this.defaultUser = defaultUser;
+    this.defaultUser = defaultUser ?? {
+      walletKey: "",
+      accountAddress: "",
+      dbEncryptionKey: "",
+      inboxId: "",
+    };
     console.debug("Starting playwright with env:", this.env);
   }
 
