@@ -141,7 +141,7 @@ function parseTestArgs(args: string[]): {
     vitestArgs: [],
     noFail: false,
     explicitLogFlag: false,
-    verboseLogging: false,
+    verboseLogging: true, // Show terminal output by default
     parallel: false,
   };
 
@@ -181,6 +181,7 @@ function parseTestArgs(args: string[]): {
       case "--debug":
         options.enableLogging = true;
         options.explicitLogFlag = true;
+        options.verboseLogging = false; // Hide terminal output when --debug is used
         break;
       case "--debug-verbose":
         options.enableLogging = true;
@@ -338,33 +339,27 @@ async function runVitestTest(
       );
       console.debug(`Executing: ${command}`);
 
-      const { exitCode, errorOutput } = await runCommand(command, env, logger);
+      const { exitCode } = await runCommand(command, env, logger);
 
-      console.debug("Tests passed successfully!");
-      // Extract meaningful error information
-      const errorLines = errorOutput
-        .split("\n")
-        .filter((line) => line.trim())
-        .slice(-10); // Get last 10 non-empty lines
-
-      const errorMessage =
-        errorLines.length > 0
-          ? `Command failed with exit code ${exitCode}:\n${errorLines.join("\n")}`
-          : `Command exited with code ${exitCode}`;
-      console.debug("ERROR MESSAGE", errorMessage);
+      if (exitCode === 0) {
+        console.debug("Tests passed successfully!");
+      } else {
+        console.debug("Tests failed!");
+      }
 
       if (attempt === options.maxAttempts) {
         console.error(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        // Extract and send Slack notification with error logs
-        const errorLogs = extractErrorLogs(logger.logFileName);
-        console.debug("ERROR LOGS", errorLogs);
-        await sendSlackNotification({
-          testName,
-          errorLogs,
-        });
+        // Only send Slack notification when debug flags are explicitly used
+        if (options.explicitLogFlag) {
+          const errorLogs = extractErrorLogs(logger.logFileName);
+          await sendSlackNotification({
+            testName,
+            errorLogs,
+          });
+        }
 
         logger.close();
         if (options.noFail) {

@@ -316,9 +316,9 @@ export function extractErrorLogs(testName: string): string {
       }
     }
 
-    console.log(errorLines);
+    console.debug(errorLines);
     if (errorLines.size > 0) {
-      return `\n\n*Error Logs:*\n\`\`\`\n${Array.from(errorLines).join(
+      return `\n\n*ERROR*\n\`\`\`\n${Array.from(errorLines).join(
         "\n",
       )}\n\`\`\``;
     }
