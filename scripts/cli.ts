@@ -92,7 +92,6 @@ function showUsageAndExit(): never {
   console.error("  yarn cli bot stress 5");
   console.error("  yarn cli script gen");
   console.error("  yarn cli test functional");
-  console.error("  yarn cli test ./suites/Gm/gm.test.ts --watch");
   console.error(
     "  yarn cli test functional --max-attempts 2  # Uses retry mode",
   );

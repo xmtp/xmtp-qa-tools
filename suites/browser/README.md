@@ -1,6 +1,6 @@
-# XMTP GM Bot Testing Suite
+# Browser Testing Suite
 
-This test suite validates the functionality and responsiveness of the XMTP GM bot in production environments.
+This test suite validates the functionality and responsiveness of the XMTP Browser in production environments.
 
 ## What it does
 
@@ -19,8 +19,8 @@ yarn install
 
 ## Key files
 
-- [gm.test.ts](./gm.test.ts) - Test implementation that sends messages and validates GM bot responses
-- [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml) - Workflow configuration for running the tests
+- [browser.test.ts](./browser.test.ts) - Test implementation that sends messages and validates GM bot responses
+- [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) - Workflow configuration for running the tests
 
 ## Test snippet
 

@@ -375,7 +375,7 @@ async function main() {
 main().catch(console.error);
 ```
 
-## XMTP Helper Functions
+## Helper Functions
 
 ```typescript
 import { getRandomValues } from "node:crypto";
@@ -445,7 +445,7 @@ export const getEncryptionKeyFromHex = (hex: string) => {
 };
 ```
 
-## XMTP Packages Reference
+## Packages Reference
 
 ```tsx
 // Client Class
@@ -453,7 +453,7 @@ declare class Client {
   constructor(client: Client$1, signer: Signer, codecs: ContentCodec[]);
 ```
 
-## XMTP Identifiers Reference
+## Identifiers Reference
 
 When working with XMTP, you'll encounter several types of identifiers:
 

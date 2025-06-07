@@ -1,4 +1,4 @@
-# XMTP Regression Testing Suite
+# Regression Testing Suite
 
 This manual test suite focuses on reproducing and verifying fixes for historical bugs and issues in the XMTP protocol and clients.
 
