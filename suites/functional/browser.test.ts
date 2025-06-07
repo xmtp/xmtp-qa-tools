@@ -7,6 +7,7 @@ import {
   GM_BOT_ADDRESS,
   sleep,
 } from "@helpers/utils";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -23,9 +24,14 @@ describe(testName, () => {
       defaultUser: inbox,
     });
     await xmtpTester.startPage();
-    const workers = await getWorkers(getFixedNames(4), testName, {
-      env: "production",
-    } as XmtpEnv);
+    const workers = await getWorkers(
+      ["bot"],
+      testName,
+      typeofStream.None,
+      typeOfResponse.None,
+      typeOfSync.None,
+      "production",
+    );
     const newGroup = await workers.createGroup();
     console.debug(JSON.stringify(inbox, null, 2));
     await newGroup.send("hi");
