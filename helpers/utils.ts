@@ -313,6 +313,15 @@ export function getRandomInboxIds(count: number) {
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
+
+export function getInbox(count: number) {
+  return newInboxes.slice(0, count) as {
+    accountAddress: string;
+    walletKey: string;
+    dbEncryptionKey: string;
+    inboxId: string;
+  }[];
+}
 export function getInboxIds(count: number) {
   return newInboxes.slice(0, count).map((inbox) => inbox.inboxId);
 }

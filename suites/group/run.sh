@@ -19,5 +19,4 @@ while true; do
     done
     echo "Waiting 30 minutes before next cycle..."
     sleep 1800
-done 
-
+done

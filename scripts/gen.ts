@@ -35,7 +35,7 @@ Options for local-update:
   --env <env>                     Environment (default: local)
 
 Options for generate-installations:
-  --privateKey <key>              Private key (0x...)
+  --walletKey <key>              Private key (0x...)
   --encryptionKey <key>           Encryption key (hex)
   --count <number>                Number of installations
   --env <env>                     Environment (default: dev)
@@ -109,9 +109,9 @@ async function generateInboxes(opts: {
   const outputFile = output || `${LOGPATH}/inboxes-${timestamp}.json`;
 
   for (let i = 0; i < count; i++) {
-    const privateKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
+    const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
     try {
-      const signer = createSigner(privateKey as `0x${string}`);
+      const signer = createSigner(walletKey as `0x${string}`);
       const identifier = await signer.getIdentifier();
       const accountAddress = identifier.identifier;
       const dbEncryptionKey = generateEncryptionKeyHex();
@@ -129,7 +129,7 @@ async function generateInboxes(opts: {
       }
       accountData.push({
         accountAddress,
-        privateKey,
+        walletKey,
         dbEncryptionKey,
         inboxId,
       });
@@ -184,7 +184,7 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
   for (let i = 0; i < generatedInboxes.length; i++) {
     const inbox = generatedInboxes[i];
     try {
-      const signer = createSigner(inbox.privateKey as `0x${string}`);
+      const signer = createSigner(inbox.walletKey as `0x${string}`);
       const dbEncryptionKey = getEncryptionKeyFromHex(
         inbox.dbEncryptionKey as string,
       );
@@ -206,7 +206,7 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
       accountData.push({
         accountAddress: inbox.accountAddress,
         inboxId: client.inboxId,
-        privateKey: inbox.privateKey,
+        walletKey: inbox.walletKey,
         dbEncryptionKey: inbox.dbEncryptionKey || inbox.encryptionKey,
         dbPath: dbPath,
       });
@@ -240,14 +240,14 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
 }
 
 async function generateInstallations(opts: {
-  privateKey?: string;
+  walletKey?: string;
   encryptionKey?: string;
   count?: number;
   env?: XmtpEnv;
   output?: string;
 }) {
-  let { privateKey, encryptionKey, count, env, output } = opts;
-  if (!privateKey) privateKey = await ask("Enter private key (0x...): ");
+  let { walletKey, encryptionKey, count, env, output } = opts;
+  if (!walletKey) walletKey = await ask("Enter private key (0x...): ");
   if (!encryptionKey) encryptionKey = await ask("Enter encryption key (hex): ");
   if (!count) count = parseInt(await ask("How many installations? "), 10);
   if (!env)
@@ -255,7 +255,7 @@ async function generateInstallations(opts: {
       await ask("Enter environment (local,dev,production): ")
     ).toLowerCase() as XmtpEnv;
   if (!validEnvironments.includes(env)) env = "dev";
-  const signer = createSigner(privateKey as `0x${string}`);
+  const signer = createSigner(walletKey as `0x${string}`);
   const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
   const installationData = [];
   let accountAddress = "";
@@ -326,20 +326,20 @@ async function main() {
     });
     await localUpdate({ input, env });
   } else if (mode === "generate-installations") {
-    let privateKey: string | undefined;
+    let walletKey: string | undefined;
     let encryptionKey: string | undefined;
     let count: number | undefined;
     let env: XmtpEnv | undefined;
     let output: string | undefined;
     args.forEach((arg, i) => {
-      if (arg === "--privateKey") privateKey = args[i + 1];
+      if (arg === "--walletKey") walletKey = args[i + 1];
       if (arg === "--encryptionKey") encryptionKey = args[i + 1];
       if (arg === "--count") count = parseInt(args[i + 1], 10);
       if (arg === "--env") env = args[i + 1] as XmtpEnv;
       if (arg === "--output") output = args[i + 1];
     });
     await generateInstallations({
-      privateKey,
+      walletKey,
       encryptionKey,
       count,
       env,
