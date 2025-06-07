@@ -16,8 +16,15 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import { verifyEpochChange, type GroupConfig } from "./helper";
 
+export const features = [
+  "verifyMessageStream",
+  "verifyMembershipStream",
+  "verifyMetadataStream",
+  "verifyEpochChange",
+  "addInstallationsRandomly",
+  "createGroup",
+];
 const TEST_NAME = "group";
 const testConfig = {
   testName: TEST_NAME,
@@ -25,7 +32,7 @@ const testConfig = {
   epochs: 3,
   manualUsers: getManualUsers(["fabri-tba"]),
   network: "production",
-  preInstallations: 20,
+  preInstallations: 1,
   randomInboxIds: 60,
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
@@ -39,8 +46,8 @@ loadEnv(TEST_NAME);
 describe(TEST_NAME, () => {
   let workers: WorkerManager;
   let creator: Worker;
-  let groupConfigs: GroupConfig[] = [];
   let allInboxIds: string[] = [];
+  let allGroups: string[] = [];
 
   setupTestLifecycle({
     expect,
@@ -64,62 +71,32 @@ describe(TEST_NAME, () => {
       process.env.CREATED_GROUPS?.split(",").filter((id) => id.trim()) || [];
     console.debug(`Loaded ${existingGroups.length} existing groups`);
 
-    // Create new group and update environment
-    const group = (await creator.client.conversations.newGroup([])) as Group;
-    await group.sync();
+    const group = (await creator.client.conversations.newGroup(
+      getRandomInboxIds(testConfig.randomInboxIds),
+    )) as Group;
 
-    const updatedGroups = [...existingGroups, group.id];
-    appendToEnv("CREATED_GROUPS", updatedGroups.join(","));
+    allGroups = [...existingGroups, group.id];
+    appendToEnv("CREATED_GROUPS", allGroups.join(","));
     console.debug(`Created new group: ${group.id}`);
 
-    // Create group configs with proper numbering
-    groupConfigs = await Promise.all(
-      updatedGroups.map(async (groupId, index) => ({
-        group: (await creator.client.conversations.getConversationById(
-          groupId,
-        )) as Group,
-        features: ["verifyEpochChange"],
-        groupNumber: index + 1,
-      })),
-    );
+    console.debug("adding manual users");
+    await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
 
-    allInboxIds = [
-      ...workers.getAllBut("bot").map((w) => w.client.inboxId),
-      testConfig.manualUsers[0].inboxId,
-      ...getRandomInboxIds(testConfig.randomInboxIds),
-    ];
-
-    await creator.client.conversations.syncAll();
-
-    // Add members to the newly created group only
-    for (const inboxId of allInboxIds) {
-      try {
-        await group.addMembers([inboxId]);
-        await group.addAdmin(inboxId);
-        await group.sync();
-      } catch (e) {
-        console.error(
-          `Error adding member ${inboxId} to group ${group.id}:`,
-          e,
-        );
-      }
-    }
-
-    console.debug(
-      `Total groups for testing: ${groupConfigs.length} (${existingGroups.length} existing + 1 new)`,
-    );
-    console.debug(
-      `All group IDs: ${groupConfigs.map((g) => g.group.id).join(", ")}`,
+    console.debug("adding members");
+    await group.addMembers(
+      workers.getAllBut("bot").map((w) => w.client.inboxId),
     );
   });
 
   it(`should verify all operations across all groups`, async () => {
     try {
-      for (const config of groupConfigs) {
-        console.debug(JSON.stringify(config, null, 2));
-        await workers.checkForks();
-
-        for (const feature of config.features) {
+      for (const feature of features) {
+        for (const groupId of allGroups) {
+          console.debug(feature, groupId);
+          const group = (await creator.client.conversations.getConversationById(
+            groupId,
+          )) as Group;
+          await workers.checkForks();
           switch (feature) {
             case "addInstallationsRandomly":
               await workers.addInstallationsRandomly();
@@ -133,16 +110,16 @@ describe(TEST_NAME, () => {
             }
             case "verifyMessageStream":
               await verifyMessageStream(
-                config.group,
+                group,
                 workers.getAllBut("bot"),
                 1,
-                `Message verification from group ${config.groupNumber}`,
+                `Message verification from group ${groupId}`,
               );
               break;
 
             case "verifyMembershipStream":
               await verifyMembershipStream(
-                config.group,
+                group,
                 workers.getAllBut("bot"),
                 getRandomInboxIds(1),
               );
@@ -150,25 +127,21 @@ describe(TEST_NAME, () => {
 
             case "verifyMetadataStream":
               await verifyMetadataStream(
-                config.group,
+                group,
                 workers.getAllBut("bot"),
                 1,
-                `${testConfig.groupName} #${config.groupNumber} - Updated`,
+                `${testConfig.groupName} #${groupId} - Updated`,
               );
               break;
 
             case "verifyEpochChange":
-              await verifyEpochChange(
-                workers,
-                config.group.id,
-                testConfig.epochs,
-              );
+              await verifyEpochChange(workers, group.id, testConfig.epochs);
               break;
           }
 
-          console.debug(`Group ${config.groupNumber} - Completed: ${feature}`);
+          console.debug(`Group ${groupId} - Completed: ${feature}`);
         }
-
+        workers.checkStatistics();
         await workers.checkForks();
       }
     } catch (error) {
@@ -177,3 +150,45 @@ describe(TEST_NAME, () => {
     }
   });
 });
+
+export async function verifyEpochChange(
+  workers: WorkerManager,
+  groupId: string,
+  epochs: number,
+): Promise<void> {
+  for (let i = 0; i < epochs; i++) {
+    const randomAdmin =
+      workers.getAllBut("bot")[
+        Math.floor(Math.random() * workers.getAllBut("bot").length)
+      ];
+    let group = (await randomAdmin.client.conversations.getConversationById(
+      groupId,
+    )) as Group;
+
+    // Check if group was found before proceeding
+    if (!group) {
+      await randomAdmin.client.conversations.syncAll();
+      group = (await randomAdmin.client.conversations.getConversationById(
+        groupId,
+      )) as Group;
+
+      if (!group) {
+        console.warn(
+          `Group ${groupId} still not found for worker ${randomAdmin.name} after sync, skipping epoch cycle ${i}`,
+        );
+        continue;
+      }
+    }
+
+    for (const member of getRandomInboxIds(6)) {
+      try {
+        await group.removeMembers([member]);
+        await group.addMembers([member]);
+        console.debug(`Membership update: ${member}`);
+        await group.sync();
+      } catch (e) {
+        console.error(`Error in membership cycle ${i}:`, e);
+      }
+    }
+  }
+}

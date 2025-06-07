@@ -794,21 +794,19 @@ export class WorkerClient extends Worker {
     const installations = await this.client.preferences.inboxState();
     const currentCount = installations.installations.length;
 
-    console.log(
+    console.debug(
       `[${this.name}] Current installations: ${currentCount}, Target: ${targetCount}`,
     );
 
     if (currentCount === targetCount) {
-      console.log(`[${this.name}] Installation count matches target`);
+      console.debug(`[${this.name}] Installation count matches target`);
       return currentCount;
     }
 
     if (currentCount > targetCount) {
-      console.log(
-        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
-      );
-      await this.client.revokeAllOtherInstallations();
-      return 1; // After revoking, we should have 1 installation
+      // console.debug(
+      //   `[${this.name}] Too many installations (${currentCount}), revoking all others`,
+      // );
     }
 
     return currentCount;
@@ -905,7 +903,7 @@ export class WorkerClient extends Worker {
     installationId: string;
     address: `0x${string}`;
   }> {
-    console.log(
+    console.debug(
       `[${this.nameId}] Adding new installation and replacing current one`,
     );
 
@@ -943,7 +941,7 @@ export class WorkerClient extends Worker {
 
     const newInstallationId = this.client.installationId;
 
-    console.log(
+    console.debug(
       `[${this.nameId}] Successfully replaced installation ${oldInstallationId} with ${newInstallationId}`,
     );
 

@@ -70,6 +70,7 @@ describe(testName, () => {
           );
         }
         await workers.checkForks();
+
         const finalSizeMB = currentTotalSize / (1024 * 1024);
         const sizePerGroupMB = finalSizeMB / groupCount;
         console.time("Syncing receiver");
