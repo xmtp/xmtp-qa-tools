@@ -420,7 +420,27 @@ async function main(): Promise<void> {
           : additionalArgs;
 
         const { testName, options } = parseTestArgs(allArgs);
-        await runVitestTest(testName, options);
+
+        // Check if this is a simple test run (no retry options)
+        const isSimpleRun =
+          options.maxAttempts === 1 &&
+          !options.explicitLogFlag &&
+          !options.noFail;
+
+        if (isSimpleRun) {
+          // Run test directly without logger for native terminal output
+          const command = buildTestCommand(
+            testName,
+            options.vitestArgs,
+            options.parallel,
+          );
+          console.debug(`Running test: ${testName}`);
+          console.debug(`Executing: ${command}`);
+          execSync(command, { stdio: "inherit" });
+        } else {
+          // Use retry mechanism with logger
+          await runVitestTest(testName, options);
+        }
 
         break;
       }
