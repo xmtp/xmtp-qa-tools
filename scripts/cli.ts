@@ -339,13 +339,10 @@ async function runVitestTest(
       console.debug(`Executing: ${command}`);
 
       const { exitCode, errorOutput } = await runCommand(command, env, logger);
+      console.debug("EXIT CODE", exitCode);
+      console.debug("ERROR OUTPUT", errorOutput);
 
       console.debug("Tests passed successfully!");
-      // Extract meaningful error information
-      const errorLines = errorOutput
-        .split("\n")
-        .filter((line) => line.trim())
-        .slice(-10); // Get last 10 non-empty lines
 
       if (attempt === options.maxAttempts) {
         console.error(
