@@ -86,11 +86,12 @@ export class playwright {
     address: string,
   ): Promise<void> {
     if (!this.page) throw new Error("Page is not initialized");
-
-    await this.page.goto(`https://xmtp.chat/conversations/group/${groupId}`);
-    await this.page.getByRole("button", { name: "Members" }).click();
+    await this.page.goto(
+      `https://xmtp.chat/conversations/${groupId}/manage/members`,
+    );
     await this.page.getByRole("textbox", { name: "Address" }).fill(address);
     await this.page.getByRole("button", { name: "Add" }).click();
+    await this.page.getByRole("button", { name: "Save" }).click();
   }
 
   public async newGroupFromUI(addresses: string[]): Promise<string> {

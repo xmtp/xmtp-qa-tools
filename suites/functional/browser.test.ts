@@ -15,9 +15,10 @@ const testName = "browser";
 loadEnv(testName);
 
 describe(testName, () => {
-  const headless = true;
+  const headless = false;
   const network = "production";
   // it("should test added to group ", async () => {
+  //try {
   //   const inbox = getInbox(1)[0];
   //   const xmtpTester = new playwright({
   //     headless,
@@ -40,15 +41,20 @@ describe(testName, () => {
   //   await newGroup.addMembers([inbox.inboxId]);
   //   console.debug(newGroup.name);
   //   await xmtpTester.waitForNewConversation(newGroup.name);
+  // } catch (e) {
+  //   logError(e, expect.getState().currentTestName);
+  //   throw e;
+  // }
   // });
 
   // it("should respond to a message", async () => {
+  //   try {
   //   const xmtpTester = new playwright({
   //     headless,
   //     env: network,
   //   });
   //   await xmtpTester.startPage();
-  //   try {
+  //
   //     await xmtpTester.newDmFromUI(GM_BOT_ADDRESS);
   //     await xmtpTester.sendMessage("hi");
   //     await xmtpTester.waitForResponse(["gm"]);
@@ -60,9 +66,19 @@ describe(testName, () => {
 
   it("should create a group and send a message", async () => {
     try {
+      const inbox = getInbox(1)[0];
+      const workers = await getWorkers(
+        ["random"],
+        testName,
+        typeofStream.Conversation,
+        typeOfResponse.None,
+        typeOfSync.None,
+        "production",
+      );
       const xmtpTester = new playwright({
         headless,
         env: network,
+        defaultUser: inbox,
       });
       await xmtpTester.startPage();
       const slicedInboxes = getInboxIds(4);
@@ -73,6 +89,10 @@ describe(testName, () => {
       console.debug(groupId);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
+      await xmtpTester.addMemberToGroup(
+        groupId,
+        workers.get("random")?.inboxId ?? "",
+      );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
