@@ -30,10 +30,6 @@ describe(testName, async () => {
     getFixedNames(m_large_WORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
-    typeOfResponse.None,
-    typeOfSync.None,
-    undefined,
-    m_large_CHECK_INSTALLATIONS,
   );
 
   let customDuration: number | undefined = undefined;

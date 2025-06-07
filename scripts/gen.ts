@@ -13,6 +13,28 @@ const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";
 const validEnvironments = ["local", "dev", "production"] as XmtpEnv[];
 
+// Type definitions for inbox data
+interface InboxData {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey: string;
+  inboxId: string;
+  installations: number;
+}
+
+interface LocalInboxData extends InboxData {
+  dbPath?: string;
+}
+
+// Type for reading existing inbox data (may have legacy field names)
+interface ExistingInboxData {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey?: string;
+  inboxId: string;
+  installations?: number;
+}
+
 function showHelp() {
   console.log(`
 XMTP Generator Utility
@@ -98,7 +120,7 @@ async function generateInboxes(opts: {
     console.log(`Creating directory: ${LOGPATH}...`);
     fs.mkdirSync(`${LOGPATH}${DB_PATH}`, { recursive: true });
   }
-  const accountData = [];
+  const accountData: InboxData[] = [];
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const outputFile = output || `${LOGPATH}/inboxes-${timestamp}.json`;
 
@@ -153,6 +175,7 @@ async function generateInboxes(opts: {
         walletKey,
         dbEncryptionKey,
         inboxId,
+        installations: installationCount,
       });
       fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
     } catch (error: unknown) {
@@ -177,7 +200,7 @@ async function localUpdate() {
   const ENV: XmtpEnv = "local";
 
   loadEnv("local-update");
-  let generatedInboxes;
+  let generatedInboxes: ExistingInboxData[];
   try {
     generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
   } catch (e) {
@@ -198,14 +221,29 @@ async function localUpdate() {
   const results = { success: 0, failed: 0, inboxIds: [] as string[] };
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const outputFile = `${LOGPATH}/local-inboxes-${timestamp}.json`;
-  const accountData = [];
+  const accountData: LocalInboxData[] = [];
   for (let i = 0; i < generatedInboxes.length; i++) {
     const inbox = generatedInboxes[i];
     try {
+      if (!inbox.walletKey || !inbox.accountAddress || !inbox.inboxId) {
+        console.error(
+          `❌ Invalid inbox data for account ${i + 1}: missing required fields`,
+        );
+        results.failed++;
+        continue;
+      }
+
+      const encryptionKey = inbox.dbEncryptionKey;
+      if (!encryptionKey) {
+        console.error(
+          `❌ Invalid inbox data for account ${i + 1}: missing encryption key`,
+        );
+        results.failed++;
+        continue;
+      }
+
       const signer = createSigner(inbox.walletKey as `0x${string}`);
-      const dbEncryptionKey = getEncryptionKeyFromHex(
-        inbox.dbEncryptionKey as string,
-      );
+      const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
       console.log(
         `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
@@ -225,8 +263,9 @@ async function localUpdate() {
         accountAddress: inbox.accountAddress,
         inboxId: client.inboxId,
         walletKey: inbox.walletKey,
-        dbEncryptionKey: inbox.dbEncryptionKey || inbox.encryptionKey,
+        dbEncryptionKey: encryptionKey,
         dbPath: dbPath,
+        installations: inbox.installations || 1,
       });
       fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
       results.success++;
