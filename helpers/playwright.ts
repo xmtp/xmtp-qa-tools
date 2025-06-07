@@ -182,7 +182,7 @@ export class playwright {
 
     if (messageItems.length === 0) return "";
     console.debug(`Found ${messageItems.length} conversation items`);
-    const latestMessageElement = messageItems[messageItems.length - 1];
+    const latestMessageElement = messageItems[0];
     const responseText = (await latestMessageElement.textContent()) || "";
     console.debug(`Latest conversation: "${responseText}"`);
 
