@@ -265,6 +265,14 @@ export function extractErrorLogs(testName: string): string {
       .filter((file) => file.endsWith(".log") && file.includes(testName));
     const errorLines: Set<string> = new Set();
 
+    // Track specific error patterns we want to deduplicate
+    const seenPatterns = new Set<string>();
+    const patternsToTrack = [
+      "sync worker error storage error",
+      "sqlcipher_mlock",
+      // Add more patterns here as needed
+    ];
+
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
@@ -287,7 +295,23 @@ export function extractErrorLogs(testName: string): string {
             cleanLine = cleanLine.split("//")[0]?.trim();
           }
           cleanLine = cleanLine?.replace("expected false to be true", "failed");
-          errorLines.add(cleanLine);
+
+          // Check if this line contains any patterns we want to deduplicate
+          let shouldSkip = false;
+          for (const pattern of patternsToTrack) {
+            if (cleanLine.includes(pattern)) {
+              if (seenPatterns.has(pattern)) {
+                shouldSkip = true;
+                break;
+              } else {
+                seenPatterns.add(pattern);
+              }
+            }
+          }
+
+          if (!shouldSkip) {
+            errorLines.add(cleanLine);
+          }
         }
       }
     }
