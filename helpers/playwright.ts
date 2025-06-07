@@ -35,8 +35,6 @@ export class playwright {
   private page: Page | null = null;
   private readonly isHeadless: boolean;
   private readonly env: XmtpEnv;
-  private readonly walletKey: string;
-  private readonly encryptionKey: string;
   private readonly defaultUser: {
     walletKey: string;
     accountAddress: string;
@@ -58,8 +56,6 @@ export class playwright {
     this.isHeadless =
       process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
-    this.walletKey = process.env.WALLET_KEY as string;
-    this.encryptionKey = process.env.ENCRYPTION_KEY as string;
     this.defaultUser = defaultUser ?? {
       walletKey: "",
       accountAddress: "",
@@ -146,6 +142,40 @@ export class playwright {
   /**
    * Waits for a response matching the expected message(s)
    */
+  public async waitForNewConversation(): Promise<boolean> {
+    if (!this.page) throw new Error("Page is not initialized");
+    for (let i = 0; i < DEFAULT_STREAM_TIMEOUT_MS / 1000; i++) {
+      await this.page.waitForTimeout(1000);
+      const responseText = await this.getLatestGroupFromList();
+      console.debug(`Latest group: "${responseText}"`);
+      if (responseText.length > 0) {
+        return true;
+      }
+      console.debug(`No response found after ${i + 1} checks`);
+    }
+    return false;
+  }
+  private async getLatestGroupFromList(): Promise<string> {
+    if (!this.page) throw new Error("Page is not initialized");
+
+    const messageItems = await this.page
+      .getByRole("navigation")
+      .getByTestId("virtuoso-item-list")
+      .locator("div")
+      .all();
+
+    if (messageItems.length === 0) return "";
+
+    const latestMessageElement = messageItems[messageItems.length - 1];
+    const responseText = (await latestMessageElement.textContent()) || "";
+    console.debug(`Latest message: "${responseText}"`);
+
+    return responseText;
+  }
+
+  /**
+   * Waits for a response matching the expected message(s)
+   */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
     for (let i = 0; i < DEFAULT_STREAM_TIMEOUT_MS / 1000; i++) {
@@ -170,7 +200,9 @@ export class playwright {
     if (!this.page) throw new Error("Page is not initialized");
 
     const messageItems = await this.page
-      .locator('div[data-testid="virtuoso-item-list"] > div')
+      .getByRole("main")
+      .getByTestId("virtuoso-item-list")
+      .locator("div")
       .all();
 
     if (messageItems.length === 0) return "";
@@ -202,8 +234,8 @@ export class playwright {
 
     await this.setLocalStorage(
       page,
-      this.defaultUser ? this.walletKey : "",
-      this.defaultUser ? this.encryptionKey : "",
+      this.defaultUser.walletKey,
+      this.defaultUser.dbEncryptionKey,
     );
 
     const url = "https://xmtp.chat/";
@@ -211,7 +243,7 @@ export class playwright {
     console.debug("Navigating to:", url);
     await page.goto(url);
     console.debug("Navigated to:", url);
-    if (!this.defaultUser) {
+    if (!this.defaultUser.walletKey) {
       console.debug("Navigating to welcome");
       await page.goto("https://xmtp.chat/welcome");
       console.debug("Clicked connect");
@@ -237,11 +269,11 @@ export class playwright {
     walletKey: string = "",
     walletEncryptionKey: string = "",
   ): Promise<void> {
-    if (this.defaultUser) {
+    if (this.defaultUser.walletKey) {
       console.debug(
         "Setting localStorage",
-        walletKey.slice(0, 4) + "...",
-        walletEncryptionKey.slice(0, 4) + "...",
+        this.defaultUser.walletKey.slice(0, 4) + "...",
+        this.defaultUser.dbEncryptionKey.slice(0, 4) + "...",
       );
     }
 

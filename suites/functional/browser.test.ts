@@ -1,14 +1,14 @@
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import {
   getFixedNames,
   getInbox,
   getInboxIds,
   GM_BOT_ADDRESS,
+  sleep,
 } from "@helpers/utils";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind, type XmtpEnv } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
@@ -16,21 +16,24 @@ loadEnv(testName);
 
 describe(testName, () => {
   it("should test added to group ", async () => {
+    const inbox = getInbox(1)[0];
     const xmtpTester = new playwright({
-      headless: true,
+      headless: false,
       env: "production",
-      defaultUser: getInbox(1)[0],
+      defaultUser: inbox,
     });
     await xmtpTester.startPage();
-    const workers = await getWorkers(getFixedNames(4), testName);
+    const workers = await getWorkers(getFixedNames(4), testName, {
+      env: "production",
+    } as XmtpEnv);
     const newGroup = await workers.createGroup();
-
-    await newGroup.addMembersByIdentifiers([
-      {
-        identifier: "0x8314682f55688294ea5bf1940ce3612f02872820",
-        identifierKind: IdentifierKind.Ethereum,
-      },
-    ]);
+    console.debug(JSON.stringify(inbox, null, 2));
+    await newGroup.send("hi");
+    await newGroup.addMembers([inbox.inboxId]);
+    await sleep(2000);
+    await newGroup.addMembers([inbox.inboxId]);
+    await xmtpTester.waitForNewConversation();
+    await sleep(2000);
   });
 
   // it("should respond to a message", async () => {
