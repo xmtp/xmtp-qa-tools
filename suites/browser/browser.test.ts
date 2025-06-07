@@ -2,15 +2,20 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import {
-  getFixedNames,
   getInbox,
   getInboxIds,
+  getRandomInboxIds,
   GM_BOT_ADDRESS,
   sleep,
 } from "@helpers/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
-import { getWorkers } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import {
+  typeOfResponse,
+  typeofStream,
+  typeOfSync,
+  type WorkerClient,
+} from "@workers/main";
+import { getWorkers, type Worker } from "@workers/manager";
+import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "gm";
 loadEnv(testName);
@@ -19,25 +24,46 @@ describe(testName, () => {
   let groupId: string;
   const network = "production";
   const headless = true;
+  let xmtpTester: playwright;
+  let creator: Worker;
+  let gmBot: Worker;
+  beforeAll(async () => {
+    const inbox = getInbox(1)[0];
+    xmtpTester = new playwright({
+      headless,
+      env: network,
+      defaultUser: inbox,
+    });
+    const convoStreamBot = await getWorkers(
+      ["bob"],
+      testName,
+      typeofStream.None,
+      typeOfResponse.None,
+      typeOfSync.None,
+      "production",
+    );
+
+    creator = convoStreamBot.get("bob") as Worker;
+    const gmAliceBot = await getWorkers(
+      ["alice"],
+      testName,
+      typeofStream.None,
+      typeOfResponse.None,
+      typeOfSync.None,
+      "production",
+    );
+    gmBot = gmAliceBot.get("alice") as Worker;
+  });
 
   it("should test added to group ", async () => {
     try {
       const inbox = getInbox(1)[0];
-      const xmtpTester = new playwright({
-        headless,
-        env: network,
-        defaultUser: inbox,
-      });
+
       await xmtpTester.startPage();
-      const workers = await getWorkers(
-        getFixedNames(4),
-        testName,
-        typeofStream.None,
-        typeOfResponse.None,
-        typeOfSync.None,
-        "production",
+
+      const newGroup = await creator.client.conversations.newGroup(
+        getRandomInboxIds(4),
       );
-      const newGroup = await workers.createGroup();
       console.debug(JSON.stringify(inbox, null, 2));
       await newGroup.send("hi");
       await newGroup.addMembers([inbox.inboxId]);
@@ -66,26 +92,19 @@ describe(testName, () => {
       throw error;
     }
   });
-
-  const defaultInbox = getInbox(1)[0];
-  const defaultTester = new playwright({
-    headless,
-    env: network,
-    defaultUser: defaultInbox,
-  });
   it("should create a group and send a message", async () => {
     try {
-      await defaultTester.startPage();
+      await xmtpTester.startPage();
       const slicedInboxes = getInboxIds(4);
-      groupId = await defaultTester.newGroupFromUI([
+      groupId = await xmtpTester.newGroupFromUI([
         ...slicedInboxes,
         GM_BOT_ADDRESS,
       ]);
-      await defaultTester.sendMessage("hi");
-      const result = await defaultTester.waitForResponse(["gm"]);
+      await xmtpTester.sendMessage("hi");
+      const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
-      await defaultTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("gm-group");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
@@ -101,13 +120,13 @@ describe(testName, () => {
         "production",
       );
 
-      await defaultTester.addMemberToGroup(
+      await xmtpTester.addMemberToGroup(
         groupId,
         workers.get("bot")?.inboxId ?? "",
       );
       await sleep(2000);
     } catch (e) {
-      await defaultTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("gm-group");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
