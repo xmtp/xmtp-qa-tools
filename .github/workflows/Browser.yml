@@ -1,4 +1,4 @@
-name: Gm
+name: Browser
 description: "should verify performance of the library in the dev network"
 
 on:
@@ -20,7 +20,6 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DEFAULT_STREAM_TIMEOUT_MS: 9000
       WALLET_KEY: ${{ secrets.WALLET_KEY }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
