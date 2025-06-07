@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { getFixedNames, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
@@ -29,6 +29,10 @@ describe(testName, async () => {
     getFixedNames(m_large_WORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
+    typeOfResponse.None,
+    typeOfSync.None,
+    undefined,
+    2,
   );
 
   let customDuration: number | undefined = undefined;
