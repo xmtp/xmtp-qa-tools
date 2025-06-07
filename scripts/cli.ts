@@ -339,10 +339,19 @@ async function runVitestTest(
       console.debug(`Executing: ${command}`);
 
       const { exitCode, errorOutput } = await runCommand(command, env, logger);
-      console.debug("EXIT CODE", exitCode);
-      console.debug("ERROR OUTPUT", errorOutput);
 
       console.debug("Tests passed successfully!");
+      // Extract meaningful error information
+      const errorLines = errorOutput
+        .split("\n")
+        .filter((line) => line.trim())
+        .slice(-10); // Get last 10 non-empty lines
+
+      const errorMessage =
+        errorLines.length > 0
+          ? `Command failed with exit code ${exitCode}:\n${errorLines.join("\n")}`
+          : `Command exited with code ${exitCode}`;
+      console.debug("ERROR MESSAGE", errorMessage);
 
       if (attempt === options.maxAttempts) {
         console.error(
@@ -351,6 +360,7 @@ async function runVitestTest(
 
         // Extract and send Slack notification with error logs
         const errorLogs = extractErrorLogs(logger.logFileName);
+        console.debug("ERROR LOGS", errorLogs);
         await sendSlackNotification({
           testName,
           errorLogs,
