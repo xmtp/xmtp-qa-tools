@@ -68,7 +68,7 @@ describe(testName, () => {
     try {
       const inbox = getInbox(1)[0];
       const workers = await getWorkers(
-        ["random"],
+        ["bot"],
         testName,
         typeofStream.Conversation,
         typeOfResponse.None,
@@ -91,7 +91,7 @@ describe(testName, () => {
       await xmtpTester.waitForResponse(["gm"]);
       await xmtpTester.addMemberToGroup(
         groupId,
-        workers.get("random")?.inboxId ?? "",
+        workers.get("bot")?.inboxId ?? "",
       );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
