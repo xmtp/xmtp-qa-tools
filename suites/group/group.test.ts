@@ -30,7 +30,7 @@ const testConfig = {
   testName: TEST_NAME,
   groupName: `Group ${getTime()}`,
   epochs: 3,
-  manualUsers: getManualUsers(["fabri-tba"]),
+  manualUsers: getManualUsers(["prod-testing"]),
   network: "production",
   preInstallations: 1,
   randomInboxIds: 60,
