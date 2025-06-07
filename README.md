@@ -1,4 +1,4 @@
-# XMTP QA Tools
+# QA Tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
@@ -9,8 +9,8 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
 | Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
 | Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
-| GM          | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
+| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                   | Every 30 min  | `production`     |
+| Browser     | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)         | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/browser)                 | Every 30 min  | `production`     |
 
 ## Architecture
 

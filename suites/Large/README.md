@@ -1,4 +1,4 @@
-# XMTP Large Group Testing Suite
+# Large Group Testing Suite
 
 This suite benchmarks XMTP network performance and scalability with large group conversations. It measures group creation, message delivery, metadata updates, and sync operations across varying group sizes.
 

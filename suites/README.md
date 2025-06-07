@@ -6,10 +6,10 @@ Comprehensive end-to-end test suites for validating XMTP protocol functionality,
 
 Tests that run automatically on CI/CD pipelines to monitor production systems.
 
-| Test Suite                        | Purpose                                      | Documentation                             |
-| --------------------------------- | -------------------------------------------- | ----------------------------------------- |
-| **[agents](./automated/agents/)** | Health monitoring of production XMTP agents  | [README.md](./automated/agents/README.md) |
-| **[gm](./automated/gm/)**         | Validation of GM bot and browser integration | [README.md](./automated/gm/README.md)     |
+| Test Suite                | Purpose                                     | Documentation                    |
+| ------------------------- | ------------------------------------------- | -------------------------------- |
+| **[agents](./agents/)**   | Health monitoring of production XMTP agents | [README.md](./agents/README.md)  |
+| **[browser](./browser/)** | Validation of browser integration           | [README.md](./browser/README.md) |
 
 ## ⚙️ Functional Test Suites
 

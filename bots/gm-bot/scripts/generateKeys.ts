@@ -37,7 +37,7 @@ try {
 // Check if XMTP_ENV is already set
 const xmtpEnvExists = existingEnv.includes("XMTP_ENV=");
 
-const envContent = `# XMTP keys for multiply-agent
+const envContent = `# keys for multiply-agent
 WALLET_KEY=${walletKey}
 ENCRYPTION_KEY=${encryptionKeyHex}
 ${!xmtpEnvExists ? "XMTP_ENV=dev\n" : ""}# public key is ${publicKey}

@@ -1,4 +1,4 @@
-# XMTP Agent Health Testing Suite
+# Agent Health Testing Suite
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 

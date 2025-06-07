@@ -1,4 +1,4 @@
-# XMTP Group Stress Testing Suite
+# Group Stress Testing Suite
 
 This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges across multiple SDK versions and client types.
 
@@ -6,7 +6,7 @@ https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
 
 > For details see [deployment](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
 
-## XMTP Features Under Test
+## Features Under Test
 
 - [x] **Multi libxtmp versions** (>2.0.4)
 - [x] **Multi binding** (web, mobile, desktop)
