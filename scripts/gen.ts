@@ -13,6 +13,28 @@ const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";
 const validEnvironments = ["local", "dev", "production"] as XmtpEnv[];
 
+// Type definitions for inbox data
+interface InboxData {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey: string;
+  inboxId: string;
+  installations: number;
+}
+
+interface LocalInboxData extends InboxData {
+  dbPath?: string;
+}
+
+// Type for reading existing inbox data (may have legacy field names)
+interface ExistingInboxData {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey?: string;
+  inboxId: string;
+  installations?: number;
+}
+
 function showHelp() {
   console.log(`
 XMTP Generator Utility
@@ -21,25 +43,14 @@ Usage:
   yarn gen --mode <mode> [options]
 
 Modes:
-  --mode generate-inboxes         Generate new XMTP inboxes
-  --mode local-update             Initialize local inboxes from a JSON file
-  --mode generate-installations   Generate multiple installations for a single account
+  --mode generate-inboxes         Generate new XMTP inboxes with optional installations
+  --mode local-update             Initialize local inboxes from helpers/inboxes.json (uses defaults)
 
 Options for generate-inboxes:
   --count <number>                Number of accounts to generate
   --envs <envs>                   Comma-separated environments (local,dev,production)
+  --installations <number>        Number of installations per account per network (default: 1)
   --output <file>                 Output file (default: logs/db-generated-...)
-
-Options for local-update:
-  --input <file>                  Input JSON file (default: @helpers/inboxes.json)
-  --env <env>                     Environment (default: local)
-
-Options for generate-installations:
-  --walletKey <key>              Private key (0x...)
-  --encryptionKey <key>           Encryption key (hex)
-  --count <number>                Number of installations
-  --env <env>                     Environment (default: dev)
-  --output <file>                 Output file (default: logs/generated-installations.json)
 
   --help                          Show this help message
 `);
@@ -91,22 +102,30 @@ async function askForEnvironments(): Promise<XmtpEnv[]> {
 async function generateInboxes(opts: {
   count?: number;
   envs?: XmtpEnv[];
+  installations?: number;
   output?: string;
 }) {
-  let { count, envs, output } = opts;
+  let { count, envs, installations, output } = opts;
   if (!count) count = await askForAccountCount();
   if (!envs) envs = await askForEnvironments();
+  const installationCount = installations || 1;
 
   console.log(`Using environments: ${envs.join(", ")}`);
-  const folderName = `db-generated-${count}-${envs.join(",")}`;
+  console.log(
+    `Creating ${installationCount} installations per account per network`,
+  );
+  const folderName = `db-generated-${count}-${envs.join(",")}-${installationCount}inst`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
   if (!fs.existsSync(`${LOGPATH}${DB_PATH}`)) {
     console.log(`Creating directory: ${LOGPATH}...`);
     fs.mkdirSync(`${LOGPATH}${DB_PATH}`, { recursive: true });
   }
-  const accountData = [];
+  const accountData: InboxData[] = [];
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const outputFile = output || `${LOGPATH}/inboxes-${timestamp}.json`;
+
+  let totalCreated = 0;
+  let totalFailed = 0;
 
   for (let i = 0; i < count; i++) {
     const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
@@ -116,50 +135,72 @@ async function generateInboxes(opts: {
       const accountAddress = identifier.identifier;
       const dbEncryptionKey = generateEncryptionKeyHex();
       let inboxId = "";
+
+      console.log(`\nProcessing account ${i + 1}/${count}: ${accountAddress}`);
+
+      // Create installations for each environment
       for (const env of envs) {
-        const client = await Client.create(signer, {
-          dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
-          dbPath: `${LOGPATH}${DB_PATH}/${env}-${accountAddress}`,
-          env: env,
-        });
-        inboxId = client.inboxId;
         console.log(
-          `Created client in ${env} environment for account ${i + 1}/${count}: ${accountAddress}`,
+          `  Creating ${installationCount} installations on ${env}...`,
         );
+
+        for (let j = 0; j < installationCount; j++) {
+          try {
+            const client = await Client.create(signer, {
+              dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
+              dbPath: `${LOGPATH}${DB_PATH}/${env}-${accountAddress}-install-${j}`,
+              env: env,
+            });
+
+            if (j === 0) {
+              inboxId = client.inboxId; // Use the first installation's inboxId
+            }
+
+            console.log(
+              `    Created installation ${j + 1}/${installationCount}: ${client.installationId}`,
+            );
+            totalCreated++;
+          } catch (error) {
+            console.error(
+              `    Failed to create installation ${j + 1}/${installationCount}:`,
+              error instanceof Error ? error.message : String(error),
+            );
+            totalFailed++;
+          }
+        }
       }
+
       accountData.push({
         accountAddress,
         walletKey,
         dbEncryptionKey,
         inboxId,
+        installations: installationCount,
       });
       fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
     } catch (error: unknown) {
-      console.error(`Error creating XMTP client for account ${i + 1}:`, error);
+      console.error(`Error processing account ${i + 1}:`, error);
     }
   }
+
+  console.log(`\n=== Generation Summary ===`);
+  console.log(`Successfully generated ${accountData.length} accounts`);
   console.log(
-    `Successfully generated ${accountData.length} accounts with XMTP clients`,
+    `Target installations per account per network: ${installationCount}`,
   );
+  console.log(`Total installations created: ${totalCreated}`);
+  console.log(`Total installations failed: ${totalFailed}`);
   console.log(`Data saved to ${outputFile}`);
   console.log(`All data stored in folder: ${LOGPATH}`);
 }
 
-async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
-  let inputFile: string;
-  if (opts.input) {
-    inputFile = opts.input;
-  } else {
-    // Use require.resolve only if it returns a string
-    try {
-      inputFile = require.resolve("@helpers/inboxes.json");
-    } catch {
-      inputFile = "helpers/inboxes.json";
-    }
-  }
-  const ENV: XmtpEnv = opts.env || "local";
+async function localUpdate() {
+  // Use defaults only - no options
+  const inputFile = "helpers/inboxes.json";
+  const ENV: XmtpEnv = "local";
+
   loadEnv("local-update");
-  let generatedInboxes;
+  let generatedInboxes: ExistingInboxData[];
   try {
     generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
   } catch (e) {
@@ -180,14 +221,29 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
   const results = { success: 0, failed: 0, inboxIds: [] as string[] };
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const outputFile = `${LOGPATH}/local-inboxes-${timestamp}.json`;
-  const accountData = [];
+  const accountData: LocalInboxData[] = [];
   for (let i = 0; i < generatedInboxes.length; i++) {
     const inbox = generatedInboxes[i];
     try {
+      if (!inbox.walletKey || !inbox.accountAddress || !inbox.inboxId) {
+        console.error(
+          `❌ Invalid inbox data for account ${i + 1}: missing required fields`,
+        );
+        results.failed++;
+        continue;
+      }
+
+      const encryptionKey = inbox.dbEncryptionKey;
+      if (!encryptionKey) {
+        console.error(
+          `❌ Invalid inbox data for account ${i + 1}: missing encryption key`,
+        );
+        results.failed++;
+        continue;
+      }
+
       const signer = createSigner(inbox.walletKey as `0x${string}`);
-      const dbEncryptionKey = getEncryptionKeyFromHex(
-        inbox.dbEncryptionKey as string,
-      );
+      const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
       const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
       console.log(
         `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
@@ -207,8 +263,9 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
         accountAddress: inbox.accountAddress,
         inboxId: client.inboxId,
         walletKey: inbox.walletKey,
-        dbEncryptionKey: inbox.dbEncryptionKey || inbox.encryptionKey,
+        dbEncryptionKey: encryptionKey,
         dbPath: dbPath,
+        installations: inbox.installations || 1,
       });
       fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
       results.success++;
@@ -239,59 +296,6 @@ async function localUpdate(opts: { input?: string; env?: XmtpEnv }) {
   }
 }
 
-async function generateInstallations(opts: {
-  walletKey?: string;
-  encryptionKey?: string;
-  count?: number;
-  env?: XmtpEnv;
-  output?: string;
-}) {
-  let { walletKey, encryptionKey, count, env, output } = opts;
-  if (!walletKey) walletKey = await ask("Enter private key (0x...): ");
-  if (!encryptionKey) encryptionKey = await ask("Enter encryption key (hex): ");
-  if (!count) count = parseInt(await ask("How many installations? "), 10);
-  if (!env)
-    env = (
-      await ask("Enter environment (local,dev,production): ")
-    ).toLowerCase() as XmtpEnv;
-  if (!validEnvironments.includes(env)) env = "dev";
-  const signer = createSigner(walletKey as `0x${string}`);
-  const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
-  const installationData = [];
-  let accountAddress = "";
-  try {
-    const identifier = await signer.getIdentifier();
-    accountAddress = identifier.identifier;
-    console.log(`Using account address: ${accountAddress}`);
-    for (let i = 0; i < count; i++) {
-      const client = await Client.create(signer, {
-        dbEncryptionKey,
-        env,
-      });
-      const inboxId = client.inboxId;
-      const installationId = client.installationId;
-      installationData.push({
-        accountAddress,
-        inboxId,
-        installationId,
-        env,
-        installationIndex: i,
-      });
-      const outputFile = output || `./logs/generated-installations.json`;
-      fs.writeFileSync(outputFile, JSON.stringify(installationData, null, 2));
-      console.log(`Created installation ${i + 1}/${count}: ${installationId}`);
-    }
-  } catch (error: unknown) {
-    console.error(`Error creating XMTP clients:`, error);
-  }
-  console.log(
-    `Successfully generated ${installationData.length} XMTP clients for account ${accountAddress}`,
-  );
-  console.log(
-    `Data saved to ${output || "./logs/generated-installations.json"}`,
-  );
-}
-
 async function main() {
   const args = process.argv.slice(2);
   if (args.includes("--help") || args.includes("-h")) {
@@ -307,6 +311,7 @@ async function main() {
   if (mode === "generate-inboxes") {
     let count: number | undefined;
     let envs: XmtpEnv[] | undefined;
+    let installations: number | undefined;
     let output: string | undefined;
     args.forEach((arg, i) => {
       if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -314,37 +319,12 @@ async function main() {
         envs = args[i + 1]
           .split(",")
           .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
+      if (arg === "--installations") installations = parseInt(args[i + 1], 10);
       if (arg === "--output") output = args[i + 1];
     });
-    await generateInboxes({ count, envs, output });
+    await generateInboxes({ count, envs, installations, output });
   } else if (mode === "local-update") {
-    let input: string | undefined;
-    let env: XmtpEnv | undefined;
-    args.forEach((arg, i) => {
-      if (arg === "--input") input = args[i + 1];
-      if (arg === "--env") env = args[i + 1] as XmtpEnv;
-    });
-    await localUpdate({ input, env });
-  } else if (mode === "generate-installations") {
-    let walletKey: string | undefined;
-    let encryptionKey: string | undefined;
-    let count: number | undefined;
-    let env: XmtpEnv | undefined;
-    let output: string | undefined;
-    args.forEach((arg, i) => {
-      if (arg === "--walletKey") walletKey = args[i + 1];
-      if (arg === "--encryptionKey") encryptionKey = args[i + 1];
-      if (arg === "--count") count = parseInt(args[i + 1], 10);
-      if (arg === "--env") env = args[i + 1] as XmtpEnv;
-      if (arg === "--output") output = args[i + 1];
-    });
-    await generateInstallations({
-      walletKey,
-      encryptionKey,
-      count,
-      env,
-      output,
-    });
+    await localUpdate();
   } else {
     showHelp();
   }

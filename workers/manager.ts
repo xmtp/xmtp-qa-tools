@@ -143,7 +143,16 @@ export class WorkerManager {
       );
     }
   }
-
+  public async verifyInstallationCount(checkInstallations: number) {
+    for (const worker of this.getAll()) {
+      const installations = await worker.client.preferences.inboxState();
+      if (installations.installations.length !== checkInstallations) {
+        throw new Error(
+          `${worker.name} has ${installations.installations.length} installations, expected ${checkInstallations}`,
+        );
+      }
+    }
+  }
   public async checkInstallations(targetCount?: number) {
     // If no target count specified, just do basic checks
     if (targetCount === undefined) {
@@ -531,7 +540,7 @@ export async function getWorkers(
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
   typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
-  installationCount?: number,
+  checkInstallations?: number,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
@@ -546,7 +555,10 @@ export async function getWorkers(
   );
   await Promise.all(workerPromises);
   await manager.printWorkers();
-  await manager.checkInstallations(installationCount);
+  if (checkInstallations) {
+    await manager.checkInstallations(checkInstallations);
+    await manager.verifyInstallationCount(checkInstallations);
+  }
   return manager;
 }
 

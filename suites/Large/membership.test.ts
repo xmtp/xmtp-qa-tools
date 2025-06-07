@@ -3,12 +3,13 @@ import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { getFixedNames, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
+  m_large_CHECK_INSTALLATIONS,
   m_large_TOTAL,
   m_large_WORKER_COUNT,
   saveLog,

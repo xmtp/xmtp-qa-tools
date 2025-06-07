@@ -141,7 +141,7 @@ function parseTestArgs(args: string[]): {
     vitestArgs: [],
     noFail: false,
     explicitLogFlag: false,
-    verboseLogging: false,
+    verboseLogging: true, // Show terminal output by default
     parallel: false,
   };
 
@@ -181,6 +181,7 @@ function parseTestArgs(args: string[]): {
       case "--debug":
         options.enableLogging = true;
         options.explicitLogFlag = true;
+        options.verboseLogging = false; // Hide terminal output when --debug is used
         break;
       case "--debug-verbose":
         options.enableLogging = true;
@@ -338,26 +339,27 @@ async function runVitestTest(
       );
       console.debug(`Executing: ${command}`);
 
-      const { exitCode, errorOutput } = await runCommand(command, env, logger);
+      const { exitCode } = await runCommand(command, env, logger);
 
-      console.debug("Tests passed successfully!");
-      // Extract meaningful error information
-      const errorLines = errorOutput
-        .split("\n")
-        .filter((line) => line.trim())
-        .slice(-10); // Get last 10 non-empty lines
+      if (exitCode === 0) {
+        console.debug("Tests passed successfully!");
+      } else {
+        console.debug("Tests failed!");
+      }
 
       if (attempt === options.maxAttempts) {
         console.error(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        // Extract and send Slack notification with error logs
-        const errorLogs = extractErrorLogs(logger.logFileName);
-        await sendSlackNotification({
-          testName,
-          errorLogs,
-        });
+        // Only send Slack notification when debug flags are explicitly used
+        if (options.explicitLogFlag) {
+          const errorLogs = extractErrorLogs(logger.logFileName);
+          await sendSlackNotification({
+            testName,
+            errorLogs,
+          });
+        }
 
         logger.close();
         if (options.noFail) {
@@ -418,7 +420,27 @@ async function main(): Promise<void> {
           : additionalArgs;
 
         const { testName, options } = parseTestArgs(allArgs);
-        await runVitestTest(testName, options);
+
+        // Check if this is a simple test run (no retry options)
+        const isSimpleRun =
+          options.maxAttempts === 1 &&
+          !options.explicitLogFlag &&
+          !options.noFail;
+
+        if (isSimpleRun) {
+          // Run test directly without logger for native terminal output
+          const command = buildTestCommand(
+            testName,
+            options.vitestArgs,
+            options.parallel,
+          );
+          console.debug(`Running test: ${testName}`);
+          console.debug(`Executing: ${command}`);
+          execSync(command, { stdio: "inherit" });
+        } else {
+          // Use retry mechanism with logger
+          await runVitestTest(testName, options);
+        }
 
         break;
       }
