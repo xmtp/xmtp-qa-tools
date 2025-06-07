@@ -84,7 +84,7 @@ export class playwright {
   /**
    * Fills addresses and creates a new conversation
    */
-  public async newGroupFromUI(addresses: string[]): Promise<void> {
+  public async newGroupFromUI(addresses: string[]): Promise<string> {
     if (!this.page) throw new Error("Page is not initialized");
 
     // Target the second button with the menu popup attribute
@@ -99,7 +99,11 @@ export class playwright {
 
     await this.page.getByRole("button", { name: "Create" }).click();
     await addressInput.waitFor({ state: "hidden" });
-    return;
+
+    const url = this.page.url();
+    const groupId = url.split("/conversations/")[1];
+    console.debug("Created group with ID:", groupId);
+    return groupId;
   }
 
   /**

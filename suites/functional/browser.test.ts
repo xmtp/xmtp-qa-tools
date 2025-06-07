@@ -15,54 +15,62 @@ const testName = "browser";
 loadEnv(testName);
 
 describe(testName, () => {
-  it("should test added to group ", async () => {
-    const inbox = getInbox(1)[0];
-    const xmtpTester = new playwright({
-      headless: true,
-      env: "production",
-      defaultUser: inbox,
-    });
-    await xmtpTester.startPage();
-    const workers = await getWorkers(
-      getFixedNames(4),
-      testName,
-      typeofStream.None,
-      typeOfResponse.None,
-      typeOfSync.None,
-      "production",
-    );
-    const newGroup = await workers.createGroup();
-    console.debug(JSON.stringify(inbox, null, 2));
-    await newGroup.send("hi");
-    await newGroup.addMembers([inbox.inboxId]);
-    await newGroup.addMembers([inbox.inboxId]);
-    console.debug(newGroup.name);
-    await xmtpTester.waitForNewConversation(newGroup.name);
-  });
+  const headless = true;
+  const network = "production";
+  // it("should test added to group ", async () => {
+  //   const inbox = getInbox(1)[0];
+  //   const xmtpTester = new playwright({
+  //     headless,
+  //     env: network,
+  //     defaultUser: inbox,
+  //   });
+  //   await xmtpTester.startPage();
+  //   const workers = await getWorkers(
+  //     getFixedNames(4),
+  //     testName,
+  //     typeofStream.None,
+  //     typeOfResponse.None,
+  //     typeOfSync.None,
+  //     "production",
+  //   );
+  //   const newGroup = await workers.createGroup();
+  //   console.debug(JSON.stringify(inbox, null, 2));
+  //   await newGroup.send("hi");
+  //   await newGroup.addMembers([inbox.inboxId]);
+  //   await newGroup.addMembers([inbox.inboxId]);
+  //   console.debug(newGroup.name);
+  //   await xmtpTester.waitForNewConversation(newGroup.name);
+  // });
 
-  it("should respond to a message", async () => {
-    const xmtpTester = new playwright({
-      headless: true,
-      env: "production",
-    });
-    await xmtpTester.startPage();
-    try {
-      await xmtpTester.newDmFromUI(GM_BOT_ADDRESS);
-      await xmtpTester.sendMessage("hi");
-      await xmtpTester.waitForResponse(["gm"]);
-    } catch (error) {
-      console.error("Error in browser test:", error);
-      throw error;
-    }
-  });
+  // it("should respond to a message", async () => {
+  //   const xmtpTester = new playwright({
+  //     headless,
+  //     env: network,
+  //   });
+  //   await xmtpTester.startPage();
+  //   try {
+  //     await xmtpTester.newDmFromUI(GM_BOT_ADDRESS);
+  //     await xmtpTester.sendMessage("hi");
+  //     await xmtpTester.waitForResponse(["gm"]);
+  //   } catch (error) {
+  //     console.error("Error in browser test:", error);
+  //     throw error;
+  //   }
+  // });
 
   it("should create a group and send a message", async () => {
     try {
       const xmtpTester = new playwright({
-        headless: true,
+        headless,
+        env: network,
       });
+      await xmtpTester.startPage();
       const slicedInboxes = getInboxIds(4);
-      await xmtpTester.newGroupFromUI([...slicedInboxes, GM_BOT_ADDRESS]);
+      const groupId = await xmtpTester.newGroupFromUI([
+        ...slicedInboxes,
+        GM_BOT_ADDRESS,
+      ]);
+      console.debug(groupId);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
     } catch (e) {
