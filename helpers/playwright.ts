@@ -81,9 +81,18 @@ export class playwright {
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
   }
 
-  /**
-   * Fills addresses and creates a new conversation
-   */
+  public async addMemberToGroup(
+    groupId: string,
+    address: string,
+  ): Promise<void> {
+    if (!this.page) throw new Error("Page is not initialized");
+
+    await this.page.goto(`https://xmtp.chat/conversations/group/${groupId}`);
+    await this.page.getByRole("button", { name: "Members" }).click();
+    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+    await this.page.getByRole("button", { name: "Add" }).click();
+  }
+
   public async newGroupFromUI(addresses: string[]): Promise<string> {
     if (!this.page) throw new Error("Page is not initialized");
 
