@@ -545,7 +545,7 @@ export class WorkerClient extends Worker {
           for await (const conversation of stream) {
             try {
               console.debug(
-                `Received conversation, ${JSON.stringify(conversation, null, 2)}`,
+                `Received conversation, conversationId: ${conversation?.id}`,
               );
               if (!this.activeStreams) {
                 console.debug(`Stopping conversation stream`);
