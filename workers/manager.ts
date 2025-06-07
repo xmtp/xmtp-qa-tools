@@ -126,9 +126,9 @@ export class WorkerManager {
   }
 
   public checkStatistics(): void {
-    for (const worker of this.getAll()) {
-      console.log(worker.client.apiStatistics());
-    }
+    // for (const worker of this.getAll()) {
+    //   console.debug(JSON.stringify(worker.client.apiStatistics(), null, 2));
+    // }
   }
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
