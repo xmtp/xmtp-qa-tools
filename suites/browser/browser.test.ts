@@ -5,15 +5,9 @@ import {
   getInbox,
   getInboxIds,
   getRandomInboxIds,
-  GM_BOT_ADDRESS,
   sleep,
 } from "@helpers/utils";
-import {
-  typeOfResponse,
-  typeofStream,
-  typeOfSync,
-  type WorkerClient,
-} from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -23,7 +17,7 @@ loadEnv(testName);
 describe(testName, () => {
   let groupId: string;
   const network = "production";
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
@@ -44,14 +38,7 @@ describe(testName, () => {
     );
 
     creator = convoStreamBot.get("bob") as Worker;
-    const gmAliceBot = await getWorkers(
-      ["alice"],
-      testName,
-      typeofStream.None,
-      typeOfResponse.None,
-      typeOfSync.None,
-      "production",
-    );
+    const gmAliceBot = await getWorkers(["alice"], testName);
     gmBot = gmAliceBot.get("alice") as Worker;
   });
 
@@ -84,7 +71,7 @@ describe(testName, () => {
       });
       await xmtpTester.startPage();
 
-      await xmtpTester.newDmFromUI(GM_BOT_ADDRESS);
+      await xmtpTester.newDmFromUI(gmBot.address);
       await xmtpTester.sendMessage("hi");
       await xmtpTester.waitForResponse(["gm"]);
     } catch (error) {
@@ -98,7 +85,7 @@ describe(testName, () => {
       const slicedInboxes = getInboxIds(4);
       groupId = await xmtpTester.newGroupFromUI([
         ...slicedInboxes,
-        GM_BOT_ADDRESS,
+        gmBot.address,
       ]);
       await xmtpTester.sendMessage("hi");
       const result = await xmtpTester.waitForResponse(["gm"]);
@@ -115,9 +102,6 @@ describe(testName, () => {
         ["bot"],
         testName,
         typeofStream.Conversation,
-        typeOfResponse.None,
-        typeOfSync.None,
-        "production",
       );
 
       await xmtpTester.addMemberToGroup(
