@@ -12,7 +12,7 @@ import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "browser";
+const testName = "gm";
 loadEnv(testName);
 
 describe(testName, () => {

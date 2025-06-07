@@ -526,10 +526,19 @@ export class WorkerClient extends Worker {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
             try {
-              if (!this.activeStreams) break;
-
-              console.debug(`Received conversation, ${conversation?.id}`);
-              if (!conversation?.id) continue;
+              console.debug(
+                `Received conversation, ${JSON.stringify(conversation, null, 2)}`,
+              );
+              if (!this.activeStreams) {
+                console.debug(`Stopping conversation stream`);
+                break;
+              }
+              if (!conversation?.id) {
+                console.debug(
+                  `Skipping conversation, ${JSON.stringify(conversation, null, 2)}`,
+                );
+                continue;
+              }
 
               if (this.listenerCount("worker_message") > 0) {
                 this.emit("worker_message", {
