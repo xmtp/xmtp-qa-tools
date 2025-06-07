@@ -110,7 +110,7 @@ function showUsageAndExit(): never {
 function runBot(botName: string, args: string[]): void {
   const botFilePath = path.join("bots", botName, "index.ts");
   const botArgs = args.join(" ");
-  console.log(
+  console.debug(
     `Starting bot: ${botName}${botArgs ? ` with args: ${botArgs}` : ""}`,
   );
   execSync(`tsx --watch ${botFilePath} ${botArgs}`, {
@@ -121,57 +121,11 @@ function runBot(botName: string, args: string[]): void {
 function runScript(scriptName: string, args: string[]): void {
   const scriptFilePath = path.join("scripts", `${scriptName}.ts`);
   const scriptArgs = args.join(" ");
-  console.log(
+  console.debug(
     `Running script: ${scriptName}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`,
   );
   execSync(`tsx ${scriptFilePath} ${scriptArgs}`, {
     stdio: "inherit",
-  });
-}
-
-function hasRetryOptions(args: string[]): boolean {
-  const retrySpecificOptions = [
-    "--max-attempts",
-    "--retry-delay",
-    "--debug",
-    "--no-log",
-    "--debug-file",
-    "--no-fail",
-    "--debug-verbose",
-  ];
-
-  return args.some((arg) => retrySpecificOptions.includes(arg));
-}
-
-function runSimpleVitest(testName: string, args: string[]): void {
-  // Check if --parallel flag is present
-  const parallelIndex = args.indexOf("--parallel");
-  const isParallel = parallelIndex !== -1;
-
-  // Remove --parallel from args since it's not a vitest option
-  const filteredArgs = isParallel
-    ? args.filter((_, index) => index !== parallelIndex)
-    : args;
-
-  const command = buildTestCommand(testName, filteredArgs, isParallel);
-  console.log(`Running vitest: ${command}`);
-
-  // Check if --debug was explicitly passed
-  const explicitLogFlag = args.includes("--debug");
-
-  const env: Record<string, string> = {
-    ...process.env,
-    RUST_BACKTRACE: "1",
-  };
-
-  // Only set debug logging if --debug was explicitly passed
-  if (explicitLogFlag) {
-    env.LOGGING_LEVEL = "debug";
-  }
-
-  execSync(command, {
-    stdio: "inherit",
-    env,
   });
 }
 
@@ -348,7 +302,7 @@ async function runCommand(
   });
 }
 
-async function runRetryTests(
+async function runVitestTest(
   testName: string,
   options: RetryOptions,
 ): Promise<void> {
@@ -359,7 +313,7 @@ async function runRetryTests(
     verboseLogging: options.verboseLogging,
   });
 
-  console.log(
+  console.debug(
     `Starting test suite: "${testName}" with up to ${options.maxAttempts} attempts, delay ${options.retryDelay}s.`,
   );
 
@@ -374,7 +328,7 @@ async function runRetryTests(
   }
 
   for (let attempt = 1; attempt <= options.maxAttempts; attempt++) {
-    console.log(`Attempt ${attempt} of ${options.maxAttempts}...`);
+    console.debug(`Attempt ${attempt} of ${options.maxAttempts}...`);
 
     try {
       const command = buildTestCommand(
@@ -382,39 +336,16 @@ async function runRetryTests(
         options.vitestArgs,
         options.parallel,
       );
-      console.log(`Executing: ${command}`);
+      console.debug(`Executing: ${command}`);
 
       const { exitCode, errorOutput } = await runCommand(command, env, logger);
 
-      if (exitCode === 0) {
-        console.log("Tests passed successfully!");
-        logger.close();
-        process.exit(0);
-      } else {
-        // Extract meaningful error information
-        const errorLines = errorOutput
-          .split("\n")
-          .filter((line) => line.trim())
-          .slice(-10); // Get last 10 non-empty lines
-
-        const errorMessage =
-          errorLines.length > 0
-            ? `Command failed with exit code ${exitCode}:\n${errorLines.join("\n")}`
-            : `Command exited with code ${exitCode}`;
-
-        throw new Error(errorMessage);
-      }
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-
-      console.error(`Attempt ${attempt} failed:`);
-      console.error(errorMessage);
-
-      // Log additional context if available
-      if (options.enableLogging) {
-        console.error(`\nFull logs are being written to the log file`);
-      }
+      console.debug("Tests passed successfully!");
+      // Extract meaningful error information
+      const errorLines = errorOutput
+        .split("\n")
+        .filter((line) => line.trim())
+        .slice(-10); // Get last 10 non-empty lines
 
       if (attempt === options.maxAttempts) {
         console.error(
@@ -437,7 +368,7 @@ async function runRetryTests(
       }
 
       if (options.retryDelay > 0) {
-        console.log(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
+        console.debug(`\n⏳ Retrying in ${options.retryDelay} seconds...`);
         Atomics.wait(
           new Int32Array(new SharedArrayBuffer(4)),
           0,
@@ -445,8 +376,11 @@ async function runRetryTests(
           options.retryDelay * 1000,
         );
       } else {
-        console.log("\n🔄 Retrying immediately...");
+        console.debug("\n🔄 Retrying immediately...");
       }
+    } catch (error) {
+      console.error(`Attempt ${attempt} failed:`);
+      console.error(error);
     }
   }
 }
@@ -483,16 +417,9 @@ async function main(): Promise<void> {
           ? [nameOrPath, ...additionalArgs]
           : additionalArgs;
 
-        // Check if retry-specific options are present
-        if (hasRetryOptions(allArgs)) {
-          // Use retry logic with multiple attempts, logging, etc.
-          const { testName, options } = parseTestArgs(allArgs);
-          await runRetryTests(testName, options);
-        } else {
-          // Run vitest directly for simple test execution
-          const testName = nameOrPath || "functional";
-          runSimpleVitest(testName, additionalArgs);
-        }
+        const { testName, options } = parseTestArgs(allArgs);
+        await runVitestTest(testName, options);
+
         break;
       }
 

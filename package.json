@@ -28,8 +28,7 @@
     "script": "yarn cli script",
     "small": "yarn test suites/small",
     "start": "vitest --ui --standalone --watch ",
-    "test": "yarn cli test",
-    "tiny": "yarn test suites/tiny"
+    "test": "yarn cli test"
   },
   "dependencies": {
     "@xmtp/content-type-reaction": "^2.0.2",
