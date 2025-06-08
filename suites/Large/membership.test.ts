@@ -55,18 +55,19 @@ describe(testName, async () => {
           const inboxes = getInboxByInstallationCount(installation, i);
           const allInboxIds = [
             ...workers.getAllButCreator().map((w) => w.client.inboxId),
-            ...inboxes.slice(0, i).map((inbox) => inbox.inboxId),
+            ...inboxes
+              .slice(0, i - workers.getAllButCreator().length - 1)
+              .map((inbox) => inbox.inboxId),
           ];
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(allInboxIds)) as Group;
 
           const members = await newGroup.members();
-          console.log(members.length);
 
           console.log(
             "Group created with",
-            allInboxIds.length,
+            members.length,
             "of",
             installation,
             "installations",
