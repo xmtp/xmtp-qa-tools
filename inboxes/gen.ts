@@ -8,6 +8,29 @@ import {
 } from "@helpers/client";
 import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
 
+function showHelp() {
+  console.debug(`
+XMTP Generator Utility
+
+Usage:
+  yarn gen [options]
+
+Options:
+  --count <number>                Total number of accounts to ensure exist
+  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
+  --installations <number>        Number of installations per account per network (default: 1)
+
+  --help                          Show this help message
+
+Smart Logic:
+  - Automatically selects inbox file based on installations number (e.g., 2.json for 2 installations)
+  - Updates installations for existing accounts as needed
+  - Generates new accounts if count exceeds existing accounts
+  - Shows cool progress bars for all operations
+  - Keeps generated accounts in logs/ folder
+`);
+}
+
 const BASE_LOGPATH = "./logs";
 
 // Simple progress bar implementation
@@ -78,29 +101,6 @@ interface ExistingInboxData {
   dbEncryptionKey?: string;
   inboxId: string;
   installations?: number;
-}
-
-function showHelp() {
-  console.debug(`
-XMTP Generator Utility
-
-Usage:
-  yarn gen [options]
-
-Options:
-  --count <number>                Total number of accounts to ensure exist
-  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
-  --installations <number>        Number of installations per account per network (default: 1)
-
-  --help                          Show this help message
-
-Smart Logic:
-  - Automatically selects inbox file based on installations number (e.g., 2.json for 2 installations)
-  - Updates installations for existing accounts as needed
-  - Generates new accounts if count exceeds existing accounts
-  - Shows cool progress bars for all operations
-  - Keeps generated accounts in logs/ folder
-`);
 }
 
 async function checkInstallations(
