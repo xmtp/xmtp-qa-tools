@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
-import newInboxes from "@inboxes/2.json";
+import newInboxes2 from "@inboxes/2.json";
+import newInboxes5 from "@inboxes/5.json";
+import newInboxes10 from "@inboxes/10.json";
+import newInboxes20 from "@inboxes/20.json";
+import newInboxes25 from "@inboxes/25.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import {
@@ -82,8 +86,6 @@ type InboxData = {
   dbEncryptionKey: string;
   inboxId: string;
 };
-
-const typedInboxes = newInboxes as InboxData[];
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -316,21 +318,41 @@ export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-export function getRandomInboxIds(count: number) {
-  return typedInboxes
-    .sort(() => Math.random() - 0.5)
+const typedInboxes = newInboxes2 as InboxData[];
+
+function getInboxesByInstallationCount(installationCount: number): InboxData[] {
+  if (installationCount === 2) {
+    return newInboxes2 as InboxData[];
+  } else if (installationCount === 5) {
+    return newInboxes5 as InboxData[];
+  } else if (installationCount === 10) {
+    return newInboxes10 as InboxData[];
+  } else if (installationCount === 20) {
+    return newInboxes20 as InboxData[];
+  } else if (installationCount === 25) {
+    return newInboxes25 as InboxData[];
+  }
+}
+
+export function getRandomInboxIds(installationCount: number, count: number) {
+  return getInboxesByInstallationCount(installationCount)
+    ?.sort(() => Math.random() - 0.5)
+    ?.slice(0, count)
+    ?.map((inbox) => inbox.inboxId);
+}
+
+export function getInbox(installationCount: number, count: number) {
+  return getInboxesByInstallationCount(installationCount).slice(0, count);
+}
+export function getInboxIds(installationCount: number, count: number) {
+  return getInboxesByInstallationCount(installationCount)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
-
-export function getInbox(count: number) {
-  return typedInboxes.slice(0, count);
-}
-export function getInboxIds(count: number) {
-  return typedInboxes.slice(0, count).map((inbox) => inbox.inboxId);
-}
-export function getAddresses(count: number) {
-  return typedInboxes.slice(0, count).map((inbox) => inbox.accountAddress);
+export function getAddresses(installationCount: number, count: number) {
+  return getInboxesByInstallationCount(installationCount)
+    .slice(0, count)
+    .map((inbox) => inbox.accountAddress);
 }
 
 /**

@@ -22,7 +22,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  let newGroup: Group;
+  const installations = [2, 5, 10, 20, 25];
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
@@ -50,30 +50,34 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveAddMember-${i}: should create a new conversation`, async () => {
-      try {
-        // Initialize workers
-        newGroup = await workers.createGroup();
+    for (const installation of installations) {
+      it(`receiveAddMember-${i}: should create a new conversation of ${installation} members`, async () => {
+        try {
+          // Initialize workers
+          const newGroup = (await workers
+            .getCreator()
+            .client.conversations.newGroup(getInboxIds(installation)) as Group<string | GroupUpdated>;
 
-        const verifyResult = await verifyMembershipStream(
-          newGroup,
-          workers.getAllButCreator(),
-          getInboxIds(1),
-        );
+          const verifyResult = await verifyMembershipStream(
+            newGroup,
+            workers.getAllButCreator(),
+            getInboxIds(installation),
+          );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
+          setCustomDuration(verifyResult.averageEventTiming);
+          expect(verifyResult.allReceived).toBe(true);
 
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          addMembersTimeMs: verifyResult.averageEventTiming,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
+          // Save metrics
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            addMembersTimeMs: verifyResult.averageEventTiming,
+          };
+        } catch (e) {
+          logError(e, expect.getState().currentTestName);
+          throw e;
+        }
+      });
+    }
   }
 
   // After all tests have run, output a concise summary of all timings per group size
