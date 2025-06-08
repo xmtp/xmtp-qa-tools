@@ -64,6 +64,7 @@ describe(testName, async () => {
               .slice(0, i - workers.getAllButCreator().length - 1)
               .map((inbox) => inbox.inboxId),
           ];
+          console.log(allInboxIds.length);
           // Add members in batches of 10
           const batchSize = 10;
           for (let j = 0; j < allInboxIds.length; j += batchSize) {
