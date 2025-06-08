@@ -322,29 +322,43 @@ type InboxData = {
   walletKey: string;
   dbEncryptionKey: string;
   inboxId: string;
+  installations: number;
 };
 
 export function getInboxByInstallationCount(installationCount: number) {
-  return typedInboxes2.filter(
-    (inbox) => inbox.installationCount === installationCount,
-  );
+  if (installationCount === 2) {
+    return typedInboxes2;
+  } else if (installationCount === 5) {
+    return typedInboxes5;
+  } else if (installationCount === 10) {
+    return typedInboxes10;
+  } else if (installationCount === 20) {
+    return typedInboxes20;
+  } else if (installationCount === 25) {
+    return typedInboxes25;
+  }
+  return typedInboxes2;
 }
 
 export function getRandomInboxIds(count: number) {
-  return typedInboxes2
+  return getInboxByInstallationCount(2)
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
 
 export function getInbox(count: number) {
-  return typedInboxes2.slice(0, count);
+  return getInboxByInstallationCount(2).slice(0, count);
 }
 export function getInboxIds(count: number) {
-  return typedInboxes2.slice(0, count).map((inbox) => inbox.inboxId);
+  return getInboxByInstallationCount(2)
+    .slice(0, count)
+    .map((inbox) => inbox.inboxId);
 }
 export function getAddresses(count: number) {
-  return typedInboxes2.slice(0, count).map((inbox) => inbox.accountAddress);
+  return getInboxByInstallationCount(2)
+    .slice(0, count)
+    .map((inbox) => inbox.accountAddress);
 }
 
 /**

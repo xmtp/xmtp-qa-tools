@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxByIndex } from "@helpers/utils";
+import { getFixedNames, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -54,7 +54,7 @@ describe(testName, async () => {
         try {
           const allInboxIds = [
             ...workers.getAllButCreator().map((w) => w.client.inboxId),
-            getInboxByIndex(10).inboxId,
+            ...getInboxIds(196),
           ];
           const newGroup = (await workers
             .getCreator()
@@ -74,7 +74,7 @@ describe(testName, async () => {
           const verifyResult = await verifyMembershipStream(
             newGroup,
             workers.getAllButCreator(),
-            [getInboxByIndex(installation, 191).inboxId],
+            [getInboxIds(191)[0]],
           );
 
           setCustomDuration(verifyResult.averageEventTiming);
