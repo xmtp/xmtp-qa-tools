@@ -4,9 +4,11 @@
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 rm -rf logs
+# Don't sleep the computer
+caffeinate -d
 
 # Array of installations values
-INSTALLATIONS=(10 15 20 25)
+INSTALLATIONS=(2 5 10 15 20 25)
 MAX_RETRIES=3
 
 # Function to run command with retry

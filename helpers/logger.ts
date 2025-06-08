@@ -318,14 +318,14 @@ export function extractErrorLogs(testName: string): string {
 
     console.debug(errorLines);
     if (errorLines.size === 1) {
-      if (errorLines.values().next().value?.includes("sync worker error")) {
-        console.log("returning empty string");
-        return "";
+      for (const pattern of patternsToTrack) {
+        if (errorLines.values().next().value?.includes(pattern)) {
+          console.log("returning empty string");
+          return "";
+        }
       }
     } else if (errorLines.size > 0) {
-      return `\n\n*ERROR*\n\`\`\`\n${Array.from(errorLines).join(
-        "\n",
-      )}\n\`\`\``;
+      return `\n\n*Logs:*\n\`\`\`\n${Array.from(errorLines).join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);

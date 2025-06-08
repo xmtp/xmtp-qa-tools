@@ -3,12 +3,10 @@ import fs from "fs";
 export const m_large_WORKER_COUNT = parseInt(process.env.WORKER_COUNT ?? "5");
 export const m_large_BATCH_SIZE = parseInt(process.env.BATCH_SIZE ?? "5");
 export const m_large_TOTAL = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
-export const m_large_CHECK_INSTALLATIONS = parseInt(
-  process.env.CHECK_INSTALLATIONS ?? "2",
-);
 
 export interface SummaryEntry {
   groupSize: number;
+  installations?: number;
   messageStreamTimeMs?: number;
   groupUpdatedStreamTimeMs?: number;
   addMembersTimeMs?: number;
@@ -20,21 +18,26 @@ export interface SummaryEntry {
   singleSyncTimeMs?: number;
   cumulativeSyncAllTimeMs?: number;
   cumulativeSyncTimeMs?: number;
+  totalGroupInstallations?: number;
 }
 
-export function saveLog(summaryMap: Record<number, SummaryEntry>) {
+export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   if (Object.keys(summaryMap).length === 0) {
     return;
   }
 
   const sorted = Object.values(summaryMap).sort(
-    (a, b) => a.groupSize - b.groupSize,
+    (a, b) =>
+      a.groupSize - b.groupSize ||
+      (a.installations ?? 0) - (b.installations ?? 0),
   );
   let messageToLog = "";
-  messageToLog += "\n===== Timing Summary per Group Size =====\n";
+  messageToLog +=
+    "\n===== Timing Summary per Group Size and Installations =====\n";
   for (const entry of sorted) {
     const {
       groupSize,
+      installations,
       conversationStreamTimeMs,
       addMembersTimeMs,
       groupUpdatedStreamTimeMs,
@@ -45,9 +48,14 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
       singleSyncTimeMs,
       cumulativeSyncAllTimeMs,
       cumulativeSyncTimeMs,
+      totalGroupInstallations,
     } = entry;
 
-    messageToLog += `Group ${groupSize} → `;
+    messageToLog += `Group ${groupSize}`;
+    if (installations !== undefined) {
+      messageToLog += ` (${installations} inst)`;
+    }
+    messageToLog += ` → `;
 
     if (conversationStreamTimeMs !== undefined) {
       messageToLog += `New Group: ${conversationStreamTimeMs.toFixed(2)} ms; `;
@@ -78,6 +86,9 @@ export function saveLog(summaryMap: Record<number, SummaryEntry>) {
     }
     if (cumulativeSyncTimeMs !== undefined) {
       messageToLog += `CumulativeSync: ${cumulativeSyncTimeMs.toFixed(2)} ms; `;
+    }
+    if (totalGroupInstallations !== undefined) {
+      messageToLog += `Total Installations: ${totalGroupInstallations}; `;
     }
     messageToLog += "\n";
   }

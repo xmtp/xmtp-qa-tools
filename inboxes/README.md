@@ -1,23 +1,12 @@
 # XMTP Inboxes
 
-This directory contains pre-generated XMTP inbox data for testing purposes. Each JSON file contains a collection of dummy wallets with their associated XMTP credentials, organized by the number of installations per inbox.
+Pre-generated XMTP inbox data for testing with multiple device installations.
 
-## Files Structure
+- [gen](./gen.ts) - Script to generate new inbox files
+- **`{number}.json`** - Inbox data with specific installation counts (2, 5, 10, 15, 20, 25)
+- **`run-installs.sh`** - Generation script
 
-- **`{number}.json`** - JSON files containing inbox data with specific installation counts:
-
-  - `2.json` - Inboxes with 2 installations each
-  - `5.json` - Inboxes with 5 installations each
-  - `10.json` - Inboxes with 10 installations each
-  - `15.json` - Inboxes with 15 installations each
-  - `20.json` - Inboxes with 20 installations each
-  - `25.json` - Inboxes with 25 installations each
-
-- **`run-installs.sh`** - Script to generate new inbox files with different installation configurations
-
-## Inbox Data Format
-
-Each JSON file contains an array of inbox objects with the following structure:
+## Data Format
 
 ```json
 {
@@ -29,32 +18,12 @@ Each JSON file contains an array of inbox objects with the following structure:
 }
 ```
 
-### Field Descriptions
-
-- **`accountAddress`** - Ethereum wallet address (42 characters starting with `0x`)
-- **`walletKey`** - Private key for the wallet (66 characters starting with `0x`)
-- **`dbEncryptionKey`** - Encryption key for XMTP local database (64 hex characters)
-- **`inboxId`** - XMTP inbox identifier (64 hex characters)
-- **`installations`** - Number of XMTP client installations for this inbox
-
-## Usage in Tests
-
-These pre-generated inboxes are used in XMTP testing scenarios to:
-
-- Test multi-device messaging scenarios
-- Simulate different installation configurations
-- Provide consistent test data across test runs
-- Avoid generating new wallets for each test execution
-
-### Example Usage
+## Usage
 
 ```typescript
 import inboxData from "./inboxes/10.json";
 
-// Get first inbox with 10 installations
 const testInbox = inboxData[0];
-
-// Use in XMTP client creation
 const signer = createSigner(testInbox.walletKey);
 const client = await Client.create(signer, {
   dbEncryptionKey: getEncryptionKeyFromHex(testInbox.dbEncryptionKey),
@@ -62,26 +31,10 @@ const client = await Client.create(signer, {
 });
 ```
 
-## Generating New Inboxes
-
-Use the provided script to generate new inbox files:
+## Generate New Inboxes
 
 ```bash
-# Generate inboxes with specific installation counts
 ./run-installs.sh
 ```
 
-The script will:
-
-- Generate 200 inboxes per configuration
-- Create files for both `local` and `production` environments
-- Support installation counts: 10, 15, 20, 25
-- Retry failed generations up to 3 times
-- Output results to the corresponding JSON files
-
-## Notes
-
-- Each inbox represents a unique XMTP identity with multiple device installations
-- Installation counts affect message delivery patterns and sync behavior
-- These are dummy wallets for testing only - never use in production
-- Files are large due to the cryptographic key data required for each inbox
+Generates 200 inboxes per configuration for installation counts: 10, 15, 20, 25.

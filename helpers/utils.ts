@@ -1,6 +1,10 @@
 import fs from "fs";
 import path from "path";
-import newInboxes from "@inboxes/2.json";
+import newInboxes2 from "@inboxes/2.json";
+import newInboxes5 from "@inboxes/5.json";
+import newInboxes10 from "@inboxes/10.json";
+import newInboxes20 from "@inboxes/20.json";
+import newInboxes25 from "@inboxes/25.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import {
@@ -75,15 +79,6 @@ import {
 } from "@xmtp/node-sdk-mls";
 import { getEnvPath } from "./client";
 import manualUsers from "./manualusers.json";
-
-type InboxData = {
-  accountAddress: string;
-  walletKey: string;
-  dbEncryptionKey: string;
-  inboxId: string;
-};
-
-const typedInboxes = newInboxes as InboxData[];
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -316,21 +311,60 @@ export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
+const typedInboxes2 = newInboxes2 as InboxData[];
+const typedInboxes5 = newInboxes5 as InboxData[];
+const typedInboxes10 = newInboxes10 as InboxData[];
+const typedInboxes20 = newInboxes20 as InboxData[];
+const typedInboxes25 = newInboxes25 as InboxData[];
+
+type InboxData = {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey: string;
+  inboxId: string;
+  installations: number;
+};
+
+export function getInboxByInstallationCount(
+  installationCount: number,
+  index?: number,
+) {
+  if (installationCount === 2) {
+    return index !== undefined ? typedInboxes2.slice(0, index) : typedInboxes2;
+  } else if (installationCount === 5) {
+    return index !== undefined ? typedInboxes5.slice(0, index) : typedInboxes5;
+  } else if (installationCount === 10) {
+    return index !== undefined
+      ? typedInboxes10.slice(0, index)
+      : typedInboxes10;
+  } else if (installationCount === 20) {
+    return index !== undefined
+      ? typedInboxes20.slice(0, index)
+      : typedInboxes20;
+  } else if (installationCount === 25) {
+    return index !== undefined
+      ? typedInboxes25.slice(0, index)
+      : typedInboxes25;
+  }
+  return typedInboxes2;
+}
+
 export function getRandomInboxIds(count: number) {
-  return typedInboxes
+  return getInboxByInstallationCount(2)
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
 
-export function getInbox(count: number) {
-  return typedInboxes.slice(0, count);
-}
 export function getInboxIds(count: number) {
-  return typedInboxes.slice(0, count).map((inbox) => inbox.inboxId);
+  return getInboxByInstallationCount(2)
+    .slice(0, count)
+    .map((inbox) => inbox.inboxId);
 }
 export function getAddresses(count: number) {
-  return typedInboxes.slice(0, count).map((inbox) => inbox.accountAddress);
+  return getInboxByInstallationCount(2)
+    .slice(0, count)
+    .map((inbox) => inbox.accountAddress);
 }
 
 /**
