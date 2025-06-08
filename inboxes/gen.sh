@@ -18,7 +18,7 @@ run_with_retry() {
     
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        yarn gen --mode generate-inboxes --count 200 --envs local,production --installations $installations
+        yarn gen --count 200 --envs local,production --installations $installations
         
         local exit_code=$?
         
