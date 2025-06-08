@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import newInboxes from "@helpers/inboxes.json";
+import newInboxes from "@inboxes/2.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import {
@@ -75,6 +75,15 @@ import {
 } from "@xmtp/node-sdk-mls";
 import { getEnvPath } from "./client";
 import manualUsers from "./manualusers.json";
+
+type InboxData = {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey: string;
+  inboxId: string;
+};
+
+const typedInboxes = newInboxes as InboxData[];
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -308,25 +317,20 @@ export const sleep = (ms: number = 1000): Promise<void> => {
 };
 
 export function getRandomInboxIds(count: number) {
-  return newInboxes
+  return typedInboxes
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
 
 export function getInbox(count: number) {
-  return newInboxes.slice(0, count) as {
-    accountAddress: string;
-    walletKey: string;
-    dbEncryptionKey: string;
-    inboxId: string;
-  }[];
+  return typedInboxes.slice(0, count);
 }
 export function getInboxIds(count: number) {
-  return newInboxes.slice(0, count).map((inbox) => inbox.inboxId);
+  return typedInboxes.slice(0, count).map((inbox) => inbox.inboxId);
 }
 export function getAddresses(count: number) {
-  return newInboxes.slice(0, count).map((inbox) => inbox.accountAddress);
+  return typedInboxes.slice(0, count).map((inbox) => inbox.accountAddress);
 }
 
 /**

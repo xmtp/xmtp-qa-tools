@@ -95,6 +95,7 @@ describe(testName, () => {
       throw e;
     }
   });
+
   it("should create a group and send a message", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
@@ -114,7 +115,15 @@ describe(testName, () => {
   it("add member to group", async () => {
     try {
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
-      await sleep(1000);
+      const conversationStream = await creator.client.conversations.stream();
+      for await (const conversation of conversationStream) {
+        if (conversation?.id === groupId) {
+          expect(conversation.id).toBe(groupId);
+          break;
+        } else {
+          expect(conversation?.id).toBeDefined();
+        }
+      }
     } catch (e) {
       await xmtpTester.takeSnapshot("gm-group");
       logError(e, expect.getState().currentTestName);

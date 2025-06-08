@@ -61,12 +61,37 @@ function getGitHubContext(): GitHubContext {
   };
 }
 
+// Check if error logs contain only worker errors
+function isOnlyWorkerError(errorLogs?: string): boolean {
+  if (!errorLogs || !errorLogs.trim()) {
+    return false;
+  }
+
+  const lines = errorLogs
+    .trim()
+    .split("\n")
+    .filter((line) => line.trim());
+
+  // If there's only one line and it contains "worker" (case insensitive), consider it a worker error
+  if (lines.length === 1) {
+    return /worker/i.test(lines[0]);
+  }
+
+  return false;
+}
+
 // Check if notification should be sent
 function shouldSendNotification(
   options: SlackNotificationOptions,
   githubContext: GitHubContext,
 ): boolean {
   const jobStatus = options.jobStatus || "failed";
+
+  // Skip if only worker error
+  if (isOnlyWorkerError(options.errorLogs)) {
+    console.log("Slack notification skipped (only worker error detected)");
+    return false;
+  }
 
   // Only send notifications for failures on main branch (unless in local development)
   if (
