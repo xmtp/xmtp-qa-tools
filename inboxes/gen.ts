@@ -7,7 +7,7 @@ import {
   getEncryptionKeyFromHex,
   loadEnv,
 } from "@helpers/client";
-import { Client, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
 const DB_PATH = "/db";
@@ -36,7 +36,7 @@ interface ExistingInboxData {
 }
 
 function showHelp() {
-  console.log(`
+  console.debug(`
 XMTP Generator Utility
 
 Usage:
@@ -80,7 +80,7 @@ async function askForAccountCount(): Promise<number> {
   const answer = await ask(`How many accounts would you like to generate? `);
   const count = parseInt(answer, 10);
   if (isNaN(count) || count <= 0) {
-    console.log("Invalid input. Please enter a positive number.");
+    console.debug("Invalid input. Please enter a positive number.");
     return askForAccountCount();
   }
   return count;
@@ -95,7 +95,7 @@ async function askForEnvironments(): Promise<XmtpEnv[]> {
     validEnvironments.includes(env as XmtpEnv),
   );
   if (validEnvs.length === 0) {
-    console.log("No valid environments provided. Using 'local' as default.");
+    console.debug("No valid environments provided. Using 'local' as default.");
 
     return ["local", "dev", "production"] as XmtpEnv[];
   }
@@ -113,14 +113,14 @@ async function generateInboxes(opts: {
   if (!envs) envs = await askForEnvironments();
   const installationCount = installations || 1;
 
-  console.log(`Using environments: ${envs.join(", ")}`);
-  console.log(
+  console.debug(`Using environments: ${envs.join(", ")}`);
+  console.debug(
     `Creating ${installationCount} installations per account per network`,
   );
   const folderName = `db-generated-${count}-${envs.join(",")}-${installationCount}inst`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
   if (!fs.existsSync(`${LOGPATH}${DB_PATH}`)) {
-    console.log(`Creating directory: ${LOGPATH}...`);
+    console.debug(`Creating directory: ${LOGPATH}...`);
     fs.mkdirSync(`${LOGPATH}${DB_PATH}`, { recursive: true });
   }
   const accountData: InboxData[] = [];
@@ -139,14 +139,13 @@ async function generateInboxes(opts: {
       const dbEncryptionKey = generateEncryptionKeyHex();
       let inboxId = "";
 
-      console.log(`\nProcessing account ${i + 1}/${count}: ${accountAddress}`);
+      console.debug(
+        `\nProcessing account ${i + 1}/${count}: ${accountAddress}`,
+      );
 
       // Create installations for each environment
       for (const env of envs) {
-        console.log(
-          `  Creating ${installationCount} installations on ${env}...`,
-        );
-
+        console.debug(`Checking ${installationCount} installations on ${env}`);
         for (let j = 0; j < installationCount; j++) {
           try {
             const client = await Client.create(signer, {
@@ -154,12 +153,14 @@ async function generateInboxes(opts: {
               dbPath: `${LOGPATH}${DB_PATH}/${env}-${accountAddress}-install-${j}`,
               env: env,
             });
-
+            console.debug(
+              `✅ Successfully initialized inbox: ${client.inboxId}`,
+            );
             if (j === 0) {
               inboxId = client.inboxId; // Use the first installation's inboxId
             }
 
-            console.log(
+            console.debug(
               `    Created installation ${j + 1}/${installationCount}: ${client.installationId}`,
             );
             totalCreated++;
@@ -186,15 +187,15 @@ async function generateInboxes(opts: {
     }
   }
 
-  console.log(`\n=== Generation Summary ===`);
-  console.log(`Successfully generated ${accountData.length} accounts`);
-  console.log(
+  console.debug(`\n=== Generation Summary ===`);
+  console.debug(`Successfully generated ${accountData.length} accounts`);
+  console.debug(
     `Target installations per account per network: ${installationCount}`,
   );
-  console.log(`Total installations created: ${totalCreated}`);
-  console.log(`Total installations failed: ${totalFailed}`);
-  console.log(`Data saved to ${outputFile}`);
-  console.log(`All data stored in folder: ${LOGPATH}`);
+  console.debug(`Total installations created: ${totalCreated}`);
+  console.debug(`Total installations failed: ${totalFailed}`);
+  console.debug(`Data saved to ${outputFile}`);
+  console.debug(`All data stored in folder: ${LOGPATH}`);
 }
 
 async function localUpdate(opts: { installations?: number } = {}) {
@@ -235,22 +236,22 @@ async function localUpdate(opts: { installations?: number } = {}) {
   }
 
   const fileNames = filesToProcess.map((f) => f.replace(`${inboxesDir}/`, ""));
-  console.log(
+  console.debug(
     `Processing ${filesToProcess.length} inbox file(s): ${fileNames.join(", ")}`,
   );
   if (overrideInstallations) {
-    console.log(`Using installations count: ${overrideInstallations}`);
+    console.debug(`Using installations count: ${overrideInstallations}`);
   }
 
   // Process each selected file
   for (const inputFile of filesToProcess) {
-    console.log(`\n=== Processing ${inputFile} ===`);
+    console.debug(`\n=== Processing ${inputFile} ===`);
 
     let generatedInboxes: ExistingInboxData[];
     try {
       generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
     } catch (e) {
-      console.log(e);
+      console.debug(e);
       console.error(`Could not read input file: ${inputFile}`);
       continue;
     }
@@ -264,7 +265,7 @@ async function localUpdate(opts: { installations?: number } = {}) {
     const folderName = `db-generated-${fileName}-${generatedInboxes.length}-${ENV}`;
     const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
     if (!fs.existsSync(LOGPATH)) {
-      console.log(`Creating directory: ${LOGPATH}...`);
+      console.debug(`Creating directory: ${LOGPATH}...`);
       fs.mkdirSync(LOGPATH, { recursive: true });
     }
     const results = { success: 0, failed: 0, inboxIds: [] as string[] };
@@ -296,27 +297,25 @@ async function localUpdate(opts: { installations?: number } = {}) {
         const signer = createSigner(inbox.walletKey as `0x${string}`);
         const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
 
-        console.log(
+        console.debug(
           `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
         );
-        console.log(`Creating ${installationCount} installations...`);
-
-        let firstClient = await Client.create(signer, {
+        let { firstClient, currentInstallations } = await checkInstallations(
+          signer,
           dbEncryptionKey,
-          dbPath: `${LOGPATH}/${ENV}-${inbox.accountAddress}-install-0`,
-          env: ENV,
-        });
-        const state = await firstClient?.preferences.inboxState();
-        const currentInstallations = state?.installations.length;
-        console.log(`${i} Current installations: ${currentInstallations}`);
-        console.log(`${i} Installation count: ${installationCount}`);
+          LOGPATH,
+          ENV,
+          installationCount,
+          i,
+          inbox.accountAddress,
+        );
         for (let j = currentInstallations; j < installationCount; j++) {
           try {
             const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}-install-${j}`;
-            console.log(
+            console.debug(
               `  Creating installation ${j + 1}/${installationCount}`,
             );
-            console.log(`  Using database path: ${dbPath}`);
+            console.debug(`  Using database path: ${dbPath}`);
 
             const client = await Client.create(signer, {
               dbEncryptionKey,
@@ -328,7 +327,7 @@ async function localUpdate(opts: { installations?: number } = {}) {
               firstClient = client; // Use the first installation for verification
             }
 
-            console.log(
+            console.debug(
               `  ✅ Created installation ${j + 1}/${installationCount}/${i}: ${client.installationId} `,
             );
             results.success++;
@@ -360,12 +359,6 @@ async function localUpdate(opts: { installations?: number } = {}) {
           });
           fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
           results.inboxIds.push(firstClient.inboxId);
-          console.log(
-            `✅ Successfully initialized address: ${inbox.accountAddress}`,
-          );
-          console.log(
-            `✅ Successfully initialized inbox: ${firstClient.inboxId}`,
-          );
         }
       } catch (error) {
         results.failed++;
@@ -373,24 +366,71 @@ async function localUpdate(opts: { installations?: number } = {}) {
         console.error(error instanceof Error ? error.message : String(error));
       }
     }
-    console.log(`\n=== Summary for ${inputFile} ===`);
-    console.log(`Total inboxes processed: ${generatedInboxes.length}`);
-    console.log(`Successfully initialized: ${results.success}`);
-    console.log(`Failed to initialize: ${results.failed}`);
-    console.log(`All data stored in: ${LOGPATH}`);
-    console.log(`Data saved to: ${outputFile}`);
+    console.debug(`\n=== Summary for ${inputFile} ===`);
+    console.debug(`Total inboxes processed: ${generatedInboxes.length}`);
+    console.debug(`Successfully initialized: ${results.success}`);
+    console.debug(`Failed to initialize: ${results.failed}`);
+    console.debug(`All data stored in: ${LOGPATH}`);
+    console.debug(`Data saved to: ${outputFile}`);
     if (results.success > 0) {
-      console.log(
+      console.debug(
         "\nThese inboxes are now ready to use in your local XMTP environment.",
       );
-      console.log(
+      console.debug(
         "You can use them in the stress test by setting XMTP_ENV=local in your .env file.",
       );
     }
   }
 
-  console.log("\n=== Overall Local Inbox Update Complete ===");
-  console.log(`Processed ${filesToProcess.length} files successfully.`);
+  console.debug("\n=== Overall Local Inbox Update Complete ===");
+  console.debug(`Processed ${filesToProcess.length} files successfully.`);
+}
+
+async function checkInstallations(
+  signer: Signer,
+  dbEncryptionKey: Uint8Array,
+  LOGPATH: string,
+  ENV: XmtpEnv,
+  installationCount: number,
+  i: number,
+  accountAddress: string,
+) {
+  let firstClient = await Client.create(signer, {
+    dbEncryptionKey,
+    dbPath: `${LOGPATH}/${ENV}-${accountAddress}-install-0`,
+    env: ENV,
+  });
+
+  let state = await firstClient?.preferences.inboxState();
+  let currentInstallations = state?.installations.length || 0;
+  console.debug(`${i} ${currentInstallations}/${installationCount}`);
+
+  // If we have more installations than desired, revoke the surplus ones
+  if (currentInstallations > installationCount) {
+    const surplusCount = currentInstallations - installationCount;
+    const allInstallations = state?.installations || [];
+
+    // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
+    const installationsToRevoke = allInstallations
+      .slice(installationCount)
+      .map((install) => {
+        // Convert hex string to Uint8Array
+        const hexString = install.id.startsWith("0x")
+          ? install.id.slice(2)
+          : install.id;
+        return new Uint8Array(Buffer.from(hexString, "hex"));
+      });
+
+    if (installationsToRevoke.length > 0) {
+      console.debug(`  Revoking ${surplusCount} surplus installations...`);
+      await firstClient.revokeInstallations(installationsToRevoke);
+
+      // Update current installations count after revocation
+      currentInstallations = installationCount;
+    }
+  }
+
+  return { firstClient, currentInstallations };
 }
 
 async function main() {
