@@ -233,12 +233,13 @@ async function smartUpdate(opts: {
   let totalFailed = 0;
   let totalUpdated = 0;
 
-  // Process existing accounts first
-  if (existingCount > 0) {
-    console.debug(`\n🔄 Updating ${existingCount} existing accounts`);
-    const updateProgress = new ProgressBar(existingCount);
+  // Process existing accounts first (only up to target count)
+  const accountsToProcess = Math.min(targetCount, existingCount);
+  if (accountsToProcess > 0) {
+    console.debug(`\n🔄 Updating ${accountsToProcess} existing accounts`);
+    const updateProgress = new ProgressBar(accountsToProcess);
 
-    for (let i = 0; i < existingInboxes.length; i++) {
+    for (let i = 0; i < accountsToProcess; i++) {
       const inbox = existingInboxes[i];
 
       try {

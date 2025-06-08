@@ -3,13 +3,18 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-rm -rf logs
-# Don't sleep the computer
-caffeinate -d
+echo "Script started at $(date)"
 
-# Array of installations values
-INSTALLATIONS=(2 5 10 15 20 25)
+# Don't sleep the computer
+caffeinate -d &
+CAFFEINATE_PID=$!
+echo "Caffeinate started with PID: $CAFFEINATE_PID"
+
+# Array of installations values - start with smaller test
+INSTALLATIONS=(2)
 MAX_RETRIES=3
+
+echo "Arrays and variables initialized"
 
 # Function to run command with retry
 run_with_retry() {
@@ -18,9 +23,14 @@ run_with_retry() {
     
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        yarn gen --count 200 --envs local,production --installations $installations
+        echo "Command: yarn gen --count 5 --envs local --installations $installations"
+        echo "Starting yarn gen at $(date)"
+        
+        # Run yarn gen command directly
+        yarn gen --count 5 --envs local --installations $installations
         
         local exit_code=$?
+        echo "Yarn gen completed at $(date) with exit code: $exit_code"
         
         # Check if command was interrupted (Ctrl+C)
         if [ $exit_code -eq 130 ]; then

@@ -10,8 +10,8 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 5;
-export const BATCH_SIZE = 5;
-export const TOTAL = 15;
+export const BATCH_SIZE = 50;
+export const TOTAL = 200;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "large-groups";
@@ -214,5 +214,5 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   messageToLog += "\n";
   console.log(messageToLog);
   // save file in ./large.log
-  fs.appendFileSync("logs/large.log", messageToLog);
+  fs.appendFileSync("logs/large-groups.log", messageToLog);
 }
