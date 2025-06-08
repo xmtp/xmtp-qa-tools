@@ -1,5 +1,10 @@
 import fs from "fs";
 
+export const debugWORKER_COUNT = 5;
+export const debugBATCH_SIZE = 100;
+export const debugTOTAL = 200;
+export const debugCHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
+
 export interface SummaryEntry {
   groupSize: number;
   installations?: number;

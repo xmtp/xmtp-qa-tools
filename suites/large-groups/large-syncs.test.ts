@@ -1,6 +1,5 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMembershipStream } from "@helpers/streams";
 import { getFixedNames, getInboxByInstallationCount } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -71,31 +70,14 @@ describe(testName, async () => {
             `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id}`,
           );
 
-          const memberToAdd = inboxes[inboxes.length - 1].inboxId;
-          const verifyResult = await verifyMembershipStream(
-            newGroup,
-            workers.getAllButCreator(),
-            [memberToAdd],
-          );
-          setCustomDuration(verifyResult.averageEventTiming);
-          expect(verifyResult.receiverCount).toBeGreaterThan(0);
-
-          let totalGroupInstallations = 0;
-          for (const member of members) {
-            totalGroupInstallations += member.installationIds.length;
-          }
-          console.warn(
-            `Total group with ${members.length} members. installations: ${totalGroupInstallations}`,
-          );
-          // Save metrics with both group size and installation count
-          const summaryKey = `${i}-inst${installation}`;
-          summaryMap[summaryKey] = {
-            ...(summaryMap[summaryKey] ?? {
-              groupSize: i,
-              installations: installation,
-              totalGroupInstallations,
-            }),
-            addMembersTimeMs: verifyResult.averageEventTiming,
+          const syncAllStart = performance.now();
+          await workers.getCreator().client.conversations.syncAll();
+          const singleSyncAllTimeMs = performance.now() - syncAllStart;
+          summaryMap[i] = {
+            ...(summaryMap[i] ?? { groupSize: i }),
+            groupSize: i,
+            installations: installation,
+            singleSyncAllTimeMs,
           };
         } catch (e) {
           logError(e, expect.getState().currentTestName);
