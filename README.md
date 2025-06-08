@@ -294,6 +294,7 @@ yarn test functional --debug --no-fail
 
 ### Resources
 
+- **Inboxes:** Inboxes for testing - [see section](/inboxes/)
 - **Local:** Work in local network - [see section](/dev/)
 - **Workers:** Worker for testing - [see section](/workers/)
 - **Helpers:** Coding helpers - [see section](/helpers/)

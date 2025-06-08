@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-export const m_large_CHECK_INSTALLATIONS = [2, 5];
+export const m_large_CHECK_INSTALLATIONS = [25];
 
 const testName = "m_large_membership";
 loadEnv(testName);
@@ -52,32 +52,30 @@ describe(testName, async () => {
     for (const installation of m_large_CHECK_INSTALLATIONS) {
       it(`receiveAddMember-${i}-inst${installation}: should create a new conversation of ${i} members with ${installation} installations`, async () => {
         try {
+          const newGroup = (await workers
+            .getCreator()
+            .client.conversations.newGroup(
+              workers.getAllButCreator().map((w) => w.client.inboxId),
+            )) as Group;
+
           const inboxes = getInboxByInstallationCount(installation, i);
           const allInboxIds = [
-            ...workers.getAllButCreator().map((w) => w.client.inboxId),
             ...inboxes
               .slice(0, i - workers.getAllButCreator().length - 1)
               .map((inbox) => inbox.inboxId),
           ];
-          const newGroup = (await workers
-            .getCreator()
-            .client.conversations.newGroup(allInboxIds)) as Group;
-
+          // Add members in batches of 10
+          const batchSize = 10;
+          for (let j = 0; j < allInboxIds.length; j += batchSize) {
+            const batch = allInboxIds.slice(j, j + batchSize);
+            await newGroup.addMembers(batch);
+          }
           const members = await newGroup.members();
-
-          console.log(
-            "Group created with",
-            members.length,
-            "of",
-            installation,
-            "installations",
-            "in a batch of",
-            i,
-            "and id",
-            newGroup.id,
+          console.warn(
+            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id}`,
           );
+
           const memberToAdd = inboxes[inboxes.length - 1].inboxId;
-          console.log("memberToAdd", memberToAdd);
           const verifyResult = await verifyMembershipStream(
             newGroup,
             workers.getAllButCreator(),

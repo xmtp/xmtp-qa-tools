@@ -323,9 +323,7 @@ export function extractErrorLogs(testName: string): string {
         return "";
       }
     } else if (errorLines.size > 0) {
-      return `\n\n*ERROR*\n\`\`\`\n${Array.from(errorLines).join(
-        "\n",
-      )}\n\`\`\``;
+      return `\n\n*Logs:*\n\`\`\`\n${Array.from(errorLines).join("\n")}\n\`\`\``;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
