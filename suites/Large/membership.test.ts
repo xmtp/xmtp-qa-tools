@@ -82,7 +82,7 @@ describe(testName, async () => {
             workers.getAllButCreator(),
             [memberToAdd],
           );
-
+          setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.allReceived).toBe(true);
 
           let totalGroupInstallations = 0;

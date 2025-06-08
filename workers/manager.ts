@@ -143,117 +143,6 @@ export class WorkerManager {
       );
     }
   }
-  public async verifyInstallationCount(checkInstallations: number) {
-    for (const worker of this.getAll()) {
-      const installations = await worker.client.preferences.inboxState();
-      if (installations.installations.length !== checkInstallations) {
-        throw new Error(
-          `${worker.name} has ${installations.installations.length} installations, expected ${checkInstallations}`,
-        );
-      }
-    }
-  }
-  public async checkInstallations(targetCount?: number) {
-    // If no target count specified, just do basic checks
-    if (targetCount === undefined) {
-      for (const worker of this.getAll()) {
-        await worker.worker.revokeExcessInstallations();
-        await worker.worker.checkInstallationAge();
-      }
-      return;
-    }
-
-    // Get base names of all workers (without installation IDs)
-    const baseNames = new Set<string>();
-    for (const worker of this.getAll()) {
-      baseNames.add(worker.name.split("-")[0]);
-    }
-
-    for (const baseName of baseNames) {
-      const baseWorker = this.get(baseName);
-      if (!baseWorker) continue;
-
-      const currentCount =
-        await baseWorker.worker.checkAndManageInstallations(targetCount);
-
-      if (currentCount < targetCount) {
-        console.log(
-          `[${baseName}] Need more installations, creating ${targetCount - currentCount} additional`,
-        );
-        await this.createAdditionalInstallations(
-          baseName,
-          targetCount - currentCount,
-        );
-      }
-    }
-  }
-
-  private async createAdditionalInstallations(
-    baseName: string,
-    count: number,
-  ): Promise<void> {
-    const newIds = this.generateInstallationIds(baseName, count);
-
-    console.log(
-      `[${baseName}] Creating installations with IDs: ${newIds.join(", ")}`,
-    );
-
-    // Create the new installations in parallel
-    const createPromises = newIds.map(async (installId) => {
-      try {
-        const descriptor = `${baseName}-${installId}`;
-        await this.createWorker(descriptor);
-        console.log(`[${baseName}] Created installation: ${installId}`);
-      } catch (error) {
-        console.error(
-          `[${baseName}] Failed to create installation ${installId}:`,
-          error,
-        );
-        throw error;
-      }
-    });
-
-    await Promise.all(createPromises);
-  }
-
-  /**
-   * Generates unique installation IDs for a base name
-   */
-  private generateInstallationIds(baseName: string, count: number): string[] {
-    const letters = "abcdefghijklmnopqrstuvwxyz";
-
-    // Find existing installation IDs for this base name
-    const existingIds = new Set<string>();
-    if (this.workers[baseName]) {
-      for (const id of Object.keys(this.workers[baseName])) {
-        existingIds.add(id);
-      }
-    }
-
-    // Generate new installation IDs
-    const newIds: string[] = [];
-    let letterIndex = 0;
-    let numIndex = 1;
-
-    while (newIds.length < count) {
-      let newId: string;
-
-      if (letterIndex < letters.length) {
-        newId = letters[letterIndex];
-        letterIndex++;
-      } else {
-        newId = `a${numIndex}`;
-        numIndex++;
-      }
-
-      if (!existingIds.has(newId)) {
-        newIds.push(newId);
-        existingIds.add(newId);
-      }
-    }
-
-    return newIds;
-  }
 
   /**
    * Adds a new installation to an existing worker, replacing the current one
@@ -540,7 +429,6 @@ export async function getWorkers(
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
   typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
-  checkInstallations?: number,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
@@ -555,10 +443,7 @@ export async function getWorkers(
   );
   await Promise.all(workerPromises);
   await manager.printWorkers();
-  if (checkInstallations) {
-    await manager.checkInstallations(checkInstallations);
-    await manager.verifyInstallationCount(checkInstallations);
-  }
+
   return manager;
 }
 

@@ -62,7 +62,6 @@ describe(TEST_NAME, () => {
       testConfig.typeOfResponse,
       testConfig.typeOfSync,
       testConfig.network,
-      testConfig.preInstallations,
     );
     creator = workers.get("bot") as Worker;
 
