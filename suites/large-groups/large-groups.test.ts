@@ -9,10 +9,10 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
-export const debugWORKER_COUNT = 5;
-export const debugBATCH_SIZE = 5;
-export const debugTOTAL = 5;
-export const debugCHECK_INSTALLATIONS = [2];
+export const WORKER_COUNT = 5;
+export const BATCH_SIZE = 5;
+export const TOTAL = 15;
+export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -23,7 +23,7 @@ describe(testName, async () => {
   const summaryMap: Record<string, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getFixedNames(debugWORKER_COUNT),
+    getFixedNames(WORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
   );
@@ -41,8 +41,8 @@ describe(testName, async () => {
     },
   });
 
-  for (let i = debugBATCH_SIZE; i <= debugTOTAL; i += debugBATCH_SIZE) {
-    for (const installation of debugCHECK_INSTALLATIONS) {
+  for (let i = BATCH_SIZE; i <= TOTAL; i += BATCH_SIZE) {
+    for (const installation of CHECK_INSTALLATIONS) {
       const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
       it(test, async () => {
         try {

@@ -1,6 +1,5 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
-import * as readline from "readline";
 import {
   createSigner,
   generateEncryptionKeyHex,
@@ -10,7 +9,6 @@ import {
 import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
-const validEnvironments = ["local", "dev", "production"] as XmtpEnv[];
 
 // Simple progress bar implementation
 class ProgressBar {
@@ -93,7 +91,6 @@ Options:
   --count <number>                Total number of accounts to ensure exist
   --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
   --installations <number>        Number of installations per account per network (default: 1)
-  --output <file>                 Output file for generated accounts (default: logs/db-generated-...)
 
   --help                          Show this help message
 
@@ -104,49 +101,6 @@ Smart Logic:
   - Shows cool progress bars for all operations
   - Keeps generated accounts in logs/ folder
 `);
-}
-
-function createInterface() {
-  return readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-}
-
-async function ask(question: string): Promise<string> {
-  const rl = createInterface();
-  return new Promise((resolve) => {
-    rl.question(question, (answer) => {
-      rl.close();
-      resolve(answer);
-    });
-  });
-}
-
-async function askForAccountCount(): Promise<number> {
-  const answer = await ask(`How many accounts would you like to generate? `);
-  const count = parseInt(answer, 10);
-  if (isNaN(count) || count <= 0) {
-    console.debug("Invalid input. Please enter a positive number.");
-    return askForAccountCount();
-  }
-  return count;
-}
-
-async function askForEnvironments(): Promise<XmtpEnv[]> {
-  const answer = await ask(
-    `Enter XMTP environments to use (comma-separated: local,dev,production): `,
-  );
-  const envs = answer.split(",").map((e) => e.trim().toLowerCase());
-  const validEnvs = envs.filter((env) =>
-    validEnvironments.includes(env as XmtpEnv),
-  );
-  if (validEnvs.length === 0) {
-    console.debug("No valid environments provided. Using 'local' as default.");
-
-    return ["local", "dev", "production"] as XmtpEnv[];
-  }
-  return validEnvs as XmtpEnv[];
 }
 
 async function checkInstallations(
@@ -200,9 +154,8 @@ async function smartUpdate(opts: {
   count?: number;
   envs?: XmtpEnv[];
   installations?: number;
-  output?: string;
 }) {
-  let { count, envs, installations, output } = opts;
+  let { count, envs, installations } = opts;
 
   // Set defaults
   envs = envs || ["local"];
@@ -259,7 +212,7 @@ async function smartUpdate(opts: {
   }
 
   const existingCount = existingInboxes.length;
-  const targetCount = count || existingCount || (await askForAccountCount());
+  const targetCount = count || existingCount;
 
   console.debug(`📊 Existing accounts: ${existingCount}`);
   console.debug(`🎯 Target accounts: ${targetCount}`);
@@ -273,7 +226,7 @@ async function smartUpdate(opts: {
   }
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const outputFile = output || `${LOGPATH}/inboxes-${timestamp}.json`;
+  const outputFile = `${LOGPATH}/inboxes-${timestamp}.json`;
   const accountData: LocalInboxData[] = [];
 
   let totalCreated = 0;
@@ -459,7 +412,6 @@ async function main() {
   let count: number | undefined;
   let envs: XmtpEnv[] | undefined;
   let installations: number | undefined;
-  let output: string | undefined;
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -468,11 +420,10 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
-    if (arg === "--output") output = args[i + 1];
   });
 
   // Run smart update with all parsed options
-  await smartUpdate({ count, envs, installations, output });
+  await smartUpdate({ count, envs, installations });
 }
 
 main().catch(console.error);
