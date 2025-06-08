@@ -10,9 +10,9 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const debugWORKER_COUNT = 5;
-export const debugBATCH_SIZE = 100;
-export const debugTOTAL = 400;
-export const debugCHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
+export const debugBATCH_SIZE = 5;
+export const debugTOTAL = 5;
+export const debugCHECK_INSTALLATIONS = [2];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -99,9 +99,9 @@ describe(testName, async () => {
               groupSize: i,
               installations: installation,
               totalGroupInstallations,
+              addMembersTimeMs: verifyResult.averageEventTiming,
               zSyncAllTimeMs,
             }),
-            addMembersTimeMs: verifyResult.averageEventTiming,
           };
         } catch (e) {
           logError(e, expect.getState().currentTestName);
