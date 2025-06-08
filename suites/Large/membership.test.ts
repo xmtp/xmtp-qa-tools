@@ -21,7 +21,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  const installations = [2];
+  const installations = [2, 5];
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
