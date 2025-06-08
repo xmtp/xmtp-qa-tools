@@ -45,8 +45,10 @@ describe(testName, async () => {
 
   for (let i = debugBATCH_SIZE; i <= debugTOTAL; i += debugBATCH_SIZE) {
     for (const installation of debugCHECK_INSTALLATIONS) {
-      it(`receiveAddMember-${i}-inst${installation}: should create a new conversation of ${i} members with ${installation} installations`, async () => {
+      const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
+      it(test, async () => {
         try {
+          console.log(test);
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(
@@ -67,9 +69,6 @@ describe(testName, async () => {
           }
           await newGroup.sync();
           const members = await newGroup.members();
-          console.warn(
-            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id}`,
-          );
 
           const memberToAdd = inboxes[inboxes.length - 1].inboxId;
           const verifyResult = await verifyMembershipStream(
@@ -85,9 +84,17 @@ describe(testName, async () => {
             totalGroupInstallations += member.installationIds.length;
           }
           console.warn(
-            `Total group with ${members.length} members. installations: ${totalGroupInstallations}`,
+            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id} total installations: ${totalGroupInstallations}`,
           );
-          // Save metrics with both group size and installation count
+
+          const zWorkerName = "random" + `${i}-${installation}`;
+          const zWorker = await getWorkers([zWorkerName], testName);
+          await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
+          const zSyncAllStart = performance.now();
+          await zWorker.getCreator().client.conversations.syncAll();
+          const zSyncAllTimeMs = performance.now() - zSyncAllStart;
+          console.warn(`SyncAll time: ${zSyncAllTimeMs}ms for ${zWorkerName}`);
+
           const summaryKey = `${i}-inst${installation}`;
           summaryMap[summaryKey] = {
             ...(summaryMap[summaryKey] ?? {
