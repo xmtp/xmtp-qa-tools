@@ -295,8 +295,10 @@ yarn test functional --debug --no-fail
 ### Troubleshoorting
 
 ```bash
+# remove all docker containers and networks
 # Update local
-yarn gen --mode local-update
+./dev/up
+yarn gen --mode update
 # delete .data
 # delete keys
 yarn functional on dev or production

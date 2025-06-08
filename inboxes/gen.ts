@@ -44,7 +44,7 @@ Usage:
 
 Modes:
   --mode generate-inboxes         Generate new XMTP inboxes with optional installations
-  --mode local-update             Initialize local inboxes from helpers/inboxes.json (uses defaults)
+  --mode update                   Initialize local inboxes from helpers/inboxes.json (uses defaults)
 
 Options for generate-inboxes:
   --count <number>                Number of accounts to generate
@@ -52,7 +52,7 @@ Options for generate-inboxes:
   --installations <number>        Number of installations per account per network (default: 1)
   --output <file>                 Output file (default: logs/db-generated-...)
 
-Options for local-update:
+Options for update:
   --installations <number>        Number of installations to create per account (overrides JSON file value)
 
   --help                          Show this help message
@@ -203,7 +203,7 @@ async function localUpdate(opts: { installations?: number } = {}) {
   const ENV: XmtpEnv = "local";
   const { installations: overrideInstallations } = opts;
 
-  loadEnv("local-update");
+  loadEnv("update");
 
   const inboxesDir = "./inboxes";
   let filesToProcess: string[] = [];
@@ -460,7 +460,7 @@ async function main() {
       if (arg === "--output") output = args[i + 1];
     });
     await generateInboxes({ count, envs, installations, output });
-  } else if (mode === "local-update") {
+  } else if (mode === "update") {
     let installations: number | undefined;
     args.forEach((arg, i) => {
       if (arg === "--installations") installations = parseInt(args[i + 1], 10);

@@ -1,3 +1,4 @@
+import fs from "fs";
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
@@ -7,14 +8,11 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
-import {
-  debugBATCH_SIZE,
-  debugCHECK_INSTALLATIONS,
-  debugTOTAL,
-  debugWORKER_COUNT,
-  saveLog,
-  type SummaryEntry,
-} from "./helpers";
+
+export const debugWORKER_COUNT = 5;
+export const debugBATCH_SIZE = 100;
+export const debugTOTAL = 200;
+export const debugCHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -95,12 +93,13 @@ describe(testName, async () => {
           const zSyncAllTimeMs = performance.now() - zSyncAllStart;
           console.warn(`SyncAll time: ${zSyncAllTimeMs}ms for ${zWorkerName}`);
 
-          const summaryKey = `${i}-inst${installation}`;
+          const summaryKey = `${i}-${installation}`;
           summaryMap[summaryKey] = {
             ...(summaryMap[summaryKey] ?? {
               groupSize: i,
               installations: installation,
               totalGroupInstallations,
+              zSyncAllTimeMs,
             }),
             addMembersTimeMs: verifyResult.averageEventTiming,
           };
@@ -117,3 +116,54 @@ describe(testName, async () => {
     saveLog(summaryMap);
   });
 });
+
+export interface SummaryEntry {
+  groupSize: number;
+  installations?: number;
+  addMembersTimeMs?: number;
+  totalGroupInstallations?: number;
+  zSyncAllTimeMs?: number;
+}
+
+export function saveLog(summaryMap: Record<string, SummaryEntry>) {
+  if (Object.keys(summaryMap).length === 0) {
+    return;
+  }
+
+  const sorted = Object.values(summaryMap).sort(
+    (a, b) =>
+      a.groupSize - b.groupSize ||
+      (a.installations ?? 0) - (b.installations ?? 0),
+  );
+
+  let messageToLog = "\n## Large Groups Performance Results\n\n";
+
+  // Table headers
+  messageToLog +=
+    "| Group Size | Target Installations | Total Installations | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |\n";
+  messageToLog +=
+    "|------------|---------------------|---------------------|------------------|--------------|----------------------|\n";
+
+  // Table rows
+  for (const entry of sorted) {
+    const {
+      groupSize,
+      installations,
+      addMembersTimeMs,
+      totalGroupInstallations,
+      zSyncAllTimeMs,
+    } = entry;
+
+    const timePerInstall =
+      addMembersTimeMs && totalGroupInstallations
+        ? (addMembersTimeMs / totalGroupInstallations).toFixed(2)
+        : "N/A";
+
+    messageToLog += `| ${groupSize} | ${installations ?? "N/A"} | ${totalGroupInstallations ?? "N/A"} | ${addMembersTimeMs?.toFixed(2) ?? "N/A"} | ${zSyncAllTimeMs?.toFixed(2) ?? "N/A"} | ${timePerInstall} |\n`;
+  }
+
+  messageToLog += "\n";
+  console.log(messageToLog);
+  // save file in ./large.log
+  fs.appendFileSync("logs/large.log", messageToLog);
+}
