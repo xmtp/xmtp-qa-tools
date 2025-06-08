@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import {
-  getInbox,
+  getInboxByInstallationCount,
   getInboxIds,
   getRandomInboxIds,
   sleep,
@@ -22,7 +22,7 @@ describe(testName, () => {
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getInbox(1)[0];
+  const inbox = getInboxByInstallationCount(2, 1)[0];
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,

@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxIdByIndex, getInboxIds } from "@helpers/utils";
+import { getFixedNames, getInboxByInstallationCount } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -15,15 +15,15 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
+export const m_large_CHECK_INSTALLATIONS = [2, 5];
+
 const testName = "m_large_membership";
 loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  const installations = [2, 5];
-
-  const summaryMap: Record<number, SummaryEntry> = {};
+  const summaryMap: Record<string, SummaryEntry> = {};
 
   workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
@@ -49,12 +49,13 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    for (const installation of installations) {
-      it(`receiveAddMember-${i}: should create a new conversation of ${installation} members`, async () => {
+    for (const installation of m_large_CHECK_INSTALLATIONS) {
+      it(`receiveAddMember-${i}-inst${installation}: should create a new conversation of ${i} members with ${installation} installations`, async () => {
         try {
+          const inboxes = getInboxByInstallationCount(installation, i);
           const allInboxIds = [
             ...workers.getAllButCreator().map((w) => w.client.inboxId),
-            ...getInboxIds(196),
+            ...inboxes.slice(0, i).map((inbox) => inbox.inboxId),
           ];
           const newGroup = (await workers
             .getCreator()
@@ -65,15 +66,16 @@ describe(testName, async () => {
 
           console.log(
             "Group created with",
-            "members",
             allInboxIds.length,
             "of",
-            installations,
+            installation,
             "installations",
+            "in a batch of",
+            i,
             "and id",
             newGroup.id,
           );
-          const memberToAdd = getInboxIdByIndex(198);
+          const memberToAdd = inboxes[inboxes.length - 1].inboxId;
           console.log("memberToAdd", memberToAdd);
           const verifyResult = await verifyMembershipStream(
             newGroup,
@@ -84,9 +86,13 @@ describe(testName, async () => {
           setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.allReceived).toBe(true);
 
-          // Save metrics
-          summaryMap[i] = {
-            ...(summaryMap[i] ?? { groupSize: i }),
+          // Save metrics with both group size and installation count
+          const summaryKey = `${i}-inst${installation}`;
+          summaryMap[summaryKey] = {
+            ...(summaryMap[summaryKey] ?? {
+              groupSize: i,
+              installations: installation,
+            }),
             addMembersTimeMs: verifyResult.averageEventTiming,
           };
         } catch (e) {

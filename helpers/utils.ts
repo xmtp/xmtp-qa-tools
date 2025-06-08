@@ -325,17 +325,20 @@ type InboxData = {
   installations: number;
 };
 
-export function getInboxByInstallationCount(installationCount: number) {
+export function getInboxByInstallationCount(
+  installationCount: number,
+  index?: number,
+) {
   if (installationCount === 2) {
-    return typedInboxes2;
+    return typedInboxes2.slice(0, index ?? 0);
   } else if (installationCount === 5) {
-    return typedInboxes5;
+    return typedInboxes5.slice(0, index ?? 0);
   } else if (installationCount === 10) {
-    return typedInboxes10;
+    return typedInboxes10.slice(0, index ?? 0);
   } else if (installationCount === 20) {
-    return typedInboxes20;
+    return typedInboxes20.slice(0, index ?? 0);
   } else if (installationCount === 25) {
-    return typedInboxes25;
+    return typedInboxes25.slice(0, index ?? 0);
   }
   return typedInboxes2;
 }
@@ -347,12 +350,6 @@ export function getRandomInboxIds(count: number) {
     .map((inbox) => inbox.inboxId);
 }
 
-export function getInbox(count: number) {
-  return getInboxByInstallationCount(2).slice(0, count);
-}
-export function getInboxIdByIndex(index: number) {
-  return getInboxByInstallationCount(2)[index].inboxId;
-}
 export function getInboxIds(count: number) {
   return getInboxByInstallationCount(2)
     .slice(0, count)
