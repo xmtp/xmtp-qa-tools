@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
+import { getFixedNames, getInboxIdByIndex, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -60,6 +60,9 @@ describe(testName, async () => {
             .getCreator()
             .client.conversations.newGroup(allInboxIds)) as Group;
 
+          const members = await newGroup.members();
+          console.log(members.length);
+
           console.log(
             "Group created with",
             "members",
@@ -70,11 +73,12 @@ describe(testName, async () => {
             "and id",
             newGroup.id,
           );
-
+          const memberToAdd = getInboxIdByIndex(198);
+          console.log("memberToAdd", memberToAdd);
           const verifyResult = await verifyMembershipStream(
             newGroup,
             workers.getAllButCreator(),
-            [getInboxIds(191)[0]],
+            [memberToAdd],
           );
 
           setCustomDuration(verifyResult.averageEventTiming);

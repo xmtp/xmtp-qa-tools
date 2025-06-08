@@ -350,6 +350,9 @@ export function getRandomInboxIds(count: number) {
 export function getInbox(count: number) {
   return getInboxByInstallationCount(2).slice(0, count);
 }
+export function getInboxIdByIndex(index: number) {
+  return getInboxByInstallationCount(2)[index].inboxId;
+}
 export function getInboxIds(count: number) {
   return getInboxByInstallationCount(2)
     .slice(0, count)
