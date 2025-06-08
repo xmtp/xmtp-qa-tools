@@ -18,6 +18,7 @@ export interface SummaryEntry {
   singleSyncTimeMs?: number;
   cumulativeSyncAllTimeMs?: number;
   cumulativeSyncTimeMs?: number;
+  totalGroupInstallations?: number;
 }
 
 export function saveLog(summaryMap: Record<string, SummaryEntry>) {
@@ -47,6 +48,7 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
       singleSyncTimeMs,
       cumulativeSyncAllTimeMs,
       cumulativeSyncTimeMs,
+      totalGroupInstallations,
     } = entry;
 
     messageToLog += `Group ${groupSize}`;
@@ -84,6 +86,9 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
     }
     if (cumulativeSyncTimeMs !== undefined) {
       messageToLog += `CumulativeSync: ${cumulativeSyncTimeMs.toFixed(2)} ms; `;
+    }
+    if (totalGroupInstallations !== undefined) {
+      messageToLog += `Total Installations: ${totalGroupInstallations}; `;
     }
     messageToLog += "\n";
   }

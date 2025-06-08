@@ -729,7 +729,7 @@ export class WorkerClient extends Worker {
         const streamMsg = msg;
 
         const matches = groupId === streamMsg.group?.conversationId;
-        console.debug(`[${this.nameId}] Group ID match: ${matches}`);
+        //console.debug(`[${this.nameId}] Group ID match: ${matches}`);
 
         return matches;
       },

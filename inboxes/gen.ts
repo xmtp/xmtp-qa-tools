@@ -52,6 +52,9 @@ Options for generate-inboxes:
   --installations <number>        Number of installations per account per network (default: 1)
   --output <file>                 Output file (default: logs/db-generated-...)
 
+Options for local-update:
+  --installations <number>        Number of installations to create per account (overrides JSON file value)
+
   --help                          Show this help message
 `);
 }
@@ -194,32 +197,50 @@ async function generateInboxes(opts: {
   console.log(`All data stored in folder: ${LOGPATH}`);
 }
 
-async function localUpdate() {
+async function localUpdate(opts: { installations?: number } = {}) {
   // Use defaults only - no options
   const ENV: XmtpEnv = "local";
+  const { installations: overrideInstallations } = opts;
 
   loadEnv("local-update");
 
-  // Scan for inbox JSON files (numbered files like 25.json, 5.json, etc.)
   const inboxesDir = "./inboxes";
-  const filesToProcess = fs
-    .readdirSync(inboxesDir)
-    .filter((file) => file.endsWith(".json"))
-    .filter((file) => /^\d+\.json$/.test(file)) // Only files that are numbers.json
-    .map((file) => `${inboxesDir}/${file}`); // Add full path
+  let filesToProcess: string[] = [];
 
-  if (filesToProcess.length === 0) {
-    console.error(
-      "No inbox JSON files found (looking for files like 25.json, 5.json, etc.)",
-    );
-    return;
+  if (overrideInstallations) {
+    // Process only the specific file that matches the installations number
+    const targetFile = `${inboxesDir}/${overrideInstallations}.json`;
+    if (fs.existsSync(targetFile)) {
+      filesToProcess = [targetFile];
+    } else {
+      console.error(
+        `File ${overrideInstallations}.json not found in ${inboxesDir}`,
+      );
+      return;
+    }
+  } else {
+    // Scan for inbox JSON files (numbered files like 25.json, 5.json, etc.)
+    filesToProcess = fs
+      .readdirSync(inboxesDir)
+      .filter((file) => file.endsWith(".json"))
+      .filter((file) => /^\d+\.json$/.test(file)) // Only files that are numbers.json
+      .map((file) => `${inboxesDir}/${file}`); // Add full path
+
+    if (filesToProcess.length === 0) {
+      console.error(
+        "No inbox JSON files found (looking for files like 25.json, 5.json, etc.)",
+      );
+      return;
+    }
   }
 
   const fileNames = filesToProcess.map((f) => f.replace(`${inboxesDir}/`, ""));
   console.log(
-    `Found ${filesToProcess.length} inbox files: ${fileNames.join(", ")}`,
+    `Processing ${filesToProcess.length} inbox file(s): ${fileNames.join(", ")}`,
   );
-  console.log("Processing all inbox files automatically...");
+  if (overrideInstallations) {
+    console.log(`Using installations count: ${overrideInstallations}`);
+  }
 
   // Process each selected file
   for (const inputFile of filesToProcess) {
@@ -270,40 +291,82 @@ async function localUpdate() {
           continue;
         }
 
+        const installationCount =
+          overrideInstallations || inbox.installations || 1;
         const signer = createSigner(inbox.walletKey as `0x${string}`);
         const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
-        const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
+
         console.log(
           `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
         );
-        console.log(`Using database path: ${dbPath}`);
-        const client = await Client.create(signer, {
+        console.log(`Creating ${installationCount} installations...`);
+
+        let firstClient = await Client.create(signer, {
           dbEncryptionKey,
-          dbPath: dbPath,
+          dbPath: `${LOGPATH}/${ENV}-${inbox.accountAddress}-install-0`,
           env: ENV,
         });
-        if (client.inboxId !== inbox.inboxId) {
-          console.warn(
-            `Warning: Inbox ID mismatch for ${inbox.accountAddress}`,
-          );
-          console.warn(`  Expected: ${inbox.inboxId}`);
-          console.warn(`  Actual: ${client.inboxId}`);
+        const state = await firstClient?.preferences.inboxState();
+        const currentInstallations = state?.installations.length;
+        console.log(`${i} Current installations: ${currentInstallations}`);
+        console.log(`${i} Installation count: ${installationCount}`);
+        for (let j = currentInstallations; j < installationCount; j++) {
+          try {
+            const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}-install-${j}`;
+            console.log(
+              `  Creating installation ${j + 1}/${installationCount}`,
+            );
+            console.log(`  Using database path: ${dbPath}`);
+
+            const client = await Client.create(signer, {
+              dbEncryptionKey,
+              dbPath: dbPath,
+              env: ENV,
+            });
+
+            if (j === 0) {
+              firstClient = client; // Use the first installation for verification
+            }
+
+            console.log(
+              `  ✅ Created installation ${j + 1}/${installationCount}/${i}: ${client.installationId} `,
+            );
+            results.success++;
+          } catch (error) {
+            console.error(
+              `  ❌ Failed to create installation ${j + 1}/${installationCount}:`,
+              error instanceof Error ? error.message : String(error),
+            );
+            results.failed++;
+          }
         }
-        accountData.push({
-          accountAddress: inbox.accountAddress,
-          inboxId: client.inboxId,
-          walletKey: inbox.walletKey,
-          dbEncryptionKey: encryptionKey,
-          dbPath: dbPath,
-          installations: inbox.installations || 1,
-        });
-        fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
-        results.success++;
-        results.inboxIds.push(client.inboxId);
-        console.log(
-          `✅ Successfully initialized address: ${inbox.accountAddress}`,
-        );
-        console.log(`✅ Successfully initialized inbox: ${client.inboxId}`);
+
+        if (firstClient) {
+          if (firstClient.inboxId !== inbox.inboxId) {
+            console.warn(
+              `Warning: Inbox ID mismatch for ${inbox.accountAddress}`,
+            );
+            console.warn(`  Expected: ${inbox.inboxId}`);
+            console.warn(`  Actual: ${firstClient.inboxId}`);
+          }
+
+          accountData.push({
+            accountAddress: inbox.accountAddress,
+            inboxId: firstClient.inboxId,
+            walletKey: inbox.walletKey,
+            dbEncryptionKey: encryptionKey,
+            dbPath: `${LOGPATH}/${ENV}-${inbox.accountAddress}-install-0`, // Base path for first installation
+            installations: installationCount,
+          });
+          fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
+          results.inboxIds.push(firstClient.inboxId);
+          console.log(
+            `✅ Successfully initialized address: ${inbox.accountAddress}`,
+          );
+          console.log(
+            `✅ Successfully initialized inbox: ${firstClient.inboxId}`,
+          );
+        }
       } catch (error) {
         results.failed++;
         console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);
@@ -358,7 +421,11 @@ async function main() {
     });
     await generateInboxes({ count, envs, installations, output });
   } else if (mode === "local-update") {
-    await localUpdate();
+    let installations: number | undefined;
+    args.forEach((arg, i) => {
+      if (arg === "--installations") installations = parseInt(args[i + 1], 10);
+    });
+    await localUpdate({ installations });
   } else {
     showHelp();
   }

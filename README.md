@@ -301,11 +301,7 @@ yarn gen --mode local-update
 # delete keys
 yarn functional on dev or production
 yarn functional on local
-```
-
-```bash
-# Generate a new inbox
-yarn gen --mode local-update
+# in local installations needs to be created again if you delete the network from docker
 ```
 
 ### Resources

@@ -70,6 +70,7 @@ describe(testName, async () => {
             const batch = allInboxIds.slice(j, j + batchSize);
             await newGroup.addMembers(batch);
           }
+          await newGroup.sync();
           const members = await newGroup.members();
           console.warn(
             `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id}`,
@@ -82,15 +83,20 @@ describe(testName, async () => {
             [memberToAdd],
           );
 
-          setCustomDuration(verifyResult.averageEventTiming);
           expect(verifyResult.allReceived).toBe(true);
 
+          let totalGroupInstallations = 0;
+          for (const member of members) {
+            totalGroupInstallations += member.installationIds.length;
+          }
+          console.warn(`Total group installations: ${totalGroupInstallations}`);
           // Save metrics with both group size and installation count
           const summaryKey = `${i}-inst${installation}`;
           summaryMap[summaryKey] = {
             ...(summaryMap[summaryKey] ?? {
               groupSize: i,
               installations: installation,
+              totalGroupInstallations,
             }),
             addMembersTimeMs: verifyResult.averageEventTiming,
           };
