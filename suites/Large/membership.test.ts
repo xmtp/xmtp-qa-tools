@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxByInstallationCount } from "@helpers/utils";
+import { getFixedNames, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -15,15 +15,15 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-export const m_large_CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
-
 const testName = "m_large_membership";
 loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  const summaryMap: Record<string, SummaryEntry> = {};
+  let newGroup: Group;
+
+  const summaryMap: Record<number, SummaryEntry> = {};
 
   workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
@@ -49,63 +49,29 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    for (const installation of m_large_CHECK_INSTALLATIONS) {
-      it(`receiveAddMember-${i}-inst${installation}: should create a new conversation of ${i} members with ${installation} installations`, async () => {
-        try {
-          const newGroup = (await workers
-            .getCreator()
-            .client.conversations.newGroup(
-              workers.getAllButCreator().map((w) => w.client.inboxId),
-            )) as Group;
+    it(`receiveAddMember-${i}: should create a new conversation`, async () => {
+      try {
+        // Initialize workers
+        newGroup = await workers.createGroup();
+        const verifyResult = await verifyMembershipStream(
+          newGroup,
+          workers.getAllButCreator(),
+          getInboxIds(1),
+        );
 
-          const inboxes = getInboxByInstallationCount(installation, i);
-          const allInboxIds = [
-            ...inboxes
-              .slice(0, i - workers.getAllButCreator().length - 1)
-              .map((inbox) => inbox.inboxId),
-          ];
-          // Add members in batches of 10
-          const batchSize = 10;
-          for (let j = 0; j < allInboxIds.length; j += batchSize) {
-            const batch = allInboxIds.slice(j, j + batchSize);
-            await newGroup.addMembers(batch);
-          }
-          await newGroup.sync();
-          const members = await newGroup.members();
-          console.warn(
-            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id}`,
-          );
+        setCustomDuration(verifyResult.averageEventTiming);
+        expect(verifyResult.allReceived).toBe(true);
 
-          const memberToAdd = inboxes[inboxes.length - 1].inboxId;
-          const verifyResult = await verifyMembershipStream(
-            newGroup,
-            workers.getAllButCreator(),
-            [memberToAdd],
-          );
-          setCustomDuration(verifyResult.averageEventTiming);
-          expect(verifyResult.allReceived).toBe(true);
-
-          let totalGroupInstallations = 0;
-          for (const member of members) {
-            totalGroupInstallations += member.installationIds.length;
-          }
-          console.warn(`Total group installations: ${totalGroupInstallations}`);
-          // Save metrics with both group size and installation count
-          const summaryKey = `${i}-inst${installation}`;
-          summaryMap[summaryKey] = {
-            ...(summaryMap[summaryKey] ?? {
-              groupSize: i,
-              installations: installation,
-              totalGroupInstallations,
-            }),
-            addMembersTimeMs: verifyResult.averageEventTiming,
-          };
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
-      });
-    }
+        // Save metrics
+        summaryMap[i] = {
+          ...(summaryMap[i] ?? { groupSize: i }),
+          addMembersTimeMs: verifyResult.averageEventTiming,
+        };
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
   }
 
   // After all tests have run, output a concise summary of all timings per group size

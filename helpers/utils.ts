@@ -330,15 +330,21 @@ export function getInboxByInstallationCount(
   index?: number,
 ) {
   if (installationCount === 2) {
-    return typedInboxes2.slice(0, index ?? 0);
+    return index !== undefined ? typedInboxes2.slice(0, index) : typedInboxes2;
   } else if (installationCount === 5) {
-    return typedInboxes5.slice(0, index ?? 0);
+    return index !== undefined ? typedInboxes5.slice(0, index) : typedInboxes5;
   } else if (installationCount === 10) {
-    return typedInboxes10.slice(0, index ?? 0);
+    return index !== undefined
+      ? typedInboxes10.slice(0, index)
+      : typedInboxes10;
   } else if (installationCount === 20) {
-    return typedInboxes20.slice(0, index ?? 0);
+    return index !== undefined
+      ? typedInboxes20.slice(0, index)
+      : typedInboxes20;
   } else if (installationCount === 25) {
-    return typedInboxes25.slice(0, index ?? 0);
+    return index !== undefined
+      ? typedInboxes25.slice(0, index)
+      : typedInboxes25;
   }
   return typedInboxes2;
 }
