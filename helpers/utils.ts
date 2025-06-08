@@ -80,13 +80,6 @@ import {
 import { getEnvPath } from "./client";
 import manualUsers from "./manualusers.json";
 
-type InboxData = {
-  accountAddress: string;
-  walletKey: string;
-  dbEncryptionKey: string;
-  inboxId: string;
-};
-
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
     fieldName: string;
@@ -318,7 +311,12 @@ export const sleep = (ms: number = 1000): Promise<void> => {
   return new Promise((resolve) => setTimeout(resolve, ms));
 };
 
-const typedInboxes = newInboxes2 as InboxData[];
+type InboxData = {
+  accountAddress: string;
+  walletKey: string;
+  dbEncryptionKey: string;
+  inboxId: string;
+};
 
 function getInboxesByInstallationCount(installationCount: number): InboxData[] {
   if (installationCount === 2) {
@@ -332,6 +330,7 @@ function getInboxesByInstallationCount(installationCount: number): InboxData[] {
   } else if (installationCount === 25) {
     return newInboxes25 as InboxData[];
   }
+  throw new Error(`Invalid installation count: ${installationCount}`);
 }
 
 export function getRandomInboxIds(installationCount: number, count: number) {
@@ -342,17 +341,17 @@ export function getRandomInboxIds(installationCount: number, count: number) {
 }
 
 export function getInbox(installationCount: number, count: number) {
-  return getInboxesByInstallationCount(installationCount).slice(0, count);
+  return getInboxesByInstallationCount(installationCount)?.slice(0, count);
 }
 export function getInboxIds(installationCount: number, count: number) {
   return getInboxesByInstallationCount(installationCount)
-    .slice(0, count)
-    .map((inbox) => inbox.inboxId);
+    ?.slice(0, count)
+    ?.map((inbox) => inbox.inboxId);
 }
 export function getAddresses(installationCount: number, count: number) {
   return getInboxesByInstallationCount(installationCount)
-    .slice(0, count)
-    .map((inbox) => inbox.accountAddress);
+    ?.slice(0, count)
+    ?.map((inbox) => inbox.accountAddress);
 }
 
 /**
