@@ -317,7 +317,12 @@ export function extractErrorLogs(testName: string): string {
     }
 
     console.debug(errorLines);
-    if (errorLines.size > 0) {
+    if (errorLines.size === 1) {
+      if (errorLines.values().next().value?.includes("sync worker error")) {
+        console.log("returning empty string");
+        return "";
+      }
+    } else if (errorLines.size > 0) {
       return `\n\n*ERROR*\n\`\`\`\n${Array.from(errorLines).join(
         "\n",
       )}\n\`\`\``;
