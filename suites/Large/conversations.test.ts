@@ -53,7 +53,7 @@ describe(testName, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(
-          getInboxIds(i),
+          getInboxIds(2, i),
         )) as Group;
         // Use the dedicated conversation stream verification helper
         const verifyResult = await verifyNewConversationStream(

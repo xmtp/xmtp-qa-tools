@@ -33,7 +33,7 @@ describe(testName, () => {
         console.time(`Testing ${memberCount}-member groups...`);
         console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
-        const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
+        const memberInboxIds = getRandomInboxIds(2, memberCount - 2); // -1 because creator is included
         let groupCount = 0;
         let installationSize = await creator?.worker.getSQLiteFileSizes();
 

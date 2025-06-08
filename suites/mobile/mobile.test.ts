@@ -68,7 +68,7 @@ describe(testName, () => {
           const groupStart = performance.now();
           const receiverInboxIds = [
             receiverInboxId,
-            ...getInboxIds(groupConfig.size),
+            ...getInboxIds(2, groupConfig.size),
           ];
 
           const group =

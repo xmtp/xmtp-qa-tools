@@ -22,7 +22,7 @@ describe(testName, () => {
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getInbox(1)[0];
+  const inbox = getInbox(2, 1)[0];
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,
@@ -51,7 +51,7 @@ describe(testName, () => {
   it("should receive invite with message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
-        getRandomInboxIds(4),
+        getRandomInboxIds(2, 4),
         {
           groupName: "Test Group 1 " + getTime(),
         },
@@ -71,7 +71,7 @@ describe(testName, () => {
   it("should receive invite without message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
-        getRandomInboxIds(4),
+        getRandomInboxIds(2, 4),
         {
           groupName: "Test Group 2 " + getTime(),
         },
@@ -102,7 +102,7 @@ describe(testName, () => {
   it("should create a group and send a message", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
-        ...getInboxIds(4),
+        ...getInboxIds(2, 4),
         gmBot.inboxId,
       ]);
       await xmtpTester.sendMessage(`hi ${receiver}`);

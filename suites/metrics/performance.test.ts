@@ -136,7 +136,7 @@ describe(testName, async () => {
   let newGroup: Group;
   it(`newGroup: should create a large group of ${i} participants ${i}`, async () => {
     try {
-      const sliced = getInboxIds(i);
+      const sliced = getInboxIds(2, i);
       newGroup = (await creatorClient.conversations.newGroup([
         ...sliced,
         ...workers.getAll().map((w) => w.client.inboxId),
@@ -150,7 +150,7 @@ describe(testName, async () => {
   });
   it(`newGroupByIdentifiers: should create a large group of ${i} participants ${i}`, async () => {
     try {
-      const sliced = getAddresses(i);
+      const sliced = getAddresses(2, i);
       const newGroupByIdentifier =
         await creatorClient.conversations.newGroupWithIdentifiers(
           sliced.map((address) => ({
@@ -240,7 +240,7 @@ describe(testName, async () => {
     let newGroup: Group;
     it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = getInboxIds(i);
+        const sliced = getInboxIds(2, i);
         newGroup = (await creatorClient.conversations.newGroup([
           ...sliced,
           ...workers.getAll().map((w) => w.client.inboxId),
@@ -253,7 +253,7 @@ describe(testName, async () => {
     });
     it(`newGroupByIdentifiers-${i}: should create a large group of ${i} participants ${i}`, async () => {
       try {
-        const sliced = getAddresses(i);
+        const sliced = getAddresses(2, i);
         const newGroupByIdentifier =
           await creatorClient.conversations.newGroupWithIdentifiers(
             sliced.map((address) => ({

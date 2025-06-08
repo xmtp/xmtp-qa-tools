@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
+import { getFixedNames, getInboxIds, getRandomInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -56,12 +56,14 @@ describe(testName, async () => {
           // Initialize workers
           const newGroup = (await workers
             .getCreator()
-            .client.conversations.newGroup(getInboxIds(installation)) as Group<string | GroupUpdated>;
+            .client.conversations.newGroup(
+              getInboxIds(2, installation),
+            )) as Group;
 
           const verifyResult = await verifyMembershipStream(
             newGroup,
             workers.getAllButCreator(),
-            getInboxIds(installation),
+            getRandomInboxIds(2, 2, 1),
           );
 
           setCustomDuration(verifyResult.averageEventTiming);

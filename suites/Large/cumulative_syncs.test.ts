@@ -52,7 +52,7 @@ describe(testName, async () => {
         const creator = workers.getCreator();
         console.log("Creator name: ", creator.name);
         const newGroup = await creator.client.conversations.newGroup(
-          getInboxIds(i),
+          getInboxIds(2, i),
         );
         await newGroup.addMembers(allWorkers.map((worker) => worker.inboxId));
         const createTimeMs = performance.now() - createTime;

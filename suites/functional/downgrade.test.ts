@@ -10,7 +10,7 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions;
-  const receiverInboxId = getInboxIds(1)[0];
+  const receiverInboxId = getInboxIds(2, 1)[0];
 
   it(`Should test the DB after downgrade`, async () => {
     try {

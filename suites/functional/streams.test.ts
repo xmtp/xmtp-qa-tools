@@ -38,7 +38,7 @@ describe(testName, async () => {
       const verifyResult = await verifyMembershipStream(
         group,
         workers.getAllButCreator(),
-        getInboxIds(1),
+        getInboxIds(2, 1),
       );
 
       expect(verifyResult.allReceived).toBe(true);
@@ -95,7 +95,7 @@ describe(testName, async () => {
       const receiver = workers.getReceiver();
       // Create group with alice as the creator
       group = (await creator.client.conversations.newGroup(
-        getInboxIds(2),
+        getInboxIds(2, 2),
       )) as Group;
       console.log("Group created", group.id);
 

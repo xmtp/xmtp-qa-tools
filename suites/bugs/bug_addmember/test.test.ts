@@ -31,7 +31,7 @@ describe(testName, async () => {
   it("should create a group", async () => {
     try {
       const allInboxIds = [
-        ...getInboxIds(1),
+        ...getInboxIds(2, 1),
         ...getManualUsers(["fabri-xmtpchat"]).map((u) => u.inboxId),
       ];
       console.log("All inbox ids", allInboxIds);

@@ -13,7 +13,7 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions;
-  const receiverInboxId = getInboxIds(1);
+  const receiverInboxId = getInboxIds(2, 1);
 
   it("should create a group conversation with all workers", async () => {
     try {

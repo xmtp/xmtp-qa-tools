@@ -44,7 +44,7 @@ describe(testName, () => {
         console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
         let groupCount = 0;
-        const memberInboxIds = getRandomInboxIds(memberCount - 2);
+        const memberInboxIds = getRandomInboxIds(2, memberCount - 2);
         let senderInstallationSize = await sender?.worker.getSQLiteFileSizes();
         let receiverInstallationSize =
           await receiver?.worker.getSQLiteFileSizes();

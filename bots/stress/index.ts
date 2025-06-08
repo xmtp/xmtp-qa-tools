@@ -74,7 +74,7 @@ const processMessage = async (
     for (let i = 0; i < groupConfig.count; i++) {
       const receiverInboxIds = [
         receiverInboxId,
-        ...getInboxIds(groupConfig.size),
+        ...getInboxIds(2, groupConfig.size),
       ];
       console.debug(
         `Creating group of ${receiverInboxIds.length} members with ${groupConfig.messages} DMs`,

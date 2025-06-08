@@ -65,7 +65,7 @@ describe(testName, async () => {
           ),
         );
         const newGroup = await creator.client.conversations.newGroup(
-          getInboxIds(i),
+          getInboxIds(2, i),
         );
         await newGroup.addMembers([workerA.inboxId, workerB.inboxId]);
         const createTimeMs = performance.now() - createTime;

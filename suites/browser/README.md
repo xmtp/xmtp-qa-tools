@@ -30,7 +30,7 @@ yarn install
 it("should receive invite with message", async () => {
   try {
     const newGroup = await creator.client.conversations.newGroup(
-      getRandomInboxIds(4),
+      getRandomInboxIds(2, 4),
       {
         groupName: "Test Group 1 " + getTime(),
       },

@@ -72,7 +72,7 @@ describe(TEST_NAME, () => {
     console.debug(`Loaded ${existingGroups.length} existing groups`);
 
     const group = (await creator.client.conversations.newGroup(
-      getRandomInboxIds(testConfig.randomInboxIds),
+      getRandomInboxIds(2, testConfig.randomInboxIds),
     )) as Group;
 
     allGroups = [...existingGroups, group.id];
@@ -121,7 +121,7 @@ describe(TEST_NAME, () => {
               await verifyMembershipStream(
                 group,
                 workers.getAllBut("bot"),
-                getRandomInboxIds(1),
+                getRandomInboxIds(2, 1),
               );
               break;
 
@@ -180,7 +180,7 @@ export async function verifyEpochChange(
       }
     }
 
-    for (const member of getRandomInboxIds(6)) {
+    for (const member of getRandomInboxIds(2, 6)) {
       try {
         await group.removeMembers([member]);
         await group.addMembers([member]);

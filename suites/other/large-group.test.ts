@@ -128,7 +128,7 @@ async function createOrVerifyGroup(worker: Worker): Promise<Group> {
 async function addMembersToGroup(group: Group): Promise<void> {
   try {
     // Get the first X inboxes from the generated inboxes
-    const inboxIds = getInboxIds(GROUP_SIZE);
+    const inboxIds = getInboxIds(2, GROUP_SIZE);
 
     const allInboxIds = [...inboxIds, ...convosUsernames];
     const batchSize = 10;
@@ -169,7 +169,7 @@ async function testMemberManagement(group: Group): Promise<void> {
   try {
     // Test removing and re-adding 10 members from generated inboxes
     console.log("Testing member removal and re-addition...");
-    const toRemove = getInboxIds(10);
+    const toRemove = getInboxIds(2, 10);
 
     console.log(`Removing ${toRemove.length} members...`);
     for (const member of toRemove) {
