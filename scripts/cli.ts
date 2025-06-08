@@ -355,10 +355,12 @@ async function runVitestTest(
         // Only send Slack notification when debug flags are explicitly used
         if (options.explicitLogFlag) {
           const errorLogs = extractErrorLogs(logger.logFileName);
-          await sendSlackNotification({
-            testName,
-            errorLogs,
-          });
+          if (errorLogs.length > 0) {
+            await sendSlackNotification({
+              testName,
+              errorLogs,
+            });
+          }
         }
 
         logger.close();
