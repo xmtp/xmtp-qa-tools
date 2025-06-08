@@ -416,9 +416,9 @@ export class WorkerClient extends Worker {
               message?.contentType?.typeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
-              console.debug(
-                `Received group updated ${JSON.stringify(message.content, null, 2)}`,
-              );
+              // console.debug(
+              //   `Received group updated ${JSON.stringify(message.content)}`,
+              // );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
                 const content = message.content as {

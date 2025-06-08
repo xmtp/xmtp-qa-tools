@@ -196,104 +196,138 @@ async function generateInboxes(opts: {
 
 async function localUpdate() {
   // Use defaults only - no options
-  const inputFile = "helpers/inboxes.json";
   const ENV: XmtpEnv = "local";
 
   loadEnv("local-update");
-  let generatedInboxes: ExistingInboxData[];
-  try {
-    generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
-  } catch (e) {
-    console.log(e);
-    console.error(`Could not read input file: ${inputFile}`);
+
+  // Scan for inbox JSON files (numbered files like 25.json, 5.json, etc.)
+  const inboxesDir = "./inboxes";
+  const filesToProcess = fs
+    .readdirSync(inboxesDir)
+    .filter((file) => file.endsWith(".json"))
+    .filter((file) => /^\d+\.json$/.test(file)) // Only files that are numbers.json
+    .map((file) => `${inboxesDir}/${file}`); // Add full path
+
+  if (filesToProcess.length === 0) {
+    console.error(
+      "No inbox JSON files found (looking for files like 25.json, 5.json, etc.)",
+    );
     return;
   }
-  if (!generatedInboxes || generatedInboxes.length === 0) {
-    console.error("No generated inboxes found in input file");
-    return;
-  }
-  const folderName = `db-generated-${generatedInboxes.length}-${ENV}`;
-  const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
-  if (!fs.existsSync(LOGPATH)) {
-    console.log(`Creating directory: ${LOGPATH}...`);
-    fs.mkdirSync(LOGPATH, { recursive: true });
-  }
-  const results = { success: 0, failed: 0, inboxIds: [] as string[] };
-  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-  const outputFile = `${LOGPATH}/local-inboxes-${timestamp}.json`;
-  const accountData: LocalInboxData[] = [];
-  for (let i = 0; i < generatedInboxes.length; i++) {
-    const inbox = generatedInboxes[i];
+
+  const fileNames = filesToProcess.map((f) => f.replace(`${inboxesDir}/`, ""));
+  console.log(
+    `Found ${filesToProcess.length} inbox files: ${fileNames.join(", ")}`,
+  );
+  console.log("Processing all inbox files automatically...");
+
+  // Process each selected file
+  for (const inputFile of filesToProcess) {
+    console.log(`\n=== Processing ${inputFile} ===`);
+
+    let generatedInboxes: ExistingInboxData[];
     try {
-      if (!inbox.walletKey || !inbox.accountAddress || !inbox.inboxId) {
-        console.error(
-          `❌ Invalid inbox data for account ${i + 1}: missing required fields`,
-        );
-        results.failed++;
-        continue;
-      }
+      generatedInboxes = JSON.parse(fs.readFileSync(inputFile, "utf8"));
+    } catch (e) {
+      console.log(e);
+      console.error(`Could not read input file: ${inputFile}`);
+      continue;
+    }
+    if (!generatedInboxes || generatedInboxes.length === 0) {
+      console.error(`No generated inboxes found in input file: ${inputFile}`);
+      continue;
+    }
+    const fileName = inputFile
+      .replace(`${inboxesDir}/`, "")
+      .replace(".json", "");
+    const folderName = `db-generated-${fileName}-${generatedInboxes.length}-${ENV}`;
+    const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
+    if (!fs.existsSync(LOGPATH)) {
+      console.log(`Creating directory: ${LOGPATH}...`);
+      fs.mkdirSync(LOGPATH, { recursive: true });
+    }
+    const results = { success: 0, failed: 0, inboxIds: [] as string[] };
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const outputFile = `${LOGPATH}/local-inboxes-${timestamp}.json`;
+    const accountData: LocalInboxData[] = [];
+    for (let i = 0; i < generatedInboxes.length; i++) {
+      const inbox = generatedInboxes[i];
+      try {
+        if (!inbox.walletKey || !inbox.accountAddress || !inbox.inboxId) {
+          console.error(
+            `❌ Invalid inbox data for account ${i + 1}: missing required fields`,
+          );
+          results.failed++;
+          continue;
+        }
 
-      const encryptionKey = inbox.dbEncryptionKey;
-      if (!encryptionKey) {
-        console.error(
-          `❌ Invalid inbox data for account ${i + 1}: missing encryption key`,
-        );
-        results.failed++;
-        continue;
-      }
+        const encryptionKey = inbox.dbEncryptionKey;
+        if (!encryptionKey) {
+          console.error(
+            `❌ Invalid inbox data for account ${i + 1}: missing encryption key`,
+          );
+          results.failed++;
+          continue;
+        }
 
-      const signer = createSigner(inbox.walletKey as `0x${string}`);
-      const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
-      const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
-      console.log(
-        `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
-      );
-      console.log(`Using database path: ${dbPath}`);
-      const client = await Client.create(signer, {
-        dbEncryptionKey,
-        dbPath: dbPath,
-        env: ENV,
-      });
-      if (client.inboxId !== inbox.inboxId) {
-        console.warn(`Warning: Inbox ID mismatch for ${inbox.accountAddress}`);
-        console.warn(`  Expected: ${inbox.inboxId}`);
-        console.warn(`  Actual: ${client.inboxId}`);
+        const signer = createSigner(inbox.walletKey as `0x${string}`);
+        const dbEncryptionKey = getEncryptionKeyFromHex(encryptionKey);
+        const dbPath = `${LOGPATH}/${ENV}-${inbox.accountAddress}`;
+        console.log(
+          `Initializing inbox ${i + 1}/${generatedInboxes.length}: ${inbox.accountAddress}`,
+        );
+        console.log(`Using database path: ${dbPath}`);
+        const client = await Client.create(signer, {
+          dbEncryptionKey,
+          dbPath: dbPath,
+          env: ENV,
+        });
+        if (client.inboxId !== inbox.inboxId) {
+          console.warn(
+            `Warning: Inbox ID mismatch for ${inbox.accountAddress}`,
+          );
+          console.warn(`  Expected: ${inbox.inboxId}`);
+          console.warn(`  Actual: ${client.inboxId}`);
+        }
+        accountData.push({
+          accountAddress: inbox.accountAddress,
+          inboxId: client.inboxId,
+          walletKey: inbox.walletKey,
+          dbEncryptionKey: encryptionKey,
+          dbPath: dbPath,
+          installations: inbox.installations || 1,
+        });
+        fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
+        results.success++;
+        results.inboxIds.push(client.inboxId);
+        console.log(
+          `✅ Successfully initialized address: ${inbox.accountAddress}`,
+        );
+        console.log(`✅ Successfully initialized inbox: ${client.inboxId}`);
+      } catch (error) {
+        results.failed++;
+        console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);
+        console.error(error instanceof Error ? error.message : String(error));
       }
-      accountData.push({
-        accountAddress: inbox.accountAddress,
-        inboxId: client.inboxId,
-        walletKey: inbox.walletKey,
-        dbEncryptionKey: encryptionKey,
-        dbPath: dbPath,
-        installations: inbox.installations || 1,
-      });
-      fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
-      results.success++;
-      results.inboxIds.push(client.inboxId);
+    }
+    console.log(`\n=== Summary for ${inputFile} ===`);
+    console.log(`Total inboxes processed: ${generatedInboxes.length}`);
+    console.log(`Successfully initialized: ${results.success}`);
+    console.log(`Failed to initialize: ${results.failed}`);
+    console.log(`All data stored in: ${LOGPATH}`);
+    console.log(`Data saved to: ${outputFile}`);
+    if (results.success > 0) {
       console.log(
-        `✅ Successfully initialized address: ${inbox.accountAddress}`,
+        "\nThese inboxes are now ready to use in your local XMTP environment.",
       );
-      console.log(`✅ Successfully initialized inbox: ${client.inboxId}`);
-    } catch (error) {
-      results.failed++;
-      console.error(`❌ Error initializing inbox ${inbox.accountAddress}:`);
-      console.error(error instanceof Error ? error.message : String(error));
+      console.log(
+        "You can use them in the stress test by setting XMTP_ENV=local in your .env file.",
+      );
     }
   }
-  console.log("\n=== Local Inbox Update Summary ===");
-  console.log(`Total inboxes processed: ${generatedInboxes.length}`);
-  console.log(`Successfully initialized: ${results.success}`);
-  console.log(`Failed to initialize: ${results.failed}`);
-  console.log(`All data stored in: ${LOGPATH}`);
-  console.log(`Data saved to: ${outputFile}`);
-  if (results.success > 0) {
-    console.log(
-      "\nThese inboxes are now ready to use in your local XMTP environment.",
-    );
-    console.log(
-      "You can use them in the stress test by setting XMTP_ENV=local in your .env file.",
-    );
-  }
+
+  console.log("\n=== Overall Local Inbox Update Complete ===");
+  console.log(`Processed ${filesToProcess.length} files successfully.`);
 }
 
 async function main() {

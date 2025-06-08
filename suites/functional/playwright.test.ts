@@ -17,7 +17,7 @@ loadEnv(testName);
 describe(testName, () => {
   let groupId: string;
   const receiver = "random";
-  const headless = false;
+  const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;

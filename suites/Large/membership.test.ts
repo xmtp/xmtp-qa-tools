@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-export const m_large_CHECK_INSTALLATIONS = [25];
+export const m_large_CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "m_large_membership";
 loadEnv(testName);
