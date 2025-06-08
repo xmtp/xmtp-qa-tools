@@ -54,7 +54,7 @@ describe(testName, async () => {
         try {
           const allInboxIds = [
             ...workers.getAllButCreator().map((w) => w.client.inboxId),
-            getInboxByIndex(installation, 191).inboxId,
+            getInboxByIndex(installation, 10).inboxId,
           ];
           const newGroup = (await workers
             .getCreator()
