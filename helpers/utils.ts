@@ -340,7 +340,10 @@ export function getRandomInboxIds(installationCount: number, count: number) {
     ?.map((inbox) => inbox.inboxId);
 }
 
-export function getInbox(installationCount: number, count: number) {
+export function getInboxByIndex(installationCount: number, index: number) {
+  return getInboxesByInstallationCount(installationCount)[index];
+}
+export function getInboxByCount(installationCount: number, count: number) {
   return getInboxesByInstallationCount(installationCount)?.slice(0, count);
 }
 export function getInboxIds(installationCount: number, count: number) {

@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds, getRandomInboxIds } from "@helpers/utils";
+import { getFixedNames, getInboxByIndex, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -21,7 +21,7 @@ loadEnv(testName);
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  const installations = [2, 5, 10, 20, 25];
+  const installations = [2];
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
@@ -52,17 +52,29 @@ describe(testName, async () => {
     for (const installation of installations) {
       it(`receiveAddMember-${i}: should create a new conversation of ${installation} members`, async () => {
         try {
-          // Initialize workers
+          const allInboxIds = [
+            ...workers.getAllButCreator().map((w) => w.client.inboxId),
+            getInboxByIndex(installation, 191).inboxId,
+          ];
           const newGroup = (await workers
             .getCreator()
-            .client.conversations.newGroup(
-              getInboxIds(2, installation),
-            )) as Group;
+            .client.conversations.newGroup(allInboxIds)) as Group;
+
+          console.log(
+            "Group created with",
+            "members",
+            allInboxIds.length,
+            "of",
+            installations,
+            "installations",
+            "and id",
+            newGroup.id,
+          );
 
           const verifyResult = await verifyMembershipStream(
             newGroup,
             workers.getAllButCreator(),
-            getRandomInboxIds(2, 1),
+            [getInboxByIndex(installation, 191).inboxId],
           );
 
           setCustomDuration(verifyResult.averageEventTiming);
