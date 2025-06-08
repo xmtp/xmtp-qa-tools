@@ -7,17 +7,14 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
-import {
-  m_large_BATCH_SIZE,
-  m_large_TOTAL,
-  m_large_WORKER_COUNT,
-  saveLog,
-  type SummaryEntry,
-} from "./helpers";
+import { saveLog, type SummaryEntry } from "./helpers";
 
-export const m_large_CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
+export const debugWORKER_COUNT = 5;
+export const debugBATCH_SIZE = 100;
+export const debugTOTAL = 200;
+export const debugCHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
-const testName = "m_large_membership";
+const testName = "large-groups";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -26,7 +23,7 @@ describe(testName, async () => {
   const summaryMap: Record<string, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getFixedNames(m_large_WORKER_COUNT),
+    getFixedNames(debugWORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
   );
@@ -44,12 +41,8 @@ describe(testName, async () => {
     },
   });
 
-  for (
-    let i = m_large_BATCH_SIZE;
-    i <= m_large_TOTAL;
-    i += m_large_BATCH_SIZE
-  ) {
-    for (const installation of m_large_CHECK_INSTALLATIONS) {
+  for (let i = debugBATCH_SIZE; i <= debugTOTAL; i += debugBATCH_SIZE) {
+    for (const installation of debugCHECK_INSTALLATIONS) {
       it(`receiveAddMember-${i}-inst${installation}: should create a new conversation of ${i} members with ${installation} installations`, async () => {
         try {
           const newGroup = (await workers
