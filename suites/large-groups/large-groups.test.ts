@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 20;
-export const TOTAL = 100;
+export const TOTAL = 220;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 20];
 
 const testName = "large-groups";
@@ -131,8 +131,7 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
 
   const sorted = Object.values(summaryMap).sort(
     (a, b) =>
-      a.groupSize - b.groupSize ||
-      (a.installations ?? 0) - (b.installations ?? 0),
+      (a.totalGroupInstallations ?? 0) - (b.totalGroupInstallations ?? 0),
   );
 
   let messageToLog = "\n## Large Groups Performance Results\n\n";
@@ -146,7 +145,9 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   const colWidths = {
     groupSize: 12,
     installations: 21,
-    totalInstallations: 21,
+    actualInstallations: 21,
+    estimatedInstallations: 21,
+    installationDiff: 21,
     addMembers: 18,
     syncAll: 14,
     timePerInstall: 22,
@@ -154,10 +155,12 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
 
   // Table headers
   messageToLog += padString("Group Size", colWidths.groupSize) + " | ";
+  messageToLog += padString("Inst/Member", colWidths.installations) + " | ";
   messageToLog +=
-    padString("Target Installations", colWidths.installations) + " | ";
+    padString("Actual Inst", colWidths.actualInstallations) + " | ";
+  messageToLog += padString("Diff", colWidths.installationDiff) + " | ";
   messageToLog +=
-    padString("Total Installations", colWidths.totalInstallations) + " | ";
+    padString("Est. Inst", colWidths.estimatedInstallations) + " | ";
   messageToLog += padString("Add Members (ms)", colWidths.addMembers) + " | ";
   messageToLog += padString("SyncAll (ms)", colWidths.syncAll) + " | ";
   messageToLog +=
@@ -166,10 +169,16 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   // Separator line
   messageToLog += "-".repeat(colWidths.groupSize) + "-|-";
   messageToLog += "-".repeat(colWidths.installations) + "-|-";
-  messageToLog += "-".repeat(colWidths.totalInstallations) + "-|-";
+  messageToLog += "-".repeat(colWidths.actualInstallations) + "-|-";
+  messageToLog += "-".repeat(colWidths.installationDiff) + "-|-";
+  messageToLog += "-".repeat(colWidths.estimatedInstallations) + "-|-";
   messageToLog += "-".repeat(colWidths.addMembers) + "-|-";
   messageToLog += "-".repeat(colWidths.syncAll) + "-|-";
   messageToLog += "-".repeat(colWidths.timePerInstall) + "-|\n";
+
+  // CSV header
+  let csvContent =
+    "Group Size,Inst/Member,Actual Inst,Diff,Est. Inst,Add Members (ms),SyncAll (ms),Time per Install (ms)\n";
 
   // Table rows
   for (const entry of sorted) {
@@ -180,6 +189,14 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
       totalGroupInstallations,
       zSyncAllTimeMs,
     } = entry;
+
+    const estimatedInstallations = installations
+      ? groupSize * installations
+      : "N/A";
+    const installationDiff =
+      installations && totalGroupInstallations
+        ? totalGroupInstallations - groupSize * installations
+        : "N/A";
 
     const timePerInstall =
       addMembersTimeMs && totalGroupInstallations
@@ -194,7 +211,15 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
     messageToLog +=
       padString(
         (totalGroupInstallations ?? "N/A").toString(),
-        colWidths.totalInstallations,
+        colWidths.actualInstallations,
+      ) + " | ";
+    messageToLog +=
+      padString(installationDiff.toString(), colWidths.installationDiff) +
+      " | ";
+    messageToLog +=
+      padString(
+        estimatedInstallations.toString(),
+        colWidths.estimatedInstallations,
       ) + " | ";
     messageToLog +=
       padString(
@@ -208,10 +233,17 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
       ) + " | ";
     messageToLog +=
       padString(timePerInstall.toString(), colWidths.timePerInstall) + " |\n";
+
+    // Add CSV row
+    csvContent += `${groupSize},${installations ?? "N/A"},${totalGroupInstallations ?? "N/A"},${installationDiff},${estimatedInstallations},${addMembersTimeMs?.toFixed(2) ?? "N/A"},${zSyncAllTimeMs?.toFixed(2) ?? "N/A"},${timePerInstall}\n`;
   }
 
   messageToLog += "\n";
   console.log(messageToLog);
-  // save file in ./large.log
+
+  // Save log file
   fs.appendFileSync("logs/large-groups.log", messageToLog);
+
+  // Save CSV file
+  fs.writeFileSync("logs/large-groups.csv", csvContent);
 }
