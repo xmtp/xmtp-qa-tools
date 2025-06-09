@@ -30,4 +30,4 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test large-groups.test
+        run: yarn test large-groups.test --debug
