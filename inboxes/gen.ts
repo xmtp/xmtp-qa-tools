@@ -191,9 +191,7 @@ async function checkInstallations(
 
     if (installationsToRevoke.length > 0) {
       console.debug(`  Revoking ${surplusCount} surplus installations...`);
-      //await clientCheckInstallations.revokeInstallations(installationsToRevoke);
-
-      // Update current installations count after revocation
+      await clientCheckInstallations.revokeInstallations(installationsToRevoke);
       currentInstallations = installationCount;
     }
   }

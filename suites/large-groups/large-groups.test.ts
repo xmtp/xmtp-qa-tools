@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 20;
-export const TOTAL = 200;
+export const TOTAL = 220;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 20];
 
 const testName = "large-groups";
@@ -210,13 +210,13 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
         colWidths.actualInstallations,
       ) + " | ";
     messageToLog +=
+      padString(installationDiff.toString(), colWidths.installationDiff) +
+      " | ";
+    messageToLog +=
       padString(
         estimatedInstallations.toString(),
         colWidths.estimatedInstallations,
       ) + " | ";
-    messageToLog +=
-      padString(installationDiff.toString(), colWidths.installationDiff) +
-      " | ";
     messageToLog +=
       padString(
         (addMembersTimeMs?.toFixed(2) ?? "N/A").toString(),
