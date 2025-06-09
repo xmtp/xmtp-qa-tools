@@ -6,7 +6,7 @@ import {
   getEncryptionKeyFromHex,
   loadEnv,
 } from "@helpers/client";
-import { Client, type Signer, type XmtpEnv } from "@xmtp/node-sdk";
+import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 function showHelp() {
   console.debug(`
@@ -130,7 +130,7 @@ function countInboxFiles(): { [key: string]: number } {
       totalAccounts += count;
       console.debug(`   📄 ${file}: ${count} accounts`);
     } catch (e) {
-      console.debug(`   ❌ ${file}: Error reading file`);
+      console.debug(`   ❌ ${file}: Error reading file`, e);
       counts[file] = 0;
     }
   }
@@ -223,9 +223,6 @@ async function smartUpdate(opts: {
     `⚙️  Target installations per account per network: ${installationCount}`,
   );
 
-  // Count all inbox files first
-  const fileCounts = countInboxFiles();
-
   // Determine target file based on installations number
   const targetFileName = `${installationCount}.json`;
   const targetFilePath = `${INBOXES_DIR}/${targetFileName}`;
@@ -239,7 +236,7 @@ async function smartUpdate(opts: {
         `📋 Loaded ${existingInboxes.length} accounts from ${targetFileName}`,
       );
     } catch (e) {
-      console.error(`❌ Could not read inbox file: ${targetFilePath}`);
+      console.error(`❌ Could not read inbox file: ${targetFilePath}`, e);
       existingInboxes = [];
     }
   } else {
@@ -430,7 +427,6 @@ async function smartUpdate(opts: {
           };
 
           existingInboxes.push(newAccount);
-          accountSuccess = true;
           consecutiveFailures = 0; // Reset failure counter on success
 
           // Save progress after each new account
