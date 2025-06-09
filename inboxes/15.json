@@ -1592,14 +1592,6 @@
     "installations": 15
   },
   {
-    "accountAddress": "0x77b1aadafba78384222066894d09967cdde855f4",
-    "inboxId": "e5afb87af8d7384f8dbfd2f80b1845c043753b7cbae95b73b5ead30f3db5fa2a",
-    "walletKey": "0xe3711c6839b49c54c0d0409226f65d87b060644d0aa095500c2717e56cf1ec5b",
-    "dbEncryptionKey": "a18455449c92a466f793a768b19abc806af90cd5d330a73cccd73fbb00948845",
-    "dbPath": "./logs/db-generated-15-local-15inst/local-0x77b1aadafba78384222066894d09967cdde855f4-install-0",
-    "installations": 15
-  },
-  {
     "accountAddress": "0x036b2786e456ab8a79814a629aa08c13abffc014",
     "walletKey": "0x4f45fdacbc9fdc3dfde1317490739cf17f4ed56e5c036bcb12002a71c2221446",
     "dbEncryptionKey": "2a5519dd2fb8b176003bc442b0e8cd1eef5af2a29b47747c0e8763d73ea130ee",
