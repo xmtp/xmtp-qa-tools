@@ -176,6 +176,10 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   messageToLog += "-".repeat(colWidths.syncAll) + "-|-";
   messageToLog += "-".repeat(colWidths.timePerInstall) + "-|\n";
 
+  // CSV header
+  let csvContent =
+    "Group Size,Inst/Member,Actual Inst,Diff,Est. Inst,Add Members (ms),SyncAll (ms),Time per Install (ms)\n";
+
   // Table rows
   for (const entry of sorted) {
     const {
@@ -229,10 +233,17 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
       ) + " | ";
     messageToLog +=
       padString(timePerInstall.toString(), colWidths.timePerInstall) + " |\n";
+
+    // Add CSV row
+    csvContent += `${groupSize},${installations ?? "N/A"},${totalGroupInstallations ?? "N/A"},${installationDiff},${estimatedInstallations},${addMembersTimeMs?.toFixed(2) ?? "N/A"},${zSyncAllTimeMs?.toFixed(2) ?? "N/A"},${timePerInstall}\n`;
   }
 
   messageToLog += "\n";
   console.log(messageToLog);
-  // save file in ./large.log
+
+  // Save log file
   fs.appendFileSync("logs/large-groups.log", messageToLog);
+
+  // Save CSV file
+  fs.writeFileSync("logs/large-groups.csv", csvContent);
 }
