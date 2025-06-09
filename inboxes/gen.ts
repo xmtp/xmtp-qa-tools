@@ -61,12 +61,19 @@ class ProgressBar {
     }
     this.lastUpdate = now;
 
-    const percentage = Math.round((this.current / this.total) * 100);
-    const filled = Math.round((this.current / this.total) * this.barLength);
-    const empty = this.barLength - filled;
+    // Safety checks to prevent negative values
+    const safeTotal = Math.max(1, this.total);
+    const safeCurrent = Math.max(0, Math.min(this.current, safeTotal));
+
+    const percentage = Math.round((safeCurrent / safeTotal) * 100);
+    const filled = Math.max(
+      0,
+      Math.round((safeCurrent / safeTotal) * this.barLength),
+    );
+    const empty = Math.max(0, this.barLength - filled);
 
     const bar = "█".repeat(filled) + "░".repeat(empty);
-    const status = `${this.current}/${this.total}`;
+    const status = `${safeCurrent}/${safeTotal}`;
 
     process.stdout.write(`\r🚀 Progress: [${bar}] ${percentage}% (${status})`);
 
@@ -323,7 +330,7 @@ async function smartUpdate(opts: {
   }
 
   // Generate new accounts if needed
-  const newAccountsNeeded = Math.max(0, targetCount - existingCount);
+  const newAccountsNeeded = Math.max(0, targetCount - accountsToProcess);
   if (newAccountsNeeded > 0) {
     console.debug(`\n✨ Generating ${newAccountsNeeded} new accounts`);
     const generateProgress = new ProgressBar(newAccountsNeeded);
@@ -387,7 +394,9 @@ async function smartUpdate(opts: {
   fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
 
   console.debug(`\n🎉 Smart Update Summary`);
-  console.debug(`📊 Existing accounts processed: ${totalUpdated}`);
+  console.debug(
+    `📊 Existing accounts processed: ${Math.min(totalUpdated, accountsToProcess)}`,
+  );
   console.debug(`✨ New accounts generated: ${newAccountsNeeded}`);
   console.debug(`🎯 Total target accounts: ${targetCount}`);
   console.debug(`✅ Total installations created: ${totalCreated}`);
