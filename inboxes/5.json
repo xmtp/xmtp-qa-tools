@@ -2781,7 +2781,7 @@
     "dbEncryptionKey": "8b0985b7d473188e138876c2a1093ab68fc4fde683d784e1769493e07b6e2ed2",
     "inboxId": "c301b8db2d7f4c3d20db4fd3c21e22cb8ea431d490f4c45450560db47c84489e",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xe33670633d75291dffd00d6b61a6f64f3449c1bf-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xe33670633d75291dffd00d6b61a6f64f3449c1bf-install-0"
   },
   {
     "accountAddress": "0x6f77ba206c3c90a8119d5597705d13577e2c205f",
@@ -2789,7 +2789,7 @@
     "dbEncryptionKey": "a8be651d7835991778a7f115c6d6a8ab4b0508e1e73bd5d0a556a81822fd6fe2",
     "inboxId": "80dfe95f9ae0ad4c3101ea14cce40fdd00d25aabbcce39405dccac040621e637",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x6f77ba206c3c90a8119d5597705d13577e2c205f-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x6f77ba206c3c90a8119d5597705d13577e2c205f-install-0"
   },
   {
     "accountAddress": "0x70cc3115c2aeebf99411b68688556be10880b74b",
@@ -2797,7 +2797,7 @@
     "dbEncryptionKey": "21c2d7515f92078c8f1049991cd84de6ca5535b2431343f158f06eb317850df4",
     "inboxId": "0d5c822c88914fe732c4fe6c43aff4408054aa5069dcdcacea02dbddd4e85bc8",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x70cc3115c2aeebf99411b68688556be10880b74b-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x70cc3115c2aeebf99411b68688556be10880b74b-install-0"
   },
   {
     "accountAddress": "0xcac2100c27f1f5fed5a6bc35093b3804758a0cd3",
@@ -2805,7 +2805,7 @@
     "dbEncryptionKey": "62ee7aea290c18a649c2c63dd4d9d1f4b83ae9632ac0ba282e575333613a6088",
     "inboxId": "f8452adc32d822688e442a7351089274c76af766da75f154e599cd2efd911bca",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xcac2100c27f1f5fed5a6bc35093b3804758a0cd3-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xcac2100c27f1f5fed5a6bc35093b3804758a0cd3-install-0"
   },
   {
     "accountAddress": "0x5f36d4c1d07af1d330a7c3fbc1b30bc442bc4afc",
@@ -2813,7 +2813,7 @@
     "dbEncryptionKey": "4bb9d2fa1a56824b688c5ea12f8b4e08ccb63206985e19d55d43860126474917",
     "inboxId": "800ecf2f4cf36dc58924d75478adf4f422bd7cd38538d91600292bd0e368d492",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x5f36d4c1d07af1d330a7c3fbc1b30bc442bc4afc-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x5f36d4c1d07af1d330a7c3fbc1b30bc442bc4afc-install-0"
   },
   {
     "accountAddress": "0x16f5bd95fed47b22c2e42bc94d6658f085c1a76e",
@@ -2821,7 +2821,7 @@
     "dbEncryptionKey": "9273e110648e18f2f461f57daee5a87df072118a21537278418bbc1f042fda7a",
     "inboxId": "6152a2018ff5796b66f0891a1c49e5c4109dea72c08361896c32ed1b7cc3c126",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x16f5bd95fed47b22c2e42bc94d6658f085c1a76e-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x16f5bd95fed47b22c2e42bc94d6658f085c1a76e-install-0"
   },
   {
     "accountAddress": "0x23705fb6372ce6e1c05b7443511441907ba679f0",
@@ -2829,7 +2829,7 @@
     "dbEncryptionKey": "97f28109368e84ff4b73ad5f161333b3f364c49445370c121e4c63a0f05dcad1",
     "inboxId": "4b75f20ea1e460a4529bb0b609cc9e6be1a0412e1ae88b71f801bdece6a00f8a",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x23705fb6372ce6e1c05b7443511441907ba679f0-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x23705fb6372ce6e1c05b7443511441907ba679f0-install-0"
   },
   {
     "accountAddress": "0x5b1337928d1757101537f2a6bcd94128eca72024",
@@ -2837,7 +2837,7 @@
     "dbEncryptionKey": "1f0972fb568cb83b11bcd2143b1a6b70507de224da60fbf6a9c05deb09f9de3c",
     "inboxId": "4abc4ac49672fc841dc95d0d12ac7cce101ec7ac6989b97f96dd4ac50d42b84b",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x5b1337928d1757101537f2a6bcd94128eca72024-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x5b1337928d1757101537f2a6bcd94128eca72024-install-0"
   },
   {
     "accountAddress": "0xa15d0e6f8b4042a653f0ac62c8c88af01162eca8",
@@ -2845,7 +2845,7 @@
     "dbEncryptionKey": "cf535b265a25f3c45704018cb9e44b4c79e97cdfd683138a27bd1a80620e098d",
     "inboxId": "e287800b4b7330cc6fbb639a56bcacad6b4653c84f6c8b7e2c9d3ff7e269e108",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xa15d0e6f8b4042a653f0ac62c8c88af01162eca8-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xa15d0e6f8b4042a653f0ac62c8c88af01162eca8-install-0"
   },
   {
     "accountAddress": "0x6fbdf257cbef0d5962deb4e94a9cbd9f3b886975",
@@ -2853,7 +2853,7 @@
     "dbEncryptionKey": "f0e9ed3bcddd20a311289d3688b218b401d14166d526fa67373b2c21873e56a6",
     "inboxId": "12d2b4d673909cd0ac2d6aed0eb0dbe7968954077c5bc64368062d3cf90a89cf",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x6fbdf257cbef0d5962deb4e94a9cbd9f3b886975-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x6fbdf257cbef0d5962deb4e94a9cbd9f3b886975-install-0"
   },
   {
     "accountAddress": "0x33e50438812ad3bbf39e37f1ee66cccc6816a3b2",
@@ -2861,7 +2861,7 @@
     "dbEncryptionKey": "f0fa4226b7a37ce7d88b3fb72047f1a5f98a5ebefdf574baf644efac37a59f51",
     "inboxId": "552001b10ebee6fc663c331b153e3081d93c4350ffa3d9555a0f83e287d4ed09",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x33e50438812ad3bbf39e37f1ee66cccc6816a3b2-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x33e50438812ad3bbf39e37f1ee66cccc6816a3b2-install-0"
   },
   {
     "accountAddress": "0x774e746804cfacf32012bd0a65ea6b6bb63baf74",
@@ -2869,7 +2869,7 @@
     "dbEncryptionKey": "4e952b9ca25bc0e4f64f74718f30913fbbe68c081aafdd3b9e76d837bb5401a1",
     "inboxId": "dc28f266fe6282c550a3c0d3fb837bdcd1168a3f4c570d867978206f1a3b68ce",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x774e746804cfacf32012bd0a65ea6b6bb63baf74-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x774e746804cfacf32012bd0a65ea6b6bb63baf74-install-0"
   },
   {
     "accountAddress": "0xd9511a87c09094e6a43c1f14d8799c62d19f180c",
@@ -2877,7 +2877,7 @@
     "dbEncryptionKey": "c8f20a83b40513355a916d8a752f53208945d26528686d0e423ec5e9c75478d9",
     "inboxId": "e9b63464b6c88fcc3aba10e5efc4c0a91b01a303c56b68ca5c3fc8d5c2bf0967",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xd9511a87c09094e6a43c1f14d8799c62d19f180c-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xd9511a87c09094e6a43c1f14d8799c62d19f180c-install-0"
   },
   {
     "accountAddress": "0xf960a335c34ee89bb6b6acc9fc0db6fb5f489030",
@@ -2885,7 +2885,7 @@
     "dbEncryptionKey": "25d83d9705551021953ea6759c79465975e9be92f2003ff793b71b0e58d30997",
     "inboxId": "d01847d34bc8dfb048bec48d7ee132ad5240d99daf00d0a0ceff821d88534f37",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xf960a335c34ee89bb6b6acc9fc0db6fb5f489030-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xf960a335c34ee89bb6b6acc9fc0db6fb5f489030-install-0"
   },
   {
     "accountAddress": "0xf7d772fe077594dcdf0af54add4daa0393665c30",
@@ -2893,7 +2893,7 @@
     "dbEncryptionKey": "05138e6df6a9c322cc7f93baafb30ac950daaedb786442ff7f6080a687ac2403",
     "inboxId": "fae39b5cdfaf91e509ad5d03a89a72a8e8082a6977bcd5667fee77762d1902fe",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xf7d772fe077594dcdf0af54add4daa0393665c30-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xf7d772fe077594dcdf0af54add4daa0393665c30-install-0"
   },
   {
     "accountAddress": "0x89cf2b8bdf99a144ed0619c37cd8f67bdbfb5283",
@@ -2901,7 +2901,7 @@
     "dbEncryptionKey": "5db69a19eca5372db07f8c0b81ef6778988bf1926b446bc0060d9ce60dad749e",
     "inboxId": "ef02f497548fc2a64022dd72106c5ab8e49f9fa8705a5cf1f9e14a73134ba159",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x89cf2b8bdf99a144ed0619c37cd8f67bdbfb5283-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x89cf2b8bdf99a144ed0619c37cd8f67bdbfb5283-install-0"
   },
   {
     "accountAddress": "0x97f3b2d9db306387455a2ac4841c671b098474d5",
@@ -2909,7 +2909,7 @@
     "dbEncryptionKey": "f43730e9da884e9ce17b4108805ef27a7b506671a32902f8e96bfbb8e8e3a7e4",
     "inboxId": "afef8d5193ab2af848342b9924eee1c6934fe31644006c6d6a966a9a2b402223",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x97f3b2d9db306387455a2ac4841c671b098474d5-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x97f3b2d9db306387455a2ac4841c671b098474d5-install-0"
   },
   {
     "accountAddress": "0xc8a60d9422c18ac0c5d8e8f5f996e8c8b690b903",
@@ -2917,7 +2917,7 @@
     "dbEncryptionKey": "6f4b764161ed21c90a64dd9e5091fe1b95dad2f4b02e0c4be0ed45a5502acc63",
     "inboxId": "36b25a24b107a314bd6dd72e3c5bda9fe983b378c737c58213609c8173665a0b",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xc8a60d9422c18ac0c5d8e8f5f996e8c8b690b903-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xc8a60d9422c18ac0c5d8e8f5f996e8c8b690b903-install-0"
   },
   {
     "accountAddress": "0x2edb6a20dd37737bf56cec9f2852c3d570a01776",
@@ -2925,7 +2925,7 @@
     "dbEncryptionKey": "e6c6417bc0c83d4de4fdd119dda4feb1d6d278706baddf72afae4a7780bb063f",
     "inboxId": "f15f668b587bb328317afe12cc1a2bed985279b47354c7f40fd02e5164b35251",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x2edb6a20dd37737bf56cec9f2852c3d570a01776-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x2edb6a20dd37737bf56cec9f2852c3d570a01776-install-0"
   },
   {
     "accountAddress": "0x7751398b7ba995f9a2080c986efdf50f935df816",
@@ -2933,7 +2933,7 @@
     "dbEncryptionKey": "3e8ef68030ad900f086809520bb735240f1fe906254c5803a5aa01228d9f2c0d",
     "inboxId": "3406a6cb6414b161dfe2696bfc778797cd1d439a5c4a59535d2e49806f59e1fe",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x7751398b7ba995f9a2080c986efdf50f935df816-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x7751398b7ba995f9a2080c986efdf50f935df816-install-0"
   },
   {
     "accountAddress": "0xe0110f6ba04b48c97f7237e7b0be401b0a797732",
@@ -2941,7 +2941,7 @@
     "dbEncryptionKey": "10df5351d3610364f5f2bef4059044d78203c2e42eb4edcd692e486f456bec72",
     "inboxId": "130578c60d62e197797894bffbb1e54cea8ed4f5823c1c6d3c46e9bf31ce953d",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xe0110f6ba04b48c97f7237e7b0be401b0a797732-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xe0110f6ba04b48c97f7237e7b0be401b0a797732-install-0"
   },
   {
     "accountAddress": "0xa875309b9dd4056c1b4c49e360417b91bd79e38b",
@@ -2949,7 +2949,7 @@
     "dbEncryptionKey": "d8064b8b95f56a878c5f94492ddcdb2e25dd16eae5be5bbeb36d0007a078f86e",
     "inboxId": "61985d46dd93881f93681f9d47e573108875f3c40b9abb16fd90cc5afac52a88",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xa875309b9dd4056c1b4c49e360417b91bd79e38b-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xa875309b9dd4056c1b4c49e360417b91bd79e38b-install-0"
   },
   {
     "accountAddress": "0xb7ce21741bdcf9d81b8987f71b7fa48cd8e688b9",
@@ -2957,7 +2957,7 @@
     "dbEncryptionKey": "15449511db079d51c5f032b68be2df6df49a68a0490d367c2b4e58f2aca982a7",
     "inboxId": "4f018bfa72d8b33b5829e54737f2d6ed4c573a37d9c6379092ab7ddff16f8e6f",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xb7ce21741bdcf9d81b8987f71b7fa48cd8e688b9-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xb7ce21741bdcf9d81b8987f71b7fa48cd8e688b9-install-0"
   },
   {
     "accountAddress": "0xaa957b0e54b905165d8c752e0b35810b27e0ae89",
@@ -2965,7 +2965,7 @@
     "dbEncryptionKey": "5565bbc5aa47abd083c8ec10b78cc80492fd9546fa49c763e8b2c6c9b91437a9",
     "inboxId": "b68c005ae492b1f53530c7bb936623aeb7e9e3be4a46c644c1952591a9057167",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xaa957b0e54b905165d8c752e0b35810b27e0ae89-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xaa957b0e54b905165d8c752e0b35810b27e0ae89-install-0"
   },
   {
     "accountAddress": "0xeb41b43e5032a85ac789dccda29c5962a76131e9",
@@ -2973,7 +2973,7 @@
     "dbEncryptionKey": "81a934c22bee7881c5686dd2534d29faf304a5e4e07209ac3baccb1c5fcfd8e6",
     "inboxId": "bc30d6fc9f1da6bf54de681ecd1ac6f304ce3a7e3a6931df20f64a4b049c30b8",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xeb41b43e5032a85ac789dccda29c5962a76131e9-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xeb41b43e5032a85ac789dccda29c5962a76131e9-install-0"
   },
   {
     "accountAddress": "0xda2300c453bf78f217ff30c59c0d19db48f26a03",
@@ -2981,7 +2981,7 @@
     "dbEncryptionKey": "cb71740a6d89bd976dd05cf3eb50a1fccae80aade0a7dfc004963585a3dcca8b",
     "inboxId": "301c1a8673dc3437120045fb7367cb5687f961dc5a47148d4fc0d43b797961b2",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xda2300c453bf78f217ff30c59c0d19db48f26a03-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xda2300c453bf78f217ff30c59c0d19db48f26a03-install-0"
   },
   {
     "accountAddress": "0xe596290a0d183d4bdc05b53f0a51de0a6a28e598",
@@ -2989,7 +2989,7 @@
     "dbEncryptionKey": "0c6ccf9ba0ea9f358c05b1833b5a2b916ba4854695e785230a8a23fe8bfb2b8b",
     "inboxId": "2e3473887d0b8f23dc9f6e521d4fcd118071377dc78edb4229fdaab0699f3d63",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xe596290a0d183d4bdc05b53f0a51de0a6a28e598-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xe596290a0d183d4bdc05b53f0a51de0a6a28e598-install-0"
   },
   {
     "accountAddress": "0xfa84950f0a5ae2a35d25d2907c1a98e38fef4288",
@@ -2997,7 +2997,7 @@
     "dbEncryptionKey": "13db24b32d47cc57cd0eaca47c155612170572125a272cc455fb7c222037c98d",
     "inboxId": "37e0a48af45835d8fa9335762e4e7779fa9f4fd195e8b3577be84e5ec44b2cc2",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xfa84950f0a5ae2a35d25d2907c1a98e38fef4288-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xfa84950f0a5ae2a35d25d2907c1a98e38fef4288-install-0"
   },
   {
     "accountAddress": "0x06ed2477c2d388478598b13decbb53d430fb65b6",
@@ -3005,7 +3005,7 @@
     "dbEncryptionKey": "209efbd30892de354b2bc196f2d5c3fb44554bf16e27b65044b969a9ed8ff6f8",
     "inboxId": "b8697c2a1b99ea871cdc44b52ec99da9cd2ba706e9f2e569bd68901d63f53c50",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x06ed2477c2d388478598b13decbb53d430fb65b6-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x06ed2477c2d388478598b13decbb53d430fb65b6-install-0"
   },
   {
     "accountAddress": "0x15f38cc160ebcbd04cdea70783d26fe4edd3695f",
@@ -3013,7 +3013,7 @@
     "dbEncryptionKey": "392703787af68eb27b5afe19305edab6065ba7769256bce35f36def87bdeed12",
     "inboxId": "9230f33b248c88ccf5b0bcdcaaa4e08c915b9194b3c769adbdc293404e1d73a9",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x15f38cc160ebcbd04cdea70783d26fe4edd3695f-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x15f38cc160ebcbd04cdea70783d26fe4edd3695f-install-0"
   },
   {
     "accountAddress": "0x5193ea03825b3cc4c22a9a23d53ea7f1bafee1ed",
@@ -3021,7 +3021,7 @@
     "dbEncryptionKey": "23990a91832dabf6264b66d51cde1d20b92506c65b8e350a679952bc4a21559a",
     "inboxId": "0b860ba115dd432a21b9408ca09d2152da0d1ac106e124fca6151e7982ce076d",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x5193ea03825b3cc4c22a9a23d53ea7f1bafee1ed-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x5193ea03825b3cc4c22a9a23d53ea7f1bafee1ed-install-0"
   },
   {
     "accountAddress": "0x82b26ace6aa45dc30f97526c36dd40eb4935ad0a",
@@ -3029,7 +3029,7 @@
     "dbEncryptionKey": "fa3da86ecad9a6e29d9dd4766e0ac2d2fd9bc613cf3daf02381ca9629bc53622",
     "inboxId": "bb79d25b4eb40b988ec33a36bec8bcf5adfe1cf7fb5af59a3ee72aa7fe34586f",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x82b26ace6aa45dc30f97526c36dd40eb4935ad0a-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x82b26ace6aa45dc30f97526c36dd40eb4935ad0a-install-0"
   },
   {
     "accountAddress": "0xf80fe87e9f5b6fd5d10409119b86f11f8a3b493a",
@@ -3037,7 +3037,7 @@
     "dbEncryptionKey": "698afbad9200d7ab0b30004e0564e6858c8e5ced7dab1712406c52b042c01754",
     "inboxId": "1d5cfd162b90a069cb861086139caa64e2ed011d5ec850ba560f9432665d2746",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xf80fe87e9f5b6fd5d10409119b86f11f8a3b493a-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xf80fe87e9f5b6fd5d10409119b86f11f8a3b493a-install-0"
   },
   {
     "accountAddress": "0x3005dfe225af8ec84039b571f77547e120b292b7",
@@ -3045,7 +3045,7 @@
     "dbEncryptionKey": "2ad50083cd37d2ff3fd92b360e6dd4d389d89352ab32df25a13349441a8d8b16",
     "inboxId": "d54d0779a239642cb15eee5da27fcbaf4b3130f8645c5f5a217f93486cb838b8",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0x3005dfe225af8ec84039b571f77547e120b292b7-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0x3005dfe225af8ec84039b571f77547e120b292b7-install-0"
   },
   {
     "accountAddress": "0xf8eb00c9ab9909ff0696ffd5eae0c7d9be29e08a",
@@ -3053,7 +3053,7 @@
     "dbEncryptionKey": "69df85c2d4769e208e8bce340b28e6bfa8a45c2f5b3937392857aa8c9276cfc8",
     "inboxId": "3914741ee369c538ebf00561f338cab85c514f52b2b6ed0944775154c6115e82",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xf8eb00c9ab9909ff0696ffd5eae0c7d9be29e08a-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xf8eb00c9ab9909ff0696ffd5eae0c7d9be29e08a-install-0"
   },
   {
     "accountAddress": "0xf66bd3d72556ac4a9b195e6942bc9f510f148b55",
@@ -3061,7 +3061,7 @@
     "dbEncryptionKey": "a08da1ce2f86f8d6a6a202028949934382778044f1142afeba818e05d07d9f5d",
     "inboxId": "697b0f001638f18b82692db28ee7a84303f521faa2a8b1c65eb218800934e479",
     "installations": 5,
-    "dbPath": "./logs/db-generated-5-production-5inst/production-0xf66bd3d72556ac4a9b195e6942bc9f510f148b55-install-0"
+    "dbPath": "./logs/db-generated-5-local-5inst/local-0xf66bd3d72556ac4a9b195e6942bc9f510f148b55-install-0"
   },
   {
     "accountAddress": "0x26845d7abf0f50f49f5e880c66bfbc6eb7e1fdc8",
