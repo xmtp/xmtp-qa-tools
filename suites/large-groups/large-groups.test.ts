@@ -9,10 +9,10 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
-export const debugWORKER_COUNT = 5;
-export const debugBATCH_SIZE = 100;
-export const debugTOTAL = 400;
-export const debugCHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
+export const WORKER_COUNT = 5;
+export const BATCH_SIZE = 50;
+export const TOTAL = 200;
+export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -23,7 +23,7 @@ describe(testName, async () => {
   const summaryMap: Record<string, SummaryEntry> = {};
 
   workers = await getWorkers(
-    getFixedNames(debugWORKER_COUNT),
+    getFixedNames(WORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
   );
@@ -41,8 +41,8 @@ describe(testName, async () => {
     },
   });
 
-  for (let i = debugBATCH_SIZE; i <= debugTOTAL; i += debugBATCH_SIZE) {
-    for (const installation of debugCHECK_INSTALLATIONS) {
+  for (let i = BATCH_SIZE; i <= TOTAL; i += BATCH_SIZE) {
+    for (const installation of CHECK_INSTALLATIONS) {
       const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
       it(test, async () => {
         try {
@@ -99,9 +99,9 @@ describe(testName, async () => {
               groupSize: i,
               installations: installation,
               totalGroupInstallations,
+              addMembersTimeMs: verifyResult.averageEventTiming,
               zSyncAllTimeMs,
             }),
-            addMembersTimeMs: verifyResult.averageEventTiming,
           };
         } catch (e) {
           logError(e, expect.getState().currentTestName);
@@ -138,11 +138,39 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
 
   let messageToLog = "\n## Large Groups Performance Results\n\n";
 
+  // Helper function to pad strings to a specific width
+  const padString = (str: string, width: number) => {
+    return str.padEnd(width);
+  };
+
+  // Define column widths
+  const colWidths = {
+    groupSize: 12,
+    installations: 21,
+    totalInstallations: 21,
+    addMembers: 18,
+    syncAll: 14,
+    timePerInstall: 22,
+  };
+
   // Table headers
+  messageToLog += padString("Group Size", colWidths.groupSize) + " | ";
   messageToLog +=
-    "| Group Size | Target Installations | Total Installations | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |\n";
+    padString("Target Installations", colWidths.installations) + " | ";
   messageToLog +=
-    "|------------|---------------------|---------------------|------------------|--------------|----------------------|\n";
+    padString("Total Installations", colWidths.totalInstallations) + " | ";
+  messageToLog += padString("Add Members (ms)", colWidths.addMembers) + " | ";
+  messageToLog += padString("SyncAll (ms)", colWidths.syncAll) + " | ";
+  messageToLog +=
+    padString("Time per Install (ms)", colWidths.timePerInstall) + " |\n";
+
+  // Separator line
+  messageToLog += "-".repeat(colWidths.groupSize) + "-|-";
+  messageToLog += "-".repeat(colWidths.installations) + "-|-";
+  messageToLog += "-".repeat(colWidths.totalInstallations) + "-|-";
+  messageToLog += "-".repeat(colWidths.addMembers) + "-|-";
+  messageToLog += "-".repeat(colWidths.syncAll) + "-|-";
+  messageToLog += "-".repeat(colWidths.timePerInstall) + "-|\n";
 
   // Table rows
   for (const entry of sorted) {
@@ -159,11 +187,32 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
         ? (addMembersTimeMs / totalGroupInstallations).toFixed(2)
         : "N/A";
 
-    messageToLog += `| ${groupSize} | ${installations ?? "N/A"} | ${totalGroupInstallations ?? "N/A"} | ${addMembersTimeMs?.toFixed(2) ?? "N/A"} | ${zSyncAllTimeMs?.toFixed(2) ?? "N/A"} | ${timePerInstall} |\n`;
+    messageToLog +=
+      padString(groupSize.toString(), colWidths.groupSize) + " | ";
+    messageToLog +=
+      padString((installations ?? "N/A").toString(), colWidths.installations) +
+      " | ";
+    messageToLog +=
+      padString(
+        (totalGroupInstallations ?? "N/A").toString(),
+        colWidths.totalInstallations,
+      ) + " | ";
+    messageToLog +=
+      padString(
+        (addMembersTimeMs?.toFixed(2) ?? "N/A").toString(),
+        colWidths.addMembers,
+      ) + " | ";
+    messageToLog +=
+      padString(
+        (zSyncAllTimeMs?.toFixed(2) ?? "N/A").toString(),
+        colWidths.syncAll,
+      ) + " | ";
+    messageToLog +=
+      padString(timePerInstall.toString(), colWidths.timePerInstall) + " |\n";
   }
 
   messageToLog += "\n";
   console.log(messageToLog);
   // save file in ./large.log
-  fs.appendFileSync("logs/large.log", messageToLog);
+  fs.appendFileSync("logs/large-groups.log", messageToLog);
 }
