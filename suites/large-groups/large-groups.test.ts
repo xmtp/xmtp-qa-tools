@@ -17,7 +17,7 @@ export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 const testName = "large-groups";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe(testName, () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<string, SummaryEntry> = {};

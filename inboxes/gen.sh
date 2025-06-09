@@ -11,9 +11,9 @@ CAFFEINATE_PID=$!
 echo "Caffeinate started with PID: $CAFFEINATE_PID"
 
 # Array of installations values
-INSTALLATIONS=(25)
+INSTALLATIONS=(2 5 10 20 25)
 MAX_RETRIES=3
-ENVS=local
+ENVS=production
 COUNT=500
 
 echo "Arrays and variables initialized"
