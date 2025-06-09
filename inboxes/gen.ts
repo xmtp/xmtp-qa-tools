@@ -314,7 +314,6 @@ async function smartUpdate(opts: {
             clientCheckInstallations,
             installationCount,
             i,
-            inbox.accountAddress,
           );
 
           // Create additional installations if needed
