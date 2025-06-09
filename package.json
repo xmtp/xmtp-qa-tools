@@ -14,6 +14,7 @@
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
+    "count-duplicates": "NODE_OPTIONS='--experimental-specifier-resolution=node' tsx inboxes/count-duplicates.ts",
     "forked": "./suites/group/run.sh",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
