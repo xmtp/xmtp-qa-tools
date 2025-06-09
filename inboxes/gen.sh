@@ -11,7 +11,7 @@ CAFFEINATE_PID=$!
 echo "Caffeinate started with PID: $CAFFEINATE_PID"
 
 # Array of installations values
-INSTALLATIONS=(2 5 10 20 25)
+INSTALLATIONS=(2 5 10 20)
 MAX_RETRIES=3
 ENVS=production
 COUNT=500
@@ -50,8 +50,8 @@ run_with_retry() {
         
         # If not the last attempt, wait before retrying
         if [ $attempt -lt $MAX_RETRIES ]; then
-            echo "Retrying in 10 seconds..."
-            sleep 10
+            echo "Retrying in 60 seconds to avoid rate limits..."
+            sleep 60
         fi
         
         ((attempt++))
@@ -67,8 +67,8 @@ echo "Starting test cycle at $(date)"
 for installations in "${INSTALLATIONS[@]}"; do
     run_with_retry $installations
     
-    # Small delay between different installation tests
-    sleep 5
+    # 1 minute delay between different installation tests to avoid rate limits
+    sleep 60
 done
 
 echo "✓ Completed all installation tests at $(date)"
