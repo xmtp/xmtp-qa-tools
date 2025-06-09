@@ -168,7 +168,6 @@ async function checkInstallations(
   clientCheckInstallations: Client,
   installationCount: number,
   i: number,
-  accountAddress: string,
 ) {
   let state = await clientCheckInstallations?.preferences.inboxState(true);
   let currentInstallations = state?.installations.length || 0;
@@ -190,13 +189,13 @@ async function checkInstallations(
         return new Uint8Array(Buffer.from(hexString, "hex"));
       });
 
-    // if (installationsToRevoke.length > 0) {
-    //   console.debug(`  Revoking ${surplusCount} surplus installations...`);
-    //   //await clientCheckInstallations.revokeInstallations(installationsToRevoke);
+    if (installationsToRevoke.length > 0) {
+      console.debug(`  Revoking ${surplusCount} surplus installations...`);
+      //await clientCheckInstallations.revokeInstallations(installationsToRevoke);
 
-    //   // Update current installations count after revocation
-    //   currentInstallations = installationCount;
-    // }
+      // Update current installations count after revocation
+      currentInstallations = installationCount;
+    }
   }
 
   return { clientCheckInstallations, currentInstallations };
@@ -311,10 +310,7 @@ async function smartUpdate(opts: {
             env: env,
           });
 
-          const {
-            clientCheckInstallations: updatedClient,
-            currentInstallations,
-          } = await checkInstallations(
+          const { currentInstallations } = await checkInstallations(
             clientCheckInstallations,
             installationCount,
             i,
