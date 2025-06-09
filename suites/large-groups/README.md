@@ -51,3 +51,10 @@ Error, decoded message length too large: found 4800716 bytes, the limit is: 4194
 ```
 
 Measuments in `local` network
+
+Networks breaks after this test with:
+
+```
+❌ Error updating inbox 0x41c4d0e3736667e9993e384c7c85e0b90771d7c1:
+[2025-06-09T18:09:29.827Z] [error] ERROR api client error api client at endpoint "get_inbox_ids" has error status: Unknown, message: "failed to connect to `host=mlsdb user=postgres database=postgres`: hostname resolving error (lookup mlsdb on 127.0.0.11:53: no such host)", details: [], metadata: MetadataMap { headers: {"content-type": "application/grpc"} }
+```
