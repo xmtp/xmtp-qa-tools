@@ -41,9 +41,9 @@ function countInboxIdDuplicates(inboxes: InboxData[]): {
   };
 }
 
-// Main function to analyze all JSON files (only inboxId duplicates)
+// Main function to analyze all JSON files (only inboxId duplicates, and remove them)
 function analyzeAllFiles(): void {
-  console.log(`🔍 XMTP Duplicate InboxId Counter\n`);
+  console.log(`🔍 XMTP Duplicate InboxId Counter & Remover\n`);
   console.log(`📁 Analyzing JSON files in ${INBOXES_DIR}\n`);
 
   if (!fs.existsSync(INBOXES_DIR)) {
@@ -68,11 +68,13 @@ function analyzeAllFiles(): void {
 
   let totalDuplicatesAcrossFiles = 0;
   let totalFilesWithDuplicates = 0;
+  let totalRecordsRemoved = 0;
   const results: Array<{
     filename: string;
     count: number;
     inboxIdDuplicates: number;
     duplicateInboxIds: string[];
+    removed: number;
   }> = [];
 
   // Process each file
@@ -114,11 +116,27 @@ function analyzeAllFiles(): void {
       const { inboxIdDuplicates, duplicateInboxIds } =
         countInboxIdDuplicates(validData);
 
+      // Deduplicate: keep only the first occurrence of each inboxId
+      const seen = new Set<string>();
+      const deduped = validData.filter((item) => {
+        if (seen.has(item.inboxId)) return false;
+        seen.add(item.inboxId);
+        return true;
+      });
+      const removed = validData.length - deduped.length;
+      totalRecordsRemoved += removed;
+
+      // Overwrite the file if any records were removed
+      if (removed > 0) {
+        fs.writeFileSync(filePath, JSON.stringify(deduped, null, 2));
+      }
+
       results.push({
         filename: file,
         count,
         inboxIdDuplicates,
         duplicateInboxIds,
+        removed,
       });
 
       if (inboxIdDuplicates > 0) {
@@ -136,21 +154,22 @@ function analyzeAllFiles(): void {
   console.log(`\n`);
 
   // Display results
-  console.log(`📋 DUPLICATE INBOXID ANALYSIS RESULTS\n`);
+  console.log(`📋 DUPLICATE INBOXID ANALYSIS & REMOVAL RESULTS\n`);
   console.log(
-    `${"File".padEnd(15)} ${"Accounts".padEnd(10)} ${"InboxID Duplicates".padEnd(18)} Duplicate InboxIds (first 3)`,
+    `${"File".padEnd(15)} ${"Accounts".padEnd(10)} ${"InboxID Duplicates".padEnd(18)} ${"Removed".padEnd(8)} Duplicate InboxIds (first 3)`,
   );
-  console.log("─".repeat(85));
+  console.log("─".repeat(100));
 
   for (const result of results) {
-    const { filename, count, inboxIdDuplicates, duplicateInboxIds } = result;
+    const { filename, count, inboxIdDuplicates, duplicateInboxIds, removed } =
+      result;
     console.log(
-      `${filename.padEnd(15)} ${count.toString().padEnd(10)} ${inboxIdDuplicates.toString().padEnd(18)} ${duplicateInboxIds.slice(0, 3).join(", ")}${duplicateInboxIds.length > 3 ? ", ..." : ""}`,
+      `${filename.padEnd(15)} ${count.toString().padEnd(10)} ${inboxIdDuplicates.toString().padEnd(18)} ${removed.toString().padEnd(8)} ${duplicateInboxIds.slice(0, 3).join(", ")}${duplicateInboxIds.length > 3 ? ", ..." : ""}`,
     );
   }
 
   // Summary
-  console.log("─".repeat(85));
+  console.log("─".repeat(100));
   console.log(`\n📈 SUMMARY:`);
   console.log(`   📄 Total files analyzed: ${files.length}`);
   console.log(
@@ -159,7 +178,8 @@ function analyzeAllFiles(): void {
   console.log(
     `   🔄 Total duplicate inboxIds found: ${totalDuplicatesAcrossFiles}`,
   );
-  console.log(`\n🎉 Analysis complete!`);
+  console.log(`   🧹 Total records removed: ${totalRecordsRemoved}`);
+  console.log(`\n🎉 Analysis & deduplication complete!`);
 }
 
 analyzeAllFiles();
