@@ -314,6 +314,8 @@ async function smartUpdate(opts: {
               dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`,
               installations: installationCount,
             });
+            // Write JSON file immediately after each processed account
+            fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
           }
         }
 
@@ -335,8 +337,20 @@ async function smartUpdate(opts: {
     console.debug(`\n✨ Generating ${newAccountsNeeded} new accounts`);
     const generateProgress = new ProgressBar(newAccountsNeeded);
 
+    let consecutiveFailures = 0;
+    const MAX_CONSECUTIVE_FAILURES = 3;
+
     for (let i = 0; i < newAccountsNeeded; i++) {
+      // Stop if we hit too many consecutive failures
+      if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
+        console.error(
+          `\n🛑 Stopping generation after ${MAX_CONSECUTIVE_FAILURES} consecutive failures`,
+        );
+        break;
+      }
+
       const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
+      let accountSuccess = false;
 
       try {
         const signer = createSigner(walletKey as `0x${string}`);
@@ -344,6 +358,7 @@ async function smartUpdate(opts: {
         const accountAddress = identifier.identifier;
         const dbEncryptionKey = generateEncryptionKeyHex();
         let inboxId = "";
+        let installationsFailed = 0;
 
         // Create installations for each environment
         for (const env of envs) {
@@ -366,17 +381,29 @@ async function smartUpdate(opts: {
                 error instanceof Error ? error.message : String(error),
               );
               totalFailed++;
+              installationsFailed++;
             }
           }
         }
 
-        accountData.push({
-          accountAddress,
-          walletKey,
-          dbEncryptionKey,
-          inboxId,
-          installations: installationCount,
-        });
+        // Only add account if at least one installation succeeded
+        if (installationsFailed < installationCount * envs.length) {
+          accountData.push({
+            accountAddress,
+            walletKey,
+            dbEncryptionKey,
+            inboxId,
+            installations: installationCount,
+          });
+
+          // Write JSON file immediately after each successful account
+          fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
+          accountSuccess = true;
+          consecutiveFailures = 0; // Reset failure counter on success
+        } else {
+          consecutiveFailures++;
+        }
+
         generateProgress.update();
       } catch (error: unknown) {
         console.error(
@@ -384,21 +411,26 @@ async function smartUpdate(opts: {
           error,
         );
         totalFailed++;
+        consecutiveFailures++;
         generateProgress.update();
       }
     }
     generateProgress.finish();
   }
 
-  // Save results
-  fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
+  // Final save to ensure all data is persisted
+  if (accountData.length > 0) {
+    fs.writeFileSync(outputFile, JSON.stringify(accountData, null, 2));
+  }
 
   console.debug(`\n🎉 Smart Update Summary`);
   console.debug(
     `📊 Existing accounts processed: ${Math.min(totalUpdated, accountsToProcess)}`,
   );
-  console.debug(`✨ New accounts generated: ${newAccountsNeeded}`);
-  console.debug(`🎯 Total target accounts: ${targetCount}`);
+  console.debug(
+    `✨ New accounts generated: ${accountData.length - accountsToProcess}`,
+  );
+  console.debug(`🎯 Total accounts in final file: ${accountData.length}`);
   console.debug(`✅ Total installations created: ${totalCreated}`);
   console.debug(`❌ Total installations failed: ${totalFailed}`);
   console.debug(`💾 Data saved to: ${outputFile}`);
