@@ -11,7 +11,7 @@ import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 5;
 export const BATCH_SIZE = 50;
-export const TOTAL = 200;
+export const TOTAL = 300;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
 
 const testName = "large-groups";
