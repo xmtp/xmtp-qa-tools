@@ -2,14 +2,14 @@ import fs from "fs";
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
-import { getFixedNames, getInboxByInstallationCount } from "@helpers/utils";
+import { getInboxByInstallationCount, getRandomNames } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
-export const WORKER_COUNT = 5;
+export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 50;
 export const TOTAL = 300;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 20, 25];
@@ -21,12 +21,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<string, SummaryEntry> = {};
-
-  workers = await getWorkers(
-    getFixedNames(WORKER_COUNT),
-    testName,
-    typeofStream.GroupUpdated,
-  );
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -47,6 +41,11 @@ describe(testName, async () => {
       it(test, async () => {
         try {
           console.log(test);
+          workers = await getWorkers(
+            getRandomNames(WORKER_COUNT),
+            testName,
+            typeofStream.GroupUpdated,
+          );
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(
