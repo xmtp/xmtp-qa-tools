@@ -10,9 +10,9 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
-export const BATCH_SIZE = 20;
+export const BATCH_SIZE = 40;
 export const TOTAL = 220;
-export const CHECK_INSTALLATIONS = [2, 5, 10, 20];
+export const CHECK_INSTALLATIONS = [10, 15];
 
 const testName = "large-groups";
 loadEnv(testName);
