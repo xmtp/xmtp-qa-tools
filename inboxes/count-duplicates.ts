@@ -33,7 +33,7 @@ function countInboxIdDuplicates(inboxes: InboxData[]): {
     );
   }
   const duplicateInboxIds = Array.from(inboxIdCounts.entries())
-    .filter(([_, count]) => count > 1)
+    .filter(([, count]) => count > 1)
     .map(([inboxId]) => inboxId);
   return {
     inboxIdDuplicates: duplicateInboxIds.length,
@@ -93,14 +93,16 @@ function analyzeAllFiles(): void {
       }
 
       // Type check the array elements
-      const isValidInboxData = (item: any): item is InboxData => {
+      const isValidInboxData = (item: unknown): item is InboxData => {
+        if (typeof item !== "object" || item === null) {
+          return false;
+        }
+        const inboxData = item as InboxData;
         return (
-          typeof item === "object" &&
-          item !== null &&
-          typeof item.accountAddress === "string" &&
-          typeof item.walletKey === "string" &&
-          typeof item.dbEncryptionKey === "string" &&
-          typeof item.inboxId === "string"
+          typeof inboxData.accountAddress === "string" &&
+          typeof inboxData.walletKey === "string" &&
+          typeof inboxData.dbEncryptionKey === "string" &&
+          typeof inboxData.inboxId === "string"
         );
       };
 
