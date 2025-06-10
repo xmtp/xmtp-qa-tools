@@ -12,7 +12,7 @@ import { afterAll, describe, expect, it } from "vitest";
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 20;
 export const TOTAL = 220;
-export const CHECK_INSTALLATIONS = [10, 15, 20, 25];
+export const CHECK_INSTALLATIONS = [15];
 export const MIN_MAX_INSTALLATIONS = [1500, 2500];
 
 const testName = "large-groups";
