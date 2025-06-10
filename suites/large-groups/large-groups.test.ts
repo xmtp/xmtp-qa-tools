@@ -10,9 +10,10 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
-export const BATCH_SIZES = [400, 200, 133, 100];
-export const CHECK_INSTALLATIONS = [5, 10, 15, 20];
-export const MAX_INSTALLATIONS = 2000;
+export const BATCH_SIZE = 20;
+export const TOTAL = 220;
+export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20];
+export const MIN_MAX_INSTALLATIONS = [1500, 2000];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -35,19 +36,19 @@ describe(testName, () => {
     },
   });
 
-  for (const batchSize of BATCH_SIZES) {
+  for (let i = BATCH_SIZE; i <= TOTAL; i += BATCH_SIZE) {
     for (const installation of CHECK_INSTALLATIONS) {
-      if (installation * batchSize > MAX_INSTALLATIONS) {
-        console.debug(
-          `Skipping test for: ${batchSize * installation} installations`,
-        );
+      if (
+        installation * i < MIN_MAX_INSTALLATIONS[0] ||
+        installation * i > MIN_MAX_INSTALLATIONS[1]
+      ) {
+        console.debug(`Skipping test for: ${installation * i} installations`);
         continue;
       }
-      console.debug(
-        `Running test for: ${batchSize * installation} installations`,
-      );
-      it(`${batchSize}-${installation}: should create a new conversation of ${batchSize} members with ${installation} installations`, async () => {
+      const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
+      it(test, async () => {
         try {
+          console.log(test);
           workers = await getWorkers(
             getRandomNames(WORKER_COUNT),
             testName,
@@ -58,11 +59,11 @@ describe(testName, () => {
             .client.conversations.newGroup(
               workers.getAllButCreator().map((w) => w.client.inboxId),
             )) as Group;
-          console.debug(`Group created with id: ${newGroup.id}`);
-          const inboxes = getInboxByInstallationCount(installation, batchSize);
+
+          const inboxes = getInboxByInstallationCount(installation, i);
           const allInboxIds = [
             ...inboxes
-              .slice(0, batchSize - workers.getAllButCreator().length - 1)
+              .slice(0, i - workers.getAllButCreator().length - 1)
               .map((inbox) => inbox.inboxId),
           ];
           // Add members in batches of 10
@@ -70,8 +71,8 @@ describe(testName, () => {
           for (let j = 0; j < allInboxIds.length; j += batchSize) {
             const batch = allInboxIds.slice(j, j + batchSize);
             await newGroup.addMembers(batch);
-            console.debug(
-              `Added ${batch.length} members of ${installation} installations`,
+            console.log(
+              `${j} of ${allInboxIds.length} - Added ${batch.length} members`,
             );
           }
           await newGroup.sync();
@@ -91,10 +92,10 @@ describe(testName, () => {
             totalGroupInstallations += member.installationIds.length;
           }
           console.warn(
-            `Group created with ${members.length} members (${installation} installations) in batch ${batchSize} - ID: ${newGroup.id} total installations: ${totalGroupInstallations}`,
+            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id} total installations: ${totalGroupInstallations}`,
           );
 
-          const zWorkerName = "random" + `${batchSize}-${installation}`;
+          const zWorkerName = "random" + `${i}-${installation}`;
           const zWorker = await getWorkers([zWorkerName], testName);
           await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
           const zSyncAllStart = performance.now();
@@ -102,10 +103,10 @@ describe(testName, () => {
           const zSyncAllTimeMs = performance.now() - zSyncAllStart;
           console.warn(`SyncAll time: ${zSyncAllTimeMs}ms for ${zWorkerName}`);
 
-          const summaryKey = `${batchSize}-${installation}`;
+          const summaryKey = `${i}-${installation}`;
           summaryMap[summaryKey] = {
             ...(summaryMap[summaryKey] ?? {
-              groupSize: batchSize,
+              groupSize: i,
               installations: installation,
               totalGroupInstallations,
               addMembersTimeMs: verifyResult.averageEventTiming,
