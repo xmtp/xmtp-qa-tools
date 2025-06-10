@@ -129,12 +129,15 @@ async function checkInstallations(
   installationCount: number,
   i: number,
 ) {
-  let state = await clientCheckInstallations?.preferences.inboxState(true);
+  let state = await clientCheckInstallations?.preferences.inboxState();
   let currentInstallations = state?.installations.length || 0;
-  console.debug(`${i} ${currentInstallations}/${installationCount}`);
+  console.debug(`\nChecking installations for account ${i}:`);
+  console.debug(`Current installations: ${currentInstallations}`);
+  console.debug(`Target installations: ${installationCount}`);
 
   // If we have more installations than desired, revoke the surplus ones
-  if (currentInstallations > installationCount) {
+  const diff = currentInstallations - installationCount;
+  if (diff > 0) {
     const surplusCount = currentInstallations - installationCount;
     const allInstallations = state?.installations || [];
 

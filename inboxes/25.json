@@ -1560,13 +1560,6 @@
     "dbPath": "./logs/db-generated-25-local-25inst/local-0xae38628daeacd4bffe1379f59d332b3461d59ed1-install-0"
   },
   {
-    "accountAddress": "0x84cd1d1f5275b3563aaa9a381fe87a4237e6aaac",
-    "walletKey": "0xa591cb9e6f8670372422d44aa5dd5c6c4a358a8f4817ef42efce9bf88007aad2",
-    "dbEncryptionKey": "43211dcac008947dd8ee037f76e8ad0b6821364ccf4fd23fd1d48ba53e91ba3e",
-    "inboxId": "",
-    "installations": 25
-  },
-  {
     "accountAddress": "0x9463bb1ff197fa94885f1586a1e1714f97c599c7",
     "walletKey": "0x5e58e3fc0819b538efdfb6e82d1ce237f48b0e9f1867ff4a4d497440eed49e99",
     "dbEncryptionKey": "2d7665cf4fabbf3d94bdfde6d1025315f338ea2e09aea90b6439ec7eb883e77d",
