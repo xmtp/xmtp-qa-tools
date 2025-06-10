@@ -292,20 +292,6 @@ yarn test functional --debug --no-fail
 - `--debug` - Enable debug logging and file output a saves logs to `logs/` directory (no terminal verbosity)
 - `--no-fail` - Exit successfully even on test failures
 
-### Troubleshoorting
-
-```bash
-# remove all docker containers and networks
-# Update local
-./dev/up
-yarn gen --mode update
-# delete .data
-# delete keys
-yarn functional on dev or production
-yarn functional on local
-# in local installations needs to be created again if you delete the network from docker
-```
-
 ### Resources
 
 - **Inboxes:** Inboxes for testing - [see section](/inboxes/)
