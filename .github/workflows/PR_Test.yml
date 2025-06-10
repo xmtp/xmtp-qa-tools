@@ -4,7 +4,6 @@ description: "should verify performance of PR"
 on:
   pull_request:
     branches:
-      - main
   workflow_dispatch:
 
 jobs:
