@@ -29,7 +29,7 @@ run_with_retry() {
         echo "Starting yarn gen at $(date)"
         
         # Run yarn gen command directly
-        yarn gen --count $COUNT --envs $ENVS --installations $installations
+        yarn gen --envs local --installations $installations
         
         local exit_code=$?
         echo "Yarn gen completed at $(date) with exit code: $exit_code"
