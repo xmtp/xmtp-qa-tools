@@ -38,11 +38,6 @@
     "sendMessage": "hi"
   },
   {
-    "name": "groupt",
-    "address": "0x70e25528d8b63905b455140f90a1659d743f21be",
-    "sendMessage": "@toss help"
-  },
-  {
     "name": "gm-bot",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     "sendMessage": "hola"
