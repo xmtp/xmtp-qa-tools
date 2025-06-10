@@ -100,46 +100,6 @@ interface InboxData {
   dbPath?: string;
 }
 
-// Count and display all inbox files
-function countInboxFiles(): { [key: string]: number } {
-  console.debug(`\n📊 Counting inbox files in ${INBOXES_DIR}:`);
-
-  if (!fs.existsSync(INBOXES_DIR)) {
-    console.debug(`❌ Directory ${INBOXES_DIR} does not exist`);
-    return {};
-  }
-
-  const files = fs
-    .readdirSync(INBOXES_DIR)
-    .filter((file) => file.endsWith(".json") && /^\d+\.json$/.test(file))
-    .sort((a, b) => {
-      const numA = parseInt(a.replace(".json", ""));
-      const numB = parseInt(b.replace(".json", ""));
-      return numA - numB;
-    });
-
-  const counts: { [key: string]: number } = {};
-  let totalAccounts = 0;
-
-  for (const file of files) {
-    const filePath = `${INBOXES_DIR}/${file}`;
-    try {
-      const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
-      const count = Array.isArray(data) ? data.length : 0;
-      counts[file] = count;
-      totalAccounts += count;
-      console.debug(`   📄 ${file}: ${count} accounts`);
-    } catch (e) {
-      console.debug(`   ❌ ${file}: Error reading file`, e);
-      counts[file] = 0;
-    }
-  }
-
-  console.debug(`   📈 Total accounts across all files: ${totalAccounts}`);
-  return counts;
-}
-
-// Remove duplicates from inbox data
 function removeDuplicates(inboxes: InboxData[]): InboxData[] {
   const seen = new Set<string>();
   const unique: InboxData[] = [];
@@ -190,7 +150,7 @@ async function checkInstallations(
       });
 
     if (installationsToRevoke.length > 0) {
-      console.debug(`  Revoking ${surplusCount} surplus installations...`);
+      console.debug(`Revoking ${surplusCount} surplus installations...`);
       await clientCheckInstallations.revokeInstallations(installationsToRevoke);
       currentInstallations = installationCount;
     }
@@ -239,15 +199,6 @@ async function smartUpdate(opts: {
     }
   } else {
     console.debug(`📄 Creating new inbox file: ${targetFileName}`);
-  }
-
-  // Remove duplicates from existing data
-  const originalCount = existingInboxes.length;
-  existingInboxes = removeDuplicates(existingInboxes);
-  if (originalCount !== existingInboxes.length) {
-    console.debug(
-      `🧹 Cleaned ${originalCount - existingInboxes.length} duplicates from existing data`,
-    );
   }
 
   const existingCount = existingInboxes.length;
@@ -377,7 +328,6 @@ async function smartUpdate(opts: {
       }
 
       const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
-      let accountSuccess = false;
 
       try {
         const signer = createSigner(walletKey as `0x${string}`);

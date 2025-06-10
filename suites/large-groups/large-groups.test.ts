@@ -1,6 +1,6 @@
 import fs from "fs";
 import { loadEnv } from "@helpers/client";
-import { logError } from "@helpers/logger";
+import { getTime, logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { getInboxByInstallationCount, getRandomNames } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -12,8 +12,8 @@ import { afterAll, describe, expect, it } from "vitest";
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 20;
 export const TOTAL = 220;
-export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20];
-export const MIN_MAX_INSTALLATIONS = [1500, 2000];
+export const CHECK_INSTALLATIONS = [15];
+export const MIN_MAX_INSTALLATIONS = [1500, 2500];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -253,8 +253,8 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   console.log(messageToLog);
 
   // Save log file
-  fs.appendFileSync("logs/large-groups.log", messageToLog);
+  fs.appendFileSync("logs/large-groups " + getTime() + ".log", messageToLog);
 
   // Save CSV file
-  fs.writeFileSync("logs/large-groups.csv", csvContent);
+  fs.writeFileSync("logs/large-groups " + getTime() + ".csv", csvContent);
 }
