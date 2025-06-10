@@ -1,9 +1,9 @@
-name: Agents
-description: Check that agents answer response is below 9 seconds for a new user. If it fails notify the team.
+name: Functional
+description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "10 * * * *" # Runs at 10 minutes past each hour
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
+        test: [browser, regression, agents]
         environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      DEFAULT_STREAM_TIMEOUT_MS: 8000
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test agents --no-fail --debug
+        run: yarn test ${{ matrix.test }} --no-fail --debug
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4

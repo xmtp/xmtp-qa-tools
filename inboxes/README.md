@@ -38,3 +38,15 @@ const client = await Client.create(signer, {
 ```
 
 Generates 200 inboxes per configuration for installation counts: 10, 15, 20, 25.
+
+### Troubleshoorting
+
+```bash
+XMTP_ENV=local
+# remove all docker containers and networks
+./dev/up
+# update local inboxes (this will take a while)
+yarn local-update
+# delete .data and keys
+yarn functional
+```
