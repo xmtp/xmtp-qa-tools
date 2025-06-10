@@ -13,7 +13,7 @@ echo "Caffeinate started with PID: $CAFFEINATE_PID"
 # Array of installations values
 INSTALLATIONS=(2 5 10 20)
 MAX_RETRIES=3
-ENVS=production
+ENVS=local
 COUNT=500
 
 echo "Arrays and variables initialized"
@@ -28,10 +28,13 @@ run_with_retry() {
         echo "Command: yarn gen --count $COUNT --envs $ENVS --installations $installations"
         echo "Starting yarn gen at $(date)"
         
-        # Run yarn gen command directly
-        yarn gen --envs local --installations $installations
-        
+        # Run yarn gen command with output capture
+        output=$(yarn gen --count $COUNT --envs $ENVS --installations $installations 2>&1)
         local exit_code=$?
+        
+        # Display the output
+        echo "Command output:"
+        echo "$output"
         echo "Yarn gen completed at $(date) with exit code: $exit_code"
         
         # Check if command was interrupted (Ctrl+C)
