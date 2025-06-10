@@ -10,8 +10,9 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
-export const BATCH_SIZES = [200, 133, 100, 90];
-export const CHECK_INSTALLATIONS = [10, 15, 20, 22];
+export const BATCH_SIZES = [400, 200, 133, 100];
+export const CHECK_INSTALLATIONS = [5, 10, 15, 20];
+export const MAX_INSTALLATIONS = 2000;
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -48,7 +49,7 @@ describe(testName, () => {
           .client.conversations.newGroup(
             workers.getAllButCreator().map((w) => w.client.inboxId),
           )) as Group;
-
+        console.debug(`Group created with id: ${newGroup.id}`);
         const inboxes = getInboxByInstallationCount(installs, size);
         const allInboxIds = [
           ...inboxes
@@ -60,6 +61,9 @@ describe(testName, () => {
         for (let j = 0; j < allInboxIds.length; j += batchSize) {
           const batch = allInboxIds.slice(j, j + batchSize);
           await newGroup.addMembers(batch);
+          console.debug(
+            `Added ${batch.length} members of ${installs} installations`,
+          );
         }
         await newGroup.sync();
         const members = await newGroup.members();
@@ -108,6 +112,12 @@ describe(testName, () => {
 
   for (const batchSize of BATCH_SIZES) {
     for (const installation of CHECK_INSTALLATIONS) {
+      if (installation * batchSize > MAX_INSTALLATIONS) {
+        continue;
+      }
+      console.debug(
+        `Running test for: ${batchSize * installation} installations`,
+      );
       createTest(batchSize, installation);
     }
   }

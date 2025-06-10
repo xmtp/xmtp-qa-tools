@@ -58,3 +58,11 @@ Networks breaks after this test with:
 ❌ Error updating inbox 0x41c4d0e3736667e9993e384c7c85e0b90771d7c1:
 [2025-06-09T18:09:29.827Z] [error] ERROR api client error api client at endpoint "get_inbox_ids" has error status: Unknown, message: "failed to connect to `host=mlsdb user=postgres database=postgres`: hostname resolving error (lookup mlsdb on 127.0.0.11:53: no such host)", details: [], metadata: MetadataMap { headers: {"content-type": "application/grpc"} }
 ```
+
+## Large Groups Performance Results
+
+| Group Size | Inst/Member | Actual Inst | Diff | Est. Inst | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |
+| ---------- | ----------- | ----------- | ---- | --------- | ---------------- | ------------ | --------------------- |
+| 10         | 15          | 263         | 113  | 150       | 95.00            | 176.85       | 0.36                  |
+| 10         | 20          | 1943        | 1743 | 200       | 415.00           | 803.69       | 0.21                  |
+| 10         | 10          | 1973        | 1873 | 100       | 286.00           | 890.75       | 0.14                  |
