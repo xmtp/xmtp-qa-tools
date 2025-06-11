@@ -1,9 +1,8 @@
 import { getRandomNames, loadEnv, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { type DecodedMessage, type Dm, type Group } from "@xmtp/node-sdk";
+import { type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "callbacks";
@@ -70,7 +69,6 @@ describe(testName, async () => {
           logError(e, expect.getState().currentTestName);
           throw e;
         });
-      await sleep(1000);
       await convo.send("1");
     } catch (e) {
       logError(e, expect.getState().currentTestName);
