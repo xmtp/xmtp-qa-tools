@@ -1,9 +1,9 @@
-name: Functional
-description: "should verify performance of the library in the dev network"
+name: Agents
+description: "should verify performance of the library in the production network"
 
 on:
   schedule:
-    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "*/30 * * * *" # Runs every 30 minutes
   workflow_dispatch:
 
 jobs:
@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [browser, regression]
-        environment: [dev, production]
+        test: [agents]
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
