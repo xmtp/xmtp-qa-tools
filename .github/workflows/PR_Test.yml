@@ -11,12 +11,9 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
-      XMTP_ENV: ${{ matrix.environment }}
+      XMTP_ENV: production
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       LOGGING_LEVEL: "error"
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
