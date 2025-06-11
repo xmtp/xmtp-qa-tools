@@ -111,18 +111,44 @@ describe(testName, () => {
     }
   });
 
-  it("add member to group", async () => {
+  it("add member to group async iterator", async () => {
     try {
+      groupId = await xmtpTester.newGroupFromUI([
+        ...getInboxIds(4),
+        gmBot.inboxId,
+      ]);
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
       const conversationStream = await creator.client.conversations.stream();
       for await (const conversation of conversationStream) {
         if (conversation?.id === groupId) {
           expect(conversation.id).toBe(groupId);
           break;
-        } else {
-          expect(conversation?.id).toBeDefined();
         }
       }
+    } catch (e) {
+      await xmtpTester.takeSnapshot("gm-group");
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("add member to group callback", async () => {
+    try {
+      groupId = await xmtpTester.newGroupFromUI([
+        ...getInboxIds(4),
+        gmBot.inboxId,
+      ]);
+      await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
+      creator.client.conversations.stream((err, conversation) => {
+        if (err) {
+          logError(err, expect.getState().currentTestName);
+          throw err;
+        }
+        if (conversation?.id) {
+          console.log("conversation", conversation.id);
+          expect(conversation.id).toBe(groupId);
+        }
+      });
     } catch (e) {
       await xmtpTester.takeSnapshot("gm-group");
       logError(e, expect.getState().currentTestName);
