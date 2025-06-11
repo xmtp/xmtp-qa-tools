@@ -76,7 +76,6 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
 // Re-export anything needed in the worker environment (if necessary)
 export type { Client };
 `;
-
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
   import { parentPort, workerData } from "node:worker_threads";
@@ -84,8 +83,6 @@ const workerBootstrap = /* JavaScript */ `
   // Execute the worker code
   const workerCode = ${JSON.stringify(workerThreadCode)};
   const workerModule = new Function('require', 'parentPort', 'workerData', 'process', workerCode);
-  
-
   
   // Get the require function
   import { createRequire } from "node:module";

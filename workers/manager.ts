@@ -15,7 +15,7 @@ export interface WorkerBase {
   testName: string;
   sdkVersion: string;
   libXmtpVersion: string;
-}
+} //
 
 export interface Worker extends WorkerBase {
   worker: WorkerClient;

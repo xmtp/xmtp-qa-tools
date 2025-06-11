@@ -1832,6 +1832,14 @@
     "dbPath": "./logs/db-generated-25-production-25inst/production-0x8513f5a6687cb75d65e57f52e19b1d70edacd7d1-install-0"
   },
   {
+    "accountAddress": "0xb2462959abc882a452a01dca7be6bbcf0adada9a",
+    "walletKey": "0x480d8b32040e6d89d2447b98f20935bdce14b914fc13c7ce5b53b372c373df0f",
+    "dbEncryptionKey": "9502558da883611ae7d68baef1d57e0949b46368660b4fb1f28696633b0d7774",
+    "inboxId": "c38af8cc6276d8ce734e2a597308f7da328ca0f562243c58bb4737fa15cb3553",
+    "installations": 15,
+    "dbPath": "./logs/db-generated-15-local-15inst/local-0xb2462959abc882a452a01dca7be6bbcf0adada9a-install-0"
+  },
+  {
     "accountAddress": "0xb0b808aedd325805b32453f3fa0e1140b72f951d",
     "walletKey": "0x678ba16afabec40bbf76788a6a82b04f2ee4116897617bf542b0435d92a36c7c",
     "dbEncryptionKey": "245c9b6fe7fa74e8cacce50daa1bf993cac4e17d225eab61ae8e46d02df1f5be",

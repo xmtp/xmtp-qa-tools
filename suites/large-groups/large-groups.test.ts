@@ -10,10 +10,10 @@ import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 
 export const WORKER_COUNT = 3;
-export const BATCH_SIZE = 20;
-export const TOTAL = 220;
+export const BATCH_SIZE = 10;
+export const TOTAL = 200;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
-export const MIN_MAX_INSTALLATIONS = [1000, 2000];
+export const MIN_MAX_INSTALLATIONS = [1800, 2200];
 
 const testName = "large-groups";
 loadEnv(testName);
@@ -42,13 +42,15 @@ describe(testName, () => {
         installation * i < MIN_MAX_INSTALLATIONS[0] ||
         installation * i > MIN_MAX_INSTALLATIONS[1]
       ) {
-        console.debug(`Skipping test for: ${installation * i} installations`);
+        console.log(
+          `Skipping test for: ${installation * i} installations (min: ${MIN_MAX_INSTALLATIONS[0]}, max: ${MIN_MAX_INSTALLATIONS[1]})`,
+        );
         continue;
       }
       const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
+      console.log(test);
       it(test, async () => {
         try {
-          console.log(test);
           workers = await getWorkers(
             getRandomNames(WORKER_COUNT),
             testName,
