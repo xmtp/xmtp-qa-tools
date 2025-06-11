@@ -9,7 +9,7 @@ import {
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 function showHelp() {
-  console.debug(`
+  console.log(`
 XMTP Generator Utility
 
 Usage:
@@ -21,14 +21,6 @@ Options:
   --installations <number>        Number of installations per account per network (default: 1)
 
   --help                          Show this help message
-
-Smart Logic:
-  - Works directly with inbox files (e.g., 2.json for 2 installations)
-  - Updates installations for existing accounts as needed
-  - Generates new accounts if count exceeds existing accounts
-  - Removes duplicates automatically
-  - Shows cool progress bars for all operations
-  - Keeps database files in logs/ folder
 `);
 }
 
@@ -135,11 +127,6 @@ async function checkInstallations(
       true,
     );
   let currentInstallations = state?.[0]?.installations.length || 0;
-  console.debug(
-    `\nChecking installations for account ${i + 1}/${installationCount}:`,
-  );
-  console.debug(`Current installations: ${currentInstallations}`);
-  console.debug(`Target installations: ${installationCount}`);
 
   // If we have more installations than desired, revoke the surplus ones
   const diff = currentInstallations - installationCount;
@@ -159,7 +146,6 @@ async function checkInstallations(
       });
 
     if (installationsToRevoke.length > 0) {
-      console.debug(`Revoking ${surplusCount} surplus installations...`);
       await clientCheckInstallations.revokeInstallations(installationsToRevoke);
       currentInstallations = installationCount;
     }
@@ -184,11 +170,10 @@ async function smartUpdate(opts: {
     loadEnv("smart-update");
   }
 
-  console.debug(`🚀 XMTP Smart Inbox Generator`);
-  console.debug(`📁 Using environments: ${envs.join(", ")}`);
-  console.debug(
-    `⚙️  Target installations per account per network: ${installationCount}`,
-  );
+  console.log(`\nConfiguration:
+- Environments: ${envs.join(", ")}
+- Installations per account: ${installationCount}
+- Target accounts: ${count || "all existing"}`);
 
   // Determine target file based on installations number
   const targetFileName = `${installationCount}.json`;
@@ -199,28 +184,19 @@ async function smartUpdate(opts: {
   if (fs.existsSync(targetFilePath)) {
     try {
       existingInboxes = JSON.parse(fs.readFileSync(targetFilePath, "utf8"));
-      console.debug(
-        `📋 Loaded ${existingInboxes.length} accounts from ${targetFileName}`,
-      );
     } catch (e) {
-      console.error(`❌ Could not read inbox file: ${targetFilePath}`, e);
+      console.error(`❌ Could not read inbox file: ${targetFilePath}`);
       existingInboxes = [];
     }
-  } else {
-    console.debug(`📄 Creating new inbox file: ${targetFileName}`);
   }
 
   const existingCount = existingInboxes.length;
   const targetCount = count || existingCount;
 
-  console.debug(`📊 Existing accounts: ${existingCount}`);
-  console.debug(`🎯 Target accounts: ${targetCount}`);
-
   // Setup directories
   const folderName = `db-generated-${installationCount}-${envs.join(",")}-${installationCount}inst`;
   const LOGPATH = `${BASE_LOGPATH}/${folderName}`;
   if (!fs.existsSync(LOGPATH)) {
-    console.debug(`📁 Creating directory: ${LOGPATH}...`);
     fs.mkdirSync(LOGPATH, { recursive: true });
   }
 
@@ -231,7 +207,6 @@ async function smartUpdate(opts: {
   // Process existing accounts first (only up to target count)
   const accountsToProcess = Math.min(targetCount, existingCount);
   if (accountsToProcess > 0) {
-    console.debug(`\n🔄 Updating ${accountsToProcess} existing accounts`);
     const updateProgress = new ProgressBar(accountsToProcess);
 
     for (let i = 0; i < accountsToProcess; i++) {
@@ -239,18 +214,12 @@ async function smartUpdate(opts: {
 
       try {
         if (!inbox.walletKey || !inbox.accountAddress || !inbox.inboxId) {
-          console.error(
-            `❌ Invalid inbox data for account ${i + 1}: missing required fields`,
-          );
           totalFailed++;
           continue;
         }
 
         const encryptionKey = inbox.dbEncryptionKey;
         if (!encryptionKey) {
-          console.error(
-            `❌ Invalid inbox data for account ${i + 1}: missing encryption key`,
-          );
           totalFailed++;
           continue;
         }
@@ -284,10 +253,6 @@ async function smartUpdate(opts: {
 
               totalCreated++;
             } catch (error) {
-              console.error(
-                `\n❌ Failed to create installation ${j + 1}/${installationCount} for ${inbox.accountAddress}:`,
-                error instanceof Error ? error.message : String(error),
-              );
               totalFailed++;
             }
           }
@@ -310,8 +275,6 @@ async function smartUpdate(opts: {
         );
       } catch (error) {
         totalFailed++;
-        console.error(`\n❌ Error updating inbox ${inbox.accountAddress}:`);
-        console.error(error instanceof Error ? error.message : String(error));
         updateProgress.update();
       }
     }
@@ -321,18 +284,13 @@ async function smartUpdate(opts: {
   // Generate new accounts if needed
   const newAccountsNeeded = Math.max(0, targetCount - accountsToProcess);
   if (newAccountsNeeded > 0) {
-    console.debug(`\n✨ Generating ${newAccountsNeeded} new accounts`);
     const generateProgress = new ProgressBar(newAccountsNeeded);
 
     let consecutiveFailures = 0;
     const MAX_CONSECUTIVE_FAILURES = 3;
 
     for (let i = 0; i < newAccountsNeeded; i++) {
-      // Stop if we hit too many consecutive failures
       if (consecutiveFailures >= MAX_CONSECUTIVE_FAILURES) {
-        console.error(
-          `\n🛑 Stopping generation after ${MAX_CONSECUTIVE_FAILURES} consecutive failures`,
-        );
         break;
       }
 
@@ -357,22 +315,17 @@ async function smartUpdate(opts: {
               });
 
               if (j === 0 && env === envs[0]) {
-                inboxId = client.inboxId; // Use the first installation's inboxId
+                inboxId = client.inboxId;
               }
 
               totalCreated++;
             } catch (error) {
-              console.error(
-                `\n❌ Failed to create installation ${j + 1}/${installationCount} for new account ${accountAddress}:`,
-                error instanceof Error ? error.message : String(error),
-              );
               totalFailed++;
               installationsFailed++;
             }
           }
         }
 
-        // Only add account if at least one installation succeeded
         if (installationsFailed < installationCount * envs.length) {
           const newAccount: InboxData = {
             accountAddress,
@@ -384,9 +337,8 @@ async function smartUpdate(opts: {
           };
 
           existingInboxes.push(newAccount);
-          consecutiveFailures = 0; // Reset failure counter on success
+          consecutiveFailures = 0;
 
-          // Save progress after each new account
           fs.writeFileSync(
             targetFilePath,
             JSON.stringify(existingInboxes, null, 2),
@@ -396,11 +348,7 @@ async function smartUpdate(opts: {
         }
 
         generateProgress.update();
-      } catch (error: unknown) {
-        console.error(
-          `\nError generating account ${existingCount + i + 1}:`,
-          error,
-        );
+      } catch (error) {
         totalFailed++;
         consecutiveFailures++;
         generateProgress.update();
@@ -411,28 +359,13 @@ async function smartUpdate(opts: {
 
   // Final cleanup and save
   const finalInboxes = removeDuplicates(existingInboxes);
-
-  // Save directly to the target file
   fs.writeFileSync(targetFilePath, JSON.stringify(finalInboxes, null, 2));
 
-  console.debug(`\n🎉 Smart Update Summary`);
-  console.debug(
-    `📊 Existing accounts processed: ${Math.min(totalUpdated, accountsToProcess)}`,
-  );
-  console.debug(
-    `✨ New accounts generated: ${finalInboxes.length - accountsToProcess}`,
-  );
-  console.debug(`🎯 Total accounts in final file: ${finalInboxes.length}`);
-  console.debug(`✅ Total installations created: ${totalCreated}`);
-  console.debug(`❌ Total installations failed: ${totalFailed}`);
-  console.debug(`💾 Data saved to: ${targetFilePath}`);
-  console.debug(`📁 Database files stored in: ${LOGPATH}`);
-
-  if (finalInboxes.length > 0) {
-    console.debug(
-      "\n🚀 These inboxes are now ready to use in your XMTP environment!",
-    );
-  }
+  console.log(`\nSummary:
+- Total accounts: ${finalInboxes.length}
+- Installations created: ${totalCreated}
+- Installations failed: ${totalFailed}
+- Data saved to: ${targetFilePath}`);
 }
 
 async function main() {
