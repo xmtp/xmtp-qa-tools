@@ -3,7 +3,7 @@ import { getRandomNames, loadEnv } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxByInstallationCount } from "@inboxes/gen";
+import { getInboxByInstallationCount } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";

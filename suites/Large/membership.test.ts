@@ -2,7 +2,7 @@ import { getFixedNames, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxIds } from "@inboxes/gen";
+import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
