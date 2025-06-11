@@ -3,6 +3,7 @@ import path from "path";
 import newInboxes2 from "@inboxes/2.json";
 import newInboxes5 from "@inboxes/5.json";
 import newInboxes10 from "@inboxes/10.json";
+import newInboxes15 from "@inboxes/15.json";
 import newInboxes20 from "@inboxes/20.json";
 import newInboxes25 from "@inboxes/25.json";
 import type { Worker, WorkerManager } from "@workers/manager";
@@ -316,6 +317,7 @@ const typedInboxes5 = newInboxes5 as InboxData[];
 const typedInboxes10 = newInboxes10 as InboxData[];
 const typedInboxes20 = newInboxes20 as InboxData[];
 const typedInboxes25 = newInboxes25 as InboxData[];
+const typedInboxes15 = newInboxes15 as InboxData[];
 
 type InboxData = {
   accountAddress: string;
@@ -337,6 +339,10 @@ export function getInboxByInstallationCount(
     return index !== undefined
       ? typedInboxes10.slice(0, index)
       : typedInboxes10;
+  } else if (installationCount === 15) {
+    return index !== undefined
+      ? typedInboxes15.slice(0, index)
+      : typedInboxes15;
   } else if (installationCount === 20) {
     return index !== undefined
       ? typedInboxes20.slice(0, index)

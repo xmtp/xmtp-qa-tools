@@ -25,11 +25,11 @@ run_with_retry() {
     
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        echo "Command: yarn gen --envs local --inst $installations"
+        echo "Command: yarn gen --envs local --installations $installations"
         echo "Starting yarn gen  -count $COUNT at $(date)"
         
         # Run yarn gen command with output capture
-        output=$(yarn gen --envs $ENVS --inst $installations --count $COUNT 2>&1)
+        output=$(yarn gen --envs $ENVS --installations $installations --count $COUNT 2>&1)
         local exit_code=$?
         
         # Display the output

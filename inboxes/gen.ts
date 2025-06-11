@@ -18,7 +18,7 @@ Usage:
 Options:
   --count <number>                Total number of accounts to ensure exist
   --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
-  --inst <number>        Number of installations per account per network (default: 1)
+  --installations <number>        Number of installations per account per network (default: 1)
 
   --help                          Show this help message
 
@@ -132,18 +132,16 @@ async function checkInstallations(
   let state = await clientCheckInstallations?.preferences.inboxState();
   let currentInstallations = state?.installations.length || 0;
   console.debug(
-    `\n🔍 Checking installations for account ${i + 1}/${installationCount}:`,
+    `\nChecking installations for account ${i + 1}/${installationCount}:`,
   );
-  console.debug(`📊 Current installations: ${currentInstallations}`);
-  console.debug(`🎯 Target installations: ${installationCount}`);
+  console.debug(`Current installations: ${currentInstallations}`);
+  console.debug(`Target installations: ${installationCount}`);
 
   // If we have more installations than desired, revoke the surplus ones
   const diff = currentInstallations - installationCount;
   if (diff > 0) {
     const surplusCount = currentInstallations - installationCount;
     const allInstallations = state?.installations || [];
-
-    console.debug(`🔄 Found ${surplusCount} surplus installations to revoke`);
 
     // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
     const installationsToRevoke = allInstallations
@@ -157,10 +155,9 @@ async function checkInstallations(
       });
 
     if (installationsToRevoke.length > 0) {
-      console.debug(`🗑️  Revoking ${surplusCount} surplus installations...`);
+      console.debug(`Revoking ${surplusCount} surplus installations...`);
       await clientCheckInstallations.revokeInstallations(installationsToRevoke);
       currentInstallations = installationCount;
-      console.debug(`✅ Successfully revoked surplus installations`);
     }
   }
 
@@ -273,26 +270,20 @@ async function smartUpdate(opts: {
           // Create additional installations if needed
           for (let j = currentInstallations; j < installationCount; j++) {
             try {
-              console.debug(
-                `\n🔄 Creating installation ${j + 1}/${installationCount} for ${inbox.accountAddress}`,
-              );
               const dbPath = `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`;
-              console.debug(`📁 Using database path: ${dbPath}`);
 
-              const client = await Client.create(signer, {
+              await Client.create(signer, {
                 dbEncryptionKey,
                 dbPath: dbPath,
                 env: env,
               });
 
-              console.debug(`✅ Successfully created installation ${j + 1}`);
               totalCreated++;
             } catch (error) {
               console.error(
                 `\n❌ Failed to create installation ${j + 1}/${installationCount} for ${inbox.accountAddress}:`,
                 error instanceof Error ? error.message : String(error),
               );
-              console.debug(`🔍 Error details:`, error);
               totalFailed++;
             }
           }
@@ -353,15 +344,8 @@ async function smartUpdate(opts: {
 
         // Create installations for each environment
         for (const env of envs) {
-          console.debug(`\n🌐 Creating installations for environment: ${env}`);
           for (let j = 0; j < installationCount; j++) {
             try {
-              console.debug(
-                `\n🔄 Creating installation ${j + 1}/${installationCount} for new account ${accountAddress}`,
-              );
-              const dbPath = `${LOGPATH}/${env}-${accountAddress}-install-${j}`;
-              console.debug(`📁 Using database path: ${dbPath}`);
-
               const client = await Client.create(signer, {
                 dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
                 dbPath: `${LOGPATH}/${env}-${accountAddress}-install-${j}`,
@@ -370,19 +354,14 @@ async function smartUpdate(opts: {
 
               if (j === 0 && env === envs[0]) {
                 inboxId = client.inboxId; // Use the first installation's inboxId
-                console.debug(
-                  `📝 Got inboxId from first installation: ${inboxId}`,
-                );
               }
 
-              console.debug(`✅ Successfully created installation ${j + 1}`);
               totalCreated++;
             } catch (error) {
               console.error(
                 `\n❌ Failed to create installation ${j + 1}/${installationCount} for new account ${accountAddress}:`,
                 error instanceof Error ? error.message : String(error),
               );
-              console.debug(`🔍 Error details:`, error);
               totalFailed++;
               installationsFailed++;
             }
@@ -470,7 +449,7 @@ async function main() {
       envs = args[i + 1]
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
-    if (arg === "--inst") installations = parseInt(args[i + 1], 10);
+    if (arg === "--installations") installations = parseInt(args[i + 1], 10);
   });
 
   // Run smart update with all parsed options

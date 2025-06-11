@@ -25,11 +25,11 @@ run_with_retry() {
     
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        echo "Command: yarn gen --envs local --inst $installations"
+        echo "Command: yarn gen --envs local --installations $installations"
         echo "Starting yarn gen at $(date)"
         
         # Run yarn gen command directly to terminal
-        yarn gen --envs $ENVS --inst $installations --count $COUNT
+        yarn gen --envs $ENVS --installations $installations --count $COUNT
         local exit_code=$?
         
         echo "Yarn gen completed at $(date) with exit code: $exit_code"
@@ -51,7 +51,7 @@ run_with_retry() {
         # If not the last attempt, wait before retrying
         if [ $attempt -lt $MAX_RETRIES ]; then
             echo "Retrying in 60 seconds to avoid rate limits..."
-            sleep 5
+            sleep 2
         fi
         
         ((attempt++))
@@ -68,7 +68,7 @@ for installations in "${INSTALLATIONS[@]}"; do
     run_with_retry $installations
     
     # 1 minute delay between different installation tests to avoid rate limits
-    sleep 10
+    sleep 2
 done
 
 echo "✓ Completed all installation tests at $(date)"
