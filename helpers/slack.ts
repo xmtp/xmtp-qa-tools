@@ -13,6 +13,9 @@ export interface SlackNotificationOptions {
   customLinks?: string;
   jobStatus?: string;
   env?: string;
+  isOutage?: boolean;
+  failedTestsCount?: number;
+  totalTestsCount?: number;
 }
 
 interface GitHubContext {
@@ -163,7 +166,18 @@ export async function sendSlackNotification(
   }
 
   // Create message with error logs
-  const message = `Test Failure ❌
+  const message = options.isOutage
+    ? `🚨 *SYSTEM OUTAGE DETECTED* 🚨
+*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
+*Environment:* \`${githubContext.environment}\`
+*Failure Rate:* \`${options.failedTestsCount}/${options.totalTestsCount} tests failed\`
+*General dashboard:* <${datadogUrl}|View>
+*Geolocation:* \`${githubContext.region || "Unknown Region"}\`
+*Timestamp:* \`${new Date().toLocaleString()}\`
+${url}
+${customLinks}
+${options.errorLogs || ""}`
+    : `Test Failure ❌
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${githubContext.environment}\`
 *General dashboard:* <${datadogUrl}|View>

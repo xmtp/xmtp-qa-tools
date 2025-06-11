@@ -114,16 +114,34 @@ describe(testName, () => {
     }
   });
 
-  it("add member to group", async () => {
+  it("should create a group and send a message", async () => {
     try {
+      groupId = await xmtpTester.newGroupFromUI([
+        ...getInboxIds(4),
+        gmBot.inboxId,
+      ]);
+      await xmtpTester.sendMessage(`hi ${receiver}`);
+      const result = await xmtpTester.waitForResponse(["gm"]);
+      expect(result).toBe(true);
+    } catch (e) {
+      await xmtpTester.takeSnapshot("gm-group");
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
+
+  it("add member to group async iterator", async () => {
+    try {
+      groupId = await xmtpTester.newGroupFromUI([
+        ...getInboxIds(4),
+        gmBot.inboxId,
+      ]);
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
       const conversationStream = await creator.client.conversations.stream();
       for await (const conversation of conversationStream) {
         if (conversation?.id === groupId) {
           expect(conversation.id).toBe(groupId);
           break;
-        } else {
-          expect(conversation?.id).toBeDefined();
         }
       }
     } catch (e) {
