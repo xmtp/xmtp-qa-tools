@@ -3,7 +3,9 @@ description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+    - cron: "15 * * * *" # Default schedule for browser tests
+    - cron: "45 * * * *" # Default schedule for regression tests
+    - cron: "30 * * * *" # Default schedule for agents tests
   workflow_dispatch:
 
 jobs:
@@ -12,8 +14,15 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [browser, regression]
+        include:
+          - test: browser
+            schedule: "15 * * * *"
+          - test: regression
+            schedule: "45 * * * *"
+          - test: agents
+            schedule: "30 * * * *"
         environment: [production]
+    if: github.event_name == 'workflow_dispatch' || github.event.schedule == matrix.schedule
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
