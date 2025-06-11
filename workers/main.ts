@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/utils";
+import { createClient, defaultValues, getDataPath } from "@helpers/client";
 import {
   ConsentState,
   Dm,

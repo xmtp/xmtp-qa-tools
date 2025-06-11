@@ -223,8 +223,11 @@ You're an expert in writing TypeScript with Node.js. Generate **high-quality XMT
 ### Solution:
 
 ```typescript
-import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { logAgentDetails } from "@helpers/utils";
+import {
+  createSigner,
+  getEncryptionKeyFromHex,
+  logAgentDetails,
+} from "@helpers/client";
 import { Client, IdentifierKind } from "@xmtp/node-sdk";
 
 // Define the address to always add to new groups

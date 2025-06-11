@@ -129,9 +129,8 @@ async function checkInstallations(
   let currentInstallations = state?.[0]?.installations.length || 0;
 
   // If we have more installations than desired, revoke the surplus ones
-  const diff = currentInstallations - installationCount;
-  if (diff > 0) {
-    const surplusCount = currentInstallations - installationCount;
+  const surplus = currentInstallations - installationCount;
+  if (surplus > 0) {
     const allInstallations = state?.[0]?.installations || [];
 
     // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
@@ -185,7 +184,7 @@ async function smartUpdate(opts: {
     try {
       existingInboxes = JSON.parse(fs.readFileSync(targetFilePath, "utf8"));
     } catch (e) {
-      console.error(`❌ Could not read inbox file: ${targetFilePath}`);
+      console.error(`❌ Could not read inbox file: ${targetFilePath}`, e);
       existingInboxes = [];
     }
   }
@@ -252,7 +251,8 @@ async function smartUpdate(opts: {
               });
 
               totalCreated++;
-            } catch (error) {
+            } catch (e) {
+              console.error(`❌ Could not create installation`, e);
               totalFailed++;
             }
           }
@@ -265,7 +265,6 @@ async function smartUpdate(opts: {
           }
         }
 
-        totalUpdated++;
         updateProgress.update();
 
         // Save progress after each account update
@@ -273,7 +272,8 @@ async function smartUpdate(opts: {
           targetFilePath,
           JSON.stringify(existingInboxes, null, 2),
         );
-      } catch (error) {
+      } catch (e) {
+        console.error(`❌ Could not update account`, e);
         totalFailed++;
         updateProgress.update();
       }
@@ -319,7 +319,8 @@ async function smartUpdate(opts: {
               }
 
               totalCreated++;
-            } catch (error) {
+            } catch (e) {
+              console.error(`❌ Could not create installation`, e);
               totalFailed++;
               installationsFailed++;
             }
@@ -348,7 +349,8 @@ async function smartUpdate(opts: {
         }
 
         generateProgress.update();
-      } catch (error) {
+      } catch (e) {
+        console.error(`❌ Could not create account`, e);
         totalFailed++;
         consecutiveFailures++;
         generateProgress.update();

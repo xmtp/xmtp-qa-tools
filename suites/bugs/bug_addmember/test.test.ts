@@ -1,7 +1,7 @@
-import { loadEnv } from "@helpers/client";
+import { getManualUsers, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getInboxIds, getManualUsers } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
