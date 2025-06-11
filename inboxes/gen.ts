@@ -364,7 +364,6 @@ async function checkInstallations(
       true,
     );
   let currentInstallations = state?.[0]?.installations.length || 0;
-  analyzeAllFiles();
 
   // If we have more installations than desired, revoke the surplus ones
   const surplus = currentInstallations - installationCount;
@@ -436,6 +435,7 @@ async function smartUpdate(opts: {
   if (!fs.existsSync(LOGPATH)) {
     fs.mkdirSync(LOGPATH, { recursive: true });
   }
+  analyzeAllFiles();
 
   let totalCreated = 0;
   let totalFailed = 0;
