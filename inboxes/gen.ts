@@ -129,8 +129,12 @@ async function checkInstallations(
   installationCount: number,
   i: number,
 ) {
-  let state = await clientCheckInstallations?.preferences.inboxState();
-  let currentInstallations = state?.installations.length || 0;
+  let state =
+    await clientCheckInstallations?.preferences.inboxStateFromInboxIds(
+      [clientCheckInstallations.inboxId],
+      true,
+    );
+  let currentInstallations = state?.[0]?.installations.length || 0;
   console.debug(
     `\nChecking installations for account ${i + 1}/${installationCount}:`,
   );
@@ -141,7 +145,7 @@ async function checkInstallations(
   const diff = currentInstallations - installationCount;
   if (diff > 0) {
     const surplusCount = currentInstallations - installationCount;
-    const allInstallations = state?.installations || [];
+    const allInstallations = state?.[0]?.installations || [];
 
     // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
     const installationsToRevoke = allInstallations
@@ -268,7 +272,7 @@ async function smartUpdate(opts: {
           );
 
           // Create additional installations if needed
-          for (let j = currentInstallations; j < installationCount; j++) {
+          for (let j = currentInstallations; j <= installationCount; j++) {
             try {
               const dbPath = `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`;
 

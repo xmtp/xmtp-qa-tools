@@ -13,7 +13,7 @@ export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 20;
 export const TOTAL = 220;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
-export const MIN_MAX_INSTALLATIONS = [10, 200];
+export const MIN_MAX_INSTALLATIONS = [1000, 2000];
 
 const testName = "large-groups";
 loadEnv(testName);
