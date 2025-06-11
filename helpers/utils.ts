@@ -6,6 +6,7 @@ import newInboxes10 from "@inboxes/10.json";
 import newInboxes15 from "@inboxes/15.json";
 import newInboxes20 from "@inboxes/20.json";
 import newInboxes25 from "@inboxes/25.json";
+import newInboxes30 from "@inboxes/30.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { type Conversation } from "@xmtp/node-sdk";
 import {
@@ -318,6 +319,7 @@ const typedInboxes10 = newInboxes10 as InboxData[];
 const typedInboxes20 = newInboxes20 as InboxData[];
 const typedInboxes25 = newInboxes25 as InboxData[];
 const typedInboxes15 = newInboxes15 as InboxData[];
+const typedInboxes30 = newInboxes30 as InboxData[];
 
 type InboxData = {
   accountAddress: string;
@@ -351,6 +353,10 @@ export function getInboxByInstallationCount(
     return index !== undefined
       ? typedInboxes25.slice(0, index)
       : typedInboxes25;
+  } else if (installationCount === 30) {
+    return index !== undefined
+      ? typedInboxes30.slice(0, index)
+      : typedInboxes30;
   }
   return typedInboxes2;
 }
