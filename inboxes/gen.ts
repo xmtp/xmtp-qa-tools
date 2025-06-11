@@ -234,7 +234,6 @@ async function smartUpdate(opts: {
           const { currentInstallations } = await checkInstallations(
             clientCheckInstallations,
             installationCount,
-            i,
           );
 
           // Create additional installations if needed
