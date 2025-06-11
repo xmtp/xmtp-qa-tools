@@ -119,7 +119,6 @@ function removeDuplicates(inboxes: InboxData[]): InboxData[] {
 async function checkInstallations(
   clientCheckInstallations: Client,
   installationCount: number,
-  i: number,
 ) {
   let state =
     await clientCheckInstallations?.preferences.inboxStateFromInboxIds(
@@ -201,7 +200,6 @@ async function smartUpdate(opts: {
 
   let totalCreated = 0;
   let totalFailed = 0;
-  let totalUpdated = 0;
 
   // Process existing accounts first (only up to target count)
   const accountsToProcess = Math.min(targetCount, existingCount);
