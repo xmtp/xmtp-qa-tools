@@ -1,8 +1,8 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/gen";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";

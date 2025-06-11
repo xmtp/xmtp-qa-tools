@@ -13,7 +13,7 @@ echo "Caffeinate started with PID: $CAFFEINATE_PID"
 # Array of installations values
 INSTALLATIONS=(2 5 10 15 20 25)
 MAX_RETRIES=3
-ENVS=local
+ENVS=production
 COUNT=200
 
 echo "Arrays and variables initialized"
@@ -26,12 +26,15 @@ run_with_retry() {
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
         echo "Command: yarn gen --envs local --installations $installations"
-        echo "Starting yarn gen at $(date)"
+        echo "Starting yarn gen  -count $COUNT at $(date)"
         
-        # Run yarn gen command directly to terminal
-        yarn gen --envs $ENVS --installations $installations --count $COUNT
+        # Run yarn gen command with output capture
+        output=$(yarn gen --envs $ENVS --installations $installations --count $COUNT 2>&1)
         local exit_code=$?
         
+        # Display the output
+        echo "Command output:"
+        echo "$output"
         echo "Yarn gen completed at $(date) with exit code: $exit_code"
         
         # Check if command was interrupted (Ctrl+C)
@@ -66,8 +69,6 @@ echo "Starting test cycle at $(date)"
 # Run tests for each installations value
 for installations in "${INSTALLATIONS[@]}"; do
     run_with_retry $installations
-    
-    # 1 minute delay between different installation tests to avoid rate limits
     sleep 2
 done
 

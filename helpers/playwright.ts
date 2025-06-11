@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { defaultValues } from "@helpers/client";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
@@ -7,7 +8,6 @@ import {
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
-import { defaultValues } from "./utils";
 
 // Default timeout for stream collection in milliseconds
 const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS

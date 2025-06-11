@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.18",
+  "version": "0.1.19",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -14,7 +14,7 @@
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
-    "count-duplicates": "NODE_OPTIONS='--experimental-specifier-resolution=node' tsx inboxes/count-duplicates.ts",
+    "count-duplicates": "NODE_OPTIONS='--experimental-specifier-resolution=node' tsx inboxes/utils.ts",
     "forked": "./suites/group/run.sh",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
@@ -26,6 +26,7 @@
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
+    "run:gen": "tsx inboxes/gen.ts",
     "script": "yarn cli script",
     "small": "yarn test suites/small",
     "start": "vitest --ui --standalone --watch ",

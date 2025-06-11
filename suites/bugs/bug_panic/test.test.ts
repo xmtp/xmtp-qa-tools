@@ -1,5 +1,4 @@
-import { loadEnv } from "@helpers/client";
-import { getFixedNames } from "@helpers/utils";
+import { getFixedNames, loadEnv } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 

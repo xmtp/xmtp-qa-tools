@@ -1,17 +1,17 @@
-import { loadEnv } from "@helpers/client";
+import {
+  appendToEnv,
+  getFixedNames,
+  getManualUsers,
+  loadEnv,
+} from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
   verifyMembershipStream,
   verifyMessageStream,
   verifyMetadataStream,
 } from "@helpers/streams";
-import {
-  appendToEnv,
-  getFixedNames,
-  getManualUsers,
-  getRandomInboxIds,
-} from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getRandomInboxIds } from "@inboxes/gen";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";

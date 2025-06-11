@@ -1,8 +1,8 @@
-import { loadEnv } from "@helpers/client";
+import { getFixedNames, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/utils";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/gen";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";

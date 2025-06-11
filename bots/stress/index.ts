@@ -1,4 +1,5 @@
-import { getInboxIds, logAndSend } from "@helpers/utils";
+import { logAndSend } from "@helpers/client";
+import { getInboxIds } from "@inboxes/gen";
 import {
   type Client,
   type Conversation,

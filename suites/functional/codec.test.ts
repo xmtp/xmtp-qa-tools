@@ -1,5 +1,4 @@
-import { loadEnv } from "@helpers/client";
-import { getFixedNames } from "@helpers/utils";
+import { getFixedNames, loadEnv } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {

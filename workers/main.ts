@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/utils";
+import { createClient, defaultValues, getDataPath } from "@helpers/client";
 import {
   ConsentState,
   Dm,
@@ -76,7 +75,6 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
 // Re-export anything needed in the worker environment (if necessary)
 export type { Client };
 `;
-
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
   import { parentPort, workerData } from "node:worker_threads";

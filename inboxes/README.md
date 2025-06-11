@@ -42,11 +42,20 @@ Generates 200 inboxes per configuration for installation counts: 10, 15, 20, 25.
 ### Troubleshoorting
 
 ```bash
+#modify workers
+#remove data and keys
 XMTP_ENV=local
+# delete .data and keys
+yarn functional
+
+# remove all docker containers and networks
+./dev/down
+
+# remove all docker containers and networks
+./dev/down
+
 # remove all docker containers and networks
 ./dev/up
 # update local inboxes (this will take a while)
 yarn local-update
-# delete .data and keys
-yarn functional
 ```
