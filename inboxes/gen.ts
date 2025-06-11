@@ -256,7 +256,7 @@ Options:
   --count <number>                Total number of accounts to ensure exist
   --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
   --installations <number>        Number of installations per account per network (default: 1)
-  --mode <mode>                   Operation mode (default: update, options: update, count-duplicates)
+  --mode <mode>                   Operation mode (default: update, options: update)
 
   --help                          Show this help message
 `);
@@ -628,11 +628,6 @@ async function main() {
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
     if (arg === "--mode") mode = args[i + 1];
   });
-
-  if (mode === "count-duplicates") {
-    analyzeAllFiles();
-    return;
-  }
 
   // Run smart update with all parsed options
   await smartUpdate({ count, envs, installations });
