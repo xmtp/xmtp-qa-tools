@@ -26,6 +26,7 @@
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
+    "run:gen": "tsx inboxes/gen.ts",
     "script": "yarn cli script",
     "small": "yarn test suites/small",
     "start": "vitest --ui --standalone --watch ",

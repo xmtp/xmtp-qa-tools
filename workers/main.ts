@@ -85,6 +85,8 @@ const workerBootstrap = /* JavaScript */ `
   const workerCode = ${JSON.stringify(workerThreadCode)};
   const workerModule = new Function('require', 'parentPort', 'workerData', 'process', workerCode);
   
+
+  
   // Get the require function
   import { createRequire } from "node:module";
   import { fileURLToPath } from "node:url";

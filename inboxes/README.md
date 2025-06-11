@@ -42,6 +42,7 @@ Generates 200 inboxes per configuration for installation counts: 10, 15, 20, 25.
 ### Troubleshoorting
 
 ```bash
+#modify workers
 XMTP_ENV=local
 # remove all docker containers and networks
 ./dev/up

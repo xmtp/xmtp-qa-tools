@@ -131,7 +131,9 @@ async function checkInstallations(
 ) {
   let state = await clientCheckInstallations?.preferences.inboxState();
   let currentInstallations = state?.installations.length || 0;
-  console.debug(`\nChecking installations for account ${i}:`);
+  console.debug(
+    `\nChecking installations for account ${i + 1}/${installationCount}:`,
+  );
   console.debug(`Current installations: ${currentInstallations}`);
   console.debug(`Target installations: ${installationCount}`);
 
@@ -171,7 +173,7 @@ async function smartUpdate(opts: {
 
   // Set defaults
   envs = envs || ["local"];
-  const installationCount = installations || 1;
+  const installationCount = installations || 2;
 
   // Load environment for local operations
   if (envs.includes("local")) {
