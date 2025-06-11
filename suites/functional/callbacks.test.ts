@@ -93,20 +93,24 @@ describe(testName, async () => {
     }
   });
 
-  it("awaitStreamConversation: should measure creating a DM and sending a message", async () => {
+  it("callbackStreamConversation: should measure creating a DM and sending a message", async () => {
     try {
       const receiver = workers.get(names[1])!;
-      receiver.client.conversations.stream((err, conversation) => {
-        if (err) throw err;
-        if (conversation?.id === convo.id) {
-          console.log("conversation", conversation.id);
-          expect(conversation.id).toBe(convo.id);
-          return;
-        } else {
-          throw new Error("Conversation not found");
-        }
-      });
-      const convo = await workers.createGroup();
+      receiver.client.conversations
+        .stream((err, conversation) => {
+          if (err) throw err;
+          if (conversation?.id === convo.id) {
+            console.log("conversation", conversation.id);
+            expect(conversation.id).toBe(convo.id);
+            return;
+          } else {
+            throw new Error("Conversation not found");
+          }
+        })
+        .catch((e: unknown) => {
+          logError(e, expect.getState().currentTestName);
+          throw e;
+        });
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
