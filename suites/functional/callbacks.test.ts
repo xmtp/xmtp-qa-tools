@@ -30,12 +30,15 @@ describe(testName, async () => {
 
       await convo.send("1");
       for await (const message of receiverConversation) {
-        if (message?.conversationId === convo.id) {
-          console.log("message", message.content);
-          expect(message.content).toBe("1");
-          break;
-        } else {
-          throw new Error("Message not found");
+        try {
+          if (message?.conversationId === convo.id) {
+            console.log("message", message.content);
+            expect(message.content).toBe("1");
+            break;
+          }
+        } catch (e) {
+          logError(e, expect.getState().currentTestName);
+          throw e;
         }
       }
     } catch (e) {
@@ -81,12 +84,15 @@ describe(testName, async () => {
       const stream = receiver.client.conversations.stream();
       const convo = await workers.createGroup();
       for await (const conversation of stream) {
-        if (conversation?.id === convo.id) {
-          console.log("conversation", conversation.id);
-          expect(conversation.id).toBe(convo.id);
-          break;
-        } else {
-          throw new Error("Conversation not found");
+        try {
+          if (conversation?.id === convo.id) {
+            console.log("conversation", conversation.id);
+            expect(conversation.id).toBe(convo.id);
+            break;
+          }
+        } catch (e) {
+          logError(e, expect.getState().currentTestName);
+          throw e;
         }
       }
     } catch (e) {
