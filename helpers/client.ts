@@ -810,29 +810,6 @@ export const formatBytes = (bytes: number): string => {
   return `${(bytes / Math.pow(k, i)).toFixed(2)} ${sizes[i]}`;
 };
 
-export const personalities = [
-  {
-    name: "sam",
-    personality: "Sam personally hates GPT and AI. Its kind of a jerk.",
-  },
-  {
-    name: "walt",
-    personality: "Walt is a bit more friendly. He likes to make jokes.",
-  },
-  {
-    name: "tina",
-    personality:
-      "Tina its non-tech savvy. She doesn't know much about anything.",
-  },
-];
-
-/**
- * Log a message to the console and send it to a conversation
- * @param message The message to log and send
- * @param conversation The conversation to send the message to
- * @param level The log level (default: 'info')
- * @returns A promise that resolves when the message is sent
- */
 export const logAndSend = async (
   message: string,
   conversation: Conversation,

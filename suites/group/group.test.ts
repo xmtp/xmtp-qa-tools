@@ -11,7 +11,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/gen";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";

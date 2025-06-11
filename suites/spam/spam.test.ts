@@ -1,7 +1,7 @@
 import { formatBytes, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getRandomInboxIds } from "@inboxes/gen";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";

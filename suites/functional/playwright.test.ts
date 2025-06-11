@@ -5,7 +5,7 @@ import {
   getInboxByInstallationCount,
   getInboxIds,
   getRandomInboxIds,
-} from "@inboxes/utils";
+} from "@inboxes/gen";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
