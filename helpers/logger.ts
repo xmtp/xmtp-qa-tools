@@ -202,7 +202,7 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    logger.error("ERROR " + message);
+    logger.error(message);
   };
 
   // Override console.debug
