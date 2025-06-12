@@ -282,6 +282,7 @@ export function extractErrorLogs(testName: string): string {
         if (
           /ERROR/.test(line) ||
           /forked/.test(line) ||
+          /FAIL/.test(line) ||
           /Message cursor/.test(line)
         ) {
           // Use the comprehensive stripAnsi function instead of simple regex
@@ -295,7 +296,7 @@ export function extractErrorLogs(testName: string): string {
             cleanLine = cleanLine.split("//")[0]?.trim();
           }
           cleanLine = cleanLine?.replace("expected false to be true", "failed");
-
+          cleanLine = cleanLine?.trim();
           // Check if this line contains any patterns we want to deduplicate
           let shouldSkip = false;
           for (const pattern of patternsToTrack) {
