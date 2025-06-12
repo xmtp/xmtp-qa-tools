@@ -15,13 +15,7 @@ export const LOG_FILTER_PATTERNS = [
 ];
 
 // Patterns to match log lines for error extraction
-export const LOG_LINE_MATCH_PATTERNS = [
-  /ERROR/,
-  /forked/,
-  /FAIL/,
-  /Message cursor/,
-  // Add more patterns here as needed
-];
+export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/];
 
 /**
  * Remove ANSI escape codes from text
