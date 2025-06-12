@@ -389,8 +389,9 @@ export async function sendDatadogLog(
     message,
     level: "error",
     service: context.service || "xmtp-qa-tools",
-    testName: context.testName,
-    environment: process.env.XMTP_ENV,
+    test: context.testName,
+    region: process.env.GEOLOCATION,
+    env: process.env.XMTP_ENV,
     ...context,
     ddtags: `env:${process.env.XMTP_ENV || "unknown"},service:xmtp-qa-tools`,
   };
