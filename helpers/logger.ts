@@ -15,7 +15,7 @@ export const LOG_FILTER_PATTERNS = [
 ];
 
 // Patterns to match log lines for error extraction
-export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/];
+export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/, /QA_ERROR/];
 
 /**
  * Remove ANSI escape codes from text
@@ -149,11 +149,11 @@ export const createLogger = () => {
 };
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
-  if (e instanceof Error) {
-    console.error(`Test failed in ${testName}`, e.message);
-  } else {
-    console.error(`Unknown error type:`, typeof e);
-  }
+  // if (e instanceof Error) {
+  //   console.warn(`Test failed in ${testName}`, e.message);
+  // } else {
+  //   console.error(`Unknown error type:`, typeof e);
+  // }
   return true;
 };
 
@@ -202,8 +202,7 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    //logger.error("ERROR " + message);
-    logger.error(message);
+    logger.error("QA_ERROR" + message);
   };
 
   // Override console.debug
@@ -287,18 +286,18 @@ export function extractErrorLogs(testName: string): Set<string> {
         if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
           // Use the comprehensive stripAnsi function instead of simple regex
           let cleanLine = stripAnsi(line);
-
-          if (cleanLine.includes("ERROR")) {
-            cleanLine = cleanLine.split("ERROR")[1].trim();
-          }
-          if (cleanLine.includes("FAIL")) {
-            cleanLine = cleanLine.split("FAIL")[1].trim();
-          }
-          if (cleanLine.includes("forked")) {
-            cleanLine = cleanLine.split("forked")[1].trim();
-          }
-          if (cleanLine.includes("//")) {
-            cleanLine = cleanLine.split("//")[0]?.trim();
+          const patterns = LOG_LINE_MATCH_PATTERNS.map(
+            (pattern) => pattern.source,
+          );
+          for (const pattern of patterns) {
+            if (cleanLine.includes(pattern)) {
+              if (pattern === "//") {
+                cleanLine = cleanLine.split(pattern)[0]?.trim();
+              } else {
+                cleanLine = cleanLine.split(pattern)[1].trim();
+              }
+              break;
+            }
           }
           cleanLine = cleanLine?.replace("expected false to be true", "failed");
           cleanLine = cleanLine?.trim();
