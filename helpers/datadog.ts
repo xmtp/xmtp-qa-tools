@@ -385,14 +385,16 @@ export async function sendDatadogLog(
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
+  const libXmtpVersion = "latest";
   const logPayload = {
     message,
     level: "error",
-    service: context.service || "xmtp-qa-tools",
-    testName: context.testName,
-    environment: process.env.XMTP_ENV,
+    service: "xmtp-qa-tools",
+    test: context.testName,
+    region: process.env.GEOLOCATION ?? "",
+    env: process.env.XMTP_ENV,
+    libxmtp: libXmtpVersion,
     ...context,
-    ddtags: `env:${process.env.XMTP_ENV || "unknown"},service:xmtp-qa-tools`,
   };
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
