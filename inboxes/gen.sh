@@ -6,8 +6,8 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 # Remove logs and .data as before
 
 echo "Script started at $(date)"
-echo "Removing logs/"
-rm -rf logs/
+#echo "Removing logs/"
+#rm -rf logs/
 
 echo "Removing .data/"
 rm -rf .data/
@@ -50,6 +50,49 @@ run_with_retry() {
 
 echo "Starting test cycle at $(date)"
 
-run_with_retry "$@"
+# Parse arguments to find --installations and its value
+INSTALLATIONS_ARG=""
+INSTALLATIONS_VALUE=""
+OTHER_ARGS=()
+
+while [[ $# -gt 0 ]]; do
+  key="$1"
+  case $key in
+    --installations)
+      INSTALLATIONS_ARG="--installations"
+      INSTALLATIONS_VALUE="$2"
+      shift # past argument
+      shift # past value
+      ;;
+    --installations=*)
+      INSTALLATIONS_ARG="--installations"
+      INSTALLATIONS_VALUE="${key#*=}"
+      shift # past argument=value
+      ;;
+    *)
+      OTHER_ARGS+=("$1")
+      shift # past argument
+      ;;
+  esac
+done
+
+if [[ -n "$INSTALLATIONS_VALUE" && "$INSTALLATIONS_VALUE" == *,* ]]; then
+  IFS=',' read -ra INSTALLATION_LIST <<< "$INSTALLATIONS_VALUE"
+  for inst in "${INSTALLATION_LIST[@]}"; do
+    echo "\n--- Running for --installations $inst ---"
+    run_with_retry "${OTHER_ARGS[@]}" $INSTALLATIONS_ARG "$inst"
+    if [ $? -ne 0 ]; then
+      echo "✗ Failed for --installations $inst. Exiting."
+      exit 1
+    fi
+  done
+else
+  # No comma, just run as before
+  if [[ -n "$INSTALLATIONS_ARG" ]]; then
+    run_with_retry "${OTHER_ARGS[@]}" $INSTALLATIONS_ARG "$INSTALLATIONS_VALUE"
+  else
+    run_with_retry "${OTHER_ARGS[@]}"
+  fi
+fi
 
 echo "✓ Completed all installation tests at $(date)"
