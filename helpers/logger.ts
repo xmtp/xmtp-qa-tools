@@ -290,7 +290,12 @@ export function extractErrorLogs(testName: string): Set<string> {
           if (cleanLine.includes("ERROR")) {
             cleanLine = cleanLine.split("ERROR")[1].trim();
           }
-
+          if (cleanLine.includes("FAIL")) {
+            cleanLine = cleanLine.split("FAIL")[1].trim();
+          }
+          if (cleanLine.includes("forked")) {
+            cleanLine = cleanLine.split("forked")[1].trim();
+          }
           if (cleanLine.includes("//")) {
             cleanLine = cleanLine.split("//")[0]?.trim();
           }
