@@ -13,7 +13,6 @@ interface InboxData {
   dbEncryptionKey: string;
   inboxId: string;
   installations: number;
-  dbPath?: string;
 }
 
 const typedInboxes2 = newInboxes2 as InboxData[];
