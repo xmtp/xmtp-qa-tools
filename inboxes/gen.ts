@@ -61,9 +61,9 @@ class ProgressBar {
   }
 }
 
-function readJson(path: string): any {
+function readJson(path: string): InboxData[] | undefined {
   try {
-    return JSON.parse(fs.readFileSync(path, "utf8"));
+    return JSON.parse(fs.readFileSync(path, "utf8")) as InboxData[];
   } catch {
     return undefined;
   }

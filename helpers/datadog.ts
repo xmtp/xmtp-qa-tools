@@ -1,6 +1,7 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
+import fetch from "node-fetch";
 
 interface NetworkStats {
   "DNS Lookup": number;
@@ -373,4 +374,36 @@ export function flushMetrics(): Promise<void> {
       resolve();
     });
   });
+}
+
+/**
+ * Send a log line to Datadog Logs Intake API
+ */
+export async function sendDatadogLog(
+  message: string,
+  context: Record<string, unknown> = {},
+): Promise<void> {
+  const apiKey = process.env.DATADOG_API_KEY;
+  if (!apiKey) return;
+  const logPayload = {
+    message,
+    level: "error",
+    service: context.service || "xmtp-qa-tools",
+    testName: context.testName,
+    environment: process.env.XMTP_ENV,
+    ...context,
+    ddtags: `env:${process.env.XMTP_ENV || "unknown"},service:xmtp-qa-tools`,
+  };
+  try {
+    await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "DD-API-KEY": apiKey,
+      },
+      body: JSON.stringify(logPayload),
+    });
+  } catch (err) {
+    console.error("Failed to send log to Datadog:", err);
+  }
 }
