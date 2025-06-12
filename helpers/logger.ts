@@ -2,6 +2,27 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 
+// Patterns to track for error deduplication and log filtering
+export const PATTERNS_TO_TRACK = [
+  "sync worker error storage error",
+  "sqlcipher_mlock",
+  // Add more patterns here as needed
+];
+
+export const LOG_FILTER_PATTERNS = [
+  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+  // Add more patterns here as needed
+];
+
+// Patterns to match log lines for error extraction
+export const LOG_LINE_MATCH_PATTERNS = [
+  /ERROR/,
+  /forked/,
+  /FAIL/,
+  /Message cursor/,
+  // Add more patterns here as needed
+];
+
 /**
  * Remove ANSI escape codes from text
  * This regex matches all ANSI escape sequences including:
@@ -230,12 +251,6 @@ export const getTime = () => {
   return time.replace(/:/g, "-");
 };
 
-// Log filtering utilities
-const LOG_FILTER_PATTERNS = [
-  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-  // Add more patterns here as needed
-];
-
 export const filterLogOutput = (data: string): string => {
   let filtered = data;
   for (const pattern of LOG_FILTER_PATTERNS) {
@@ -267,11 +282,6 @@ export function extractErrorLogs(testName: string): Set<string> {
 
     // Track specific error patterns we want to deduplicate
     const seenPatterns = new Set<string>();
-    const patternsToTrack = [
-      "sync worker error storage error",
-      "sqlcipher_mlock",
-      // Add more patterns here as needed
-    ];
 
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
@@ -279,12 +289,7 @@ export function extractErrorLogs(testName: string): Set<string> {
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (
-          /ERROR/.test(line) ||
-          /forked/.test(line) ||
-          /FAIL/.test(line) ||
-          /Message cursor/.test(line)
-        ) {
+        if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
           // Use the comprehensive stripAnsi function instead of simple regex
           let cleanLine = stripAnsi(line);
 
@@ -299,7 +304,7 @@ export function extractErrorLogs(testName: string): Set<string> {
           cleanLine = cleanLine?.trim();
           // Check if this line contains any patterns we want to deduplicate
           let shouldSkip = false;
-          for (const pattern of patternsToTrack) {
+          for (const pattern of PATTERNS_TO_TRACK) {
             if (cleanLine.includes(pattern)) {
               if (seenPatterns.has(pattern)) {
                 shouldSkip = true;
@@ -319,7 +324,7 @@ export function extractErrorLogs(testName: string): Set<string> {
 
     console.debug(errorLines);
     if (errorLines.size === 1) {
-      for (const pattern of patternsToTrack) {
+      for (const pattern of PATTERNS_TO_TRACK) {
         if (errorLines.values().next().value?.includes(pattern)) {
           console.log("returning empty string");
           return new Set();
