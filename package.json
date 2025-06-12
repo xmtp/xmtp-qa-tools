@@ -25,7 +25,7 @@
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500",
     "medium": "yarn test suites/medium",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
-    "prod-update": "./inboxes/gen.sh --envs production --installations 2,5,10,15,20,25,30 --count 200",
+    "prod-update": "./inboxes/gen.sh --envs production --installations 2,5,10,15,20,25,30 --count 500",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "run:gen": "tsx inboxes/gen.ts",
