@@ -85,8 +85,6 @@ describe(testName, async () => {
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
-      console.log("canMessage", Object.fromEntries(canMessage));
       expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
