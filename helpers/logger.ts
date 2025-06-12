@@ -1,3 +1,4 @@
+import { error } from "console";
 import fs from "fs";
 import path from "path";
 import winston from "winston";
@@ -253,9 +254,9 @@ export interface TestLogOptions {
 }
 
 // Extract error logs from log files
-export function extractErrorLogs(testName: string): string {
+export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
-    return "";
+    return new Set();
   }
   console.log("testName", testName);
 
@@ -322,17 +323,17 @@ export function extractErrorLogs(testName: string): string {
       for (const pattern of patternsToTrack) {
         if (errorLines.values().next().value?.includes(pattern)) {
           console.log("returning empty string");
-          return "";
+          return new Set();
         }
       }
     } else if (errorLines.size > 0) {
-      return `\n\n*Logs:*\n\`\`\`\n${Array.from(errorLines).join("\n")}\n\`\`\``;
+      return errorLines;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
   }
 
-  return "";
+  return new Set();
 }
 
 export const createTestLogger = (options: TestLogOptions) => {

@@ -10,7 +10,7 @@ interface SlackApiResponse {
 
 export interface SlackNotificationOptions {
   testName: string;
-  errorLogs?: string;
+  errorLogs?: Set<string>;
   customLinks?: string;
   jobStatus?: string;
   env?: string;
@@ -66,15 +66,12 @@ function getGitHubContext(): GitHubContext {
 }
 
 // Check if error logs contain only worker errors
-function isOnlyWorkerError(errorLogs?: string): boolean {
-  if (!errorLogs || !errorLogs.trim()) {
+function isOnlyWorkerError(errorLogs?: Set<string>): boolean {
+  if (!errorLogs || errorLogs.size === 0) {
     return false;
   }
 
-  const lines = errorLogs
-    .trim()
-    .split("\n")
-    .filter((line) => line.trim());
+  const lines = Array.from(errorLogs);
 
   // If there's only one line and it contains "worker" (case insensitive), consider it a worker error
   if (lines.length === 1) {
@@ -131,10 +128,7 @@ export async function sendSlackNotification(
 
   // Send each error log line to Datadog
   if (options.errorLogs) {
-    const lines = options.errorLogs
-      .split("\n")
-      .map((line) => line.trim())
-      .filter(Boolean);
+    const lines = Array.from(options.errorLogs);
     for (const line of lines) {
       // Only send non-empty lines
       await sendDatadogLog(line, {
@@ -181,27 +175,20 @@ export async function sendSlackNotification(
     }
   }
 
-  // Create message with error logs
-  const message = options.isOutage
-    ? `🚨 *SYSTEM OUTAGE DETECTED* 🚨
-*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
+  const title = options.isOutage
+    ? "🚨 *SYSTEM OUTAGE DETECTED* 🚨:"
+    : "*Test Failure ❌*";
+
+  const message = `${title}\n\n*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${githubContext.environment}\`
-*Failure Rate:* \`${options.failedTestsCount}/${options.totalTestsCount} tests failed\`
-*General dashboard:* <${datadogUrl}|View>
+${options.isOutage ? `*Failure Rate:* \`${options.failedTestsCount}/${options.totalTestsCount} tests failed\`\n` : ""}*General dashboard:* <${datadogUrl}|View>
 *Geolocation:* \`${githubContext.region || "Unknown Region"}\`
 *Timestamp:* \`${new Date().toLocaleString()}\`
 ${url}
 ${customLinks}
-${options.errorLogs || ""}`
-    : `Test Failure ❌
-*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
-*Environment:* \`${githubContext.environment}\`
-*General dashboard:* <${datadogUrl}|View>
-*Geolocation:* \`${githubContext.region || "Unknown Region"}\`
-*Timestamp:* \`${new Date().toLocaleString()}\`
-${url}
-${customLinks}
-${options.errorLogs || ""}`;
+Logs:
+\`\`\`${Array.from(options.errorLogs || []).join("\n")}\`\`\`
+`;
 
   try {
     const response = await fetch("https://slack.com/api/chat.postMessage", {
