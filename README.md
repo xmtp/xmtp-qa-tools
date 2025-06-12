@@ -245,6 +245,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 ## Tools & utilities
 
 - **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
+- **Logging:** Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)

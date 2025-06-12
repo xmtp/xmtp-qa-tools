@@ -381,7 +381,7 @@ export function flushMetrics(): Promise<void> {
  */
 export async function sendDatadogLog(
   message: string,
-  context: Record<string, any> = {},
+  context: Record<string, unknown> = {},
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
