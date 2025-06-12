@@ -1,5 +1,6 @@
 import "dotenv/config";
 import fetch from "node-fetch";
+import { sendDatadogLog } from "./datadog";
 
 // Type definitions
 interface SlackApiResponse {
@@ -126,6 +127,21 @@ export async function sendSlackNotification(
   // Check if we should send the notification
   if (!shouldSendNotification(options, githubContext)) {
     return;
+  }
+
+  // Send each error log line to Datadog
+  if (options.errorLogs) {
+    const lines = options.errorLogs
+      .split("\n")
+      .map((line) => line.trim())
+      .filter(Boolean);
+    for (const line of lines) {
+      // Only send non-empty lines
+      await sendDatadogLog(line, {
+        testName: options.testName,
+        environment: githubContext.environment,
+      });
+    }
   }
 
   const slackChannel = process.env.SLACK_CHANNEL || "general";
