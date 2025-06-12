@@ -15,13 +15,7 @@ export const LOG_FILTER_PATTERNS = [
 ];
 
 // Patterns to match log lines for error extraction
-export const LOG_LINE_MATCH_PATTERNS = [
-  /ERROR/,
-  /forked/,
-  /FAIL/,
-  /Message cursor/,
-  // Add more patterns here as needed
-];
+export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/];
 
 /**
  * Remove ANSI escape codes from text
@@ -208,7 +202,8 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    logger.error("ERROR " + message);
+    //logger.error("ERROR " + message);
+    logger.error(message);
   };
 
   // Override console.debug
@@ -296,7 +291,12 @@ export function extractErrorLogs(testName: string): Set<string> {
           if (cleanLine.includes("ERROR")) {
             cleanLine = cleanLine.split("ERROR")[1].trim();
           }
-
+          if (cleanLine.includes("FAIL")) {
+            cleanLine = cleanLine.split("FAIL")[1].trim();
+          }
+          if (cleanLine.includes("forked")) {
+            cleanLine = cleanLine.split("forked")[1].trim();
+          }
           if (cleanLine.includes("//")) {
             cleanLine = cleanLine.split("//")[0]?.trim();
           }
