@@ -149,11 +149,11 @@ export const createLogger = () => {
 };
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
-  // if (e instanceof Error) {
-  //   console.warn(`Test failed in ${testName}`, e.message);
-  // } else {
-  //   console.error(`Unknown error type:`, typeof e);
-  // }
+  if (e instanceof Error) {
+    console.warn(`${testName}`, e.message);
+  } else {
+    console.warn(`Unknown error type:`, typeof e);
+  }
   return true;
 };
 
