@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.20",
+  "version": "0.1.22",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -10,6 +10,7 @@
   ],
   "scripts": {
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
+    "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
     "build": "tsc",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
@@ -21,9 +22,10 @@
     "gen": "tsx inboxes/gen.ts",
     "large": "yarn test suites/large/*",
     "lint": "eslint .",
-    "local-update": "./inboxes/local-update.sh",
+    "local-update": "./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 200",
     "medium": "yarn test suites/medium",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
+    "prod-update": "./inboxes/gen.sh --envs production --installations 2,5,10,15,20,25,30 --count 200",
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "run:gen": "tsx inboxes/gen.ts",

@@ -13,7 +13,6 @@ interface InboxData {
   dbEncryptionKey: string;
   inboxId: string;
   installations: number;
-  dbPath?: string;
 }
 
 const typedInboxes2 = newInboxes2 as InboxData[];
@@ -57,7 +56,8 @@ export function getInboxByInstallationCount(
 }
 
 export function getRandomInboxIds(count: number) {
-  return getInboxByInstallationCount(2)
+  const pool = getInboxByInstallationCount(2).slice(0, 200);
+  return pool
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);

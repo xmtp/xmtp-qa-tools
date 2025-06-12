@@ -449,9 +449,9 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              console.debug(
-                `[${this.nameId}] Received message, ${message.content as string}`,
-              );
+              // console.debug(
+              //   `[${this.nameId}] Received message, ${message.content as string}`,
+              // );
               // Handle auto-responses if enabled
               await this.handleResponse(message);
 
@@ -485,9 +485,9 @@ export class WorkerClient extends Worker {
         return;
       }
       if (this.typeOfResponse === typeOfResponse.None) {
-        console.warn(
-          `[${this.nameId}] Skipping message, typeOfResponse is ${this.typeOfResponse}`,
-        );
+        // console.warn(
+        //   `[${this.nameId}] Skipping message, typeOfResponse is ${this.typeOfResponse}`,
+        // );
         return;
       }
 

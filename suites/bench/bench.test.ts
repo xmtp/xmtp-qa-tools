@@ -12,10 +12,10 @@ import { afterAll, describe, expect, it } from "vitest";
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 10;
 export const TOTAL = 200;
-export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25, 30];
-export const MIN_MAX_INSTALLATIONS = [1800, 2200];
+export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
+export const MIN_MAX_INSTALLATIONS = [20, 100];
 
-const testName = "large-groups";
+const testName = "bench";
 loadEnv(testName);
 
 describe(testName, () => {
@@ -255,8 +255,8 @@ export function saveLog(summaryMap: Record<string, SummaryEntry>) {
   console.log(messageToLog);
 
   // Save log file
-  fs.appendFileSync("logs/large-groups " + getTime() + ".log", messageToLog);
+  fs.appendFileSync("logs/bench " + getTime() + ".log", messageToLog);
 
   // Save CSV file
-  fs.writeFileSync("logs/large-groups " + getTime() + ".csv", csvContent);
+  fs.writeFileSync("logs/bench " + getTime() + ".csv", csvContent);
 }
