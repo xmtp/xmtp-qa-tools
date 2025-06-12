@@ -8,14 +8,6 @@ import {
 } from "@helpers/client";
 import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
-// Simple progress indicator
-function showProgress(current: number, total: number, filename: string) {
-  const percentage = Math.round((current / total) * 100);
-  process.stdout.write(
-    `\r🔍 Processing: ${filename} (${current}/${total}) ${percentage}%`,
-  );
-}
-
 // Count duplicates based only on inboxId
 function countInboxIdDuplicates(inboxes: InboxData[]): {
   inboxIdDuplicates: number;
@@ -77,8 +69,6 @@ export function analyzeInboxFiles(): void {
   for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const filePath = `${INBOXES_DIR}/${file}`;
-
-    showProgress(i + 1, files.length, file);
 
     try {
       const data = JSON.parse(fs.readFileSync(filePath, "utf8"));
@@ -261,7 +251,6 @@ interface InboxData {
   dbEncryptionKey: string;
   inboxId: string;
   installations: number;
-  dbPath?: string;
 }
 
 function removeDuplicates(inboxes: InboxData[]): InboxData[] {
@@ -292,16 +281,24 @@ async function checkInstallations(
   clientCheckInstallations: Client,
   installationCount: number,
 ) {
+  console.log(
+    `\n🔍 Checking installations for inbox: ${clientCheckInstallations.inboxId}`,
+  );
   let state =
     await clientCheckInstallations?.preferences.inboxStateFromInboxIds(
       [clientCheckInstallations.inboxId],
       true,
     );
   let currentInstallations = state?.[0]?.installations.length || 0;
+  console.log(
+    `📊 Current installations: ${currentInstallations}/${installationCount}`,
+  );
 
   // If we have more installations than desired, revoke the surplus ones
   const surplus = currentInstallations - installationCount;
+
   if (surplus > 0) {
+    console.log(`🔄 Revoking ${surplus} surplus installations`);
     const allInstallations = state?.[0]?.installations || [];
 
     // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
@@ -317,6 +314,9 @@ async function checkInstallations(
 
     if (installationsToRevoke.length > 0) {
       await clientCheckInstallations.revokeInstallations(installationsToRevoke);
+      console.log(
+        `✅ Successfully revoked ${installationsToRevoke.length} installations`,
+      );
       currentInstallations = installationCount;
     }
   }
@@ -413,6 +413,9 @@ async function smartUpdate(opts: {
           for (let j = currentInstallations; j <= installationCount; j++) {
             try {
               const dbPath = `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`;
+              console.log(
+                `\n📱 Creating installation ${j} for ${env} (${inbox.accountAddress})`,
+              );
 
               await Client.create(signer, {
                 dbEncryptionKey,
@@ -420,18 +423,12 @@ async function smartUpdate(opts: {
                 env: env,
               });
 
+              console.log(`✅ Successfully created installation ${j}`);
               totalCreated++;
             } catch (e) {
-              console.error(`❌ Could not create installation`, e);
+              console.error(`❌ Failed to create installation ${j}:`, e);
               totalFailed++;
             }
-          }
-
-          // Update dbPath for the account
-          if (env === envs[0]) {
-            existingInboxes[i].dbPath =
-              `${LOGPATH}/${env}-${inbox.accountAddress}-install-0`;
-            existingInboxes[i].installations = installationCount;
           }
         }
 
@@ -478,6 +475,13 @@ async function smartUpdate(opts: {
         for (const env of envs) {
           for (let j = 0; j < installationCount; j++) {
             try {
+              console.log(
+                `\n📱 Creating new installation ${j} for ${env} (${accountAddress})`,
+              );
+              console.log(
+                `💾 DB Path: ${LOGPATH}/${env}-${accountAddress}-install-${j}`,
+              );
+
               const client = await Client.create(signer, {
                 dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
                 dbPath: `${LOGPATH}/${env}-${accountAddress}-install-${j}`,
@@ -486,11 +490,13 @@ async function smartUpdate(opts: {
 
               if (j === 0 && env === envs[0]) {
                 inboxId = client.inboxId;
+                console.log(`📬 Got inboxId: ${inboxId}`);
               }
 
+              console.log(`✅ Successfully created installation ${j}`);
               totalCreated++;
             } catch (e) {
-              console.error(`❌ Could not create installation`, e);
+              console.error(`❌ Failed to create installation ${j}:`, e);
               totalFailed++;
               installationsFailed++;
             }
@@ -504,7 +510,6 @@ async function smartUpdate(opts: {
             dbEncryptionKey,
             inboxId,
             installations: installationCount,
-            dbPath: `${LOGPATH}/${envs[0]}-${accountAddress}-install-0`,
           };
 
           existingInboxes.push(newAccount);
