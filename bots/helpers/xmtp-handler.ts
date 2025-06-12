@@ -38,10 +38,6 @@ export const DEFAULT_CORE_OPTIONS: ClientOptions = {
   ...DEFAULT_SKILL_OPTIONS,
 };
 
-// Constants
-const MAX_RETRIES = 6;
-const RETRY_DELAY_MS = 2000;
-
 // Helper functions
 export const sleep = (ms: number): Promise<void> =>
   new Promise((resolve) => setTimeout(resolve, ms));
@@ -141,7 +137,5 @@ export const initializeClient = async (
   }
 
   await logAgentDetails(clients);
-
-  //await Promise.all(streamPromises);
   return clients;
 };

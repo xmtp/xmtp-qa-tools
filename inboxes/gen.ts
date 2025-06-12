@@ -191,8 +191,7 @@ Options:
   --count <number>                Total number of accounts to ensure exist
   --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
   --installations <number>        Number of installations per account per network (default: 1)
-  --mode <mode>                   Operation mode (default: update, options: update)
-
+ 
   --help                          Show this help message
 `);
 }
@@ -552,7 +551,6 @@ async function main() {
   let count: number | undefined;
   let envs: XmtpEnv[] | undefined;
   let installations: number | undefined;
-  let mode: string = "update";
 
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
@@ -561,7 +559,6 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
-    if (arg === "--mode") mode = args[i + 1];
   });
 
   // Run smart update with all parsed options
