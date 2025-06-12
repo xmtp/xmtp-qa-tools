@@ -3,26 +3,9 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-# Default value for ENVS
-ENVS="local"
-
-# Parse command line arguments
-while [[ $# -gt 0 ]]; do
-    case $1 in
-        --envs)
-            ENVS="$2"
-            shift 2
-            ;;
-        *)
-            echo "Unknown parameter: $1"
-            exit 1
-            ;;
-    esac
-done
+# Remove logs and .data as before
 
 echo "Script started at $(date)"
-echo "Using environment: $ENVS"
-
 echo "Removing logs/"
 rm -rf logs/
 
@@ -34,64 +17,39 @@ caffeinate -d &
 CAFFEINATE_PID=$!
 echo "Caffeinate started with PID: $CAFFEINATE_PID"
 
-# Array of installations values
-INSTALLATIONS=(2 5 10 15 20 25 30)
 MAX_RETRIES=3
-COUNT=200
-
-echo "Arrays and variables initialized"
 
 # Function to run command with retry
 run_with_retry() {
-    local installations=$1
     local attempt=1
-    
     while [ $attempt -le $MAX_RETRIES ]; do
-        echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        echo "Command: yarn gen --envs $ENVS --installations $installations"
+        echo "Running test (attempt $attempt/$MAX_RETRIES)"
+        echo "Command: yarn gen $@"
         echo "Starting yarn gen at $(date)"
-        
-        # Run yarn gen command directly to terminal
-        yarn gen --envs $ENVS --installations $installations --count $COUNT
+        yarn gen "$@"
         local exit_code=$?
-        
         echo "Yarn gen completed at $(date) with exit code: $exit_code"
-        
-        # Check if command was interrupted (Ctrl+C)
         if [ $exit_code -eq 130 ]; then
             echo "Command interrupted by user, exiting..."
             exit 0
         fi
-        
-        # If successful, break out of retry loop
         if [ $exit_code -eq 0 ]; then
-            echo "✓ Successfully completed test with installations $installations"
+            echo "✓ Successfully completed test"
             return 0
         fi
-        
         echo "✗ Test failed with exit code $exit_code"
-        
-        # If not the last attempt, wait before retrying
         if [ $attempt -lt $MAX_RETRIES ]; then
             echo "Retrying in 60 seconds to avoid rate limits..."
             sleep 2
         fi
-        
         ((attempt++))
     done
-    
-    echo "✗ Failed all $MAX_RETRIES attempts for installations $installations"
+    echo "✗ Failed all $MAX_RETRIES attempts"
     return 1
 }
 
 echo "Starting test cycle at $(date)"
 
-# Run tests for each installations value
-for installations in "${INSTALLATIONS[@]}"; do
-    run_with_retry $installations
-    
-    # 1 minute delay between different installation tests to avoid rate limits
-    sleep 2
-done
+run_with_retry "$@"
 
 echo "✓ Completed all installation tests at $(date)"

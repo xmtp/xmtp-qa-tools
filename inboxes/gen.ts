@@ -12,6 +12,12 @@ const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes";
 let debugMode = false;
 
+// === Tweakable Defaults ===
+const DEFAULT_COUNT = 200;
+const DEFAULT_ENVS: XmtpEnv[] = ["local"];
+const DEFAULT_INSTALLATIONS = 2;
+// =========================
+
 interface InboxData {
   accountAddress: string;
   walletKey: string;
@@ -339,9 +345,9 @@ async function main() {
     showHelp();
     return;
   }
-  let count: number | undefined,
-    envs: XmtpEnv[] | undefined,
-    installations: number | undefined;
+  let count: number | undefined = undefined,
+    envs: XmtpEnv[] | undefined = undefined,
+    installations: number | undefined = undefined;
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
     if (arg === "--envs")
@@ -351,7 +357,9 @@ async function main() {
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
     if (arg === "--debug") debugMode = true;
   });
-  if (count === undefined) count = 200;
+  if (count === undefined) count = DEFAULT_COUNT;
+  if (envs === undefined) envs = DEFAULT_ENVS;
+  if (installations === undefined) installations = DEFAULT_INSTALLATIONS;
   await smartUpdate({ count, envs, installations });
 }
 
