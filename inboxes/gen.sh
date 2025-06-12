@@ -3,8 +3,28 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-echo "Script started at $(date)"
+# Default value for ENVS
+ENVS="local"
 
+# Parse command line arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --envs)
+            ENVS="$2"
+            shift 2
+            ;;
+        *)
+            echo "Unknown parameter: $1"
+            exit 1
+            ;;
+    esac
+done
+
+echo "Script started at $(date)"
+echo "Using environment: $ENVS"
+
+echo "Removing logs/"
+rm -rf logs/
 # Don't sleep the computer
 caffeinate -d &
 CAFFEINATE_PID=$!
@@ -13,7 +33,6 @@ echo "Caffeinate started with PID: $CAFFEINATE_PID"
 # Array of installations values
 INSTALLATIONS=(2 5 10 15 20 25 30)
 MAX_RETRIES=3
-ENVS=local
 COUNT=200
 
 echo "Arrays and variables initialized"
@@ -25,7 +44,7 @@ run_with_retry() {
     
     while [ $attempt -le $MAX_RETRIES ]; do
         echo "Running test with installations $installations (attempt $attempt/$MAX_RETRIES)"
-        echo "Command: yarn gen --envs local --installations $installations"
+        echo "Command: yarn gen --envs $ENVS --installations $installations"
         echo "Starting yarn gen at $(date)"
         
         # Run yarn gen command directly to terminal

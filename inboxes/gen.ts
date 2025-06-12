@@ -181,13 +181,21 @@ Options:
   --count <number>                Total number of accounts to ensure exist
   --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)
   --installations <number>        Number of installations per account per network (default: 1)
- 
+  --debug                         Enable debug logging
   --help                          Show this help message
 `);
 }
 
 const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes";
+
+// Debug logging function
+let debugMode = false;
+function debugLog(...args: unknown[]): void {
+  if (debugMode) {
+    console.log(...args);
+  }
+}
 
 // Simple progress bar implementation
 class ProgressBar {
@@ -281,7 +289,7 @@ async function checkInstallations(
   clientCheckInstallations: Client,
   installationCount: number,
 ) {
-  console.log(
+  debugLog(
     `\n🔍 Checking installations for inbox: ${clientCheckInstallations.inboxId}`,
   );
   let state =
@@ -290,7 +298,7 @@ async function checkInstallations(
       true,
     );
   let currentInstallations = state?.[0]?.installations.length || 0;
-  console.log(
+  debugLog(
     `📊 Current installations: ${currentInstallations}/${installationCount}`,
   );
 
@@ -298,7 +306,7 @@ async function checkInstallations(
   const surplus = currentInstallations - installationCount;
 
   if (surplus > 0) {
-    console.log(`🔄 Revoking ${surplus} surplus installations`);
+    debugLog(`🔄 Revoking ${surplus} surplus installations`);
     const allInstallations = state?.[0]?.installations || [];
 
     // Get the installation IDs to revoke (keeping the first ones, revoking the last ones)
@@ -314,7 +322,7 @@ async function checkInstallations(
 
     if (installationsToRevoke.length > 0) {
       await clientCheckInstallations.revokeInstallations(installationsToRevoke);
-      console.log(
+      debugLog(
         `✅ Successfully revoked ${installationsToRevoke.length} installations`,
       );
       currentInstallations = installationCount;
@@ -340,7 +348,7 @@ async function smartUpdate(opts: {
     loadEnv("smart-update");
   }
 
-  console.log(`\nConfiguration:
+  debugLog(`\nConfiguration:
 - Environments: ${envs.join(", ")}
 - Installations per account: ${installationCount}
 - Target accounts: ${count || "all existing"}`);
@@ -413,7 +421,7 @@ async function smartUpdate(opts: {
           for (let j = currentInstallations; j <= installationCount; j++) {
             try {
               const dbPath = `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`;
-              console.log(
+              debugLog(
                 `\n📱 Creating installation ${j} for ${env} (${inbox.accountAddress})`,
               );
 
@@ -423,10 +431,10 @@ async function smartUpdate(opts: {
                 env: env,
               });
 
-              console.log(`✅ Successfully created installation ${j}`);
+              debugLog(`✅ Successfully created installation ${j}`);
               totalCreated++;
             } catch (e) {
-              console.error(`❌ Failed to create installation ${j}:`, e);
+              debugLog(`❌ Failed to create installation ${j}:`, e);
               totalFailed++;
             }
           }
@@ -440,7 +448,7 @@ async function smartUpdate(opts: {
           JSON.stringify(existingInboxes, null, 2),
         );
       } catch (e) {
-        console.error(`❌ Could not update account`, e);
+        debugLog(`❌ Could not update account`, e);
         totalFailed++;
         updateProgress.update();
       }
@@ -564,6 +572,7 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
+    if (arg === "--debug") debugMode = true;
   });
 
   // Run smart update with all parsed options
