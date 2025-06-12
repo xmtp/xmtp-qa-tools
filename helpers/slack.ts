@@ -97,7 +97,6 @@ function shouldSendNotification(
   // Only send notifications for failures on main branch (unless in local development)
   if (
     jobStatus === "success" ||
-    jobStatus === "passed" ||
     (githubContext.branchName !== "main" && process.env.GITHUB_ACTIONS)
   ) {
     console.log(
