@@ -25,6 +25,10 @@ echo "Using environment: $ENVS"
 
 echo "Removing logs/"
 rm -rf logs/
+
+echo "Removing .data/"
+rm -rf .data/
+
 # Don't sleep the computer
 caffeinate -d &
 CAFFEINATE_PID=$!

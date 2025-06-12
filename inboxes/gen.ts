@@ -54,9 +54,6 @@ export function analyzeInboxFiles(): void {
     return;
   }
 
-  let totalDuplicatesAcrossFiles = 0;
-  let totalFilesWithDuplicates = 0;
-  let totalRecordsRemoved = 0;
   const results: Array<{
     filename: string;
     count: number;
@@ -112,7 +109,6 @@ export function analyzeInboxFiles(): void {
         return true;
       });
       const removed = validData.length - deduped.length;
-      totalRecordsRemoved += removed;
 
       // Overwrite the file if any records were removed
       if (removed > 0) {
@@ -126,11 +122,6 @@ export function analyzeInboxFiles(): void {
         duplicateInboxIds,
         removed,
       });
-
-      if (inboxIdDuplicates > 0) {
-        totalFilesWithDuplicates++;
-        totalDuplicatesAcrossFiles += inboxIdDuplicates;
-      }
     } catch (error: unknown) {
       console.log(
         `\n❌ ${file}: Error reading file - ${error instanceof Error ? error.message : String(error)}`,
@@ -141,6 +132,18 @@ export function analyzeInboxFiles(): void {
   // Clear progress line
   console.log(`\n`);
 
+  if (debugMode) showFileStats(results);
+}
+
+function showFileStats(
+  results: Array<{
+    filename: string;
+    count: number;
+    inboxIdDuplicates: number;
+    duplicateInboxIds: string[];
+    removed: number;
+  }>,
+) {
   // Display results
   console.log(`📋 DUPLICATE INBOXID ANALYSIS & REMOVAL RESULTS\n`);
   console.log(
@@ -159,17 +162,26 @@ export function analyzeInboxFiles(): void {
   // Summary
   console.log("─".repeat(100));
   console.log(`\n📈 SUMMARY:`);
-  console.log(`   📄 Total files analyzed: ${files.length}`);
+  console.log(`   📄 Total files analyzed: ${results.length}`);
   console.log(
-    `   🔄 Total files with duplicate inboxIds: ${totalFilesWithDuplicates}`,
+    `   🔄 Total files with duplicate inboxIds: ${
+      results.filter((result) => result.inboxIdDuplicates > 0).length
+    }`,
   );
   console.log(
-    `   🔄 Total duplicate inboxIds found: ${totalDuplicatesAcrossFiles}`,
+    `   🔄 Total duplicate inboxIds found: ${results.reduce(
+      (acc, result) => acc + result.inboxIdDuplicates,
+      0,
+    )}`,
   );
-  console.log(`   🧹 Total records removed: ${totalRecordsRemoved}`);
+  console.log(
+    `   🧹 Total records removed: ${results.reduce(
+      (acc, result) => acc + result.removed,
+      0,
+    )}`,
+  );
   console.log(`\n🎉 Analysis & deduplication complete!`);
 }
-
 function showHelp() {
   console.log(`
 XMTP Generator Utility
