@@ -14,10 +14,10 @@ interface Agent {
   address: string;
   sendMessage: string;
   expectedMessage: string[];
+  networks: string[];
+  disabled: boolean;
 }
 
-// Type assertion for imported JSON
-const typedAgents = productionAgents as Agent[];
 const testName = "agents";
 loadEnv(testName);
 
@@ -30,16 +30,22 @@ describe(testName, () => {
       typeofStream.Message,
       typeOfResponse.None,
       typeOfSync.None,
-      "production",
+      process.env.XMPT_ENV as "dev" | "production",
     );
   });
   setupTestLifecycle({
     expect,
   });
 
+  const filteredAgents = productionAgents.filter((agent) => {
+    if (process.env.XMPT_ENV === "dev") {
+      return agent.networks.includes("dev") && !agent.disabled;
+    }
+    return agent.networks.includes("production") && !agent.disabled;
+  });
   // For local testing, test all agents on their supported networks
-  for (const agent of typedAgents) {
-    it(`test ${agent.name}:${agent.address} on production`, async () => {
+  for (const agent of filteredAgents) {
+    it(`test ${agent.name}:${agent.address} on ${process.env.XMPT_ENV}`, async () => {
       try {
         console.debug(`Testing ${agent.name} with address ${agent.address} `);
 
