@@ -2,12 +2,7 @@ import { loadEnv, sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
-import {
-  getInboxByInstallationCount,
-  getInboxIds,
-  getRandomInbox,
-  getRandomInboxIds,
-} from "@inboxes/utils";
+import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
