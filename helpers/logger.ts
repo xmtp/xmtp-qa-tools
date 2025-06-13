@@ -285,6 +285,13 @@ export function extractErrorLogs(testName: string): Set<string> {
         if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
           // Use the comprehensive stripAnsi function instead of simple regex
           let cleanLine = stripAnsi(line);
+
+          // Don't split the line if it contains a test file path
+          if (cleanLine.includes("test.ts")) {
+            errorLines.add(cleanLine.trim());
+            continue;
+          }
+
           const patterns = LOG_LINE_MATCH_PATTERNS.map(
             (pattern) => pattern.source,
           );
