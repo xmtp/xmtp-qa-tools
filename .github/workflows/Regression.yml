@@ -30,7 +30,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run versions
-        run: yarn versions
+        run: yarn script versions
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
       - name: Upload test artifacts
