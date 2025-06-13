@@ -1,5 +1,5 @@
-name: Functional
-description: "should verify performance of the library in the dev network"
+name: Regression
+description: "should verify last 3 versions of the library"
 
 on:
   schedule:
