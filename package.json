@@ -16,7 +16,7 @@
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
     "count-duplicates": "NODE_OPTIONS='--experimental-specifier-resolution=node' tsx inboxes/utils.ts",
-    "dev-update": "./inboxes/gen.sh --envs dev --installations 2,5,10,15,20,25,30 --count 200",
+    "dev-update": "./inboxes/gen.sh --envs dev --installations 2 --count 200",
     "forked": "./suites/group/run.sh",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",

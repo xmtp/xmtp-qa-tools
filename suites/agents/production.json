@@ -56,6 +56,6 @@
     "name": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "sendMessage": "hey there how are you?",
-    "networks": ["dev", "production"]
+    "networks": ["production"]
   }
 ]
