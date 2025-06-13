@@ -4,6 +4,7 @@ import { playwright } from "@helpers/playwright";
 import {
   getInboxByInstallationCount,
   getInboxIds,
+  getRandomInbox,
   getRandomInboxIds,
 } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
@@ -20,7 +21,7 @@ describe(testName, () => {
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getInboxByInstallationCount(2, 1)[0];
+  const inbox = getRandomInbox();
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,
