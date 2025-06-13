@@ -1,11 +1,7 @@
 import { loadEnv, sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
-import {
-  getInboxByInstallationCount,
-  getInboxIds,
-  getRandomInboxIds,
-} from "@inboxes/utils";
+import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -20,7 +16,7 @@ describe(testName, () => {
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getInboxByInstallationCount(2, 1)[0];
+  const inbox = getRandomInbox();
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,

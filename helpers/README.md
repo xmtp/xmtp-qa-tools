@@ -13,7 +13,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing    |
 | **tests.ts**      | Test configuration and utilities | Test setup, SDK version management               |
 | **inboxes.json**  | Pre-generated test identities    | Test account data for simulations                |
-| **slack.ts**      | Slack notification utilities     | Send notifications to Slack channels             |
 | **ai.ts**         | OpenAI API utilities             | Generate OpenAI responses                        |
 
 ## Usage
