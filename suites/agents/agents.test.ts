@@ -30,7 +30,7 @@ describe(testName, () => {
       typeofStream.Message,
       typeOfResponse.None,
       typeOfSync.None,
-      process.env.XMPT_ENV as "dev" | "production",
+      process.env.XMTP_ENV as "dev" | "production",
     );
   });
   setupTestLifecycle({
@@ -38,14 +38,14 @@ describe(testName, () => {
   });
 
   const filteredAgents = productionAgents.filter((agent) => {
-    if (process.env.XMPT_ENV === "dev") {
-      return agent.networks.includes("dev") && !agent.disabled;
-    }
-    return agent.networks.includes("production") && !agent.disabled;
+    return (
+      agent.networks.includes(process.env.XMTP_ENV as "dev" | "production") &&
+      !agent.disabled
+    );
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
-    it(`test ${agent.name}:${agent.address} on ${process.env.XMPT_ENV}`, async () => {
+    it(`test ${agent.name}:${agent.address} on ${process.env.XMTP_ENV}`, async () => {
       try {
         console.debug(`Testing ${agent.name} with address ${agent.address} `);
 
