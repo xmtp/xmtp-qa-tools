@@ -1,5 +1,5 @@
-name: Functional
-description: "should verify performance of the library in the dev network"
+name: Browser
+description: "should verify browser support"
 
 on:
   schedule:
