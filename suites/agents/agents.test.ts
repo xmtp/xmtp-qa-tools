@@ -38,10 +38,10 @@ describe(testName, () => {
   });
 
   const filteredAgents = productionAgents.filter((agent) => {
-    if (process.env.XMTP_ENV === "dev") {
-      return agent.networks.includes("dev") && !agent.disabled;
-    }
-    return agent.networks.includes("production") && !agent.disabled;
+    return (
+      agent.networks.includes(process.env.XMTP_ENV as "dev" | "production") &&
+      !agent.disabled
+    );
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
