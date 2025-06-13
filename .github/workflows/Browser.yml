@@ -1,9 +1,9 @@
-name: Performance
-description: "should verify performance "
+name: Functional
+description: "should verify performance of the library in the dev network"
 
 on:
   schedule:
-    - cron: "30 * * * *" # Runs every 30 minutes
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
@@ -12,14 +12,13 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [performance]
+        test: [browser]
         environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      BATCH_SIZE: 50
-      MAX_GROUP_SIZE: 200
+      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:

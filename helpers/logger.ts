@@ -169,7 +169,7 @@ declare module "winston" {
 const logger = createLogger();
 
 // Override console methods to use the pretty logger
-export const setupPrettyLogs = () => {
+export const setupPrettyLogs = (testName: string) => {
   // Store original console methods
   const originalConsole = {
     log: console.log,
@@ -202,7 +202,7 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    logger.error("QA_ERROR" + message);
+    logger.error("QA_ERROR" + testName + message);
   };
 
   // Override console.debug
@@ -266,7 +266,6 @@ export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
-  console.log("testName", testName);
 
   try {
     const logFiles = fs
@@ -286,6 +285,13 @@ export function extractErrorLogs(testName: string): Set<string> {
         if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
           // Use the comprehensive stripAnsi function instead of simple regex
           let cleanLine = stripAnsi(line);
+
+          // Don't split the line if it contains a test file path
+          if (cleanLine.includes("test.ts")) {
+            errorLines.add(cleanLine.trim());
+            continue;
+          }
+
           const patterns = LOG_LINE_MATCH_PATTERNS.map(
             (pattern) => pattern.source,
           );

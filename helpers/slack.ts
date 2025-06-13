@@ -14,7 +14,6 @@ export interface SlackNotificationOptions {
   customLinks?: string;
   jobStatus?: string;
   env?: string;
-  isOutage?: boolean;
   failedTestsCount?: number;
   totalTestsCount?: number;
 }
@@ -92,6 +91,29 @@ function shouldSendNotification(
   if (isOnlyWorkerError(options.errorLogs)) {
     console.log("Slack notification skipped (only worker error detected)");
     return false;
+  }
+
+  // For local development, check if there are actual test failures
+  if (!process.env.GITHUB_ACTIONS) {
+    if (!options.errorLogs || options.errorLogs.size === 0) {
+      console.log(
+        "Slack notification skipped (no error logs in local development)",
+      );
+      return false;
+    }
+
+    // Check if any error log contains actual test failure indicators
+    const hasTestFailure = Array.from(options.errorLogs).some((log) => {
+      const hasFailure = log.includes("test.ts");
+      return hasFailure;
+    });
+
+    if (!hasTestFailure) {
+      console.log(
+        "Slack notification skipped (no actual test failures detected)",
+      );
+      return false;
+    }
   }
 
   // Only send notifications for failures on main branch (unless in local development)
@@ -174,13 +196,11 @@ export async function sendSlackNotification(
     }
   }
 
-  const title = options.isOutage
-    ? "🚨 *SYSTEM OUTAGE DETECTED* 🚨:"
-    : "*Test Failure ❌*";
+  const title = "*Test Failure ❌*";
 
   const message = `${title}\n\n*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${githubContext.environment}\`
-${options.isOutage ? `*Failure Rate:* \`${options.failedTestsCount}/${options.totalTestsCount} tests failed\`\n` : ""}*General dashboard:* <${datadogUrl}|View>
+*General dashboard:* <${datadogUrl}|View>
 *Geolocation:* \`${githubContext.region || "Unknown Region"}\`
 *Timestamp:* \`${new Date().toLocaleString()}\`
 ${url}

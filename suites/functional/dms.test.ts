@@ -93,4 +93,7 @@ describe(testName, async () => {
       throw e;
     }
   });
+  it("fail on purpose", () => {
+    expect(true).toBe(false);
+  });
 });

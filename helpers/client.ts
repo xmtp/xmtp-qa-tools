@@ -420,7 +420,7 @@ export function getEnvPath(): string {
 export function loadEnv(testName: string) {
   const envPath = getEnvPath();
   dotenv.config({ path: envPath });
-  setupPrettyLogs();
+  setupPrettyLogs(testName);
   addFileLogging(testName);
   initDataDog();
 }
