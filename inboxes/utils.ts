@@ -59,7 +59,7 @@ export function getRandomInbox() {
   return pool[Math.floor(Math.random() * pool.length)];
 }
 export function getRandomInboxIds(count: number) {
-  const pool = getInboxByInstallationCount(2);
+  const pool = getInboxByInstallationCount(2).slice(0, 200);
   return pool
     .sort(() => Math.random() - 0.5)
     .slice(0, count)
@@ -68,11 +68,13 @@ export function getRandomInboxIds(count: number) {
 
 export function getInboxIds(count: number) {
   return getInboxByInstallationCount(2)
+    .slice(0, 200)
     .slice(0, count)
     .map((inbox) => inbox.inboxId);
 }
 export function getAddresses(count: number) {
   return getInboxByInstallationCount(2)
+    .slice(0, 200)
     .slice(0, count)
     .map((inbox) => inbox.accountAddress);
 }
