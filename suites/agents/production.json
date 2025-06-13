@@ -5,11 +5,6 @@
     "sendMessage": "/kc help"
   },
   {
-    "name": "grindery",
-    "address": "0xe0c63A6d78e9eb9565D7da3F1b4108cF2aEC2312",
-    "sendMessage": "hi"
-  },
-  {
     "name": "csx",
     "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
     "sendMessage": "hola",
@@ -20,12 +15,6 @@
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "sendMessage": "hola",
     "expectedMessage": ["chat", "invalid"]
-  },
-
-  {
-    "name": "flaunchy",
-    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
-    "sendMessage": "hi"
   },
   {
     "name": "elsa",
