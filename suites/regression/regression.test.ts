@@ -1,4 +1,4 @@
-import { defaultNames, loadEnv, sdkVersionOptions } from "@helpers/client";
+import { defaultNames, loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getInboxIds } from "@inboxes/utils";
