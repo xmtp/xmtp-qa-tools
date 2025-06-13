@@ -1,7 +1,10 @@
-name: Functional
-description: "should verify performance of the library in the dev network"
+name: Regression
+description: "should verify last 3 versions of the library"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *" # Runs at midnight UTC every day
   workflow_dispatch:
@@ -30,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run versions
-        run: yarn versions
+        run: yarn script versions
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
       - name: Upload test artifacts
