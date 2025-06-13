@@ -109,7 +109,7 @@ The `logger.ts` module provides logging utilities with formatting and file outpu
 const logger = createLogger();
 
 // Set up pretty console log formatting
-setupPrettyLogs();
+setupPrettyLogs(testName);
 
 // Log test errors and track failures
 const logError(error, expect);
