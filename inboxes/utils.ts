@@ -54,7 +54,10 @@ export function getInboxByInstallationCount(
   }
   return typedInboxes2;
 }
-
+export function getRandomInbox() {
+  const pool = getInboxByInstallationCount(2).slice(0, 200);
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 export function getRandomInboxIds(count: number) {
   const pool = getInboxByInstallationCount(2).slice(0, 200);
   return pool

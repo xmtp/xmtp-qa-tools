@@ -5,6 +5,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import {
   getInboxByInstallationCount,
   getInboxIds,
+  getRandomInbox,
   getRandomInboxIds,
 } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
@@ -17,11 +18,11 @@ loadEnv(testName);
 describe(testName, () => {
   let groupId: string;
   const receiver = "random";
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getInboxByInstallationCount(2, 1)[0];
+  const inbox = getRandomInbox();
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,
