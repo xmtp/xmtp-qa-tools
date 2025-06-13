@@ -93,27 +93,24 @@ function shouldSendNotification(
     return false;
   }
 
-  // For local development, check if there are actual test failures
-  if (!process.env.GITHUB_ACTIONS) {
-    if (!options.errorLogs || options.errorLogs.size === 0) {
-      console.log(
-        "Slack notification skipped (no error logs in local development)",
-      );
-      return false;
-    }
+  if (!options.errorLogs || options.errorLogs.size === 0) {
+    console.log(
+      "Slack notification skipped (no error logs in local development)",
+    );
+    return false;
+  }
 
-    // Check if any error log contains actual test failure indicators
-    const hasTestFailure = Array.from(options.errorLogs).some((log) => {
-      const hasFailure = log.includes("test.ts");
-      return hasFailure;
-    });
+  // Check if any error log contains actual test failure indicators
+  const hasTestFailure = Array.from(options.errorLogs).some((log) => {
+    const hasFailure = log.includes("test.ts");
+    return hasFailure;
+  });
 
-    if (!hasTestFailure) {
-      console.log(
-        "Slack notification skipped (no actual test failures detected)",
-      );
-      return false;
-    }
+  if (!hasTestFailure) {
+    console.log(
+      "Slack notification skipped (no actual test failures detected)",
+    );
+    return false;
   }
 
   // Only send notifications for failures on main branch (unless in local development)
