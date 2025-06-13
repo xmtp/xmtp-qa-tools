@@ -2,9 +2,6 @@ name: Regression
 description: "should verify last 3 versions of the library"
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 0 * * *" # Runs at midnight UTC every day
   workflow_dispatch:
