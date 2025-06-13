@@ -1,4 +1,4 @@
-import { defaultNames, loadEnv } from "@helpers/client";
+import { defaultNames, loadEnv, sdkVersionOptions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getInboxIds } from "@inboxes/utils";
@@ -12,7 +12,7 @@ loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = ["209", "210"];
+  const versions = sdkVersionOptions.reverse().slice(0, 3);
   const receiverInboxId = getInboxIds(1);
 
   it("should create a group conversation with all workers", async () => {
