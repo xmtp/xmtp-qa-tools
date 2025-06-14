@@ -8,21 +8,13 @@ import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
-// Define the types for the agents
-interface Agent {
-  name: string;
-  address: string;
-  sendMessage: string;
-  expectedMessage: string[];
-  networks: string[];
-  disabled: boolean;
-}
-
 const testName = "agents";
 loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
+  const env = process.env.XMTP_ENV as "dev" | "production";
+  console.log("env", env);
   beforeAll(async () => {
     workers = await getWorkers(
       ["bot"],
@@ -30,7 +22,7 @@ describe(testName, () => {
       typeofStream.Message,
       typeOfResponse.None,
       typeOfSync.None,
-      process.env.XMTP_ENV as "dev" | "production",
+      env,
     );
   });
   setupTestLifecycle({
@@ -38,10 +30,7 @@ describe(testName, () => {
   });
 
   const filteredAgents = productionAgents.filter((agent) => {
-    return (
-      agent.networks.includes(process.env.XMTP_ENV as "dev" | "production") &&
-      !agent.disabled
-    );
+    return agent.networks.includes(env) && !agent.disabled;
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
