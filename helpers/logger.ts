@@ -298,11 +298,8 @@ export function extractErrorLogs(testName: string): Set<string> {
           );
           for (const pattern of patterns) {
             if (cleanLine.includes(pattern)) {
-              if (pattern === "//") {
-                cleanLine = cleanLine.split(pattern)[0]?.trim();
-              } else {
-                cleanLine = cleanLine.split(pattern)[1].trim();
-              }
+              cleanLine = cleanLine.split(pattern)[1].trim();
+
               break;
             }
           }
