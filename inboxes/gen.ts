@@ -231,7 +231,7 @@ async function smartUpdate({
   const accountsToProcess = Math.min(targetCount, existingCount);
   if (accountsToProcess > 0) {
     const updateProgress = new ProgressBar(accountsToProcess);
-    for (let i = 0; i < accountsToProcess; i++) {
+    for (let i = 0; i < targetCount; i++) {
       const inbox = existingInboxes[i];
       try {
         if (
@@ -262,6 +262,11 @@ async function smartUpdate({
                 dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
                 env,
               });
+              if (debugMode) {
+                console.log(
+                  `Created installation ${j} for ${inbox.accountAddress} in ${env}`,
+                );
+              }
               totalCreated++;
             } catch {
               totalFailed++;
