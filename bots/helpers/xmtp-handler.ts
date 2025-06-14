@@ -7,6 +7,7 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
 } from "@helpers/client";
+import { sendSlackNotification } from "@helpers/notifications";
 import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -69,6 +70,11 @@ export const initializeClient = async (
     void client.conversations.streamAllMessages((error, message) => {
       if (error) {
         console.error(`[${env}] Error in streamMessages:`, error);
+        void sendSlackNotification({
+          testName: "simple",
+          label: "error",
+          errorLogs: new Set([`test.ts: Stream failed`]),
+        });
         return;
       }
       if (message) {
