@@ -1,0 +1,17 @@
+{
+  "name": "claude-bot",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsx index.ts",
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@slack/bolt": "^4.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "tsx": "^4.19.2"
+  }
+}
