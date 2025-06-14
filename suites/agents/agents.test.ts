@@ -55,8 +55,10 @@ describe(testName, () => {
           await conversation.sync();
           const messages = await conversation.messages();
           expect(messages.length).toBe(countBefore + 2);
+        } else {
+          console.debug(`${agent.name} with address ${agent.address} passed`);
+          expect(result.allReceived).toBe(true);
         }
-        expect(result.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

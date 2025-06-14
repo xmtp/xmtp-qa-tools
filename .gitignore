@@ -63,3 +63,7 @@ dist
 
 # xmtp
 *.db3*
+
+# Claude Code (keep config, ignore session data)
+.claude/session-*
+.claude/.tmp/
