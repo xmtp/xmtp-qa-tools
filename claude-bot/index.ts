@@ -1,10 +1,13 @@
 import { spawn } from "child_process";
 import { WebClient } from "@slack/web-api";
+import dotenv from "dotenv";
 import express, { type Request, type Response } from "express";
+
+dotenv.config();
 
 const client = new WebClient(process.env.SLACK_BOT_TOKEN);
 const app = express();
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 // Middleware to parse JSON
 app.use(express.json());

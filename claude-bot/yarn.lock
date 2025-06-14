@@ -561,6 +561,7 @@ __metadata:
     "@slack/web-api": "npm:^7.0.0"
     "@types/express": "npm:^4.17.0"
     "@types/node": "npm:^20.0.0"
+    dotenv: "npm:^16.4.7"
     express: "npm:^4.18.0"
     tsx: "npm:^4.19.2"
   languageName: unknown
@@ -671,6 +672,13 @@ __metadata:
   version: 1.2.0
   resolution: "destroy@npm:1.2.0"
   checksum: 10/0acb300b7478a08b92d810ab229d5afe0d2f4399272045ab22affa0d99dbaf12637659411530a6fcd597a9bdac718fc94373a61a95b4651bbc7b83684a565e38
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^16.4.7":
+  version: 16.5.0
+  resolution: "dotenv@npm:16.5.0"
+  checksum: 10/e68a16834f1a41cc2dfb01563bc150668ad675e6cd09191211467b5c0806b6ecd6ec438e021aa8e01cd0e72d2b70ef4302bec7cc0fe15b6955f85230b62dc8a9
   languageName: node
   linkType: hard
 
