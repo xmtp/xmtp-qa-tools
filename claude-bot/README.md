@@ -1,98 +1,67 @@
-# Slack Claude Bot
+# Claude Slack Bot
 
-A Slack bot that relays messages to Claude Code running in your XMTP QA Tools repository.
+A simple CLI tool that sends messages to Claude Code and posts the responses to Slack channels.
 
 ## Setup
 
-### 1. Install Dependencies
+1. **Get your Slack Bot Token**:
 
-```bash
-cd slack-claude-bot
-yarn install
-```
+   - Go to https://api.slack.com/apps
+   - Create a new app or select an existing one
+   - Go to "OAuth & Permissions"
+   - Copy the "Bot User OAuth Token" (starts with `xoxb-`)
 
-### 2. Create Slack App
+2. **Set up environment variables**:
 
-1. Go to https://api.slack.com/apps
-2. Create a new app "From an app manifest"
-3. Use this manifest:
+   ```bash
+   cp env.template .env
+   # Edit .env and add your SLACK_BOT_TOKEN
+   ```
 
-```json
-{
-  "display_information": {
-    "name": "Claude Bot"
-  },
-  "features": {
-    "bot_user": {
-      "display_name": "Claude Bot",
-      "always_online": false
-    }
-  },
-  "oauth_config": {
-    "scopes": {
-      "bot": [
-        "app_mentions:read",
-        "chat:write",
-        "reactions:read",
-        "reactions:write"
-      ]
-    }
-  },
-  "event_subscriptions": {
-    "bot_events": ["app_mention"]
-  },
-  "socket_mode_enabled": true
-}
-```
-
-### 3. Configure Environment Variables
-
-Create a `.env` file with:
-
-```bash
-SLACK_BOT_TOKEN=xoxb-your-bot-token-here
-SLACK_SIGNING_SECRET=your-signing-secret-here
-SLACK_APP_TOKEN=xapp-your-app-token-here
-XMTP_REPO_PATH=/Users/fabrizioguespe/DevRel/xmtp-qa-tools
-```
-
-Get these values from your Slack app settings:
-
-- **Bot Token**: OAuth & Permissions → Bot User OAuth Token
-- **Signing Secret**: Basic Information → Signing Secret
-- **App Token**: Basic Information → App-Level Tokens (create with `connections:write` scope)
-
-### 4. Install Bot to Workspace
-
-1. Go to OAuth & Permissions
-2. Click "Install to Workspace"
-3. Authorize the app
-
-### 5. Run the Bot
-
-```bash
-yarn dev
-```
+3. **Install dependencies**:
+   ```bash
+   yarn install
+   ```
 
 ## Usage
 
-1. Invite the bot to a Slack channel: `/invite @Claude Bot`
-2. Mention the bot with your message: `@Claude Bot run yarn test`
-3. The bot will:
-   - Add a 🤔 reaction
-   - Send your message to Claude Code in the XMTP repo
-   - Reply with Claude's response in a thread
-   - Remove the 🤔 reaction
+Send a message to Claude Code and post the response to a Slack channel:
 
-## How It Works
+```bash
+# Basic usage
+yarn dev '#general' 'create a simple hello world script'
 
-```
-Slack Message → Slack Bot → Claude Code → XMTP Repo (.claude/context.md) → Response → Slack
+# Reply to a specific thread
+yarn dev '#general' 'fix the bug in index.ts' '1234567890.123456'
 ```
 
-The bot spawns `claude "your message"` in your XMTP repo directory, which means Claude Code will:
+### Arguments
 
-- Read your `.claude/context.md` file (with yarn-only constraint)
-- Have access to your XMTP testing framework
-- Only run yarn commands as specified in your context
-- Return results back to Slack
+- `<channel>`: Slack channel name (e.g., `#general`) or channel ID
+- `<message>`: The message to send to Claude Code
+- `[thread_ts]`: Optional - timestamp of the thread to reply to
+
+## Required Permissions
+
+Your Slack bot needs the following OAuth scopes:
+
+- `chat:write` - To post messages
+- `channels:read` - To access channel information
+
+## Examples
+
+```bash
+# Ask Claude to create a new script
+yarn dev '#dev-team' 'create a TypeScript function that validates email addresses'
+
+# Ask Claude to debug code
+yarn dev '#general' 'review this function and suggest improvements: function add(a, b) { return a + b; }'
+
+# Reply in a thread
+yarn dev '#general' 'explain how this works' '1703123456.789123'
+```
+
+## Environment Variables
+
+- `SLACK_BOT_TOKEN` - Required. Your Slack bot token (starts with `xoxb-`)
+- `XMTP_REPO_PATH` - Optional. Path to your XMTP repository (defaults to current directory)
