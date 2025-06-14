@@ -1,0 +1,27 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["@modelcontextprotocol/server-filesystem"],
+      "env": {
+        "ALLOWED_DIRECTORIES": [
+          "suites",
+          "workers",
+          "helpers",
+          "logs",
+          "inboxes",
+          "bots",
+          "scripts",
+          ".claude"
+        ]
+      }
+    }
+  },
+  "tools": {
+    "allowed": ["Read", "Write", "Edit", "Bash", "Search"]
+  },
+  "context": {
+    "autoLoad": [".claude/context.md"],
+    "description": "XMTP QA Tools Repository - Testing framework for XMTP protocol with worker management, client helpers, and multi-environment support"
+  }
+}
