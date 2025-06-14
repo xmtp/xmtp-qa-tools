@@ -231,7 +231,7 @@ async function smartUpdate({
   const accountsToProcess = Math.min(targetCount, existingCount);
   if (accountsToProcess > 0) {
     const updateProgress = new ProgressBar(accountsToProcess);
-    for (let i = 0; i < accountsToProcess; i++) {
+    for (let i = 0; i < targetCount; i++) {
       const inbox = existingInboxes[i];
       try {
         if (
@@ -255,16 +255,47 @@ async function smartUpdate({
             client,
             installationCount,
           );
-          for (let j = currentInstallations; j < installationCount; j++) {
-            try {
-              await Client.create(signer, {
-                dbEncryptionKey,
-                dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
-                env,
-              });
-              totalCreated++;
-            } catch {
-              totalFailed++;
+          if (debugMode) {
+            const installProgress = new ProgressBar(
+              installationCount - currentInstallations,
+            );
+            for (let j = currentInstallations; j < installationCount; j++) {
+              try {
+                await Client.create(signer, {
+                  dbEncryptionKey,
+                  dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
+                  env,
+                });
+                if (debugMode) {
+                  process.stdout.write(
+                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
+                  );
+                }
+                totalCreated++;
+                installProgress.update();
+              } catch {
+                totalFailed++;
+                installProgress.update();
+              }
+            }
+            installProgress.finish();
+          } else {
+            for (let j = currentInstallations; j < installationCount; j++) {
+              try {
+                await Client.create(signer, {
+                  dbEncryptionKey,
+                  dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
+                  env,
+                });
+                if (debugMode) {
+                  process.stdout.write(
+                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
+                  );
+                }
+                totalCreated++;
+              } catch {
+                totalFailed++;
+              }
             }
           }
         }
