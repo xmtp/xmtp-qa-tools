@@ -19,22 +19,6 @@ When you run `claude` in this repository, it will automatically:
 ## Examples
 
 ```bash
-# Start Claude with repo context
-npx @anthropic-ai/claude-code
-
-# Ask about your codebase
-npx @anthropic-ai/claude-code "How do I create a new test using the worker framework?"
-
-# Debug issues
-npx @anthropic-ai/claude-code "Why is my XMTP test failing with a database error?"
-
-# Analyze logs
-npx @anthropic-ai/claude-code "Check the latest test logs and tell me what failed"
-
-# Get help with patterns
-npx @anthropic-ai/claude-code "Show me the correct pattern for creating XMTP clients"
-
-# Use the globally installed version (if available)
 claude "Same commands work with global installation"
 ```
 
