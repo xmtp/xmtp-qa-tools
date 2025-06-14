@@ -55,6 +55,7 @@ describe(testName, () => {
             identifier: agent.address,
             identifierKind: IdentifierKind.Ethereum,
           });
+        const countBefore = (await conversation.messages()).length;
 
         const result = await verifyMessageStream(
           conversation as Dm,
@@ -62,6 +63,11 @@ describe(testName, () => {
           1,
           agent.sendMessage,
         );
+        if (!result.allReceived) {
+          await conversation.sync();
+          const messages = await conversation.messages();
+          expect(messages.length).toBe(countBefore + 2);
+        }
         expect(result.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

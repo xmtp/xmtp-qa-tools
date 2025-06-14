@@ -255,21 +255,47 @@ async function smartUpdate({
             client,
             installationCount,
           );
-          for (let j = currentInstallations; j < installationCount; j++) {
-            try {
-              await Client.create(signer, {
-                dbEncryptionKey,
-                dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
-                env,
-              });
-              if (debugMode) {
-                console.log(
-                  `Created installation ${j} for ${inbox.accountAddress} in ${env}`,
-                );
+          if (debugMode) {
+            const installProgress = new ProgressBar(
+              installationCount - currentInstallations,
+            );
+            for (let j = currentInstallations; j < installationCount; j++) {
+              try {
+                await Client.create(signer, {
+                  dbEncryptionKey,
+                  dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
+                  env,
+                });
+                if (debugMode) {
+                  process.stdout.write(
+                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
+                  );
+                }
+                totalCreated++;
+                installProgress.update();
+              } catch {
+                totalFailed++;
+                installProgress.update();
               }
-              totalCreated++;
-            } catch {
-              totalFailed++;
+            }
+            installProgress.finish();
+          } else {
+            for (let j = currentInstallations; j < installationCount; j++) {
+              try {
+                await Client.create(signer, {
+                  dbEncryptionKey,
+                  dbPath: `${LOGPATH}/${env}-${inbox.accountAddress}-install-${j}`,
+                  env,
+                });
+                if (debugMode) {
+                  process.stdout.write(
+                    `\rCreated installation ${j} for ${inbox.accountAddress} in ${env} - `,
+                  );
+                }
+                totalCreated++;
+              } catch {
+                totalFailed++;
+              }
             }
           }
         }
