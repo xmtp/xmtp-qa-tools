@@ -14,7 +14,6 @@ loadEnv(testName);
 describe(testName, () => {
   let workers: WorkerManager;
   const env = process.env.XMTP_ENV as "dev" | "production";
-  console.log("env", env);
   beforeAll(async () => {
     workers = await getWorkers(
       ["bot"],
