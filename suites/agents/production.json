@@ -18,7 +18,7 @@
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "hi",
     "networks": ["production"],
-    "disabled": true
+    "disabled": false
   },
   {
     "name": "gang",
@@ -56,6 +56,6 @@
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "hi",
     "networks": ["production"],
-    "disabled": true
+    "disabled": false
   }
 ]
