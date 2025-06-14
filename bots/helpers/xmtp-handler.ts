@@ -7,7 +7,6 @@ import {
   getEncryptionKeyFromHex,
   logAgentDetails,
 } from "@helpers/client";
-import { sendSlackNotification } from "@helpers/notifications";
 import { generatePrivateKey } from "viem/accounts";
 import {
   DEFAULT_SKILL_OPTIONS,
@@ -70,11 +69,10 @@ export const initializeClient = async (
     void client.conversations.streamAllMessages((error, message) => {
       if (error) {
         console.error(`[${env}] Error in streamMessages:`, error);
-        void sendSlackNotification({
-          testName: "simple",
-          label: "error",
-          errorLogs: new Set([`test.ts: Stream failed`]),
-        });
+        void sendSlackNotification(
+          `[${env}] Error in streamMessages: ${error.message}`,
+          `key-check`,
+        );
         return;
       }
       if (message) {
@@ -143,4 +141,27 @@ export const initializeClient = async (
 
   await logAgentDetails(clients);
   return clients;
+};
+
+export const sendSlackNotification = async (
+  message: string,
+  source: string,
+) => {
+  console.log("Sending slack notification", message, source);
+  if (!process.env.SLACK_BOT_TOKEN) {
+    throw new Error("SLACK_BOT_TOKEN is not set");
+  }
+
+  await fetch("https://slack.com/api/chat.postMessage", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      channel: process.env.SLACK_CHANNEL || "#general",
+      text: `[${source}] ${message}`,
+      mrkdwn: true,
+    }),
+  });
 };
