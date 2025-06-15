@@ -5868,6 +5868,8 @@ __metadata:
     "@eslint/js": "npm:^9.19.0"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"
     "@playwright/test": "npm:^1.50.1"
+    "@slack/bolt": "npm:^4.4.0"
+    "@slack/web-api": "npm:^7.0.0"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
     "@vitest/ui": "npm:^3.0.6"

@@ -2,6 +2,10 @@
 
 This repository contains testing tools and frameworks for XMTP (Extensible Message Transport Protocol).
 
+## IMPORTANT
+
+- Only use YARN
+
 ## Repository Structure
 
 ### Key Directories
