@@ -42,9 +42,25 @@ app.event("app_mention", async ({ event, say }) => {
 // Respond to direct messages
 app.message(async ({ message, say, client }) => {
   console.log("Message event received:", {
-    message,
+    channel: message.channel,
+    user: message.user,
+    text: message.text,
+    bot_id: message.bot_id,
+    subtype: message.subtype,
     timestamp: new Date().toISOString(),
   });
+
+  // Skip bot messages to avoid loops
+  if (message.bot_id || message.subtype === "bot_message") {
+    console.log("Skipping bot message");
+    return;
+  }
+
+  // Skip messages without text
+  if (!message.text || !message.text.trim()) {
+    console.log("Skipping message without text");
+    return;
+  }
 
   try {
     // Get channel info to verify if it's a DM
@@ -52,12 +68,20 @@ app.message(async ({ message, say, client }) => {
       channel: message.channel,
     });
 
-    console.log("Channel info:", channelInfo);
+    console.log("Channel info:", {
+      is_im: channelInfo.channel.is_im,
+      is_channel: channelInfo.channel.is_channel,
+      is_group: channelInfo.channel.is_group,
+      is_mpim: channelInfo.channel.is_mpim,
+      name: channelInfo.channel.name,
+    });
 
     if (channelInfo.channel.is_im) {
-      console.log("Processing DM message");
+      console.log("Processing DM message:", message.text);
       const claudeResponse = await runClaudeCommand(message.text);
-      await say(`<@${message.user}> ${claudeResponse}`);
+      console.log("Claude response:", claudeResponse);
+      await say(`${claudeResponse}`);
+      console.log("Response sent successfully");
     } else {
       console.log("Not a DM channel, ignoring message");
     }
