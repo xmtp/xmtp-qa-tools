@@ -24,24 +24,28 @@ async function runClaudeCommand(message) {
     return "Error running claude command";
   }
 }
+app.message(async ({ message }) => {
+  console.log("ANY MESSAGE:", message);
+});
 
 // Respond to @mentions
 app.event("app_mention", async ({ event, say }) => {
+  console.log(`[MENTION] From: ${event.user}, Text: ${event.text}`);
   const claudeResponse = await runClaudeCommand(event.text);
   await say(`<@${event.user}> ${claudeResponse}`);
 });
 
 // Respond to direct messages
 app.message(async ({ message, say }) => {
-  if (!("subtype" in message)) {
-    const claudeResponse = await runClaudeCommand(message.text);
-    await say(`<@${message.user}> ${claudeResponse}`);
-  }
+  console.log(`[DM] From: ${message.user}, Text: ${message.text}`);
+  const claudeResponse = await runClaudeCommand(message.text);
+  await say(`<@${message.user}> ${claudeResponse}`);
 });
 
 // Respond to /qa slash command
 app.command("/qa", async ({ command, ack, respond }) => {
   await ack();
+  console.log(`[SLASH] From: ${command.user_id}, Text: ${command.text}`);
   const claudeResponse = await runClaudeCommand(command.text);
   await respond(`<@${command.user_id}> ${claudeResponse}`);
 });
