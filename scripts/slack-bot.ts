@@ -10,6 +10,9 @@ dotenv.config();
 // Initialize logger
 const logger = createLogger();
 
+// Track active Claude processes for cleanup
+const activeClaudeProcesses = new Set<ChildProcess>();
+
 interface ValidationResult {
   isValid: boolean;
   sanitized?: string;
@@ -81,15 +84,23 @@ async function runClaudeCommand(message: string): Promise<string> {
       },
     });
 
+    // Track this process for cleanup
+    activeClaudeProcesses.add(claude);
+
     let stdout = "";
     let stderr = "";
     let hasResponded = false;
+
+    const cleanup = () => {
+      activeClaudeProcesses.delete(claude);
+    };
 
     const timeout = setTimeout(() => {
       if (!hasResponded) {
         hasResponded = true;
         logger.warn("⏰ Claude command timed out after 2 minutes");
         claude.kill("SIGTERM");
+        cleanup();
         resolve(
           "Error: Claude command timed out (2 minutes). Please try a simpler query or break it into smaller parts.",
         );
@@ -106,6 +117,7 @@ async function runClaudeCommand(message: string): Promise<string> {
 
     claude.on("close", (code) => {
       clearTimeout(timeout);
+      cleanup();
       if (!hasResponded) {
         hasResponded = true;
         logger.info(`🏁 Claude command finished with code: ${code}`);
@@ -123,6 +135,7 @@ async function runClaudeCommand(message: string): Promise<string> {
 
     claude.on("error", (error) => {
       clearTimeout(timeout);
+      cleanup();
       if (!hasResponded) {
         hasResponded = true;
         logger.error(`💥 Claude spawn error: ${error.message}`);
@@ -134,6 +147,7 @@ async function runClaudeCommand(message: string): Promise<string> {
       claude.stdin.write(validation.sanitized);
       claude.stdin.end();
     } else {
+      cleanup();
       resolve("Error: Failed to send input to Claude");
     }
   });
@@ -211,6 +225,30 @@ app.message(async ({ message, say, client }) => {
   }
 });
 
+// Function to cleanup all active Claude processes
+function cleanupClaudeProcesses() {
+  if (activeClaudeProcesses.size > 0) {
+    logger.info(
+      `🧹 Cleaning up ${activeClaudeProcesses.size} active Claude processes`,
+    );
+
+    for (const process of activeClaudeProcesses) {
+      try {
+        if (!process.killed) {
+          process.kill("SIGTERM");
+          logger.info("🔪 Terminated Claude process");
+        }
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        logger.error(`Error killing Claude process: ${errorMessage}`);
+      }
+    }
+
+    activeClaudeProcesses.clear();
+  }
+}
+
 // Application startup
 void (async () => {
   try {
@@ -218,6 +256,7 @@ void (async () => {
     logger.info("🚀 Slack bot started successfully");
   } catch (error: any) {
     logger.error(`Failed to start Slack bot: ${error.message}`);
+    cleanupClaudeProcesses();
     process.exit(1);
   }
 })();
@@ -225,10 +264,12 @@ void (async () => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   logger.info("🛑 Shutting down gracefully");
+  cleanupClaudeProcesses();
   process.exit(0);
 });
 
 process.on("SIGINT", () => {
   logger.info("🛑 Shutting down gracefully");
+  cleanupClaudeProcesses();
   process.exit(0);
 });
