@@ -4,6 +4,85 @@ const { spawn } = require("child_process");
 
 dotenv.config();
 
+// Store active threads for users
+const userThreads = new Map();
+
+// Helper function to determine if a message is a new topic
+function isNewTopic(message, userId) {
+  const userHistory = userThreads.get(userId);
+  if (!userHistory || userHistory.length === 0) {
+    return true;
+  }
+
+  // Simple heuristic: if the message is significantly different from recent messages
+  // or contains question words, treat it as a new topic
+  const lastMessage = userHistory[userHistory.length - 1];
+  const timeDiff = Date.now() - lastMessage.timestamp;
+
+  // Start new thread if last message was more than 10 minutes ago
+  if (timeDiff > 10 * 60 * 1000) {
+    return true;
+  }
+
+  // Check for topic indicators (questions, greetings, etc.)
+  const topicIndicators = [
+    "what",
+    "how",
+    "why",
+    "when",
+    "where",
+    "can you",
+    "help me",
+    "i need",
+    "question",
+    "problem",
+  ];
+  const lowerMessage = message.toLowerCase();
+
+  return topicIndicators.some((indicator) => lowerMessage.includes(indicator));
+}
+
+// Helper function to store thread info
+function storeThreadInfo(userId, threadTs, channel, message) {
+  if (!userThreads.has(userId)) {
+    userThreads.set(userId, []);
+  }
+
+  const userHistory = userThreads.get(userId);
+  userHistory.push({
+    threadTs,
+    channel,
+    message: message.substring(0, 100), // Store first 100 chars for context
+    timestamp: Date.now(),
+  });
+
+  // Keep only last 5 threads per user to avoid memory bloat
+  if (userHistory.length > 5) {
+    userHistory.splice(0, userHistory.length - 5);
+  }
+}
+
+// Helper function to get current thread for user
+function getCurrentThread(userId, channel) {
+  const userHistory = userThreads.get(userId);
+  if (!userHistory || userHistory.length === 0) {
+    return null;
+  }
+
+  // Find the most recent thread for this channel
+  for (let i = userHistory.length - 1; i >= 0; i--) {
+    if (userHistory[i].channel === channel) {
+      const timeDiff = Date.now() - userHistory[i].timestamp;
+      // Only return thread if it's less than 10 minutes old
+      if (timeDiff < 10 * 60 * 1000) {
+        return userHistory[i].threadTs;
+      }
+    }
+  }
+
+  return null;
+}
+
 // Validate required environment variables
 const requiredEnvVars = ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN"];
 const missingEnvVars = requiredEnvVars.filter(
@@ -129,38 +208,84 @@ async function runClaudeCommand(message) {
 }
 
 // Helper function to send thinking message and update it with response
-async function sendThinkingMessage(say, client, channel, userMention = "") {
+async function sendThinkingMessage(
+  say,
+  client,
+  channel,
+  userMention = "",
+  threadTs = null,
+) {
   try {
     // Send initial thinking message
-    const thinkingResponse = await say(`${userMention}🤔 Thinking...`);
+    const messageOptions = {
+      text: `${userMention}🤔 Thinking...`,
+    };
+
+    if (threadTs) {
+      messageOptions.thread_ts = threadTs;
+    }
+
+    const thinkingResponse = await say(messageOptions);
 
     return {
       update: async (finalMessage) => {
         try {
           if (thinkingResponse && thinkingResponse.ts) {
-            await client.chat.update({
+            const updateOptions = {
               channel: channel,
               ts: thinkingResponse.ts,
               text: `${userMention}${finalMessage}`,
-            });
+            };
+
+            if (threadTs) {
+              updateOptions.thread_ts = threadTs;
+            }
+
+            await client.chat.update(updateOptions);
           } else {
             // Fallback: send new message if update fails
-            await say(`${userMention}${finalMessage}`);
+            const fallbackOptions = {
+              text: `${userMention}${finalMessage}`,
+            };
+
+            if (threadTs) {
+              fallbackOptions.thread_ts = threadTs;
+            }
+
+            await say(fallbackOptions);
           }
         } catch (updateError) {
           console.error("Failed to update thinking message:", updateError);
           // Fallback: send new message
-          await say(`${userMention}${finalMessage}`);
+          const fallbackOptions = {
+            text: `${userMention}${finalMessage}`,
+          };
+
+          if (threadTs) {
+            fallbackOptions.thread_ts = threadTs;
+          }
+
+          await say(fallbackOptions);
         }
       },
+      threadTs: thinkingResponse?.ts || threadTs,
     };
   } catch (error) {
     console.error("Failed to send thinking message:", error);
     // Return fallback that just sends the final message
     return {
       update: async (finalMessage) => {
-        await say(`${userMention}${finalMessage}`);
+        const fallbackOptions = {
+          text: `${userMention}${finalMessage}`,
+        };
+
+        if (threadTs) {
+          fallbackOptions.thread_ts = threadTs;
+        }
+
+        await say(fallbackOptions);
       },
+      threadTs: threadTs,
     };
   }
 }
@@ -170,14 +295,41 @@ app.event("app_mention", async ({ event, say, client }) => {
   try {
     console.log("App mention received from user:", event.user);
 
+    const userId = event.user;
+    const channel = event.channel;
+    const message = event.text;
+
+    let threadTs = null;
+
+    // Check if this should start a new thread or continue existing one
+    if (isNewTopic(message, userId)) {
+      console.log("Starting new thread for user:", userId);
+      // Don't set threadTs - this will start a new thread
+    } else {
+      threadTs = getCurrentThread(userId, channel);
+      if (threadTs) {
+        console.log("Continuing existing thread:", threadTs);
+      } else {
+        console.log("No recent thread found, starting new thread");
+      }
+    }
+
     const thinkingMsg = await sendThinkingMessage(
       say,
       client,
-      event.channel,
-      `<@${event.user}> `,
+      channel,
+      `<@${userId}> `,
+      threadTs,
     );
-    const claudeResponse = await runClaudeCommand(event.text);
+
+    const claudeResponse = await runClaudeCommand(message);
     await thinkingMsg.update(claudeResponse);
+
+    // Store thread info for future reference
+    const finalThreadTs = thinkingMsg.threadTs || threadTs;
+    if (finalThreadTs) {
+      storeThreadInfo(userId, finalThreadTs, channel, message);
+    }
   } catch (error) {
     console.error("Error processing app mention:", error);
     await say(
@@ -207,13 +359,41 @@ app.message(async ({ message, say, client }) => {
     });
 
     if (channelInfo.channel.is_im) {
+      const userId = message.user;
+      const channel = message.channel;
+      const messageText = message.text;
+
+      let threadTs = null;
+
+      // Check if this should start a new thread or continue existing one
+      if (isNewTopic(messageText, userId)) {
+        console.log("Starting new thread for user:", userId);
+        // Don't set threadTs - this will start a new thread
+      } else {
+        threadTs = getCurrentThread(userId, channel);
+        if (threadTs) {
+          console.log("Continuing existing thread:", threadTs);
+        } else {
+          console.log("No recent thread found, starting new thread");
+        }
+      }
+
       const thinkingMsg = await sendThinkingMessage(
         say,
         client,
-        message.channel,
+        channel,
+        "",
+        threadTs,
       );
-      const claudeResponse = await runClaudeCommand(message.text);
+
+      const claudeResponse = await runClaudeCommand(messageText);
       await thinkingMsg.update(claudeResponse);
+
+      // Store thread info for future reference
+      const finalThreadTs = thinkingMsg.threadTs || threadTs;
+      if (finalThreadTs) {
+        storeThreadInfo(userId, finalThreadTs, channel, messageText);
+      }
     }
   } catch (error) {
     console.error("Error processing message:", error);
@@ -234,16 +414,54 @@ app.command("/qa", async ({ command, ack, respond, client }) => {
   await ack();
 
   try {
-    // Send initial thinking response
-    await respond(`<@${command.user_id}> 🤔 Thinking...`);
+    const userId = command.user_id;
+    const channel = command.channel_id;
+    const message = command.text;
 
-    const claudeResponse = await runClaudeCommand(command.text);
+    let threadTs = null;
+
+    // Check if this should start a new thread or continue existing one
+    if (isNewTopic(message, userId)) {
+      console.log("Starting new thread for slash command user:", userId);
+      // Don't set threadTs - this will start a new thread
+    } else {
+      threadTs = getCurrentThread(userId, channel);
+      if (threadTs) {
+        console.log("Continuing existing thread:", threadTs);
+      } else {
+        console.log("No recent thread found, starting new thread");
+      }
+    }
+
+    // Send initial thinking response
+    const initialOptions = {
+      text: `<@${userId}> 🤔 Thinking...`,
+    };
+
+    if (threadTs) {
+      initialOptions.thread_ts = threadTs;
+    }
+
+    const initialResponse = await respond(initialOptions);
+    const claudeResponse = await runClaudeCommand(message);
 
     // Send follow-up response with actual result
-    await client.chat.postMessage({
-      channel: command.channel_id,
-      text: `<@${command.user_id}> ${claudeResponse}`,
-    });
+    const followUpOptions = {
+      channel: channel,
+      text: `<@${userId}> ${claudeResponse}`,
+    };
+
+    if (threadTs) {
+      followUpOptions.thread_ts = threadTs;
+    }
+
+    const finalResponse = await client.chat.postMessage(followUpOptions);
+
+    // Store thread info for future reference
+    const finalThreadTs = threadTs || finalResponse.ts;
+    if (finalThreadTs) {
+      storeThreadInfo(userId, finalThreadTs, channel, message);
+    }
   } catch (error) {
     console.error("Error processing slash command:", error);
     await respond(
