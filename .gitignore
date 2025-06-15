@@ -55,6 +55,7 @@ dist
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
+!.yarn/qa-agent/releases
 !.yarn/sdks
 !.yarn/versions
 
