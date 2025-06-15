@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.29",
+  "version": "0.1.30",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -10,7 +10,7 @@
     "workers"
   ],
   "scripts": {
-    "agent": "cd qa-agent && yarn dev",
+    "agent": "tsx scripts/slack-bot.ts",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
@@ -36,6 +36,8 @@
     "test": "yarn cli test"
   },
   "dependencies": {
+    "@slack/bolt": "^4.4.0",
+    "@slack/web-api": "^7.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/node-bindings": "1.2.0",
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0",
