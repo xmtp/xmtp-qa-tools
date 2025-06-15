@@ -4,7 +4,7 @@ This repository contains testing tools and frameworks for XMTP (Extensible Messa
 
 ## IMPORTANT
 
-- Only use YARN
+- Only use `YARN`
 
 ## Repository Structure
 
@@ -102,7 +102,7 @@ const client = await Client.create(signer, {
 
 ```bash
 # Run specific test suites
-yarn test suites/functional/
+yarn test dms
 yarn test suites/group/
 yarn large  # Large test suite
 yarn functional  # Functional tests
@@ -114,9 +114,9 @@ yarn lint  # Code linting
 yarn format  # Code formatting
 
 # CLI tool
-yarn cli test <test-name>
-yarn cli bot <bot-command>
-yarn cli script <script-name>
+yarn test <test-name>
+yarn bot <bot-command>
+yarn script <script-name>
 ```
 
 ### Integration Points
