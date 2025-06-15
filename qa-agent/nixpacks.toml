@@ -1,0 +1,12 @@
+[phases.setup]
+nixPkgs = ["nodejs", "python3", "curl"]
+cmds = ["npm install -g @anthropic-ai/claude-code"]
+
+[phases.install]
+cmds = ["npm ci"]
+
+[phases.build]
+cmds = ["npm run build"]
+
+[start]
+cmd = "npm start" 

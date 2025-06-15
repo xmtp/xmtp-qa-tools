@@ -71,5 +71,6 @@ app.command("/qa", async ({ command, ack, respond }) => {
 });
 
 (async () => {
+  console.log("Starting Slack bot...");
   await app.start();
 })();
