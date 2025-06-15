@@ -5,14 +5,21 @@ const util = require("util");
 const execPromise = util.promisify(exec);
 
 dotenv.config();
-console.log(process.env.SLACK_BOT_TOKEN);
-console.log(process.env.SLACK_APP_TOKEN);
+console.log("Starting bot with tokens:", {
+  hasBotToken: !!process.env.SLACK_BOT_TOKEN,
+  hasAppToken: !!process.env.SLACK_APP_TOKEN,
+});
 
 const app = new App({
   token: process.env.SLACK_BOT_TOKEN,
   appToken: process.env.SLACK_APP_TOKEN,
   socketMode: true,
-  logLevel: LogLevel.INFO,
+  logLevel: LogLevel.DEBUG,
+});
+
+// Add error handler
+app.error(async (error) => {
+  console.error("App error:", error);
 });
 
 async function runClaudeCommand(message) {
@@ -24,9 +31,6 @@ async function runClaudeCommand(message) {
     return "Error running claude command";
   }
 }
-app.message(async ({ message }) => {
-  console.log("ANY MESSAGE:", message);
-});
 
 // Respond to @mentions
 app.event("app_mention", async ({ event, say }) => {
@@ -36,10 +40,30 @@ app.event("app_mention", async ({ event, say }) => {
 });
 
 // Respond to direct messages
-app.message(async ({ message, say }) => {
-  console.log(`[DM] From: ${message.user}, Text: ${message.text}`);
-  const claudeResponse = await runClaudeCommand(message.text);
-  await say(`<@${message.user}> ${claudeResponse}`);
+app.message(async ({ message, say, client }) => {
+  console.log("Message event received:", {
+    message,
+    timestamp: new Date().toISOString(),
+  });
+
+  try {
+    // Get channel info to verify if it's a DM
+    const channelInfo = await client.conversations.info({
+      channel: message.channel,
+    });
+
+    console.log("Channel info:", channelInfo);
+
+    if (channelInfo.channel.is_im) {
+      console.log("Processing DM message");
+      const claudeResponse = await runClaudeCommand(message.text);
+      await say(`<@${message.user}> ${claudeResponse}`);
+    } else {
+      console.log("Not a DM channel, ignoring message");
+    }
+  } catch (error) {
+    console.error("Error processing message:", error);
+  }
 });
 
 // Respond to /qa slash command
