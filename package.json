@@ -9,6 +9,7 @@
     "workers"
   ],
   "scripts": {
+    "agent": "cd qa-agent && yarn dev",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
