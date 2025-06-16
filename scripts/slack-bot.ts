@@ -269,14 +269,59 @@ ${contextContent}
 - Provide expert guidance on XMTP testing and development
 - Help debug issues using the patterns and knowledge from the context above
 - Give specific, actionable advice based on the repository structure and best practices
-- Prioritize checking logs, analyzing test patterns, and understanding configurations when helping users`;
+- Prioritize checking logs, analyzing test patterns, and understanding configurations when helping users
+
+## Response Formatting:
+- **Keep responses very concise and to the point**
+- Use **bold** for emphasis (will be converted to Slack format)
+- Use \`code\` for inline code snippets
+- Use \`\`\`code blocks\`\`\` for multi-line code
+- Use bullet points with - for lists
+- Avoid lengthy explanations - provide direct, actionable answers`;
   } catch (error) {
     logger.error(
       `Failed to load context.md: ${error instanceof Error ? error.message : String(error)}`,
     );
     // Fallback to basic system prompt if file reading fails
-    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.`;
+    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+
+## Response Formatting:
+- Use **bold** for emphasis (will be converted to Slack format)
+- Use \`code\` for inline code snippets
+- Use \`\`\`code blocks\`\`\` for multi-line code
+- Keep responses clear and well-structured for Slack messaging`;
   }
+}
+
+// Convert standard markdown to Slack mrkdwn format
+function convertToSlackFormat(message: string): string {
+  let converted = message;
+
+  // Convert **bold** to *bold*
+  converted = converted.replace(/\*\*(.*?)\*\*/g, "*$1*");
+
+  // Convert __bold__ to *bold*
+  converted = converted.replace(/__(.*?)__/g, "*$1*");
+
+  // Convert *italic* to _italic_ (but only single asterisks, not the double ones we just converted)
+  converted = converted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "_$1_");
+
+  // Convert `code` to `code` (already correct)
+  // Keep ```code blocks``` as is (already correct)
+
+  // Convert markdown links [text](url) to Slack format <url|text>
+  converted = converted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<$2|$1>");
+
+  // Convert > blockquotes to Slack format
+  converted = converted.replace(/^> (.+)/gm, "> $1");
+
+  // Convert numbered lists (1. item) to just bullet points with numbers
+  converted = converted.replace(/^\d+\.\s+(.+)/gm, "• $1");
+
+  // Convert - bullet points to •
+  converted = converted.replace(/^-\s+(.+)/gm, "• $1");
+
+  return converted;
 }
 
 // Process message with Anthropic SDK
@@ -293,7 +338,7 @@ async function processWithAnthropic(message: string): Promise<string> {
     const systemPrompt = loadSystemPrompt();
 
     const response = await anthropicClient.messages.create({
-      model: "claude-3-haiku-20240307",
+      model: "claude-3-5-sonnet-20241022",
       max_tokens: 1024,
       system: systemPrompt,
       messages: [
@@ -309,7 +354,7 @@ async function processWithAnthropic(message: string): Promise<string> {
       logger.info(
         `✅ Anthropic response received: "${content.text.substring(0, 100)}..."`,
       );
-      return content.text;
+      return convertToSlackFormat(content.text);
     } else {
       throw new Error("Unexpected response type from Anthropic");
     }
