@@ -23,7 +23,7 @@ export async function getWorkersFromGroup(
   return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
 }
 
-describe(testName, async () => {
+describe("Message Delivery Reliability Metrics - Stream vs Poll Performance Analysis", async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
@@ -52,7 +52,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("stream_order: verify message order when receiving via streams", async () => {
+  it("should verify message delivery and order accuracy using message streams", async () => {
     try {
       const verifyResult = await verifyMessageStream(
         group,
@@ -102,7 +102,7 @@ describe(testName, async () => {
     }
   });
 
-  it("poll_order: verify message order when receiving via pull", async () => {
+  it("should verify message delivery and order accuracy using polling method", async () => {
     try {
       const workersFromGroup = await getWorkersFromGroup(group, workers);
       const messagesByWorker: string[][] = [];
@@ -171,7 +171,7 @@ describe(testName, async () => {
     }
   });
 
-  it("offline_recovery: verify message recovery after disconnection", async () => {
+  it("should verify message recovery and delivery after client reconnection", async () => {
     try {
       // Select one worker to take offline
       const offlineWorker = workers.getCreator(); // Second worker

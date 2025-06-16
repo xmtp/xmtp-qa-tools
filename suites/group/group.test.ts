@@ -43,7 +43,7 @@ const testConfig = {
 
 loadEnv(TEST_NAME);
 
-describe(TEST_NAME, () => {
+describe("Group Stress Testing - Multi-Feature Validation Across All Groups", () => {
   let workers: WorkerManager;
   let creator: Worker;
   let allInboxIds: string[] = [];

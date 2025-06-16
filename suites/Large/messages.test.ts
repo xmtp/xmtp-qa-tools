@@ -18,7 +18,7 @@ import {
 const testName = "m_large_messages";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("Large-Scale Message Delivery Performance - Group Message Streams at Scale", async () => {
   let workers: WorkerManager;
   let newGroup: Group;
 
@@ -48,7 +48,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveMessage-${i}: should create a group and measure all streams`, async () => {
+    it(`should measure message delivery performance for ${i}-member group`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(

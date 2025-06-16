@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "groups";
 loadEnv(testName);
-describe(testName, async () => {
+describe("Group Conversation Functionality - Creation, Management, and Message Delivery", async () => {
   const workers = await getWorkers(
     [
       "henry",
@@ -37,7 +37,7 @@ describe(testName, async () => {
   });
 
   for (let i = batchSize; i <= total; i += batchSize) {
-    it(`newGroup-${i}: should create a large group of ${i} participants ${i}`, async () => {
+    it(`should create a group with ${i} participants`, async () => {
       try {
         const sliced = getInboxIds(i);
         console.log("Creating group with", sliced.length, "participants");
@@ -51,7 +51,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`syncGroup-${i}: should sync a large group of ${i} participants ${i}`, async () => {
+    it(`should sync group with ${i} participants and verify member count`, async () => {
       try {
         await groupsBySize[i].sync();
         const members = await groupsBySize[i].members();
@@ -61,7 +61,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`updateGroupName-${i}: should update the group name`, async () => {
+    it(`should update group name for ${i}-member group`, async () => {
       try {
         const newName = "Large Group";
         await (groupsBySize[i] as Group).updateName(newName);
@@ -73,7 +73,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+    it(`should remove a member from ${i}-member group and verify count`, async () => {
       try {
         const previousMembers = await groupsBySize[i].members();
         await (groupsBySize[i] as Group).removeMembers([
@@ -90,7 +90,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
+    it(`should send message to group with ${i} participants`, async () => {
       try {
         const groupMessage =
           "gm-" + Math.random().toString(36).substring(2, 15);
@@ -102,7 +102,7 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`receiveGroupMessage-${i}: should create a group and measure all streams`, async () => {
+    it(`should verify message delivery streams for ${i}-member group`, async () => {
       try {
         console.log(
           `Creating test group with ${workers.getAll().length} worker participants`,

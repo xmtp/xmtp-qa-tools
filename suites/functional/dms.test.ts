@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("Direct Message (DM) Functionality - Creation, Sending, and Message Delivery", async () => {
   const workers = await getWorkers(
     [
       "henry",
@@ -33,7 +33,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("newDm: should measure creating a DM", async () => {
+  it("should create a new DM conversation using inbox ID", async () => {
     try {
       convo = (await workers
         .get("henry")!
@@ -49,7 +49,7 @@ describe(testName, async () => {
     }
   });
 
-  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+  it("should create a new DM conversation using Ethereum address", async () => {
     try {
       const dm2 = await workers
         .get("henry")!
@@ -65,7 +65,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("sendGM: should measure sending a gm", async () => {
+  it("should send a message in DM conversation", async () => {
     try {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -82,7 +82,7 @@ describe(testName, async () => {
     }
   });
 
-  it("receiveGM: should measure receiving a gm", async () => {
+  it("should receive and verify message delivery in DM conversation", async () => {
     try {
       const verifyResult = await verifyMessageStream(convo, [
         workers.get("randomguy")!,
