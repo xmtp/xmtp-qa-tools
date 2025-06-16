@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import { Anthropic } from "@anthropic-ai/sdk";
 import { sendDatadogLog } from "@helpers/datadog";
 import { createLogger } from "@helpers/logger";
@@ -251,6 +253,32 @@ Examples:
   }
 }
 
+// Load system prompt from context.md file
+function loadSystemPrompt(): string {
+  try {
+    const contextPath = path.join(process.cwd(), ".claude", "context.md");
+    const contextContent = fs.readFileSync(contextPath, "utf-8");
+
+    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+
+Here is the comprehensive context about this repository:
+
+${contextContent}
+
+## Your Role:
+- Provide expert guidance on XMTP testing and development
+- Help debug issues using the patterns and knowledge from the context above
+- Give specific, actionable advice based on the repository structure and best practices
+- Prioritize checking logs, analyzing test patterns, and understanding configurations when helping users`;
+  } catch (error) {
+    logger.error(
+      `Failed to load context.md: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    // Fallback to basic system prompt if file reading fails
+    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.`;
+  }
+}
+
 // Process message with Anthropic SDK
 async function processWithAnthropic(message: string): Promise<string> {
   if (!anthropicClient) {
@@ -262,9 +290,12 @@ async function processWithAnthropic(message: string): Promise<string> {
       `🤖 Sending message to Anthropic: "${message.substring(0, 50)}..."`,
     );
 
+    const systemPrompt = loadSystemPrompt();
+
     const response = await anthropicClient.messages.create({
       model: "claude-3-haiku-20240307",
       max_tokens: 1024,
+      system: systemPrompt,
       messages: [
         {
           role: "user",
