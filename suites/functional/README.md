@@ -1,6 +1,18 @@
-# 🧪 XMTP Functional Tests
+# XMTP Functional Testing Suite
 
-This directory contains functional tests for the XMTP protocol. These tests verify the core functionality of XMTP, including direct messages, group conversations, consent management, and more.
+This test suite validates core XMTP protocol functionality including direct messages, group conversations, consent management, and message delivery systems.
+
+## What it does (units)
+
+- Test DM conversation creation and message delivery
+- Validate group conversation functionality and member management
+- Verify message streaming and synchronization performance
+- Test multi-device installation and cross-device sync
+- Validate consent management and content codec handling
+
+## Environment Setup
+
+Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding network.
 
 ## Quick reference
 
@@ -21,22 +33,20 @@ This directory contains functional tests for the XMTP protocol. These tests veri
 | **streams.test.ts**       | Message streaming verification          | Stream performance, delivery confirmation  |
 | **sync.test.ts**          | Synchronization methods comparison      | Performance benchmarking, sync strategies  |
 
-## Usage
+## How to run
 
-The functional tests are designed to be run with Vitest:
+### Run all functional tests
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-# Run all functional tests
 yarn test functional
+```
 
-# Run a specific test file
+### Run specific test files
+
+```bash
+yarn test functional/dms.test.ts
+yarn test functional/groups.test.ts
 yarn test functional/streams.test.ts
-
-# Run tests with a specific tag
-yarn test --grep "group"
 ```
 
 ## 🌐 Browser Testing

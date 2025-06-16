@@ -1,6 +1,25 @@
-# Metrics Test Suite
+# Message Delivery Reliability & Performance Metrics Suite
 
-Performance and delivery measurement tests for XMTP protocol operations. These tests measure execution times, message delivery rates, ordering accuracy, and system reliability under various conditions.
+This test suite measures message delivery reliability, performance benchmarks, and operational metrics for XMTP protocol operations.
+
+## What it does (units)
+
+- Measure message delivery reliability and ordering accuracy via streams vs polling
+- Benchmark execution time of core XMTP operations at various scales
+- Test offline recovery capabilities and message loss prevention
+- Validate performance consistency across different group sizes
+- Collect operational metrics for performance monitoring
+
+## Environment Setup
+
+Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding network.
+
+### Environment Variables
+
+- `DELIVERY_AMOUNT` - Number of messages to send for testing (default: 10)
+- `DELIVERY_RECEIVERS` - Number of receiving clients (default: 4)
+- `BATCH_SIZE` - Increment size for scaling tests (default: 5)
+- `MAX_GROUP_SIZE` - Maximum group size to test (default: 10)
 
 ## Test 1 (Delivery)
 

@@ -87,7 +87,7 @@ describe("Group Stress Testing - Multi-Feature Validation Across All Groups", ()
     );
   });
 
-  it(`should verify all operations across all groups`, async () => {
+  it("should verify message streams, membership changes, metadata updates, and epoch changes across all groups", async () => {
     try {
       for (const feature of features) {
         for (const groupId of allGroups) {

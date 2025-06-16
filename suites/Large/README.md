@@ -1,6 +1,18 @@
-# Large Group Testing Suite
+# Large-Scale Performance Testing Suite
 
-This suite benchmarks XMTP network performance and scalability with large group conversations. It measures group creation, message delivery, metadata updates, and sync operations across varying group sizes.
+This test suite benchmarks XMTP network performance and scalability with large group conversations across varying group sizes.
+
+## What it does (units)
+
+- Measure group creation time and member addition performance at scale
+- Benchmark message delivery latency and reliability in large groups
+- Test group metadata update propagation and sync performance
+- Evaluate cumulative sync performance as groups grow over time
+- Validate member management operations in large group contexts
+
+## Environment Setup
+
+Set `XMTP_ENV` to either `dev` or `production` to test against the corresponding network.
 
 ## Directory Contents
 
@@ -26,14 +38,20 @@ This suite benchmarks XMTP network performance and scalability with large group 
   Shared utilities/constants for group creation, logging, and test parameterization (e.g., batch size, total group size).
   - Exports: `m_large_WORKER_COUNT`, `m_large_BATCH_SIZE`, `m_large_TOTAL`, `m_large_createGroup`, `saveLog`, and `SummaryEntry` type.
 
-## Running the Suite
+## How to run
+
+### Run all large-scale tests
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-
 yarn test large
+```
+
+### Run specific test files
+
+```bash
+yarn test large/messages.test.ts
+yarn test large/syncs.test.ts
+yarn test large/membership.test.ts
 ```
 
 - Results and timing summaries are appended to `logs/large.log` after each run.
