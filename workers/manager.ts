@@ -204,14 +204,17 @@ export class WorkerManager {
   }
   async createGroup(
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
+    members: string[] | null = null
   ): Promise<Group> {
     const creator = this.getCreator();
-    const group = await creator.client.conversations.newGroup(
-      this.getAllButCreator().map((worker) => worker.client.inboxId),
-      {
-        groupName: groupName,
-      },
-    );
+    const memberList = members
+      ? members.map((name) => this.get(name)!.client.inboxId)
+      : this.getAllButCreator().map((worker) => worker.client.inboxId);
+
+    const group = await creator.client.conversations.newGroup(memberList, {
+      groupName,
+    });
+
     return group as Group;
   }
   getAllBut(excludeName: string): Worker[] {
@@ -331,7 +334,7 @@ export class WorkerManager {
   /**
    * Creates a new worker with all necessary initialization
    */
-  public async createWorker(descriptor: string): Promise<Worker> {
+public async createWorker(descriptor: string, apiUrl?: string): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
@@ -368,7 +371,10 @@ export class WorkerManager {
       this.typeOfResponse,
       this.typeOfSync,
       this.env,
+      {},
+      apiUrl
     );
+
 
     const initializedWorker = await workerClient.initialize();
 
@@ -401,7 +407,7 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptors: string[],
+  descriptorsOrMap: string[] | Record<string, string>,
   testName: string,
   typeofStreamType: typeofStream = typeofStream.None,
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
@@ -415,10 +421,19 @@ export async function getWorkers(
     typeOfSyncType,
     env,
   );
-  // Process descriptors in parallel
-  const workerPromises = descriptors.map((descriptor) =>
-    manager.createWorker(descriptor),
-  );
+
+  let workerPromises: Promise<Worker>[] = [];
+
+  if (Array.isArray(descriptorsOrMap)) {
+    workerPromises = descriptorsOrMap.map((descriptor) =>
+      manager.createWorker(descriptor)
+    );
+  } else {
+    workerPromises = Object.entries(descriptorsOrMap).map(
+      ([descriptor, apiUrl]) => manager.createWorker(descriptor, apiUrl)
+    );
+  }
+
   await Promise.all(workerPromises);
   manager.printWorkers();
   await manager.checkInstallations();

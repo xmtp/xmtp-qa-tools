@@ -33,6 +33,7 @@ export async function createClient(
     folder: string;
   },
   env: XmtpEnv,
+  apiUrl?: string
 ): Promise<{
   client: unknown;
   dbPath: string;
@@ -65,6 +66,7 @@ export async function createClient(
     encryptionKey,
     dbPath,
     env,
+    apiUrl
   );
 
   return {
@@ -82,10 +84,14 @@ export const regressionClient = async (
   dbEncryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
+  apiURL?: string
 ): Promise<unknown> => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);
+  const apiUrl = apiURL; //"http://localhost:8556";
+  console.log("Creating API client with: SDK version: " + sdkVersion + " walletKey: " + walletKey + " API URL: " + apiUrl);
+
   const ClientClass =
     sdkVersions[versionInt as keyof typeof sdkVersions].Client;
   let client = null;
@@ -99,6 +105,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
+      apiUrl
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 100 && versionInt < 200) {
@@ -108,6 +115,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
+      apiUrl
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 200) {
@@ -118,6 +126,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
+      apiUrl
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
