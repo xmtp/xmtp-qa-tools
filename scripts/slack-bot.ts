@@ -154,7 +154,7 @@ async function runClaudeCommand(message: string): Promise<string> {
 }
 
 // Respond to @mentions
-app.event<"app_mention">("app_mention", async ({ event, say }) => {
+app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
   try {
     const message = event.text || "";
     const userId = event.user;
@@ -164,15 +164,27 @@ app.event<"app_mention">("app_mention", async ({ event, say }) => {
     logger.info(`📝 Message Content: "${message}"`);
 
     const thinkingMessage = `<@${userId}> 🤔 Thinking...`;
-    await say(thinkingMessage);
+    const thinkingResponse = await say(thinkingMessage);
     logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
     const claudeResponse = await runClaudeCommand(message);
     logger.info(`🤖 Claude Response: "${claudeResponse}"`);
 
     const finalResponse = `<@${userId}> ${claudeResponse}`;
-    await say(finalResponse);
-    logger.info(`📤 SENT FINAL RESPONSE: "${finalResponse}"`);
+
+    // Replace the thinking message with the final response
+    if (thinkingResponse && thinkingResponse.ts) {
+      await client.chat.update({
+        channel: channel,
+        ts: thinkingResponse.ts,
+        text: finalResponse,
+      });
+      logger.info(`📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${finalResponse}"`);
+    } else {
+      // Fallback to sending a new message if update fails
+      await say(finalResponse);
+      logger.info(`📤 SENT FINAL RESPONSE: "${finalResponse}"`);
+    }
   } catch (error: any) {
     logger.error(`Error processing app mention: ${error.message}`);
     const errorResponse = `<@${event.user}> Sorry, I encountered an error processing your request.`;
@@ -207,14 +219,27 @@ app.message(async ({ message, say, client }) => {
       logger.info(`📝 Message Content: "${messageText}"`);
 
       const thinkingMessage = "🤔 Thinking...";
-      await say(thinkingMessage);
+      const thinkingResponse = await say(thinkingMessage);
       logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
       const claudeResponse = await runClaudeCommand(messageText);
       logger.info(`🤖 Claude Response: "${claudeResponse}"`);
 
-      await say(claudeResponse);
-      logger.info(`📤 SENT FINAL RESPONSE: "${claudeResponse}"`);
+      // Replace the thinking message with the final response
+      if (thinkingResponse && thinkingResponse.ts) {
+        await client.chat.update({
+          channel: message.channel,
+          ts: thinkingResponse.ts,
+          text: claudeResponse,
+        });
+        logger.info(
+          `📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${claudeResponse}"`,
+        );
+      } else {
+        // Fallback to sending a new message if update fails
+        await say(claudeResponse);
+        logger.info(`📤 SENT FINAL RESPONSE: "${claudeResponse}"`);
+      }
     }
   } catch (error: any) {
     logger.error(`Error processing direct message: ${error.message}`);
