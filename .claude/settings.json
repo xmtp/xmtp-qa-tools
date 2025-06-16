@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "yarn*",
+      "Bash(find:*)",
       "Bash(yarn*)",
       "tsx*",
       "Bash(tsx*)",
