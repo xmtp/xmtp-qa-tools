@@ -1,4 +1,5 @@
-import { spawn, type ChildProcess } from "child_process";
+import { Anthropic } from "@anthropic-ai/sdk";
+import { sendDatadogLog } from "@helpers/datadog";
 import { createLogger } from "@helpers/logger";
 import pkg from "@slack/bolt";
 import dotenv from "dotenv";
@@ -10,21 +11,8 @@ dotenv.config();
 // Initialize logger
 const logger = createLogger();
 
-// Single persistent Claude process
-let claudeProcess: ChildProcess | null = null;
-let claudeReady = false;
-let claudeInitializing = false;
-
-// Message queue for handling requests
-interface PendingMessage {
-  resolve: (value: string) => void;
-  reject: (reason?: any) => void;
-  message: string;
-  timestamp: number;
-}
-
-const messageQueue: PendingMessage[] = [];
-let processingMessage = false;
+// Initialize Anthropic client
+let anthropicClient: Anthropic | null = null;
 
 interface ValidationResult {
   isValid: boolean;
@@ -32,8 +20,18 @@ interface ValidationResult {
   error?: string;
 }
 
+interface SlackChannelHistory {
+  messages: any[];
+  hasMore: boolean;
+  responseMetadata?: any;
+}
+
 // Validate required environment variables
-const requiredEnvVars = ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN"];
+const requiredEnvVars = [
+  "SLACK_BOT_TOKEN",
+  "SLACK_APP_TOKEN",
+  "ANTHROPIC_API_KEY",
+];
 const missingEnvVars = requiredEnvVars.filter(
   (varName) => !process.env[varName],
 );
@@ -51,6 +49,16 @@ const app = new App({
   socketMode: true,
   logLevel: LogLevel.ERROR,
 });
+
+// Initialize Anthropic client
+function initializeAnthropic(): void {
+  if (!anthropicClient && process.env.ANTHROPIC_API_KEY) {
+    anthropicClient = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY,
+    });
+    logger.info("✅ Anthropic client initialized");
+  }
+}
 
 // Input validation and sanitization
 function validateAndSanitizeInput(input: string): ValidationResult {
@@ -74,157 +82,219 @@ function validateAndSanitizeInput(input: string): ValidationResult {
   return { isValid: true, sanitized };
 }
 
-async function initializeClaudeProcess(): Promise<void> {
-  if (claudeInitializing || claudeReady) {
-    return;
+// Parse commands from message
+function parseCommand(
+  message: string,
+): { command: string; args: string[] } | null {
+  const trimmed = message.trim();
+
+  // Check for slash commands
+  if (trimmed.startsWith("/")) {
+    const parts = trimmed.slice(1).split(/\s+/);
+    return {
+      command: parts[0].toLowerCase(),
+      args: parts.slice(1),
+    };
   }
 
-  claudeInitializing = true;
-  logger.info("🚀 Initializing persistent Claude process...");
+  return null;
+}
 
+// Fetch Slack channel history
+async function fetchChannelHistory(
+  client: any,
+  channelId: string,
+  limit: number = 50,
+  query?: string,
+): Promise<SlackChannelHistory> {
   try {
-    claudeProcess = spawn("npx", ["@anthropic-ai/claude-code"], {
-      stdio: ["pipe", "pipe", "pipe"],
-      cwd: process.cwd(),
-      env: {
-        ...process.env,
-      },
+    logger.info(
+      `📜 Fetching channel history for ${channelId}, limit: ${limit}`,
+    );
+
+    const result = await client.conversations.history({
+      channel: channelId,
+      limit: Math.min(limit, 100), // Slack API limit
+      inclusive: true,
     });
 
-    let initOutput = "";
+    if (!result.ok) {
+      throw new Error(`Slack API error: ${String(result.error)}`);
+    }
 
-    claudeProcess.stdout?.on("data", (data: Buffer) => {
-      const output = data.toString();
-      initOutput += output;
+    let messages = result.messages || [];
 
-      // Process any queued messages when Claude is ready
-      if (
-        !processingMessage &&
-        messageQueue.length > 0 &&
-        initOutput.includes("Claude is ready")
-      ) {
-        processNextMessage();
-      }
-    });
+    // Filter messages if query is provided
+    if (query) {
+      const searchTerm = query.toLowerCase();
+      messages = messages.filter(
+        (msg: any) =>
+          msg.text &&
+          typeof msg.text === "string" &&
+          msg.text.toLowerCase().includes(searchTerm),
+      );
+    }
 
-    claudeProcess.stderr?.on("data", (data) => {
-      const error = data.toString();
-      logger.warn(`Claude stderr: ${error}`);
-    });
-
-    claudeProcess.on("close", (code) => {
-      logger.warn(`Claude process closed with code: ${code}`);
-      claudeReady = false;
-      claudeProcess = null;
-
-      // Reject any pending messages
-      while (messageQueue.length > 0) {
-        const pending = messageQueue.shift();
-        if (pending) {
-          pending.reject(new Error("Claude process closed unexpectedly"));
-        }
-      }
-    });
-
-    claudeProcess.on("error", (error) => {
-      logger.error(`Claude process error: ${error.message}`);
-      claudeReady = false;
-      claudeProcess = null;
-      claudeInitializing = false;
-
-      // Reject any pending messages
-      while (messageQueue.length > 0) {
-        const pending = messageQueue.shift();
-        if (pending) {
-          pending.reject(error);
-        }
-      }
-    });
-
-    // Give Claude a moment to initialize
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    claudeReady = true;
-    claudeInitializing = false;
-    logger.info("✅ Claude process initialized and ready");
+    return {
+      messages,
+      hasMore: Boolean(result.has_more),
+      responseMetadata: result.response_metadata,
+    };
   } catch (error) {
-    claudeInitializing = false;
     const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`Failed to initialize Claude process: ${errorMessage}`);
+    logger.error(`❌ Error fetching channel history: ${errorMessage}`);
     throw error;
   }
 }
 
-function processNextMessage(): void {
-  if (
-    processingMessage ||
-    messageQueue.length === 0 ||
-    !claudeReady ||
-    !claudeProcess
-  ) {
-    return;
+// Format messages for display
+function formatMessagesForDisplay(
+  messages: any[],
+  maxMessages: number = 10,
+): string {
+  if (messages.length === 0) {
+    return "No messages found matching your criteria.";
   }
 
-  const pending = messageQueue.shift();
-  if (!pending) return;
+  const sortedMessages = messages
+    .slice(0, maxMessages)
+    .sort((a, b) => parseFloat(b.ts) - parseFloat(a.ts));
 
-  processingMessage = true;
+  let formatted = `📋 Found ${messages.length} message(s):\n\n`;
 
-  logger.info(
-    `📝 Processing message: "${pending.message.substring(0, 50)}..."`,
-  );
+  for (const msg of sortedMessages) {
+    const timestamp = new Date(parseFloat(msg.ts) * 1000).toLocaleString();
+    const user = msg.user ? `<@${msg.user}>` : "Unknown User";
+    const text = msg.text ? msg.text.substring(0, 200) : "[No text]";
 
-  let responseBuffer = "";
-  let responseStarted = false;
-  const responseTimeout = setTimeout(() => {
-    pending.reject(new Error("Claude response timeout"));
-    processingMessage = false;
-    processNextMessage(); // Process next message
-  }, 30000); // 30 second timeout
-
-  const dataHandler = (data: Buffer) => {
-    const output = data.toString();
-    responseBuffer += output;
-
-    if (!responseStarted) {
-      responseStarted = true;
+    formatted += `🕒 ${timestamp}\n`;
+    formatted += `👤 ${user}\n`;
+    formatted += `💬 ${text}\n`;
+    if (text.length === 200 && msg.text && msg.text.length > 200) {
+      formatted += `... (truncated)\n`;
     }
+    formatted += `\n`;
+  }
 
-    // Simple heuristic: if we get a substantial response and it ends with a newline,
-    // consider it complete. This might need adjustment based on Claude's output format.
-    if (responseBuffer.length > 10 && output.includes("\n")) {
-      claudeProcess?.stdout?.off("data", dataHandler);
-      clearTimeout(responseTimeout);
+  if (messages.length > maxMessages) {
+    formatted += `\n... and ${messages.length - maxMessages} more messages`;
+  }
 
-      const response = responseBuffer.trim();
-      logger.info(
-        `✅ Claude response complete: ${response.substring(0, 100)}...`,
-      );
+  return formatted;
+}
 
-      pending.resolve(response || "No response from Claude");
-      processingMessage = false;
+// Handle DataDog logs command
+async function handleDataDogLogsCommand(args: string[]): Promise<string> {
+  try {
+    const testName = args[0] || "recent-logs";
+    const logMessage = `Fetching DataDog logs for: ${testName}`;
 
-      // Process next message in queue
-      setImmediate(() => {
-        processNextMessage();
-      });
-    }
-  };
+    // Send log to DataDog
+    await sendDatadogLog(logMessage, {
+      testName,
+      source: "slack-bot",
+      command: "logs",
+      timestamp: new Date().toISOString(),
+    });
 
-  claudeProcess.stdout?.on("data", dataHandler);
-
-  // Send the message to Claude
-  if (claudeProcess.stdin) {
-    claudeProcess.stdin.write(`${pending.message}\n`);
-  } else {
-    clearTimeout(responseTimeout);
-    pending.reject(new Error("Claude process stdin not available"));
-    processingMessage = false;
-    processNextMessage();
+    return `📊 DataDog log sent for test: ${testName}\nLog message: "${logMessage}"`;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`❌ Error handling DataDog logs: ${errorMessage}`);
+    return `❌ Error sending DataDog log: ${errorMessage}`;
   }
 }
 
-async function runClaudeCommand(message: string): Promise<string> {
+// Main command handler
+async function handleCommand(
+  command: string,
+  args: string[],
+  client: any,
+  channelId: string,
+): Promise<string> {
+  switch (command) {
+    case "history": {
+      const limit = parseInt(args[0]) || 50;
+      const query = args.slice(1).join(" ");
+
+      try {
+        const history = await fetchChannelHistory(
+          client,
+          channelId,
+          limit,
+          query,
+        );
+        return formatMessagesForDisplay(history.messages);
+      } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        return `❌ Error fetching channel history: ${errorMessage}`;
+      }
+    }
+
+    case "logs":
+      return await handleDataDogLogsCommand(args);
+
+    case "help":
+      return `🤖 Available commands:
+• \`/history [limit] [search_query]\` - Fetch channel message history
+• \`/logs [test_name]\` - Send DataDog log entry
+• \`/help\` - Show this help message
+
+Examples:
+• \`/history 20\` - Get last 20 messages
+• \`/history 10 xmtp\` - Get last 10 messages containing "xmtp"
+• \`/logs integration-test\` - Send DataDog log for integration-test`;
+
+    default:
+      return `❓ Unknown command: ${command}. Type \`/help\` for available commands.`;
+  }
+}
+
+// Process message with Anthropic SDK
+async function processWithAnthropic(message: string): Promise<string> {
+  if (!anthropicClient) {
+    throw new Error("Anthropic client not initialized");
+  }
+
+  try {
+    logger.info(
+      `🤖 Sending message to Anthropic: "${message.substring(0, 50)}..."`,
+    );
+
+    const response = await anthropicClient.messages.create({
+      model: "claude-3-haiku-20240307",
+      max_tokens: 1024,
+      messages: [
+        {
+          role: "user",
+          content: message,
+        },
+      ],
+    });
+
+    const content = response.content[0];
+    if (content.type === "text") {
+      logger.info(
+        `✅ Anthropic response received: "${content.text.substring(0, 100)}..."`,
+      );
+      return content.text;
+    } else {
+      throw new Error("Unexpected response type from Anthropic");
+    }
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`❌ Error calling Anthropic API: ${errorMessage}`);
+    throw error;
+  }
+}
+
+// Main message processing function
+async function processMessage(
+  message: string,
+  client: any,
+  channelId: string,
+): Promise<string> {
   const validation = validateAndSanitizeInput(message);
 
   if (!validation.isValid) {
@@ -236,61 +306,23 @@ async function runClaudeCommand(message: string): Promise<string> {
     return "Error: Invalid message after sanitization";
   }
 
-  // Initialize Claude if not ready
-  if (!claudeReady && !claudeInitializing) {
-    try {
-      await initializeClaudeProcess();
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      return `Error: Failed to initialize Claude - ${errorMessage}`;
-    }
+  // Check for commands first
+  const commandParsed = parseCommand(sanitizedMessage);
+  if (commandParsed) {
+    return await handleCommand(
+      commandParsed.command,
+      commandParsed.args,
+      client,
+      channelId,
+    );
   }
 
-  // Wait for Claude to be ready
-  let waitCount = 0;
-  while (!claudeReady && waitCount < 50) {
-    await new Promise((resolve) => setTimeout(resolve, 100));
-    waitCount++;
-  }
-
-  if (!claudeReady) {
-    return "Error: Claude process not ready after timeout";
-  }
-
-  return new Promise<string>((resolve, reject) => {
-    messageQueue.push({
-      resolve,
-      reject,
-      message: sanitizedMessage,
-      timestamp: Date.now(),
-    });
-
-    // Start processing if not already processing
-    if (!processingMessage) {
-      processNextMessage();
-    }
-
-    // Timeout for the entire request
-    setTimeout(() => {
-      reject(new Error("Request timeout"));
-    }, 60000); // 1 minute total timeout
-  });
-}
-
-// Function to cleanup Claude process
-function cleanupClaudeProcess() {
-  if (claudeProcess && !claudeProcess.killed) {
-    logger.info("🧹 Cleaning up Claude process");
-    try {
-      claudeProcess.kill("SIGTERM");
-      claudeProcess = null;
-      claudeReady = false;
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
-      logger.error(`Error killing Claude process: ${errorMessage}`);
-    }
+  // If not a command, process with Anthropic
+  try {
+    return await processWithAnthropic(sanitizedMessage);
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return `Error: Failed to process message - ${errorMessage}`;
   }
 }
 
@@ -304,14 +336,14 @@ app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
     logger.info(`📨 RECEIVED MENTION - Channel: ${channel}, User: ${userId}`);
     logger.info(`📝 Message Content: "${message}"`);
 
-    const thinkingMessage = `<@${userId}> 🤔 Thinking...`;
+    const thinkingMessage = `<@${userId}> 🤔 Processing...`;
     const thinkingResponse = await say(thinkingMessage);
     logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
-    const claudeResponse = await runClaudeCommand(message);
-    logger.info(`🤖 Claude Response: "${claudeResponse}"`);
+    const botResponse = await processMessage(message, client, channel);
+    logger.info(`🤖 Bot Response: "${botResponse}"`);
 
-    const finalResponse = `<@${userId}> ${claudeResponse}`;
+    const finalResponse = `<@${userId}> ${botResponse}`;
 
     // Replace the thinking message with the final response
     if (thinkingResponse && thinkingResponse.ts) {
@@ -361,27 +393,29 @@ app.message(async ({ message, say, client }) => {
       logger.info(`📨 RECEIVED DM - User: ${userId}`);
       logger.info(`📝 Message Content: "${messageText}"`);
 
-      const thinkingMessage = "🤔 Thinking...";
+      const thinkingMessage = "🤔 Processing...";
       const thinkingResponse = await say(thinkingMessage);
       logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
-      const claudeResponse = await runClaudeCommand(messageText);
-      logger.info(`🤖 Claude Response: "${claudeResponse}"`);
+      const botResponse = await processMessage(
+        messageText,
+        client,
+        message.channel,
+      );
+      logger.info(`🤖 Bot Response: "${botResponse}"`);
 
       // Replace the thinking message with the final response
       if (thinkingResponse && thinkingResponse.ts) {
         await client.chat.update({
           channel: message.channel,
           ts: thinkingResponse.ts,
-          text: claudeResponse,
+          text: botResponse,
         });
-        logger.info(
-          `📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${claudeResponse}"`,
-        );
+        logger.info(`📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${botResponse}"`);
       } else {
         // Fallback to sending a new message if update fails
-        await say(claudeResponse);
-        logger.info(`📤 SENT FINAL RESPONSE: "${claudeResponse}"`);
+        await say(botResponse);
+        logger.info(`📤 SENT FINAL RESPONSE: "${botResponse}"`);
       }
     }
   } catch (error: unknown) {
@@ -398,18 +432,17 @@ app.message(async ({ message, say, client }) => {
 // Application startup
 void (async () => {
   try {
-    // Initialize Claude first
-    logger.info("🔧 Initializing Claude process before starting Slack bot...");
-    await initializeClaudeProcess();
+    // Initialize Anthropic first
+    logger.info("🔧 Initializing Anthropic SDK before starting Slack bot...");
+    initializeAnthropic();
 
-    // Only start Slack bot after Claude is ready
+    // Start Slack bot
     await app.start();
-    logger.info("🚀 Slack bot started successfully with Claude ready");
+    logger.info("🚀 Slack bot started successfully with Anthropic SDK ready");
   } catch (error: unknown) {
     logger.error(
       `Failed to start application: ${error instanceof Error ? error.message : String(error)}`,
     );
-    cleanupClaudeProcess();
     process.exit(1);
   }
 })();
@@ -417,12 +450,10 @@ void (async () => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   logger.info("🛑 Shutting down gracefully");
-  cleanupClaudeProcess();
   process.exit(0);
 });
 
 process.on("SIGINT", () => {
   logger.info("🛑 Shutting down gracefully");
-  cleanupClaudeProcess();
   process.exit(0);
 });
