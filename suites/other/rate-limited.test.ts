@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 const testName = "rate-limited";
 loadEnv(testName);
 
-describe("Rate Limiting Validation - High-Volume Message Burst Testing", async () => {
+describe(testName, () => {
   const workers = await getWorkers(
     ["henry", "ivy", "jack", "karen", "larry", "mary", "nancy", "oscar"],
     testName,

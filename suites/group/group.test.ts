@@ -25,9 +25,9 @@ export const features = [
   "addInstallationsRandomly",
   "createGroup",
 ];
-const TEST_NAME = "group";
+const testName = "group";
 const testConfig = {
-  testName: TEST_NAME,
+  testName: testName,
   groupName: `Group ${getTime()}`,
   epochs: 3,
   manualUsers: getManualUsers(["prod-testing"]),
@@ -41,9 +41,9 @@ const testConfig = {
   freshInstalls: false,
 } as const;
 
-loadEnv(TEST_NAME);
+loadEnv(testName);
 
-describe("Group Stress Testing - Multi-Feature Validation Across All Groups", () => {
+describe(testName, () => {
   let workers: WorkerManager;
   let creator: Worker;
   let allInboxIds: string[] = [];

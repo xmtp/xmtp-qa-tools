@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 const testName = "consent";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe(testName, () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(getFixedNames(5), testName, typeofStream.Consent);
@@ -18,7 +18,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("should stream consent updates when a user is blocked", async () => {
+  it("should stream consent state changes when users are blocked or unblocked", async () => {
     try {
       const verifyResult = await verifyConsentStream(
         workers.getCreator(),

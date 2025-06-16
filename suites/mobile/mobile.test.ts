@@ -27,12 +27,13 @@ const receiverInboxId = receiverObj.inboxId;
 const testName = "bot-stress";
 loadEnv(testName);
 
-describe("Mobile stress test", () => {
+describe(testName, () => {
   let workers: WorkerManager;
   let bot: Worker;
   let globalGroupCounter = 0;
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

@@ -9,7 +9,7 @@ loadEnv(testName);
 const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
-describe("Push Notification Testing - DM and Group Message Delivery", () => {
+describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
 

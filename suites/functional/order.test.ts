@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "order";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe(testName, () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
@@ -22,7 +22,8 @@ describe(testName, async () => {
   setupTestLifecycle({
     expect,
   });
-  it("poll_order: verify message order when receiving via pull", async () => {
+
+  it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
     try {
       group = await workers.createGroup();
       await group.sync();
@@ -67,7 +68,8 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("stream_order: verify message order when receiving via streams", async () => {
+
+  it("should verify message ordering accuracy when receiving messages via real-time streams", async () => {
     try {
       group = await workers.createGroup();
       const verifyResult = await verifyMessageStream(

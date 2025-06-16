@@ -18,7 +18,7 @@ import {
 const testName = "m_large_metadata";
 loadEnv(testName);
 
-describe("Large Group Metadata Stream Performance - Testing group metadata update notification delivery times across different group sizes", async () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   let newGroup: Group;
@@ -37,6 +37,7 @@ describe("Large Group Metadata Stream Performance - Testing group metadata updat
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

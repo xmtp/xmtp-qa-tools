@@ -18,7 +18,7 @@ import {
 const testName = "m_large_messages";
 loadEnv(testName);
 
-describe("Large Group Message Delivery Performance - Testing message stream delivery times with groups ranging from 5-10 members", async () => {
+describe(testName, async () => {
   let workers: WorkerManager;
   let newGroup: Group;
 
@@ -36,6 +36,7 @@ describe("Large Group Message Delivery Performance - Testing message stream deli
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

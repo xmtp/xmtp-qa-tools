@@ -23,7 +23,7 @@ export async function getWorkersFromGroup(
   return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
 }
 
-describe("Message Delivery Reliability Metrics - Stream vs Poll Performance Analysis", async () => {
+describe(testName, async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
@@ -49,6 +49,7 @@ describe("Message Delivery Reliability Metrics - Stream vs Poll Performance Anal
   });
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

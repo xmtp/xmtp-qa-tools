@@ -18,7 +18,7 @@ import {
 const testName = "m_large_conversations";
 loadEnv(testName);
 
-describe("Large Group Conversation Stream Performance - Testing new conversation notification delivery times across multiple group sizes", async () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   let newGroup: Group;

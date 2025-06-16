@@ -15,7 +15,7 @@ import {
 const testName = "m_large_syncs";
 loadEnv(testName);
 
-describe("Large Group Sync Performance - Testing cold start sync times for group creation, syncAll, and individual sync operations", async () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -35,6 +35,7 @@ describe("Large Group Sync Performance - Testing cold start sync times for group
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration,

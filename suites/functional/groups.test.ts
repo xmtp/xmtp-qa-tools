@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 
 const testName = "groups";
 loadEnv(testName);
-describe("Group Conversation Functionality - Creation, Management, and Message Delivery", async () => {
+describe(testName, () => {
   const workers = await getWorkers(
     [
       "henry",

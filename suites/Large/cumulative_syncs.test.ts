@@ -15,7 +15,7 @@ import {
 const testName = "m_large_cumulative_syncs";
 loadEnv(testName);
 
-describe("Large Group Cumulative Sync Performance - Testing progressive sync performance degradation as group database grows", async () => {
+describe(testName, () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};

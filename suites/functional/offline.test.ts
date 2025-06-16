@@ -10,7 +10,7 @@ loadEnv(testName);
 
 const amountofMessages = 5;
 
-describe(testName, async () => {
+describe("XMTP Offline Message Recovery - Client Disconnection and Reconnection Scenarios", async () => {
   let group: Group;
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"], testName);
@@ -21,7 +21,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("offline_recovery: verify message recovery after disconnection", async () => {
+  it("should recover all missed messages after client reconnection following offline period", async () => {
     try {
       group = await workers.createGroup();
       console.log("Group created", group.id);

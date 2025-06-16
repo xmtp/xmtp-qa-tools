@@ -39,7 +39,7 @@ describe(testName, () => {
     gmBot = gmBotWorker.get(receiver) as Worker;
   });
 
-  it("should receive invite with message", async () => {
+  it("should detect group invitation in browser when invitation includes an initial message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -53,13 +53,13 @@ describe(testName, () => {
       const result = await xmtpTester.waitForNewConversation(newGroup.name);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("group-invite-with-message");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  it("should receive invite without message", async () => {
+  it("should detect group invitation in browser when invitation has no accompanying message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -72,26 +72,26 @@ describe(testName, () => {
       const result = await xmtpTester.waitForNewConversation(newGroup.name);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("group-invite-without-message");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  it("should respond to a message", async () => {
+  it("should create DM via browser UI and receive automated GM bot response", async () => {
     try {
       await xmtpTester.newDmFromUI(gmBot.address);
       await xmtpTester.sendMessage(`hi ${receiver}`);
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("dm-creation-gm-response");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  it("should create a group and send a message", async () => {
+  it("should create group via browser UI and validate GM bot messaging functionality", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -101,13 +101,13 @@ describe(testName, () => {
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("group-creation-gm-response");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  it("add member to group async iterator", async () => {
+  it("should stream real-time group updates when members are added using async iterator pattern", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -122,13 +122,13 @@ describe(testName, () => {
         }
       }
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("async-iterator-member-addition");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  it("add member to group callback", async () => {
+  it("should stream real-time group updates when members are added using callback pattern", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -146,18 +146,17 @@ describe(testName, () => {
         }
       });
     } catch (e) {
-      await xmtpTester.takeSnapshot("gm-group");
+      await xmtpTester.takeSnapshot("callback-pattern-member-addition");
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
 
-  let xmtpNewTester: playwright;
-  it("should respond to a message", async () => {
+  it("should handle multiple browser instances with independent messaging sessions", async () => {
+    const xmtpNewTester = new playwright({
+      headless,
+    });
     try {
-      xmtpNewTester = new playwright({
-        headless,
-      });
       await xmtpNewTester.startPage();
 
       await xmtpNewTester.newDmFromUI(gmBot.address);
@@ -165,7 +164,7 @@ describe(testName, () => {
       const result = await xmtpNewTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpNewTester.takeSnapshot("gm-group");
+      await xmtpNewTester.takeSnapshot("multi-instance-independent-sessions");
       logError(e, expect.getState().currentTestName);
       throw e;
     }

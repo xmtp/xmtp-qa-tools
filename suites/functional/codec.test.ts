@@ -10,14 +10,15 @@ import { describe, expect, it } from "vitest";
 const testName = "codec";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("XMTP SDK Version Compatibility - Database Stability Across Version Downgrades", () => {
   let workers: WorkerManager;
   workers = await getWorkers(getFixedNames(2), testName);
 
   setupTestLifecycle({
     expect,
   });
-  it("codec: should trigger a stream error", async () => {
+
+  it("should handle codec errors gracefully when sending unsupported content types", async () => {
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();

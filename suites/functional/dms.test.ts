@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 loadEnv(testName);
 
-describe("Direct Message (DM) Functionality - Creation, Sending, and Message Delivery", async () => {
+describe(testName, () => {
   const workers = await getWorkers(
     [
       "henry",

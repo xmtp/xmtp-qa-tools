@@ -1,3 +1,4 @@
+import test from "node:test";
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
@@ -11,7 +12,7 @@ import productionAgents from "./production.json";
 const testName = "agents";
 loadEnv(testName);
 
-describe("Agent Health Testing - Live XMTP Agent Response Validation", () => {
+describe(testName, () => {
   let workers: WorkerManager;
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {

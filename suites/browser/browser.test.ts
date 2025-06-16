@@ -10,7 +10,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 const testName = "browser";
 loadEnv(testName);
 
-describe("XMTP Browser End-to-End Testing Suite", () => {
+describe(testName, () => {
   let groupId: string;
   const receiver = "random";
   const headless = false;
@@ -133,11 +133,10 @@ describe("XMTP Browser End-to-End Testing Suite", () => {
   });
 
   it("should handle multiple browser instances with independent messaging sessions", async () => {
-    let xmtpNewTester: playwright;
+    const xmtpNewTester = new playwright({
+      headless,
+    });
     try {
-      xmtpNewTester = new playwright({
-        headless,
-      });
       await xmtpNewTester.startPage();
 
       await xmtpNewTester.newDmFromUI(gmBot.address);
@@ -145,7 +144,7 @@ describe("XMTP Browser End-to-End Testing Suite", () => {
       const result = await xmtpNewTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
-      await xmtpNewTester!.takeSnapshot("multi-instance-messaging");
+      await xmtpNewTester.takeSnapshot("multi-instance-messaging");
       logError(e, expect.getState().currentTestName);
       throw e;
     }

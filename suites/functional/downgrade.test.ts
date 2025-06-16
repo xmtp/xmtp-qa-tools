@@ -12,7 +12,7 @@ describe(testName, () => {
   const versions = sdkVersionOptions;
   const receiverInboxId = getInboxIds(1)[0];
 
-  it(`Should test the DB after downgrade`, async () => {
+  it("should maintain database integrity and functionality when downgrading across SDK versions", async () => {
     try {
       for (const version of versions.reverse()) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);

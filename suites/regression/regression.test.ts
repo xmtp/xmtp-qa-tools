@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "regression";
 loadEnv(testName);
 
-describe("Regression Testing - Cross-Version Compatibility and Database Migration", () => {
+describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions.reverse().slice(0, 3);
   const receiverInboxId = getInboxIds(1);

@@ -11,7 +11,7 @@ import { describe, expect, it } from "vitest";
 const testName = "m_performance";
 loadEnv(testName);
 
-describe("Performance test of every operation", async () => {
+describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
   console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
@@ -28,6 +28,7 @@ describe("Performance test of every operation", async () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

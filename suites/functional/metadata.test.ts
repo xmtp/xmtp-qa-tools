@@ -9,7 +9,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 const testName = "metadata";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("XMTP Group Metadata Management - Name Updates and Member Management", async () => {
   let group: Group;
 
   const workers = await getWorkers(
@@ -43,20 +43,20 @@ describe(testName, async () => {
     console.log("group", group.id);
   });
 
-  it("receiveMetadata", async () => {
+  it("should stream group metadata updates when group name or description changes", async () => {
     const verifyResult = await verifyMetadataStream(group, [
       workers.get("oscar")!,
     ]);
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("addMembers", async () => {
+  it("should successfully add new members to existing group and verify member count", async () => {
     await group.addMembers([workers.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     expect(members.length).toBe(5);
   });
 
-  it("removeMembers", async () => {
+  it("should successfully remove members from group and verify updated member count", async () => {
     await group.removeMembers([workers.get("randomguy")!.client.inboxId]);
     const members = await group.members();
     expect(members.length).toBe(4);

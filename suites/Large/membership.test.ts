@@ -18,7 +18,7 @@ import {
 const testName = "m_large_membership";
 loadEnv(testName);
 
-describe("Large Group Membership Stream Performance - Testing group member addition notification delivery times across varying group sizes", async () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   let newGroup: Group;
