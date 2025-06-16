@@ -2,81 +2,38 @@
 
 This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
-## What it does
+## What it does (units)
 
-- Sends test messages to production XMTP agents
-- Validates agent responses against expected patterns
-- Measures response times and success rates
-- Reports health status for monitoring
+- Create DM conversation with agent using their Ethereum address
+- Send configured test message to agent
+- Verify agent responds within expected timeframe
+- Validate message delivery and response patterns
 
-## Setup
+## Environment Setup
 
-```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-```
+Set `XMTP_ENV` to either `dev` or `production` to test agents on the corresponding network.
 
-## Key files
+## How to run
 
-- [production.json](./production.json) - List of agents to be tested with their addresses
-- [agents.test.ts](./agents.test.ts) - Test implementation that sends messages and validates responses
-- [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) - Workflow configuration for running the tests
-
-## Test snippet
-
-```typescript
-// From agents.test.ts
-for (const agent of typedAgents) {
-  it(`test ${agent.name}:${agent.address} on production`, async () => {
-    try {
-      const convo = await workers
-        .get("bot")
-        ?.client.conversations.newDmWithIdentifier({
-          identifier: agent.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
-      expect(convo).toBeDefined();
-      const result = await verifyMessageStream(
-        convo!,
-        workers.getAll(),
-        agent.sendMessage,
-      );
-      expect(result.allReceived).toBe(true);
-    } catch (error) {
-      logError(error, `${agent.name}-${agent.address}`);
-      throw error;
-    }
-  });
-}
-```
-
-## Test execution
+### Run all agent tests
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-
 yarn test agents
 ```
 
-## Automation
+## Configuration
 
-Tests run automatically via [GitHub Actions](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml):
+The `production.json` file contains agent configurations with these fields:
 
-```yaml
-# From agents.yml
-name: agents
-on:
-  pull_request:
-    branches:
-      - main
-  schedule:
-    - cron: "10 * * * *" # Runs at 10 minutes past each hour
-  workflow_dispatch:
-```
+- `name` - Agent identifier
+- `address` - Ethereum address of the agent
+- `sendMessage` - Test message to send to the agent
+- `networks` - Array of networks the agent supports (`["dev", "production"]`)
+- `disabled` - Optional flag to skip testing this agent
+- `expectedMessage` - Optional array of expected response keywords
 
-## Artifacts
+## Key files
 
-Test logs and results are stored as artifacts in GitHub Actions for diagnostic purposes.
+- **[production.json](./production.json)** - Configuration file containing agents to test with their addresses, test messages, and supported networks
+- **[agents.test.ts](./agents.test.ts)** - Main test implementation
+- **[GitHub Actions Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)** - Automated test execution configuration
