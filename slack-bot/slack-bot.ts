@@ -102,6 +102,42 @@ function parseCommand(
   return null;
 }
 
+// Find channel ID by name
+async function findChannelByName(
+  client: any,
+  channelName: string,
+): Promise<string | null> {
+  try {
+    logger.info(`🔍 Looking for channel: ${channelName}`);
+
+    const result = await client.conversations.list({
+      types: "public_channel,private_channel",
+      limit: 1000,
+    });
+
+    if (!result.ok) {
+      throw new Error(`Slack API error: ${String(result.error)}`);
+    }
+
+    const channel = result.channels?.find(
+      (ch: any) =>
+        ch.name === channelName || ch.name === channelName.replace("#", ""),
+    );
+
+    if (channel && typeof channel.id === "string") {
+      logger.info(`✅ Found channel ${channelName} with ID: ${channel.id}`);
+      return channel.id;
+    }
+
+    logger.error(`❌ Channel ${channelName} not found`);
+    return null;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`❌ Error finding channel ${channelName}: ${errorMessage}`);
+    return null;
+  }
+}
+
 // Fetch Slack channel history
 async function fetchChannelHistory(
   client: any,
@@ -130,7 +166,7 @@ async function fetchChannelHistory(
     if (query) {
       const searchTerm = query.toLowerCase();
       messages = messages.filter(
-        (msg: any): msg is { text: string } =>
+        (msg: any): msg is any =>
           msg.text &&
           typeof msg.text === "string" &&
           msg.text.toLowerCase().includes(searchTerm),
@@ -190,6 +226,35 @@ function formatMessagesForDisplay(
   return formatted;
 }
 
+// List all available channels for debugging
+async function listAvailableChannels(client: any): Promise<string> {
+  try {
+    const result = await client.conversations.list({
+      types: "public_channel,private_channel",
+      limit: 1000,
+    });
+
+    if (!result.ok) {
+      throw new Error(`Slack API error: ${String(result.error)}`);
+    }
+
+    const channels = result.channels || [];
+    const channelList = channels
+      .filter(
+        (ch: any): ch is any =>
+          ch.name && typeof ch.name === "string" && typeof ch.id === "string",
+      ) // Only channels with names
+      .map((ch: any) => `• #${ch.name} (${ch.id})`)
+      .sort()
+      .slice(0, 20); // Limit to first 20 channels
+
+    return `🔍 Available channels (showing first 20):\n${channelList.join("\n")}\n\nLooking for a specific channel? Let me know the exact name!`;
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return `❌ Error listing channels: ${errorMessage}`;
+  }
+}
+
 // Handle DataDog logs command
 async function handleDataDogLogsCommand(args: string[]): Promise<string> {
   try {
@@ -223,19 +288,34 @@ async function handleCommand(
     case "history": {
       const limit = parseInt(args[0]) || 50;
       const query = args.slice(1).join(" ");
+      const channelName = "notify-qa-tools";
 
       try {
+        logger.info(`🔍 Attempting to find channel: ${channelName}`);
+        const targetChannelId = await findChannelByName(client, channelName);
+
+        if (!targetChannelId) {
+          logger.error(`❌ Channel not found: ${channelName}`);
+          const availableChannels = await listAvailableChannels(client);
+          return `❌ Could not find channel #${channelName}. Make sure the bot is invited to the channel.\n\n${availableChannels}`;
+        }
+
+        logger.info(`✅ Found channel ${channelName}, fetching history...`);
         const history = await fetchChannelHistory(
           client,
-          channelId,
+          targetChannelId,
           limit,
           query,
         );
-        return formatMessagesForDisplay(history.messages);
+        logger.info(
+          `📋 Successfully fetched ${history.messages.length} messages`,
+        );
+        return `📋 History from #${channelName}:\n\n${formatMessagesForDisplay(history.messages)}`;
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
-        return `❌ Error fetching channel history: ${errorMessage}`;
+        logger.error(`❌ Detailed error in history command: ${errorMessage}`);
+        return `❌ Error fetching channel history from #${channelName}: ${errorMessage}`;
       }
     }
 
@@ -244,13 +324,13 @@ async function handleCommand(
 
     case "help":
       return `🤖 Available commands:
-• \`/history [limit] [search_query]\` - Fetch channel message history
+• \`/history [limit] [search_query]\` - Fetch message history from #notify-qa-tools
 • \`/logs [test_name]\` - Send DataDog log entry
 • \`/help\` - Show this help message
 
 Examples:
-• \`/history 20\` - Get last 20 messages
-• \`/history 10 xmtp\` - Get last 10 messages containing "xmtp"
+• \`/history 20\` - Get last 20 messages from #notify-qa-tools
+• \`/history 10 xmtp\` - Get last 10 messages containing "xmtp" from #notify-qa-tools
 • \`/logs integration-test\` - Send DataDog log for integration-test`;
 
     default:
@@ -264,17 +344,25 @@ function loadSystemPrompt(): string {
     const contextPath = path.join(process.cwd(), ".claude", "context.md");
     const contextContent = fs.readFileSync(contextPath, "utf-8");
 
-    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+    return `You are a highly technical, intelligent model and expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
 
 Here is the comprehensive context about this repository:
 
 ${contextContent}
 
 ## Your Role:
-- Provide expert guidance on XMTP testing and development
+- You are a highly technical, intelligent model - never guess or make assumptions
+- If information is not clear or you need more context to provide an accurate answer, always ask for clarification
+- Provide expert guidance on XMTP testing and development based only on verified information
 - Help debug issues using the patterns and knowledge from the context above
 - Give specific, actionable advice based on the repository structure and best practices
 - Prioritize checking logs, analyzing test patterns, and understanding configurations when helping users
+
+## Response Approach:
+- **Never guess** - if you're uncertain about something, ask for more context or specific details
+- If information is incomplete or ambiguous, explicitly request clarification
+- Base responses only on information you can verify from the provided context
+- When you need more information to help effectively, be specific about what additional details would be helpful
 
 ## Response Formatting:
 - **Keep responses very concise and to the point**
@@ -288,7 +376,13 @@ ${contextContent}
       `Failed to load context.md: ${error instanceof Error ? error.message : String(error)}`,
     );
     // Fallback to basic system prompt if file reading fails
-    return `You are an expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+    return `You are a highly technical, intelligent model and expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+
+## Your Approach:
+- You are a highly technical, intelligent model - never guess or make assumptions
+- If information is not clear or you need more context to provide an accurate answer, always ask for clarification
+- Base responses only on information you can verify
+- When you need more information to help effectively, be specific about what additional details would be helpful
 
 ## Response Formatting:
 - Use **bold** for emphasis (will be converted to Slack format)
@@ -296,6 +390,76 @@ ${contextContent}
 - Use \`\`\`code blocks\`\`\` for multi-line code
 - Keep responses clear and well-structured for Slack messaging`;
   }
+}
+
+// Intent detection with structured output
+interface CommandIntent {
+  action: "history" | "logs" | "help" | "channels" | "general";
+  parameters: {
+    limit?: number;
+    searchQuery?: string;
+    testName?: string;
+  };
+  confidence: number;
+}
+
+async function detectIntent(message: string): Promise<CommandIntent> {
+  if (!anthropicClient) {
+    return { action: "general", parameters: {}, confidence: 0 };
+  }
+
+  try {
+    const response = await anthropicClient.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 200,
+      system: `You are a command parser for a Slack bot. Your job is to detect when users want to:
+
+1. **FETCH HISTORY** (most important):
+   - Keywords: "history", "show", "get messages", "fetch", "recent", "last messages"
+   - Examples: "show me history", "get history", "show me the history", "fetch recent messages", "get last 20 messages"
+   - Action: "history"
+
+2. Send DataDog logs:
+   - Keywords: "logs", "datadog", "send logs"
+   - Action: "logs"
+
+3. Show help or list channels:
+   - Keywords: "help", "channels", "list channels"
+   - Actions: "help" or "channels"
+
+IMPORTANT: Be very liberal with detecting "history" intent. If the message contains ANY reference to history, messages, recent activity, or showing past content, return "history" action with high confidence.
+
+Return ONLY valid JSON with this exact structure:
+{"action": "history|logs|help|channels|general", "parameters": {"limit": number, "searchQuery": "string", "testName": "string"}, "confidence": 0.0-1.0}
+
+Examples:
+"show me history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
+"show me the history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
+"get history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
+"history" -> {"action": "history", "parameters": {}, "confidence": 0.9}
+"get last 20 messages" -> {"action": "history", "parameters": {"limit": 20}, "confidence": 0.9}
+"show recent messages" -> {"action": "history", "parameters": {}, "confidence": 0.9}`,
+      messages: [
+        {
+          role: "user",
+          content: `Parse this message and detect intent: "${message}"`,
+        },
+      ],
+    });
+
+    const content = response.content[0];
+    if (content.type === "text") {
+      const parsed = JSON.parse(content.text) as CommandIntent;
+      logger.info(`🎯 Intent detection result: ${JSON.stringify(parsed)}`);
+      return parsed;
+    }
+  } catch (error) {
+    logger.error(
+      `Error detecting intent: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+
+  return { action: "general", parameters: {}, confidence: 0 };
 }
 
 // Convert standard markdown to Slack mrkdwn format
@@ -343,7 +507,7 @@ async function processWithAnthropic(message: string): Promise<string> {
     const systemPrompt = loadSystemPrompt();
 
     const response = await anthropicClient.messages.create({
-      model: "claude-3-5-sonnet-20241022",
+      model: "claude-sonnet-4-20250514",
       max_tokens: 1024,
       system: systemPrompt,
       messages: [
@@ -387,7 +551,7 @@ async function processMessage(
     return "Error: Invalid message after sanitization";
   }
 
-  // Check for commands first
+  // Check for explicit slash commands first
   const commandParsed = parseCommand(sanitizedMessage);
   if (commandParsed) {
     return await handleCommand(
@@ -398,7 +562,89 @@ async function processMessage(
     );
   }
 
-  // If not a command, process with Anthropic
+  // Simple keyword check for history as a fallback
+  const lowerMessage = sanitizedMessage.toLowerCase();
+  if (
+    lowerMessage.includes("history") ||
+    (lowerMessage.includes("show me") &&
+      (lowerMessage.includes("message") || lowerMessage.includes("recent")))
+  ) {
+    logger.info(
+      `🎯 Keyword-based history detection for: "${sanitizedMessage}"`,
+    );
+    return await handleCommand("history", [], client, channelId);
+  }
+
+  // Use intent detection for natural language
+  const intent = await detectIntent(sanitizedMessage);
+
+  // If we have confidence in a command intent, execute it
+  if (intent.confidence > 0.5) {
+    logger.info(
+      `🎯 Detected intent: ${intent.action} with confidence ${intent.confidence}`,
+    );
+
+    switch (intent.action) {
+      case "history": {
+        const limit = intent.parameters.limit || 50;
+        const query = intent.parameters.searchQuery || "";
+        const channelName = "notify-qa-tools";
+
+        try {
+          logger.info(
+            `🔍 Intent-based: Attempting to find channel: ${channelName}`,
+          );
+          const targetChannelId = await findChannelByName(client, channelName);
+
+          if (!targetChannelId) {
+            logger.error(`❌ Intent-based: Channel not found: ${channelName}`);
+            const availableChannels = await listAvailableChannels(client);
+            return `❌ Could not find channel #${channelName}. Make sure the bot is invited to the channel.\n\n${availableChannels}`;
+          }
+
+          logger.info(
+            `✅ Intent-based: Found channel ${channelName}, fetching history...`,
+          );
+          const history = await fetchChannelHistory(
+            client,
+            targetChannelId,
+            limit,
+            query,
+          );
+          logger.info(
+            `📋 Intent-based: Successfully fetched ${history.messages.length} messages`,
+          );
+          return `📋 History from #${channelName}:\n\n${formatMessagesForDisplay(history.messages)}`;
+        } catch (error) {
+          const errorMessage =
+            error instanceof Error ? error.message : String(error);
+          logger.error(`❌ Intent-based detailed error: ${errorMessage}`);
+          return `❌ Error fetching channel history from #${channelName}: ${errorMessage}`;
+        }
+      }
+
+      case "logs": {
+        const testName = intent.parameters.testName || "recent-logs";
+        return await handleDataDogLogsCommand([testName]);
+      }
+
+      case "help": {
+        return `🤖 I can help you with:
+• **History**: Ask me to "show history", "get last 20 messages", "find messages with error", etc.
+• **Logs**: Say "send logs for test-name" or "create datadog log"
+• **Channels**: Say "list channels" or "show channels" to see available channels
+• **Help**: Just ask "help" or "what can you do"
+
+I automatically fetch from #notify-qa-tools when you ask for history!`;
+      }
+
+      case "channels": {
+        return await listAvailableChannels(client);
+      }
+    }
+  }
+
+  // If not a command or low confidence, process with Anthropic for general chat
   try {
     return await processWithAnthropic(sanitizedMessage);
   } catch (error) {
