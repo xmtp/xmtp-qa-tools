@@ -36,6 +36,7 @@
     "test": "yarn cli test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.54.0",
     "@slack/bolt": "^4.4.0",
     "@slack/web-api": "^7.0.0",
     "@xmtp/content-type-reaction": "^2.0.2",

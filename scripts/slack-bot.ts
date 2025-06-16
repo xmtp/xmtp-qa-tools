@@ -10,8 +10,21 @@ dotenv.config();
 // Initialize logger
 const logger = createLogger();
 
-// Track active Claude processes for cleanup
-const activeClaudeProcesses = new Set<ChildProcess>();
+// Single persistent Claude process
+let claudeProcess: ChildProcess | null = null;
+let claudeReady = false;
+let claudeInitializing = false;
+
+// Message queue for handling requests
+interface PendingMessage {
+  resolve: (value: string) => void;
+  reject: (reason?: any) => void;
+  message: string;
+  timestamp: number;
+}
+
+const messageQueue: PendingMessage[] = [];
+let processingMessage = false;
 
 interface ValidationResult {
   isValid: boolean;
@@ -55,10 +68,156 @@ function validateAndSanitizeInput(input: string): ValidationResult {
     return { isValid: false, error: "Message too long (max 4000 characters)" };
   }
 
-  // Remove or escape potentially dangerous characters
+  // Remove or escape potentially dangerous characters for safety
   const sanitized = trimmed.replace(/[`$\\]/g, "\\$&");
 
   return { isValid: true, sanitized };
+}
+
+async function initializeClaudeProcess(): Promise<void> {
+  if (claudeInitializing || claudeReady) {
+    return;
+  }
+
+  claudeInitializing = true;
+  logger.info("🚀 Initializing persistent Claude process...");
+
+  try {
+    claudeProcess = spawn("npx", ["@anthropic-ai/claude-code"], {
+      stdio: ["pipe", "pipe", "pipe"],
+      cwd: process.cwd(),
+      env: {
+        ...process.env,
+      },
+    });
+
+    let initOutput = "";
+
+    claudeProcess.stdout?.on("data", (data: Buffer) => {
+      const output = data.toString();
+      initOutput += output;
+
+      // Process any queued messages when Claude is ready
+      if (!processingMessage && messageQueue.length > 0) {
+        processNextMessage();
+      }
+    });
+
+    claudeProcess.stderr?.on("data", (data) => {
+      const error = data.toString();
+      logger.warn(`Claude stderr: ${error}`);
+    });
+
+    claudeProcess.on("close", (code) => {
+      logger.warn(`Claude process closed with code: ${code}`);
+      claudeReady = false;
+      claudeProcess = null;
+
+      // Reject any pending messages
+      while (messageQueue.length > 0) {
+        const pending = messageQueue.shift();
+        if (pending) {
+          pending.reject(new Error("Claude process closed unexpectedly"));
+        }
+      }
+    });
+
+    claudeProcess.on("error", (error) => {
+      logger.error(`Claude process error: ${error.message}`);
+      claudeReady = false;
+      claudeProcess = null;
+      claudeInitializing = false;
+
+      // Reject any pending messages
+      while (messageQueue.length > 0) {
+        const pending = messageQueue.shift();
+        if (pending) {
+          pending.reject(error);
+        }
+      }
+    });
+
+    // Give Claude a moment to initialize
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+
+    claudeReady = true;
+    claudeInitializing = false;
+    logger.info("✅ Claude process initialized and ready");
+  } catch (error) {
+    claudeInitializing = false;
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    logger.error(`Failed to initialize Claude process: ${errorMessage}`);
+    throw error;
+  }
+}
+
+function processNextMessage(): void {
+  if (
+    processingMessage ||
+    messageQueue.length === 0 ||
+    !claudeReady ||
+    !claudeProcess
+  ) {
+    return;
+  }
+
+  const pending = messageQueue.shift();
+  if (!pending) return;
+
+  processingMessage = true;
+
+  logger.info(
+    `📝 Processing message: "${pending.message.substring(0, 50)}..."`,
+  );
+
+  let responseBuffer = "";
+  let responseStarted = false;
+  const responseTimeout = setTimeout(() => {
+    pending.reject(new Error("Claude response timeout"));
+    processingMessage = false;
+    processNextMessage(); // Process next message
+  }, 30000); // 30 second timeout
+
+  const dataHandler = (data: Buffer) => {
+    const output = data.toString();
+    responseBuffer += output;
+
+    if (!responseStarted) {
+      responseStarted = true;
+    }
+
+    // Simple heuristic: if we get a substantial response and it ends with a newline,
+    // consider it complete. This might need adjustment based on Claude's output format.
+    if (responseBuffer.length > 10 && output.includes("\n")) {
+      claudeProcess?.stdout?.off("data", dataHandler);
+      clearTimeout(responseTimeout);
+
+      const response = responseBuffer.trim();
+      logger.info(
+        `✅ Claude response complete: ${response.substring(0, 100)}...`,
+      );
+
+      pending.resolve(response || "No response from Claude");
+      processingMessage = false;
+
+      // Process next message in queue
+      setImmediate(() => {
+        processNextMessage();
+      });
+    }
+  };
+
+  claudeProcess.stdout?.on("data", dataHandler);
+
+  // Send the message to Claude
+  if (claudeProcess.stdin) {
+    claudeProcess.stdin.write(`${pending.message}\n`);
+  } else {
+    clearTimeout(responseTimeout);
+    pending.reject(new Error("Claude process stdin not available"));
+    processingMessage = false;
+    processNextMessage();
+  }
 }
 
 async function runClaudeCommand(message: string): Promise<string> {
@@ -68,89 +227,67 @@ async function runClaudeCommand(message: string): Promise<string> {
     return `Error: ${validation.error}`;
   }
 
-  return new Promise((resolve) => {
-    logger.info(
-      `🤖 Starting Claude command with message: "${validation.sanitized}"`,
-    );
+  const sanitizedMessage = validation.sanitized;
+  if (!sanitizedMessage) {
+    return "Error: Invalid message after sanitization";
+  }
 
-    // Run claude with proper workspace context and configuration
-    // Use the same command as defined in package.json
-    const claude: ChildProcess = spawn("npx", ["@anthropic-ai/claude-code"], {
-      stdio: ["pipe", "pipe", "pipe"],
-      timeout: 120000, // Increased to 2 minutes
-      cwd: process.cwd(), // Ensure we're in the correct workspace directory
-      env: {
-        ...process.env, // Inherit all environment variables
-      },
-    });
-
-    // Track this process for cleanup
-    activeClaudeProcesses.add(claude);
-
-    let stdout = "";
-    let stderr = "";
-    let hasResponded = false;
-
-    const cleanup = () => {
-      activeClaudeProcesses.delete(claude);
-    };
-
-    const timeout = setTimeout(() => {
-      if (!hasResponded) {
-        hasResponded = true;
-        logger.warn("⏰ Claude command timed out after 2 minutes");
-        claude.kill("SIGTERM");
-        cleanup();
-        resolve(
-          "Error: Claude command timed out (2 minutes). Please try a simpler query or break it into smaller parts.",
-        );
-      }
-    }, 120000); // 2 minutes timeout
-
-    claude.stdout?.on("data", (data) => {
-      stdout += (data as Buffer).toString();
-    });
-
-    claude.stderr?.on("data", (data) => {
-      stderr += (data as Buffer).toString();
-    });
-
-    claude.on("close", (code) => {
-      clearTimeout(timeout);
-      cleanup();
-      if (!hasResponded) {
-        hasResponded = true;
-        logger.info(`🏁 Claude command finished with code: ${code}`);
-        if (code === 0) {
-          resolve(stdout || "No response from Claude");
-        } else {
-          const errorMsg = stderr
-            ? `Claude error: ${stderr}`
-            : "Claude command failed";
-          logger.error(`❌ Claude command failed: ${errorMsg}`);
-          resolve(`Error: ${errorMsg}`);
-        }
-      }
-    });
-
-    claude.on("error", (error) => {
-      clearTimeout(timeout);
-      cleanup();
-      if (!hasResponded) {
-        hasResponded = true;
-        logger.error(`💥 Claude spawn error: ${error.message}`);
-        resolve(`Error: Failed to run Claude command - ${error.message}`);
-      }
-    });
-
-    if (claude.stdin && validation.sanitized) {
-      claude.stdin.write(validation.sanitized);
-      claude.stdin.end();
-    } else {
-      cleanup();
-      resolve("Error: Failed to send input to Claude");
+  // Initialize Claude if not ready
+  if (!claudeReady && !claudeInitializing) {
+    try {
+      await initializeClaudeProcess();
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      return `Error: Failed to initialize Claude - ${errorMessage}`;
     }
+  }
+
+  // Wait for Claude to be ready
+  let waitCount = 0;
+  while (!claudeReady && waitCount < 50) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+    waitCount++;
+  }
+
+  if (!claudeReady) {
+    return "Error: Claude process not ready after timeout";
+  }
+
+  return new Promise<string>((resolve, reject) => {
+    messageQueue.push({
+      resolve,
+      reject,
+      message: sanitizedMessage,
+      timestamp: Date.now(),
+    });
+
+    // Start processing if not already processing
+    if (!processingMessage) {
+      processNextMessage();
+    }
+
+    // Timeout for the entire request
+    setTimeout(() => {
+      reject(new Error("Request timeout"));
+    }, 60000); // 1 minute total timeout
   });
+}
+
+// Function to cleanup Claude process
+function cleanupClaudeProcess() {
+  if (claudeProcess && !claudeProcess.killed) {
+    logger.info("🧹 Cleaning up Claude process");
+    try {
+      claudeProcess.kill("SIGTERM");
+      claudeProcess = null;
+      claudeReady = false;
+    } catch (error) {
+      const errorMessage =
+        error instanceof Error ? error.message : String(error);
+      logger.error(`Error killing Claude process: ${errorMessage}`);
+    }
+  }
 }
 
 // Respond to @mentions
@@ -250,38 +387,19 @@ app.message(async ({ message, say, client }) => {
   }
 });
 
-// Function to cleanup all active Claude processes
-function cleanupClaudeProcesses() {
-  if (activeClaudeProcesses.size > 0) {
-    logger.info(
-      `🧹 Cleaning up ${activeClaudeProcesses.size} active Claude processes`,
-    );
-
-    for (const process of activeClaudeProcesses) {
-      try {
-        if (!process.killed) {
-          process.kill("SIGTERM");
-          logger.info("🔪 Terminated Claude process");
-        }
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(`Error killing Claude process: ${errorMessage}`);
-      }
-    }
-
-    activeClaudeProcesses.clear();
-  }
-}
-
 // Application startup
 void (async () => {
   try {
+    // Initialize Claude first
+    logger.info("🔧 Initializing Claude process before starting Slack bot...");
+    await initializeClaudeProcess();
+
+    // Only start Slack bot after Claude is ready
     await app.start();
-    logger.info("🚀 Slack bot started successfully");
+    logger.info("🚀 Slack bot started successfully with Claude ready");
   } catch (error: any) {
-    logger.error(`Failed to start Slack bot: ${error.message}`);
-    cleanupClaudeProcesses();
+    logger.error(`Failed to start application: ${error.message}`);
+    cleanupClaudeProcess();
     process.exit(1);
   }
 })();
@@ -289,12 +407,12 @@ void (async () => {
 // Graceful shutdown
 process.on("SIGTERM", () => {
   logger.info("🛑 Shutting down gracefully");
-  cleanupClaudeProcesses();
+  cleanupClaudeProcess();
   process.exit(0);
 });
 
 process.on("SIGINT", () => {
   logger.info("🛑 Shutting down gracefully");
-  cleanupClaudeProcesses();
+  cleanupClaudeProcess();
   process.exit(0);
 });
