@@ -10,7 +10,7 @@
     "workers"
   ],
   "scripts": {
-    "agent": "tsx scripts/slack-bot.ts",
+    "agent": "tsx slack-bot/index.ts",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
