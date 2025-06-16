@@ -56,32 +56,24 @@ Benchmarks the execution time of core XMTP operations including client managemen
 - `sendGroupMessage-{size}` - Measures message sending time in groups of varying sizes
 - `receiveGroupMessage-{size}` - Measures message reception time across different group sizes
 
-## How to Run
+## How to run
+
+### Run all metrics tests
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-# Run all metrics tests
-yarn test suites/metrics
-
-# Run specific test files
-yarn test suites/metrics/delivery.test.ts
-yarn test suites/metrics/performance.test.ts
-
-# Run with custom environment variables
-DELIVERY_AMOUNT=20 DELIVERY_RECEIVERS=6 yarn test suites/metrics/delivery.test.ts
-BATCH_SIZE=10 MAX_GROUP_SIZE=50 yarn test suites/metrics/performance.test.ts
+yarn test metrics
 ```
 
-### Environment Variables
+### Run specific test files
 
-**Delivery Tests:**
+```bash
+yarn test metrics/delivery.test.ts
+yarn test metrics/performance.test.ts
+```
 
-- `DELIVERY_AMOUNT` - Number of messages to send for testing (default: 10)
-- `DELIVERY_RECEIVERS` - Number of receiving clients (default: 4)
+### Run with custom parameters
 
-**Performance Tests:**
-
-- `BATCH_SIZE` - Increment size for scaling tests (default: 5)
-- `MAX_GROUP_SIZE` - Maximum group size to test (default: 10)
+```bash
+DELIVERY_AMOUNT=20 DELIVERY_RECEIVERS=6 yarn test metrics/delivery.test.ts
+BATCH_SIZE=10 MAX_GROUP_SIZE=50 yarn test metrics/performance.test.ts
+```
