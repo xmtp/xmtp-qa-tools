@@ -1,3 +1,80 @@
+# Performance Benchmarking Suite
+
+This test suite measures XMTP protocol performance across different group sizes and installation counts, providing detailed metrics for scalability analysis.
+
+## What it does
+
+- Creates groups with varying member counts (10-200 members)
+- Tests different installation counts per member (2-25 installations)
+- Measures member addition timing and synchronization performance
+- Tracks total installation counts and performance scaling
+- Generates comprehensive performance reports
+
+## Key Metrics
+
+- **Add Members Time**: Time to add new members to existing groups
+- **SyncAll Time**: Time for new clients to sync all conversations
+- **Time per Installation**: Performance efficiency metric (ms per installation)
+- **Installation Count Accuracy**: Verification of expected vs actual installation counts
+
+## Environment Setup
+
+Set `XMTP_ENV` to `dev` or `production` to test performance on the corresponding network.
+
+## How to run
+
+### Run performance benchmarks
+
+```bash
+yarn test bench
+```
+
+### Configuration Parameters
+
+The test suite uses these configurable parameters:
+
+- `WORKER_COUNT`: Number of concurrent test workers (default: 3)
+- `BATCH_SIZE`: Group size increment for testing (default: 10)
+- `TOTAL`: Maximum group size to test (default: 200)
+- `CHECK_INSTALLATIONS`: Installation counts to test per member ([2, 5, 10, 15, 20, 25])
+- `MIN_MAX_INSTALLATIONS`: Installation count boundaries ([1000, 2000])
+
+## Test Results
+
+Performance results are automatically saved to:
+
+- `logs/bench_[timestamp].log` - Formatted table output
+- `logs/bench_[timestamp].csv` - Raw data for analysis
+
+### Sample Performance Data
+
+| Group Size | Inst/Member | Actual Inst | Add Members (ms) | SyncAll (ms) | Time per Install (ms) |
+| ---------- | ----------- | ----------- | ---------------- | ------------ | --------------------- |
+| 20         | 2           | 40          | 78.00            | 46.05        | 1.95                  |
+| 40         | 2           | 80          | 95.00            | 80.04        | 1.19                  |
+| 100        | 5           | 491         | 181.00           | 272.49       | 0.37                  |
+| 200        | 10          | 1976        | 342.00           | 1260.17      | 0.17                  |
+
+## Performance Insights
+
+### Scalability Patterns
+
+- **Time per installation decreases** as group size increases (better efficiency at scale)
+- **SyncAll time grows** roughly linearly with total installation count
+- **Installation count variations** due to key rotation and multi-device scenarios
+
+### Known Limitations
+
+- Groups with >3200 installations may hit message size limits (4MB)
+- Network connectivity issues may occur during large-scale testing
+- Performance varies significantly between `dev` and `production` environments
+
+## Key Files
+
+- **[bench.test.ts](./bench.test.ts)** - Main performance testing implementation
+- **[all.csv](./all.csv)** - Historical performance data
+- **[README.md](./README.md)** - This documentation
+
 ## Large Groups Performance Results
 
 | Group Size | Inst/Member | Actual Inst | Diff | Est. Inst | B receives member (ms) | Z gets added (ms) | Time per Install (ms) |
