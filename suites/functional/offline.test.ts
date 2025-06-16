@@ -8,7 +8,7 @@ const testName = "recovery";
 
 const amountofMessages = 5;
 
-describe("XMTP Offline Message Recovery - Client Disconnection and Reconnection Scenarios", async () => {
+describe(testName, async () => {
   let group: Group;
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"], testName);

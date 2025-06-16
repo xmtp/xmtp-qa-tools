@@ -7,7 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";
 
-describe("XMTP Group Metadata Management - Name Updates and Member Management", async () => {
+describe(testName, async () => {
   let group: Group;
 
   const workers = await getWorkers(
