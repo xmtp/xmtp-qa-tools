@@ -18,7 +18,7 @@ import {
 const testName = "m_large_metadata";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("Large Group Metadata Stream Performance - Testing group metadata update notification delivery times across different group sizes", async () => {
   let workers: WorkerManager;
 
   let newGroup: Group;
@@ -48,7 +48,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveMetadata-${i}: should create a group and measure all streams`, async () => {
+    it(`should create ${i}-member group and verify all workers receive group metadata update notifications within acceptable time`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(

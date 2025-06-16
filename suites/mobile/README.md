@@ -1,58 +1,103 @@
-# Mobile Performance Test Suite
+# Mobile Performance Testing Suite
 
-Measures application performance degradation ("slugishness") under increasing load conditions using different loads.
+This test suite measures mobile application performance degradation under increasing data load conditions, simulating real-world usage scenarios across different device capabilities and data volumes.
 
-## Configurations
+## What it does
 
-- **Small** ~15 groups, 10,20 messages
-- **Medium** ~50 groups of various sizes with 10,20 messages
-- **Large** ~100 groups with 10,20,100 messages
-- **XL** ~400 groups with 20 messages
+- Tests application responsiveness under various conversation loads
+- Measures performance across different load configurations (Small/Medium/Large/XL)
+- Evaluates key mobile interaction metrics (login, notifications, messaging, UI responsiveness)
+- Provides standardized performance ratings for mobile user experience
+- Tracks performance regressions across application versions
 
-## How to Run
+## Environment Setup
+
+Set `XMTP_ENV` to `dev` or `production` to test mobile performance on the corresponding network.
+
+## How to run
+
+### Run mobile performance tests
 
 ```bash
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-# Run individual configurations
 yarn test mobile
 ```
 
-## Mobile Performance Rating
+## Test Configurations
 
-#### Prod v82
+The suite tests four distinct load scenarios:
 
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
-| ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
-| **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️ |
-| **Medium**    | 2      | 3        | 2        | 2                | 3           | 3      | ⭐️⭐️ (2.5)    |
-| **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
-| **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
+### Small Load Configuration
 
-#### Prod v304 (Medium +40%)
+- **Groups**: ~15 groups
+- **Messages**: 10-20 messages per group
+- **Use Case**: Typical casual user with minimal conversation history
 
-| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Rating          |
+### Medium Load Configuration
+
+- **Groups**: ~50 groups of various sizes
+- **Messages**: 10-20 messages per group
+- **Use Case**: Active user with moderate conversation activity
+
+### Large Load Configuration
+
+- **Groups**: ~100 groups
+- **Messages**: 10-100 messages per group
+- **Use Case**: Power user with extensive conversation history
+
+### XL Load Configuration
+
+- **Groups**: ~400 groups
+- **Messages**: 20 messages per group
+- **Use Case**: Enterprise or extreme usage scenarios
+
+## Performance Metrics
+
+Each configuration is evaluated across six key mobile interaction areas:
+
+- **Log in** - Time from login to full display of conversation list
+- **On notif** - Time for notification tap to open conversation
+- **Messages** - Message rendering speed in conversation list
+- **Button Responses** - UI button tap responsiveness and feedback
+- **Transitions** - Navigation speed between screens (conversations ↔ messages)
+- **Scroll** - UI scroll performance in conversation/message lists
+
+## Performance Ratings
+
+### Rating Scale
+
+- **⭐️⭐️⭐️⭐️⭐️ (Instant)** - All interactions feel immediate and responsive
+- **⭐️⭐️⭐️⭐️ (Fast)** - Minor delays but still feels snappy
+- **⭐️⭐️⭐️ (Acceptable)** - Noticeable delays but usable
+- **⭐️⭐️ (Slow)** - Significant delays affecting user experience
+- **⭐️ (Unusable)** - Severe delays causing user frustration
+
+### Sample Performance Results
+
+#### Production v304 (Medium +40% improvement)
+
+| Configuration | Log in | On notif | Messages | Button Responses | Transitions | Scroll | Overall Rating  |
 | ------------- | ------ | -------- | -------- | ---------------- | ----------- | ------ | --------------- |
 | **Small**     | 4      | 4        | 3        | 4                | 5           | 4      | ⭐️⭐️⭐️⭐️⭐️ |
 | **Medium**    | 3      | 4        | 3        | 4                | 4           | 3      | ⭐️⭐️⭐️ (3.5) |
 | **Large**     | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 | **XL**        | 1      | 1        | 1        | 1                | 1           | 1      | ⭐️             |
 
-### Performance Metrics
+## Performance Analysis
 
-- **Log in** - Time from login to full display of conversation list
-- **On notif** - Time for individual notification to open a conversation.
-- **Messages** - How quickly messages render in a message list
-- **Button Responses** - How quickly UI buttons respond to user taps and interactions
-- **Transitions** - Speed of navigation between screens (conversation and messages)
-- **Scroll** - How quickly UI scrolls to the bottom of the conversation list or top for message history
-- **Rating** - Overall rating of the application's performance based on the above metrics
+### Optimal Performance Range
 
-### Rating Scale
+- **Small to Medium** configurations maintain acceptable performance (3+ stars)
+- **Large configurations** show significant degradation (1-2 stars)
+- **XL configurations** become unusable for typical mobile interactions
 
-- ⭐️⭐️⭐️⭐️⭐️ - **Instant** - All interactions feel immediate and responsive
-- ⭐️⭐️⭐️⭐️ - **Fast** - Minor delays but still feels snappy
-- ⭐️⭐️⭐️ - **Acceptable** - Noticeable delays but usable
-- ⭐️⭐️ - **Slow** - Significant delays affecting user experience
-- ⭐️ - **Unusable** - Severe delays causing user frustration
+### Performance Recommendations
+
+- **Target Range**: Optimize for Small-Medium load scenarios (≤50 groups)
+- **Performance Threshold**: Maintain 3+ star rating for core interactions
+- **Load Management**: Consider pagination/lazy loading for Large+ configurations
+- **User Experience**: Implement performance warnings for extreme usage scenarios
+
+## Key Files
+
+- **[mobile.test.ts](./mobile.test.ts)** - Mobile performance testing implementation
+- **[README.md](./README.md)** - This documentation

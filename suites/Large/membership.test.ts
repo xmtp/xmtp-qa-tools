@@ -18,7 +18,7 @@ import {
 const testName = "m_large_membership";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("Large Group Membership Stream Performance - Testing group member addition notification delivery times across varying group sizes", async () => {
   let workers: WorkerManager;
 
   let newGroup: Group;
@@ -49,7 +49,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveAddMember-${i}: should create a new conversation`, async () => {
+    it(`should add members to ${i}-member group and verify all workers receive membership update notifications within acceptable time`, async () => {
       try {
         // Initialize workers
         newGroup = await workers.createGroup();
