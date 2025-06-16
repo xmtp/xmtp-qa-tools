@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,7 +9,6 @@ import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "m_performance";
-loadEnv(testName);
 
 describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");

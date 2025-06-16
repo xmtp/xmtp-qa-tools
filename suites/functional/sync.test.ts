@@ -1,13 +1,14 @@
-import { loadEnv, sleep } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
+  setupTestLifecycle({ testName, expect });
   let workers: WorkerManager;
   let testGroup: Group;
 

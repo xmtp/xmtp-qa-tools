@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -16,7 +16,6 @@ import {
 } from "./helpers";
 
 const testName = "m_large_metadata";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;

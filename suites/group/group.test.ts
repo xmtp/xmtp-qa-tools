@@ -1,9 +1,4 @@
-import {
-  appendToEnv,
-  getFixedNames,
-  getManualUsers,
-  loadEnv,
-} from "@helpers/client";
+import { appendToEnv, getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
   verifyMembershipStream,
@@ -41,8 +36,6 @@ const testConfig = {
   freshInstalls: false,
 } as const;
 
-loadEnv(testName);
-
 describe(testName, () => {
   let workers: WorkerManager;
   let creator: Worker;
@@ -50,6 +43,7 @@ describe(testName, () => {
   let allGroups: string[] = [];
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

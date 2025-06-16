@@ -1,15 +1,12 @@
-import { loadEnv } from "@helpers/client";
-import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import type { Conversation, Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "installations";
-loadEnv(testName);
+
 describe(testName, () => {
   setupTestLifecycle({
+    testName,
     expect,
   });
 

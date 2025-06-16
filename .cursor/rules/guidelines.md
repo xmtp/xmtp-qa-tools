@@ -64,7 +64,6 @@
    import { loadEnv } from "@helpers/client";
 
    const testName = "my-test";
-   loadEnv(testName);
    ```
 
 7. **For multi-device testing, create separate worker sets**:
@@ -142,7 +141,6 @@
     import { describe, expect, it } from "vitest";
 
     const testName = "your-test-name";
-    loadEnv(testName);
 
     describe(testName, async () => {
       const workers = await getWorkers(["alice", "bob"], testName);

@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
@@ -9,7 +9,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
-loadEnv(testName);
 
 /**
  * Gets workers that are members of a group

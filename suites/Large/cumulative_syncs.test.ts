@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -13,9 +13,8 @@ import {
 } from "./helpers";
 
 const testName = "m_large_cumulative_syncs";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -35,6 +34,7 @@ describe(testName, () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration,

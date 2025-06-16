@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -8,13 +8,13 @@ import {
 import { describe, expect, it } from "vitest";
 
 const testName = "codec";
-loadEnv(testName);
 
-describe("XMTP SDK Version Compatibility - Database Stability Across Version Downgrades", () => {
+describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(getFixedNames(2), testName);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

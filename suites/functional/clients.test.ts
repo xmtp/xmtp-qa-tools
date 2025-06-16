@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -6,9 +5,8 @@ import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
-loadEnv(testName);
 
-describe("XMTP SDK Version Compatibility - Database Stability Across Version Downgrades", () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(
@@ -28,6 +26,7 @@ describe("XMTP SDK Version Compatibility - Database Stability Across Version Dow
   );
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

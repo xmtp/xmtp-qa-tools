@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,9 +7,8 @@ import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "dms";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   const workers = await getWorkers(
     [
       "henry",
@@ -30,6 +28,7 @@ describe(testName, () => {
   let convo: Dm;
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

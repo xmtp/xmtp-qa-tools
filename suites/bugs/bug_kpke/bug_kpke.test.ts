@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,7 +8,6 @@ import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "bug_kpke";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
@@ -23,6 +22,7 @@ describe(testName, () => {
   });
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

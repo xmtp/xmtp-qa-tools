@@ -1,4 +1,4 @@
-import { defaultNames, loadEnv, sdkVersionOptions } from "@helpers/client";
+import { defaultNames, sdkVersionOptions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { getInboxIds } from "@inboxes/utils";
@@ -8,7 +8,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "regression";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;

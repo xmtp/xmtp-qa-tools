@@ -1,17 +1,17 @@
-import { getRandomNames, loadEnv } from "@helpers/client";
+import { getRandomNames } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type DecodedMessage, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "callbacks";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   const names = getRandomNames(5);
   const workers = await getWorkers(names, testName);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

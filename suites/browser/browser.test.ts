@@ -1,4 +1,4 @@
-import { loadEnv, sleep } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,7 +8,6 @@ import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
-loadEnv(testName);
 
 describe(testName, () => {
   let groupId: string;
@@ -18,6 +17,10 @@ describe(testName, () => {
   let creator: Worker;
   let gmBot: Worker;
   const inbox = getRandomInbox();
+  setupTestLifecycle({
+    testName,
+    expect,
+  });
   beforeAll(async () => {
     xmtpTester = new playwright({
       headless,
@@ -38,9 +41,6 @@ describe(testName, () => {
 
     creator = convoStreamBot.get("bob") as Worker;
     gmBot = gmBotWorker.get(receiver) as Worker;
-  });
-  setupTestLifecycle({
-    expect,
   });
 
   it("should receive group invitation in browser when accompanied by an initial message", async () => {

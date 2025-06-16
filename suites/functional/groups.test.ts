@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,8 +8,8 @@ import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "groups";
-loadEnv(testName);
-describe(testName, () => {
+
+describe(testName, async () => {
   const workers = await getWorkers(
     [
       "henry",
@@ -33,6 +32,7 @@ describe(testName, () => {
   const groupsBySize: Record<number, Conversation> = {};
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

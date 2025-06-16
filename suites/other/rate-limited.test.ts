@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -6,9 +5,8 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "rate-limited";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   const workers = await getWorkers(
     ["henry", "ivy", "jack", "karen", "larry", "mary", "nancy", "oscar"],
     testName,
@@ -21,6 +19,7 @@ describe(testName, () => {
   let targetInboxId: string;
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

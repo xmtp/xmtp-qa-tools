@@ -1,5 +1,3 @@
-import test from "node:test";
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -10,7 +8,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
 const testName = "agents";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
@@ -26,6 +23,7 @@ describe(testName, () => {
     );
   });
   setupTestLifecycle({
+    testName,
     expect,
   });
 

@@ -98,7 +98,11 @@ async function initializeClaudeProcess(): Promise<void> {
       initOutput += output;
 
       // Process any queued messages when Claude is ready
-      if (!processingMessage && messageQueue.length > 0) {
+      if (
+        !processingMessage &&
+        messageQueue.length > 0 &&
+        initOutput.includes("Claude is ready")
+      ) {
         processNextMessage();
       }
     });
@@ -322,8 +326,10 @@ app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
       await say(finalResponse);
       logger.info(`📤 SENT FINAL RESPONSE: "${finalResponse}"`);
     }
-  } catch (error: any) {
-    logger.error(`Error processing app mention: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(
+      `Error processing app mention: ${error instanceof Error ? error.message : String(error)}`,
+    );
     const errorResponse = `<@${event.user}> Sorry, I encountered an error processing your request.`;
     await say(errorResponse);
     logger.info(`📤 SENT ERROR RESPONSE: "${errorResponse}"`);
@@ -378,8 +384,10 @@ app.message(async ({ message, say, client }) => {
         logger.info(`📤 SENT FINAL RESPONSE: "${claudeResponse}"`);
       }
     }
-  } catch (error: any) {
-    logger.error(`Error processing direct message: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(
+      `Error processing direct message: ${error instanceof Error ? error.message : String(error)}`,
+    );
     const errorResponse =
       "Sorry, I encountered an error processing your message.";
     await say(errorResponse);
@@ -397,8 +405,10 @@ void (async () => {
     // Only start Slack bot after Claude is ready
     await app.start();
     logger.info("🚀 Slack bot started successfully with Claude ready");
-  } catch (error: any) {
-    logger.error(`Failed to start application: ${error.message}`);
+  } catch (error: unknown) {
+    logger.error(
+      `Failed to start application: ${error instanceof Error ? error.message : String(error)}`,
+    );
     cleanupClaudeProcess();
     process.exit(1);
   }

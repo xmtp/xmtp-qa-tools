@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -13,7 +13,6 @@ import {
 } from "./helpers";
 
 const testName = "m_large_syncs";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;

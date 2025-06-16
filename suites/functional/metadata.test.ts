@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -7,7 +6,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "metadata";
-loadEnv(testName);
 
 describe("XMTP Group Metadata Management - Name Updates and Member Management", async () => {
   let group: Group;
@@ -29,6 +27,7 @@ describe("XMTP Group Metadata Management - Name Updates and Member Management", 
   );
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

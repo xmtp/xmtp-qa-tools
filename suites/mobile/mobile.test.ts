@@ -1,4 +1,4 @@
-import { getManualUsers, loadEnv } from "@helpers/client";
+import { getManualUsers } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -25,7 +25,6 @@ const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
 const testName = "bot-stress";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;

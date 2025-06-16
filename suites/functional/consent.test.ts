@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -7,14 +7,14 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "consent";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(getFixedNames(5), testName, typeofStream.Consent);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

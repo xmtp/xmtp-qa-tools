@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
   verifyAddMemberStream,
@@ -17,15 +17,15 @@ import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "streams";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   let group: Group;
   const names = getFixedNames(5);
   let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle
   setupTestLifecycle({
+    testName,
     expect,
   });
 

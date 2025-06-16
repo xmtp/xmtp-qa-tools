@@ -1,11 +1,11 @@
-import { getManualUsers, loadEnv } from "@helpers/client";
+import { getManualUsers } from "@helpers/client";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
 const testName = "notifications";
-loadEnv(testName);
+
 const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
 const receiverInboxId = receiverObj.inboxId;
 

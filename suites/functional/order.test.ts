@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv, sleep } from "@helpers/client";
+import { getFixedNames, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,9 +8,8 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "order";
-loadEnv(testName);
 
-describe(testName, () => {
+describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
@@ -20,6 +19,7 @@ describe(testName, () => {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
