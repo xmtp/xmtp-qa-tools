@@ -2,7 +2,7 @@
 
 This test suite measures XMTP protocol performance across different group sizes and installation counts, providing detailed metrics for scalability analysis.
 
-## What it does
+## What it does (units)
 
 - Creates groups with varying member counts (10-200 members)
 - Tests different installation counts per member (2-25 installations)
