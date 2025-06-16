@@ -10,12 +10,12 @@ import { describe, expect, it } from "vitest";
 const testName = "regression";
 loadEnv(testName);
 
-describe(testName, () => {
+describe("Regression Testing - Cross-Version Compatibility and Database Migration", () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions.reverse().slice(0, 3);
   const receiverInboxId = getInboxIds(1);
 
-  it("should create a group conversation with all workers", async () => {
+  it("should create group conversation across multiple SDK versions and verify message delivery", async () => {
     try {
       let names = defaultNames.slice(0, versions.length);
       let count = 0;
@@ -53,7 +53,7 @@ describe(testName, () => {
     }
   });
 
-  it(`Should test the DB after upgrade`, async () => {
+  it("should test database compatibility after SDK version upgrades", async () => {
     try {
       for (const version of versions) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
@@ -74,7 +74,7 @@ describe(testName, () => {
     }
   });
 
-  it(`Should test the DB after downgrade`, async () => {
+  it("should test database compatibility after SDK version downgrades", async () => {
     try {
       for (const version of versions.reverse()) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);

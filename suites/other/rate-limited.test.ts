@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 const testName = "rate-limited";
 loadEnv(testName);
 
-describe(testName, async () => {
+describe("Rate Limiting Validation - High-Volume Message Burst Testing", async () => {
   const workers = await getWorkers(
     ["henry", "ivy", "jack", "karen", "larry", "mary", "nancy", "oscar"],
     testName,
@@ -24,7 +24,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("massiveBurstFromWorkerThreads: should use actual worker threads to send messages in parallel", async () => {
+  it("should send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
     try {
       // Use ivy as the target that everyone will message
       targetInboxId = workers.getCreator().client.inboxId;
