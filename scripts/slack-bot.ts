@@ -130,7 +130,7 @@ async function fetchChannelHistory(
     if (query) {
       const searchTerm = query.toLowerCase();
       messages = messages.filter(
-        (msg: any) =>
+        (msg: any): msg is { text: string } =>
           msg.text &&
           typeof msg.text === "string" &&
           msg.text.toLowerCase().includes(searchTerm),
@@ -160,12 +160,17 @@ function formatMessagesForDisplay(
 
   const sortedMessages = messages
     .slice(0, maxMessages)
-    .sort((a, b) => parseFloat(b.ts) - parseFloat(a.ts));
+    .sort(
+      (a: any, b: any) =>
+        parseFloat(b.ts as string) - parseFloat(a.ts as string),
+    );
 
   let formatted = `📋 Found ${messages.length} message(s):\n\n`;
 
   for (const msg of sortedMessages) {
-    const timestamp = new Date(parseFloat(msg.ts) * 1000).toLocaleString();
+    const timestamp = new Date(
+      parseFloat(msg.ts as string) * 1000,
+    ).toLocaleString();
     const user = msg.user ? `<@${msg.user}>` : "Unknown User";
     const text = msg.text ? msg.text.substring(0, 200) : "[No text]";
 
