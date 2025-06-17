@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
+import { KNOWN_ISSUES } from "./logger";
 
 // Type definitions for Slack functionality
 interface SlackApiResponse {
@@ -46,26 +47,7 @@ class SlackNotifier {
     this.datadogUrl =
       "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
     this.githubContext = this.getGitHubContext();
-    this.testFilters = [
-      {
-        testName: "Browser",
-        uniqueErrorLines: [
-          "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously",
-        ],
-      },
-      {
-        testName: "Dms",
-        uniqueErrorLines: [
-          "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
-        ],
-      },
-      {
-        testName: "Agents",
-        uniqueErrorLines: [
-          'FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending "hi"',
-        ],
-      },
-    ];
+    this.testFilters = KNOWN_ISSUES;
   }
 
   private getGitHubContext(): GitHubContext {
@@ -183,16 +165,16 @@ class SlackNotifier {
     return "";
   }
 
-  private generateUrl(): string {
+  private generateUrl(): string | undefined {
     if (this.githubContext.workflowUrl) {
-      return `*Test log:* <${this.githubContext.workflowUrl}|View url>`;
+      return this.githubContext.workflowUrl;
     }
 
     const serviceId = this.getServiceId(this.githubContext.region || "");
     if (serviceId) {
-      return `*Test log:* <https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792|View url>`;
+      return `https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792`;
     }
-    return "";
+    return undefined;
   }
 
   private generateMessage(options: SlackNotificationOptions): string {
@@ -210,7 +192,7 @@ class SlackNotifier {
 *General dashboard:* <${this.datadogUrl}|View>
 *Geolocation:* \`${this.githubContext.region || "Unknown Region"}\`
 *Timestamp:* \`${new Date().toLocaleString()}\`
-${url}
+${url ? `*Test log:* <${url}|View url>` : ""}
 ${customLinks}
 Logs:
 \`\`\`${Array.from(options.errorLogs || []).join("\n")}\`\`\``;
@@ -230,8 +212,11 @@ Logs:
 
     if (options.errorLogs) {
       await sendDatadogLog(Array.from(options.errorLogs), {
-        testName: options.testName,
-        environment: this.githubContext.environment,
+        test: options.testName,
+        url: this.generateUrl(),
+        env: this.githubContext.environment,
+        region: this.githubContext.region,
+        libxmtp: "latest",
       });
     }
 

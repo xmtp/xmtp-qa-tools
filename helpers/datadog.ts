@@ -385,16 +385,11 @@ export async function sendDatadogLog(
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
-  const libXmtpVersion = "latest";
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
-    source: context.testName,
-    test: context.testName,
-    region: process.env.GEOLOCATION ?? "",
-    env: process.env.XMTP_ENV,
-    libxmtp: libXmtpVersion,
+    source: "xmtp-qa-tools",
     ...context,
   };
   try {
