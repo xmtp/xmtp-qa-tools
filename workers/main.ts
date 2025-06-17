@@ -767,14 +767,8 @@ export class WorkerClient extends Worker {
               DEFAULT_STREAM_TIMEOUT_MS / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
-          if (options.additionalInfo) {
-            console.error(
-              `[${this.nameId}] Additional context:`,
-              JSON.stringify(options.additionalInfo, null, 2),
-            );
-          }
-          console.error(`[${this.nameId}] Collected events:`, events);
-          resolve(events); // Resolve with whatever events we've collected so far
+
+          resolve(events);
         }
       }, DEFAULT_STREAM_TIMEOUT_MS);
     });
