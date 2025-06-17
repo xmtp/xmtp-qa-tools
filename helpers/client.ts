@@ -796,7 +796,7 @@ export const defaultNames = [
 export const defaultValues = {
   amount: 5, // 5 messages
   playwrightBeforeSendTimeout: 1000, // 1 second
-  streamTimeout: 10000, // 3 seconds
+  streamTimeout: 3000, // 3 seconds
   timeout: 40000, // 40 seconds
   perMessageTimeout: 3000, // 3 seconds
   defaultNames,

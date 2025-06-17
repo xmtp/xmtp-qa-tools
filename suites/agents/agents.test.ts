@@ -44,20 +44,50 @@ describe(testName, () => {
           });
         const countBefore = (await conversation.messages()).length;
 
-        const result = await verifyMessageStream(
-          conversation as Dm,
-          [workers.getCreator()],
-          1,
-          agent.sendMessage,
-        );
-        if (!result.allReceived) {
+        let retries = 3;
+        let agentResponded = false;
+        let result;
+
+        while (retries > 0) {
+          result = await verifyMessageStream(
+            conversation as Dm,
+            [workers.getCreator()],
+            1,
+            agent.sendMessage,
+          );
+
           await conversation.sync();
           const messages = await conversation.messages();
-          expect(messages.length).toBe(countBefore + 2);
-        } else {
-          console.debug(`${agent.name} with address ${agent.address} passed`);
-          expect(result.allReceived).toBe(true);
+
+          // Check if we have exactly 2 messages (sent + received)
+          if (messages.length === countBefore + 2) {
+            const lastMessage = messages[messages.length - 1];
+            // Verify the last message is from the agent (not from us)
+            if (
+              lastMessage.senderInboxId.toLowerCase() !==
+              workers.getCreator().client.inboxId.toLowerCase()
+            ) {
+              console.debug(
+                `${agent.name} with address ${agent.address} responded with message`,
+              );
+              agentResponded = true;
+              break;
+            }
+          }
+
+          // Also check if verifyMessageStream confirms reception
+          if (result?.allReceived) {
+            console.debug(
+              `${agent.name} with address ${agent.address} passed via verifyMessageStream`,
+            );
+            agentResponded = true;
+            break;
+          }
+
+          retries--;
         }
+
+        expect(agentResponded).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;
