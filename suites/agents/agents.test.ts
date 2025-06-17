@@ -43,13 +43,17 @@ describe(testName, () => {
             identifier: agent.address,
             identifierKind: IdentifierKind.Ethereum,
           });
+        await conversation.sync();
         let messages = await conversation.messages();
-        const countBefore = messages.length;
+        let countBefore = messages.length;
 
         let agentResponded = false;
         let result;
 
         while (retries > 0) {
+          messages = await conversation.messages();
+          countBefore = messages.length;
+
           result = await verifyMessageStream(
             conversation as Dm,
             [workers.getCreator()],
