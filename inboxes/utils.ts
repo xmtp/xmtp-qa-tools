@@ -58,6 +58,20 @@ export function getRandomInbox() {
   const pool = getInboxByInstallationCount(2).slice(0, 200);
   return pool[Math.floor(Math.random() * pool.length)];
 }
+export function getRandomInboxIdsWithRandomInstallations(count: number) {
+  let totalInboxes = [];
+  const possibleInstallations = [2, 5, 10, 15, 20, 25, 30];
+  for (let i = 2; i <= count; i++) {
+    let inboxes = getInboxByInstallationCount(
+      possibleInstallations[
+        Math.floor(Math.random() * possibleInstallations.length)
+      ],
+    );
+    let whichRandom = Math.floor(Math.random() * inboxes.length);
+    totalInboxes.push(inboxes[whichRandom]);
+  }
+  return totalInboxes.map((inbox) => inbox.inboxId);
+}
 export function getRandomInboxIds(count: number) {
   const pool = getInboxByInstallationCount(2).slice(0, 200);
   return pool

@@ -6,8 +6,13 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
+import {
+  typeOfResponse,
+  typeofStream,
+  typeOfSync,
+  type WorkerClient,
+} from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -17,7 +22,7 @@ export const features = [
   "verifyMembershipStream",
   "verifyMetadataStream",
   "verifyEpochChange",
-  "addInstallationsRandomly",
+  "addRandomInstallations",
   "createGroup",
 ];
 const testName = "group";
@@ -28,7 +33,7 @@ const testConfig = {
   manualUsers: getManualUsers(["prod-testing"]),
   network: "production",
   preInstallations: 1,
-  randomInboxIds: 60,
+  randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
@@ -65,7 +70,7 @@ describe(testName, () => {
     console.debug(`Loaded ${existingGroups.length} existing groups`);
 
     const group = (await creator.client.conversations.newGroup(
-      getRandomInboxIds(testConfig.randomInboxIds),
+      testConfig.randomInboxIds,
     )) as Group;
 
     allGroups = [...existingGroups, group.id];
@@ -91,9 +96,6 @@ describe(testName, () => {
           )) as Group;
           await workers.checkForks();
           switch (feature) {
-            case "addInstallationsRandomly":
-              await workers.addInstallationsRandomly();
-              break;
             case "createGroup": {
               const newGroup = (await creator.client.conversations.newGroup(
                 allInboxIds,
@@ -101,6 +103,9 @@ describe(testName, () => {
               await newGroup.sync();
               break;
             }
+            case "addRandomInstallations":
+              await verifyAddRandomInstallations(workers);
+              break;
             case "verifyMessageStream":
               await verifyMessageStream(
                 group,
@@ -114,7 +119,7 @@ describe(testName, () => {
               await verifyMembershipStream(
                 group,
                 workers.getAllBut("bot"),
-                getRandomInboxIds(1),
+                testConfig.randomInboxIds.slice(0, 1),
               );
               break;
 
@@ -143,7 +148,13 @@ describe(testName, () => {
     }
   });
 });
-
+export async function verifyAddRandomInstallations(
+  workers: WorkerManager,
+): Promise<void> {
+  for (const worker of workers.getAllBut("bot")) {
+    await worker.worker.addNewInstallation();
+  }
+}
 export async function verifyEpochChange(
   workers: WorkerManager,
   groupId: string,
@@ -173,7 +184,7 @@ export async function verifyEpochChange(
       }
     }
 
-    for (const member of getRandomInboxIds(6)) {
+    for (const member of getRandomInboxIdsWithRandomInstallations(6)) {
       try {
         await group.removeMembers([member]);
         await group.addMembers([member]);
