@@ -35,7 +35,7 @@ describe(testName, () => {
   for (const agent of filteredAgents) {
     it(`should receive response from ${agent.name} agent (${agent.address}) when sending "${agent.sendMessage}"`, async () => {
       try {
-        console.debug(`Testing ${agent.name} with address ${agent.address} `);
+        console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
         const conversation = await workers
           .getCreator()

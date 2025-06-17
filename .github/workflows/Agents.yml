@@ -2,6 +2,9 @@ name: Agents
 description: "should verify performance of the library in the production network"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "*/15 * * * *" # Runs every 15 minutes
   workflow_dispatch:
@@ -17,9 +20,8 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      DEFAULT_STREAM_TIMEOUT_MS: 20000
+      DEFAULT_STREAM_TIMEOUT_MS: 40000
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -28,6 +30,9 @@ jobs:
         with:
           node-version-file: ".node-version"
           cache: "yarn"
+          cache-dependency-path: |
+            yarn.lock
+            **/package.json
       - name: Install dependencies
         run: yarn
       - name: Run tests
@@ -36,7 +41,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.environment }}
+          name: artifacts-${{ matrix.environment }}-${{ matrix.test }}
           path: |
             logs/**/*
             .data/**/*
