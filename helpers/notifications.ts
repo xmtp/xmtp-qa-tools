@@ -222,15 +222,15 @@ Logs:
       return;
     }
 
-    if (this.shouldFilterOutTest(options)) {
-      return;
-    }
-
     if (options.errorLogs) {
       await sendDatadogLog(Array.from(options.errorLogs), {
         testName: options.testName,
         environment: this.githubContext.environment,
       });
+    }
+
+    if (this.shouldFilterOutTest(options)) {
+      return;
     }
 
     try {
