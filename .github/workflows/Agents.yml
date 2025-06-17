@@ -17,6 +17,7 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
+      DEFAULT_STREAM_TIMEOUT_MS: 20000
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
