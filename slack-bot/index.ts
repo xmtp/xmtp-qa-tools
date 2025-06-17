@@ -1,11 +1,8 @@
-import fs from "fs";
-import path from "path";
-import { Anthropic } from "@anthropic-ai/sdk";
-import { sendDatadogLog } from "@helpers/datadog";
 import { createLogger } from "@helpers/logger";
 import pkg from "@slack/bolt";
 import dotenv from "dotenv";
 import fetch from "node-fetch";
+import type { DatadogLogEntry } from "./history.test";
 
 const { App, LogLevel } = pkg;
 
@@ -13,34 +10,6 @@ dotenv.config();
 
 // Initialize logger
 const logger = createLogger();
-
-// Initialize Anthropic client
-let anthropicClient: Anthropic | null = null;
-
-interface ValidationResult {
-  isValid: boolean;
-  sanitized?: string;
-  error?: string;
-}
-
-interface DatadogLogEntry {
-  id: string;
-  type: string;
-  attributes: {
-    service: string;
-    message: string;
-    timestamp?: string;
-    attributes: {
-      test?: string;
-      region?: string;
-      env?: string;
-      libxmtp?: string;
-      service?: string;
-      level?: string;
-      [key: string]: any;
-    };
-  };
-}
 
 interface DatadogLogsResponse {
   data: DatadogLogEntry[];
@@ -63,7 +32,6 @@ interface TestFailure {
 const requiredEnvVars = [
   "SLACK_BOT_TOKEN",
   "SLACK_APP_TOKEN",
-  "ANTHROPIC_API_KEY",
   "DATADOG_API_KEY",
   "DATADOG_APP_KEY",
 ];
@@ -85,562 +53,300 @@ const app = new App({
   logLevel: LogLevel.ERROR,
 });
 
-// Initialize Anthropic client
-function initializeAnthropic(): void {
-  if (!anthropicClient && process.env.ANTHROPIC_API_KEY) {
-    anthropicClient = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    });
-    logger.info("✅ Anthropic client initialized");
-  }
+// Store latest test failures globally
+let latestTestFailures: TestFailure[] = [];
+let lastFetchTime: Date = new Date();
+
+// Analysis functions
+interface ComponentStatus {
+  name: string;
+  status: "healthy" | "issues" | "down";
+  failureCount: number;
+  recentFailures: TestFailure[];
+  summary: string;
 }
 
-// Input validation and sanitization
-function validateAndSanitizeInput(input: string): ValidationResult {
-  if (!input || typeof input !== "string") {
-    return { isValid: false, error: "Invalid input" };
-  }
-
-  const trimmed = input.trim();
-
-  if (trimmed.length === 0) {
-    return { isValid: false, error: "Empty message" };
-  }
-
-  if (trimmed.length > 4000) {
-    return { isValid: false, error: "Message too long (max 4000 characters)" };
-  }
-
-  // Remove or escape potentially dangerous characters for safety
-  const sanitized = trimmed.replace(/[`$\\]/g, "\\$&");
-
-  return { isValid: true, sanitized };
+interface SystemAnalysis {
+  overallHealth: "healthy" | "issues" | "critical";
+  componentStatuses: ComponentStatus[];
+  totalFailures: number;
+  criticalIssues: string[];
+  recommendations: string[];
 }
 
-// Parse commands from message
-function parseCommand(
-  message: string,
-): { command: string; args: string[] } | null {
-  const trimmed = message.trim();
+function analyzeTestFailures(
+  failures: TestFailure[],
+  hours: number = 24,
+): SystemAnalysis {
+  const componentMap = new Map<string, TestFailure[]>();
 
-  // Check for slash commands
-  if (trimmed.startsWith("/")) {
-    const parts = trimmed.slice(1).split(/\s+/);
-    return {
-      command: parts[0].toLowerCase(),
-      args: parts.slice(1),
-    };
-  }
+  // Group failures by component/category
+  failures.forEach((failure) => {
+    const testName = failure.testName || "unknown";
+    const component = extractComponent(testName);
 
-  return null;
-}
+    if (!componentMap.has(component)) {
+      componentMap.set(component, []);
+    }
+    const componentFailures = componentMap.get(component);
+    if (componentFailures) {
+      componentFailures.push(failure);
+    }
+  });
 
-// Handle DataDog logs command
-async function handleDataDogLogsCommand(args: string[]): Promise<string> {
-  try {
-    const testName = args[0] || "recent-logs";
-    const logMessage = `Fetching DataDog logs for: ${testName}`;
+  const componentStatuses: ComponentStatus[] = [];
+  const criticalIssues: string[] = [];
 
-    // Send log to DataDog
-    await sendDatadogLog([logMessage], {
-      testName,
-      source: "slack-bot",
-      command: "logs",
-      timestamp: new Date().toISOString(),
-    });
+  // Analyze each component
+  for (const [component, componentFailures] of componentMap) {
+    const failureCount = componentFailures.length;
+    let status: "healthy" | "issues" | "down";
+    let summary: string;
 
-    return `📊 DataDog log sent for test: ${testName}\nLog message: "${logMessage}"`;
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`❌ Error handling DataDog logs: ${errorMessage}`);
-    return `❌ Error sending DataDog log: ${errorMessage}`;
-  }
-}
-
-// Main command handler
-async function handleCommand(command: string, args: string[]): Promise<string> {
-  switch (command) {
-    case "history": {
-      const hours = parseInt(args[0]) || 24;
-      const query = args.slice(1).join(" ");
-
-      try {
-        logger.info(
-          `🔍 Fetching test failures from Datadog for last ${hours} hours`,
-        );
-        const failures = await fetchDatadogTestFailures(hours);
-
-        // If query is provided, filter the results
-        let filteredFailures = failures;
-        if (query) {
-          filteredFailures = failures.filter(
-            (failure) =>
-              failure.testName?.toLowerCase().includes(query.toLowerCase()) ||
-              failure.errorLogs.some((log) =>
-                log.toLowerCase().includes(query.toLowerCase()),
-              ),
-          );
-        }
-
-        logger.info(
-          `📋 Successfully fetched ${filteredFailures.length} test failures`,
-        );
-        return formatTestFailuresForSlack(filteredFailures, hours);
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : String(error);
-        logger.error(`❌ Detailed error in history command: ${errorMessage}`);
-        return `❌ Error fetching test failures from Datadog: ${errorMessage}`;
-      }
+    if (failureCount === 0) {
+      status = "healthy";
+      summary = "No issues detected";
+    } else if (failureCount <= 2) {
+      status = "issues";
+      summary = `${failureCount} minor issue${failureCount > 1 ? "s" : ""}`;
+    } else {
+      status = "down";
+      summary = `${failureCount} failures - needs attention`;
+      criticalIssues.push(`${component}: ${failureCount} failures`);
     }
 
-    case "logs":
-      return await handleDataDogLogsCommand(args);
-
-    case "help":
-      return `🤖 Available commands:
-• \`/history [hours] [search_query]\` - Fetch test failures from Datadog logs
-• \`/logs [test_name]\` - Send DataDog log entry
-• \`/help\` - Show this help message
-
-Examples:
-• \`/history 24\` - Get test failures from last 24 hours
-• \`/history 12 browser\` - Get browser test failures from last 12 hours
-• \`/logs integration-test\` - Send DataDog log for integration-test`;
-
-    default:
-      return `❓ Unknown command: ${command}. Type \`/help\` for available commands.`;
+    componentStatuses.push({
+      name: component,
+      status,
+      failureCount,
+      recentFailures: componentFailures.slice(0, 3),
+      summary,
+    });
   }
-}
 
-// Load system prompt from context.md file
-function loadSystemPrompt(): string {
-  try {
-    const contextPath = path.join(process.cwd(), ".claude", "context.md");
-    const contextContent = fs.readFileSync(contextPath, "utf-8");
+  // Determine overall health
+  const criticalComponents = componentStatuses.filter(
+    (c) => c.status === "down",
+  ).length;
+  const issueComponents = componentStatuses.filter(
+    (c) => c.status === "issues",
+  ).length;
 
-    return `You are a highly technical, intelligent model and expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
+  let overallHealth: "healthy" | "issues" | "critical";
+  if (criticalComponents > 0) {
+    overallHealth = "critical";
+  } else if (issueComponents > 2) {
+    overallHealth = "issues";
+  } else {
+    overallHealth = "healthy";
+  }
 
-Here is the comprehensive context about this repository:
-
-${contextContent}
-
-## Your Role:
-- You are a highly technical, intelligent model - never guess or make assumptions
-- If information is not clear or you need more context to provide an accurate answer, always ask for clarification
-- Provide expert guidance on XMTP testing and development based only on verified information
-- Help debug issues using the patterns and knowledge from the context above
-- Give specific, actionable advice based on the repository structure and best practices
-- Prioritize checking logs, analyzing test patterns, and understanding configurations when helping users
-
-## Response Approach:
-- **Never guess** - if you're uncertain about something, ask for more context or specific details
-- If information is incomplete or ambiguous, explicitly request clarification
-- Base responses only on information you can verify from the provided context
-- When you need more information to help effectively, be specific about what additional details would be helpful
-
-## Response Formatting:
-- **Keep responses very concise and to the point**
-- Use **bold** for emphasis (will be converted to Slack format)
-- Use \`code\` for inline code snippets
-- Use \`\`\`code blocks\`\`\` for multi-line code
-- Use bullet points with - for lists
-- Avoid lengthy explanations - provide direct, actionable answers`;
-  } catch (error) {
-    logger.error(
-      `Failed to load context.md: ${error instanceof Error ? error.message : String(error)}`,
+  // Generate recommendations
+  const recommendations: string[] = [];
+  if (criticalComponents > 0) {
+    recommendations.push(
+      "🚨 Immediate attention required for critical components",
     );
-    // Fallback to basic system prompt if file reading fails
-    return `You are a highly technical, intelligent model and expert assistant for the XMTP QA Tools repository. You specialize in helping with XMTP (Extensible Message Transport Protocol) testing, debugging, and development.
-
-## Your Approach:
-- You are a highly technical, intelligent model - never guess or make assumptions
-- If information is not clear or you need more context to provide an accurate answer, always ask for clarification
-- Base responses only on information you can verify
-- When you need more information to help effectively, be specific about what additional details would be helpful
-
-## Response Formatting:
-- Use **bold** for emphasis (will be converted to Slack format)
-- Use \`code\` for inline code snippets
-- Use \`\`\`code blocks\`\`\` for multi-line code
-- Keep responses clear and well-structured for Slack messaging`;
   }
-}
+  if (
+    failures.some((f) => f.errorLogs.some((log) => log.includes("timeout")))
+  ) {
+    recommendations.push(
+      "⏱️ Multiple timeout issues detected - check network/performance",
+    );
+  }
+  if (
+    failures.some((f) => f.errorLogs.some((log) => log.includes("connection")))
+  ) {
+    recommendations.push(
+      "🔌 Connection issues detected - check service availability",
+    );
+  }
 
-// Intent detection with structured output
-interface CommandIntent {
-  action: "history" | "logs" | "help" | "channels" | "general";
-  parameters: {
-    limit?: number;
-    searchQuery?: string;
-    testName?: string;
+  return {
+    overallHealth,
+    componentStatuses,
+    totalFailures: failures.length,
+    criticalIssues,
+    recommendations,
   };
-  confidence: number;
 }
 
-async function detectIntent(message: string): Promise<CommandIntent> {
-  if (!anthropicClient) {
-    return { action: "general", parameters: {}, confidence: 0 };
-  }
+function extractComponent(testName: string): string {
+  const name = testName.toLowerCase();
 
-  try {
-    const response = await anthropicClient.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 200,
-      system: `You are a command parser for a Slack bot. Your job is to detect when users want to:
+  if (name.includes("browser") || name.includes("playwright")) return "browser";
+  if (name.includes("agent") || name.includes("bot")) return "agents";
+  if (name.includes("group")) return "groups";
+  if (name.includes("dm") || name.includes("direct")) return "direct-messages";
+  if (name.includes("stream")) return "streams";
+  if (name.includes("sync")) return "sync";
+  if (name.includes("consent")) return "consent";
+  if (name.includes("notification")) return "notifications";
+  if (name.includes("mobile")) return "mobile";
+  if (name.includes("performance") || name.includes("bench"))
+    return "performance";
+  if (name.includes("stress") || name.includes("large")) return "load-testing";
+  if (name.includes("regression")) return "regression";
+  if (name.includes("smoke")) return "smoke-tests";
 
-1. **FETCH HISTORY** (most important):
-   - Keywords: "history", "show", "get messages", "fetch", "recent", "last messages"
-   - Examples: "show me history", "get history", "show me the history", "fetch recent messages", "get last 20 messages"
-   - Action: "history"
+  return "general";
+}
 
-2. Send DataDog logs:
-   - Keywords: "logs", "datadog", "send logs"
-   - Action: "logs"
+function answerSpecificQuestion(
+  question: string,
+  analysis: SystemAnalysis,
+): string {
+  const lowerQuestion = question.toLowerCase();
 
-3. Show help or list channels:
-   - Keywords: "help", "channels", "list channels"
-   - Actions: "help" or "channels"
-
-IMPORTANT: Be very liberal with detecting "history" intent. If the message contains ANY reference to history, messages, recent activity, or showing past content, return "history" action with high confidence.
-
-Return ONLY valid JSON with this exact structure:
-{"action": "history|logs|help|channels|general", "parameters": {"limit": number, "searchQuery": "string", "testName": "string"}, "confidence": 0.0-1.0}
-
-Examples:
-"show me history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
-"show me the history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
-"get history" -> {"action": "history", "parameters": {}, "confidence": 0.95}
-"history" -> {"action": "history", "parameters": {}, "confidence": 0.9}
-"get last 20 messages" -> {"action": "history", "parameters": {"limit": 20}, "confidence": 0.9}
-"show recent messages" -> {"action": "history", "parameters": {}, "confidence": 0.9}`,
-      messages: [
-        {
-          role: "user",
-          content: `Parse this message and detect intent: "${message}"`,
-        },
-      ],
-    });
-
-    const content = response.content[0];
-    if (content.type === "text") {
-      const parsed = JSON.parse(content.text) as CommandIntent;
-      logger.info(`🎯 Intent detection result: ${JSON.stringify(parsed)}`);
-      return parsed;
-    }
-  } catch (error) {
-    logger.error(
-      `Error detecting intent: ${error instanceof Error ? error.message : String(error)}`,
+  // Browser status questions
+  if (lowerQuestion.includes("browser")) {
+    const browserStatus = analysis.componentStatuses.find(
+      (c) => c.name === "browser",
     );
-  }
-
-  return { action: "general", parameters: {}, confidence: 0 };
-}
-
-// Convert standard markdown to Slack mrkdwn format
-function convertToSlackFormat(message: string): string {
-  let converted = message;
-
-  // Convert **bold** to *bold*
-  converted = converted.replace(/\*\*(.*?)\*\*/g, "*$1*");
-
-  // Convert __bold__ to *bold*
-  converted = converted.replace(/__(.*?)__/g, "*$1*");
-
-  // Convert *italic* to _italic_ (but only single asterisks, not the double ones we just converted)
-  converted = converted.replace(/(?<!\*)\*([^*]+)\*(?!\*)/g, "_$1_");
-
-  // Convert `code` to `code` (already correct)
-  // Keep ```code blocks``` as is (already correct)
-
-  // Convert markdown links [text](url) to Slack format <url|text>
-  converted = converted.replace(/\[([^\]]+)\]\(([^)]+)\)/g, "<$2|$1>");
-
-  // Convert > blockquotes to Slack format
-  converted = converted.replace(/^> (.+)/gm, "> $1");
-
-  // Convert numbered lists (1. item) to just bullet points with numbers
-  converted = converted.replace(/^\d+\.\s+(.+)/gm, "• $1");
-
-  // Convert - bullet points to •
-  converted = converted.replace(/^-\s+(.+)/gm, "• $1");
-
-  return converted;
-}
-
-// Process message with Anthropic SDK
-async function processWithAnthropic(message: string): Promise<string> {
-  if (!anthropicClient) {
-    throw new Error("Anthropic client not initialized");
-  }
-
-  try {
-    logger.info(
-      `🤖 Sending message to Anthropic: "${message.substring(0, 50)}..."`,
-    );
-
-    const systemPrompt = loadSystemPrompt();
-
-    const response = await anthropicClient.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: [
-        {
-          role: "user",
-          content: message,
-        },
-      ],
-    });
-
-    const content = response.content[0];
-    if (content.type === "text") {
-      logger.info(
-        `✅ Anthropic response received: "${content.text.substring(0, 100)}..."`,
-      );
-      return convertToSlackFormat(content.text);
-    } else {
-      throw new Error("Unexpected response type from Anthropic");
+    if (!browserStatus) {
+      return "🌐 **Browser Tests**: No recent browser test data available";
     }
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    logger.error(`❌ Error calling Anthropic API: ${errorMessage}`);
-    throw error;
-  }
-}
 
-// Main message processing function
-async function processMessage(message: string): Promise<string> {
-  const validation = validateAndSanitizeInput(message);
+    const statusEmoji =
+      browserStatus.status === "healthy"
+        ? "✅"
+        : browserStatus.status === "issues"
+          ? "⚠️"
+          : "❌";
 
-  if (!validation.isValid) {
-    return `Error: ${validation.error}`;
+    return `🌐 **Browser Tests**: ${statusEmoji} ${browserStatus.summary}\n${browserStatus.failureCount > 0 ? `Recent issues: ${browserStatus.recentFailures.map((f) => f.errorLogs[0]?.substring(0, 100)).join(", ")}` : "All browser tests passing"}`;
   }
 
-  const sanitizedMessage = validation.sanitized;
-  if (!sanitizedMessage) {
-    return "Error: Invalid message after sanitization";
+  // Agent status questions
+  if (lowerQuestion.includes("agent") || lowerQuestion.includes("bot")) {
+    const agentStatus = analysis.componentStatuses.find(
+      (c) => c.name === "agents",
+    );
+    if (!agentStatus) {
+      return "🤖 **Agents**: No recent agent test data available";
+    }
+
+    const statusEmoji =
+      agentStatus.status === "healthy"
+        ? "✅"
+        : agentStatus.status === "issues"
+          ? "⚠️"
+          : "❌";
+
+    return `🤖 **Agents**: ${statusEmoji} ${agentStatus.summary}\n${agentStatus.failureCount > 0 ? `Issues detected: ${agentStatus.recentFailures.map((f) => f.testName).join(", ")}` : "All agents functioning normally"}`;
   }
 
-  // Check for explicit slash commands first
-  const commandParsed = parseCommand(sanitizedMessage);
-  if (commandParsed) {
-    return await handleCommand(commandParsed.command, commandParsed.args);
+  // Groups status
+  if (lowerQuestion.includes("group")) {
+    const groupStatus = analysis.componentStatuses.find(
+      (c) => c.name === "groups",
+    );
+    if (!groupStatus) {
+      return "👥 **Groups**: No recent group test data available";
+    }
+
+    const statusEmoji =
+      groupStatus.status === "healthy"
+        ? "✅"
+        : groupStatus.status === "issues"
+          ? "⚠️"
+          : "❌";
+
+    return `👥 **Groups**: ${statusEmoji} ${groupStatus.summary}`;
   }
 
-  // Simple keyword check for history as a fallback
-  const lowerMessage = sanitizedMessage.toLowerCase();
+  // Performance questions
   if (
-    lowerMessage.includes("history") ||
-    (lowerMessage.includes("show me") &&
-      (lowerMessage.includes("test") || lowerMessage.includes("failure")))
+    lowerQuestion.includes("performance") ||
+    lowerQuestion.includes("slow") ||
+    lowerQuestion.includes("speed")
   ) {
-    logger.info(
-      `🎯 Keyword-based history detection for: "${sanitizedMessage}"`,
+    const perfStatus = analysis.componentStatuses.find(
+      (c) => c.name === "performance",
     );
-    return await handleCommand("history", []);
-  }
-
-  // Use intent detection for natural language
-  const intent = await detectIntent(sanitizedMessage);
-
-  // If we have confidence in a command intent, execute it
-  if (intent.confidence > 0.5) {
-    logger.info(
-      `🎯 Detected intent: ${intent.action} with confidence ${intent.confidence}`,
+    const timeoutIssues = analysis.componentStatuses.flatMap((c) =>
+      c.recentFailures.filter((f) =>
+        f.errorLogs.some((log) => log.includes("timeout")),
+      ),
     );
 
-    switch (intent.action) {
-      case "history": {
-        const hours = intent.parameters.limit || 24;
-        const query = intent.parameters.searchQuery || "";
-
-        try {
-          logger.info(
-            `🔍 Intent-based: Fetching test failures from Datadog for last ${hours} hours`,
-          );
-          const failures = await fetchDatadogTestFailures(hours);
-
-          // If query is provided, filter the results
-          let filteredFailures = failures;
-          if (query) {
-            filteredFailures = failures.filter(
-              (failure) =>
-                failure.testName?.toLowerCase().includes(query.toLowerCase()) ||
-                failure.errorLogs.some((log) =>
-                  log.toLowerCase().includes(query.toLowerCase()),
-                ),
-            );
-          }
-
-          logger.info(
-            `📋 Intent-based: Successfully fetched ${filteredFailures.length} test failures`,
-          );
-          return formatTestFailuresForSlack(filteredFailures, hours);
-        } catch (error) {
-          const errorMessage =
-            error instanceof Error ? error.message : String(error);
-          logger.error(`❌ Intent-based detailed error: ${errorMessage}`);
-          return `❌ Error fetching test failures from Datadog: ${errorMessage}`;
-        }
-      }
-
-      case "logs": {
-        const testName = intent.parameters.testName || "recent-logs";
-        return await handleDataDogLogsCommand([testName]);
-      }
-
-      case "help": {
-        return `🤖 I can help you with:
-• **History**: Ask me to "show history", "get test failures", "show failures from last 12 hours", etc.
-• **Logs**: Say "send logs for test-name" or "create datadog log"
-• **Help**: Just ask "help" or "what can you do"
-
-I automatically fetch test failures from Datadog when you ask for history!`;
-      }
-
-      case "channels": {
-        return `📊 I fetch test failure data from Datadog logs, not Slack channels. Use \`/history\` to see recent test failures.`;
-      }
-    }
+    return `⚡ **Performance**: ${perfStatus ? perfStatus.summary : "No performance test data"}\n${timeoutIssues.length > 0 ? `⏱️ ${timeoutIssues.length} timeout issues detected` : "No timeout issues"}`;
   }
 
-  // If not a command or low confidence, process with Anthropic for general chat
-  try {
-    return await processWithAnthropic(sanitizedMessage);
-  } catch (error) {
-    const errorMessage = error instanceof Error ? error.message : String(error);
-    return `Error: Failed to process message - ${errorMessage}`;
-  }
-}
-
-// Respond to @mentions
-app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
-  try {
-    const message = event.text || "";
-    const userId = event.user;
-    const channel = event.channel;
-
-    logger.info(`📨 RECEIVED MENTION - Channel: ${channel}, User: ${userId}`);
-    logger.info(`📝 Message Content: "${message}"`);
-
-    const thinkingMessage = `<@${userId}> 🤔 Processing...`;
-    const thinkingResponse = await say(thinkingMessage);
-    logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
-
-    const botResponse = await processMessage(message);
-    logger.info(`🤖 Bot Response: "${botResponse}"`);
-
-    const finalResponse = `<@${userId}> ${botResponse}`;
-
-    // Replace the thinking message with the final response
-    if (thinkingResponse && thinkingResponse.ts) {
-      await client.chat.update({
-        channel: channel,
-        ts: thinkingResponse.ts,
-        text: finalResponse,
-      });
-      logger.info(`📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${finalResponse}"`);
-    } else {
-      // Fallback to sending a new message if update fails
-      await say(finalResponse);
-      logger.info(`📤 SENT FINAL RESPONSE: "${finalResponse}"`);
-    }
-  } catch (error: unknown) {
-    logger.error(
-      `Error processing app mention: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    const errorResponse = `<@${event.user}> Sorry, I encountered an error processing your request.`;
-    await say(errorResponse);
-    logger.info(`📤 SENT ERROR RESPONSE: "${errorResponse}"`);
-  }
-});
-
-// Respond to direct messages
-app.message(async ({ message, say, client }) => {
-  // Type guard to ensure we have the right message type
+  // Overall health questions
   if (
-    !("text" in message) ||
-    !("user" in message) ||
-    !message.text ||
-    message.subtype === "bot_message"
+    lowerQuestion.includes("health") ||
+    lowerQuestion.includes("status") ||
+    lowerQuestion.includes("everything") ||
+    lowerQuestion.includes("overall")
   ) {
-    return;
-  }
+    const healthEmoji =
+      analysis.overallHealth === "healthy"
+        ? "✅"
+        : analysis.overallHealth === "issues"
+          ? "⚠️"
+          : "❌";
 
-  try {
-    // Check if it's a DM
-    const channelInfo = await client.conversations.info({
-      channel: message.channel,
+    let response = `${healthEmoji} **Overall System Health**: ${analysis.overallHealth.toUpperCase()}\n\n`;
+
+    response += `📊 **Summary**: ${analysis.totalFailures} total failures in last 24h\n\n`;
+
+    if (analysis.criticalIssues.length > 0) {
+      response += `🚨 **Critical Issues**:\n${analysis.criticalIssues.map((issue) => `• ${issue}`).join("\n")}\n\n`;
+    }
+
+    response += `🔍 **Component Status**:\n`;
+    analysis.componentStatuses.forEach((comp) => {
+      const emoji =
+        comp.status === "healthy"
+          ? "✅"
+          : comp.status === "issues"
+            ? "⚠️"
+            : "❌";
+      response += `${emoji} ${comp.name}: ${comp.summary}\n`;
     });
 
-    if (channelInfo.channel?.is_im) {
-      const messageText = message.text;
-      const userId = message.user;
-
-      logger.info(`📨 RECEIVED DM - User: ${userId}`);
-      logger.info(`📝 Message Content: "${messageText}"`);
-
-      const thinkingMessage = "🤔 Processing...";
-      const thinkingResponse = await say(thinkingMessage);
-      logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
-
-      const botResponse = await processMessage(messageText);
-      logger.info(`🤖 Bot Response: "${botResponse}"`);
-
-      // Replace the thinking message with the final response
-      if (thinkingResponse && thinkingResponse.ts) {
-        await client.chat.update({
-          channel: message.channel,
-          ts: thinkingResponse.ts,
-          text: botResponse,
-        });
-        logger.info(`📤 UPDATED MESSAGE WITH FINAL RESPONSE: "${botResponse}"`);
-      } else {
-        // Fallback to sending a new message if update fails
-        await say(botResponse);
-        logger.info(`📤 SENT FINAL RESPONSE: "${botResponse}"`);
-      }
+    if (analysis.recommendations.length > 0) {
+      response += `\n💡 **Recommendations**:\n${analysis.recommendations.map((rec) => `• ${rec}`).join("\n")}`;
     }
-  } catch (error: unknown) {
-    logger.error(
-      `Error processing direct message: ${error instanceof Error ? error.message : String(error)}`,
-    );
-    const errorResponse =
-      "Sorry, I encountered an error processing your message.";
-    await say(errorResponse);
-    logger.info(`📤 SENT ERROR RESPONSE: "${errorResponse}"`);
+
+    return response;
   }
-});
 
-// Application startup
-void (async () => {
-  try {
-    // Initialize Anthropic first
-    logger.info("🔧 Initializing Anthropic SDK before starting Slack bot...");
-    initializeAnthropic();
-
-    // Start Slack bot
-    await app.start();
-    logger.info("🚀 Slack bot started successfully with Anthropic SDK ready");
-  } catch (error: unknown) {
-    logger.error(
-      `Failed to start application: ${error instanceof Error ? error.message : String(error)}`,
+  // What's down/failing questions
+  if (
+    lowerQuestion.includes("down") ||
+    lowerQuestion.includes("failing") ||
+    lowerQuestion.includes("broken")
+  ) {
+    const criticalComponents = analysis.componentStatuses.filter(
+      (c) => c.status === "down",
     );
-    process.exit(1);
+    const issueComponents = analysis.componentStatuses.filter(
+      (c) => c.status === "issues",
+    );
+
+    if (criticalComponents.length === 0 && issueComponents.length === 0) {
+      return "✅ **Good news!** No components are currently down or experiencing major issues.";
+    }
+
+    let response = "";
+    if (criticalComponents.length > 0) {
+      response += `❌ **Down/Critical**:\n${criticalComponents.map((c) => `• ${c.name}: ${c.failureCount} failures`).join("\n")}\n\n`;
+    }
+
+    if (issueComponents.length > 0) {
+      response += `⚠️ **Minor Issues**:\n${issueComponents.map((c) => `• ${c.name}: ${c.failureCount} issue${c.failureCount > 1 ? "s" : ""}`).join("\n")}`;
+    }
+
+    return response;
   }
-})();
 
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  logger.info("🛑 Shutting down gracefully");
-  process.exit(0);
-});
-
-process.on("SIGINT", () => {
-  logger.info("🛑 Shutting down gracefully");
-  process.exit(0);
-});
+  // Default response if no specific question matched
+  const analysis_summary = `📊 **Latest Data** (${lastFetchTime.toLocaleTimeString()}):\n${analysis.totalFailures} total failures detected\n\nTry asking: "is browser fine?", "what agents are down?", "overall health", "what's broken?"`;
+  return analysis_summary;
+}
 
 // Fetch test failures from Datadog
 async function fetchDatadogTestFailures(
@@ -744,7 +450,7 @@ function formatTestFailuresForSlack(
   hours: number,
 ): string {
   if (failures.length === 0) {
-    return `📊 No test failures found in the last ${hours} hours`;
+    return `📊 No test failures found in the last ${hours} hours (Last updated: ${lastFetchTime.toLocaleTimeString()})`;
   }
 
   const grouped = failures.reduce<Record<string, TestFailure[]>>(
@@ -759,7 +465,7 @@ function formatTestFailuresForSlack(
     {},
   );
 
-  let result = `📊 Found ${failures.length} test failures in the last ${hours} hours:\n\n`;
+  let result = `📊 Found ${failures.length} test failures in the last ${hours} hours (Last updated: ${lastFetchTime.toLocaleTimeString()}):\n\n`;
 
   for (const [testName, testFailures] of Object.entries(grouped)) {
     result += `**${testName}** (${testFailures.length} failures)\n`;
@@ -786,3 +492,185 @@ function formatTestFailuresForSlack(
 
   return result;
 }
+
+// Periodic fetch function
+async function fetchLogsAndUpdate(): Promise<void> {
+  try {
+    logger.info("🔍 Fetching DataDog logs...");
+    latestTestFailures = await fetchDatadogTestFailures(24);
+    lastFetchTime = new Date();
+    logger.info(`📋 Fetched ${latestTestFailures.length} test failures`);
+  } catch (error) {
+    logger.error(
+      `❌ Error fetching DataDog logs: ${error instanceof Error ? error.message : String(error)}`,
+    );
+  }
+}
+
+// Handle messages with DataDog log information
+async function handleMessage(message: string): Promise<string> {
+  const lowerMessage = message.toLowerCase();
+
+  // Check for specific time requests
+  let hours = 24;
+  const hourMatch = message.match(/(\d+)\s*hours?/i);
+  if (hourMatch) {
+    hours = parseInt(hourMatch[1]);
+  }
+
+  // Determine which data to use for analysis
+  let dataToAnalyze: TestFailure[];
+
+  // Check if user wants fresh data
+  if (
+    lowerMessage.includes("fresh") ||
+    lowerMessage.includes("latest") ||
+    lowerMessage.includes("now")
+  ) {
+    try {
+      logger.info("🔄 Fetching fresh DataDog logs on demand...");
+      dataToAnalyze = await fetchDatadogTestFailures(hours);
+    } catch (error) {
+      return `❌ Error fetching fresh DataDog logs: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  } else if (hours !== 24) {
+    // If specific hours requested, fetch fresh data
+    try {
+      dataToAnalyze = await fetchDatadogTestFailures(hours);
+    } catch (error) {
+      return `❌ Error fetching DataDog logs: ${error instanceof Error ? error.message : String(error)}`;
+    }
+  } else {
+    // Use cached data
+    dataToAnalyze = latestTestFailures;
+  }
+
+  // Analyze the data
+  const analysis = analyzeTestFailures(dataToAnalyze, hours);
+
+  // Check if user wants raw data instead of analysis
+  if (
+    lowerMessage.includes("raw") ||
+    lowerMessage.includes("list") ||
+    lowerMessage.includes("show all")
+  ) {
+    return formatTestFailuresForSlack(dataToAnalyze, hours);
+  }
+
+  // Answer specific questions about the analysis
+  return answerSpecificQuestion(message, analysis);
+}
+
+// Respond to @mentions
+app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
+  try {
+    const message = event.text || "";
+    const userId = event.user;
+    const channel = event.channel;
+
+    logger.info(`📨 RECEIVED MENTION - Channel: ${channel}, User: ${userId}`);
+
+    const thinkingMessage = `<@${userId}> 🤔 Checking DataDog logs...`;
+    const thinkingResponse = await say(thinkingMessage);
+
+    const botResponse = await handleMessage(message);
+    const finalResponse = `<@${userId}> ${botResponse}`;
+
+    // Replace the thinking message with the final response
+    if (thinkingResponse && thinkingResponse.ts) {
+      await client.chat.update({
+        channel: channel,
+        ts: thinkingResponse.ts,
+        text: finalResponse,
+      });
+    } else {
+      await say(finalResponse);
+    }
+  } catch (error: unknown) {
+    logger.error(
+      `Error processing app mention: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    const errorResponse = `<@${event.user}> Sorry, I encountered an error checking DataDog logs.`;
+    await say(errorResponse);
+  }
+});
+
+// Respond to direct messages
+app.message(async ({ message, say, client }) => {
+  // Type guard to ensure we have the right message type
+  if (
+    !("text" in message) ||
+    !("user" in message) ||
+    !message.text ||
+    message.subtype === "bot_message"
+  ) {
+    return;
+  }
+
+  try {
+    // Check if it's a DM
+    const channelInfo = await client.conversations.info({
+      channel: message.channel,
+    });
+
+    if (channelInfo.channel?.is_im) {
+      const messageText = message.text;
+      const userId = message.user;
+
+      logger.info(`📨 RECEIVED DM - User: ${userId}`);
+
+      const thinkingMessage = "🤔 Checking DataDog logs...";
+      const thinkingResponse = await say(thinkingMessage);
+
+      const botResponse = await handleMessage(messageText);
+
+      // Replace the thinking message with the final response
+      if (thinkingResponse && thinkingResponse.ts) {
+        await client.chat.update({
+          channel: message.channel,
+          ts: thinkingResponse.ts,
+          text: botResponse,
+        });
+      } else {
+        await say(botResponse);
+      }
+    }
+  } catch (error: unknown) {
+    logger.error(
+      `Error processing direct message: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    await say("Sorry, I encountered an error checking DataDog logs.");
+  }
+});
+
+// Application startup
+void (async () => {
+  try {
+    // Start Slack bot
+    await app.start();
+    logger.info("🚀 Slack bot started successfully");
+
+    // Initial fetch
+    await fetchLogsAndUpdate();
+
+    // Set up periodic fetching every 10 minutes
+    setInterval(() => void fetchLogsAndUpdate(), 10 * 60 * 1000);
+    logger.info("⏰ DataDog log fetching scheduled every 10 minutes");
+  } catch (error: unknown) {
+    logger.error(
+      `Failed to start application: ${error instanceof Error ? error.message : String(error)}`,
+    );
+    process.exit(1);
+  }
+})();
+
+// Graceful shutdown
+process.on("SIGTERM", () => {
+  logger.info("🛑 Shutting down gracefully");
+  process.exit(0);
+});
+
+process.on("SIGINT", () => {
+  logger.info("🛑 Shutting down gracefully");
+  process.exit(0);
+});

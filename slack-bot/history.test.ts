@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 dotenv.config();
 
-interface DatadogLogEntry {
+export interface DatadogLogEntry {
   id: string;
   type: string;
   attributes: {
