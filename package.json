@@ -29,7 +29,6 @@
     "railway": "railway run yarn test ",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "run:gen": "tsx inboxes/gen.ts",
-    "runagent": "./suites/agents/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
     "small": "yarn test suites/small",
