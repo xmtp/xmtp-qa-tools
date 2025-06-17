@@ -1,5 +1,18 @@
 [
   {
+    "name": "flaunchy",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "disabled": false
+  },
+  {
+    "name": "squabble",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
+    "sendMessage": "hi",
+    "networks": ["production"]
+  },
+  {
     "name": "key-check",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "sendMessage": "/kc help",
@@ -13,13 +26,6 @@
     "networks": ["dev", "production"]
   },
 
-  {
-    "name": "flaunchy",
-    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
-    "sendMessage": "hi",
-    "networks": ["production"],
-    "disabled": false
-  },
   {
     "name": "gang",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",

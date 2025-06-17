@@ -2,6 +2,8 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import type { Worker, WorkerManager } from "@workers/manager";
+import { ReactionCodec } from "@xmtp/content-type-reaction";
+import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
   IdentifierKind,
   type Client,
@@ -319,6 +321,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
+      codecs: [new ReactionCodec(), new ReplyCodec()],
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {

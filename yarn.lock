@@ -1531,6 +1531,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@xmtp/content-type-reply@npm:^2.0.2":
+  version: 2.0.2
+  resolution: "@xmtp/content-type-reply@npm:2.0.2"
+  dependencies:
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/proto": "npm:^3.78.0"
+  checksum: 10/259bc342d1f92d5d8eb1ee19eee7a322b2f9888f6a7115c647aeb7ea4a6830b20441a780a031be284a43d73f6159d08b97395b5c2fa8727baa9f081183c71f2b
+  languageName: node
+  linkType: hard
+
 "@xmtp/content-type-text@npm:^1.0.0":
   version: 1.0.1
   resolution: "@xmtp/content-type-text@npm:1.0.1"
@@ -5502,6 +5512,7 @@ __metadata:
     "@types/node": "npm:^20.0.0"
     "@vitest/ui": "npm:^3.0.6"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
+    "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.2.0"
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0"
     "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3"
