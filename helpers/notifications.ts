@@ -194,7 +194,7 @@ class SlackNotifier {
 *Environment:* \`${this.githubContext.environment}\`
 *General dashboard:* <${this.datadogUrl}|View>  
 *Geolocation:* \`${this.githubContext.region || "Unknown Region"}\`
-*Timestamp:* \`${new Date().toLocaleString()}\`
+*Timestamp:* \`${new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })}\`
 *Full logs:* <${this.datadogLogsUrl}|View>
 ${url ? `*Test log:* <${url}|View url>` : ""}
 ${customLinks}
