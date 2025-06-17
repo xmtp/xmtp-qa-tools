@@ -148,7 +148,7 @@ export class WorkerManager {
     }
   }
 
-  public async revokeExcessInstallations(threshold: number = 10) {
+  public async revokeExcessInstallations(threshold: number = 5) {
     const workers = this.getAll();
     for (const worker of workers) {
       await worker.worker.revokeExcessInstallations(threshold);
