@@ -60,7 +60,7 @@ export function getRandomInbox() {
 }
 export function getRandomInboxIdsWithRandomInstallations(count: number) {
   let totalInboxes = [];
-  const possibleInstallations = [2, 5, 10, 15, 20, 25, 30];
+  const possibleInstallations = [2];
   for (let i = 2; i <= count; i++) {
     let inboxes = getInboxByInstallationCount(
       possibleInstallations[

@@ -7,12 +7,7 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
-import {
-  typeOfResponse,
-  typeofStream,
-  typeOfSync,
-  type WorkerClient,
-} from "@workers/main";
+import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -30,9 +25,7 @@ const testConfig = {
   testName: testName,
   groupName: `Group ${getTime()}`,
   epochs: 3,
-  manualUsers: getManualUsers(["prod-testing"]),
-  network: "production",
-  preInstallations: 1,
+  manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
@@ -60,7 +53,6 @@ describe(testName, () => {
       testConfig.typeofStream,
       testConfig.typeOfResponse,
       testConfig.typeOfSync,
-      testConfig.network,
     );
     creator = workers.get("bot") as Worker;
 
@@ -90,7 +82,7 @@ describe(testName, () => {
     try {
       for (const feature of features) {
         for (const groupId of allGroups) {
-          console.debug(feature, groupId);
+          console.warn(feature, groupId);
           const group = (await creator.client.conversations.getConversationById(
             groupId,
           )) as Group;
@@ -150,9 +142,19 @@ describe(testName, () => {
 });
 export async function verifyAddRandomInstallations(
   workers: WorkerManager,
+  maxInstallationsPerWorker: number = 5,
 ): Promise<void> {
   for (const worker of workers.getAllBut("bot")) {
-    await worker.worker.addNewInstallation();
+    // Random number between 1 and maxInstallationsPerWorker
+    const randomInstallations =
+      Math.floor(Math.random() * maxInstallationsPerWorker) + 1;
+
+    for (let i = 0; i < randomInstallations; i++) {
+      await worker.worker.addNewInstallation();
+      console.debug(
+        `Added installation ${i + 1}/${randomInstallations} for worker ${worker.name}`,
+      );
+    }
   }
 }
 export async function verifyEpochChange(

@@ -174,7 +174,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
   const sentEvents = await options.triggerEvents();
   await sleep(1000);
-  console.warn("triggerEvents done");
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
