@@ -11,6 +11,7 @@ const testName = "agents";
 
 describe(testName, () => {
   let workers: WorkerManager;
+  let retries = 3;
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
     workers = await getWorkers(
@@ -42,14 +43,13 @@ describe(testName, () => {
             identifier: agent.address,
             identifierKind: IdentifierKind.Ethereum,
           });
-        const countBefore = (await conversation.messages()).length;
+        let messages = await conversation.messages();
+        const countBefore = messages.length;
 
-        let retries = 3;
         let agentResponded = false;
         let result;
 
         while (retries > 0) {
-          console.warn(`${retries} tries left for ${agent.name}`);
           result = await verifyMessageStream(
             conversation as Dm,
             [workers.getCreator()],
@@ -57,24 +57,29 @@ describe(testName, () => {
             agent.sendMessage,
           );
 
-          await conversation.sync();
-          const messages = await conversation.messages();
-
-          // Check if we have exactly 2 messages (sent + received)
-          if (messages.length === countBefore + 2) {
-            agentResponded = true;
-            break;
-          } else if (result?.allReceived) {
+          if (result?.allReceived) {
+            console.warn("result?.allReceived");
             agentResponded = true;
             break;
           }
 
-          // last Message
-          const lastMessage = messages[messages.length - 1];
-          console.warn("lastMessage", lastMessage);
-
+          await conversation.sync();
+          messages = await conversation.messages();
+          // Check if we have exactly 2 messages (sent + received)
+          if (messages.length === countBefore + 2) {
+            console.warn("messages.length === countBefore + 2");
+            agentResponded = true;
+            break;
+          }
           retries--;
         }
+
+        console.warn(
+          "lastMessage",
+          messages[messages.length - 1].content,
+          "received in",
+          result?.averageEventTiming,
+        );
 
         expect(agentResponded).toBe(true);
       } catch (e) {

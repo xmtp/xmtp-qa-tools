@@ -450,11 +450,12 @@ export class WorkerClient extends Worker {
               continue;
             }
             if (
-              message.contentType?.typeId === "text" &&
+              (message.contentType?.typeId === "text" ||
+                message.contentType?.typeId === "reply") &&
               type === typeofStream.Message
             ) {
               console.debug(
-                `[${this.nameId}] Received TEXT message: "${message.content as string}" from ${message.senderInboxId} in conversation ${message.conversationId}`,
+                `[${this.nameId}] Received ${message.contentType?.typeId} message: "${message.content as string}" from ${message.senderInboxId} in conversation ${message.conversationId}`,
               );
 
               // Log message details for debugging
@@ -698,23 +699,23 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
-        console.debug(
-          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
-        );
+        // console.debug(
+        //   `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
+        // );
 
         if (isRightType && passesFilter) {
           events.push(msg as T);
-          console.debug(
-            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
-          );
+          // console.debug(
+          //   `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
+          // );
 
           if (events.length >= count) {
             resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
-            console.debug(
-              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
-            );
+            // console.debug(
+            //   `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
+            // );
             resolve(events);
           }
         } else {
@@ -750,9 +751,9 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
   ): Promise<StreamTextMessage[]> {
-    console.debug(
-      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
-    );
+    // console.debug(
+    //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+    // );
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
@@ -771,7 +772,8 @@ export class WorkerClient extends Worker {
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
-        const typeIsText = contentType?.typeId === "text";
+        const typeIsText =
+          contentType?.typeId === "text" || contentType?.typeId === "reply";
 
         console.debug(
           `[${this.nameId}] Message filter check: conversationId=${conversationId}, expectedId=${groupId}, idsMatch=${idsMatch}, contentType=${contentType?.typeId}, typeIsText=${typeIsText}`,

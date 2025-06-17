@@ -172,15 +172,9 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
-
-  console.warn("sleeping for 1 second before triggerEvents");
-  await sleep(1000);
-  console.warn("sleeping for 1 second before triggerEvents done");
   const sentEvents = await options.triggerEvents();
-  console.warn("triggerEvents done");
-  console.warn("sleeping for 1 second before collectPromises");
   await sleep(1000);
-  console.warn("sleeping for 1 second before collectPromises done");
+  console.warn("triggerEvents done");
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
