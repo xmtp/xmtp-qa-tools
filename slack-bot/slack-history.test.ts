@@ -66,7 +66,8 @@ describe("Slack Bolt Integration Test", () => {
         cursor,
       });
 
-      if (result.messages) allMessages.push(...result.messages);
+      if (result.messages)
+        allMessages.push(...(result.messages as unknown as SlackMessage[]));
       cursor = result.response_metadata?.next_cursor;
     } while (cursor);
 
