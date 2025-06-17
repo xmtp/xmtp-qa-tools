@@ -81,13 +81,6 @@ export function blackHoleInterContainer(container: DockerContainer): void {
   execSync(`sudo iptables -I DOCKER-USER -s ${ip} -j DROP`);
 }
 
-export function unblockInterContainer(container: DockerContainer): void {
-  const ip = container.ip;
-  console.log(`[iptables] REMOVE DROP to/from ${container.name} (${ip}) in DOCKER-USER`);
-  execSync(`sudo iptables -D DOCKER-USER -d ${ip} -j DROP`);
-  execSync(`sudo iptables -D DOCKER-USER -s ${ip} -j DROP`);
-}
-
 export function blockFromHostTo(container: DockerContainer): void {
   console.log(`[iptables] Blocking traffic from host to ${container.name} (IP ${container.ip})`);
   execSync(`sudo iptables -A OUTPUT -d ${container.ip} -j DROP`);

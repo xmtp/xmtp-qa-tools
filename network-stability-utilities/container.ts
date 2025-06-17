@@ -151,9 +151,6 @@ export class DockerContainer {
     iptables.blackHoleInterContainer(this);
   }
 
-  clearInterContainerBlackhole(): void {
-    iptables.unblockInterContainer(this);
-  }
 
   kill(): void {
     execFileSync("docker", ["kill", this.name], { stdio: "inherit" });
