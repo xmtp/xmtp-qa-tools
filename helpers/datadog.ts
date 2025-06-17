@@ -389,7 +389,7 @@ export async function sendDatadogLog(
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
-    service: process.env.XMTP_ENV,
+    service: "xmtp-qa-tools",
     source: context.testName,
     test: context.testName,
     region: process.env.GEOLOCATION ?? "",
