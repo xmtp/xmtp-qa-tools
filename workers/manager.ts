@@ -187,7 +187,12 @@ export class WorkerManager {
 
     return updatedWorker;
   }
-
+  public async revokeExcessInstallations(threshold: number = 10) {
+    const workers = this.getAll();
+    for (const worker of workers) {
+      await worker.worker.revokeExcessInstallations(threshold);
+    }
+  }
   public async printWorkers() {
     try {
       let workersToPrint = [];
@@ -447,10 +452,10 @@ export async function getWorkers(
   );
   await Promise.all(workerPromises);
   await manager.printWorkers();
+  await manager.revokeExcessInstallations();
 
   return manager;
 }
-
 /**
  * Helper function to get the next available folder name
  */

@@ -85,8 +85,11 @@ export async function processLogFile(
 
 /**
  * Clean all raw-*.log files by removing ANSI codes
+ * @param deleteOriginals - If true, delete the original raw files after cleaning
  */
-export async function cleanAllRawLogs(): Promise<void> {
+export async function cleanAllRawLogs(
+  deleteOriginals: boolean = false,
+): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
@@ -119,6 +122,11 @@ export async function cleanAllRawLogs(): Promise<void> {
     try {
       await processLogFile(inputPath, outputPath);
       console.log(`Cleaned: ${file} -> ${outputFileName}`);
+
+      if (deleteOriginals) {
+        await fs.promises.unlink(inputPath);
+        console.log(`Deleted original: ${file}`);
+      }
     } catch (error) {
       console.error(`Failed to clean ${file}:`, error);
     }

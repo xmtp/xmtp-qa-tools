@@ -1,7 +1,11 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { createTestLogger, extractErrorLogs } from "@helpers/logger";
+import {
+  cleanAllRawLogs,
+  createTestLogger,
+  extractErrorLogs,
+} from "@helpers/logger";
 import { sendSlackNotification } from "@helpers/notifications";
 import "dotenv/config";
 
@@ -343,6 +347,14 @@ async function runVitestTest(
 
       if (exitCode === 0) {
         console.debug("Tests passed successfully!");
+        logger.close();
+
+        // Clean up raw log files when debug mode is enabled
+        if (options.explicitLogFlag) {
+          await cleanAllRawLogs(true);
+        }
+
+        return; // Exit the function on success
       } else {
         console.debug("Tests failed!");
       }
@@ -364,6 +376,12 @@ async function runVitestTest(
         }
 
         logger.close();
+
+        // Clean up raw log files when debug mode is enabled
+        if (options.explicitLogFlag) {
+          await cleanAllRawLogs(true);
+        }
+
         if (options.noFail) {
           process.exit(0);
         } else {

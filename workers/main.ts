@@ -882,8 +882,7 @@ export class WorkerClient extends Worker {
     const installations = await this.client.preferences.inboxState();
     if (installations.installations.length > threshold) {
       await this.client.revokeAllOtherInstallations();
-      const updatedInstallations =
-        await this.client.preferences.inboxState(true);
+      const updatedInstallations = await this.client.preferences.inboxState();
       console.warn(
         `[${this.name}] Installations after revocation: ${updatedInstallations.installations.length}`,
       );
