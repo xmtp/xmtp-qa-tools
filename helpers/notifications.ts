@@ -39,6 +39,7 @@ interface TestFilter {
 class SlackNotifier {
   private readonly slackChannel: string;
   private readonly datadogUrl: string;
+  private readonly datadogLogsUrl: string;
   private readonly githubContext: GitHubContext;
   private readonly testFilters: TestFilter[];
 
@@ -46,6 +47,8 @@ class SlackNotifier {
     this.slackChannel = process.env.SLACK_CHANNEL || "general";
     this.datadogUrl =
       "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
+    this.datadogLogsUrl =
+      "https://app.datadoghq.com/logs?saved-view-id=3577227";
     this.githubContext = this.getGitHubContext();
     this.testFilters = KNOWN_ISSUES;
   }
@@ -189,9 +192,10 @@ class SlackNotifier {
     return `*Test Failure ❌*
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${this.githubContext.environment}\`
-*General dashboard:* <${this.datadogUrl}|View>
+*General dashboard:* <${this.datadogUrl}|View>  
 *Geolocation:* \`${this.githubContext.region || "Unknown Region"}\`
 *Timestamp:* \`${new Date().toLocaleString()}\`
+*Full logs:* <${this.datadogLogsUrl}|View>
 ${url ? `*Test log:* <${url}|View url>` : ""}
 ${customLinks}
 Logs:
