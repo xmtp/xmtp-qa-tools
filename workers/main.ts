@@ -468,9 +468,9 @@ export class WorkerClient extends Worker {
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
-                console.debug(
-                  `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
-                );
+                // console.debug(
+                //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
+                // );
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
                   message: {
@@ -533,7 +533,8 @@ export class WorkerClient extends Worker {
       const content = (message.content as string).toLowerCase();
       let shouldRespond = false;
       if (
-        (message?.contentType?.typeId === "text" &&
+        ((message?.contentType?.typeId === "text" ||
+          message?.contentType?.typeId === "reply") &&
           content.includes(baseName) &&
           !content.includes("/") &&
           !content.includes("workers") &&
