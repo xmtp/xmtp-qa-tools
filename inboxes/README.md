@@ -2,11 +2,15 @@
 
 Pre-generated XMTP inbox data for testing with multiple device installations.
 
-- [gen](./gen.ts) - Script to generate new inbox files
-- **`{number}.json`** - Inbox data with specific installation counts (2, 5, 10, 15, 20, 25)
-- **`run-installs.sh`** - Generation script
+## Files
+
+- **`{number}.json`** - Inbox data files (e.g., `2.json`, `5.json`, `10.json`)
+- **`gen.ts`** - TypeScript generator script
+- **`gen.sh`** - Bash wrapper for batch generation
 
 ## Data Format
+
+Each JSON file contains an array of inbox objects:
 
 ```json
 {
@@ -18,7 +22,7 @@ Pre-generated XMTP inbox data for testing with multiple device installations.
 }
 ```
 
-## Usage
+## Usage in Tests
 
 ```typescript
 import inboxData from "./inboxes/10.json";
@@ -31,26 +35,61 @@ const client = await Client.create(signer, {
 });
 ```
 
-## Generate New Inboxes
+## Generation Commands
+
+### Quick Commands (Predefined)
 
 ```bash
-./run-installs.sh
+# Generate for local environment only
+yarn local-update
+
+# Generate for all environments
+yarn prod-update
 ```
 
-Generates 200 inboxes per configuration for installation counts: 10, 15, 20, 25.
-
-### Troubleshoorting
+### Direct Generation with yarn gen
 
 ```bash
-#modify workers
-#remove data and keys
+# Basic usage - generates 200 inboxes with 2 installations each
+yarn gen
+
+# Custom count and installations
+yarn gen --count 500 --installations 10 --envs local
+
+# Multiple environments
+yarn gen --count 200 --installations 5 --envs local,dev,production
+```
+
+### Batch Generation with gen.sh
+
+```bash
+# Generate multiple installation counts at once
+./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500
+
+# Creates: 2.json, 5.json, 10.json, 15.json, 20.json, 25.json
+# Each file contains 500 accounts with respective installation counts
+```
+
+## Parameters
+
+- **`--count`** - Number of accounts to generate (default: 200)
+- **`--installations`** - Number of installations per account (default: 2)
+- **`--envs`** - Target environments: `local`, `dev`, `production` (default: local)
+- **`--debug`** - Enable verbose logging
+
+## Troubleshooting
+
+```bash
+# Clean reset for local development
 XMTP_ENV=local
-# delete .data and keys
-yarn functional
-# remove all docker containers and networks
-./dev/down
-# remove all docker containers and networks
-./dev/up
-# update local inboxes (this will take a while)
+
+# Remove data and restart
+rm -rf .data/ logs/
+./dev/down && ./dev/up
+
+# Regenerate local inboxes
 yarn local-update
+
+# Run tests to verify
+yarn functional
 ```
