@@ -1,7 +1,8 @@
+import fs from "fs";
+import path from "path";
 import { createLogger } from "@helpers/logger";
 import pkg from "@slack/bolt";
 import dotenv from "dotenv";
-import fetch from "node-fetch";
 import type { DatadogLogEntry } from "./history.test";
 
 const { App, LogLevel } = pkg;
@@ -11,30 +12,33 @@ dotenv.config();
 // Initialize logger
 const logger = createLogger();
 
-interface DatadogLogsResponse {
-  data: DatadogLogEntry[];
-  meta: {
-    page: {
-      after?: string;
-    };
-  };
-}
-
 interface TestFailure {
   testName: string | null;
   environment: string | null;
   geolocation: string | null;
   timestamp: string | null;
+  workflowUrl: string | null;
+  dashboardUrl: string | null;
+  customLinks: string | null;
   errorLogs: string[];
 }
 
+interface IssuesData {
+  metadata: {
+    source: string;
+    date: string;
+    totalTestFailures: number;
+    totalLogEntries: number;
+    queryPeriod: {
+      from: string;
+      to: string;
+    };
+  };
+  testFailures: TestFailure[];
+}
+
 // Validate required environment variables
-const requiredEnvVars = [
-  "SLACK_BOT_TOKEN",
-  "SLACK_APP_TOKEN",
-  "DATADOG_API_KEY",
-  "DATADOG_APP_KEY",
-];
+const requiredEnvVars = ["SLACK_BOT_TOKEN", "SLACK_APP_TOKEN"];
 const missingEnvVars = requiredEnvVars.filter(
   (varName) => !process.env[varName],
 );
@@ -348,100 +352,20 @@ function answerSpecificQuestion(
   return analysis_summary;
 }
 
-// Fetch test failures from Datadog
-async function fetchDatadogTestFailures(
-  hours: number = 24,
-): Promise<TestFailure[]> {
-  if (!process.env.DATADOG_API_KEY || !process.env.DATADOG_APP_KEY) {
-    throw new Error(
-      "Missing DATADOG_API_KEY or DATADOG_APP_KEY environment variables",
+// Read test failures from issues.json
+function readTestFailures(): TestFailure[] {
+  try {
+    const issuesPath = path.join(__dirname, "issues.json");
+    const issuesData = fs.readFileSync(issuesPath, "utf8");
+    const parsedData: IssuesData = JSON.parse(issuesData);
+    lastFetchTime = new Date(parsedData.metadata.date);
+    return parsedData.testFailures;
+  } catch (error) {
+    logger.error(
+      `Error reading issues.json: ${error instanceof Error ? error.message : String(error)}`,
     );
+    return [];
   }
-
-  const now = new Date();
-  const hoursAgo = new Date(now.getTime() - hours * 60 * 60 * 1000);
-  const fromTime = hoursAgo.toISOString();
-  const toTime = now.toISOString();
-
-  // Query Datadog Logs API
-  const allLogs: DatadogLogEntry[] = [];
-  let nextCursor: string | undefined;
-
-  do {
-    const response = await fetch(
-      "https://api.datadoghq.com/api/v2/logs/events/search",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "DD-API-KEY": process.env.DATADOG_API_KEY,
-          "DD-APPLICATION-KEY": process.env.DATADOG_APP_KEY,
-        },
-        body: JSON.stringify({
-          filter: {
-            query: "service:xmtp-qa-tools",
-            from: fromTime,
-            to: toTime,
-          },
-          sort: "-timestamp",
-          page: {
-            limit: 1000,
-            cursor: nextCursor,
-          },
-        }),
-      },
-    );
-
-    if (!response.ok) {
-      throw new Error(
-        `Datadog API error: ${response.status} ${response.statusText}`,
-      );
-    }
-
-    const data = (await response.json()) as DatadogLogsResponse;
-    allLogs.push(...data.data);
-    nextCursor = data.meta?.page?.after;
-  } while (nextCursor);
-
-  // Process logs and extract test failures
-  const testFailures: TestFailure[] = allLogs
-    .filter((log) => {
-      const message = log.attributes.message || "";
-      const hasTestContext = log.attributes.attributes.test;
-      const isErrorLevel = log.attributes.attributes.level === "error";
-      return (
-        hasTestContext &&
-        isErrorLevel &&
-        (message.includes("failed") ||
-          message.includes("error") ||
-          message.includes("Error") ||
-          message.includes("FAIL"))
-      );
-    })
-    .map((log) => {
-      const message = log.attributes.message || "";
-      const attrs = log.attributes.attributes;
-
-      return {
-        testName: attrs.test || null,
-        environment: attrs.env || null,
-        geolocation: attrs.region || null,
-        timestamp: log.attributes.timestamp || null,
-        errorLogs: message.split("\n").filter((line) => line.trim()),
-      };
-    });
-
-  // Remove duplicates based on test name and timestamp
-  const uniqueFailures = testFailures.filter((failure, index, array) => {
-    return (
-      array.findIndex(
-        (f) =>
-          f.testName === failure.testName && f.timestamp === failure.timestamp,
-      ) === index
-    );
-  });
-
-  return uniqueFailures;
 }
 
 // Format test failures for Slack display
@@ -493,33 +417,22 @@ function formatTestFailuresForSlack(
   return result;
 }
 
-// Periodic fetch function
-async function fetchLogsAndUpdate(): Promise<void> {
+// Load test failures from issues.json
+function loadTestFailures(): void {
   try {
-    logger.info("🔍 Fetching DataDog logs...");
-    latestTestFailures = await fetchDatadogTestFailures(24);
-    lastFetchTime = new Date();
-    logger.info(`📋 Fetched ${latestTestFailures.length} test failures`);
+    logger.info("🔍 Loading test failures from issues.json...");
+    latestTestFailures = readTestFailures();
+    logger.info(`📋 Loaded ${latestTestFailures.length} test failures`);
   } catch (error) {
     logger.error(
-      `❌ Error fetching DataDog logs: ${error instanceof Error ? error.message : String(error)}`,
+      `❌ Error loading test failures: ${error instanceof Error ? error.message : String(error)}`,
     );
   }
 }
 
-// Handle messages with DataDog log information
+// Handle messages with test failure information
 async function handleMessage(message: string): Promise<string> {
   const lowerMessage = message.toLowerCase();
-
-  // Check for specific time requests
-  let hours = 24;
-  const hourMatch = message.match(/(\d+)\s*hours?/i);
-  if (hourMatch) {
-    hours = parseInt(hourMatch[1]);
-  }
-
-  // Determine which data to use for analysis
-  let dataToAnalyze: TestFailure[];
 
   // Check if user wants fresh data
   if (
@@ -528,25 +441,18 @@ async function handleMessage(message: string): Promise<string> {
     lowerMessage.includes("now")
   ) {
     try {
-      logger.info("🔄 Fetching fresh DataDog logs on demand...");
-      dataToAnalyze = await fetchDatadogTestFailures(hours);
+      logger.info("🔄 Loading fresh test failures on demand...");
+      latestTestFailures = readTestFailures();
     } catch (error) {
-      return `❌ Error fetching fresh DataDog logs: ${error instanceof Error ? error.message : String(error)}`;
+      return `❌ Error loading fresh test failures: ${error instanceof Error ? error.message : String(error)}`;
     }
-  } else if (hours !== 24) {
-    // If specific hours requested, fetch fresh data
-    try {
-      dataToAnalyze = await fetchDatadogTestFailures(hours);
-    } catch (error) {
-      return `❌ Error fetching DataDog logs: ${error instanceof Error ? error.message : String(error)}`;
-    }
-  } else {
-    // Use cached data
-    dataToAnalyze = latestTestFailures;
   }
 
+  // Use loaded data
+  const dataToAnalyze = latestTestFailures;
+
   // Analyze the data
-  const analysis = analyzeTestFailures(dataToAnalyze, hours);
+  const analysis = analyzeTestFailures(dataToAnalyze, 24);
 
   // Check if user wants raw data instead of analysis
   if (
@@ -554,7 +460,7 @@ async function handleMessage(message: string): Promise<string> {
     lowerMessage.includes("list") ||
     lowerMessage.includes("show all")
   ) {
-    return formatTestFailuresForSlack(dataToAnalyze, hours);
+    return formatTestFailuresForSlack(dataToAnalyze, 24);
   }
 
   // Answer specific questions about the analysis

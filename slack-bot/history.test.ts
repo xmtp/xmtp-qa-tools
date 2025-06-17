@@ -6,22 +6,25 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 dotenv.config();
 
+// Type definitions for Datadog functionality
 export interface DatadogLogEntry {
   id: string;
   type: string;
   attributes: {
-    service: string;
-    message: string;
     timestamp?: string;
-    attributes: {
+    message?: string;
+    service?: string;
+    status?: string;
+    attributes?: {
       test?: string;
       region?: string;
       env?: string;
       libxmtp?: string;
       service?: string;
       level?: string;
-      [key: string]: any;
+      [key: string]: unknown;
     };
+    [key: string]: unknown;
   };
 }
 
@@ -34,7 +37,7 @@ interface DatadogLogsResponse {
   };
 }
 
-interface TestFailure {
+export interface TestFailure {
   testName: string | null;
   environment: string | null;
   geolocation: string | null;
@@ -45,34 +48,65 @@ interface TestFailure {
   errorLogs: string[];
 }
 
-describe("Datadog Logs Integration Test", () => {
-  beforeAll(() => {
+export interface DatadogLogOptions {
+  timeRange?: {
+    from?: string;
+    to?: string;
+  };
+  service?: string;
+  outputPath?: string;
+}
+
+class DatadogLogProcessor {
+  private readonly service: string;
+  private readonly outputPath: string;
+
+  constructor() {
+    this.service = "xmtp-qa-tools";
+    this.outputPath = path.join(__dirname, "issues.json");
+  }
+
+  private validateApiKeys(): void {
     if (!process.env.DATADOG_API_KEY) {
       throw new Error("DATADOG_API_KEY environment variable is required");
     }
     if (!process.env.DATADOG_APP_KEY) {
       throw new Error("DATADOG_APP_KEY environment variable is required");
     }
-  });
+  }
 
-  it("should fetch today's test failures from Datadog", async () => {
-    // Calculate time range for today
+  private getTimeRange(options?: DatadogLogOptions) {
+    if (options?.timeRange?.from && options?.timeRange?.to) {
+      return {
+        from: options.timeRange.from,
+        to: options.timeRange.to,
+      };
+    }
+
+    // Default to today's range
     const now = new Date();
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const fromTime = startOfToday.toISOString();
-    const toTime = now.toISOString();
+    return {
+      from: startOfToday.toISOString(),
+      to: now.toISOString(),
+    };
+  }
 
-    // Query Datadog Logs API
+  private async fetchAllLogs(
+    options?: DatadogLogOptions,
+  ): Promise<DatadogLogEntry[]> {
+    const timeRange = this.getTimeRange(options);
+    const service = options?.service || this.service;
     const allLogs: DatadogLogEntry[] = [];
     let nextCursor: string | undefined;
 
     do {
       const queryParams = new URLSearchParams({
-        "filter[query]": "service:xmtp-qa-tools",
-        "filter[from]": fromTime,
-        "filter[to]": toTime,
+        "filter[query]": `service:${service}`,
+        "filter[from]": timeRange.from,
+        "filter[to]": timeRange.to,
         "page[limit]": "1000",
       });
 
@@ -91,9 +125,9 @@ describe("Datadog Logs Integration Test", () => {
           },
           body: JSON.stringify({
             filter: {
-              query: "service:xmtp-qa-tools",
-              from: fromTime,
-              to: toTime,
+              query: `service:${service}`,
+              from: timeRange.from,
+              to: timeRange.to,
             },
             sort: "-timestamp",
             page: {
@@ -116,78 +150,63 @@ describe("Datadog Logs Integration Test", () => {
       nextCursor = data.meta?.page?.after;
     } while (nextCursor);
 
-    // Process logs and extract test failures
-    const testFailures: TestFailure[] = allLogs
-      .filter((log) => {
-        const message = log.attributes.message || "";
-        const hasTestContext = log.attributes.attributes.test;
-        const isErrorLevel = log.attributes.attributes.level === "error";
-        return (
-          hasTestContext &&
-          isErrorLevel &&
-          (message.includes("failed") ||
-            message.includes("error") ||
-            message.includes("Error") ||
-            message.includes("FAIL"))
-        );
-      })
+    return allLogs;
+  }
+
+  private isTestFailureLog(log: DatadogLogEntry): boolean {
+    const message = (log.attributes.message as string) || "";
+    const hasTestContext = Boolean(log.attributes.attributes?.test);
+    const isErrorLevel = log.attributes.attributes?.level === "error";
+
+    return (
+      hasTestContext &&
+      isErrorLevel &&
+      typeof message === "string" &&
+      (message.includes("failed") ||
+        message.includes("error") ||
+        message.includes("Error") ||
+        message.includes("FAIL"))
+    );
+  }
+
+  private processLogsToFlatFormat(logs: DatadogLogEntry[]): any[] {
+    return logs
+      .filter((log) => this.isTestFailureLog(log))
       .map((log) => {
-        const message = log.attributes.message || "";
-        const attrs = log.attributes.attributes;
+        const message = (log.attributes.message as string) || "";
+        const attrs = log.attributes.attributes || {};
 
         return {
-          testName: attrs.test || extractTestNameFromMessage(message),
-          environment: attrs.env || null,
-          geolocation: attrs.region || null,
-          timestamp: log.attributes.timestamp || null,
-          workflowUrl: extractUrlFromMessage(message, "github.com") || null,
-          dashboardUrl: extractUrlFromMessage(message, "dashboard") || null,
-          customLinks: extractUrlFromMessage(message, "agents") || null,
-          errorLogs: message.split("\n").filter((line) => line.trim()),
+          id: log.id,
+          type: log.type,
+          environment: (attrs.env as string) || null,
+          test: (attrs.test as string) || null,
+          level: (attrs.level as string) || null,
+          service: (attrs.service as string) || this.service,
+          region: (attrs.region as string) || null,
+          env: (attrs.env as string) || null,
+          libxmtp: (attrs.libxmtp as string) || null,
+          message: message,
         };
       });
+  }
 
-    // Remove duplicates based on test name and timestamp
-    const uniqueFailures = testFailures.filter((failure, index, array) => {
+  private removeDuplicateFailures(failures: any[]): any[] {
+    return failures.filter((failure, index, array) => {
       return (
         array.findIndex(
-          (f) =>
-            f.testName === failure.testName &&
-            f.timestamp === failure.timestamp,
+          (f) => f.testName === failure.testName && f.id === failure.id,
         ) === index
       );
     });
+  }
 
-    // Save to file
-    const data = {
-      metadata: {
-        source: "datadog-logs",
-        date: new Date().toISOString(),
-        totalTestFailures: uniqueFailures.length,
-        queryPeriod: {
-          from: fromTime,
-          to: toTime,
-        },
-      },
-      testFailures: uniqueFailures,
-    };
-
-    const filepath = path.join(__dirname, "issues.json");
+  private saveToFile(data: any, outputPath?: string): void {
+    const filepath = outputPath || this.outputPath;
     fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
+  }
 
-    // Verify
-    expect(fs.existsSync(filepath)).toBe(true);
-    expect(uniqueFailures.length).toBeGreaterThanOrEqual(0);
-
-    console.log(
-      `✅ Extracted ${uniqueFailures.length} test failures from Datadog logs`,
-    );
-    console.log(`📊 Processed ${allLogs.length} total log entries`);
-  }, 30000);
-
-  // Helper functions
-  function extractTestNameFromMessage(message: string): string | null {
-    // Try to extract test name from various patterns in the message
+  private extractTestNameFromMessage(message: string): string | null {
     const patterns = [/Test:\s*([^\n]+)/i, /test[:\s]+([^\n]+)/i, /^([^:]+):/];
 
     for (const pattern of patterns) {
@@ -200,12 +219,69 @@ describe("Datadog Logs Integration Test", () => {
     return null;
   }
 
-  function extractUrlFromMessage(
-    message: string,
-    urlType: string,
-  ): string | null {
-    const urlPattern = new RegExp(`https?://[^\\s]*${urlType}[^\\s]*`, "i");
-    const match = message.match(urlPattern);
-    return match ? match[0] : null;
+  public async processLogs(options?: DatadogLogOptions): Promise<{
+    allLogs: DatadogLogEntry[];
+    testFailures: any[];
+    metadata: any;
+  }> {
+    this.validateApiKeys();
+
+    const allLogs = await this.fetchAllLogs(options);
+    const testFailures = this.processLogsToFlatFormat(allLogs);
+    const uniqueFailures = this.removeDuplicateFailures(testFailures);
+    const timeRange = this.getTimeRange(options);
+
+    // Save directly as an array in the desired format
+    this.saveToFile(uniqueFailures, options?.outputPath);
+
+    return {
+      allLogs,
+      testFailures: uniqueFailures,
+      metadata: {
+        source: "datadog-logs",
+        date: new Date().toISOString(),
+        totalTestFailures: uniqueFailures.length,
+        totalLogEntries: allLogs.length,
+        queryPeriod: timeRange,
+      },
+    };
   }
+}
+
+// Public API - keep it simple
+export async function processDatadogLogs(options?: DatadogLogOptions): Promise<{
+  allLogs: DatadogLogEntry[];
+  testFailures: TestFailure[];
+  metadata: any;
+}> {
+  const processor = new DatadogLogProcessor();
+  return await processor.processLogs(options);
+}
+
+describe("Datadog Logs Integration Test", () => {
+  beforeAll(() => {
+    if (!process.env.DATADOG_API_KEY) {
+      throw new Error("DATADOG_API_KEY environment variable is required");
+    }
+    if (!process.env.DATADOG_APP_KEY) {
+      throw new Error("DATADOG_APP_KEY environment variable is required");
+    }
+  });
+
+  it("should fetch and process today's test failures from Datadog", async () => {
+    const result = await processDatadogLogs();
+
+    // Verify file was created
+    const filepath = path.join(__dirname, "issues.json");
+    expect(fs.existsSync(filepath)).toBe(true);
+
+    // Verify results
+    expect(result.testFailures.length).toBeGreaterThanOrEqual(0);
+    expect(result.allLogs.length).toBeGreaterThanOrEqual(0);
+
+    console.log(
+      `✅ Extracted ${result.testFailures.length} test failures from Datadog logs`,
+    );
+    console.log(`📊 Processed ${result.allLogs.length} total log entries`);
+  }, 30000);
 });
