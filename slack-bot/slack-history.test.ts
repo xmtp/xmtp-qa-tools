@@ -8,7 +8,7 @@ dotenv.config();
 
 describe("Slack Bolt Integration Test", () => {
   let app: App;
-  const testChannelName = "notify-qa-tools";
+  const testChannelName = process.env.SLACK_CHANNEL;
 
   beforeAll(() => {
     if (!process.env.SLACK_BOT_TOKEN) {
