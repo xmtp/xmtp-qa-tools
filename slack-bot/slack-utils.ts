@@ -2,15 +2,55 @@ import { createLogger } from "@helpers/logger";
 
 const logger = createLogger();
 
+// Slack API type definitions
+interface SlackChannel {
+  id: string;
+  name: string;
+}
+
+export interface SlackMessage {
+  text?: string;
+  user?: string;
+  ts: string;
+}
+
+interface SlackConversationsListResponse {
+  ok: boolean;
+  channels?: SlackChannel[];
+  error?: string;
+}
+
+interface SlackConversationsHistoryResponse {
+  ok: boolean;
+  messages?: SlackMessage[];
+  has_more?: boolean;
+  response_metadata?: Record<string, unknown>;
+  error?: string;
+}
+
+export interface SlackWebClient {
+  conversations: {
+    list: (params: {
+      types: string;
+      limit: number;
+    }) => Promise<SlackConversationsListResponse>;
+    history: (params: {
+      channel: string;
+      limit: number;
+      inclusive: boolean;
+    }) => Promise<SlackConversationsHistoryResponse>;
+  };
+}
+
 export interface SlackChannelHistory {
-  messages: any[];
+  messages: SlackMessage[];
   hasMore: boolean;
-  responseMetadata?: any;
+  responseMetadata?: Record<string, unknown>;
 }
 
 // Find channel ID by name
 export async function findChannelByName(
-  client: any,
+  client: SlackWebClient,
   channelName: string,
 ): Promise<string | null> {
   logger.info(`🔍 Looking for channel: ${channelName}`);
@@ -25,13 +65,13 @@ export async function findChannelByName(
   }
 
   const channel = result.channels?.find(
-    (ch: any) =>
+    (ch: SlackChannel) =>
       ch.name === channelName || ch.name === channelName.replace("#", ""),
   );
 
   if (channel && typeof channel.id === "string") {
     logger.info(`✅ Found channel ${channelName} with ID: ${channel.id}`);
-    return channel.id as string;
+    return channel.id;
   }
 
   logger.error(`❌ Channel ${channelName} not found`);
@@ -40,7 +80,7 @@ export async function findChannelByName(
 
 // Fetch Slack channel history
 export async function fetchChannelHistory(
-  client: any,
+  client: SlackWebClient,
   channelId: string,
   limit: number = 50,
   query?: string,
@@ -63,7 +103,7 @@ export async function fetchChannelHistory(
   if (query) {
     const searchTerm = query.toLowerCase();
     messages = messages.filter(
-      (msg: any) =>
+      (msg: SlackMessage) =>
         msg.text &&
         typeof msg.text === "string" &&
         msg.text.toLowerCase().includes(searchTerm),
@@ -79,7 +119,7 @@ export async function fetchChannelHistory(
 
 // Format messages for display
 export function formatMessagesForDisplay(
-  messages: any[],
+  messages: SlackMessage[],
   maxMessages: number = 10,
 ): string {
   if (messages.length === 0) {
@@ -89,16 +129,13 @@ export function formatMessagesForDisplay(
   const sortedMessages = messages
     .slice(0, maxMessages)
     .sort(
-      (a: any, b: any) =>
-        parseFloat(b.ts as string) - parseFloat(a.ts as string),
+      (a: SlackMessage, b: SlackMessage) => parseFloat(b.ts) - parseFloat(a.ts),
     );
 
   let formatted = `📋 Found ${messages.length} message(s):\n\n`;
 
   for (const msg of sortedMessages) {
-    const timestamp = new Date(
-      parseFloat(msg.ts as string) * 1000,
-    ).toLocaleString();
+    const timestamp = new Date(parseFloat(msg.ts) * 1000).toLocaleString();
     const user = msg.user ? `<@${msg.user}>` : "Unknown User";
     const text = msg.text ? msg.text.substring(0, 200) : "[No text]";
 
@@ -119,7 +156,9 @@ export function formatMessagesForDisplay(
 }
 
 // List all available channels for debugging
-export async function listAvailableChannels(client: any): Promise<string> {
+export async function listAvailableChannels(
+  client: SlackWebClient,
+): Promise<string> {
   const result = await client.conversations.list({
     types: "public_channel,private_channel",
     limit: 1000,
@@ -132,10 +171,10 @@ export async function listAvailableChannels(client: any): Promise<string> {
   const channels = result.channels || [];
   const channelList = channels
     .filter(
-      (ch: any) =>
+      (ch: SlackChannel) =>
         ch.name && typeof ch.name === "string" && typeof ch.id === "string",
-    ) // Only channels with names
-    .map((ch: any) => `• #${ch.name} (${ch.id})`)
+    )
+    .map((ch: SlackChannel) => `• #${ch.name} (${ch.id})`)
     .sort()
     .slice(0, 20); // Limit to first 20 channels
 

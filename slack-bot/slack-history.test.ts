@@ -3,6 +3,7 @@ import path from "path";
 import { App } from "@slack/bolt";
 import dotenv from "dotenv";
 import { beforeAll, describe, expect, it } from "vitest";
+import type { SlackMessage } from "./slack-utils";
 
 dotenv.config();
 
@@ -55,7 +56,7 @@ describe("Slack Bolt Integration Test", () => {
     const channelId = channel!.id!;
 
     // Fetch all messages with pagination
-    const allMessages: any[] = [];
+    const allMessages: SlackMessage[] = [];
     let cursor: string | undefined;
 
     do {

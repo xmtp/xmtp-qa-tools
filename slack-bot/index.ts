@@ -10,6 +10,7 @@ import {
   findChannelByName,
   formatMessagesForDisplay,
   listAvailableChannels,
+  type SlackWebClient,
 } from "./slack-utils";
 
 const { App, LogLevel } = pkg;
@@ -128,7 +129,7 @@ async function handleDataDogLogsCommand(args: string[]): Promise<string> {
 async function handleCommand(
   command: string,
   args: string[],
-  client: any,
+  client: SlackWebClient,
   channelId: string,
 ): Promise<string> {
   switch (command) {
@@ -384,7 +385,7 @@ async function processWithAnthropic(message: string): Promise<string> {
 // Main message processing function
 async function processMessage(
   message: string,
-  client: any,
+  client: SlackWebClient,
   channelId: string,
 ): Promise<string> {
   const validation = validateAndSanitizeInput(message);
@@ -514,7 +515,11 @@ app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
     const thinkingResponse = await say(thinkingMessage);
     logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
-    const botResponse = await processMessage(message, client, channel);
+    const botResponse = await processMessage(
+      message,
+      client as SlackWebClient,
+      channel,
+    );
     logger.info(`🤖 Bot Response: "${botResponse}"`);
 
     const finalResponse = `<@${userId}> ${botResponse}`;
@@ -573,7 +578,7 @@ app.message(async ({ message, say, client }) => {
 
       const botResponse = await processMessage(
         messageText,
-        client,
+        client as SlackWebClient,
         message.channel,
       );
       logger.info(`🤖 Bot Response: "${botResponse}"`);
