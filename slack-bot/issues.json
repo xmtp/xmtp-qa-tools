@@ -1,12 +1,422 @@
 {
   "metadata": {
     "source": "datadog-logs",
-    "date": "2025-06-17T03:56:28.917Z",
-    "totalTestFailures": 0,
+    "date": "2025-06-17T04:01:27.382Z",
+    "totalTestFailures": 34,
     "queryPeriod": {
       "from": "2025-06-17T03:00:00.000Z",
-      "to": "2025-06-17T03:56:27.841Z"
+      "to": "2025-06-17T04:01:26.491Z"
     }
   },
-  "testFailures": []
+  "testFailures": [
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:58.102Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:58.055Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "browser > [bob-210] conversation stream error: Error: group with welcome id 108933375 not found"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:57.982Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [108933375] already processed"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:57.886Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"b0145bd1c9795c1bb39c1bfa22a9035d46e66eb5b34055393e91dfc9776a09e2\" installation_id=\"fa3019b3ceb0a3cef53cfd49674a87d8c6c438b9bfa6ac4c25af6c925c8ea03c\""
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:56.659Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:56.635Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99229067] already processed"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:56.595Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "browser > [bob-210] conversation stream error: Error: group with welcome id 99229067 not found"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:59:56.529Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"c972ee22f034a17d5e8a02e395f5810a293f93150fcfa55a66a0a23aa9a197e1\" installation_id=\"bec2391410e9344d6976b93222aa7d6c862416b2159b3912fbad6c763ce6a789\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:58:29.821Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending \"hi\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:58:29.669Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"f4d457036aec77e1914316180052f5459b9737929bf2651f0df4f8b663aca27c\" installation_id=\"9ec26eeae3f3efef0ef33020173be39fa5954ea941684a0db17bd74f77922f72\""
+      ]
+    },
+    {
+      "testName": "delivery",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:58:16.557Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"ce4918c3e22c14322caf77bdee505deee68f0a226be4e42846c5adc6ad286154\" installation_id=\"592053d9efe887e4d1b7a00fe0e8089168b05e05f2c4e0973c0c957036a506bc\""
+      ]
+    },
+    {
+      "testName": "dms",
+      "environment": "local",
+      "geolocation": "south-america",
+      "timestamp": "2025-06-17T03:45:56.805Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"f17cb6a853492a8c9775af1cd91162d8bd42967df37be731884dd12737a15bfc\" installation_id=\"55f4419907f0f8d7e380b13bd465554b8f1931d4f8a21f37efce30d953905902\"",
+        "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:38:33.740Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [108928091] already processed"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:38:33.626Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"c9bce52d76198ae0826cd4d780b2f2534158a07670a0bffa727b20fe351a27d3\" installation_id=\"d602f9f952827a913f068a80a9a57b548d6f16c042b4fcf070411f7528d851e7\""
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:38:30.887Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99223832] already processed"
+      ]
+    },
+    {
+      "testName": "browser",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:38:30.774Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"f0d3edfc5344b89919404a6587dafd5591e215df671b6e946700f47e1e81cb50\" installation_id=\"b3c63f8d290fe81a9becca195958318e4a13b8f6700a9d097042bc46d5ca0bee\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:29.930Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending \"hi\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:29.861Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from gang agent (0x6461bf53ddb33b525c84bf60d6bb31fa10828474) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:29.840Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from csx agent (0x74563b2e03f8539ea0ee99a2d6c6b4791e652901) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:29.747Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"4788a2996ba06ffb1df1020401c5edbd73c8d00a2a0e07cecdcb34f2c84c7fb5\" installation_id=\"198fba89790697e58b7c9317ccd77dfccdcf177f81ba9d4c3505f3acfd23c5ec\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:03.453Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from gang agent (0x6461bf53ddb33b525c84bf60d6bb31fa10828474) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:03.391Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from csx agent (0x74563b2e03f8539ea0ee99a2d6c6b4791e652901) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:37:03.284Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"433f27c42560347360b2cde12bfdcb105bba13b8218bcbfd7edbb67b5df79ad4\" installation_id=\"6b8aafe892d9a12485bdf339b6df4e59d6d435c210cea6bcf14b8bd9a4bd413c\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:30.541Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending \"hi\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:30.500Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from gang agent (0x6461bf53ddb33b525c84bf60d6bb31fa10828474) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "production",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:30.382Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"861559da46edf8be2dd93f2c3a58c31836f68804a130c40a51f6da99416f7e25\" installation_id=\"1b49caff45f5a94ea19ab064ef637acbf8d16a22a41badfef689600594f1a830\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:02.299Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from gang agent (0x6461bf53ddb33b525c84bf60d6bb31fa10828474) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:02.269Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/agents/agents.test.ts > agents > should receive response from csx agent (0x74563b2e03f8539ea0ee99a2d6c6b4791e652901) when sending \"hola\""
+      ]
+    },
+    {
+      "testName": "agents",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:12:02.163Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"869681374575a1d6d5525a443a369b60b0edcfeca10a51a9952ab772486a2c9f\" installation_id=\"9e66c744c59243dd4cbd45769963b3e22fb16197cf8e77826ff31f81abdb2fda\""
+      ]
+    },
+    {
+      "testName": "performance",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:07:09.561Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams"
+      ]
+    },
+    {
+      "testName": "performance",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:07:09.494Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams"
+      ]
+    },
+    {
+      "testName": "performance",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:07:09.435Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams"
+      ]
+    },
+    {
+      "testName": "performance",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:07:09.403Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams"
+      ]
+    },
+    {
+      "testName": "performance",
+      "environment": "dev",
+      "geolocation": "us-east",
+      "timestamp": "2025-06-17T03:07:09.254Z",
+      "workflowUrl": null,
+      "dashboardUrl": null,
+      "customLinks": null,
+      "errorLogs": [
+        "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"ebf09492c129d89978ab958a03dda99b4dcf2096cd042fbf98a4e35add720a45\" installation_id=\"c2db3f3be915d0711aa57b224130ca8cd6f8eec10a310ee90bedb9b1693f230c\""
+      ]
+    }
+  ]
 }

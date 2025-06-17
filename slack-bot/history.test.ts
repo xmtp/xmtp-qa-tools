@@ -7,9 +7,12 @@ import { beforeAll, describe, expect, it } from "vitest";
 dotenv.config();
 
 interface DatadogLogEntry {
-  content: {
+  id: string;
+  type: string;
+  attributes: {
+    service: string;
     message: string;
-    timestamp: string;
+    timestamp?: string;
     attributes: {
       test?: string;
       region?: string;
@@ -67,7 +70,7 @@ describe("Datadog Logs Integration Test", () => {
 
     do {
       const queryParams = new URLSearchParams({
-        "filter[query]": "service:xmtp-qa-tools level:error",
+        "filter[query]": "service:xmtp-qa-tools",
         "filter[from]": fromTime,
         "filter[to]": toTime,
         "page[limit]": "1000",
@@ -88,7 +91,7 @@ describe("Datadog Logs Integration Test", () => {
           },
           body: JSON.stringify({
             filter: {
-              query: "service:xmtp-qa-tools level:error",
+              query: "service:xmtp-qa-tools",
               from: fromTime,
               to: toTime,
             },
@@ -116,24 +119,27 @@ describe("Datadog Logs Integration Test", () => {
     // Process logs and extract test failures
     const testFailures: TestFailure[] = allLogs
       .filter((log) => {
-        const message = log.content.message || "";
-        const hasTestContext = log.content.attributes.test;
+        const message = log.attributes.message || "";
+        const hasTestContext = log.attributes.attributes.test;
+        const isErrorLevel = log.attributes.attributes.level === "error";
         return (
           hasTestContext &&
+          isErrorLevel &&
           (message.includes("failed") ||
             message.includes("error") ||
-            message.includes("Error"))
+            message.includes("Error") ||
+            message.includes("FAIL"))
         );
       })
       .map((log) => {
-        const message = log.content.message || "";
-        const attrs = log.content.attributes;
+        const message = log.attributes.message || "";
+        const attrs = log.attributes.attributes;
 
         return {
           testName: attrs.test || extractTestNameFromMessage(message),
           environment: attrs.env || null,
           geolocation: attrs.region || null,
-          timestamp: log.content.timestamp,
+          timestamp: log.attributes.timestamp || null,
           workflowUrl: extractUrlFromMessage(message, "github.com") || null,
           dashboardUrl: extractUrlFromMessage(message, "dashboard") || null,
           customLinks: extractUrlFromMessage(message, "agents") || null,
