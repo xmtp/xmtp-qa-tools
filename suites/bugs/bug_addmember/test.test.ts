@@ -1,4 +1,4 @@
-import { getManualUsers, loadEnv } from "@helpers/client";
+import { getManualUsers } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -8,7 +8,6 @@ import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_addmember";
-loadEnv(testName);
 
 describe(testName, async () => {
   const workers = await getWorkers(["bob"], testName);
@@ -25,6 +24,7 @@ describe(testName, async () => {
   let group: Group;
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 

@@ -1,4 +1,4 @@
-import { formatBytes, loadEnv } from "@helpers/client";
+import { formatBytes } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
@@ -12,10 +12,9 @@ const spamInboxIds = [
   "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
 ];
 const testName = "spam";
-loadEnv(testName);
 
 describe(testName, () => {
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     try {

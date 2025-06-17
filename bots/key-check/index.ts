@@ -8,7 +8,6 @@ import {
   type KeyPackageStatus,
 } from "@xmtp/node-sdk";
 import { initializeClient } from "../helpers/xmtp-handler";
-import type { MessageContext } from "../helpers/xmtp-skills";
 
 // Get XMTP SDK version from package.json
 const require = createRequire(import.meta.url);
@@ -22,7 +21,6 @@ const processMessage = async (
   client: Client,
   conversation: Conversation,
   message: DecodedMessage,
-  _messageContext: MessageContext,
 ) => {
   // Get the message content
   const content = message.content as string;

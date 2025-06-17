@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -8,16 +8,17 @@ import {
 import { describe, expect, it } from "vitest";
 
 const testName = "codec";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(getFixedNames(2), testName);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
-  it("codec: should trigger a stream error", async () => {
+
+  it("should handle codec errors gracefully when sending unsupported content types", async () => {
     try {
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();

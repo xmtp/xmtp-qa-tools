@@ -1,9 +1,4 @@
-import {
-  appendToEnv,
-  getFixedNames,
-  getManualUsers,
-  loadEnv,
-} from "@helpers/client";
+import { appendToEnv, getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
   verifyMembershipStream,
@@ -25,9 +20,9 @@ export const features = [
   "addInstallationsRandomly",
   "createGroup",
 ];
-const TEST_NAME = "group";
+const testName = "group";
 const testConfig = {
-  testName: TEST_NAME,
+  testName: testName,
   groupName: `Group ${getTime()}`,
   epochs: 3,
   manualUsers: getManualUsers(["prod-testing"]),
@@ -41,15 +36,14 @@ const testConfig = {
   freshInstalls: false,
 } as const;
 
-loadEnv(TEST_NAME);
-
-describe(TEST_NAME, () => {
+describe(testName, () => {
   let workers: WorkerManager;
   let creator: Worker;
   let allInboxIds: string[] = [];
   let allGroups: string[] = [];
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
@@ -87,7 +81,7 @@ describe(TEST_NAME, () => {
     );
   });
 
-  it(`should verify all operations across all groups`, async () => {
+  it("should verify message streams, membership changes, metadata updates, and epoch changes across all groups", async () => {
     try {
       for (const feature of features) {
         for (const groupId of allGroups) {

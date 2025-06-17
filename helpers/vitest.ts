@@ -1,15 +1,27 @@
-import { afterAll, afterEach, beforeEach, type ExpectStatic } from "vitest";
+import {
+  afterAll,
+  afterEach,
+  beforeAll,
+  beforeEach,
+  type ExpectStatic,
+} from "vitest";
+import { loadEnv } from "./client";
 import { flushMetrics, sendPerformanceMetric } from "./datadog";
 
 export const setupTestLifecycle = ({
+  testName,
   expect,
   getCustomDuration,
   setCustomDuration,
 }: {
+  testName: string;
   expect: ExpectStatic;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
+  beforeAll(() => {
+    loadEnv(testName);
+  });
   let start: number;
   beforeEach(() => {
     start = performance.now();

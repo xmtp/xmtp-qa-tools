@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
   verifyAddMemberStream,
@@ -17,7 +17,6 @@ import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "streams";
-loadEnv(testName);
 
 describe(testName, async () => {
   let group: Group;
@@ -26,10 +25,11 @@ describe(testName, async () => {
 
   // Setup test lifecycle
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("AddMembersStream: should add members to a group", async () => {
+  it("should stream group membership updates when members are added to existing groups", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
@@ -48,7 +48,7 @@ describe(testName, async () => {
     }
   });
 
-  it("ConsentStream: manage consent for all members in a group", async () => {
+  it("should stream consent state changes when managing permissions for group members", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Consent);
 
@@ -64,7 +64,7 @@ describe(testName, async () => {
     }
   });
 
-  it("MessageStream: should measure receiving a gm", async () => {
+  it("should stream direct messages in real-time between two participants", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       // Create direct message
@@ -88,7 +88,7 @@ describe(testName, async () => {
     }
   });
 
-  it("addMemberStream: should measure adding a member to a group", async () => {
+  it("should stream real-time notifications when new members are added to groups", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Conversation);
       const creator = workers.getCreator();
@@ -111,7 +111,7 @@ describe(testName, async () => {
     }
   });
 
-  it("MessageGroupStream: should measure receiving a gm", async () => {
+  it("should stream group messages in real-time across multiple participants", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
       const newGroup = await workers.createGroup();
@@ -130,7 +130,7 @@ describe(testName, async () => {
     }
   });
 
-  it("GroupMetadataStream: should update group name", async () => {
+  it("should stream group metadata updates when group name or description changes", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
@@ -148,7 +148,7 @@ describe(testName, async () => {
     }
   });
 
-  it("ConversationStream: should create a new conversation", async () => {
+  it("should stream new conversation events when participants are invited to join", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);
@@ -166,7 +166,7 @@ describe(testName, async () => {
     }
   });
 
-  it("NewConversationStream: should create a add members to a conversation", async () => {
+  it("should stream conversation updates when members are dynamically added to existing groups", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
       workers = await getWorkers(names, testName, typeofStream.Conversation);

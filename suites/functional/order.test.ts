@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv, sleep } from "@helpers/client";
+import { getFixedNames, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,7 +8,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "order";
-loadEnv(testName);
 
 describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
@@ -20,9 +19,11 @@ describe(testName, async () => {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
-  it("poll_order: verify message order when receiving via pull", async () => {
+
+  it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
     try {
       group = await workers.createGroup();
       await group.sync();
@@ -67,7 +68,8 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("stream_order: verify message order when receiving via streams", async () => {
+
+  it("should verify message ordering accuracy when receiving messages via real-time streams", async () => {
     try {
       group = await workers.createGroup();
       const verifyResult = await verifyMessageStream(

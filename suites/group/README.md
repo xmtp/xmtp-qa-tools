@@ -1,54 +1,97 @@
 # Group Stress Testing Suite
 
-This test suite reproduces group conversation forking issues in XMTP by simulating high-frequency membership changes and message exchanges across multiple SDK versions and client types.
+This test suite validates group conversation stability under high-frequency membership changes and concurrent operations, helping identify forking issues and race conditions in XMTP group conversations.
 
-https://github.com/user-attachments/assets/e4842b28-e1c4-4a6c-87ac-2e11651b2939
+## What it does
 
-> For details see [deployment](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd/service/d92446b3-7ee4-43c9-a2ec-ceac87082970?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792)
+- Simulates intensive group membership changes (add/remove cycles)
+- Tests group metadata updates under load (`updateName()`, sync operations)
+- Validates message delivery during concurrent group operations
+- Monitors group state consistency across multiple client installations
+- Tests admin permission management during stress scenarios
+- Generates runtime installations to simulate real-world usage
 
-## Features Under Test
+## Environment Setup
 
-- [x] **Multi libxtmp versions** (>2.0.4)
-- [x] **Multi binding** (web, mobile, desktop)
-- [x] **Membership Change Cycles** (cycles remove/add)
-- [x] **Group Metadata Updates** (`updateName()`)
-- [x] **Group State Synchronization** (`sync()`, `syncAll()`)
-- [x] **Group Admin Permissions**
-- [x] **30 min recurring changes**
-- [x] **Message & Update Streams**
-- [x] **New installations created on run-time**
-- [x] **Minimum required installations** (10)
-- [x] **Multi-Worker** (14 concurrent workers)
-- [x] **Rate Limiting** (message throttling, API call limits)
-- [ ] **Sync Installations**
-- [ ] **Race Conditions**
+Set `XMTP_ENV` to `production` or `dev` to test group stability on the corresponding network.
 
-## Setup
-
-```bash
-# Installation
-git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
-cd xmtp-qa-tools
-yarn install
-```
-
-## Configuration
-
-Create a `.env` file in the root directory:
+Create a `.env` file with the following configuration:
 
 ```bash
 LOGGING_LEVEL=off  # Options: debug, info, warn, error, off
 XMTP_ENV=production  # Options: production, dev
-
-# Auto-populated during testing
-GROUP_ID=""
-
-# WORKERS
-# where rest of workers will be saved
+GROUP_ID=""  # Auto-populated during testing
 ```
 
-## Test Execution
+## How to run
+
+### Run group stress tests
 
 ```bash
 yarn test group
 ```
+
+### Run with automated scheduling
+
+```bash
+./run.sh
+```
+
+## Test Features
+
+### Core Functionality
+
+- ✅ **Multi libxmtp versions** (>2.0.4)
+- ✅ **Multi binding support** (web, mobile, desktop)
+- ✅ **Membership change cycles** (remove/add operations)
+- ✅ **Group metadata updates** (`updateName()`)
+- ✅ **Group state synchronization** (`sync()`, `syncAll()`)
+- ✅ **Group admin permissions**
+- ✅ **Message & update streams**
+- ✅ **Runtime installation creation**
+- ✅ **Multi-worker concurrency** (14 concurrent workers)
+- ✅ **Rate limiting** (message throttling, API call limits)
+
+### Planned Features
+
+- ⏳ **Sync installations**
+- ⏳ **Race condition detection**
+
+### Stress Testing Parameters
+
+- **Minimum installations**: 10 per test
+- **Concurrent workers**: 14
+- **Change frequency**: 30-minute recurring cycles
+- **Operations tested**: Add/remove members, metadata updates, message streams
+
+## Test Scenarios
+
+1. **Membership Cycling**: Rapid addition and removal of group members
+2. **Concurrent Operations**: Multiple workers performing group operations simultaneously
+3. **Metadata Stress**: Frequent group name and setting updates
+4. **Stream Validation**: Ensuring message and update streams remain stable
+5. **Permission Testing**: Admin operations under concurrent load
+
+## Monitoring & Results
+
+The test suite includes comprehensive monitoring for:
+
+- Group forking detection
+- Message delivery consistency
+- Stream reliability
+- Permission state accuracy
+- Installation synchronization
+
+## Known Issues
+
+This test suite specifically targets and helps reproduce:
+
+- Group conversation forking under high load
+- Race conditions in membership changes
+- Stream inconsistencies during concurrent operations
+
+## Key Files
+
+- **[group.test.ts](./group.test.ts)** - Main stress testing implementation
+- **[run.sh](./run.sh)** - Automated test execution script
+- **[README.md](./README.md)** - This documentation

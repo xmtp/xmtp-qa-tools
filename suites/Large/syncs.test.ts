@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -13,7 +13,6 @@ import {
 } from "./helpers";
 
 const testName = "m_large_syncs";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
@@ -35,6 +34,7 @@ describe(testName, async () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration,
@@ -47,7 +47,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
+    it(`should create new ${i}-member group and measure cold start group creation time including member additions`, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
@@ -79,7 +79,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`singleSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
+    it(`should perform cold start syncAll operation on ${i}-member group and measure total synchronization time`, async () => {
       try {
         const syncAllStart = performance.now();
         await workerA.client.conversations.syncAll();
@@ -94,7 +94,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`singleSync-${i}: should measure sync for a different worker (cold start)`, async () => {
+    it(`should perform cold start sync operation on ${i}-member group using different worker and measure sync time`, async () => {
       try {
         const syncStart = performance.now();
         await workerB.client.conversations.sync();

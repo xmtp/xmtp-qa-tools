@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,7 +8,6 @@ import { beforeAll, describe, expect, it } from "vitest";
 import productionAgents from "./production.json";
 
 const testName = "agents";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
@@ -25,6 +23,7 @@ describe(testName, () => {
     );
   });
   setupTestLifecycle({
+    testName,
     expect,
   });
 
@@ -33,7 +32,7 @@ describe(testName, () => {
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
-    it(`test ${agent.name}:${agent.address} on ${process.env.XMTP_ENV}`, async () => {
+    it(`should receive response from ${agent.name} agent (${agent.address}) when sending "${agent.sendMessage}"`, async () => {
       try {
         console.debug(`Testing ${agent.name} with address ${agent.address} `);
 

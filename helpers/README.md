@@ -38,7 +38,6 @@ const signer = createSigner(WALLET_KEY);
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
 // Load environment configuration for tests
-loadEnv(testName);
 
 // Create an XMTP client with specific version
 const client = await createClient(

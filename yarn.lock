@@ -41,6 +41,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@anthropic-ai/sdk@npm:^0.54.0":
+  version: 0.54.0
+  resolution: "@anthropic-ai/sdk@npm:0.54.0"
+  bin:
+    anthropic-ai-sdk: bin/cli
+  checksum: 10/85aa3cc054367455d0b930b63cbb4b9bce66aea65a479852487c4eaf8e9c08bdc21acf527dd048bb4a4202b11316ec689d3bd2f7f9b7dcad9c75155843c5d7d0
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.27.1":
   version: 7.27.1
   resolution: "@babel/code-frame@npm:7.27.1"
@@ -5483,6 +5492,7 @@ __metadata:
   resolution: "xmtp-qa-tools@workspace:."
   dependencies:
     "@anthropic-ai/claude-code": "npm:^1.0.24"
+    "@anthropic-ai/sdk": "npm:^0.54.0"
     "@eslint/compat": "npm:^1.2.6"
     "@eslint/js": "npm:^9.19.0"
     "@ianvs/prettier-plugin-sort-imports": "npm:^4.4.1"

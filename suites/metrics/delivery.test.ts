@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { sendDeliveryMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
@@ -9,7 +9,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
-loadEnv(testName);
 
 /**
  * Gets workers that are members of a group
@@ -49,10 +48,11 @@ describe(testName, async () => {
   });
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("stream_order: verify message order when receiving via streams", async () => {
+  it("should verify message delivery and order accuracy using message streams", async () => {
     try {
       const verifyResult = await verifyMessageStream(
         group,
@@ -102,7 +102,7 @@ describe(testName, async () => {
     }
   });
 
-  it("poll_order: verify message order when receiving via pull", async () => {
+  it("should verify message delivery and order accuracy using polling method", async () => {
     try {
       const workersFromGroup = await getWorkersFromGroup(group, workers);
       const messagesByWorker: string[][] = [];
@@ -171,7 +171,7 @@ describe(testName, async () => {
     }
   });
 
-  it("offline_recovery: verify message recovery after disconnection", async () => {
+  it("should verify message recovery and delivery after client reconnection", async () => {
     try {
       // Select one worker to take offline
       const offlineWorker = workers.getCreator(); // Second worker

@@ -1,11 +1,11 @@
-import { getManualUsers, loadEnv } from "@helpers/client";
+import { getManualUsers } from "@helpers/client";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
 const testName = "notifications";
-loadEnv(testName);
+
 const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
@@ -13,7 +13,7 @@ describe(testName, () => {
   let group: Conversation;
   let workers: WorkerManager;
 
-  it(`should create a group with ${receiverObj.name} members`, async () => {
+  it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
     workers = await getWorkers(
       ["alice", "bob", "sam", "walt", "tina"],
       testName,
@@ -35,7 +35,7 @@ describe(testName, () => {
     console.log(`Created group ${group.id}`);
   });
 
-  it(`should send messages to ${receiverInboxId}`, async () => {
+  it(`should send DM messages to ${receiverInboxId} for notification testing`, async () => {
     try {
       let counter = 0;
       console.log(`Starting notification test with random delays...`);
@@ -52,7 +52,7 @@ describe(testName, () => {
     }
   });
 
-  it(`should send messages to ${receiverObj.inboxId}`, async () => {
+  it(`should send group messages to ${receiverObj.inboxId} for notification testing`, async () => {
     try {
       let counter = 0;
 

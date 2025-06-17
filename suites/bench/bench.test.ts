@@ -1,5 +1,5 @@
 import fs from "fs";
-import { getRandomNames, loadEnv } from "@helpers/client";
+import { getRandomNames } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -16,7 +16,6 @@ export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
 export const MIN_MAX_INSTALLATIONS = [1000, 2000];
 
 const testName = "bench";
-loadEnv(testName);
 
 describe(testName, () => {
   let workers: WorkerManager;
@@ -29,6 +28,7 @@ describe(testName, () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

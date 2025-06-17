@@ -28,7 +28,6 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 
 const testName = "my-test";
-loadEnv(testName);
 
 const workers = await getWorkers(["alice", "bob"], testName);
 setupTestLifecycle({ expect, workers, testName });

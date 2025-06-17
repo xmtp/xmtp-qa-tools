@@ -1,4 +1,4 @@
-import { getFixedNames, loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -13,7 +13,6 @@ import {
 } from "./helpers";
 
 const testName = "m_large_cumulative_syncs";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
@@ -35,6 +34,7 @@ describe(testName, async () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration,
@@ -46,7 +46,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`newGroup-${i}: should verify new group time for a single worker (cold start)`, async () => {
+    it(`should create ${i}-member group and add all worker members for cumulative sync testing setup`, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
@@ -66,7 +66,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`cumulativeSyncAll-${i}: should measure syncAll for a single worker (cold start)`, async () => {
+    it(`should measure cumulative syncAll performance impact on ${i}-member group with growing conversation history`, async () => {
       try {
         const syncAllStart = performance.now();
         await allWorkers[run].client.conversations.syncAll();
@@ -81,7 +81,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`cumulativeSync-${i}: should measure sync for a different worker (cold start)`, async () => {
+    it(`should measure cumulative sync performance impact on ${i}-member group using different worker with accumulated data`, async () => {
       try {
         const syncStart = performance.now();
         await allWorkers[run + 1].client.conversations.sync();

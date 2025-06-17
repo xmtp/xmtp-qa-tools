@@ -158,7 +158,8 @@ class SlackNotifier {
       options.customLinks || this.generateCustomLinks(options.testName);
     const url = this.generateUrl();
 
-    return `*Test Failure ❌*\n\n*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
+    return `*Test Failure ❌*
+*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
 *Environment:* \`${this.githubContext.environment}\`
 *General dashboard:* <${this.datadogUrl}|View>
 *Geolocation:* \`${this.githubContext.region || "Unknown Region"}\`

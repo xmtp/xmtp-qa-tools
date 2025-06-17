@@ -1,4 +1,4 @@
-import { formatBytes, loadEnv } from "@helpers/client";
+import { formatBytes } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
@@ -18,10 +18,9 @@ interface StorageMetrics {
 const memberCounts = [2, 10, 50, 100, 150, 200];
 const targetSizeMB = 5;
 const testName = "storage";
-loadEnv(testName);
 
 describe(testName, () => {
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     const results: StorageMetrics[] = [];

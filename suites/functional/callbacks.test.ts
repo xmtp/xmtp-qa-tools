@@ -1,21 +1,21 @@
-import { getRandomNames, loadEnv } from "@helpers/client";
+import { getRandomNames } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type DecodedMessage, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "callbacks";
-loadEnv(testName);
 
 describe(testName, async () => {
   const names = getRandomNames(5);
   const workers = await getWorkers(names, testName);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("awaitStreamMessage: should measure creating a DM and sending a message", async () => {
+  it("should receive messages using async iterator pattern with streamAllMessages", async () => {
     const sender = workers.get(names[0])!;
     const receiver = workers.get(names[1])!;
 
@@ -54,7 +54,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("callbackMessageStream: should measure creating a DM and sending a message", async () => {
+  it("should receive messages using callback pattern with streamAllMessages", async () => {
     const sender = workers.get(names[2])!;
     const receiver = workers.get(names[1])!;
 
@@ -89,7 +89,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("awaitStreamConversation: should measure creating a DM and sending a message", async () => {
+  it("should receive conversation events using async iterator pattern with conversation stream", async () => {
     const receiver = workers.get(names[1])!;
 
     // Set up stream first
@@ -122,7 +122,7 @@ describe(testName, async () => {
     expect(conversation.id).toBe(convo.id);
   });
 
-  it("callbackStreamConversation: should measure creating a DM and sending a message", async () => {
+  it("should receive conversation events using callback pattern with conversation stream", async () => {
     const receiver = workers.get(names[1])!;
 
     // Set up stream first
