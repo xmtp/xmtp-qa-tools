@@ -5,13 +5,7 @@ import { sendDatadogLog } from "@helpers/datadog";
 import { createLogger } from "@helpers/logger";
 import pkg from "@slack/bolt";
 import dotenv from "dotenv";
-import {
-  fetchChannelHistory,
-  findChannelByName,
-  formatMessagesForDisplay,
-  listAvailableChannels,
-  type SlackWebClient,
-} from "./slack-utils";
+import fetch from "node-fetch";
 
 const { App, LogLevel } = pkg;
 
@@ -29,11 +23,49 @@ interface ValidationResult {
   error?: string;
 }
 
+interface DatadogLogEntry {
+  id: string;
+  type: string;
+  attributes: {
+    service: string;
+    message: string;
+    timestamp?: string;
+    attributes: {
+      test?: string;
+      region?: string;
+      env?: string;
+      libxmtp?: string;
+      service?: string;
+      level?: string;
+      [key: string]: any;
+    };
+  };
+}
+
+interface DatadogLogsResponse {
+  data: DatadogLogEntry[];
+  meta: {
+    page: {
+      after?: string;
+    };
+  };
+}
+
+interface TestFailure {
+  testName: string | null;
+  environment: string | null;
+  geolocation: string | null;
+  timestamp: string | null;
+  errorLogs: string[];
+}
+
 // Validate required environment variables
 const requiredEnvVars = [
   "SLACK_BOT_TOKEN",
   "SLACK_APP_TOKEN",
   "ANTHROPIC_API_KEY",
+  "DATADOG_API_KEY",
+  "DATADOG_APP_KEY",
 ];
 const missingEnvVars = requiredEnvVars.filter(
   (varName) => !process.env[varName],
@@ -126,44 +158,39 @@ async function handleDataDogLogsCommand(args: string[]): Promise<string> {
 }
 
 // Main command handler
-async function handleCommand(
-  command: string,
-  args: string[],
-  client: SlackWebClient,
-  channelId: string,
-): Promise<string> {
+async function handleCommand(command: string, args: string[]): Promise<string> {
   switch (command) {
     case "history": {
-      const limit = parseInt(args[0]) || 50;
+      const hours = parseInt(args[0]) || 24;
       const query = args.slice(1).join(" ");
-      const channelName = "notify-qa-tools";
 
       try {
-        logger.info(`🔍 Attempting to find channel: ${channelName}`);
-        const targetChannelId = await findChannelByName(client, channelName);
+        logger.info(
+          `🔍 Fetching test failures from Datadog for last ${hours} hours`,
+        );
+        const failures = await fetchDatadogTestFailures(hours);
 
-        if (!targetChannelId) {
-          logger.error(`❌ Channel not found: ${channelName}`);
-          const availableChannels = await listAvailableChannels(client);
-          return `❌ Could not find channel #${channelName}. Make sure the bot is invited to the channel.\n\n${availableChannels}`;
+        // If query is provided, filter the results
+        let filteredFailures = failures;
+        if (query) {
+          filteredFailures = failures.filter(
+            (failure) =>
+              failure.testName?.toLowerCase().includes(query.toLowerCase()) ||
+              failure.errorLogs.some((log) =>
+                log.toLowerCase().includes(query.toLowerCase()),
+              ),
+          );
         }
 
-        logger.info(`✅ Found channel ${channelName}, fetching history...`);
-        const history = await fetchChannelHistory(
-          client,
-          targetChannelId,
-          limit,
-          query,
-        );
         logger.info(
-          `📋 Successfully fetched ${history.messages.length} messages`,
+          `📋 Successfully fetched ${filteredFailures.length} test failures`,
         );
-        return `📋 History from #${channelName}:\n\n${formatMessagesForDisplay(history.messages)}`;
+        return formatTestFailuresForSlack(filteredFailures, hours);
       } catch (error) {
         const errorMessage =
           error instanceof Error ? error.message : String(error);
         logger.error(`❌ Detailed error in history command: ${errorMessage}`);
-        return `❌ Error fetching channel history from #${channelName}: ${errorMessage}`;
+        return `❌ Error fetching test failures from Datadog: ${errorMessage}`;
       }
     }
 
@@ -172,13 +199,13 @@ async function handleCommand(
 
     case "help":
       return `🤖 Available commands:
-• \`/history [limit] [search_query]\` - Fetch message history from #notify-qa-tools
+• \`/history [hours] [search_query]\` - Fetch test failures from Datadog logs
 • \`/logs [test_name]\` - Send DataDog log entry
 • \`/help\` - Show this help message
 
 Examples:
-• \`/history 20\` - Get last 20 messages from #notify-qa-tools
-• \`/history 10 xmtp\` - Get last 10 messages containing "xmtp" from #notify-qa-tools
+• \`/history 24\` - Get test failures from last 24 hours
+• \`/history 12 browser\` - Get browser test failures from last 12 hours
 • \`/logs integration-test\` - Send DataDog log for integration-test`;
 
     default:
@@ -383,11 +410,7 @@ async function processWithAnthropic(message: string): Promise<string> {
 }
 
 // Main message processing function
-async function processMessage(
-  message: string,
-  client: SlackWebClient,
-  channelId: string,
-): Promise<string> {
+async function processMessage(message: string): Promise<string> {
   const validation = validateAndSanitizeInput(message);
 
   if (!validation.isValid) {
@@ -402,12 +425,7 @@ async function processMessage(
   // Check for explicit slash commands first
   const commandParsed = parseCommand(sanitizedMessage);
   if (commandParsed) {
-    return await handleCommand(
-      commandParsed.command,
-      commandParsed.args,
-      client,
-      channelId,
-    );
+    return await handleCommand(commandParsed.command, commandParsed.args);
   }
 
   // Simple keyword check for history as a fallback
@@ -415,12 +433,12 @@ async function processMessage(
   if (
     lowerMessage.includes("history") ||
     (lowerMessage.includes("show me") &&
-      (lowerMessage.includes("message") || lowerMessage.includes("recent")))
+      (lowerMessage.includes("test") || lowerMessage.includes("failure")))
   ) {
     logger.info(
       `🎯 Keyword-based history detection for: "${sanitizedMessage}"`,
     );
-    return await handleCommand("history", [], client, channelId);
+    return await handleCommand("history", []);
   }
 
   // Use intent detection for natural language
@@ -434,40 +452,36 @@ async function processMessage(
 
     switch (intent.action) {
       case "history": {
-        const limit = intent.parameters.limit || 50;
+        const hours = intent.parameters.limit || 24;
         const query = intent.parameters.searchQuery || "";
-        const channelName = "notify-qa-tools";
 
         try {
           logger.info(
-            `🔍 Intent-based: Attempting to find channel: ${channelName}`,
+            `🔍 Intent-based: Fetching test failures from Datadog for last ${hours} hours`,
           );
-          const targetChannelId = await findChannelByName(client, channelName);
+          const failures = await fetchDatadogTestFailures(hours);
 
-          if (!targetChannelId) {
-            logger.error(`❌ Intent-based: Channel not found: ${channelName}`);
-            const availableChannels = await listAvailableChannels(client);
-            return `❌ Could not find channel #${channelName}. Make sure the bot is invited to the channel.\n\n${availableChannels}`;
+          // If query is provided, filter the results
+          let filteredFailures = failures;
+          if (query) {
+            filteredFailures = failures.filter(
+              (failure) =>
+                failure.testName?.toLowerCase().includes(query.toLowerCase()) ||
+                failure.errorLogs.some((log) =>
+                  log.toLowerCase().includes(query.toLowerCase()),
+                ),
+            );
           }
 
           logger.info(
-            `✅ Intent-based: Found channel ${channelName}, fetching history...`,
+            `📋 Intent-based: Successfully fetched ${filteredFailures.length} test failures`,
           );
-          const history = await fetchChannelHistory(
-            client,
-            targetChannelId,
-            limit,
-            query,
-          );
-          logger.info(
-            `📋 Intent-based: Successfully fetched ${history.messages.length} messages`,
-          );
-          return `📋 History from #${channelName}:\n\n${formatMessagesForDisplay(history.messages)}`;
+          return formatTestFailuresForSlack(filteredFailures, hours);
         } catch (error) {
           const errorMessage =
             error instanceof Error ? error.message : String(error);
           logger.error(`❌ Intent-based detailed error: ${errorMessage}`);
-          return `❌ Error fetching channel history from #${channelName}: ${errorMessage}`;
+          return `❌ Error fetching test failures from Datadog: ${errorMessage}`;
         }
       }
 
@@ -478,16 +492,15 @@ async function processMessage(
 
       case "help": {
         return `🤖 I can help you with:
-• **History**: Ask me to "show history", "get last 20 messages", "find messages with error", etc.
+• **History**: Ask me to "show history", "get test failures", "show failures from last 12 hours", etc.
 • **Logs**: Say "send logs for test-name" or "create datadog log"
-• **Channels**: Say "list channels" or "show channels" to see available channels
 • **Help**: Just ask "help" or "what can you do"
 
-I automatically fetch from #notify-qa-tools when you ask for history!`;
+I automatically fetch test failures from Datadog when you ask for history!`;
       }
 
       case "channels": {
-        return await listAvailableChannels(client);
+        return `📊 I fetch test failure data from Datadog logs, not Slack channels. Use \`/history\` to see recent test failures.`;
       }
     }
   }
@@ -515,11 +528,7 @@ app.event<"app_mention">("app_mention", async ({ event, say, client }) => {
     const thinkingResponse = await say(thinkingMessage);
     logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
-    const botResponse = await processMessage(
-      message,
-      client as SlackWebClient,
-      channel,
-    );
+    const botResponse = await processMessage(message);
     logger.info(`🤖 Bot Response: "${botResponse}"`);
 
     const finalResponse = `<@${userId}> ${botResponse}`;
@@ -576,11 +585,7 @@ app.message(async ({ message, say, client }) => {
       const thinkingResponse = await say(thinkingMessage);
       logger.info(`📤 SENT THINKING MESSAGE: "${thinkingMessage}"`);
 
-      const botResponse = await processMessage(
-        messageText,
-        client as SlackWebClient,
-        message.channel,
-      );
+      const botResponse = await processMessage(messageText);
       logger.info(`🤖 Bot Response: "${botResponse}"`);
 
       // Replace the thinking message with the final response
@@ -636,3 +641,148 @@ process.on("SIGINT", () => {
   logger.info("🛑 Shutting down gracefully");
   process.exit(0);
 });
+
+// Fetch test failures from Datadog
+async function fetchDatadogTestFailures(
+  hours: number = 24,
+): Promise<TestFailure[]> {
+  if (!process.env.DATADOG_API_KEY || !process.env.DATADOG_APP_KEY) {
+    throw new Error(
+      "Missing DATADOG_API_KEY or DATADOG_APP_KEY environment variables",
+    );
+  }
+
+  const now = new Date();
+  const hoursAgo = new Date(now.getTime() - hours * 60 * 60 * 1000);
+  const fromTime = hoursAgo.toISOString();
+  const toTime = now.toISOString();
+
+  // Query Datadog Logs API
+  const allLogs: DatadogLogEntry[] = [];
+  let nextCursor: string | undefined;
+
+  do {
+    const response = await fetch(
+      "https://api.datadoghq.com/api/v2/logs/events/search",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "DD-API-KEY": process.env.DATADOG_API_KEY,
+          "DD-APPLICATION-KEY": process.env.DATADOG_APP_KEY,
+        },
+        body: JSON.stringify({
+          filter: {
+            query: "service:xmtp-qa-tools",
+            from: fromTime,
+            to: toTime,
+          },
+          sort: "-timestamp",
+          page: {
+            limit: 1000,
+            cursor: nextCursor,
+          },
+        }),
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(
+        `Datadog API error: ${response.status} ${response.statusText}`,
+      );
+    }
+
+    const data = (await response.json()) as DatadogLogsResponse;
+    allLogs.push(...data.data);
+    nextCursor = data.meta?.page?.after;
+  } while (nextCursor);
+
+  // Process logs and extract test failures
+  const testFailures: TestFailure[] = allLogs
+    .filter((log) => {
+      const message = log.attributes.message || "";
+      const hasTestContext = log.attributes.attributes.test;
+      const isErrorLevel = log.attributes.attributes.level === "error";
+      return (
+        hasTestContext &&
+        isErrorLevel &&
+        (message.includes("failed") ||
+          message.includes("error") ||
+          message.includes("Error") ||
+          message.includes("FAIL"))
+      );
+    })
+    .map((log) => {
+      const message = log.attributes.message || "";
+      const attrs = log.attributes.attributes;
+
+      return {
+        testName: attrs.test || null,
+        environment: attrs.env || null,
+        geolocation: attrs.region || null,
+        timestamp: log.attributes.timestamp || null,
+        errorLogs: message.split("\n").filter((line) => line.trim()),
+      };
+    });
+
+  // Remove duplicates based on test name and timestamp
+  const uniqueFailures = testFailures.filter((failure, index, array) => {
+    return (
+      array.findIndex(
+        (f) =>
+          f.testName === failure.testName && f.timestamp === failure.timestamp,
+      ) === index
+    );
+  });
+
+  return uniqueFailures;
+}
+
+// Format test failures for Slack display
+function formatTestFailuresForSlack(
+  failures: TestFailure[],
+  hours: number,
+): string {
+  if (failures.length === 0) {
+    return `📊 No test failures found in the last ${hours} hours`;
+  }
+
+  const grouped = failures.reduce<Record<string, TestFailure[]>>(
+    (acc, failure) => {
+      const key = failure.testName || "Unknown";
+      if (!acc[key]) {
+        acc[key] = [];
+      }
+      acc[key].push(failure);
+      return acc;
+    },
+    {},
+  );
+
+  let result = `📊 Found ${failures.length} test failures in the last ${hours} hours:\n\n`;
+
+  for (const [testName, testFailures] of Object.entries(grouped)) {
+    result += `**${testName}** (${testFailures.length} failures)\n`;
+
+    for (const failure of testFailures.slice(0, 3)) {
+      // Show max 3 per test
+      const env = failure.environment || "unknown";
+      const region = failure.geolocation || "unknown";
+      const time = failure.timestamp
+        ? new Date(failure.timestamp).toLocaleTimeString()
+        : "unknown";
+
+      result += `• ${env}/${region} at ${time}\n`;
+      if (failure.errorLogs[0]) {
+        result += `  \`${failure.errorLogs[0].substring(0, 100)}${failure.errorLogs[0].length > 100 ? "..." : ""}\`\n`;
+      }
+    }
+
+    if (testFailures.length > 3) {
+      result += `  ... and ${testFailures.length - 3} more\n`;
+    }
+    result += "\n";
+  }
+
+  return result;
+}
