@@ -1,117 +1,169 @@
 import fs from "fs";
 import path from "path";
-import { App } from "@slack/bolt";
 import dotenv from "dotenv";
+import fetch from "node-fetch";
 import { beforeAll, describe, expect, it } from "vitest";
-import type { SlackMessage } from "./slack-utils";
 
 dotenv.config();
 
-describe("Slack Bolt Integration Test", () => {
-  let app: App;
-  const testChannelName = "notify-qa-tools";
+interface DatadogLogEntry {
+  content: {
+    message: string;
+    timestamp: string;
+    attributes: {
+      test?: string;
+      region?: string;
+      env?: string;
+      libxmtp?: string;
+      service?: string;
+      level?: string;
+      [key: string]: any;
+    };
+  };
+}
 
+interface DatadogLogsResponse {
+  data: DatadogLogEntry[];
+  meta: {
+    page: {
+      after?: string;
+    };
+  };
+}
+
+interface TestFailure {
+  testName: string | null;
+  environment: string | null;
+  geolocation: string | null;
+  timestamp: string | null;
+  workflowUrl: string | null;
+  dashboardUrl: string | null;
+  customLinks: string | null;
+  errorLogs: string[];
+}
+
+describe("Datadog Logs Integration Test", () => {
   beforeAll(() => {
-    if (!process.env.SLACK_BOT_TOKEN) {
-      throw new Error("SLACK_BOT_TOKEN environment variable is required");
+    if (!process.env.DATADOG_API_KEY) {
+      throw new Error("DATADOG_API_KEY environment variable is required");
     }
-
-    app = new App({
-      token: process.env.SLACK_BOT_TOKEN,
-      signingSecret: process.env.SLACK_SIGNING_SECRET || "dummy-secret",
-    });
+    if (!process.env.DATADOG_APP_KEY) {
+      throw new Error("DATADOG_APP_KEY environment variable is required");
+    }
   });
 
-  it("should fetch channel ID and latest message", async () => {
-    const memberResult = await app.client.users.conversations({
-      types: "public_channel,private_channel",
-      limit: 1000,
-    });
-
-    const channel = memberResult.channels?.find(
-      (ch: any) => ch.name === testChannelName,
-    );
-    expect(channel?.id).toBeDefined();
-
-    const historyResult = await app.client.conversations.history({
-      channel: channel!.id!,
-      limit: 1,
-    });
-
-    if (historyResult.messages?.length) {
-      const latestMessage = historyResult.messages[0];
-      expect(latestMessage.ts).toBeDefined();
-    }
-  }, 15000);
-
-  it("should extract today's test failures", async () => {
-    // Get channel
-    const memberResult = await app.client.users.conversations({
-      types: "public_channel,private_channel",
-      limit: 1000,
-    });
-    const channel = memberResult.channels?.find(
-      (ch: any) => ch.name === testChannelName,
-    );
-    const channelId = channel!.id!;
-
-    // Fetch all messages with pagination
-    const allMessages: SlackMessage[] = [];
-    let cursor: string | undefined;
-
-    do {
-      const result = await app.client.conversations.history({
-        channel: channelId,
-        limit: 200,
-        cursor,
-      });
-
-      if (result.messages)
-        allMessages.push(...(result.messages as unknown as SlackMessage[]));
-      cursor = result.response_metadata?.next_cursor;
-    } while (cursor);
-
-    // Extract today's test failures
+  it("should fetch today's test failures from Datadog", async () => {
+    // Calculate time range for today
+    const now = new Date();
     const startOfToday = new Date();
     startOfToday.setHours(0, 0, 0, 0);
 
-    const testFailures = allMessages
-      .filter((msg) => {
-        const isToday =
-          new Date(parseFloat(String(msg.ts || "0")) * 1000) >= startOfToday;
-        return isToday && String(msg.text || "").includes("Test Failure :x:");
+    const fromTime = startOfToday.toISOString();
+    const toTime = now.toISOString();
+
+    // Query Datadog Logs API
+    const allLogs: DatadogLogEntry[] = [];
+    let nextCursor: string | undefined;
+
+    do {
+      const queryParams = new URLSearchParams({
+        "filter[query]": "service:xmtp-qa-tools level:error",
+        "filter[from]": fromTime,
+        "filter[to]": toTime,
+        "page[limit]": "1000",
+      });
+
+      if (nextCursor) {
+        queryParams.set("page[cursor]", nextCursor);
+      }
+
+      const response = await fetch(
+        `https://api.datadoghq.com/api/v2/logs/events/search?${queryParams.toString()}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "DD-API-KEY": process.env.DATADOG_API_KEY!,
+            "DD-APPLICATION-KEY": process.env.DATADOG_APP_KEY!,
+          },
+          body: JSON.stringify({
+            filter: {
+              query: "service:xmtp-qa-tools level:error",
+              from: fromTime,
+              to: toTime,
+            },
+            sort: "-timestamp",
+            page: {
+              limit: 1000,
+              cursor: nextCursor,
+            },
+          }),
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error(
+          `Datadog API error: ${response.status} ${response.statusText}`,
+        );
+      }
+
+      const data = (await response.json()) as DatadogLogsResponse;
+      allLogs.push(...data.data);
+
+      nextCursor = data.meta?.page?.after;
+    } while (nextCursor);
+
+    // Process logs and extract test failures
+    const testFailures: TestFailure[] = allLogs
+      .filter((log) => {
+        const message = log.content.message || "";
+        const hasTestContext = log.content.attributes.test;
+        return (
+          hasTestContext &&
+          (message.includes("failed") ||
+            message.includes("error") ||
+            message.includes("Error"))
+        );
       })
-      .map((msg) => {
-        const text = String(msg.text || "");
+      .map((log) => {
+        const message = log.content.message || "";
+        const attrs = log.content.attributes;
+
         return {
-          testName: extractBetween(
-            text,
-            "*Test:*",
-            "github.com/xmtp/xmtp-qa-tools/actions/workflows/",
-            ".yml",
-          ),
-          environment: extractField(text, "*Environment:*"),
-          geolocation: extractField(text, "*Geolocation:*"),
-          timestamp: extractField(text, "*Timestamp:*"),
-          workflowUrl: extractUrl(text, "*Test log:*"),
-          dashboardUrl: extractUrl(text, "*General dashboard:*"),
-          customLinks: extractUrl(text, "*Agents tested:*"),
-          errorLogs:
-            text
-              .match(/\*Logs:\*\s*```([^`]+)```/s)?.[1]
-              ?.split("\n")
-              .filter((l) => l.trim()) || [],
+          testName: attrs.test || extractTestNameFromMessage(message),
+          environment: attrs.env || null,
+          geolocation: attrs.region || null,
+          timestamp: log.content.timestamp,
+          workflowUrl: extractUrlFromMessage(message, "github.com") || null,
+          dashboardUrl: extractUrlFromMessage(message, "dashboard") || null,
+          customLinks: extractUrlFromMessage(message, "agents") || null,
+          errorLogs: message.split("\n").filter((line) => line.trim()),
         };
       });
+
+    // Remove duplicates based on test name and timestamp
+    const uniqueFailures = testFailures.filter((failure, index, array) => {
+      return (
+        array.findIndex(
+          (f) =>
+            f.testName === failure.testName &&
+            f.timestamp === failure.timestamp,
+        ) === index
+      );
+    });
 
     // Save to file
     const data = {
       metadata: {
-        channel: testChannelName,
+        source: "datadog-logs",
         date: new Date().toISOString(),
-        totalTestFailures: testFailures.length,
+        totalTestFailures: uniqueFailures.length,
+        queryPeriod: {
+          from: fromTime,
+          to: toTime,
+        },
       },
-      testFailures,
+      testFailures: uniqueFailures,
     };
 
     const filepath = path.join(__dirname, "issues.json");
@@ -119,34 +171,35 @@ describe("Slack Bolt Integration Test", () => {
 
     // Verify
     expect(fs.existsSync(filepath)).toBe(true);
-    expect(testFailures.length).toBeGreaterThanOrEqual(0);
+    expect(uniqueFailures.length).toBeGreaterThanOrEqual(0);
 
-    console.log(`✅ Extracted ${testFailures.length} test failures from today`);
+    console.log(
+      `✅ Extracted ${uniqueFailures.length} test failures from Datadog logs`,
+    );
+    console.log(`📊 Processed ${allLogs.length} total log entries`);
   }, 30000);
 
   // Helper functions
-  function extractField(text: string, label: string): string | null {
-    const line = text.split("\n").find((l) => l.includes(label));
-    return line?.split(label)[1]?.replace(/`/g, "").trim() || null;
+  function extractTestNameFromMessage(message: string): string | null {
+    // Try to extract test name from various patterns in the message
+    const patterns = [/Test:\s*([^\n]+)/i, /test[:\s]+([^\n]+)/i, /^([^:]+):/];
+
+    for (const pattern of patterns) {
+      const match = message.match(pattern);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+
+    return null;
   }
 
-  function extractUrl(text: string, label: string): string | null {
-    const line = text.split("\n").find((l) => l.includes(label));
-    return line?.match(/<([^|>]+)/)?.[1] || null;
-  }
-
-  function extractBetween(
-    text: string,
-    label: string,
-    start: string,
-    end: string,
+  function extractUrlFromMessage(
+    message: string,
+    urlType: string,
   ): string | null {
-    const field = extractField(text, label);
-    if (!field) return null;
-    const startIdx = field.indexOf(start);
-    if (startIdx === -1) return null;
-    const after = field.substring(startIdx + start.length);
-    const endIdx = after.indexOf(end);
-    return endIdx === -1 ? null : after.substring(0, endIdx);
+    const urlPattern = new RegExp(`https?://[^\\s]*${urlType}[^\\s]*`, "i");
+    const match = message.match(urlPattern);
+    return match ? match[0] : null;
   }
 });
