@@ -11,6 +11,7 @@
   ],
   "scripts": {
     "agent": "tsx slack-bot/index.ts",
+    "agents": "./suites/agents/run.sh",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/logger.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",

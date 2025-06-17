@@ -1,6 +1,11 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, defaultValues, getDataPath } from "@helpers/client";
+import {
+  createClient,
+  defaultValues,
+  getDataPath,
+  sleep,
+} from "@helpers/client";
 import {
   ConsentState,
   Dm,
@@ -199,6 +204,32 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+  }
+
+  /**
+   * Restarts the message stream by stopping current streams and starting them again
+   */
+  public async restartMessageStream(): Promise<void> {
+    console.debug(
+      `[${this.nameId}] Restarting message stream - stopping current streams`,
+    );
+    this.stopStreams();
+    console.debug(
+      `[${this.nameId}] Streams stopped, activeStreams: ${this.activeStreams}`,
+    );
+
+    // Clear ALL existing event listeners to prevent cross-contamination
+    this.removeAllListeners("worker_message");
+    console.debug(`[${this.nameId}] Cleared all worker_message listeners`);
+
+    console.debug(`[${this.nameId}] Starting new stream`);
+    this.startStream();
+    console.debug(
+      `[${this.nameId}] New stream started, activeStreams: ${this.activeStreams}`,
+    );
+
+    await sleep(1000);
+    console.debug(`[${this.nameId}] Message stream restart completed`);
   }
 
   /**
@@ -401,6 +432,10 @@ export class WorkerClient extends Worker {
         try {
           const stream = await this.client.conversations.streamAllMessages();
           for await (const message of stream) {
+            console.debug(
+              `[${this.nameId}] Received message`,
+              JSON.stringify(message, null, 2),
+            );
             if (!this.activeStreams) break;
 
             if (
@@ -414,9 +449,9 @@ export class WorkerClient extends Worker {
               message?.contentType?.typeId === "group_updated" &&
               type === typeofStream.GroupUpdated
             ) {
-              // console.debug(
-              //   `Received group updated ${JSON.stringify(message.content)}`,
-              // );
+              console.debug(
+                `Received group updated ${JSON.stringify(message.content)}`,
+              );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
                 const content = message.content as {
@@ -449,19 +484,42 @@ export class WorkerClient extends Worker {
               message.contentType?.typeId === "text" &&
               type === typeofStream.Message
             ) {
-              // console.debug(
-              //   `[${this.nameId}] Received message, ${message.content as string}`,
-              // );
+              console.debug(
+                `[${this.nameId}] Received TEXT message: "${message.content as string}" from ${message.senderInboxId} in conversation ${message.conversationId}`,
+              );
+
+              // Log message details for debugging
+              console.debug(
+                `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
+              );
+
               // Handle auto-responses if enabled
               await this.handleResponse(message);
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
+                console.debug(
+                  `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
+                );
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
-                  message, // This is the DecodedMessage object
+                  message: {
+                    conversationId: message.conversationId,
+                    senderInboxId: message.senderInboxId,
+                    content: message.content as string,
+                    contentType: message.contentType,
+                  },
                 });
+              } else {
+                console.debug(
+                  `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
+                );
               }
+            } else {
+              // Log non-text messages for debugging
+              console.debug(
+                `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
+              );
             }
           }
         } catch (error) {
@@ -639,9 +697,24 @@ export class WorkerClient extends Worker {
   }): Promise<T[]> {
     const { type, filterFn, count } = options;
 
+    // Create unique collector ID to prevent conflicts
+    const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    console.debug(
+      `[${this.nameId}] Starting collector ${collectorId} for ${count} events of type ${type}`,
+    );
+
     return new Promise((resolve) => {
       const events: T[] = [];
+      let resolved = false;
+
       const onMessage = (msg: StreamMessage) => {
+        if (resolved) {
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} already resolved, ignoring message`,
+          );
+          return;
+        }
+
         // Map from typeofStream to StreamCollectorType
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
@@ -656,13 +729,29 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
+        console.debug(
+          `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
+        );
+
         if (isRightType && passesFilter) {
           events.push(msg as T);
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
+          );
+
           if (events.length >= count) {
+            resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
+            console.debug(
+              `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
+            );
             resolve(events);
           }
+        } else {
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} rejected message`,
+          );
         }
       };
 
@@ -670,13 +759,23 @@ export class WorkerClient extends Worker {
 
       // Add timeout to prevent hanging indefinitely
       const timeoutId = setTimeout(() => {
-        this.off("worker_message", onMessage);
-        console.error(
-          `[${this.nameId}] Stream collection timed out. ${
-            DEFAULT_STREAM_TIMEOUT_MS / 1000
-          }s.`,
-        );
-        resolve(events); // Resolve with whatever events we've collected so far
+        if (!resolved) {
+          resolved = true;
+          this.off("worker_message", onMessage);
+          console.error(
+            `[${this.nameId}] Collector ${collectorId} timed out. ${
+              DEFAULT_STREAM_TIMEOUT_MS / 1000
+            }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
+          );
+          if (options.additionalInfo) {
+            console.error(
+              `[${this.nameId}] Additional context:`,
+              JSON.stringify(options.additionalInfo, null, 2),
+            );
+          }
+          console.error(`[${this.nameId}] Collected events:`, events);
+          resolve(events); // Resolve with whatever events we've collected so far
+        }
       }, DEFAULT_STREAM_TIMEOUT_MS);
     });
   }
@@ -688,16 +787,39 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
   ): Promise<StreamTextMessage[]> {
+    console.debug(
+      `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+    );
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
-        if (msg.type !== StreamCollectorType.Message) return false;
-        const streamMsg = msg; // Type assertion is fine after the check
+        console.debug(
+          `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
+        );
+
+        if (msg.type !== StreamCollectorType.Message) {
+          console.debug(
+            `[${this.nameId}] Message filtered out: wrong type ${msg.type}`,
+          );
+          return false;
+        }
+
+        const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
         const typeIsText = contentType?.typeId === "text";
-        return idsMatch && typeIsText;
+
+        console.debug(
+          `[${this.nameId}] Message filter check: conversationId=${conversationId}, expectedId=${groupId}, idsMatch=${idsMatch}, contentType=${contentType?.typeId}, typeIsText=${typeIsText}`,
+        );
+
+        const shouldAccept = idsMatch && typeIsText;
+        console.debug(
+          `[${this.nameId}] Message ${shouldAccept ? "ACCEPTED" : "REJECTED"}`,
+        );
+
+        return shouldAccept;
       },
       count,
       additionalInfo: {
