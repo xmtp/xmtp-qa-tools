@@ -30,16 +30,36 @@ interface GitHubContext {
   region?: string;
 }
 
+interface TestFilter {
+  testName: string;
+  uniqueErrorLines: string[];
+}
+
 class SlackNotifier {
   private readonly slackChannel: string;
   private readonly datadogUrl: string;
   private readonly githubContext: GitHubContext;
+  private readonly testFilters: TestFilter[];
 
   constructor() {
     this.slackChannel = process.env.SLACK_CHANNEL || "general";
     this.datadogUrl =
       "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
     this.githubContext = this.getGitHubContext();
+    this.testFilters = [
+      {
+        testName: "Browser",
+        uniqueErrorLines: [
+          "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously",
+        ],
+      },
+      {
+        testName: "Dms",
+        uniqueErrorLines: [
+          "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
+        ],
+      },
+    ];
   }
 
   private getGitHubContext(): GitHubContext {
@@ -107,6 +127,39 @@ class SlackNotifier {
     return true;
   }
 
+  private shouldFilterOutTest(options: SlackNotificationOptions): boolean {
+    if (!options.errorLogs || options.errorLogs.size === 0) {
+      return false;
+    }
+
+    const errorLogs = Array.from(options.errorLogs);
+    const failLines = errorLogs.filter((log) => log.includes("FAIL  suites/"));
+
+    if (failLines.length === 0) {
+      return false;
+    }
+
+    // Check each configured filter
+    for (const filter of this.testFilters) {
+      const matchingLines = failLines.filter((line) =>
+        filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
+      );
+
+      // If all fail lines match this filter's unique error lines, filter it out
+      if (
+        matchingLines.length > 0 &&
+        matchingLines.length === failLines.length
+      ) {
+        console.log(
+          `Slack notification skipped (filtered out ${filter.testName} test failure)`,
+        );
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private getServiceId(region: string): string {
     const serviceIds: Record<string, string> = {
       europe: "c05a415c-23a6-46b9-ae8c-1935a219bae1",
@@ -134,19 +187,6 @@ class SlackNotifier {
       return `*Test log:* <https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792|View url>`;
     }
     return "";
-  }
-
-  private async sendToDatadog(
-    errorLogs: Set<string>,
-    testName: string,
-  ): Promise<void> {
-    const lines = Array.from(errorLogs);
-    for (const line of lines) {
-      await sendDatadogLog(line, {
-        testName,
-        environment: this.githubContext.environment,
-      });
-    }
   }
 
   private generateMessage(options: SlackNotificationOptions): string {
@@ -183,7 +223,14 @@ Logs:
     }
 
     if (options.errorLogs) {
-      await this.sendToDatadog(options.errorLogs, options.testName);
+      await sendDatadogLog(Array.from(options.errorLogs), {
+        testName: options.testName,
+        environment: this.githubContext.environment,
+      });
+    }
+
+    if (this.shouldFilterOutTest(options)) {
+      return;
     }
 
     try {
