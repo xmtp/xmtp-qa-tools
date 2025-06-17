@@ -1,5 +1,6 @@
 import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
+import { KNOWN_ISSUES } from "./logger";
 
 // Type definitions for Slack functionality
 interface SlackApiResponse {
@@ -46,26 +47,7 @@ class SlackNotifier {
     this.datadogUrl =
       "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
     this.githubContext = this.getGitHubContext();
-    this.testFilters = [
-      {
-        testName: "Browser",
-        uniqueErrorLines: [
-          "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously",
-        ],
-      },
-      {
-        testName: "Dms",
-        uniqueErrorLines: [
-          "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
-        ],
-      },
-      {
-        testName: "Agents",
-        uniqueErrorLines: [
-          'FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending "hi"',
-        ],
-      },
-    ];
+    this.testFilters = KNOWN_ISSUES;
   }
 
   private getGitHubContext(): GitHubContext {

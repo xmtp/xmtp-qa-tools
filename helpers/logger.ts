@@ -3,6 +3,27 @@ import path from "path";
 import winston from "winston";
 import "dotenv/config";
 
+export const KNOWN_ISSUES = [
+  {
+    testName: "Browser",
+    uniqueErrorLines: [
+      "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously",
+    ],
+  },
+  {
+    testName: "Dms",
+    uniqueErrorLines: [
+      "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
+    ],
+  },
+  {
+    testName: "Agents",
+    uniqueErrorLines: [
+      'FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending "hi"',
+    ],
+  },
+];
+
 // Patterns to track for error deduplication and log filtering
 export const PATTERNS_TO_TRACK = [
   "sync worker error storage error",
