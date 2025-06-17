@@ -151,7 +151,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   messageTemplate?: string;
   participantsForStats: Worker[];
 }) {
-  await sleep(1000);
   const {
     receivers,
     startCollectors,
@@ -173,6 +172,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
+
+  await sleep(1000);
   const sentEvents = await options.triggerEvents();
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};

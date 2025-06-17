@@ -44,7 +44,7 @@ describe(testName, () => {
           });
         const countBefore = (await conversation.messages()).length;
 
-        let retries = 3;
+        let retries = 1;
         let agentResponded = false;
         let result;
 
