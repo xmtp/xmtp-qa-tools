@@ -1,11 +1,6 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import {
-  createClient,
-  defaultValues,
-  getDataPath,
-  sleep,
-} from "@helpers/client";
+import { createClient, defaultValues, getDataPath } from "@helpers/client";
 import {
   ConsentState,
   Dm,
@@ -204,32 +199,6 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
-  }
-
-  /**
-   * Restarts the message stream by stopping current streams and starting them again
-   */
-  public async restartMessageStream(): Promise<void> {
-    console.debug(
-      `[${this.nameId}] Restarting message stream - stopping current streams`,
-    );
-    this.stopStreams();
-    console.debug(
-      `[${this.nameId}] Streams stopped, activeStreams: ${this.activeStreams}`,
-    );
-
-    // Clear ALL existing event listeners to prevent cross-contamination
-    this.removeAllListeners("worker_message");
-    console.debug(`[${this.nameId}] Cleared all worker_message listeners`);
-
-    console.debug(`[${this.nameId}] Starting new stream`);
-    this.startStream();
-    console.debug(
-      `[${this.nameId}] New stream started, activeStreams: ${this.activeStreams}`,
-    );
-
-    await sleep(1000);
-    console.debug(`[${this.nameId}] Message stream restart completed`);
   }
 
   /**
