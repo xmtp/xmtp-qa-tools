@@ -781,9 +781,6 @@ export class WorkerClient extends Worker {
         );
 
         const shouldAccept = idsMatch && typeIsText;
-        console.debug(
-          `[${this.nameId}] Message ${shouldAccept ? "ACCEPTED" : "REJECTED"}`,
-        );
 
         return shouldAccept;
       },

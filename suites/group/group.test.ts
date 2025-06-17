@@ -6,7 +6,7 @@ import {
   verifyMetadataStream,
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
+import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -17,7 +17,7 @@ export const features = [
   "verifyMembershipStream",
   "verifyMetadataStream",
   "verifyEpochChange",
-  "addInstallationsRandomly",
+  "addRandomInstallations",
   "createGroup",
 ];
 const testName = "group";
@@ -25,10 +25,8 @@ const testConfig = {
   testName: testName,
   groupName: `Group ${getTime()}`,
   epochs: 3,
-  manualUsers: getManualUsers(["prod-testing"]),
-  network: "production",
-  preInstallations: 1,
-  randomInboxIds: 60,
+  manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
+  randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
   typeofStream: typeofStream.None,
   typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
@@ -55,7 +53,6 @@ describe(testName, () => {
       testConfig.typeofStream,
       testConfig.typeOfResponse,
       testConfig.typeOfSync,
-      testConfig.network,
     );
     creator = workers.get("bot") as Worker;
 
@@ -65,7 +62,7 @@ describe(testName, () => {
     console.debug(`Loaded ${existingGroups.length} existing groups`);
 
     const group = (await creator.client.conversations.newGroup(
-      getRandomInboxIds(testConfig.randomInboxIds),
+      testConfig.randomInboxIds,
     )) as Group;
 
     allGroups = [...existingGroups, group.id];
@@ -85,15 +82,12 @@ describe(testName, () => {
     try {
       for (const feature of features) {
         for (const groupId of allGroups) {
-          console.debug(feature, groupId);
+          console.warn(feature, groupId);
           const group = (await creator.client.conversations.getConversationById(
             groupId,
           )) as Group;
           await workers.checkForks();
           switch (feature) {
-            case "addInstallationsRandomly":
-              await workers.addInstallationsRandomly();
-              break;
             case "createGroup": {
               const newGroup = (await creator.client.conversations.newGroup(
                 allInboxIds,
@@ -101,6 +95,9 @@ describe(testName, () => {
               await newGroup.sync();
               break;
             }
+            case "addRandomInstallations":
+              await verifyAddRandomInstallations(workers);
+              break;
             case "verifyMessageStream":
               await verifyMessageStream(
                 group,
@@ -114,7 +111,7 @@ describe(testName, () => {
               await verifyMembershipStream(
                 group,
                 workers.getAllBut("bot"),
-                getRandomInboxIds(1),
+                testConfig.randomInboxIds.slice(0, 1),
               );
               break;
 
@@ -143,7 +140,23 @@ describe(testName, () => {
     }
   });
 });
+export async function verifyAddRandomInstallations(
+  workers: WorkerManager,
+  maxInstallationsPerWorker: number = 5,
+): Promise<void> {
+  for (const worker of workers.getAllBut("bot")) {
+    // Random number between 1 and maxInstallationsPerWorker
+    const randomInstallations =
+      Math.floor(Math.random() * maxInstallationsPerWorker) + 1;
 
+    for (let i = 0; i < randomInstallations; i++) {
+      await worker.worker.addNewInstallation();
+      console.debug(
+        `Added installation ${i + 1}/${randomInstallations} for worker ${worker.name}`,
+      );
+    }
+  }
+}
 export async function verifyEpochChange(
   workers: WorkerManager,
   groupId: string,
@@ -173,7 +186,7 @@ export async function verifyEpochChange(
       }
     }
 
-    for (const member of getRandomInboxIds(6)) {
+    for (const member of getRandomInboxIdsWithRandomInstallations(6)) {
       try {
         await group.removeMembers([member]);
         await group.addMembers([member]);

@@ -148,46 +148,7 @@ export class WorkerManager {
     }
   }
 
-  /**
-   * Adds a new installation to an existing worker, replacing the current one
-   * @param baseName - The base name of the worker
-   * @param installationId - The installation ID (optional, defaults to "a")
-   * @returns Updated worker with new installation
-   */
-  public async addNewInstallationToWorker(
-    baseName: string,
-    installationId: string = "a",
-  ): Promise<Worker> {
-    const worker = this.get(baseName, installationId);
-    if (!worker) {
-      throw new Error(`Worker ${baseName}-${installationId} not found`);
-    }
-
-    console.log(`[${baseName}] Adding new installation to replace current one`);
-
-    // Create new installation on the existing worker
-    const newInstallationDetails = await worker.worker.addNewInstallation();
-
-    // Update the worker object with new installation details
-    const updatedWorker: Worker = {
-      ...worker,
-      client: newInstallationDetails.client,
-      dbPath: newInstallationDetails.dbPath,
-      installationId: newInstallationDetails.installationId,
-      address: newInstallationDetails.address,
-      folder: worker.worker.currentFolder, // Use the updated folder from the worker
-    };
-
-    // Update in our internal storage
-    this.workers[baseName][installationId] = updatedWorker;
-
-    console.log(
-      `[${baseName}] Successfully updated worker with new installation: ${newInstallationDetails.installationId}`,
-    );
-
-    return updatedWorker;
-  }
-  public async revokeExcessInstallations(threshold: number = 10) {
+  public async revokeExcessInstallations(threshold: number = 5) {
     const workers = this.getAll();
     for (const worker of workers) {
       await worker.worker.revokeExcessInstallations(threshold);
@@ -236,15 +197,7 @@ export class WorkerManager {
     );
     return group as Group;
   }
-  async addInstallationsRandomly() {
-    const workers = this.getAll();
-    for (const worker of workers) {
-      const isRandom = Math.random() < 0.5;
-      if (isRandom) {
-        await worker.worker.addNewInstallation();
-      }
-    }
-  }
+
   getAllBut(excludeName: string): Worker[] {
     const workers = this.getAll();
     return workers.filter((worker) => worker.name !== excludeName);

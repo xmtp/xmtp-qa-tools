@@ -14,9 +14,9 @@
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "4e9a79326f013ed23e6c0e3b0a885fa2e9f68357a03e04898c912baf277b4e70",
+    "inboxId": "2b9c13bff17ee77498ec41dacbe5d91de6c6897755d4477c85791868c77a1f6d",
     "network": "local",
-    "name": "prod-"
+    "name": "local-testing"
   },
   {
     "app": "fabri-convos",
