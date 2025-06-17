@@ -60,6 +60,34 @@ export interface DatadogLogOptions {
   outputPath?: string;
 }
 
+export interface ProcessedLogEntry {
+  id: string;
+  type: string;
+  environment: string | null;
+  test: string | null;
+  level: string | null;
+  service: string;
+  region: string | null;
+  env: string | null;
+  libxmtp: string | null;
+  message: string;
+}
+
+export interface ProcessLogsResult {
+  allLogs: DatadogLogEntry[];
+  testFailures: ProcessedLogEntry[];
+  metadata: {
+    source: string;
+    date: string;
+    totalTestFailures: number;
+    totalLogEntries: number;
+    queryPeriod: {
+      from: string;
+      to: string;
+    };
+  };
+}
+
 // System prompt for Claude analysis
 export const SYSTEM_PROMPT = `You are an expert at analyzing test failure data and logs.
 
@@ -261,7 +289,9 @@ export class DatadogLogProcessor {
     );
   }
 
-  private processLogsToFlatFormat(logs: DatadogLogEntry[]): any[] {
+  private processLogsToFlatFormat(
+    logs: DatadogLogEntry[],
+  ): ProcessedLogEntry[] {
     return logs
       .filter((log) => this.isTestFailureLog(log))
       .map((log) => {
@@ -283,26 +313,26 @@ export class DatadogLogProcessor {
       });
   }
 
-  private removeDuplicateFailures(failures: any[]): any[] {
+  private removeDuplicateFailures(
+    failures: ProcessedLogEntry[],
+  ): ProcessedLogEntry[] {
     return failures.filter((failure, index, array) => {
       return (
         array.findIndex(
-          (f) => f.testName === failure.testName && f.id === failure.id,
+          (f) => f.test === failure.test && f.id === failure.id,
         ) === index
       );
     });
   }
 
-  private saveToFile(data: any, outputPath?: string): void {
+  private saveToFile(data: ProcessedLogEntry[], outputPath?: string): void {
     const filepath = outputPath || this.outputPath;
     fs.writeFileSync(filepath, JSON.stringify(data, null, 2));
   }
 
-  public async processLogs(options?: DatadogLogOptions): Promise<{
-    allLogs: DatadogLogEntry[];
-    testFailures: any[];
-    metadata: any;
-  }> {
+  public async processLogs(
+    options?: DatadogLogOptions,
+  ): Promise<ProcessLogsResult> {
     this.validateApiKeys();
 
     const allLogs = await this.fetchAllLogs(options);
@@ -330,8 +360,8 @@ export class DatadogLogProcessor {
 // Public API - keep it simple
 export async function processDatadogLogs(options?: DatadogLogOptions): Promise<{
   allLogs: DatadogLogEntry[];
-  testFailures: TestFailure[];
-  metadata: any;
+  testFailures: ProcessedLogEntry[];
+  metadata: ProcessLogsResult["metadata"];
 }> {
   const processor = new DatadogLogProcessor();
   return await processor.processLogs(options);

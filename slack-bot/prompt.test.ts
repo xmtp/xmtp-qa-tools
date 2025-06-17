@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { askClaude, readIssuesData, SYSTEM_PROMPT } from "./helper";
+import { askClaude, readIssuesData } from "./helper";
 
 describe("Claude Issues Analyzer", () => {
   it("should answer: Which tests fail most often?", async () => {
