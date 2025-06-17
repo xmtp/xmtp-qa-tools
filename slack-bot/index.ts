@@ -110,7 +110,7 @@ async function handleDataDogLogsCommand(args: string[]): Promise<string> {
     const logMessage = `Fetching DataDog logs for: ${testName}`;
 
     // Send log to DataDog
-    await sendDatadogLog(logMessage, {
+    await sendDatadogLog([logMessage], {
       testName,
       source: "slack-bot",
       command: "logs",

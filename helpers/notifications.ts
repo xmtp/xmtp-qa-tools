@@ -136,19 +136,6 @@ class SlackNotifier {
     return "";
   }
 
-  private async sendToDatadog(
-    errorLogs: Set<string>,
-    testName: string,
-  ): Promise<void> {
-    const lines = Array.from(errorLogs);
-    for (const line of lines) {
-      await sendDatadogLog(line, {
-        testName,
-        environment: this.githubContext.environment,
-      });
-    }
-  }
-
   private generateMessage(options: SlackNotificationOptions): string {
     const upperCaseTestName = options.testName
       ? options.testName[0].toUpperCase() + options.testName.slice(1)
@@ -183,7 +170,10 @@ Logs:
     }
 
     if (options.errorLogs) {
-      await this.sendToDatadog(options.errorLogs, options.testName);
+      await sendDatadogLog(Array.from(options.errorLogs), {
+        testName: options.testName,
+        environment: this.githubContext.environment,
+      });
     }
 
     try {

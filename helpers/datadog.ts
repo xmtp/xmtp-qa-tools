@@ -380,14 +380,14 @@ export function flushMetrics(): Promise<void> {
  * Send a log line to Datadog Logs Intake API
  */
 export async function sendDatadogLog(
-  message: string,
+  lines: string[],
   context: Record<string, unknown> = {},
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
   const libXmtpVersion = "latest";
   const logPayload = {
-    message,
+    message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     test: context.testName,
