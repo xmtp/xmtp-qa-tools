@@ -1,9 +1,9 @@
-name: Agents
-description: "should verify performance of the library in the production network"
+name: Functional
+description: "should verify message loss when receiving via 200 streams"
 
 on:
   schedule:
-    - cron: "*/15 * * * *" # Runs every 15 minutes
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
   workflow_dispatch:
 
 jobs:
@@ -12,13 +12,14 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [agents]
+        test: [functional]
         environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      DEFAULT_STREAM_TIMEOUT_MS: 40000
+      DEFAULT_STREAM_TIMEOUT_MS: 10000
       GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: 100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -37,12 +38,11 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.environment }}-${{ matrix.test }}
+          name: artifacts-${{ matrix.environment }}
           path: |
             logs/**/*
             .data/**/*
             .env
           if-no-files-found: ignore
-          overwrite: true
           include-hidden-files: true
           retention-days: 90
