@@ -16,7 +16,7 @@ jobs:
     strategy:
       matrix:
         test: [agents]
-        environment: [dev]
+        environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
