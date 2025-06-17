@@ -49,6 +49,7 @@ describe(testName, () => {
         let result;
 
         while (retries > 0) {
+          console.warn(`${retries} tries left for ${agent.name}`);
           result = await verifyMessageStream(
             conversation as Dm,
             [workers.getCreator()],
@@ -76,7 +77,7 @@ describe(testName, () => {
           }
 
           // Also check if verifyMessageStream confirms reception
-          if (result?.allReceived) {
+          else if (result?.allReceived) {
             console.debug(
               `${agent.name} with address ${agent.address} passed via verifyMessageStream`,
             );
