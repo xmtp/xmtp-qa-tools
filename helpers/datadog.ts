@@ -389,7 +389,7 @@ export async function sendDatadogLog(
     message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
-    source: context.testName,
+    source: "xmtp-qa-tools",
     ...context,
   };
   try {
