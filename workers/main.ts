@@ -545,12 +545,12 @@ export class WorkerClient extends Worker {
         );
         return;
       }
-      let message = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
       if (conversation && conversation.debugInfo !== undefined) {
         const debugInfo = await conversation.debugInfo();
-        message += ` and epoch ${debugInfo?.epoch}`;
+        response += ` and epoch ${debugInfo?.epoch}`;
       }
-      await conversation.send(message);
+      await conversation.send(response);
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }

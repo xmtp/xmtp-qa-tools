@@ -5,14 +5,14 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const testName = "playwright";
 
 describe(testName, async () => {
   let groupId: string;
   const receiver = "random";
-  const headless = false;
+  const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;

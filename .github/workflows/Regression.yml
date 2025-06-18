@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [regression]
+        test: [functional]
         environment: [dev, production]
     env:
       LOGGING_LEVEL: "off"
@@ -34,7 +34,7 @@ jobs:
       - name: Run versions
         run: yarn script versions
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }} --versions 208,209,210 --no-fail --debug
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
