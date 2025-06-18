@@ -43,7 +43,7 @@ describe(testName, () => {
     gmBot = gmBotWorker.get(receiver) as Worker;
   });
 
-  it("should receive group invitation in browser when accompanied by an initial message", async () => {
+  it("Browser new conversation stream with message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -63,7 +63,7 @@ describe(testName, () => {
     }
   });
 
-  it("should receive group invitation in browser without any initial message", async () => {
+  it("Browser new conversation stream without message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -82,7 +82,7 @@ describe(testName, () => {
     }
   });
 
-  it("should create DM through browser UI and receive automated bot response", async () => {
+  it("Browser DM creation and message stream", async () => {
     try {
       await xmtpTester.newDmFromUI(gmBot.address);
       await xmtpTester.sendMessage(`hi ${receiver}`);
@@ -95,7 +95,7 @@ describe(testName, () => {
     }
   });
 
-  it("should handle send a message to a bot", async () => {
+  it("Browser group creation and message stream", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -111,7 +111,7 @@ describe(testName, () => {
     }
   });
 
-  it("should handle adding a member to a group", async () => {
+  it("Browser group member addition", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -132,7 +132,7 @@ describe(testName, () => {
     }
   });
 
-  it("should handle send a message to a bot", async () => {
+  it("Browser new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
       headless,
     });
