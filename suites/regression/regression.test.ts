@@ -14,7 +14,7 @@ describe(testName, () => {
   const versions = sdkVersionOptions.reverse().slice(0, 3);
   const receiverInboxId = getInboxIds(1);
 
-  it("should create group conversation across multiple SDK versions and verify message delivery", async () => {
+  it("should create group conversation with workers using different SDK versions and verify cross-version message delivery", async () => {
     try {
       let names = defaultNames.slice(0, versions.length);
       let count = 0;
@@ -52,20 +52,29 @@ describe(testName, () => {
     }
   });
 
-  it("should test database compatibility after SDK version upgrades", async () => {
+  it("should maintain database compatibility when upgrading SDK versions sequentially from oldest to newest", async () => {
     try {
       for (const version of versions) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
         const bob = workers.get("bob");
-        console.log(
+        console.warn(
           "Upgraded to",
           "node-sdk:" + String(bob?.sdkVersion),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
-
-        expect(convo?.id).toBeDefined();
+        let newGroup = (await bob?.client.conversations.newGroup(
+          receiverInboxId,
+        )) as Group;
+        let members = await newGroup.members();
+        console.log(
+          "Group created with id",
+          newGroup?.id,
+          "and members",
+          members.length,
+        );
+        let verifyResult = await verifyMessageStream(newGroup, [bob!]);
+        expect(verifyResult.allReceived).toBe(true);
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -73,20 +82,29 @@ describe(testName, () => {
     }
   });
 
-  it("should test database compatibility after SDK version downgrades", async () => {
+  it("should maintain database compatibility when downgrading SDK versions sequentially from newest to oldest", async () => {
     try {
       for (const version of versions.reverse()) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
         const bob = workers.get("bob");
-        console.log(
+        console.warn(
           "Downgraded to ",
           "node-sdk:" + String(bob?.sdkVersion),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
-
-        expect(convo?.id).toBeDefined();
+        let newGroup = (await bob?.client.conversations.newGroup(
+          receiverInboxId,
+        )) as Group;
+        let members = await newGroup.members();
+        console.log(
+          "Group created with id",
+          newGroup?.id,
+          "and members",
+          members.length,
+        );
+        let verifyResult = await verifyMessageStream(newGroup, [bob!]);
+        expect(verifyResult.allReceived).toBe(true);
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
