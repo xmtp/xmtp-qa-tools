@@ -1,4 +1,4 @@
-import { getFixedNames } from "@helpers/client";
+import { getFixedNames, getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import {
   verifyAddMemberStream,
@@ -21,7 +21,7 @@ const testName = "streams";
 describe(testName, async () => {
   let group: Group;
   const names = getFixedNames(5);
-  let workers = await getWorkers(names, testName);
+  let workers = await getWorkers(getWorkersWithVersions(names), testName);
 
   // Setup test lifecycle
   setupTestLifecycle({

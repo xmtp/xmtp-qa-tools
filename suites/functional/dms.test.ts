@@ -10,8 +10,6 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 
 describe(testName, async () => {
-  // Example: Using getWorkersWithVersions to support --versions parameter
-  // If TEST_VERSIONS is not set, it will use the latest version for all workers
   const workerDescriptors = getWorkersWithVersions([
     "henry",
     "ivy",

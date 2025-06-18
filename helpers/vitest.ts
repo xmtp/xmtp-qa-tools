@@ -22,6 +22,7 @@ export const setupTestLifecycle = ({
   beforeAll(() => {
     loadEnv(testName);
   });
+
   let start: number;
   beforeEach(() => {
     start = performance.now();

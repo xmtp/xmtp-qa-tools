@@ -1,4 +1,4 @@
-import { getFixedNames } from "@helpers/client";
+import { getFixedNames, getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -11,7 +11,11 @@ const testName = "consent";
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(getFixedNames(5), testName, typeofStream.Consent);
+  workers = await getWorkers(
+    getWorkersWithVersions(getFixedNames(5)),
+    testName,
+    typeofStream.Consent,
+  );
 
   setupTestLifecycle({
     testName,

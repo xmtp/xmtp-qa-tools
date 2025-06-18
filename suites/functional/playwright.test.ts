@@ -1,20 +1,27 @@
 import { sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "gm";
+const testName = "playwright";
 
 describe(testName, () => {
   let groupId: string;
   const receiver = "random";
-  const headless = false;
+  const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
+
+  setupTestLifecycle({
+    testName,
+    expect,
+  });
+
   const inbox = getRandomInbox();
   beforeAll(async () => {
     xmtpTester = new playwright({
