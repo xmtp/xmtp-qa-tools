@@ -25,9 +25,6 @@ interface ParsedTestName {
   members: string;
 }
 
-type MetricSubType = "stream" | "poll" | "recovery";
-type MetricType = "delivery" | "order";
-
 const GEO_TO_COUNTRY_CODE = {
   "us-east": "US",
   "us-west": "US",
