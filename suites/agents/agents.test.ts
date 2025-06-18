@@ -1,5 +1,5 @@
 import { logError } from "@helpers/logger";
-import { verifyBotMessageStream } from "@helpers/streams";
+import { sendDeliveryMetric, verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -83,7 +83,14 @@ describe(testName, () => {
           "received in",
           result?.averageEventTiming,
         );
-
+        sendDeliveryMetric(
+          result?.receptionPercentage ?? 0,
+          workers.getCreator().sdkVersion,
+          workers.getCreator().libXmtpVersion,
+          testName,
+          "stream",
+          "delivery",
+        );
         expect(agentResponded).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
