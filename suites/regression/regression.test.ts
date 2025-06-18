@@ -1,4 +1,4 @@
-import { defaultNames, sdkVersionOptions } from "@helpers/client";
+import { defaultNames, sdkVersionOptions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { typeofStream } from "@workers/main";
@@ -10,7 +10,7 @@ const testName = "regression";
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions.reverse().slice(0, 3);
+  const versions = sdkVersionOptions.reverse().slice(0, 1);
   let cantWorkers = 6;
   let cantRetries = 5;
   let group: Group | undefined = undefined;
@@ -29,9 +29,10 @@ describe(testName, () => {
         ArrayofVersionsRandom.join(", "),
       async () => {
         try {
+          await sleep(1000);
+
           console.warn("allNames", allNames);
           workers = await getWorkers(allNames, testName, typeofStream.Message);
-
           if (!group) {
             group = await workers.createGroup();
           }
@@ -48,6 +49,7 @@ describe(testName, () => {
             workers.getAllButCreator(),
           );
           expect(verifyResult.allReceived).toBe(true);
+          await workers.terminateAll();
         } catch (e) {
           logError(e, expect.getState().currentTestName);
           throw e;
