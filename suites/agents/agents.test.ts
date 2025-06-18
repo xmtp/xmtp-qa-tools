@@ -90,7 +90,7 @@ describe(testName, () => {
           address: agent.address,
           test: testName,
           metric_type: "responseTime",
-          metric_subtype: "",
+          metric_subtype: agent.name,
         });
         expect(agentResponded).toBe(true);
       } catch (e) {
