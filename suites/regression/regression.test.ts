@@ -1,7 +1,6 @@
 import { defaultNames, sdkVersionOptions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -12,65 +11,48 @@ const testName = "regression";
 describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions.reverse().slice(0, 3);
-  const receiverInboxId = getInboxIds(1);
+  let cantWorkers = 6;
+  let cantRetries = 5;
+  let group: Group | undefined = undefined;
 
-  it("should create group conversation with workers using different SDK versions and verify cross-version message delivery", async () => {
-    try {
-      let names = defaultNames.slice(0, versions.length);
-      let count = 0;
-      let allNames = [];
-      for (const version of versions) {
-        allNames.push(names[count] + "-b-" + version);
-        count++;
-      }
-      workers = await getWorkers(allNames, testName, typeofStream.Message);
-      const group = await workers.createGroup();
+  for (let i = 0; i < cantRetries; i++) {
+    let names = defaultNames.slice(0, cantWorkers - 1);
+    const ArrayofVersionsRandom = versions.sort(() => Math.random() - 0.5);
+    let allNames = names.map(
+      (name, index) =>
+        name +
+        "-a-" +
+        ArrayofVersionsRandom[index % ArrayofVersionsRandom.length],
+    );
+    it(
+      "should create group conversation with versions " +
+        ArrayofVersionsRandom.join(", "),
+      async () => {
+        try {
+          console.warn("allNames", allNames);
+          workers = await getWorkers(allNames, testName, typeofStream.Message);
 
-      const members = await group.members();
-      console.log(
-        "Group created with id",
-        group?.id,
-        "and members",
-        members.length,
-      );
-      const verifyResult = await verifyMessageStream(
-        group,
-        workers.getAllButCreator(),
-      );
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+          if (!group) {
+            group = await workers.createGroup();
+          }
 
-  it("should maintain database compatibility when upgrading SDK versions sequentially from oldest to newest", async () => {
-    try {
-      for (const version of versions) {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-
-        const bob = workers.get("bob");
-        console.warn(
-          "Upgraded to",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
-        );
-        let newGroup = (await bob?.client.conversations.newGroup(
-          receiverInboxId,
-        )) as Group;
-        let members = await newGroup.members();
-        console.log(
-          "Group created with id",
-          newGroup?.id,
-          "and members",
-          members.length,
-        );
-        let verifyResult = await verifyMessageStream(newGroup, [bob!]);
-        expect(verifyResult.allReceived).toBe(true);
-      }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+          const members = await group?.members();
+          console.log(
+            "Group created with id",
+            group?.id,
+            "and members",
+            members?.length,
+          );
+          const verifyResult = await verifyMessageStream(
+            group,
+            workers.getAllButCreator(),
+          );
+          expect(verifyResult.allReceived).toBe(true);
+        } catch (e) {
+          logError(e, expect.getState().currentTestName);
+          throw e;
+        }
+      },
+    );
+  }
 });
