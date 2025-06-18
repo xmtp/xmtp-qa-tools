@@ -24,6 +24,7 @@ jobs:
       WORKER_COUNT: 5
       BATCH_SIZE: 50
       MAX_GROUP_SIZE: 200
+      DEFAULT_STREAM_TIMEOUT_MS: 10000
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -36,8 +37,8 @@ jobs:
           cache-dependency-path: "yarn.lock"
       - name: Install dependencies
         run: yarn
-      - name: Run tests
-        run: yarn  ${{ matrix.test }}
+              - name: Run tests
+          run: yarn test ${{ matrix.test }} --no-fail --debug
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4

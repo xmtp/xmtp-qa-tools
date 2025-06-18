@@ -19,6 +19,7 @@ jobs:
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       BATCH_SIZE: 50
+      DEFAULT_STREAM_TIMEOUT_MS: 10000
       MAX_GROUP_SIZE: 200
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
