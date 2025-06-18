@@ -730,7 +730,7 @@ export class WorkerClient extends Worker {
           resolved = true;
           this.off("worker_message", onMessage);
           console.error(
-            `[${this.nameId}] Collector ${collectorId} timed out. ${
+            `[${this.nameId}] Collector timed out. ${
               streamTimeout / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
