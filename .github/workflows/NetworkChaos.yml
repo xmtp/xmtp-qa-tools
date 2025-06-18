@@ -18,9 +18,9 @@ jobs:
           - group-partition-delayedreceive.test.ts
           - node-blackhole.test.ts
           - networkchaos.test.ts
-          - keyrotation.test.ts
           - group-reconciliation.test.ts
           - group-client-partition.test.ts
+          - keyrotation.test.ts
 
     env:
       XMTP_ENV: local
