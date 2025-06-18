@@ -827,7 +827,9 @@ export const defaultNames = [
 
 export const browserTimeout = 10000;
 export const playwrightBeforeSendTimeout = 1000; // 1 second
-export const streamTimeout = 40000; // 10 seconds
+export const streamTimeout = process.env.DEFAULT_STREAM_TIMEOUT_MS
+  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
+  : 20000; // 10 seconds
 
 export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return "0 B";
