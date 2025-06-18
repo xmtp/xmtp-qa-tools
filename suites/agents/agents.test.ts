@@ -1,5 +1,5 @@
 import { logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
+import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -54,10 +54,9 @@ describe(testName, () => {
           messages = await conversation.messages();
           countBefore = messages.length;
 
-          result = await verifyMessageStream(
+          result = await verifyBotMessageStream(
             conversation as Dm,
             [workers.getCreator()],
-            1,
             agent.sendMessage,
           );
 

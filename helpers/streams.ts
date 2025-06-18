@@ -251,7 +251,6 @@ export async function verifyMessageStream(
         let content = messageTemplate;
         content = content.replace("{i}", `${i + 1}`);
         content = content.replace("{randomSuffix}", randomSuffix);
-        //console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
@@ -497,4 +496,31 @@ export function calculateMessageStats(
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
   return { receptionPercentage, orderPercentage };
+}
+
+/**
+ * Specialized function to verify bot response streams
+ * Measures the time it takes for a bot to respond to a trigger message
+ */
+export async function verifyBotMessageStream(
+  group: Conversation,
+  receivers: Worker[],
+  triggerMessage: string,
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await group.send(triggerMessage);
+      // For bot responses, we use a fixed key since any response counts
+      return [{ key: "bot-response", sentAt }];
+    },
+    getKey: () => "bot-response", // Fixed key for both sent and received
+    getMessage: extractContent,
+    statsLabel: "bot-response:",
+    count: 1,
+    messageTemplate: "",
+    participantsForStats: receivers,
+  });
 }
