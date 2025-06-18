@@ -45,22 +45,6 @@ export function unblockFromHostTo(container: DockerContainer): void {
   }
 }
 
-export function blackHoleToHost(container: DockerContainer): void {
-  const hostIP = getGatewayIPFromContainer(container);
-  console.log(`[iptables] Blackholing traffic from ${container.name} to host gateway ${hostIP}`);
-  execSync(`sudo nsenter -t ${container.pid} -n iptables -A OUTPUT -d ${hostIP} -j DROP`);
-}
-
-export function unblockToHost(container: DockerContainer): void {
-  const hostIP = getGatewayIPFromContainer(container);
-  console.log(`[iptables] Removing blackhole rule from ${container.name} to host (${hostIP})`);
-  try {
-    execSync(`sudo nsenter -t ${container.pid} -n iptables -D OUTPUT -d ${hostIP} -j DROP`);
-  } catch (e) {
-    console.warn(`[iptables] Could not delete container-to-host rule: ${e instanceof Error ? e.message : String(e)}`);
-  }
-}
-
 export function blockHostPort(port: number): void {
   console.log(`[iptables] Blocking host traffic to port ${port}`);
   execSync(`sudo iptables -A OUTPUT -p tcp --dport ${port} -j DROP`);
@@ -73,12 +57,6 @@ export function unblockHostPort(port: number): void {
   } catch (e) {
     console.warn(`[iptables] Could not delete rule: ${e instanceof Error ? e.message : String(e)}`);
   }
-}
-export function blackHoleInterContainer(container: DockerContainer): void {
-  const ip = container.ip;
-  console.log(`[iptables] DROP all to/from ${container.name} (${ip}) in DOCKER-USER`);
-  execSync(`sudo iptables -I DOCKER-USER -d ${ip} -j DROP`);
-  execSync(`sudo iptables -I DOCKER-USER -s ${ip} -j DROP`);
 }
 
 export function blockFromHostTo(container: DockerContainer): void {

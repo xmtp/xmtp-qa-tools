@@ -89,7 +89,7 @@ export const regressionClient = async (
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);
-  const apiUrl = apiURL; //"http://localhost:8556";
+  const apiUrl = apiURL;
   console.log("Creating API client with: SDK version: " + sdkVersion + " walletKey: " + walletKey + " API URL: " + apiUrl);
 
   const ClientClass =

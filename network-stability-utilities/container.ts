@@ -99,14 +99,6 @@ export class DockerContainer {
     netem.applyLoss(this, percent);
   }
 
-  blockOutboundTrafficToHost(): void {
-    iptables.blackHoleToHost(this);
-  }
-
-  unblockToHost(): void {
-    iptables.unblockToHost(this);
-  }
-
   blockInboundFromHost(): void {
     iptables.blockFromHostTo(this);
   }
@@ -117,10 +109,6 @@ export class DockerContainer {
     } catch {
       console.log(`[netem] No existing qdisc to clear on ${this.name}`);
     }
-  }
-
-  addFixedLatencyTo(other: DockerContainer, latencyMs: number): void {
-    netem.applyBidirectionalLatency(this, other, latencyMs);
   }
 
   blockOutboundTrafficTo(target: DockerContainer): void {
@@ -147,29 +135,8 @@ export class DockerContainer {
     }
   }
 
-  simulateInterContainerBlackhole(): void {
-    iptables.blackHoleInterContainer(this);
-  }
-
-
   kill(): void {
     execFileSync("docker", ["kill", this.name], { stdio: "inherit" });
-  }
-
-  pause(): void {
-    execFileSync("docker", ["pause", this.name], { stdio: "inherit" });
-  }
-
-  unpause(): void {
-    execFileSync("docker", ["unpause", this.name], { stdio: "inherit" });
-  }
-
-  static listRunningXmtpNodes(): DockerContainer[] {
-    const output = execSync(
-      `docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`
-    ).toString().trim();
-    if (!output) return [];
-    return output.split("\n").map((name) => new DockerContainer(name));
   }
 
   static validateDependencies(): void {
@@ -182,16 +149,4 @@ export class DockerContainer {
       }
     }
   }
-
-  static listByNamePrefix(prefix: string): DockerContainer[] {
-    const output = execSync(`docker ps --format "{{.Names}}"`)
-      .toString()
-      .trim();
-    if (!output) return [];
-    return output
-      .split("\n")
-      .filter((name) => name.startsWith(prefix))
-      .map((name) => new DockerContainer(name));
-  }
-
 }

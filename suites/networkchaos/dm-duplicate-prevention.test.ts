@@ -38,9 +38,9 @@ describe(testName, async () => {
       console.log("[test] Blocking host -> container before send to force retry...");
       node2.blockInboundFromHost();
       console.log("[test] Applying latency, jitter, and packet loss to sender node...");
-      const delay = Math.floor(400 + Math.random() * 200);   // 400–600ms
-      const jitter = Math.floor(Math.random() * 100);        // 0–100ms
-      const loss = Math.random() * 5;                        // 0–5%
+      const delay = Math.floor(400 + Math.random() * 200);   // 400-600ms
+      const jitter = Math.floor(Math.random() * 100);        // 0-100ms
+      const loss = Math.random() * 5;                        // 0-5%
 
       try {
         node2.addJitter(delay, jitter);
