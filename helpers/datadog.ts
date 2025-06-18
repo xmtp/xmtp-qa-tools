@@ -290,20 +290,11 @@ export async function sendPerformanceMetric(
  * Send delivery reliability metrics
  */
 export function sendDeliveryMetric(
+  metricName: string,
   metricValue: number,
-  sdkVersion: string,
-  libXmtpVersion: string,
-  testName: string,
-  metricSubType: MetricSubType,
-  metricType: MetricType,
+  tags: Record<string, string>,
 ): void {
-  sendMetric(metricType, metricValue, {
-    libxmtp: libXmtpVersion,
-    sdk: sdkVersion,
-    test: testName,
-    metric_type: metricType,
-    metric_subtype: metricSubType,
-  });
+  sendMetric(metricName, metricValue, tags);
 }
 
 // Network performance
