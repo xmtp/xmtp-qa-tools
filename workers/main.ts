@@ -12,11 +12,6 @@ import "dotenv/config";
 import path from "node:path";
 import type { WorkerBase } from "./manager";
 
-// Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
-  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
-  : defaultValues.streamTimeout; // 3 seconds
-
 export enum typeOfResponse {
   Gm = "gm",
   Gpt = "gpt",
@@ -735,13 +730,13 @@ export class WorkerClient extends Worker {
           this.off("worker_message", onMessage);
           console.error(
             `[${this.nameId}] Collector ${collectorId} timed out. ${
-              DEFAULT_STREAM_TIMEOUT_MS / 1000
+              defaultValues.streamTimeout / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
           resolve(events);
         }
-      }, DEFAULT_STREAM_TIMEOUT_MS);
+      }, defaultValues.streamTimeout);
     });
   }
 
