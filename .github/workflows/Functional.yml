@@ -17,7 +17,6 @@ jobs:
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
-      DEFAULT_STREAM_TIMEOUT_MS: 10000
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       DELIVERY_AMOUNT: 100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
@@ -33,7 +32,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4

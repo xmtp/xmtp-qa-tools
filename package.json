@@ -20,7 +20,7 @@
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
-    "large": "yarn test suites/large/* ",
+    "large": "yarn test suites/large",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500",
     "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",

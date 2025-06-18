@@ -71,7 +71,6 @@ The tests require specific environment variables for proper operation:
 ```bash
 # Set in .env file
 XMTP_ENV=dev  # or production
-DEFAULT_STREAM_TIMEOUT_MS=10000
 GITHUB_ACTIONS=false  # Set to true in CI environment
 ```
 
@@ -236,9 +235,6 @@ yarn test browser
 
 # Run in headless mode
 HEADLESS=true yarn test browser
-
-# Run with specific timeout
-DEFAULT_STREAM_TIMEOUT_MS=15000 yarn test browser
 ```
 
 ### Debugging
@@ -287,70 +283,3 @@ jobs:
 - **Scheduled Runs**: Hourly execution to catch regressions quickly
 - **Failure Artifacts**: Screenshots and logs automatically collected
 - **Performance Metrics**: Response time and delivery tracking
-
-## Troubleshooting
-
-### Common Issues
-
-1. **Timeout Errors**
-
-   - Increase `DEFAULT_STREAM_TIMEOUT_MS`
-   - Check network connectivity to xmtp.chat
-   - Verify XMTP network status
-
-2. **UI Element Not Found**
-
-   - Check if xmtp.chat UI has changed
-   - Update selectors in playwright helper
-   - Take screenshots to debug layout changes
-
-3. **Message Delivery Failures**
-   - Verify worker bot connectivity
-   - Check XMTP environment configuration
-   - Review network logs for errors
-
-### Debug Commands
-
-```bash
-# Run with full debug output
-DEBUG=* yarn test browser
-
-# Generate detailed test report
-yarn test browser --reporter=html
-
-# Run specific test case
-yarn test browser -t "should receive invite with message"
-```
-
-## Metrics and Reporting
-
-### Performance Tracking
-
-- Message delivery latency
-- UI response times
-- Group creation duration
-- Browser load times
-
-### Test Coverage
-
-- Group messaging workflows: 100%
-- DM functionality: 100%
-- UI navigation: 95%
-- Error scenarios: 80%
-
-## Future Enhancements
-
-### Planned Features
-
-1. **Mobile Browser Testing**: Add mobile viewport testing
-2. **Network Conditions**: Test under various network conditions
-3. **Accessibility Testing**: WCAG compliance validation
-4. **Performance Monitoring**: Detailed performance metrics
-5. **Cross-Browser Support**: Firefox and Safari testing
-
-### Integration Opportunities
-
-1. **Visual Regression**: Screenshot comparison testing
-2. **API Monitoring**: Backend API health checks
-3. **Load Testing**: Multi-user concurrent scenarios
-4. **Security Testing**: XSS and injection testing

@@ -796,14 +796,9 @@ export const defaultNames = [
   "guada", // max 61
 ];
 
-export const defaultValues = {
-  amount: 5, // 5 messages
-  playwrightBeforeSendTimeout: 1000, // 1 second
-  streamTimeout: 3000, // 3 seconds
-  timeout: 40000, // 40 seconds
-  perMessageTimeout: 3000, // 3 seconds
-  defaultNames,
-};
+export const playwrightBeforeSendTimeout = 1000; // 1 second
+export const streamTimeout = 10000; // 10 seconds
+
 export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return "0 B";
   const k = 1024;
