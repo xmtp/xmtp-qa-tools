@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { defaultValues } from "@helpers/client";
+import { playwrightBeforeSendTimeout, streamTimeout } from "@helpers/client";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
@@ -141,7 +141,7 @@ export class playwright {
       name: "Type a message...",
     });
     await messageInput.waitFor({ state: "visible" });
-    await this.page.waitForTimeout(defaultValues.playwrightBeforeSendTimeout);
+    await this.page.waitForTimeout(playwrightBeforeSendTimeout);
 
     console.debug("Filling message");
     await messageInput.fill(message);
@@ -155,7 +155,7 @@ export class playwright {
    */
   public async waitForNewConversation(groupName: string): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < defaultValues.streamTimeout / 1000; i++) {
+    for (let i = 0; i < streamTimeout / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestGroupFromList();
       console.debug(`Latest group: "${responseText}"`);
@@ -189,7 +189,7 @@ export class playwright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < defaultValues.streamTimeout / 1000; i++) {
+    for (let i = 0; i < streamTimeout / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestMessageText();
       if (

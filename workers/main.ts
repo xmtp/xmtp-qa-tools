@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { createClient, defaultValues, getDataPath } from "@helpers/client";
+import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
   Dm,
@@ -730,13 +730,13 @@ export class WorkerClient extends Worker {
           this.off("worker_message", onMessage);
           console.error(
             `[${this.nameId}] Collector ${collectorId} timed out. ${
-              defaultValues.streamTimeout / 1000
+              streamTimeout / 1000
             }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
           );
 
           resolve(events);
         }
-      }, defaultValues.streamTimeout);
+      }, streamTimeout);
     });
   }
 
