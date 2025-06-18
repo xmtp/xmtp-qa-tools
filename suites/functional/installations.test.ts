@@ -1,4 +1,6 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -12,7 +14,11 @@ describe(testName, () => {
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
-    let initialWorkers = await getWorkers(names, testName);
+    let initialWorkers = await getWorkers(
+      getWorkersWithVersions(names),
+      testName,
+      typeofStream.Message,
+    );
     expect(initialWorkers.get(names[0])?.folder).toBe("a");
     expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
@@ -41,7 +47,11 @@ describe(testName, () => {
       secondaryWorkers.get(names[1], "b")?.dbPath,
     );
     // Create charlie only when we need him
-    const terciaryWorkers = await getWorkers([names[2]], testName);
+    const terciaryWorkers = await getWorkers(
+      getWorkersWithVersions([names[2]]),
+      testName,
+      typeofStream.Message,
+    );
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryWorkers.get(names[0], "desktop");

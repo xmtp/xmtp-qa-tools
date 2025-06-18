@@ -1,6 +1,7 @@
-import { sleep } from "@helpers/client";
+import { getWorkersWithVersions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -8,19 +9,17 @@ import { describe, expect, it } from "vitest";
 const testName = "sync-comparison";
 
 describe(testName, async () => {
-  setupTestLifecycle({ testName, expect });
   let workers: WorkerManager;
   let testGroup: Group;
 
   // Define test workers
-  const testWorkers = [
-    "henry", // Group creator
-    "ivy", // Message sender
-    "jack", // Test sync at client level
-    "karen", // Test sync at conversation level
-    "larry", // Test messages without sync
-  ];
-  workers = await getWorkers(testWorkers, testName);
+  const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
+  workers = await getWorkers(
+    getWorkersWithVersions(testWorkers),
+    testName,
+    typeofStream.Message,
+  );
+  setupTestLifecycle({ testName, expect });
 
   it("should establish test environment by creating group with all participants", async () => {
     try {

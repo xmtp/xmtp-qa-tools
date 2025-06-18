@@ -1,3 +1,4 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -11,7 +12,7 @@ describe(testName, async () => {
   let group: Group;
 
   const workers = await getWorkers(
-    [
+    getWorkersWithVersions([
       "henry",
       "ivy",
       "jack",
@@ -21,7 +22,7 @@ describe(testName, async () => {
       "mary",
       "nancy",
       "oscar",
-    ],
+    ]),
     testName,
     typeofStream.GroupUpdated,
   );

@@ -545,11 +545,12 @@ export class WorkerClient extends Worker {
         );
         return;
       }
-
-      const debugInfo = await conversation?.debugInfo();
-      await conversation?.send(
-        `${this.nameId} says: gm from epoch ${debugInfo?.epoch}`,
-      );
+      let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      if (conversation && conversation.debugInfo !== undefined) {
+        const debugInfo = await conversation.debugInfo();
+        response += ` and epoch ${debugInfo?.epoch}`;
+      }
+      await conversation.send(response);
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }

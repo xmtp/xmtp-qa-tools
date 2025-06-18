@@ -1,5 +1,7 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -10,7 +12,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(
-    [
+    getWorkersWithVersions([
       "henry",
       "ivy",
       "jack",
@@ -21,8 +23,9 @@ describe(testName, async () => {
       "mary",
       "nancy",
       "oscar",
-    ],
+    ]),
     testName,
+    typeofStream.Message,
   );
 
   setupTestLifecycle({

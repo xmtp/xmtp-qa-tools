@@ -1,42 +1,48 @@
-import { sleep } from "@helpers/client";
+import { getWorkersWithVersions, sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
-import { beforeAll, describe, expect, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
-const testName = "gm";
+const testName = "playwright";
 
-describe(testName, () => {
+describe(testName, async () => {
   let groupId: string;
   const receiver = "random";
   const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;
-  const inbox = getRandomInbox();
-  beforeAll(async () => {
-    xmtpTester = new playwright({
-      headless,
-      defaultUser: inbox,
-    });
-    await xmtpTester.startPage();
-    const convoStreamBot = await getWorkers(
-      ["bob"],
-      testName,
-      typeofStream.Conversation,
-    );
-    const gmBotWorker = await getWorkers(
-      [receiver],
-      testName,
-      typeofStream.Message,
-      typeOfResponse.Gm,
-    );
 
-    creator = convoStreamBot.get("bob") as Worker;
-    gmBot = gmBotWorker.get(receiver) as Worker;
+  setupTestLifecycle({
+    testName,
+    expect,
   });
+
+  const inbox = getRandomInbox();
+
+  xmtpTester = new playwright({
+    headless,
+    defaultUser: inbox,
+  });
+  await xmtpTester.startPage();
+  const convoStreamBot = await getWorkers(
+    getWorkersWithVersions(["bob"]),
+    testName,
+    typeofStream.Conversation,
+  );
+  const gmBotWorker = await getWorkers(
+    getWorkersWithVersions([receiver]),
+    testName,
+    typeofStream.Message,
+    typeOfResponse.Gm,
+  );
+
+  creator = convoStreamBot.get("bob") as Worker;
+  gmBot = gmBotWorker.get(receiver) as Worker;
 
   it("should detect group invitation in browser when invitation includes an initial message", async () => {
     try {

@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { playwrightBeforeSendTimeout, streamTimeout } from "@helpers/client";
+import { browserTimeout, playwrightBeforeSendTimeout } from "@helpers/client";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
@@ -155,7 +155,7 @@ export class playwright {
    */
   public async waitForNewConversation(groupName: string): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < streamTimeout / 1000; i++) {
+    for (let i = 0; i < browserTimeout / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestGroupFromList();
       console.debug(`Latest group: "${responseText}"`);
@@ -189,7 +189,7 @@ export class playwright {
    */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < streamTimeout / 1000; i++) {
+    for (let i = 0; i < browserTimeout / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestMessageText();
       if (

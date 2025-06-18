@@ -1,17 +1,19 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
-import { getWorkers } from "@workers/manager";
+import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "groups";
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    [
+  let workers: WorkerManager;
+  workers = await getWorkers(
+    getWorkersWithVersions([
       "henry",
       "ivy",
       "jack",
@@ -21,7 +23,7 @@ describe(testName, async () => {
       "mary",
       "nancy",
       "oscar",
-    ],
+    ]),
     testName,
     typeofStream.Message,
   );

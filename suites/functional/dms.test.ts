@@ -1,3 +1,4 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,19 +10,21 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 
 describe(testName, async () => {
+  const workerDescriptors = getWorkersWithVersions([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "randomguy2",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
+
   const workers = await getWorkers(
-    [
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "randomguy2",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ],
+    workerDescriptors,
     testName,
     typeofStream.Message,
   );

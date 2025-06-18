@@ -82,10 +82,13 @@ function showUsageAndExit(): never {
     "      --debug-verbose     Enable logging to both file AND terminal output",
   );
   console.error(
-    "      --debug-file <name>   Custom log file name (default: auto-generated)",
+    "      --debug-file <n>   Custom log file name (default: auto-generated)",
   );
   console.error(
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
+  );
+  console.error(
+    "      --versions <list>   Comma-separated list of SDK versions (e.g., 209,210)",
   );
   console.error(
     "      [vitest_options...] Other options passed directly to vitest",
@@ -107,6 +110,9 @@ function showUsageAndExit(): never {
   );
   console.error(
     "  yarn cli test functional --no-fail        # Uses retry mode",
+  );
+  console.error(
+    "  yarn cli test functional --versions 209,210 # Uses random workers with versions 209 and 210",
   );
   process.exit(1);
 }
@@ -182,6 +188,17 @@ function parseTestArgs(args: string[]): {
           i++;
         }
         break;
+      case "--versions":
+        if (nextArg) {
+          // Store versions in vitestArgs to be passed as environment variable
+          options.vitestArgs.push(`--versions=${nextArg}`);
+          i++;
+        } else {
+          console.warn(
+            "--versions flag requires a value (e.g., --versions 209,210)",
+          );
+        }
+        break;
       case "--debug":
         options.enableLogging = true;
         options.explicitLogFlag = true;
@@ -232,7 +249,7 @@ function buildTestCommand(
     : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
 
   if (testName === "functional") {
-    const expandedFiles = expandGlobPattern("./functional/*.test.ts");
+    const expandedFiles = expandGlobPattern("./suites/functional/*.test.ts");
     if (expandedFiles.length === 0) {
       throw new Error("No functional test files found");
     }
@@ -326,6 +343,21 @@ async function runVitestTest(
     ...process.env,
     RUST_BACKTRACE: "1",
   };
+
+  // Extract --versions parameter and set as environment variable
+  const versionsArg = options.vitestArgs.find((arg) =>
+    arg.startsWith("--versions="),
+  );
+  if (versionsArg) {
+    const versions = versionsArg.split("=")[1];
+    env.TEST_VERSIONS = versions;
+    console.debug(`Setting TEST_VERSIONS environment variable to: ${versions}`);
+
+    // Remove from vitestArgs since it's not a vitest parameter
+    options.vitestArgs = options.vitestArgs.filter(
+      (arg) => !arg.startsWith("--versions="),
+    );
+  }
 
   // Only set debug logging if --debug was explicitly passed
   if (options.explicitLogFlag) {
@@ -448,6 +480,29 @@ async function main(): Promise<void> {
           !options.noFail;
 
         if (isSimpleRun) {
+          // Process environment variables for simple runs too
+          const env: Record<string, string> = {
+            ...process.env,
+            RUST_BACKTRACE: "1",
+          };
+
+          // Extract --versions parameter and set as environment variable
+          const versionsArg = options.vitestArgs.find((arg) =>
+            arg.startsWith("--versions="),
+          );
+          if (versionsArg) {
+            const versions = versionsArg.split("=")[1];
+            env.TEST_VERSIONS = versions;
+            console.debug(
+              `Setting TEST_VERSIONS environment variable to: ${versions}`,
+            );
+
+            // Remove from vitestArgs since it's not a vitest parameter
+            options.vitestArgs = options.vitestArgs.filter(
+              (arg) => !arg.startsWith("--versions="),
+            );
+          }
+
           // Run test directly without logger for native terminal output
           const command = buildTestCommand(
             testName,
@@ -456,7 +511,7 @@ async function main(): Promise<void> {
           );
           console.debug(`Running test: ${testName}`);
           console.debug(`Executing: ${command}`);
-          execSync(command, { stdio: "inherit" });
+          execSync(command, { stdio: "inherit", env });
         } else {
           // Use retry mechanism with logger
           await runVitestTest(testName, options);
