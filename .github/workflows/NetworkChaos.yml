@@ -11,6 +11,7 @@ jobs:
 
     strategy:
       max-parallel: 1
+      fail-fast: false
       matrix:
         test_file:
           - smoketests.test.ts
@@ -51,7 +52,7 @@ jobs:
           FILE=suites/networkchaos/${{ matrix.test_file }}
           echo "Running $FILE"
           if ! npx vitest run $FILE; then
-            echo "Retrying $FILE after environment reset..."
+            echo "Initial run failed for $FILE. Retrying after env reset..."
             ./multinode/ci.sh
             npx vitest run $FILE
           fi
@@ -73,3 +74,4 @@ jobs:
       - name: Tear Down Docker
         if: always()
         run: cd multinode && docker compose down
+
