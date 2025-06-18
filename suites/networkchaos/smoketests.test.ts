@@ -1,5 +1,5 @@
 import { describe, it } from "vitest";
-import { DockerContainer } from "../network-stability-utilities/container";
+import { DockerContainer } from "../../network-stability-utilities/container";
 
 describe("Basic Network Fault Tests", () => {
     const node1 = new DockerContainer("multinode-node1-1");
