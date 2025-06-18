@@ -733,6 +733,35 @@ export function getMultiVersion(count: number): string[] {
 
   return descriptors;
 }
+
+/**
+ * Creates worker descriptors with versions from TEST_VERSIONS environment variable
+ * If TEST_VERSIONS is not set, uses the latest version
+ * @param workerNames - Array of worker names to create descriptors for
+ * @returns Array of worker descriptors with version suffixes
+ */
+export function getWorkersWithVersions(workerNames: string[]): string[] {
+  const testVersions = process.env.TEST_VERSIONS;
+
+  if (!testVersions) {
+    // No versions specified, return names as-is (will use latest version)
+    return workerNames;
+  }
+
+  const availableVersions = testVersions.split(",").map((v) => v.trim());
+  console.debug(`Using TEST_VERSIONS: ${availableVersions.join(", ")}`);
+
+  const descriptors: string[] = [];
+  for (const workerName of workerNames) {
+    // Pick a random version from the specified list
+    const randomVersion =
+      availableVersions[Math.floor(Math.random() * availableVersions.length)];
+    descriptors.push(`${workerName}-a-${randomVersion}`);
+  }
+
+  return descriptors;
+}
+
 export const getRandomNames = (count: number): string[] => {
   return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
 };
@@ -795,6 +824,8 @@ export const defaultNames = [
   "zara",
   "guada", // max 61
 ];
+
+export const browserTimeout = 10000;
 
 export const playwrightBeforeSendTimeout = 1000; // 1 second
 export const streamTimeout = 40000; // 10 seconds

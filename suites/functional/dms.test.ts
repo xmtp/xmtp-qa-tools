@@ -1,3 +1,4 @@
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,19 +10,23 @@ import { describe, expect, it } from "vitest";
 const testName = "dms";
 
 describe(testName, async () => {
+  // Example: Using getWorkersWithVersions to support --versions parameter
+  // If TEST_VERSIONS is not set, it will use the latest version for all workers
+  const workerDescriptors = getWorkersWithVersions([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "randomguy2",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
+
   const workers = await getWorkers(
-    [
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "randomguy2",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ],
+    workerDescriptors,
     testName,
     typeofStream.Message,
   );
