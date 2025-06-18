@@ -28,7 +28,7 @@ export const KNOWN_ISSUES = [
 export const PATTERNS_TO_TRACK = [
   "sync worker error storage error",
   "sqlcipher_mlock",
-  "timed out.",
+  "Collector timed out.",
   // Add more patterns here as needed
 ];
 
