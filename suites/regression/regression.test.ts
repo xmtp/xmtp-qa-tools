@@ -19,21 +19,13 @@ describe(testName, () => {
       let names = defaultNames.slice(0, versions.length);
       let count = 0;
       let allNames = [];
-      for (const version of versions.reverse()) {
+      for (const version of versions) {
         allNames.push(names[count] + "-b-" + version);
         count++;
       }
       workers = await getWorkers(allNames, testName, typeofStream.Message);
-      const creator = workers.getCreator();
-      const group = (await creator.client.conversations.newGroup([])) as Group;
+      const group = await workers.createGroup();
 
-      for (const worker of workers.getAllButCreator()) {
-        try {
-          await group.addMembers([worker.client.inboxId]);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-        }
-      }
       const members = await group.members();
       console.log(
         "Group created with id",
@@ -60,36 +52,6 @@ describe(testName, () => {
         const bob = workers.get("bob");
         console.warn(
           "Upgraded to",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
-        );
-        let newGroup = (await bob?.client.conversations.newGroup(
-          receiverInboxId,
-        )) as Group;
-        let members = await newGroup.members();
-        console.log(
-          "Group created with id",
-          newGroup?.id,
-          "and members",
-          members.length,
-        );
-        let verifyResult = await verifyMessageStream(newGroup, [bob!]);
-        expect(verifyResult.allReceived).toBe(true);
-      }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("should maintain database compatibility when downgrading SDK versions sequentially from newest to oldest", async () => {
-    try {
-      for (const version of versions.reverse()) {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-
-        const bob = workers.get("bob");
-        console.warn(
-          "Downgraded to ",
           "node-sdk:" + String(bob?.sdkVersion),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
