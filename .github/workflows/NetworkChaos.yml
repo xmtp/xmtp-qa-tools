@@ -13,6 +13,7 @@ jobs:
       max-parallel: 1
       matrix:
         test_file:
+          - smoketests.test.ts
           - group-client-partition.test.ts
           - group-partition-delayedreceive.test.ts
           - node-blackhole.test.ts
@@ -71,5 +72,4 @@ jobs:
 
       - name: Tear Down Docker
         if: always()
-        run: docker compose down
-
+        run: cd multinode && docker compose down
