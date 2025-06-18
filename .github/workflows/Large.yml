@@ -37,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn  ${{ matrix.test }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
