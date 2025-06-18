@@ -826,7 +826,6 @@ export const defaultNames = [
 ];
 
 export const browserTimeout = 10000;
-
 export const playwrightBeforeSendTimeout = 1000; // 1 second
 export const streamTimeout = 40000; // 10 seconds
 
