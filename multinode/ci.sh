@@ -1,4 +1,6 @@
 #!/bin/bash
+script_dir="$(cd $(dirname $0) && pwd)"
+pushd $script_dir >/dev/null
 echo "Tearing down and starting Docker environment..."
 
 for x in {1..3}; {
@@ -16,3 +18,5 @@ for x in {1..3}; {
 }
 
 echo "Could not start XMTP nodes after 3 attempts, exiting" && exit 1
+
+popd >/dev/null
