@@ -2,6 +2,9 @@ name: Large
 description: "should verify performance of the group streams"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 */2 * * *" # Runs every 2 hours
   workflow_dispatch:
@@ -34,7 +37,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --no-fail --debug
+        run: yarn test ${{ matrix.test }}
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
