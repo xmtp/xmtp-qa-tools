@@ -127,8 +127,3 @@ services:
     environment:
       POSTGRES_PASSWORD: xmtp
 
-  upload-service:
-    build: ./uploadService
-    ports:
-      - 3000:3000
-
