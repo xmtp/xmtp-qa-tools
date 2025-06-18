@@ -14,13 +14,13 @@ jobs:
       matrix:
         test_file:
           - smoketests.test.ts
-          - group-client-partition.test.ts
+          - dm-duplicate-prevention.test.ts
           - group-partition-delayedreceive.test.ts
           - node-blackhole.test.ts
           - networkchaos.test.ts
           - keyrotation.test.ts
           - group-reconciliation.test.ts
-          - dm-duplicate-prevention.test.ts
+          - group-client-partition.test.ts
 
     env:
       XMTP_ENV: local
