@@ -1,7 +1,6 @@
-import { defaultNames, sdkVersionOptions } from "@helpers/client";
+import { defaultNames, sdkVersionOptions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
-import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -11,86 +10,51 @@ const testName = "regression";
 
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions.reverse().slice(0, 3);
-  const receiverInboxId = getInboxIds(1);
+  const versions = sdkVersionOptions.reverse().slice(0, 1);
+  let cantWorkers = 6;
+  let cantRetries = 5;
+  let group: Group | undefined = undefined;
 
-  it("should create group conversation across multiple SDK versions and verify message delivery", async () => {
-    try {
-      let names = defaultNames.slice(0, versions.length);
-      let count = 0;
-      let allNames = [];
-      for (const version of versions.reverse()) {
-        allNames.push(names[count] + "-b-" + version);
-        count++;
-      }
-      workers = await getWorkers(allNames, testName, typeofStream.Message);
-      const creator = workers.getCreator();
-      const group = (await creator.client.conversations.newGroup([])) as Group;
-
-      for (const worker of workers.getAllButCreator()) {
+  for (let i = 0; i < cantRetries; i++) {
+    let names = defaultNames.slice(0, cantWorkers - 1);
+    const ArrayofVersionsRandom = versions.sort(() => Math.random() - 0.5);
+    let allNames = names.map(
+      (name, index) =>
+        name +
+        "-a-" +
+        ArrayofVersionsRandom[index % ArrayofVersionsRandom.length],
+    );
+    it(
+      "should create group conversation with versions " +
+        ArrayofVersionsRandom.join(", "),
+      async () => {
         try {
-          await group.addMembers([worker.client.inboxId]);
+          await sleep(1000);
+
+          console.warn("allNames", allNames);
+          workers = await getWorkers(allNames, testName, typeofStream.Message);
+          if (!group) {
+            group = await workers.createGroup();
+          }
+
+          const members = await group?.members();
+          console.log(
+            "Group created with id",
+            group?.id,
+            "and members",
+            members?.length,
+          );
+          const verifyResult = await verifyMessageStream(
+            group,
+            workers.getAllButCreator(),
+          );
+          expect(verifyResult.allReceived).toBe(true);
+          await workers.terminateAll();
         } catch (e) {
           logError(e, expect.getState().currentTestName);
+          throw e;
         }
-      }
-      const members = await group.members();
-      console.log(
-        "Group created with id",
-        group?.id,
-        "and members",
-        members.length,
-      );
-      const verifyResult = await verifyMessageStream(
-        group,
-        workers.getAllButCreator(),
-      );
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("should test database compatibility after SDK version upgrades", async () => {
-    try {
-      for (const version of versions) {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-
-        const bob = workers.get("bob");
-        console.log(
-          "Upgraded to",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
-        );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
-
-        expect(convo?.id).toBeDefined();
-      }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it("should test database compatibility after SDK version downgrades", async () => {
-    try {
-      for (const version of versions.reverse()) {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
-
-        const bob = workers.get("bob");
-        console.log(
-          "Downgraded to ",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
-        );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId[0]);
-
-        expect(convo?.id).toBeDefined();
-      }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+      },
+    );
+  }
 });

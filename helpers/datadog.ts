@@ -286,26 +286,6 @@ export async function sendPerformanceMetric(
   }
 }
 
-/**
- * Send delivery reliability metrics
- */
-export function sendDeliveryMetric(
-  metricValue: number,
-  sdkVersion: string,
-  libXmtpVersion: string,
-  testName: string,
-  metricSubType: MetricSubType,
-  metricType: MetricType,
-): void {
-  sendMetric(metricType, metricValue, {
-    libxmtp: libXmtpVersion,
-    sdk: sdkVersion,
-    test: testName,
-    metric_type: metricType,
-    metric_subtype: metricSubType,
-  });
-}
-
 // Network performance
 const execAsync = promisify(exec);
 

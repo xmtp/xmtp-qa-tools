@@ -1,5 +1,6 @@
+import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
+import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -54,10 +55,9 @@ describe(testName, () => {
           messages = await conversation.messages();
           countBefore = messages.length;
 
-          result = await verifyMessageStream(
+          result = await verifyBotMessageStream(
             conversation as Dm,
             [workers.getCreator()],
-            1,
             agent.sendMessage,
           );
 
@@ -85,6 +85,13 @@ describe(testName, () => {
           result?.averageEventTiming,
         );
 
+        sendMetric("agents", result?.averageEventTiming ?? 0, {
+          agent: agent.name,
+          address: agent.address,
+          test: testName,
+          metric_type: "responseTime",
+          metric_subtype: agent.name,
+        });
         expect(agentResponded).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

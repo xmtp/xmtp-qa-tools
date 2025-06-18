@@ -1,5 +1,5 @@
 import { getFixedNames } from "@helpers/client";
-import { sendDeliveryMetric } from "@helpers/datadog";
+import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -75,26 +75,26 @@ describe(testName, async () => {
       // Only run expectations if we have values
       if (receptionPercentage > 0) {
         expect(receptionPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          receptionPercentage,
-          workers.getCreator().sdkVersion,
-          workers.getCreator().libXmtpVersion,
-          testName,
-          "stream",
-          "delivery",
-        );
+
+        sendMetric("delivery", receptionPercentage, {
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
+          test: testName,
+          metric_type: "stream",
+          metric_subtype: "delivery",
+        });
       }
 
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          orderPercentage,
-          workers.getCreator().sdkVersion,
-          workers.getCreator().libXmtpVersion,
-          testName,
-          "stream",
-          "order",
-        );
+
+        sendMetric("delivery", orderPercentage, {
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
+          test: testName,
+          metric_type: "stream",
+          metric_subtype: "order",
+        });
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -144,26 +144,25 @@ describe(testName, async () => {
       // Only run expectations if we have values
       if (receptionPercentage > 0) {
         expect(receptionPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          receptionPercentage,
-          workers.getCreator().sdkVersion,
-          workers.getCreator().libXmtpVersion,
-          testName,
-          "poll",
-          "delivery",
-        );
+
+        sendMetric("delivery", receptionPercentage, {
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
+          test: testName,
+          metric_type: "poll",
+          metric_subtype: "delivery",
+        });
       }
 
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          orderPercentage,
-          workers.getCreator().sdkVersion,
-          workers.getCreator().libXmtpVersion,
-          testName,
-          "poll",
-          "order",
-        );
+        sendMetric("delivery", orderPercentage, {
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
+          test: testName,
+          metric_type: "poll",
+          metric_subtype: "order",
+        });
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -236,26 +235,25 @@ describe(testName, async () => {
       // Only run expectations if we have values
       if (receptionPercentage > 0) {
         expect(receptionPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          receptionPercentage,
-          offlineWorker.sdkVersion,
-          offlineWorker.libXmtpVersion,
-          testName,
-          "recovery",
-          "delivery",
-        );
+
+        sendMetric("delivery", receptionPercentage, {
+          libxmtp: offlineWorker.libXmtpVersion,
+          sdk: offlineWorker.sdkVersion,
+          test: testName,
+          metric_type: "recovery",
+          metric_subtype: "delivery",
+        });
       }
 
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
-        sendDeliveryMetric(
-          orderPercentage,
-          offlineWorker.sdkVersion,
-          offlineWorker.libXmtpVersion,
-          testName,
-          "recovery",
-          "order",
-        );
+        sendMetric("delivery", orderPercentage, {
+          libxmtp: offlineWorker.libXmtpVersion,
+          sdk: offlineWorker.sdkVersion,
+          test: testName,
+          metric_type: "recovery",
+          metric_subtype: "order",
+        });
       }
     } catch (e) {
       logError(e, expect.getState().currentTestName);

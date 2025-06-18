@@ -324,6 +324,78 @@
         "type": "list_stream"
       },
       "layout": { "x": 0, "y": 11, "width": 6, "height": 4 }
+    },
+    {
+      "id": 8901234567890123,
+      "definition": {
+        "title": "Agent Response Times",
+        "type": "query_table",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.agents{metric_type:responseTime,$env,$region,$test} by {agent,address}"
+              }
+            ],
+            "response_format": "scalar",
+            "order": "desc",
+            "limit": 50,
+            "sort": {
+              "count": 500,
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
+            },
+            "formulas": [
+              { "alias": "Avg Response Time (ms)", "formula": "query1" }
+            ]
+          }
+        ],
+        "has_search_bar": "auto"
+      },
+      "layout": { "x": 0, "y": 15, "width": 6, "height": 4 }
+    },
+    {
+      "id": 9012345678901234,
+      "definition": {
+        "title": "Agent Response Times Over Time",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value"],
+        "type": "timeseries",
+        "requests": [
+          {
+            "formulas": [{ "formula": "query1" }],
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.agents{metric_type:responseTime,$env,$region,$test} by {agent}"
+              }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ],
+        "markers": [
+          {
+            "label": "Max Acceptable Response Time (5s)",
+            "value": "y = 5000",
+            "display_type": "warning dashed"
+          },
+          {
+            "label": "Critical Response Time (10s)",
+            "value": "y = 10000",
+            "display_type": "error dashed"
+          }
+        ]
+      },
+      "layout": { "x": 6, "y": 15, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
