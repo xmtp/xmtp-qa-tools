@@ -1,4 +1,4 @@
-import { sendDeliveryMetric } from "@helpers/datadog";
+import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -84,18 +84,14 @@ describe(testName, () => {
           "received in",
           result?.averageEventTiming,
         );
-        sendDeliveryMetric(
-          "agents.responseTime",
-          result?.averageEventTiming ?? 0,
-          {
-            network: env,
-            sdk: workers.getCreator().sdkVersion,
-            libxmtp: workers.getCreator().libXmtpVersion,
-            agent: agent.name,
-            address: agent.address,
-            test: testName,
-          },
-        );
+
+        sendMetric("agents", result?.averageEventTiming ?? 0, {
+          agent: agent.name,
+          address: agent.address,
+          test: testName,
+          metric_type: "responseTime",
+          metric_subtype: "",
+        });
         expect(agentResponded).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);

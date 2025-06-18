@@ -286,17 +286,6 @@ export async function sendPerformanceMetric(
   }
 }
 
-/**
- * Send delivery reliability metrics
- */
-export function sendDeliveryMetric(
-  metricName: string,
-  metricValue: number,
-  tags: Record<string, string>,
-): void {
-  sendMetric(metricName, metricValue, tags);
-}
-
 // Network performance
 const execAsync = promisify(exec);
 
