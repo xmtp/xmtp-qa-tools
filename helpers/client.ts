@@ -797,7 +797,7 @@ export const defaultNames = [
 ];
 
 export const playwrightBeforeSendTimeout = 1000; // 1 second
-export const streamTimeout = 10000; // 10 seconds
+export const streamTimeout = 40000; // 10 seconds
 
 export const formatBytes = (bytes: number): string => {
   if (bytes === 0) return "0 B";
