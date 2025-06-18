@@ -12,7 +12,6 @@ const testName = "agents";
 
 describe(testName, () => {
   let workers: WorkerManager;
-  let retries = 3;
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
     workers = await getWorkers(
@@ -36,6 +35,7 @@ describe(testName, () => {
   for (const agent of filteredAgents) {
     it(`should receive response from ${agent.name} agent (${agent.address}) when sending "${agent.sendMessage}"`, async () => {
       try {
+        let retries = 3; // Move retries inside each test for fresh count
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
         const conversation = await workers

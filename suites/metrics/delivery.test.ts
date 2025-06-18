@@ -26,7 +26,7 @@ describe(testName, async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
-  console.log(
+  console.debug(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
   let workers = await getWorkers(
@@ -39,7 +39,7 @@ describe(testName, async () => {
 
   beforeAll(async () => {
     try {
-      console.log("creating group");
+      console.debug("creating group");
       group = await workers.createGroup();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -63,14 +63,15 @@ describe(testName, async () => {
       const receptionPercentage = verifyResult.receptionPercentage ?? 0;
       const orderPercentage = verifyResult.orderPercentage ?? 0;
 
-      console.log(
+      console.debug(
         `Stream reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
       );
 
       // Don't fail if stats are missing or incomplete, just log and continue
-      if (!verifyResult.receptionPercentage || !verifyResult.orderPercentage) {
-        console.log("Warning: No stats were generated for stream verification");
-      }
+      if (!verifyResult.receptionPercentage || !verifyResult.orderPercentage)
+        console.debug(
+          "Warning: No stats were generated for stream verification",
+        );
 
       // Only run expectations if we have values
       if (receptionPercentage > 0) {
@@ -88,7 +89,7 @@ describe(testName, async () => {
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
 
-        sendMetric("delivery", orderPercentage, {
+        sendMetric("order", orderPercentage, {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
@@ -137,7 +138,7 @@ describe(testName, async () => {
       const receptionPercentage = stats.receptionPercentage ?? 0;
       const orderPercentage = stats.orderPercentage ?? 0;
 
-      console.log(
+      console.debug(
         `Poll reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
       );
 
@@ -156,7 +157,7 @@ describe(testName, async () => {
 
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
-        sendMetric("delivery", orderPercentage, {
+        sendMetric("order", orderPercentage, {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
@@ -176,7 +177,7 @@ describe(testName, async () => {
       const offlineWorker = workers.getCreator(); // Second worker
       const onlineWorker = workers.getReceiver(); // First worker
 
-      console.log(`Taking ${offlineWorker.name} offline`);
+      console.debug(`Taking ${offlineWorker.name} offline`);
 
       // Disconnect the selected worker
       await offlineWorker.worker.terminate();
@@ -184,17 +185,17 @@ describe(testName, async () => {
       // Send messages from an online worker
       const conversation =
         await onlineWorker.client.conversations.getConversationById(group.id);
-      console.log(
+      console.debug(
         `Sending ${amountofMessages} messages while client is offline`,
       );
       for (let i = 0; i < amountofMessages; i++) {
         const message = `offline-msg-${i + 1}-${randomSuffix}`;
         await conversation!.send(message);
       }
-      console.log("Sent messages");
+      console.debug("Sent messages");
 
       // Reconnect the offline worker
-      console.log(`Reconnecting ${offlineWorker.name}`);
+      console.debug(`Reconnecting ${offlineWorker.name}`);
       const { client } = await offlineWorker.worker.initialize();
       offlineWorker.client = client;
       await offlineWorker.client.conversations.sync();
@@ -228,7 +229,7 @@ describe(testName, async () => {
       const receptionPercentage = stats.receptionPercentage ?? 0;
       const orderPercentage = stats.orderPercentage ?? 0;
 
-      console.log(
+      console.debug(
         `Recovery reception percentage: ${receptionPercentage}%, order percentage: ${orderPercentage}%`,
       );
 
@@ -247,7 +248,7 @@ describe(testName, async () => {
 
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
-        sendMetric("delivery", orderPercentage, {
+        sendMetric("order", orderPercentage, {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
