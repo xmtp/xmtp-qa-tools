@@ -95,7 +95,7 @@ describe(testName, () => {
     }
   });
 
-  it("should create group through browser UI and validate messaging functionality", async () => {
+  it("should handle send a message to a bot", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -111,7 +111,7 @@ describe(testName, () => {
     }
   });
 
-  it("should detect real-time group updates when members are added asynchronously", async () => {
+  it("should handle adding a member to a group", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -132,7 +132,7 @@ describe(testName, () => {
     }
   });
 
-  it("should handle multiple browser instances with independent messaging sessions", async () => {
+  it("should handle send a message to a bot", async () => {
     const xmtpNewTester = new playwright({
       headless,
     });

@@ -76,6 +76,7 @@ describe(testName, async () => {
           return;
         }
         console.log("Callback received message:", message?.content);
+        console.log("Callback received message:", message?.content as string);
         if (message?.conversationId) {
           clearTimeout(timeout);
           resolve(message as DecodedMessage);
