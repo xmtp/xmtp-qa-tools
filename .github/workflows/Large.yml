@@ -36,8 +36,8 @@ jobs:
           cache-dependency-path: "yarn.lock"
       - name: Install dependencies
         run: yarn
-              - name: Run tests
-          run: yarn test ${{ matrix.test }} --no-fail --debug
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --no-fail --debug
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
