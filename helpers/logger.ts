@@ -29,6 +29,8 @@ export const PATTERNS_TO_TRACK = [
   "sync worker error storage error",
   "sqlcipher_mlock",
   "Collector timed out.",
+  "welcome with cursor",
+  "group with welcome id",
   // Add more patterns here as needed
 ];
 
