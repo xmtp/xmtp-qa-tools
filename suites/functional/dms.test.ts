@@ -96,7 +96,7 @@ describe(testName, async () => {
     }
   });
 
-  it("fail on purpose", () => {
-    expect(false).toBe(true);
-  });
+  // it("fail on purpose", () => {
+  //   expect(false).toBe(true);
+  // });
 });
