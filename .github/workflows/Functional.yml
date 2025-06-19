@@ -2,9 +2,6 @@ name: Functional
 description: "should verify message loss when receiving via 200 streams"
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 0 * * *" # Runs at midnight UTC every day
   workflow_dispatch:
