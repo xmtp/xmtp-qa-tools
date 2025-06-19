@@ -7,7 +7,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition;g",
+      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
     ],
   },
   {
