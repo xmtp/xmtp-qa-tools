@@ -7,7 +7,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
     ],
   },
   {
@@ -25,7 +25,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Functional",
     uniqueErrorLines: [
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern",
+      "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
     ],
   },
   {
