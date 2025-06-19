@@ -13,7 +13,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Dms",
     uniqueErrorLines: [
-      "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
+      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
     ],
   },
   {

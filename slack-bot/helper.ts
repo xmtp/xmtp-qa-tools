@@ -70,7 +70,7 @@ export interface ProcessedLogEntry {
   region: string | null;
   env: string | null;
   libxmtp: string | null;
-  message: string;
+  message: string[];
 }
 
 export interface ProcessLogsResult {
@@ -206,13 +206,12 @@ export class DatadogLogProcessor {
       };
     }
 
-    // Default to today's range
+    // Default to last 4 hours
     const now = new Date();
-    const startOfToday = new Date();
-    startOfToday.setHours(0, 0, 0, 0);
+    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
 
     return {
-      from: startOfToday.toISOString(),
+      from: fourHoursAgo.toISOString(),
       to: now.toISOString(),
     };
   }
@@ -298,8 +297,15 @@ export class DatadogLogProcessor {
     return logs
       .filter((log) => this.isTestFailureLog(log))
       .map((log) => {
-        const message = (log.attributes.message as string) || "";
+        const rawMessage = (log.attributes.message as string) || "";
         const attrs = log.attributes.attributes || {};
+
+        // Format message as array of lines for better readability
+        const messageLines = rawMessage
+          .replace(/\\n/g, "\n") // Convert literal \n to actual line breaks
+          .split("\n") // Split into array of lines
+          .map((line) => line.trim()) // Trim whitespace from each line
+          .filter((line) => line.length > 0); // Remove empty lines
 
         return {
           id: log.id,
@@ -311,8 +317,18 @@ export class DatadogLogProcessor {
           region: (attrs.region as string) || null,
           env: (attrs.env as string) || null,
           libxmtp: (attrs.libxmtp as string) || null,
-          message: message,
+          message: messageLines,
         };
+      })
+      .filter((entry) => {
+        const entryJson = JSON.stringify(entry);
+        if (entryJson.length > 5000) {
+          console.log(
+            `Skipping large log entry: ${entryJson.length} characters (limit: 5000)`,
+          );
+          return false;
+        }
+        return true;
       });
   }
 
@@ -338,12 +354,17 @@ export class DatadogLogProcessor {
   ): Promise<ProcessLogsResult> {
     this.validateApiKeys();
 
+    // Clear/create fresh file at the start of each refresh
+    const filepath = options?.outputPath || this.outputPath;
+    fs.writeFileSync(filepath, JSON.stringify([], null, 2));
+    console.log(`Created fresh file: ${filepath}`);
+
     const allLogs = await this.fetchAllLogs(options);
     const testFailures = this.processLogsToFlatFormat(allLogs);
     const uniqueFailures = this.removeDuplicateFailures(testFailures);
     const timeRange = this.getTimeRange(options);
 
-    // Save directly as an array in the desired format
+    // Save the processed data to the fresh file
     this.saveToFile(uniqueFailures, options?.outputPath);
 
     return {
