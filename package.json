@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.35",
+  "version": "0.1.36",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -31,7 +31,6 @@
     "run:forked": "./suites/group/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
-    "small": "yarn test suites/small",
     "start": "vitest --ui --standalone --watch ",
     "test": "yarn cli test"
   },

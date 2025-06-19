@@ -296,7 +296,10 @@ export interface TestLogOptions {
 }
 
 // Extract error logs from log files
-export function extractErrorLogs(testName: string): Set<string> {
+export function extractErrorLogs(
+  testName: string,
+  limit?: number,
+): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
@@ -305,7 +308,7 @@ export function extractErrorLogs(testName: string): Set<string> {
     const logFiles = fs
       .readdirSync("logs")
       .filter((file) => file.endsWith(".log") && file.includes(testName));
-    const errorLines: Set<string> = new Set();
+    const errorLines: string[] = []; // Changed from Set to Array to maintain order
 
     // Track specific error patterns we want to deduplicate
     const seenPatterns = new Set<string>();
@@ -322,7 +325,7 @@ export function extractErrorLogs(testName: string): Set<string> {
 
           // Don't split the line if it contains a test file path
           if (cleanLine.includes("test.ts")) {
-            errorLines.add(cleanLine.trim());
+            errorLines.push(cleanLine.trim());
             continue;
           }
 
@@ -352,22 +355,31 @@ export function extractErrorLogs(testName: string): Set<string> {
           }
 
           if (!shouldSkip) {
-            errorLines.add(cleanLine);
+            errorLines.push(cleanLine);
           }
         }
       }
     }
 
-    console.debug(errorLines);
-    if (errorLines.size === 1) {
+    console.log(
+      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
+    );
+
+    if (errorLines.length === 1) {
       for (const pattern of PATTERNS_TO_TRACK) {
-        if (errorLines.values().next().value?.includes(pattern)) {
+        if (errorLines[0]?.includes(pattern)) {
           console.log("returning empty string");
           return new Set();
         }
       }
-    } else if (errorLines.size > 0) {
-      return errorLines;
+    }
+
+    if (errorLines.length > 0) {
+      // Apply limit if specified (take the last N errors to get most recent)
+      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
+      let returnSet = new Set(limitedErrors);
+      console.log(returnSet);
+      return returnSet;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
