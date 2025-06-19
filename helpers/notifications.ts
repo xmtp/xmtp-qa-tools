@@ -196,8 +196,7 @@ class SlackNotifier {
 
     // Sanitize logs before embedding in Slack message
     const errorLogsArr = Array.from(options.errorLogs || []);
-    const last20Logs = errorLogsArr.slice(-20);
-    const logs = this.sanitizeLogs(last20Logs.join("\n"));
+    const logs = this.sanitizeLogs(errorLogsArr.join("\n"));
 
     return `*Test Failure ❌*
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
