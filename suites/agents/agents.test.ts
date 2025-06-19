@@ -1,3 +1,4 @@
+import { getRandomNames } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
@@ -15,7 +16,7 @@ describe(testName, () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
     workers = await getWorkers(
-      ["bot"],
+      ["bob"],
       testName,
       typeofStream.Message,
       typeOfResponse.None,
@@ -35,7 +36,7 @@ describe(testName, () => {
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} : ${agent.address}`, async () => {
       try {
-        let retries = 3; // Move retries inside each test for fresh count
+        let retries = 1; // Move retries inside each test for fresh count
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
         const conversation = await workers
@@ -85,12 +86,12 @@ describe(testName, () => {
           result?.averageEventTiming,
         );
 
-        sendMetric("agents", result?.averageEventTiming ?? 0, {
+        sendMetric("response", result?.averageEventTiming ?? 0, {
+          metric_type: "agent",
+          metric_subtype: agent.name,
           agent: agent.name,
           address: agent.address,
           test: testName,
-          metric_type: "responseTime",
-          metric_subtype: agent.name,
         });
         expect(agentResponded).toBe(true);
       } catch (e) {
