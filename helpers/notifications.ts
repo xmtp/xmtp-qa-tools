@@ -181,8 +181,7 @@ class SlackNotifier {
   }
 
   private sanitizeLogs(logs: string): string {
-    // Replace all occurrences of triple backticks with three single quotes
-    return logs.replace(/```/g, "'''");
+    return logs.replaceAll(/```/g, "'''");
   }
 
   private generateMessage(options: SlackNotificationOptions): string {

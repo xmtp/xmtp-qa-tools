@@ -7,33 +7,32 @@ import { describe, expect, it } from "vitest";
 const testName = "regression";
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions.slice(0, 3).reverse();
+  const versions = sdkVersionOptions.reverse().slice(0, 3);
   const receiverInboxId = getInboxIds(1)[0];
 
-  it(`downgrade ${versions.join(",")}`, async () => {
-    try {
-      for (const version of versions.reverse()) {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
+  for (const version of versions) {
+    it(`downgrade to ${version}`, async () => {
+      try {
+        workers = await getWorkers(["alice-" + "a" + "-" + version], testName);
 
-        const bob = workers.get("bob");
+        const alice = workers.get("alice");
         console.log(
           "Downgraded to ",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
+          "node-sdk:" + String(alice?.sdkVersion),
+          "node-bindings:" + String(alice?.libXmtpVersion),
         );
-        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+        let convo = await alice?.client.conversations.newDm(receiverInboxId);
 
         expect(convo?.id).toBeDefined();
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
       }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
-
-  it(`upgrade ${versions.join(",")}`, async () => {
-    try {
-      for (const version of versions) {
+    });
+  }
+  for (const version of versions.reverse()) {
+    it(`upgrade to ${version}`, async () => {
+      try {
         workers = await getWorkers(["alice-" + "a" + "-" + version], testName);
 
         const alice = workers.get("alice");
@@ -45,10 +44,10 @@ describe(testName, () => {
         let convo = await alice?.client.conversations.newDm(receiverInboxId);
 
         expect(convo?.id).toBeDefined();
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
       }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
-  });
+    });
+  }
 });
