@@ -361,7 +361,7 @@ export function extractErrorLogs(
       }
     }
 
-    console.debug(
+    console.log(
       `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
     );
 
@@ -377,7 +377,9 @@ export function extractErrorLogs(
     if (errorLines.length > 0) {
       // Apply limit if specified (take the last N errors to get most recent)
       const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
-      return new Set(limitedErrors);
+      let returnSet = new Set(limitedErrors);
+      console.log(returnSet);
+      return returnSet;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
