@@ -1,24 +1,6 @@
 [
   {
-    "id": "AwAAAZeJaWMgnQUT0AAAABhBWmVKYVdNZ0FBQmN5dDJ0U3FXZUNRQUEAAAAkMDE5Nzg5NmMtN2FkYi00YjY4LWE3OWQtN2UyMjI2ODRjYWIzAAAg4g",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      ", Library)",
-      ", last_stream_id: StreamId(0) }",
-      "sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(7)))] group_id=\"370b85bbe935300ffed3a9e07952e73d\" inbox_id=\"4f77124bc0cefeabd7324234609510205e15d140958eb45ff4294934acdb0abb\" installation_id=\"4e927dcb1b2ef26b6eb574ac4720a67cca70e80c09550da01c24b7275d7bef43\"",
-      "sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(7)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(7)))]",
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose"
-    ]
-  },
-  {
-    "id": "AwAAAZeJXYHslPgzcgAAABhBWmVKWFlIc0FBQ3pxZXlQUXFFem13QUEAAAAkMDE5Nzg5NjQtNTVhMS00ZWE1LWI4M2EtNjQ5OGM2YTg3NzllAAA1dA",
+    "id": "AwAAAZeKi2FIzvmf2gAAABhBWmVLaTJGSUFBQlA4VnpIMXRkRkdBQUEAAAAkMDE5NzhhOGItNzNkMC00YWQ0LTgzNDMtNTY4NGI0YWQ0NTQxAAAAbQ",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -28,56 +10,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"d12c5858f3ce8a332c587dbc628d85341770f521306671e016ae035b0c65ccb1\" installation_id=\"28b2469ba2eae2fd12d86f322e050c3b519d312097247798f5edcf5b75a3a7a9\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"f2d35155060cef04fc29f09de4aa9b5f5902e27364fa67f47d236f7596a823e3\" installation_id=\"a8a1cfd2eef904c64fd7f334bd532852566c40a770a2f9cf5e84e62438e3d07f\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeJWMu1wdrS2AAAABhBWmVKV011MUFBQU1oUkZhZnlxVFR3QUEAAAAkMDE5Nzg5NjQtNTVhMS00ZWE1LWI4M2EtNjQ5OGM2YTg3NzllAAA1dQ",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      ", Library)",
-      ", last_stream_id: StreamId(0) }",
-      "sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(5)))] group_id=\"f17cf19330f507cfae0f523f7f6f44d7\" inbox_id=\"cb136fd6295c334420841f47f7e568f6d20a166f41ed7ae348d6c8d2868fc67c\" installation_id=\"82c9e4b398028f11171b6ea1eb019128fc2d7d53063d53b9f142b0e74a31d59b\"",
-      "sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(5)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(5)))]",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(9)))] group_id=\"e7f322ef76cd649ae15526857d1a2823\" inbox_id=\"cb136fd6295c334420841f47f7e568f6d20a166f41ed7ae348d6c8d2868fc67c\" installation_id=\"82c9e4b398028f11171b6ea1eb019128fc2d7d53063d53b9f142b0e74a31d59b\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(9)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(9)))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(4513901))] group_id=\"e3c64d81d946e6a5ed5ba419a45deb42\" inbox_id=\"cb136fd6295c334420841f47f7e568f6d20a166f41ed7ae348d6c8d2868fc67c\" installation_id=\"82c9e4b398028f11171b6ea1eb019128fc2d7d53063d53b9f142b0e74a31d59b\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(4513901))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(4513901))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))] group_id=\"e3c64d81d946e6a5ed5ba419a45deb42\" inbox_id=\"fdc407113758ea0c1cfe31e41fe33a5fb6bb5b4e72dea35a85c84f3c17c5829d\" installation_id=\"8730fdd3ab542a18b5dd5df98b97f18342dae1bce1ccebdc30dbd4840fe81ba3\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([OpenMlsProcessMessage(ValidationError(WrongEpoch))]) error=Receive errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))] group_id=\"e3c64d81d946e6a5ed5ba419a45deb42\" inbox_id=\"82da437bbd39216dac0acb1d6142b0b48fe18a3253c403a6b572c178544313f4\" installation_id=\"8f9ddf35455c8f880fe478872dbb65c262ccb571cc16fe43b474d6eec438f945\"",
-      "}",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(4513903))] group_id=\"f4adeb2501f3cc368517b2184e1c0608\" inbox_id=\"cb136fd6295c334420841f47f7e568f6d20a166f41ed7ae348d6c8d2868fc67c\" installation_id=\"82c9e4b398028f11171b6ea1eb019128fc2d7d53063d53b9f142b0e74a31d59b\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(4513903))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(4513903))]"
-    ]
-  },
-  {
-    "id": "AwAAAZeJUS9D-EwGrwAAABhBWmVKVVM5REFBQjctcVpnUC1LbjZBQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJQQ",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"fa332049d0698da71300d1d3eb458be81e5d021e64ea13b4a77eb6d9bc9c8ac4\" installation_id=\"d8f85cb4e82f828c362080c10616dae025c48583ca88f0f0e81e2478cf7f7c3b\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeJURX3ZfcczAAAABhBWmVKVVJYM0FBQV9qMU1CMmpoMFhRQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJQg",
+    "id": "AwAAAZeKgy_4dfgB0wAAABhBWmVLZ3lfNEFBQ3pIMVJnbGZNM09BQUEAAAAkMDE5NzhhODYtZTIyYi00YjM3LTg3ZTEtMmUwYmJmYjZlMjMyAAASig",
     "type": "log",
     "environment": "production",
     "test": "browser",
@@ -87,14 +26,14 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"7df11b954e9b8f61d26773382daf1d825c1e39a69e515867cf27b3962ab335b8\" installation_id=\"14d95ed5b1beee6f344e957c8fd4bc8bd2651483efd83d36d493add4668cae3b\"",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110215611 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110215611] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"706278d8d8f67e6eeacf68abc780e01cf270aa0f122d1927357538fab85239c5\" installation_id=\"50a9534117461846eee16d567db5759a647a778ba400ef807bd4e67c76d32949\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110394983] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110394983 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeJUQ03Kh0UKwAAABhBWmVKVVEwM0FBQklfNGNIekFkS29nQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJQw",
+    "id": "AwAAAZeKgy_Co4T-cwAAABhBWmVLZ3lfQ0FBRC1ySWtzRDY5QWh3QUEAAAAkMDE5NzhhODYtZTIyYi00YjM3LTg3ZTEtMmUwYmJmYjZlMjMyAAASiw",
     "type": "log",
     "environment": "dev",
     "test": "browser",
@@ -104,33 +43,14 @@
     "env": "dev",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"06bf88610398de389a69da60b6320c3d12d8dae392da87b8633478fd84e75917\" installation_id=\"e3c1141ddce0b2e30d74076ad39fed825672f116a13810f908f6b4eabda0c299\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99625514] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99625514 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"57b54e721bbb374423f1a07b2677f83c217fdb8bd3d32de5046d8228645825b8\" installation_id=\"dff5e35d6a79c2d2b7bc0f70aa9e16e30018f4821775eb7ad486eaeec67ce000\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99661448] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99661448 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeJR-in_LvnvQAAABhBWmVKUi1pbkFBQmZMV1NEb1dGWVZBQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJRA",
-    "type": "log",
-    "environment": "production",
-    "test": "performance",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6edcb49b7b2d5bf46281b962e5d7efb550c445c608c07243c01bc6cd50bcc858\" installation_id=\"03906f88f806c786185310692d33b411d0ff8162a6b36d6a0c98113f18836ecb\"",
-      "m_performance > [dave-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams"
-    ]
-  },
-  {
-    "id": "AwAAAZeJRSkJCzPUNwAAABhBWmVKUlNrSkFBQ1VfZWhpVGxocTJRQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJRQ",
+    "id": "AwAAAZeKgBBscVpF6wAAABhBWmVLZ0JCc0FBQl9ncnliV3VMaTVnQUEAAAAkMDE5NzhhODAtOGFjNi00N2ViLWJmZjEtOGMyN2Y1Nzg4MGU3AAAXFA",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -140,47 +60,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"54d2a959ed311bbc44b84bfbdf347abfa2a1fc7c82bbc6166ed06c07cc23db31\" installation_id=\"ab3f6b1c256e465f13c6e261c5d5424fd6edffe353a056c3ce196a5bb3312d65\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"e8f68694453e364cbdd56cd8feb512a348655f246c49899e7273b0d8303ac9bd\" installation_id=\"0cb4c46b8c4aba086a113307d9de4b33cd245f32a9f327f1b546896f3a949931\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeJOWvbEFT7_AAAABhBWmVKT1d2YkFBQXFkVThTMS05RmR3QUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJRg",
-    "type": "log",
-    "environment": "dev",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "dev",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"679adad73aa5a94975351da89f5a252825e26872794bcd0a45982f65e6ea0dfb\" installation_id=\"29ca98a488c134d5fdd2bb08a5d6a7e97073811a3539756833540ac8c4809b01\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99618777] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99618777 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeJOWq0d1axtgAAABhBWmVKT1dxMEFBRDIwUG1TalUxVjh3QUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJRw",
-    "type": "log",
-    "environment": "production",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2dc155864bde3a063affde8cbf95164c3663eaaf74d5dbde8644ea071090b20a\" installation_id=\"cc5e67ee46e075345bc8630c38fa6430be7e00fa7e5a94b5f75ce9de2702524e\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110208300] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110208300 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeJN-nGtyonRQAAABhBWmVKTi1uR0FBQjJQZlZPeWxWMDBBQUEAAAAkMDE5Nzg5NWQtZTJmNC00ZTU3LThhMDctYmU3YTUwNjZiYjY0AAGJSA",
+    "id": "AwAAAZeKcMsF-h7FMgAAABhBWmVLY01zRkFBQ1F2cVpfVDFxS0dRQUEAAAAkMDE5NzhhNzMtZmI5MC00OTVmLThkNDMtNjY0MjI5MGE0ZGU2AAAeIA",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -190,95 +76,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"50193e71f90bc8318ac8d57b593415064dcc0886f50dfeb7dca906c0ad4f0548\" installation_id=\"35075831210e0e79f23604c860e97f11ce365cf6b7aa3fcec0e25c2c1ff920cf\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"98da10d17f04a8061f53c984783572110c32da5302b8a726e2171a814a798106\" installation_id=\"bc5db43811487c5d29967240ca37af253a0fed503f9da80adf9d90867bf81fbb\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeJJfcuXRX23gAAABhBWmVKSmZjdUFBQW1XX2tBSy1DMXRnQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP9g",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"9247e0461fb4cd860b757a78cb88d0e49eaa35aac753f74faa02e4601eded165\" installation_id=\"52bdfe3b070e98331c032f4a77385d15d46e91f7b67283ebe9b4c2f2f155c667\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeJHBwRyT2Z7QAAABhBWmVKSEJ3UkFBRGJXcjJsSkdKM0dBQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP9w",
-    "type": "log",
-    "environment": "dev",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "dev",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"e9b5ff477450a78be49b421fe042b1d23b38f00adfc9769698c225b524d768e6\" installation_id=\"d490b3d30d1b5c8418b6e68c3e7fa7b4d3e31a56b4b68c1cae68bd942ac53505\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99618379] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99618379 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeJHBQ8TJjgZQAAABhBWmVKSEJROEFBQXNKeERwcjFGZjBnQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP-A",
-    "type": "log",
-    "environment": "production",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"3ed67eabc4897b2ad42fa2aba66f80314b0907b18edf2dc4fb6b64f85b88c647\" installation_id=\"a947106a6ca66487e940c39e4dde00d7e51c3769047b8b0f637e46faca97f1f4\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110207839] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110207839 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeJG-qT0z3EFQAAABhBWmVKRy1xVEFBQV83ZmsyeUw5ZzdnQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP-Q",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"b6e8de15fe0701578f54700c336f5ef1a2ef2f48bf30c2f608bdaeba26e71fb3\" installation_id=\"792c473a19cb9208d6cedfa3608d0f0391327e584642af13dbbfd0424cce71dc\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeJGwt_mF6ApQAAABhBWmVKR3d0X0FBQkExOVhLZGkxV3BRQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP-g",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2d0710e059defba98207450147c1240a11f035503f6ef61d379e4eed7c782bd5\" installation_id=\"5caf93e74e4d3722965af5c713e6c3169bf4504c0713bfbd2c160b47a2635623\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeJGvsXlkRWSAAAABhBWmVKR3ZzWEFBQ3FxWFNmVkp4NFZRQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP-w",
+    "id": "AwAAAZeKbvo-RcLfygAAABhBWmVLYnZvLUFBQkNXNFVGeHVGV2ZRQUEAAAAkMDE5NzhhNzMtZmI5MC00OTVmLThkNDMtNjY0MjI5MGE0ZGU2AAAeIQ",
     "type": "log",
     "environment": "production",
     "test": "functional",
@@ -290,102 +94,87 @@
     "message": [
       ", last_stream_id: StreamId(0) }",
       ", Library)",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(4512628))] group_id=\"f8a6e057e0b4b890a5fa506f6e2b45c3\" inbox_id=\"0c21d705a95f9d7763bd3d935439649157d881886e590fde47961f2ccdaeee57\" installation_id=\"f37305802dcc9e0d1f9df767a7b1cf866244971feed9493d3c1adcc7abe1407e\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(4512628))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(4512628))]",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(21)))] group_id=\"f8a6e057e0b4b890a5fa506f6e2b45c3\" inbox_id=\"0c21d705a95f9d7763bd3d935439649157d881886e590fde47961f2ccdaeee57\" installation_id=\"f37305802dcc9e0d1f9df767a7b1cf866244971feed9493d3c1adcc7abe1407e\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(21)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(21)))]",
-      "CORE sqlcipher_page_cipher: hmac check failed for pgno=97",
-      "CORE sqlite3Codec: error decrypting page 97 data: 1",
-      "CORE sqlcipher_codec_ctx_set_error 1",
+      "sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(9)))] group_id=\"0a316d784e21747e602da5ab7a44454e\" inbox_id=\"f3a11f2326165d77793651c8e25a4e5d0689ad70fe2c3fc0aa173a1fa95f394f\" installation_id=\"0e666004656200a6484cc867a6929ed24211477b51bb764b1e974b23de408f02\"",
+      "sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(9)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(9)))]",
+      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
+      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream"
+    ]
+  },
+  {
+    "id": "AwAAAZeKbkq7Kp2upwAAABhBWmVLYmtxN0FBQnpIbGdhUDBiUnJnQUEAAAAkMDE5NzhhNzMtZmI5MC00OTVmLThkNDMtNjY0MjI5MGE0ZGU2AAAeIg",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"4c89993dbfe312b8b2975f80d374fa42e367adce2ec7cd0e28cedb63a42c4912\" installation_id=\"c67d03dfb6e24bd0d70f27d3f8f46f457ab0a44ed29682a7e730948e5fee108c\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKbPvzBiCUHgAAABhBWmVLYlB2ekFBQ3hfU3h0SHJQUTVnQUEAAAAkMDE5NzhhNmQtM2UxMy00NzQxLWE0MTUtYzVmZjBjZmI1OTQ1AAAfmQ",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"24407532f6de59863365324dd7ca3539580044dad5809247a6ee7acc94d58b5c\" installation_id=\"c45d6659f6ce54c31dc827728892f36ec432a2c3c89ccd93ee9bdd1c06698a63\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKaKtDXkmorwAAABhBWmVLYUt0REFBQWhLc01kbHRyclhBQUEAAAAkMDE5NzhhNmQtM2UxMy00NzQxLWE0MTUtYzVmZjBjZmI1OTQ1AAAfmg",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"0ba6b17fed0cc46f6758388d05530f7990e9024598bb03faed92fa30664332d7\" installation_id=\"cf3703766c146b1d39da5ca8ce2c66ec70da208a80be7ae918ab92758fdb4e39\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKZi1rLg-pkwAAABhBWmVLWmkxckFBQkFZU2xDeDFrZUx3QUEAAAAkMDE5NzhhNjYtMzFhZi00Y2ZiLTkyMTctYTZmMDc5MTdkNWEzAAAl0g",
+    "type": "log",
+    "environment": "production",
+    "test": "functional",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      ", last_stream_id: StreamId(0) }",
+      ", Library)",
+      "FAIL  suites/functional/clients.test.ts [ suites/functional/clients.test.ts ]",
+      "FAIL  suites/functional/codec.test.ts [ suites/functional/codec.test.ts ]",
       "FAIL  suites/functional/consent.test.ts [ suites/functional/consent.test.ts ]",
       "FAIL  suites/functional/order.test.ts [ suites/functional/order.test.ts ]",
+      "FAIL  suites/functional/playwright.test.ts [ suites/functional/playwright.test.ts ]",
       "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
       "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose"
+      "FAIL  suites/functional/regression.test.ts > regression > downgrade to 210",
+      "FAIL  suites/functional/regression.test.ts > regression > downgrade to 209",
+      "FAIL  suites/functional/regression.test.ts > regression > downgrade to 208"
     ]
   },
   {
-    "id": "AwAAAZeJGc93nRHl9QAAABhBWmVKR2M5M0FBQWFKbmVqRndnTUpnQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP_A",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      ", Library)",
-      ", last_stream_id: StreamId(0) }",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose"
-    ]
-  },
-  {
-    "id": "AwAAAZeJGcQ8ZegvLgAAABhBWmVKR2NROEFBQk9UNHR6c3RSRkVRQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP_Q",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: client: Association error: Missing identity update",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(26)))] group_id=\"5eb9d8237fa04ffe9d4d610134c8a989\" inbox_id=\"0556ca0bcfe82b464d7b5a081d00de628e5057b45f5df50323074707c5c3b5dc\" installation_id=\"811dcaa39a9efd1ac77275a5d0ed02bfa83789e8e7199dbfc72dc39cc1b89ba6\"",
-      "sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(26)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(26)))]",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern"
-    ]
-  },
-  {
-    "id": "AwAAAZeJGWurtr_EFQAAABhBWmVKR1d1ckFBQV83ZmsyeUxwRWNBQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGP_w",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"b83aa5f49c163ba9f073b0ed06b32ec76a4183e57888166a226b3253e6838af7\" installation_id=\"b269a7e08b65e18db6c9ef58589e011134fbb682ee28ddaf92863927e682d568\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110205726] already processed",
-      "streams > [alice-210] conversation stream error: Error: group with welcome id 110205728 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Sync worker error: storage error: UNIQUE constraint failed: processed_device_sync_messages.message_id inbox_id=\"801ca92b9d6c4aaf42f3638284c9df3075d868b130a6ade8a7de13190e44d273\" installation_id=\"c51195d7ed68f0661c1d4667ead1115ac6694d197d92fab7ca533d98a2e3463d\"",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Sync worker error: storage error: UNIQUE constraint failed: processed_device_sync_messages.message_id inbox_id=\"f9288d36ff8bbcde807add797fdb708a26861014a74f616f5916a4e3a645ec04\" installation_id=\"6b9a65d341cd77892dc3ee990c60795a38440fce6a7fdb7fa507f190c5eb3aca\"",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/downgrade.test.ts > downgrade > should maintain database integrity and functionality when downgrading across SDK versions",
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern"
-    ]
-  },
-  {
-    "id": "AwAAAZeJFoxY0-1KkwAAABhBWmVKRm94WUFBQm1mT1FCdmh4a1pBQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGQAA",
-    "type": "log",
-    "environment": "local",
-    "test": "dms",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "south-america",
-    "env": "local",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"249dfd8a09e486a24c66e57642b9809dda10827e3bbd7b04878090efc64ef930\" installation_id=\"adc636095b8c9a27c77d7b7c7746392752d7960bed44c00428aa5f3c20f26c6b\"",
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose"
-    ]
-  },
-  {
-    "id": "AwAAAZeJELGvp-UM3AAAABhBWmVKRUxHdkFBQjYzM05DTk92aEFRQUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2XA",
+    "id": "AwAAAZeKZc9qXyFm1wAAABhBWmVLWmM5cUFBQ243RU1WYm9qaFpRQUEAAAAkMDE5NzhhNjYtMzFhZi00Y2ZiLTkyMTctYTZmMDc5MTdkNWEzAAAl0w",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -395,134 +184,29 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"bd30c64e4cd721c5f2b87d55df01eee538d758c5b71e671bf2870c940cb97bfa\" installation_id=\"8efb0059fc696dfb9438e1f24a2c51a7efc1b606cfd96d4d6e314e9a177c0629\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"88fdbd3abc45739f186ceb82e2219a44a7445543fdf1bcb4597f431bb15a9726\" installation_id=\"7bbfacfdcbe451114ca65ddad0bd8c0d1c74b059c35223d4907baca833317eb2\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeJEHgsZqaxhgAAABhBWmVKRUhnc0FBQ2plQnlLWkwwMWpBQUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2XQ",
+    "id": "AwAAAZeKZUrB8FBF6wAAABhBWmVLWlVyQkFBQl9ncnliV3JOaDNBQUEAAAAkMDE5NzhhNjYtMzFhZi00Y2ZiLTkyMTctYTZmMDc5MTdkNWEzAAAl1A",
     "type": "log",
     "environment": "production",
-    "test": "functional",
+    "test": "agents",
     "level": "error",
     "service": "xmtp-qa-tools",
     "region": "us-east",
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(5)))] group_id=\"a56deb968db0e2364e8109c7bdf3e35c\" inbox_id=\"7318c564755f5fc923ca9a00ea334b86e8a517d924d3672adaf9b14a3dca4e47\" installation_id=\"1ab3e228a7ed37e58a7fd8c0223cce7040b2197a066cbfb32b871f1e9ca7f9bc\"",
-      "sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(5)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(5)))]",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6092453622312716cdabb83dbe0e9a25c6feff25ff569451ad53eebeacd13ac4\" installation_id=\"8f804e718ce7fbfd04337697189ff9a2bd1139a7ddfb31b0b020e8c8909cc9d5\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeJDz1IChBEbgAAABhBWmVKRHoxSUFBRFdNZktRblIxOEdBQUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2Xg",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(4)))] group_id=\"44f99fcb57a65a282cae840f7d35c762\" inbox_id=\"57522102ac08fbb61084463d9b72672ba31cecee4ecf778753317626e13cf35a\" installation_id=\"03cbd098313548247c1ec65bbea03a9b2f9dca1f8c89ac3545b6c6490ae04445\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(4)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(4)))]",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(7)))] group_id=\"17e0e183965d6cb3f15ebe1ee8f4b56e\" inbox_id=\"eedfa9d0334bff016afe554c1a1d48040c17f3e114f54078b7057e3531b1b6d7\" installation_id=\"b8c7abdb29e714bde0503a62a16c228df5fc34f0f20cc873a2caad5586912dd5\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(7)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(7)))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(4510530))] group_id=\"b4f9a4f3d20616a3aab1d43f07d0a099\" inbox_id=\"155f300f32cc807504e033b541eb934b30387620269115fbfe17397923e820ab\" installation_id=\"1949def63d8c1531a0340ac10dff86c03b112c7ab8f640b82fce06afa3d2b4fe\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(4510530))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(4510530))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))] group_id=\"b4f9a4f3d20616a3aab1d43f07d0a099\" inbox_id=\"eedfa9d0334bff016afe554c1a1d48040c17f3e114f54078b7057e3531b1b6d7\" installation_id=\"b8c7abdb29e714bde0503a62a16c228df5fc34f0f20cc873a2caad5586912dd5\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([OpenMlsProcessMessage(ValidationError(WrongEpoch))]) error=Receive errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))]",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))] group_id=\"b4f9a4f3d20616a3aab1d43f07d0a099\" inbox_id=\"57522102ac08fbb61084463d9b72672ba31cecee4ecf778753317626e13cf35a\" installation_id=\"03cbd098313548247c1ec65bbea03a9b2f9dca1f8c89ac3545b6c6490ae04445\"",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [OpenMlsProcessMessage(ValidationError(WrongEpoch))] group_id=\"b4f9a4f3d20616a3aab1d43f07d0a099\" inbox_id=\"94c7076ce83ddb3e4b4a9898bf42f23bf39927284db27651721f3200489735e0\" installation_id=\"00e311c9485aeae9aa98c6fbaa0aa0fd5aa45b455bd0ed6fa0c08bf3ed2aa5cb\"",
-      "process:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [ProcessIntent(AlreadyProcessed(4510534))] group_id=\"10867cdac9a30ab1cabeace6a04a1189\" inbox_id=\"155f300f32cc807504e033b541eb934b30387620269115fbfe17397923e820ab\" installation_id=\"1949def63d8c1531a0340ac10dff86c03b112c7ab8f640b82fce06afa3d2b4fe\"",
-      "process:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([ProcessIntent(AlreadyProcessed(4510534))]) error=Receive errors: [ProcessIntent(AlreadyProcessed(4510534))]"
-    ]
-  },
-  {
-    "id": "AwAAAZeJDuuEq7Um9gAAABhBWmVKRHV1RUFBQ0ZYMjRBUUpBTHN3QUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2Xw",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream"
-    ]
-  },
-  {
-    "id": "AwAAAZeJDusC_vuVXwAAABhBWmVKRHVzQ0FBQnAyazI5S05aZURnQUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2YA",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "FAIL  suites/functional/consent.test.ts [ suites/functional/consent.test.ts ]",
-      "FAIL  suites/functional/order.test.ts [ suites/functional/order.test.ts ]"
-    ]
-  },
-  {
-    "id": "AwAAAZeJDhAe7idXAAAAABhBWmVKRGhBZUFBQ2hpeUp1N1VpMnhBQUEAAAAkMDE5Nzg5MTMtODA1Ny00ZTc5LTg5MTMtZDkwNjMyNDgzYmUwAAA2YQ",
-    "type": "log",
-    "environment": "local",
-    "test": "suites/functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "south-america",
-    "env": "local",
-    "libxmtp": "latest",
-    "message": [
-      ", Library)",
-      ", last_stream_id: StreamId(0) }",
-      "}",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107))), Storage(NotFound(IntentForCommitted(141)))] group_id=\"38252f89c1bb89763a43e64c1feae771\" inbox_id=\"e7f0149ce65570a6c321c02a76eb58206c1dc7d46c4f2e6ab28dba7a6d1c3150\" installation_id=\"eb129ccae5c9caa68866cb8ca90ae34f81f612fb009a83244c91853727dd3d83\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107))), Storage(NotFound(IntentForCommitted(141)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107))), Storage(NotFound(IntentForCommitted(141)))]",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream"
-    ]
-  },
-  {
-    "id": "AwAAAZeJA-SqqTcBRQAAABhBWmVKQS1TcUFBQUZyT1RBNXpMQXZRQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGQAQ",
-    "type": "log",
-    "environment": "production",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"9071fb711353e5f712335c13cdd05409094a99677e4f083686b24596b008b453\" installation_id=\"2dd20144c615f54a088819876eaa6f1141cf2c8dd6203d0278f087b4d1c0fee0\"",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110197487 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110197487] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeJA9Q5aPDl9QAAABhBWmVKQTlRNUFBQWFKbmVqRjlyWUJRQUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGQAg",
+    "id": "AwAAAZeKYyCM5P-aBAAAABhBWmVLWXlDTUFBRGVqb1lsZjhvcTJ3QUEAAAAkMDE5NzhhNjYtMzFhZi00Y2ZiLTkyMTctYTZmMDc5MTdkNWEzAAAl1Q",
     "type": "log",
     "environment": "dev",
     "test": "browser",
@@ -532,127 +216,14 @@
     "env": "dev",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"74ff633397860cb564954d8cf2546759ae7a73437be191fdb9cc9f864bc828e3\" installation_id=\"32166a09e230b2e0d104c134311a42af9dc5cec160e12a9a5e242d11f2aa261b\"",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99611494 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99611494] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"aa954c073aaef71856f4de8526c556a158859f8410efd2ce27263e8b3b2e5e99\" installation_id=\"1a672ef09b2fc6599892a352c83d9d662ba309827b4d5d14bfc75e3ea16a9268\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99660837 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99660837] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeJAxydgm-D0gAAABhBWmVKQXh5ZEFBQXh1WlJIblJZLWF3QUEAAAAkMDE5Nzg5MzYtN2M2ZS00ZjdjLTg0MjItZTZhOWI5MGM2ODM3AAGQAw",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2785e183bbce1c8c20ac0c72af43427ac31b76abb00a283fbebe32fe1759de5f\" installation_id=\"af8d9be967c576313333e627f163adc22866bedc0559287d66ad0a1fed67edf3\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: gang : 0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeI8PTL1UTc_gAAABhBWmVJOFBUTEFBRDBubVNVNy1yWVFRQUEAAAAkMDE5Nzg5MDItNGMyMi00NzAzLWJjY2MtZTE5MDRkMDdlZDkxAAFY0w",
-    "type": "log",
-    "environment": "local",
-    "test": "suites/functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "south-america",
-    "env": "local",
-    "libxmtp": "latest",
-    "message": [
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn:receive: xmtp_mls::groups::mls_sync: Message processing errors: [Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107)))] group_id=\"38252f89c1bb89763a43e64c1feae771\" inbox_id=\"e7f0149ce65570a6c321c02a76eb58206c1dc7d46c4f2e6ab28dba7a6d1c3150\" installation_id=\"eb129ccae5c9caa68866cb8ca90ae34f81f612fb009a83244c91853727dd3d83\"",
-      "send_message:sync_until_last_intent_resolved:sync_until_intent_resolved:sync_with_conn: xmtp_mls::groups::mls_sync: receive error ReceiveErrors([Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107)))]) error=Receive errors: [Storage(NotFound(IntentForCommitted(69))), Storage(NotFound(IntentForCommitted(107)))]",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive messages using async iterator pattern with streamAllMessages",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream"
-    ]
-  },
-  {
-    "id": "AwAAAZeI74qG_FjXIgAAABhBWmVJNzRxR0FBQ3JLUkZHVTN3QjBnQUEAAAAkMDE5Nzg5MDItNGMyMi00NzAzLWJjY2MtZTE5MDRkMDdlZDkxAAFY1A",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"a6274e2e03b754c27a954e68e3f767c4132e4102be4b50b42e63aa2995b1b106\" installation_id=\"fd59e0f90dd7760fe168a8f6e377bf04cd046a60538d13a70d19eccc470b7f0e\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeI5fu2TkpHwAAAABhBWmVJNWZ1MkFBRHRjWjVBVFdWU213QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7rg",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"8e45601a9e643a92a1dfe586133a2d36b21f2f2229572f1bcc6ff799bed8fa58\" installation_id=\"ea09ef7795403fbbf7569f1fa6678c79b81ccddd95b18edcab954d7f02b40d78\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: group with welcome id 110157178 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110157195] already processed"
-    ]
-  },
-  {
-    "id": "AwAAAZeI5LsFEkU37wAAABhBWmVJNUxzRkFBQ01QcXhKM0gydm93QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7rw",
-    "type": "log",
-    "environment": "local",
-    "test": "suites/functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "south-america",
-    "env": "local",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2c4a2a54256f356c8ac5895cbb0c74b6bb5adce1850c12a40c7d54ac0a576963\" installation_id=\"529fd4e6271ce08dbf0dc8be7dd7d70ca5ad46ea904031d66be9c4bd3e5d0cb6\"",
-      "playwright > [bob-210] conversation stream error: Error: group with welcome id 402188 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [402188] already processed",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Sync worker error: storage error: UNIQUE constraint failed: processed_device_sync_messages.message_id inbox_id=\"00d7204146e14a7d563d42cd10fb0b4702b8e1e622f1ece1a4e9a1a58d542092\" installation_id=\"61a347b1b84a291831e5711739c3e15b79f749f64c4df99b1fae44698376111f\"",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Message processing: Archive(Reqwest(reqwest::Error { kind: Request, url: \"http://localhost:5558/upload\", source: hyper_util::client::legacy::Error(Connect, ConnectError(\"tcp connect error\", Os { code: 61, kind: ConnectionRefused, message: \"Connection refused\" })) }))",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Message processing: Storage(Connection(Database(DatabaseError(Unknown, \"database is locked\"))))",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Sync worker error: storage error: database is locked inbox_id=\"ada2bd0b226979338ed530fd3637ea6cafd1e34acb9cba05a2aa0fb48730eb25\" installation_id=\"527c187eece43a24ffcac92b8d5d82f9b79001970408472c5538e3e27d48fed1\"",
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern"
-    ]
-  },
-  {
-    "id": "AwAAAZeI4rCjxveBcwAAABhBWmVJNHJDakFBQURKSE1laHlNblVRQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7sA",
-    "type": "log",
-    "environment": "dev",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "dev",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"4880709d96fdaa2c3962e0343674afba3e3f3f0cb52e08ecbeadc2e6aa524d0c\" installation_id=\"2a28059f496f79b03222f92512b6be0ed66fd88a745baada141f0beded28da0e\"",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99611264 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99611264] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeI4rAlsgbIBgAAABhBWmVJNHJBbEFBQy0wMmM1N3RIcGZRQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7sQ",
+    "id": "AwAAAZeKYxjh_Tw5dAAAABhBWmVLWXhqaEFBRG5KQmphRXFrUkVBQUEAAAAkMDE5NzhhNjYtMzFhZi00Y2ZiLTkyMTctYTZmMDc5MTdkNWEzAAAl1g",
     "type": "log",
     "environment": "production",
     "test": "browser",
@@ -662,40 +233,14 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"0f7aa508cd6bfe1929d0a52de8745a6856459aaa7ffeb3e42f72e32ed5559b8c\" installation_id=\"9ff2550db0892cddde98d049bf45295963d3d8daa92c82edbcc65e7c5aebef35\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110157121] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110157121 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"89d62d359e7fc1bb5389a1997f208448567bf1ec3bd5ab03a66161db9e070599\" installation_id=\"1fc9712e5666ddc16cc2c0592c7ed7bc0d2f7833578ab2d990e8e1006ee2fb50\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110392703] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110392703 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeI4gZf7QJHwAAAABhBWmVJNGdaZkFBRHRjWjVBVFZ6eFV3QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7sg",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2a6c6160aacd7b0542eb23e053d3437e5c90b623602bd11f8dd0d1333aff8da5\" installation_id=\"c5aec1d86422bd87a4de3efa0c1497827a1633306b409259769e8ab374635a41\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110156576] already processed",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "streams > [elon-210] conversation stream error: Error: group with welcome id 110156577 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      ", last_stream_id: StreamId(0) }",
-      ", Library)",
-      "CORE sqlcipher_page_cipher: hmac check failed for pgno=149",
-      "CORE sqlite3Codec: error decrypting page 149 data: 1",
-      "CORE sqlcipher_codec_ctx_set_error 1",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern"
-    ]
-  },
-  {
-    "id": "AwAAAZeI4dhVTN2HHwAAABhBWmVJNGRoVkFBQ0ZXNjBqenpzWEhnQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7sw",
+    "id": "AwAAAZeKYqhFO0kUXQAAABhBWmVLWXFoRkFBRHZFWWVIZmttZFNBQUEAAAAkMDE5NzhhNjItYzNjYS00OTIyLWE0MjQtZWJjMDNmZTg2MjQ4AAAJMA",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -705,54 +250,29 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"e1e52005e5634100ede924eba0b08c229fbd849de561484481252f367b99eeea\" installation_id=\"2b61b2b0eef1890deb49c1fae087c8c262c40e132ee8d249feeed5048a824293\"",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"ea3544df84746a201b441d598b9197fcba7473fbc3ff0e80bb9011ffb8547828\" installation_id=\"15e34bed8dfb4198067eb89bceee9f9463883938289e7b8ef0aa1d57ff76dd99\"",
       "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeI3l0DcgSZZQAAABhBWmVJM2wwREFBQVd1T2xvT2ZSY1lBQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7tQ",
+    "id": "AwAAAZeKYRuWXX2N8QAAABhBWmVLWVJ1V0FBQkpPb3lUSlZRVHF3QUEAAAAkMDE5NzhhNjEtM2RjOS00YjAyLTgwYjctYzI0MjhiOTBmM2YyAAAEGA",
     "type": "log",
     "environment": "production",
-    "test": "functional",
+    "test": "agents",
     "level": "error",
     "service": "xmtp-qa-tools",
     "region": "us-east",
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"057da8ed144b9672710212ca86c4c312a94ca582d37f3612c3693593f3a308ca\" installation_id=\"1bb9f57f15c704cfc97a8842b8b4ef001802dd1e4c9a130d877f0ff36e8e1995\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110155919] already processed",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: group with welcome id 110155938 not found",
-      "DEVICE SYNC: xmtp_mls::groups::device_sync::worker: Sync worker error: storage error: UNIQUE constraint failed: processed_device_sync_messages.message_id inbox_id=\"7ca65dbe043578c81579704532b5ab5f35c15c969d3ca7b1587e7fe2cd39c8bf\" installation_id=\"1ba8f9d71b9f9a482f3495fe0296a70b332cf207198e0b77686af869cac5110f\""
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"fe7fda0ed796ee377e1e0e06a83e04349cf0b5eba23c7d6b670aafa41baf8981\" installation_id=\"97cdc2b14921cf466c8b12a8bff629c6c0712eada76ab822dc8ce026326c3285\"",
+      "agents > [bob-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeI22gAY-gvzwAAABhBWmVJMjJnQUFBQXF3Q013MjU2RXh3QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7tg",
-    "type": "log",
-    "environment": "production",
-    "test": "functional",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"7cfd374dd570763e4fed5df1f295cb3f69324ae85fc5ba94b6faaa3e25a3cc8e\" installation_id=\"28e6eab25e69dffade293beb9d93fdbd7d95278fba05f8f2d1835381a8439667\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110155264] already processed",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: group with welcome id 110155280 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome error: Error writing to storage: connection database is locked",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: storage error: UNIQUE constraint failed: consent_records.entity_type, consent_records.entity",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using async iterator pattern with conversation stream",
-      "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation events using callback pattern with conversation stream",
-      "FAIL  suites/functional/playwright.test.ts > playwright > should stream real-time group updates when members are added using async iterator pattern",
-      "FAIL  suites/functional/regresstion.test.ts > regression > downgrade 204,203,202",
-      "FAIL  suites/functional/regresstion.test.ts > regression > upgrade 204,203,202"
-    ]
-  },
-  {
-    "id": "AwAAAZeI2m4GANJHqwAAABhBWmVJMm00R0FBQkdIdXc1Q000Rm5nQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7uA",
+    "id": "AwAAAZeKWvzW-Sz7igAAABhBWmVLV3Z6V0FBQjliSTRBWGs1WVV3QUEAAAAkMDE5NzhhNWYtMTQ2Yi00YWI5LWJjMzAtNDIyOTc1YTNlNmQ2AAAfYA",
     "type": "log",
     "environment": "dev",
     "test": "performance",
@@ -762,8 +282,8 @@
     "env": "dev",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"a9112d87d27b2cc26cf297f804196523c3c5fd535c526a5f27ca31f8770b05a9\" installation_id=\"7287293e53f77ce0e6c84519a28f0a40de28cf1b8f75222d2be6bfe9fe601577\"",
-      "m_performance > [elon-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"a67987c600ce13c88f1d3276c03c7f523bddec092d6c6fc49944c5befa93f101\" installation_id=\"7159ba10bcc7228481ac99f616856a111861348fe5c9cca6a4b7f6125d2e8319\"",
+      "m_performance > [grace-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
       "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
       "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
@@ -771,7 +291,7 @@
     ]
   },
   {
-    "id": "AwAAAZeI1vhEuwaD0gAAABhBWmVJMXZoRUFBQXh1WlJIbmJoM0FnQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7uQ",
+    "id": "AwAAAZeKV2ZrvWX7GQAAABhBWmVLVjJackFBQ19lNzk4eXEwRUxnQUEAAAAkMDE5NzhhNWYtMTQ2Yi00YWI5LWJjMzAtNDIyOTc1YTNlNmQ2AAAfYQ",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -781,30 +301,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6c5672c8303a509e21ac108279ac63394b715c83712dc4674dc424c7cf8ce662\" installation_id=\"78c9fe356d0dfc87609521f1350b8c5de417c9d4aff723eda71c6018c4af8c62\"",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"caf0674014b195ffa0cef02e869d550156633be4a180111a3b63580b94327069\" installation_id=\"bb26e57f49e907ff020d9c50b143a7bf98461eaf18142d5d741fe71e926918f6\"",
       "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeIzBDFi_lflwAAABhBWmVJekJERkFBREo2MmFqazZFcWN3QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7ug",
-    "type": "log",
-    "environment": "production",
-    "test": "browser",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"818b2a2b2d556a7296d14db67a125cbd27c8886f63c7c4873585268a02efca6e\" installation_id=\"9276caa8f5090c16bc83175e2d70e044406bf5f4afa57131d87c19b085e1d6d9\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110148194] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110148194 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
-    ]
-  },
-  {
-    "id": "AwAAAZeIzAgd_VWrowAAABhBWmVJekFnZEFBQk1NLTlmbVFtNzRRQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7uw",
+    "id": "AwAAAZeKTD18NoaaKQAAABhBWmVLVEQxOEFBQmhaaXh2Z0V0ZHFRQUEAAAAkMDE5NzhhNTktN2FiMS00ZmEyLTg1MjktZTU4ZWIwMzNkODdmAAERUg",
     "type": "log",
     "environment": "dev",
     "test": "browser",
@@ -814,46 +317,14 @@
     "env": "dev",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"4b5e44a6e0a62e42de8bc130565e5ebf40dea686281d3b72e0f66de56deff8de\" installation_id=\"552e72f3a9dffcbc8cf1c7b5b119a909cc811810ea9755c7d45c8fea1c9170fb\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99604557] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 99604557 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"2a586fe739a457b764d6b23b29f13e437169febfb6a552c7d594dea801ad3b9a\" installation_id=\"195ae6031764f219860048c229d4a660149ffa68eca4c51f478e0c9983774089\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99653943] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99653943 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeIykmvfF_4CwAAABhBWmVJeWttdkFBQkJFaUNOQWx2WHRnQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7vA",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"fbd0d851076baf00824c64d9499e2efdf40e01e5eafa39ca345effc4a647a7ac\" installation_id=\"c06ea7ea383636bead0c1ace65899033822e4a59d23140622920c69588828647\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeIuCDk7udtiAAAABhBWmVJdUNEa0FBQXhJUFhIUXZfNGVBQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7vQ",
-    "type": "log",
-    "environment": "production",
-    "test": "agents",
-    "level": "error",
-    "service": "xmtp-qa-tools",
-    "region": "us-east",
-    "env": "production",
-    "libxmtp": "latest",
-    "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"4cb04ae184a66e3e633a4a35ac40aa7b22de5c7a24927d52e1b21767b4dbe43c\" installation_id=\"a1c7556fff0718b66fc5249d4c2ae4b56a8d15dbeb0298590500296dbf82abe1\"",
-      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
-      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
-    ]
-  },
-  {
-    "id": "AwAAAZeIrJMge-4HOwAAABhBWmVJckpNZ0FBQlN0Rl9nTl8ydzFBQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7vg",
+    "id": "AwAAAZeKTCl-8Gdm1wAAABhBWmVLVENsLUFBQ243RU1WYmx0eXF3QUEAAAAkMDE5NzhhNTktN2FiMS00ZmEyLTg1MjktZTU4ZWIwMzNkODdmAAERUw",
     "type": "log",
     "environment": "production",
     "test": "browser",
@@ -863,14 +334,14 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"182a9b1dee7c43fa657cd6048d59ae840037cd794b13805469487a6a2294cbea\" installation_id=\"4fac05a9fcdcc1f3542018a6ae2d0951745e48aaad678725076d12525c76acda\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110147845] already processed",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110147845 not found",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"eed28030d0a2ef854fb4c3710e67cb84f42406aa805ea4e9756b9861e7be912c\" installation_id=\"d2d5769a70a166fd9a4e7c41ba1ecc1f10ae4ec29666b208ca7ea26d1fb029af\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110384653 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110384653] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeIq_mLNVm3ugAAABhBWmVJcV9tTEFBRFFiR09ySUh5bURBQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7vw",
+    "id": "AwAAAZeKSm-ua00-qgAAABhBWmVLU20tdUFBQjF6MFFrb1dOck1nQUEAAAAkMDE5NzhhNTktN2FiMS00ZmEyLTg1MjktZTU4ZWIwMzNkODdmAAERVA",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -880,13 +351,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"98739caeb8265e6f6d1cfd06e9435830026fa4057cbe408212240858cbe3deab\" installation_id=\"21535a5ea857cc51a6d88eaaf49ef6ab55dc6e52b096aa724134ed2b889d6498\"",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"80b3bf9a9745ce5f0dbd0fb17f1bece170e0651bd43e854277ac3f081a6302cf\" installation_id=\"f8d14391d59ae8bc9983589e399ecb58ec96f106a3283c9e6a6ca334eee797a2\"",
       "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeIoGix-wLkYQAAABhBWmVJb0dpeEFBQ1hlbURQT0pIM1BnQUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7wA",
+    "id": "AwAAAZeKOThdV5RbqwAAABhBWmVLT1RoZEFBQ3hOQ2g0VllnU01BQUEAAAAkMDE5NzhhM2ItZTdiNC00YWJlLTg0ZmQtMzIwMWNiMjY1NjkxAAE0Tg",
     "type": "log",
     "environment": "production",
     "test": "agents",
@@ -896,13 +367,13 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"9bfeb470ad7726a9af68d0af4a26ad7e77b1c2929a65a5cd40899d686281ebfd\" installation_id=\"97d5627c55a89cda31eafd11774e0d3c936c3fe3b3d4a261b497d6dbe0522ef3\"",
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"aa7b9c25371b79db9a4aa7164b82eabb5de81e37e574f2f588413235bba006a1\" installation_id=\"3de01eda318c75212eba1f6eea86bff1d567002e758ba08b3bac944b0247f406\"",
       "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
     ]
   },
   {
-    "id": "AwAAAZeIlS6H9FuDOwAAABhBWmVJbFM2SEFBQzJWSnRxdC0tem93QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7wQ",
+    "id": "AwAAAZeKK6jvTjEoXwAAABhBWmVLSzZqdkFBQkFMdUZpX183TWRRQUEAAAAkMDE5NzhhM2ItZTdiNC00YWJlLTg0ZmQtMzIwMWNiMjY1NjkxAAE0Tw",
     "type": "log",
     "environment": "production",
     "test": "browser",
@@ -912,14 +383,14 @@
     "env": "production",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"b02b9f58c84fecea3a3f0881b80dc55300a6ccfac2b5e9aedebfa59c54c6cc5a\" installation_id=\"c9cc65fdf7a7d22cd100d0aef07dc3b42e6fe5af6612e2e62003c5ac4c767f12\"",
-      "browser > [bob-210] conversation stream error: Error: group with welcome id 110140795 not found",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110140795] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"66c456775620dec92ee4a98a2614ae03df45aa16e6e5c28c0359c8b8d7d30fa6\" installation_id=\"6dab5705a54a7aa930b85b19d26cb6e56f6102e7ae3e886dcbfaf723bb611612\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110329129] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110329129 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
     ]
   },
   {
-    "id": "AwAAAZeIlSl8_R2BcwAAABhBWmVJbFNsOEFBQURKSE1laDMxZGR3QUEAAABdMDE5Nzg4ZWItMWZiMy00OTM3LTliNTYtYzYzNTQ2ZGY1NDRiLXN5bnRoZXRpYy10aW1lLTE3NTAzNDE2MDAwMDAwMDAwMDBjLTE3NTAzNDg3OTk5MjMwMDAwMDFvAAh7wg",
+    "id": "AwAAAZeKK43wHjxdgwAAABhBWmVLSzQzd0FBQUl6QlJYdUNySkJ3QUEAAAAkMDE5NzhhM2ItZTdiNC00YWJlLTg0ZmQtMzIwMWNiMjY1NjkxAAE0UA",
     "type": "log",
     "environment": "dev",
     "test": "browser",
@@ -929,9 +400,292 @@
     "env": "dev",
     "libxmtp": "latest",
     "message": [
-      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"741cee8ab6cb58b5894b2287f890005e46c09abacd3406df3590059c8b4cc63e\" installation_id=\"6344aaaf8fcc6f198d00989813b28a8816c21de1d7f261e576d0e4ea8a205fcc\"",
-      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99597545] already processed",
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition"
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6c154aecbb50481b929d8f00396208fc649012830d16a467b1b51e2dacc90385\" installation_id=\"c140f68087a6e3dec0d83f2cd8e19ed06be961241b9433341eb4b64c6b805ff2\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99653722 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99653722] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeKKn5Lt75iVAAAABhBWmVLS241TEFBQVNkdUNpSGxqck1nQUEAAAAkMDE5NzhhM2ItZTdiNC00YWJlLTg0ZmQtMzIwMWNiMjY1NjkxAAE0UQ",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6e4d239b4d95b6ecb777ce4aaa4a5068a1b203b9faafa4173bdcccbddf1f17b2\" installation_id=\"b295493b6b18770bda95d7720628d1b892bad2f4530e15706a0e4801b717b4b8\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKIE1QXpiFAQAAABhBWmVLSUUxUUFBREhxZktOUHJzR1ZnQUEAAAAkMDE5NzhhMjItYTdlOS00MjA3LWIwNjktNDAxZWU0ZGE3OTU4AAD8mw",
+    "type": "log",
+    "environment": "production",
+    "test": "performance",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"51b4f7bc24f280498e1b4e356e5a431fa5eaa225012e1655c3fc6caceb4134b7\" installation_id=\"3c92d3bc170abe6d393d55d0b923fff7b8e4ac2a6073e1d655e10d1ef8396bb3\"",
+      "m_performance > [joe-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams"
+    ]
+  },
+  {
+    "id": "AwAAAZeKHpCg0lin6AAAABhBWmVLSHBDZ0FBQWpUeUxzMFFjVGhnQUEAAAAkMDE5NzhhM2ItZTdiNC00YWJlLTg0ZmQtMzIwMWNiMjY1NjkxAAE0Ug",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"e7f9697f7a16f182853a43ff7e68ca26b55a3912938da30244698fd265828deb\" installation_id=\"d8752afb2a0df9abdf3bf8d2d914907449b824422606039bf0a99e19abca577d\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKFQhxYaCG0gAAABhBWmVLRlFoeEFBQ0dRLVFBWV80eDVRQUEAAAAkMDE5NzhhMjItYTdlOS00MjA3LWIwNjktNDAxZWU0ZGE3OTU4AAD8nA",
+    "type": "log",
+    "environment": "production",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"32a0bea83779e0fb825a18c61de6780067decc3640b98451312cdd6264a89cbc\" installation_id=\"1b4a55906b02fb66b9095be95c07ecc2a67b52b79a5abe92790b08b17db42835\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110321496 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110321496] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeKFQKDWw_QZwAAABhBWmVLRlFLREFBRENjUmdoY09vUjRRQUEAAAAkMDE5NzhhMjItYTdlOS00MjA3LWIwNjktNDAxZWU0ZGE3OTU4AAD8nQ",
+    "type": "log",
+    "environment": "dev",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "dev",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"1ebf777250f59de1684639630a1342736365f2a5a4eeb1be78896f9acc98639a\" installation_id=\"97ce56ca5fc27ed05f77f25fe54ea4ba993cc9f00589ce4f877c9060f414bbab\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99646899 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99646899] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeKEx4Xv8FmXAAAABhBWmVLRXg0WEFBQk5XTGNjek15empBQUEAAAAkMDE5NzhhMjItYTdlOS00MjA3LWIwNjktNDAxZWU0ZGE3OTU4AAD8ng",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"c943c636db244eb0828c2e4597a3d4f7988b0ba4b4c12133a184267e5a485150\" installation_id=\"e8c7b235398d0b99afb6894e6b5a670c617fbfa99723ce4756abcc242fd03deb\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeKAj2dyALgFAAAABhBWmVLQWoyZEFBQnVGd0lMQXI4QmlnQUEAAAAkMDE5NzhhMjItYTdlOS00MjA3LWIwNjktNDAxZWU0ZGE3OTU4AAD8nw",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"b0eed6d8c541b9f9a0f574960bec2bc2f1b97ebbde6cdc8a396e5cb7d5f24dfe\" installation_id=\"a088e76731b6b22d0fd81880f3a1a10c7a1e44d4d667748472ee45ddacc8ad3b\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ9mCW376yAAAAABhBWmVKOW1DV0FBQjV0RUR3MkNBWnFBQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYAw",
+    "type": "log",
+    "environment": "production",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"0a5a8e5a7d247e8ddddf6564e6c442ae0108cdd95895ed82f7f255e125843a52\" installation_id=\"f00b03b41803e3ca2aeb118fc33e12b3bfadde912bd7c1f0e2e16632c09d93e5\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110320898 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110320898] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ9WuamnBlIwAAABhBWmVKOVd1YUFBREhUeGhuWUNkU3dBQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYBA",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"315c8d14eb0951ac302f01b3a9b9146cb11127472e9f6df02fe7056f4e2da341\" installation_id=\"a014ba5b0cbd5e51c6f3835df200be96de39c74ca5906e286f7521650f13823a\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ6fDnlDRE0gAAABhBWmVKNmZEbkFBQ3dUajBVWkFBWXhnQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYBQ",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"44d045f7514816b06bb345bb337df8053ac5b33f8fb6cc329f9a1d9a9c4419cd\" installation_id=\"acec752c9207ebce78cc2793af799a899dc068353db8955e57760edad23096cf\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ3xTGwVOnxAAAABhBWmVKM3hUR0FBRFJKZmpDcHd3VFZnQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYBg",
+    "type": "log",
+    "environment": "dev",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "dev",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"342776f1054edac87381a5263e565ba61e19e51250653345f934c9157787030b\" installation_id=\"d04e2df95742f90f744aee1bfe30f7c53a12fa59c6277434c5a97bfb780e588b\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99639857] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99639857 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ3xKOCUiyAAAAABhBWmVKM3hLT0FBQjV0RUR3MlBSRE1nQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYBw",
+    "type": "log",
+    "environment": "production",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6f37e4f98cb77377232cfb5bff1adcad6ffaaad307ec277e318b1dfa35067593\" installation_id=\"fd61e71714c48abd0a2b6cb0e186f5368adc270be8e43f56296f992aabcd3267\"",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 110313504 not found",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [110313504] already processed",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeJ3TgdIDzQZwAAABhBWmVKM1RnZEFBRENjUmdoY0lIWERnQUEAAAAkMDE5Nzg5ZmItZTRmMC00YTllLWE1MTctMzhhMGRiZGIzZjYxAAEYCA",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"6ca12c7ed46afb83315def73a6e92ca97767a4af476a9c2a5b52fa79df0701c4\" installation_id=\"0fc0c2eee8015417280a4e049b274c85f0ab7275057add509126bc8fb8240a3c\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJy4lnhmYB0wAAABhBWmVKeTRsbkFBQ3pIMVJnbGFSSHBnQUEAAAAkMDE5Nzg5ZDgtYTRiYS00N2MwLWI5MGEtYmQ5MmEzYjUwMWFlAAEMQw",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"871cd891cc1b89ad4640d694e73f66a4898517341f7616946a9f73f6fe5400e7\" installation_id=\"a53bdcb1db173531e7a1a346bbc3c240e200d9c1078ae20b014f76eb769d678d\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJveXWaNmdqwAAABhBWmVKdmVYV0FBQjhtMFNianlRNElBQUEAAABdMDE5Nzg5YzYtZDllNC00MzE3LWJiNzctZjdkN2UzNjhkNTIzLXN5bnRoZXRpYy10aW1lLTE3NTAzNTk2MDAwMDAwMDAwMDBjLTE3NTAzNjMxOTk5NzIwMDAwMDFvAAixxg",
+    "type": "log",
+    "environment": "dev",
+    "test": "browser",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "dev",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"61a42ee0837fd27bbd3968b27a6e0bf9df7eff4f852d06982e6fa3f09cd517da\" installation_id=\"984cad5115385b93af0197bdac8cc42fde253cb72f965827302e89eba894607a\"",
+      "process:sync_welcomes: xmtp_mls::groups::welcome_sync: failed to create group from welcome: welcome with cursor [99639641] already processed",
+      "browser > [bob-210] conversation stream error: Error: group with welcome id 99639641 not found",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member"
+    ]
+  },
+  {
+    "id": "AwAAAZeJvMKBxeg-bQAAABhBWmVKdk1LQkFBQ0xzd1d0OURZeUdRQUEAAABdMDE5Nzg5YzYtZDllNC00MzE3LWJiNzctZjdkN2UzNjhkNTIzLXN5bnRoZXRpYy10aW1lLTE3NTAzNTk2MDAwMDAwMDAwMDBjLTE3NTAzNjMxOTk5NzIwMDAwMDFvAAixxw",
+    "type": "log",
+    "environment": "production",
+    "test": "agents",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "production",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"7349f555d6b9c0f3a06267c31df56ca6fa738f4e82a6056143544d967eacbfc1\" installation_id=\"065b9f015217b404b1bd557992c9a4612ccba8c8cc4334cac2a66cb65794fcb3\"",
+      "agents > [bot-210] Collector timed out. 30s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466"
+    ]
+  },
+  {
+    "id": "AwAAAZeJs70JUHxh8QAAABhBWmVKczcwSkFBQmVSVk81YmFUSXdnQUEAAABdMDE5Nzg5YzYtZDllNC00MzE3LWJiNzctZjdkN2UzNjhkNTIzLXN5bnRoZXRpYy10aW1lLTE3NTAzNTk2MDAwMDAwMDAwMDBjLTE3NTAzNjMxOTk5NzIwMDAwMDFvAAixyA",
+    "type": "log",
+    "environment": "dev",
+    "test": "performance",
+    "level": "error",
+    "service": "xmtp-qa-tools",
+    "region": "us-east",
+    "env": "dev",
+    "libxmtp": "latest",
+    "message": [
+      "xmtp_mls::groups::key_package_cleaner_worker: sync worker error storage error: Record not found inbox_id=\"9444fb868bd1afa02a6a1dbc696fb04e5fdccbe0f2181b3e3436a28cc14124b0\" installation_id=\"8d3b513cdb9b9eebb1e4ff0ff60125bd9a1d41a916a28981267a2f653c70ee6d\"",
+      "m_performance > [fabri-210] Collector timed out. 10s. Expected 1 events of type message, collected 0 events.",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams"
     ]
   }
 ]
