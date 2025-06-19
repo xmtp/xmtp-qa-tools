@@ -1,6 +1,9 @@
 import { resolve } from "path";
 import { defineConfig } from "vitest/config";
 
+// Detect if running in UI mode
+const isUIMode = process.argv.includes("--ui");
+
 export default defineConfig({
   base: "/__vitest__/#/",
   resolve: {
@@ -14,19 +17,28 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    reporters: ["default"],
+    reporters: isUIMode ? ["basic"] : ["default"],
     environment: "node",
     watch: false,
-    testTimeout: 6000000,
-    hookTimeout: 6000000,
+    testTimeout: isUIMode ? 300000 : 6000000,
+    hookTimeout: isUIMode ? 60000 : 6000000,
     pool: "threads",
     poolOptions: {
       singleThread: true,
+      ...(isUIMode && {
+        maxThreads: 1,
+        minThreads: 1,
+      }),
     },
     api: {
       host: "0.0.0.0",
       port: 51204,
     },
     dangerouslyIgnoreUnhandledErrors: true,
+    ...(isUIMode && {
+      silent: false,
+      maxConcurrency: 1,
+      isolate: true,
+    }),
   },
 });
