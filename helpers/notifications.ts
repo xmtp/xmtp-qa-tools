@@ -182,7 +182,12 @@ class SlackNotifier {
 
   private sanitizeLogs(logs: string): string {
     // Replace all occurrences of triple backticks with three single quotes
-    return logs.replace(/```/g, "'''");
+    // Also escape other problematic characters for Slack markdown
+    return logs
+      .replace(/```/g, "'''")
+      .replace(/`/g, "'") // Replace single backticks that could break formatting
+      .replace(/\*/g, "\\*") // Escape asterisks to prevent bold formatting issues
+      .replace(/_/g, "\\_"); // Escape underscores to prevent italic formatting issues
   }
 
   private generateMessage(options: SlackNotificationOptions): string {
