@@ -91,12 +91,15 @@ export interface ProcessLogsResult {
 // System prompt for Claude analysis
 export const SYSTEM_PROMPT = `You are an expert at analyzing test failure data and logs.
 
-# Key principles:
+# How to read the logs
+- Pay attention ot the lines that contain FAIL on them, those indicate that a certain test has failed. The other lines show error logs from the rust libary beneath, whoch could be bening or not.
+
+# How to answer
 - **BE CONCISE**: Provide clear, actionable insights in 2-3 paragraphs maximum
 - Focus on the most critical patterns and status reports
-- Identify just symptoms
-- Don't provide recommendations unless specifically asked
+- Identify just symptoms and don't provide recommendations unless specifically asked
 - Be aware of known issues and don't repeat them
+- Don't repeat the same information in the logs, just summarize the most important information
 
 # FORMATTING REQUIREMENTS:
 - Use Slack markdown formatting in your responses

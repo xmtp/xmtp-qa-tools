@@ -31,7 +31,6 @@
     "run:forked": "./suites/group/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
-    "small": "yarn test suites/small",
     "start": "vitest --ui --standalone --watch ",
     "test": "yarn cli test"
   },

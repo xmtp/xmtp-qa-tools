@@ -127,6 +127,7 @@ class SlackNotifier {
     const failLines = errorLogs.filter((log) => log.includes("FAIL  suites/"));
 
     if (failLines.length === 0) {
+      //don't show if test dont fail
       return true;
     }
 
