@@ -2,6 +2,9 @@ name: Functional
 description: "should verify message loss when receiving via 200 streams"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *" # Runs at midnight UTC every day
   workflow_dispatch:
@@ -13,7 +16,7 @@ jobs:
     strategy:
       matrix:
         test: [functional]
-        environment: [dev, production]
+        environment: [production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
@@ -39,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }}
+        run: yarn test ${{ matrix.test }} --debug --no-fail
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4

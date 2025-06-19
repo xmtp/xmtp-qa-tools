@@ -180,6 +180,11 @@ class SlackNotifier {
     return undefined;
   }
 
+  private sanitizeLogs(logs: string): string {
+    // Replace all occurrences of triple backticks with three single quotes
+    return logs.replace(/```/g, "'''");
+  }
+
   private generateMessage(options: SlackNotificationOptions): string {
     const upperCaseTestName = options.testName
       ? options.testName[0].toUpperCase() + options.testName.slice(1)
@@ -188,6 +193,11 @@ class SlackNotifier {
     const customLinks =
       options.customLinks || this.generateCustomLinks(options.testName);
     const url = this.generateUrl();
+
+    // Sanitize logs before embedding in Slack message
+    const errorLogsArr = Array.from(options.errorLogs || []);
+    const last20Logs = errorLogsArr.slice(-20);
+    const logs = this.sanitizeLogs(last20Logs.join("\n"));
 
     return `*Test Failure ❌*
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
@@ -199,7 +209,7 @@ class SlackNotifier {
 ${url ? `*Test log:* <${url}|View url>` : ""}
 ${customLinks}
 Logs:
-\`\`\`${Array.from(options.errorLogs || []).join("\n")}\`\`\``;
+\`\`\`${logs}\`\`\``;
   }
 
   public async sendNotification(

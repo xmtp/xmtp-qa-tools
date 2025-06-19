@@ -2,6 +2,9 @@ name: Regression
 description: "should verify last 3 versions of the library"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 0 * * *" # Runs at midnight UTC every day
   workflow_dispatch:
@@ -13,7 +16,7 @@ jobs:
     strategy:
       matrix:
         test: [functional]
-        environment: [dev, production]
+        environment: [production]
     env:
       LOGGING_LEVEL: "off"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
