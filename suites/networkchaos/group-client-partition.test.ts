@@ -9,7 +9,7 @@ import { DockerContainer } from "../../network-stability-utilities/container";
 import * as iptables from "../../network-stability-utilities/iptables";
 import type { Group } from "@xmtp/node-sdk";
 
-const testName = "group-client-partitioning";
+const testName = "group-client-partition";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -25,7 +25,7 @@ describe(testName, async () => {
     typeOfResponse.Gm
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   const partitionNode = new DockerContainer("multinode-node2-1");
   const partitionPort = 6556;
@@ -36,7 +36,7 @@ describe(testName, async () => {
     try {
       group = await workers.createGroup("Client Partition Test Group");
       await group.sync();
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       const verifyInitial = await verifyMessageStream(group, workers.getAllButCreator());
       expect(verifyInitial.receiverCount).toBe(3);
@@ -60,7 +60,7 @@ describe(testName, async () => {
         }
       }
 
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       console.log("[verify-before-reconnect] Verifying user3/user4 did NOT receive messages during partition");
       for (const recipient of ["user3", "user4"]) {
@@ -81,7 +81,7 @@ describe(testName, async () => {
       await workers.get("user3")!.client.conversations.getConversationById(group.id);
       await workers.get("user4")!.client.conversations.getConversationById(group.id);
 
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       console.log("[verify-after-reconnect] Checking that user3 and user4 received all mid-partition messages (if supported)");
       for (const recipient of ["user3", "user4"]) {
@@ -110,7 +110,7 @@ describe(testName, async () => {
       expect(verifyFinal.receiverCount).toBe(3);
       expect(verifyFinal.allReceived).toBe(true);
 
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
     } catch (err) {
       logError(err, expect.getState().currentTestName);
       throw err;

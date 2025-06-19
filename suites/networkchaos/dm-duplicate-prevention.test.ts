@@ -7,7 +7,7 @@ import { type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "dm-duplicate-chaos";
+const testName = "dm-duplicate-prevention";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -20,7 +20,7 @@ describe(testName, async () => {
     typeofStream.Message,
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
 

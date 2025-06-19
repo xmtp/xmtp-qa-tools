@@ -6,7 +6,7 @@ import { getWorkers } from "@workers/manager";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "key-rotation-chaos";
+const testName = "keyrotation-chaos";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -31,7 +31,7 @@ describe(testName, async () => {
     typeOfResponse.Gm
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   it("should handle staggered key rotations and network chaos under load", async () => {
     const group = await workers.createGroup("Key Rotation Stress Test");
@@ -66,7 +66,7 @@ describe(testName, async () => {
       verifyInterval = setInterval(async () => {
         try {
           console.log("[verify] Checking fork and delivery");
-          await workers.checkIfGroupForked(group.id);
+          await workers.checkForks();
           const res = await verifyMessageStream(group, otherUsers);
           expect(res.allReceived).toBe(true);
         } catch (e) {
@@ -139,7 +139,7 @@ describe(testName, async () => {
     }
 
     console.log("[final] Validating final group state and message sync");
-    await workers.checkIfGroupForked(group.id);
+    await workers.checkForks();
     const verifyFinal = await verifyMessageStream(group, otherUsers);
     expect(verifyFinal.allReceived).toBe(true);
   });

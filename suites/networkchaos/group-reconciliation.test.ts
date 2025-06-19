@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 import type { Group } from "@xmtp/node-sdk";
 
-const testName = "group-reconciliation-recovery";
+const testName = "group-reconciliation";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -24,7 +24,7 @@ describe(testName, async () => {
     typeOfResponse.Gm
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   let group: Group;
 

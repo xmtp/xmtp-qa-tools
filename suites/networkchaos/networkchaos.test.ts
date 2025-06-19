@@ -32,7 +32,7 @@ describe(testName, async () => {
     typeOfResponse.Gm
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   it("should survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroup("Latency Chaos Spike Test");
@@ -65,7 +65,7 @@ describe(testName, async () => {
       verifyInterval = setInterval(async () => {
         try {
           console.log("[verify] Checking fork and delivery under chaos");
-          await workers.checkIfGroupForked(group.id);
+          await workers.checkForks();
           const res = await verifyMessageStream(group, otherUsers);
           expect(res.allReceived).toBe(true);
         } catch (e) {
@@ -118,7 +118,7 @@ describe(testName, async () => {
 
     // Final delivery validation
     console.log("[final] Validating full group state and message sync");
-    await workers.checkIfGroupForked(group.id);
+    await workers.checkForks();
     const verifyFinal = await verifyMessageStream(group, otherUsers);
     expect(verifyFinal.allReceived).toBe(true);
   });

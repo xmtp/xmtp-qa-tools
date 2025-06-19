@@ -24,7 +24,7 @@ describe(testName, async () => {
     typeOfResponse.Gm,
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");
@@ -85,7 +85,7 @@ describe(testName, async () => {
       console.log("[test] Lifting blackhole");
       node2.clearBlackhole([node1, node3, node4]);
       await new Promise((res) => setTimeout(res, 3000));
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       console.log("[test] Verifying messages are now received post-blackhole");
       const updatedUser3Msgs = await user3Group!.messages();

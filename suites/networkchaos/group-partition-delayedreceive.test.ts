@@ -8,7 +8,7 @@ import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 import type { Group } from "@xmtp/node-sdk";
 
-const testName = "group-partition-sequencing";
+const testName = "group-partition-delayedreceive";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -24,7 +24,7 @@ describe(testName, async () => {
     typeOfResponse.Gm
   );
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({ testName, expect });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");
@@ -37,7 +37,7 @@ describe(testName, async () => {
     try {
       group = await workers.createGroup("Partitioned Test Group");
       await group.sync();
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       console.log("[test] Sending group message before partition");
       const verifyInitial = await verifyMessageStream(group, workers.getAllButCreator());
@@ -60,7 +60,7 @@ describe(testName, async () => {
 
       const user2Group = await workers.get("user2")!.client.conversations.getConversationById(group.id);
       await user2Group!.send(midPartitionMsg);
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       console.log("=== Message Dump After Partition ===");
       for (const name of ["user1", "user2", "user3", "user4"]) {
@@ -102,7 +102,7 @@ describe(testName, async () => {
       node2.unblockOutboundTrafficTo(node4);
 
       await new Promise((r) => setTimeout(r, 3000));
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
 
       const postRecoveryMsgs = await Promise.all(
         ["user3", "user4"].map(async (name) => {
@@ -118,7 +118,7 @@ describe(testName, async () => {
       const verifyFinal = await verifyMessageStream(group, workers.getAllButCreator());
       expect(verifyFinal.receiverCount).toBe(3);
       expect(verifyFinal.allReceived).toBe(true);
-      await workers.checkIfGroupForked(group.id);
+      await workers.checkForks();
     } catch (err) {
       logError(err, expect.getState().currentTestName);
       throw err;
