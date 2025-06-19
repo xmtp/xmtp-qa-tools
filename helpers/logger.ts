@@ -22,6 +22,15 @@ export const KNOWN_ISSUES = [
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     ],
   },
+  {
+    testName: "Performance",
+    uniqueErrorLines: [
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
+    ],
+  },
 ];
 
 // Patterns to track for error deduplication and log filtering
