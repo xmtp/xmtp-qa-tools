@@ -127,7 +127,7 @@ class SlackNotifier {
     const failLines = errorLogs.filter((log) => log.includes("FAIL  suites/"));
 
     if (failLines.length === 0) {
-      return false;
+      return true;
     }
 
     // Check each configured filter
