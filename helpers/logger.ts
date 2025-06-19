@@ -19,7 +19,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Agents",
     uniqueErrorLines: [
-      'FAIL  suites/agents/agents.test.ts > agents > should receive response from clankerchat.base.eth agent (0x9E73e4126bb22f79f89b6281352d01dd3d203466) when sending "hi"',
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     ],
   },
 ];
