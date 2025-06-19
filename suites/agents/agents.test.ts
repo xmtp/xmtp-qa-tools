@@ -33,7 +33,7 @@ describe(testName, () => {
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
-    it(`should receive response from ${agent.name} agent (${agent.address}) when sending "${agent.sendMessage}"`, async () => {
+    it(`${env}: ${agent.name} : ${agent.address}`, async () => {
       try {
         let retries = 3; // Move retries inside each test for fresh count
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
