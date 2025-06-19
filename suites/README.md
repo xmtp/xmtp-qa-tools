@@ -107,3 +107,56 @@ Our test suites provide comprehensive coverage across:
 - **Security**: Spam prevention, consent management, permission controls
 - **Reliability**: Offline capabilities, message ordering, error handling
 - **Regression**: Historical bug prevention and validation
+
+## Version Testing
+
+The testing framework supports running tests with specific SDK versions for compatibility testing:
+
+### CLI Usage
+
+```bash
+# Test with random mix of versions 209 and 210
+yarn cli test functional --versions 209,210
+
+# Test with only version 209
+yarn cli test functional --versions 209
+
+# Test with multiple versions
+yarn cli test functional --versions 202,203,204,205
+```
+
+### Code Usage
+
+To make your tests support version parameters, use the `getWorkersWithVersions` helper:
+
+```typescript
+import { getWorkersWithVersions } from "@helpers/client";
+import { getWorkers } from "@workers/manager";
+
+const testName = "my-test";
+
+// Instead of passing worker names directly
+const workers = await getWorkers(["alice", "bob"], testName);
+
+// Use getWorkersWithVersions to support --versions parameter
+const workerDescriptors = getWorkersWithVersions(["alice", "bob"]);
+const workers = await getWorkers(workerDescriptors, testName);
+```
+
+When `--versions` is specified, workers will be created with random versions from the provided list. When not specified, the latest version is used.
+
+### Available Versions
+
+The testimg supports the following SDK versions:
+
+- `0.0.47` (legacy)
+- `1.0.0`
+- `1.0.5`
+- `2.0.2`
+- `2.0.3`
+- `2.0.4`
+- `2.0.5`
+- `2.0.6`
+- `2.0.8`
+- `2.0.9`
+- `2.1.0` (latest)
