@@ -2,13 +2,16 @@ name: Agents
 description: "should verify performance of the library in the production network"
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "*/15 * * * *" # Runs every 15 minutes
   workflow_dispatch:
 
 jobs:
   test:
-    timeout-minutes: 20
+    timeout-minutes: 10
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,7 +21,6 @@ jobs:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      DEFAULT_STREAM_TIMEOUT_MS: 30000
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
