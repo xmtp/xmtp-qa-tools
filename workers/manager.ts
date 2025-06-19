@@ -1,8 +1,12 @@
 import fs from "fs";
 import { appendFile } from "fs/promises";
 import path from "path";
-import { generateEncryptionKeyHex } from "@helpers/client";
-import { sdkVersions, sleep } from "@helpers/tests";
+import {
+  formatBytes,
+  generateEncryptionKeyHex,
+  sdkVersions,
+  sleep,
+} from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { typeOfResponse, typeofStream, typeOfSync, WorkerClient } from "./main";
@@ -72,6 +76,7 @@ export class WorkerManager {
     const terminationPromises = this.activeWorkers.map(
       async (worker: WorkerClient) => {
         try {
+          // await worker.client.clearAllStatistics();
           await worker.terminate();
           if (deleteDbs) {
             await worker.clearDB();
@@ -125,64 +130,43 @@ export class WorkerManager {
     return this.workers[firstBaseName][firstInstallId].sdkVersion;
   }
 
-  public async checkIfGroupForked(groupId: string): Promise<void> {
+  public checkStatistics(): void {
+    // for (const worker of this.getAll()) {
+    //   console.debug(JSON.stringify(worker.client.apiStatistics(), null, 2));
+    // }
+  }
+  public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
-      const group =
-        await worker.client.conversations.getConversationById(groupId);
-      if (!group) continue;
-      const debugInfo = await group.debugInfo();
-      console.debug(
-        `${worker.name} is on epoch ${debugInfo.epoch} and ${debugInfo.maybeForked}`,
+      const groups = await worker.client.conversations.list();
+      await Promise.all(
+        groups.flat().map(async (g) => {
+          const debugInfo = await g.debugInfo();
+          if (debugInfo.maybeForked) {
+            throw new Error(`Stopping test, group id ${g.id} may have forked`);
+          }
+        }),
       );
-      if (debugInfo.maybeForked) {
-        throw new Error("Stopping test, group may have forked");
-      }
     }
   }
 
-  public async checkInstallations() {
-    for (const worker of this.getAll()) {
-      const installations = await worker.client.preferences.inboxState();
-      if (installations.installations.length > 10) {
-        await worker.client.revokeAllOtherInstallations();
-        const installations = await worker.client.preferences.inboxState(true);
-        if (installations.installations.length > 10) {
-          throw new Error(
-            `[${worker.name}] Max installation reached: ${installations.installations.length}`,
-          );
-        } else {
-          console.warn(
-            `[${worker.name}] Package details: ${installations.installations.length}`,
-          );
-        }
-      }
-      for (const installation of installations.installations) {
-        // Convert nanoseconds to milliseconds for Date constructor
-        const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
-        const installationDate = new Date(timestampMs);
-        const now = new Date();
-        const diffMs = now.getTime() - installationDate.getTime();
-        const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-
-        const daysText = diffDays === 1 ? "day" : "days";
-        const greenCheck = diffDays < 90 ? " ✅" : "❌";
-
-        if (diffDays > 90) {
-          console.warn(
-            `[${worker.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
-          );
-        }
-      }
+  public async revokeExcessInstallations(threshold: number = 5) {
+    const workers = this.getAll();
+    for (const worker of workers) {
+      await worker.worker.revokeExcessInstallations(threshold);
     }
   }
-  public printWorkers() {
+  public async printWorkers() {
     try {
       let workersToPrint = [];
       for (const baseName in this.workers) {
         for (const installationId in this.workers[baseName]) {
           const currentWorker = this.workers[baseName][installationId];
+          const installationCount =
+            await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion}`,
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+              (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
+            )}`,
           );
         }
       }
@@ -217,6 +201,7 @@ export class WorkerManager {
 
     return group as Group;
   }
+
   getAllBut(excludeName: string): Worker[] {
     const workers = this.getAll();
     return workers.filter((worker) => worker.name !== excludeName);
@@ -435,11 +420,11 @@ export async function getWorkers(
   }
 
   await Promise.all(workerPromises);
-  manager.printWorkers();
-  await manager.checkInstallations();
+  await manager.printWorkers();
+  await manager.revokeExcessInstallations();
+
   return manager;
 }
-
 /**
  * Helper function to get the next available folder name
  */

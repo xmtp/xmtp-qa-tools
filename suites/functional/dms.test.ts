@@ -1,4 +1,4 @@
-import { loadEnv } from "@helpers/client";
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -8,32 +8,34 @@ import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "dms";
-loadEnv(testName);
 
 describe(testName, async () => {
+  const workerDescriptors = getWorkersWithVersions([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "randomguy2",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
+
   const workers = await getWorkers(
-    [
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "randomguy2",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ],
+    workerDescriptors,
     testName,
     typeofStream.Message,
   );
   let convo: Dm;
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("newDm: should measure creating a DM", async () => {
+  it("should create a new DM conversation using inbox ID", async () => {
     try {
       convo = (await workers
         .get("henry")!
@@ -49,7 +51,7 @@ describe(testName, async () => {
     }
   });
 
-  it("newDmWithIdentifiers: should measure creating a DM", async () => {
+  it("should create a new DM conversation using Ethereum address", async () => {
     try {
       const dm2 = await workers
         .get("henry")!
@@ -65,7 +67,7 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("sendGM: should measure sending a gm", async () => {
+  it("should send a message in DM conversation", async () => {
     try {
       const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
@@ -82,7 +84,7 @@ describe(testName, async () => {
     }
   });
 
-  it("receiveGM: should measure receiving a gm", async () => {
+  it("should receive and verify message delivery in DM conversation", async () => {
     try {
       const verifyResult = await verifyMessageStream(convo, [
         workers.get("randomguy")!,

@@ -1,0 +1,38 @@
+{
+  "permissions": {
+    "allow": [
+      "yarn*",
+      "Bash(find:*)",
+      "Bash(yarn*)",
+      "tsx*",
+      "Bash(tsx*)",
+      "npx*",
+      "Bash(npx*)",
+      "node*",
+      "Bash(node*)",
+      "ls*",
+      "Bash(ls*)",
+      "cat*",
+      "Bash(cat*)",
+      "echo*",
+      "Bash(echo*)",
+      "mkdir*",
+      "Bash(mkdir*)",
+      "rm*",
+      "Bash(rm*)",
+      "cp*",
+      "Bash(cp*)",
+      "mv*",
+      "Bash(mv*)",
+      "pwd",
+      "Bash(pwd)",
+      "which*",
+      "Bash(which*)",
+      "env",
+      "Bash(env)",
+      "export*",
+      "Bash(export*)"
+    ],
+    "deny": []
+  }
+}

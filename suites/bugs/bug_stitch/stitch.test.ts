@@ -1,6 +1,5 @@
-import { loadEnv } from "@helpers/client";
+import { defaultNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { defaultNames } from "@helpers/tests";
 import { getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -23,7 +22,6 @@ const users: {
 };
 
 const testName = "bug_stitch";
-loadEnv(testName);
 
 describe(testName, () => {
   const randomName =

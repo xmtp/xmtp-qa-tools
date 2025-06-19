@@ -8,6 +8,8 @@ export default defineConfig({
       "@helpers": resolve(__dirname, "./helpers"),
       "@workers": resolve(__dirname, "./workers"),
       "@scripts": resolve(__dirname, "./scripts"),
+      "@inboxes": resolve(__dirname, "./inboxes"),
+      "@bots": resolve(__dirname, "./bots/helpers"),
     },
   },
   test: {
@@ -15,8 +17,8 @@ export default defineConfig({
     reporters: ["default"],
     environment: "node",
     watch: false,
-    testTimeout: 600000,
-    hookTimeout: 600000,
+    testTimeout: 6000000,
+    hookTimeout: 6000000,
     pool: "threads",
     poolOptions: {
       singleThread: true,

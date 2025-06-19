@@ -13,7 +13,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing    |
 | **tests.ts**      | Test configuration and utilities | Test setup, SDK version management               |
 | **inboxes.json**  | Pre-generated test identities    | Test account data for simulations                |
-| **slack.ts**      | Slack notification utilities     | Send notifications to Slack channels             |
 | **ai.ts**         | OpenAI API utilities             | Generate OpenAI responses                        |
 
 ## Usage
@@ -39,7 +38,6 @@ const signer = createSigner(WALLET_KEY);
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
 // Load environment configuration for tests
-loadEnv(testName);
 
 // Create an XMTP client with specific version
 const client = await createClient(
@@ -109,7 +107,7 @@ The `logger.ts` module provides logging utilities with formatting and file outpu
 const logger = createLogger();
 
 // Set up pretty console log formatting
-setupPrettyLogs();
+setupPrettyLogs(testName);
 
 // Log test errors and track failures
 const logError(error, expect);

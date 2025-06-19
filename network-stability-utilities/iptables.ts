@@ -63,5 +63,3 @@ export function blockFromHostTo(container: DockerContainer): void {
   console.log(`[iptables] Blocking traffic from host to ${container.name} (IP ${container.ip})`);
   execSync(`sudo iptables -A OUTPUT -d ${container.ip} -j DROP`);
 }
-
-

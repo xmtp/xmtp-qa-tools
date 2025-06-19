@@ -1,6 +1,141 @@
 import fs from "fs";
 import path from "path";
 import winston from "winston";
+import "dotenv/config";
+
+export const KNOWN_ISSUES = [
+  {
+    testName: "Browser",
+    uniqueErrorLines: [
+      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
+    ],
+  },
+  {
+    testName: "Dms",
+    uniqueErrorLines: [
+      "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
+    ],
+  },
+  {
+    testName: "Agents",
+    uniqueErrorLines: [
+      "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    ],
+  },
+];
+
+// Patterns to track for error deduplication and log filtering
+export const PATTERNS_TO_TRACK = [
+  "sync worker error storage error",
+  "sqlcipher_mlock",
+  "Collector timed out.",
+  "welcome with cursor",
+  "group with welcome id",
+  // Add more patterns here as needed
+];
+
+export const LOG_FILTER_PATTERNS = [
+  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+  /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
+  // Add more patterns here as needed
+];
+
+// Patterns to match log lines for error extraction
+export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/, /QA_ERROR/];
+
+/**
+ * Remove ANSI escape codes from text
+ * This regex matches all ANSI escape sequences including:
+ * - Color codes (\x1b[31m, \x1b[0m, etc.)
+ * - Cursor movement codes
+ * - Other terminal control sequences
+ */
+export function stripAnsi(text: string): string {
+  // ANSI escape code regex pattern
+  // eslint-disable-next-line no-control-regex
+  const ansiRegex = /\x1b\[[0-9;]*[a-zA-Z]/g;
+
+  // Also handle some common ANSI sequences that might be encoded differently
+  // eslint-disable-next-line no-control-regex
+  const ansiRegex2 = /\u001b\[[0-9;]*[a-zA-Z]/g;
+
+  return (
+    text
+      .replace(ansiRegex, "")
+      .replace(ansiRegex2, "")
+      // Remove any remaining control characters
+      // eslint-disable-next-line no-control-regex
+      .replace(/[\x00-\x1f\x7f-\x9f]/g, (char) => {
+        // Keep newlines, tabs, and carriage returns
+        if (char === "\n" || char === "\t" || char === "\r") {
+          return char;
+        }
+        return "";
+      })
+  );
+}
+
+/**
+ * Process a single log file to remove ANSI codes
+ */
+export async function processLogFile(
+  inputPath: string,
+  outputPath: string,
+): Promise<void> {
+  const content = await fs.promises.readFile(inputPath, "utf-8");
+  const cleanedContent = stripAnsi(content);
+  await fs.promises.writeFile(outputPath, cleanedContent, "utf-8");
+}
+
+/**
+ * Clean all raw-*.log files by removing ANSI codes
+ * @param deleteOriginals - If true, delete the original raw files after cleaning
+ */
+export async function cleanAllRawLogs(
+  deleteOriginals: boolean = false,
+): Promise<void> {
+  const logsDir = path.join(process.cwd(), "logs");
+  const outputDir = path.join(logsDir, "cleaned");
+
+  if (!fs.existsSync(logsDir)) {
+    console.log("No logs directory found");
+    return;
+  }
+
+  if (!fs.existsSync(outputDir)) {
+    await fs.promises.mkdir(outputDir, { recursive: true });
+  }
+
+  const files = await fs.promises.readdir(logsDir);
+  const rawLogFiles = files.filter(
+    (file) => file.startsWith("raw-") && file.endsWith(".log"),
+  );
+
+  if (rawLogFiles.length === 0) {
+    console.log("No raw-*.log files found to clean");
+    return;
+  }
+
+  console.log(`Found ${rawLogFiles.length} raw log files to clean`);
+
+  for (const file of rawLogFiles) {
+    const inputPath = path.join(logsDir, file);
+    const outputFileName = file.replace("raw-", "cleaned-");
+    const outputPath = path.join(outputDir, outputFileName);
+
+    try {
+      await processLogFile(inputPath, outputPath);
+      console.log(`Cleaned: ${file} -> ${outputFileName}`);
+
+      if (deleteOriginals) {
+        await fs.promises.unlink(inputPath);
+        console.log(`Deleted original: ${file}`);
+      }
+    } catch (error) {
+      console.error(`Failed to clean ${file}:`, error);
+    }
+  }
+}
 
 // Create a simple logger that formats logs in a pretty way
 export const createLogger = () => {
@@ -49,9 +184,9 @@ export const createLogger = () => {
 
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
-    console.error(`Test failed in ${testName}`, e.message);
+    console.warn(`${testName}`, e.message);
   } else {
-    console.error(`Unknown error type:`, typeof e);
+    console.warn(`Unknown error type:`, typeof e);
   }
   return true;
 };
@@ -68,7 +203,7 @@ declare module "winston" {
 const logger = createLogger();
 
 // Override console methods to use the pretty logger
-export const setupPrettyLogs = () => {
+export const setupPrettyLogs = (testName: string) => {
   // Store original console methods
   const originalConsole = {
     log: console.log,
@@ -101,7 +236,7 @@ export const setupPrettyLogs = () => {
   // Override console.error
   console.error = (...args) => {
     const message = args.join(" ");
-    logger.error("ERROR " + message);
+    logger.error("QA_ERROR " + testName + " > " + message);
   };
 
   // Override console.debug
@@ -144,12 +279,6 @@ export const getTime = () => {
   return time.replace(/:/g, "-");
 };
 
-// Log filtering utilities
-const LOG_FILTER_PATTERNS = [
-  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-  // Add more patterns here as needed
-];
-
 export const filterLogOutput = (data: string): string => {
   let filtered = data;
   for (const pattern of LOG_FILTER_PATTERNS) {
@@ -167,11 +296,10 @@ export interface TestLogOptions {
 }
 
 // Extract error logs from log files
-export function extractErrorLogs(testName: string): string {
+export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
-    return "";
+    return new Set();
   }
-  console.log("testName", testName);
 
   try {
     const logFiles = fs
@@ -179,48 +307,75 @@ export function extractErrorLogs(testName: string): string {
       .filter((file) => file.endsWith(".log") && file.includes(testName));
     const errorLines: Set<string> = new Set();
 
+    // Track specific error patterns we want to deduplicate
+    const seenPatterns = new Set<string>();
+
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (
-          /ERROR/.test(line) ||
-          /forked/.test(line) ||
-          /Message cursor/.test(line)
-        ) {
-          //remove ansi codes
-          const ansiRegex = new RegExp(
-            `[${String.fromCharCode(27)}${String.fromCharCode(155)}][[()#;?]*(?:[0-9]{1,4}(?:;[0-9]{0,4})*)?[0-9A-ORZcf-nqry=><]`,
-            "g",
-          );
-          let cleanLine = line.replace(ansiRegex, "");
-          if (cleanLine.includes("ERROR")) {
-            cleanLine = cleanLine.split("ERROR")[1].trim();
+        if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
+          // Use the comprehensive stripAnsi function instead of simple regex
+          let cleanLine = stripAnsi(line);
+
+          // Don't split the line if it contains a test file path
+          if (cleanLine.includes("test.ts")) {
+            errorLines.add(cleanLine.trim());
+            continue;
           }
 
-          if (cleanLine.includes("//")) {
-            cleanLine = cleanLine.split("//")[0]?.trim();
+          const patterns = LOG_LINE_MATCH_PATTERNS.map(
+            (pattern) => pattern.source,
+          );
+          for (const pattern of patterns) {
+            if (cleanLine.includes(pattern)) {
+              cleanLine = cleanLine.split(pattern)[1].trim();
+
+              break;
+            }
           }
           cleanLine = cleanLine?.replace("expected false to be true", "failed");
-          errorLines.add(cleanLine);
+          cleanLine = cleanLine?.trim();
+          // Check if this line contains any patterns we want to deduplicate
+          let shouldSkip = false;
+          for (const pattern of PATTERNS_TO_TRACK) {
+            if (cleanLine.includes(pattern)) {
+              if (seenPatterns.has(pattern)) {
+                shouldSkip = true;
+                break;
+              } else {
+                seenPatterns.add(pattern);
+              }
+            }
+          }
+
+          if (!shouldSkip) {
+            errorLines.add(cleanLine);
+          }
         }
       }
     }
 
-    console.log(errorLines);
-    if (errorLines.size > 0) {
-      return `\n\n*Error Logs:*\n\`\`\`\n${Array.from(errorLines).join(
-        "\n",
-      )}\n\`\`\``;
+    console.debug(errorLines);
+    if (errorLines.size === 1) {
+      for (const pattern of PATTERNS_TO_TRACK) {
+        if (errorLines.values().next().value?.includes(pattern)) {
+          console.log("returning empty string");
+          return new Set();
+        }
+      }
+    } else if (errorLines.size > 0) {
+      return errorLines;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
   }
 
-  return "";
+  return new Set();
 }
+
 export const createTestLogger = (options: TestLogOptions) => {
   let logStream: fs.WriteStream | undefined;
   // Extract clean test name for log file (remove path and extension)

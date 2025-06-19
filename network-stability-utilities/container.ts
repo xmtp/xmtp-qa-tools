@@ -17,7 +17,9 @@ export class DockerContainer {
   }
 
   private getIP(): string {
-    return this.sh(`docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${this.name}`);
+    return this.sh(
+      `docker inspect -f '{{range.NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${this.name}`,
+    );
   }
 
   private getPID(): string {
@@ -36,8 +38,11 @@ export class DockerContainer {
       const lines = linksOutput.split("\n");
 
       const vethLine = lines.find((line) => line.startsWith(`${ifIndex}: `));
-      if (!vethLine) throw new Error(`Could not find host veth interface for ifindex ${ifIndex}`);
-
+      if (!vethLine)
+        throw new Error(
+          `Could not find host veth interface for ifindex ${ifIndex}`,
+        );
+      
       const iface = vethLine.split(":")[1].trim().split("@")[0];
       return iface;
     } catch (err) {
@@ -49,7 +54,9 @@ export class DockerContainer {
   sh(cmd: string, expectFailure = false): string {
     console.log(`[sh] Executing: ${cmd}`);
     try {
-      const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] }).toString().trim();
+      const output = execSync(cmd, { stdio: ["inherit", "pipe", "pipe"] })
+        .toString()
+        .trim();
       return output;
     } catch (e) {
       if (expectFailure) {
@@ -62,17 +69,26 @@ export class DockerContainer {
         console.error(`[sh] Error output: ${stderr}`);
       }
 
-      throw new Error(`Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`);
+      throw new Error(
+        `Command failed: ${cmd}\n${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 
   ping(target: DockerContainer, count = 3, expectFailure = false): void {
-    console.log(`[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`);
+    console.log(
+      `[sh] Pinging ${target.name} (${target.ip}) from ${this.name}...`,
+    );
     try {
-      const output = execSync(`docker exec ${this.name} ping -c ${count} ${target.ip}`, {
-        stdio: "pipe"
-      }).toString();
-      const summary = output.split("\n").find((line) => line.includes("rtt") || line.includes("round-trip"));
+      const output = execSync(
+        `docker exec ${this.name} ping -c ${count} ${target.ip}`,
+        {
+          stdio: "pipe",
+        },
+      ).toString();
+      const summary = output
+        .split("\n")
+        .find((line) => line.includes("rtt") || line.includes("round-trip"));
       if (summary !== undefined) {
         console.log(`[sh] ${summary}`);
       } else {
@@ -82,7 +98,9 @@ export class DockerContainer {
       if (expectFailure) {
         console.log("[iptables] Ping failed as expected");
       } else {
-        console.error(`[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`);
+        console.error(
+          `[sh] Ping failed unexpectedly: ${e instanceof Error ? e.message : String(e)}`,
+        );
       }
     }
   }

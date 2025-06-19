@@ -118,7 +118,6 @@ Workflows are configured using GitHub repository secrets and variables:
 ### Secrets
 
 - `DATADOG_API_KEY`: API key for metrics reporting
-- `OPENAI_API_KEY`: OpenAI API key for AI-powered testing
 - `SLACK_BOT_TOKEN`: Slack bot token for notifications
 - `WALLET_KEY`: XMTP wallet private key for testing
 - `ENCRYPTION_KEY`: XMTP encryption key for database
@@ -172,6 +171,6 @@ The workflows have been updated to use standardized naming conventions:
 | `m_delivery.yml`    | `Delivery.yml`    | `yarn test delivery`    |
 | `m_performance.yml` | `Performance.yml` | `yarn test performance` |
 | `m_large.yml`       | `Large.yml`       | `yarn test large`       |
-| `StressGroup.yml`   | `GroupStress.yml` | `yarn test not-forked`  |
+| `StressGroup.yml`   | `GroupStress.yml` | `yarn test group`       |
 
 All test suites now follow consistent kebab-case naming conventions for better organization and maintainability.

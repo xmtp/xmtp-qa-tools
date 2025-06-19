@@ -1,18 +1,17 @@
-import { loadEnv } from "@helpers/client";
+import { sdkVersionOptions } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getInboxIds, sdkVersionOptions } from "@helpers/tests";
+import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "regression";
-loadEnv(testName);
+const testName = "downgrade";
 
 describe(testName, () => {
   let workers: WorkerManager;
   const versions = sdkVersionOptions;
   const receiverInboxId = getInboxIds(1)[0];
 
-  it(`Should test the DB after downgrade`, async () => {
+  it("should maintain database integrity and functionality when downgrading across SDK versions", async () => {
     try {
       for (const version of versions.reverse()) {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);

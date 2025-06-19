@@ -1,8 +1,6 @@
 import fs from "node:fs";
 import { Worker, type WorkerOptions } from "node:worker_threads";
-import { generateOpenAIResponse } from "@helpers/ai";
-import { createClient, getDataPath } from "@helpers/client";
-import { defaultValues } from "@helpers/tests";
+import { createClient, getDataPath, streamTimeout } from "@helpers/client";
 import {
   ConsentState,
   Dm,
@@ -11,12 +9,8 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import "dotenv/config";
+import path from "node:path";
 import type { WorkerBase } from "./manager";
-
-// Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
-  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
-  : defaultValues.streamTimeout; // 3 seconds
 
 export enum typeOfResponse {
   Gm = "gm",
@@ -76,7 +70,6 @@ parentPort.on("worker_message", (message: { type: string; data: any }) => {
 // Re-export anything needed in the worker environment (if necessary)
 export type { Client };
 `;
-
 // Bootstrap code that loads the worker thread code
 const workerBootstrap = /* JavaScript */ `
   import { parentPort, workerData } from "node:worker_threads";
@@ -160,6 +153,7 @@ export class WorkerClient extends Worker {
   private env: XmtpEnv;
   private apiUrl?: string;
   private activeStreams: boolean = false;
+  public dbPath!: string;
 
   constructor(
     worker: WorkerBase,
@@ -188,7 +182,6 @@ export class WorkerClient extends Worker {
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
-
     this.setupEventHandlers();
   }
 
@@ -204,6 +197,62 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+  }
+
+  /**
+   * Gets the current folder identifier for this worker
+   */
+  get currentFolder(): string {
+    return this.folder;
+  }
+  async getSQLiteFileSizes() {
+    const dbPath = this.dbPath;
+    // Get the directory containing the database file
+    const dbDir = path.dirname(dbPath);
+    const dbFileName = path.basename(dbPath);
+
+    const files = fs.readdirSync(dbDir);
+    const sizes = {
+      dbFile: 0,
+      walFile: 0,
+      shmFile: 0,
+      total: 0,
+      conversations: 0,
+    };
+    for (const file of files) {
+      const filePath = path.join(dbDir, file);
+
+      // Only consider files that start with our database name
+      if (!file.startsWith(dbFileName)) {
+        continue;
+      }
+
+      const stats = fs.statSync(filePath);
+
+      const conversations = await this.client.conversations.list();
+      sizes.conversations = conversations.length;
+      if (file === dbFileName) {
+        sizes.dbFile = stats.size;
+      } else if (file.endsWith("-wal")) {
+        sizes.walFile = stats.size;
+      } else if (file.endsWith("-shm")) {
+        sizes.shmFile = stats.size;
+      }
+      sizes.total = sizes.dbFile + sizes.walFile + sizes.shmFile;
+    }
+
+    // const formattedSizes = {
+    //   dbFile: formatBytes(sizes.dbFile),
+    //   walFile: formatBytes(sizes.walFile),
+    //   shmFile: formatBytes(sizes.shmFile),
+    //   conversations: sizes.conversations,
+    //   total: formatBytes(sizes.total),
+    // };
+
+    // console.debug(
+    //   `[${this.nameId}] SQLite file sizes: ${JSON.stringify(formattedSizes, null, 2)}`,
+    // );
+    return sizes;
   }
 
   /**
@@ -271,6 +320,7 @@ export class WorkerClient extends Worker {
       this.apiUrl
     );
 
+    this.dbPath = dbPath;
     this.client = client as Client;
     this.address = address;
 
@@ -293,7 +343,7 @@ export class WorkerClient extends Worker {
    */
   private startSyncs(interval: number = 10000) {
     if (this.typeofSync !== typeOfSync.None) {
-      console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
+      //console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
       void (async () => {
         while (true) {
           if (this.typeofSync === typeOfSync.SyncAll) {
@@ -350,6 +400,10 @@ export class WorkerClient extends Worker {
         try {
           const stream = await this.client.conversations.streamAllMessages();
           for await (const message of stream) {
+            console.debug(
+              `[${this.nameId}] Received message`,
+              JSON.stringify(message, null, 2),
+            );
             if (!this.activeStreams) break;
 
             if (
@@ -364,7 +418,7 @@ export class WorkerClient extends Worker {
               type === typeofStream.GroupUpdated
             ) {
               console.debug(
-                `Received group updated ${JSON.stringify(message.content, null, 2)}`,
+                `Received group updated ${JSON.stringify(message.content)}`,
               );
               if (this.listenerCount("worker_message") > 0) {
                 // Extract group name from metadata changes
@@ -395,26 +449,51 @@ export class WorkerClient extends Worker {
               continue;
             }
             if (
-              message.contentType?.typeId === "text" &&
+              (message.contentType?.typeId === "text" ||
+                message.contentType?.typeId === "reply") &&
               type === typeofStream.Message
             ) {
-              // console.debug(
-              //   `[${this.nameId}] Received message, ${message.content as string}`,
-              // );
+              console.debug(
+                `[${this.nameId}] Received ${message.contentType?.typeId} message: "${message.content as string}" from ${message.senderInboxId} in conversation ${message.conversationId}`,
+              );
+
+              // Log message details for debugging
+              console.debug(
+                `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
+              );
+
               // Handle auto-responses if enabled
               await this.handleResponse(message);
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
+                // console.debug(
+                //   `[${this.nameId}] Emitting message to ${this.listenerCount("worker_message")} listeners: "${message.content as string}"`,
+                // );
                 this.emit("worker_message", {
                   type: StreamCollectorType.Message,
-                  message, // This is the DecodedMessage object
+                  message: {
+                    conversationId: message.conversationId,
+                    senderInboxId: message.senderInboxId,
+                    content: message.content as string,
+                    contentType: message.contentType,
+                  },
                 });
+              } else {
+                console.debug(
+                  `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
+                );
               }
+            } else {
+              // Log non-text messages for debugging
+              console.debug(
+                `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
+              );
             }
           }
         } catch (error) {
           console.error(`[${this.nameId}] message stream: ${String(error)}`);
+          throw error;
         }
       }
     })();
@@ -427,20 +506,34 @@ export class WorkerClient extends Worker {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
+        console.warn(
+          `[${this.nameId}] Skipping message from self, ${message.content as string}`,
+        );
         return;
       }
-      if (this.typeOfResponse === typeOfResponse.None) return;
+      if (this.typeOfResponse === typeOfResponse.None) {
+        // console.warn(
+        //   `[${this.nameId}] Skipping message, typeOfResponse is ${this.typeOfResponse}`,
+        // );
+        return;
+      }
 
       const conversation = await this.client.conversations.getConversationById(
         message.conversationId,
       );
-      if (!conversation) return;
+      if (!conversation) {
+        console.warn(
+          `[${this.nameId}] Skipping message, conversation not found`,
+        );
+        return;
+      }
       const baseName = this.name.split("-")[0].toLowerCase();
       const isDm = conversation instanceof Dm;
       const content = (message.content as string).toLowerCase();
       let shouldRespond = false;
       if (
-        (message?.contentType?.typeId === "text" &&
+        ((message?.contentType?.typeId === "text" ||
+          message?.contentType?.typeId === "reply") &&
           content.includes(baseName) &&
           !content.includes("/") &&
           !content.includes("workers") &&
@@ -450,28 +543,18 @@ export class WorkerClient extends Worker {
       ) {
         shouldRespond = true;
       }
-      if (!shouldRespond) return;
-
-      if (this.typeOfResponse === typeOfResponse.Gpt) {
-        const messages = await conversation?.messages();
-        const baseName = this.name.split("-")[0].toLowerCase();
-
-        // Generate a response using OpenAI
-        const response = await generateOpenAIResponse(
-          message.content as string,
-          messages ?? [],
-          baseName,
+      if (!shouldRespond) {
+        console.warn(
+          `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
         );
-
-        console.debug(`GPT response, "${response.slice(0, 50)}..."`);
-
-        await conversation?.send(response);
-      } else {
-        const debugInfo = await conversation?.debugInfo();
-        await conversation?.send(
-          `${this.nameId} says: gm from epoch ${debugInfo?.epoch}`,
-        );
+        return;
       }
+      let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      if (conversation && conversation.debugInfo !== undefined) {
+        const debugInfo = await conversation.debugInfo();
+        response += ` and epoch ${debugInfo?.epoch}`;
+      }
+      await conversation.send(response);
     } catch (error) {
       console.error(`[${this.nameId}] Error generating response:`, error);
     }
@@ -487,22 +570,39 @@ export class WorkerClient extends Worker {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
-            if (!this.activeStreams) break;
+            try {
+              console.debug(
+                `Received conversation, conversationId: ${conversation?.id}`,
+              );
+              if (!this.activeStreams) {
+                console.debug(`Stopping conversation stream`);
+                break;
+              }
+              if (!conversation?.id) {
+                console.debug(
+                  `Skipping conversation, ${JSON.stringify(conversation, null, 2)}`,
+                );
+                continue;
+              }
 
-            console.debug(`Received conversation, ${conversation?.id}`);
-            if (!conversation?.id) continue;
-
-            if (this.listenerCount("worker_message") > 0) {
-              this.emit("worker_message", {
-                type: StreamCollectorType.Conversation,
-                conversation,
-              });
+              if (this.listenerCount("worker_message") > 0) {
+                this.emit("worker_message", {
+                  type: StreamCollectorType.Conversation,
+                  conversation,
+                });
+              }
+            } catch (error) {
+              console.error(
+                `[${this.nameId}] conversation stream error: ${String(error)}`,
+              );
+              throw error;
             }
           }
         } catch (error) {
           console.error(
             `[${this.nameId}] conversation stream error: ${String(error)}`,
           );
+          throw error;
         }
       }
     })();
@@ -541,9 +641,10 @@ export class WorkerClient extends Worker {
                   this.emit("worker_message", consentEvent);
                 }
               } else {
-                console.debug(
+                console.error(
                   `Skipping empty consent update, ${JSON.stringify(consentUpdate, null, 2)}`,
                 );
+                throw new Error("Empty consent update");
               }
             }
           }
@@ -567,9 +668,24 @@ export class WorkerClient extends Worker {
   }): Promise<T[]> {
     const { type, filterFn, count } = options;
 
+    // Create unique collector ID to prevent conflicts
+    const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    console.debug(
+      `[${this.nameId}] Starting collector ${collectorId} for ${count} events of type ${type}`,
+    );
+
     return new Promise((resolve) => {
       const events: T[] = [];
+      let resolved = false;
+
       const onMessage = (msg: StreamMessage) => {
+        if (resolved) {
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} already resolved, ignoring message`,
+          );
+          return;
+        }
+
         // Map from typeofStream to StreamCollectorType
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
@@ -584,13 +700,29 @@ export class WorkerClient extends Worker {
         const isRightType = expectedType !== null && msg.type === expectedType;
         const passesFilter = !filterFn || filterFn(msg);
 
+        // console.debug(
+        //   `[${this.nameId}] Collector ${collectorId} evaluating message: isRightType=${isRightType}, passesFilter=${passesFilter}`,
+        // );
+
         if (isRightType && passesFilter) {
           events.push(msg as T);
+          // console.debug(
+          //   `[${this.nameId}] Collector ${collectorId} accepted message, collected ${events.length}/${count}`,
+          // );
+
           if (events.length >= count) {
+            resolved = true;
             this.off("worker_message", onMessage);
             clearTimeout(timeoutId);
+            // console.debug(
+            //   `[${this.nameId}] Collector ${collectorId} completed successfully with ${events.length} events`,
+            // );
             resolve(events);
           }
+        } else {
+          console.debug(
+            `[${this.nameId}] Collector ${collectorId} rejected message`,
+          );
         }
       };
 
@@ -598,14 +730,18 @@ export class WorkerClient extends Worker {
 
       // Add timeout to prevent hanging indefinitely
       const timeoutId = setTimeout(() => {
-        this.off("worker_message", onMessage);
-        console.error(
-          `[${this.nameId}] Stream collection timed out. ${
-            DEFAULT_STREAM_TIMEOUT_MS / 1000
-          }s.`,
-        );
-        resolve(events); // Resolve with whatever events we've collected so far
-      }, DEFAULT_STREAM_TIMEOUT_MS);
+        if (!resolved) {
+          resolved = true;
+          this.off("worker_message", onMessage);
+          console.error(
+            `[${this.nameId}] Collector timed out. ${
+              streamTimeout / 1000
+            }s. Expected ${count} events of type ${type}, collected ${events.length} events.`,
+          );
+
+          resolve(events);
+        }
+      }, streamTimeout);
     });
   }
 
@@ -616,16 +752,37 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number,
   ): Promise<StreamTextMessage[]> {
+    // console.debug(
+    //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
+    // );
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
-        if (msg.type !== StreamCollectorType.Message) return false;
-        const streamMsg = msg; // Type assertion is fine after the check
+        console.debug(
+          `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
+        );
+
+        if (msg.type !== StreamCollectorType.Message) {
+          console.debug(
+            `[${this.nameId}] Message filtered out: wrong type ${msg.type}`,
+          );
+          return false;
+        }
+
+        const streamMsg = msg;
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
-        const typeIsText = contentType?.typeId === "text";
-        return idsMatch && typeIsText;
+        const typeIsText =
+          contentType?.typeId === "text" || contentType?.typeId === "reply";
+
+        console.debug(
+          `[${this.nameId}] Message filter check: conversationId=${conversationId}, expectedId=${groupId}, idsMatch=${idsMatch}, contentType=${contentType?.typeId}, typeIsText=${typeIsText}`,
+        );
+
+        const shouldAccept = idsMatch && typeIsText;
+
+        return shouldAccept;
       },
       count,
       additionalInfo: {
@@ -655,7 +812,7 @@ export class WorkerClient extends Worker {
         const streamMsg = msg;
 
         const matches = groupId === streamMsg.group?.conversationId;
-        console.debug(`[${this.nameId}] Group ID match: ${matches}`);
+        //console.debug(`[${this.nameId}] Group ID match: ${matches}`);
 
         return matches;
       },
@@ -664,6 +821,26 @@ export class WorkerClient extends Worker {
     });
   }
 
+  collectAddedMembers(
+    groupId: string,
+    count: number = 1,
+  ): Promise<StreamConversationMessage[]> {
+    const additionalInfo: Record<string, string | number | boolean> = {
+      groupId,
+    };
+
+    return this.collectStreamEvents<StreamConversationMessage>({
+      type: typeofStream.Conversation,
+      filterFn: (msg) => {
+        if (msg.type !== StreamCollectorType.Conversation) return false;
+        const streamMsg = msg;
+        const matches = groupId === streamMsg.conversation.id;
+        return matches;
+      },
+      count,
+      additionalInfo,
+    });
+  }
   /**
    * Collect conversations
    */
@@ -720,5 +897,180 @@ export class WorkerClient extends Worker {
       console.error(`[${this.nameId}] Error clearing database:`, error);
       return Promise.resolve(false);
     }
+  }
+
+  /**
+   * Checks and manages installations for this specific worker
+   * @param targetCount - Target number of installations for this worker
+   * @returns Current installation count after operations
+   */
+  async checkAndManageInstallations(targetCount: number): Promise<number> {
+    const installations = await this.client.preferences.inboxState();
+    const currentCount = installations.installations.length;
+
+    console.debug(
+      `[${this.name}] Current installations: ${currentCount}, Target: ${targetCount}`,
+    );
+
+    if (currentCount === targetCount) {
+      console.debug(`[${this.name}] Installation count matches target`);
+      return currentCount;
+    } else if (currentCount > targetCount) {
+      console.debug(
+        `[${this.name}] Too many installations (${currentCount}), revoking all others`,
+      );
+      await this.addNewInstallation();
+      return currentCount + 1;
+    } else if (currentCount < targetCount) {
+      console.debug(
+        `[${this.name}] Not enough installations (${currentCount}), adding new installation`,
+      );
+      for (let i = 0; i < targetCount - currentCount; i++) {
+        await this.addNewInstallation();
+      }
+      return targetCount;
+    }
+
+    return currentCount;
+  }
+
+  /**
+   * Checks installation age and warns about old installations
+   */
+  async checkInstallationAge(): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+
+    for (const installation of installations.installations) {
+      // Convert nanoseconds to milliseconds for Date constructor
+      const timestampMs = Number(installation.clientTimestampNs) / 1_000_000;
+      const installationDate = new Date(timestampMs);
+      const now = new Date();
+      const diffMs = now.getTime() - installationDate.getTime();
+      const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+      const daysText = diffDays === 1 ? "day" : "days";
+      const greenCheck = diffDays < 90 ? " ✅" : "❌";
+
+      if (diffDays > 90) {
+        console.warn(
+          `[${this.name}] Installation: ${diffDays} ${daysText} ago${greenCheck}`,
+        );
+      }
+    }
+  }
+
+  /**
+   * Revokes installations above a threshold count
+   * @param threshold - Maximum number of installations allowed
+   */
+  async revokeExcessInstallations(threshold: number = 10): Promise<void> {
+    const installations = await this.client.preferences.inboxState();
+    if (installations.installations.length > threshold) {
+      await this.client.revokeAllOtherInstallations();
+      const updatedInstallations = await this.client.preferences.inboxState();
+      console.warn(
+        `[${this.name}] Installations after revocation: ${updatedInstallations.installations.length}`,
+      );
+    }
+  }
+
+  /**
+   * Gets the next alphabetical folder name for this worker
+   */
+  private getNextAlphabeticalFolder(): string {
+    const letters = "abcdefghijklmnopqrstuvwxyz";
+    const baseName = this.name.split("-")[0];
+    const dataPath = getDataPath() + "/" + baseName;
+
+    // Find existing folders for this worker
+    const existingFolders = new Set<string>();
+    if (fs.existsSync(dataPath)) {
+      const folders = fs.readdirSync(dataPath);
+      folders.forEach((folder) => {
+        // Only consider single letter folders (a, b, c, etc.) and numbered variants (a1, a2, etc.)
+        if (/^[a-z](\d+)?$/.test(folder)) {
+          existingFolders.add(folder);
+        }
+      });
+    }
+
+    // Find the next available letter
+    for (let i = 0; i < letters.length; i++) {
+      const letter = letters[i];
+      if (!existingFolders.has(letter)) {
+        return letter;
+      }
+    }
+
+    // If all letters are taken, start with numbered variants
+    let numIndex = 1;
+    while (true) {
+      const newId = `a${numIndex}`;
+      if (!existingFolders.has(newId)) {
+        return newId;
+      }
+      numIndex++;
+    }
+  }
+
+  /**
+   * Adds a new installation to this worker, replacing the existing one
+   * This will stop current streams, create a fresh client installation, and restart all services
+   * @returns The new installation details
+   */
+  async addNewInstallation(): Promise<{
+    client: Client;
+    dbPath: string;
+    installationId: string;
+    address: `0x${string}`;
+  }> {
+    console.debug(
+      `[${this.nameId}] Adding new installation and replacing current one`,
+    );
+
+    // Stop current streams and clear resources
+    this.stopStreams();
+
+    // Store old installation ID for logging
+    const oldInstallationId = this.client?.installationId;
+
+    // Generate the next alphabetical folder name for the new installation
+    const newFolder = this.getNextAlphabeticalFolder();
+
+    // Create a fresh client with new installation using a different folder
+    const { client, dbPath, address } = await createClient(
+      this.walletKey as `0x${string}`,
+      this.encryptionKeyHex,
+      {
+        sdkVersion: this.sdkVersion,
+        name: this.name,
+        testName: this.testName,
+        folder: newFolder, // Use new folder to ensure new database/installation
+      },
+      this.env,
+    );
+
+    // Update worker properties with new client and folder
+    this.dbPath = dbPath;
+    this.client = client as Client;
+    this.address = address;
+    this.folder = newFolder; // Update folder reference
+
+    // Restart streams and syncs with new installation
+    this.startStream();
+    this.startSyncs();
+
+    const newInstallationId = this.client.installationId;
+
+    console.debug(
+      `[${this.nameId}] Successfully replaced installation ${oldInstallationId} with ${newInstallationId}`,
+    );
+
+    return {
+      client: this.client,
+      dbPath,
+      address: address,
+      installationId: newInstallationId,
+    };
   }
 }

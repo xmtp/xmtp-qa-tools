@@ -1,3 +1,4 @@
+import { sleep } from "@helpers/client";
 import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
@@ -6,7 +7,6 @@ import {
   type Conversation,
   type Group,
 } from "@xmtp/node-sdk";
-import { sleep } from "./tests";
 
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
@@ -151,7 +151,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   messageTemplate?: string;
   participantsForStats: Worker[];
 }) {
-  await sleep(1000);
   const {
     receivers,
     startCollectors,
@@ -174,6 +173,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     ),
   );
   const sentEvents = await options.triggerEvents();
+  await sleep(1000);
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -251,7 +251,6 @@ export async function verifyMessageStream(
         let content = messageTemplate;
         content = content.replace("{i}", `${i + 1}`);
         content = content.replace("{randomSuffix}", randomSuffix);
-        //console.warn("sending message", content);
         const sentAt = Date.now();
         await group.send(content);
         sent.push({ content, sentAt });
@@ -315,8 +314,10 @@ export async function verifyMembershipStream(
     triggerEvents: async () => {
       const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
-      await group.addMembers(membersToAdd);
-      sent.push({ inboxId: membersToAdd[0], sentAt });
+      for (const member of membersToAdd) {
+        await group.addMembers([member]);
+        sent.push({ inboxId: member, sentAt });
+      }
       return sent;
     },
     getKey: extractAddedInboxes,
@@ -408,6 +409,28 @@ export async function verifyConversationStream(
   });
 }
 
+export async function verifyAddMemberStream(
+  group: Group,
+  receivers: Worker[],
+  membersToAdd: string[],
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectAddedMembers(group.id, 1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await group.addMembers(membersToAdd);
+      return [{ id: "conversation", sentAt }];
+    },
+    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
+    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
+    statsLabel: "conversation:",
+    count: 1,
+    messageTemplate: "",
+    participantsForStats: receivers,
+  });
+}
+
 /**
  * Verifies conversation streaming functionality for group member additions
  */
@@ -473,4 +496,31 @@ export function calculateMessageStats(
     (totalReceivedMessages / totalExpectedMessages) * 100;
   const orderPercentage = (workersInOrder / workerCount) * 100;
   return { receptionPercentage, orderPercentage };
+}
+
+/**
+ * Specialized function to verify bot response streams
+ * Measures the time it takes for a bot to respond to a trigger message
+ */
+export async function verifyBotMessageStream(
+  group: Conversation,
+  receivers: Worker[],
+  triggerMessage: string,
+): Promise<VerifyStreamResult> {
+  return collectAndTimeEventsWithStats({
+    receivers,
+    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+    triggerEvents: async () => {
+      const sentAt = Date.now();
+      await group.send(triggerMessage);
+      // For bot responses, we use a fixed key since any response counts
+      return [{ key: "bot-response", sentAt }];
+    },
+    getKey: () => "bot-response", // Fixed key for both sent and received
+    getMessage: extractContent,
+    statsLabel: "bot-response:",
+    count: 1,
+    messageTemplate: "",
+    participantsForStats: receivers,
+  });
 }

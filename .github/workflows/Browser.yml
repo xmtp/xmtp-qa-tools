@@ -1,0 +1,54 @@
+name: Browser
+description: "should verify browser support"
+
+on:
+  schedule:
+    - cron: "15,45 * * * *" # Runs at 15 and 45 minutes past each hour
+  workflow_dispatch:
+
+jobs:
+  test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        test: [browser]
+        environment: [dev, production]
+    env:
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: ".node-version"
+          # Disable built-in cache to use shared cache below
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+          key: deps-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            deps-
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --no-fail --debug
+      - name: Upload test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: artifacts-${{ matrix.environment }}
+          path: |
+            logs/**/*
+            .data/**/*
+            .env
+          if-no-files-found: ignore
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 90

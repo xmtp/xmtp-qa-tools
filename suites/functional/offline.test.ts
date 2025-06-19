@@ -1,27 +1,32 @@
-import { loadEnv } from "@helpers/client";
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "recovery";
-loadEnv(testName);
 
 const amountofMessages = 5;
 
 describe(testName, async () => {
   let group: Group;
   let workers: WorkerManager;
-  workers = await getWorkers(["random1", "random2", "random3"], testName);
+  workers = await getWorkers(
+    getWorkersWithVersions(["random1", "random2", "random3"]),
+    testName,
+    typeofStream.Message,
+  );
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("offline_recovery: verify message recovery after disconnection", async () => {
+  it("should recover all missed messages after client reconnection following offline period", async () => {
     try {
       group = await workers.createGroup();
       console.log("Group created", group.id);

@@ -1,40 +1,39 @@
 [
   {
-    "app": "fabri-convos",
-    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
-    "address": "0x5c2d8d286bdaf8a51f1bce8dfec5f5b7faa25245",
+    "app": "fabri-convos-desktop",
+    "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
+    "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
     "network": "production",
-    "name": "prod-testing2"
+    "name": "prod-testing"
   },
   {
     "app": "fabri-tba",
-    "inboxId": "7ba6992b03fc8a177b9665c1a04d498dccec65ce40d85f7b1f01160a0eb7dc7d",
+    "inboxId": "7e5d2a57b752d7b0a29807929c09b416f64ec0878204b87ab6a32c0b47729f27",
     "network": "production",
     "name": "prod-testing"
   },
   {
     "app": "fabri-xmtpchat",
-    "inboxId": "ae0f44e62e2fa9c8fd8cc42dd33858cc604f383dd2353708e4c2f7ee46e3e0bc",
+    "inboxId": "2b9c13bff17ee77498ec41dacbe5d91de6c6897755d4477c85791868c77a1f6d",
+    "network": "local",
+    "name": "local-testing"
+  },
+  {
+    "app": "fabri-convos",
+    "inboxId": "68afe2066b84b48e0b09c2b78be7324a4fb66a973bb0def478ea390312e759b5",
+    "network": "production",
+    "name": "prod-"
+  },
+  {
+    "app": "fabri-convos-oneoff",
+    "inboxId": "c2982d604ab4a3b21949893060e430388c1219f33124aa214eb44d727b4b70d6",
     "network": "production",
     "name": "prod-testing"
   },
   {
-    "app": "fabri-convos",
-    "inboxId": "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
-    "network": "dev",
-    "name": "dev-testing"
-  },
-  {
-    "app": "fabri-convos-desktop",
-    "inboxId": "3a54da678a547ea3012b55734d22eb5682c74da1747a31f907d36afe20e5b8f9",
-    "address": "0x62bd2ac2e5a9728b764775cfc88836519efc93b7",
-    "network": "production",
-    "name": "prod-testing2"
-  },
-  {
     "app": "fabri-convos-dev",
-    "inboxId": "ea82e98279a62e5166287441aa32a6f8c8c54707f2e95cac4af41ef6d803f9ab",
+    "inboxId": "00aa27f05cbedf4addebd1213208a90c51147e72f42dfc9b12f132010057d473",
     "network": "dev",
-    "name": "one-off"
+    "name": "dev-oneoff"
   }
 ]

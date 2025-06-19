@@ -1,8 +1,8 @@
-import { loadEnv } from "@helpers/client";
+import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
-import { getFixedNames, getInboxIds } from "@helpers/tests";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
@@ -16,7 +16,6 @@ import {
 } from "./helpers";
 
 const testName = "m_large_conversations";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
@@ -37,6 +36,7 @@ describe(testName, async () => {
   };
 
   setupTestLifecycle({
+    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
@@ -49,7 +49,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`newGroup-${i}: should create a new conversation`, async () => {
+    it(`should create ${i}-member group and verify all workers receive new conversation notifications within acceptable time`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(

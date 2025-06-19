@@ -55,6 +55,7 @@ dist
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
+!.yarn/qa-agent/releases
 !.yarn/sdks
 !.yarn/versions
 
@@ -63,3 +64,7 @@ dist
 
 # xmtp
 *.db3*
+
+# Claude Code (keep config, ignore session data)
+.claude/session-*
+.claude/.tmp/

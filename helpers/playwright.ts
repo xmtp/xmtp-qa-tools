@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import { browserTimeout, playwrightBeforeSendTimeout } from "@helpers/client";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
@@ -7,12 +8,6 @@ import {
   type BrowserContext,
   type Page,
 } from "playwright-chromium";
-import { defaultValues } from "./tests";
-
-// Default timeout for stream collection in milliseconds
-const DEFAULT_STREAM_TIMEOUT_MS = process.env.DEFAULT_STREAM_TIMEOUT_MS
-  ? parseInt(process.env.DEFAULT_STREAM_TIMEOUT_MS)
-  : defaultValues.streamTimeout; // 3 seconds
 
 export type BrowserSession = {
   browser: Browser;
@@ -22,7 +17,12 @@ export type BrowserSession = {
 interface playwrightOptions {
   headless?: boolean;
   env?: XmtpEnv | null;
-  defaultUser?: boolean;
+  defaultUser?: {
+    walletKey: string;
+    accountAddress: string;
+    dbEncryptionKey: string;
+    inboxId: string;
+  };
 }
 
 export class playwright {
@@ -30,23 +30,33 @@ export class playwright {
   private page: Page | null = null;
   private readonly isHeadless: boolean;
   private readonly env: XmtpEnv;
-  private readonly walletKey: string;
-  private readonly encryptionKey: string;
-  private readonly defaultUser: boolean;
+  private readonly defaultUser: {
+    walletKey: string;
+    accountAddress: string;
+    dbEncryptionKey: string;
+    inboxId: string;
+  };
 
   constructor(
-    { headless = true, env = null, defaultUser = false }: playwrightOptions = {
+    {
+      headless = true,
+      env = null,
+      defaultUser = undefined,
+    }: playwrightOptions = {
       headless: true,
       env: null,
-      defaultUser: false,
+      defaultUser: undefined,
     },
   ) {
     this.isHeadless =
       process.env.GITHUB_ACTIONS !== undefined ? true : headless;
     this.env = env ?? (process.env.XMTP_ENV as XmtpEnv);
-    this.walletKey = process.env.WALLET_KEY as string;
-    this.encryptionKey = process.env.ENCRYPTION_KEY as string;
-    this.defaultUser = defaultUser;
+    this.defaultUser = defaultUser ?? {
+      walletKey: "",
+      accountAddress: "",
+      dbEncryptionKey: "",
+      inboxId: "",
+    };
     console.debug("Starting playwright with env:", this.env);
   }
 
@@ -66,10 +76,22 @@ export class playwright {
     await this.page.screenshot({ path: screenshotPath, fullPage: true });
   }
 
-  /**
-   * Fills addresses and creates a new conversation
-   */
-  public async newGroupFromUI(addresses: string[]): Promise<void> {
+  public async addMemberToGroup(
+    groupId: string,
+    address: string,
+  ): Promise<void> {
+    if (!this.page) throw new Error("Page is not initialized");
+    await this.page.goto(
+      `https://xmtp.chat/conversations/${groupId}/manage/members`,
+    );
+    await this.page.getByRole("textbox", { name: "Address" }).fill(address);
+    await this.page.getByRole("button", { name: "Add" }).click();
+    await this.page.getByRole("button", { name: "Save" }).click();
+    console.debug("Added member to group");
+    return;
+  }
+
+  public async newGroupFromUI(addresses: string[]): Promise<string> {
     if (!this.page) throw new Error("Page is not initialized");
 
     // Target the second button with the menu popup attribute
@@ -84,7 +106,11 @@ export class playwright {
 
     await this.page.getByRole("button", { name: "Create" }).click();
     await addressInput.waitFor({ state: "hidden" });
-    return;
+
+    const url = this.page.url();
+    const groupId = url.split("/conversations/")[1];
+    console.debug("Created group with ID:", groupId);
+    return groupId;
   }
 
   /**
@@ -115,7 +141,7 @@ export class playwright {
       name: "Type a message...",
     });
     await messageInput.waitFor({ state: "visible" });
-    await this.page.waitForTimeout(defaultValues.playwrightBeforeSendTimeout);
+    await this.page.waitForTimeout(playwrightBeforeSendTimeout);
 
     console.debug("Filling message");
     await messageInput.fill(message);
@@ -127,9 +153,43 @@ export class playwright {
   /**
    * Waits for a response matching the expected message(s)
    */
+  public async waitForNewConversation(groupName: string): Promise<boolean> {
+    if (!this.page) throw new Error("Page is not initialized");
+    for (let i = 0; i < browserTimeout / 1000; i++) {
+      await this.page.waitForTimeout(1000);
+      const responseText = await this.getLatestGroupFromList();
+      console.debug(`Latest group: "${responseText}"`);
+      if (responseText.includes(groupName)) {
+        return true;
+      }
+      console.debug(`No response found after ${i + 1} checks`);
+    }
+    return false;
+  }
+  private async getLatestGroupFromList(): Promise<string> {
+    if (!this.page) throw new Error("Page is not initialized");
+
+    const messageItems = await this.page
+      .getByRole("navigation")
+      .getByTestId("virtuoso-item-list")
+      .locator("div")
+      .all();
+
+    if (messageItems.length === 0) return "";
+    console.debug(`Found ${messageItems.length} conversation items`);
+    const latestMessageElement = messageItems[0];
+    const responseText = (await latestMessageElement.textContent()) || "";
+    console.debug(`Latest conversation: "${responseText}"`);
+
+    return responseText;
+  }
+
+  /**
+   * Waits for a response matching the expected message(s)
+   */
   public async waitForResponse(expectedMessage: string[]): Promise<boolean> {
     if (!this.page) throw new Error("Page is not initialized");
-    for (let i = 0; i < DEFAULT_STREAM_TIMEOUT_MS / 1000; i++) {
+    for (let i = 0; i < browserTimeout / 1000; i++) {
       await this.page.waitForTimeout(1000);
       const responseText = await this.getLatestMessageText();
       if (
@@ -151,7 +211,9 @@ export class playwright {
     if (!this.page) throw new Error("Page is not initialized");
 
     const messageItems = await this.page
-      .locator('div[data-testid="virtuoso-item-list"] > div')
+      .getByRole("main")
+      .getByTestId("virtuoso-item-list")
+      .locator("div")
       .all();
 
     if (messageItems.length === 0) return "";
@@ -183,8 +245,8 @@ export class playwright {
 
     await this.setLocalStorage(
       page,
-      this.defaultUser ? this.walletKey : "",
-      this.defaultUser ? this.encryptionKey : "",
+      this.defaultUser.walletKey,
+      this.defaultUser.dbEncryptionKey,
     );
 
     const url = "https://xmtp.chat/";
@@ -192,7 +254,7 @@ export class playwright {
     console.debug("Navigating to:", url);
     await page.goto(url);
     console.debug("Navigated to:", url);
-    if (!this.defaultUser) {
+    if (!this.defaultUser.walletKey) {
       console.debug("Navigating to welcome");
       await page.goto("https://xmtp.chat/welcome");
       console.debug("Clicked connect");
@@ -218,11 +280,11 @@ export class playwright {
     walletKey: string = "",
     walletEncryptionKey: string = "",
   ): Promise<void> {
-    if (this.defaultUser) {
+    if (this.defaultUser.walletKey) {
       console.debug(
         "Setting localStorage",
-        walletKey.slice(0, 4) + "...",
-        walletEncryptionKey.slice(0, 4) + "...",
+        this.defaultUser.walletKey.slice(0, 4) + "...",
+        this.defaultUser.dbEncryptionKey.slice(0, 4) + "...",
       );
     }
 

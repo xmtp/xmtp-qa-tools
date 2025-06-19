@@ -1,18 +1,18 @@
-import { loadEnv } from "@helpers/client";
+import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "clients";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(
-    [
+    getWorkersWithVersions([
       "henry",
       "ivy",
       "jack",
@@ -23,15 +23,17 @@ describe(testName, async () => {
       "mary",
       "nancy",
       "oscar",
-    ],
+    ]),
     testName,
+    typeofStream.Message,
   );
 
   setupTestLifecycle({
+    testName,
     expect,
   });
 
-  it("clientCreate: should measure creating a client", async () => {
+  it("should measure XMTP client creation performance and initialization", async () => {
     try {
       const client = await getWorkers(["randomclient"], testName);
       expect(client).toBeDefined();
@@ -40,7 +42,8 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("getInboxIdByAddress: should measure getInboxIdByAddress", async () => {
+
+  it("should resolve inbox ID from Ethereum address using getInboxIdByAddress", async () => {
     try {
       const client = workers.get("henry")!.client;
       const randomAddress = workers.get("ivy")!.address;
@@ -57,7 +60,7 @@ describe(testName, async () => {
     }
   });
 
-  it("createDm: should measure createDm", async () => {
+  it("should create direct message conversation and measure performance", async () => {
     try {
       const client = workers.get("henry")!.client;
       const dm = await client.conversations.newDm(
@@ -70,7 +73,7 @@ describe(testName, async () => {
     }
   });
 
-  it("canMessage: should measure static canMessage", async () => {
+  it("should validate messaging capability using both static and instance canMessage methods", async () => {
     try {
       const randomAddress = workers.get("karen")!.address;
       const identifier: Identifier = {
@@ -85,8 +88,6 @@ describe(testName, async () => {
       const henryClient = workers.get("henry")!.client;
       const canMessage = await henryClient.canMessage([identifier]);
 
-      console.log("staticCanMessage", Object.fromEntries(staticCanMessage));
-      console.log("canMessage", Object.fromEntries(canMessage));
       expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
@@ -94,7 +95,8 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("inboxState: should measure inboxState of henry", async () => {
+
+  it("should retrieve inbox state with installation validation and key package status", async () => {
     try {
       const inboxState = await workers
         .get("henry")!
@@ -125,7 +127,8 @@ describe(testName, async () => {
       throw e;
     }
   });
-  it("inboxStateFromInboxIds: should measure inboxState of henry", async () => {
+
+  it("should query inbox state from external inbox IDs for cross-user information", async () => {
     try {
       const bobInboxId = workers.get("bob")!.client.inboxId;
       const inboxState = await workers

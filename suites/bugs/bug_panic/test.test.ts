@@ -1,10 +1,8 @@
-import { loadEnv } from "@helpers/client";
-import { getFixedNames } from "@helpers/tests";
+import { getFixedNames } from "@helpers/client";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "bug_panic";
-loadEnv(testName);
 
 describe(testName, () => {
   it("newGroupByInboxIds: should measure creating a group with inbox ids", async () => {

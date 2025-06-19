@@ -1,28 +1,27 @@
-import { loadEnv } from "@helpers/client";
+import { getWorkersWithVersions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { sleep } from "@helpers/tests";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "sync-comparison";
-loadEnv(testName);
 
 describe(testName, async () => {
   let workers: WorkerManager;
   let testGroup: Group;
 
   // Define test workers
-  const testWorkers = [
-    "henry", // Group creator
-    "ivy", // Message sender
-    "jack", // Test sync at client level
-    "karen", // Test sync at conversation level
-    "larry", // Test messages without sync
-  ];
-  workers = await getWorkers(testWorkers, testName);
+  const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
+  workers = await getWorkers(
+    getWorkersWithVersions(testWorkers),
+    testName,
+    typeofStream.Message,
+  );
+  setupTestLifecycle({ testName, expect });
 
-  it("should create a test group with all participants", async () => {
+  it("should establish test environment by creating group with all participants", async () => {
     try {
       // Create a group with all test workers
       const memberInboxIds = testWorkers
@@ -57,7 +56,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should send a message to the group for testing sync methods", async () => {
+  it("should send baseline message to group for synchronization performance testing", async () => {
     try {
       // Sync Ivy's conversations first to ensure the group is visible
       const ivyClient = workers.get("ivy")!.client;
@@ -83,7 +82,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should measure performance of client.conversations.sync()", async () => {
+  it("should measure performance impact of client-level conversations.sync() operation", async () => {
     try {
       const jackClient = workers.get("jack")!.client;
 
@@ -118,7 +117,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should measure performance of individual conversation sync()", async () => {
+  it("should measure performance impact of individual conversation.sync() operation", async () => {
     try {
       const karenClient = workers.get("karen")!.client;
 
@@ -153,7 +152,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should test retrieving messages without explicit sync", async () => {
+  it("should measure message retrieval performance without explicit synchronization", async () => {
     try {
       const larryClient = workers.get("larry")!.client;
 

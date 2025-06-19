@@ -1,9 +1,73 @@
 import {
+  Dm,
+  Group,
   type Client,
   type Conversation,
   type DecodedMessage,
 } from "@xmtp/node-sdk";
-import type { AgentOptions } from "./xmtp-handler";
+import type { ClientOptions } from "./xmtp-handler";
+
+/**
+ * Skill-related options for message processing
+ */
+export interface SkillOptions {
+  /** Whether to accept group conversations */
+  acceptGroups?: boolean;
+  /** Public key of the agent */
+  publicKey?: string;
+  /** Content types to accept (default: ['text']) */
+  acceptTypes?: string[];
+  /** Welcome message to send to the conversation */
+  welcomeMessage?: string;
+  /** Whether to send a welcome message to the conversation */
+  groupWelcomeMessage?: string;
+  /** Allowed commands that the agent will respond to */
+  allowedCommands?: string[];
+  /** Command prefix (default: "@") */
+  commandPrefix?: string;
+  /** Whether to strictly filter messages based on commands (default: false) */
+  strictCommandFiltering?: boolean;
+  /** Whether to send a welcome message to the conversation */
+  codecs?: any[];
+}
+
+/**
+ * Combined agent options
+ */
+export interface AgentOptions extends ClientOptions, SkillOptions {}
+
+/**
+ * Message context with analysis results
+ */
+export interface MessageContext {
+  isDm: boolean;
+  options: SkillOptions;
+  type: string;
+  command: string;
+  hasCommand: boolean;
+  commandData: { name: string; args: string[] };
+}
+
+/**
+ * Message handler callback type
+ */
+export type MessageHandler = (
+  client: Client,
+  conversation: Conversation,
+  message: DecodedMessage,
+  messageContext: MessageContext,
+) => Promise<void> | void;
+
+export const DEFAULT_SKILL_OPTIONS: SkillOptions = {
+  acceptGroups: false,
+  acceptTypes: ["text"],
+  welcomeMessage: "",
+  groupWelcomeMessage: "",
+  allowedCommands: ["help"],
+  commandPrefix: "",
+  strictCommandFiltering: false,
+  codecs: [],
+};
 
 export const sendWelcomeMessage = async (
   client: Client,
@@ -26,12 +90,12 @@ export const sendWelcomeMessage = async (
 /**
  * Extract command from message content
  * @param content The message content to parse
- * @param commandPrefix The command prefix to look for (default: "@toss")
+ * @param commandPrefix The command prefix to look for (default: "@")
  * @returns The command string or null if no command found
  */
 export function extractCommand(
   content: string,
-  commandPrefix: string = "@toss",
+  commandPrefix: string = "@",
 ): string | null {
   // Escape special regex characters in the prefix
   const escapedPrefix = commandPrefix.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -43,12 +107,12 @@ export function extractCommand(
 /**
  * Check if a message contains a valid command
  * @param message The decoded message to check
- * @param commandPrefix The command prefix to look for (default: "@toss")
+ * @param commandPrefix The command prefix to look for (default: "@")
  * @returns True if the message contains a command, false otherwise
  */
 export function isCommand(
   message: DecodedMessage,
-  commandPrefix: string = "@toss",
+  commandPrefix: string = "@",
 ): boolean {
   if (message.contentType?.typeId !== "text") {
     return false;
@@ -56,15 +120,6 @@ export function isCommand(
 
   const command = extractCommand(message.content as string, commandPrefix);
   return command !== null;
-}
-
-/**
- * Check if a message is a transaction reference
- * @param message The decoded message to check
- * @returns True if the message is a transaction reference
- */
-export function isTransactionReference(message: DecodedMessage): boolean {
-  return message.contentType?.typeId === "transactionReference";
 }
 
 /**
@@ -103,12 +158,12 @@ export function isExplicitCommand(
  * @param options Agent options
  * @returns Command configuration object
  */
-export function getCommandConfig(options: AgentOptions): {
+export function getCommandConfig(options: SkillOptions): {
   prefix: string;
   allowedCommands: string[];
 } {
   return {
-    prefix: options.commandPrefix || "@toss",
+    prefix: options.commandPrefix || "@",
     allowedCommands: options.allowedCommands || ["help"],
   };
 }
@@ -121,18 +176,18 @@ export function getCommandConfig(options: AgentOptions): {
  */
 export function shouldProcessMessage(
   message: DecodedMessage,
-  options: AgentOptions,
+  options: SkillOptions,
 ): boolean {
-  const config = getCommandConfig(options);
-  const messageAnalysis = processMessageCommands(message, config.prefix);
-
-  // Always process transaction references
-  if (messageAnalysis.isTransaction) {
-    console.debug("Processing transaction reference");
+  // If no command prefix is configured, process all messages
+  if (!options.commandPrefix) {
+    console.debug("No command prefix configured - processing all messages");
     return true;
   }
 
-  // Process any message that has the command prefix (both explicit commands and natural language prompts)
+  const config = getCommandConfig(options);
+  const messageAnalysis = processMessageCommands(message, config.prefix);
+
+  // If message has the command prefix, process it
   if (messageAnalysis.hasCommand) {
     // If it's an explicit command, check if it's allowed
     if (
@@ -163,8 +218,10 @@ export function shouldProcessMessage(
     }
   }
 
-  console.debug("Message filtered out - no command or transaction reference");
-  return false;
+  // If command prefix is configured but message doesn't have it,
+  // still process the message (for backward compatibility and flexibility)
+  console.debug("Processing message without command prefix");
+  return true;
 }
 
 export const preMessageHandler = async (
@@ -172,7 +229,7 @@ export const preMessageHandler = async (
   conversation: Conversation,
   message: DecodedMessage,
   isDm: boolean,
-  options: AgentOptions,
+  options: SkillOptions,
 ) => {
   // Handle welcome messages first
   if (options.welcomeMessage && isDm) {
@@ -193,8 +250,11 @@ export const preMessageHandler = async (
     if (sent) return true;
   }
 
-  // Filter messages based on command configuration
-  if (!shouldProcessMessage(message, options)) {
+  // Only filter messages if explicitly configured to do so
+  if (
+    options.strictCommandFiltering &&
+    !shouldProcessMessage(message, options)
+  ) {
     return true; // Skip processing
   }
 
@@ -202,22 +262,20 @@ export const preMessageHandler = async (
 };
 
 /**
- * Enhanced message handler that includes command detection and filtering
+ * Enhanced message handler that includes command detection
  * @param message The decoded message
- * @param commandPrefix The command prefix to look for (default: "@toss")
- * @returns Object with command detection results and whether to continue processing
+ * @param commandPrefix The command prefix to look for (default: "@")
+ * @returns Object with command detection results
  */
 export const processMessageCommands = (
   message: DecodedMessage,
-  commandPrefix: string = "@toss",
+  commandPrefix: string = "@",
 ): {
   hasCommand: boolean;
-  isTransaction: boolean;
   command?: string;
   commandData?: { name: string; args: string[] };
 } => {
   const hasCommand = isCommand(message, commandPrefix);
-  const isTransaction = isTransactionReference(message);
 
   let command: string | undefined;
   let commandData: { name: string; args: string[] } | undefined;
@@ -229,8 +287,252 @@ export const processMessageCommands = (
 
   return {
     hasCommand,
-    isTransaction,
     command,
     commandData,
+  };
+};
+
+/**
+ * Core message processing logic moved from xmtp-handler
+ * @param client The XMTP client
+ * @param message The decoded message
+ * @param messageHandler The message handler callback
+ * @param options Skill options for message processing
+ * @param env Environment string for logging
+ */
+export const processMessage = async (
+  client: Client,
+  message: DecodedMessage,
+  messageHandler: MessageHandler,
+  options: SkillOptions,
+  env: string,
+): Promise<void> => {
+  try {
+    // Skip messages from self or with unsupported content types
+    const acceptTypes = options.acceptTypes || ["text"];
+    const messageContentType = message.contentType?.typeId as string;
+
+    if (
+      message.senderInboxId.toLowerCase() === client.inboxId.toLowerCase() ||
+      !acceptTypes.includes(messageContentType)
+    ) {
+      return;
+    }
+
+    const conversation = await client.conversations.getConversationById(
+      message.conversationId,
+    );
+
+    if (!conversation) {
+      console.debug(`[${env}] Unable to find conversation, skipping`);
+      return;
+    }
+
+    console.debug(
+      `[${env}] Received message: ${message.content as string} from ${message.senderInboxId}`,
+    );
+
+    const isDm = conversation instanceof Dm;
+    const isGroup = conversation instanceof Group;
+
+    const preMessageHandlerResult = await preMessageHandler(
+      client,
+      conversation as Conversation,
+      message,
+      isDm,
+      options,
+    );
+    if (preMessageHandlerResult) {
+      console.debug(`[${env}] Pre-message handler returned true, skipping`);
+      return;
+    }
+
+    if (isDm || (isGroup && options.acceptGroups)) {
+      try {
+        console.debug(
+          `[${env}] Processing message ${message.content as string}...`,
+        );
+
+        // Get command configuration and analyze message
+        const commandConfig = getCommandConfig(options);
+        const analysis = processMessageCommands(message, commandConfig.prefix);
+
+        const messageContext: MessageContext = {
+          isDm,
+          options,
+          type: message.contentType?.typeId || "text",
+          command: analysis.command || "",
+          hasCommand: analysis.hasCommand,
+          commandData: analysis.commandData || { name: "", args: [] },
+        };
+
+        await messageHandler(
+          client,
+          conversation as Conversation,
+          message,
+          messageContext,
+        );
+      } catch (handlerError) {
+        console.error(`[${env}] Error in message handler:`, handlerError);
+      }
+    } else {
+      console.debug(
+        `[${env}] Conversation is not a DM and acceptGroups=false, skipping`,
+      );
+    }
+  } catch (error) {
+    // Handle errors within message processing without breaking the stream
+    console.error(`[${env}] Error processing message:`, error);
+  }
+};
+
+/**
+ * Configuration for adding someone to a group
+ */
+export interface AddToGroupConfig {
+  groupId: string;
+  groupCode: string;
+  adminInboxIds?: string[];
+  messages: {
+    success: string[];
+    alreadyInGroup: string;
+    invalid: string;
+    error: string;
+    groupNotFound?: string;
+  };
+  sleepBetweenMessages?: number;
+}
+
+/**
+ * Add a user to a group with customizable copy
+ * @param client The XMTP client
+ * @param conversation The conversation to respond in
+ * @param message The decoded message
+ * @param config Configuration for the group addition
+ * @returns Promise<boolean> - true if user was added, false if already in group
+ */
+export const addToGroupWithCustomCopy = async (
+  client: Client,
+  conversation: Conversation,
+  message: DecodedMessage,
+  config: AddToGroupConfig,
+): Promise<boolean> => {
+  try {
+    // Get the group conversation
+    const group = await client.conversations.getConversationById(
+      config.groupId,
+    );
+    if (!group) {
+      console.debug(`Group not found in the db: ${config.groupId}`);
+      const errorMessage =
+        config.messages.groupNotFound ||
+        "Group not found in the db, contact the admin";
+      await conversation.send(errorMessage);
+      return false;
+    }
+
+    // Check the message content against the secret code
+    if (message.content !== config.groupCode) {
+      await conversation.send(config.messages.invalid);
+      return false;
+    }
+
+    console.debug(`Secret code received, processing group addition`);
+
+    await group.sync();
+    if (group instanceof Group) {
+      const members = await group.members();
+      const isMember = members.some(
+        (member) =>
+          member.inboxId.toLowerCase() === message.senderInboxId.toLowerCase(),
+      );
+
+      if (!isMember) {
+        console.debug(
+          `Adding member ${message.senderInboxId} to group ${config.groupId}`,
+        );
+        await group.addMembers([message.senderInboxId]);
+
+        // Check if user should be admin
+        if (config.adminInboxIds?.includes(message.senderInboxId)) {
+          console.debug(
+            `Adding admin ${message.senderInboxId} to group ${config.groupId}`,
+          );
+          await group.addSuperAdmin(message.senderInboxId);
+        }
+
+        // Send success messages with optional delay
+        for (const successMessage of config.messages.success) {
+          await conversation.send(successMessage);
+        }
+        return true;
+      } else {
+        // User is already in group, check if they need admin privileges
+        const isAdminFromGroup = group.isSuperAdmin(message.senderInboxId);
+        if (
+          !isAdminFromGroup &&
+          config.adminInboxIds?.includes(message.senderInboxId)
+        ) {
+          console.debug(
+            `Adding admin privileges to ${message.senderInboxId} in group ${config.groupId}`,
+          );
+          await group.addSuperAdmin(message.senderInboxId);
+        }
+
+        console.debug(
+          `Member ${message.senderInboxId} already in group ${config.groupId}`,
+        );
+        await conversation.send(config.messages.alreadyInGroup);
+        return false;
+      }
+    }
+
+    throw new Error("Group is not a valid Group instance");
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error(`Error processing group addition:`, errorMessage);
+    await conversation.send(config.messages.error);
+    return false;
+  }
+};
+
+/**
+ * Helper function to create AddToGroupConfig from GroupConfig
+ * @param groupConfig The group configuration
+ * @param envKey The environment key (dev, production, local)
+ * @param adminInboxIds Optional array of admin inbox IDs
+ * @returns AddToGroupConfig
+ */
+export const createAddToGroupConfig = (
+  groupConfig: {
+    groupId: Record<string, string>;
+    groupCode: string;
+    messages: {
+      success: string[];
+      alreadyInGroup: string;
+      invalid: string;
+      error: string;
+      groupNotFound?: string;
+      adminAdded?: string;
+    };
+    sleepBetweenMessages?: number;
+  },
+  envKey: string,
+  adminInboxIds?: string[],
+): AddToGroupConfig => {
+  return {
+    groupId: groupConfig.groupId[envKey],
+    groupCode: groupConfig.groupCode,
+    adminInboxIds,
+    messages: {
+      success: groupConfig.messages.success,
+      alreadyInGroup: groupConfig.messages.alreadyInGroup,
+      invalid: groupConfig.messages.invalid,
+      error: groupConfig.messages.error,
+      groupNotFound:
+        groupConfig.messages.groupNotFound ||
+        "Group not found in the db, contact the admin",
+    },
+    sleepBetweenMessages: groupConfig.sleepBetweenMessages || 500,
   };
 };

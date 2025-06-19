@@ -1,4 +1,4 @@
-# XMTP QA Tools
+# QA Tools
 
 This monorepo contains a comprehensive collection of tools for testing and monitoring the XMTP protocol and its implementations.
 
@@ -9,8 +9,8 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 | Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
 | Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
 | Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
-| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/agents)         | Every 30 min  | `production`     |
-| GM          | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Gm.yml)                   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/gm.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/automated/gm)                 | Every 30 min  | `production`     |
+| Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                   | Every 30 min  | `production`     |
+| Browser     | [![Functional](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/browser)                 | Every 30 min  | `production`     |
 
 ## Architecture
 
@@ -129,16 +129,16 @@ We can test all XMTP bindings using three main applications. We use [xmtp.chat](
 
 #### Sender-Side average performance
 
-| Size | Send message | Update name | Remove members | Create | Performance  |
-| ---- | ------------ | ----------- | -------------- | ------ | ------------ |
-| 50   | 86           | 135         | 139            | 1329   | ✅ On Target |
-| 100  | 88           | 145         | 157            | 1522   | ✅ On Target |
-| 150  | 95           | 203         | 190            | 2306   | ✅ On Target |
-| 200  | 93           | 193         | 205            | 3344   | ✅ On Target |
-| 250  | 108          | 219         | 237            | 4276   | ⚠️ Concern   |
-| 300  | 97           | 244         | 247            | 5463   | ⚠️ Concern   |
-| 350  | 101          | 264         | 308            | 6641   | ⚠️ Concern   |
-| 400  | 111          | 280         | 320            | 7641   | ⚠️ Concern   |
+| Size | Send message | Update name | Remove members | Create  | Performance  |
+| ---- | ------------ | ----------- | -------------- | ------- | ------------ |
+| 50   | 86           | 135         | 139            | 1329    | ✅ On Target |
+| 100  | 88           | 145         | 157            | 1522    | ✅ On Target |
+| 150  | 95           | 203         | 190            | 2306    | ✅ On Target |
+| 200  | 93           | 193         | 205            | ⚠️ 3344 | ✅ On Target |
+| 250  | 108          | 219         | 237            | ⚠️ 4276 | ✅ On Target |
+| 300  | 97           | 244         | 247            | ⚠️ 5463 | ✅ On Target |
+| 350  | 101          | 264         | 308            | ⚠️ 6641 | ✅ On Target |
+| 400  | 111          | 280         | 320            | ⚠️ 7641 | ✅ On Target |
 
 _Note: This measurments are taken only from the sender side and after the group is created._
 
@@ -213,7 +213,20 @@ _Note: `Production` network consistently shows better network performance across
 
 _Note: Testing regularly in groups of `40` active members listening to one user sending 100 messages_
 
-### Success criteria summary
+## Storage
+
+### Storage by Group Size
+
+| Group Size  | Groups | Sender storage | Avg Group Size | Receiver storage | Efficiency Gain |
+| ----------- | ------ | -------------- | -------------- | ---------------- | --------------- |
+| 2 members   | 261    | 5.1 MB         | 0.020 MB       | 1.617 MB         | baseline        |
+| 10 members  | 114    | 5.1 MB         | 0.044 MB       | 3.133 MB         | 2.2× better     |
+| 50 members  | 31     | 5.3 MB         | 0.169 MB       | 3.625 MB         | 2.9× better     |
+| 100 members | 19     | 5.6 MB         | 0.292 MB       | 5.566 MB         | 3.3× better     |
+| 150 members | 12     | 5.6 MB         | 0.465 MB       | 6.797 MB         | 3.2× better     |
+| 200 members | 10     | 6.2 MB         | 0.618 MB       | 8.090 MB         | 3.2× better     |
+
+## Success criteria summary
 
 | Metric                  | Current Performance         | Target                 | Performance  |
 | ----------------------- | --------------------------- | ---------------------- | ------------ |
@@ -232,12 +245,11 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 ## Tools & utilities
 
 - **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
+- **Logging:** Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
-- **Vitest:** Interactive vitest UI - [see section](https://xmtp-qa-toolsus-east-production.up.railway.app/__vitest__/#/)
 - **Railway:** Railway project with all our services - [see section](https://railway.com/project/cc97c743-1be5-4ca3-a41d-0109e41ca1fd)
 - **Bots:** Bots for testing with multiple agents - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/bots/)
   - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
-  - [`stress-bot.eth`](https://xmtp.chat/dm/0x73BB05B6f1719ae0320701fC25d0bE64EBA59EB3): Stress test group operations
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
@@ -262,11 +274,11 @@ yarn install
 To get started set up the environment variables in [./env.example](./env.example) and run the tests with:
 
 ```bash
-### simple dms test
+# Simple dms test
 yarn test dms
-### full functional test
+# Full functional test
 yarn test functional
-### performance test example
+# Performance test example
 yarn test performance
 ```
 
@@ -283,6 +295,7 @@ yarn test functional --debug --no-fail
 
 ### Resources
 
+- **Inboxes:** Inboxes for testing - [see section](/inboxes/)
 - **Local:** Work in local network - [see section](/dev/)
 - **Workers:** Worker for testing - [see section](/workers/)
 - **Helpers:** Coding helpers - [see section](/helpers/)
