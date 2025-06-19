@@ -16,7 +16,7 @@ describe(testName, () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
     workers = await getWorkers(
-      ["bob"],
+      getRandomNames(1),
       testName,
       typeofStream.Message,
       typeOfResponse.None,
