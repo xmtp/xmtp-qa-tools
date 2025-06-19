@@ -26,58 +26,45 @@ For each directory, create or update the README.md file with a comprehensive ove
 Make the README.md content similar in style and format to this example:
 
 ```markdown
-# 🤖 XMTP Test Bots
+# Agent Health Testing Suite
 
-This directory contains test bots for the XMTP protocol. These bots help validate the functionality of XMTP, automate testing scenarios, and provide interactive agents for development purposes.
+This test suite validates the health and responsiveness of live XMTP agents in production environments.
 
-## Quick reference
+## What it does (units)
 
-| Bot         | Purpose                     | Key Features                             |
-| ----------- | --------------------------- | ---------------------------------------- |
-| **bots/** | AI-powered personality bots | GPT integration, persistent identities   |
-| **gm-bot/** | Simple greeting bot         | Basic response, standalone deployment    |
-| **simple/** | Diagnostics bot             | Identity info, conversation details      |
-| **stress/** | Load testing bot            | Group scaling, performance benchmarking  |
-| **test/**   | Command-based testing bot   | Test automation, conversation management |
+- Create DM conversation with agent using their Ethereum address
+- Send configured test message to agent
+- Verify agent responds within expected timeframe
+- Validate message delivery and response patterns
 
-## Usage
+## Environment Setup
 
-You can run these bots using the yarn commands defined in package.json:
+Set `XMTP_ENV` to either `dev` or `production` to test agents on the corresponding network.
+
+## How to run
+
+### Run all agent tests
 
 ```bash
-# Run the GM bot
-yarn bot gm
+yarn test agents
 ```
 
-## 🧠 AI Agents
+## Configuration
 
-The `agents` bot provides AI-powered chat personalities using GPT integration.
+The `production.json` file contains agent configurations with these fields:
 
-```typescript
-// Initialize multiple agent personalities
-const workersGpt = await getWorkers(
-  ["sam", "tina", "walt"],
-  testName,
-  "message",
-  "gpt"
-);
-```
+- `name` - Agent identifier
+- `address` - Ethereum address of the agent
+- `sendMessage` - Test message to send to the agent
+- `networks` - Array of networks the agent supports (`["dev", "production"]`)
+- `disabled` - Optional flag to skip testing this agent
+- `expectedMessage` - Optional array of expected response keywords
 
-**Key features:**
-- Persistent GPT-powered personalities
-- Multiple character identities
-- Natural language interaction
-- Automatic message streaming
+## Key files
 
-## 📝 Best practices
-
-When using these test bots, consider the following best practices:
-
-1. **Environment configuration:** Set proper environment variables for network and logging
-2. **Error handling:** Add error reporting to catch and log failures
-3. **Resource management:** Close streams and clients properly when shutting down
-4. **Identity management:** Use appropriate wallet keys for different environments
-5. **Network selection:** Choose the appropriate XMTP network (dev, production) for testing
+- **[production.json](./production.json)** - Configuration file containing agents to test with their addresses, test messages, and supported networks
+- **[agents.test.ts](./agents.test.ts)** - Main test implementation
+- **[GitHub Actions Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)** - Automated test execution configuration
 ```
 
 Process each directory thoroughly, analyzing all subdirectories and files to create accurate and helpful documentation. Do not ask for clarification - use your best judgment based on file contents, directory structure, and filename patterns. Be creative in generating useful examples where direct code is not available. Deliver all README updates in a single response.

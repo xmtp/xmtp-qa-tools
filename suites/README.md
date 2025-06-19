@@ -1,153 +1,451 @@
-# Test Suites
+# 🧪 Test Suites
 
 Comprehensive end-to-end test suites for validating XMTP protocol functionality, performance, and reliability across different scenarios and environments.
 
-## 🤖 Automated Test Suites
+## Quick Reference
 
-Tests that run automatically on CI/CD pipelines to monitor production systems.
+| Test Suite                            | Purpose                            | Key Features                                 | Documentation                          |
+| ------------------------------------- | ---------------------------------- | -------------------------------------------- | -------------------------------------- |
+| **[agents](./agents/)**               | Production agent health monitoring | Live agent testing, response validation      | [📖 README](./agents/README.md)        |
+| **[bench](./bench/)**                 | Performance benchmarking           | Throughput measurement, latency analysis     | [📖 README](./bench/README.md)         |
+| **[browser](./browser/)**             | Browser integration validation     | Playwright automation, cross-browser testing | [📖 README](./browser/README.md)       |
+| **[bugs](./bugs/)**                   | Bug reproduction and tracking      | Historical issues, regression prevention     | [📖 README](./bugs/README.md)          |
+| **[functional](./functional/)**       | Core protocol functionality        | Complete feature coverage, integration tests | [📖 README](./functional/README.md)    |
+| **[group](./group/)**                 | Group conversation testing         | Stress testing, multi-version compatibility  | [📖 README](./group/README.md)         |
+| **[large](./large/)**                 | Large-scale performance testing    | Scalability validation, resource monitoring  | [📖 README](./large/README.md)         |
+| **[metrics](./metrics/)**             | Performance metrics collection     | Delivery reliability, operational metrics    | [📖 README](./metrics/README.md)       |
+| **[mobile](./mobile/)**               | Mobile performance testing         | Load testing, responsiveness validation      | [📖 README](./mobile/README.md)        |
+| **[notifications](./notifications/)** | Push notification testing          | Notification delivery, integration testing   | [📖 README](./notifications/README.md) |
+| **[other](./other/)**                 | Specialized edge case testing      | Rate limiting, miscellaneous scenarios       | [View tests →](./other/)               |
+| **[spam](./spam/)**                   | Security and spam validation       | Threat prevention, security testing          | [📖 README](./spam/README.md)          |
+| **[storage](./storage/)**             | Storage efficiency analysis        | Database optimization, space utilization     | [📖 README](./storage/README.md)       |
 
-| Test Suite                | Purpose                                     | Documentation                    |
-| ------------------------- | ------------------------------------------- | -------------------------------- |
-| **[agents](./agents/)**   | Health monitoring of production XMTP agents | [README.md](./agents/README.md)  |
-| **[browser](./browser/)** | Validation of browser integration           | [README.md](./browser/README.md) |
+## 🤖 Production & Monitoring
 
-## ⚙️ Functional Test Suites
+### Agent Health Testing
 
-Core XMTP protocol functionality validation with comprehensive test coverage.
+Validates production XMTP agents for responsiveness and functionality.
 
-| Test Suite                      | Purpose                                       | Documentation                       |
-| ------------------------------- | --------------------------------------------- | ----------------------------------- |
-| **[functional](./functional/)** | Complete protocol functionality testing suite | [README.md](./functional/README.md) |
+```bash
+yarn test agents
+```
 
-Includes: browser testing, client management, codec error handling, consent management, conversations, DMs, groups, installations, metadata, offline capabilities, message ordering, streams, and sync performance.
+**Key Features:**
 
-## 🔄 Group & Conversation Test Suites
+- Live agent health checks
+- Response time validation
+- Message delivery verification
+- Multi-network support (dev/production)
 
-Specialized testing for group conversations, membership management, and conversation forking scenarios.
+### Performance Benchmarking
 
-| Test Suite            | Purpose                                             | Documentation                  |
-| --------------------- | --------------------------------------------------- | ------------------------------ |
-| **[group](./group/)** | Group conversation forking and stress testing suite | [README.md](./group/README.md) |
+Comprehensive performance measurement and analysis toolkit.
 
-Features: Multi-version testing, membership change cycles, group metadata updates, admin permissions, message streams, concurrent workers, and rate limiting validation.
+```bash
+yarn test bench
+```
 
-## 🚀 Performance & Scale Test Suites
+**Key Features:**
 
-Performance measurement, scalability testing, and reliability validation with detailed metrics collection.
+- Message throughput benchmarking
+- Latency measurement across operations
+- Performance regression detection
+- CSV data export for analysis
 
-| Test Suite                | Purpose                                              | Documentation                    |
-| ------------------------- | ---------------------------------------------------- | -------------------------------- |
-| **[large](./large/)**     | Large-scale performance and scalability testing      | [README.md](./large/README.md)   |
-| **[metrics](./metrics/)** | Message delivery reliability and performance metrics | [README.md](./metrics/README.md) |
-| **[mobile](./mobile/)**   | Mobile application performance under load testing    | [README.md](./mobile/README.md)  |
-| **[storage](./storage/)** | Storage efficiency analysis across group sizes       | [README.md](./storage/README.md) |
+## ⚙️ Core Functionality Testing
 
-### Performance Test Details
+### Functional Test Suite
 
-- **Large Suite**: Cumulative syncs, membership management, message handling, metadata operations, conversation management
-- **Metrics Suite**: End-to-end delivery testing and operational performance measurement
-- **Mobile Suite**: Performance degradation testing under various load configurations (Small/Medium/Large/XL)
-- **Storage Suite**: Storage cost analysis and efficiency gains measurement across different group sizes
+Complete validation of XMTP protocol features and capabilities.
 
-## 🔒 Security & Spam Test Suites
+```bash
+yarn test functional
+```
 
-Security validation, spam testing, and threat prevention for XMTP protocol implementations.
+**Test Coverage:**
 
-| Test Suite          | Purpose                              | Documentation                 |
-| ------------------- | ------------------------------------ | ----------------------------- |
-| **[spam](./spam/)** | Spam testing and security validation | [README.md](./spam/README.md) |
+- **Client Management**: Connection, authentication, lifecycle
+- **Conversations**: DMs, groups, metadata management
+- **Messaging**: Content types, delivery, ordering
+- **Streams**: Real-time message streaming, callbacks
+- **Consent**: Permission management, blocking/allowing
+- **Installations**: Multi-device support, synchronization
+- **Codec**: Content encoding/decoding, error handling
+- **Offline**: Disconnection handling, message queuing
+- **Sync**: Data synchronization, consistency
+- **Regression**: Historical bug prevention
+
+**Individual Test Files:**
+
+```bash
+yarn test suites/functional/streams.test.ts     # Message streaming
+yarn test suites/functional/groups.test.ts      # Group functionality
+yarn test suites/functional/dms.test.ts         # Direct messaging
+yarn test suites/functional/sync.test.ts        # Synchronization
+yarn test suites/functional/consent.test.ts     # Consent management
+```
+
+### Browser Integration Testing
+
+Cross-browser compatibility and web integration validation.
+
+```bash
+yarn test browser
+```
+
+**Key Features:**
+
+- Playwright-based automation
+- Cross-browser compatibility testing
+- Web integration scenarios
+- UI/UX validation
+
+## 🔄 Group & Conversation Testing
+
+### Group Stress Testing
+
+Specialized testing for group conversations under various stress conditions.
+
+```bash
+yarn test group
+```
+
+**Key Features:**
+
+- Multi-version compatibility testing
+- Membership change stress testing
+- Group metadata operations
+- Admin permission validation
+- Message stream performance
+- Concurrent worker scenarios
+
+## 🚀 Performance & Scale Testing
+
+### Large-Scale Testing
+
+Comprehensive scalability and performance validation under high load.
+
+```bash
+yarn test large
+```
+
+**Test Categories:**
+
+- **Conversations**: Large conversation set management
+- **Cumulative Syncs**: Progressive synchronization testing
+- **Membership**: Large group member management
+- **Messages**: High-volume message handling
+- **Metadata**: Bulk metadata operations
+- **Syncs**: Large-scale synchronization performance
+
+**Individual Test Files:**
+
+```bash
+yarn test suites/large/conversations.test.ts    # Conversation scaling
+yarn test suites/large/membership.test.ts       # Member management
+yarn test suites/large/messages.test.ts         # Message volume
+yarn test suites/large/syncs.test.ts           # Sync performance
+```
+
+### Performance Metrics
+
+Detailed performance measurement and reliability validation.
+
+```bash
+yarn test metrics
+```
+
+**Key Metrics:**
+
+- **Delivery Testing**: End-to-end message delivery reliability
+- **Performance Analysis**: Operational performance measurement
+- **Latency Tracking**: Response time analysis
+- **Throughput Measurement**: Message processing capacity
+
+**Individual Test Files:**
+
+```bash
+yarn test suites/metrics/delivery.test.ts       # Delivery reliability
+yarn test suites/metrics/performance.test.ts    # Performance metrics
+```
+
+### Mobile Performance Testing
+
+Mobile application performance validation under various load conditions.
+
+```bash
+yarn test mobile
+```
+
+**Load Configurations:**
+
+- **Small**: Basic mobile performance
+- **Medium**: Moderate load scenarios
+- **Large**: High load testing
+- **XL**: Maximum capacity testing
+
+### Storage Efficiency Testing
+
+Database optimization and storage utilization analysis.
+
+```bash
+yarn test storage
+```
+
+**Key Features:**
+
+- Storage cost analysis across group sizes
+- Database efficiency measurement
+- Space utilization optimization
+- Performance vs. storage trade-offs
+
+## 🔒 Security & Quality Assurance
+
+### Spam & Security Testing
+
+Comprehensive security validation and threat prevention testing.
+
+```bash
+yarn test spam
+```
+
+**Key Features:**
+
+- Spam detection validation
+- Security threat simulation
+- Content filtering testing
+- Protection mechanism verification
+
+### Notification Testing
+
+Push notification delivery and integration validation.
+
+```bash
+yarn test notifications
+```
+
+**Key Features:**
+
+- Notification delivery testing
+- Integration with notification services
+- Delivery reliability validation
+- Multi-platform support
 
 ## 🐛 Bug Documentation & Regression
 
-Historical bug tracking, reproduction tests, and regression prevention.
+### Bug Reproduction Testing
 
-| Test Suite                      | Purpose                                      | Documentation                       |
-| ------------------------------- | -------------------------------------------- | ----------------------------------- |
-| **[bugs](./bugs/)**             | Bug documentation and reproduction tests     | [README.md](./bugs/README.md)       |
-| **[regression](./regression/)** | Historical bug reproduction and verification | [README.md](./regression/README.md) |
+Historical bug tracking and regression prevention.
 
-Bug categories include: member addition issues, KPKE errors, panic scenarios, welcome message problems, stitching bugs, and other miscellaneous issues.
+```bash
+yarn test bugs
+```
 
-## 🔧 Other Test Suites
+**Bug Categories:**
 
-Additional specialized testing suites for specific use cases and edge scenarios.
+- **Member Addition Issues**: Group membership problems
+- **KPKE Errors**: Key package encryption issues
+- **Panic Scenarios**: System crash conditions
+- **Welcome Message Problems**: Onboarding issues
+- **Stitching Bugs**: Message continuity problems
+- **Other Issues**: Miscellaneous edge cases
 
-| Test Suite            | Purpose                                  | Documentation            |
-| --------------------- | ---------------------------------------- | ------------------------ |
-| **[other](./other/)** | Miscellaneous and specialized test cases | [View tests →](./other/) |
+**Bug Documentation Structure:**
 
-Includes: Push notification testing, rate limiting validation, and large group performance tests.
+- Individual directories for each bug category
+- Reproduction test cases
+- Log files and error traces
+- Resolution documentation
 
-## 🏃‍♂️ Running Test Suites
+## 🔧 Specialized Testing
 
-Each test suite can be run independently using the following patterns:
+### Rate Limiting & Edge Cases
+
+Testing for specialized scenarios and edge cases.
+
+```bash
+yarn test other/rate-limited.test.ts
+```
+
+**Coverage:**
+
+- Rate limiting validation
+- Edge case scenario testing
+- Boundary condition validation
+- Error handling verification
+
+## 🏃‍♂️ Running Tests
+
+### Basic Test Execution
 
 ```bash
 # Run specific test suites
-yarn test functional          # Core functionality tests
+yarn test agents              # Production agent health
+yarn test functional          # Core functionality
 yarn test groups             # Group stress testing
-yarn test mobile             # Mobile performance tests
-yarn test storage            # Storage efficiency analysis
-yarn test metrics/delivery   # Delivery reliability tests
+yarn test mobile             # Mobile performance
+yarn test storage            # Storage efficiency
+yarn test metrics/delivery   # Delivery reliability
 yarn test metrics/performance # Performance metrics
+yarn test browser            # Browser integration
+yarn test notifications      # Push notifications
+yarn test spam               # Security testing
+yarn test bench              # Performance benchmarking
 
 # Run individual test files
 yarn test suites/functional/streams.test.ts
 yarn test suites/large/membership.test.ts
 yarn test suites/mobile/mobile.test.ts
+yarn test suites/bugs/bug_addmember/test.test.ts
 ```
 
-## 📊 Test Coverage
+### Advanced Test Configuration
 
-Our test suites provide comprehensive coverage across:
+#### Multi-Version Testing
 
-- **Protocol Features**: DMs, groups, installations, metadata, streams, sync
-- **Performance**: Message delivery, storage efficiency, mobile responsiveness
-- **Scalability**: Large groups, high message volumes, concurrent operations
-- **Security**: Spam prevention, consent management, permission controls
-- **Reliability**: Offline capabilities, message ordering, error handling
-- **Regression**: Historical bug prevention and validation
-
-## Version Testing
-
-The testing framework supports running tests with specific SDK versions for compatibility testing:
-
-### CLI Usage
+Test compatibility across different SDK versions:
 
 ```bash
-# Test with random mix of versions 209 and 210
+# Test with random mix of versions 2.0.9 and 2.1.0
 yarn cli test functional --versions 209,210
 
-# Test with only version 209
+# Test with only version 2.0.9
 yarn cli test functional --versions 209
 
 # Test with multiple versions
-yarn cli test functional --versions 202,203,204,205
+yarn cli test functional --versions 202,203,204,205,206,208,209,210
 ```
 
-### Code Usage
+#### Environment Configuration
 
-To make your tests support version parameters, use the `getWorkersWithVersions` helper:
+Configure test environment and network:
+
+```bash
+# Set environment for testing
+export XMTP_ENV=dev          # Development network
+export XMTP_ENV=production   # Production network
+export XMTP_ENV=local        # Local testing
+```
+
+#### Custom Test Configuration
+
+Configure specific test parameters:
+
+```bash
+# Run with custom worker count
+yarn test large --workers 10
+
+# Run with specific timeout
+yarn test functional --timeout 30000
+
+# Run with verbose output
+yarn test --verbose
+```
+
+## 📊 Test Coverage & Validation
+
+### Comprehensive Protocol Coverage
+
+Our test suites provide complete coverage across all XMTP protocol features:
+
+**Core Protocol Features:**
+
+- ✅ Direct Messages (DMs)
+- ✅ Group Conversations
+- ✅ Installation Management
+- ✅ Metadata Operations
+- ✅ Message Streaming
+- ✅ Synchronization
+- ✅ Content Types & Codecs
+- ✅ Consent Management
+
+**Performance & Scalability:**
+
+- ✅ Message Delivery Reliability
+- ✅ Storage Efficiency Analysis
+- ✅ Mobile Responsiveness
+- ✅ Large-Scale Operations
+- ✅ Concurrent User Scenarios
+- ✅ Network Performance
+
+**Security & Quality:**
+
+- ✅ Spam Prevention
+- ✅ Permission Controls
+- ✅ Threat Detection
+- ✅ Content Filtering
+- ✅ Error Handling
+- ✅ Edge Case Validation
+
+**Integration & Compatibility:**
+
+- ✅ Multi-Version Support
+- ✅ Cross-Browser Testing
+- ✅ Mobile Platforms
+- ✅ Notification Services
+- ✅ Development Environments
+
+### Test Implementation Patterns
+
+#### Using Worker Framework for Testing
+
+All tests use the standardized worker framework for consistent test environments:
 
 ```typescript
-import { getWorkersWithVersions } from "@helpers/client";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 
 const testName = "my-test";
 
-// Instead of passing worker names directly
-const workers = await getWorkers(["alice", "bob"], testName);
+describe(testName, async () => {
+  const workers = await getWorkers(["alice", "bob"], testName);
 
-// Use getWorkersWithVersions to support --versions parameter
+  setupTestLifecycle({
+    expect,
+    workers,
+    testName,
+  });
+
+  it("should test functionality", async () => {
+    const alice = workers.get("alice");
+    const bob = workers.get("bob");
+
+    // Test implementation
+  });
+});
+```
+
+#### Multi-Version Testing Support
+
+Enable version compatibility testing in your test files:
+
+```typescript
+import { getWorkersWithVersions } from "@helpers/client";
+
+// Support --versions parameter for compatibility testing
 const workerDescriptors = getWorkersWithVersions(["alice", "bob"]);
 const workers = await getWorkers(workerDescriptors, testName);
 ```
 
-When `--versions` is specified, workers will be created with random versions from the provided list. When not specified, the latest version is used.
+#### Performance Measurement
 
-### Available Versions
+Utilize built-in performance measurement tools:
 
-The testimg supports the following SDK versions:
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+
+// Verify message delivery performance
+const verifyResult = await verifyMessageStream(
+  conversation,
+  [workers.get("bob")!],
+  messageCount,
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+## 🔧 Available SDK Versions
+
+The testing framework supports the following XMTP SDK versions for compatibility testing:
 
 - `0.0.47` (legacy)
 - `1.0.0`
@@ -160,3 +458,17 @@ The testimg supports the following SDK versions:
 - `2.0.8`
 - `2.0.9`
 - `2.1.0` (latest)
+
+When `--versions` is specified, workers will be randomly assigned versions from the provided list. When not specified, the latest version is used by default.
+
+## 📈 Continuous Integration
+
+All test suites are integrated with GitHub Actions for continuous monitoring:
+
+- **Automated Execution**: Tests run on code changes and scheduled intervals
+- **Performance Monitoring**: Continuous performance regression detection
+- **Multi-Environment Testing**: Validation across dev/production environments
+- **Failure Alerting**: Immediate notification of test failures
+- **Historical Tracking**: Long-term trend analysis and reporting
+
+View the automated test execution in the [GitHub Actions Workflows](https://github.com/xmtp/xmtp-qa-tools/actions).
