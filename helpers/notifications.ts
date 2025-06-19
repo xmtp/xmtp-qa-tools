@@ -195,9 +195,9 @@ class SlackNotifier {
     const url = this.generateUrl();
 
     // Sanitize logs before embedding in Slack message
-    const logs = this.sanitizeLogs(
-      Array.from(options.errorLogs || []).join("\n"),
-    );
+    const errorLogsArr = Array.from(options.errorLogs || []);
+    const last20Logs = errorLogsArr.slice(-20);
+    const logs = this.sanitizeLogs(last20Logs.join("\n"));
 
     return `*Test Failure ❌*
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
