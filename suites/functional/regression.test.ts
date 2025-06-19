@@ -13,15 +13,15 @@ describe(testName, () => {
   for (const version of versions) {
     it(`downgrade to ${version}`, async () => {
       try {
-        workers = await getWorkers(["alice-" + "a" + "-" + version], testName);
+        workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
-        const alice = workers.get("alice");
+        const bob = workers.get("bob");
         console.log(
           "Downgraded to ",
-          "node-sdk:" + String(alice?.sdkVersion),
-          "node-bindings:" + String(alice?.libXmtpVersion),
+          "node-sdk:" + String(bob?.sdkVersion),
+          "node-bindings:" + String(bob?.libXmtpVersion),
         );
-        let convo = await alice?.client.conversations.newDm(receiverInboxId);
+        let convo = await bob?.client.conversations.newDm(receiverInboxId);
 
         expect(convo?.id).toBeDefined();
       } catch (e) {
