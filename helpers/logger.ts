@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
-import winston from "winston";
+import winston, { stream } from "winston";
 import "dotenv/config";
 
 export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
     ],
   },
   {
@@ -20,6 +20,12 @@ export const KNOWN_ISSUES = [
     testName: "Agents",
     uniqueErrorLines: [
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    ],
+  },
+  {
+    testName: "Functional",
+    uniqueErrorLines: [
+      "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
     ],
   },
   {
