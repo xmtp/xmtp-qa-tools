@@ -55,6 +55,9 @@ describe(testName, async () => {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
           const convo = await sender.client.conversations.getConversationById(group.id);
+          if (!convo) {
+            throw new Error(`[sendLoop] No conversation found for ${sender.name}`);
+          }
           const content = "gm-" + sender.name + "-" + Date.now();
           await convo.send(content);
         }
@@ -91,7 +94,6 @@ describe(testName, async () => {
         })();
       }, 10000);
     };
-
 
     const startChaos = () => {
       chaosInterval = setInterval(() => {

@@ -34,23 +34,27 @@ describe(testName, async () => {
       group = await workers.createGroup("Test Group", ["user1", "user2", "user3"]);
       await group.sync();
       console.log("[test] Initial group created");
+
       const user1Group = await workers.get("user1")!.client.conversations.getConversationById(group.id);
       console.log("Sending welcome message from user1...");
       await user1Group?.send("Initial welcome message from user1");
       await new Promise((res) => setTimeout(res, 3000));
-
 
       console.log("[test] Dumping messages received by group members and confirming user4 has no convo yet:");
       const users = ["user1", "user2", "user3", "user4"];
       for (const name of users) {
         const client = workers.get(name)?.client;
         const convo = client && (await client.conversations.getConversationById(group.id));
-        if (name === "user4") { // check if env dirty
-          expect(convo).toBeFalsy();
-          console.log("  [user4] No conversation found - expected.");
+        if (!convo) { 
+          if (name === "user4") { // check if env dirty
+            expect(convo).toBeFalsy();
+            console.log("  [user4] No conversation found - expected.");
+          } else {
+            throw new Error(`[${name}] convo unexpectedly undefined`);
+          }
           continue;
         }
-        expect(convo).toBeTruthy(); 
+        expect(convo).toBeTruthy();
         const messages = await convo.messages();
         console.log("  [" + name + "] Received " + messages.length + " messages:");
         for (const msg of messages) {
@@ -60,8 +64,6 @@ describe(testName, async () => {
         }
       }
 
-
-      // Isolate node3 from replication cluster (user3)
       const node1 = new DockerContainer("multinode-node1-1");
       const node2 = new DockerContainer("multinode-node2-1");
       const node3 = new DockerContainer("multinode-node3-1");
@@ -75,10 +77,9 @@ describe(testName, async () => {
       await new Promise((res) => setTimeout(res, 5000));
       console.log("[test] Isolated node3 (user3) from cluster");
 
-      // Step 3: user1 adds user4 to group
       console.log("Sending welcome message from user1...");
       await user1Group?.send("Additional welcome message from user1 before user4 joins...");
-      await user1Group?.addMembers([workers.get("user4")!.client.inboxId]);
+      await (user1Group as Group).addMembers([workers.get("user4")!.client.inboxId]);
       await new Promise((res) => setTimeout(res, 3000));
 
       console.log("[test] user4 added to group");
@@ -129,11 +130,11 @@ describe(testName, async () => {
       await user4Group?.send(recoveryMsg);
       console.log("[test] user4 sent post-recovery message");
 
-      // Step 9: Poll user3 until it sees updated members
+      // Poll user3 until it sees updated members
       let found = false;
       for (let attempts = 0; attempts < 5 && !found; attempts++) {
         await user3Group?.sync();
-      
+
         const members = await user3Group?.members();
         const hasUser4 = members?.some((m) => m.inboxId === user4Id);
         if (hasUser4) {
@@ -141,16 +142,16 @@ describe(testName, async () => {
           found = true;
           break;
         }
-      
+
         const msgs = await user3Group?.messages();
         if (msgs?.some((m) => typeof m.content === "string" && m.content.includes(recoveryMsg))) {
           console.log("[test] user3 received recovery message");
         }
-      
+
         console.log("[test] retrying group sync check (" + (attempts + 1) + "/5)");
         await new Promise((r) => setTimeout(r, 1000));
       }
-      
+
       expect(found).toBe(true);
       console.log("[test] Group reconciliation and message recovery succeeded");
 
