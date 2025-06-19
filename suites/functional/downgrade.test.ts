@@ -4,7 +4,7 @@ import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "regression";
+const testName = "downgrade";
 
 describe(testName, () => {
   let workers: WorkerManager;

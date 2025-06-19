@@ -76,6 +76,7 @@ export class WorkerManager {
     const terminationPromises = this.activeWorkers.map(
       async (worker: WorkerClient) => {
         try {
+          // await worker.client.clearAllStatistics();
           await worker.terminate();
           if (deleteDbs) {
             await worker.clearDB();
