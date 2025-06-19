@@ -7,7 +7,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
+      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition;g",
     ],
   },
   {
@@ -34,6 +34,7 @@ export const PATTERNS_TO_TRACK = [
 
 export const LOG_FILTER_PATTERNS = [
   /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+  /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
   // Add more patterns here as needed
 ];
 
