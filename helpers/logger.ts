@@ -7,7 +7,7 @@ export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > should detect real-time group updates when members are added asynchronously",
+      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
     ],
   },
   {
