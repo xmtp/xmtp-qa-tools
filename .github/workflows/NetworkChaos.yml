@@ -38,7 +38,17 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: ".node-version"
-          cache: "yarn"
+          # Disable built-in cache to use shared cache below
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            .yarn/cache
+          key: deps-${{ hashFiles('yarn.lock') }}
+          restore-keys: |
+            deps-
 
       - name: Install Dependencies
         run: yarn
