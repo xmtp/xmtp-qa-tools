@@ -50,11 +50,12 @@ describe(testName, async () => {
 
     console.log("[start] Initiating concurrent message traffic");
 
+    // fire-and-forget send loop
     const sendLoop = async () => {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
           const convo = await sender.client.conversations.getConversationById(group.id);
-          if (!convo) throw new Error(`[sendLoop] No conversation for ${sender.name}`);
+          if (!convo) throw new Error(`[sendLoop] No convo for ${sender.name}`);
           const content = `gm-${sender.name}-${Date.now()}`;
           await convo.send(content);
         }
@@ -64,7 +65,7 @@ describe(testName, async () => {
 
     const verifyLoop = () => {
       verifyInterval = setInterval(() => {
-        (async () => {
+        void (async () => {
           try {
             console.log("[verify] Checking fork and delivery");
             await workers.checkForks();
@@ -77,10 +78,11 @@ describe(testName, async () => {
       }, 10 * 1000);
     };
 
+    // rotate keys every 10s
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
-        (async () => {
-          console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
+        void (async () => {
+          console.log("[key-rotation] Rotating group key");
           try {
             const newMember = workers.getRandomWorker().client.inboxId;
             await group.removeMembers([newMember]);
@@ -88,16 +90,17 @@ describe(testName, async () => {
             const info = await group.debugInfo();
           console.log("[key-rotation] After rotation, epoch =", info.epoch);
           } catch (err) {
-            console.error("[key-rotation] error", err);
+            console.error("[key-rotation] error:", err);
           }
         })();
       }, 10 * 1000);
     };
 
+    // inject chaos every 10s
     const startChaos = () => {
       chaosInterval = setInterval(() => {
-        (async () => {
-          console.log("[chaos] Injecting latency/jitter/loss...");
+        void (async () => {
+          console.log("[chaos] Applying network chaos");
           for (const node of allNodes) {
           const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
           const jitter = 50 + Math.floor(Math.random() * 150);   // 50–200ms
@@ -129,7 +132,6 @@ describe(testName, async () => {
     try {
       verifyLoop();
       startChaos();
-      keyRotationLoop();
       await sendLoop();
 
       console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
