@@ -9,10 +9,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
-
-/**
- * Gets workers that are members of a group
- */
 export async function getWorkersFromGroup(
   group: Group,
   workers: WorkerManager,
@@ -52,7 +48,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("should verify message delivery and order accuracy using message streams", async () => {
+  it("verifyMessageStream: should verify message delivery and order accuracy using message streams", async () => {
     try {
       const verifyResult = await verifyMessageStream(
         group,
@@ -103,7 +99,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should verify message delivery and order accuracy using polling method", async () => {
+  it("verifyMessagePoll: should verify message delivery and order accuracy using polling method", async () => {
     try {
       const workersFromGroup = await getWorkersFromGroup(group, workers);
       const messagesByWorker: string[][] = [];
@@ -171,7 +167,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should verify message recovery and delivery after client reconnection", async () => {
+  it("verifyMessageRecovery: should verify message recovery and delivery after client reconnection", async () => {
     try {
       // Select one worker to take offline
       const offlineWorker = workers.getCreator(); // Second worker

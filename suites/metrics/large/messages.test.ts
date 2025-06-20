@@ -1,6 +1,6 @@
 import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMetadataStream } from "@helpers/streams";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
@@ -15,11 +15,10 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_metadata";
+const testName = "m_large_messages";
 
 describe(testName, async () => {
   let workers: WorkerManager;
-
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -27,7 +26,7 @@ describe(testName, async () => {
   workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
     testName,
-    typeofStream.GroupUpdated,
+    typeofStream.Message,
   );
 
   let customDuration: number | undefined = undefined;
@@ -43,33 +42,36 @@ describe(testName, async () => {
       customDuration = v;
     },
   });
+
   for (
     let i = m_large_BATCH_SIZE;
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`should create ${i}-member group and verify all workers receive group metadata update notifications within acceptable time`, async () => {
+    it(`receiveGroupMessage-${i}: should deliver messages to all ${i} group members within acceptable time limits and verify stream consistency`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(
           getInboxIds(i),
         )) as Group;
+        await newGroup.sync();
         await newGroup.addMembers(
-          workers.getAllButCreator().map((worker) => worker.inboxId),
+          workers.getAllButCreator().map((worker) => worker.client.inboxId),
         );
-        const verifyResult = await verifyMetadataStream(
+        await newGroup.sync();
+        const verifyResult = await verifyMessageStream(
           newGroup,
           workers.getAllButCreator(),
         );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
-
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
+          messageStreamTimeMs: verifyResult.averageEventTiming,
         };
+
+        setCustomDuration(verifyResult.averageEventTiming);
+        expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

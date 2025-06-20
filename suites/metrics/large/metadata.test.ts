@@ -1,11 +1,11 @@
 import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { verifyMembershipStream } from "@helpers/streams";
+import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
+import type { Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
@@ -15,7 +15,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_membership";
+const testName = "m_large_metadata";
 
 describe(testName, async () => {
   let workers: WorkerManager;
@@ -43,20 +43,23 @@ describe(testName, async () => {
       customDuration = v;
     },
   });
-
   for (
     let i = m_large_BATCH_SIZE;
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`should add members to ${i}-member group and verify all workers receive membership update notifications within acceptable time`, async () => {
+    it(`receiveGroupUpdated-${i}: should create ${i}-member group and verify all workers receive group metadata update notifications within acceptable time`, async () => {
       try {
-        // Initialize workers
-        newGroup = await workers.createGroup();
-        const verifyResult = await verifyMembershipStream(
+        const creator = workers.getCreator();
+        newGroup = (await creator.client.conversations.newGroup(
+          getInboxIds(i),
+        )) as Group;
+        await newGroup.addMembers(
+          workers.getAllButCreator().map((worker) => worker.inboxId),
+        );
+        const verifyResult = await verifyMetadataStream(
           newGroup,
           workers.getAllButCreator(),
-          getInboxIds(1),
         );
 
         setCustomDuration(verifyResult.averageEventTiming);
@@ -65,7 +68,7 @@ describe(testName, async () => {
         // Save metrics
         summaryMap[i] = {
           ...(summaryMap[i] ?? { groupSize: i }),
-          addMembersTimeMs: verifyResult.averageEventTiming,
+          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
         logError(e, expect.getState().currentTestName);
@@ -74,6 +77,7 @@ describe(testName, async () => {
     });
   }
 
+  // Aft
   // After all tests have run, output a concise summary of all timings per group size
   afterAll(() => {
     saveLog(summaryMap);

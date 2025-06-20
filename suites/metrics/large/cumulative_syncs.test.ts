@@ -46,7 +46,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`should create ${i}-member group and add all worker members for cumulative sync testing setup`, async () => {
+    it(`newGroup-${i}: should create ${i}-member group and add all worker members for cumulative sync testing setup`, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
@@ -66,7 +66,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`should measure cumulative syncAll performance impact on ${i}-member group with growing conversation history`, async () => {
+    it(`syncAll-${i}: should measure cumulative syncAll performance impact on ${i}-member group with growing conversation history`, async () => {
       try {
         const syncAllStart = performance.now();
         await allWorkers[run].client.conversations.syncAll();
@@ -81,7 +81,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`should measure cumulative sync performance impact on ${i}-member group using different worker with accumulated data`, async () => {
+    it(`sync-${i}: should measure cumulative sync performance impact on ${i}-member group using different worker with accumulated data`, async () => {
       try {
         const syncStart = performance.now();
         await allWorkers[run + 1].client.conversations.sync();
