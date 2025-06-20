@@ -282,11 +282,12 @@ class SlackNotifier {
       }
     }
 
-    if (options.errorLogs) {
+    if (options.errorLogs && options.errorLogs.size > 0) {
+      const failLines = this.extractFailLines(options.errorLogs);
       await sendDatadogLog(Array.from(options.errorLogs), {
         test: options.testName,
         url: this.generateUrl(),
-        count: Array.from(options.errorLogs).length,
+        count: Array.from(failLines).length,
         env: this.githubContext.environment,
         region: this.githubContext.region,
         libxmtp: "latest",
