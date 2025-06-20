@@ -2,7 +2,26 @@ import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
 import { KNOWN_ISSUES } from "./logger";
 
-// Type definitions for Slack functionality
+// Configuration constants
+const URLS = {
+  DATADOG_DASHBOARD:
+    "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true",
+  DATADOG_LOGS: "https://app.datadoghq.com/logs?saved-view-id=3577227",
+  SLACK_API: "https://slack.com/api/chat.postMessage",
+  GITHUB_ACTIONS: "https://github.com",
+  RAILWAY_PROJECT: "https://railway.com/project",
+} as const;
+
+const SERVICE_IDS: Record<string, string> = {
+  europe: "c05a415c-23a6-46b9-ae8c-1935a219bae1",
+  "us-east": "d92446b3-7ee4-43c9-a2ec-ceac87082970",
+  "us-west": "00a6919a-a123-496b-b072-a149798099f9",
+  asia: "cc97c743-1be5-4ca3-a41d-0109e41ca1fd",
+} as const;
+
+const TIMEZONE = "America/Argentina/Buenos_Aires";
+
+// Type definitions
 interface SlackApiResponse {
   ok: boolean;
   [key: string]: unknown;
@@ -38,17 +57,11 @@ interface TestFilter {
 
 class SlackNotifier {
   private readonly slackChannel: string;
-  private readonly datadogUrl: string;
-  private readonly datadogLogsUrl: string;
   private readonly githubContext: GitHubContext;
   private readonly testFilters: TestFilter[];
 
   constructor() {
     this.slackChannel = process.env.SLACK_CHANNEL || "general";
-    this.datadogUrl =
-      "https://app.datadoghq.com/dashboard/9z2-in4-3we/sdk-performance?fromUser=false&from_ts=1746630906777&to_ts=1746717306777&live=true";
-    this.datadogLogsUrl =
-      "https://app.datadoghq.com/logs?saved-view-id=3577227";
     this.githubContext = this.getGitHubContext();
     this.testFilters = KNOWN_ISSUES;
   }
@@ -61,15 +74,8 @@ class SlackNotifier {
     const region = process.env.GEOLOCATION || "Unknown Region";
     const branchName = githubRef.replace("refs/heads/", "");
 
-    let workflowUrl = "";
-    if (repository !== "Unknown Repository" && runId !== "Unknown Run ID") {
-      workflowUrl = `https://github.com/${repository}/actions/runs/${runId}`;
-    }
-
-    const matrixKeys = Object.keys(process.env)
-      .filter((key) => key.startsWith("MATRIX_"))
-      .map((key) => `${key.replace("MATRIX_", "")}: ${process.env[key]}`)
-      .join(", ");
+    const workflowUrl = this.buildGitHubWorkflowUrl(repository, runId);
+    const matrix = this.extractMatrixInfo();
 
     return {
       workflowName,
@@ -78,15 +84,29 @@ class SlackNotifier {
       githubRef,
       branchName,
       workflowUrl,
-      matrix: matrixKeys || undefined,
+      matrix,
       environment: process.env.ENVIRONMENT || process.env.XMTP_ENV || undefined,
       region,
     };
   }
 
-  private hasErrorLogs(options: SlackNotificationOptions): boolean {
-    const jobStatus = options.jobStatus || "failed";
+  private buildGitHubWorkflowUrl(repository: string, runId: string): string {
+    if (repository === "Unknown Repository" || runId === "Unknown Run ID") {
+      return "";
+    }
+    return `${URLS.GITHUB_ACTIONS}/${repository}/actions/runs/${runId}`;
+  }
 
+  private extractMatrixInfo(): string | undefined {
+    const matrixKeys = Object.keys(process.env)
+      .filter((key) => key.startsWith("MATRIX_"))
+      .map((key) => `${key.replace("MATRIX_", "")}: ${process.env[key]}`)
+      .join(", ");
+
+    return matrixKeys || undefined;
+  }
+
+  private hasValidErrorLogs(options: SlackNotificationOptions): boolean {
     if (!options.errorLogs || options.errorLogs.size === 0) {
       console.log(
         "Slack notification skipped (no error logs in local development)",
@@ -105,17 +125,32 @@ class SlackNotifier {
       return false;
     }
 
-    if (
-      jobStatus === "success" ||
-      (this.githubContext.branchName !== "main" && process.env.GITHUB_ACTIONS)
-    ) {
-      console.log(
-        `Slack notification skipped (status: ${jobStatus}, branch: ${this.githubContext.branchName})`,
-      );
-      return false;
+    return true;
+  }
+
+  private shouldSkipNotification(options: SlackNotificationOptions): boolean {
+    const jobStatus = options.jobStatus || "failed";
+
+    if (jobStatus === "success") {
+      console.log(`Slack notification skipped (status: ${jobStatus})`);
+      return true;
     }
 
-    return true;
+    if (
+      this.githubContext.branchName !== "main" &&
+      process.env.GITHUB_ACTIONS
+    ) {
+      console.log(
+        `Slack notification skipped (branch: ${this.githubContext.branchName})`,
+      );
+      return true;
+    }
+
+    return false;
+  }
+
+  private extractFailLines(errorLogs: Set<string>): string[] {
+    return Array.from(errorLogs).filter((log) => log.includes("FAIL  suites/"));
   }
 
   private shouldFilterOutTest(options: SlackNotificationOptions): boolean {
@@ -123,12 +158,10 @@ class SlackNotifier {
       return false;
     }
 
-    const errorLogs = Array.from(options.errorLogs);
-    const failLines = errorLogs.filter((log) => log.includes("FAIL  suites/"));
+    const failLines = this.extractFailLines(options.errorLogs);
 
     if (failLines.length === 0) {
-      //don't show if test dont fail
-      return true;
+      return true; // Don't show if tests don't fail
     }
 
     // Check each configured filter
@@ -152,19 +185,9 @@ class SlackNotifier {
     return false;
   }
 
-  private getServiceId(region: string): string {
-    const serviceIds: Record<string, string> = {
-      europe: "c05a415c-23a6-46b9-ae8c-1935a219bae1",
-      "us-east": "d92446b3-7ee4-43c9-a2ec-ceac87082970",
-      "us-west": "00a6919a-a123-496b-b072-a149798099f9",
-      asia: "cc97c743-1be5-4ca3-a41d-0109e41ca1fd",
-    };
-    return serviceIds[region] || "";
-  }
-
   private generateCustomLinks(testName: string): string {
     if (testName.toLowerCase().includes("agents")) {
-      return `*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>`;
+      return "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>";
     }
     return "";
   }
@@ -174,10 +197,11 @@ class SlackNotifier {
       return this.githubContext.workflowUrl;
     }
 
-    const serviceId = this.getServiceId(this.githubContext.region || "");
+    const serviceId = SERVICE_IDS[this.githubContext.region || ""];
     if (serviceId) {
-      return `https://railway.com/project/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792`;
+      return `${URLS.RAILWAY_PROJECT}/${serviceId}/service/${serviceId}/schedule?environmentId=2d2be2e3-6f54-452c-a33c-522bcdef7792`;
     }
+
     return undefined;
   }
 
@@ -185,30 +209,74 @@ class SlackNotifier {
     return logs.replaceAll(/```/g, "'''");
   }
 
-  private generateMessage(options: SlackNotificationOptions): string {
-    const upperCaseTestName = options.testName
-      ? options.testName[0].toUpperCase() + options.testName.slice(1)
-      : "";
+  private formatTestName(testName: string): string {
+    return testName ? testName[0].toUpperCase() + testName.slice(1) : "";
+  }
 
+  private generateMessage(options: SlackNotificationOptions): string {
+    const upperCaseTestName = this.formatTestName(options.testName);
     const customLinks =
       options.customLinks || this.generateCustomLinks(options.testName);
     const url = this.generateUrl();
+    const timestamp = new Date().toLocaleString("en-US", {
+      timeZone: TIMEZONE,
+    });
 
     // Sanitize logs before embedding in Slack message
     const errorLogsArr = Array.from(options.errorLogs || []);
     const logs = this.sanitizeLogs(errorLogsArr.join("\n"));
 
-    return `*Test Failure ❌*
-*Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>
-*Environment:* \`${this.githubContext.environment}\`
-*General dashboard:* <${this.datadogUrl}|View>  
-*Geolocation:* \`${this.githubContext.region || "Unknown Region"}\`
-*Timestamp:* \`${new Date().toLocaleString("en-US", { timeZone: "America/Argentina/Buenos_Aires" })}\`
-*Full logs:* <${this.datadogLogsUrl}|View>
-${url ? `*Test log:* <${url}|View url>` : ""}
-${customLinks}
-Logs:
-\`\`\`${logs}\`\`\``;
+    const sections = [
+      "*Test Failure ❌*",
+      `*Test:* <${URLS.GITHUB_ACTIONS}/${this.githubContext.repository}/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>`,
+      `*Environment:* \`${this.githubContext.environment}\``,
+      `*General dashboard:* <${URLS.DATADOG_DASHBOARD}|View>`,
+      `*Geolocation:* \`${this.githubContext.region || "Unknown Region"}\``,
+      `*Timestamp:* \`${timestamp}\``,
+      `*Full logs:* <${URLS.DATADOG_LOGS}|View>`,
+      url ? `*Test log:* <${url}|View url>` : "",
+      customLinks,
+      `Logs:\n\`\`\`${logs}\`\`\``,
+    ];
+
+    return sections.filter(Boolean).join("\n");
+  }
+
+  private async sendDatadogLogs(
+    options: SlackNotificationOptions,
+  ): Promise<void> {
+    if (!options.errorLogs) return;
+
+    await sendDatadogLog(Array.from(options.errorLogs), {
+      test: options.testName,
+      url: this.generateUrl(),
+      env: this.githubContext.environment,
+      region: this.githubContext.region,
+      libxmtp: "latest",
+    });
+  }
+
+  private async postToSlack(message: string): Promise<void> {
+    const response = await fetch(URLS.SLACK_API, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        channel: this.slackChannel,
+        text: message,
+        mrkdwn: true,
+      }),
+    });
+
+    const data = (await response.json()) as SlackApiResponse;
+
+    if (data && data.ok) {
+      console.log("✅ Slack notification sent successfully!");
+    } else {
+      console.error("❌ Failed to send Slack notification. Response:", data);
+    }
   }
 
   public async sendNotification(
@@ -219,52 +287,35 @@ Logs:
       return;
     }
 
-    if (options.label === "error" && !this.hasErrorLogs(options)) {
-      return;
+    if (options.label === "error") {
+      if (
+        !this.hasValidErrorLogs(options) ||
+        this.shouldSkipNotification(options)
+      ) {
+        return;
+      }
     }
 
-    if (options.errorLogs) {
-      await sendDatadogLog(Array.from(options.errorLogs), {
-        test: options.testName,
-        url: this.generateUrl(),
-        env: this.githubContext.environment,
-        region: this.githubContext.region,
-        libxmtp: "latest",
-      });
-    }
+    // Send logs to Datadog first
+    await this.sendDatadogLogs(options);
 
+    // Check if test should be filtered out
     if (this.shouldFilterOutTest(options)) {
       return;
     }
 
     try {
-      const response = await fetch("https://slack.com/api/chat.postMessage", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          channel: this.slackChannel,
-          text: this.generateMessage(options),
-          mrkdwn: true,
-        }),
-      });
-
-      const data = (await response.json()) as SlackApiResponse;
-
-      if (data && data.ok) {
-        console.log("✅ Slack notification sent successfully!");
-      } else {
-        console.error("❌ Failed to send Slack notification. Response:", data);
-      }
+      const message = this.generateMessage(options);
+      await this.postToSlack(message);
     } catch (error) {
       console.error("Error sending Slack notification:", error);
     }
   }
 }
 
-// Public API - keep it simple
+/**
+ * Send a Slack notification with the provided options
+ */
 export async function sendSlackNotification(
   options: SlackNotificationOptions,
 ): Promise<void> {

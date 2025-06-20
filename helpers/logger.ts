@@ -3,6 +3,7 @@ import path from "path";
 import winston from "winston";
 import "dotenv/config";
 
+// Known test issues for tracking
 export const KNOWN_ISSUES = [
   {
     testName: "Browser",
@@ -39,56 +40,67 @@ export const KNOWN_ISSUES = [
   },
 ];
 
-// Patterns to track for error deduplication and log filtering
-export const PATTERNS_TO_TRACK = [
-  "sync worker error storage error",
-  "sqlcipher_mlock",
-  "Collector timed out.",
-  "welcome with cursor",
-  "group with welcome id",
-  // Add more patterns here as needed
-];
-export const ignoreLinesWithLogs = ["last_stream_id: StreamId(0) }", "Library"];
+// Patterns configuration
+export const ERROR_PATTERNS = {
+  // Patterns to track for error deduplication
+  TRACK: [
+    "sync worker error storage error",
+    "sqlcipher_mlock",
+    "Collector timed out.",
+    "welcome with cursor",
+    "group with welcome id",
+  ],
 
-export const LOG_FILTER_PATTERNS = [
-  /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-  /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
-  // Add more patterns here as needed
-];
+  // Lines to ignore in logs
+  IGNORE: ["last_stream_id: StreamId(0) }", "Library"],
 
-// Patterns to match log lines for error extraction
-export const LOG_LINE_MATCH_PATTERNS = [/ERROR/, /forked/, /FAIL/, /QA_ERROR/];
+  // Regex patterns for filtering logs
+  FILTER: [
+    /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
+    /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
+  ],
+
+  // Patterns to match error log lines
+  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
+} as const;
+
+// Consolidated ANSI escape code regex
+// eslint-disable-next-line no-control-regex
+const ANSI_REGEX = /[\x1b\u001b]\[[0-9;]*[a-zA-Z]/g;
 
 /**
- * Remove ANSI escape codes from text
- * This regex matches all ANSI escape sequences including:
- * - Color codes (\x1b[31m, \x1b[0m, etc.)
- * - Cursor movement codes
- * - Other terminal control sequences
+ * Remove ANSI escape codes and control characters from text
  */
 export function stripAnsi(text: string): string {
-  // ANSI escape code regex pattern
-  // eslint-disable-next-line no-control-regex
-  const ansiRegex = /\x1b\[[0-9;]*[a-zA-Z]/g;
-
-  // Also handle some common ANSI sequences that might be encoded differently
-  // eslint-disable-next-line no-control-regex
-  const ansiRegex2 = /\u001b\[[0-9;]*[a-zA-Z]/g;
-
   return (
     text
-      .replace(ansiRegex, "")
-      .replace(ansiRegex2, "")
-      // Remove any remaining control characters
+      .replace(ANSI_REGEX, "")
       // eslint-disable-next-line no-control-regex
       .replace(/[\x00-\x1f\x7f-\x9f]/g, (char) => {
         // Keep newlines, tabs, and carriage returns
-        if (char === "\n" || char === "\t" || char === "\r") {
-          return char;
-        }
-        return "";
+        return ["\n", "\t", "\r"].includes(char) ? char : "";
       })
   );
+}
+
+/**
+ * Filter log output based on configured patterns
+ */
+export function filterLogOutput(data: string): string {
+  let filtered = data;
+
+  // Apply regex pattern filtering
+  for (const pattern of ERROR_PATTERNS.FILTER) {
+    filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
+  }
+
+  // Filter out lines containing ignore patterns
+  const lines = filtered.split("\n");
+  const filteredLines = lines.filter((line) => {
+    return !ERROR_PATTERNS.IGNORE.some((pattern) => line.includes(pattern));
+  });
+
+  return filteredLines.join("\n");
 }
 
 /**
@@ -105,7 +117,6 @@ export async function processLogFile(
 
 /**
  * Clean all raw-*.log files by removing ANSI codes
- * @param deleteOriginals - If true, delete the original raw files after cleaning
  */
 export async function cleanAllRawLogs(
   deleteOriginals: boolean = false,
@@ -153,51 +164,56 @@ export async function cleanAllRawLogs(
   }
 }
 
-// Create a simple logger that formats logs in a pretty way
+// Extend winston Logger interface for custom methods
+declare module "winston" {
+  interface Logger {
+    time(label: string): void;
+    timeEnd(label: string): void;
+  }
+}
+
+/**
+ * Create a winston logger with custom formatting and timer methods
+ */
 export const createLogger = () => {
-  // Format timestamp to match [YYYY-MM-DDThh:mm:ss.sssZ]
   const prettyFormat = winston.format.printf((info) => {
     return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
   });
 
-  // Combine formats
   const combinedFormat = winston.format.combine(
     winston.format.timestamp(),
     winston.format.colorize(),
     prettyFormat,
   );
 
-  // Create the logger with console transport
   const logger = winston.createLogger({
     level: process.env.LOG_LEVEL || "silly",
     format: combinedFormat,
     transports: [new winston.transports.Console()],
   });
 
-  // Add time and timeEnd methods to the logger
+  // Add timer functionality
   const timers = new Map<string, number>();
 
-  // Add custom time method
   logger.time = (label: string) => {
     timers.set(label, performance.now());
-    //  logger.info(${label});
   };
 
-  // Add custom timeEnd method
   logger.timeEnd = (label: string) => {
     const startTime = timers.get(label);
     if (startTime) {
       const duration = performance.now() - startTime;
       timers.delete(label);
       logger.info(`${label}: ${duration.toFixed(3)}ms`);
-    } else {
-      // logger.warn(`Timer "${label}" does not exist`);
     }
   };
 
   return logger;
 };
 
+/**
+ * Log error with consistent formatting
+ */
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
     console.warn(`${testName}`, e.message);
@@ -207,20 +223,13 @@ export const logError = (e: unknown, testName: string | undefined): boolean => {
   return true;
 };
 
-// Extend the winston Logger type to include our custom methods
-declare module "winston" {
-  interface Logger {
-    time(label: string): void;
-    timeEnd(label: string): void;
-  }
-}
-
-// Create a global logger instance
+// Global logger instance
 const logger = createLogger();
 
-// Override console methods to use the pretty logger
+/**
+ * Override console methods with pretty logging
+ */
 export const setupPrettyLogs = (testName: string) => {
-  // Store original console methods
   const originalConsole = {
     log: console.log,
     info: console.info,
@@ -231,96 +240,81 @@ export const setupPrettyLogs = (testName: string) => {
     timeEnd: console.timeEnd,
   };
 
-  // Override console.log
-  console.log = (...args) => {
-    const message = args.join(" ");
-    logger.info(message);
+  const createLogMethod = (level: keyof typeof logger, prefix = "") => {
+    return (...args: unknown[]) => {
+      const message = args.join(" ");
+      (logger[level] as (msg: string) => void)(prefix + message);
+    };
   };
 
-  // Override console.info
-  console.info = (...args) => {
-    const message = args.join(" ");
-    logger.info(message);
+  // Override console methods
+  console.log = createLogMethod("info");
+  console.info = createLogMethod("info");
+  console.warn = createLogMethod("warn");
+  console.error = createLogMethod("error", `QA_ERROR ${testName} > `);
+  console.debug = createLogMethod("debug");
+  console.time = (label: string) => {
+    logger.time(label);
+  };
+  console.timeEnd = (label: string) => {
+    logger.timeEnd(label);
   };
 
-  // Override console.warn
-  console.warn = (...args) => {
-    const message = args.join(" ");
-    logger.warn(message);
-  };
-
-  // Override console.error
-  console.error = (...args) => {
-    const message = args.join(" ");
-    logger.error("QA_ERROR " + testName + " > " + message);
-  };
-
-  // Override console.debug
-  console.debug = (...args) => {
-    const message = args.join(" ");
-    logger.debug(message);
-  };
-
-  // Override console.time
-  console.time = (...args) => {
-    const message = args.join(" ");
-    logger.time(message);
-  };
-
-  // Override console.timeEnd
-  console.timeEnd = (...args) => {
-    const message = args.join(" ");
-    logger.timeEnd(message);
-  };
-
-  // Return function to restore original console if needed
+  // Return restore function
   return () => {
-    console.log = originalConsole.log;
-    console.info = originalConsole.info;
-    console.time = originalConsole.time;
-    console.timeEnd = originalConsole.timeEnd;
-    console.warn = originalConsole.warn;
-    console.error = originalConsole.error;
-    console.debug = originalConsole.debug;
+    Object.assign(console, originalConsole);
   };
 };
 
-export const getTime = () => {
-  const time = new Date().toLocaleTimeString("en-US", {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
-    timeZone: "America/Buenos_Aires",
-  });
-  return time.replace(/:/g, "-");
+/**
+ * Get formatted timestamp for file naming
+ */
+export const getTime = (): string => {
+  return new Date()
+    .toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+      timeZone: "America/Buenos_Aires",
+    })
+    .replace(/:/g, "-");
 };
 
-export const filterLogOutput = (data: string): string => {
-  let filtered = data;
+/**
+ * Process error line for deduplication and cleaning
+ */
+function processErrorLine(line: string): {
+  cleanLine: string;
+  shouldSkip: boolean;
+} {
+  let cleanLine = stripAnsi(line);
 
-  // Apply regex pattern filtering
-  for (const pattern of LOG_FILTER_PATTERNS) {
-    filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
+  // Skip lines with ignore patterns
+  if (ERROR_PATTERNS.IGNORE.some((pattern) => cleanLine.includes(pattern))) {
+    return { cleanLine, shouldSkip: true };
   }
 
-  // Filter out lines containing patterns from ignoreLinesWithLogs
-  const lines = filtered.split("\n");
-  const filteredLines = lines.filter((line) => {
-    return !ignoreLinesWithLogs.some((pattern) => line.includes(pattern));
-  });
+  // Don't split lines containing test file paths
+  if (cleanLine.includes("test.ts")) {
+    return { cleanLine: cleanLine.trim(), shouldSkip: false };
+  }
 
-  return filteredLines.join("\n");
-};
+  // Extract error content after pattern markers
+  for (const pattern of ERROR_PATTERNS.MATCH) {
+    if (cleanLine.includes(pattern.source)) {
+      cleanLine = cleanLine.split(pattern.source)[1]?.trim() || cleanLine;
+      break;
+    }
+  }
 
-export interface TestLogOptions {
-  enableLogging: boolean;
-  customLogFile?: string;
-  testName: string;
-  logFileName?: string;
-  verboseLogging?: boolean;
+  cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
+
+  return { cleanLine, shouldSkip: false };
 }
 
-// Extract error logs from log files
+/**
+ * Extract error logs from log files with deduplication
+ */
 export function extractErrorLogs(
   testName: string,
   limit?: number,
@@ -333,9 +327,8 @@ export function extractErrorLogs(
     const logFiles = fs
       .readdirSync("logs")
       .filter((file) => file.endsWith(".log") && file.includes(testName));
-    const errorLines: string[] = []; // Changed from Set to Array to maintain order
 
-    // Track specific error patterns we want to deduplicate
+    const errorLines: string[] = [];
     const seenPatterns = new Set<string>();
 
     for (const logFile of logFiles) {
@@ -344,51 +337,26 @@ export function extractErrorLogs(
       const lines = content.split("\n");
 
       for (const line of lines) {
-        if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
-          // Use the comprehensive stripAnsi function instead of simple regex
-          let cleanLine = stripAnsi(line);
+        if (!ERROR_PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
+          continue;
+        }
 
-          // Skip lines that contain patterns from ignoreLinesWithLogs
-          if (
-            ignoreLinesWithLogs.some((pattern) => cleanLine.includes(pattern))
-          ) {
-            continue;
-          }
+        const { cleanLine, shouldSkip } = processErrorLine(line);
+        if (shouldSkip) continue;
 
-          // Don't split the line if it contains a test file path
-          if (cleanLine.includes("test.ts")) {
-            errorLines.push(cleanLine.trim());
-            continue;
-          }
-
-          const patterns = LOG_LINE_MATCH_PATTERNS.map(
-            (pattern) => pattern.source,
-          );
-          for (const pattern of patterns) {
-            if (cleanLine.includes(pattern)) {
-              cleanLine = cleanLine.split(pattern)[1].trim();
-
-              break;
+        // Check for pattern deduplication
+        const isDuplicate = ERROR_PATTERNS.TRACK.some((pattern) => {
+          if (cleanLine.includes(pattern)) {
+            if (seenPatterns.has(pattern)) {
+              return true;
             }
+            seenPatterns.add(pattern);
           }
-          cleanLine = cleanLine?.replace("expected false to be true", "failed");
-          cleanLine = cleanLine?.trim();
-          // Check if this line contains any patterns we want to deduplicate
-          let shouldSkip = false;
-          for (const pattern of PATTERNS_TO_TRACK) {
-            if (cleanLine.includes(pattern)) {
-              if (seenPatterns.has(pattern)) {
-                shouldSkip = true;
-                break;
-              } else {
-                seenPatterns.add(pattern);
-              }
-            }
-          }
+          return false;
+        });
 
-          if (!shouldSkip) {
-            errorLines.push(cleanLine);
-          }
+        if (!isDuplicate) {
+          errorLines.push(cleanLine);
         }
       }
     }
@@ -397,21 +365,22 @@ export function extractErrorLogs(
       `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
     );
 
+    // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
-      for (const pattern of PATTERNS_TO_TRACK) {
-        if (errorLines[0]?.includes(pattern)) {
-          console.log("returning empty string");
-          return new Set();
-        }
+      const hasKnownPattern = ERROR_PATTERNS.TRACK.some((pattern) =>
+        errorLines[0]?.includes(pattern),
+      );
+      if (hasKnownPattern) {
+        console.log("returning empty string");
+        return new Set();
       }
     }
 
     if (errorLines.length > 0) {
-      // Apply limit if specified (take the last N errors to get most recent)
       const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
-      let returnSet = new Set(limitedErrors);
-      console.log(returnSet);
-      return returnSet;
+      const resultSet = new Set(limitedErrors);
+      console.log(resultSet);
+      return resultSet;
     }
   } catch (error) {
     console.error("Error reading log files:", error);
@@ -420,13 +389,22 @@ export function extractErrorLogs(
   return new Set();
 }
 
+export interface TestLogOptions {
+  enableLogging: boolean;
+  customLogFile?: string;
+  testName: string;
+  logFileName?: string;
+  verboseLogging?: boolean;
+}
+
+/**
+ * Create a test logger with file output and filtering
+ */
 export const createTestLogger = (options: TestLogOptions) => {
   let logStream: fs.WriteStream | undefined;
-  // Extract clean test name for log file (remove path and extension)
-  let logFileName: string = "";
+  let logFileName = "";
 
   if (options.enableLogging) {
-    // Ensure logs directory exists
     const logsDir = "logs";
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
@@ -440,20 +418,16 @@ export const createTestLogger = (options: TestLogOptions) => {
         .replace(/\.test\.ts$/, "");
       logFileName = `raw-${process.env.XMTP_ENV}-${cleanTestName}-${getTime()}.log`;
     }
+
     const logPath = path.join(logsDir, logFileName);
-
     logStream = fs.createWriteStream(logPath, { flags: "w" });
-    console.log(`Logging to: ${logPath}`);
 
-    if (options.verboseLogging) {
-      console.log(
-        "Verbose logging enabled: output will be shown in terminal AND logged to file.",
-      );
-    } else {
-      console.log(
-        "Test output will be hidden from terminal and logged to file only.",
-      );
-    }
+    console.log(`Logging to: ${logPath}`);
+    console.log(
+      options.verboseLogging
+        ? "Verbose logging enabled: output will be shown in terminal AND logged to file."
+        : "Test output will be hidden from terminal and logged to file only.",
+    );
   } else {
     console.log(
       "Warning: Logging is disabled. Test output will not be visible anywhere.",
@@ -466,12 +440,7 @@ export const createTestLogger = (options: TestLogOptions) => {
     const filtered = filterLogOutput(text);
 
     if (filtered.trim()) {
-      // Write to file if logging is enabled
-      if (logStream) {
-        logStream.write(filtered);
-      }
-
-      // Also write to terminal if verbose logging is enabled
+      logStream?.write(filtered);
       if (options.verboseLogging) {
         process.stdout.write(filtered);
       }
@@ -479,9 +448,7 @@ export const createTestLogger = (options: TestLogOptions) => {
   };
 
   const close = () => {
-    if (logStream) {
-      logStream.end();
-    }
+    logStream?.end();
   };
 
   return {
@@ -491,20 +458,21 @@ export const createTestLogger = (options: TestLogOptions) => {
   };
 };
 
-// Optional: Add file logging capability
+/**
+ * Add file logging capability to the global logger
+ */
 export const addFileLogging = (filename: string) => {
   const logPath = path.join(
     process.cwd(),
     "logs",
-    filename + "-" + String(process.env.XMTP_ENV) + "-" + getTime() + ".log",
+    `${filename}-${process.env.XMTP_ENV}-${getTime()}.log`,
   );
-  const dir = path.dirname(logPath);
 
+  const dir = path.dirname(logPath);
   if (!fs.existsSync(dir)) {
     fs.mkdirSync(dir, { recursive: true });
   }
 
-  // Add file transport to the logger
   logger.add(
     new winston.transports.File({
       filename: logPath,

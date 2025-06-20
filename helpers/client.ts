@@ -1,6 +1,7 @@
 import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
+import manualUsers from "@inboxes/manualusers.json";
 import type { Worker, WorkerManager } from "@workers/manager";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
@@ -92,7 +93,6 @@ import {
 import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
-import manualUsers from "./manualusers.json";
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
