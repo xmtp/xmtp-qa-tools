@@ -111,7 +111,6 @@ describe(testName, async () => {
           } catch (err) {
             console.warn("[chaos] Error applying netem on " + node.name + ":", err);
           }
-
           if (node !== allNodes[0]) {
             void allNodes[0].ping(node);
           }
@@ -129,9 +128,9 @@ describe(testName, async () => {
     };
 
     try {
-      verifyLoop();
-      startChaos();
-      keyRotationLoop();
+      void verifyLoop();
+      void startChaos();
+      void keyRotationLoop();
       await sendLoop();
       console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
       clearChaos();
