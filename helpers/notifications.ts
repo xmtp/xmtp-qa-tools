@@ -242,20 +242,6 @@ class SlackNotifier {
     return sections.filter(Boolean).join("\n");
   }
 
-  private async sendDatadogLogs(
-    options: SlackNotificationOptions,
-  ): Promise<void> {
-    if (!options.errorLogs) return;
-
-    await sendDatadogLog(Array.from(options.errorLogs), {
-      test: options.testName,
-      url: this.generateUrl(),
-      env: this.githubContext.environment,
-      region: this.githubContext.region,
-      libxmtp: "latest",
-    });
-  }
-
   private async postToSlack(message: string): Promise<void> {
     const response = await fetch(URLS.SLACK_API, {
       method: "POST",
@@ -296,8 +282,16 @@ class SlackNotifier {
       }
     }
 
-    // Send logs to Datadog first
-    await this.sendDatadogLogs(options);
+    if (options.errorLogs) {
+      await sendDatadogLog(Array.from(options.errorLogs), {
+        test: options.testName,
+        url: this.generateUrl(),
+        errorLogs: Array.from(options.errorLogs).length,
+        env: this.githubContext.environment,
+        region: this.githubContext.region,
+        libxmtp: "latest",
+      });
+    }
 
     // Check if test should be filtered out
     if (this.shouldFilterOutTest(options)) {
