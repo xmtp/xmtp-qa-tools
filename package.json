@@ -31,9 +31,9 @@
     "run:forked": "./suites/group/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
-    "start": "vitest --ui --standalone --watch ",
-    "start:dev": "yarn start & yarn slack-bot",
-    "test": "yarn cli test"
+    "test": "yarn cli test",
+    "ui": "vitest --ui --standalone --watch "
+    "start:dev": "yarn ui & yarn slack-bot"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",

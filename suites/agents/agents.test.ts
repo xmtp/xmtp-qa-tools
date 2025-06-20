@@ -3,11 +3,11 @@ import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import productionAgents from "@inboxes/agents.json";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
-import productionAgents from "./production.json";
 
 const testName = "agents";
 
@@ -16,7 +16,7 @@ describe(testName, () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
     workers = await getWorkers(
-      ["bob"],
+      getRandomNames(1),
       testName,
       typeofStream.Message,
       typeOfResponse.None,
