@@ -52,18 +52,10 @@ describe(testName, async () => {
     const stopChaosBeforeEnd = 10 * 1000; // Allow 10s of normal network before asserting final state
     const startTime = Date.now();
 
-    let chaosInterval: NodeJS.Timeout;
-    let verifyInterval: NodeJS.Timeout;
-    let rotationInterval: NodeJS.Timeout;
-
-    const allUsers = workers.getAll();
-    const otherUsers = workers.getAllButCreator();
-
-    console.log("[start] Initiating concurrent message traffic");
-
+    // 1) Fire off the send loop
     async function sendLoop() {
       while (Date.now() - startTime < chaosDuration) {
-        for (const sender of allUsers) {
+        for (const sender of workers.getAll()) {
           const convo = await sender.client.conversations.getConversationById(group.id);
           if (!convo) {
             throw new Error(`[sendLoop] No convo for ${sender.name}`);
@@ -77,7 +69,7 @@ describe(testName, async () => {
     async function doVerify() {
       console.log("[verify] Checking fork and delivery");
       await workers.checkForks();
-      const res = await verifyMessageStream(group, otherUsers);
+      const res = await verifyMessageStream(group, workers.getAllButCreator());
       expect(res.allReceived).toBe(true);
     }
 
@@ -92,37 +84,39 @@ describe(testName, async () => {
 
     async function doChaos() {
       console.log("[chaos] Applying network chaos");
-      for (const node of allNodes) {
+      const nodes = allNodes;
+      for (const node of nodes) {
         const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
         const jitter = 50 + Math.floor(Math.random() * 150);   // 50–200ms
         const loss = 2 + Math.random() * 8;                    // 2–10% PL
-
         try {
           node.addJitter(delay, jitter);
           if (Math.random() < 0.5) node.addLoss(loss);
         } catch (err) {
             console.warn("[chaos] Error applying netem on " + node.name + ":", err);
         }
-        if (node !== allNodes[0]) {
-          await allNodes[0].ping(node);
+        if (node !== nodes[0]) {
+          await nodes[0].ping(node);
         }
       }
     }
 
-    verifyInterval = scheduleAsyncTask(doVerify, 10_000);
-    rotationInterval = scheduleAsyncTask(doKeyRotation, 10_000);
-    chaosInterval = scheduleAsyncTask(doChaos, 10_000);
+    // 5) Start the repeating tasks
+    const verifyInterval = scheduleAsyncTask(doVerify, 10_000);
+    const rotationInterval = scheduleAsyncTask(doKeyRotation, 10_000);
+    const chaosInterval = scheduleAsyncTask(doChaos, 10_000);
 
     try {
-      // 6) Run sendLoop (awaited)
+      // 6) Run traffic
       await sendLoop();
 
-      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
+      // 7) Cooldown
+      console.log(`[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`);
       clearInterval(verifyInterval);
       clearInterval(rotationInterval);
       clearInterval(chaosInterval);
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
-    } catch (err) {
+    } catch (err: unknown) {
       console.error("[test] Error during chaos test:", err);
       clearInterval(verifyInterval);
       clearInterval(rotationInterval);
@@ -130,6 +124,7 @@ describe(testName, async () => {
       throw err;
     }
 
+    // 8) Final check
     console.log("[final] Validating final group state and message sync");
     await workers.checkForks();
     const verifyFinal = await verifyMessageStream(group, otherUsers);
