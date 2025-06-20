@@ -88,7 +88,7 @@ function showUsageAndExit(): never {
     "      --no-fail           Exit with code 0 even on test failures (still sends Slack notifications)",
   );
   console.error(
-    "      --versions <list>   Comma-separated list of SDK versions (e.g., 209,210)",
+    "      --versions count   Number of SDK versions to use (e.g., 3)",
   );
   console.error(
     "      [vitest_options...] Other options passed directly to vitest",
@@ -112,7 +112,7 @@ function showUsageAndExit(): never {
     "  yarn cli test functional --no-fail        # Uses retry mode",
   );
   console.error(
-    "  yarn cli test functional --versions 209,210 # Uses random workers with versions 209 and 210",
+    "  yarn cli test functional --versions 3 # Uses random workers with versions 209, 210, and 220",
   );
   process.exit(1);
 }
@@ -194,9 +194,7 @@ function parseTestArgs(args: string[]): {
           options.vitestArgs.push(`--versions=${nextArg}`);
           i++;
         } else {
-          console.warn(
-            "--versions flag requires a value (e.g., --versions 209,210)",
-          );
+          console.warn("--versions flag requires a value (e.g., --versions 3)");
         }
         break;
       case "--debug":

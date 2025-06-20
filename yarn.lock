@@ -1394,24 +1394,24 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@vitest/expect@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/expect@npm:3.2.3"
+"@vitest/expect@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/expect@npm:3.2.4"
   dependencies:
     "@types/chai": "npm:^5.2.2"
-    "@vitest/spy": "npm:3.2.3"
-    "@vitest/utils": "npm:3.2.3"
+    "@vitest/spy": "npm:3.2.4"
+    "@vitest/utils": "npm:3.2.4"
     chai: "npm:^5.2.0"
     tinyrainbow: "npm:^2.0.0"
-  checksum: 10/c67318892c2441a53fd6386232a3392fd86faf3a17528ce70fa2b6ede7778b9d7e3142b463f722d0fb5516fb671f422549d34e674f4fe8721209101c5b69805d
+  checksum: 10/dc69ce886c13714dfbbff78f2d2cb7eb536017e82301a73c42d573a9e9d2bf91005ac7abd9b977adf0a3bd431209f45a8ac2418029b68b0a377e092607c843ce
   languageName: node
   linkType: hard
 
-"@vitest/mocker@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/mocker@npm:3.2.3"
+"@vitest/mocker@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/mocker@npm:3.2.4"
   dependencies:
-    "@vitest/spy": "npm:3.2.3"
+    "@vitest/spy": "npm:3.2.4"
     estree-walker: "npm:^3.0.3"
     magic-string: "npm:^0.30.17"
   peerDependencies:
@@ -1422,55 +1422,55 @@ __metadata:
       optional: true
     vite:
       optional: true
-  checksum: 10/984203df788f9822d9d8ae0a85abc204f08770c63191d1300b6e05172021309b90321fddb5962101c268e66cc9f920982c0ccf768ee67a3d4c5cb44fb27b2934
+  checksum: 10/5e92431b6ed9fc1679060e4caef3e4623f4750542a5d7cd944774f8217c4d231e273202e8aea00bab33260a5a9222ecb7005d80da0348c3c829bd37d123071a8
   languageName: node
   linkType: hard
 
-"@vitest/pretty-format@npm:3.2.3, @vitest/pretty-format@npm:^3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/pretty-format@npm:3.2.3"
+"@vitest/pretty-format@npm:3.2.4, @vitest/pretty-format@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/pretty-format@npm:3.2.4"
   dependencies:
     tinyrainbow: "npm:^2.0.0"
-  checksum: 10/fd39fa90f5ec486215c962ee05d80c31dc8bff84f4c29c4390a129757ac4cbbae09b4aa669982a7888fea5de1bb2c3532aefe6c13b7d28d45295f00793aea306
+  checksum: 10/8dd30cbf956e01fbab042fe651fb5175d9f0cd00b7b569a46cd98df89c4fec47dab12916201ad6e09a4f25f2a2ec8927a4bfdc61118593097f759c90b18a51d4
   languageName: node
   linkType: hard
 
-"@vitest/runner@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/runner@npm:3.2.3"
+"@vitest/runner@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/runner@npm:3.2.4"
   dependencies:
-    "@vitest/utils": "npm:3.2.3"
+    "@vitest/utils": "npm:3.2.4"
     pathe: "npm:^2.0.3"
     strip-literal: "npm:^3.0.0"
-  checksum: 10/4c4bdef49c646c47ef91683bf30797d48e2d1c2a615dc1adb730232578b7c4b00642204d2d15b6f73e70ecfda548da9a3c7883b50655d2801db19088f7769860
+  checksum: 10/197bd55def519ef202f990b7c1618c212380831827c116240871033e4973decb780503c705ba9245a12bd8121f3ac4086ffcb3e302148b62d9bd77fd18dd1deb
   languageName: node
   linkType: hard
 
-"@vitest/snapshot@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/snapshot@npm:3.2.3"
+"@vitest/snapshot@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/snapshot@npm:3.2.4"
   dependencies:
-    "@vitest/pretty-format": "npm:3.2.3"
+    "@vitest/pretty-format": "npm:3.2.4"
     magic-string: "npm:^0.30.17"
     pathe: "npm:^2.0.3"
-  checksum: 10/64b085246172d5f1c3c9815062270988757f8f00244a678b81ad00cb7ffbb8df84767a508eac00ee9bf26485b8c4f600d19e3c76618f746270337cd1a7f82136
+  checksum: 10/acfb682491b9ca9345bf9fed02c2779dec43e0455a380c1966b0aad8dd81c79960902cf34621ab48fe80a0eaf8c61cc42dec186a1321dc3c9897ef2ebd5f1bc4
   languageName: node
   linkType: hard
 
-"@vitest/spy@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/spy@npm:3.2.3"
+"@vitest/spy@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/spy@npm:3.2.4"
   dependencies:
     tinyspy: "npm:^4.0.3"
-  checksum: 10/cff3d764c461f544cec692ff110c7dc0ee74dc5e1b6e228eba0e04b35819faf27c46321f1697f3a69010cdb609a87b7a32e852f0d07da9e510238c92006372c1
+  checksum: 10/7d38c299f42a8c7e5e41652b203af98ca54e63df69c3b072d0e401d5a57fbbba3e39d8538ac1b3022c26718a6388d0bcc222bc2f07faab75942543b9247c007d
   languageName: node
   linkType: hard
 
-"@vitest/ui@npm:^3.0.6":
-  version: 3.2.3
-  resolution: "@vitest/ui@npm:3.2.3"
+"@vitest/ui@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/ui@npm:3.2.4"
   dependencies:
-    "@vitest/utils": "npm:3.2.3"
+    "@vitest/utils": "npm:3.2.4"
     fflate: "npm:^0.8.2"
     flatted: "npm:^3.3.3"
     pathe: "npm:^2.0.3"
@@ -1478,19 +1478,19 @@ __metadata:
     tinyglobby: "npm:^0.2.14"
     tinyrainbow: "npm:^2.0.0"
   peerDependencies:
-    vitest: 3.2.3
-  checksum: 10/d06e2fbc2bdf8d60841d56e199e633262882e88d187ac0aa0bda2df6c6972e4c6dbe97e30a822606e01fd45f53bc008eae6cdf1d5213d751eed16dc9927ff474
+    vitest: 3.2.4
+  checksum: 10/727ca0a1421fff894ff6d5891bab7fa70546735ac08c4a6b07d509950ecb93529a38dd58c208cf5919c55347103c79a1c65c9b1c859e9af4302cef4e1b81fe5e
   languageName: node
   linkType: hard
 
-"@vitest/utils@npm:3.2.3":
-  version: 3.2.3
-  resolution: "@vitest/utils@npm:3.2.3"
+"@vitest/utils@npm:3.2.4":
+  version: 3.2.4
+  resolution: "@vitest/utils@npm:3.2.4"
   dependencies:
-    "@vitest/pretty-format": "npm:3.2.3"
-    loupe: "npm:^3.1.3"
+    "@vitest/pretty-format": "npm:3.2.4"
+    loupe: "npm:^3.1.4"
     tinyrainbow: "npm:^2.0.0"
-  checksum: 10/ac69c88082f2590c6793b600726b25edcb27a483b12a5aae6ce88b8fff64890aa4243ea14786659961be261303dcf312b2676674f8216d57e4f63ddf5a24aa28
+  checksum: 10/7f12ef63bd8ee13957744d1f336b0405f164ade4358bf9dfa531f75bbb58ffac02bf61aba65724311ddbc50b12ba54853a169e59c6b837c16086173b9a480710
   languageName: node
   linkType: hard
 
@@ -1580,13 +1580,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-116@npm:@xmtp/node-bindings@1.1.6, @xmtp/node-bindings@npm:1.1.6":
-  version: 1.1.6
-  resolution: "@xmtp/node-bindings@npm:1.1.6"
-  checksum: 10/8eb5991da04a38fdde053d8f54d8cf2c03b0edfa30aded13e4c277e910cd95009ca48835e437f808624e19c8702d3171a010db05a25bf310c956f4681c14f90a
-  languageName: node
-  linkType: hard
-
 "@xmtp/node-bindings-118@npm:@xmtp/node-bindings@1.1.8, @xmtp/node-bindings@npm:1.1.8":
   version: 1.1.8
   resolution: "@xmtp/node-bindings@npm:1.1.8"
@@ -1594,45 +1587,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-120-1@npm:@xmtp/node-bindings@1.2.0-dev.bed98df":
-  version: 1.2.0-dev.bed98df
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.bed98df"
-  checksum: 10/a7e57fb3a1fa462ba49be33ad4ec05e3f164cfd198b5011a12968e57f477abe822c754a74a6fb7b529789408caee38ed1291e1e0165b4f5f3969e50ce98d1e15
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120-2@npm:@xmtp/node-bindings@1.2.0-dev.c24af30, @xmtp/node-bindings@npm:1.2.0-dev.c24af30":
-  version: 1.2.0-dev.c24af30
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.c24af30"
-  checksum: 10/51ba1d46bbf6016e9eaa6c9909f39392ea3bc48826f61514b9b68dcc706f9d3318c0eb283cdcba30bc5fc65e8c6f3614610231b92548bc2722e0aa70090d655b
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120-3@npm:@xmtp/node-bindings@1.2.0-dev.068bb4c, @xmtp/node-bindings@npm:1.2.0-dev.068bb4c":
-  version: 1.2.0-dev.068bb4c
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.068bb4c"
-  checksum: 10/80b77efecb6624b57e3cee7f506acfbb0579a6246c20c376ff2019cac3419d13338bfa553098ccae825412c86da8289807a99b0253a838348065ef71ac356039
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120-4@npm:@xmtp/node-bindings@1.2.0-dev.b96f93d, @xmtp/node-bindings@npm:1.2.0-dev.b96f93d":
-  version: 1.2.0-dev.b96f93d
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.b96f93d"
-  checksum: 10/f4c200dce0a41e0991328eca9a225e8c38909c72474fe73f14eb62cbba0ae5261aa37a4261e41b577f29e82be0be39e2ef1c3a7dacd5720246b6eeea5fc07e9c
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120-5@npm:@xmtp/node-bindings@1.2.0-dev.ef2c57d":
-  version: 1.2.0-dev.ef2c57d
-  resolution: "@xmtp/node-bindings@npm:1.2.0-dev.ef2c57d"
-  checksum: 10/647c3420e0ece504fed3464ea1757c82229ba4793442740aef151af4338a74c001a12ef4373109c11b0902c5e65c865cafcfd460f960b5f05ee3fb183237aa63
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120@npm:@xmtp/node-bindings@1.2.0, @xmtp/node-bindings@npm:1.2.0, @xmtp/node-bindings@npm:^1.0.0, @xmtp/node-bindings@npm:^1.1.3, @xmtp/node-bindings@npm:^1.2.0-dev.bed98df":
+"@xmtp/node-bindings-120@npm:@xmtp/node-bindings@1.2.0, @xmtp/node-bindings@npm:1.2.0, @xmtp/node-bindings@npm:^1.0.0, @xmtp/node-bindings@npm:^1.1.3":
   version: 1.2.0
   resolution: "@xmtp/node-bindings@npm:1.2.0"
   checksum: 10/cbdd074a464695d38d3001055eeaf41009b4bff9be3e720e413e5dd87f0da2b9a4f40bee77da273506599074edb4ab3ba21221a34e3de37afa6e4ce84464b88e
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-bindings-122@npm:@xmtp/node-bindings@1.2.2, @xmtp/node-bindings@npm:1.2.2":
+  version: 1.2.2
+  resolution: "@xmtp/node-bindings@npm:1.2.2"
+  checksum: 10/5870d1bfa629c86ce6d6e61f6804cb2dad992dd75d541f90584cd92ef5a31073c6178986b2ec90efaac3c966d5ea6d9a9131201ff08cfe1cfd1ef9baeecaa004
   languageName: node
   linkType: hard
 
@@ -1669,84 +1634,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-202@npm:@xmtp/node-sdk@2.0.2":
-  version: 2.0.2
-  resolution: "@xmtp/node-sdk@npm:2.0.2"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:^1.2.0-dev.bed98df"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/c75bb2a4f218baed1145a2546b3f2c552c8ea5ec866f806bea192b59854172bb44f75568eafdc3e19ef9a949514243fca68fdb38bd06000fe88021e3e1f8912f
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-sdk-203@npm:@xmtp/node-sdk@2.0.3":
-  version: 2.0.3
-  resolution: "@xmtp/node-sdk@npm:2.0.3"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0-dev.c24af30"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/73f5377f18ed75840c87f5e05dc4d3380ab6c1616aedbe81354a4a20edfbae9b499cecc5dd1d04e35372c259351abafd130faa8c242274a778508c9a43be7d42
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-sdk-204@npm:@xmtp/node-sdk@2.0.4":
-  version: 2.0.4
-  resolution: "@xmtp/node-sdk@npm:2.0.4"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0-dev.068bb4c"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/cf3e5039842f5299411d950a0067287e6c21a0fc8333a84a51534e56ec0b72ea4b948ae3403a69d44e20f5c6befb299326d4724782609c506364ee8455697bbb
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-sdk-205@npm:@xmtp/node-sdk@2.0.5":
-  version: 2.0.5
-  resolution: "@xmtp/node-sdk@npm:2.0.5"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0-dev.b96f93d"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/27aa28f99a4f084d2129e615af499b26d6bed41b78ee84678cf48722fbef02d1291d3a301485a87b033beec37558b41e3ee9d46bdff06ca64eeb0e7bf763c571
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-sdk-206@npm:@xmtp/node-sdk@2.0.6":
-  version: 2.0.6
-  resolution: "@xmtp/node-sdk@npm:2.0.6"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.1.6"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/734ff15f764a356f2e06b7b44849bf53b45032c6207d73d1005ca05dbd9df8d5008935b65f6f9ea64fcd7c137ecb4c5dc8eaec9e0afd36936a54e60140612edb
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-sdk-208@npm:@xmtp/node-sdk@2.0.8, @xmtp/node-sdk@npm:2.0.8":
-  version: 2.0.8
-  resolution: "@xmtp/node-sdk@npm:2.0.8"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.1.8"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/cc76d8eab8094ba9f67d08244b2f2ee2a9b790631d696f7c688c830193ff4a51a177290dd23a2e483711d1933a1fe97f14c194cc1b65726a6935790ed05c3956
-  languageName: node
-  linkType: hard
-
 "@xmtp/node-sdk-209@npm:@xmtp/node-sdk@2.0.9":
   version: 2.0.9
   resolution: "@xmtp/node-sdk@npm:2.0.9"
@@ -1760,7 +1647,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-210@npm:@xmtp/node-sdk@2.1.0, @xmtp/node-sdk@npm:2.1.0":
+"@xmtp/node-sdk-210@npm:@xmtp/node-sdk@2.1.0":
   version: 2.1.0
   resolution: "@xmtp/node-sdk@npm:2.1.0"
   dependencies:
@@ -1769,6 +1656,18 @@ __metadata:
     "@xmtp/content-type-text": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.2.0"
   checksum: 10/9994e639a18f89ee1ed9d8c3af6737d249b1ee88138152cdc4e630b043f17474ede48de758e43713df6bac0f7d33a0bceff8c3ec9969dad682017bef72ecbf8e
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-220@npm:@xmtp/node-sdk@2.2.0, @xmtp/node-sdk@npm:2.2.0":
+  version: 2.2.0
+  resolution: "@xmtp/node-sdk@npm:2.2.0"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.2.2"
+  checksum: 10/b3bc4cf62186b654b09376fd85dcb627a2cb31cbff677cc6326910bc04db774bd2f97342647beb02970353141a91f2fcf74fbf71186574403967853421c83933
   languageName: node
   linkType: hard
 
@@ -1794,6 +1693,19 @@ __metadata:
     "@xmtp/mls-client-bindings-node": "npm:^0.0.9"
     "@xmtp/proto": "npm:^3.62.1"
   checksum: 10/0a90c0261abc9a021499b5c9d422c528f07f444b66df44b0b26aa10e49068f0f8f3ce23f1de5488b6f293b82d1857ae2beeff82d384a6760d55efe6c00290baa
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk@npm:2.0.8":
+  version: 2.0.8
+  resolution: "@xmtp/node-sdk@npm:2.0.8"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.1.8"
+    "@xmtp/proto": "npm:^3.78.0"
+  checksum: 10/cc76d8eab8094ba9f67d08244b2f2ee2a9b790631d696f7c688c830193ff4a51a177290dd23a2e483711d1933a1fe97f14c194cc1b65726a6935790ed05c3956
   languageName: node
   linkType: hard
 
@@ -3656,7 +3568,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"loupe@npm:^3.1.0, loupe@npm:^3.1.3":
+"loupe@npm:^3.1.0, loupe@npm:^3.1.4":
   version: 3.1.4
   resolution: "loupe@npm:3.1.4"
   checksum: 10/06ab1893731f167f2ce71f464a8a68372dc4cb807ecae20f9b844660c93813a298ca76bcd747ba6568b057af725ea63f0034ba3140c8f1d1fbb482d797e593ef
@@ -4980,7 +4892,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tinypool@npm:^1.1.0":
+"tinypool@npm:^1.1.1":
   version: 1.1.1
   resolution: "tinypool@npm:1.1.1"
   checksum: 10/0d54139e9dbc6ef33349768fa78890a4d708d16a7ab68e4e4ef3bb740609ddf0f9fd13292c2f413fbba756166c97051a657181c8f7ae92ade690604f183cc01d
@@ -5232,9 +5144,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite-node@npm:3.2.3":
-  version: 3.2.3
-  resolution: "vite-node@npm:3.2.3"
+"vite-node@npm:3.2.4":
+  version: 3.2.4
+  resolution: "vite-node@npm:3.2.4"
   dependencies:
     cac: "npm:^6.7.14"
     debug: "npm:^4.4.1"
@@ -5243,7 +5155,7 @@ __metadata:
     vite: "npm:^5.0.0 || ^6.0.0 || ^7.0.0-0"
   bin:
     vite-node: vite-node.mjs
-  checksum: 10/0dacd6b70cae010dadb560cf38afe33cef956a7cdf99fd099294891ae664b4c8bff7d217d7d85de8a042efcb0ac2d1cd9cea4901e8f48adf4356625c01b0a2aa
+  checksum: 10/343244ecabbab3b6e1a3065dabaeefa269965a7a7c54652d4b7a7207ee82185e887af97268c61755dcb2dd6a6ce5d9e114400cbd694229f38523e935703cc62f
   languageName: node
   linkType: hard
 
@@ -5302,18 +5214,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vitest@npm:^3.0.8":
-  version: 3.2.3
-  resolution: "vitest@npm:3.2.3"
+"vitest@npm:^3.2.4":
+  version: 3.2.4
+  resolution: "vitest@npm:3.2.4"
   dependencies:
     "@types/chai": "npm:^5.2.2"
-    "@vitest/expect": "npm:3.2.3"
-    "@vitest/mocker": "npm:3.2.3"
-    "@vitest/pretty-format": "npm:^3.2.3"
-    "@vitest/runner": "npm:3.2.3"
-    "@vitest/snapshot": "npm:3.2.3"
-    "@vitest/spy": "npm:3.2.3"
-    "@vitest/utils": "npm:3.2.3"
+    "@vitest/expect": "npm:3.2.4"
+    "@vitest/mocker": "npm:3.2.4"
+    "@vitest/pretty-format": "npm:^3.2.4"
+    "@vitest/runner": "npm:3.2.4"
+    "@vitest/snapshot": "npm:3.2.4"
+    "@vitest/spy": "npm:3.2.4"
+    "@vitest/utils": "npm:3.2.4"
     chai: "npm:^5.2.0"
     debug: "npm:^4.4.1"
     expect-type: "npm:^1.2.1"
@@ -5324,17 +5236,17 @@ __metadata:
     tinybench: "npm:^2.9.0"
     tinyexec: "npm:^0.3.2"
     tinyglobby: "npm:^0.2.14"
-    tinypool: "npm:^1.1.0"
+    tinypool: "npm:^1.1.1"
     tinyrainbow: "npm:^2.0.0"
     vite: "npm:^5.0.0 || ^6.0.0 || ^7.0.0-0"
-    vite-node: "npm:3.2.3"
+    vite-node: "npm:3.2.4"
     why-is-node-running: "npm:^2.3.0"
   peerDependencies:
     "@edge-runtime/vm": "*"
     "@types/debug": ^4.1.12
     "@types/node": ^18.0.0 || ^20.0.0 || >=22.0.0
-    "@vitest/browser": 3.2.3
-    "@vitest/ui": 3.2.3
+    "@vitest/browser": 3.2.4
+    "@vitest/ui": 3.2.4
     happy-dom: "*"
     jsdom: "*"
   peerDependenciesMeta:
@@ -5354,7 +5266,7 @@ __metadata:
       optional: true
   bin:
     vitest: vitest.mjs
-  checksum: 10/7412aaa6f4c5d259b7329a7aba5466b3fd1fa67f4af0ee1ea14474c48f0c5f1b230fba2a5418a6c21df19c9b8268ba0d133f9d7aac553727914fa56664344b4a
+  checksum: 10/f10bbce093ecab310ecbe484536ef4496fb9151510b2be0c5907c65f6d31482d9c851f3182531d1d27d558054aa78e8efd9d4702ba6c82058657e8b6a52507ee
   languageName: node
   linkType: hard
 
@@ -5510,33 +5422,23 @@ __metadata:
     "@slack/bolt": "npm:^4.4.0"
     "@types/eslint__js": "npm:^8.42.3"
     "@types/node": "npm:^20.0.0"
-    "@vitest/ui": "npm:^3.0.6"
+    "@vitest/ui": "npm:^3.2.4"
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0"
+    "@xmtp/node-bindings": "npm:1.2.2"
     "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0"
     "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3"
-    "@xmtp/node-bindings-116": "npm:@xmtp/node-bindings@1.1.6"
     "@xmtp/node-bindings-118": "npm:@xmtp/node-bindings@1.1.8"
     "@xmtp/node-bindings-120": "npm:@xmtp/node-bindings@1.2.0"
-    "@xmtp/node-bindings-120-1": "npm:@xmtp/node-bindings@1.2.0-dev.bed98df"
-    "@xmtp/node-bindings-120-2": "npm:@xmtp/node-bindings@1.2.0-dev.c24af30"
-    "@xmtp/node-bindings-120-3": "npm:@xmtp/node-bindings@1.2.0-dev.068bb4c"
-    "@xmtp/node-bindings-120-4": "npm:@xmtp/node-bindings@1.2.0-dev.b96f93d"
-    "@xmtp/node-bindings-120-5": "npm:@xmtp/node-bindings@1.2.0-dev.ef2c57d"
+    "@xmtp/node-bindings-122": "npm:@xmtp/node-bindings@1.2.2"
     "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41"
     "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9"
-    "@xmtp/node-sdk": "npm:2.1.0"
+    "@xmtp/node-sdk": "npm:2.2.0"
     "@xmtp/node-sdk-100": "npm:@xmtp/node-sdk@1.0.0"
     "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5"
-    "@xmtp/node-sdk-202": "npm:@xmtp/node-sdk@2.0.2"
-    "@xmtp/node-sdk-203": "npm:@xmtp/node-sdk@2.0.3"
-    "@xmtp/node-sdk-204": "npm:@xmtp/node-sdk@2.0.4"
-    "@xmtp/node-sdk-205": "npm:@xmtp/node-sdk@2.0.5"
-    "@xmtp/node-sdk-206": "npm:@xmtp/node-sdk@2.0.6"
-    "@xmtp/node-sdk-208": "npm:@xmtp/node-sdk@2.0.8"
     "@xmtp/node-sdk-209": "npm:@xmtp/node-sdk@2.0.9"
     "@xmtp/node-sdk-210": "npm:@xmtp/node-sdk@2.1.0"
+    "@xmtp/node-sdk-220": "npm:@xmtp/node-sdk@2.2.0"
     "@xmtp/node-sdk-47": "npm:@xmtp/node-sdk@0.0.47"
     "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13"
     axios: "npm:^1.8.2"
@@ -5556,7 +5458,7 @@ __metadata:
     typescript-eslint: "npm:^8.22.0"
     uint8arrays: "npm:^5.1.0"
     viem: "npm:^2"
-    vitest: "npm:^3.0.8"
+    vitest: "npm:^3.2.4"
     winston: "npm:^3.17.0"
   languageName: unknown
   linkType: soft

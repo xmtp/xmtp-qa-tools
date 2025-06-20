@@ -289,22 +289,6 @@ describe(testName, async () => {
         throw e;
       }
     });
-    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
-      try {
-        const previousMembers = await newGroup.members();
-        await newGroup.removeMembers([
-          previousMembers.filter(
-            (member) => member.inboxId !== newGroup.addedByInboxId,
-          )[0].inboxId,
-        ]);
-
-        const members = await newGroup.members();
-        expect(members.length).toBe(previousMembers.length - 1);
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
-    });
     it(`sendGroupMessage-${i}: should measure sending a gm in a group of ${i} participants`, async () => {
       try {
         const groupMessage =
@@ -325,6 +309,22 @@ describe(testName, async () => {
         );
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.allReceived).toBe(true);
+      } catch (e) {
+        logError(e, expect.getState().currentTestName);
+        throw e;
+      }
+    });
+    it(`removeMembers-${i}: should remove a participant from a group`, async () => {
+      try {
+        const previousMembers = await newGroup.members();
+        await newGroup.removeMembers([
+          previousMembers.filter(
+            (member) => member.inboxId !== newGroup.addedByInboxId,
+          )[0].inboxId,
+        ]);
+
+        const members = await newGroup.members();
+        expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

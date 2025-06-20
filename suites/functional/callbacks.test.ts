@@ -20,7 +20,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("should receive messages using async iterator pattern with streamAllMessages", async () => {
+  it("should receive messages using await async", async () => {
     const sender = workers.get(names[0])!;
     const receiver = workers.get(names[1])!;
 
@@ -59,7 +59,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("should receive messages using callback pattern with streamAllMessages", async () => {
+  it("should receive messages using callback", async () => {
     const sender = workers.get(names[2])!;
     const receiver = workers.get(names[1])!;
 
@@ -75,7 +75,6 @@ describe(testName, async () => {
           reject(err instanceof Error ? err : new Error(String(err)));
           return;
         }
-        console.log("Callback received message:", message?.content);
         console.log("Callback received message:", message?.content as string);
         if (message?.conversationId) {
           clearTimeout(timeout);
@@ -95,7 +94,7 @@ describe(testName, async () => {
     expect(message.content).toBe("1");
   });
 
-  it("should receive conversation events using async iterator pattern with conversation stream", async () => {
+  it("should receive conversation with async", async () => {
     const receiver = workers.get(names[1])!;
 
     // Set up stream first
@@ -128,7 +127,7 @@ describe(testName, async () => {
     expect(conversation.id).toBe(convo.id);
   });
 
-  it("should receive conversation events using callback pattern with conversation stream", async () => {
+  it("should receive conversation with callback", async () => {
     const receiver = workers.get(names[1])!;
 
     // Set up stream first

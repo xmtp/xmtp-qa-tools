@@ -307,13 +307,7 @@ Test compatibility across different SDK versions:
 
 ```bash
 # Test with random mix of versions 2.0.9 and 2.1.0
-yarn cli test functional --versions 209,210
-
-# Test with only version 2.0.9
-yarn cli test functional --versions 209
-
-# Test with multiple versions
-yarn cli test functional --versions 202,203,204,205,206,208,209,210
+yarn cli test functional --versions 3
 ```
 
 #### Environment Configuration
@@ -422,7 +416,7 @@ Enable version compatibility testing in your test files:
 ```typescript
 import { getWorkersWithVersions } from "@helpers/client";
 
-// Support --versions parameter for compatibility testing
+// Support --versions parameter for compatibility testing (e.g., --versions 3)
 const workerDescriptors = getWorkersWithVersions(["alice", "bob"]);
 const workers = await getWorkers(workerDescriptors, testName);
 ```

@@ -29,15 +29,15 @@ export const KNOWN_ISSUES = [
       "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
     ],
   },
-  {
-    testName: "Performance",
-    uniqueErrorLines: [
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
-      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
-    ],
-  },
+  // {
+  //   testName: "Performance",
+  //   uniqueErrorLines: [
+  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
+  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
+  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
+  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
+  //   ],
+  // },
   {
     testName: "Large",
     uniqueErrorLines: [
