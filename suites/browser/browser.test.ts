@@ -1,8 +1,8 @@
-import { sleep } from "@helpers/client";
+import { getRandomNames, sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getInboxIds, getRandomInbox, getRandomInboxIds } from "@inboxes/utils";
+import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -11,36 +11,43 @@ const testName = "browser";
 
 describe(testName, () => {
   let groupId: string;
-  const receiver = "random";
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
-  let gmBot: Worker;
-  const inbox = getRandomInbox();
+  let xmtpChat: Worker;
+  let receiver: Worker;
+  const names = getRandomNames(3);
+
   setupTestLifecycle({
     testName,
     expect,
   });
   beforeAll(async () => {
-    xmtpTester = new playwright({
-      headless,
-      defaultUser: inbox,
-    });
-    await xmtpTester.startPage();
     const convoStreamBot = await getWorkers(
-      ["bob"],
+      [names[0], names[1]],
       testName,
       typeofStream.Conversation,
     );
     const gmBotWorker = await getWorkers(
-      [receiver],
+      [names[2]],
       testName,
       typeofStream.Message,
       typeOfResponse.Gm,
     );
-
-    creator = convoStreamBot.get("bob") as Worker;
-    gmBot = gmBotWorker.get(receiver) as Worker;
+    creator = convoStreamBot.get(names[0]) as Worker;
+    xmtpChat = convoStreamBot.get(names[1]) as Worker;
+    receiver = gmBotWorker.get(names[2]) as Worker;
+    console.log(names[1], xmtpChat.inboxId, xmtpChat.name);
+    xmtpTester = new playwright({
+      headless,
+      defaultUser: {
+        inboxId: xmtpChat.inboxId,
+        dbEncryptionKey: xmtpChat.encryptionKey,
+        walletKey: xmtpChat.walletKey,
+        accountAddress: xmtpChat.address,
+      },
+    });
+    await xmtpTester.startPage();
   });
 
   it("conversation stream with message", async () => {
@@ -52,8 +59,8 @@ describe(testName, () => {
         },
       );
       await sleep(1000);
-      await newGroup.addMembers([inbox.inboxId]);
-      await newGroup.send(`hi ${receiver}`);
+      await newGroup.addMembers([xmtpChat.inboxId]);
+      await newGroup.send(`hi ${receiver.name}`);
       const result = await xmtpTester.waitForNewConversation(newGroup.name);
       expect(result).toBe(true);
     } catch (e) {
@@ -72,7 +79,7 @@ describe(testName, () => {
         },
       );
       await sleep(1000);
-      await newGroup.addMembers([inbox.inboxId]);
+      await newGroup.addMembers([xmtpChat.inboxId]);
       const result = await xmtpTester.waitForNewConversation(newGroup.name);
       expect(result).toBe(true);
     } catch (e) {
@@ -84,8 +91,8 @@ describe(testName, () => {
 
   it("newDm and message stream", async () => {
     try {
-      await xmtpTester.newDmFromUI(gmBot.address);
-      await xmtpTester.sendMessage(`hi ${receiver}`);
+      await xmtpTester.newDmFromUI(receiver.address);
+      await xmtpTester.sendMessage(`hi ${receiver.name}`);
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
@@ -99,9 +106,9 @@ describe(testName, () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
-        gmBot.inboxId,
+        receiver.inboxId,
       ]);
-      await xmtpTester.sendMessage(`hi ${receiver}`);
+      await xmtpTester.sendMessage(`hi ${receiver.name}`);
       const result = await xmtpTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {
@@ -115,7 +122,7 @@ describe(testName, () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
-        gmBot.inboxId,
+        receiver.inboxId,
       ]);
       await xmtpTester.addMemberToGroup(groupId, creator.inboxId);
       const conversationStream = await creator.client.conversations.stream();
@@ -139,8 +146,8 @@ describe(testName, () => {
     try {
       await xmtpNewTester.startPage();
 
-      await xmtpNewTester.newDmFromUI(gmBot.address);
-      await xmtpNewTester.sendMessage(`hi ${receiver}`);
+      await xmtpNewTester.newDmFromUI(receiver.address);
+      await xmtpNewTester.sendMessage(`hi ${receiver.name}`);
       const result = await xmtpNewTester.waitForResponse(["gm"]);
       expect(result).toBe(true);
     } catch (e) {

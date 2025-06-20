@@ -959,7 +959,7 @@ export class WorkerClient extends Worker {
    * Revokes installations above a threshold count
    * @param threshold - Maximum number of installations allowed
    */
-  async revokeExcessInstallations(threshold: number = 10): Promise<void> {
+  async revokeExcessInstallations(threshold: number = 5): Promise<void> {
     const installations = await this.client.preferences.inboxState();
     if (installations.installations.length > threshold) {
       await this.client.revokeAllOtherInstallations();
