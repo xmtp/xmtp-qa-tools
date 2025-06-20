@@ -65,40 +65,35 @@ describe(testName, async () => {
     };
 
     const verifyLoop = () => {
-      verifyInterval = setInterval(() => {
-        void (async () => {
-          try {
-            console.log("[verify] Checking fork and delivery");
-            await workers.checkForks();
-            const res = await verifyMessageStream(group, otherUsers);
-            expect(res.allReceived).toBe(true);
-          } catch (e) {
-            console.warn("[verify] Skipping check due to error:", e);
-          }
-        })();
+      verifyInterval = setInterval(async () => {
+        try {
+          console.log("[verify] Checking fork and delivery");
+          await workers.checkForks();
+          const res = await verifyMessageStream(group, otherUsers);
+          expect(res.allReceived).toBe(true);
+        } catch (e) {
+          console.warn("[verify] Skipping check due to error:", e);
+        }
       }, 10 * 1000);
     };
 
     const keyRotationLoop = () => {
-      rotationInterval = setInterval(() => {
+      rotationInterval = setInterval(async () => {
         console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
-        void (async () => {
-          try {
-            const newMember = workers.getRandomWorker().client.inboxId;
-            await group.removeMembers([newMember]);
-            await group.addMembers([newMember]);
-            const info = await group.debugInfo();
-            console.log("[key-rotation] After rotation, epoch =", info.epoch);
-          } catch (err) {
-            console.error("[key-rotation] error", err);
-          }
-        })();
-      }, 10000);
+        try {
+          const newMember = workers.getRandomWorker().client.inboxId;
+          await group.removeMembers([newMember]);
+          await group.addMembers([newMember]);
+          const info = await group.debugInfo();
+          console.log("[key-rotation] After rotation, epoch =", info.epoch);
+        } catch (err) {
+          console.error("[key-rotation] error", err);
+        }
+      }, 10 * 1000);
     };
 
-
     const startChaos = () => {
-      chaosInterval = setInterval(() => {
+      chaosInterval = setInterval(async () => {
         console.log("[chaos] Injecting latency/jitter/loss...");
         for (const node of allNodes) {
           const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
@@ -111,8 +106,9 @@ describe(testName, async () => {
           } catch (err) {
             console.warn("[chaos] Error applying netem on " + node.name + ":", err);
           }
+
           if (node !== allNodes[0]) {
-            void allNodes[0].ping(node);
+            await allNodes[0].ping(node);
           }
         }
       }, 10 * 1000);
@@ -128,10 +124,11 @@ describe(testName, async () => {
     };
 
     try {
-      void verifyLoop();
-      void startChaos();
-      void keyRotationLoop();
+      verifyLoop();
+      startChaos();
+      keyRotationLoop();
       await sendLoop();
+
       console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
