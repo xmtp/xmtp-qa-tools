@@ -295,7 +295,9 @@ export const regressionClient = async (
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);
   const apiUrl = apiURL;
-  console.log("Creating API client with: SDK version: " + sdkVersion + " walletKey: " + walletKey + " API URL: " + apiUrl);
+  console.log(
+    `Creating API client with: SDK version: ${String(sdkVersion)} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`
+  );
 
   const ClientClass =
     sdkVersions[versionInt as keyof typeof sdkVersions].Client;

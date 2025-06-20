@@ -5,7 +5,6 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
-import { DockerContainer } from "../../network-stability-utilities/container";
 import * as iptables from "../../network-stability-utilities/iptables";
 import type { Group } from "@xmtp/node-sdk";
 
@@ -82,7 +81,7 @@ describe(testName, async () => {
 
       await workers.checkForks();
 
-      console.log("[verify-after-reconnect] Checking that user3 and user4 received all mid-partition messages (if supported)");
+      console.log("[verify-after-reconnect] Checking that user3 and user4 received all mid-partition messages:");
       for (const recipient of ["user3", "user4"]) {
         const convo = await workers.get(recipient)!.client.conversations.getConversationById(group.id);
         const msgs = await convo!.messages();

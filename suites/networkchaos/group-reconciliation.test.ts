@@ -45,10 +45,10 @@ describe(testName, async () => {
       for (const name of users) {
         const client = workers.get(name)?.client;
         const convo = client && (await client.conversations.getConversationById(group.id));
-        if (!convo) { 
-        if (name === "user4") { // check if env dirty
-          expect(convo).toBeFalsy();
-          console.log("  [user4] No conversation found - expected.");
+        if (!convo) {
+          if (name === "user4") { // check if env dirty
+            expect(convo).toBeFalsy();
+            console.log("  [user4] No conversation found - expected.");
           } else {
             throw new Error(`[${name}] convo unexpectedly undefined`);
           }
@@ -56,13 +56,13 @@ describe(testName, async () => {
         }
         expect(convo).toBeTruthy();
         const messages = await convo.messages();
-        console.log("  [" + name + "] Received " + messages.length + " messages:");
+        console.log("  [" + name + "] Received " + String(messages.length) + " messages:");
         for (const msg of messages) {
           const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          console.log("    [" + timestamp + "] " + String(msg.content));
+          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          console.log("    [" + timestamp + "] " + safeContent);
         }
       }
-
 
       // Isolate node3 from replication cluster (user3)
       const node1 = new DockerContainer("multinode-node1-1");
@@ -97,10 +97,11 @@ describe(testName, async () => {
           continue;
         }
         const messages = await convo.messages();
-        console.log("  [" + name + "] Received " + messages.length + " messages:");
+        console.log("  [" + name + "] Received " + String(messages.length) + " messages:");
         for (const msg of messages) {
           const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          console.log("    [" + timestamp + "] " + String(msg.content));
+          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          console.log("    [" + timestamp + "] " + safeContent);
         }
       }
 
@@ -108,7 +109,6 @@ describe(testName, async () => {
       const user4Group = await workers.get("user4")!.client.conversations.getConversationById(group.id);
       await user4Group?.sync();
       console.log("[test] user4 joined and synced");
-
 
       // Restore network
       node1.unblockOutboundTrafficTo(node3);

@@ -85,7 +85,8 @@ describe(testName, async () => {
 
       for (const m of matching) {
         const ts = new Date(Number(m.sentAtNs) / 1e6).toISOString();
-        console.log("[recv] [" + ts + "]: " + String(m.content));
+        const safeContent = typeof m.content === "string" ? m.content : JSON.stringify(m.content);
+        console.log("[recv] [" + ts + "]: " + safeContent);
       }
 
       expect(matching.length).toBe(1); // Validate deduplication held

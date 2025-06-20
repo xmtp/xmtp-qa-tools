@@ -82,7 +82,7 @@ describe(testName, async () => {
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
         console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
-        void (async () => {
+        (async () => {
           try {
             const newMember = workers.getRandomWorker().client.inboxId;
             await group.removeMembers([newMember]);
@@ -95,6 +95,7 @@ describe(testName, async () => {
         })();
       }, 10000);
     };
+
 
     const startChaos = () => {
       chaosInterval = setInterval(() => {
