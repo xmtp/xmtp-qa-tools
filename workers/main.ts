@@ -398,9 +398,13 @@ export class WorkerClient extends Worker {
         try {
           const stream = await this.client.conversations.streamAllMessages();
           for await (const message of stream) {
+            // console.debug(
+            //   `[${this.nameId}] Received message`,
+            //   JSON.stringify(message, null, 2),
+            // );
             console.debug(
               `[${this.nameId}] Received message`,
-              JSON.stringify(message, null, 2),
+              JSON.stringify(message?.content, null, 2),
             );
             if (!this.activeStreams) break;
 
@@ -761,9 +765,6 @@ export class WorkerClient extends Worker {
         );
 
         if (msg.type !== StreamCollectorType.Message) {
-          console.debug(
-            `[${this.nameId}] Message filtered out: wrong type ${msg.type}`,
-          );
           return false;
         }
 
@@ -773,10 +774,6 @@ export class WorkerClient extends Worker {
         const idsMatch = groupId === conversationId;
         const typeIsText =
           contentType?.typeId === "text" || contentType?.typeId === "reply";
-
-        console.debug(
-          `[${this.nameId}] Message filter check: conversationId=${conversationId}, expectedId=${groupId}, idsMatch=${idsMatch}, contentType=${contentType?.typeId}, typeIsText=${typeIsText}`,
-        );
 
         const shouldAccept = idsMatch && typeIsText;
 
