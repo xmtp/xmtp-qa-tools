@@ -2,6 +2,7 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 import "dotenv/config";
+import { m_large_BATCH_SIZE } from "suites/large/helpers";
 
 // Known test issues for tracking
 export const KNOWN_ISSUES = [
@@ -38,6 +39,14 @@ export const KNOWN_ISSUES = [
       "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
     ],
   },
+  {
+    testName: "Large",
+    uniqueErrorLines: [
+      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 100-member group and verify all workers receive new conversation notifications within acceptable time",
+      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 150-member group and verify all workers receive new conversation notifications within acceptable time",
+      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 200-member group and verify all workers receive new conversation notifications within acceptable time",
+    ],
+  },
 ];
 
 // Patterns configuration
@@ -52,7 +61,7 @@ export const ERROR_PATTERNS = {
   ],
 
   // Lines to ignore in logs
-  IGNORE: ["last_stream_id: StreamId(0) }", "Library"],
+  IGNORE: [", last_stream_id: StreamId(0) }", ", Library)"],
 
   // Regex patterns for filtering logs
   FILTER: [
