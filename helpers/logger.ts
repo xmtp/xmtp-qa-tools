@@ -1,25 +1,40 @@
 import fs from "fs";
 import path from "path";
-import winston from "winston";
+import winston, { stream } from "winston";
 import "dotenv/config";
 
 export const KNOWN_ISSUES = [
   {
     testName: "Browser",
     uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > Browser group member addition",
+      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
     ],
   },
   {
     testName: "Dms",
     uniqueErrorLines: [
-      "FAIL  suites/functional/dms.test.ts > dms > should  fail on purpose",
+      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
     ],
   },
   {
     testName: "Agents",
     uniqueErrorLines: [
       "FAIL  suites/agents/agents.test.ts > agents > production: clankerchat.base.eth : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    ],
+  },
+  {
+    testName: "Functional",
+    uniqueErrorLines: [
+      "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
+    ],
+  },
+  {
+    testName: "Performance",
+    uniqueErrorLines: [
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
+      "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
     ],
   },
 ];
@@ -296,7 +311,10 @@ export interface TestLogOptions {
 }
 
 // Extract error logs from log files
-export function extractErrorLogs(testName: string): Set<string> {
+export function extractErrorLogs(
+  testName: string,
+  limit?: number,
+): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
@@ -305,7 +323,7 @@ export function extractErrorLogs(testName: string): Set<string> {
     const logFiles = fs
       .readdirSync("logs")
       .filter((file) => file.endsWith(".log") && file.includes(testName));
-    const errorLines: Set<string> = new Set();
+    const errorLines: string[] = []; // Changed from Set to Array to maintain order
 
     // Track specific error patterns we want to deduplicate
     const seenPatterns = new Set<string>();
@@ -322,7 +340,7 @@ export function extractErrorLogs(testName: string): Set<string> {
 
           // Don't split the line if it contains a test file path
           if (cleanLine.includes("test.ts")) {
-            errorLines.add(cleanLine.trim());
+            errorLines.push(cleanLine.trim());
             continue;
           }
 
@@ -352,22 +370,31 @@ export function extractErrorLogs(testName: string): Set<string> {
           }
 
           if (!shouldSkip) {
-            errorLines.add(cleanLine);
+            errorLines.push(cleanLine);
           }
         }
       }
     }
 
-    console.debug(errorLines);
-    if (errorLines.size === 1) {
+    console.log(
+      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
+    );
+
+    if (errorLines.length === 1) {
       for (const pattern of PATTERNS_TO_TRACK) {
-        if (errorLines.values().next().value?.includes(pattern)) {
+        if (errorLines[0]?.includes(pattern)) {
           console.log("returning empty string");
           return new Set();
         }
       }
-    } else if (errorLines.size > 0) {
-      return errorLines;
+    }
+
+    if (errorLines.length > 0) {
+      // Apply limit if specified (take the last N errors to get most recent)
+      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
+      let returnSet = new Set(limitedErrors);
+      console.log(returnSet);
+      return returnSet;
     }
   } catch (error) {
     console.error("Error reading log files:", error);

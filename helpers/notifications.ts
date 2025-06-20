@@ -127,7 +127,8 @@ class SlackNotifier {
     const failLines = errorLogs.filter((log) => log.includes("FAIL  suites/"));
 
     if (failLines.length === 0) {
-      return false;
+      //don't show if test dont fail
+      return true;
     }
 
     // Check each configured filter
@@ -181,8 +182,7 @@ class SlackNotifier {
   }
 
   private sanitizeLogs(logs: string): string {
-    // Replace all occurrences of triple backticks with three single quotes
-    return logs.replace(/```/g, "'''");
+    return logs.replaceAll(/```/g, "'''");
   }
 
   private generateMessage(options: SlackNotificationOptions): string {
@@ -196,8 +196,7 @@ class SlackNotifier {
 
     // Sanitize logs before embedding in Slack message
     const errorLogsArr = Array.from(options.errorLogs || []);
-    const last20Logs = errorLogsArr.slice(-20);
-    const logs = this.sanitizeLogs(last20Logs.join("\n"));
+    const logs = this.sanitizeLogs(errorLogsArr.join("\n"));
 
     return `*Test Failure ❌*
 *Test:* <https://github.com/xmtp/xmtp-qa-tools/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>

@@ -44,7 +44,7 @@ describe(testName, async () => {
   creator = convoStreamBot.get("bob") as Worker;
   gmBot = gmBotWorker.get(receiver) as Worker;
 
-  it("should detect group invitation in browser when invitation includes an initial message", async () => {
+  it("conversation stream with message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -64,7 +64,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should detect group invitation in browser when invitation has no accompanying message", async () => {
+  it("conversation stream without message", async () => {
     try {
       const newGroup = await creator.client.conversations.newGroup(
         getRandomInboxIds(4),
@@ -83,7 +83,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should create DM via browser UI and receive automated GM bot response", async () => {
+  it("newDm and message stream", async () => {
     try {
       await xmtpTester.newDmFromUI(gmBot.address);
       await xmtpTester.sendMessage(`hi ${receiver}`);
@@ -96,7 +96,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should create group via browser UI and validate GM bot messaging functionality", async () => {
+  it("newGroup and message stream", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -112,7 +112,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should stream real-time group updates when members are added using async iterator pattern", async () => {
+  it("conversation stream for new member", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -133,7 +133,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should stream real-time group updates when members are added using callback pattern", async () => {
+  it("conversation stream for new member with callback", async () => {
     try {
       groupId = await xmtpTester.newGroupFromUI([
         ...getInboxIds(4),
@@ -157,7 +157,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should handle multiple browser instances with independent messaging sessions", async () => {
+  it("new installation and message stream", async () => {
     const xmtpNewTester = new playwright({
       headless,
     });
