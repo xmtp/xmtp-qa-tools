@@ -662,7 +662,6 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
   }
 
   const availableVersions = testVersions.split(",").map((v) => v.trim());
-  console.debug(`Using TEST_VERSIONS: ${availableVersions.join(", ")}`);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
