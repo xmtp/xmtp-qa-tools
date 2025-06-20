@@ -5,7 +5,7 @@
     {
       "id": 504026830671482,
       "definition": {
-        "title": "Stream Delivery Rate (%)",
+        "title": "Delivery Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -34,12 +34,12 @@
         ],
         "autoscale": true
       },
-      "layout": { "x": 0, "y": 0, "width": 3, "height": 1 }
+      "layout": { "x": 0, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 7386776256176399,
       "definition": {
-        "title": "Stream Order Rate (%)",
+        "title": "Order Rate (%)",
         "title_size": "16",
         "title_align": "left",
         "type": "query_value",
@@ -68,7 +68,44 @@
         ],
         "autoscale": true
       },
-      "layout": { "x": 3, "y": 0, "width": 3, "height": 1 }
+      "layout": { "x": 2, "y": 0, "width": 2, "height": 1 }
+    },
+    {
+      "id": 2409904999307821,
+      "definition": {
+        "title": "Avg Agent Response Time (ms)",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "query_value",
+        "requests": [
+          {
+            "response_format": "scalar",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{$env,$region,$test, metric_type:agent}"
+              }
+            ],
+            "formulas": [{ "formula": "query1" }],
+            "conditional_formats": [
+              {
+                "comparator": "<=",
+                "value": 1000,
+                "palette": "white_on_green"
+              },
+              {
+                "comparator": "<=",
+                "value": 5000,
+                "palette": "white_on_yellow"
+              },
+              { "comparator": ">", "value": 5000, "palette": "white_on_red" }
+            ]
+          }
+        ],
+        "autoscale": true
+      },
+      "layout": { "x": 4, "y": 0, "width": 2, "height": 1 }
     },
     {
       "id": 4980151126779186,
@@ -173,6 +210,233 @@
       "layout": { "x": 0, "y": 1, "width": 6, "height": 2 }
     },
     {
+      "id": 1933279114458496,
+      "definition": {
+        "title": "Agents response times",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": {},
+        "type": "timeseries",
+        "requests": [
+          {
+            "response_format": "timeseries",
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:bankr.base.eth}"
+              },
+              {
+                "name": "query2",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:byte}"
+              },
+              {
+                "name": "query3",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:clankerchat.base.eth}"
+              },
+              {
+                "name": "query5",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:flaunchy}"
+              },
+              {
+                "name": "query6",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:squabble}"
+              },
+              {
+                "name": "query7",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:key-check}"
+              },
+              {
+                "name": "query8",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:gang}"
+              },
+              {
+                "name": "query9",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:gm}"
+              },
+              {
+                "name": "query10",
+                "data_source": "metrics",
+                "query": "avg:xmtp.sdk.response{agent:csx}"
+              }
+            ],
+            "formulas": [
+              { "alias": "Bankr", "formula": "query1" },
+              { "alias": "Byte", "formula": "query2" },
+              { "alias": "Clanker", "formula": "query3" },
+              { "alias": "Flaunchy", "formula": "query5" },
+              { "alias": "Squabble", "formula": "query6" },
+              { "alias": "Key-check", "formula": "query7" },
+              { "alias": "Gang", "formula": "query8" },
+              { "alias": "Gm", "formula": "query9" },
+              { "alias": "Csx", "formula": "query10" }
+            ],
+            "style": {
+              "palette": "dog_classic",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 3, "width": 4, "height": 3 }
+    },
+    {
+      "id": 4027963223548428,
+      "definition": {
+        "title": "Agent Response Times by Agent",
+        "title_size": "16",
+        "title_align": "left",
+        "type": "toplist",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.response{$env,$region,$test, metric_type:agent} by {agent}",
+                "aggregator": "avg"
+              }
+            ],
+            "response_format": "scalar",
+            "formulas": [{ "formula": "query1" }],
+            "sort": {
+              "count": 500,
+              "order_by": [{ "type": "formula", "index": 0, "order": "asc" }]
+            }
+          }
+        ],
+        "style": { "display": { "type": "stacked", "legend": "automatic" } }
+      },
+      "layout": { "x": 4, "y": 3, "width": 2, "height": 3 }
+    },
+    {
+      "id": 1234567890123456,
+      "definition": {
+        "title": "Group Operations Table",
+        "type": "query_table",
+        "requests": [
+          {
+            "queries": [
+              {
+                "data_source": "metrics",
+                "name": "query1",
+                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members, metric_subtype:group} by {operation,members,test}"
+              }
+            ],
+            "response_format": "scalar",
+            "order": "desc",
+            "limit": 100,
+            "sort": {
+              "count": 500,
+              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
+            },
+            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
+          }
+        ],
+        "has_search_bar": "auto"
+      },
+      "layout": { "x": 6, "y": 3, "width": 6, "height": 7 }
+    },
+    {
+      "id": 202034964114978,
+      "definition": {
+        "title": "Daily Error Count vs Error Lines",
+        "title_size": "16",
+        "title_align": "left",
+        "show_legend": true,
+        "legend_layout": "auto",
+        "legend_columns": ["avg", "min", "max", "value", "sum"],
+        "time": {},
+        "type": "timeseries",
+        "requests": [
+          {
+            "queries": [
+              {
+                "name": "query1",
+                "data_source": "logs",
+                "search": { "query": "@service:xmtp-qa-tools" },
+                "indexes": ["*"],
+                "group_by": [],
+                "compute": {
+                  "aggregation": "count",
+                  "rollup": { "type": "day" }
+                },
+                "storage": "hot"
+              },
+              {
+                "name": "query2",
+                "data_source": "logs",
+                "search": { "query": "@service:xmtp-qa-tools" },
+                "indexes": ["*"],
+                "group_by": [],
+                "compute": {
+                  "aggregation": "sum",
+                  "metric": "@failLines",
+                  "rollup": { "type": "day" }
+                },
+                "storage": "hot"
+              }
+            ],
+            "formulas": [
+              { "alias": "Daily Error Occurrences", "formula": "query1" },
+              { "alias": "Daily Error Lines Total", "formula": "query2" }
+            ],
+            "response_format": "timeseries",
+            "style": {
+              "palette": "dog_classic",
+              "order_by": "values",
+              "line_type": "solid",
+              "line_width": "normal"
+            },
+            "display_type": "line"
+          }
+        ]
+      },
+      "layout": { "x": 0, "y": 6, "width": 6, "height": 4 }
+    },
+    {
+      "id": 5297767210484191,
+      "definition": {
+        "title": "Fail lines",
+        "title_size": "16",
+        "title_align": "left",
+        "time": { "type": "live", "unit": "week", "value": 1 },
+        "requests": [
+          {
+            "response_format": "event_list",
+            "query": {
+              "data_source": "logs_stream",
+              "query_string": "@service:xmtp-qa-tools",
+              "indexes": [],
+              "storage": "hot"
+            },
+            "columns": [
+              { "field": "status_line", "width": "auto" },
+              { "field": "timestamp", "width": "auto" },
+              { "field": "env", "width": "auto" },
+              { "field": "region", "width": "auto" },
+              { "field": "test", "width": "auto" },
+              { "field": "failLines", "width": "auto" }
+            ]
+          }
+        ],
+        "type": "list_stream"
+      },
+      "layout": { "x": 0, "y": 10, "width": 6, "height": 4 }
+    },
+    {
       "id": 7792773130762525,
       "definition": {
         "title": "Network Performance",
@@ -202,35 +466,7 @@
           }
         ]
       },
-      "layout": { "x": 0, "y": 3, "width": 6, "height": 2 }
-    },
-    {
-      "id": 1234567890123456,
-      "definition": {
-        "title": "Group Operations Table",
-        "type": "query_table",
-        "requests": [
-          {
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.duration{metric_type:operation,$env,$region,$test,$libxmtp,$members, metric_subtype:group} by {operation,members,test}"
-              }
-            ],
-            "response_format": "scalar",
-            "order": "desc",
-            "limit": 100,
-            "sort": {
-              "count": 500,
-              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
-            },
-            "formulas": [{ "alias": "Duration (ms)", "formula": "query1" }]
-          }
-        ],
-        "has_search_bar": "auto"
-      },
-      "layout": { "x": 6, "y": 3, "width": 6, "height": 8 }
+      "layout": { "x": 6, "y": 10, "width": 6, "height": 2 }
     },
     {
       "id": 3075918014507898,
@@ -266,7 +502,7 @@
         ],
         "has_search_bar": "auto"
       },
-      "layout": { "x": 0, "y": 5, "width": 6, "height": 2 }
+      "layout": { "x": 6, "y": 12, "width": 6, "height": 2 }
     },
     {
       "id": 403905557672626,
@@ -293,109 +529,7 @@
         "style": { "palette": "green_to_orange", "palette_flip": false },
         "view": { "focus": "WORLD" }
       },
-      "layout": { "x": 0, "y": 7, "width": 6, "height": 4 }
-    },
-    {
-      "id": 3625787533135842,
-      "definition": {
-        "title": "",
-        "title_size": "16",
-        "title_align": "left",
-        "time": { "type": "live", "unit": "minute", "value": 15 },
-        "requests": [
-          {
-            "response_format": "event_list",
-            "query": {
-              "data_source": "logs_stream",
-              "query_string": "@service:xmtp-qa-tools",
-              "indexes": [],
-              "storage": "hot",
-              "sort": { "order": "asc", "column": "timestamp" }
-            },
-            "columns": [
-              { "field": "status_line", "width": "auto" },
-              { "field": "timestamp", "width": "auto" },
-              { "field": "host", "width": "auto" },
-              { "field": "service", "width": "auto" },
-              { "field": "content", "width": "auto" }
-            ]
-          }
-        ],
-        "type": "list_stream"
-      },
-      "layout": { "x": 0, "y": 11, "width": 6, "height": 4 }
-    },
-    {
-      "id": 8901234567890123,
-      "definition": {
-        "title": "Agent Response Times",
-        "type": "query_table",
-        "requests": [
-          {
-            "queries": [
-              {
-                "data_source": "metrics",
-                "name": "query1",
-                "query": "avg:xmtp.sdk.agents{metric_type:responseTime,$env,$region,$test} by {agent,address}"
-              }
-            ],
-            "response_format": "scalar",
-            "order": "desc",
-            "limit": 50,
-            "sort": {
-              "count": 500,
-              "order_by": [{ "type": "formula", "index": 0, "order": "desc" }]
-            },
-            "formulas": [
-              { "alias": "Avg Response Time (ms)", "formula": "query1" }
-            ]
-          }
-        ],
-        "has_search_bar": "auto"
-      },
-      "layout": { "x": 0, "y": 15, "width": 6, "height": 4 }
-    },
-    {
-      "id": 9012345678901234,
-      "definition": {
-        "title": "Agent Response Times Over Time",
-        "show_legend": true,
-        "legend_layout": "auto",
-        "legend_columns": ["avg", "min", "max", "value"],
-        "type": "timeseries",
-        "requests": [
-          {
-            "formulas": [{ "formula": "query1" }],
-            "queries": [
-              {
-                "name": "query1",
-                "data_source": "metrics",
-                "query": "avg:xmtp.sdk.agents{metric_type:responseTime,$env,$region,$test} by {agent}"
-              }
-            ],
-            "response_format": "timeseries",
-            "style": {
-              "palette": "dog_classic",
-              "line_type": "solid",
-              "line_width": "normal"
-            },
-            "display_type": "line"
-          }
-        ],
-        "markers": [
-          {
-            "label": "Max Acceptable Response Time (5s)",
-            "value": "y = 5000",
-            "display_type": "warning dashed"
-          },
-          {
-            "label": "Critical Response Time (10s)",
-            "value": "y = 10000",
-            "display_type": "error dashed"
-          }
-        ]
-      },
-      "layout": { "x": 6, "y": 15, "width": 6, "height": 4 }
+      "layout": { "x": 0, "y": 14, "width": 6, "height": 4 }
     }
   ],
   "template_variables": [
