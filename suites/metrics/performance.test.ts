@@ -323,6 +323,7 @@ describe(testName, async () => {
           newGroup,
           workers.getAllButCreator(),
         );
+        console.debug(JSON.stringify(verifyResult, null, 2));
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.allReceived).toBe(true);
       } catch (e) {
