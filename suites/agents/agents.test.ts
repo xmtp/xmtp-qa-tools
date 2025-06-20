@@ -1,4 +1,4 @@
-import { getRandomNames } from "@helpers/client";
+import { getRandomNames, streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
@@ -86,7 +86,7 @@ describe(testName, () => {
           result?.averageEventTiming,
         );
 
-        sendMetric("response", result?.averageEventTiming ?? 0, {
+        sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
           metric_type: "agent",
           metric_subtype: agent.name,
           agent: agent.name,
