@@ -465,7 +465,7 @@ export const sdkVersions = {
     sdkPackage: "node-sdk-209",
     bindingsPackage: "node-bindings-118",
     sdkVersion: "2.0.9",
-    libXmtpVersion: "ef2c57d",
+    libXmtpVersion: "bfadb76",
   },
   210: {
     Client: Client210,
