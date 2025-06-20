@@ -9,7 +9,13 @@ import {
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { typeOfResponse, typeofStream, typeOfSync, WorkerClient } from "./main";
+import {
+  installationThreshold,
+  typeOfResponse,
+  typeofStream,
+  typeOfSync,
+  WorkerClient,
+} from "./main";
 
 export interface WorkerBase {
   name: string;
@@ -149,7 +155,9 @@ export class WorkerManager {
     }
   }
 
-  public async revokeExcessInstallations(threshold: number = 5) {
+  public async revokeExcessInstallations(
+    threshold: number = installationThreshold,
+  ) {
     const workers = this.getAll();
     for (const worker of workers) {
       await worker.worker.revokeExcessInstallations(threshold);
