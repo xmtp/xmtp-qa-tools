@@ -81,7 +81,7 @@ describe(testName, async () => {
       // User1 adds user4 to group
       console.log("Sending welcome message from user1...");
       await user1Group?.send("Additional welcome message from user1 before user4 joins...");
-      await user1Group?.addMembers([workers.get("user4")!.client.inboxId]);
+      await (user1Group as Group).addMembers([workers.get("user4")!.client.inboxId]);
       await new Promise((res) => setTimeout(res, 3000));
 
       console.log("[test] user4 added to group");
