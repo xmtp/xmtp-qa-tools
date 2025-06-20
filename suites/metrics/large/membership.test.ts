@@ -49,7 +49,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`membershipStream-${i}: should add members to ${i}-member group and verify all workers receive membership update notifications within acceptable time`, async () => {
+    it(`receiveMembershipUpdate-${i}: should add members to ${i}-member group and verify all workers receive membership update notifications within acceptable time`, async () => {
       try {
         // Initialize workers
         newGroup = await workers.createGroup();

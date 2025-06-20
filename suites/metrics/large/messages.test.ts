@@ -48,7 +48,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`messageStream-${i}: should deliver messages to all ${i} group members within acceptable time limits and verify stream consistency`, async () => {
+    it(`receiveGroupMessage-${i}: should deliver messages to all ${i} group members within acceptable time limits and verify stream consistency`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(
