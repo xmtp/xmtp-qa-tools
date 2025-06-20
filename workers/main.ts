@@ -18,6 +18,7 @@ export enum typeOfResponse {
   Gpt = "gpt",
   None = "none",
 }
+//lets
 export enum typeOfSync {
   SyncAll = "sync_all",
   Sync = "sync_conversation",
