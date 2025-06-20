@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import winston, { stream } from "winston";
+import winston from "winston";
 import "dotenv/config";
 
 export const KNOWN_ISSUES = [
@@ -48,6 +48,7 @@ export const PATTERNS_TO_TRACK = [
   "group with welcome id",
   // Add more patterns here as needed
 ];
+export const ignoreLinesWithLogs = ["last_stream_id: StreamId(0) }", "Library"];
 
 export const LOG_FILTER_PATTERNS = [
   /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
@@ -296,10 +297,19 @@ export const getTime = () => {
 
 export const filterLogOutput = (data: string): string => {
   let filtered = data;
+
+  // Apply regex pattern filtering
   for (const pattern of LOG_FILTER_PATTERNS) {
     filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
   }
-  return filtered;
+
+  // Filter out lines containing patterns from ignoreLinesWithLogs
+  const lines = filtered.split("\n");
+  const filteredLines = lines.filter((line) => {
+    return !ignoreLinesWithLogs.some((pattern) => line.includes(pattern));
+  });
+
+  return filteredLines.join("\n");
 };
 
 export interface TestLogOptions {
@@ -337,6 +347,13 @@ export function extractErrorLogs(
         if (LOG_LINE_MATCH_PATTERNS.some((pattern) => pattern.test(line))) {
           // Use the comprehensive stripAnsi function instead of simple regex
           let cleanLine = stripAnsi(line);
+
+          // Skip lines that contain patterns from ignoreLinesWithLogs
+          if (
+            ignoreLinesWithLogs.some((pattern) => cleanLine.includes(pattern))
+          ) {
+            continue;
+          }
 
           // Don't split the line if it contains a test file path
           if (cleanLine.includes("test.ts")) {

@@ -18,7 +18,7 @@ export default defineConfig({
   },
   test: {
     globals: true,
-    reporters: isUIMode ? ["basic"] : ["default"],
+    reporters: isUIMode ? [["default", { summary: false }]] : ["default"],
     environment: "node",
     watch: false,
     // Reduce timeouts for UI mode to prevent hanging
@@ -40,8 +40,8 @@ export default defineConfig({
     dangerouslyIgnoreUnhandledErrors: true,
     // UI-specific optimizations
     ...(isUIMode && {
-      // Reduce output verbosity for UI
-      silent: false,
+      // Skip console logs entirely in UI mode to reduce noise
+      onConsoleLog: () => false,
       // Limit concurrent tests
       maxConcurrency: 1,
       // Enable test isolation

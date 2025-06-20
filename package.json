@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.1.37",
+  "version": "0.1.38",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -31,8 +31,8 @@
     "run:forked": "./suites/group/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
-    "start": "vitest --ui --standalone --watch ",
-    "test": "yarn cli test"
+    "test": "yarn cli test",
+    "ui": "vitest --ui --standalone --watch "
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
