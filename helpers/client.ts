@@ -654,14 +654,14 @@ export function getMultiVersion(count: number): string[] {
  * @returns Array of worker descriptors with version suffixes
  */
 export function getWorkersWithVersions(workerNames: string[]): string[] {
-  const testVersions = process.env.TEST_VERSIONS;
+  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
 
   if (!testVersions) {
     // No versions specified, return names as-is (will use latest version)
     return workerNames;
   }
 
-  const availableVersions = testVersions.split(",").map((v) => v.trim());
+  const availableVersions = sdkVersionOptions.reverse().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {

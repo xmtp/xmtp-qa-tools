@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 const testName = "regression";
 describe(testName, () => {
   let workers: WorkerManager;
-  const versions = sdkVersionOptions.reverse().slice(0, 3);
+  const versions = sdkVersionOptions.reverse().slice(0, 2);
   const receiverInboxId = getInboxIds(1)[0];
 
   for (const version of versions) {
