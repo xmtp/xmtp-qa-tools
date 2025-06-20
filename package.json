@@ -23,7 +23,7 @@
     "large": "yarn test suites/large",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500",
-    "monitor:dev": "httpstat https://grpc.dev.xmtp.network:443",
+    "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs dev,production --installations 15,20,25,30 --count 500",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn test suites/functional --versions 208,209,210",
@@ -33,6 +33,7 @@
     "slack-bot": "tsx slack-bot/index.ts",
     "test": "yarn cli test",
     "ui": "vitest --ui --standalone --watch "
+    "start:dev": "yarn ui & yarn slack-bot"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
