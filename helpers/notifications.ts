@@ -286,7 +286,7 @@ class SlackNotifier {
       await sendDatadogLog(Array.from(options.errorLogs), {
         test: options.testName,
         url: this.generateUrl(),
-        errorLogs: Array.from(options.errorLogs).length,
+        count: Array.from(options.errorLogs).length,
         env: this.githubContext.environment,
         region: this.githubContext.region,
         libxmtp: "latest",
