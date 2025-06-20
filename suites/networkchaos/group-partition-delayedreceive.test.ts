@@ -35,9 +35,8 @@ describe(testName, async () => {
 
   it("should verify group messaging with partitioning", async () => {
     try {
-      group = await workers.createGroup("Partitioned Test Group");
+      group = await workers.createGroup("Partition Test Group");
       await group.sync();
-      await workers.checkForks();
 
       console.log("[test] Sending group message before partition");
       const verifyInitial = await verifyMessageStream(group, workers.getAllButCreator());
@@ -69,7 +68,7 @@ describe(testName, async () => {
         console.log("Messages seen by " + name + ":");
         for (const msg of msgs) {
           const ts = new Date(Number(msg.sentAtNs) / 1e6).toISOString();
-          console.log("- [" + ts + "]: " + msg.content);
+          console.log("- [" + ts + "]: " + String(msg.content));
         }
       }
       console.log("=== Done ===");
@@ -85,9 +84,9 @@ describe(testName, async () => {
       const user3SawMid = user3Msgs.some((m) => m.content === midPartitionMsg);
       const user4SawMid = user4Msgs.some((m) => m.content === midPartitionMsg);
 
-      console.log("[verify] user2 should see message: " + user2SawMid);
-      console.log("[verify] user3 should NOT see message: " + user3SawMid);
-      console.log("[verify] user4 should NOT see message: " + user4SawMid);
+      console.log("[verify] user2 should see message: " + String(user2SawMid));
+      console.log("[verify] user3 should NOT see message: " + String(user3SawMid));
+      console.log("[verify] user4 should NOT see message: " + String(user4SawMid));
 
       expect(user2SawMid).toBe(true);
       expect(user3SawMid).toBe(false);

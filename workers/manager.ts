@@ -192,7 +192,11 @@ export class WorkerManager {
   ): Promise<Group> {
     const creator = this.getCreator();
     const memberList = members
-      ? members.map((name) => this.get(name)!.client.inboxId)
+      ? members.map((name) => {
+        const worker = this.get(name);
+        if (!worker) throw new Error(`Worker not registered: ${name}`);
+        return worker.client.inboxId;
+      })
       : this.getAllButCreator().map((worker) => worker.client.inboxId);
 
     const group = await creator.client.conversations.newGroup(memberList, {

@@ -19,9 +19,9 @@ describe(testName, async () => {
 
   const userDescriptors: Record<string, string> = {};
   for (let i = 0; i < 20; i++) {
-    const user = "user" + (i + 1);
+    const user = "user" + (i + 1).toString();
     const port = 5556 + 1000 * Math.floor(Math.random() * 4); // 5556, 6556, 7556, 8556
-    userDescriptors[user] = "http://localhost:" + port;
+    userDescriptors[user] = "http://localhost:" + port.toString();
   }
 
   const workers = await getWorkers(
@@ -47,7 +47,6 @@ describe(testName, async () => {
 
     const allUsers = workers.getAll();
     const otherUsers = workers.getAllButCreator();
-    const rotators = [allUsers[0], allUsers[5], allUsers[10], allUsers[15]];
 
     console.log("[start] Initiating concurrent message traffic");
 
@@ -58,7 +57,7 @@ describe(testName, async () => {
           if (!convo) {
             throw new Error(`[sendLoop] No conversation found for ${sender.name}`);
           }
-          const content = "gm-" + sender.name + "-" + Date.now();
+          const content = "gm-" + sender.name + "-" + Date.now().toString();
           await convo.send(content);
         }
         await new Promise((r) => setTimeout(r, 1000));
@@ -66,22 +65,24 @@ describe(testName, async () => {
     };
 
     const verifyLoop = () => {
-      verifyInterval = setInterval(async () => {
-        try {
-          console.log("[verify] Checking fork and delivery");
-          await workers.checkForks();
-          const res = await verifyMessageStream(group, otherUsers);
-          expect(res.allReceived).toBe(true);
-        } catch (e) {
-          console.warn("[verify] Skipping check due to error:", e);
-        }
+      verifyInterval = setInterval(() => {
+        void (async () => {
+          try {
+            console.log("[verify] Checking fork and delivery");
+            await workers.checkForks();
+            const res = await verifyMessageStream(group, otherUsers);
+            expect(res.allReceived).toBe(true);
+          } catch (e) {
+            console.warn("[verify] Skipping check due to error:", e);
+          }
+        })();
       }, 10 * 1000);
     };
 
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
         console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
-        (async () => {
+        void (async () => {
           try {
             const newMember = workers.getRandomWorker().client.inboxId;
             await group.removeMembers([newMember]);
@@ -111,7 +112,7 @@ describe(testName, async () => {
           }
 
           if (node !== allNodes[0]) {
-            allNodes[0].ping(node);
+            void allNodes[0].ping(node);
           }
         }
       }, 10 * 1000);
@@ -131,7 +132,7 @@ describe(testName, async () => {
       startChaos();
       keyRotationLoop();
       await sendLoop();
-      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000) + "s before final validation");
+      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
     } catch (err) {

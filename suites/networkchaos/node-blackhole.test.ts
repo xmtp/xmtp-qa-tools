@@ -62,7 +62,8 @@ describe(testName, async () => {
         console.log(`Messages seen by ${name}:`);
         for (const msg of msgs) {
           const ts = new Date(Number(msg.sentAtNs) / 1e6).toISOString();
-          console.log(`- [${ts}]: ${msg.content}`);
+          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          console.log(`- [${ts}]: ${safeContent}`);
         }
       }
 

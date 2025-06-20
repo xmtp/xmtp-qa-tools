@@ -1,15 +1,6 @@
 import type { DockerContainer } from "./container";
 import { execSync } from "child_process";
 
-function getGatewayIPFromContainer(container: DockerContainer): string {
-  const route = container.sh(`ip route | grep default`).trim();
-  const match = route.match(/default via ([0-9.]+) dev/);
-  if (!match) {
-    throw new Error(`Unable to parse gateway IP from route output: ${route}`);
-  }
-  return match[1];
-}
-
 export function blockOutboundTraffic(from: DockerContainer, to: DockerContainer): void {
   console.log(`[iptables] Blocking traffic from ${from.name} to ${to.name}`);
   execSync(`sudo nsenter -t ${from.pid} -n iptables -A OUTPUT -d ${to.ip} -j DROP`);

@@ -27,7 +27,6 @@ describe(testName, async () => {
 
   setupTestLifecycle({ testName, expect });
 
-  const partitionNode = new DockerContainer("multinode-node2-1");
   const partitionPort = 6556;
 
   let group: Group;

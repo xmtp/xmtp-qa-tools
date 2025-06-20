@@ -46,9 +46,9 @@ describe(testName, async () => {
         const client = workers.get(name)?.client;
         const convo = client && (await client.conversations.getConversationById(group.id));
         if (!convo) { 
-          if (name === "user4") { // check if env dirty
-            expect(convo).toBeFalsy();
-            console.log("  [user4] No conversation found - expected.");
+        if (name === "user4") { // check if env dirty
+          expect(convo).toBeFalsy();
+          console.log("  [user4] No conversation found - expected.");
           } else {
             throw new Error(`[${name}] convo unexpectedly undefined`);
           }
@@ -59,11 +59,12 @@ describe(testName, async () => {
         console.log("  [" + name + "] Received " + messages.length + " messages:");
         for (const msg of messages) {
           const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          const content = msg.content || "(empty)";
-          console.log("    [" + timestamp + "] " + content);
+          console.log("    [" + timestamp + "] " + String(msg.content));
         }
       }
 
+
+      // Isolate node3 from replication cluster (user3)
       const node1 = new DockerContainer("multinode-node1-1");
       const node2 = new DockerContainer("multinode-node2-1");
       const node3 = new DockerContainer("multinode-node3-1");
@@ -77,9 +78,10 @@ describe(testName, async () => {
       await new Promise((res) => setTimeout(res, 5000));
       console.log("[test] Isolated node3 (user3) from cluster");
 
+      // User1 adds user4 to group
       console.log("Sending welcome message from user1...");
       await user1Group?.send("Additional welcome message from user1 before user4 joins...");
-      await (user1Group as Group).addMembers([workers.get("user4")!.client.inboxId]);
+      await user1Group?.addMembers([workers.get("user4")!.client.inboxId]);
       await new Promise((res) => setTimeout(res, 3000));
 
       console.log("[test] user4 added to group");
@@ -98,8 +100,7 @@ describe(testName, async () => {
         console.log("  [" + name + "] Received " + messages.length + " messages:");
         for (const msg of messages) {
           const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          const content = msg.content || "(empty)";
-          console.log("    [" + timestamp + "] " + content);
+          console.log("    [" + timestamp + "] " + String(msg.content));
         }
       }
 
@@ -123,7 +124,9 @@ describe(testName, async () => {
       await user3Group?.sync();
       const membersAfterRecovery = await user3Group?.members();
       console.log("[test] user3 sees group members after partition recovery:");
-      membersAfterRecovery?.forEach((m) => console.log("  " + m.inboxId));
+      membersAfterRecovery?.forEach((m) => {
+        console.log("  " + m.inboxId);
+      });
 
       const user4Id = workers.get("user4")!.client.inboxId;
       const recoveryMsg = "User4 says hello - user3 should see me too!";
@@ -148,7 +151,7 @@ describe(testName, async () => {
           console.log("[test] user3 received recovery message");
         }
 
-        console.log("[test] retrying group sync check (" + (attempts + 1) + "/5)");
+        console.log("[test] retrying group sync check (" + String(attempts + 1) + "/5)");
         await new Promise((r) => setTimeout(r, 1000));
       }
 

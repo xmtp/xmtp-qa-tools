@@ -7,7 +7,7 @@ import { type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "dm-duplicate-prevention";
+const testName = "dm-duplicate-chaos";
 loadEnv(testName);
 
 describe(testName, async () => {
@@ -32,7 +32,7 @@ describe(testName, async () => {
         .get("henry")!
         .client.conversations.newDm(workers.get("randomguy")!.client.inboxId)) as Dm;
 
-      const messageContent = "dedupe-chaos-" + Date.now();
+      const messageContent = "dedupe-chaos-" + String(Date.now());
 
       // Force SDK into retry state by blocking host -> container
       console.log("[test] Blocking host -> container before send to force retry...");
@@ -45,7 +45,7 @@ describe(testName, async () => {
       try {
         node2.addJitter(delay, jitter);
         node2.addLoss(loss);
-      } catch (err) {
+      } catch (err: unknown) {
         console.warn("[test] Failed applying netem:", err);
       }
 
@@ -58,8 +58,12 @@ describe(testName, async () => {
       node2.unblockFromHost();
 
       // Allow time for retry to succeed under chaos
-      await sendPromise.catch((err) => {
-        console.warn("[warn] send() threw error (may still retry):", err.message || err);
+      await sendPromise.catch((err: unknown) => {
+        if (err instanceof Error) {
+          console.warn("[warn] send() threw error (may still retry):", err.message || err);
+        } else {
+          console.warn("[warn] send() threw unknown error:", err);
+        }
       });
 
       const duration = Date.now() - start;
@@ -81,7 +85,7 @@ describe(testName, async () => {
 
       for (const m of matching) {
         const ts = new Date(Number(m.sentAtNs) / 1e6).toISOString();
-        console.log("[recv] [" + ts + "]: " + m.content);
+        console.log("[recv] [" + ts + "]: " + String(m.content));
       }
 
       expect(matching.length).toBe(1); // Validate deduplication held

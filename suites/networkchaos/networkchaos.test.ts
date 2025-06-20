@@ -62,15 +62,17 @@ describe(testName, async () => {
     };
 
     const verifyLoop = () => {
-      verifyInterval = setInterval(async () => {
-        try {
-          console.log("[verify] Checking fork and delivery under chaos");
+      verifyInterval = setInterval(() => {
+        void (async () => {
+          try {
+            console.log("[verify] Checking fork and delivery under chaos");
           await workers.checkForks();
-          const res = await verifyMessageStream(group, otherUsers);
-          expect(res.allReceived).toBe(true);
-        } catch (e) {
-          console.warn("[verify] Skipping check due to exception:", e);
-        }
+            const res = await verifyMessageStream(group, otherUsers);
+            expect(res.allReceived).toBe(true);
+          } catch (e) {
+            console.warn("[verify] Skipping check due to exception:", e);
+          }
+        })();
       }, 10 * 1000);
     };
 
