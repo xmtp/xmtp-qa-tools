@@ -9,6 +9,17 @@ import { DockerContainer } from "../../network-stability-utilities/container";
 const testName = "keyrotation-chaos";
 loadEnv(testName);
 
+function scheduleAsyncTask(
+  task: () => Promise<void>,
+  intervalMs: number
+): NodeJS.Timeout {
+  return setInterval(() => {
+    task().catch(err => {
+      console.error(`[scheduled task] error in ${task.name}:`, err);
+    });
+  }, intervalMs);
+}
+
 describe(testName, async () => {
   const allNodes = [
     new DockerContainer("multinode-node1-1"),
@@ -50,42 +61,35 @@ describe(testName, async () => {
 
     console.log("[start] Initiating concurrent message traffic");
 
-    const sendLoop = async () => {
+    async function sendLoop() {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
           const convo = await sender.client.conversations.getConversationById(group.id);
-          if (!convo) throw new Error(`[sendLoop] No convo for ${sender.name}`);
+          if (!convo) {
+            throw new Error(`[sendLoop] No convo for ${sender.name}`);
+          }
           await convo.send(`gm-${sender.name}-${Date.now()}`);
         }
         await new Promise((r) => setTimeout(r, 1000));
       }
-    };
+    }
 
     async function doVerify() {
-      try {
-        console.log("[verify] Checking fork and delivery");
-        await workers.checkForks();
-        const res = await verifyMessageStream(group, otherUsers);
-        expect(res.allReceived).toBe(true);
-      } catch (e) {
-        console.warn("[verify] Skipping check due to error:", e);
-      }
+      console.log("[verify] Checking fork and delivery");
+      await workers.checkForks();
+      const res = await verifyMessageStream(group, otherUsers);
+      expect(res.allReceived).toBe(true);
     }
 
     async function doKeyRotation() {
       console.log("[key-rotation] Rotating group key");
-      try {
-        const newMember = workers.getRandomWorker().client.inboxId;
-        await group.removeMembers([newMember]);
-        await group.addMembers([newMember]);
-        const info = await group.debugInfo();
-        console.log("[key-rotation] After rotation, epoch =", info.epoch);
-      } catch (err) {
-        console.error("[key-rotation] error:", err);
-      }
+      const newMember = workers.getRandomWorker().client.inboxId;
+      await group.removeMembers([newMember]);
+      await group.addMembers([newMember]);
+      const info = await group.debugInfo();
+      console.log("[key-rotation] After rotation, epoch =", info.epoch);
     }
 
-    // 4) Extracted async helper for chaos injection
     async function doChaos() {
       console.log("[chaos] Applying network chaos");
       for (const node of allNodes) {
@@ -105,47 +109,24 @@ describe(testName, async () => {
       }
     }
 
-    // 5) Loops using only void helper() calls in plain callbacks
-    const verifyLoop = () => {
-      verifyInterval = setInterval(() => {
-        void doVerify();
-      }, 10 * 1000);
-    };
-
-    const keyRotationLoop = () => {
-      rotationInterval = setInterval(() => {
-        void doKeyRotation();
-      }, 10 * 1000);
-    };
-
-    const startChaos = () => {
-      chaosInterval = setInterval(() => {
-        void doChaos();
-      }, 10 * 1000);
-    };
-
-    const clearChaos = () => {
-      clearInterval(chaosInterval);
-      clearInterval(verifyInterval);
-      clearInterval(rotationInterval);
-      for (const node of allNodes) {
-        node.clearLatency();
-      }
-    };
+    verifyInterval = scheduleAsyncTask(doVerify, 10_000);
+    rotationInterval = scheduleAsyncTask(doKeyRotation, 10_000);
+    chaosInterval = scheduleAsyncTask(doChaos, 10_000);
 
     try {
-      verifyLoop();
-      keyRotationLoop();
-      startChaos();
-
+      // 6) Run sendLoop (awaited)
       await sendLoop();
 
       console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
-      clearChaos();
+      clearInterval(verifyInterval);
+      clearInterval(rotationInterval);
+      clearInterval(chaosInterval);
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
     } catch (err) {
       console.error("[test] Error during chaos test:", err);
-      clearChaos();
+      clearInterval(verifyInterval);
+      clearInterval(rotationInterval);
+      clearInterval(chaosInterval);
       throw err;
     }
 
