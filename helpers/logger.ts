@@ -2,7 +2,6 @@ import fs from "fs";
 import path from "path";
 import winston from "winston";
 import "dotenv/config";
-import { m_large_BATCH_SIZE } from "suites/large/helpers";
 
 // Known test issues for tracking
 export const KNOWN_ISSUES = [
