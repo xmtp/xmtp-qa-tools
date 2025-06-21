@@ -31,25 +31,6 @@ describe(testName, () => {
     expect,
   });
 
-  // Status monitoring for all groups
-  const statusCheck = async () => {
-    const statusPromises = groups.map(async (group, index) => {
-      await group.sync();
-      const members = await group.members();
-      const epoch = await group.debugInfo();
-      let totalGroupInstallations = 0;
-      for (const member of members) {
-        totalGroupInstallations += member.installationIds.length;
-      }
-      console.log(
-        `Group ${index + 1} - Members: ${members.length} - Epoch: ${epoch.epoch} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
-      );
-      return { groupIndex: index, epoch: epoch.epoch };
-    });
-
-    return Promise.all(statusPromises);
-  };
-
   // Create operation factories
   const createOperations = (
     worker: Worker,
@@ -67,7 +48,10 @@ describe(testName, () => {
           g.updateName(`${testConfig.groupName} - ${worker.name} Update`),
         ),
       createInstallation: () =>
-        getGroup().then((g) => worker.worker.addNewInstallation()),
+        getGroup().then((g) => {
+          console.log(`Creating installation for ${g.id}`);
+          return worker.worker.addNewInstallation();
+        }),
       addMember: () =>
         getGroup().then((g) =>
           g.addMembers([
