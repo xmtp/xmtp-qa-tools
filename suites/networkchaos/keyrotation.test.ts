@@ -65,22 +65,24 @@ describe(testName, async () => {
     };
 
     const verifyLoop = () => {
-      verifyInterval = setInterval(async () => {
-        try {
-          console.log("[verify] Checking fork and delivery");
-          await workers.checkForks();
-          const res = await verifyMessageStream(group, otherUsers);
-          expect(res.allReceived).toBe(true);
-        } catch (e) {
-          console.warn("[verify] Skipping check due to error:", e);
-        }
+      verifyInterval = setInterval(() => {
+        void (async () => {
+          try {
+            console.log("[verify] Checking fork and delivery");
+            await workers.checkForks();
+            const res = await verifyMessageStream(group, otherUsers);
+            expect(res.allReceived).toBe(true);
+          } catch (e) {
+            console.warn("[verify] Skipping check due to error:", e);
+          }
+        })();
       }, 10 * 1000);
     };
 
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
         console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
-        (async () => {
+        void (async () => {
           try {
             const newMember = workers.getRandomWorker().client.inboxId;
             await group.removeMembers([newMember]);
@@ -91,16 +93,16 @@ describe(testName, async () => {
             console.error("[key-rotation] error", err);
           }
         })();
-      }, 10000);
+      }, 10 * 1000);
     };
 
     const startChaos = () => {
       chaosInterval = setInterval(() => {
         console.log("[chaos] Injecting latency/jitter/loss...");
         for (const node of allNodes) {
-          const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
-          const jitter = 50 + Math.floor(Math.random() * 150);   // 50–200ms
-          const loss = 2 + Math.random() * 8;                    // 2–10% PL
+          const delay = 300 + Math.floor(Math.random() * 400);
+          const jitter = 50 + Math.floor(Math.random() * 150);
+          const loss = 2 + Math.random() * 8;
 
           try {
             node.addJitter(delay, jitter);
@@ -130,6 +132,7 @@ describe(testName, async () => {
       startChaos();
       keyRotationLoop();
       await sendLoop();
+
       console.log(
         `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`
       );
