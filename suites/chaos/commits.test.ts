@@ -1,6 +1,5 @@
 import { getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
