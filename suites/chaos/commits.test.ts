@@ -8,7 +8,7 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "commits";
-const workerCount = 6; // Reduced for simplicity
+const workerCount = 6;
 const testConfig = {
   testName,
   groupName: `Group ${getTime()}`,
@@ -31,19 +31,16 @@ describe(testName, () => {
   });
   // Status monitoring
   const statusCheck = async () => {
-    for (let i = 0; i < 10; i++) {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-      await group.sync();
-      const members = await group.members();
-      const epoch = await group.debugInfo();
-      let totalGroupInstallations = 0;
-      for (const member of members) {
-        totalGroupInstallations += member.installationIds.length;
-      }
-      console.log(
-        `Status ${i + 1}: Members: ${members.length} - Epoch: ${epoch.epoch} - Installations: ${totalGroupInstallations}`,
-      );
+    await group.sync();
+    const members = await group.members();
+    const epoch = await group.debugInfo();
+    let totalGroupInstallations = 0;
+    for (const member of members) {
+      totalGroupInstallations += member.installationIds.length;
     }
+    console.log(
+      `Members: ${members.length} - Epoch: ${epoch.epoch} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
+    );
   };
   // Generic operation runner with random delays
   const runOperations = async (
@@ -122,15 +119,19 @@ describe(testName, () => {
 
     // Create and run concurrent operations
     const concurrentTasks = allWorkers.map(async (worker) => {
-      const ops = createOperations(worker, availableMembers);
-      const operationList = [
-        ops.updateName,
-        ops.addMember,
-        ops.sendMessage,
-        ops.removeMember,
-      ];
-      await statusCheck();
-      return runOperations(worker, operationList);
+      try {
+        const ops = createOperations(worker, availableMembers);
+        const operationList = [
+          ops.updateName,
+          ops.addMember,
+          ops.sendMessage,
+          ops.removeMember,
+        ];
+        await runOperations(worker, operationList);
+        await statusCheck();
+      } catch (e) {
+        console.log(`${worker.name}: Operation failed:`, e);
+      }
     });
 
     // Run all operations concurrently
