@@ -129,6 +129,7 @@ export async function processLogFile(
 export async function cleanAllRawLogs(
   deleteOriginals: boolean = false,
 ): Promise<void> {
+  return false;
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
