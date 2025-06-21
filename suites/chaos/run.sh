@@ -3,11 +3,9 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-rm -rf logs
-
 while true; do
     echo "Starting test cycle at $(date)"
-    for i in {1..100}; do
+    for i in {1..10}; do
         echo "Running test iteration $i of 100"
         yarn test suites/chaos/commits.test.ts --debug-verbose
         
@@ -17,6 +15,6 @@ while true; do
             exit 0
         fi
     done
-    echo "Waiting 30 minutes before next cycle..."
-    sleep 1800
+    echo "Waiting 1 minutes before next cycle..."
+    sleep 60
 done
