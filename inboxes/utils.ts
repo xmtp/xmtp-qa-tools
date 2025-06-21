@@ -72,8 +72,11 @@ export function getRandomInboxIdsWithRandomInstallations(count: number) {
   }
   return totalInboxes.map((inbox) => inbox.inboxId);
 }
-export function getRandomInboxIds(count: number) {
-  const pool = getInboxByInstallationCount(2).slice(0, 200);
+export function getRandomInboxIds(
+  count: number,
+  installationCount: number = 2,
+) {
+  const pool = getInboxByInstallationCount(installationCount).slice(0, 200);
   return pool
     .sort(() => Math.random() - 0.5)
     .slice(0, count)

@@ -487,10 +487,10 @@ export class WorkerClient extends Worker {
                 );
               }
             } else {
-              // Log non-text messages for debugging
-              console.debug(
-                `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
-              );
+              // // Log non-text messages for debugging
+              // console.debug(
+              //   `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
+              // );
             }
           }
         } catch (error) {

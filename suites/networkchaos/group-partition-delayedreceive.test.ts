@@ -4,9 +4,9 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
-import type { Group } from "@xmtp/node-sdk";
 
 const testName = "group-partition-delayedreceive";
 loadEnv(testName);
@@ -21,7 +21,7 @@ describe(testName, async () => {
     },
     testName,
     typeofStream.Message,
-    typeOfResponse.Gm
+    typeOfResponse.Gm,
   );
 
   setupTestLifecycle({ testName, expect });
@@ -39,7 +39,10 @@ describe(testName, async () => {
       await group.sync();
 
       console.log("[test] Sending group message before partition");
-      const verifyInitial = await verifyMessageStream(group, workers.getAllButCreator());
+      const verifyInitial = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+      );
       expect(verifyInitial.receiverCount).toBe(3);
       expect(verifyInitial.allReceived).toBe(true);
 
@@ -55,27 +58,40 @@ describe(testName, async () => {
       await new Promise((r) => setTimeout(r, 2000));
 
       const midPartitionMsg = "group-msg-during-partition";
-      console.log("[test] Sending message during partition: " + midPartitionMsg);
+      console.log(
+        "[test] Sending message during partition: " + midPartitionMsg,
+      );
 
-      const user2Group = await workers.get("user2")!.client.conversations.getConversationById(group.id);
+      const user2Group = await workers
+        .get("user2")!
+        .client.conversations.getConversationById(group.id);
       await user2Group!.send(midPartitionMsg);
       await workers.checkForks();
 
       console.log("=== Message Dump After Partition ===");
       for (const name of ["user1", "user2", "user3", "user4"]) {
-        const g = await workers.get(name)!.client.conversations.getConversationById(group.id);
+        const g = await workers
+          .get(name)!
+          .client.conversations.getConversationById(group.id);
         const msgs = await g!.messages();
         console.log("Messages seen by " + name + ":");
         for (const msg of msgs) {
           const ts = new Date(Number(msg.sentAtNs) / 1e6).toISOString();
-          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          const safeContent =
+            typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg.content);
           console.log("- [" + ts + "]: " + safeContent);
         }
       }
       console.log("=== Done ===");
 
-      const user3Group = await workers.get("user3")!.client.conversations.getConversationById(group.id);
-      const user4Group = await workers.get("user4")!.client.conversations.getConversationById(group.id);
+      const user3Group = await workers
+        .get("user3")!
+        .client.conversations.getConversationById(group.id);
+      const user4Group = await workers
+        .get("user4")!
+        .client.conversations.getConversationById(group.id);
 
       const user2Msgs = await user2Group!.messages();
       const user3Msgs = await user3Group!.messages();
@@ -86,8 +102,12 @@ describe(testName, async () => {
       const user4SawMid = user4Msgs.some((m) => m.content === midPartitionMsg);
 
       console.log("[verify] user2 should see message: " + String(user2SawMid));
-      console.log("[verify] user3 should NOT see message: " + String(user3SawMid));
-      console.log("[verify] user4 should NOT see message: " + String(user4SawMid));
+      console.log(
+        "[verify] user3 should NOT see message: " + String(user3SawMid),
+      );
+      console.log(
+        "[verify] user4 should NOT see message: " + String(user4SawMid),
+      );
 
       expect(user2SawMid).toBe(true);
       expect(user3SawMid).toBe(false);
@@ -106,16 +126,21 @@ describe(testName, async () => {
 
       const postRecoveryMsgs = await Promise.all(
         ["user3", "user4"].map(async (name) => {
-          const g = await workers.get(name)!.client.conversations.getConversationById(group.id);
+          const g = await workers
+            .get(name)!
+            .client.conversations.getConversationById(group.id);
           const msgs = await g!.messages();
           return msgs.some((m) => m.content === midPartitionMsg);
-        })
+        }),
       );
 
       expect(postRecoveryMsgs.every(Boolean)).toBe(true);
 
       console.log("[test] Verifying group message after recovery");
-      const verifyFinal = await verifyMessageStream(group, workers.getAllButCreator());
+      const verifyFinal = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+      );
       expect(verifyFinal.receiverCount).toBe(3);
       expect(verifyFinal.allReceived).toBe(true);
       await workers.checkForks();

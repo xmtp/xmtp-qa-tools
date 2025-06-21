@@ -1,6 +1,6 @@
-import { execSync, execFileSync } from "child_process";
-import * as netem from "./netem";
+import { execFileSync, execSync } from "child_process";
 import * as iptables from "./iptables";
+import * as netem from "./netem";
 
 export class DockerContainer {
   name: string;
@@ -42,7 +42,7 @@ export class DockerContainer {
         throw new Error(
           `Could not find host veth interface for ifindex ${ifIndex}`,
         );
-      
+
       const iface = vethLine.split(":")[1].trim().split("@")[0];
       return iface;
     } catch (err) {
