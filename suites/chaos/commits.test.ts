@@ -1,5 +1,6 @@
 import { getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -13,8 +14,8 @@ const testConfig = {
   groupName: `Group ${getTime()}`,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIds(40),
-  typeofStream: typeofStream.None,
-  typeOfResponse: typeOfResponse.None,
+  typeofStream: typeofStream.Message,
+  typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(5),
 } as const;
@@ -79,6 +80,7 @@ describe(testName, () => {
             console.error(`Error in member operation ${i + 1}:`, e);
           }
         }
+        await verifyMessageStream(group, workers.getAllButCreator());
 
         // Sync the group after each operation
         await group.sync();
