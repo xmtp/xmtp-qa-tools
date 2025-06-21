@@ -28,7 +28,7 @@
     "record": "npx playwright codegen 'https://xmtp.chat/'",
     "regression": "yarn test suites/functional --versions 3",
     "run:agent": "./suites/agents/run.sh",
-    "run:forked": "./suites/group/run.sh",
+    "run:chaos": "./suites/chaos/run.sh",
     "script": "yarn cli script",
     "slack-bot": "tsx slack-bot/index.ts",
     "start:dev": "yarn ui & yarn slack-bot",

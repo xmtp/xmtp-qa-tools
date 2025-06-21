@@ -381,7 +381,7 @@ async function runVitestTest(
 
         // Clean up raw log files when debug mode is enabled
         if (options.explicitLogFlag) {
-          await cleanAllRawLogs(true);
+          await cleanAllRawLogs(false);
         }
 
         return; // Exit the function on success
@@ -409,7 +409,7 @@ async function runVitestTest(
 
         // Clean up raw log files when debug mode is enabled
         if (options.explicitLogFlag) {
-          await cleanAllRawLogs(true);
+          await cleanAllRawLogs(false);
         }
 
         if (options.noFail) {
