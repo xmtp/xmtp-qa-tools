@@ -13,7 +13,7 @@ const testConfig = {
   testName,
   groupName: `Group ${getTime()}`,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
-  randomInboxIds: getRandomInboxIds(workerCount * 5, 3),
+  randomInboxIds: getRandomInboxIds(workerCount * 5, 5),
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
@@ -41,20 +41,6 @@ describe(testName, () => {
     console.log(
       `Members: ${members.length} - Epoch: ${epoch.epoch} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
     );
-  };
-  // Generic operation runner with random delays
-  const runOperations = async (
-    worker: Worker,
-    operations: (() => Promise<void>)[],
-  ) => {
-    for (const operation of operations) {
-      await new Promise((resolve) => setTimeout(resolve, Math.random() * 500));
-      try {
-        await operation();
-      } catch (e) {
-        console.log(`${worker.name}: Operation failed:`, e);
-      }
-    }
   };
 
   // Create operation factories
@@ -117,24 +103,63 @@ describe(testName, () => {
     const allWorkers = workers.getAll();
     const availableMembers = testConfig.randomInboxIds;
 
-    // Create and run concurrent operations
-    const concurrentTasks = allWorkers.map(async (worker) => {
-      try {
-        const ops = createOperations(worker, availableMembers);
-        const operationList = [
-          ops.updateName,
-          ops.addMember,
-          ops.sendMessage,
-          ops.removeMember,
-        ];
-        await runOperations(worker, operationList);
-        await statusCheck();
-      } catch (e) {
-        console.log(`${worker.name}: Operation failed:`, e);
-      }
-    });
+    let currentEpoch = 0n;
+    let operationCount = 0;
+    const TARGET_EPOCH = 100n;
 
-    // Run all operations concurrently
-    await Promise.all([...concurrentTasks]);
+    // Keep running operations until we reach epoch 100+
+    while (currentEpoch < TARGET_EPOCH) {
+      // Create batch of 20 parallel operations
+      const batchSize = 20;
+      const parallelOperations = Array.from({ length: batchSize }, (_, i) =>
+        (async () => {
+          // Select random worker
+          const randomWorker =
+            allWorkers[Math.floor(Math.random() * allWorkers.length)];
+
+          // Create operations for the selected worker
+          const ops = createOperations(randomWorker, availableMembers);
+          const operationList = [
+            ops.updateName,
+            ops.addMember,
+            ops.sendMessage,
+            ops.removeMember,
+          ];
+
+          // Select random operation
+          const randomOperation =
+            operationList[Math.floor(Math.random() * operationList.length)];
+
+          try {
+            await randomOperation();
+            console.log(
+              `Operation ${operationCount + i + 1}: ${randomWorker.name} completed operation`,
+            );
+          } catch (e) {
+            console.log(
+              `Operation ${operationCount + i + 1}: ${randomWorker.name} failed:`,
+              e,
+            );
+          }
+        })(),
+      );
+
+      // Run batch of operations in parallel
+      await Promise.all(parallelOperations);
+      operationCount += batchSize;
+
+      // Check current epoch after batch
+      await statusCheck();
+      const epoch = await group.debugInfo();
+      currentEpoch = epoch.epoch;
+
+      console.log(
+        `Completed ${operationCount} operations. Current epoch: ${currentEpoch}/${TARGET_EPOCH}`,
+      );
+    }
+
+    console.log(
+      `Target reached! Final epoch: ${currentEpoch} after ${operationCount} operations`,
+    );
   });
 });
