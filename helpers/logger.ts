@@ -118,14 +118,92 @@ export async function processLogFile(
   inputPath: string,
   outputPath: string,
 ): Promise<void> {
-  const content = await fs.promises.readFile(inputPath, "utf-8");
-  const cleanedContent = stripAnsi(content);
-  await fs.promises.writeFile(outputPath, cleanedContent, "utf-8");
+  return new Promise((resolve, reject) => {
+    const readStream = fs.createReadStream(inputPath, {
+      encoding: "utf8",
+      highWaterMark: 64 * 1024,
+    });
+    const writeStream = fs.createWriteStream(outputPath, { encoding: "utf8" });
+
+    readStream.on("data", (chunk: string | Buffer) => {
+      const chunkStr =
+        typeof chunk === "string" ? chunk : chunk.toString("utf8");
+      const cleanedChunk = stripAnsi(chunkStr);
+      writeStream.write(cleanedChunk);
+    });
+
+    readStream.on("end", () => {
+      writeStream.end();
+    });
+
+    writeStream.on("finish", () => {
+      resolve();
+    });
+
+    readStream.on("error", (error) => {
+      writeStream.destroy();
+      reject(error);
+    });
+
+    writeStream.on("error", (error) => {
+      readStream.destroy();
+      reject(error);
+    });
+  });
 }
 
 /**
  * Clean all raw-*.log files by removing ANSI codes
  */
+/**
+ * Check if a large file contains a target string using streaming
+ */
+async function fileContainsString(
+  filePath: string,
+  targetString: string,
+): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(filePath, {
+      encoding: "utf8",
+      highWaterMark: 64 * 1024,
+    }); // 64KB chunks
+    let buffer = "";
+    let found = false;
+
+    stream.on("data", (chunk: string | Buffer) => {
+      const chunkStr =
+        typeof chunk === "string" ? chunk : chunk.toString("utf8");
+      buffer += chunkStr;
+
+      // Check if we found the target string
+      if (buffer.includes(targetString)) {
+        found = true;
+        stream.destroy(); // Stop reading
+        return;
+      }
+
+      // Keep only the last part of buffer to handle strings that span chunks
+      // Keep twice the target string length to be safe
+      const keepLength = targetString.length * 2;
+      if (buffer.length > keepLength) {
+        buffer = buffer.slice(-keepLength);
+      }
+    });
+
+    stream.on("end", () => {
+      resolve(found);
+    });
+
+    stream.on("error", (error) => {
+      reject(error);
+    });
+
+    stream.on("close", () => {
+      resolve(found);
+    });
+  });
+}
+
 export async function cleanAllRawLogs(): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
@@ -156,9 +234,13 @@ export async function cleanAllRawLogs(): Promise<void> {
     const inputPath = path.join(logsDir, file);
 
     try {
-      // Check if file contains "your group may be forked"
-      const content = await fs.promises.readFile(inputPath, "utf-8");
-      if (!content.includes("your group may be forked")) {
+      // Check if file contains "your group may be forked" using streaming
+      const containsTargetString = await fileContainsString(
+        inputPath,
+        "your group may be forked",
+      );
+
+      if (!containsTargetString) {
         console.log(
           `Skipping ${file} - does not contain "your group may be forked"`,
         );
