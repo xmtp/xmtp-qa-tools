@@ -1,5 +1,6 @@
 import { getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -12,11 +13,11 @@ const testConfig = {
   testName: testName,
   groupName: `Group ${getTime()}`,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
-  randomInboxIds: getRandomInboxIds(2), //TODO: change to 60
-  typeofStream: typeofStream.None,
-  typeOfResponse: typeOfResponse.None,
+  randomInboxIds: getRandomInboxIds(40),
+  typeofStream: typeofStream.Message,
+  typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
-  workerNames: getFixedNames(40),
+  workerNames: getFixedNames(5),
 } as const;
 
 describe(testName, () => {
@@ -32,13 +33,13 @@ describe(testName, () => {
   beforeAll(async () => {
     // Initialize workers
     workers = await getWorkers(
-      ["bot", ...testConfig.workerNames],
+      testConfig.workerNames,
       testConfig.testName,
       testConfig.typeofStream,
       testConfig.typeOfResponse,
       testConfig.typeOfSync,
     );
-    creator = workers.get("bot") as Worker;
+    creator = workers.getCreator();
 
     // Create a single group for testing
     group = (await creator.client.conversations.newGroup(
@@ -50,10 +51,7 @@ describe(testName, () => {
     // Add manual users and worker members
     await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
     await group.addMembers(
-      workers
-        .getAllBut("bot")
-        .slice(0, 5)
-        .map((w) => w.client.inboxId),
+      workers.getAllButCreator().map((w) => w.client.inboxId),
     );
   });
 
@@ -85,8 +83,9 @@ describe(testName, () => {
 
         // Sync the group after each operation
         await group.sync();
+        const members = await group.members();
         const epoch = await group.debugInfo();
-        console.log(`Epoch: ${epoch.epoch}`);
+        console.log(`Members: ${members.length} - Epoch: ${epoch.epoch}`);
         await workers.checkForks();
       }
 

@@ -546,9 +546,9 @@ export class WorkerClient extends Worker {
         shouldRespond = true;
       }
       if (!shouldRespond) {
-        console.warn(
-          `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
-        );
+        // console.warn(
+        //   `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
+        // );
         return;
       }
       let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
