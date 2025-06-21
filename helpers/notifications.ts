@@ -187,7 +187,7 @@ class SlackNotifier {
 
   private generateCustomLinks(testName: string): string {
     if (testName.toLowerCase().includes("agents")) {
-      return "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/at_agents/production.json|View file>";
+      return "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/inboxes/agents.json|View file>";
     }
     return "";
   }
