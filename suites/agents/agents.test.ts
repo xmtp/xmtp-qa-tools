@@ -36,7 +36,7 @@ describe(testName, () => {
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} : ${agent.address}`, async () => {
       try {
-        let retries = 3; // Move retries inside each test for fresh count
+        let retries = 1; // Move retries inside each test for fresh count
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
         const conversation = await workers
