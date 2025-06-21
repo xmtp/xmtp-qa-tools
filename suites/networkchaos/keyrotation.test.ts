@@ -54,73 +54,65 @@ describe(testName, async () => {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
           const convo = await sender.client.conversations.getConversationById(group.id);
-          if (!convo) throw new Error(`[sendLoop] No convo for ${sender.name}`);
-          await convo.send(`gm-${sender.name}-${Date.now()}`);
+          if (!convo) {
+            throw new Error(`[sendLoop] No conversation found for ${sender.name}`);
+          }
+          const content = "gm-" + sender.name + "-" + Date.now();
+          await convo.send(content);
         }
         await new Promise((r) => setTimeout(r, 1000));
       }
     };
 
-    async function doVerify() {
-      try {
-        console.log("[verify] Checking fork and delivery");
-        await workers.checkForks();
-        const res = await verifyMessageStream(group, otherUsers);
-        expect(res.allReceived).toBe(true);
-      } catch (e) {
-        console.warn("[verify] Skipping check due to error:", e);
-      }
-    }
-
-    async function doKeyRotation() {
-      console.log("[key-rotation] Rotating group key");
-      try {
-        const newMember = workers.getRandomWorker().client.inboxId;
-        await group.removeMembers([newMember]);
-        await group.addMembers([newMember]);
-        const info = await group.debugInfo();
-        console.log("[key-rotation] After rotation, epoch =", info.epoch);
-      } catch (err) {
-        console.error("[key-rotation] error:", err);
-      }
-    }
-
-    // 4) Extracted async helper for chaos injection
-    async function doChaos() {
-      console.log("[chaos] Applying network chaos");
-      for (const node of allNodes) {
-        const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
-        const jitter = 50 + Math.floor(Math.random() * 150);   // 50–200ms
-        const loss = 2 + Math.random() * 8;                    // 2–10% PL
-
-        try {
-          node.addJitter(delay, jitter);
-          if (Math.random() < 0.5) node.addLoss(loss);
-        } catch (err) {
-          console.warn("[chaos] Error applying netem on " + node.name + ":", err);
-        }
-        if (node !== allNodes[0]) {
-          await allNodes[0].ping(node);
-        }
-      }
-    }
-
-    // 5) Loops using only void helper() calls in plain callbacks
     const verifyLoop = () => {
-      verifyInterval = setInterval(() => {
-        void doVerify();
+      verifyInterval = setInterval(async () => {
+        try {
+          console.log("[verify] Checking fork and delivery");
+          await workers.checkForks();
+          const res = await verifyMessageStream(group, otherUsers);
+          expect(res.allReceived).toBe(true);
+        } catch (e) {
+          console.warn("[verify] Skipping check due to error:", e);
+        }
       }, 10 * 1000);
     };
 
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
-        void doKeyRotation();
-      }, 10 * 1000);
+        console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
+        (async () => {
+          try {
+            const newMember = workers.getRandomWorker().client.inboxId;
+            await group.removeMembers([newMember]);
+            await group.addMembers([newMember]);
+            const info = await group.debugInfo();
+            console.log("[key-rotation] After rotation, epoch =", info.epoch);
+          } catch (err) {
+            console.error("[key-rotation] error", err);
+          }
+        })();
+      }, 10000);
     };
 
     const startChaos = () => {
       chaosInterval = setInterval(() => {
-        void doChaos();
+        console.log("[chaos] Injecting latency/jitter/loss...");
+        for (const node of allNodes) {
+          const delay = 300 + Math.floor(Math.random() * 400);   // 300–700ms
+          const jitter = 50 + Math.floor(Math.random() * 150);   // 50–200ms
+          const loss = 2 + Math.random() * 8;                    // 2–10% PL
+
+          try {
+            node.addJitter(delay, jitter);
+            if (Math.random() < 0.5) node.addLoss(loss);
+          } catch (err) {
+            console.warn("[chaos] Error applying netem on " + node.name + ":", err);
+          }
+
+          if (node !== allNodes[0]) {
+            allNodes[0].ping(node);
+          }
+        }
       }, 10 * 1000);
     };
 
@@ -135,12 +127,10 @@ describe(testName, async () => {
 
     try {
       verifyLoop();
-      keyRotationLoop();
       startChaos();
-
+      keyRotationLoop();
       await sendLoop();
-
-      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000).toString() + "s before final validation");
+      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000) + "s before final validation");
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
     } catch (err) {
