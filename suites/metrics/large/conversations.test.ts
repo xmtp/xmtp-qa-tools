@@ -49,7 +49,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveNewConversation-${i}: should create ${i}-member group and verify all workers receive new conversation notifications within acceptable time`, async () => {
+    it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(

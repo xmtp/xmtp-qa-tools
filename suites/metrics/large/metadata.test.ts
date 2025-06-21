@@ -48,7 +48,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`receiveGroupUpdated-${i}: should create ${i}-member group and verify all workers receive group metadata update notifications within acceptable time`, async () => {
+    it(`receiveGroupUpdated-${i}: should create ${i} member group`, async () => {
       try {
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(

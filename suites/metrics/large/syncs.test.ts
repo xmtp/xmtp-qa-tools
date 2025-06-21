@@ -47,7 +47,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`newGroup-${i}: should create new ${i}-member group and measure cold start group creation time including member additions`, async () => {
+    it(`newGroup-${i}: should create new ${i} member group`, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();
@@ -79,7 +79,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`syncAll-${i}: should perform cold start syncAll operation on ${i}-member group and measure total synchronization time`, async () => {
+    it(`syncAll-${i}: should perform cold start syncAll operation on ${i} member group`, async () => {
       try {
         const syncAllStart = performance.now();
         await workerA.client.conversations.syncAll();
@@ -94,7 +94,7 @@ describe(testName, async () => {
       }
     });
 
-    it(`sync-${i}: should perform cold start sync operation on ${i}-member group using different worker and measure sync time`, async () => {
+    it(`sync-${i}: should perform cold start sync operation on ${i} member group`, async () => {
       try {
         const syncStart = performance.now();
         await workerB.client.conversations.sync();

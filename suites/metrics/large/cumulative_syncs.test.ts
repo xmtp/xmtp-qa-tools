@@ -46,7 +46,7 @@ describe(testName, async () => {
     i <= m_large_TOTAL;
     i += m_large_BATCH_SIZE
   ) {
-    it(`newGroup-${i}: should create ${i}-member group and add all worker members for cumulative sync testing setup`, async () => {
+    it(`newGroup-${i}: should create ${i} member group and add all worker members`, async () => {
       try {
         const createTime = performance.now();
         const creator = workers.getCreator();

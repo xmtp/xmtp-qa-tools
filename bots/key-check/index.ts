@@ -234,7 +234,7 @@ const processMessage = async (
 await initializeClient(processMessage, [
   {
     networks: ["dev", "production"],
-    welcomeMessage: " Send /kc help",
+    welcomeMessage: "Send /kc help",
     commandPrefix: "/kc",
   },
 ]);

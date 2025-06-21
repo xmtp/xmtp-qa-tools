@@ -400,7 +400,7 @@ export class WorkerClient extends Worker {
           for await (const message of stream) {
             console.debug(
               `[${this.nameId}] Received message`,
-              JSON.stringify(message, null, 2),
+              JSON.stringify(message?.content, null, 2),
             );
             if (!this.activeStreams) break;
 
