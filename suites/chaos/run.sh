@@ -5,6 +5,7 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 while true; do
     echo "Starting test cycle at $(date)"
+    rm -rf .data/
     for i in {1..10}; do
         echo "Running test iteration $i of 100"
         yarn test suites/chaos/commits.test.ts --debug-verbose
