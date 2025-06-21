@@ -57,7 +57,7 @@ describe(testName, async () => {
           if (!convo) {
             throw new Error(`[sendLoop] No conversation found for ${sender.name}`);
           }
-          const content = "gm-" + sender.name + "-" + Date.now();
+          const content = `gm-${sender.name}-${Date.now()}`;
           await convo.send(content);
         }
         await new Promise((r) => setTimeout(r, 1000));
@@ -130,7 +130,9 @@ describe(testName, async () => {
       startChaos();
       keyRotationLoop();
       await sendLoop();
-      console.log("[cooldown] Waiting " + (stopChaosBeforeEnd / 1000) + "s before final validation");
+      console.log(
+        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`
+      );
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
     } catch (err) {
