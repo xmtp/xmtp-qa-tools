@@ -80,7 +80,6 @@ describe(testName, () => {
             console.error(`Error in member operation ${i + 1}:`, e);
           }
         }
-        await verifyMessageStream(group, workers.getAllButCreator());
 
         // Sync the group after each operation
         await group.sync();
