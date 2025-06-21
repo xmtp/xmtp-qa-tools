@@ -1,6 +1,5 @@
 import { getFixedNames, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -30,33 +29,30 @@ describe(testName, () => {
     expect,
   });
 
-  beforeAll(async () => {
-    // Initialize workers
-    workers = await getWorkers(
-      testConfig.workerNames,
-      testConfig.testName,
-      testConfig.typeofStream,
-      testConfig.typeOfResponse,
-      testConfig.typeOfSync,
-    );
-    creator = workers.getCreator();
-
-    // Create a single group for testing
-    group = (await creator.client.conversations.newGroup(
-      testConfig.randomInboxIds,
-    )) as Group;
-
-    console.debug(`Created group: ${group.id}`);
-
-    // Add manual users and worker members
-    await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
-    await group.addMembers(
-      workers.getAllButCreator().map((w) => w.client.inboxId),
-    );
-  });
-
   it("should perform 100 epoch changes (name updates and member add/remove)", async () => {
     try {
+      // Initialize workers
+      workers = await getWorkers(
+        testConfig.workerNames,
+        testConfig.testName,
+        testConfig.typeofStream,
+        testConfig.typeOfResponse,
+        testConfig.typeOfSync,
+      );
+      creator = workers.getCreator();
+
+      // Create a single group for testing
+      group = (await creator.client.conversations.newGroup(
+        testConfig.randomInboxIds,
+      )) as Group;
+
+      console.debug(`Created group: ${group.id}`);
+
+      // Add manual users and worker members
+      await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
+      await group.addMembers(
+        workers.getAllButCreator().map((w) => w.client.inboxId),
+      );
       for (let i = 0; i < 100; i++) {
         console.log(`Performing commit ${i + 1}/100`);
 
