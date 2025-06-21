@@ -63,7 +63,6 @@ describe(testName, () => {
           );
 
           if (result?.allReceived) {
-            console.warn("result?.allReceived");
             agentResponded = true;
             break;
           }
@@ -81,7 +80,7 @@ describe(testName, () => {
 
         console.warn(
           "lastMessage",
-          messages[messages.length - 1].content,
+          JSON.stringify(messages[messages.length - 1].content, null, 2),
           "received in",
           result?.averageEventTiming,
         );
