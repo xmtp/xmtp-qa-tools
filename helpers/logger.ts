@@ -126,9 +126,7 @@ export async function processLogFile(
 /**
  * Clean all raw-*.log files by removing ANSI codes
  */
-export async function cleanAllRawLogs(
-  deleteOriginals: boolean = false,
-): Promise<void> {
+export async function cleanAllRawLogs(): Promise<void> {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
@@ -151,25 +149,36 @@ export async function cleanAllRawLogs(
     return;
   }
 
-  console.log(`Found ${rawLogFiles.length} raw log files to clean`);
+  console.log(`Found ${rawLogFiles.length} raw log files to check`);
 
+  let processedCount = 0;
   for (const file of rawLogFiles) {
     const inputPath = path.join(logsDir, file);
-    const outputFileName = file.replace("raw-", "cleaned-");
-    const outputPath = path.join(outputDir, outputFileName);
 
     try {
+      // Check if file contains "your group may be forked"
+      const content = await fs.promises.readFile(inputPath, "utf-8");
+      if (!content.includes("your group may be forked")) {
+        console.log(
+          `Skipping ${file} - does not contain "your group may be forked"`,
+        );
+        continue;
+      }
+
+      const outputFileName = file.replace("raw-", "cleaned-");
+      const outputPath = path.join(outputDir, outputFileName);
+
       await processLogFile(inputPath, outputPath);
       console.log(`Cleaned: ${file} -> ${outputFileName}`);
-
-      if (deleteOriginals) {
-        await fs.promises.unlink(inputPath);
-        console.log(`Deleted original: ${file}`);
-      }
+      processedCount++;
     } catch (error) {
-      console.error(`Failed to clean ${file}:`, error);
+      console.error(`Failed to process ${file}:`, error);
     }
   }
+
+  console.log(
+    `Processed ${processedCount} files containing "your group may be forked"`,
+  );
 }
 
 // Extend winston Logger interface for custom methods

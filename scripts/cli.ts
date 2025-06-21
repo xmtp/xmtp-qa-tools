@@ -376,9 +376,9 @@ async function runVitestTest(
         logger.close();
 
         // // Clean up raw log files when debug mode is enabled
-        // if (options.explicitLogFlag) {
-        //   await cleanAllRawLogs(false);
-        // }
+        if (options.explicitLogFlag) {
+          await cleanAllRawLogs();
+        }
 
         return; // Exit the function on success
       } else {
@@ -404,9 +404,9 @@ async function runVitestTest(
         logger.close();
 
         // // Clean up raw log files when debug mode is enabled
-        // if (options.explicitLogFlag) {
-        //   await cleanAllRawLogs(false);
-        // }
+        if (options.explicitLogFlag) {
+          await cleanAllRawLogs();
+        }
 
         if (options.noFail) {
           process.exit(0);
