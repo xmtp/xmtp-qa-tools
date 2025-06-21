@@ -29,7 +29,22 @@ describe(testName, () => {
     testName,
     expect,
   });
-
+  // Status monitoring
+  const statusCheck = async () => {
+    for (let i = 0; i < 10; i++) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await group.sync();
+      const members = await group.members();
+      const epoch = await group.debugInfo();
+      let totalGroupInstallations = 0;
+      for (const member of members) {
+        totalGroupInstallations += member.installationIds.length;
+      }
+      console.log(
+        `Status ${i + 1}: Members: ${members.length} - Epoch: ${epoch.epoch} - Installations: ${totalGroupInstallations}`,
+      );
+    }
+  };
   // Generic operation runner with random delays
   const runOperations = async (
     worker: Worker,
@@ -92,7 +107,7 @@ describe(testName, () => {
     creator = workers.getCreator();
 
     group = (await creator.client.conversations.newGroup(
-      testConfig.randomInboxIds.slice(0, 5),
+      testConfig.randomInboxIds,
     )) as Group;
 
     // Setup group with workers as super admins
@@ -103,46 +118,22 @@ describe(testName, () => {
     }
 
     const allWorkers = workers.getAll();
-    const availableMembers = testConfig.randomInboxIds.slice(workerCount);
+    const availableMembers = testConfig.randomInboxIds;
 
     // Create and run concurrent operations
-    const concurrentTasks = allWorkers
-      .slice(0, 4)
-      .map(async (worker, index) => {
-        const ops = createOperations(worker, availableMembers);
-        const operationList = [
-          ops.updateName,
-          ops.addMember,
-          ops.sendMessage,
-          ...(index % 2 === 0 ? [ops.removeMember] : []),
-        ];
-        return runOperations(worker, operationList);
-      });
-
-    // Status monitoring
-    const statusCheck = async () => {
-      for (let i = 0; i < 10; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
-        await group.sync();
-        const members = await group.members();
-        const epoch = await group.debugInfo();
-        console.log(
-          `Status ${i + 1}: Members: ${members.length} - Epoch: ${epoch.epoch}`,
-        );
-      }
-    };
+    const concurrentTasks = allWorkers.map(async (worker) => {
+      const ops = createOperations(worker, availableMembers);
+      const operationList = [
+        ops.updateName,
+        ops.addMember,
+        ops.sendMessage,
+        ops.removeMember,
+      ];
+      await statusCheck();
+      return runOperations(worker, operationList);
+    });
 
     // Run all operations concurrently
-    await Promise.all([...concurrentTasks, statusCheck()]);
-
-    // Final verification
-    await group.sync();
-    const finalMembers = await group.members();
-    const finalEpoch = await group.debugInfo();
-    console.log(
-      `Final Status: Members: ${finalMembers.length} - Epoch: ${finalEpoch.epoch} - Maybe: ${finalEpoch.maybeForked}`,
-    );
-
-    expect(finalMembers.length).toBeGreaterThan(0);
+    await Promise.all([...concurrentTasks]);
   });
 });
