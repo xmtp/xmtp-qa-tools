@@ -22,7 +22,7 @@
     "gen": "tsx inboxes/gen.ts",
     "large": "yarn test suites/metrics/large",
     "lint": "eslint .",
-    "local-update": "./inboxes/gen.sh --envs local --installations 2,5,10,15,20,25 --count 500",
+    "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
     "monitor:yarn": "httpstat https://grpc.dev.xmtp.network:443",
     "prod-update": "./inboxes/gen.sh --envs dev,production --installations 15,20,25,30 --count 500",
     "record": "npx playwright codegen 'https://xmtp.chat/'",
