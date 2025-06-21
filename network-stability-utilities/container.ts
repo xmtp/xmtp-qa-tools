@@ -1,6 +1,6 @@
-import { execFileSync, execSync } from "child_process";
-import * as iptables from "./iptables";
+import { execSync, execFileSync } from "child_process";
 import * as netem from "./netem";
+import * as iptables from "./iptables";
 
 export class DockerContainer {
   name: string;
@@ -42,7 +42,7 @@ export class DockerContainer {
         throw new Error(
           `Could not find host veth interface for ifindex ${ifIndex}`,
         );
-
+      
       const iface = vethLine.split(":")[1].trim().split("@")[0];
       return iface;
     } catch (err) {
@@ -117,16 +117,16 @@ export class DockerContainer {
     netem.applyLoss(this, percent);
   }
 
+  blockInboundFromHost(): void {
+    iptables.blockFromHostTo(this);
+  }
+
   clearLatency(): void {
     try {
       netem.clear(this);
     } catch {
       console.log(`[netem] No existing qdisc to clear on ${this.name}`);
     }
-  }
-
-  addFixedLatencyTo(other: DockerContainer, latencyMs: number): void {
-    netem.applyBidirectionalLatency(this, other, latencyMs);
   }
 
   blockOutboundTrafficTo(target: DockerContainer): void {
@@ -137,30 +137,24 @@ export class DockerContainer {
     iptables.unblockOutboundTraffic(this, target);
   }
 
-  blackHoleTo(target: DockerContainer): void {
-    iptables.blockOutboundTraffic(this, target);
+  unblockFromHost(): void {
+    iptables.unblockFromHostTo(this);
+  }
+
+  simulateBlackhole(others: DockerContainer[]): void {
+    for (const other of others) {
+      iptables.blackHoleTo(this, other);
+    }
+  }
+
+  clearBlackhole(others: DockerContainer[]): void {
+    for (const other of others) {
+      iptables.unblockBlackHoleTo(this, other);
+    }
   }
 
   kill(): void {
     execFileSync("docker", ["kill", this.name], { stdio: "inherit" });
-  }
-
-  pause(): void {
-    execFileSync("docker", ["pause", this.name], { stdio: "inherit" });
-  }
-
-  unpause(): void {
-    execFileSync("docker", ["unpause", this.name], { stdio: "inherit" });
-  }
-
-  static listRunningXmtpNodes(): DockerContainer[] {
-    const output = execSync(
-      `docker ps --filter "ancestor=xmtp-node" --format "{{.Names}}"`,
-    )
-      .toString()
-      .trim();
-    if (!output) return [];
-    return output.split("\n").map((name) => new DockerContainer(name));
   }
 
   static validateDependencies(): void {
@@ -172,16 +166,5 @@ export class DockerContainer {
         throw new Error(`Dependency not found - please install: ${cmd}`);
       }
     }
-  }
-
-  static listByNamePrefix(prefix: string): DockerContainer[] {
-    const output = execSync(`docker ps --format "{{.Names}}"`)
-      .toString()
-      .trim();
-    if (!output) return [];
-    return output
-      .split("\n")
-      .filter((name) => name.startsWith(prefix))
-      .map((name) => new DockerContainer(name));
   }
 }
