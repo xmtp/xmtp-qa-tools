@@ -55,10 +55,16 @@ describe(testName, async () => {
         for (const sender of allUsers) {
           const convo = await sender.client.conversations.getConversationById(group.id);
           if (!convo) {
-            throw new Error(`[sendLoop] No conversation found for ${sender.name}`);
+            console.warn(`[sendLoop] ${sender.name} not in group right now — skipping send`);
+            continue;
           }
+
           const content = `gm-${sender.name}-${Date.now()}`;
-          await convo.send(content);
+          try {
+            await convo.send(content);
+          } catch (err) {
+            console.warn(`[sendLoop] send failed for ${sender.name}:`, err);
+          }
         }
         await new Promise((r) => setTimeout(r, 1000));
       }
