@@ -9,7 +9,6 @@ while true; do
         echo "Running test iteration $i of 100"
         yarn test suites/chaos/commits.test.ts --debug --no-fail
         exit_code=$?
-        
         # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop
         echo "Test iteration $i completed with exit code $exit_code"
     done

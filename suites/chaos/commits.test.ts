@@ -10,15 +10,23 @@ import { describe, expect, it } from "vitest";
 const testName = "commits";
 const workerCount = 6;
 const groupCount = 5;
+const targetEpoch = 100n;
+const installationPerRandomInbox = 5;
+const randomInboxIdsCount = 30;
+
 const testConfig = {
   testName,
   groupName: `Group ${getTime()}`,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
-  randomInboxIds: getRandomInboxIds(workerCount * 5, 5),
+  randomInboxIds: getRandomInboxIds(
+    randomInboxIdsCount,
+    installationPerRandomInbox,
+  ),
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
   workerNames: getRandomNames(workerCount),
+  targetEpoch,
 } as const;
 
 describe(testName, () => {
@@ -115,7 +123,6 @@ describe(testName, () => {
 
     const allWorkers = workers.getAll();
     const availableMembers = testConfig.randomInboxIds;
-    const TARGET_EPOCH = 100n;
 
     // Run commit operations for each group in parallel
     console.log("Starting parallel commit operations for all groups...");
@@ -123,48 +130,39 @@ describe(testName, () => {
       let currentEpoch = 0n;
       let operationCount = 0;
 
-      // Keep running operations until this specific group reaches epoch 100+
-      while (currentEpoch < TARGET_EPOCH) {
-        // Create batch of operations for this specific group
-        const batchSize = 4; // Smaller batch per group since we have 5 groups running in parallel
-        const parallelOperations = Array.from({ length: batchSize }, (_, i) =>
-          (async () => {
-            // Select random worker for this group
-            const randomWorker =
-              allWorkers[Math.floor(Math.random() * allWorkers.length)];
+      // Keep running operations until this specific group reaches target epoch
+      while (currentEpoch < testConfig.targetEpoch) {
+        // Select random worker for this group
+        const randomWorker =
+          allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-            // Create operations for the selected worker and this specific group
-            const ops = createOperations(randomWorker, group, availableMembers);
-            const operationList = [
-              ops.updateName,
-              ops.addMember,
-              ops.sendMessage,
-              ops.removeMember,
-              ops.createInstallation,
-            ];
+        // Create operations for the selected worker and this specific group
+        const ops = createOperations(randomWorker, group, availableMembers);
+        const operationList = [
+          ops.updateName,
+          ops.addMember,
+          ops.sendMessage,
+          ops.removeMember,
+          ops.createInstallation,
+        ];
 
-            // Select random operation
-            const randomOperation =
-              operationList[Math.floor(Math.random() * operationList.length)];
+        // Select random operation
+        const randomOperation =
+          operationList[Math.floor(Math.random() * operationList.length)];
 
-            try {
-              await randomOperation();
-              console.log(
-                `Group ${groupIndex + 1} Operation ${operationCount + i + 1}: ${randomWorker.name} completed operation`,
-              );
-            } catch (e) {
-              console.log(
-                `Group ${groupIndex + 1} Operation ${operationCount + i + 1}: ${randomWorker.name} failed:`,
-                e,
-              );
-            }
-          })(),
-        );
+        try {
+          await randomOperation();
+          console.log(
+            `Group ${groupIndex + 1} Operation ${operationCount + 1}: ${randomWorker.name} completed operation`,
+          );
+        } catch (e) {
+          console.log(
+            `Group ${groupIndex + 1} Operation ${operationCount + 1}: ${randomWorker.name} failed:`,
+            e,
+          );
+        }
 
-        // Run batch of operations in parallel for this group
-        await Promise.all(parallelOperations);
-        operationCount += batchSize;
-
+        operationCount++;
         // Check current epoch for this specific group
         await group.sync();
         const epoch = await group.debugInfo();
@@ -178,7 +176,7 @@ describe(testName, () => {
         }
 
         console.log(
-          `Group ${groupIndex + 1} - Operations: ${operationCount} - Members: ${members.length} - Epoch: ${currentEpoch}/${TARGET_EPOCH} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
+          `Group ${groupIndex + 1} - Operations: ${operationCount} - Members: ${members.length} - Epoch: ${currentEpoch}/${testConfig.targetEpoch} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
         );
       }
 
