@@ -23,6 +23,18 @@
 **Purpose:**
 Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
 
+## Download the code
+
+```bash
+# Installation For a faster download with just the latest code
+git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+cd xmtp-qa-tools
+yarn install
+./dev/up
+yarn local-update
+yarn run:commits
+```
+
 # Current Status
 
 | Runs | Forks | Percentage |
