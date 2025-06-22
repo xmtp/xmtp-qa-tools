@@ -88,24 +88,21 @@ describe(testName, () => {
 
     // Create 5 groups and set them up in parallel
     console.log(`Creating and setting up ${groupCount} groups in parallel...`);
-    const groupCreationPromises = Array.from(
-      { length: groupCount },
-      async (_, i) => {
-        // Create group
-        const group = (await creator.client.conversations.newGroup(
-          testConfig.randomInboxIds,
-        )) as Group;
+    groups = [];
+    for (let i = 0; i < groupCount; i++) {
+      // Create group
+      const group = (await creator.client.conversations.newGroup(
+        testConfig.randomInboxIds,
+      )) as Group;
 
-        for (const worker of workers.getAllButCreator()) {
-          await group.addMembers([worker.client.inboxId]);
-          await group.addSuperAdmin(worker.client.inboxId);
-        }
+      for (const worker of workers.getAllButCreator()) {
+        await group.addMembers([worker.client.inboxId]);
+        await group.addSuperAdmin(worker.client.inboxId);
+      }
 
-        return group;
-      },
-    );
+      groups.push(group);
+    }
 
-    groups = await Promise.all(groupCreationPromises);
     console.log(`Created and set up ${groups.length} groups successfully`);
 
     const allWorkers = workers.getAll();
