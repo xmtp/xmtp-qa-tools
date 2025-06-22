@@ -11,9 +11,9 @@ rm -rf logs/
 rm -rf .data/
 
 echo "Starting test cycle at $(date)"
-for i in {1..$num_runs}; do
-    echo "Running test iteration $i of 100"
-    yarn test suites/chaos/commits.test.ts --debug --no-fail
+for ((i=1; i<=num_runs; i++)); do
+    echo "Running test iteration $i of $num_runs"
+    yarn test suites/commits/commits.test.ts --debug --no-fail
     exit_code=$?
     
     # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop

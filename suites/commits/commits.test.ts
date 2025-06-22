@@ -85,7 +85,6 @@ describe("commits", () => {
     creator = workers.getCreator();
 
     const allWorkers = workers.getAll();
-    const availableMembers = randomInboxIds;
 
     const groupOperationPromises = Array.from(
       { length: groupCount },
@@ -93,11 +92,6 @@ describe("commits", () => {
         const group = (await creator.client.conversations.newGroup(
           randomInboxIds,
         )) as Group;
-
-        for (const worker of workers.getAllButCreator()) {
-          await group.addMembers([worker.client.inboxId]);
-          await group.addSuperAdmin(worker.client.inboxId);
-        }
 
         let currentEpoch = 0n;
 
@@ -107,11 +101,7 @@ describe("commits", () => {
               const randomWorker =
                 allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-              const ops = createOperations(
-                randomWorker,
-                group,
-                availableMembers,
-              );
+              const ops = createOperations(randomWorker, group, randomInboxIds);
               const operationList = [
                 ops.updateName,
                 ops.addMember,
