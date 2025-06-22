@@ -1,12 +1,12 @@
 import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
-import type { Group } from "@xmtp/node-sdk";
 
 const testName = "group-reconciliation";
 loadEnv(testName);
@@ -21,7 +21,7 @@ describe(testName, async () => {
     },
     testName,
     typeofStream.Message,
-    typeOfResponse.Gm
+    typeOfResponse.Gm,
   );
 
   setupTestLifecycle({ testName, expect });
@@ -31,22 +31,32 @@ describe(testName, async () => {
   it("should recover and sync group state after node isolation", async () => {
     try {
       // Create group with users 1-3
-      group = await workers.createGroup("Test Group", ["user1", "user2", "user3"]);
+      group = await workers.createGroup("Test Group", [
+        "user1",
+        "user2",
+        "user3",
+      ]);
       await group.sync();
       console.log("[test] Initial group created");
 
-      const user1Group = await workers.get("user1")!.client.conversations.getConversationById(group.id);
+      const user1Group = await workers
+        .get("user1")!
+        .client.conversations.getConversationById(group.id);
       console.log("Sending welcome message from user1...");
       await user1Group?.send("Initial welcome message from user1");
       await new Promise((res) => setTimeout(res, 3000));
 
-      console.log("[test] Dumping messages received by group members and confirming user4 has no convo yet:");
+      console.log(
+        "[test] Dumping messages received by group members and confirming user4 has no convo yet:",
+      );
       const users = ["user1", "user2", "user3", "user4"];
       for (const name of users) {
         const client = workers.get(name)?.client;
-        const convo = client && (await client.conversations.getConversationById(group.id));
+        const convo =
+          client && (await client.conversations.getConversationById(group.id));
         if (!convo) {
-          if (name === "user4") { // check if env dirty
+          if (name === "user4") {
+            // check if env dirty
             expect(convo).toBeFalsy();
             console.log("  [user4] No conversation found - expected.");
           } else {
@@ -56,10 +66,17 @@ describe(testName, async () => {
         }
         expect(convo).toBeTruthy();
         const messages = await convo.messages();
-        console.log("  [" + name + "] Received " + String(messages.length) + " messages:");
+        console.log(
+          "  [" + name + "] Received " + String(messages.length) + " messages:",
+        );
         for (const msg of messages) {
-          const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          const timestamp = msg.sentAt
+            ? new Date(msg.sentAt).toISOString()
+            : "unknown";
+          const safeContent =
+            typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg.content);
           console.log("    [" + timestamp + "] " + safeContent);
         }
       }
@@ -80,8 +97,12 @@ describe(testName, async () => {
 
       // User1 adds user4 to group
       console.log("Sending welcome message from user1...");
-      await user1Group?.send("Additional welcome message from user1 before user4 joins...");
-      await (user1Group as Group).addMembers([workers.get("user4")!.client.inboxId]);
+      await user1Group?.send(
+        "Additional welcome message from user1 before user4 joins...",
+      );
+      await (user1Group as Group).addMembers([
+        workers.get("user4")!.client.inboxId,
+      ]);
       await new Promise((res) => setTimeout(res, 3000));
 
       console.log("[test] user4 added to group");
@@ -91,22 +112,32 @@ describe(testName, async () => {
       console.log("[test] Dumping messages received by group members:");
       for (const name of users) {
         const client = workers.get(name)?.client;
-        const convo = client && (await client.conversations.getConversationById(group.id));
+        const convo =
+          client && (await client.conversations.getConversationById(group.id));
         if (!convo) {
           console.log("  [" + name + "] No conversation found.");
           continue;
         }
         const messages = await convo.messages();
-        console.log("  [" + name + "] Received " + String(messages.length) + " messages:");
+        console.log(
+          "  [" + name + "] Received " + String(messages.length) + " messages:",
+        );
         for (const msg of messages) {
-          const timestamp = msg.sentAt ? new Date(msg.sentAt).toISOString() : "unknown";
-          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          const timestamp = msg.sentAt
+            ? new Date(msg.sentAt).toISOString()
+            : "unknown";
+          const safeContent =
+            typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg.content);
           console.log("    [" + timestamp + "] " + safeContent);
         }
       }
 
       // Sync user4 with the group
-      const user4Group = await workers.get("user4")!.client.conversations.getConversationById(group.id);
+      const user4Group = await workers
+        .get("user4")!
+        .client.conversations.getConversationById(group.id);
       await user4Group?.sync();
       console.log("[test] user4 joined and synced");
 
@@ -120,7 +151,9 @@ describe(testName, async () => {
       await new Promise((r) => setTimeout(r, 3000));
       console.log("[test] Restored node3's connectivity");
 
-      const user3Group = await workers.get("user3")!.client.conversations.getConversationById(group.id);
+      const user3Group = await workers
+        .get("user3")!
+        .client.conversations.getConversationById(group.id);
       await user3Group?.sync();
       const membersAfterRecovery = await user3Group?.members();
       console.log("[test] user3 sees group members after partition recovery:");
@@ -147,20 +180,29 @@ describe(testName, async () => {
         }
 
         const msgs = await user3Group?.messages();
-        if (msgs?.some((m) => typeof m.content === "string" && m.content.includes(recoveryMsg))) {
+        if (
+          msgs?.some(
+            (m) =>
+              typeof m.content === "string" && m.content.includes(recoveryMsg),
+          )
+        ) {
           console.log("[test] user3 received recovery message");
         }
 
-        console.log("[test] retrying group sync check (" + String(attempts + 1) + "/5)");
+        console.log(
+          "[test] retrying group sync check (" + String(attempts + 1) + "/5)",
+        );
         await new Promise((r) => setTimeout(r, 1000));
       }
 
       expect(found).toBe(true);
       console.log("[test] Group reconciliation and message recovery succeeded");
 
-      const verifyFinal = await verifyMessageStream(group, workers.getAllButCreator());
+      const verifyFinal = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+      );
       expect(verifyFinal.allReceived).toBe(true);
-
     } catch (err) {
       logError(err, expect.getState().currentTestName);
       throw err;

@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
 import { typeOfResponse, typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "keyrotation-chaos";
@@ -28,7 +28,7 @@ describe(testName, async () => {
     userDescriptors,
     testName,
     typeofStream.Message,
-    typeOfResponse.Gm
+    typeOfResponse.Gm,
   );
 
   setupTestLifecycle({ testName, expect });
@@ -53,9 +53,11 @@ describe(testName, async () => {
     const sendLoop = async () => {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
-          const convo = await sender.client.conversations.getConversationById(group.id);
+          const convo = await sender.client.conversations.getConversationById(
+            group.id,
+          );
           if (!convo) {
-            console.warn(`[sendLoop] ${sender.name} not in group right now — skipping send`);
+            console.warn(`[sendLoop] ${sender.name} not in group right now ï¿½ skipping send`);
             continue;
           }
 
@@ -87,7 +89,9 @@ describe(testName, async () => {
 
     const keyRotationLoop = () => {
       rotationInterval = setInterval(() => {
-        console.log("[key-rotation] Rotating group key by adding and removing a random worker from the group...");
+        console.log(
+          "[key-rotation] Rotating group key by adding and removing a random worker from the group...",
+        );
         void (async () => {
           try {
             const newMember = workers.getRandomWorker().client.inboxId;
@@ -114,7 +118,10 @@ describe(testName, async () => {
             node.addJitter(delay, jitter);
             if (Math.random() < 0.5) node.addLoss(loss);
           } catch (err) {
-            console.warn("[chaos] Error applying netem on " + node.name + ":", err);
+            console.warn(
+              "[chaos] Error applying netem on " + node.name + ":",
+              err,
+            );
           }
 
           if (node !== allNodes[0]) {
@@ -140,7 +147,7 @@ describe(testName, async () => {
       await sendLoop();
 
       console.log(
-        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`
+        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
       );
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));

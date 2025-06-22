@@ -209,7 +209,7 @@ export async function createClient(
     folder: string;
   },
   env: XmtpEnv,
-  apiUrl?: string
+  apiUrl?: string,
 ): Promise<{
   client: unknown;
   dbPath: string;
@@ -241,7 +241,7 @@ export async function createClient(
     encryptionKey,
     dbPath,
     env,
-    apiUrl
+    apiUrl,
   );
 
   return {
@@ -259,15 +259,17 @@ export const regressionClient = async (
   dbEncryptionKey: Uint8Array,
   dbPath: string,
   env: XmtpEnv,
-  apiURL?: string
+  apiURL?: string,
 ): Promise<unknown> => {
   const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);
   const apiUrl = apiURL;
-  console.log(
-    `Creating API client with: SDK version: ${String(sdkVersion)} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`
-  );
+  if (apiUrl) {
+    console.log(
+      `Creating API client with: SDK version: ${String(sdkVersion)} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
+    );
+  }
 
   const ClientClass =
     sdkVersions[versionInt as keyof typeof sdkVersions].Client;
@@ -282,7 +284,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
-      apiUrl
+      apiUrl,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 100 && versionInt < 200) {
@@ -292,7 +294,7 @@ export const regressionClient = async (
       dbPath,
       env,
       loggingLevel,
-      apiUrl
+      apiUrl,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 200) {

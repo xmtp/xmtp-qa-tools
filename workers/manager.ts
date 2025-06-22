@@ -196,15 +196,15 @@ export class WorkerManager {
   }
   async createGroup(
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
-    members: string[] | null = null
+    members: string[] | null = null,
   ): Promise<Group> {
     const creator = this.getCreator();
     const memberList = members
       ? members.map((name) => {
-        const worker = this.get(name);
-        if (!worker) throw new Error(`Worker not registered: ${name}`);
-        return worker.client.inboxId;
-      })
+          const worker = this.get(name);
+          if (!worker) throw new Error(`Worker not registered: ${name}`);
+          return worker.client.inboxId;
+        })
       : this.getAllButCreator().map((worker) => worker.client.inboxId);
 
     const group = await creator.client.conversations.newGroup(memberList, {
@@ -331,7 +331,10 @@ export class WorkerManager {
   /**
    * Creates a new worker with all necessary initialization
    */
-public async createWorker(descriptor: string, apiUrl?: string): Promise<Worker> {
+  public async createWorker(
+    descriptor: string,
+    apiUrl?: string,
+  ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
     const providedInstallId = parts.length > 1 ? parts[1] : undefined;
@@ -369,9 +372,8 @@ public async createWorker(descriptor: string, apiUrl?: string): Promise<Worker> 
       this.typeOfSync,
       this.env,
       {},
-      apiUrl
+      apiUrl,
     );
-
 
     const initializedWorker = await workerClient.initialize();
 
@@ -423,11 +425,11 @@ export async function getWorkers(
 
   if (Array.isArray(descriptorsOrMap)) {
     workerPromises = descriptorsOrMap.map((descriptor) =>
-      manager.createWorker(descriptor)
+      manager.createWorker(descriptor),
     );
   } else {
     workerPromises = Object.entries(descriptorsOrMap).map(
-      ([descriptor, apiUrl]) => manager.createWorker(descriptor, apiUrl)
+      ([descriptor, apiUrl]) => manager.createWorker(descriptor, apiUrl),
     );
   }
 

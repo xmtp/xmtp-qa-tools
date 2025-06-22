@@ -2,11 +2,11 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream, typeOfResponse } from "@workers/main";
+import { typeOfResponse, typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
+import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
-import type { Group } from "@xmtp/node-sdk";
 
 const testName = "group-node-blackhole";
 loadEnv(testName);
@@ -41,14 +41,21 @@ describe(testName, async () => {
       await group.sync();
 
       console.log("[test] Verifying initial message delivery to all");
-      const preCheck = await verifyMessageStream(group, workers.getAllButCreator());
+      const preCheck = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+      );
       expect(preCheck.allReceived).toBe(true);
 
       console.log("[test] Applying blackhole: isolating node2 from node1/3/4");
       node2.simulateBlackhole([node1, node3, node4]);
 
-      console.log("[test] Sending 3 group messages DURING blackhole from user2");
-      const user2Group = await workers.get("user2")!.client.conversations.getConversationById(group.id);
+      console.log(
+        "[test] Sending 3 group messages DURING blackhole from user2",
+      );
+      const user2Group = await workers
+        .get("user2")!
+        .client.conversations.getConversationById(group.id);
       for (const msg of expectedMessages) {
         await user2Group!.send(msg);
       }
@@ -57,12 +64,17 @@ describe(testName, async () => {
 
       console.log("=== Message Dump During Blackhole ===");
       for (const name of ["user1", "user2", "user3", "user4"]) {
-        const g = await workers.get(name)!.client.conversations.getConversationById(group.id);
+        const g = await workers
+          .get(name)!
+          .client.conversations.getConversationById(group.id);
         const msgs = await g!.messages();
         console.log(`Messages seen by ${name}:`);
         for (const msg of msgs) {
           const ts = new Date(Number(msg.sentAtNs) / 1e6).toISOString();
-          const safeContent = typeof msg.content === "string" ? msg.content : JSON.stringify(msg.content);
+          const safeContent =
+            typeof msg.content === "string"
+              ? msg.content
+              : JSON.stringify(msg.content);
           console.log(`- [${ts}]: ${safeContent}`);
         }
       }
@@ -73,9 +85,15 @@ describe(testName, async () => {
         expect(user2Msgs.some((m) => m.content === msg)).toBe(true);
       }
 
-      console.log("[test] Verifying user3 and user4 do NOT see any messages during blackhole");
-      const user3Group = await workers.get("user3")!.client.conversations.getConversationById(group.id);
-      const user4Group = await workers.get("user4")!.client.conversations.getConversationById(group.id);
+      console.log(
+        "[test] Verifying user3 and user4 do NOT see any messages during blackhole",
+      );
+      const user3Group = await workers
+        .get("user3")!
+        .client.conversations.getConversationById(group.id);
+      const user4Group = await workers
+        .get("user4")!
+        .client.conversations.getConversationById(group.id);
       const user3Msgs = await user3Group!.messages();
       const user4Msgs = await user4Group!.messages();
       for (const msg of expectedMessages) {
@@ -97,7 +115,10 @@ describe(testName, async () => {
       }
 
       console.log("[test] Verifying post-recovery stream");
-      const postCheck = await verifyMessageStream(group, workers.getAllButCreator());
+      const postCheck = await verifyMessageStream(
+        group,
+        workers.getAllButCreator(),
+      );
       expect(postCheck.allReceived).toBe(true);
       expect(postCheck.orderPercentage).toBe(100);
     } catch (e) {

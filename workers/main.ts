@@ -319,7 +319,7 @@ export class WorkerClient extends Worker {
         folder: this.folder,
       },
       this.env,
-      this.apiUrl
+      this.apiUrl,
     );
 
     this.dbPath = dbPath;
@@ -459,14 +459,10 @@ export class WorkerClient extends Worker {
                 message.contentType?.typeId === "reply") &&
               type === typeofStream.Message
             ) {
-              console.debug(
-                `[${this.nameId}] Received ${message.contentType?.typeId} message: "${message.content as string}" from ${message.senderInboxId} in conversation ${message.conversationId}`,
-              );
-
               // Log message details for debugging
-              console.debug(
-                `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
-              );
+              // console.debug(
+              //   `[${this.nameId}] Message details: conversationId=${message.conversationId}, senderInboxId=${message.senderInboxId}, myInboxId=${this.client.inboxId}`,
+              // );
 
               // Handle auto-responses if enabled
               await this.handleResponse(message);
@@ -491,10 +487,10 @@ export class WorkerClient extends Worker {
                 );
               }
             } else {
-              // Log non-text messages for debugging
-              console.debug(
-                `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
-              );
+              // // Log non-text messages for debugging
+              // console.debug(
+              //   `[${this.nameId}] Received NON-TEXT message: contentType=${message.contentType?.typeId}, streamType=${type}`,
+              // );
             }
           }
         } catch (error) {
@@ -550,9 +546,9 @@ export class WorkerClient extends Worker {
         shouldRespond = true;
       }
       if (!shouldRespond) {
-        console.warn(
-          `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
-        );
+        // console.warn(
+        //   `[${this.nameId}] Skipping message, shouldRespond is ${shouldRespond}`,
+        // );
         return;
       }
       let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
@@ -764,9 +760,9 @@ export class WorkerClient extends Worker {
     return this.collectStreamEvents<StreamTextMessage>({
       type: typeofStream.Message,
       filterFn: (msg) => {
-        console.debug(
-          `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
-        );
+        // console.debug(
+        //   `[${this.nameId}] Filtering message: type=${msg.type}, expected=${StreamCollectorType.Message}`,
+        // );
 
         if (msg.type !== StreamCollectorType.Message) {
           return false;

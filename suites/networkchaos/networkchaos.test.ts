@@ -1,9 +1,9 @@
-import { describe, expect, it } from "vitest";
 import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers } from "@workers/manager";
 import { typeOfResponse, typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "networkchaos";
@@ -29,7 +29,7 @@ describe(testName, async () => {
     userDescriptors,
     testName,
     typeofStream.Message,
-    typeOfResponse.Gm
+    typeOfResponse.Gm,
   );
 
   setupTestLifecycle({ testName, expect });
@@ -53,7 +53,9 @@ describe(testName, async () => {
     const sendLoop = async () => {
       while (Date.now() - startTime < chaosDuration) {
         for (const sender of allUsers) {
-          const convo = await sender.client.conversations.getConversationById(group.id);
+          const convo = await sender.client.conversations.getConversationById(
+            group.id,
+          );
           const content = `gm-${sender.name}-${Date.now()}`;
           await convo!.send(content);
         }
@@ -66,7 +68,7 @@ describe(testName, async () => {
         void (async () => {
           try {
             console.log("[verify] Checking fork and delivery under chaos");
-          await workers.checkForks();
+            await workers.checkForks();
             const res = await verifyMessageStream(group, otherUsers);
             expect(res.allReceived).toBe(true);
           } catch (e) {
@@ -78,11 +80,13 @@ describe(testName, async () => {
 
     const startChaos = () => {
       chaosInterval = setInterval(() => {
-        console.log("[chaos] Applying jitter, delay, and drop rules to all nodes...");
+        console.log(
+          "[chaos] Applying jitter, delay, and drop rules to all nodes...",
+        );
         for (const node of allNodes) {
-          const delay = Math.floor(100 + Math.random() * 400); // 100–500ms
-          const jitter = Math.floor(Math.random() * 100); // 0–100ms
-          const loss = Math.random() * 5; // 0–5% packet loss
+          const delay = Math.floor(100 + Math.random() * 400); // 100ï¿½500ms
+          const jitter = Math.floor(Math.random() * 100); // 0ï¿½100ms
+          const loss = Math.random() * 5; // 0ï¿½5% packet loss
 
           try {
             node.addJitter(delay, jitter);
@@ -109,7 +113,9 @@ describe(testName, async () => {
       verifyLoop();
       startChaos();
       await sendLoop();
-      console.log(`[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`);
+      console.log(
+        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
+      );
       clearChaos();
       await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
     } catch (err) {
