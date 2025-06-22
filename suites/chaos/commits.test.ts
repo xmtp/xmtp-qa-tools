@@ -103,7 +103,6 @@ describe(testName, () => {
         }
 
         let currentEpoch = 0n;
-        let operationCount = 0;
 
         while (currentEpoch < TARGET_EPOCH) {
           const parallelOperations = Array.from({ length: batchSize }, () =>
@@ -136,7 +135,6 @@ describe(testName, () => {
           );
 
           await Promise.all(parallelOperations);
-          operationCount += batchSize;
 
           await group.sync();
           const epoch = await group.debugInfo();
@@ -147,23 +145,16 @@ describe(testName, () => {
           }
           currentEpoch = epoch.epoch;
 
-          if (operationCount % 20 === 0) {
+          if (currentEpoch % 20n === 0n) {
             console.log(
               `Group ${groupIndex + 1} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
             );
           }
         }
 
-        return { groupIndex, finalEpoch: currentEpoch, operationCount };
+        return { groupIndex, finalEpoch: currentEpoch };
       },
     );
-
-    const results = await Promise.all(groupOperationPromises);
-
-    const totalOperations = results.reduce(
-      (sum, result) => sum + result.operationCount,
-      0,
-    );
-    console.log(`Total operations: ${totalOperations}`);
+    await Promise.all(groupOperationPromises);
   });
 });
