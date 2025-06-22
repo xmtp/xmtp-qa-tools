@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "commits";
 const workerCount = 6;
 const groupCount = 5;
-const batchSize = 4;
+const batchSize = 4; // Smaller batch per group since we have 5 groups running in parallel
 const TARGET_EPOCH = 100n;
 const randomInboxIdsCount = 30;
 const installationCount = 5;
@@ -88,21 +88,24 @@ describe(testName, () => {
 
     // Create 5 groups and set them up in parallel
     console.log(`Creating and setting up ${groupCount} groups in parallel...`);
-    groups = [];
-    for (let i = 0; i < groupCount; i++) {
-      // Create group
-      const group = (await creator.client.conversations.newGroup(
-        testConfig.randomInboxIds,
-      )) as Group;
+    const groupCreationPromises = Array.from(
+      { length: groupCount },
+      async (_, i) => {
+        // Create group
+        const group = (await creator.client.conversations.newGroup(
+          testConfig.randomInboxIds,
+        )) as Group;
 
-      for (const worker of workers.getAllButCreator()) {
-        await group.addMembers([worker.client.inboxId]);
-        await group.addSuperAdmin(worker.client.inboxId);
-      }
+        for (const worker of workers.getAllButCreator()) {
+          await group.addMembers([worker.client.inboxId]);
+          await group.addSuperAdmin(worker.client.inboxId);
+        }
 
-      groups.push(group);
-    }
+        return group;
+      },
+    );
 
+    groups = await Promise.all(groupCreationPromises);
     console.log(`Created and set up ${groups.length} groups successfully`);
 
     const allWorkers = workers.getAll();
