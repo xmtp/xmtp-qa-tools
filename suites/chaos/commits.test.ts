@@ -145,7 +145,7 @@ describe(testName, () => {
 
           if (operationCount % 20 === 0) {
             console.log(
-              `Group ${groupIndex + 1} - Epoch: ${currentEpoch}/${TARGET_EPOCH} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
+              `Group ${groupIndex + 1} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
             );
           }
         }
