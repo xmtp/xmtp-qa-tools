@@ -1,4 +1,3 @@
-import { getRandomNames } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
@@ -8,7 +7,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const testName = "commits";
-const workerCount = 6;
 const groupCount = 5;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
@@ -21,7 +19,7 @@ const testConfig = {
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
-  workerNames: getRandomNames(workerCount),
+  workerNames: ["random1", "random2", "random3", "random4", "random5"],
 } as const;
 
 describe(testName, () => {
@@ -153,13 +151,6 @@ describe(testName, () => {
         return { groupIndex, finalEpoch: currentEpoch, operationCount };
       },
     );
-
-    const results = await Promise.all(groupOperationPromises);
-
-    const totalOperations = results.reduce(
-      (sum, result) => sum + result.operationCount,
-      0,
-    );
-    console.log(`Total operations: ${totalOperations}`);
+    await Promise.all(groupOperationPromises);
   });
 });

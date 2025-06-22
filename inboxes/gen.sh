@@ -6,8 +6,8 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 # Remove logs and .data as before
 
 echo "Script started at $(date)"
-#echo "Removing logs/"
-#rm -rf logs/
+echo "Removing logs/"
+rm -rf logs/
 
 echo "Removing .data/"
 rm -rf .data/
