@@ -112,7 +112,7 @@ export function filterLogOutput(data: string): string {
 }
 
 /**
- * Process a single log file to remove ANSI codes
+ * Process a single log file to remove ANSI codes and stop after first "may be fork..." line
  */
 export async function processLogFile(
   inputPath: string,
@@ -125,14 +125,46 @@ export async function processLogFile(
     });
     const writeStream = fs.createWriteStream(outputPath, { encoding: "utf8" });
 
+    let buffer = "";
+    let foundForkLine = false;
+    const targetString = "may be fork";
+
     readStream.on("data", (chunk: string | Buffer) => {
+      if (foundForkLine) {
+        // Stop processing once we've found the fork line
+        return;
+      }
+
       const chunkStr =
         typeof chunk === "string" ? chunk : chunk.toString("utf8");
-      const cleanedChunk = stripAnsi(chunkStr);
-      writeStream.write(cleanedChunk);
+      buffer += chunkStr;
+
+      // Process complete lines
+      const lines = buffer.split("\n");
+      // Keep the last incomplete line in buffer
+      buffer = lines.pop() || "";
+
+      for (const line of lines) {
+        const cleanedLine = stripAnsi(line);
+        writeStream.write(cleanedLine + "\n");
+
+        // Check if this line contains "may be fork..."
+        if (cleanedLine.toLowerCase().includes(targetString)) {
+          foundForkLine = true;
+          // Stop processing after this line
+          readStream.destroy();
+          writeStream.end();
+          return;
+        }
+      }
     });
 
     readStream.on("end", () => {
+      // Process any remaining content in buffer
+      if (buffer && !foundForkLine) {
+        const cleanedBuffer = stripAnsi(buffer);
+        writeStream.write(cleanedBuffer);
+      }
       writeStream.end();
     });
 
@@ -149,11 +181,17 @@ export async function processLogFile(
       readStream.destroy();
       reject(error);
     });
+
+    readStream.on("close", () => {
+      if (!writeStream.destroyed) {
+        writeStream.end();
+      }
+    });
   });
 }
 
 /**
- * Clean all raw-*.log files by removing ANSI codes
+ * Clean all raw-*.log files by removing ANSI codes and stopping after first "may be fork..." line
  */
 /**
  * Check if a large file contains a target string using streaming
