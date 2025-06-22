@@ -1,4 +1,4 @@
-import { getManualUsers, getRandomNames } from "@helpers/client";
+import { getRandomNames } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
@@ -10,14 +10,13 @@ import { describe, expect, it } from "vitest";
 const testName = "commits";
 const workerCount = 6;
 const groupCount = 5;
-const batchSize = 4; // Smaller batch per group since we have 5 groups running in parallel
+const batchSize = 4;
 const TARGET_EPOCH = 100n;
 const randomInboxIdsCount = 30;
 const installationCount = 5;
 const testConfig = {
   testName,
   groupName: `Group ${getTime()}`,
-  manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIds(randomInboxIdsCount, installationCount),
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
@@ -95,13 +94,8 @@ describe(testName, () => {
         // Create group
         const group = (await creator.client.conversations.newGroup(
           testConfig.randomInboxIds,
-          {
-            groupName: `${testConfig.groupName} ${i + 1}`,
-          },
         )) as Group;
 
-        // Setup group with workers as super admins
-        await group.addMembers(testConfig.manualUsers.map((u) => u.inboxId));
         for (const worker of workers.getAllButCreator()) {
           await group.addMembers([worker.client.inboxId]);
           await group.addSuperAdmin(worker.client.inboxId);
