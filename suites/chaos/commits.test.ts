@@ -27,7 +27,6 @@ const testConfig = {
 describe(testName, () => {
   let workers: WorkerManager;
   let creator: Worker;
-  let groups: Group[];
 
   setupTestLifecycle({
     testName,
@@ -137,11 +136,16 @@ describe(testName, () => {
 
           await group.sync();
           const epoch = await group.debugInfo();
+          const members = await group.members();
+          let totalGroupInstallations = 0;
+          for (const member of members) {
+            totalGroupInstallations += member.installationIds.length;
+          }
           currentEpoch = epoch.epoch;
 
           if (operationCount % 20 === 0) {
             console.log(
-              `Group ${groupIndex + 1} - Epoch: ${currentEpoch}/${TARGET_EPOCH}`,
+              `Group ${groupIndex + 1} - Epoch: ${currentEpoch}/${TARGET_EPOCH} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
             );
           }
         }
