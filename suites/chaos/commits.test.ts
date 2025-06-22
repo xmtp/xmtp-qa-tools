@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 const testName = "commits";
 const workerCount = 6;
 const groupCount = 5;
-const batchSize = 4; // Smaller batch per group since we have 5 groups running in parallel
+const batchSize = 4;
 const TARGET_EPOCH = 100n;
 const randomInboxIdsCount = 30;
 const installationCount = 5;
@@ -34,7 +34,6 @@ describe(testName, () => {
     expect,
   });
 
-  // Create operation factories
   const createOperations = (
     worker: Worker,
     group: Group,
@@ -76,7 +75,6 @@ describe(testName, () => {
   };
 
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
-    // Initialize workers
     workers = await getWorkers(
       testConfig.workerNames,
       testConfig.testName,
@@ -86,12 +84,12 @@ describe(testName, () => {
     );
     creator = workers.getCreator();
 
-    // Create 5 groups and set them up in parallel
-    console.log(`Creating and setting up ${groupCount} groups in parallel...`);
-    const groupCreationPromises = Array.from(
+    const allWorkers = workers.getAll();
+    const availableMembers = testConfig.randomInboxIds;
+
+    const groupOperationPromises = Array.from(
       { length: groupCount },
-      async (_, i) => {
-        // Create group
+      async (_, groupIndex) => {
         const group = (await creator.client.conversations.newGroup(
           testConfig.randomInboxIds,
         )) as Group;
@@ -101,102 +99,63 @@ describe(testName, () => {
           await group.addSuperAdmin(worker.client.inboxId);
         }
 
-        return group;
+        let currentEpoch = 0n;
+        let operationCount = 0;
+
+        while (currentEpoch < TARGET_EPOCH) {
+          const parallelOperations = Array.from({ length: batchSize }, (_, i) =>
+            (async () => {
+              const randomWorker =
+                allWorkers[Math.floor(Math.random() * allWorkers.length)];
+
+              const ops = createOperations(
+                randomWorker,
+                group,
+                availableMembers,
+              );
+              const operationList = [
+                ops.updateName,
+                ops.addMember,
+                ops.sendMessage,
+                ops.removeMember,
+                ops.createInstallation,
+              ];
+
+              const randomOperation =
+                operationList[Math.floor(Math.random() * operationList.length)];
+
+              try {
+                await randomOperation();
+              } catch (e) {
+                console.log(`Group ${groupIndex + 1} operation failed:`, e);
+              }
+            })(),
+          );
+
+          await Promise.all(parallelOperations);
+          operationCount += batchSize;
+
+          await group.sync();
+          const epoch = await group.debugInfo();
+          currentEpoch = epoch.epoch;
+
+          if (operationCount % 20 === 0) {
+            console.log(
+              `Group ${groupIndex + 1} - Epoch: ${currentEpoch}/${TARGET_EPOCH}`,
+            );
+          }
+        }
+
+        return { groupIndex, finalEpoch: currentEpoch, operationCount };
       },
     );
 
-    groups = await Promise.all(groupCreationPromises);
-    console.log(`Created and set up ${groups.length} groups successfully`);
-
-    const allWorkers = workers.getAll();
-    const availableMembers = testConfig.randomInboxIds;
-
-    // Run commit operations for each group in parallel
-    console.log("Starting parallel commit operations for all groups...");
-    const groupOperationPromises = groups.map(async (group, groupIndex) => {
-      let currentEpoch = 0n;
-      let operationCount = 0;
-
-      // Keep running operations until this specific group reaches epoch 100+
-      while (currentEpoch < TARGET_EPOCH) {
-        // Create batch of operations for this specific group
-        const parallelOperations = Array.from({ length: batchSize }, (_, i) =>
-          (async () => {
-            // Select random worker for this group
-            const randomWorker =
-              allWorkers[Math.floor(Math.random() * allWorkers.length)];
-
-            // Create operations for the selected worker and this specific group
-            const ops = createOperations(randomWorker, group, availableMembers);
-            const operationList = [
-              ops.updateName,
-              ops.addMember,
-              ops.sendMessage,
-              ops.removeMember,
-              ops.createInstallation,
-            ];
-
-            // Select random operation
-            const randomOperation =
-              operationList[Math.floor(Math.random() * operationList.length)];
-
-            try {
-              await randomOperation();
-              console.log(
-                `Group ${groupIndex + 1} Operation ${operationCount + i + 1}: ${randomWorker.name} completed operation`,
-              );
-            } catch (e) {
-              console.log(
-                `Group ${groupIndex + 1} Operation ${operationCount + i + 1}: ${randomWorker.name} failed:`,
-                e,
-              );
-            }
-          })(),
-        );
-
-        // Run batch of operations in parallel for this group
-        await Promise.all(parallelOperations);
-        operationCount += batchSize;
-
-        // Check current epoch for this specific group
-        await group.sync();
-        const epoch = await group.debugInfo();
-        currentEpoch = epoch.epoch;
-
-        // Status update for this group
-        const members = await group.members();
-        let totalGroupInstallations = 0;
-        for (const member of members) {
-          totalGroupInstallations += member.installationIds.length;
-        }
-
-        console.log(
-          `Group ${groupIndex + 1} - Operations: ${operationCount} - Members: ${members.length} - Epoch: ${currentEpoch}/${TARGET_EPOCH} - Maybe: ${epoch.maybeForked} - Installations: ${totalGroupInstallations}`,
-        );
-      }
-
-      console.log(
-        `Group ${groupIndex + 1} completed! Final epoch: ${currentEpoch} after ${operationCount} operations`,
-      );
-
-      return { groupIndex, finalEpoch: currentEpoch, operationCount };
-    });
-
-    // Wait for all groups to complete
     const results = await Promise.all(groupOperationPromises);
 
     const totalOperations = results.reduce(
       (sum, result) => sum + result.operationCount,
       0,
     );
-    console.log(
-      `All groups completed! Total operations across all groups: ${totalOperations}`,
-    );
-
-    results.forEach(({ groupIndex, finalEpoch, operationCount }) => {
-      console.log(
-        `Group ${groupIndex + 1}: ${finalEpoch} epochs, ${operationCount} operations`,
-      );
-    });
+    console.log(`Total operations: ${totalOperations}`);
   });
 });
