@@ -19,7 +19,13 @@ const testConfig = {
   typeofStream: typeofStream.Message,
   typeOfResponse: typeOfResponse.Gm,
   typeOfSync: typeOfSync.Both,
-  workerNames: ["random1", "random2", "random3", "random4", "random5"],
+  workerNames: [
+    "random1",
+    "random2",
+    "random3",
+    "random4",
+    "random5",
+  ] as string[],
 } as const;
 
 describe(testName, () => {
@@ -47,7 +53,7 @@ describe(testName, () => {
           g.updateName(`${testConfig.groupName} - ${worker.name} Update`),
         ),
       createInstallation: () =>
-        getGroup().then((g) => worker.worker.addNewInstallation()),
+        getGroup().then(() => worker.worker.addNewInstallation()),
       addMember: () =>
         getGroup().then((g) =>
           g.addMembers([
@@ -100,7 +106,7 @@ describe(testName, () => {
         let operationCount = 0;
 
         while (currentEpoch < TARGET_EPOCH) {
-          const parallelOperations = Array.from({ length: batchSize }, (_, i) =>
+          const parallelOperations = Array.from({ length: batchSize }, () =>
             (async () => {
               const randomWorker =
                 allWorkers[Math.floor(Math.random() * allWorkers.length)];
@@ -151,6 +157,13 @@ describe(testName, () => {
         return { groupIndex, finalEpoch: currentEpoch, operationCount };
       },
     );
-    await Promise.all(groupOperationPromises);
+
+    const results = await Promise.all(groupOperationPromises);
+
+    const totalOperations = results.reduce(
+      (sum, result) => sum + result.operationCount,
+      0,
+    );
+    console.log(`Total operations: ${totalOperations}`);
   });
 });

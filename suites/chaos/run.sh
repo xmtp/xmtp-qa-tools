@@ -20,7 +20,7 @@ rm -rf .data/
 echo "Starting test cycle at $(date)"
 for i in {1..20}; do
         echo "Running test iteration $i of 100"
-        yarn test suites/chaos/commits.test.ts --debug --no-fail
+        yarn test suites/chaos/commits.test.ts --debug-verbose --no-fail
         exit_code=$?
         
         # Check for forks after each test
