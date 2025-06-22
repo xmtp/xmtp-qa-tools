@@ -1,41 +1,56 @@
+/*
+## Chaos Test: Concurrent Group Operations
+
+**Setup:**
+• 5 groups, 5 workers, 30 random members
+• Target: reach epoch 100 per group
+• 4 concurrent operations per batch
+
+**Test Flow:**
+• Create 5 groups in parallel
+• Add all workers as super admins to each group
+• **Loop until epoch 100:**
+  - Run 4 random operations simultaneously:
+    - Update group name
+    - Add/remove random member
+    - Send message
+    - Create new installation
+  - Sync group and check epoch progress
+  - Log stats every 20 operations
+
+**Purpose:**
+Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
+*/
+
 import { getTime } from "@helpers/logger";
-import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
-const testName = "commits";
 const groupCount = 5;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
 const randomInboxIdsCount = 30;
 const installationCount = 5;
-const testConfig = {
-  testName,
-  groupName: `Group ${getTime()}`,
-  randomInboxIds: getRandomInboxIds(randomInboxIdsCount, installationCount),
-  typeofStream: typeofStream.Message,
-  typeOfResponse: typeOfResponse.Gm,
-  typeOfSync: typeOfSync.Both,
-  workerNames: [
-    "random1",
-    "random2",
-    "random3",
-    "random4",
-    "random5",
-  ] as string[],
-} as const;
+const randomInboxIds = getRandomInboxIds(
+  randomInboxIdsCount,
+  installationCount,
+);
+const typeofStreamForTest = typeofStream.Message; // Stream all messages
+const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
+const workerNames = [
+  "random1",
+  "random2",
+  "random3",
+  "random4",
+  "random5",
+] as string[];
 
-describe(testName, () => {
+describe("commits", () => {
   let workers: WorkerManager;
   let creator: Worker;
-
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
 
   const createOperations = (
     worker: Worker,
@@ -50,7 +65,7 @@ describe(testName, () => {
     return {
       updateName: () =>
         getGroup().then((g) =>
-          g.updateName(`${testConfig.groupName} - ${worker.name} Update`),
+          g.updateName(`${getTime()} - ${worker.name} Update`),
         ),
       createInstallation: () =>
         getGroup().then(() => worker.worker.addNewInstallation()),
@@ -79,22 +94,22 @@ describe(testName, () => {
 
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
     workers = await getWorkers(
-      testConfig.workerNames,
-      testConfig.testName,
-      testConfig.typeofStream,
-      testConfig.typeOfResponse,
-      testConfig.typeOfSync,
+      workerNames,
+      "commits",
+      typeofStreamForTest,
+      typeOfResponse.None,
+      typeOfSyncForTest,
     );
     creator = workers.getCreator();
 
     const allWorkers = workers.getAll();
-    const availableMembers = testConfig.randomInboxIds;
+    const availableMembers = randomInboxIds;
 
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
         const group = (await creator.client.conversations.newGroup(
-          testConfig.randomInboxIds,
+          randomInboxIds,
         )) as Group;
 
         for (const worker of workers.getAllButCreator()) {
