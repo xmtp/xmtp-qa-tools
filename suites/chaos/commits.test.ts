@@ -23,11 +23,12 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
 */
 
 import { getTime } from "@helpers/logger";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const groupCount = 5;
 const batchSize = 4;
@@ -51,6 +52,11 @@ const workerNames = [
 describe("commits", () => {
   let workers: WorkerManager;
   let creator: Worker;
+
+  setupTestLifecycle({
+    testName: "commits",
+    expect,
+  });
 
   const createOperations = (
     worker: Worker,
