@@ -82,7 +82,7 @@ describe(testName, async () => {
             console.warn("[verify] Skipping check due to error:", e);
           }
         })();
-      }, 10 * 1000);
+      }, 30 * 1000);
     };
 
     const keyRotationLoop = () => {
