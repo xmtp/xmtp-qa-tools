@@ -69,7 +69,7 @@ export const ERROR_PATTERNS = {
     "Collector timed out.",
     "welcome with cursor",
     "group with welcome id",
-    "receive error",
+    "xmtp_mls::groups::mls_sync: receive error",
   ],
 
   // Lines to ignore in logs
