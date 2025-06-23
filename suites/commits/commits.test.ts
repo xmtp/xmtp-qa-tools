@@ -1,6 +1,5 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -8,8 +7,6 @@ import { describe, expect, it } from "vitest";
 const groupCount = 5;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
-const typeofStreamForTest = typeofStream.None; // Stream all messages
-const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
 const workerNames = [
   "random1",
   "random2",
@@ -74,13 +71,7 @@ describe("commits", () => {
   };
 
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
-    workers = await getWorkers(
-      workerNames,
-      "commits",
-      typeofStreamForTest,
-      typeOfResponse.None,
-      typeOfSyncForTest,
-    );
+    workers = await getWorkers(workerNames, "commits");
     creator = workers.getCreator();
 
     const allWorkers = workers.getAll();
