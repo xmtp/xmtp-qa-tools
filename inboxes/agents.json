@@ -7,6 +7,12 @@
     "disabled": false
   },
   {
+    "name": "mamo.base.eth",
+    "address": "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
+    "sendMessage": "hi",
+    "networks": ["production"]
+  },
+  {
     "name": "squabble",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "@squabble.base.eth",
