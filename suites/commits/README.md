@@ -15,7 +15,7 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
   - Log epoch progress
 - Clean logs and export forks
 
-## Download the code
+## Test setup
 
 ```bash
 # Installation For a faster download with just the latest code
