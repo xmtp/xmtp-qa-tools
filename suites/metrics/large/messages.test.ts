@@ -58,6 +58,7 @@ describe(testName, async () => {
         await newGroup.addMembers(
           workers.getAllButCreator().map((worker) => worker.client.inboxId),
         );
+
         await newGroup.sync();
         const verifyResult = await verifyMessageStream(
           newGroup,
