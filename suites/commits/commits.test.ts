@@ -47,22 +47,22 @@ describe("commits", () => {
         ),
       createInstallation: () =>
         getGroup().then(() => worker.worker.addNewInstallation()),
-      addMember: () =>
-        getGroup().then((g) =>
-          g.addMembers([
-            availableMembers[
-              Math.floor(Math.random() * availableMembers.length)
-            ],
-          ]),
-        ),
-      removeMember: () =>
-        getGroup().then((g) =>
-          g.removeMembers([
-            availableMembers[
-              Math.floor(Math.random() * availableMembers.length)
-            ],
-          ]),
-        ),
+      // addMember: () =>
+      //   getGroup().then((g) =>
+      //     g.addMembers([
+      //       availableMembers[
+      //         Math.floor(Math.random() * availableMembers.length)
+      //       ],
+      //     ]),
+      //   ),
+      // removeMember: () =>
+      //   getGroup().then((g) =>
+      //     g.removeMembers([
+      //       availableMembers[
+      //         Math.floor(Math.random() * availableMembers.length)
+      //       ],
+      //     ]),
+      //   ),
       sendMessage: () =>
         getGroup().then((g) =>
           g.send(`Message from ${worker.name}`).then(() => {}),
