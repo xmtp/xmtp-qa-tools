@@ -456,6 +456,7 @@ export class WorkerClient extends Worker {
             }
             if (
               (message.contentType?.typeId === "text" ||
+                message.contentType?.typeId === "reaction" ||
                 message.contentType?.typeId === "reply") &&
               type === typeofStream.Message
             ) {
@@ -535,6 +536,7 @@ export class WorkerClient extends Worker {
       let shouldRespond = false;
       if (
         ((message?.contentType?.typeId === "text" ||
+          message?.contentType?.typeId === "reaction" ||
           message?.contentType?.typeId === "reply") &&
           content.includes(baseName) &&
           !content.includes("/") &&
@@ -773,7 +775,9 @@ export class WorkerClient extends Worker {
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
         const typeIsText =
-          contentType?.typeId === "text" || contentType?.typeId === "reply";
+          contentType?.typeId === "text" ||
+          contentType?.typeId === "reply" ||
+          contentType?.typeId === "reaction";
 
         const shouldAccept = idsMatch && typeIsText;
 

@@ -57,7 +57,9 @@ describe(testName, async () => {
             group.id,
           );
           if (!convo) {
-            console.warn(`[sendLoop] ${sender.name} not in group right now � skipping send`);
+            console.warn(
+              `[sendLoop] ${sender.name} not in group right now skipping send`,
+            );
             continue;
           }
 
