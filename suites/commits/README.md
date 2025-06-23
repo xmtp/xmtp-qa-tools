@@ -1,4 +1,4 @@
-# Chaos Test: Concurrent Group Operations
+# Chaos Test: 100 Epochs
 
 Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
 
