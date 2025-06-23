@@ -468,6 +468,8 @@ export function getLatestVersion(): string {
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
-  return sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
-    .libXmtpVersion;
+  return (
+    sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
+      ?.libXmtpVersion || "unknown"
+  );
 }

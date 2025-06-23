@@ -426,7 +426,7 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = ["208", "209", "210", "220"];
+export const sdkVersionOptions = ["209", "210", "220"];
 
 // SDK version mappings
 export const sdkVersions = {
