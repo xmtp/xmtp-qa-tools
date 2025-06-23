@@ -675,7 +675,7 @@ export class WorkerClient extends Worker {
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
     console.debug(
-      `[${this.nameId}] Starting collector ${collectorId} for ${count} events of type ${type}`,
+      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
     );
 
     return new Promise((resolve) => {

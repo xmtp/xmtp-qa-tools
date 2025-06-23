@@ -30,13 +30,12 @@ describe(testName, () => {
   });
 
   const filteredAgents = productionAgents.filter((agent) => {
-    return agent.networks.includes(env) && !agent.disabled;
+    return agent.networks.includes(env);
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} : ${agent.address}`, async () => {
       try {
-        let retries = 3; // Move retries inside each test for fresh count
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
         const conversation = await workers
@@ -49,9 +48,9 @@ describe(testName, () => {
         let messages = await conversation.messages();
         let countBefore = messages.length;
 
+        let retries = 3;
         let agentResponded = false;
         let result;
-
         while (retries > 0) {
           messages = await conversation.messages();
           countBefore = messages.length;
@@ -85,7 +84,10 @@ describe(testName, () => {
           result?.averageEventTiming,
         );
 
-        sendMetric("response", result?.averageEventTiming ?? streamTimeout, {
+        let metricValue = result?.averageEventTiming as number;
+        if (!agentResponded) metricValue = streamTimeout;
+
+        sendMetric("response", metricValue, {
           metric_type: "agent",
           metric_subtype: agent.name,
           agent: agent.name,
