@@ -3,7 +3,7 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-num_runs=50
+num_runs=100
 
 
 
@@ -13,7 +13,7 @@ rm -rf .data/
 echo "Starting test cycle at $(date)"
 for ((i=1; i<=num_runs; i++)); do
     echo "Running test iteration $i of $num_runs"
-    yarn test suites/commits/commits.test.ts  --no-fail
+    yarn test suites/commits/commits.test.ts  --no-fail --debug
     exit_code=$?
     
     # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop
