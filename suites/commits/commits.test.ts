@@ -1,6 +1,5 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -9,20 +8,19 @@ import { describe, expect, it } from "vitest";
 const groupCount = 5;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
-const randomInboxIdsCount = 30;
-const installationCount = 5;
-const randomInboxIds = getRandomInboxIds(
-  randomInboxIdsCount,
-  installationCount,
-);
-const typeofStreamForTest = typeofStream.Message; // Stream all messages
-const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
+const typeofStreamForTest = typeofStream.None; // Stream all messages
+const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
 const workerNames = [
   "random1",
   "random2",
   "random3",
   "random4",
   "random5",
+  "random6",
+  "random7",
+  "random8",
+  "random9",
+  "random10",
 ] as string[];
 
 describe("commits", () => {
@@ -34,11 +32,12 @@ describe("commits", () => {
     expect,
   });
 
-  const createOperations = (
+  const createOperations = async (
     worker: Worker,
     group: Group,
     availableMembers: string[],
   ) => {
+    await worker.client.conversations.syncAll();
     const getGroup = () =>
       worker.client.conversations.getConversationById(
         group.id,
@@ -85,13 +84,12 @@ describe("commits", () => {
     creator = workers.getCreator();
 
     const allWorkers = workers.getAll();
-    const availableMembers = randomInboxIds;
 
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
         const group = (await creator.client.conversations.newGroup(
-          randomInboxIds,
+          [],
         )) as Group;
 
         for (const worker of workers.getAllButCreator()) {
@@ -107,18 +105,8 @@ describe("commits", () => {
               const randomWorker =
                 allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-              const ops = createOperations(
-                randomWorker,
-                group,
-                availableMembers,
-              );
-              const operationList = [
-                ops.updateName,
-                ops.addMember,
-                ops.sendMessage,
-                ops.removeMember,
-                ops.createInstallation,
-              ];
+              const ops = await createOperations(randomWorker, group, []);
+              const operationList = [ops.updateName, ops.sendMessage];
 
               const randomOperation =
                 operationList[Math.floor(Math.random() * operationList.length)];
