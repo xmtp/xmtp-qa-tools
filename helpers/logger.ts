@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import winston from "winston";
+import winston, { error } from "winston";
 import "dotenv/config";
 
 // Known test issues for tracking
@@ -69,6 +69,7 @@ export const ERROR_PATTERNS = {
     "Collector timed out.",
     "welcome with cursor",
     "group with welcome id",
+    "xmtp_mls::groups::mls_sync: receive error",
   ],
 
   // Lines to ignore in logs
