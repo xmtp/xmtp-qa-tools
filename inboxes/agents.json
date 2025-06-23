@@ -58,15 +58,15 @@
     "networks": ["production"]
   },
   {
-    "name": "bankr.base.eth",
+    "name": "bankr",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "sendMessage": "hey there how are you?",
     "networks": ["production"]
   },
   {
-    "name": "clankerchat.base.eth",
+    "name": "tokenbot",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-    "sendMessage": "hi",
+    "sendMessage": "@tokenbot",
     "networks": ["production"]
   }
 ]
