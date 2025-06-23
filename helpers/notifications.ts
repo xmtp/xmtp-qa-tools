@@ -226,8 +226,13 @@ class SlackNotifier {
     const errorLogsArr = Array.from(options.errorLogs || []);
     const logs = this.sanitizeLogs(errorLogsArr.join("\n"));
 
+    // Check if we need to tag @fabri for multiple failures
+    const failLines = this.extractFailLines(options.errorLogs || new Set());
+    const shouldTagFabri = failLines.length > 3;
+    const tagMessage = shouldTagFabri ? " <@fabri>" : "";
+
     const sections = [
-      "*Test Failure ❌*",
+      `*Test Failure ❌*${tagMessage}`,
       `*Test:* <${URLS.GITHUB_ACTIONS}/${this.githubContext.repository}/actions/workflows/${this.githubContext.workflowName}.yml|${upperCaseTestName}>`,
       `*Environment:* \`${this.githubContext.environment}\``,
       `*General dashboard:* <${URLS.DATADOG_DASHBOARD}|View>`,

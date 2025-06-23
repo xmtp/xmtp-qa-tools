@@ -460,6 +460,14 @@ function processErrorLine(line: string): {
 
   cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
 
+  if (cleanLine.length < 30) {
+    return { cleanLine, shouldSkip: true };
+  }
+  // Trim long lines to 200 characters max
+  if (cleanLine.length > 150) {
+    cleanLine = cleanLine.substring(0, 147) + "...";
+  }
+
   return { cleanLine, shouldSkip: false };
 }
 
