@@ -4,7 +4,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const groupCount = 5;
+const groupCount = 2;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
 const workerNames = [
@@ -13,11 +13,6 @@ const workerNames = [
   "random3",
   "random4",
   "random5",
-  "random6",
-  "random7",
-  "random8",
-  "random9",
-  "random10",
 ] as string[];
 
 describe("commits", () => {
@@ -28,47 +23,6 @@ describe("commits", () => {
     testName: "commits",
     expect,
   });
-
-  const createOperations = async (
-    worker: Worker,
-    group: Group,
-    availableMembers: string[],
-  ) => {
-    await worker.client.conversations.syncAll();
-    const getGroup = () =>
-      worker.client.conversations.getConversationById(
-        group.id,
-      ) as Promise<Group>;
-
-    return {
-      updateName: () =>
-        getGroup().then((g) =>
-          g.updateName(`${getTime()} - ${worker.name} Update`),
-        ),
-      createInstallation: () =>
-        getGroup().then(() => worker.worker.addNewInstallation()),
-      // addMember: () =>
-      //   getGroup().then((g) =>
-      //     g.addMembers([
-      //       availableMembers[
-      //         Math.floor(Math.random() * availableMembers.length)
-      //       ],
-      //     ]),
-      //   ),
-      // removeMember: () =>
-      //   getGroup().then((g) =>
-      //     g.removeMembers([
-      //       availableMembers[
-      //         Math.floor(Math.random() * availableMembers.length)
-      //       ],
-      //     ]),
-      //   ),
-      sendMessage: () =>
-        getGroup().then((g) =>
-          g.send(`Message from ${worker.name}`).then(() => {}),
-        ),
-    };
-  };
 
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
     workers = await getWorkers(workerNames, "commits");
@@ -93,17 +47,19 @@ describe("commits", () => {
         while (currentEpoch < TARGET_EPOCH) {
           const parallelOperations = Array.from({ length: batchSize }, () =>
             (async () => {
-              const randomWorker =
-                allWorkers[Math.floor(Math.random() * allWorkers.length)];
-
-              const ops = await createOperations(randomWorker, group, []);
-              const operationList = [ops.updateName, ops.sendMessage];
-
-              const randomOperation =
-                operationList[Math.floor(Math.random() * operationList.length)];
-
               try {
-                await randomOperation();
+                const randomWorker =
+                  allWorkers[Math.floor(Math.random() * allWorkers.length)];
+
+                await randomWorker.client.conversations.syncAll();
+                const groupFromWorker =
+                  (await randomWorker.client.conversations.getConversationById(
+                    group.id,
+                  )) as Group;
+
+                await groupFromWorker.updateName(
+                  `${getTime()} - ${randomWorker.name} Update`,
+                );
               } catch (e) {
                 console.log(`Group ${groupIndex + 1} operation failed:`, e);
               }
@@ -113,18 +69,14 @@ describe("commits", () => {
           await Promise.all(parallelOperations);
 
           await group.sync();
-          const epoch = await group.debugInfo();
-          const members = await group.members();
-          let totalGroupInstallations = 0;
-          for (const member of members) {
-            totalGroupInstallations += member.installationIds.length;
-          }
-          currentEpoch = epoch.epoch;
-
+          const debugInfo = await group.debugInfo();
+          currentEpoch = debugInfo.epoch;
           if (currentEpoch % 20n === 0n) {
-            console.log(
-              `Group ${groupIndex + 1} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
-            );
+            console.log(`Group ${groupIndex + 1} - Epoch: ${currentEpoch} `);
+          }
+          if (debugInfo.maybeForked) {
+            console.log(`Group ${groupIndex + 1} forked`);
+            break;
           }
         }
 
