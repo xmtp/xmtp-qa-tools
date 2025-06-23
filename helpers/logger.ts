@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import winston, { error } from "winston";
+import winston from "winston";
 import "dotenv/config";
 
 // Known test issues for tracking
