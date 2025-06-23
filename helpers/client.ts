@@ -426,7 +426,6 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-export const sdkVersionOptions = ["208", "209", "210", "220"];
 
 // SDK version mappings
 export const sdkVersions = {
@@ -501,6 +500,11 @@ export const sdkVersions = {
     libXmtpVersion: "d0f0b67",
   },
 };
+
+export const sdkVersionOptions = Object.keys(sdkVersions)
+  .filter((key) => parseInt(key) >= 200)
+  .sort((a, b) => parseInt(b) - parseInt(a))
+  .slice(0, 3);
 
 /**
  * Creates random installations for a worker
