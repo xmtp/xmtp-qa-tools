@@ -19,7 +19,7 @@ describe(testName, async () => {
 
   // Randomly assign 20 users to the 4 nodes via API URLs
   const userDescriptors: Record<string, string> = {};
-  for (let i = 0; i < 20; i++) {
+  for (let i = 0; i < 100; i++) {
     const user = `user${i + 1}`;
     const port = 5556 + 1000 * Math.floor(Math.random() * 4); // 5556, 6556, 7556, 8556
     userDescriptors[user] = `http://localhost:${port}`;
