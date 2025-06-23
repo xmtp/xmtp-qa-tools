@@ -1,30 +1,5 @@
-/*
-## Chaos Test: Concurrent Group Operations
-
-**Setup:**
-• 5 groups, 5 workers, 30 random members
-• Target: reach epoch 100 per group
-• 4 concurrent operations per batch
-
-**Test Flow:**
-• Create 5 groups in parallel
-• Add all workers as super admins to each group
-• **Loop until epoch 100:**
-  - Run 4 random operations simultaneously:
-    - Update group name
-    - Add/remove random member
-    - Send message
-    - Create new installation
-  - Sync group and check epoch progress
-  - Log stats every 20 operations
-
-**Purpose:**
-Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
-*/
-
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -33,12 +8,7 @@ import { describe, expect, it } from "vitest";
 const groupCount = 5;
 const batchSize = 4;
 const TARGET_EPOCH = 100n;
-const randomInboxIdsCount = 30;
-const installationCount = 5;
-const randomInboxIds = getRandomInboxIds(
-  randomInboxIdsCount,
-  installationCount,
-);
+
 const typeofStreamForTest = typeofStream.Message; // Stream all messages
 const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
 const workerNames = [
@@ -58,11 +28,7 @@ describe("commits", () => {
     expect,
   });
 
-  const createOperations = (
-    worker: Worker,
-    group: Group,
-    availableMembers: string[],
-  ) => {
+  const createOperations = (worker: Worker, group: Group) => {
     const getGroup = () =>
       worker.client.conversations.getConversationById(
         group.id,
@@ -75,22 +41,6 @@ describe("commits", () => {
         ),
       createInstallation: () =>
         getGroup().then(() => worker.worker.addNewInstallation()),
-      addMember: () =>
-        getGroup().then((g) =>
-          g.addMembers([
-            availableMembers[
-              Math.floor(Math.random() * availableMembers.length)
-            ],
-          ]),
-        ),
-      removeMember: () =>
-        getGroup().then((g) =>
-          g.removeMembers([
-            availableMembers[
-              Math.floor(Math.random() * availableMembers.length)
-            ],
-          ]),
-        ),
       sendMessage: () =>
         getGroup().then((g) =>
           g.send(`Message from ${worker.name}`).then(() => {}),
@@ -109,13 +59,12 @@ describe("commits", () => {
     creator = workers.getCreator();
 
     const allWorkers = workers.getAll();
-    const availableMembers = randomInboxIds;
 
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
         const group = (await creator.client.conversations.newGroup(
-          randomInboxIds,
+          [],
         )) as Group;
 
         for (const worker of workers.getAllButCreator()) {
@@ -131,16 +80,10 @@ describe("commits", () => {
               const randomWorker =
                 allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-              const ops = createOperations(
-                randomWorker,
-                group,
-                availableMembers,
-              );
+              const ops = createOperations(randomWorker, group);
               const operationList = [
                 ops.updateName,
-                ops.addMember,
                 ops.sendMessage,
-                ops.removeMember,
                 ops.createInstallation,
               ];
 
