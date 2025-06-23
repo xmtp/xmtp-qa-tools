@@ -4,8 +4,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const groupCount = 2;
-const batchSize = 4;
+const groupCount = 5;
 const TARGET_EPOCH = 100n;
 const workerNames = [
   "random1",
@@ -13,6 +12,11 @@ const workerNames = [
   "random3",
   "random4",
   "random5",
+  "random6",
+  "random7",
+  "random8",
+  "random9",
+  "random10",
 ] as string[];
 
 describe("commits", () => {
@@ -45,28 +49,22 @@ describe("commits", () => {
         let currentEpoch = 0n;
 
         while (currentEpoch < TARGET_EPOCH) {
-          const parallelOperations = Array.from({ length: batchSize }, () =>
-            (async () => {
-              try {
-                const randomWorker =
-                  allWorkers[Math.floor(Math.random() * allWorkers.length)];
+          try {
+            const randomWorker =
+              allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-                await randomWorker.client.conversations.syncAll();
-                const groupFromWorker =
-                  (await randomWorker.client.conversations.getConversationById(
-                    group.id,
-                  )) as Group;
+            await randomWorker.client.conversations.syncAll();
+            const groupFromWorker =
+              (await randomWorker.client.conversations.getConversationById(
+                group.id,
+              )) as Group;
 
-                await groupFromWorker.updateName(
-                  `${getTime()} - ${randomWorker.name} Update`,
-                );
-              } catch (e) {
-                console.log(`Group ${groupIndex + 1} operation failed:`, e);
-              }
-            })(),
-          );
-
-          await Promise.all(parallelOperations);
+            await groupFromWorker.updateName(
+              `${getTime()} - ${randomWorker.name}`,
+            );
+          } catch (e) {
+            console.log(`Group ${groupIndex + 1} operation failed:`, e);
+          }
 
           await group.sync();
           const debugInfo = await group.debugInfo();
