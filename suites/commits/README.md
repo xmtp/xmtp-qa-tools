@@ -10,7 +10,6 @@
 
 - Create 5 groups in parallel
 - Add all workers as super admins to each group
-
 - **Loop until epoch 100:**
   - Run 4 random operations simultaneously:
     - Update group name
@@ -18,7 +17,8 @@
     - Send message (random message)
     - Create new installation (random installation) (this is a new installation for the group)
   - Sync group and check epoch progress
-  - Log stats every 20 operations
+  - Log epoch every 20 operations
+- Save the logs in `logs/cleaned`
 
 **Purpose:**
 Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
@@ -28,11 +28,21 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
 ```bash
 # Installation For a faster download with just the latest code
 git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools
+
+# Go to the project directory
 cd xmtp-qa-tools
+
+# Install the dependencies
 yarn install
+
+# Start the local environment
 ./dev/up
-yarn local-update
+
+# Run the test
 yarn run:commits
+
+# When the test ends fork logs will be stored in
+# logs/cleaned
 ```
 
 # Current Status
