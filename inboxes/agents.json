@@ -3,7 +3,8 @@
     "name": "flaunchy",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "hi",
-    "networks": ["production"]
+    "networks": ["production"],
+    "disabled": false
   },
   {
     "name": "mamo.base.eth",
