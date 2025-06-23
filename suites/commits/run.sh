@@ -3,7 +3,7 @@
 # Handle Ctrl+C to exit the entire script cleanly
 trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
-num_runs=50
+num_runs=100
 
 
 
