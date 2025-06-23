@@ -1,6 +1,5 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
