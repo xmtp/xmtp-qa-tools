@@ -775,7 +775,9 @@ export class WorkerClient extends Worker {
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
         const typeIsText =
-          contentType?.typeId === "text" || contentType?.typeId === "reply";
+          contentType?.typeId === "text" ||
+          contentType?.typeId === "reply" ||
+          contentType?.typeId === "reaction";
 
         const shouldAccept = idsMatch && typeIsText;
 
