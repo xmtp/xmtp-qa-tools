@@ -95,16 +95,4 @@ describe(testName, async () => {
       throw e;
     }
   });
-
-  it("fail on purssspos2e", () => {
-    expect(false).toBe(true);
-  });
-
-  it("faild on sdds", () => {
-    expect(false).toBe(true);
-  });
-
-  it("faidl on faa", () => {
-    expect(false).toBe(true);
-  });
 });
