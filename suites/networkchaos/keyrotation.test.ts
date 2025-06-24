@@ -75,16 +75,17 @@ describe(testName, async () => {
     const verifyLoop = () => {
       verifyInterval = setInterval(() => {
         void (async () => {
-          try {
-            console.log("[verify] Checking fork and delivery");
-            await workers.checkForks();
-            const res = await verifyMessageStream(group, otherUsers);
-            expect(res.allReceived).toBe(true);
-          } catch (e) {
-            console.warn("[verify] Skipping check due to error:", e);
-          }
-        })();
+          console.log("[verify] Checking fork and delivery");
+          await workers.checkForks();
+          const res = await verifyMessageStream(group, otherUsers);
+          expect(res.allReceived).toBe(true);
+        })().catch((err) => {
+          console.error("[verify] Fatal verification error, exiting test:", err);
+          clearChaos();
+          throw err;
+        });
       }, 30 * 1000);
+
     };
 
     const keyRotationLoop = () => {
