@@ -16,7 +16,7 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
     - Create installation (random inboxId)
   - Sync group
   - Log epoch progress
-- Clean logs and export forks
+- Export forks into a folder
 
 ## Parameters
 
