@@ -1,6 +1,6 @@
 import fetch from "node-fetch";
 import { sendDatadogLog } from "./datadog";
-import { KNOWN_ISSUES } from "./logger";
+import { PATTERNS } from "./errors";
 
 // Configuration constants
 const URLS = {
@@ -63,7 +63,7 @@ class SlackNotifier {
   constructor() {
     this.slackChannel = process.env.SLACK_CHANNEL || "general";
     this.githubContext = this.getGitHubContext();
-    this.testFilters = KNOWN_ISSUES;
+    this.testFilters = PATTERNS.KNOWN_ISSUES;
   }
 
   private getGitHubContext(): GitHubContext {
