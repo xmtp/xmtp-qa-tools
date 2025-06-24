@@ -16,7 +16,7 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
     - Create installation (random inboxId)
   - Sync group
   - Log epoch progress
-- Clean logs and export forks
+- Export forks into a folder
 
 ## Parameters
 
@@ -44,6 +44,6 @@ yarn install
 # Start local network
 ./dev/up
 
-# Run the test 100 times
+# Run the test 100 times and exports logs
 yarn run:commits
 ```
