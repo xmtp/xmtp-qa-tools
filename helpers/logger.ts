@@ -34,10 +34,9 @@ export const KNOWN_ISSUES = [
   // },
 ];
 
-// Patterns configuration
+// Error patterns for filtering and deduplication
 export const ERROR_PATTERNS = {
-  // Patterns to track for error deduplication
-  TRACK: [
+  DEDUPE: [
     "sync worker error storage error",
     "sqlcipher_mlock",
     "Collector timed out.",
@@ -47,250 +46,75 @@ export const ERROR_PATTERNS = {
     "Message processing errors:",
     "xmtp_mls::groups::mls_sync: receive error",
   ],
-
-  // Lines to ignore in logs
-  IGNORE: [", last_stream_id: StreamId(0) }", ", Library)"],
-
-  // Regex patterns for filtering logs
-  FILTER: [
-    /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-    /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
-  ],
-
-  // Patterns to match error log lines
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
 
-// Consolidated ANSI escape code regex
 // eslint-disable-next-line no-control-regex
 const ANSI_REGEX = /[\x1b\u001b]\[[0-9;]*[a-zA-Z]/g;
 
 /**
- * Remove ANSI escape codes and control characters from text
+ * Remove ANSI escape codes from text
  */
 export function stripAnsi(text: string): string {
-  return (
-    text
-      .replace(ANSI_REGEX, "")
-      // eslint-disable-next-line no-control-regex
-      .replace(/[\x00-\x1f\x7f-\x9f]/g, (char) => {
-        // Keep newlines, tabs, and carriage returns
-        return ["\n", "\t", "\r"].includes(char) ? char : "";
-      })
-  );
+  return text.replace(ANSI_REGEX, "");
 }
 
 /**
- * Filter log output based on configured patterns
+ * Clean and process log files by removing ANSI codes and stopping at fork lines
  */
-export function filterLogOutput(data: string): string {
-  let filtered = data;
+export function processLogFile(inputPath: string, outputPath: string): void {
+  const content = fs.readFileSync(inputPath, "utf8");
+  const lines = content.split("\n");
+  const cleanedLines: string[] = [];
 
-  // Apply regex pattern filtering
-  for (const pattern of ERROR_PATTERNS.FILTER) {
-    filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
+  for (const line of lines) {
+    const cleanLine = stripAnsi(line);
+    cleanedLines.push(cleanLine);
+
+    if (cleanLine.toLowerCase().includes("may be fork")) {
+      break;
+    }
   }
 
-  // Filter out lines containing ignore patterns
-  const lines = filtered.split("\n");
-  const filteredLines = lines.filter((line) => {
-    return !ERROR_PATTERNS.IGNORE.some((pattern) => line.includes(pattern));
-  });
-
-  return filteredLines.join("\n");
+  fs.writeFileSync(outputPath, cleanedLines.join("\n"));
 }
 
 /**
- * Process a single log file to remove ANSI codes and stop after first "may be fork..." line
+ * Clean all raw-*.log files that contain fork messages
  */
-export async function processLogFile(
-  inputPath: string,
-  outputPath: string,
-): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const readStream = fs.createReadStream(inputPath, {
-      encoding: "utf8",
-      highWaterMark: 64 * 1024,
-    });
-    const writeStream = fs.createWriteStream(outputPath, { encoding: "utf8" });
-
-    let buffer = "";
-    let foundForkLine = false;
-    const targetString = "may be fork";
-
-    readStream.on("data", (chunk: string | Buffer) => {
-      if (foundForkLine) {
-        // Stop processing once we've found the fork line
-        return;
-      }
-
-      const chunkStr =
-        typeof chunk === "string" ? chunk : chunk.toString("utf8");
-      buffer += chunkStr;
-
-      // Process complete lines
-      const lines = buffer.split("\n");
-      // Keep the last incomplete line in buffer
-      buffer = lines.pop() || "";
-
-      for (const line of lines) {
-        const cleanedLine = stripAnsi(line);
-        writeStream.write(cleanedLine + "\n");
-
-        // Check if this line contains "may be fork..."
-        if (cleanedLine.toLowerCase().includes(targetString)) {
-          foundForkLine = true;
-          // Stop processing after this line
-          readStream.destroy();
-          writeStream.end();
-          return;
-        }
-      }
-    });
-
-    readStream.on("end", () => {
-      // Process any remaining content in buffer
-      if (buffer && !foundForkLine) {
-        const cleanedBuffer = stripAnsi(buffer);
-        writeStream.write(cleanedBuffer);
-      }
-      writeStream.end();
-    });
-
-    writeStream.on("finish", () => {
-      resolve();
-    });
-
-    readStream.on("error", (error) => {
-      writeStream.destroy();
-      reject(error);
-    });
-
-    writeStream.on("error", (error) => {
-      readStream.destroy();
-      reject(error);
-    });
-
-    readStream.on("close", () => {
-      if (!writeStream.destroyed) {
-        writeStream.end();
-      }
-    });
-  });
-}
-
-/**
- * Clean all raw-*.log files by removing ANSI codes and stopping after first "may be fork..." line
- */
-/**
- * Check if a large file contains a target string using streaming
- */
-async function fileContainsString(
-  filePath: string,
-  targetString: string,
-): Promise<boolean> {
-  return new Promise((resolve, reject) => {
-    const stream = fs.createReadStream(filePath, {
-      encoding: "utf8",
-      highWaterMark: 64 * 1024,
-    }); // 64KB chunks
-    let buffer = "";
-    let found = false;
-
-    stream.on("data", (chunk: string | Buffer) => {
-      const chunkStr =
-        typeof chunk === "string" ? chunk : chunk.toString("utf8");
-      buffer += chunkStr;
-
-      // Check if we found the target string
-      if (buffer.includes(targetString)) {
-        found = true;
-        stream.destroy(); // Stop reading
-        return;
-      }
-
-      // Keep only the last part of buffer to handle strings that span chunks
-      // Keep twice the target string length to be safe
-      const keepLength = targetString.length * 2;
-      if (buffer.length > keepLength) {
-        buffer = buffer.slice(-keepLength);
-      }
-    });
-
-    stream.on("end", () => {
-      resolve(found);
-    });
-
-    stream.on("error", (error) => {
-      reject(error);
-    });
-
-    stream.on("close", () => {
-      resolve(found);
-    });
-  });
-}
-
-export async function cleanAllRawLogs(): Promise<void> {
+export function cleanAllRawLogs(): void {
   const logsDir = path.join(process.cwd(), "logs");
   const outputDir = path.join(logsDir, "cleaned");
 
-  if (!fs.existsSync(logsDir)) {
-    console.log("No logs directory found");
-    return;
-  }
+  if (!fs.existsSync(logsDir)) return;
 
   if (!fs.existsSync(outputDir)) {
-    await fs.promises.mkdir(outputDir, { recursive: true });
+    fs.mkdirSync(outputDir, { recursive: true });
   }
 
-  const files = await fs.promises.readdir(logsDir);
+  const files = fs.readdirSync(logsDir);
   const rawLogFiles = files.filter(
     (file) => file.startsWith("raw-") && file.endsWith(".log"),
   );
 
-  if (rawLogFiles.length === 0) {
-    console.log("No raw-*.log files found to clean");
-    return;
-  }
-
-  console.log(`Found ${rawLogFiles.length} raw log files to check`);
-
   let processedCount = 0;
   for (const file of rawLogFiles) {
     const inputPath = path.join(logsDir, file);
+    const content = fs.readFileSync(inputPath, "utf8");
 
-    try {
-      // Check if file contains "your group may be forked" using streaming
-      const containsTargetString = await fileContainsString(
-        inputPath,
-        "your group may be forked",
-      );
+    if (!content.includes("your group may be forked")) continue;
 
-      if (!containsTargetString) {
-        console.log(
-          `Skipping ${file} - does not contain "your group may be forked"`,
-        );
-        continue;
-      }
+    const outputFileName = file.replace("raw-", "cleaned-");
+    const outputPath = path.join(outputDir, outputFileName);
 
-      const outputFileName = file.replace("raw-", "cleaned-");
-      const outputPath = path.join(outputDir, outputFileName);
-
-      await processLogFile(inputPath, outputPath);
-      console.log(`Cleaned: ${file} -> ${outputFileName}`);
-      processedCount++;
-    } catch (error) {
-      console.error(`Failed to process ${file}:`, error);
-    }
+    processLogFile(inputPath, outputPath);
+    processedCount++;
   }
 
-  console.log(
-    `Processed ${processedCount} files containing "your group may be forked"`,
-  );
+  console.log(`Processed ${processedCount} files containing fork messages`);
 }
 
-// Extend winston Logger interface for custom methods
+// Extend winston Logger interface
 declare module "winston" {
   interface Logger {
     time(label: string): void;
@@ -299,32 +123,24 @@ declare module "winston" {
 }
 
 /**
- * Create a winston logger with custom formatting and timer methods
+ * Create winston logger with timer methods
  */
 export const createLogger = () => {
-  const prettyFormat = winston.format.printf((info) => {
-    return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
-  });
-
-  const combinedFormat = winston.format.combine(
-    winston.format.timestamp(),
-    winston.format.colorize(),
-    prettyFormat,
-  );
-
   const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || "silly",
-    format: combinedFormat,
+    level: process.env.LOG_LEVEL || "info",
+    format: winston.format.combine(
+      winston.format.timestamp(),
+      winston.format.colorize(),
+      winston.format.printf(
+        (info) => `[${info.timestamp}] [${info.level}] ${info.message}`,
+      ),
+    ),
     transports: [new winston.transports.Console()],
   });
 
-  // Add timer functionality
   const timers = new Map<string, number>();
 
-  logger.time = (label: string) => {
-    timers.set(label, performance.now());
-  };
-
+  logger.time = (label: string) => timers.set(label, performance.now());
   logger.timeEnd = (label: string) => {
     const startTime = timers.get(label);
     if (startTime) {
@@ -342,43 +158,27 @@ export const createLogger = () => {
  */
 export const logError = (e: unknown, testName: string | undefined): boolean => {
   if (e instanceof Error) {
-    console.warn(`${testName}`, e.message);
+    console.warn(testName || "unknown", e.message);
   } else {
     console.warn(`Unknown error type:`, typeof e);
   }
   return true;
 };
 
-// Global logger instance
 const logger = createLogger();
 
 /**
- * Override console methods with pretty logging
+ * Override console methods with winston logging
  */
 export const setupPrettyLogs = (testName: string) => {
-  const originalConsole = {
-    log: console.log,
-    info: console.info,
-    warn: console.warn,
-    error: console.error,
-    debug: console.debug,
-    time: console.time,
-    timeEnd: console.timeEnd,
-  };
+  const originalConsole = { ...console };
 
-  const createLogMethod = (level: keyof typeof logger, prefix = "") => {
-    return (...args: unknown[]) => {
-      const message = args.join(" ");
-      (logger[level] as (msg: string) => void)(prefix + message);
-    };
-  };
-
-  // Override console methods
-  console.log = createLogMethod("info");
-  console.info = createLogMethod("info");
-  console.warn = createLogMethod("warn");
-  console.error = createLogMethod("error", `QA_ERROR ${testName} > `);
-  console.debug = createLogMethod("debug");
+  console.log = (...args: any[]) => logger.info(args.join(" "));
+  console.info = (...args: any[]) => logger.info(args.join(" "));
+  console.warn = (...args: any[]) => logger.warn(args.join(" "));
+  console.error = (...args: any[]) =>
+    logger.error(`QA_ERROR ${String(testName)} > ${String(args.join(" "))}`);
+  console.debug = (...args: any[]) => logger.debug(args.join(" "));
   console.time = (label: string) => {
     logger.time(label);
   };
@@ -386,10 +186,7 @@ export const setupPrettyLogs = (testName: string) => {
     logger.timeEnd(label);
   };
 
-  // Return restore function
-  return () => {
-    Object.assign(console, originalConsole);
-  };
+  return () => Object.assign(console, originalConsole);
 };
 
 /**
@@ -408,55 +205,46 @@ export const getTime = (): string => {
 };
 
 /**
- * Process error line for deduplication and cleaning
+ * Process and clean error line
  */
-function processErrorLine(line: string): {
-  cleanLine: string;
-  shouldSkip: boolean;
-} {
+function cleanErrorLine(line: string): string | null {
   let cleanLine = stripAnsi(line);
 
-  // Skip lines with ignore patterns
-  if (ERROR_PATTERNS.IGNORE.some((pattern) => cleanLine.includes(pattern))) {
-    return { cleanLine, shouldSkip: true };
-  }
-
-  // Don't split lines containing test file paths
+  // Keep test file paths intact
   if (cleanLine.includes("test.ts")) {
-    return { cleanLine: cleanLine.trim(), shouldSkip: false };
+    return cleanLine.trim();
   }
 
-  // Extract error content after pattern markers
+  // Extract content after error markers
   for (const pattern of ERROR_PATTERNS.MATCH) {
-    if (cleanLine.includes(pattern.source)) {
-      cleanLine = cleanLine.split(pattern.source)[1]?.trim() || cleanLine;
+    const parts = cleanLine.split(pattern.source);
+    if (parts.length > 1) {
+      cleanLine = parts[1]?.trim() || cleanLine;
       break;
     }
   }
 
   cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
 
-  if (cleanLine.length < 30) {
-    return { cleanLine, shouldSkip: true };
-  }
-  // Trim long lines to 200 characters max
+  // Skip short or empty lines
+  if (cleanLine.length < 30) return null;
+
+  // Truncate long lines
   if (cleanLine.length > 150) {
     cleanLine = cleanLine.substring(0, 147) + "...";
   }
 
-  return { cleanLine, shouldSkip: false };
+  return cleanLine;
 }
 
 /**
- * Extract error logs from log files with deduplication
+ * Extract unique error logs from files with deduplication
  */
 export function extractErrorLogs(
   testName: string,
   limit?: number,
 ): Set<string> {
-  if (!fs.existsSync("logs")) {
-    return new Set();
-  }
+  if (!fs.existsSync("logs")) return new Set();
 
   try {
     const logFiles = fs
@@ -469,26 +257,26 @@ export function extractErrorLogs(
     for (const logFile of logFiles) {
       const logPath = path.join("logs", logFile);
       const content = fs.readFileSync(logPath, "utf-8");
-      const lines = content.split("\n");
 
-      for (const line of lines) {
-        if (!ERROR_PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
+      for (const line of content.split("\n")) {
+        // Check if line matches error patterns
+        if (!ERROR_PATTERNS.MATCH.some((pattern) => pattern.test(line)))
           continue;
-        }
 
-        const { cleanLine, shouldSkip } = processErrorLine(line);
-        if (shouldSkip) continue;
+        const cleanLine = cleanErrorLine(line);
+        if (!cleanLine) continue;
 
-        // Check for pattern deduplication
-        const isDuplicate = ERROR_PATTERNS.TRACK.some((pattern) => {
+        // Check for known patterns to dedupe
+        let isDuplicate = false;
+        for (const pattern of ERROR_PATTERNS.DEDUPE) {
           if (cleanLine.includes(pattern)) {
             if (seenPatterns.has(pattern)) {
-              return true;
+              isDuplicate = true;
+              break;
             }
             seenPatterns.add(pattern);
           }
-          return false;
-        });
+        }
 
         if (!isDuplicate) {
           errorLines.push(cleanLine);
@@ -496,32 +284,13 @@ export function extractErrorLogs(
       }
     }
 
-    console.log(
-      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
-    );
-
-    // Return empty set if only one error and it's a known pattern
-    if (errorLines.length === 1) {
-      const hasKnownPattern = ERROR_PATTERNS.TRACK.some((pattern) =>
-        errorLines[0]?.includes(pattern),
-      );
-      if (hasKnownPattern) {
-        console.log("returning empty string");
-        return new Set();
-      }
-    }
-
-    if (errorLines.length > 0) {
-      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
-      const resultSet = new Set(limitedErrors);
-      console.log(resultSet);
-      return resultSet;
-    }
+    // Return limited results
+    const result = limit ? errorLines.slice(-limit) : errorLines;
+    return new Set(result);
   } catch (error) {
     console.error("Error reading log files:", error);
+    return new Set();
   }
-
-  return new Set();
 }
 
 export interface TestLogOptions {
@@ -533,7 +302,7 @@ export interface TestLogOptions {
 }
 
 /**
- * Create a test logger with file output and filtering
+ * Create test logger with file output
  */
 export const createTestLogger = (options: TestLogOptions) => {
   let logStream: fs.WriteStream | undefined;
@@ -545,56 +314,31 @@ export const createTestLogger = (options: TestLogOptions) => {
       fs.mkdirSync(logsDir, { recursive: true });
     }
 
-    if (options.customLogFile) {
-      logFileName = options.customLogFile;
-    } else {
-      const cleanTestName = path
-        .basename(options.testName)
-        .replace(/\.test\.ts$/, "");
-      logFileName = `raw-${process.env.XMTP_ENV}-${cleanTestName}-${getTime()}.log`;
-    }
+    logFileName =
+      options.customLogFile ||
+      `raw-${process.env.XMTP_ENV}-${path.basename(options.testName).replace(/\.test\.ts$/, "")}-${getTime()}.log`;
 
     const logPath = path.join(logsDir, logFileName);
     logStream = fs.createWriteStream(logPath, { flags: "w" });
-
-    console.log(`Logging to: ${logPath}`);
-    console.log(
-      options.verboseLogging
-        ? "Verbose logging enabled: output will be shown in terminal AND logged to file."
-        : "Test output will be hidden from terminal and logged to file only.",
-    );
-  } else {
-    console.log(
-      "Warning: Logging is disabled. Test output will not be visible anywhere.",
-    );
-    console.log("Consider using --debug to enable file logging.");
   }
 
   const processOutput = (data: Buffer) => {
     const text = data.toString();
-    const filtered = filterLogOutput(text);
-
-    if (filtered.trim()) {
-      logStream?.write(filtered);
+    if (text.trim()) {
+      logStream?.write(text);
       if (options.verboseLogging) {
-        process.stdout.write(filtered);
+        process.stdout.write(text);
       }
     }
   };
 
-  const close = () => {
-    logStream?.end();
-  };
+  const close = () => logStream?.end();
 
-  return {
-    processOutput,
-    close,
-    logFileName,
-  };
+  return { processOutput, close, logFileName };
 };
 
 /**
- * Add file logging capability to the global logger
+ * Add file logging to global logger
  */
 export const addFileLogging = (filename: string) => {
   const logPath = path.join(
@@ -613,9 +357,9 @@ export const addFileLogging = (filename: string) => {
       filename: logPath,
       format: winston.format.combine(
         winston.format.timestamp(),
-        winston.format.printf((info) => {
-          return `[${info.timestamp as string}] [${info.level}] ${info.message as string}`;
-        }),
+        winston.format.printf(
+          (info) => `[${info.timestamp}] [${info.level}] ${info.message}`,
+        ),
       ),
     }),
   );
