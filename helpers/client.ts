@@ -677,7 +677,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = sdkVersionOptions.reverse().slice(0, testVersions);
+  const availableVersions = sdkVersionOptions.slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
