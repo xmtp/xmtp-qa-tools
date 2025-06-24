@@ -125,8 +125,6 @@ describe("commits", () => {
             console.log(`Group ${groupIndex + 1} operation failed:`, e);
           }
 
-          await Promise.all(parallelOperations);
-
           await group.sync();
           currentEpoch = (await group.debugInfo()).epoch;
           await workers.checkForksForGroup(group.id);
