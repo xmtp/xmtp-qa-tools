@@ -3,51 +3,83 @@ import path from "path";
 import winston from "winston";
 import "dotenv/config";
 
-// Known test issues for tracking
-export const KNOWN_ISSUES = [
-  {
-    testName: "Browser",
-    uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
-    ],
-  },
-  {
-    testName: "Dms",
-    uniqueErrorLines: [
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-    ],
-  },
-  {
-    testName: "Functional",
-    uniqueErrorLines: [
-      "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-    ],
-  },
-  // {
-  //   testName: "Performance",
-  //   uniqueErrorLines: [
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
-  //   ],
-  // },
-];
+// Unified configuration object
+export const CONFIG = {
+  // Error processing thresholds
+  errorLineMinLength: 30,
+  errorLineMaxLength: 150,
+  errorLineTruncateLength: 147,
 
-// Error patterns for filtering and deduplication
-export const ERROR_PATTERNS = {
-  DEDUPE: [
-    "sync worker error storage error",
-    "sqlcipher_mlock",
-    "Collector timed out.",
-    "welcome with cursor",
-    "group with welcome id",
-    "receiveGroupMessage",
-    "Message processing errors:",
-    "xmtp_mls::groups::mls_sync: receive error",
+  // Text replacements
+  errorReplacement: {
+    from: "expected false to be true",
+    to: "failed",
+  },
+
+  // File processing strings
+  forkSearchStrings: {
+    short: "may be fork",
+    full: "your group may be forked",
+  },
+
+  // File patterns and extensions
+  filePatterns: {
+    rawPrefix: "raw-",
+    cleanedPrefix: "cleaned-",
+    logExtension: ".log",
+    testExtension: ".test.ts",
+  },
+
+  // Default values
+  defaultLogLevel: "info",
+  timeZone: "America/Buenos_Aires",
+
+  // Directory names
+  directories: {
+    logs: "logs",
+    cleaned: "cleaned",
+  },
+
+  // Error patterns for filtering and deduplication
+  errorPatterns: {
+    dedupe: [
+      "sync worker error storage error",
+      "sqlcipher_mlock",
+      "Collector timed out.",
+      "welcome with cursor",
+      "group with welcome id",
+      "receiveGroupMessage",
+      "Message processing errors:",
+      "xmtp_mls::groups::mls_sync: receive error",
+    ],
+    match: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
+  },
+
+  // Known test issues
+  knownIssues: [
+    {
+      testName: "Browser",
+      uniqueErrorLines: [
+        "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
+      ],
+    },
+    {
+      testName: "Dms",
+      uniqueErrorLines: [
+        "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
+      ],
+    },
+    {
+      testName: "Functional",
+      uniqueErrorLines: [
+        "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
+      ],
+    },
   ],
-  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
+
+// Legacy exports for backward compatibility
+export const KNOWN_ISSUES = CONFIG.knownIssues;
 
 // eslint-disable-next-line no-control-regex
 const ANSI_REGEX = /[\x1b\u001b]\[[0-9;]*[a-zA-Z]/g;
@@ -71,7 +103,7 @@ export function processLogFile(inputPath: string, outputPath: string): void {
     const cleanLine = stripAnsi(line);
     cleanedLines.push(cleanLine);
 
-    if (cleanLine.toLowerCase().includes("may be fork")) {
+    if (cleanLine.toLowerCase().includes(CONFIG.forkSearchStrings.short)) {
       break;
     }
   }
@@ -83,8 +115,8 @@ export function processLogFile(inputPath: string, outputPath: string): void {
  * Clean all raw-*.log files that contain fork messages
  */
 export function cleanAllRawLogs(): void {
-  const logsDir = path.join(process.cwd(), "logs");
-  const outputDir = path.join(logsDir, "cleaned");
+  const logsDir = path.join(process.cwd(), CONFIG.directories.logs);
+  const outputDir = path.join(logsDir, CONFIG.directories.cleaned);
 
   if (!fs.existsSync(logsDir)) return;
 
@@ -94,7 +126,9 @@ export function cleanAllRawLogs(): void {
 
   const files = fs.readdirSync(logsDir);
   const rawLogFiles = files.filter(
-    (file) => file.startsWith("raw-") && file.endsWith(".log"),
+    (file) =>
+      file.startsWith(CONFIG.filePatterns.rawPrefix) &&
+      file.endsWith(CONFIG.filePatterns.logExtension),
   );
 
   let processedCount = 0;
@@ -102,9 +136,12 @@ export function cleanAllRawLogs(): void {
     const inputPath = path.join(logsDir, file);
     const content = fs.readFileSync(inputPath, "utf8");
 
-    if (!content.includes("your group may be forked")) continue;
+    if (!content.includes(CONFIG.forkSearchStrings.full)) continue;
 
-    const outputFileName = file.replace("raw-", "cleaned-");
+    const outputFileName = file.replace(
+      CONFIG.filePatterns.rawPrefix,
+      CONFIG.filePatterns.cleanedPrefix,
+    );
     const outputPath = path.join(outputDir, outputFileName);
 
     processLogFile(inputPath, outputPath);
@@ -127,12 +164,13 @@ declare module "winston" {
  */
 export const createLogger = () => {
   const logger = winston.createLogger({
-    level: process.env.LOG_LEVEL || "info",
+    level: process.env.LOG_LEVEL || CONFIG.defaultLogLevel,
     format: winston.format.combine(
       winston.format.timestamp(),
       winston.format.colorize(),
       winston.format.printf(
-        (info) => `[${info.timestamp}] [${info.level}] ${info.message}`,
+        (info) =>
+          `[${String(info.timestamp)}] [${String(info.level)}] ${String(info.message)}`,
       ),
     ),
     transports: [new winston.transports.Console()],
@@ -173,12 +211,12 @@ const logger = createLogger();
 export const setupPrettyLogs = (testName: string) => {
   const originalConsole = { ...console };
 
-  console.log = (...args: any[]) => logger.info(args.join(" "));
-  console.info = (...args: any[]) => logger.info(args.join(" "));
-  console.warn = (...args: any[]) => logger.warn(args.join(" "));
-  console.error = (...args: any[]) =>
+  console.log = (...args: unknown[]) => logger.info(args.join(" "));
+  console.info = (...args: unknown[]) => logger.info(args.join(" "));
+  console.warn = (...args: unknown[]) => logger.warn(args.join(" "));
+  console.error = (...args: unknown[]) =>
     logger.error(`QA_ERROR ${String(testName)} > ${String(args.join(" "))}`);
-  console.debug = (...args: any[]) => logger.debug(args.join(" "));
+  console.debug = (...args: unknown[]) => logger.debug(args.join(" "));
   console.time = (label: string) => {
     logger.time(label);
   };
@@ -199,7 +237,7 @@ export const getTime = (): string => {
       minute: "2-digit",
       second: "2-digit",
       hour12: false,
-      timeZone: "America/Buenos_Aires",
+      timeZone: CONFIG.timeZone,
     })
     .replace(/:/g, "-");
 };
@@ -211,12 +249,12 @@ function cleanErrorLine(line: string): string | null {
   let cleanLine = stripAnsi(line);
 
   // Keep test file paths intact
-  if (cleanLine.includes("test.ts")) {
+  if (cleanLine.includes(CONFIG.filePatterns.testExtension)) {
     return cleanLine.trim();
   }
 
   // Extract content after error markers
-  for (const pattern of ERROR_PATTERNS.MATCH) {
+  for (const pattern of CONFIG.errorPatterns.match) {
     const parts = cleanLine.split(pattern.source);
     if (parts.length > 1) {
       cleanLine = parts[1]?.trim() || cleanLine;
@@ -224,14 +262,16 @@ function cleanErrorLine(line: string): string | null {
     }
   }
 
-  cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
+  cleanLine = cleanLine
+    .replace(CONFIG.errorReplacement.from, CONFIG.errorReplacement.to)
+    .trim();
 
   // Skip short or empty lines
-  if (cleanLine.length < 30) return null;
+  if (cleanLine.length < CONFIG.errorLineMinLength) return null;
 
   // Truncate long lines
-  if (cleanLine.length > 150) {
-    cleanLine = cleanLine.substring(0, 147) + "...";
+  if (cleanLine.length > CONFIG.errorLineMaxLength) {
+    cleanLine = cleanLine.substring(0, CONFIG.errorLineTruncateLength) + "...";
   }
 
   return cleanLine;
@@ -244,23 +284,27 @@ export function extractErrorLogs(
   testName: string,
   limit?: number,
 ): Set<string> {
-  if (!fs.existsSync("logs")) return new Set();
+  if (!fs.existsSync(CONFIG.directories.logs)) return new Set();
 
   try {
     const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log") && file.includes(testName));
+      .readdirSync(CONFIG.directories.logs)
+      .filter(
+        (file) =>
+          file.endsWith(CONFIG.filePatterns.logExtension) &&
+          file.includes(testName),
+      );
 
     const errorLines: string[] = [];
     const seenPatterns = new Set<string>();
 
     for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
+      const logPath = path.join(CONFIG.directories.logs, logFile);
       const content = fs.readFileSync(logPath, "utf-8");
 
       for (const line of content.split("\n")) {
         // Check if line matches error patterns
-        if (!ERROR_PATTERNS.MATCH.some((pattern) => pattern.test(line)))
+        if (!CONFIG.errorPatterns.match.some((pattern) => pattern.test(line)))
           continue;
 
         const cleanLine = cleanErrorLine(line);
@@ -268,7 +312,7 @@ export function extractErrorLogs(
 
         // Check for known patterns to dedupe
         let isDuplicate = false;
-        for (const pattern of ERROR_PATTERNS.DEDUPE) {
+        for (const pattern of CONFIG.errorPatterns.dedupe) {
           if (cleanLine.includes(pattern)) {
             if (seenPatterns.has(pattern)) {
               isDuplicate = true;
@@ -309,14 +353,19 @@ export const createTestLogger = (options: TestLogOptions) => {
   let logFileName = "";
 
   if (options.enableLogging) {
-    const logsDir = "logs";
+    const logsDir = CONFIG.directories.logs;
     if (!fs.existsSync(logsDir)) {
       fs.mkdirSync(logsDir, { recursive: true });
     }
 
     logFileName =
       options.customLogFile ||
-      `raw-${process.env.XMTP_ENV}-${path.basename(options.testName).replace(/\.test\.ts$/, "")}-${getTime()}.log`;
+      `${CONFIG.filePatterns.rawPrefix}${process.env.XMTP_ENV}-${path
+        .basename(options.testName)
+        .replace(
+          CONFIG.filePatterns.testExtension,
+          "",
+        )}-${getTime()}${CONFIG.filePatterns.logExtension}`;
 
     const logPath = path.join(logsDir, logFileName);
     logStream = fs.createWriteStream(logPath, { flags: "w" });
@@ -343,8 +392,8 @@ export const createTestLogger = (options: TestLogOptions) => {
 export const addFileLogging = (filename: string) => {
   const logPath = path.join(
     process.cwd(),
-    "logs",
-    `${filename}-${process.env.XMTP_ENV}-${getTime()}.log`,
+    CONFIG.directories.logs,
+    `${filename}-${process.env.XMTP_ENV}-${getTime()}${CONFIG.filePatterns.logExtension}`,
   );
 
   const dir = path.dirname(logPath);
@@ -358,7 +407,8 @@ export const addFileLogging = (filename: string) => {
       format: winston.format.combine(
         winston.format.timestamp(),
         winston.format.printf(
-          (info) => `[${info.timestamp}] [${info.level}] ${info.message}`,
+          (info) =>
+            `[${String(info.timestamp)}] [${String(info.level)}] ${String(info.message)}`,
         ),
       ),
     }),
