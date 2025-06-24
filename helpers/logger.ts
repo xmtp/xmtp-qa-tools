@@ -3,63 +3,6 @@ import path from "path";
 import winston from "winston";
 import "dotenv/config";
 
-// Known test issues for tracking
-export const KNOWN_ISSUES = [
-  {
-    testName: "Browser",
-    uniqueErrorLines: [
-      "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
-    ],
-  },
-  {
-    testName: "Dms",
-    uniqueErrorLines: [
-      "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-    ],
-  },
-  {
-    testName: "Functional",
-    uniqueErrorLines: [
-      "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-    ],
-  },
-  // {
-  //   testName: "Performance",
-  //   uniqueErrorLines: [
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-50: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-100: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-150: should create a group and measure all streams",
-  //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
-  //   ],
-  // },
-];
-
-// Patterns configuration
-export const ERROR_PATTERNS = {
-  // Patterns to track for error deduplication
-  TRACK: [
-    "sync worker error storage error",
-    "sqlcipher_mlock",
-    "Collector timed out.",
-    "welcome with cursor",
-    "group with welcome id",
-    "receiveGroupMessage",
-    "xmtp_mls::groups::mls_sync: receive error",
-  ],
-
-  // Lines to ignore in logs
-  IGNORE: [", last_stream_id: StreamId(0) }", ", Library)"],
-
-  // Regex patterns for filtering logs
-  FILTER: [
-    /ERROR MEMORY sqlcipher_mlock: mlock\(\) returned -1 errno=12/,
-    /process:sync_welcomes: xmtp_mls::groups::welcome_sync: /g,
-  ],
-
-  // Patterns to match error log lines
-  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
-} as const;
-
 // Consolidated ANSI escape code regex
 // eslint-disable-next-line no-control-regex
 const ANSI_REGEX = /[\x1b\u001b]\[[0-9;]*[a-zA-Z]/g;
@@ -77,26 +20,6 @@ export function stripAnsi(text: string): string {
         return ["\n", "\t", "\r"].includes(char) ? char : "";
       })
   );
-}
-
-/**
- * Filter log output based on configured patterns
- */
-export function filterLogOutput(data: string): string {
-  let filtered = data;
-
-  // Apply regex pattern filtering
-  for (const pattern of ERROR_PATTERNS.FILTER) {
-    filtered = filtered.replace(new RegExp(pattern.source, "g"), "");
-  }
-
-  // Filter out lines containing ignore patterns
-  const lines = filtered.split("\n");
-  const filteredLines = lines.filter((line) => {
-    return !ERROR_PATTERNS.IGNORE.some((pattern) => line.includes(pattern));
-  });
-
-  return filteredLines.join("\n");
 }
 
 /**
@@ -406,123 +329,6 @@ export const getTime = (): string => {
     .replace(/:/g, "-");
 };
 
-/**
- * Process error line for deduplication and cleaning
- */
-function processErrorLine(line: string): {
-  cleanLine: string;
-  shouldSkip: boolean;
-} {
-  let cleanLine = stripAnsi(line);
-
-  // Skip lines with ignore patterns
-  if (ERROR_PATTERNS.IGNORE.some((pattern) => cleanLine.includes(pattern))) {
-    return { cleanLine, shouldSkip: true };
-  }
-
-  // Don't split lines containing test file paths
-  if (cleanLine.includes("test.ts")) {
-    return { cleanLine: cleanLine.trim(), shouldSkip: false };
-  }
-
-  // Extract error content after pattern markers
-  for (const pattern of ERROR_PATTERNS.MATCH) {
-    if (cleanLine.includes(pattern.source)) {
-      cleanLine = cleanLine.split(pattern.source)[1]?.trim() || cleanLine;
-      break;
-    }
-  }
-
-  cleanLine = cleanLine.replace("expected false to be true", "failed").trim();
-
-  if (cleanLine.length < 30) {
-    return { cleanLine, shouldSkip: true };
-  }
-  // Trim long lines to 200 characters max
-  if (cleanLine.length > 150) {
-    cleanLine = cleanLine.substring(0, 147) + "...";
-  }
-
-  return { cleanLine, shouldSkip: false };
-}
-
-/**
- * Extract error logs from log files with deduplication
- */
-export function extractErrorLogs(
-  testName: string,
-  limit?: number,
-): Set<string> {
-  if (!fs.existsSync("logs")) {
-    return new Set();
-  }
-
-  try {
-    const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log") && file.includes(testName));
-
-    const errorLines: string[] = [];
-    const seenPatterns = new Set<string>();
-
-    for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
-      const content = fs.readFileSync(logPath, "utf-8");
-      const lines = content.split("\n");
-
-      for (const line of lines) {
-        if (!ERROR_PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
-          continue;
-        }
-
-        const { cleanLine, shouldSkip } = processErrorLine(line);
-        if (shouldSkip) continue;
-
-        // Check for pattern deduplication
-        const isDuplicate = ERROR_PATTERNS.TRACK.some((pattern) => {
-          if (cleanLine.includes(pattern)) {
-            if (seenPatterns.has(pattern)) {
-              return true;
-            }
-            seenPatterns.add(pattern);
-          }
-          return false;
-        });
-
-        if (!isDuplicate) {
-          errorLines.push(cleanLine);
-        }
-      }
-    }
-
-    console.log(
-      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
-    );
-
-    // Return empty set if only one error and it's a known pattern
-    if (errorLines.length === 1) {
-      const hasKnownPattern = ERROR_PATTERNS.TRACK.some((pattern) =>
-        errorLines[0]?.includes(pattern),
-      );
-      if (hasKnownPattern) {
-        console.log("returning empty string");
-        return new Set();
-      }
-    }
-
-    if (errorLines.length > 0) {
-      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
-      const resultSet = new Set(limitedErrors);
-      console.log(resultSet);
-      return resultSet;
-    }
-  } catch (error) {
-    console.error("Error reading log files:", error);
-  }
-
-  return new Set();
-}
-
 export interface TestLogOptions {
   enableLogging: boolean;
   customLogFile?: string;
@@ -571,12 +377,11 @@ export const createTestLogger = (options: TestLogOptions) => {
 
   const processOutput = (data: Buffer) => {
     const text = data.toString();
-    const filtered = filterLogOutput(text);
 
-    if (filtered.trim()) {
-      logStream?.write(filtered);
+    if (text.trim()) {
+      logStream?.write(text);
       if (options.verboseLogging) {
-        process.stdout.write(filtered);
+        process.stdout.write(text);
       }
     }
   };

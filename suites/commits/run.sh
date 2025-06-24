@@ -5,8 +5,6 @@ trap 'echo -e "\n\nScript interrupted by user. Exiting..."; exit 0' INT
 
 num_runs=100
 
-
-
 rm -rf logs/
 rm -rf .data/
 
