@@ -503,8 +503,7 @@ export const sdkVersions = {
 
 export const sdkVersionOptions = Object.keys(sdkVersions)
   .filter((key) => parseInt(key) >= 200)
-  .sort((a, b) => parseInt(b) - parseInt(a))
-  .slice(0, 3);
+  .sort((a, b) => parseInt(b) - parseInt(a));
 
 /**
  * Creates random installations for a worker
