@@ -503,8 +503,7 @@ export const sdkVersions = {
 
 export const sdkVersionOptions = Object.keys(sdkVersions)
   .filter((key) => parseInt(key) >= 200)
-  .sort((a, b) => parseInt(b) - parseInt(a))
-  .slice(0, 3);
+  .sort((a, b) => parseInt(b) - parseInt(a));
 
 /**
  * Creates random installations for a worker
@@ -678,7 +677,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = sdkVersionOptions.reverse().slice(0, testVersions);
+  const availableVersions = sdkVersionOptions.slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {

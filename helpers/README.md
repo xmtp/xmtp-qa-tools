@@ -4,31 +4,41 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## Quick reference
 
-| Module            | Purpose                          | Key Features                                     |
-| ----------------- | -------------------------------- | ------------------------------------------------ |
-| **client.ts**     | XMTP client creation             | Signers, encryption keys, client versioning      |
-| **datadog.ts**    | Metrics and monitoring           | Performance tracking, test results reporting     |
-| **logger.ts**     | Logging utilities                | Formatted logging, file output, error tracking   |
-| **playwright.ts** | Browser automation               | UI testing, group creation, message verification |
-| **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing    |
-| **tests.ts**      | Test configuration and utilities | Test setup, SDK version management               |
-| **inboxes.json**  | Pre-generated test identities    | Test account data for simulations                |
-| **ai.ts**         | OpenAI API utilities             | Generate OpenAI responses                        |
+| Module               | Purpose                          | Key Features                                         |
+| -------------------- | -------------------------------- | ---------------------------------------------------- |
+| **client.ts**        | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
+| **analyzer.ts**      | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
+| **notifications.ts** | Test failure notifications       | Slack alerts, error reporting, filtering             |
+| **logger.ts**        | Logging utilities                | File logging, ANSI stripping, pretty console output  |
+| **vitest.ts**        | Test lifecycle management        | Test setup, performance metrics, cleanup             |
+| **playwright.ts**    | Browser automation               | UI testing, group creation, message verification     |
+| **datadog.ts**       | Metrics and monitoring           | Performance tracking, network stats, reporting       |
+| **streams.ts**       | Message streaming utilities      | Stream verification, message delivery testing        |
 
 ## Usage
 
 The helper modules are designed to be imported and used in test suites:
 
 ```typescript
-import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
-import { sendPerformanceResult } from "@helpers/datadog";
-import { logError } from "@helpers/logger";
-import { verifyMessageStream, verifyMessageStreamAll } from "@helpers/streams";
+import { extractErrorLogs, shouldFilterOutTest } from "@helpers/analyzer";
+import {
+  createSigner,
+  getEncryptionKeyFromHex,
+  loadEnv,
+} from "@helpers/client";
+import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
+import { logError, setupPrettyLogs } from "@helpers/logger";
+import { sendSlackNotification } from "@helpers/notifications";
+import {
+  verifyConversationStream,
+  verifyMessageStream,
+} from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
 ```
 
-## 🔑 Client Module
+## 🔑 Client Module (`client.ts`)
 
-The `client.ts` module provides utilities for creating and managing XMTP clients.
+The `client.ts` module provides utilities for creating and managing XMTP clients across different SDK versions.
 
 ```typescript
 // Create a signer for an XMTP client
@@ -38,203 +48,312 @@ const signer = createSigner(WALLET_KEY);
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
 
 // Load environment configuration for tests
+loadEnv(testName);
 
 // Create an XMTP client with specific version
-const client = await createClient(
+const clientData = await createClient(
   walletKey,
   encryptionKeyHex,
-  { sdkVersion, name, testName, folder },
-  xmtpEnv,
+  { sdkVersion: "220", name: "alice", testName, folder: "test-run" },
+  "dev",
 );
+
+// Log agent details with connection info
+await logAgentDetails(client);
 ```
 
 **Key features:**
 
-- Signer creation for different SDK versions
-- Encryption key management
-- Database path handling
-- Environment configuration loading
+- **Multi-version SDK support**: Works with SDK versions 47, 100, 105, 209, 210, 220, and MLS
+- **Signer creation**: Compatible signers for different SDK versions
+- **Database management**: Automatic database path creation and management
+- **Environment configuration**: Loading and validating environment variables
+- **Key generation**: Private key and encryption key utilities
 
-## 📊 Datadog Module
+**SDK Version Mappings:**
 
-The `datadog.ts` module provides utilities for sending metrics and test results to Datadog.
+```typescript
+export const sdkVersions = {
+  47: { Client: Client47, sdkVersion: "0.0.47", libXmtpVersion: "6bd613d" },
+  100: { Client: Client100, sdkVersion: "1.0.0", libXmtpVersion: "c205eec" },
+  105: { Client: Client105, sdkVersion: "1.0.5", libXmtpVersion: "6eb1ce4" },
+  209: { Client: Client209, sdkVersion: "2.0.9", libXmtpVersion: "bfadb76" },
+  210: { Client: Client210, sdkVersion: "2.1.0", libXmtpVersion: "7b9b4d0" },
+  220: { Client: Client220, sdkVersion: "2.2.0", libXmtpVersion: "d0f0b67" },
+  // ... and more
+};
+```
+
+## 🔍 Analyzer Module (`analyzer.ts`)
+
+The `analyzer.ts` module provides log analysis and error detection capabilities for identifying test failures and patterns.
+
+```typescript
+// Extract error logs from test output
+const errorLogs = extractErrorLogs(testName, 50);
+
+// Check if test failures match known issues
+const shouldFilter = shouldFilterOutTest(errorLogs);
+
+// Extract test failure lines specifically
+const failLines = extractFailLines(errorLogs);
+
+// Process and clean error lines
+const { cleanLine, shouldSkip } = processErrorLine(rawLogLine);
+```
+
+**Key features:**
+
+- **Error pattern matching**: Identifies known test issues and failure patterns
+- **Log deduplication**: Removes duplicate error messages to reduce noise
+- **ANSI code handling**: Cleans logs from terminal formatting codes
+- **Test filtering**: Determines if test failures are known issues to avoid false alerts
+
+**Known Issue Patterns:**
+
+```typescript
+export const PATTERNS = {
+  KNOWN_ISSUES: [
+    {
+      testName: "Browser",
+      uniqueErrorLines: ["FAIL suites/browser/browser.test.ts"],
+    },
+    {
+      testName: "Dms",
+      uniqueErrorLines: ["FAIL suites/functional/dms.test.ts"],
+    },
+  ],
+  DEDUPE: ["sync worker error", "sqlcipher_mlock", "Collector timed out"],
+  MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
+};
+```
+
+## 📢 Notifications Module (`notifications.ts`)
+
+The `notifications.ts` module handles test failure notifications through Slack integration.
+
+```typescript
+// Send a Slack notification for test failures
+await sendSlackNotification({
+  testName: "functional-tests",
+  label: "error",
+  errorLogs: extractedLogs,
+  jobStatus: "failed",
+  env: "dev",
+  failedTestsCount: 3,
+  totalTestsCount: 10,
+});
+```
+
+**Key features:**
+
+- **Slack integration**: Sends formatted notifications to Slack channels
+- **Smart filtering**: Avoids spam by filtering known issues and branch restrictions
+- **Rich formatting**: Includes links to dashboards, logs, and test runs
+- **Error context**: Provides relevant error logs and failure details
+
+**Configuration:**
+
+```typescript
+const URLS = {
+  DATADOG_DASHBOARD: "https://app.datadoghq.com/dashboard/...",
+  DATADOG_LOGS: "https://app.datadoghq.com/logs?saved-view-id=...",
+  SLACK_API: "https://slack.com/api/chat.postMessage",
+  GITHUB_ACTIONS: "https://github.com",
+};
+```
+
+## 📝 Logger Module (`logger.ts`)
+
+The `logger.ts` module provides comprehensive logging utilities with file output and formatting.
+
+```typescript
+// Set up pretty console logging
+setupPrettyLogs(testName);
+
+// Add file logging capability
+addFileLogging(testName);
+
+// Create a test logger with options
+const logger = createTestLogger({
+  enableLogging: true,
+  testName: "my-test",
+  verboseLogging: true,
+});
+
+// Log errors with consistent formatting
+logError(error, testName);
+
+// Clean log files by removing ANSI codes
+await cleanAllRawLogs();
+```
+
+**Key features:**
+
+- **File logging**: Automatic log file creation with timestamps
+- **ANSI code stripping**: Removes terminal formatting for clean log files
+- **Pretty formatting**: Colorized console output with timestamps
+- **Log processing**: Utilities for cleaning and processing large log files
+- **Winston integration**: Professional logging with multiple transports
+
+## 🧪 Vitest Module (`vitest.ts`)
+
+The `vitest.ts` module provides test lifecycle management and performance tracking integration.
+
+```typescript
+// Set up test lifecycle with automatic metrics
+setupTestLifecycle({
+  testName: "my-test-suite",
+  expect,
+  getCustomDuration: () => customDuration,
+  setCustomDuration: (v) => {
+    customDuration = v;
+  },
+});
+```
+
+**Key features:**
+
+- **Automatic setup**: Handles environment loading and metric initialization
+- **Performance tracking**: Measures test duration and sends metrics to Datadog
+- **Custom duration support**: Allows tests to override automatic timing
+- **Cleanup management**: Ensures proper cleanup after test completion
+
+**Lifecycle hooks:**
+
+- `beforeAll`: Loads environment configuration
+- `beforeEach`: Starts performance timing
+- `afterEach`: Sends performance metrics
+- `afterAll`: Flushes metrics and cleanup
+
+## 🌐 Playwright Module (`playwright.ts`)
+
+The `playwright.ts` module provides browser automation for testing XMTP web applications.
+
+```typescript
+// Create a Playwright instance
+const browser = new playwright({
+  headless: true,
+  env: "dev",
+  defaultUser: {
+    walletKey: "0x...",
+    accountAddress: "0x...",
+    dbEncryptionKey: "...",
+    inboxId: "...",
+  },
+});
+
+// Start browser session
+const { page } = await browser.startPage();
+
+// Create a new group through UI
+const groupId = await browser.newGroupFromUI([address1, address2]);
+
+// Send a message
+await browser.sendMessage("Hello world!");
+
+// Wait for response
+const received = await browser.waitForResponse(["Hello", "response"]);
+
+// Take a screenshot
+await browser.takeSnapshot("test-completed");
+```
+
+**Key features:**
+
+- **Headless browser automation**: Runs tests in Chrome/Chromium
+- **XMTP web app integration**: Pre-configured for XMTP chat interfaces
+- **Group management**: Create groups and manage members through UI
+- **Message testing**: Send messages and verify delivery
+- **Screenshot capture**: Visual debugging and test verification
+
+## 📊 Datadog Module (`datadog.ts`)
+
+The `datadog.ts` module provides metrics collection and performance tracking integration.
 
 ```typescript
 // Initialize Datadog metrics
 initDataDog();
 
-// Send performance metrics
-sendPerformanceResult(expect, workers, start);
-```
+// Send custom metrics
+sendMetric("test.duration", 1234, {
+  operation: "createGroup",
+  test: "functional",
+  members: "10",
+});
 
-### Schema for Datadog metrics:
+// Send performance metrics with network stats
+await sendPerformanceMetric(duration, testName, false);
 
-```bash
+// Get network performance statistics
+const networkStats = await getNetworkStats("https://grpc.dev.xmtp.network:443");
 
-- `timestamp`: string, ISO8601 or log timestamp
-- `level`: string, log level (e.g., debug, info)
-- `metric_name`: string, the metric name (e.g., xmtp.sdk.duration)
-- `metric_value`: number, the value of the metric
-- `tags`: object, key-value pairs with additional context, including:
-  - `libxmtp`: string or number
-  - `operation`: string
-  - `test`: string
-  - `metric_type`: string
-  - `metric_subtype`: string
-  - `description`: string
-  - `members`: string or number
-  - `region`: string
-  - `env`: string
-  - `vm`: string
-  - `network_phase`: string (optional, for network metrics)
-  - `country_iso_code`: string (optional, for network metrics)
-  - ...any other key:value pairs present in the tags
+// Flush all metrics
+await flushMetrics();
+
+// Send logs to Datadog
+await sendDatadogLog(["Error line 1", "Error line 2"], {
+  test: testName,
+  env: "dev",
+});
 ```
 
 **Key features:**
 
-- Performance metric tracking
-- Test result reporting
-- Network statistics
-- Operation thresholds based on group size
+- **Performance monitoring**: Tracks test execution times and operation durations
+- **Network statistics**: Measures DNS, TCP, TLS, and processing times
+- **Metric aggregation**: Collects and groups metrics by operation and member count
+- **Geographic tracking**: Includes region and country information
+- **Log integration**: Sends structured logs to Datadog Logs
 
-## 📝 Logger Module
-
-The `logger.ts` module provides logging utilities with formatting and file output.
+**Network Statistics:**
 
 ```typescript
-// Create a formatted logger
-const logger = createLogger();
-
-// Set up pretty console log formatting
-setupPrettyLogs(testName);
-
-// Log test errors and track failures
-const logError(error, expect);
-
-// Add file logging capability
-addFileLogging(filename);
+interface NetworkStats {
+  "DNS Lookup": number;
+  "TCP Connection": number;
+  "TLS Handshake": number;
+  Processing: number;
+  "Server Call": number;
+}
 ```
 
-**Key features:**
+## 🔄 Streams Module (`streams.ts`)
 
-- Formatted console logging
-- File output for logs
-- Error tracking for test failures
-- Performance timing utilities
-
-## 🌐 Playwright Module
-
-The `playwright.ts` module provides browser automation for testing XMTP in web applications.
+The `streams.ts` module provides utilities for testing message delivery and conversation streams.
 
 ```typescript
-// Create a new Playwright instance
-const xmtpPlaywright = new playwright(headless, env);
-
-// Create a group and check for response
-await xmtpPlaywright.createGroupAndReceiveGm(addresses);
-```
-
-**Key features:**
-
-- Headless browser testing
-- Group creation through UI
-- Message verification
-- Screenshot capabilities
-
-## 🔄 Streams Module
-
-The `streams.ts` module provides utilities for testing message delivery through streams.
-
-```typescript
-// Verify that all participants in a group receive messages
-const result = await verifyMessageStreamAll(group, workers, messageCount);
-
-// Verify message delivery with custom settings
+// Verify message delivery to all participants
 const result = await verifyMessageStream(
-  group,
+  conversation,
   participants,
-  contentType,
-  messageCount,
-);
-
-// Verify conversation events are received by participants
-const result = await verifyConversationStream(initiator, participants);
-```
-
-**Key features:**
-
-- Message delivery verification
-- Stream testing for different content types
-- Group update notifications
-- Performance metrics for message delivery
-
-## 🧪 Tests Module
-
-The `tests.ts` module provides test configuration and utilities.
-
-```typescript
-// Access SDK version configurations
-const sdkVersion = sdkVersions[200];
-
-// Default test values
-const { streamTimeout, messageCount } = defaultValues;
-```
-
-**Key features:**
-
-- SDK version management
-- Test configuration
-- Test data generation
-- Default test parameters
-
-## 📁 Data Files
-
-### inboxes.json
-
-Pre-generated XMTP identities for testing.
-
-**Features:**
-
-- Account addresses
-- Private keys
-- Encryption keys
-- Inbox IDs
-
-### oldpackages.json
-
-Configuration for legacy package versions.
-
-**Features:**
-
-- Package name mappings
-- Version information
-- Dependency configurations
-
-## 🔍 Module Details
-
-### streams.ts
-
-Handles stream utilities for testing message delivery:
-
-```typescript
-// Verify that all participants in a group receive messages
-const result = await verifyMessageStreamAll(group, workers, messageCount);
-
-// Verify message delivery with custom settings
-const result = await verifyMessageStream(
-  group,
-  participants,
-  contentType,
+  "text",
   messageCount,
   messageGenerator,
   messageSender,
 );
 
-// Verify conversation events are received by participants
-const result = await verifyConversationStream(initiator, participants);
+// Verify metadata updates are received
+const metadataResult = await verifyMetadataStream(
+  group,
+  participants,
+  metadataUpdates,
+);
 
-// Calculate statistics about message delivery
+// Verify membership changes
+const membershipResult = await verifyMembershipStream(
+  group,
+  participants,
+  membershipChanges,
+);
+
+// Verify conversation creation events
+const conversationResult = await verifyConversationStream(
+  initiator,
+  participants,
+);
+
+// Calculate message delivery statistics
 const stats = calculateMessageStats(
   messagesByWorker,
   messagePrefix,
@@ -243,74 +362,87 @@ const stats = calculateMessageStats(
 );
 ```
 
-### tests.ts
+**Key features:**
 
-Handles test configuration and setup:
+- **Message verification**: Ensures all participants receive expected messages
+- **Stream testing**: Tests real-time message, conversation, and metadata streams
+- **Delivery statistics**: Calculates success rates and timing metrics
+- **Content type support**: Works with text, reactions, replies, and other content types
+- **Group operations**: Verifies group updates, member additions, and metadata changes
 
-```typescript
-// Create a test configuration
-const testConfig = createTestConfig(testName, workerConfigs);
+**Stream Types Supported:**
+
+- Message streams (text, reactions, replies)
+- Conversation streams (new conversations)
+- Metadata streams (group name, description changes)
+- Membership streams (member additions/removals)
+- Consent streams (contact approvals)
+
+## 🔧 Environment Configuration
+
+All helper modules work together through environment configuration:
+
+```bash
+# Required environment variables
+XMTP_ENV=dev                    # XMTP environment (dev, production)
+LOGGING_LEVEL=info              # Log level (debug, info, warn, error)
+DATADOG_API_KEY=...             # For metrics reporting
+SLACK_BOT_TOKEN=...             # For failure notifications
+SLACK_CHANNEL=general           # Slack channel for notifications
+GEOLOCATION=us-east             # Geographic region for testing
 ```
 
-### client.ts
+## 📁 Data Files
 
-Handles XMTP client creation and version mappings:
+### External Dependencies
 
-### datadog.ts
+The helpers reference data files in other directories:
 
-Utilities for sending metrics to Datadog:
+- **`@inboxes/manualusers.json`**: Pre-configured test user accounts
+- **`@inboxes/*.json`**: Generated test identities and wallet data
+- **Environment variables**: Loaded from `.env` files
+
+## 🚀 Getting Started
+
+To use the helpers in your tests:
+
+1. **Import the required helpers**:
 
 ```typescript
-// Send a metric to Datadog
-sendMetric(metricName, metricValue, tags);
-
-// Send a performance metric to Datadog
-sendPerformanceMetric(metricValue, testName, libXmtpVersion, skipNetworkStats);
+import { createSigner, loadEnv } from "@helpers/client";
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
 ```
 
-### groups.ts
-
-Utilities for creating and managing test groups:
+2. **Set up test lifecycle**:
 
 ```typescript
-// Create a group with a specific number of participants
-const result = await createGroupWithBatch(
-  creator,
-  allWorkers,
-  batchSize,
-  installationsPerUser,
+describe("My Test Suite", () => {
+  setupTestLifecycle({
+    testName: "my-test-suite",
+    expect,
+  });
+
+  // Your tests here
+});
+```
+
+3. **Create XMTP clients**:
+
+```typescript
+const signer = createSigner(walletKey);
+const client = await createClient(walletKey, encryptionKey, config, env);
+```
+
+4. **Verify message delivery**:
+
+```typescript
+const result = await verifyMessageStream(
+  conversation,
+  participants,
+  messageCount,
 );
+expect(result.allReceived).toBe(true);
 ```
 
-### logger.ts
-
-Provides logging capabilities for tests:
-
-```typescript
-// Create a logger for a specific test
-const logger = createLogger(testName);
-
-// Override console methods to use the logger
-overrideConsole(logger);
-
-// Flush logs to disk when test completes
-flushLogger(testName);
-```
-
-### playwright.ts
-
-Utilities for testing message delivery using Playwright:
-
-```typescript
-// Initialize Playwright browser
-const browser = await playwright.launch({ headless: true });
-
-// Create a new page
-const page = await browser.newPage();
-
-// Navigate to a specific URL
-await page.goto("https://xmtp.chat");
-
-// Close the browser
-await browser.close();
-```
+The helpers are designed to work together seamlessly, providing a comprehensive testing framework for XMTP applications.
