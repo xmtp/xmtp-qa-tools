@@ -2,8 +2,8 @@ import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
 import Anthropic from "@anthropic-ai/sdk";
+import { PATTERNS } from "@helpers/analyzer";
 import fetch from "node-fetch";
-import { KNOWN_ISSUES } from "../helpers/logger";
 
 // ES module equivalent of __dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -112,7 +112,7 @@ export const SYSTEM_PROMPT = `You are an expert at analyzing test failure data a
 - Structure responses with clear sections using *bold headers*
 
 # KNOWN ISSUES
-${KNOWN_ISSUES.map((issue) => `- ${JSON.stringify(issue)}`).join("\n")}`;
+${PATTERNS.KNOWN_ISSUES.map((issue) => `- ${JSON.stringify(issue)}`).join("\n")}`;
 
 // Initialize Anthropic client
 const anthropic = new Anthropic({

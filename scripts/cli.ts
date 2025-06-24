@@ -1,7 +1,7 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { extractErrorLogs } from "@helpers/errors";
+import { extractErrorLogs } from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
 import { sendSlackNotification } from "@helpers/notifications";
 import "dotenv/config";

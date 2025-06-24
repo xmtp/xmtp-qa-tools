@@ -1,6 +1,10 @@
 import fetch from "node-fetch";
+import {
+  extractFailLines,
+  sanitizeLogs,
+  shouldFilterOutTest,
+} from "./analyzer";
 import { sendDatadogLog } from "./datadog";
-import { PATTERNS } from "./errors";
 
 // Configuration constants
 const URLS = {
@@ -50,20 +54,13 @@ interface GitHubContext {
   region?: string;
 }
 
-interface TestFilter {
-  testName: string;
-  uniqueErrorLines: string[];
-}
-
 class SlackNotifier {
   private readonly slackChannel: string;
   private readonly githubContext: GitHubContext;
-  private readonly testFilters: TestFilter[];
 
   constructor() {
     this.slackChannel = process.env.SLACK_CHANNEL || "general";
     this.githubContext = this.getGitHubContext();
-    this.testFilters = PATTERNS.KNOWN_ISSUES;
   }
 
   private getGitHubContext(): GitHubContext {
@@ -149,42 +146,6 @@ class SlackNotifier {
     return false;
   }
 
-  private extractFailLines(errorLogs: Set<string>): string[] {
-    return Array.from(errorLogs).filter((log) => log.includes("FAIL  suites/"));
-  }
-
-  private shouldFilterOutTest(options: SlackNotificationOptions): boolean {
-    if (!options.errorLogs || options.errorLogs.size === 0) {
-      return false;
-    }
-
-    const failLines = this.extractFailLines(options.errorLogs);
-
-    if (failLines.length === 0) {
-      return true; // Don't show if tests don't fail
-    }
-
-    // Check each configured filter
-    for (const filter of this.testFilters) {
-      const matchingLines = failLines.filter((line) =>
-        filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-      );
-
-      // If all fail lines match this filter's unique error lines, filter it out
-      if (
-        matchingLines.length > 0 &&
-        matchingLines.length === failLines.length
-      ) {
-        console.log(
-          `Slack notification skipped (filtered out ${filter.testName} test failure)`,
-        );
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   private generateCustomLinks(testName: string): string {
     if (testName.toLowerCase().includes("agents")) {
       return "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/inboxes/agents.json|View file>";
@@ -205,10 +166,6 @@ class SlackNotifier {
     return undefined;
   }
 
-  private sanitizeLogs(logs: string): string {
-    return logs.replaceAll(/```/g, "'''");
-  }
-
   private formatTestName(testName: string): string {
     return testName ? testName[0].toUpperCase() + testName.slice(1) : "";
   }
@@ -224,10 +181,10 @@ class SlackNotifier {
 
     // Sanitize logs before embedding in Slack message
     const errorLogsArr = Array.from(options.errorLogs || []);
-    const logs = this.sanitizeLogs(errorLogsArr.join("\n"));
+    const logs = sanitizeLogs(errorLogsArr.join("\n"));
 
     // Check if we need to tag @fabri for multiple failures
-    const failLines = this.extractFailLines(options.errorLogs || new Set());
+    const failLines = extractFailLines(options.errorLogs || new Set());
     const shouldTagFabri = failLines.length > 3;
     const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
@@ -288,7 +245,7 @@ class SlackNotifier {
     }
 
     if (options.errorLogs && options.errorLogs.size > 0) {
-      const failLines = this.extractFailLines(options.errorLogs);
+      const failLines = extractFailLines(options.errorLogs);
       await sendDatadogLog(Array.from(options.errorLogs), {
         test: options.testName,
         url: this.generateUrl(),
@@ -300,7 +257,7 @@ class SlackNotifier {
     }
 
     // Check if test should be filtered out
-    if (this.shouldFilterOutTest(options)) {
+    if (options.errorLogs && shouldFilterOutTest(options.errorLogs)) {
       return;
     }
 
