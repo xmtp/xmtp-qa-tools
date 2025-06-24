@@ -6,7 +6,7 @@ import "dotenv/config";
 // Unified configuration object
 export const CONFIG = {
   // Error processing thresholds
-  errorLineMinLength: 30,
+  errorLineMinLength: 40,
   errorLineMaxLength: 150,
   errorLineTruncateLength: 147,
 
@@ -49,8 +49,7 @@ export const CONFIG = {
       "welcome with cursor",
       "group with welcome id",
       "receiveGroupMessage",
-      "Message processing errors:",
-      "xmtp_mls::groups::mls_sync: receive error",
+      "xmtp_mls::groups::mls_sync",
     ],
     match: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
   },
