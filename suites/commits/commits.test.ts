@@ -22,6 +22,8 @@ const workerNames = [
   "random9",
   "random10",
 ] as string[];
+
+//The target of epoch to stop the test, epochs are when performing commits to the group
 const TARGET_EPOCH = 100n;
 
 // How many inboxIds to use randomly in the add/remove opps
