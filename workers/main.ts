@@ -483,9 +483,9 @@ export class WorkerClient extends Worker {
                   },
                 });
               } else {
-                console.debug(
-                  `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
-                );
+                // console.debug(
+                //   `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
+                // );
               }
             } else {
               // // Log non-text messages for debugging
