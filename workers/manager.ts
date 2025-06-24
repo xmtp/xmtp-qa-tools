@@ -154,6 +154,36 @@ export class WorkerManager {
       );
     }
   }
+  public async checkForksForGroup(groupId: string): Promise<bigint> {
+    for (const worker of this.getAll()) {
+      const group =
+        await worker.client.conversations.getConversationById(groupId);
+      if (!group) {
+        console.warn(
+          `Group ${groupId} not found for worker ${worker.name}, skipping...`,
+        );
+        continue;
+      }
+
+      await group.sync();
+      const debugInfo = await group.debugInfo();
+      const members = await group.members();
+      let totalGroupInstallations = 0;
+      for (const member of members)
+        totalGroupInstallations += member.installationIds.length;
+
+      if (debugInfo.maybeForked) {
+        throw new Error(`Stopping test, group id ${groupId} may have forked`);
+      }
+      const currentEpoch = debugInfo.epoch;
+      if (currentEpoch % 20n === 0n) {
+        console.log(
+          `Worker ${worker.name} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
+        );
+      }
+    }
+    return 0n;
+  }
   //lo
   public async revokeExcessInstallations(
     threshold: number = installationThreshold,

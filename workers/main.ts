@@ -406,10 +406,10 @@ export class WorkerClient extends Worker {
             //   `[${this.nameId}] Received message`,
             //   JSON.stringify(message, null, 2),
             // );
-            console.debug(
-              `[${this.nameId}] Received message`,
-              JSON.stringify(message?.content, null, 2),
-            );
+            // console.debug(
+            //   `[${this.nameId}] Received message`,
+            //   JSON.stringify(message?.content, null, 2),
+            // );
             if (!this.activeStreams) break;
 
             if (
@@ -483,9 +483,9 @@ export class WorkerClient extends Worker {
                   },
                 });
               } else {
-                console.debug(
-                  `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
-                );
+                // console.debug(
+                //   `[${this.nameId}] No listeners for worker_message, skipping emit for: "${message.content as string}"`,
+                // );
               }
             } else {
               // // Log non-text messages for debugging

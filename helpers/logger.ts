@@ -32,26 +32,6 @@ export const KNOWN_ISSUES = [
   //     "FAIL  suites/metrics/performance.test.ts > m_performance > receiveGroupMessage-200: should create a group and measure all streams",
   //   ],
   // },
-  {
-    testName: "Large",
-    uniqueErrorLines: [
-      "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-100: should deliver messages to all 100",
-    ],
-  },
-  {
-    testName: "Large",
-    uniqueErrorLines: [
-      "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-50: should deliver messages to all 50",
-    ],
-  },
-  {
-    testName: "Large",
-    uniqueErrorLines: [
-      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 100-member group and verify all workers receive new conversation notifications within acceptable time",
-      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 150-member group and verify all workers receive new conversation notifications within acceptable time",
-      "FAIL  suites/Large/conversations.test.ts > m_large_conversations > should create 200-member group and verify all workers receive new conversation notifications within acceptable time",
-    ],
-  },
 ];
 
 // Patterns configuration
@@ -63,6 +43,7 @@ export const ERROR_PATTERNS = {
     "Collector timed out.",
     "welcome with cursor",
     "group with welcome id",
+    "receiveGroupMessage",
     "xmtp_mls::groups::mls_sync: receive error",
   ],
 
