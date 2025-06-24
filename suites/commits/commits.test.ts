@@ -25,7 +25,7 @@ const workerNames = [
 
 //The target of epoch to stop the test, epochs are when performing commits to the group
 const TARGET_EPOCH = 100n;
-
+const network = process.env.XMTP_ENV;
 // How many inboxIds to use randomly in the add/remove opps
 const randomInboxIdsCount = 30;
 // How many installations to use randomly in the createInstallation opps
@@ -87,6 +87,7 @@ describe("commits", () => {
       typeofStreamForTest,
       typeOfResponseForTest,
       typeOfSyncForTest,
+      network as "local" | "dev" | "production",
     );
     const creator = workers.getCreator();
 
