@@ -136,7 +136,7 @@ export function extractErrorLogs(
         errorLines[0]?.includes(pattern),
       );
       if (hasKnownPattern) {
-        console.log("returning empty string");
+        console.log("hasKnownPattern, returning empty string");
         return new Set();
       }
     }
