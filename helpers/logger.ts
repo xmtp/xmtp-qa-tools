@@ -44,6 +44,7 @@ export const ERROR_PATTERNS = {
     "welcome with cursor",
     "group with welcome id",
     "receiveGroupMessage",
+    "Message processing errors:",
     "xmtp_mls::groups::mls_sync: receive error",
   ],
 
