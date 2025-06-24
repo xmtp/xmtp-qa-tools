@@ -7,6 +7,7 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const groupCount = 5;
+const batchSize = 4;
 const workerNames = [
   // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
   // We want to create a key each run to ensure the forks are "pure"
@@ -22,13 +23,11 @@ const workerNames = [
   "random10",
 ] as string[];
 const TARGET_EPOCH = 100n;
-const randomInboxIdsCount = 30;
-const installationCount = 5;
-const randomInboxIds: string[] = getRandomInboxIds(
-  randomInboxIdsCount,
-  installationCount,
-);
 
+// How many inboxIds to use randomly in the add/remove opps
+const randomInboxIdsCount = 30;
+// How many installations to use randomly in the createInstallation opps
+const installationCount = 5;
 const typeofStreamForTest = typeofStream.Message; // Starts a streamAllMessages in each worker
 const typeOfResponseForTest = typeOfResponse.Gm; // Replies gm if mentioned
 const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
@@ -49,6 +48,10 @@ describe("commits", () => {
         group.id,
       ) as Promise<Group>;
 
+    const randomInboxIds: string[] = getRandomInboxIds(
+      randomInboxIdsCount,
+      installationCount,
+    );
     return {
       updateName: () =>
         getGroup().then((g) =>
@@ -104,30 +107,34 @@ describe("commits", () => {
         let currentEpoch = 0n;
 
         while (currentEpoch < TARGET_EPOCH) {
-          const randomWorker =
-            allWorkers[Math.floor(Math.random() * allWorkers.length)];
+          const parallelOperations = Array.from({ length: batchSize }, () =>
+            (async () => {
+              const randomWorker =
+                allWorkers[Math.floor(Math.random() * allWorkers.length)];
 
-          const ops = await createOperations(randomWorker, group);
-          const operationList = [
-            ops.updateName,
-            ops.sendMessage,
-            ops.addMember,
-            ops.removeMember,
-            ops.createInstallation,
-          ];
+              const ops = await createOperations(randomWorker, group);
+              const operationList = [
+                ops.updateName,
+                ops.sendMessage,
+                ops.addMember,
+                ops.removeMember,
+                ops.createInstallation,
+              ];
 
-          const randomOperation =
-            operationList[Math.floor(Math.random() * operationList.length)];
+              const randomOperation =
+                operationList[Math.floor(Math.random() * operationList.length)];
 
-          try {
-            await randomOperation();
-          } catch (e) {
-            console.log(`Group ${groupIndex + 1} operation failed:`, e);
-          }
+              try {
+                await randomOperation();
+              } catch (e) {
+                console.log(`Group ${groupIndex + 1} operation failed:`, e);
+              }
+            })(),
+          );
 
-          await group.sync();
-          currentEpoch = (await group.debugInfo()).epoch;
+          await Promise.all(parallelOperations);
           await workers.checkForksForGroup(group.id);
+          currentEpoch = (await group.debugInfo()).epoch;
         }
 
         return { groupIndex, finalEpoch: currentEpoch };

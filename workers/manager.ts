@@ -169,16 +169,16 @@ export class WorkerManager {
       const debugInfo = await group.debugInfo();
       const members = await group.members();
       let totalGroupInstallations = 0;
-      for (const member of members) {
+      for (const member of members)
         totalGroupInstallations += member.installationIds.length;
-      }
+
       if (debugInfo.maybeForked) {
         throw new Error(`Stopping test, group id ${groupId} may have forked`);
       }
       const currentEpoch = debugInfo.epoch;
       if (currentEpoch % 20n === 0n) {
         console.log(
-          `Group ${group.id} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
+          `Worker ${worker.name} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
         );
       }
     }
