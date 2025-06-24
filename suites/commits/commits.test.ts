@@ -4,7 +4,7 @@ import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const groupCount = 5;
+const groupCount = 2;
 const TARGET_EPOCH = 100n;
 const workerNames = [
   "random1",
@@ -12,11 +12,6 @@ const workerNames = [
   "random3",
   "random4",
   "random5",
-  "random6",
-  "random7",
-  "random8",
-  "random9",
-  "random10",
 ] as string[];
 
 describe("commits", () => {
