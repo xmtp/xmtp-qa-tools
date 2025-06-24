@@ -50,10 +50,6 @@ describe("commits", () => {
         group.id,
       ) as Promise<Group>;
 
-    const randomInboxIds: string[] = getRandomInboxIds(
-      randomInboxIdsCount,
-      installationCount,
-    );
     return {
       updateName: () =>
         getGroup().then((g) =>
@@ -62,17 +58,25 @@ describe("commits", () => {
       createInstallation: () =>
         getGroup().then(() => worker.worker.addNewInstallation()),
       addMember: () =>
-        getGroup().then((g) =>
-          g.addMembers([
+        getGroup().then((g) => {
+          const randomInboxIds = getRandomInboxIds(
+            randomInboxIdsCount,
+            installationCount,
+          );
+          return g.addMembers([
             randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)],
-          ]),
-        ),
+          ]);
+        }),
       removeMember: () =>
-        getGroup().then((g) =>
-          g.removeMembers([
+        getGroup().then((g) => {
+          const randomInboxIds = getRandomInboxIds(
+            randomInboxIdsCount,
+            installationCount,
+          );
+          return g.removeMembers([
             randomInboxIds[Math.floor(Math.random() * randomInboxIds.length)],
-          ]),
-        ),
+          ]);
+        }),
       sendMessage: () =>
         getGroup().then((g) =>
           g.send(`Message from ${worker.name}`).then(() => {}),
@@ -91,9 +95,6 @@ describe("commits", () => {
     );
     const creator = workers.getCreator();
 
-    // Get all workers
-    const allWorkers = workers.getAll();
-
     // Create groups
     const groupOperationPromises = Array.from(
       { length: groupCount },
@@ -110,32 +111,38 @@ describe("commits", () => {
         let currentEpoch = 0n;
 
         while (currentEpoch < TARGET_EPOCH) {
-          const parallelOperations = Array.from({ length: batchSize }, () =>
-            (async () => {
-              const randomWorker =
-                allWorkers[Math.floor(Math.random() * allWorkers.length)];
+          const parallelOperationsArray = Array.from(
+            { length: parallelOperations },
+            () =>
+              (async () => {
+                const randomWorker =
+                  workers.getAll()[
+                    Math.floor(Math.random() * workers.getAll().length)
+                  ];
 
-              const ops = await createOperations(randomWorker, group);
-              const operationList = [
-                ops.updateName,
-                ops.sendMessage,
-                ops.addMember,
-                ops.removeMember,
-                ops.createInstallation,
-              ];
+                const ops = await createOperations(randomWorker, group);
+                const operationList = [
+                  ops.updateName,
+                  ops.sendMessage,
+                  ops.addMember,
+                  ops.removeMember,
+                  ops.createInstallation,
+                ];
 
-              const randomOperation =
-                operationList[Math.floor(Math.random() * operationList.length)];
+                const randomOperation =
+                  operationList[
+                    Math.floor(Math.random() * operationList.length)
+                  ];
 
-              try {
-                await randomOperation();
-              } catch (e) {
-                console.log(`Group ${groupIndex + 1} operation failed:`, e);
-              }
-            })(),
+                try {
+                  await randomOperation();
+                } catch (e) {
+                  console.log(`Group ${groupIndex + 1} operation failed:`, e);
+                }
+              })(),
           );
 
-          await Promise.all(parallelOperations);
+          await Promise.all(parallelOperationsArray);
           await workers.checkForksForGroup(group.id);
           currentEpoch = (await group.debugInfo()).epoch;
         }
