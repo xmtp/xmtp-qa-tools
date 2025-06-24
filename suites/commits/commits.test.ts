@@ -7,7 +7,7 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 const groupCount = 5;
-const batchSize = 4;
+const batchSize = 1;
 const workerNames = [
   // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
   // We want to create a key each run to ensure the forks are "pure"

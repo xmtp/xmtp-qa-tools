@@ -31,6 +31,6 @@ yarn install
 # Start local network
 ./dev/up
 
-# Run the test
+# Run the test 100 times
 yarn run:commits
 ```
