@@ -1,31 +1,36 @@
 [
   {
     "name": "flaunchy",
+    "baseName": "flaunchy.base.eth",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "hi",
     "networks": ["production"],
     "disabled": false
   },
   {
-    "name": "mamo.base.eth",
+    "name": "mamo",
+    "baseName": "mamo.base.eth",
     "address": "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
     "sendMessage": "hi",
     "networks": ["production"]
   },
   {
     "name": "squabble",
+    "baseName": "squabble.base.eth",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
     "sendMessage": "@squabble.base.eth",
     "networks": ["production"]
   },
   {
     "name": "key-check",
+    "baseName": "key-check.base.eth",
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "sendMessage": "/kc help",
     "networks": ["dev", "production"]
   },
   {
     "name": "csx",
+    "baseName": "csx.base.eth",
     "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
     "sendMessage": "hola",
     "expectedMessage": ["chat", "invalid"],
@@ -34,6 +39,7 @@
 
   {
     "name": "gang",
+    "baseName": "gang.base.eth",
     "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
     "sendMessage": "hola",
     "expectedMessage": ["chat", "invalid"],
@@ -41,30 +47,35 @@
   },
   {
     "name": "elsa",
+    "baseName": "elsa.base.eth",
     "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
     "sendMessage": "hi",
     "networks": ["production"]
   },
   {
     "name": "byte",
+    "baseName": "byte.base.eth",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     "sendMessage": "hi",
     "networks": ["production"]
   },
   {
     "name": "gm",
+    "baseName": "gm.base.eth",
     "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
     "sendMessage": "hola",
     "networks": ["production"]
   },
   {
     "name": "bankr",
+    "baseName": "bankr.base.eth",
     "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
     "sendMessage": "hey there how are you?",
     "networks": ["production"]
   },
   {
     "name": "tokenbot",
+    "baseName": "tokenbot.base.eth",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
     "networks": ["production"]
