@@ -4,21 +4,18 @@ Comprehensive end-to-end test suites for validating XMTP protocol functionality,
 
 ## Quick Reference
 
-| Test Suite                            | Purpose                            | Key Features                                 | Documentation                          |
-| ------------------------------------- | ---------------------------------- | -------------------------------------------- | -------------------------------------- |
-| **[agents](./agents/)**               | Production agent health monitoring | Live agent testing, response validation      | [📖 README](./agents/README.md)        |
-| **[bench](./bench/)**                 | Performance benchmarking           | Throughput measurement, latency analysis     | [📖 README](./bench/README.md)         |
-| **[browser](./browser/)**             | Browser integration validation     | Playwright automation, cross-browser testing | [📖 README](./browser/README.md)       |
-| **[bugs](./bugs/)**                   | Bug reproduction and tracking      | Historical issues, regression prevention     | [📖 README](./bugs/README.md)          |
-| **[functional](./functional/)**       | Core protocol functionality        | Complete feature coverage, integration tests | [📖 README](./functional/README.md)    |
-| **[group](./group/)**                 | Group conversation testing         | Stress testing, multi-version compatibility  | [📖 README](./group/README.md)         |
-| **[large](./large/)**                 | Large-scale performance testing    | Scalability validation, resource monitoring  | [📖 README](./large/README.md)         |
-| **[metrics](./metrics/)**             | Performance metrics collection     | Delivery reliability, operational metrics    | [📖 README](./metrics/README.md)       |
-| **[mobile](./mobile/)**               | Mobile performance testing         | Load testing, responsiveness validation      | [📖 README](./mobile/README.md)        |
-| **[notifications](./notifications/)** | Push notification testing          | Notification delivery, integration testing   | [📖 README](./notifications/README.md) |
-| **[other](./other/)**                 | Specialized edge case testing      | Rate limiting, miscellaneous scenarios       | [View tests →](./other/)               |
-| **[spam](./spam/)**                   | Security and spam validation       | Threat prevention, security testing          | [📖 README](./spam/README.md)          |
-| **[storage](./storage/)**             | Storage efficiency analysis        | Database optimization, space utilization     | [📖 README](./storage/README.md)       |
+| Test Suite                      | Purpose                            | Key Features                                 | Documentation                       |
+| ------------------------------- | ---------------------------------- | -------------------------------------------- | ----------------------------------- |
+| **[agents](./agents/)**         | Production agent health monitoring | Live agent testing, response validation      | [📖 README](./agents/README.md)     |
+| **[bench](./bench/)**           | Performance benchmarking           | Throughput measurement, latency analysis     | [📖 README](./bench/README.md)      |
+| **[browser](./browser/)**       | Browser integration validation     | Playwright automation, cross-browser testing | [📖 README](./browser/README.md)    |
+| **[bugs](./bugs/)**             | Bug reproduction and tracking      | Historical issues, regression prevention     | [📖 README](./bugs/README.md)       |
+| **[functional](./functional/)** | Core protocol functionality        | Complete feature coverage, integration tests | [📖 README](./functional/README.md) |
+| **[group](./group/)**           | Group conversation testing         | Stress testing, multi-version compatibility  | [📖 README](./group/README.md)      |
+| **[large](./large/)**           | Large-scale performance testing    | Scalability validation, resource monitoring  | [📖 README](./large/README.md)      |
+| **[metrics](./metrics/)**       | Performance metrics collection     | Delivery reliability, operational metrics    | [📖 README](./metrics/README.md)    |
+| **[mobile](./mobile/)**         | Mobile performance testing         | Load testing, responsiveness validation      | [📖 README](./mobile/README.md)     |
+| **[other](./other/)**           | Specialized edge case testing      | Rate limiting, storage, notifications, etc   | [View tests →](./other/)            |
 
 ## 🤖 Production & Monitoring
 
@@ -444,16 +441,11 @@ The testing framework supports the following XMTP SDK versions for compatibility
 - `0.0.47` (legacy)
 - `1.0.0`
 - `1.0.5`
-- `2.0.2`
-- `2.0.3`
-- `2.0.4`
-- `2.0.5`
-- `2.0.6`
-- `2.0.8`
 - `2.0.9`
-- `2.1.0` (latest)
+- `2.1.0`
+- `2.1.1` (latest)
 
-When `--versions` is specified, workers will be randomly assigned versions from the provided list. When not specified, the latest version is used by default.
+  When `--versions` is specified, workers will be randomly assigned versions from the provided list. When not specified, the latest version is used by default.
 
 ## 📈 Continuous Integration
 
