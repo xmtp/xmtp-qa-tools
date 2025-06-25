@@ -88,7 +88,6 @@ export interface ProcessLogsResult {
   };
 }
 
-// System prompt for Claude analysis
 export const SYSTEM_PROMPT = `You are a friendly expert at analyzing test failure data and logs.
 
 # How to read the logs
