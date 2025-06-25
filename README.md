@@ -239,6 +239,7 @@ Based on my analysis of the `/suites`, `/helpers`, `/scripts`, and `dashboard.js
 
 - **Functional**: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
 - **Metrics**: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
+- **Regression**: Regression functional testing for the last 3 versions
 - **NetworkChaos**: Partition tolerance, duplicate prevention, reconciliation, key rotation
 - **Browser**: Cross-browser compatibility via Playwright automation
 - **Agents**: Live production bot health monitoring
