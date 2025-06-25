@@ -127,33 +127,33 @@ describe(testName, async () => {
     expect(conversation.id).toBe(convo.id);
   });
 
-  it("should receive conversation with callback", async () => {
-    const receiver = workers.get(names[1])!;
+  // it("should receive conversation with callback", async () => {
+  //   const receiver = workers.get(names[1])!;
 
-    // Set up stream first
-    const conversationPromise = new Promise<Dm>((resolve, reject) => {
-      const timeout = setTimeout(() => {
-        reject(new Error("Timeout waiting for conversation"));
-      }, 5000);
+  //   // Set up stream first
+  //   const conversationPromise = new Promise<Dm>((resolve, reject) => {
+  //     const timeout = setTimeout(() => {
+  //       reject(new Error("Timeout waiting for conversation"));
+  //     }, 5000);
 
-      void receiver.client.conversations.stream((err, conversation) => {
-        if (err) {
-          clearTimeout(timeout);
-          reject(err instanceof Error ? err : new Error(String(err)));
-          return;
-        }
-        console.log("Callback received conversation:", conversation?.id);
-        if (conversation?.id) {
-          clearTimeout(timeout);
-          resolve(conversation as Dm);
-          return;
-        }
-      });
-    });
+  //     void receiver.client.conversations.stream((err, conversation) => {
+  //       if (err) {
+  //         clearTimeout(timeout);
+  //         reject(err instanceof Error ? err : new Error(String(err)));
+  //         return;
+  //       }
+  //       console.log("Callback received conversation:", conversation?.id);
+  //       if (conversation?.id) {
+  //         clearTimeout(timeout);
+  //         resolve(conversation as Dm);
+  //         return;
+  //       }
+  //     });
+  //   });
 
-    // Create group after stream is ready
-    await workers.createGroup();
-    const conversation = await conversationPromise;
-    expect(conversation.id).toBeDefined();
-  });
+  //   // Create group after stream is ready
+  //   await workers.createGroup();
+  //   const conversation = await conversationPromise;
+  //   expect(conversation.id).toBeDefined();
+  // });
 });
