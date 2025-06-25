@@ -26,7 +26,7 @@ export const PATTERNS = {
     {
       testName: "Agents",
       uniqueErrorLines: [
-        "FAIL  suites/agents/agents.test.ts > agents > conversation stream for new member",
+        "FAIL  suites/agents/agents.test.ts > agents > production: byte : 0xdfc00a0B28Df3c07b0942300E896C97d62014499",
       ],
     },
   ],
