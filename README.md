@@ -82,29 +82,6 @@ flowchart LR
 
 We can test all XMTP bindings using three main applications. We use [xmtp.chat](https://xmtp.chat/) to test the Browser SDK's Wasm binding in actual web environments. We use [Convos](https://github.com/ephemeraHQ/converse-app) to test the React Native SDK, which uses both Swift and Kotlin FFI bindings for mobile devices. We use [agents](https://github.com/ephemeraHQ/xmtp-agent-examples) to test the Node SDK's Napi binding for server functions. This testing method checks the entire protocol across all binding types, making sure different clients work together, messages are saved, and users have the same experience across the XMTP system.
 
-## Testing details
-
-> Baseline is `us-east` region and `production` network.
-
-- Multi-region testing nodes (`us-east`, `us-west` , `asia`, `europe` )
-- 30-minute automated test execution intervals
-- Comprehensive data aggregation in datadog
-- All measurements are in `milliseconds`
-- Testing directly on top of SDKs for real-world scenarios
-- `dev` and `production` network covered
-- Automated testing for web app `xmtp.chat`
-- Manual testing for react native apps
-- Simulated agent testing for real-world simulations
-
-### TLDR: Metrics
-
-- **Core SDK Performance**: Direct message creation (<500), group operations (<200-500)
-- **Network Performance**: Server call (<100), TLS handshake (<100), total processing (<300)
-- **Group Scaling**: Supports up to 300 members efficiently (create: 9s, operations: <350)
-- **Regional Performance**: US/Europe optimal, Asia/South America higher latency (+46-160%)
-- **Message Reliability**: 100% delivery rate (target: 99.9%), perfect ordering
-- **Environments**: Production consistently outperfor Dev network by 5-9%
-
 ## Operation performance
 
 ### Core SDK Operations Performance
@@ -253,6 +230,45 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
   - [`key-check.eth`](https://xmtp.chat/dm/0x235017975ed5F55e23a71979697Cd67DcAE614Fa): Verify key packages
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
+
+Based on my analysis of the `/suites`, `/helpers`, `/scripts`, and `dashboard.json`, here's a short summary of all things tested in the XMTP QA Tools:
+
+## Testing Summary
+
+### Test Suites Coverage
+
+- **Functional**: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
+- **Metrics**: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
+- **NetworkChaos**: Partition tolerance, duplicate prevention, reconciliation, key rotation
+- **Browser**: Cross-browser compatibility via Playwright automation
+- **Agents**: Live production bot health monitoring
+- **Mobile**: Cross-platform performance testing
+- **Bugs**: Historical issue reproduction and regression prevention
+- **Other**: Security, spam detection, rate limiting, storage efficiency
+
+### Testing Framework (Helpers)
+
+- **Multi-Version SDK Support**: Compatibility testing across versions 0.0.47 → 2.2.0+
+- **Stream Verification**: Message delivery, conversation streams, metadata updates
+- **Performance Monitoring**: Real-time Datadog metrics collection
+- **Browser Automation**: Playwright-based web app testing
+- **Smart Alerting**: Slack notifications with error pattern filtering
+- **Log Analysis**: Automated error detection and deduplication
+
+### Monitoring & Automation (Scripts/Dashboard)
+
+- **Real-time Dashboard**: Datadog integration tracking delivery rates, response times, geographic performance
+- **CLI Tools**: Test execution, version management, key generation
+- **Slack Bot**: AI-powered responses, history fetching, log management
+- **Geographic Testing**: Multi-region performance across US, Europe, Asia, South America
+
+### Key Metrics Tracked
+
+- **Delivery**: 100% success rate (target: 99.9%)
+- **Performance**: <350ms core operations, <200ms messaging, <150ms TLS
+- **Scale**: Groups up to 400 members, high-volume message testing
+- **Network**: DNS, TCP, TLS timing across 5 global regions
+- **Agent Health**: Live production bot response time monitoring
 
 ## Development
 
