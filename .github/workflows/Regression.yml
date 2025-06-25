@@ -41,7 +41,7 @@ jobs:
         run: yarn script versions
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
-      - name: Upload test artifacts
+source ~/.bashrc;pr_push      - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
         with:
