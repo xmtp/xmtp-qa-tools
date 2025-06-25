@@ -231,43 +231,41 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
   - [`hi.xmtp.eth`](https://xmtp.chat/dm/0x937C0d4a6294cdfa575de17382c7076b579DC176): A bot that replies "hi" to all messages
 - **Test suites:** Test suites directory - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/)
 
-Based on my analysis of the `/suites`, `/helpers`, `/scripts`, and `dashboard.json`, here's a short summary of all things tested in the XMTP QA Tools:
-
 ## Testing Summary
 
 ### Test coverage
 
-- **Functional**: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
-- **Metrics**: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- **Regression**: Regression functional testing for the last 3 versions
-- **NetworkChaos**: Partition tolerance, duplicate prevention, reconciliation, key rotation
-- **Browser**: Cross-browser compatibility via Playwright automation
-- **Agents**: Live production bot health monitoring
-- **Mobile**: Cross-platform performance testing
-- **Bugs**: Historical issue reproduction and regression prevention
-- **Other**: Security, spam detection, rate limiting, storage efficiency
+- Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
+- Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
+- Regression: Regression functional testing for the last 3 versions
+- NetworkChaos: Partition tolerance, duplicate prevention, reconciliation, key rotation
+- Browser: Cross-browser compatibility via Playwright automation
+- Agents: Live production bot health monitoring
+- Mobile: Cross-platform performance testing
+- Bugs: Historical issue reproduction and regression prevention
+- Other: Security, spam detection, rate limiting, storage efficiency
 
 ### Testing framework
 
-- **Multi-Version SDK Support**: Compatibility testing across versions 0.0.47 → 2.2.0+
-- **Stream Verification**: Message delivery, conversation streams, metadata updates
-- **Performance Monitoring**: Real-time Datadog metrics collection
-- **Browser Automation**: Playwright-based web app testing
-- **CI automation**: CI automation with logging and alerting
-- **Smart Alerting**: Slack notifications with error pattern filtering
-- **Log Analysis**: Automated error detection and deduplication
-- **Real-time Dashboard**: Datadog integration tracking delivery rates, response times, geographic performance
-- **CLI Tools**: Test execution, version management, key generation
-- **Slack Bot**: AI-powered responses, history fetching, log management
-- **Geographic Testing**: Multi-region performance across US, Europe, Asia, South America
+- Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
+- Stream verification: Message delivery, conversation streams, metadata updates
+- Performance monitoring: Real-time Datadog metrics collection
+- Browser automation: Playwright-based web app testing
+- CI automation: CI automation with logging and alerting
+- Smart alerting: Slack notifications with error pattern filtering
+- Log analysis: Automated error detection and deduplication
+- Real-time dashboard: Datadog integration tracking delivery rates, response times, geographic performance
+- CLI Tools: Test execution, version management, key generation
+- Slack Bot: AI-powered responses, history fetching, log management
+- Geographic testing: Multi-region performance across US, Europe, Asia, South America
 
 ### Metrics tracked
 
-- **Delivery**: 100% success rate (target: 99.9%)
-- **Performance**: <350ms core operations, <200ms messaging, <150ms TLS
-- **Scale**: Groups up to 400 members, high-volume message testing
-- **Network**: DNS, TCP, TLS timing across 5 global regions
-- **Agent Health**: Live production bot response time monitoring
+- Delivery: 100% success rate (target: 99.9%)
+- Performance: <350ms core operations, <200ms messaging, <150ms TLS
+- Scale: Groups up to 400 members, high-volume message testing
+- Network: DNS, TCP, TLS timing across 5 global regions
+- Agent health: Live production bot response time monitoring
 
 ## Development
 
