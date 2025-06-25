@@ -21,12 +21,13 @@ interface ParsedTestName {
 interface BaseMetricTags {
   metric_type: "agent" | "operation" | "network" | "delivery" | "response";
   metric_subtype?: string;
-  env: string;
-  region: string;
+  env?: string;
+  region?: string;
   libxmtp: string;
   sdk: string;
+  operation?: string;
   test: string;
-  country_iso_code: string;
+  country_iso_code?: string;
 }
 
 interface DurationMetricTags extends BaseMetricTags {
@@ -45,6 +46,7 @@ interface NetworkMetricTags extends BaseMetricTags {
     | "tls_handshake"
     | "server_call"
     | "processing";
+  operation: string;
   network_phase:
     | "dns_lookup"
     | "tcp_connection"
@@ -177,26 +179,30 @@ export function sendMetric(
   if (!state.isInitialized) return;
 
   try {
+    // Auto-populate environment fields if not provided
+    const enrichedTags: MetricTags = {
+      ...tags,
+      env: tags.env || (process.env.XMTP_ENV as string),
+      region: tags.region || (process.env.GEOLOCATION as string),
+      country_iso_code:
+        tags.country_iso_code ||
+        GEO_TO_COUNTRY_CODE[
+          process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+        ],
+    };
+
     const fullMetricName = `xmtp.sdk.${metricName}`;
-    const allTags = Object.entries({ ...tags }).map(
+    const allTags = Object.entries(enrichedTags).map(
       ([key, value]) => `${key}:${String(value)}`,
     );
 
-    // Add environment tag if not already present
-    if (!allTags.some((tag) => tag.startsWith("env:"))) {
-      allTags.push(`env:${process.env.XMTP_ENV as string}`);
-    }
-    // Add region tag if not already present
-    if (!allTags.some((tag) => tag.startsWith("region:"))) {
-      allTags.push(`region:${process.env.GEOLOCATION as string}`);
-    }
-
     // Create a distinctive operation key that properly includes member count
     // Format: operation_name-member_count (e.g., "createGroup-10")
-    const memberCount = "members" in tags ? tags.members || "" : "";
+    const memberCount =
+      "members" in enrichedTags ? enrichedTags.members || "" : "";
     const operationKey =
-      "operation" in tags && tags.operation
-        ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
+      "operation" in enrichedTags && enrichedTags.operation
+        ? `${enrichedTags.operation}${memberCount ? `-${memberCount}` : ""}`
         : metricName;
 
     if (!state.collectedMetrics[operationKey]) {
@@ -208,7 +214,7 @@ export function sendMetric(
 
     state.collectedMetrics[operationKey].values.push(metricValue);
 
-    if (tags.metric_type !== "network") {
+    if (enrichedTags.metric_type !== "network") {
       console.debug(
         JSON.stringify(
           {
@@ -343,12 +349,8 @@ export async function sendPerformanceMetric(
   if (!state.isInitialized) return;
   const libXmtpVersion = "latest";
   try {
-    const {
-      metricDescription,
-      testNameExtracted,
-      operationType,
-      operationName,
-    } = parseTestName(testName);
+    const { testNameExtracted, operationType, operationName } =
+      parseTestName(testName);
 
     const countryCode =
       GEO_TO_COUNTRY_CODE[

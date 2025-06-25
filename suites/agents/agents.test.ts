@@ -93,12 +93,8 @@ describe(testName, () => {
           agent: agent.name,
           address: agent.address,
           test: testName,
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
-          libxmtp: process.env.LIBXMTP_VERSION as string,
-          sdk: process.env.XMTP_SDK_VERSION as string,
-          operation: "agent",
-          country_iso_code: process.env.GEOLOCATION as string,
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
         });
         expect(agentResponded).toBe(true);
       } catch (e) {

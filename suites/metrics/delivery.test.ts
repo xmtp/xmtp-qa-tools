@@ -1,5 +1,5 @@
 import { getFixedNames } from "@helpers/client";
-import { GEO_TO_COUNTRY_CODE, sendMetric } from "@helpers/datadog";
+import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -77,10 +77,6 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          operation: "messageDelivery",
-          country_iso_code: "US",
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
           conversation_type: "group",
           delivery_status: "received",
@@ -95,10 +91,6 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          operation: "messageOrder",
-          country_iso_code: "US",
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
           conversation_type: "group",
           delivery_status: "received",
@@ -158,10 +150,6 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          operation: "messageDelivery",
-          country_iso_code: "US",
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
           conversation_type: "group",
           delivery_status: "received",
@@ -175,10 +163,6 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          operation: "messageOrder",
-          country_iso_code: "US",
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
           conversation_type: "group",
           delivery_status: "received",
@@ -261,10 +245,6 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          operation: "messageDelivery",
-          country_iso_code: "US",
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
           conversation_type: "group",
           delivery_status: "received",
@@ -278,17 +258,10 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          operation: "messageOrder",
-          country_iso_code:
-            GEO_TO_COUNTRY_CODE[
-              process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
-            ],
-          env: process.env.XMTP_ENV as string,
-          region: process.env.GEOLOCATION as string,
           metric_type: "delivery",
-          metric_subtype: "recovery",
           conversation_type: "group",
           delivery_status: "received",
+          metric_subtype: "recovery",
         });
       }
     } catch (e) {
