@@ -30,7 +30,7 @@ interface BaseMetricTags {
   country_iso_code?: string;
 }
 
-interface DurationMetricTags extends BaseMetricTags {
+export interface DurationMetricTags extends BaseMetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
@@ -336,78 +336,6 @@ export function parseTestName(testName: string): ParsedTestName {
     operationName,
     members,
   };
-}
-
-/**
- * Send detailed performance metrics
- */
-export async function sendPerformanceMetric(
-  metricValue: number,
-  testName: string,
-  skipNetworkStats: boolean = false,
-): Promise<void> {
-  if (!state.isInitialized) return;
-  const libXmtpVersion = "latest";
-  try {
-    const { testNameExtracted, operationType, operationName, members } =
-      parseTestName(testName);
-
-    const countryCode =
-      GEO_TO_COUNTRY_CODE[
-        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
-      ];
-
-    const values: DurationMetricTags = {
-      metric_type: "operation",
-      metric_subtype: operationType,
-      operation: operationName,
-      test: testNameExtracted,
-      libxmtp: libXmtpVersion,
-      region: process.env.GEOLOCATION ?? "",
-      env: process.env.XMTP_ENV ?? "",
-      country_iso_code: countryCode,
-      sdk: process.env.XMTP_SDK_VERSION as string,
-      installations: members,
-      members,
-    };
-
-    if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
-      sendMetric("duration", metricValue, values);
-    }
-
-    // Network stats handling
-    if (!skipNetworkStats && testName.includes("m_performance")) {
-      const networkStats = await getNetworkStats();
-
-      for (const [statName, statValue] of Object.entries(networkStats)) {
-        const networkMetricValue = Math.round(statValue * 1000);
-        const networkPhase = statName.toLowerCase().replace(/\s+/g, "_") as
-          | "dns_lookup"
-          | "tcp_connection"
-          | "tls_handshake"
-          | "server_call"
-          | "processing";
-
-        sendMetric("duration", networkMetricValue, {
-          metric_type: "network",
-          metric_subtype: networkPhase,
-          libxmtp: libXmtpVersion,
-          operation: operationName,
-          test: testNameExtracted,
-          network_phase: networkPhase,
-          region: process.env.GEOLOCATION as string,
-          country_iso_code: countryCode,
-          env: process.env.XMTP_ENV as string,
-          sdk: process.env.XMTP_SDK_VERSION as string,
-        });
-      }
-    }
-  } catch (error) {
-    console.error(
-      `❌ Error sending performance metric for '${testName}':`,
-      error,
-    );
-  }
 }
 
 // Network performance
