@@ -88,11 +88,13 @@ describe(testName, () => {
         if (!agentResponded) metricValue = streamTimeout;
 
         sendMetric("response", metricValue, {
+          test: testName,
           metric_type: "agent",
           metric_subtype: agent.name,
           agent: agent.name,
           address: agent.address,
-          test: testName,
+          libxmtp: workers.getCreator().libXmtpVersion,
+          sdk: workers.getCreator().sdkVersion,
         });
         expect(agentResponded).toBe(true);
       } catch (e) {

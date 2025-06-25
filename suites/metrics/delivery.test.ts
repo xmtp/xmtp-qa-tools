@@ -77,8 +77,10 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "stream",
-          metric_subtype: "delivery",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "stream",
         });
       }
 
@@ -89,8 +91,10 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "stream",
-          metric_subtype: "order",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "stream",
         });
       }
     } catch (e) {
@@ -146,8 +150,10 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "poll",
-          metric_subtype: "delivery",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "poll",
         });
       }
 
@@ -157,8 +163,10 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "poll",
-          metric_subtype: "order",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "poll",
         });
       }
     } catch (e) {
@@ -237,8 +245,10 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          metric_type: "recovery",
-          metric_subtype: "delivery",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "recovery",
         });
       }
 
@@ -248,8 +258,10 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          metric_type: "recovery",
-          metric_subtype: "order",
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "recovery",
         });
       }
     } catch (e) {

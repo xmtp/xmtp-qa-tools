@@ -280,6 +280,7 @@ sendMetric("test.duration", 1234, {
   operation: "createGroup",
   test: "functional",
   members: "10",
+  installations: "10",
 });
 
 // Send performance metrics with network stats
