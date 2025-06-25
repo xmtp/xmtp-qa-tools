@@ -260,7 +260,7 @@ Based on my analysis of the `/suites`, `/helpers`, `/scripts`, and `dashboard.js
 - **Slack Bot**: AI-powered responses, history fetching, log management
 - **Geographic Testing**: Multi-region performance across US, Europe, Asia, South America
 
-### Key Metrics Tracked
+### Metrics tracked
 
 - **Delivery**: 100% success rate (target: 99.9%)
 - **Performance**: <350ms core operations, <200ms messaging, <150ms TLS
