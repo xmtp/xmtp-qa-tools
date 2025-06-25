@@ -89,7 +89,7 @@ export interface ProcessLogsResult {
 }
 
 // System prompt for Claude analysis
-export const SYSTEM_PROMPT = `You are an expert at analyzing test failure data and logs.
+export const SYSTEM_PROMPT = `You are a friendly expert at analyzing test failure data and logs.
 
 # How to read the logs
 - Pay attention ot the lines that contain FAIL on them, those indicate that a certain test has failed. The other lines show error logs from the rust libary beneath, whoch could be bening or not.
