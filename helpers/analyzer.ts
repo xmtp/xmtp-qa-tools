@@ -24,6 +24,13 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Functional",
+      uniqueErrorLines: [
+        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
+        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
+      ],
+    },
+    {
       testName: "Agents",
       uniqueErrorLines: [
         "FAIL  suites/agents/agents.test.ts > agents > production: byte : 0xdfc00a0B28Df3c07b0942300E896C97d62014499",
