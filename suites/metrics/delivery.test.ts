@@ -46,6 +46,7 @@ describe(testName, async () => {
   setupTestLifecycle({
     testName,
     expect,
+    workers,
   });
 
   it("verifyMessageStream: should verify message delivery and order accuracy using message streams", async () => {
