@@ -37,6 +37,7 @@ export const PATTERNS = {
       ],
     },
   ],
+  minFailLines: 3,
   minumumLineLength: 40,
   maxLineLength: 150,
 

@@ -5,6 +5,7 @@ import {
   shouldFilterOutTest,
 } from "./analyzer";
 import { sendDatadogLog } from "./datadog";
+import { PATTERNS } from "./patterns";
 
 // Configuration
 const URLS = {
@@ -87,7 +88,7 @@ function generateMessage(options: SlackNotificationOptions): string {
   const logs = sanitizeLogs(errorLogsArr.join("\n"));
 
   const failLines = extractFailLines(options.errorLogs || new Set());
-  const shouldTagFabri = failLines.length > 3;
+  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
