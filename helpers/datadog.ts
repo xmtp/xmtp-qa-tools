@@ -361,11 +361,12 @@ export async function sendPerformanceMetric(
       operation: operationName,
       test: testNameExtracted,
       libxmtp: libXmtpVersion,
-      description: metricDescription,
       region: process.env.GEOLOCATION ?? "",
       env: process.env.XMTP_ENV ?? "",
       country_iso_code: countryCode,
       sdk: process.env.XMTP_SDK_VERSION as string,
+      installations: "1",
+      members: "1",
     };
 
     if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
