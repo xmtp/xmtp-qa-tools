@@ -233,39 +233,39 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Testing Summary
 
-### Test coverage
+- **Test coverage:**
 
-- Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
-- Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- Regression: Regression functional testing for the last 3 versions
-- NetworkChaos: Partition tolerance, duplicate prevention, reconciliation, key rotation
-- Browser: Cross-browser compatibility via Playwright automation
-- Agents: Live production bot health monitoring
-- Mobile: Cross-platform performance testing
-- Bugs: Historical issue reproduction and regression prevention
-- Other: Security, spam detection, rate limiting, storage efficiency
+  - Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
+  - Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
+  - Regression: Regression functional testing for the last 3 versions
+  - NetworkChaos: Partition tolerance, duplicate prevention, reconciliation, key rotation
+  - Browser: Cross-browser compatibility via Playwright automation
+  - Agents: Live production bot health monitoring
+  - Mobile: Cross-platform performance testing
+  - Bugs: Historical issue reproduction and regression prevention
+  - Other: Security, spam detection, rate limiting, storage efficiency
 
-### Testing framework
+- **Testing framework:**
 
-- Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
-- Stream verification: Message delivery, conversation streams, metadata updates
-- Performance monitoring: Real-time Datadog metrics collection
-- Browser automation: Playwright-based web app testing
-- CI automation: CI automation with logging and alerting
-- Smart alerting: Slack notifications with error pattern filtering
-- Log analysis: Automated error detection and deduplication
-- Real-time dashboard: Datadog integration tracking delivery rates, response times, geographic performance
-- CLI Tools: Test execution, version management, key generation
-- Slack Bot: AI-powered responses, history fetching, log management
-- Geographic testing: Multi-region performance across US, Europe, Asia, South America
+  - Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
+  - Stream verification: Message delivery, conversation streams, metadata updates
+  - Performance monitoring: Real-time Datadog metrics collection
+  - Browser automation: Playwright-based web app testing
+  - CI automation: CI automation with logging and alerting
+  - Smart alerting: Slack notifications with error pattern filtering
+  - Log analysis: Automated error detection and deduplication
+  - Real-time dashboard: Datadog integration tracking delivery rates, response times, geographic performance
+  - CLI Tools: Test execution, version management, key generation
+  - Slack Bot: AI-powered responses, history fetching, log management
+  - Geographic testing: Multi-region performance across US, Europe, Asia, South America
 
-### Metrics tracked
+- **Metrics tracked:**
 
-- Delivery: 100% success rate (target: 99.9%)
-- Performance: <350ms core operations, <200ms messaging, <150ms TLS
-- Scale: Groups up to 400 members, high-volume message testing
-- Network: DNS, TCP, TLS timing across 5 global regions
-- Agent health: Live production bot response time monitoring
+  - Delivery: 100% success rate (target: 99.9%)
+  - Performance: <350ms core operations, <200ms messaging, <150ms TLS
+  - Scale: Groups up to 400 members, high-volume message testing
+  - Network: DNS, TCP, TLS timing across 5 global regions
+  - Agent health: Live production bot response time monitoring
 
 ## Development
 
