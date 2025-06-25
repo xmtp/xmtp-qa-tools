@@ -24,7 +24,7 @@ interface BaseMetricTags {
   env: string;
   region: string;
   libxmtp: string;
-  operation: string;
+  sdk: string;
   test: string;
   country_iso_code: string;
 }
@@ -32,17 +32,9 @@ interface BaseMetricTags {
 interface DurationMetricTags extends BaseMetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
-  description?: string;
-  installations?: string;
-  members?: string;
-}
-
-interface NetworkStats {
-  "DNS Lookup": number;
-  "TCP Connection": number;
-  "TLS Handshake": number;
-  Processing: number;
-  "Server Call": number;
+  operation: string;
+  installations: string;
+  members: string;
 }
 
 interface NetworkMetricTags extends BaseMetricTags {
@@ -76,7 +68,15 @@ interface ResponseMetricTags extends BaseMetricTags {
   address?: string;
 }
 
-const GEO_TO_COUNTRY_CODE = {
+interface NetworkStats {
+  "DNS Lookup": number;
+  "TCP Connection": number;
+  "TLS Handshake": number;
+  Processing: number;
+  "Server Call": number;
+}
+
+export const GEO_TO_COUNTRY_CODE = {
   "us-east": "US",
   "us-west": "US",
   europe: "FR",
@@ -365,6 +365,7 @@ export async function sendPerformanceMetric(
       region: process.env.GEOLOCATION ?? "",
       env: process.env.XMTP_ENV ?? "",
       country_iso_code: countryCode,
+      sdk: process.env.XMTP_SDK_VERSION as string,
     };
 
     if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
@@ -394,6 +395,7 @@ export async function sendPerformanceMetric(
           region: process.env.GEOLOCATION as string,
           country_iso_code: countryCode,
           env: process.env.XMTP_ENV as string,
+          sdk: process.env.XMTP_SDK_VERSION as string,
         });
       }
     }

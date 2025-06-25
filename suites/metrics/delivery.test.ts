@@ -1,5 +1,5 @@
 import { getFixedNames } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
+import { GEO_TO_COUNTRY_CODE, sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -77,8 +77,14 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "stream",
-          metric_subtype: "delivery",
+          operation: "messageDelivery",
+          country_iso_code: "US",
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "stream",
         });
       }
 
@@ -89,8 +95,14 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "stream",
-          metric_subtype: "order",
+          operation: "messageOrder",
+          country_iso_code: "US",
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "stream",
         });
       }
     } catch (e) {
@@ -146,8 +158,14 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "poll",
-          metric_subtype: "delivery",
+          operation: "messageDelivery",
+          country_iso_code: "US",
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "poll",
         });
       }
 
@@ -157,8 +175,14 @@ describe(testName, async () => {
           libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
-          metric_type: "poll",
-          metric_subtype: "order",
+          operation: "messageOrder",
+          country_iso_code: "US",
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "poll",
         });
       }
     } catch (e) {
@@ -237,8 +261,14 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          metric_type: "recovery",
-          metric_subtype: "delivery",
+          operation: "messageDelivery",
+          country_iso_code: "US",
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          conversation_type: "group",
+          delivery_status: "received",
+          metric_subtype: "recovery",
         });
       }
 
@@ -248,8 +278,17 @@ describe(testName, async () => {
           libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
-          metric_type: "recovery",
-          metric_subtype: "order",
+          operation: "messageOrder",
+          country_iso_code:
+            GEO_TO_COUNTRY_CODE[
+              process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+            ],
+          env: process.env.XMTP_ENV as string,
+          region: process.env.GEOLOCATION as string,
+          metric_type: "delivery",
+          metric_subtype: "recovery",
+          conversation_type: "group",
+          delivery_status: "received",
         });
       }
     } catch (e) {
