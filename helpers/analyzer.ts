@@ -24,6 +24,12 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Large",
+      uniqueErrorLines: [
+        "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-50: should deliver messages to all 50",
+      ],
+    },
+    {
       testName: "Functional",
       uniqueErrorLines: [
         "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
