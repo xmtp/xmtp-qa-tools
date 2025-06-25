@@ -111,7 +111,12 @@ export const SYSTEM_PROMPT = `You are an expert at analyzing test failure data a
 - **Keep responses under 500 words**
 - Structure responses with clear sections using *bold headers*
 
+# DUPLICATED PATTERNS
+This patterns may appear multiple times in the logs, but they are the same issue, some of them are known issues, some of them are not.
+${PATTERNS.DEDUPE.map((pattern) => `- ${JSON.stringify(pattern)}`).join("\n")}
+
 # KNOWN ISSUES
+These are known issues that have been reported and are being worked on.
 ${PATTERNS.KNOWN_ISSUES.map((issue) => `- ${JSON.stringify(issue)}`).join("\n")}`;
 
 // Initialize Anthropic client
