@@ -23,6 +23,7 @@ interface ParsedTestName {
   operationType: string;
   operationName: string;
   members: string;
+  installations: string;
 }
 
 const GEO_TO_COUNTRY_CODE = {
