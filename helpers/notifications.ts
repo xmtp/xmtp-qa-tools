@@ -1,3 +1,4 @@
+import { PATTERNS } from "@helpers/analyzer";
 import fetch from "node-fetch";
 import {
   extractFailLines,
@@ -5,7 +6,6 @@ import {
   shouldFilterOutTest,
 } from "./analyzer";
 import { sendDatadogLog } from "./datadog";
-import { PATTERNS } from "./patterns";
 
 // Configuration
 const URLS = {
