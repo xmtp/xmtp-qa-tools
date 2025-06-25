@@ -35,7 +35,7 @@ describe(testName, async () => {
     expect,
   });
 
-  it("should create a new DM conversation using inbox ID", async () => {
+  it("newDm: should create a new DM conversation using inbox ID", async () => {
     try {
       convo = (await workers
         .get("henry")!
@@ -51,7 +51,7 @@ describe(testName, async () => {
     }
   });
 
-  it("should create a new DM conversation using Ethereum address", async () => {
+  it("newDmWithIdentifier should create a new DM conversation using Ethereum address", async () => {
     try {
       const dm2 = await workers
         .get("henry")!

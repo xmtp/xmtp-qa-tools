@@ -12,7 +12,7 @@ interface ParsedTestName {
   metricName: string;
   metricDescription: string;
   testNameExtracted: string;
-  operationType: string;
+  operationType: "group" | "core";
   operationName: string;
   members: string;
 }
@@ -208,7 +208,6 @@ export function sendMetric(
 
     state.collectedMetrics[operationKey].values.push(metricValue);
 
-    console.log(JSON.stringify(tags, null, 2));
     if (tags.metric_type !== "network") {
       console.debug(
         JSON.stringify(
@@ -222,8 +221,13 @@ export function sendMetric(
         ),
       );
     }
+    // Trim whitespace from all tag values
+    const trimmedTags = allTags.map((tag) => {
+      const [key, value] = tag.split(":");
+      return `${key}:${value?.trim() || ""}`;
+    });
 
-    metrics.gauge(fullMetricName, Math.round(metricValue), allTags);
+    metrics.gauge(fullMetricName, Math.round(metricValue), trimmedTags);
   } catch (error) {
     console.error(
       `❌ Error sending metric '${metricName}':`,
@@ -344,7 +348,6 @@ export async function sendPerformanceMetric(
       testNameExtracted,
       operationType,
       operationName,
-      members,
     } = parseTestName(testName);
 
     const countryCode =
@@ -352,21 +355,19 @@ export async function sendPerformanceMetric(
         process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
       ];
 
-    const values = {
+    const values: DurationMetricTags = {
       metric_type: "operation",
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
       libxmtp: libXmtpVersion,
       description: metricDescription,
-      members: members,
       region: process.env.GEOLOCATION ?? "",
       env: process.env.XMTP_ENV ?? "",
       country_iso_code: countryCode,
-      installations: members,
     };
 
-    if (testName.includes("m_")) {
+    if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
       sendMetric("duration", metricValue, values);
     }
 
@@ -376,7 +377,12 @@ export async function sendPerformanceMetric(
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const networkMetricValue = Math.round(statValue * 1000);
-        const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
+        const networkPhase = statName.toLowerCase().replace(/\s+/g, "_") as
+          | "dns_lookup"
+          | "tcp_connection"
+          | "tls_handshake"
+          | "server_call"
+          | "processing";
 
         sendMetric("duration", networkMetricValue, {
           metric_type: "network",
@@ -385,11 +391,9 @@ export async function sendPerformanceMetric(
           operation: operationName,
           test: testNameExtracted,
           network_phase: networkPhase,
-          members: members,
           region: process.env.GEOLOCATION as string,
           country_iso_code: countryCode,
           env: process.env.XMTP_ENV as string,
-          installations: members,
         });
       }
     }
