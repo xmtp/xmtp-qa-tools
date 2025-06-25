@@ -23,6 +23,12 @@ export const PATTERNS = {
         "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
       ],
     },
+    {
+      testName: "Agents",
+      uniqueErrorLines: [
+        "FAIL  suites/agents/agents.test.ts > agents > conversation stream for new member",
+      ],
+    },
   ],
   minumumLineLength: 40,
   maxLineLength: 150,
