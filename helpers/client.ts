@@ -50,6 +50,12 @@ import {
   Group as Group220,
 } from "@xmtp/node-sdk-220";
 import {
+  Client as Client300,
+  Conversation as Conversation300,
+  Dm as Dm300,
+  Group as Group300,
+} from "@xmtp/node-sdk-300";
+import {
   Client as ClientMls,
   Conversation as ConversationMls,
 } from "@xmtp/node-sdk-mls";
@@ -63,6 +69,90 @@ import {
 import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
+
+// SDK version mappings
+export const sdkVersions = {
+  30: {
+    Client: ClientMls,
+    Conversation: ConversationMls,
+    Dm: ConversationMls,
+    Group: ConversationMls,
+    sdkPackage: "node-sdk-mls",
+    bindingsPackage: "node-bindings-mls",
+    sdkVersion: "0.0.13",
+    libXmtpVersion: "0.0.9",
+  },
+  47: {
+    Client: Client47,
+    Conversation: Conversation47,
+    Dm: Dm47,
+    Group: Group47,
+    sdkPackage: "node-sdk-47",
+    bindingsPackage: "node-bindings-41",
+    sdkVersion: "0.0.47",
+    libXmtpVersion: "6bd613d",
+  },
+  100: {
+    Client: Client100,
+    Conversation: Conversation100,
+    Dm: Dm100,
+    Group: Group100,
+    sdkPackage: "node-sdk-100",
+    bindingsPackage: "node-bindings-100",
+    sdkVersion: "1.0.0",
+    libXmtpVersion: "c205eec",
+  },
+  105: {
+    Client: Client105,
+    Conversation: Conversation105,
+    Dm: Dm105,
+    Group: Group105,
+    sdkPackage: "node-sdk-105",
+    bindingsPackage: "node-bindings-113",
+    sdkVersion: "1.0.5",
+    libXmtpVersion: "6eb1ce4",
+  },
+  209: {
+    Client: Client209,
+    Conversation: Conversation209,
+    Dm: Dm209,
+    Group: Group209,
+    sdkPackage: "node-sdk-209",
+    bindingsPackage: "node-bindings-118",
+    sdkVersion: "2.0.9",
+    libXmtpVersion: "bfadb76",
+  },
+  210: {
+    Client: Client210,
+    Conversation: Conversation210,
+    Dm: Dm210,
+    Group: Group210,
+    sdkPackage: "node-sdk-210",
+    bindingsPackage: "node-bindings-120",
+    sdkVersion: "2.1.0",
+    libXmtpVersion: "7b9b4d0",
+  },
+  220: {
+    Client: Client220,
+    Conversation: Conversation220,
+    Dm: Dm220,
+    Group: Group220,
+    sdkPackage: "node-sdk-220",
+    bindingsPackage: "node-bindings-122",
+    sdkVersion: "2.2.0",
+    libXmtpVersion: "d0f0b67",
+  },
+  300: {
+    Client: Client300,
+    Conversation: Conversation300,
+    Dm: Dm300,
+    Group: Group300,
+    sdkPackage: "node-sdk-300",
+    bindingsPackage: "node-bindings-124",
+    sdkVersion: "3.0.0",
+    libXmtpVersion: "df2f166",
+  },
+};
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -426,80 +516,6 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-
-// SDK version mappings
-export const sdkVersions = {
-  30: {
-    Client: ClientMls,
-    Conversation: ConversationMls,
-    Dm: ConversationMls,
-    Group: ConversationMls,
-    sdkPackage: "node-sdk-mls",
-    bindingsPackage: "node-bindings-mls",
-    sdkVersion: "0.0.13",
-    libXmtpVersion: "0.0.9",
-  },
-  47: {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-    sdkPackage: "node-sdk-47",
-    bindingsPackage: "node-bindings-41",
-    sdkVersion: "0.0.47",
-    libXmtpVersion: "6bd613d",
-  },
-  100: {
-    Client: Client100,
-    Conversation: Conversation100,
-    Dm: Dm100,
-    Group: Group100,
-    sdkPackage: "node-sdk-100",
-    bindingsPackage: "node-bindings-100",
-    sdkVersion: "1.0.0",
-    libXmtpVersion: "c205eec",
-  },
-  105: {
-    Client: Client105,
-    Conversation: Conversation105,
-    Dm: Dm105,
-    Group: Group105,
-    sdkPackage: "node-sdk-105",
-    bindingsPackage: "node-bindings-113",
-    sdkVersion: "1.0.5",
-    libXmtpVersion: "6eb1ce4",
-  },
-  209: {
-    Client: Client209,
-    Conversation: Conversation209,
-    Dm: Dm209,
-    Group: Group209,
-    sdkPackage: "node-sdk-209",
-    bindingsPackage: "node-bindings-118",
-    sdkVersion: "2.0.9",
-    libXmtpVersion: "bfadb76",
-  },
-  210: {
-    Client: Client210,
-    Conversation: Conversation210,
-    Dm: Dm210,
-    Group: Group210,
-    sdkPackage: "node-sdk-210",
-    bindingsPackage: "node-bindings-120",
-    sdkVersion: "2.1.0",
-    libXmtpVersion: "7b9b4d0",
-  },
-  220: {
-    Client: Client220,
-    Conversation: Conversation220,
-    Dm: Dm220,
-    Group: Group220,
-    sdkPackage: "node-sdk-220",
-    bindingsPackage: "node-bindings-122",
-    sdkVersion: "2.2.0",
-    libXmtpVersion: "d0f0b67",
-  },
-};
 
 export const sdkVersionOptions = Object.keys(sdkVersions)
   .filter((key) => parseInt(key) >= 200)
