@@ -23,7 +23,52 @@ interface ParsedTestName {
   operationType: string;
   operationName: string;
   members: string;
-  installations: string;
+}
+
+// Metric type interfaces
+interface BaseMetricTags {
+  metric_type: "agent" | "operation" | "network" | "delivery" | "response";
+  metric_subtype?: string;
+  env: string;
+  region: string;
+  libxmtp: string;
+  operation: string;
+  test: string;
+  country_iso_code: string;
+}
+
+interface DurationMetricTags extends BaseMetricTags {
+  metric_type: "operation";
+  metric_subtype: "group" | "core";
+  description?: string;
+  installations?: string;
+  members?: string;
+}
+
+interface NetworkMetricTags extends BaseMetricTags {
+  metric_type: "network";
+  metric_subtype:
+    | "dns_lookup"
+    | "tcp_connection"
+    | "tls_handshake"
+    | "server_call"
+    | "processing";
+  network_phase: string;
+}
+
+interface DeliveryMetricTags extends BaseMetricTags {
+  metric_type: "delivery";
+  message_id?: string;
+  conversation_type: "dm" | "group";
+  delivery_status: "sent" | "received" | "failed";
+  members?: string;
+}
+
+interface ResponseMetricTags extends BaseMetricTags {
+  metric_type: "agent";
+  metric_subtype: string;
+  agent?: string;
+  address?: string;
 }
 
 const GEO_TO_COUNTRY_CODE = {
@@ -109,13 +154,21 @@ export function initDataDog(): boolean {
   }
 }
 
+// Union type for all metric tag types
+type MetricTags =
+  | DurationMetricTags
+  | DeliveryMetricTags
+  | ResponseMetricTags
+  | NetworkMetricTags
+  | Record<string, string>;
+
 /**
  * Send a metric to DataDog and collect for summary
  */
 export function sendMetric(
   metricName: string,
   metricValue: number,
-  tags: Record<string, string>,
+  tags: MetricTags,
 ): void {
   if (!state.isInitialized) return;
 
@@ -136,10 +189,11 @@ export function sendMetric(
 
     // Create a distinctive operation key that properly includes member count
     // Format: operation_name-member_count (e.g., "createGroup-10")
-    const memberCount = tags.members || "";
-    const operationKey = tags.operation
-      ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
-      : metricName;
+    const memberCount = "members" in tags ? tags.members || "" : "";
+    const operationKey =
+      "operation" in tags && tags.operation
+        ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
+        : metricName;
 
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
@@ -150,6 +204,7 @@ export function sendMetric(
 
     state.collectedMetrics[operationKey].values.push(metricValue);
 
+    console.log(JSON.stringify(tags, null, 2));
     if (tags.metric_type !== "network") {
       console.debug(
         JSON.stringify(
@@ -171,6 +226,56 @@ export function sendMetric(
       error instanceof Error ? error.message : String(error),
     );
   }
+}
+
+/**
+ * Send a typed duration metric for performance measurements
+ */
+export function sendDurationMetric(
+  metricValue: number,
+  tags: DurationMetricTags,
+): void {
+  const enhancedTags: DurationMetricTags = {
+    ...tags,
+    env: tags.env || (process.env.XMTP_ENV as string),
+    region: tags.region || (process.env.GEOLOCATION as string),
+  };
+
+  sendMetric("duration", metricValue, enhancedTags);
+}
+
+/**
+ * Send a typed delivery metric for message delivery tracking
+ */
+export function sendDeliveryMetric(
+  metricValue: number,
+  tags: DeliveryMetricTags,
+): void {
+  const enhancedTags: DeliveryMetricTags = {
+    ...tags,
+    metric_type: "delivery",
+    env: tags.env || (process.env.XMTP_ENV as string),
+    region: tags.region || (process.env.GEOLOCATION as string),
+  };
+
+  sendMetric("delivery", metricValue, enhancedTags);
+}
+
+/**
+ * Send a typed response metric for API/network response measurements
+ */
+export function sendResponseMetric(
+  metricValue: number,
+  tags: ResponseMetricTags,
+): void {
+  const enhancedTags: ResponseMetricTags = {
+    ...tags,
+    metric_type: "agent",
+    env: tags.env || (process.env.XMTP_ENV as string),
+    region: tags.region || (process.env.GEOLOCATION as string),
+  };
+
+  sendMetric("response", metricValue, enhancedTags);
 }
 
 /**
@@ -238,16 +343,25 @@ export async function sendPerformanceMetric(
       members,
     } = parseTestName(testName);
 
+    const countryCode =
+      GEO_TO_COUNTRY_CODE[
+        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+      ];
+
     const values = {
-      libxmtp: libXmtpVersion,
-      operation: operationName,
-      test: testNameExtracted,
       metric_type: "operation",
       metric_subtype: operationType,
+      operation: operationName,
+      test: testNameExtracted,
+      libxmtp: libXmtpVersion,
       description: metricDescription,
       members: members,
       region: process.env.GEOLOCATION ?? "",
+      env: process.env.XMTP_ENV ?? "",
+      country_iso_code: countryCode,
+      installations: members,
     };
+
     if (testName.includes("m_")) {
       sendMetric("duration", metricValue, values);
     }
@@ -255,24 +369,23 @@ export async function sendPerformanceMetric(
     // Network stats handling
     if (!skipNetworkStats && testName.includes("m_performance")) {
       const networkStats = await getNetworkStats();
-      const countryCode =
-        GEO_TO_COUNTRY_CODE[
-          process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
-        ];
 
       for (const [statName, statValue] of Object.entries(networkStats)) {
         const networkMetricValue = Math.round(statValue * 1000);
         const networkPhase = statName.toLowerCase().replace(/\s+/g, "_");
 
         sendMetric("duration", networkMetricValue, {
+          metric_type: "network",
+          metric_subtype: networkPhase,
           libxmtp: libXmtpVersion,
           operation: operationName,
           test: testNameExtracted,
-          metric_type: "network",
           network_phase: networkPhase,
-          country_iso_code: countryCode,
           members: members,
-          region: process.env.GEOLOCATION ?? "",
+          region: process.env.GEOLOCATION as string,
+          country_iso_code: countryCode,
+          env: process.env.XMTP_ENV as string,
+          installations: members,
         });
       }
     }
