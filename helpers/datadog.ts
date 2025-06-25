@@ -3,14 +3,6 @@ import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
 
-interface NetworkStats {
-  "DNS Lookup": number;
-  "TCP Connection": number;
-  "TLS Handshake": number;
-  Processing: number;
-  "Server Call": number;
-}
-
 interface MetricData {
   values: number[];
   members?: string;
@@ -45,6 +37,14 @@ interface DurationMetricTags extends BaseMetricTags {
   members?: string;
 }
 
+interface NetworkStats {
+  "DNS Lookup": number;
+  "TCP Connection": number;
+  "TLS Handshake": number;
+  Processing: number;
+  "Server Call": number;
+}
+
 interface NetworkMetricTags extends BaseMetricTags {
   metric_type: "network";
   metric_subtype:
@@ -53,7 +53,12 @@ interface NetworkMetricTags extends BaseMetricTags {
     | "tls_handshake"
     | "server_call"
     | "processing";
-  network_phase: string;
+  network_phase:
+    | "dns_lookup"
+    | "tcp_connection"
+    | "tls_handshake"
+    | "server_call"
+    | "processing";
 }
 
 interface DeliveryMetricTags extends BaseMetricTags {
@@ -159,8 +164,7 @@ type MetricTags =
   | DurationMetricTags
   | DeliveryMetricTags
   | ResponseMetricTags
-  | NetworkMetricTags
-  | Record<string, string>;
+  | NetworkMetricTags;
 
 /**
  * Send a metric to DataDog and collect for summary
