@@ -150,7 +150,7 @@ export const sdkVersions = {
     sdkPackage: "node-sdk-300",
     bindingsPackage: "node-bindings-124",
     sdkVersion: "3.0.0",
-    libXmtpVersion: "7b9b4d0",
+    libXmtpVersion: "df2f166",
   },
 };
 
