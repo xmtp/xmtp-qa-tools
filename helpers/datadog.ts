@@ -349,7 +349,7 @@ export async function sendPerformanceMetric(
   if (!state.isInitialized) return;
   const libXmtpVersion = "latest";
   try {
-    const { testNameExtracted, operationType, operationName } =
+    const { testNameExtracted, operationType, operationName, members } =
       parseTestName(testName);
 
     const countryCode =
@@ -367,8 +367,8 @@ export async function sendPerformanceMetric(
       env: process.env.XMTP_ENV ?? "",
       country_iso_code: countryCode,
       sdk: process.env.XMTP_SDK_VERSION as string,
-      installations: "1",
-      members: "1",
+      installations: members,
+      members,
     };
 
     if (testName.includes("m_") || process.env.XMTP_ENV === "local") {
