@@ -6,8 +6,15 @@ import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const groupCount = 5;
-const parallelOperations = 1; // How many operations to perform in parallel
+const groupCount = process.env.GROUP_COUNT ? parseInt(process.env.GROUP_COUNT) : 5;
+const parallelOperations = process.env.PARALLEL_OPS ? parseInt(process.env.PARALLEL_OPS) : 1; 
+const TARGET_EPOCH = process.env.TARGET_EPOCH ? BigInt(process.env.TARGET_EPOCH) : 100n;
+const randomInboxIdsCount = process.env.RANDOM_INBOX_IDS ? parseInt(process.env.RANDOM_INBOX_IDS) : 30;
+const installationCount = process.env.INSTALLATION_COUNT ? parseInt(process.env.INSTALLATION_COUNT) : 5;
+const network = process.env.XMTP_ENV ?? "local";
+const workerPrefix = process.env.WORKER_PREFIX ?? "random";
+const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT) : 10;
+
 const workerNames = [
   // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
   // We want to create a key each run to ensure the forks are "pure"
@@ -23,16 +30,23 @@ const workerNames = [
   "random10",
 ] as string[];
 
-//The target of epoch to stop the test, epochs are when performing commits to the group
-const TARGET_EPOCH = 100n;
-const network = process.env.XMTP_ENV;
-// How many inboxIds to use randomly in the add/remove opps
-const randomInboxIdsCount = 30;
-// How many installations to use randomly in the createInstallation opps
-const installationCount = 5;
-const typeofStreamForTest = typeofStream.Message; // Starts a streamAllMessages in each worker
-const typeOfResponseForTest = typeOfResponse.Gm; // Replies gm if mentioned
-const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
+const typeofStreamForTest = typeofStream.Message;
+const typeOfResponseForTest = typeOfResponse.Gm;
+const typeOfSyncForTest = typeOfSync.Both;
+
+console.log("Running commits.test.ts with the following configuration:");
+console.table({
+  GROUP_COUNT: groupCount,
+  PARALLEL_OPS: parallelOperations,
+  TARGET_EPOCH: TARGET_EPOCH.toString(),
+  RANDOM_INBOX_IDS: randomInboxIdsCount,
+  INSTALLATION_COUNT: installationCount,
+  network,
+  WORKER_PREFIX: workerPrefix,
+  WORKER_COUNT: workerCount,
+});
+
+
 
 describe("commits", () => {
   setupTestLifecycle({
@@ -117,7 +131,7 @@ describe("commits", () => {
               (async () => {
                 const randomWorker =
                   workers.getAll()[
-                    Math.floor(Math.random() * workers.getAll().length)
+                  Math.floor(Math.random() * workers.getAll().length)
                   ];
 
                 const ops = await createOperations(randomWorker, group);
@@ -131,7 +145,7 @@ describe("commits", () => {
 
                 const randomOperation =
                   operationList[
-                    Math.floor(Math.random() * operationList.length)
+                  Math.floor(Math.random() * operationList.length)
                   ];
 
                 try {
