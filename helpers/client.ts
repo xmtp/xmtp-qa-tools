@@ -20,12 +20,6 @@ import {
   Group as Group47,
 } from "@xmtp/node-sdk-47";
 import {
-  Client as Client100,
-  Conversation as Conversation100,
-  Dm as Dm100,
-  Group as Group100,
-} from "@xmtp/node-sdk-100";
-import {
   Client as Client105,
   Conversation as Conversation105,
   Dm as Dm105,
@@ -92,16 +86,6 @@ export const sdkVersions = {
     sdkVersion: "0.0.47",
     libXmtpVersion: "6bd613d",
   },
-  100: {
-    Client: Client100,
-    Conversation: Conversation100,
-    Dm: Dm100,
-    Group: Group100,
-    sdkPackage: "node-sdk-100",
-    bindingsPackage: "node-bindings-100",
-    sdkVersion: "1.0.0",
-    libXmtpVersion: "c205eec",
-  },
   105: {
     Client: Client105,
     Conversation: Conversation105,
@@ -148,9 +132,9 @@ export const sdkVersions = {
     Dm: Dm300,
     Group: Group300,
     sdkPackage: "node-sdk-300",
-    bindingsPackage: "node-bindings-124",
-    sdkVersion: "3.0.0",
-    libXmtpVersion: "df2f166",
+    bindingsPackage: "node-bindings-125",
+    sdkVersion: "3.0.1",
+    libXmtpVersion: "dc3e8c8",
   },
 };
 
