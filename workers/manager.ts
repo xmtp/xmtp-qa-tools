@@ -173,7 +173,10 @@ export class WorkerManager {
         totalGroupInstallations += member.installationIds.length;
 
       if (debugInfo.maybeForked) {
-        throw new Error(`Stopping test, group id ${groupId} may have forked`);
+        console.log(
+          `Fork detected, group id ${groupId} may have forked, epoch ${debugInfo.epoch}`,
+        );
+        throw new Error(`Fork detected, group id ${groupId} may have forked`);
       }
       const currentEpoch = debugInfo.epoch;
       if (currentEpoch % 20n === 0n) {

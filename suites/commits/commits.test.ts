@@ -93,8 +93,6 @@ describe("commits", () => {
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
-        let allreceivedcheckpoint = false;
-
         const group = (await creator.client.conversations.newGroup(
           [],
         )) as Group;
