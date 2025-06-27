@@ -162,14 +162,39 @@ describe("commits", () => {
   };
 
   it("should perform concurrent operations with multiple users across groups", async () => {
-    const workers = await getWorkers(
-      workerNames,
-      "commits",
-      typeofStreamForTest,
-      typeOfResponseForTest,
-      typeOfSyncForTest,
-      network as "local" | "dev" | "production"
-    );
+    const nodes = DockerContainer.getNodes();
+
+    let workers: Awaited<ReturnType<typeof getWorkers>>;
+    if (nodes.length > 1) {
+      const basePort = 5556;
+      const ports = nodes.map((_, i) => basePort + i * 1000);
+      const userDescriptors: Record<string, string> = {};
+      for (let i = 0; i < workerCount; i++) {
+        const port = ports[i % ports.length];
+        userDescriptors[`${workerPrefix}${i + 1}`] = `http://localhost:${port}`;
+      }
+
+      console.log("[partition] Assigning users to XMTP nodes by port:");
+      console.table(userDescriptors);
+
+      workers = await getWorkers(
+        userDescriptors,
+        "commits",
+        typeofStreamForTest,
+        typeOfResponseForTest,
+        typeOfSyncForTest,
+        network as "local" | "dev" | "production"
+      );
+    } else {
+      workers = await getWorkers(
+        workerNames,
+        "commits",
+        typeofStreamForTest,
+        typeOfResponseForTest,
+        typeOfSyncForTest,
+        network as "local" | "dev" | "production"
+      );
+    }
 
     const clearChaos = applyChaosIfEnabled();
 
