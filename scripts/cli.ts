@@ -241,7 +241,7 @@ function buildTestCommand(
   // Base threading options for consecutive execution
   const threadingOptions = parallel
     ? ""
-    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false --maxConcurrency=1";
 
   if (testName === "functional") {
     const expandedFiles = expandGlobPattern("./suites/functional/*.test.ts");
@@ -280,7 +280,7 @@ function buildTestCommand(
 
   const defaultThreadingOptions = parallel
     ? "--pool=forks"
-    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false";
+    : "--pool=threads --poolOptions.singleThread=true --fileParallelism=false --maxConcurrency=1";
   return `npx vitest run ${testName} ${defaultThreadingOptions} ${vitestArgsString}`.trim();
 }
 
