@@ -168,7 +168,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 
   const files = await fs.promises.readdir(logsDir);
   const rawLogFiles = files.filter(
-    (file) => file.startsWith("raw-") && file.endsWith(".log"),
+    (file) => !file.startsWith("raw-") && file.endsWith(".log"),
   );
 
   if (rawLogFiles.length === 0) {
@@ -184,10 +184,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 
     try {
       // Check if file contains "your group may be forked" using streaming
-      const containsTargetString = await fileContainsString(
-        inputPath,
-        "your group may be forked",
-      );
+      const containsTargetString = await fileContainsString(inputPath, "fork");
 
       if (!containsTargetString) {
         console.log(
