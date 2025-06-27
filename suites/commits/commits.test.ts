@@ -4,13 +4,17 @@ import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { DockerContainer, getXmtpNodes } from "../../network-stability-utilities/container";
+import { DockerContainer } from "../../network-stability-utilities/container";
 import { describe, expect, it } from "vitest";
 
 // Chaos knobs
 const CHAOS_LATENCY_MS = process.env.CHAOS_LATENCY_MS ? parseInt(process.env.CHAOS_LATENCY_MS) : 0;
 const CHAOS_JITTER_MS = process.env.CHAOS_JITTER_MS ? parseInt(process.env.CHAOS_JITTER_MS) : 0;
 const CHAOS_PACKET_LOSS_PCT = process.env.CHAOS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_PACKET_LOSS_PCT) : 0;
+
+const CHAOS_EGRESS_LATENCY_MS = process.env.CHAOS_EGRESS_LATENCY_MS ? parseInt(process.env.CHAOS_EGRESS_LATENCY_MS) : 0;
+const CHAOS_EGRESS_JITTER_MS = process.env.CHAOS_EGRESS_JITTER_MS ? parseInt(process.env.CHAOS_EGRESS_JITTER_MS) : 0;
+const CHAOS_EGRESS_PACKET_LOSS_PCT = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? parseFloat(process.env.CHAOS_EGRESS_PACKET_LOSS_PCT) : 0;
 
 // Other test knobs
 const groupCount = process.env.GROUP_COUNT ? parseInt(process.env.GROUP_COUNT) : 5;
@@ -41,6 +45,9 @@ console.table({
   CHAOS_LATENCY_MS,
   CHAOS_JITTER_MS,
   CHAOS_PACKET_LOSS_PCT,
+  CHAOS_EGRESS_LATENCY_MS,
+  CHAOS_EGRESS_JITTER_MS,
+  CHAOS_EGRESS_PACKET_LOSS_PCT,
 });
 
 describe("commits", () => {
@@ -84,51 +91,72 @@ describe("commits", () => {
   };
 
   const applyChaosIfEnabled = (): (() => void) => {
-    if (!(CHAOS_LATENCY_MS || CHAOS_JITTER_MS || CHAOS_PACKET_LOSS_PCT)) {
-      console.log("[chaos] Skipping chaos injection — all knobs set to 0");
-      return () => { };
+    const ingressEnabled = CHAOS_LATENCY_MS || CHAOS_JITTER_MS || CHAOS_PACKET_LOSS_PCT;
+    const egressEnabled = CHAOS_EGRESS_LATENCY_MS || CHAOS_EGRESS_JITTER_MS || CHAOS_EGRESS_PACKET_LOSS_PCT;
+
+    if (!ingressEnabled && !egressEnabled) {
+      console.log("[chaos] Skipping chaos injection - all knobs set to 0");
+      return () => {};
     }
 
     const nodes = DockerContainer.getNodes();
     if (nodes.length === 0) {
       console.warn("[chaos] No XMTP nodes detected - check environment!");
-      return () => { };
+      return () => {};
     }
 
-    console.log(`[chaos] Detected ${nodes.length} XMTP node(s): ${nodes.map(n => n.name).join(", ")}`);
+    console.log("[chaos] Detected " + nodes.length + " XMTP node(s): " + nodes.map(n => n.name).join(", "));
 
-    for (const node of nodes) {
-      if (CHAOS_JITTER_MS > 0) {
-        node.addJitter(CHAOS_LATENCY_MS, CHAOS_JITTER_MS);
-      } else if (CHAOS_LATENCY_MS > 0) {
-        node.addLatency(CHAOS_LATENCY_MS);
-      }
+    if (ingressEnabled) {
+      console.log("[chaos] Applying ingress (host to container) chaos");
+      for (const node of nodes) {
+        if (CHAOS_JITTER_MS > 0) {
+          node.addJitter(CHAOS_LATENCY_MS, CHAOS_JITTER_MS);
+        } else if (CHAOS_LATENCY_MS > 0) {
+          node.addLatency(CHAOS_LATENCY_MS);
+        }
 
-      if (CHAOS_PACKET_LOSS_PCT > 0) {
-        node.addLoss(CHAOS_PACKET_LOSS_PCT);
+        if (CHAOS_PACKET_LOSS_PCT > 0) {
+          node.addLoss(CHAOS_PACKET_LOSS_PCT);
+        }
       }
     }
 
-    console.log("[chaos] Checking chaos connectivity between XMTP nodes via ping...");
+    if (egressEnabled && nodes.length > 1) {
+      console.log("[chaos] Applying egress (container to others) chaos");
+      for (const node of nodes) {
+        if (CHAOS_EGRESS_JITTER_MS > 0) {
+          node.addEgressJitter(CHAOS_EGRESS_LATENCY_MS, CHAOS_EGRESS_JITTER_MS);
+        } else if (CHAOS_EGRESS_LATENCY_MS > 0) {
+          node.addEgressLatency(CHAOS_EGRESS_LATENCY_MS);
+        }
+
+        if (CHAOS_EGRESS_PACKET_LOSS_PCT > 0) {
+          node.addEgressLoss(CHAOS_EGRESS_PACKET_LOSS_PCT);
+        }
+      }
+    }
+
+    console.log("[chaos] Checking connectivity between XMTP nodes via ping...");
     if (nodes.length > 1) {
       for (let i = 0; i < nodes.length; i++) {
-        console.log(`[chaos] Host=>${nodes[i].name} ping`);
+        console.log("[chaos] Host to " + nodes[i].name + " ping");
         nodes[i].pingFromHost();
         for (let j = i + 1; j < nodes.length; j++) {
-          console.log(`[chaos] ${nodes[i].name}=>${nodes[j].name}`);
+          console.log("[chaos] " + nodes[i].name + " to " + nodes[j].name);
           nodes[i].ping(nodes[j]);
         }
       }
     } else {
-      console.log(`[chaos] Host=>Single Node`);
+      console.log("[chaos] Host to single node");
       nodes[0].pingFromHost();
-
     }
 
     return () => {
       console.log("[chaos] Clearing netem on all XMTP nodes");
       for (const node of nodes) {
         node.clearLatency();
+        node.clearEgressLatency();
       }
     };
   };
@@ -176,7 +204,7 @@ describe("commits", () => {
               try {
                 await op();
               } catch (e) {
-                console.log(`Group ${groupIndex + 1} operation failed:`, e);
+                console.log("Group " + (groupIndex + 1) + " operation failed:", e);
               }
             });
 
