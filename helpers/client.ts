@@ -149,7 +149,7 @@ export const sdkVersions = {
     Group: Group300,
     sdkPackage: "node-sdk-300",
     bindingsPackage: "node-bindings-124",
-    sdkVersion: "3.0.0",
+    sdkVersion: "3.0.1",
     libXmtpVersion: "df2f166",
   },
 };
