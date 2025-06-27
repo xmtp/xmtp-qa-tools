@@ -1,4 +1,5 @@
 import { getTime } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -94,11 +95,12 @@ describe("commits", () => {
       network as "local" | "dev" | "production",
     );
     const creator = workers.getCreator();
-
     // Create groups
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
+        let allreceivedcheckpoint = false;
+
         const group = (await creator.client.conversations.newGroup(
           [],
         )) as Group;
@@ -141,11 +143,10 @@ describe("commits", () => {
                 }
               })(),
           );
-
           await Promise.all(parallelOperationsArray);
-          await workers.checkForksForGroup(group.id);
           currentEpoch = (await group.debugInfo()).epoch;
         }
+        await workers.checkForksForGroup(group.id);
 
         return { groupIndex, finalEpoch: currentEpoch };
       },
