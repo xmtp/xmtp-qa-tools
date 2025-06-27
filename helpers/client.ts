@@ -54,7 +54,7 @@ import {
   Conversation as Conversation300,
   Dm as Dm300,
   Group as Group300,
-} from "@xmtp/node-sdk-300";
+} from "@xmtp/node-sdk-301";
 import {
   Client as ClientMls,
   Conversation as ConversationMls,

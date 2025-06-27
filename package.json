@@ -128,7 +128,7 @@
         "@xmtp/node-bindings": "1.2.2"
       }
     },
-    "@xmtp/node-sdk@3.0.0": {
+    "@xmtp/node-sdk@3.0.1": {
       "dependencies": {
         "@xmtp/node-bindings": "1.2.4"
       }
