@@ -132,9 +132,9 @@ export const sdkVersions = {
     Dm: Dm300,
     Group: Group300,
     sdkPackage: "node-sdk-300",
-    bindingsPackage: "node-bindings-124",
+    bindingsPackage: "node-bindings-125",
     sdkVersion: "3.0.1",
-    libXmtpVersion: "df2f166",
+    libXmtpVersion: "dc3e8c8",
   },
 };
 
