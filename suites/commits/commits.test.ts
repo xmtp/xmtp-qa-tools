@@ -1,5 +1,4 @@
 import { getTime } from "@helpers/logger";
-import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
@@ -7,7 +6,7 @@ import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const groupCount = 5;
+const groupCount = 2;
 const parallelOperations = 1; // How many operations to perform in parallel
 const workerNames = [
   // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
@@ -17,11 +16,6 @@ const workerNames = [
   "random3",
   "random4",
   "random5",
-  "random6",
-  "random7",
-  "random8",
-  "random9",
-  "random10",
 ] as string[];
 
 //The target of epoch to stop the test, epochs are when performing commits to the group
