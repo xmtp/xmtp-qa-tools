@@ -178,7 +178,7 @@ export class WorkerManager {
         throw new Error(logMessage);
       }
       const currentEpoch = debugInfo.epoch;
-      if (currentEpoch % 20n === 0n) {
+      if (currentEpoch % 10n === 0n) {
         console.log(
           `Worker ${worker.name} - Epoch: ${currentEpoch} - Members: ${members.length} - Installations: ${totalGroupInstallations}`,
         );
