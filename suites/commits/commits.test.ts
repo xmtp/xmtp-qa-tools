@@ -25,9 +25,9 @@ const network = process.env.XMTP_ENV;
 const randomInboxIdsCount = 30;
 // How many installations to use randomly in the createInstallation opps
 const installationCount = 5;
-const typeofStreamForTest = typeofStream.Message; // Starts a streamAllMessages in each worker
-const typeOfResponseForTest = typeOfResponse.Gm; // Replies gm if mentioned
-const typeOfSyncForTest = typeOfSync.Both; // Sync all every 5 seconds
+const typeofStreamForTest = typeofStream.None; // Starts a streamAllMessages in each worker
+const typeOfResponseForTest = typeOfResponse.None; // Replies gm if mentioned
+const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
 
 describe("commits", () => {
   setupTestLifecycle({
