@@ -22,33 +22,14 @@ const parallelOperations = process.env.PARALLEL_OPS ? parseInt(process.env.PARAL
 const TARGET_EPOCH = process.env.TARGET_EPOCH ? BigInt(process.env.TARGET_EPOCH) : 100n;
 const randomInboxIdsCount = process.env.RANDOM_INBOX_IDS ? parseInt(process.env.RANDOM_INBOX_IDS) : 30;
 const installationCount = process.env.INSTALLATION_COUNT ? parseInt(process.env.INSTALLATION_COUNT) : 5;
-const network = process.env.XMTP_ENV ?? "local";
-const workerPrefix = process.env.WORKER_PREFIX ?? "random";
 const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT) : 10;
+const workerPrefix = "random";
 
 const workerNames = Array.from({ length: workerCount }, (_, i) => `${workerPrefix}${i + 1}`);
 
 const typeofStreamForTest = typeofStream.Message;
 const typeOfResponseForTest = typeOfResponse.Gm;
 const typeOfSyncForTest = typeOfSync.Both;
-
-console.log("Running commits.test.ts with the following configuration:");
-console.table({
-  GROUP_COUNT: groupCount,
-  PARALLEL_OPS: parallelOperations,
-  TARGET_EPOCH: TARGET_EPOCH.toString(),
-  RANDOM_INBOX_IDS: randomInboxIdsCount,
-  INSTALLATION_COUNT: installationCount,
-  network,
-  WORKER_PREFIX: workerPrefix,
-  WORKER_COUNT: workerCount,
-  CHAOS_LATENCY_MS,
-  CHAOS_JITTER_MS,
-  CHAOS_PACKET_LOSS_PCT,
-  CHAOS_EGRESS_LATENCY_MS,
-  CHAOS_EGRESS_JITTER_MS,
-  CHAOS_EGRESS_PACKET_LOSS_PCT,
-});
 
 describe("commits", () => {
   setupTestLifecycle({
@@ -174,6 +155,22 @@ describe("commits", () => {
         userDescriptors[`${workerPrefix}${i + 1}`] = `http://localhost:${port}`;
       }
 
+      console.log("Running commits.test.ts with the following configuration:");
+      console.table({
+        GROUP_COUNT: groupCount,
+        PARALLEL_OPS: parallelOperations,
+        TARGET_EPOCH: TARGET_EPOCH.toString(),
+        RANDOM_INBOX_IDS: randomInboxIdsCount,
+        INSTALLATION_COUNT: installationCount,
+        WORKER_COUNT: workerCount,
+        CHAOS_LATENCY_MS,
+        CHAOS_JITTER_MS,
+        CHAOS_PACKET_LOSS_PCT,
+        CHAOS_EGRESS_LATENCY_MS,
+        CHAOS_EGRESS_JITTER_MS,
+        CHAOS_EGRESS_PACKET_LOSS_PCT,
+      });
+
       console.log("[partition] Assigning users to XMTP nodes by port:");
       console.table(userDescriptors);
 
@@ -183,7 +180,7 @@ describe("commits", () => {
         typeofStreamForTest,
         typeOfResponseForTest,
         typeOfSyncForTest,
-        network as "local" | "dev" | "production"
+        "local"
       );
     } else {
       workers = await getWorkers(
@@ -192,7 +189,7 @@ describe("commits", () => {
         typeofStreamForTest,
         typeOfResponseForTest,
         typeOfSyncForTest,
-        network as "local" | "dev" | "production"
+        "local"
       );
     }
 
