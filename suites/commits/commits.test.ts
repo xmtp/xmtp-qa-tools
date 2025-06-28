@@ -7,7 +7,7 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 // Count of groups to create
-const groupCount = 2;
+const groupCount = 5;
 const parallelOperations = 1; // How many operations to perform in parallel
 const workerNames = [
   // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
