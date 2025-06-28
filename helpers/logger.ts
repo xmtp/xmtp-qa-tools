@@ -245,7 +245,7 @@ export const createTestLogger = (options: TestLogOptions) => {
       const cleanTestName = path
         .basename(options.testName)
         .replace(/\.test\.ts$/, "");
-      logFileName = `raw-${process.env.XMTP_ENV}-${cleanTestName}-${getTime()}.log`;
+      logFileName = `raw-${cleanTestName}-${process.env.XMTP_ENV}-${getTime()}.log`;
     }
 
     const logPath = path.join(logsDir, logFileName);

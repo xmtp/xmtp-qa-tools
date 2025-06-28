@@ -19,6 +19,15 @@ const workerNames = [
   "random5",
 ] as string[];
 
+// Operations configuration - enable/disable specific operations
+const enabledOperations = {
+  updateName: true, // updates the name of the group
+  sendMessage: false, // sends a message to the group
+  addMember: true, // adds a random member to the group
+  removeMember: true, // removes a random member from the group
+  createInstallation: true, // creates a new installation for a random worker
+};
+
 //The target of epoch to stop the test, epochs are when performing commits to the group
 const TARGET_EPOCH = 100n;
 const network = process.env.XMTP_ENV;
@@ -89,19 +98,11 @@ describe("commits", () => {
       typeOfSyncForTest,
       network as "local" | "dev" | "production",
     );
-    const creator = workers.getCreator();
     // Create groups
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
-        const group = (await creator.client.conversations.newGroup(
-          [],
-        )) as Group;
-
-        for (const worker of workers.getAllButCreator()) {
-          await group.addMembers([worker.client.inboxId]);
-          await group.addSuperAdmin(worker.client.inboxId);
-        }
+        const group = await workers.createGroup();
 
         let currentEpoch = 0n;
 
@@ -117,11 +118,13 @@ describe("commits", () => {
 
                 const ops = await createOperations(randomWorker, group);
                 const operationList = [
-                  ops.updateName,
-                  ops.sendMessage,
-                  ops.addMember,
-                  ops.removeMember,
-                  ops.createInstallation,
+                  ...(enabledOperations.updateName ? [ops.updateName] : []),
+                  ...(enabledOperations.sendMessage ? [ops.sendMessage] : []),
+                  ...(enabledOperations.addMember ? [ops.addMember] : []),
+                  ...(enabledOperations.removeMember ? [ops.removeMember] : []),
+                  ...(enabledOperations.createInstallation
+                    ? [ops.createInstallation]
+                    : []),
                 ];
 
                 const randomOperation =
