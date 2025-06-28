@@ -54,6 +54,7 @@ export const PATTERNS = {
     "welcome with cursor",
     "group with welcome id",
     "receiveGroupMessage",
+    "receiveNewConversation",
     "Skipping welcome",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",
