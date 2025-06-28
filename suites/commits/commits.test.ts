@@ -19,7 +19,7 @@ const CHAOS_EGRESS_PACKET_LOSS_PCT = process.env.CHAOS_EGRESS_PACKET_LOSS_PCT ? 
 // Other test knobs
 const groupCount = process.env.GROUP_COUNT ? parseInt(process.env.GROUP_COUNT) : 5;
 const parallelOperations = process.env.PARALLEL_OPS ? parseInt(process.env.PARALLEL_OPS) : 1;
-const TARGET_EPOCH = process.env.TARGET_EPOCH ? BigInt(process.env.TARGET_EPOCH) : 100n;
+const TARGET_EPOCH = process.env.TARGET_EPOCH ? parseInt(process.env.TARGET_EPOCH) : 100;
 const randomInboxIdsCount = process.env.RANDOM_INBOX_IDS ? parseInt(process.env.RANDOM_INBOX_IDS) : 30;
 const installationCount = process.env.INSTALLATION_COUNT ? parseInt(process.env.INSTALLATION_COUNT) : 5;
 const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT) : 10;
@@ -159,7 +159,7 @@ describe("commits", () => {
       console.table({
         GROUP_COUNT: groupCount,
         PARALLEL_OPS: parallelOperations,
-        TARGET_EPOCH: TARGET_EPOCH.toString(),
+        TARGET_EPOCH: TARGET_EPOCH,
         RANDOM_INBOX_IDS: randomInboxIdsCount,
         INSTALLATION_COUNT: installationCount,
         WORKER_COUNT: workerCount,
