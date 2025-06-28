@@ -9,9 +9,10 @@ import { describe, expect, it } from "vitest";
 // Count of groups to create
 const groupCount = 5;
 const parallelOperations = 1; // How many operations to perform in parallel
+
+// By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
+// We want to create a key each run to ensure the forks are "pure"
 const workerNames = [
-  // By calling workers with prefix random1, random2, etc. we guarantee that creates a new key each run
-  // We want to create a key each run to ensure the forks are "pure"
   "random1",
   "random2",
   "random3",
@@ -25,16 +26,12 @@ const enabledOperations = {
   sendMessage: false, // sends a message to the group
   addMember: true, // adds a random member to the group
   removeMember: true, // removes a random member from the group
-  createInstallation: true, // creates a new installation for a random worker
+  createInstallation: false, // creates a new installation for a random worker
 };
-
-//The target of epoch to stop the test, epochs are when performing commits to the group
-const TARGET_EPOCH = 100n;
-const network = process.env.XMTP_ENV;
-// How many inboxIds to use randomly in the add/remove opps
-const randomInboxIdsCount = 30;
-// How many installations to use randomly in the createInstallation opps
-const installationCount = 5;
+const targetEpoch = 100n; // The target epoch to stop the test (epochs are when performing commits to the group)
+const network = process.env.XMTP_ENV; // Network environment setting
+const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/remove operations
+const installationCount = 5; // How many installations to use randomly in the createInstallation operations
 const typeofStreamForTest = typeofStream.None; // Starts a streamAllMessages in each worker
 const typeOfResponseForTest = typeOfResponse.None; // Replies gm if mentioned
 const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
@@ -106,7 +103,7 @@ describe("commits", () => {
 
         let currentEpoch = 0n;
 
-        while (currentEpoch < TARGET_EPOCH) {
+        while (currentEpoch < targetEpoch) {
           const parallelOperationsArray = Array.from(
             { length: parallelOperations },
             () =>
