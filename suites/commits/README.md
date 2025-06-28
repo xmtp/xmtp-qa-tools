@@ -1,6 +1,6 @@
-# Fork Test
+# Commits Test
 
-Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
+Stress test XMTP group to produce forks.
 
 ## Test Flow:
 
