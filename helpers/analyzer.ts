@@ -54,7 +54,7 @@ export const PATTERNS = {
     "group with welcome id",
     "receiveGroupMessage",
     "receiveNewConversation",
-    "process:sync_welcomes:create_from_welcome",
+    "Skipping welcome",
     "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",

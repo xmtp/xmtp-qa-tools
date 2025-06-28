@@ -6,6 +6,7 @@ import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
+// Count of groups to create
 const groupCount = 2;
 const parallelOperations = 1; // How many operations to perform in parallel
 const workerNames = [
@@ -136,9 +137,9 @@ describe("commits", () => {
               })(),
           );
           await Promise.all(parallelOperationsArray);
+          await workers.checkForksForGroup(group.id);
           currentEpoch = (await group.debugInfo()).epoch;
         }
-        await workers.checkForksForGroup(group.id);
 
         return { groupIndex, finalEpoch: currentEpoch };
       },
