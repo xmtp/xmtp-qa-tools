@@ -48,7 +48,7 @@ export const PATTERNS = {
   maxLineLength: 150,
 
   DEDUPE: [
-    "sync worker error storage error",
+    "sync worker error",
     "sqlcipher_mlock",
     "Collector timed out.",
     "welcome with cursor",
