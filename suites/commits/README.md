@@ -1,12 +1,12 @@
-# Chaos Test: 100 Epochs
+# Commits Test
 
-Stress test XMTP group consensus by hammering multiple groups with concurrent operations to verify system stability under chaos conditions.
+Stress test XMTP group to produce forks.
 
 ## Test Flow:
 
 - Create X groups in parallel
 - Add X workers as super admins to each group
-- Loop each group until epoch 100:
+- Loop each group until epoch Y:
   - Choose random worker and syncAll conversations
   - Run between 2 random operations:
     - Update group name
