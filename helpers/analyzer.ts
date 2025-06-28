@@ -55,6 +55,7 @@ export const PATTERNS = {
     "receiveGroupMessage",
     "receiveNewConversation",
     "Skipping welcome",
+    "Skipping already processed",
     "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",
@@ -168,7 +169,7 @@ export async function cleanAllRawLogs(): Promise<void> {
   const files = await fs.promises.readdir(logsDir);
   // Look for non-raw log files instead
   const nonRawLogFiles = files.filter(
-    (file) => !file.startsWith("raw-") && file.endsWith(".log"),
+    (file) => file.startsWith("raw-") && file.endsWith(".log"),
   );
 
   if (nonRawLogFiles.length === 0) {
@@ -195,7 +196,7 @@ export async function cleanAllRawLogs(): Promise<void> {
       }
 
       // Construct the corresponding raw filename
-      const rawFileName = `raw-${file}`;
+      const rawFileName = file;
       const rawFilePath = path.join(logsDir, rawFileName);
 
       // Check if the raw file exists
