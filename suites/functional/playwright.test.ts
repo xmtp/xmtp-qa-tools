@@ -12,7 +12,7 @@ const testName = "playwright";
 describe(testName, async () => {
   let groupId: string;
   const receiver = "random";
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let gmBot: Worker;

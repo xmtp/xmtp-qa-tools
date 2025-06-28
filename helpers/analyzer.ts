@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { stripAnsi } from "./logger";
+import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
 export const PATTERNS = {
@@ -97,6 +97,131 @@ export function processErrorLine(line: string): {
   }
 
   return { cleanLine, shouldSkip: false };
+}
+
+/**
+ * Clean raw-*.log files by checking corresponding non-raw log files for "fork" content
+ * If a non-raw file contains "fork", clean the corresponding raw file
+ */
+/**
+ * Check if a large file contains a target string using streaming
+ */
+async function fileContainsString(
+  filePath: string,
+  targetString: string,
+): Promise<boolean> {
+  return new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(filePath, {
+      encoding: "utf8",
+      highWaterMark: 64 * 1024,
+    }); // 64KB chunks
+    let buffer = "";
+    let found = false;
+
+    stream.on("data", (chunk: string | Buffer) => {
+      const chunkStr =
+        typeof chunk === "string" ? chunk : chunk.toString("utf8");
+      buffer += chunkStr;
+
+      // Check if we found the target string
+      if (buffer.includes(targetString)) {
+        found = true;
+        stream.destroy(); // Stop reading
+        return;
+      }
+
+      // Keep only the last part of buffer to handle strings that span chunks
+      // Keep twice the target string length to be safe
+      const keepLength = targetString.length * 2;
+      if (buffer.length > keepLength) {
+        buffer = buffer.slice(-keepLength);
+      }
+    });
+
+    stream.on("end", () => {
+      resolve(found);
+    });
+
+    stream.on("error", (error) => {
+      reject(error);
+    });
+
+    stream.on("close", () => {
+      resolve(found);
+    });
+  });
+}
+
+export async function cleanAllRawLogs(): Promise<void> {
+  const logsDir = path.join(process.cwd(), "logs");
+  const outputDir = path.join(logsDir, "cleaned");
+
+  if (!fs.existsSync(logsDir)) {
+    console.log("No logs directory found");
+    return;
+  }
+
+  if (!fs.existsSync(outputDir)) {
+    await fs.promises.mkdir(outputDir, { recursive: true });
+  }
+
+  const files = await fs.promises.readdir(logsDir);
+  // Look for non-raw log files instead
+  const nonRawLogFiles = files.filter(
+    (file) => !file.startsWith("raw-") && file.endsWith(".log"),
+  );
+
+  if (nonRawLogFiles.length === 0) {
+    console.log("No non-raw *.log files found to check");
+    return;
+  }
+
+  console.log(`Found ${nonRawLogFiles.length} non-raw log files to check`);
+
+  let processedCount = 0;
+  for (const file of nonRawLogFiles) {
+    const inputPath = path.join(logsDir, file);
+
+    try {
+      // Check if non-raw file contains "fork" using streaming
+      const containsTargetString = await fileContainsString(
+        inputPath,
+        "Fork detected",
+      );
+
+      if (!containsTargetString) {
+        console.log(`Skipping ${file} - does not contain "fork"`);
+        continue;
+      }
+
+      // Construct the corresponding raw filename
+      const rawFileName = `raw-${file}`;
+      const rawFilePath = path.join(logsDir, rawFileName);
+
+      // Check if the raw file exists
+      if (!fs.existsSync(rawFilePath)) {
+        console.log(
+          `Skipping ${file} - corresponding raw file ${rawFileName} not found`,
+        );
+        continue;
+      }
+
+      const outputFileName = rawFileName.replace("raw-", "cleaned-");
+      const outputPath = path.join(outputDir, outputFileName);
+
+      await processLogFile(rawFilePath, outputPath);
+      console.log(
+        `Cleaned: ${rawFileName} -> ${outputFileName} (triggered by ${file})`,
+      );
+      processedCount++;
+    } catch (error) {
+      console.error(`Failed to process ${file}:`, error);
+    }
+  }
+
+  console.log(
+    `Processed ${processedCount} raw files based on non-raw files containing "fork"`,
+  );
 }
 
 /**
