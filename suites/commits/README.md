@@ -50,6 +50,9 @@ yarn install
 # Start local network
 ./dev/up
 
+# Update local network pre-generated inboxIds
+yarn local-update
+
 # Run the test 100 times and exports logs
 yarn run:commits
 ```
