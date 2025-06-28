@@ -48,14 +48,14 @@ export const PATTERNS = {
   maxLineLength: 150,
 
   DEDUPE: [
-    "sync worker error",
     "sqlcipher_mlock",
     "Collector timed out.",
     "welcome with cursor",
     "group with welcome id",
     "receiveGroupMessage",
     "receiveNewConversation",
-    "Skipping welcome",
+    "process:sync_welcomes:create_from_welcome",
+    "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",
   ],
