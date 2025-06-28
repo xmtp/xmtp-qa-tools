@@ -174,7 +174,7 @@ export class WorkerManager {
 
       if (debugInfo.maybeForked) {
         const logMessage = `Fork detected, group id ${groupId} may have forked, epoch ${debugInfo.epoch} for worker ${worker.name}`;
-        console.log(logMessage);
+        console.error(logMessage);
         throw new Error(logMessage);
       }
       const currentEpoch = debugInfo.epoch;
