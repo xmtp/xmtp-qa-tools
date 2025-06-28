@@ -29,7 +29,7 @@ const enabledOperations = {
 };
 
 //The target of epoch to stop the test, epochs are when performing commits to the group
-const TARGET_EPOCH = 100n;
+const targetEpoch = 100n;
 const network = process.env.XMTP_ENV;
 // How many inboxIds to use randomly in the add/remove opps
 const randomInboxIdsCount = 30;
@@ -106,11 +106,8 @@ describe("commits", () => {
 
         let currentEpoch = 0n;
 
-        while (currentEpoch < TARGET_EPOCH) {
-          const parallelOperationsArray = Array.from(
-            { length: parallelOperations },
-            () =>
-              (async () => {
+        while (currentEpoch < targetEpoch) {
+      
                 const randomWorker =
                   workers.getAll()[
                     Math.floor(Math.random() * workers.getAll().length)

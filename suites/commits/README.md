@@ -22,7 +22,6 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
 
 - **groupCount**: `5` - Number of groups to create in parallel
 - **parallelOperations**: `1` - How many operations to perform in parallel
-
 - **enabledOperations**: - Operations configuration - enable/disable specific operations
   - `updateName`: true, // updates the name of the group
   - `sendMessage`: false, // sends a message to the group
@@ -30,7 +29,7 @@ Stress test XMTP group consensus by hammering multiple groups with concurrent op
   - `removeMember`: true, // removes a random member from the group
   - `createInstallation`: true, // creates a new installation for a random worker
 - **workerNames**: Random workers (`random1`, `random2`, ..., `random10`)
-- **TARGET_EPOCH**: `100n` - The target epoch to stop the test (epochs are when performing commits to the group)
+- **targetEpoch**: `100n` - The target epoch to stop the test (epochs are when performing commits to the group)
 - **network**: `process.env.XMTP_ENV` - Network environment setting
 - **randomInboxIdsCount**: `30` - How many inboxIds to use randomly in the add/remove operations
 - **installationCount**: `5` - How many installations to use randomly in the createInstallation operations
