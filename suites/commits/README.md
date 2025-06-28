@@ -53,6 +53,6 @@ yarn install
 # Update local network pre-generated inboxIds
 yarn local-update
 
-# Run the test 100 times and exports logs
+# Process that runs the test 100 times and exports forks logs
 yarn run:commits
 ```
