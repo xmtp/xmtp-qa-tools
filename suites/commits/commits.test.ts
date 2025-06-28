@@ -19,6 +19,15 @@ const workerNames = [
   "random5",
 ] as string[];
 
+// Operations configuration - enable/disable specific operations
+const enabledOperations = {
+  updateName: true,
+  sendMessage: true,
+  addMember: true,
+  removeMember: true,
+  createInstallation: true,
+};
+
 //The target of epoch to stop the test, epochs are when performing commits to the group
 const TARGET_EPOCH = 100n;
 const network = process.env.XMTP_ENV;
@@ -117,11 +126,13 @@ describe("commits", () => {
 
                 const ops = await createOperations(randomWorker, group);
                 const operationList = [
-                  ops.updateName,
-                  ops.sendMessage,
-                  ops.addMember,
-                  ops.removeMember,
-                  ops.createInstallation,
+                  ...(enabledOperations.updateName ? [ops.updateName] : []),
+                  ...(enabledOperations.sendMessage ? [ops.sendMessage] : []),
+                  ...(enabledOperations.addMember ? [ops.addMember] : []),
+                  ...(enabledOperations.removeMember ? [ops.removeMember] : []),
+                  ...(enabledOperations.createInstallation
+                    ? [ops.createInstallation]
+                    : []),
                 ];
 
                 const randomOperation =
