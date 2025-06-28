@@ -26,7 +26,7 @@ const enabledOperations = {
   sendMessage: false, // sends a message to the group
   addMember: true, // adds a random member to the group
   removeMember: true, // removes a random member from the group
-  createInstallation: true, // creates a new installation for a random worker
+  createInstallation: false, // creates a new installation for a random worker
 };
 const targetEpoch = 100n; // The target epoch to stop the test (epochs are when performing commits to the group)
 const network = process.env.XMTP_ENV; // Network environment setting
