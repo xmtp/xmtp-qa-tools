@@ -122,7 +122,7 @@ describe(testName, async () => {
   //   });
 
   //   // Create group after stream is ready
-  //   const convo = await workers.createGroupBetweenAllWorkers();
+  //   const convo = await workers.createGroupBetweenAll();
   //   const conversation = await conversationPromise;
   //   expect(conversation.id).toBe(convo.id);
   // });
@@ -152,7 +152,7 @@ describe(testName, async () => {
   //   });
 
   //   // Create group after stream is ready
-  //   await workers.createGroupBetweenAllWorkers();
+  //   await workers.createGroupBetweenAll();
   //   const conversation = await conversationPromise;
   //   expect(conversation.id).toBeDefined();
   // });

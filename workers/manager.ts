@@ -227,7 +227,7 @@ export class WorkerManager {
     const otherWorkers = workers.filter((worker) => worker !== creator);
     return otherWorkers[Math.floor(Math.random() * otherWorkers.length)];
   }
-  async createGroupBetweenAllWorkers(
+  async createGroupBetweenAll(
     groupName: string = `Test Group ${Math.random().toString(36).substring(2, 15)}`,
     members: string[] | null = null,
   ): Promise<Group> {

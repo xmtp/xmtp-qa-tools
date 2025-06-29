@@ -108,7 +108,7 @@
     // CORRECT: Use built-in utility methods
     workers.getCreator(); // Returns the worker creator
     workers.getAll(); // Returns all workers
-    workers.createGroupBetweenAllWorkers(groupName, workerNames); // Creates a group
+    workers.createGroupBetweenAll(groupName, workerNames); // Creates a group
     workers.getLength(); // Returns total number of workers
     workers.getRandomWorkers(count); // Gets random subset
     ```

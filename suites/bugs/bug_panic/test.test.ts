@@ -8,7 +8,7 @@ describe(testName, () => {
   it("newGroupByInboxIds: should measure creating a group with inbox ids", async () => {
     const workers = await getWorkers(getFixedNames(50), testName);
     const workerArray = workers.getAll();
-    const groupByInboxIds = await workers.createGroupBetweenAllWorkers();
+    const groupByInboxIds = await workers.createGroupBetweenAll();
     for (const worker of workerArray) {
       await worker.worker?.terminate();
     }

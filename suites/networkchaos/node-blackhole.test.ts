@@ -37,9 +37,7 @@ describe(testName, async () => {
   it("should simulate a node blackhole in a group chat and recover cleanly", async () => {
     try {
       console.log("[test] Creating group conversation");
-      group = await workers.createGroupBetweenAllWorkers(
-        "Blackhole Group Test",
-      );
+      group = await workers.createGroupBetweenAll("Blackhole Group Test");
       await group.sync();
 
       console.log("[test] Verifying initial message delivery to all");

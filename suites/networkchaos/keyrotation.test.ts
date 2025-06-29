@@ -34,7 +34,7 @@ describe(testName, async () => {
   setupTestLifecycle({ testName, expect });
 
   it("should handle staggered key rotations and network chaos under load", async () => {
-    const group = await workers.createGroupBetweenAllWorkers(
+    const group = await workers.createGroupBetweenAll(
       "Key Rotation Stress Test",
     );
     await group.sync();
