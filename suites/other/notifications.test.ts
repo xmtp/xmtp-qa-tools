@@ -22,7 +22,7 @@ describe(testName, () => {
       typeOfSync.None,
       receiverObj.network as "production" | "dev" | "local",
     );
-    group = await workers.createGroup();
+    group = await workers.createGroupBetweenAllWorkers();
     if (!group) {
       console.error(`Failed to create conversation for alice`);
       return;

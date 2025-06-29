@@ -28,7 +28,7 @@ describe(testName, async () => {
 
   it("should recover all missed messages after client reconnection following offline period", async () => {
     try {
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAllWorkers();
       console.log("Group created", group.id);
       // Select one worker to take offline
       const offlineWorker = workers.getReceiver(); // Second worker

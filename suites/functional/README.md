@@ -58,7 +58,7 @@ The `browser.test.ts` module tests XMTP in browser environments.
 const xmtpPlaywright = new playwright(headless, env);
 
 // Test group creation and messaging in browser
-await xmtpPlaywright.createGroupAndReceiveGm(addresses);
+await xmtpPlaywright.createGroupBetweenAllWorkersAndReceiveGm(addresses);
 ```
 
 **Key features:**

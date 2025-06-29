@@ -17,12 +17,12 @@ describe(testName, () => {
   });
 
   it("stream: send the stream", async () => {
-    group = await workers.createGroup();
+    group = await workers.createGroupBetweenAllWorkers();
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
   });
   it("stream: send the stream", async () => {
-    group = await workers.createGroup();
+    group = await workers.createGroupBetweenAllWorkers();
     console.log("Group created", group.id);
     expect(group.id).toBeDefined();
   });

@@ -29,7 +29,7 @@ describe(testName, async () => {
 
   it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
     try {
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAllWorkers();
       await group.sync();
       console.log("group", group.id);
       expect(group.id).toBeDefined();
@@ -75,7 +75,7 @@ describe(testName, async () => {
 
   it("should verify message ordering accuracy when receiving messages via real-time streams", async () => {
     try {
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAllWorkers();
       const verifyResult = await verifyMessageStream(
         group,
         workers.getAllButCreator(),

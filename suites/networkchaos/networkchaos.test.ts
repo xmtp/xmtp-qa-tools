@@ -35,7 +35,9 @@ describe(testName, async () => {
   setupTestLifecycle({ testName, expect });
 
   it("should survive sustained latency + jitter + packet loss under group message load", async () => {
-    const group = await workers.createGroup("Latency Chaos Spike Test");
+    const group = await workers.createGroupBetweenAllWorkers(
+      "Latency Chaos Spike Test",
+    );
     await group.sync();
 
     const chaosDuration = 60 * 1000;

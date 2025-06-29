@@ -33,7 +33,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAllWorkers();
 
       const verifyResult = await verifyMembershipStream(
         group,
@@ -114,7 +114,7 @@ describe(testName, async () => {
   it("should stream group messages in real-time across multiple participants", async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.Message);
-      const newGroup = await workers.createGroup();
+      const newGroup = await workers.createGroupBetweenAllWorkers();
 
       // Verify message delivery
       const verifyResult = await verifyMessageStream(
@@ -134,7 +134,7 @@ describe(testName, async () => {
     try {
       workers = await getWorkers(names, testName, typeofStream.GroupUpdated);
       // Initialize workers
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAllWorkers();
 
       const verifyResult = await verifyMetadataStream(
         group,

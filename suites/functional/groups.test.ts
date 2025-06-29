@@ -110,7 +110,7 @@ describe(testName, async () => {
           `Creating test group with ${workers.getAll().length} worker participants`,
         );
 
-        const testGroup = await workers.createGroup();
+        const testGroup = await workers.createGroupBetweenAllWorkers();
 
         console.log(`Test group created with ID: ${testGroup.id}`);
 

@@ -35,7 +35,9 @@ describe(testName, async () => {
 
   it("should verify group messaging with partitioning", async () => {
     try {
-      group = await workers.createGroup("Partition Test Group");
+      group = await workers.createGroupBetweenAllWorkers(
+        "Partition Test Group",
+      );
       await group.sync();
 
       console.log("[test] Sending group message before partition");
