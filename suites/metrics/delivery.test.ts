@@ -36,7 +36,7 @@ describe(testName, async () => {
   beforeAll(async () => {
     try {
       console.debug("creating group");
-      group = await workers.createGroup();
+      group = await workers.createGroupBetweenAll();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;

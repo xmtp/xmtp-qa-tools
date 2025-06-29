@@ -53,7 +53,7 @@ describe(testName, async () => {
     it(`receiveMembershipUpdate-${i}: should add members to ${i} member group`, async () => {
       try {
         // Initialize workers
-        newGroup = await workers.createGroup();
+        newGroup = await workers.createGroupBetweenAll();
         const verifyResult = await verifyMembershipStream(
           newGroup,
           workers.getAllButCreator(),

@@ -139,7 +139,7 @@ const workers = await getWorkers(4, testName);
 | `workers.get(name, installationId?)`                          | Retrieves a specific worker              |
 | `workers.getCreator()`                                        | Returns the worker creator               |
 | `workers.getAll()`                                            | Returns all workers                      |
-| `workers.createGroup(groupName, workerNames)`                 | Creates a group of workers               |
+| `workers.createGroupBetweenAll(groupName, workerNames)`       | Creates a group of workers               |
 | `workers.getLength()`                                         | Returns the total number of workers      |
 | `workers.getRandomWorkers(count)`                             | Gets a random subset of workers          |
 

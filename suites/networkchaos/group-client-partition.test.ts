@@ -32,7 +32,9 @@ describe(testName, async () => {
 
   it("should verify group messaging during and after client-side blackhole partition", async () => {
     try {
-      group = await workers.createGroup("Client Partition Test Group");
+      group = await workers.createGroupBetweenAll(
+        "Client Partition Test Group",
+      );
       await group.sync();
       await workers.checkForks();
 

@@ -99,7 +99,7 @@ describe("commits", () => {
     const groupOperationPromises = Array.from(
       { length: groupCount },
       async (_, groupIndex) => {
-        const group = await workers.createGroup();
+        const group = await workers.createGroupBetweenAll();
 
         let currentEpoch = 0n;
 
