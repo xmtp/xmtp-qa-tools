@@ -53,7 +53,7 @@ function discoverPackages(): VersionConfig[] {
 
     if (matchingBindings) {
       // Try to get actual version from package.json
-      let sdkVersion = "";
+      let nodeSdkVersion = "";
       let libXmtpVersion = "";
 
       try {
@@ -63,10 +63,10 @@ function discoverPackages(): VersionConfig[] {
             "utf8",
           ),
         );
-        sdkVersion = sdkPackageJson.version || "";
+        nodeSdkVersion = sdkPackageJson.version || "";
       } catch (error: unknown) {
         console.error(error);
-        sdkVersion = "unknown";
+        nodeSdkVersion = "unknown";
       }
 
       try {
@@ -85,7 +85,7 @@ function discoverPackages(): VersionConfig[] {
       configs.push({
         sdkPackage,
         bindingsPackage: matchingBindings,
-        sdkVersion,
+        nodeSdkVersion,
         libXmtpVersion,
         Client,
         Conversation,

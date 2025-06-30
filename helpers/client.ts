@@ -73,7 +73,7 @@ export const sdkVersions = {
     Group: ConversationMls,
     sdkPackage: "node-sdk-mls",
     bindingsPackage: "node-bindings-mls",
-    sdkVersion: "0.0.13",
+    nodeSdkVersion: "0.0.13",
     libXmtpVersion: "0.0.9",
   },
   47: {
@@ -83,7 +83,7 @@ export const sdkVersions = {
     Group: Group47,
     sdkPackage: "node-sdk-47",
     bindingsPackage: "node-bindings-41",
-    sdkVersion: "0.0.47",
+    nodeSdkVersion: "0.0.47",
     libXmtpVersion: "6bd613d",
   },
   105: {
@@ -93,7 +93,7 @@ export const sdkVersions = {
     Group: Group105,
     sdkPackage: "node-sdk-105",
     bindingsPackage: "node-bindings-113",
-    sdkVersion: "1.0.5",
+    nodeSdkVersion: "1.0.5",
     libXmtpVersion: "6eb1ce4",
   },
   209: {
@@ -103,7 +103,7 @@ export const sdkVersions = {
     Group: Group209,
     sdkPackage: "node-sdk-209",
     bindingsPackage: "node-bindings-118",
-    sdkVersion: "2.0.9",
+    nodeSdkVersion: "2.0.9",
     libXmtpVersion: "bfadb76",
   },
   210: {
@@ -113,7 +113,7 @@ export const sdkVersions = {
     Group: Group210,
     sdkPackage: "node-sdk-210",
     bindingsPackage: "node-bindings-120",
-    sdkVersion: "2.1.0",
+    nodeSdkVersion: "2.1.0",
     libXmtpVersion: "7b9b4d0",
   },
   220: {
@@ -123,7 +123,7 @@ export const sdkVersions = {
     Group: Group220,
     sdkPackage: "node-sdk-220",
     bindingsPackage: "node-bindings-122",
-    sdkVersion: "2.2.0",
+    nodeSdkVersion: "2.2.0",
     libXmtpVersion: "d0f0b67",
   },
   300: {
@@ -133,7 +133,7 @@ export const sdkVersions = {
     Group: Group300,
     sdkPackage: "node-sdk-300",
     bindingsPackage: "node-bindings-125",
-    sdkVersion: "3.0.1",
+    nodeSdkVersion: "3.0.1",
     libXmtpVersion: "dc3e8c8",
   },
 };
