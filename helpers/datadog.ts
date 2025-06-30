@@ -23,7 +23,6 @@ interface BaseMetricTags {
   metric_subtype?: string;
   env?: string;
   region?: string;
-  libxmtp: string;
   sdk: string;
   operation?: string;
   test: string;

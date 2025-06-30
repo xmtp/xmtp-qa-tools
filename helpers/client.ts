@@ -322,7 +322,7 @@ export async function createClient(
     client,
     dbPath,
     address,
-    sdkVersion: String(sdkVersion),
+    sdkVersion: String(sdkVersion) + "@" + libXmtpVersion,
     libXmtpVersion,
   };
 }

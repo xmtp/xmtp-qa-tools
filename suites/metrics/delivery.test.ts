@@ -75,7 +75,6 @@ describe(testName, async () => {
         expect(receptionPercentage).toBeGreaterThan(0);
 
         sendMetric("delivery", receptionPercentage, {
-          libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
           metric_type: "delivery",
@@ -89,7 +88,6 @@ describe(testName, async () => {
         expect(orderPercentage).toBeGreaterThan(0);
 
         sendMetric("order", orderPercentage, {
-          libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
           metric_type: "delivery",
@@ -148,7 +146,6 @@ describe(testName, async () => {
         expect(receptionPercentage).toBeGreaterThan(0);
 
         sendMetric("delivery", receptionPercentage, {
-          libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
           metric_type: "delivery",
@@ -161,7 +158,6 @@ describe(testName, async () => {
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
         sendMetric("order", orderPercentage, {
-          libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
           test: testName,
           metric_type: "delivery",
@@ -243,7 +239,6 @@ describe(testName, async () => {
         expect(receptionPercentage).toBeGreaterThan(0);
 
         sendMetric("delivery", receptionPercentage, {
-          libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
           metric_type: "delivery",
@@ -256,7 +251,6 @@ describe(testName, async () => {
       if (orderPercentage > 0) {
         expect(orderPercentage).toBeGreaterThan(0);
         sendMetric("order", orderPercentage, {
-          libxmtp: offlineWorker.libXmtpVersion,
           sdk: offlineWorker.sdkVersion,
           test: testName,
           metric_type: "delivery",

@@ -93,7 +93,6 @@ describe(testName, () => {
           metric_subtype: agent.name,
           agent: agent.name,
           address: agent.address,
-          libxmtp: workers.getCreator().libXmtpVersion,
           sdk: workers.getCreator().sdkVersion,
         });
         expect(agentResponded).toBe(true);
