@@ -368,9 +368,9 @@ export class WorkerClient extends Worker {
   /**
    * Unified method to start the appropriate stream based on configuration
    */
-  private startStream() {
+  private startStream(typeofStream) {
     try {
-      switch (this.typeofStream) {
+      switch (typeofStream) {
         case typeofStream.Message:
           this.initMessageStream(typeofStream.Message);
           break;

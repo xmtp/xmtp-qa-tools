@@ -11,7 +11,7 @@ const testName = "playwright";
 
 describe(testName, () => {
   let groupId: string;
-  const headless = true;
+  const headless = false;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
