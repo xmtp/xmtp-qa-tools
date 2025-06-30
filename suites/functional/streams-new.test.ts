@@ -12,8 +12,12 @@ const testName = "streams-new";
 describe(testName, async () => {
   const workerNames = ["alice", "bob", "charlie", "david"];
 
-  // Create workers with NO initial streams - demonstrating new functionality
-  let workers = await getWorkers(workerNames, testName, typeofStream.None);
+  // 🆕 NEW APPROACH: Create workers without ANY stream type parameters
+  // This demonstrates the new paradigm where streams are purely dynamic
+  //
+  // OLD WAY: getWorkers(names, testName, typeofStream.Message) ❌
+  // NEW WAY: getWorkers(names, testName) → then start streams dynamically ✅
+  let workers = await getWorkers(workerNames, testName);
 
   setupTestLifecycle({
     testName,
@@ -21,9 +25,9 @@ describe(testName, async () => {
     workers,
   });
 
-  it("should create workers with no initial streams active", () => {
+  it("should create workers without declaring any stream types upfront", () => {
     try {
-      // Verify workers exist but have no streams running
+      // Verify workers exist but have zero stream configuration
       const alice = workers.get(workerNames[0])!;
       const bob = workers.get(workerNames[1])!;
 
@@ -33,7 +37,7 @@ describe(testName, async () => {
       expect(bob.worker).toBeDefined();
 
       console.log(
-        `✅ Created workers ${alice.name} and ${bob.name} with no initial streams`,
+        `✅ Created ${alice.name} and ${bob.name} with completely clean slate - no stream types declared`,
       );
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -248,17 +252,17 @@ describe(testName, async () => {
     }
   });
 
-  it("should demonstrate stream lifecycle management patterns", () => {
+  it("should demonstrate the new stream lifecycle management paradigm", () => {
     try {
       const alice = workers.get(workerNames[0])!;
 
-      console.log("🔄 Demonstrating complete stream lifecycle...");
+      console.log("🔄 Demonstrating the NEW stream lifecycle paradigm...");
 
-      // Pattern 1: Start with no streams, add as needed
-      console.log("1️⃣ Starting with no streams");
+      // Pattern 1: Workers start completely clean (nothing declared upfront)
+      console.log("1️⃣ Workers created with zero stream configuration");
 
-      // Pattern 2: Add streams based on application needs
-      console.log("2️⃣ Adding message stream for real-time chat");
+      // Pattern 2: Add streams based on runtime application needs
+      console.log("2️⃣ Dynamically adding message stream for real-time chat");
       alice.worker.startStream(typeofStream.Message);
 
       console.log(
