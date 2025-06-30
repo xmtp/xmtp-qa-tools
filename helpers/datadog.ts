@@ -413,7 +413,7 @@ export function flushMetrics(): Promise<void> {
 export async function sendDatadogLog(
   lines: string[],
   context: Record<string, unknown> = {},
-  channel?: string,
+  options?: { channel?: string },
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
@@ -423,7 +423,7 @@ export async function sendDatadogLog(
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
-    channel: channel || context.channel || "general",
+    channel: options?.channel || context.channel || "general",
     ...context,
   };
   

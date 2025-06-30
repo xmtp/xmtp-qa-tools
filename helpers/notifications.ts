@@ -184,7 +184,7 @@ export async function sendSlackNotification(
         region: process.env.GEOLOCATION,
         sdk: "latest",
       },
-      options.channel,
+      { channel: options.channel },
     );
   }
 
@@ -298,7 +298,7 @@ export async function sendAgentNotification(
         region: process.env.GEOLOCATION,
         sdk: "latest",
       },
-      options.slackChannel,
+      { channel: options.slackChannel },
     );
   }
 
