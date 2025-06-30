@@ -11,6 +11,7 @@ import {
 // Define the expected return type of verifyMessageStream
 export type VerifyStreamResult = {
   allReceived: boolean;
+  almostAllReceived: boolean;
   receiverCount: number;
   messages: string;
   eventTimings: string;
@@ -217,8 +218,13 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
   }
+  const diff = count
+    ? count * allReceived.length -
+      allReceived.reduce((sum, arr) => sum + arr.length, 0)
+    : 0;
   const allResults = {
-    allReceived: allReceived.every((msgs) => msgs.length === count),
+    allReceived: diff === 0,
+    almostAllReceived: diff <= 2,
     receiverCount: allReceived.length,
     messages: messagesAsStrings.join(","),
     eventTimings: Object.entries(eventTimingsArray)
