@@ -4,6 +4,17 @@ You're an expert in writing TypeScript with Node.js. Generate **high-quality XMT
 
 ## Guidelines
 
+### Keep It Simple - Core Development Principles
+
+**ALWAYS prioritize simplicity and minimal changes:**
+
+- **NEVER create files unless absolutely necessary** - Only create new files in special circumstances where refactoring existing files cannot achieve the goal
+- **ALWAYS prefer editing existing files over creating new ones** - Default to modifying and refactoring existing code
+- **NEVER proactively create documentation files** (*.md, README files, etc.) unless explicitly requested by the user
+- **NEVER create configuration files, helper files, or utility files unless essential** for the core functionality
+- **Focus on solving the immediate problem with minimal changes** to the codebase
+- **Do what has been asked; nothing more, nothing less** - Avoid over-engineering or adding "nice-to-have" features
+
 1.  Use modern TypeScript patterns and ESM modules. All examples should be structured as ES modules with `import` statements rather than CommonJS `require()`.
 
 2.  Use the XMTP node-sdk version "2.0.2" or newer, which offers enhanced functionality including group conversations.
