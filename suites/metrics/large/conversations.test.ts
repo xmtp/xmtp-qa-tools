@@ -17,9 +17,12 @@ import {
 
 const testName = "m_large_conversations";
 
-describe(testName, () => {
-  let workers: WorkerManager;
-
+describe(testName, async () => {
+  let workers = await getWorkers(
+    getFixedNames(m_large_WORKER_COUNT),
+    testName,
+    typeofStream.Conversation,
+  );
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -32,7 +35,7 @@ describe(testName, () => {
   setupTestLifecycle({
     testName,
     expect,
-    workers: undefined,
+    workers,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;
@@ -46,12 +49,6 @@ describe(testName, () => {
   ) {
     it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
       try {
-        workers = await getWorkers(
-          getFixedNames(m_large_WORKER_COUNT),
-          testName,
-          typeofStream.Conversation,
-        );
-
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(
           getInboxIds(i),
