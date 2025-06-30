@@ -9,7 +9,6 @@ This directory contains utility modules that power the XMTP testing framework. T
 | **client.ts**        | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
 | **analyzer.ts**      | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
 | **notifications.ts** | Test failure notifications       | Slack alerts, error reporting, filtering             |
-| **notification-service.ts** | Generic notification service | Multi-provider notifications, agent-specific channels |
 | **logger.ts**        | Logging utilities                | File logging, ANSI stripping, pretty console output  |
 | **vitest.ts**        | Test lifecycle management        | Test setup, performance metrics, cleanup             |
 | **playwright.ts**    | Browser automation               | UI testing, group creation, message verification     |
@@ -30,7 +29,6 @@ import {
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
 import { logError, setupPrettyLogs } from "@helpers/logger";
 import { sendSlackNotification } from "@helpers/notifications";
-import { sendAgentNotification, NotificationService } from "@helpers/notification-service";
 import {
   verifyConversationStream,
   verifyMessageStream,
@@ -165,87 +163,7 @@ const URLS = {
 };
 ```
 
-## � Notification Service Module (`notification-service.ts`)
-
-The `notification-service.ts` module provides a generic, extensible notification system that supports multiple providers and agent-specific channels.
-
-```typescript
-// Send agent-specific notifications
-await sendAgentNotification({
-  agentName: "my-agent",
-  agentAddress: "0x123...",
-  errorLogs: new Set(["Agent failed to respond", "Timeout after 3 retries"]),
-  testName: "agent-test",
-  env: "production",
-  slackChannel: "#my-agent-alerts",
-  responseTime: 5000,
-});
-
-// Use the notification service directly
-const notificationService = NotificationService.getInstance();
-
-await notificationService.sendNotification({
-  provider: NotificationProvider.SLACK,
-  title: "Test Failure",
-  message: "Agent test failed",
-  type: NotificationType.AGENT_FAILURE,
-  channel: "#agent-alerts",
-  timestamp: new Date(),
-});
-
-// Send custom Slack notifications
-await sendSlackNotification({
-  title: "Custom Alert",
-  message: "Something important happened",
-  type: NotificationType.INFO,
-  channel: "#general",
-});
-```
-
-**Key features:**
-
-- **Multi-provider support**: Slack, Discord, Email (extensible for more)
-- **Agent-specific channels**: Each agent can have its own notification channel
-- **Type-safe interfaces**: Strong TypeScript support for all notification types
-- **Singleton pattern**: Single service instance for the entire application
-- **Rich formatting**: Enhanced message formatting with metadata and links
-- **Smart filtering**: Inherits filtering logic from the original notifications module
-
-**Supported Providers:**
-
-```typescript
-export enum NotificationProvider {
-  SLACK = "slack",
-  DISCORD = "discord", // Coming soon
-  EMAIL = "email",     // Coming soon
-}
-
-export enum NotificationType {
-  ERROR = "error",
-  WARNING = "warning",
-  INFO = "info",
-  SUCCESS = "success",
-  AGENT_FAILURE = "agent_failure",
-  TEST_FAILURE = "test_failure",
-}
-```
-
-**Agent Configuration:**
-
-Agents can now specify their own Slack channels in the configuration:
-
-```json
-{
-  "name": "my-agent",
-  "baseName": "my-agent.base.eth",
-  "address": "0x123...",
-  "sendMessage": "hi",
-  "networks": ["production"],
-  "slackChannel": "#my-agent-alerts"
-}
-```
-
-## �📝 Logger Module (`logger.ts`)
+## 📝 Logger Module (`logger.ts`)
 
 The `logger.ts` module provides comprehensive logging utilities with file output and formatting.
 

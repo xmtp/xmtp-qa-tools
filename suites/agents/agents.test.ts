@@ -1,7 +1,7 @@
 import { getRandomNames, streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
-import { sendAgentNotification } from "@helpers/notification-service";
+import { sendAgentNotification } from "@helpers/notifications";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import productionAgents from "@inboxes/agents.json";

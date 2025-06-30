@@ -33,6 +33,18 @@ export interface SlackNotificationOptions {
   env?: string;
   failedTestsCount?: number;
   totalTestsCount?: number;
+  channel?: string;
+}
+
+export interface AgentNotificationOptions {
+  agentName: string;
+  agentAddress: string;
+  errorLogs?: Set<string>;
+  testName: string;
+  env?: string;
+  slackChannel?: string;
+  responseTime?: number;
+  customLinks?: string;
 }
 
 function shouldSkipNotification(options: SlackNotificationOptions): boolean {
@@ -112,7 +124,9 @@ function generateMessage(options: SlackNotificationOptions): string {
   return sections.filter(Boolean).join("\n");
 }
 
-async function postToSlack(message: string): Promise<void> {
+async function postToSlack(message: string, channel?: string): Promise<void> {
+  const targetChannel = channel || process.env.SLACK_CHANNEL || "general";
+  
   const response = await fetch(URLS.SLACK_API, {
     method: "POST",
     headers: {
@@ -120,7 +134,7 @@ async function postToSlack(message: string): Promise<void> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: process.env.SLACK_CHANNEL || "general",
+      channel: targetChannel,
       text: message,
       mrkdwn: true,
     }),
@@ -132,7 +146,7 @@ async function postToSlack(message: string): Promise<void> {
   };
 
   if (data && data.ok) {
-    console.log("✅ Slack notification sent successfully!");
+    console.log(`✅ Slack notification sent successfully to ${targetChannel}!`);
   } else {
     console.error("❌ Failed to send Slack notification. Response:", data);
   }
@@ -177,8 +191,119 @@ export async function sendSlackNotification(
 
   try {
     const message = generateMessage(options);
-    await postToSlack(message);
+    await postToSlack(message, options.channel);
   } catch (error) {
     console.error("Error sending Slack notification:", error);
+  }
+}
+
+function generateAgentMessage(options: AgentNotificationOptions): string {
+  const {
+    agentName,
+    agentAddress,
+    testName,
+    env,
+    errorLogs,
+    responseTime,
+    customLinks,
+  } = options;
+
+  const url = generateUrl();
+  const timestamp = new Date().toLocaleString("en-US", {
+    timeZone: "America/Argentina/Buenos_Aires",
+  });
+
+  const errorLogsArr = Array.from(errorLogs || []);
+  const logs = sanitizeLogs(errorLogsArr.join("\n"));
+
+  const failLines = extractFailLines(errorLogs || new Set());
+  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
+  const tagMessage = shouldTagFabri ? " <@fabri>" : "";
+
+  const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
+  const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
+  const region = process.env.GEOLOCATION || "Unknown Region";
+
+  const agentLinks = customLinks || 
+    `*Agent tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/inboxes/agents.json|${agentName}>`;
+
+  const responseTimeInfo = responseTime 
+    ? `*Response Time:* \`${responseTime}ms\`` 
+    : "";
+
+  const sections = [
+    `*Agent Test Failure ❌*${tagMessage}`,
+    `*Agent:* \`${agentName}\``,
+    `*Address:* \`${agentAddress}\``,
+    `*Test:* <${URLS.GITHUB_ACTIONS}/${repository}/actions/workflows/${workflowName}.yml|${testName}>`,
+    `*Environment:* \`${env}\``,
+    `*Geolocation:* \`${region}\``,
+    responseTimeInfo,
+    `*Timestamp:* \`${timestamp}\``,
+    `*General dashboard:* <${URLS.DATADOG_DASHBOARD}|View>`,
+    `*Full logs:* <${URLS.DATADOG_LOGS}|View>`,
+    url ? `*Test log:* <${url}|View url>` : "",
+    agentLinks,
+    `Logs:\n\`\`\`${logs}\`\`\``,
+  ];
+
+  return sections.filter(Boolean).join("\n");
+}
+
+function shouldSkipAgentNotification(options: AgentNotificationOptions): boolean {
+  // Skip if no error logs for error notifications
+  if (!options.errorLogs || options.errorLogs.size === 0) {
+    console.log("Agent notification skipped (no actual test failures detected)");
+    return false;
+  }
+
+  // Skip for non-main branches in CI
+  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
+  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
+    console.log(`Agent notification skipped (branch: ${branchName})`);
+    return true;
+  }
+
+  return false;
+}
+
+export async function sendAgentNotification(
+  options: AgentNotificationOptions,
+): Promise<void> {
+  if (!process.env.SLACK_BOT_TOKEN) {
+    console.log("Agent notification skipped (SLACK_BOT_TOKEN not set)");
+    return;
+  }
+
+  // Skip notification conditions
+  if (shouldSkipAgentNotification(options)) {
+    return;
+  }
+
+  // Send to Datadog if there are error logs
+  if (options.errorLogs && options.errorLogs.size > 0) {
+    const failLines = extractFailLines(options.errorLogs);
+    await sendDatadogLog(Array.from(options.errorLogs), {
+      test: options.testName,
+      agent: options.agentName,
+      url: generateUrl(),
+      failLines: Array.from(failLines).length,
+      env: options.env || process.env.XMTP_ENV,
+      region: process.env.GEOLOCATION,
+      sdk: "latest",
+    });
+  }
+
+  // Filter out tests that should be ignored
+  if (options.errorLogs && shouldFilterOutTest(options.errorLogs)) {
+    return;
+  }
+
+  try {
+    const message = generateAgentMessage(options);
+    const finalChannel = options.slackChannel || process.env.SLACK_CHANNEL || "#general";
+    await postToSlack(message, finalChannel);
+  } catch (error) {
+    console.error("Error sending agent notification:", error);
   }
 }
