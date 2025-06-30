@@ -227,7 +227,7 @@ export class WorkerClient extends Worker {
 
     this.activeStreamTypes.add(streamType);
     this.activeStreams = true;
-    
+
     try {
       switch (streamType) {
         case typeofStream.Message:
@@ -245,7 +245,10 @@ export class WorkerClient extends Worker {
       }
       console.debug(`[${this.nameId}] Started ${streamType} stream`);
     } catch (error) {
-      console.error(`[${this.nameId}] Failed to start ${streamType} stream:`, error);
+      console.error(
+        `[${this.nameId}] Failed to start ${streamType} stream:`,
+        error,
+      );
       this.activeStreamTypes.delete(streamType);
       throw error;
     }
@@ -259,14 +262,14 @@ export class WorkerClient extends Worker {
     if (streamType) {
       console.debug(`[${this.nameId}] Stopping ${streamType} stream`);
       this.activeStreamTypes.delete(streamType);
-      
+
       // Abort the specific stream controller
       const controller = this.streamControllers.get(streamType);
       if (controller) {
         controller.abort();
         this.streamControllers.delete(streamType);
       }
-      
+
       // If no streams are active, set activeStreams to false
       if (this.activeStreamTypes.size === 0) {
         this.activeStreams = false;
@@ -402,7 +405,7 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    this.startStream();
+    this.startInitialStream();
     this.startSyncs();
 
     const installationId = this.client.installationId;
@@ -442,7 +445,7 @@ export class WorkerClient extends Worker {
   /**
    * Unified method to start the appropriate stream based on configuration
    */
-  private startStream() {
+  private startInitialStream() {
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
@@ -475,7 +478,7 @@ export class WorkerClient extends Worker {
     // Create abort controller for this stream
     const controller = new AbortController();
     this.streamControllers.set(type, controller);
-    
+
     void (async () => {
       while (this.activeStreamTypes.has(type) && !controller.signal.aborted) {
         try {
@@ -489,7 +492,8 @@ export class WorkerClient extends Worker {
             //   `[${this.nameId}] Received message`,
             //   JSON.stringify(message?.content, null, 2),
             // );
-            if (!this.activeStreamTypes.has(type) || controller.signal.aborted) break;
+            if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
+              break;
 
             if (
               !message ||
@@ -651,9 +655,12 @@ export class WorkerClient extends Worker {
     // Create abort controller for this stream
     const controller = new AbortController();
     this.streamControllers.set(streamType, controller);
-    
+
     void (async () => {
-      while (this.activeStreamTypes.has(streamType) && !controller.signal.aborted) {
+      while (
+        this.activeStreamTypes.has(streamType) &&
+        !controller.signal.aborted
+      ) {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
@@ -661,7 +668,10 @@ export class WorkerClient extends Worker {
               console.debug(
                 `Received conversation, conversationId: ${conversation?.id}`,
               );
-              if (!this.activeStreamTypes.has(streamType) || controller.signal.aborted) {
+              if (
+                !this.activeStreamTypes.has(streamType) ||
+                controller.signal.aborted
+              ) {
                 console.debug(`Stopping conversation stream`);
                 break;
               }
@@ -703,9 +713,12 @@ export class WorkerClient extends Worker {
     // Create abort controller for this stream
     const controller = new AbortController();
     this.streamControllers.set(streamType, controller);
-    
+
     void (async () => {
-      while (this.activeStreamTypes.has(streamType) && !controller.signal.aborted) {
+      while (
+        this.activeStreamTypes.has(streamType) &&
+        !controller.signal.aborted
+      ) {
         try {
           const stream = await this.client.preferences.streamConsent();
 
@@ -1145,7 +1158,7 @@ export class WorkerClient extends Worker {
     this.folder = newFolder; // Update folder reference
 
     // Restart streams and syncs with new installation
-    this.startStream();
+    this.startInitialStream();
     this.startSyncs();
 
     const newInstallationId = this.client.installationId;

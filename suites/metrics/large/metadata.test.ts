@@ -4,7 +4,7 @@ import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
 import {
