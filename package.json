@@ -30,6 +30,7 @@
     "regression": "yarn test suites/functional --versions 3 ",
     "run:agent": "./suites/agents/run.sh",
     "run:commits": "./suites/commits/run.sh",
+    "run:commitsmatrix": "./suites/commits/run-matrix.sh",
     "script": "yarn cli script",
     "test": "yarn cli test",
     "ui": "vitest --ui --standalone --watch"
