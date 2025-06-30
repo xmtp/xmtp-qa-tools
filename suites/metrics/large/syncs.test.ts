@@ -15,11 +15,9 @@ import {
 const testName = "m_large_syncs";
 
 describe(testName, async () => {
-  let workers: WorkerManager;
-
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(
+  let workers = await getWorkers(
     getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
     testName,
     typeofStream.None,

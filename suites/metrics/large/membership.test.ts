@@ -18,13 +18,11 @@ import {
 const testName = "m_large_membership";
 
 describe(testName, async () => {
-  let workers: WorkerManager;
-
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(
+  let workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
     testName,
     typeofStream.GroupUpdated,
