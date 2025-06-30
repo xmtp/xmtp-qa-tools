@@ -20,6 +20,7 @@
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
+    "gen:installations": "tsx inboxes/gen.ts --create-installations",
     "large": "yarn test suites/metrics/large",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
