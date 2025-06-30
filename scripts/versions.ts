@@ -1,11 +1,11 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import { sdkVersions } from "@helpers/client";
+import { VersionList } from "@helpers/client";
 import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 
-type VersionConfig = (typeof sdkVersions)[keyof typeof sdkVersions];
-const staticConfigs = Object.values(sdkVersions).map((version) => ({
+type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
+const staticConfigs = Object.values(VersionList).map((version) => ({
   ...version,
   sdkPackage: version.sdkPackage,
   bindingsPackage: version.bindingsPackage,
@@ -53,7 +53,7 @@ function discoverPackages(): VersionConfig[] {
 
     if (matchingBindings) {
       // Try to get actual version from package.json
-      let sdkVersion = "";
+      let nodeVersion = "";
       let libXmtpVersion = "";
 
       try {
@@ -63,10 +63,10 @@ function discoverPackages(): VersionConfig[] {
             "utf8",
           ),
         );
-        sdkVersion = sdkPackageJson.version || "";
+        nodeVersion = sdkPackageJson.version || "";
       } catch (error: unknown) {
         console.error(error);
-        sdkVersion = "unknown";
+        nodeVersion = "unknown";
       }
 
       try {
@@ -85,7 +85,7 @@ function discoverPackages(): VersionConfig[] {
       configs.push({
         sdkPackage,
         bindingsPackage: matchingBindings,
-        sdkVersion,
+        nodeVersion,
         libXmtpVersion,
         Client,
         Conversation,

@@ -73,7 +73,7 @@ await logAgentDetails(client);
 **SDK Version Mappings:**
 
 ```typescript
-export const sdkVersions = {
+export const VersionList = {
   47: { Client: Client47, sdkVersion: "0.0.47", libXmtpVersion: "6bd613d" },
   100: { Client: Client100, sdkVersion: "1.0.0", libXmtpVersion: "c205eec" },
   105: { Client: Client105, sdkVersion: "1.0.5", libXmtpVersion: "6eb1ce4" },

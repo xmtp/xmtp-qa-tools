@@ -4,8 +4,8 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  sdkVersions,
   sleep,
+  VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -497,12 +497,25 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 export function getLatestVersion(): string {
-  return Object.keys(sdkVersions).pop() as string;
+  const versions = Object.keys(VersionList);
+  const latestVersion = versions.pop();
+  if (!latestVersion) {
+    // Fallback to a known good version if VersionList is somehow empty
+    return "300";
+  }
+  return latestVersion;
+}
+
+export function getNodeSdkVersion(sdkVersion: string): string {
+  return (
+    VersionList[Number(sdkVersion) as keyof typeof VersionList]?.nodeVersion ||
+    "unknown"
+  );
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
   return (
-    sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
+    VersionList[Number(sdkVersion) as keyof typeof VersionList]
       ?.libXmtpVersion || "unknown"
   );
 }
