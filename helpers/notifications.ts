@@ -88,7 +88,7 @@ function generateMessage(options: SlackNotificationOptions): string {
   const customLinks =
     options.customLinks ||
     (options.testName.toLowerCase().includes("agents")
-      ? "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/inboxes/agents.json|View file>"
+      ? "*Agents tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/agents/agents.json|View file>"
       : "");
 
   const url = generateUrl();
@@ -229,7 +229,7 @@ function generateAgentMessage(options: AgentNotificationOptions): string {
   const region = process.env.GEOLOCATION || "Unknown Region";
 
   const agentLinks = customLinks || 
-    `*Agent tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/inboxes/agents.json|${agentName}>`;
+    `*Agent tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/agents/agents.json|${agentName}>`;
 
   const responseTimeInfo = responseTime 
     ? `*Response Time:* \`${responseTime}ms\`` 
