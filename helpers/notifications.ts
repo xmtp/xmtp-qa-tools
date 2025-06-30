@@ -174,14 +174,18 @@ export async function sendSlackNotification(
 
   if (options.errorLogs && options.errorLogs.size > 0) {
     const failLines = extractFailLines(options.errorLogs);
-    await sendDatadogLog(Array.from(options.errorLogs), {
-      test: options.testName,
-      url: generateUrl(),
-      failLines: Array.from(failLines).length,
-      env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
-      region: process.env.GEOLOCATION,
-      sdk: "latest",
-    });
+    await sendDatadogLog(
+      Array.from(options.errorLogs),
+      {
+        test: options.testName,
+        url: generateUrl(),
+        failLines: Array.from(failLines).length,
+        env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
+        region: process.env.GEOLOCATION,
+        sdk: "latest",
+      },
+      options.channel,
+    );
   }
 
   // Check if test should be filtered out
@@ -283,15 +287,19 @@ export async function sendAgentNotification(
   // Send to Datadog if there are error logs
   if (options.errorLogs && options.errorLogs.size > 0) {
     const failLines = extractFailLines(options.errorLogs);
-    await sendDatadogLog(Array.from(options.errorLogs), {
-      test: options.testName,
-      agent: options.agentName,
-      url: generateUrl(),
-      failLines: Array.from(failLines).length,
-      env: options.env || process.env.XMTP_ENV,
-      region: process.env.GEOLOCATION,
-      sdk: "latest",
-    });
+    await sendDatadogLog(
+      Array.from(options.errorLogs),
+      {
+        test: options.testName,
+        agent: options.agentName,
+        url: generateUrl(),
+        failLines: Array.from(failLines).length,
+        env: options.env || process.env.XMTP_ENV,
+        region: process.env.GEOLOCATION,
+        sdk: "latest",
+      },
+      options.slackChannel,
+    );
   }
 
   // Filter out tests that should be ignored
