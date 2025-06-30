@@ -218,8 +218,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
   }
-  const diff = count ? count - allReceived.length : 0;
-
+  const diff = count
+    ? count * allReceived.length -
+      allReceived.reduce((sum, arr) => sum + arr.length, 0)
+    : 0;
   const allResults = {
     allReceived: diff === 0,
     almostAllReceived: diff <= 2,
