@@ -117,6 +117,26 @@ export class DockerContainer {
     netem.applyLoss(this, percent);
   }
 
+  addEgressLatency(ms: number): void {
+    netem.applyEgressLatency(this, ms);
+  }
+
+  addEgressJitter(delay: number, jitter: number): void {
+    netem.applyEgressJitter(this, delay, jitter);
+  }
+
+  addEgressLoss(percent: number): void {
+    netem.applyEgressLoss(this, percent);
+  }
+
+  clearEgressLatency(): void {
+    try {
+      netem.clearEgress(this);
+    } catch {
+      console.log(`[netem] No existing egress qdisc to clear on ${this.name}`);
+    }
+  }
+
   blockInboundFromHost(): void {
     iptables.blockFromHostTo(this);
   }
@@ -157,6 +177,38 @@ export class DockerContainer {
     execFileSync("docker", ["kill", this.name], { stdio: "inherit" });
   }
 
+  measureRttFromHost(): number | null {
+    try {
+      const output = execSync(`ping -c 3 ${this.ip}`, { stdio: "pipe" }).toString();
+      const match = output.match(/rtt.*? = ([0-9.]+)\/[0-9.]+\/[0-9.]+\/[0-9.]+ ms/);
+      if (match) {
+        return parseFloat(match[1]);
+      }
+    } catch (e) {
+      console.warn(`[sh] RTT check from host failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+    return null;
+  }
+
+  pingFromHost(count = 3): void {
+    console.log(`[sh] Pinging ${this.name} (${this.ip}) from host...`);
+    try {
+      const output = execSync(`ping -c ${count} ${this.ip}`, {
+        stdio: "pipe"
+      }).toString();
+      const summary = output
+        .split("\n")
+        .find((line) => line.includes("rtt") || line.includes("round-trip"));
+      if (summary) {
+        console.log(`[sh] ${summary}`);
+      } else {
+        console.log(`[sh] ${output}`);
+      }
+    } catch (e) {
+      console.error(`[sh] Ping from host failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
   static validateDependencies(): void {
     const dependencies = ["docker", "iptables", "tc"];
     for (const cmd of dependencies) {
@@ -167,4 +219,30 @@ export class DockerContainer {
       }
     }
   }
+
+  static getNodes(): DockerContainer[] {
+    try {
+      const output = execSync(
+        `docker ps --filter ancestor=xmtp/node-go --format '{{.Names}}'`
+      )
+        .toString()
+        .trim();
+
+      if (!output) {
+        console.warn("[DockerContainer.getXmtpNodes] No XMTP node containers found");
+        return [];
+      }
+
+      const names = output.split("\n").filter(Boolean);
+      console.log(`[DockerContainer.getXmtpNodes] Found ${names.length} XMTP node(s):`, names);
+      return names.map((name) => new DockerContainer(name));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error(`[DockerContainer.getXmtpNodes] Failed to detect XMTP nodes: ${msg}`);
+      return [];
+    }
+  }
+
 }
+
+
