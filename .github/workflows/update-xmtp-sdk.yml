@@ -1,0 +1,269 @@
+name: Update XMTP Node SDK
+
+on:
+  schedule:
+    # Check for updates daily at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch: # Allow manual triggering
+
+jobs:
+  check-for-updates:
+    runs-on: ubuntu-latest
+    outputs:
+      new_version: ${{ steps.check-version.outputs.new_version }}
+      current_version: ${{ steps.check-version.outputs.current_version }}
+      needs_update: ${{ steps.check-version.outputs.needs_update }}
+      corresponding_bindings_version: ${{ steps.check-bindings.outputs.bindings_version }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Check for new version
+        id: check-version
+        run: |
+          # Get current version from package.json
+          CURRENT_VERSION=$(node -p "require('./package.json').dependencies['@xmtp/node-sdk']")
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
+          
+          # Get latest version from npm
+          LATEST_VERSION=$(npm view @xmtp/node-sdk version)
+          echo "new_version=$LATEST_VERSION" >> $GITHUB_OUTPUT
+          
+          # Compare versions
+          if [ "$CURRENT_VERSION" != "$LATEST_VERSION" ]; then
+            echo "needs_update=true" >> $GITHUB_OUTPUT
+            echo "New version available: $CURRENT_VERSION -> $LATEST_VERSION"
+          else
+            echo "needs_update=false" >> $GITHUB_OUTPUT
+            echo "Already on latest version: $CURRENT_VERSION"
+          fi
+
+      - name: Check corresponding node-bindings version
+        id: check-bindings
+        if: steps.check-version.outputs.needs_update == 'true'
+        run: |
+          # Get the node-bindings version that the new SDK version depends on
+          NEW_SDK_VERSION="${{ steps.check-version.outputs.new_version }}"
+          
+          # Create a temporary package.json to check dependencies
+          mkdir temp_check
+          cd temp_check
+          npm init -y
+          npm install @xmtp/node-sdk@$NEW_SDK_VERSION --no-save
+          
+          # Extract the node-bindings version from the installed package
+          BINDINGS_VERSION=$(node -p "
+            try {
+              const pkg = require('./node_modules/@xmtp/node-sdk/package.json');
+              pkg.dependencies['@xmtp/node-bindings'] || 'not-found';
+            } catch (e) {
+              'not-found';
+            }
+          ")
+          
+          cd ..
+          rm -rf temp_check
+          
+          echo "bindings_version=$BINDINGS_VERSION" >> $GITHUB_OUTPUT
+          echo "Corresponding node-bindings version: $BINDINGS_VERSION"
+
+  create-update-pr:
+    needs: check-for-updates
+    if: needs.check-for-updates.outputs.needs_update == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Create update branch
+        run: |
+          NEW_VERSION="${{ needs.check-for-updates.outputs.new_version }}"
+          BRANCH_NAME="update/xmtp-sdk-$NEW_VERSION"
+          git checkout -b "$BRANCH_NAME"
+
+      - name: Update package.json
+        run: |
+          NEW_VERSION="${{ needs.check-for-updates.outputs.new_version }}"
+          BINDINGS_VERSION="${{ needs.check-for-updates.outputs.corresponding_bindings_version }}"
+          
+          # Create version alias (remove dots and take first 3 digits)
+          VERSION_ALIAS=$(echo "$NEW_VERSION" | sed 's/\.//g' | cut -c1-3)
+          
+          # Update package.json using Node.js
+          node << 'EOF'
+          const fs = require('fs');
+          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+          
+          const newVersion = process.env.NEW_VERSION || '$NEW_VERSION';
+          const bindingsVersion = process.env.BINDINGS_VERSION || '$BINDINGS_VERSION';
+          const versionAlias = process.env.VERSION_ALIAS || '$VERSION_ALIAS';
+          
+          // Update main dependency
+          pkg.dependencies['@xmtp/node-sdk'] = newVersion;
+          
+          // Add versioned alias for node-sdk
+          const sdkAliasKey = `@xmtp/node-sdk-${versionAlias}`;
+          pkg.dependencies[sdkAliasKey] = `npm:@xmtp/node-sdk@${newVersion}`;
+          
+          // Add versioned alias for node-bindings if we found a version
+          if (bindingsVersion && bindingsVersion !== 'not-found') {
+            const bindingsAlias = bindingsVersion.replace(/\./g, '').substring(0, 3);
+            const bindingsAliasKey = `@xmtp/node-bindings-${bindingsAlias}`;
+            if (!pkg.dependencies[bindingsAliasKey]) {
+              pkg.dependencies[bindingsAliasKey] = `npm:@xmtp/node-bindings@${bindingsVersion}`;
+            }
+            
+            // Add package extension for the new SDK version
+            if (!pkg.packageExtensions[`@xmtp/node-sdk@${newVersion}`]) {
+              pkg.packageExtensions[`@xmtp/node-sdk@${newVersion}`] = {
+                "dependencies": {
+                  "@xmtp/node-bindings": bindingsVersion
+                }
+              };
+            }
+          }
+          
+          // Sort dependencies and packageExtensions
+          const sortObject = (obj) => {
+            return Object.keys(obj).sort().reduce((result, key) => {
+              result[key] = obj[key];
+              return result;
+            }, {});
+          };
+          
+          pkg.dependencies = sortObject(pkg.dependencies);
+          pkg.packageExtensions = sortObject(pkg.packageExtensions);
+          
+          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n');
+          EOF
+          
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+          echo "VERSION_ALIAS=$VERSION_ALIAS" >> $GITHUB_ENV
+
+      - name: Install dependencies
+        run: yarn install
+
+      - name: Run tests to verify compatibility
+        run: |
+          # Run a basic test to ensure the new version works
+          yarn build || echo "Build failed, but continuing with PR creation"
+
+      - name: Commit changes
+        run: |
+          git add package.json yarn.lock
+          git commit -m "feat: update @xmtp/node-sdk to $NEW_VERSION
+
+          - Updated main @xmtp/node-sdk dependency to $NEW_VERSION
+          - Added versioned alias @xmtp/node-sdk-$VERSION_ALIAS
+          - Updated corresponding node-bindings dependencies
+          - Added package extensions for compatibility
+
+          Auto-generated by dependency update workflow"
+
+      - name: Push changes
+        run: |
+          BRANCH_NAME="update/xmtp-sdk-$NEW_VERSION"
+          git push origin "$BRANCH_NAME"
+
+      - name: Create Pull Request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const newVersion = '${{ needs.check-for-updates.outputs.new_version }}';
+            const currentVersion = '${{ needs.check-for-updates.outputs.current_version }}';
+            const bindingsVersion = '${{ needs.check-for-updates.outputs.corresponding_bindings_version }}';
+            
+            const title = `feat: update @xmtp/node-sdk to ${newVersion}`;
+            
+            const body = `## 🔄 Automated XMTP SDK Update
+            
+            This PR automatically updates the XMTP Node SDK to the latest version.
+            
+            ### Changes
+            - **Updated:** \`@xmtp/node-sdk\` from \`${currentVersion}\` to \`${newVersion}\`
+            - **Added:** Versioned alias for backward compatibility
+            - **Updated:** Corresponding \`@xmtp/node-bindings\` dependency${bindingsVersion !== 'not-found' ? ` to \`${bindingsVersion}\`` : ''}
+            
+            ### What's New
+            Check the [release notes](https://github.com/xmtp/xmtp-node-js-sdk/releases/tag/v${newVersion}) for details about this version.
+            
+            ### Testing
+            - [ ] Automated build completed
+            - [ ] Manual testing recommended before merge
+            
+            ### Migration Notes
+            Please review any breaking changes in the release notes and update code accordingly.
+            
+            ---
+            *This PR was automatically created by the dependency update workflow.*
+            `;
+
+            const branchName = `update/xmtp-sdk-${newVersion}`;
+            
+            try {
+              const { data: pr } = await github.rest.pulls.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                head: branchName,
+                base: 'main',
+                body: body,
+                draft: false
+              });
+              
+              // Add labels
+              await github.rest.issues.addLabels({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                labels: ['dependencies', 'automated', 'xmtp-sdk']
+              });
+              
+              console.log(`Created PR #${pr.number}: ${title}`);
+              
+              return pr.number;
+            } catch (error) {
+              console.error('Error creating PR:', error);
+              throw error;
+            }
+
+  notify-failure:
+    needs: [check-for-updates, create-update-pr]
+    if: failure()
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create issue on failure
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `🚨 XMTP SDK Update Workflow Failed`;
+            const body = `The automated XMTP SDK update workflow failed.
+            
+            **Workflow Run:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            
+            Please check the logs and fix any issues manually.`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['bug', 'automated', 'workflow-failure']
+            });

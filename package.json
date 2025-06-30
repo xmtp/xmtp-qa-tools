@@ -14,6 +14,7 @@
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
     "build": "tsc",
+    "check-updates:xmtp": "node scripts/update-xmtp-sdk.js --check",
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
@@ -33,7 +34,8 @@
     "slack-bot": "tsx slack-bot/index.ts",
     "start:dev": "yarn ui & yarn slack-bot",
     "test": "yarn cli test",
-    "ui": "vitest --ui --standalone --watch"
+    "ui": "vitest --ui --standalone --watch",
+    "update:xmtp": "node scripts/update-xmtp-sdk.js --update"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
