@@ -61,7 +61,6 @@ export const setupTestLifecycle = ({
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
-      libxmtp: libXmtpVersion,
       sdk: sdkVersion,
       installations: members,
       members,
@@ -86,7 +85,6 @@ export const setupTestLifecycle = ({
         sendMetric("duration", Math.round(statValue * 1000), {
           metric_type: "network",
           metric_subtype: networkPhase,
-          libxmtp: libXmtpVersion,
           sdk: sdkVersion,
           operation: operationName,
           test: testNameExtracted,
