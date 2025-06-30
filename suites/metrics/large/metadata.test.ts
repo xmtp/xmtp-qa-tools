@@ -48,7 +48,7 @@ describe(testName, () => {
         workers = await getWorkers(
           getFixedNames(m_large_WORKER_COUNT),
           testName,
-          typeofStream.Message,
+          typeofStream.GroupUpdated,
         );
         const creator = workers.getCreator();
         newGroup = (await creator.client.conversations.newGroup(
