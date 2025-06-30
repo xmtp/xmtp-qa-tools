@@ -477,6 +477,14 @@ export class WorkerClient extends Worker {
    * Unified method to start the appropriate stream based on configuration
    */
   private startInitialStream() {
+    if (this.typeofStream === typeofStream.None) {
+      return;
+    }
+
+    // Mark this stream type as active during initialization
+    this.activeStreamTypes.add(this.typeofStream);
+    this.activeStreams = true;
+
     try {
       switch (this.typeofStream) {
         case typeofStream.Message:
@@ -498,6 +506,11 @@ export class WorkerClient extends Worker {
         `[${this.nameId}] Failed to start ${this.typeofStream} stream:`,
         error,
       );
+      // Remove from active streams if initialization failed
+      this.activeStreamTypes.delete(this.typeofStream);
+      if (this.activeStreamTypes.size === 0) {
+        this.activeStreams = false;
+      }
       throw error;
     }
   }
