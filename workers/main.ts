@@ -156,6 +156,8 @@ export class WorkerClient extends Worker {
   private env: XmtpEnv;
   private apiUrl?: string;
   private activeStreams: boolean = false;
+  private activeStreamTypes: Set<typeofStream> = new Set();
+  private streamControllers: Map<typeofStream, AbortController> = new Map();
   public dbPath!: string;
 
   constructor(
@@ -201,6 +203,78 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+    this.activeStreamTypes.clear();
+    // Abort all stream controllers
+    for (const controller of this.streamControllers.values()) {
+      controller.abort();
+    }
+    this.streamControllers.clear();
+  }
+
+  /**
+   * Starts a specific stream type
+   * @param streamType - The type of stream to start
+   */
+  public startStream(streamType: typeofStream): void {
+    if (streamType === typeofStream.None) {
+      return;
+    }
+
+    if (this.activeStreamTypes.has(streamType)) {
+      console.debug(`[${this.nameId}] Stream ${streamType} is already active`);
+      return;
+    }
+
+    this.activeStreamTypes.add(streamType);
+    this.activeStreams = true;
+    
+    try {
+      switch (streamType) {
+        case typeofStream.Message:
+          this.initMessageStream(typeofStream.Message);
+          break;
+        case typeofStream.GroupUpdated:
+          this.initMessageStream(typeofStream.GroupUpdated);
+          break;
+        case typeofStream.Conversation:
+          this.initConversationStream();
+          break;
+        case typeofStream.Consent:
+          this.initConsentStream();
+          break;
+      }
+      console.debug(`[${this.nameId}] Started ${streamType} stream`);
+    } catch (error) {
+      console.error(`[${this.nameId}] Failed to start ${streamType} stream:`, error);
+      this.activeStreamTypes.delete(streamType);
+      throw error;
+    }
+  }
+
+  /**
+   * Stops streams - all streams if no parameter, or a specific stream type
+   * @param streamType - Optional specific stream type to stop. If not provided, stops all streams
+   */
+  public endStream(streamType?: typeofStream): void {
+    if (streamType) {
+      console.debug(`[${this.nameId}] Stopping ${streamType} stream`);
+      this.activeStreamTypes.delete(streamType);
+      
+      // Abort the specific stream controller
+      const controller = this.streamControllers.get(streamType);
+      if (controller) {
+        controller.abort();
+        this.streamControllers.delete(streamType);
+      }
+      
+      // If no streams are active, set activeStreams to false
+      if (this.activeStreamTypes.size === 0) {
+        this.activeStreams = false;
+      }
+    } else {
+      console.debug(`[${this.nameId}] Stopping all streams`);
+      this.stopStreams();
+    }
   }
 
   /**
@@ -398,9 +472,12 @@ export class WorkerClient extends Worker {
    * Initialize message stream for both regular messages and group updates
    */
   private initMessageStream(type: typeofStream) {
-    this.activeStreams = true;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(type, controller);
+    
     void (async () => {
-      while (this.activeStreams) {
+      while (this.activeStreamTypes.has(type) && !controller.signal.aborted) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
           for await (const message of stream) {
@@ -412,7 +489,7 @@ export class WorkerClient extends Worker {
             //   `[${this.nameId}] Received message`,
             //   JSON.stringify(message?.content, null, 2),
             // );
-            if (!this.activeStreams) break;
+            if (!this.activeStreamTypes.has(type) || controller.signal.aborted) break;
 
             if (
               !message ||
@@ -570,9 +647,13 @@ export class WorkerClient extends Worker {
    * Initialize conversation stream
    */
   private initConversationStream() {
-    this.activeStreams = true;
+    const streamType = typeofStream.Conversation;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(streamType, controller);
+    
     void (async () => {
-      while (this.activeStreams) {
+      while (this.activeStreamTypes.has(streamType) && !controller.signal.aborted) {
         try {
           const stream = this.client.conversations.stream();
           for await (const conversation of stream) {
@@ -580,7 +661,7 @@ export class WorkerClient extends Worker {
               console.debug(
                 `Received conversation, conversationId: ${conversation?.id}`,
               );
-              if (!this.activeStreams) {
+              if (!this.activeStreamTypes.has(streamType) || controller.signal.aborted) {
                 console.debug(`Stopping conversation stream`);
                 break;
               }
@@ -618,9 +699,13 @@ export class WorkerClient extends Worker {
    * Initialize consent stream
    */
   private initConsentStream() {
-    this.activeStreams = true;
+    const streamType = typeofStream.Consent;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(streamType, controller);
+    
     void (async () => {
-      while (this.activeStreams) {
+      while (this.activeStreamTypes.has(streamType) && !controller.signal.aborted) {
         try {
           const stream = await this.client.preferences.streamConsent();
 

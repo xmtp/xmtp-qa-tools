@@ -173,3 +173,132 @@ afterAll(async () => {
 - Database paths follow a structured format to avoid conflicts between tests
 - Message streams, conversation streams, and consent streams are supported
 - GPT responses are generated using OpenAI's API if enabled
+
+# Worker Manager
+
+This package provides a robust framework for managing XMTP workers with support for multiple stream types and dynamic stream control.
+
+## Features
+
+- Multi-device simulation with separate installations
+- Dynamic stream control - start and stop specific stream types at runtime
+- Support for different stream types: Messages, Group Updates, Conversations, Consent
+- Automatic key generation and persistence
+- Built-in message collection and verification
+
+## Stream Control
+
+Workers now support dynamic stream control, allowing you to start and stop specific stream types during runtime:
+
+### Starting Streams
+
+```typescript
+import { typeofStream } from "@workers/main";
+
+// Start a message stream
+worker.worker.startStream(typeofStream.Message);
+
+// Start a group update stream
+worker.worker.startStream(typeofStream.GroupUpdated);
+
+// Start multiple streams
+worker.worker.startStream(typeofStream.Conversation);
+worker.worker.startStream(typeofStream.Consent);
+```
+
+### Stopping Streams
+
+```typescript
+// Stop all streams
+worker.worker.endStream();
+
+// Stop a specific stream type
+worker.worker.endStream(typeofStream.Message);
+```
+
+### Example Usage
+
+```typescript
+import { getWorkers } from "@workers/manager";
+import { typeofStream } from "@workers/main";
+
+const testName = "stream-control-test";
+
+describe("Dynamic Stream Control", async () => {
+  // Create workers without any initial streams
+  const workers = await getWorkers(["alice", "bob"], testName, typeofStream.None);
+  
+  it("should control streams dynamically", async () => {
+    const alice = workers.get("alice");
+    const bob = workers.get("bob");
+    
+    // Start message streams for both workers
+    alice.worker.startStream(typeofStream.Message);
+    bob.worker.startStream(typeofStream.Message);
+    
+    // Create a group and send messages
+    const group = await alice.client.conversations.newGroup([bob.client.inboxId]);
+    await group.send("Hello!");
+    
+    // Collect messages
+    const messages = await bob.worker.collectMessages(group.id, 1);
+    expect(messages).toHaveLength(1);
+    
+    // Stop message streams and start conversation streams
+    alice.worker.endStream(typeofStream.Message);
+    bob.worker.endStream(typeofStream.Message);
+    
+    alice.worker.startStream(typeofStream.Conversation);
+    bob.worker.startStream(typeofStream.Conversation);
+    
+    // Now test conversation creation...
+  });
+});
+```
+
+## Stream Types
+
+The available stream types are:
+
+- `typeofStream.Message` - Regular text messages, reactions, and replies
+- `typeofStream.GroupUpdated` - Group metadata changes and member updates  
+- `typeofStream.Conversation` - New conversation creation events
+- `typeofStream.Consent` - Consent state changes
+- `typeofStream.None` - No streams (useful for initialization)
+
+## Benefits of Dynamic Stream Control
+
+1. **Resource Efficiency**: Only run streams when needed
+2. **Test Isolation**: Start/stop streams for specific test scenarios
+3. **Multiple Stream Types**: Run different stream types simultaneously
+4. **Better Debugging**: Control exactly which events are being monitored
+
+## Usage Examples
+
+### Testing Message Delivery
+```typescript
+// Start only message streams for delivery test
+alice.worker.startStream(typeofStream.Message);
+bob.worker.startStream(typeofStream.Message);
+
+// Test message delivery
+// ...
+
+// Clean up
+alice.worker.endStream();
+bob.worker.endStream();
+```
+
+### Testing Group Management
+```typescript
+// Start group update streams for membership changes
+alice.worker.startStream(typeofStream.GroupUpdated);
+bob.worker.startStream(typeofStream.GroupUpdated);
+
+// Test group operations
+// ...
+
+// Stop when done
+alice.worker.endStream(typeofStream.GroupUpdated);
+bob.worker.endStream(typeofStream.GroupUpdated);
+```
