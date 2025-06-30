@@ -141,7 +141,6 @@ type StreamMessage =
 export class WorkerClient extends Worker {
   public name: string;
   public sdk: string;
-  private testName: string;
   private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
@@ -183,7 +182,6 @@ export class WorkerClient extends Worker {
     this.env = env;
     this.apiUrl = apiUrl;
     this.nameId = worker.name + "-" + worker.sdkVersion;
-    this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
     this.setupEventHandlers();
@@ -314,12 +312,9 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      {
-        sdkVersion: this.sdkVersion,
-        name: this.name,
-        testName: this.testName,
-        folder: this.folder,
-      },
+      Number(this.sdkVersion),
+      this.name,
+      this.folder,
       this.env,
       this.apiUrl,
     );
@@ -1044,12 +1039,9 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      {
-        sdkVersion: this.sdkVersion,
-        name: this.name,
-        testName: this.testName,
-        folder: newFolder, // Use new folder to ensure new database/installation
-      },
+      Number(this.sdkVersion),
+      this.name,
+      newFolder,
       this.env,
     );
 

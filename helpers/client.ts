@@ -276,12 +276,9 @@ export const getDbPath = (description: string = "xmtp") => {
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
-  workerData: {
-    sdkVersion: string;
-    name: string;
-    testName: string;
-    folder: string;
-  },
+  sdkVersion: number,
+  name: string,
+  folder: string,
   env: XmtpEnv,
   apiUrl?: string,
 ): Promise<{
@@ -293,19 +290,13 @@ export async function createClient(
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-  const sdkVersion = Number(workerData.sdkVersion);
   // Use type assertion to access the static version property
   const libXmtpVersion =
     VersionList[sdkVersion as keyof typeof VersionList].libXmtpVersion;
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
-  const dbPath = getDbPathOfInstallation(
-    workerData.name,
-    address,
-    workerData.folder,
-    env,
-  );
+  const dbPath = getDbPathOfInstallation(name, address, folder, env);
 
   // Use type assertion to handle the client creation
   const client = await regressionClient(
