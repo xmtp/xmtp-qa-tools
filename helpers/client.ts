@@ -65,7 +65,7 @@ import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 // SDK version mappings
-export const sdkVersions = {
+export const VersionList = {
   30: {
     Client: ClientMls,
     Conversation: ConversationMls,
@@ -296,7 +296,7 @@ export async function createClient(
   const sdkVersion = Number(workerData.sdkVersion);
   // Use type assertion to access the static version property
   const libXmtpVersion =
-    sdkVersions[sdkVersion as keyof typeof sdkVersions].libXmtpVersion;
+    VersionList[sdkVersion as keyof typeof VersionList].libXmtpVersion;
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
@@ -346,7 +346,7 @@ export const regressionClient = async (
   }
 
   const ClientClass =
-    sdkVersions[versionInt as keyof typeof sdkVersions].Client;
+    VersionList[versionInt as keyof typeof VersionList].Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
   if (versionInt === 30) {
@@ -501,7 +501,7 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 
-export const sdkVersionOptions = Object.keys(sdkVersions)
+export const sdkVersionOptions = Object.keys(VersionList)
   .filter((key) => parseInt(key) >= 200)
   .sort((a, b) => parseInt(b) - parseInt(a));
 
