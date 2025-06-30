@@ -23,7 +23,7 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
-  sdkVersion: string;
+  nodeSdkVersion: string;
   libXmtpVersion: string;
 }
 
@@ -31,13 +31,12 @@ export interface Worker extends WorkerBase {
   worker: WorkerClient;
   dbPath: string;
   client: Client;
-  sdkVersion: string;
-  libXmtpVersion: string;
   installationId: string;
   inboxId: string;
   env: XmtpEnv;
   folder: string;
   address: string;
+  sdk: string;
 }
 
 /**
@@ -123,24 +122,6 @@ export class WorkerManager {
     return allWorkers[Math.floor(Math.random() * allWorkers.length)];
   }
 
-  /**
-   * Gets the version of the first worker (as a representative version)
-   */
-  public getVersion(): string {
-    const firstBaseName = Object.keys(this.workers)[0];
-    if (!firstBaseName) return "unknown";
-
-    const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
-    if (!firstInstallId) return "unknown";
-
-    return this.workers[firstBaseName][firstInstallId].sdkVersion;
-  }
-
-  public checkStatistics(): void {
-    // for (const worker of this.getAll()) {
-    //   console.debug(JSON.stringify(worker.client.apiStatistics(), null, 2));
-    // }
-  }
   public async checkForks(): Promise<void> {
     for (const worker of this.getAll()) {
       const groups = await worker.client.conversations.list();
@@ -205,7 +186,7 @@ export class WorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.nodeSdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
               (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
             )}`,
           );
@@ -393,7 +374,7 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
-      sdkVersion: sdkVersion,
+      nodeSdkVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
     };
 
@@ -416,11 +397,10 @@ export class WorkerManager {
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
-      sdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
       installationId: initializedWorker.client.installationId,
       env: this.env,
+      sdk: sdkVersion + "@" + libXmtpVersion,
       folder,
       worker: workerClient,
     };
