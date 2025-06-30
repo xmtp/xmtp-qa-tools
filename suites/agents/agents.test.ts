@@ -94,7 +94,7 @@ describe(testName, () => {
           agent: agent.name,
           address: agent.address,
 
-          sdk: workers.getCreator().sdkVersion,
+          sdk: workers.getCreator().sdk,
         });
         expect(agentResponded).toBe(true);
       } catch (e) {
