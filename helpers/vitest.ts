@@ -54,7 +54,7 @@ export const setupTestLifecycle = ({
 
     // Get version info from workers if available
     const libXmtpVersion = workers?.getCreator()?.libXmtpVersion || "unknown";
-    const sdkVersion = workers?.getCreator()?.sdkVersion || "unknown";
+    const sdkVersion = workers?.getCreator()?.sdk || "unknown";
 
     const values: DurationMetricTags = {
       metric_type: "operation",

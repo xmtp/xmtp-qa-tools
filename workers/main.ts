@@ -148,7 +148,7 @@ export class WorkerClient extends Worker {
   private typeofSync: typeOfSync;
   private typeOfResponse: typeOfResponse;
   private folder: string;
-  private sdkVersion: string;
+  private nodeVersion: string;
   private libXmtpVersion: string;
   public address!: `0x${string}`;
   public client!: Client;
@@ -175,12 +175,12 @@ export class WorkerClient extends Worker {
     this.typeOfResponse = typeOfResponse;
     this.typeofStream = typeofStream;
     this.name = worker.name;
-    this.sdkVersion = worker.sdkVersion;
+    this.nodeVersion = worker.nodeVersion;
     this.libXmtpVersion = worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
-    this.nameId = worker.name + "-" + worker.sdkVersion;
+    this.nameId = worker.name + "-" + worker.nodeVersion;
     this.testName = worker.testName;
     this.walletKey = worker.walletKey;
     this.encryptionKeyHex = worker.encryptionKey;
@@ -305,7 +305,7 @@ export class WorkerClient extends Worker {
       data: {
         name: this.name,
         folder: this.folder,
-        sdkVersion: this.sdkVersion,
+        sdkVersion: this.nodeVersion,
         libXmtpVersion: this.libXmtpVersion,
       },
     });
@@ -313,7 +313,7 @@ export class WorkerClient extends Worker {
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
       {
-        sdkVersion: this.sdkVersion,
+        sdkVersion: this.nodeVersion,
         name: this.name,
         testName: this.testName,
         folder: this.folder,
@@ -553,7 +553,7 @@ export class WorkerClient extends Worker {
         // );
         return;
       }
-      let response = `${this.nameId} says: gm from sdk ${this.sdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      let response = `${this.nameId} says: gm from sdk ${this.nodeVersion} and libXmtp ${this.libXmtpVersion}`;
       if (conversation && conversation.debugInfo !== undefined) {
         const debugInfo = await conversation.debugInfo();
         response += ` and epoch ${debugInfo?.epoch}`;
@@ -1043,7 +1043,7 @@ export class WorkerClient extends Worker {
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
       {
-        sdkVersion: this.sdkVersion,
+        sdkVersion: this.nodeVersion,
         name: this.name,
         testName: this.testName,
         folder: newFolder, // Use new folder to ensure new database/installation

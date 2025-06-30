@@ -17,11 +17,7 @@ describe(testName, () => {
         workers = await getWorkers(["bob-" + "a" + "-" + version], testName);
 
         const bob = workers.get("bob");
-        console.log(
-          "Downgraded to ",
-          "node-sdk:" + String(bob?.sdkVersion),
-          "node-bindings:" + String(bob?.libXmtpVersion),
-        );
+        console.log("Downgraded to " + String(bob?.sdk));
         let convo = await bob?.client.conversations.newDm(receiverInboxId);
 
         expect(convo?.id).toBeDefined();
@@ -37,11 +33,7 @@ describe(testName, () => {
         workers = await getWorkers(["alice-" + "a" + "-" + version], testName);
 
         const alice = workers.get("alice");
-        console.log(
-          "Upgraded to ",
-          "node-sdk:" + String(alice?.sdkVersion),
-          "node-bindings:" + String(alice?.libXmtpVersion),
-        );
+        console.log("Upgraded to " + String(alice?.sdk));
         let convo = await alice?.client.conversations.newDm(receiverInboxId);
 
         expect(convo?.id).toBeDefined();
