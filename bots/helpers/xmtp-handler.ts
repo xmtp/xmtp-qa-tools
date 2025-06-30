@@ -114,20 +114,24 @@ export const initializeClient = async (
           codecs: option.codecs,
         };
 
-        const client = await Client.create(signer, {
+        const createOptions: Parameters<typeof Client.create>[1] = {
           dbEncryptionKey,
           env: env as XmtpEnv,
           loggingLevel: option.loggingLevel,
           dbPath: getDbPath(`${env}-${signerIdentifier}`),
-          codecs: skillOptions.codecs ?? [],
-        });
+        };
 
-        // @ts-expect-error - TODO: fix this
-        clients.push(client);
+        // Only add codecs if they are provided
+        if (skillOptions.codecs && skillOptions.codecs.length > 0) {
+          (createOptions as { codecs: unknown[] }).codecs = skillOptions.codecs;
+        }
+
+        const client = await Client.create(signer, createOptions);
+
+        clients.push(client as Client);
 
         const streamPromise = streamMessages(
-          // @ts-expect-error - TODO: fix this
-          client,
+          client as Client,
           messageHandler,
           skillOptions,
         );

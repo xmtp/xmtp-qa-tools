@@ -27,8 +27,8 @@ export interface SkillOptions {
   commandPrefix?: string;
   /** Whether to strictly filter messages based on commands (default: false) */
   strictCommandFiltering?: boolean;
-  /** Whether to send a welcome message to the conversation */
-  codecs?: any[];
+  /** Content codecs to register with the client (should be ContentCodec objects) */
+  codecs?: unknown[];
 }
 
 /**
