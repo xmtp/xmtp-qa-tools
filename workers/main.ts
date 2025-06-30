@@ -553,7 +553,7 @@ export class WorkerClient extends Worker {
         // );
         return;
       }
-      let response = `${this.nameId} says: gm from sdk ${this.nodeSdkVersion} and libXmtp ${this.libXmtpVersion}`;
+      let response = `${this.nameId} says: gm from sdk ${this.nodeSdkVersion}@${this.libXmtpVersion}`;
       if (conversation && conversation.debugInfo !== undefined) {
         const debugInfo = await conversation.debugInfo();
         response += ` and epoch ${debugInfo?.epoch}`;

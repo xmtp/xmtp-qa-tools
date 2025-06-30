@@ -2,7 +2,12 @@ import fs from "fs";
 import { getRandomValues } from "node:crypto";
 import path from "node:path";
 import manualUsers from "@inboxes/manualusers.json";
-import type { Worker, WorkerManager } from "@workers/manager";
+import {
+  getLibXmtpVersion,
+  getNodeSdkVersion,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import { ReactionCodec } from "@xmtp/content-type-reaction";
 import { ReplyCodec } from "@xmtp/content-type-reply";
 import {
@@ -65,7 +70,7 @@ import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 // SDK version mappings
-export const sdkVersions = {
+export const VersionList = {
   30: {
     Client: ClientMls,
     Conversation: ConversationMls,
@@ -295,8 +300,8 @@ export async function createClient(
 
   const sdkVersion = Number(workerData.sdkVersion);
   // Use type assertion to access the static version property
-  const libXmtpVersion =
-    sdkVersions[sdkVersion as keyof typeof sdkVersions].libXmtpVersion;
+  const libXmtpVersion = getLibXmtpVersion(String(sdkVersion));
+  const nodeSdkVersion = getNodeSdkVersion(String(sdkVersion));
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
@@ -344,11 +349,11 @@ export const regressionClient = async (
       `Creating API client with: SDK version: ${String(sdkVersion)} walletKey: ${String(walletKey)} API URL: ${String(apiUrl)}`,
     );
   }
+  let client = null;
 
   const ClientClass =
-    sdkVersions[versionInt as keyof typeof sdkVersions].Client;
-  let client = null;
-  let libXmtpVersionAfterClient = "unknown";
+    VersionList[versionInt as keyof typeof VersionList].Client;
+
   if (versionInt === 30) {
     throw new Error("Invalid version");
   } else if (versionInt === 47) {
@@ -360,7 +365,6 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 100 && versionInt < 200) {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
@@ -370,7 +374,6 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 200) {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility issues
@@ -382,11 +385,13 @@ export const regressionClient = async (
       apiUrl,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
     console.debug("Invalid version" + versionStr);
     throw new Error("Invalid version" + versionStr);
   }
+
+  const nodeSdkVersionAfterClient = getNodeSdkVersion(versionStr);
+  const libXmtpVersionAfterClient = getLibXmtpVersion(versionStr);
 
   if (libXmtpVersion !== libXmtpVersionAfterClient) {
     console.debug(
@@ -402,7 +407,7 @@ export const regressionClient = async (
 };
 
 // @ts-expect-error: SDK version compatibility issues
-export const getLibXmtpVersion = (client: typeof ClientClass) => {
+export const getLibXmtpVersionFromClient = (client: typeof ClientClass) => {
   try {
     const version = client.version;
     if (!version || typeof version !== "string") return "unknown";
@@ -501,7 +506,7 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 
-export const sdkVersionOptions = Object.keys(sdkVersions)
+export const sdkVersionOptions = Object.keys(VersionList)
   .filter((key) => parseInt(key) >= 200)
   .sort((a, b) => parseInt(b) - parseInt(a));
 

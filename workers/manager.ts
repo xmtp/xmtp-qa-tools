@@ -4,8 +4,8 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  sdkVersions,
   sleep,
+  VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
@@ -362,7 +362,8 @@ export class WorkerManager {
     const folder = providedInstallId || getNextFolderName();
 
     const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
-    const libXmtpVersion = getLibxmtpVersion(sdkVersion);
+    const libXmtpVersion = getLibXmtpVersion(sdkVersion);
+    const nodeSdkVersion = getNodeSdkVersion(sdkVersion);
 
     // Get or generate keys
     const { walletKey, encryptionKey } = this.ensureKeys(baseName);
@@ -374,8 +375,8 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
-      nodeSdkVersion: sdkVersion,
-      libXmtpVersion: libXmtpVersion,
+      nodeSdkVersion,
+      libXmtpVersion,
     };
 
     // Create and initialize the worker
@@ -477,12 +478,18 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 export function getLatestVersion(): string {
-  return Object.keys(sdkVersions).pop() as string;
+  return Object.keys(VersionList).pop() as string;
 }
 
-export function getLibxmtpVersion(sdkVersion: string): string {
+export function getNodeSdkVersion(sdkVersion: string): string {
   return (
-    sdkVersions[Number(sdkVersion) as keyof typeof sdkVersions]
+    VersionList[Number(sdkVersion) as keyof typeof VersionList]
+      ?.nodeSdkVersion || "unknown"
+  );
+}
+export function getLibXmtpVersion(sdkVersion: string): string {
+  return (
+    VersionList[Number(sdkVersion) as keyof typeof VersionList]
       ?.libXmtpVersion || "unknown"
   );
 }
