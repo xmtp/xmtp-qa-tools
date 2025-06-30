@@ -166,7 +166,7 @@ export async function sendSlackNotification(
       failLines: Array.from(failLines).length,
       env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
       region: process.env.GEOLOCATION,
-      libxmtp: "latest",
+      sdk: "latest",
     });
   }
 
