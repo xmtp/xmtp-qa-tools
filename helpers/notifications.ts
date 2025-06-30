@@ -258,7 +258,7 @@ function shouldSkipAgentNotification(options: AgentNotificationOptions): boolean
   // Skip if no error logs for error notifications
   if (!options.errorLogs || options.errorLogs.size === 0) {
     console.log("Agent notification skipped (no actual test failures detected)");
-    return false;
+    return true;
   }
 
   // Skip for non-main branches in CI
