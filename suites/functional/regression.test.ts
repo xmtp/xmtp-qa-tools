@@ -19,7 +19,7 @@ describe(testName, () => {
         const bob = workers.get("bob");
         console.log(
           "Downgraded to ",
-          "node-sdk:" + String(bob?.sdkVersion),
+          "node-sdk:" + String(bob?.sdk),
           "node-bindings:" + String(bob?.libXmtpVersion),
         );
         let convo = await bob?.client.conversations.newDm(receiverInboxId);

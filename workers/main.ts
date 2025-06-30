@@ -140,6 +140,7 @@ type StreamMessage =
 
 export class WorkerClient extends Worker {
   public name: string;
+  public sdk: string;
   private testName: string;
   private nameId: string;
   private walletKey: string;
@@ -177,6 +178,7 @@ export class WorkerClient extends Worker {
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
     this.libXmtpVersion = worker.libXmtpVersion;
+    this.sdk = worker.sdkVersion + "@" + worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
