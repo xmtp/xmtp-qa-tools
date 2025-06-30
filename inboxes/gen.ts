@@ -10,7 +10,7 @@ import { Client, type XmtpEnv } from "@xmtp/node-sdk";
 
 const BASE_LOGPATH = "./logs";
 const INBOXES_DIR = "./inboxes";
-const INSTALLATIONS_DIR = "./installations";
+const INSTALLATIONS_DIR = "./inboxes/installations";
 let debugMode = false;
 
 // === Tweakable Defaults ===
@@ -187,7 +187,7 @@ function showFileStats(
 
 function showHelp() {
   console.log(
-    `\nXMTP Generator Utility\n\nUsage:\n  yarn gen [options]\n  yarn gen:installations [options]\n\nStandard Options:\n  --count <number>                Total number of accounts to ensure exist\n  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)\n  --installations <number>        Number of installations per account per network (default: 1)\n  --debug                         Enable debug logging\n  --help                          Show this help message\n\nInstallations with Content Options:\n  --create-installations <number> Create installations with populated databases (default: 10)\n  --groups-per-installation <number> Number of groups per installation (default: 200)\n  --conversations-per-group <number> Number of conversations per group (default: 200)\n\nExamples:\n  yarn gen --count 100                    # Create 100 basic accounts\n  yarn gen:installations                   # Create 10 installations with content\n  yarn gen --create-installations 5       # Create 5 installations with content\n`,
+    `\nXMTP Generator Utility\n\nUsage:\n  yarn gen [options]\n\nOptions:\n  --count <number>                Total number of accounts to ensure exist\n  --envs <envs>                   Comma-separated environments (local,dev,production) (default: local)\n  --installations <number>        Number of installations per account per network (default: 1)\n  --create-installations <number> Create installations with populated databases (default: 10)\n  --groups-per-installation <number> Number of groups per installation (default: 200)\n  --conversations-per-group <number> Number of conversations per group (default: 200)\n  --debug                         Enable debug logging\n  --help                          Show this help message\n`,
   );
 }
 
@@ -395,15 +395,11 @@ async function createGroupsAndConversations(
   let groupsCreated = 0;
   let conversationsCreated = 0;
 
-  console.log(`🏗️  Creating ${targetGroups} groups with ${conversationsPerGroup} conversations each...`);
-  const progress = new ProgressBar(targetGroups);
-
-  // Sync first to ensure we have the latest state
   await client.conversations.sync();
+  const progress = new ProgressBar(targetGroups);
 
   for (let i = 0; i < targetGroups; i++) {
     try {
-      // Select random inboxes for the group (2-5 members)
       const groupSize = Math.floor(Math.random() * 4) + 2;
       const randomInboxes = allInboxes
         .filter(inbox => inbox.inboxId !== client.inboxId)
@@ -411,23 +407,19 @@ async function createGroupsAndConversations(
         .slice(0, groupSize - 1)
         .map(inbox => inbox.inboxId);
 
-      // Create a group
-      const groupName = `Test Group ${i + 1}`;
       const group = await client.conversations.newGroup(randomInboxes, {
-        groupName: groupName,
+        groupName: `Test Group ${i + 1}`,
         groupDescription: `Auto-generated test group ${i + 1}`,
       });
 
       groupsCreated++;
 
-      // Create conversations (messages) in the group
       for (let j = 0; j < conversationsPerGroup; j++) {
         try {
-          const messageContent = `Message ${j + 1} in ${groupName} - Generated at ${new Date().toISOString()}`;
-          await group.send(messageContent);
+          await group.send(`Message ${j + 1} in Test Group ${i + 1}`);
           conversationsCreated++;
         } catch (error) {
-          debugLog(`Failed to send message ${j + 1} in group ${groupName}:`, error);
+          debugLog(`Failed to send message ${j + 1}:`, error);
         }
       }
 
@@ -443,7 +435,7 @@ async function createGroupsAndConversations(
 }
 
 async function generateInstallationsWithContent({
-  count = 10,
+  count = DEFAULT_INSTALLATIONS_COUNT,
   env = "local" as XmtpEnv,
   groupsPerInstallation = DEFAULT_GROUPS_PER_INSTALLATION,
   conversationsPerGroup = DEFAULT_CONVERSATIONS_PER_GROUP,
@@ -455,24 +447,27 @@ async function generateInstallationsWithContent({
 }) {
   if (env === "local") loadEnv("installation-generation");
   
-  console.log(`\n🚀 Generating ${count} installations with content:`);
-  console.log(`   📁 Environment: ${env}`);
-  console.log(`   👥 Groups per installation: ${groupsPerInstallation}`);
-  console.log(`   💬 Conversations per group: ${conversationsPerGroup}`);
+  console.log(`\n🚀 Generating ${count} installations with ${groupsPerInstallation} groups, ${conversationsPerGroup} conversations each`);
 
-  // Ensure installations directory exists
   if (!fs.existsSync(INSTALLATIONS_DIR)) {
     fs.mkdirSync(INSTALLATIONS_DIR, { recursive: true });
   }
 
   // Load existing inboxes for group members
-  const inboxesFile = `${INBOXES_DIR}/5.json`; // Use the 5.json file as it has the most inboxes
-  let allInboxes: InboxData[] = readJson(inboxesFile) || [];
+  const inboxFiles = ["5.json", "25.json", "20.json", "15.json", "10.json"];
+  let allInboxes: InboxData[] = [];
   
-  if (allInboxes.length < 50) {
-    console.log("⚠️  Not enough existing inboxes found. Creating some first...");
-    await smartUpdate({ count: 100, envs: [env], installations: 1 });
-    allInboxes = readJson(inboxesFile) || [];
+  for (const file of inboxFiles) {
+    const inboxes = readJson(`${INBOXES_DIR}/${file}`);
+    if (inboxes && inboxes.length > 0) {
+      allInboxes = inboxes;
+      break;
+    }
+  }
+  
+  if (allInboxes.length < 10) {
+    console.error("❌ Not enough existing inboxes found. Please run 'yarn gen --count 100' first.");
+    return;
   }
 
   const installations: InstallationData[] = [];
@@ -480,24 +475,19 @@ async function generateInstallationsWithContent({
 
   for (let i = 0; i < count; i++) {
     try {
-      // Generate a new wallet for this installation
       const walletKey = `0x${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString("hex")}`;
       const signer = createSigner(walletKey as `0x${string}`);
       const identifier = await signer.getIdentifier();
       const accountAddress = identifier.identifier;
       const dbEncryptionKey = generateEncryptionKeyHex();
-      
-      // Create the DB path (not in logs, but in installations directory)
       const dbPath = `${INSTALLATIONS_DIR}/installation-${i + 1}-${env}`;
       
-      // Create the client
       const client = await Client.create(signer, {
         dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
         dbPath,
         env,
       });
 
-      // Create groups and conversations
       const { groupsCreated, conversationsCreated } = await createGroupsAndConversations(
         client,
         groupsPerInstallation,
@@ -505,7 +495,7 @@ async function generateInstallationsWithContent({
         allInboxes
       );
 
-      const installationData: InstallationData = {
+      installations.push({
         accountAddress,
         walletKey,
         dbEncryptionKey,
@@ -515,12 +505,10 @@ async function generateInstallationsWithContent({
         env,
         groupsCreated,
         conversationsCreated,
-      };
+      });
 
-      installations.push(installationData);
       progress.update();
-      
-      debugLog(`✅ Installation ${i + 1} created: ${groupsCreated} groups, ${conversationsCreated} conversations`);
+      debugLog(`✅ Installation ${i + 1}: ${groupsCreated} groups, ${conversationsCreated} conversations`);
     } catch (error) {
       console.error(`❌ Failed to create installation ${i + 1}:`, error);
       progress.update();
@@ -529,19 +517,14 @@ async function generateInstallationsWithContent({
 
   progress.finish();
 
-  // Save installation data
   const installationsFile = `${INSTALLATIONS_DIR}/installations-${env}.json`;
   writeJson(installationsFile, installations);
 
   const totalGroups = installations.reduce((sum, inst) => sum + inst.groupsCreated, 0);
   const totalConversations = installations.reduce((sum, inst) => sum + inst.conversationsCreated, 0);
 
-  console.log(`\n📊 Installation Generation Complete:`);
-  console.log(`   🏗️  Installations created: ${installations.length}`);
-  console.log(`   👥 Total groups created: ${totalGroups}`);
-  console.log(`   💬 Total conversations created: ${totalConversations}`);
-  console.log(`   💾 Installation data saved to: ${installationsFile}`);
-  console.log(`   📁 DB files location: ${INSTALLATIONS_DIR}/`);
+  console.log(`\n✅ Created ${installations.length} installations with ${totalGroups} groups and ${totalConversations} conversations`);
+  console.log(`📁 Files saved to: ${INSTALLATIONS_DIR}/`);
 
   return installations;
 }

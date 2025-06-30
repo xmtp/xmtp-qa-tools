@@ -65,7 +65,7 @@ dist
 # xmtp
 *.db3*
 # Allow installations directory db files to be tracked
-!installations/**/*.db3*
+!inboxes/installations/**/*.db3*
 
 # Claude Code (keep config, ignore session data)
 .claude/session-*
