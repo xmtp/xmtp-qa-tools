@@ -1,11 +1,13 @@
 import { getRandomNames, streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
+import { sendAgentNotification } from "@helpers/notifications";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import productionAgents from "@inboxes/agents.json";
+import productionAgents from "./agents.json";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
+import { type AgentConfig } from "./agents";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -29,12 +31,16 @@ describe(testName, () => {
     expect,
   });
 
-  const filteredAgents = productionAgents.filter((agent) => {
+  const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env);
   });
   // For local testing, test all agents on their supported networks
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} : ${agent.address}`, async () => {
+      const errorLogs = new Set<string>();
+      let agentResponded = false;
+      let result;
+      
       try {
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
@@ -49,8 +55,6 @@ describe(testName, () => {
         let countBefore = messages.length;
 
         let retries = 3;
-        let agentResponded = false;
-        let result;
         while (retries > 0) {
           messages = await conversation.messages();
           countBefore = messages.length;
@@ -85,7 +89,11 @@ describe(testName, () => {
         );
 
         let metricValue = result?.averageEventTiming as number;
-        if (!agentResponded) metricValue = streamTimeout;
+        if (!agentResponded) {
+          metricValue = streamTimeout;
+          errorLogs.add(`Agent ${agent.name} failed to respond after 3 retries`);
+          errorLogs.add(`Response time exceeded timeout: ${streamTimeout}ms`);
+        }
 
         sendMetric("response", metricValue, {
           test: testName,
@@ -93,11 +101,44 @@ describe(testName, () => {
           metric_subtype: agent.name,
           agent: agent.name,
           address: agent.address,
-
           sdk: workers.getCreator().sdk,
         });
+
+        // Send agent-specific notification if the test failed
+        if (!agentResponded && errorLogs.size > 0) {
+          await sendAgentNotification({
+            agentName: agent.name,
+            agentAddress: agent.address,
+            errorLogs,
+            testName: `${testName}-${agent.name}`,
+            env,
+                         slackChannel: agent.slackChannel,
+            responseTime: metricValue,
+          });
+        }
+
         expect(agentResponded).toBe(true);
       } catch (e) {
+        const errorMessage = e instanceof Error ? e.message : String(e);
+        errorLogs.add(`Error testing agent ${agent.name}: ${errorMessage}`);
+        
+        // Send agent-specific notification for caught errors
+        if (errorLogs.size > 0) {
+          try {
+            await sendAgentNotification({
+              agentName: agent.name,
+              agentAddress: agent.address,
+              errorLogs,
+              testName: `${testName}-${agent.name}`,
+              env,
+              slackChannel: agent.slackChannel,
+              responseTime: result?.averageEventTiming || streamTimeout,
+            });
+          } catch (notificationError) {
+            console.error("Failed to send agent notification:", notificationError);
+          }
+        }
+        
         logError(e, expect.getState().currentTestName);
         throw e;
       }
