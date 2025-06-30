@@ -69,7 +69,7 @@ export interface ProcessedLogEntry {
   service: string;
   region: string | null;
   env: string | null;
-  libxmtp: string | null;
+  sdk: string | null;
   message: string[];
 }
 
@@ -320,7 +320,7 @@ export class DatadogLogProcessor {
           service: (attrs.service as string) || this.service,
           region: (attrs.region as string) || null,
           env: (attrs.env as string) || null,
-          libxmtp: (attrs.libxmtp as string) || null,
+          sdk: (attrs.sdk as string) || null,
           message: messageLines,
         };
       })

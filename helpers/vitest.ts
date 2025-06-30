@@ -52,17 +52,12 @@ export const setupTestLifecycle = ({
     const { testNameExtracted, operationType, operationName, members } =
       parseTestName(testName);
 
-    // Get version info from workers if available
-    const libXmtpVersion = workers?.getCreator()?.libXmtpVersion || "unknown";
-    const sdkVersion = workers?.getCreator()?.sdkVersion || "unknown";
-
     const values: DurationMetricTags = {
       metric_type: "operation",
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
-      libxmtp: libXmtpVersion,
-      sdk: sdkVersion,
+      sdk: workers?.getCreator()?.sdk || "unknown",
       installations: members,
       members,
     };
@@ -86,8 +81,7 @@ export const setupTestLifecycle = ({
         sendMetric("duration", Math.round(statValue * 1000), {
           metric_type: "network",
           metric_subtype: networkPhase,
-          libxmtp: libXmtpVersion,
-          sdk: sdkVersion,
+          sdk: workers?.getCreator()?.sdk || "unknown",
           operation: operationName,
           test: testNameExtracted,
           network_phase: networkPhase,

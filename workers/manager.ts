@@ -19,6 +19,7 @@ import {
 
 export interface WorkerBase {
   name: string;
+  sdk: string;
   folder: string;
   walletKey: string;
   encryptionKey: string;
@@ -31,8 +32,6 @@ export interface Worker extends WorkerBase {
   worker: WorkerClient;
   dbPath: string;
   client: Client;
-  sdkVersion: string;
-  libXmtpVersion: string;
   installationId: string;
   inboxId: string;
   env: XmtpEnv;
@@ -389,6 +388,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
+      sdk: sdkVersion + "@" + libXmtpVersion,
       folder,
       testName: this.testName,
       walletKey,
