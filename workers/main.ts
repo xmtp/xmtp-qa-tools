@@ -158,6 +158,7 @@ export class WorkerClient extends Worker {
   private activeStreams: boolean = false;
   private activeStreamTypes: Set<typeofStream> = new Set();
   private streamControllers: Map<typeofStream, AbortController> = new Map();
+  private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
   public dbPath!: string;
 
   constructor(
@@ -204,7 +205,23 @@ export class WorkerClient extends Worker {
   stopStreams(): void {
     this.activeStreams = false;
     this.activeStreamTypes.clear();
-    // Abort all stream controllers
+
+    // End streams using their .end() method if available, otherwise abort
+    for (const [streamType, streamRef] of this.streamReferences.entries()) {
+      if (streamRef.end && typeof streamRef.end === "function") {
+        try {
+          streamRef.end();
+        } catch (error) {
+          console.warn(
+            `[${this.nameId}] Error calling stream.end() for ${streamType}:`,
+            error,
+          );
+        }
+      }
+    }
+    this.streamReferences.clear();
+
+    // Abort all stream controllers as fallback
     for (const controller of this.streamControllers.values()) {
       controller.abort();
     }
@@ -263,7 +280,21 @@ export class WorkerClient extends Worker {
       console.debug(`[${this.nameId}] Stopping ${streamType} stream`);
       this.activeStreamTypes.delete(streamType);
 
-      // Abort the specific stream controller
+      // End the stream using its .end() method if available
+      const streamRef = this.streamReferences.get(streamType);
+      if (streamRef?.end && typeof streamRef.end === "function") {
+        try {
+          streamRef.end();
+        } catch (error) {
+          console.warn(
+            `[${this.nameId}] Error calling stream.end() for ${streamType}:`,
+            error,
+          );
+        }
+      }
+      this.streamReferences.delete(streamType);
+
+      // Abort the specific stream controller as fallback
       const controller = this.streamControllers.get(streamType);
       if (controller) {
         controller.abort();
@@ -483,6 +514,18 @@ export class WorkerClient extends Worker {
       while (this.activeStreamTypes.has(type) && !controller.signal.aborted) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(type, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(`[${this.nameId}] Mock ending ${type} stream`);
+                controller.abort();
+              }),
+          });
           for await (const message of stream) {
             // console.debug(
             //   `[${this.nameId}] Received message`,
@@ -663,6 +706,20 @@ export class WorkerClient extends Worker {
       ) {
         try {
           const stream = this.client.conversations.stream();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(streamType, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(
+                  `[${this.nameId}] Mock ending ${streamType} stream`,
+                );
+                controller.abort();
+              }),
+          });
           for await (const conversation of stream) {
             try {
               console.debug(
@@ -721,6 +778,20 @@ export class WorkerClient extends Worker {
       ) {
         try {
           const stream = await this.client.preferences.streamConsent();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(streamType, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(
+                  `[${this.nameId}] Mock ending ${streamType} stream`,
+                );
+                controller.abort();
+              }),
+          });
 
           for await (const consentUpdate of stream) {
             console.debug(
