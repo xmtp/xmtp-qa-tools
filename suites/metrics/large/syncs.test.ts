@@ -3,7 +3,7 @@ import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import { getWorkers, type Worker } from "@workers/manager";
 import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
