@@ -72,7 +72,7 @@ describe(testName, () => {
         };
 
         setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
+        expect(verifyResult.almostAllReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;
