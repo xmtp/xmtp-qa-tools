@@ -23,7 +23,7 @@ export interface WorkerBase {
   walletKey: string;
   encryptionKey: string;
   testName: string;
-  sdkVersion: string;
+  nodeVersion: string;
   libXmtpVersion: string;
 }
 
@@ -31,11 +31,10 @@ export interface Worker extends WorkerBase {
   worker: WorkerClient;
   dbPath: string;
   client: Client;
-  sdkVersion: string;
-  libXmtpVersion: string;
   installationId: string;
   inboxId: string;
   env: XmtpEnv;
+  sdk: string;
   folder: string;
   address: string;
 }
@@ -133,7 +132,7 @@ export class WorkerManager {
     const firstInstallId = Object.keys(this.workers[firstBaseName])[0];
     if (!firstInstallId) return "unknown";
 
-    return this.workers[firstBaseName][firstInstallId].sdkVersion;
+    return this.workers[firstBaseName][firstInstallId].sdk;
   }
 
   public checkStatistics(): void {
@@ -205,7 +204,7 @@ export class WorkerManager {
           const installationCount =
             await currentWorker.client.preferences.inboxState();
           workersToPrint.push(
-            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdkVersion}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
+            `${this.env}:${baseName}-${installationId} ${currentWorker.address} ${currentWorker.sdk}-${currentWorker.libXmtpVersion} ${installationCount.installations.length} - ${formatBytes(
               (await currentWorker.worker.getSQLiteFileSizes())?.total ?? 0,
             )}`,
           );
@@ -393,7 +392,7 @@ export class WorkerManager {
       testName: this.testName,
       walletKey,
       encryptionKey,
-      sdkVersion: sdkVersion,
+      nodeVersion: sdkVersion,
       libXmtpVersion: libXmtpVersion,
     };
 
@@ -416,7 +415,8 @@ export class WorkerManager {
       client: initializedWorker.client,
       inboxId: initializedWorker.client.inboxId,
       dbPath: initializedWorker.dbPath,
-      sdkVersion: sdkVersion,
+      nodeVersion: sdkVersion,
+      sdk: sdkVersion,
       libXmtpVersion: libXmtpVersion,
       address: initializedWorker.address,
       installationId: initializedWorker.client.installationId,
