@@ -146,11 +146,14 @@ export const initializeClient = async (
 export const sendSlackNotification = async (
   message: string,
   source: string,
+  channel?: string,
 ) => {
   console.log("Sending slack notification", message, source);
   if (!process.env.SLACK_BOT_TOKEN) {
     throw new Error("SLACK_BOT_TOKEN is not set");
   }
+
+  const targetChannel = channel || process.env.SLACK_CHANNEL || "#general";
 
   await fetch("https://slack.com/api/chat.postMessage", {
     method: "POST",
@@ -159,7 +162,7 @@ export const sendSlackNotification = async (
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: process.env.SLACK_CHANNEL || "#general",
+      channel: targetChannel,
       text: `[${source}] ${message}`,
       mrkdwn: true,
     }),
