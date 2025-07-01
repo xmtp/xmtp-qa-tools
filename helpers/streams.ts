@@ -153,6 +153,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
   await sleep(streamColdStartTimeout); // wait for stream to start
   const sentEvents = await options.triggerEvents();
+  await sleep(streamColdStartTimeout); // wait for stream to start
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
