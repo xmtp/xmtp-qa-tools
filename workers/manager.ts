@@ -452,10 +452,10 @@ export async function getWorkers(
   options: {
     env?: XmtpEnv;
     useVersions?: boolean;
-    randonNames?: boolean;
+    randomNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = true, randonNames = true } = options;
+  const { useVersions = true, randomNames = true } = options;
   const env = options.env || (process.env.XMTP_ENV as XmtpEnv);
   const manager = new WorkerManager(env);
 
@@ -467,7 +467,7 @@ export async function getWorkers(
     const count = descriptorsOrMap;
     let names: string[];
 
-    if (randonNames) {
+    if (randomNames) {
       names = getRandomNames(count);
     } else {
       names = getFixedNames(count);

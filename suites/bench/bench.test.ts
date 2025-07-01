@@ -50,7 +50,7 @@ describe(testName, () => {
       it(test, async () => {
         try {
           workers = await getWorkers(WORKER_COUNT, {
-            randonNames: true,
+            randomNames: true,
             env: "local",
           });
 

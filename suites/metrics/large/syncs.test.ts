@@ -16,7 +16,7 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   let workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1, {
-    randonNames: false,
+    randomNames: false,
   });
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];
