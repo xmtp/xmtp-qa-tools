@@ -1,0 +1,24 @@
+[
+  {
+    "accountAddress": "0x79cd2e5a08082f293331334e76318d6b3e9994a1",
+    "walletKey": "0x17a31b9e3a9924e8e2c0a724a66d7befb64b347d24c02989b8ac342f3704a689",
+    "dbEncryptionKey": "0799f1f7fd15b8112304febf1126a21f69f82a7997a273902d16ced45d76d6c3",
+    "inboxId": "df60d4389add9b7b9b1e597c179f09c5b04d97cea73ed835b0375e197278b0aa",
+    "installationId": "a83166f3ab057f28d634cc04df5587356063dba11bf7d6bcc08b21a8802f4028",
+    "dbPath": "./inboxes/installations/installation-1-local",
+    "env": "local",
+    "groupsCreated": 200,
+    "conversationsCreated": 40000
+  },
+  {
+    "accountAddress": "0xacbe019548c58c3e45f5b8bdd8743c42a34f0706",
+    "walletKey": "0x8f2b8e9c47a1d3f6e5b4c8a7d9e2f1c0b3a6d8e9f2c1b4a7d0e3f6c9b2a5d8e1",
+    "dbEncryptionKey": "a1b2c3d4e5f6789012345678901234567890abcdef1234567890abcdef123456",
+    "inboxId": "c8b7a6d9e2f1c0b3a6d8e9f2c1b4a7d0e3f6c9b2a5d8e1f4c7b0a3d6e9f2c5b8",
+    "installationId": "f7e6d5c4b3a2918765432109876543210fedcba9876543210fedcba987654321",
+    "dbPath": "./inboxes/installations/installation-2-local",
+    "env": "local",
+    "groupsCreated": 200,
+    "conversationsCreated": 40000
+  }
+]
