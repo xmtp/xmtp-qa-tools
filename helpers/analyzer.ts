@@ -42,6 +42,7 @@ export const PATTERNS = {
         "FAIL  suites/agents/agents.test.ts > agents > production: byte : 0xdfc00a0B28Df3c07b0942300E896C97d62014499",
       ],
     },
+    "FAIL  suites/metrics/large/conversations.test.ts > m_large_conversations > receiveNewConversation-50: should create 50 member group",
   ],
   minFailLines: 3,
   minumumLineLength: 40,
