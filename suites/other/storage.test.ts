@@ -30,7 +30,6 @@ describe(testName, () => {
     const receiverName = `receiver${randomSuffix}-${memberCount}`;
     const workers = await getWorkers(
       [name, receiverName],
-      testName,
       typeofStream.None,
       typeOfResponse.None,
       typeOfSync.None,

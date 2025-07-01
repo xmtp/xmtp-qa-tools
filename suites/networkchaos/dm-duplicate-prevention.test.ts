@@ -16,7 +16,6 @@ describe(testName, async () => {
       henry: "http://localhost:5556",
       randomguy: "http://localhost:6556",
     },
-    testName,
     typeofStream.Message,
   );
 

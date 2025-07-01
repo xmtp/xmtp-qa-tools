@@ -15,7 +15,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(
     getWorkersWithVersions(["random1", "random2", "random3"]),
-    testName,
     typeofStream.Message,
   );
 

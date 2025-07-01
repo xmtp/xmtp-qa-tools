@@ -25,12 +25,10 @@ describe(testName, () => {
   beforeAll(async () => {
     const convoStreamBot = await getWorkers(
       [names[0], names[1]],
-      testName,
       typeofStream.Conversation,
     );
     const gmBotWorker = await getWorkers(
       [names[2]],
-      testName,
       typeofStream.Message,
       typeOfResponse.Gm,
     );

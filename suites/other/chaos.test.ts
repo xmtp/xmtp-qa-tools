@@ -49,7 +49,6 @@ describe(testName, () => {
     // Initialize workers
     workers = await getWorkers(
       ["bot", ...testConfig.workerNames],
-      testConfig.testName,
       testConfig.typeofStream,
       testConfig.typeOfResponse,
       testConfig.typeOfSync,

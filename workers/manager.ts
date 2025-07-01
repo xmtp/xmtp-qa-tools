@@ -23,7 +23,6 @@ export interface WorkerBase {
   folder: string;
   walletKey: string;
   encryptionKey: string;
-  testName: string;
   sdkVersion: string;
   libXmtpVersion: string;
 }
@@ -45,7 +44,6 @@ export interface Worker extends WorkerBase {
  */
 export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
-  private testName: string;
   private activeWorkers: WorkerClient[] = [];
   private typeofStream: typeofStream = typeofStream.Message;
   private typeOfResponse: typeOfResponse = typeOfResponse.Gm;
@@ -60,13 +58,11 @@ export class WorkerManager {
    * Constructor creates an empty manager or populates it with existing workers
    */
   constructor(
-    testName: string,
     typeofStreamType: typeofStream = typeofStream.Message,
     typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
     typeOfSyncType: typeOfSync = typeOfSync.None,
     env: XmtpEnv,
   ) {
-    this.testName = testName;
     this.typeofStream = typeofStreamType;
     this.typeOfResponse = typeOfResponseType;
     this.typeOfSync = typeOfSyncType;
@@ -390,7 +386,6 @@ export class WorkerManager {
       name: baseName,
       sdk: sdkVersion + "@" + libXmtpVersion,
       folder,
-      testName: this.testName,
       walletKey,
       encryptionKey,
       sdkVersion: sdkVersion,
@@ -440,14 +435,12 @@ export class WorkerManager {
  */
 export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string>,
-  testName: string,
   typeofStreamType: typeofStream = typeofStream.None,
   typeOfResponseType: typeOfResponse = typeOfResponse.None,
   typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
-    testName,
     typeofStreamType,
     typeOfResponseType,
     typeOfSyncType,

@@ -20,7 +20,6 @@ const testName = "m_large_messages";
 describe(testName, async () => {
   let workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
-    testName,
     typeofStream.Message,
   );
   let newGroup: Group;

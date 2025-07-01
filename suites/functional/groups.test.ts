@@ -24,7 +24,6 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    testName,
     typeofStream.Message,
   );
   const batchSize = 5;
