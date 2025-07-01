@@ -98,7 +98,7 @@ describe(testName, () => {
           );
 
           const zWorkerName = "random" + `${i}-${installation}`;
-          const zWorker = await getWorkers([zWorkerName]);
+          const zWorker = await getWorkers([zWorkerName], testName);
           await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
           const zSyncAllStart = performance.now();
           await zWorker.getCreator().client.conversations.syncAll();

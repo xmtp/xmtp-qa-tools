@@ -7,7 +7,7 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -27,7 +27,8 @@ const testConfig = {
   epochs: 3,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
-  typeofStream: typeofStream.None: typeOfSync.Both,
+  typeofStream: typeofStream.None,
+  typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(40),
   freshInstalls: false,
 } as const;

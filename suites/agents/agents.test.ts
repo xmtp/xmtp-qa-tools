@@ -4,7 +4,6 @@ import { logError } from "@helpers/logger";
 import { sendAgentNotification } from "@helpers/notifications";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import productionAgents from "@inboxes/agents.json";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";

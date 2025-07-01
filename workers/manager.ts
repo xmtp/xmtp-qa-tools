@@ -49,7 +49,6 @@ export class WorkerManager {
    * Constructor creates an empty manager or populates it with existing workers
    */
   constructor(testName: string, env: XmtpEnv) {
-    this.testName = testName;
     this.env = env;
     this.workers = {};
   }

@@ -38,7 +38,7 @@ describe(testName, async () => {
 
   it("should measure XMTP client creation performance and initialization", async () => {
     try {
-      const client = await getWorkers(["randomclient"]);
+      const client = await getWorkers(["randomclient"], testName);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);

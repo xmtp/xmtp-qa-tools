@@ -21,7 +21,7 @@ const testName = "streams";
 describe(testName, async () => {
   let group: Group;
   const names = getWorkersWithVersions(getFixedNames(5));
-  let workers = await getWorkers(names);
+  let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle
   setupTestLifecycle({

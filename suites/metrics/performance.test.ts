@@ -42,7 +42,7 @@ describe(testName, async () => {
 
   it("clientCreate: should measure creating a client", async () => {
     try {
-      const client = await getWorkers(["randomclient"]);
+      const client = await getWorkers(["randomclient"], testName);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -51,7 +51,7 @@ describe(testName, async () => {
   });
   it("canMessage: should measure canMessage", async () => {
     try {
-      const client = await getWorkers(["randomclient"]);
+      const client = await getWorkers(["randomclient"], testName);
       if (!client) {
         throw new Error("Client not found");
       }
