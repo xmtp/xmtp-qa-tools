@@ -11,7 +11,6 @@ const testName = "m_performance";
 describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
-  console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
   let dm: Dm | undefined;
   let workers: WorkerManager;
 
@@ -132,6 +131,7 @@ describe(testName, async () => {
       throw e;
     }
   });
+
   let i = 4;
   let newGroup: Group;
   it(`newGroup: should create a large group of ${i} participants ${i}`, async () => {
