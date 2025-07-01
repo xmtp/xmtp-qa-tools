@@ -20,7 +20,6 @@ const testName = "m_large_metadata";
 describe(testName, async () => {
   let workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
-    testName,
     typeofStream.GroupUpdated,
   );
 

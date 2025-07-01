@@ -24,7 +24,6 @@ describe(testName, async () => {
 
   let workers = await getWorkers(
     getFixedNames(m_large_WORKER_COUNT),
-    testName,
     typeofStream.GroupUpdated,
   );
 

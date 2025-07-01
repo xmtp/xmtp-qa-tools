@@ -21,7 +21,6 @@ describe(testName, async () => {
 
   workers = await getWorkers(
     getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
-    testName,
     typeofStream.None,
   );
   let allWorkers: Worker[];

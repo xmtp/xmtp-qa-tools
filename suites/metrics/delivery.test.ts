@@ -27,7 +27,6 @@ describe(testName, async () => {
   );
   let workers = await getWorkers(
     getFixedNames(receiverAmount),
-    testName,
     typeofStream.Message,
   );
   let group: Group;
