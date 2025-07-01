@@ -30,6 +30,12 @@ export const PATTERNS = {
         "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
       ],
     },
+    {
+      testName: "Agents",
+      uniqueErrorLines: [
+        "FAIL  suites/agents/agents.test.ts > agents > production: tokenbot : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+      ],
+    },
   ],
   minFailLines: 3,
   minumumLineLength: 40,
