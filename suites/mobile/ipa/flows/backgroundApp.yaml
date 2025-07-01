@@ -1,0 +1,11 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Send app to background
+- pressKey: Home
+
+# Wait for app to be backgrounded
+- waitForAnimationToEnd
+
+# Take screenshot of home screen
+- runScript: |
+    maestro screenshot app-backgrounded.png

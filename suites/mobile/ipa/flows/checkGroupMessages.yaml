@@ -1,0 +1,18 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Navigate to conversations
+- assertVisible: "Conversations"
+
+# Look for the group in conversations list
+- assertVisible: "${GROUP_NAME}"
+- tapOn: "${GROUP_NAME}"
+
+# Verify the expected message appears
+- assertVisible: "${EXPECTED_MESSAGE}"
+
+# Take screenshot of group message
+- runScript: |
+    maestro screenshot group-message-received.png
+
+# Go back to conversations list
+- tapOn: "Back"

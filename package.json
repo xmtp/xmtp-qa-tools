@@ -20,6 +20,8 @@
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
+    "ipa": "yarn test suites/mobile/ipa",
+    "ipa:setup": "./suites/mobile/ipa/setup.sh",
     "large": "yarn test suites/metrics/large",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",

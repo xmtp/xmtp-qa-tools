@@ -1,0 +1,24 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Create new direct message
+- assertVisible: "Conversations"
+- tapOn: "New Message"
+
+# Enter recipient address
+- assertVisible: "Enter address"
+- inputText: "${RECIPIENT_ADDRESS}"
+- tapOn: "Next"
+
+# Wait for conversation to load
+- assertVisible: "Type a message"
+
+# Send message
+- inputText: "${MESSAGE_TEXT}"
+- tapOn: "Send"
+
+# Verify message appears in conversation
+- assertVisible: "${MESSAGE_TEXT}"
+
+# Take screenshot of sent message
+- runScript: |
+    maestro screenshot message-sent.png

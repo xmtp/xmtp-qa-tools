@@ -1,0 +1,33 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Navigate to group creation
+- assertVisible: "Conversations"
+- tapOn: "New Group"
+
+# Enter group name
+- assertVisible: "Group Name"
+- inputText: "${GROUP_NAME}"
+
+# Add members
+- tapOn: "Add Members"
+- inputText: "${MEMBER_ADDRESSES}"
+- tapOn: "Add"
+
+# Create the group
+- tapOn: "Create Group"
+
+# Wait for group to be created
+- assertVisible: "${GROUP_NAME}"
+- assertVisible: "Type a message"
+
+# Send initial message
+- inputText: "Welcome to ${GROUP_NAME}!"
+- tapOn: "Send"
+
+# Verify group appears in conversations list
+- tapOn: "Back"
+- assertVisible: "${GROUP_NAME}"
+
+# Take screenshot
+- runScript: |
+    maestro screenshot group-created.png

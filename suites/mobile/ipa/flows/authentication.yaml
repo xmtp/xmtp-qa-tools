@@ -1,0 +1,35 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Launch app and complete authentication flow
+- launchApp
+- assertVisible: "Welcome to XMTP"
+
+# Handle onboarding screens
+- assertVisible: "Get Started"
+- tapOn: "Get Started"
+
+# Connect wallet
+- assertVisible: "Connect Wallet"
+- tapOn: "Connect Wallet"
+
+# Select wallet type (adjust based on your app's wallet options)
+- assertVisible: "MetaMask"
+- tapOn: "MetaMask"
+
+# Enter wallet details if needed
+- assertVisible: "Private Key"
+- inputText: "${PRIVATE_KEY}"
+- tapOn: "Import"
+
+# Complete setup
+- assertVisible: "Setup Complete"
+- tapOn: "Continue"
+
+# Wait for main conversations screen
+- assertVisible:
+    text: "Conversations"
+    timeout: 10000
+
+# Take a screenshot to confirm we're authenticated
+- runScript: |
+    maestro screenshot authenticated-success.png

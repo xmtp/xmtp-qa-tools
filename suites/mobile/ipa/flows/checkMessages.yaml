@@ -1,0 +1,18 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Wait for new message notification or refresh conversations
+- assertVisible: "Conversations"
+
+# Look for the sender in conversations list
+- assertVisible: "${SENDER_ADDRESS}"
+- tapOn: "${SENDER_ADDRESS}"
+
+# Verify the expected message appears
+- assertVisible: "${EXPECTED_MESSAGE}"
+
+# Take screenshot of received message
+- runScript: |
+    maestro screenshot message-received.png
+
+# Go back to conversations list
+- tapOn: "Back"

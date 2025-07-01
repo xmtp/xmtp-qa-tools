@@ -1,0 +1,29 @@
+appId: ${APP_BUNDLE_ID}
+
+# Global settings
+settings:
+  timeout: 30000
+  screenshotOnFailure: true
+  videoRecording: false
+
+# Environment variables
+env:
+  DEBUG: true
+  TIMEOUT: 30000
+  SCREENSHOT_ON_FAILURE: true
+
+# Flow files to include
+flows:
+  - authentication.yaml
+  - messaging.yaml
+  - groupCreation.yaml
+  - checkMessages.yaml
+  - checkGroupMessages.yaml
+  - backgroundApp.yaml
+  - handleNotification.yaml
+
+# Device preferences
+device:
+  platform: iOS
+  preferredDeviceType: "iPhone 15 Pro"
+  preferredIOSVersion: "17.0"

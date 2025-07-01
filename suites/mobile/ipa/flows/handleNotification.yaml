@@ -1,0 +1,17 @@
+appId: ${APP_BUNDLE_ID}
+---
+# Wait for notification to appear
+- assertVisible:
+    text: "${EXPECTED_NOTIFICATION}"
+    timeout: 10000
+
+# Tap on the notification
+- tapOn: "${EXPECTED_NOTIFICATION}"
+
+# App should open to the conversation
+- assertVisible: "${SENDER_NAME}"
+- assertVisible: "${EXPECTED_NOTIFICATION}"
+
+# Take screenshot of opened conversation
+- runScript: |
+    maestro screenshot notification-opened.png
