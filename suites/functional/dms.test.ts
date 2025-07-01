@@ -21,7 +21,6 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ],
-    undefined,
     { useVersions: true },
   );
 

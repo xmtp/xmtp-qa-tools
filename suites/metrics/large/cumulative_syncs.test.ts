@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -18,9 +17,7 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  workers = await getWorkers(
-    getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
-  );
+  workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1);
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];
   // Use different workers for each measurement

@@ -1,4 +1,3 @@
-import { getFixedNames, getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
@@ -11,7 +10,7 @@ const testName = "codec";
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(getWorkersWithVersions(getFixedNames(2)));
+  workers = await getWorkers(2);
 
   setupTestLifecycle({
     testName,

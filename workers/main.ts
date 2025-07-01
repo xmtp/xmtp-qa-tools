@@ -756,7 +756,6 @@ export class WorkerClient extends Worker {
         try {
           const stream = await this.client.preferences.streamConsent();
 
-          // Store stream reference with .end() method if available, otherwise create mock
           const streamRef = stream as any;
           this.streamReferences.set(streamType, {
             end:
@@ -822,9 +821,9 @@ export class WorkerClient extends Worker {
 
     // Create unique collector ID to prevent conflicts
     const collectorId = `${type}-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
-    console.debug(
-      `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
-    );
+    // console.debug(
+    //   `[${this.nameId}] Starting stream ${collectorId} for ${count} events of type ${type}`,
+    // );
 
     return new Promise((resolve) => {
       const events: T[] = [];

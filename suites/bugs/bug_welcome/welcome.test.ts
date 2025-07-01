@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -10,8 +9,7 @@ describe(testName, () => {
   let group: Group;
 
   beforeAll(async () => {
-    const names = getFixedNames(10);
-    workers = await getWorkers(names);
+    workers = await getWorkers(10);
   });
 
   it("stream: send the stream", async () => {

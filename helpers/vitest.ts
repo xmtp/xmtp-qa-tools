@@ -1,3 +1,5 @@
+import { basename } from "path";
+import { fileURLToPath } from "url";
 import type { WorkerManager } from "@workers/manager";
 import {
   afterAll,
@@ -14,6 +16,17 @@ import {
   sendMetric,
   type DurationMetricTags,
 } from "./datadog";
+
+/**
+ * Extracts test name from the current file path by removing the .test.ts extension
+ * @param importMetaUrl - The import.meta.url of the calling file
+ * @returns The test name derived from the filename
+ */
+export const getTestNameFromFile = (importMetaUrl: string): string => {
+  const filePath = fileURLToPath(importMetaUrl);
+  const fileName = basename(filePath);
+  return fileName.replace(/\.test\.ts$/, "");
+};
 
 export const setupTestLifecycle = ({
   testName,

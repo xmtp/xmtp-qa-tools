@@ -83,10 +83,9 @@ describe("commits", () => {
   };
 
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
-    let workers = await getWorkers(
-      workerNames,
-      network as "local" | "dev" | "production",
-    );
+    let workers = await getWorkers(workerNames, {
+      env: network as "local" | "dev" | "production",
+    });
     // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
     // Create groups
     const groupOperationPromises = Array.from(

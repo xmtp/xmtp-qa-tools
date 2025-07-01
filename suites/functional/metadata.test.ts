@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -10,19 +9,17 @@ const testName = "metadata";
 describe(testName, async () => {
   let group: Group;
 
-  const workers = await getWorkers(
-    getWorkersWithVersions([
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ]),
-  );
+  const workers = await getWorkers([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
 
   setupTestLifecycle({
     testName,
