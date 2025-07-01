@@ -9,12 +9,7 @@ import {
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import {
-  installationThreshold,
-  typeofStream,
-  typeOfSync,
-  WorkerClient,
-} from "./main";
+import { installationThreshold, WorkerClient } from "./main";
 
 export interface WorkerBase {
   name: string;
@@ -46,8 +41,6 @@ export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private testName: string;
   private activeWorkers: WorkerClient[] = [];
-  private typeofStream: typeofStream = typeofStream.Message;
-  private typeOfSync: typeOfSync = typeOfSync.None;
   private env: XmtpEnv;
   private keysCache: Record<
     string,
@@ -57,15 +50,8 @@ export class WorkerManager {
   /**
    * Constructor creates an empty manager or populates it with existing workers
    */
-  constructor(
-    testName: string,
-    typeofStreamType: typeofStream = typeofStream.Message,
-    typeOfSyncType: typeOfSync = typeOfSync.None,
-    env: XmtpEnv,
-  ) {
+  constructor(testName: string, env: XmtpEnv) {
     this.testName = testName;
-    this.typeofStream = typeofStreamType;
-    this.typeOfSync = typeOfSyncType;
     this.env = env;
     this.workers = {};
   }
@@ -394,14 +380,7 @@ export class WorkerManager {
     };
 
     // Create and initialize the worker
-    const workerClient = new WorkerClient(
-      workerData,
-      this.typeofStream,
-      this.typeOfSync,
-      this.env,
-      {},
-      apiUrl,
-    );
+    const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
 
     const initializedWorker = await workerClient.initialize();
 
@@ -436,16 +415,9 @@ export class WorkerManager {
 export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string>,
   testName: string,
-  typeofStreamType: typeofStream = typeofStream.None,
-  typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
-  const manager = new WorkerManager(
-    testName,
-    typeofStreamType,
-    typeOfSyncType,
-    env,
-  );
+  const manager = new WorkerManager(testName, env);
 
   let workerPromises: Promise<Worker>[] = [];
 

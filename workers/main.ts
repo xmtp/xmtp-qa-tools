@@ -140,8 +140,6 @@ export class WorkerClient extends Worker {
   private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
-  private typeofStream: typeofStream;
-  private typeofSync: typeOfSync;
   private folder: string;
   private sdkVersion: string;
   private libXmtpVersion: string;
@@ -157,8 +155,6 @@ export class WorkerClient extends Worker {
 
   constructor(
     worker: WorkerBase,
-    typeofStream: typeofStream,
-    typeofSync: typeOfSync,
     env: XmtpEnv,
     options: WorkerOptions = {},
     apiUrl?: string,
@@ -168,8 +164,6 @@ export class WorkerClient extends Worker {
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
-    this.typeofSync = typeofSync;
-    this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
     this.libXmtpVersion = worker.libXmtpVersion;
@@ -218,6 +212,33 @@ export class WorkerClient extends Worker {
       controller.abort();
     }
     this.streamControllers.clear();
+  }
+
+  /**
+   * Starts a specific sync type
+   * @param syncType - The type of sync to start
+   * @param interval - The interval in milliseconds to sync
+   */
+  public startSync(syncType: typeOfSync, interval: number = 10000): void {
+    if (syncType === typeOfSync.None) {
+      return;
+    }
+
+    console.debug(`[${this.nameId}] Starting ${syncType} sync`);
+    void (async () => {
+      while (true) {
+        if (syncType === typeOfSync.SyncAll) {
+          await this.client.conversations.syncAll();
+        } else if (syncType === typeOfSync.Sync) {
+          await this.client.conversations.sync();
+        } else if (syncType === typeOfSync.Both) {
+          await this.client.conversations.syncAll();
+          await this.client.conversations.sync();
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
+    })();
   }
 
   /**
@@ -448,69 +469,17 @@ export class WorkerClient extends Worker {
    * Starts a periodic sync of all conversations
    * @param interval - The interval in milliseconds to sync
    */
-  private startSyncs(interval: number = 10000) {
-    if (this.typeofSync !== typeOfSync.None) {
-      //console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
-      void (async () => {
-        while (true) {
-          if (this.typeofSync === typeOfSync.SyncAll) {
-            await this.client.conversations.syncAll();
-          } else if (this.typeofSync === typeOfSync.Sync) {
-            await this.client.conversations.sync();
-          } else if (this.typeofSync === typeOfSync.Both) {
-            await this.client.conversations.syncAll();
-            await this.client.conversations.sync();
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, interval));
-        }
-      })();
-    }
+  private startSyncs() {
+    // No automatic syncs - everything is on-demand now
+    // Use startSync() method to start syncs manually
   }
 
   /**
    * Unified method to start the appropriate stream based on configuration
    */
   private startInitialStream() {
-    if (this.typeofStream === typeofStream.None) {
-      return;
-    }
-
-    // Mark this stream type as active during initialization
-    this.activeStreamTypes.add(this.typeofStream);
-    this.activeStreams = true;
-
-    try {
-      switch (this.typeofStream) {
-        case typeofStream.Message:
-          this.initMessageStream(typeofStream.Message);
-          break;
-        case typeofStream.MessageandResponse:
-          this.initMessageStream(typeofStream.MessageandResponse);
-          break;
-        case typeofStream.GroupUpdated:
-          this.initMessageStream(typeofStream.GroupUpdated);
-          break;
-        case typeofStream.Conversation:
-          this.initConversationStream();
-          break;
-        case typeofStream.Consent:
-          this.initConsentStream();
-          break;
-        // Add additional stream types as needed
-      }
-    } catch (error) {
-      console.error(
-        `[${this.nameId}] Failed to start ${this.typeofStream} stream:`,
-        error,
-      );
-      // Remove from active streams if initialization failed
-      this.activeStreamTypes.delete(this.typeofStream);
-      if (this.activeStreamTypes.size === 0) {
-        this.activeStreams = false;
-      }
-      throw error;
-    }
+    // No automatic streams - everything is on-demand now
+    // Use startStream() method to start streams manually
   }
 
   /**
@@ -595,7 +564,8 @@ export class WorkerClient extends Worker {
               (message.contentType?.typeId === "text" ||
                 message.contentType?.typeId === "reaction" ||
                 message.contentType?.typeId === "reply") &&
-              type === typeofStream.Message
+              (type === typeofStream.Message ||
+                type === typeofStream.MessageandResponse)
             ) {
               // Log message details for debugging
               // console.debug(
