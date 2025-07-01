@@ -49,8 +49,9 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(WORKER_COUNT, undefined, {
-            nameMode: "random",
+          workers = await getWorkers(WORKER_COUNT, {
+            randonNames: true,
+            env: "local",
           });
 
           const newGroup = (await workers

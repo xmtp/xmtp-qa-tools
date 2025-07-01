@@ -1,4 +1,3 @@
-import { getRandomNames, getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type DecodedMessage, type Dm } from "@xmtp/node-sdk";
@@ -7,9 +6,11 @@ import { describe, expect, it } from "vitest";
 const testName = "callbacks";
 
 describe(testName, async () => {
-  const names = getRandomNames(5);
-  const workers = await getWorkers(getWorkersWithVersions(names));
+  const workers = await getWorkers(5, {
+    env: "local",
+  });
 
+  const names = workers.getAll().map((w) => w.name);
   setupTestLifecycle({
     testName,
     expect,

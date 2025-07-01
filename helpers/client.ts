@@ -634,38 +634,6 @@ export const appendToEnv = (key: string, value: string): void => {
   }
 };
 
-// Deprecated: Use getWorkers with count and options instead
-export const getFixedNames = (count: number): string[] => {
-  return [...defaultNames].slice(0, count);
-};
-
-// Deprecated: Use getWorkers with count and options instead
-export const getRandomNames = (count: number): string[] => {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
-};
-
-// Deprecated: Use getWorkers with useVersions option instead
-export function getWorkersWithVersions(workerNames: string[]): string[] {
-  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-
-  if (!testVersions) {
-    // No versions specified, return names as-is (will use latest version)
-    return workerNames;
-  }
-
-  const availableVersions = sdkVersionOptions.slice(0, testVersions);
-
-  const descriptors: string[] = [];
-  for (const workerName of workerNames) {
-    // Pick a random version from the specified list
-    const randomVersion =
-      availableVersions[Math.floor(Math.random() * availableVersions.length)];
-    descriptors.push(`${workerName}-a-${randomVersion}`);
-  }
-
-  return descriptors;
-}
-
 export async function removeDataFolder(): Promise<void> {
   const dataPath = path.join(process.cwd(), ".data");
   if (fs.existsSync(dataPath)) {
@@ -682,66 +650,6 @@ export function getMultiVersion(count: number): string[] {
 
   return descriptors;
 }
-
-// Default worker names
-export const defaultNames = [
-  "bob",
-  "alice",
-  "fabri",
-  "elon",
-  "joe",
-  "charlie",
-  "dave",
-  "eve",
-  "frank",
-  "grace",
-  "henry",
-  "ivy",
-  "jack",
-  "karen",
-  "larry",
-  "mary",
-  "nancy",
-  "oscar",
-  "paul",
-  "quinn",
-  "rachel",
-  "steve",
-  "tom",
-  "ursula",
-  "victor",
-  "wendy",
-  "xavier",
-  "yolanda",
-  "zack",
-  "adam",
-  "bella",
-  "carl",
-  "diana",
-  "eric",
-  "fiona",
-  "george",
-  "hannah",
-  "ian",
-  "julia",
-  "keith",
-  "lisa",
-  "mike",
-  "nina",
-  "oliver",
-  "penny",
-  "quentin",
-  "rosa",
-  "sam",
-  "tina",
-  "walt",
-  "uma",
-  "vince",
-  "xena",
-  "yara",
-  "zara",
-  "guada", // max 61
-];
 
 export const browserTimeout = 10000;
 export const streamColdStartTimeout = 1000; // 1 second

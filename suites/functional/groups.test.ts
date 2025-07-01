@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -12,19 +11,17 @@ const testName = "groups";
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(
-    getWorkersWithVersions([
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "randomguy",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ]),
-  );
+  workers = await getWorkers([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "randomguy",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
   const batchSize = 5;
   const total = 10;
 

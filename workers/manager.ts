@@ -4,6 +4,7 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
+  sdkVersionOptions,
   sleep,
   VersionList,
 } from "@helpers/client";
@@ -11,6 +12,37 @@ import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import { installationThreshold, WorkerClient } from "./main";
 
+// Deprecated: Use getWorkers with count and options instead
+export const getFixedNames = (count: number): string[] => {
+  return [...defaultNames].slice(0, count);
+};
+
+// Deprecated: Use getWorkers with count and options instead
+export const getRandomNames = (count: number): string[] => {
+  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+};
+
+// Deprecated: Use getWorkers with useVersions option instead
+export function getWorkersWithVersions(workerNames: string[]): string[] {
+  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
+
+  if (!testVersions) {
+    // No versions specified, return names as-is (will use latest version)
+    return workerNames;
+  }
+
+  const availableVersions = sdkVersionOptions.slice(0, testVersions);
+
+  const descriptors: string[] = [];
+  for (const workerName of workerNames) {
+    // Pick a random version from the specified list
+    const randomVersion =
+      availableVersions[Math.floor(Math.random() * availableVersions.length)];
+    descriptors.push(`${workerName}-a-${randomVersion}`);
+  }
+
+  return descriptors;
+}
 export interface WorkerBase {
   name: string;
   sdk: string;
@@ -410,13 +442,14 @@ export class WorkerManager {
  */
 export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string> | number,
-  env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
   options: {
+    env?: XmtpEnv;
     useVersions?: boolean;
-    nameMode?: "fixed" | "random";
+    randonNames?: boolean;
   } = {},
 ): Promise<WorkerManager> {
-  const { useVersions = false, nameMode = "fixed" } = options;
+  const { useVersions = true, randonNames = true } = options;
+  const env = options.env || (process.env.XMTP_ENV as XmtpEnv);
   const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
@@ -427,7 +460,7 @@ export async function getWorkers(
     const count = descriptorsOrMap;
     let names: string[];
 
-    if (nameMode === "random") {
+    if (randonNames) {
       names = getRandomNames(count);
     } else {
       names = getFixedNames(count);
@@ -472,40 +505,6 @@ export async function getWorkers(
   await manager.revokeExcessInstallations();
 
   return manager;
-}
-
-// Helper functions moved inside this file for internal use
-function getFixedNames(count: number): string[] {
-  return [...defaultNames].slice(0, count);
-}
-
-function getRandomNames(count: number): string[] {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
-}
-
-function getWorkersWithVersions(workerNames: string[]): string[] {
-  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-
-  if (!testVersions) {
-    // No versions specified, return names as-is (will use latest version)
-    return workerNames;
-  }
-
-  const sdkVersionOptions = Object.keys(VersionList)
-    .filter((key) => parseInt(key) >= 200)
-    .sort((a, b) => parseInt(b) - parseInt(a));
-
-  const availableVersions = sdkVersionOptions.slice(0, testVersions);
-
-  const descriptors: string[] = [];
-  for (const workerName of workerNames) {
-    // Pick a random version from the specified list
-    const randomVersion =
-      availableVersions[Math.floor(Math.random() * availableVersions.length)];
-    descriptors.push(`${workerName}-a-${randomVersion}`);
-  }
-
-  return descriptors;
 }
 
 // Default worker names

@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -13,7 +12,7 @@ describe(testName, () => {
   let conversation: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(getFixedNames(1));
+    workers = await getWorkers(1);
   });
 
   setupTestLifecycle({

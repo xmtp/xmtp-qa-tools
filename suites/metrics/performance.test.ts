@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -16,7 +15,7 @@ describe(testName, async () => {
   let dm: Dm | undefined;
   let workers: WorkerManager;
 
-  workers = await getWorkers(getFixedNames(10));
+  workers = await getWorkers(10);
 
   const creator = workers.getCreator();
   console.warn("creator is:", creator.name);

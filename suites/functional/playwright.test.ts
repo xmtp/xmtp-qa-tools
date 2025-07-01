@@ -1,4 +1,4 @@
-import { getRandomNames, sleep } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -16,20 +16,21 @@ describe(testName, () => {
   let creator: Worker;
   let xmtpChat: Worker;
   let receiver: Worker;
-  const names = getRandomNames(3);
 
   setupTestLifecycle({
     testName,
     expect,
   });
+
   beforeAll(async () => {
-    const convoStreamBot = await getWorkers([names[0], names[1]]);
+    const convoStreamBot = await getWorkers(2);
+    const gmBotWorker = await getWorkers(1);
+    const names = convoStreamBot.getAll().map((w) => w.name);
     // Start conversation streams for group event detection
     convoStreamBot.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Conversation);
     });
 
-    const gmBotWorker = await getWorkers([names[2]]);
     // Start message and response streams for gm bot
     gmBotWorker.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.MessageandResponse);

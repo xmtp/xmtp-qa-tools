@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -13,9 +12,7 @@ const amountofMessages = 5;
 describe(testName, async () => {
   let group: Group;
   let workers: WorkerManager;
-  workers = await getWorkers(
-    getWorkersWithVersions(["random1", "random2", "random3"]),
-  );
+  workers = await getWorkers(["random1", "random2", "random3"]);
   // Start message streams for offline tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

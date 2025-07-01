@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -17,7 +16,7 @@ import {
 const testName = "m_large_messages";
 
 describe(testName, async () => {
-  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT));
+  let workers = await getWorkers(m_large_WORKER_COUNT);
 
   let newGroup: Group;
 

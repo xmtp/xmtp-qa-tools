@@ -1,4 +1,4 @@
-import { appendToEnv, getFixedNames, getManualUsers } from "@helpers/client";
+import { appendToEnv, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
   verifyMembershipStream,

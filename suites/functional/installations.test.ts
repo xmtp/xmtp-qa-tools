@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -14,7 +13,7 @@ describe(testName, () => {
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
-    let initialWorkers = await getWorkers(getWorkersWithVersions(names));
+    let initialWorkers = await getWorkers(names);
     // Start message streams for installation tests
     initialWorkers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Message);
@@ -47,9 +46,7 @@ describe(testName, () => {
       secondaryWorkers.get(names[1], "b")?.dbPath,
     );
     // Create charlie only when we need him
-    const terciaryWorkers = await getWorkers(
-      getWorkersWithVersions([names[2]]),
-    );
+    const terciaryWorkers = await getWorkers([names[2]]);
     // Start message streams for terciary workers
     terciaryWorkers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Message);
