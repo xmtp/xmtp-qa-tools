@@ -139,6 +139,11 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     count,
     messageTemplate,
   } = options;
+  // Sync conversations for all receiving workers to ensure they have local group instances
+  await Promise.all(
+    receivers.map((worker) => worker.client.conversations.syncAll()),
+  );
+
   const collectPromises: Promise<
     { key: string; receivedAt: number; message: string; event: unknown }[]
   >[] = receivers.map((r) =>
@@ -153,7 +158,6 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
   );
   await sleep(streamColdStartTimeout); // wait for stream to start
   const sentEvents = await options.triggerEvents();
-  await sleep(streamColdStartTimeout); // wait for stream to start
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -230,6 +234,7 @@ export async function verifyMessageStream(
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
+
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
@@ -358,6 +363,7 @@ export async function verifyConsentStream(
   receiver: Worker,
 ): Promise<VerifyStreamResult> {
   receiver.worker.startStream(typeofStream.Consent);
+
   return collectAndTimeEventsWithStats({
     receivers: [receiver],
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
@@ -528,6 +534,7 @@ export async function verifyBotMessageStream(
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
+
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, 1),
