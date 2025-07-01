@@ -4,12 +4,12 @@ import { logError } from "@helpers/logger";
 import { sendAgentNotification } from "@helpers/notifications";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import productionAgents from "./agents.json";
 import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type AgentConfig } from "./agents";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
+import { type AgentConfig } from "./agents";
+import productionAgents from "./agents.json";
 
 const testName = "agents";
 
@@ -39,7 +39,7 @@ describe(testName, () => {
       const errorLogs = new Set<string>();
       let agentResponded = false;
       let result;
-      
+
       try {
         console.warn(`Testing ${agent.name} with address ${agent.address} `);
 
@@ -90,7 +90,9 @@ describe(testName, () => {
         let metricValue = result?.averageEventTiming as number;
         if (!agentResponded) {
           metricValue = streamTimeout;
-          errorLogs.add(`Agent ${agent.name} failed to respond after 3 retries`);
+          errorLogs.add(
+            `Agent ${agent.name} failed to respond after 3 retries`,
+          );
           errorLogs.add(`Response time exceeded timeout: ${streamTimeout}ms`);
         }
 
@@ -111,7 +113,7 @@ describe(testName, () => {
             errorLogs,
             testName: `${testName}-${agent.name}`,
             env,
-                         slackChannel: agent.slackChannel,
+            slackChannel: agent.slackChannel,
             responseTime: metricValue,
           });
         }
@@ -120,7 +122,7 @@ describe(testName, () => {
       } catch (e) {
         const errorMessage = e instanceof Error ? e.message : String(e);
         errorLogs.add(`Error testing agent ${agent.name}: ${errorMessage}`);
-        
+
         // Send agent-specific notification for caught errors
         if (errorLogs.size > 0) {
           try {
@@ -134,10 +136,13 @@ describe(testName, () => {
               responseTime: result?.averageEventTiming || streamTimeout,
             });
           } catch (notificationError) {
-            console.error("Failed to send agent notification:", notificationError);
+            console.error(
+              "Failed to send agent notification:",
+              notificationError,
+            );
           }
         }
-        
+
         logError(e, expect.getState().currentTestName);
         throw e;
       }
