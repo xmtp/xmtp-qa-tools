@@ -49,10 +49,7 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(WORKER_COUNT, {
-            randomNames: true,
-            env: "local",
-          });
+          workers = await getWorkers(WORKER_COUNT);
 
           const newGroup = (await workers
             .getCreator()
