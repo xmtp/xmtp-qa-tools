@@ -25,8 +25,11 @@ describe(testName, async () => {
       "oscar",
     ]),
     testName,
-    typeofStream.Message,
   );
+  // Start message streams for group tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   const batchSize = 5;
   const total = 10;
 

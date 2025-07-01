@@ -51,11 +51,11 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(
-            getRandomNames(WORKER_COUNT),
-            testName,
-            typeofStream.GroupUpdated,
-          );
+          workers = await getWorkers(getRandomNames(WORKER_COUNT), testName);
+          // Start group updated streams for bench tests
+          workers.getAll().forEach((worker) => {
+            worker.worker.startStream(typeofStream.GroupUpdated);
+          });
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(

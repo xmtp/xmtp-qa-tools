@@ -7,7 +7,7 @@ import {
 } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -28,7 +28,6 @@ const testConfig = {
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
   randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
   typeofStream: typeofStream.None,
-  typeOfResponse: typeOfResponse.None,
   typeOfSync: typeOfSync.Both,
   workerNames: getFixedNames(40),
   freshInstalls: false,
@@ -50,10 +49,12 @@ describe(testName, () => {
     workers = await getWorkers(
       ["bot", ...testConfig.workerNames],
       testConfig.testName,
-      testConfig.typeofStream,
-      testConfig.typeOfResponse,
-      testConfig.typeOfSync,
     );
+    // Note: typeofStream was None and typeOfResponse was None, so no streams needed
+    // Start syncs if needed
+    workers.getAll().forEach((worker) => {
+      worker.worker.startSync(testConfig.typeOfSync);
+    });
     creator = workers.get("bot") as Worker;
 
     // Load all existing groups

@@ -22,11 +22,11 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  let workers = await getWorkers(
-    getFixedNames(m_large_WORKER_COUNT),
-    testName,
-    typeofStream.GroupUpdated,
-  );
+  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT), testName);
+  // Start group updated streams for membership tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {

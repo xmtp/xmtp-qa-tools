@@ -14,8 +14,11 @@ describe(testName, async () => {
   workers = await getWorkers(
     getWorkersWithVersions(getFixedNames(5)),
     testName,
-    typeofStream.Consent,
   );
+  // Start consent streams for consent tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Consent);
+  });
 
   setupTestLifecycle({
     testName,

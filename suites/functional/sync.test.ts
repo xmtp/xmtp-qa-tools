@@ -14,11 +14,11 @@ describe(testName, async () => {
 
   // Define test workers
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
-  workers = await getWorkers(
-    getWorkersWithVersions(testWorkers),
-    testName,
-    typeofStream.Message,
-  );
+  workers = await getWorkers(getWorkersWithVersions(testWorkers), testName);
+  // Start message streams for sync tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   setupTestLifecycle({ testName, expect });
 
   it("should establish test environment by creating group with all participants", async () => {

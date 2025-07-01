@@ -1,5 +1,5 @@
 import { getManualUsers } from "@helpers/client";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
@@ -17,11 +17,12 @@ describe(testName, () => {
     workers = await getWorkers(
       ["alice", "bob", "sam", "walt", "tina"],
       testName,
-      typeofStream.Message,
-      typeOfResponse.Gm,
-      typeOfSync.None,
       receiverObj.network as "production" | "dev" | "local",
     );
+    // Start message and response streams for notifications
+    workers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.MessageandResponse);
+    });
     group = await workers.createGroupBetweenAll();
     if (!group) {
       console.error(`Failed to create conversation for alice`);

@@ -1,7 +1,7 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -33,7 +33,6 @@ const network = process.env.XMTP_ENV; // Network environment setting
 const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/remove operations
 const installationCount = 5; // How many installations to use randomly in the createInstallation operations
 const typeofStreamForTest = typeofStream.None; // Starts a streamAllMessages in each worker
-const typeOfResponseForTest = typeOfResponse.None; // Replies gm if mentioned
 const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
 
 describe("commits", () => {
@@ -90,11 +89,9 @@ describe("commits", () => {
     let workers = await getWorkers(
       workerNames,
       "commits",
-      typeofStreamForTest,
-      typeOfResponseForTest,
-      typeOfSyncForTest,
       network as "local" | "dev" | "production",
     );
+    // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start
     // Create groups
     const groupOperationPromises = Array.from(
       { length: groupCount },

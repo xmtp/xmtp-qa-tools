@@ -2,7 +2,7 @@ import { getManualUsers } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 import { TEST_CONFIGS } from "../../bots/stress/index";
@@ -41,11 +41,9 @@ describe(testName, () => {
       workers = await getWorkers(
         ["bot"],
         testName,
-        typeofStream.None,
-        typeOfResponse.None,
-        typeOfSync.None,
         receiverObj.network as "local" | "dev" | "production",
       );
+      // Note: No streams or syncs needed for this test (all were set to None)
       bot = workers.get("bot")!;
     } catch (e) {
       logError(e, expect.getState().currentTestName);

@@ -17,8 +17,11 @@ describe(testName, () => {
     let initialWorkers = await getWorkers(
       getWorkersWithVersions(names),
       testName,
-      typeofStream.Message,
     );
+    // Start message streams for installation tests
+    initialWorkers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Message);
+    });
     expect(initialWorkers.get(names[0])?.folder).toBe("a");
     expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
@@ -50,8 +53,11 @@ describe(testName, () => {
     const terciaryWorkers = await getWorkers(
       getWorkersWithVersions([names[2]]),
       testName,
-      typeofStream.Message,
     );
+    // Start message streams for terciary workers
+    terciaryWorkers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Message);
+    });
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryWorkers.get(names[0], "desktop");

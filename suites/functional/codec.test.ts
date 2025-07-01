@@ -15,8 +15,11 @@ describe(testName, async () => {
   workers = await getWorkers(
     getWorkersWithVersions(getFixedNames(2)),
     testName,
-    typeofStream.Message,
   );
+  // Start message streams for codec tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
 
   setupTestLifecycle({
     testName,

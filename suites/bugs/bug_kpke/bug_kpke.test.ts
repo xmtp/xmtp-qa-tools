@@ -14,11 +14,11 @@ describe(testName, () => {
   let conversation: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(
-      getFixedNames(1),
-      testName,
-      typeofStream.Message,
-    );
+    workers = await getWorkers(getFixedNames(1), testName);
+    // Start message streams for bug test
+    workers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Message);
+    });
   });
 
   setupTestLifecycle({

@@ -20,8 +20,8 @@ describe(testName, async () => {
   let workers = await getWorkers(
     getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
     testName,
-    typeofStream.None,
   );
+  // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];
   // Use different workers for each measurement
   allWorkers = workers.getAllButCreator();

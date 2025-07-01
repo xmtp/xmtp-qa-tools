@@ -37,18 +37,19 @@ import {
   Dm as Dm210,
   Group as Group210,
 } from "@xmtp/node-sdk-210";
-import {
-  Client as Client220,
-  Conversation as Conversation220,
-  Dm as Dm220,
-  Group as Group220,
-} from "@xmtp/node-sdk-220";
-import {
-  Client as Client300,
-  Conversation as Conversation300,
-  Dm as Dm300,
-  Group as Group300,
-} from "@xmtp/node-sdk-300";
+// NOTE: These SDK versions are currently unavailable
+// import {
+//   Client as Client220,
+//   Conversation as Conversation220,
+//   Dm as Dm220,
+//   Group as Group220,
+// } from "@xmtp/node-sdk-220";
+// import {
+//   Client as Client300,
+//   Conversation as Conversation300,
+//   Dm as Dm300,
+//   Group as Group300,
+// } from "@xmtp/node-sdk-300";
 import {
   Client as ClientMls,
   Conversation as ConversationMls,
@@ -116,26 +117,27 @@ export const VersionList = {
     nodeVersion: "2.1.0",
     libXmtpVersion: "7b9b4d0",
   },
-  220: {
-    Client: Client220,
-    Conversation: Conversation220,
-    Dm: Dm220,
-    Group: Group220,
-    sdkPackage: "node-sdk-220",
-    bindingsPackage: "node-bindings-122",
-    nodeVersion: "2.2.0",
-    libXmtpVersion: "d0f0b67",
-  },
-  300: {
-    Client: Client300,
-    Conversation: Conversation300,
-    Dm: Dm300,
-    Group: Group300,
-    sdkPackage: "node-sdk-300",
-    bindingsPackage: "node-bindings-125",
-    nodeVersion: "3.0.1",
-    libXmtpVersion: "dc3e8c8",
-  },
+  // NOTE: These SDK versions are currently unavailable
+  // 220: {
+  //   Client: Client220,
+  //   Conversation: Conversation220,
+  //   Dm: Dm220,
+  //   Group: Group220,
+  //   sdkPackage: "node-sdk-220",
+  //   bindingsPackage: "node-bindings-122",
+  //   nodeVersion: "2.2.0",
+  //   libXmtpVersion: "d0f0b67",
+  // },
+  // 300: {
+  //   Client: Client300,
+  //   Conversation: Conversation300,
+  //   Dm: Dm300,
+  //   Group: Group300,
+  //   sdkPackage: "node-sdk-300",
+  //   bindingsPackage: "node-bindings-125",
+  //   nodeVersion: "3.0.1",
+  //   libXmtpVersion: "dc3e8c8",
+  // },
 };
 
 export type GroupMetadataContent = {
@@ -353,7 +355,7 @@ export const regressionClient = async (
     throw new Error("Invalid version");
   } else if (versionInt === 47) {
     const signer = createSigner47(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -363,7 +365,7 @@ export const regressionClient = async (
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 100 && versionInt < 200) {
     const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -373,7 +375,7 @@ export const regressionClient = async (
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (versionInt >= 200) {
     const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility issues
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, {
       dbEncryptionKey,
       dbPath,

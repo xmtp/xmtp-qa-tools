@@ -4,7 +4,7 @@ import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import productionAgents from "@inboxes/agents.json";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -15,14 +15,11 @@ describe(testName, () => {
   let workers: WorkerManager;
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
-    workers = await getWorkers(
-      getRandomNames(1),
-      testName,
-      typeofStream.Message,
-      typeOfResponse.None,
-      typeOfSync.None,
-      env,
-    );
+    workers = await getWorkers(getRandomNames(1), testName, env);
+    // Start message streams for agent communication
+    workers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Message);
+    });
   });
   setupTestLifecycle({
     testName,

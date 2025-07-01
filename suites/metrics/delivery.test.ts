@@ -25,11 +25,11 @@ describe(testName, async () => {
   console.debug(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
-  let workers = await getWorkers(
-    getFixedNames(receiverAmount),
-    testName,
-    typeofStream.Message,
-  );
+  let workers = await getWorkers(getFixedNames(receiverAmount), testName);
+  // Start message streams for delivery tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 

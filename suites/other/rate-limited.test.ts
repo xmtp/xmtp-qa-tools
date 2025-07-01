@@ -1,6 +1,6 @@
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -10,11 +10,13 @@ describe(testName, async () => {
   const workers = await getWorkers(
     ["henry", "ivy", "jack", "karen", "larry", "mary", "nancy", "oscar"],
     testName,
-    typeofStream.Message,
-    typeOfResponse.Gm,
-    typeOfSync.Both,
     "production",
   );
+  // Start message and response streams for rate limiting test
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.MessageandResponse);
+    worker.worker.startSync(typeOfSync.Both);
+  });
 
   let targetInboxId: string;
 

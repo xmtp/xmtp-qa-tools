@@ -16,8 +16,11 @@ describe(testName, async () => {
   workers = await getWorkers(
     getWorkersWithVersions(["random1", "random2", "random3"]),
     testName,
-    typeofStream.Message,
   );
+  // Start message streams for offline tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 

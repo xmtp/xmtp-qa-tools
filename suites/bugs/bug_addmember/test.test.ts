@@ -2,7 +2,7 @@ import { getManualUsers } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -11,13 +11,11 @@ const testName = "bug_addmember";
 
 describe(testName, async () => {
   const workers = await getWorkers(["bob"], testName);
-  const receiverWorkers = await getWorkers(
-    ["alice"],
-    testName,
-    typeofStream.Conversation,
-    typeOfResponse.None,
-    typeOfSync.None,
-  );
+  const receiverWorkers = await getWorkers(["alice"], testName);
+  // Start conversation streams for the receiver
+  receiverWorkers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Conversation);
+  });
   let creator = workers.get("bob")!;
   let receiver = receiverWorkers.get("alice")!;
 
