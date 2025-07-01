@@ -16,6 +16,12 @@ describe(testName, () => {
   let creator: Worker;
   let xmtpChat: Worker;
   let receiver: Worker;
+
+  // Example of using new getWorkers API with count and mode
+  // const workerManager = await getWorkers(3, undefined, { nameMode: 'random' });
+  // const names = getWorkerNames(workerManager);
+
+  // For now keeping original pattern for compatibility
   const names = getRandomNames(3);
 
   setupTestLifecycle({
