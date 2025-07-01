@@ -232,9 +232,8 @@ function generateAgentMessage(options: AgentNotificationOptions): string {
     customLinks ||
     `*Agent tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/agents/agents.json|${agentName}>`;
 
-  const responseTimeInfo = responseTime
-    ? `*Response Time:* \`${responseTime}ms\``
-    : "";
+  const responseTimeInfo =
+    responseTime != null ? `*Response Time:* \`${responseTime}ms\`` : "";
 
   const sections = [
     `*Agent Test Failure ❌*${tagMessage}`,
