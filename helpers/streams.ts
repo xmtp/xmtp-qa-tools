@@ -1,4 +1,5 @@
 import { sleep } from "@helpers/client";
+import { typeofStream } from "@workers/main";
 import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,

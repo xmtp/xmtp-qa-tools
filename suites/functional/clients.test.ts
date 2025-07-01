@@ -24,10 +24,6 @@ describe(testName, async () => {
       "oscar",
     ]),
   );
-  // Start message streams for client tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
 
   setupTestLifecycle({
     testName,

@@ -11,10 +11,7 @@ const testName = "bug_addmember";
 describe(testName, async () => {
   const workers = await getWorkers(["bob"]);
   const receiverWorkers = await getWorkers(["alice"]);
-  // Start conversation streams for the receiver
-  receiverWorkers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Conversation);
-  });
+
   let creator = workers.get("bob")!;
   let receiver = receiverWorkers.get("alice")!;
 

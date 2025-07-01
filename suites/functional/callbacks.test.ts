@@ -9,10 +9,6 @@ const testName = "callbacks";
 describe(testName, async () => {
   const names = getRandomNames(5);
   const workers = await getWorkers(getWorkersWithVersions(names));
-  // Start message streams for callback verification
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
 
   setupTestLifecycle({
     testName,
