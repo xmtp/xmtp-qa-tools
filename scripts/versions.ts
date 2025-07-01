@@ -4,11 +4,7 @@ import path from "path";
 import { VersionList } from "@helpers/client";
 
 type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
-const staticConfigs = Object.values(VersionList).map((version) => ({
-  ...version,
-  sdkPackage: version.sdkPackage,
-  bindingsPackage: version.bindingsPackage,
-}));
+const staticConfigs = Object.values(VersionList);
 /**
  * Auto-discover SDK and bindings packages in node_modules/@xmtp
  */
