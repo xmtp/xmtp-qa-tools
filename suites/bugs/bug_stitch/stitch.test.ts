@@ -1,6 +1,5 @@
-import { defaultNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
-import { getWorkers, type Worker } from "@workers/manager";
+import { defaultNames, getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const users: {

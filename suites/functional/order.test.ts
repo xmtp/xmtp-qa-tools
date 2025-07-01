@@ -1,4 +1,4 @@
-import { getFixedNames, getWorkersWithVersions, sleep } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -12,7 +12,7 @@ describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
-  workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
+  workers = await getWorkers(5);
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);

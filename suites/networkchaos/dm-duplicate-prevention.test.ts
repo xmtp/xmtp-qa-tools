@@ -14,9 +14,7 @@ describe(testName, async () => {
     randomguy: "http://localhost:6556",
   });
   // Start message streams for duplicate prevention test
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers.startStream(typeofStream.Message);
 
   setupTestLifecycle({ testName, expect });
 

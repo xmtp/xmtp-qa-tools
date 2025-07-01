@@ -406,18 +406,6 @@ describe(testName, async () => {
 });
 ```
 
-#### Multi-Version Testing Support
-
-Enable version compatibility testing in your test files:
-
-```typescript
-import { getWorkersWithVersions } from "@helpers/client";
-
-// Support --versions parameter for compatibility testing (e.g., --versions 3)
-const workerDescriptors = getWorkersWithVersions(["alice", "bob"]);
-const workers = await getWorkers(workerDescriptors);
-```
-
 #### Performance Measurement
 
 Utilize built-in performance measurement tools:

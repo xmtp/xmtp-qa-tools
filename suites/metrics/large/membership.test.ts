@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -21,7 +20,7 @@ describe(testName, async () => {
 
   const summaryMap: Record<number, SummaryEntry> = {};
 
-  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT));
+  let workers = await getWorkers(m_large_WORKER_COUNT);
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {

@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -10,20 +9,18 @@ const testName = "clients";
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(
-    getWorkersWithVersions([
-      "henry",
-      "ivy",
-      "jack",
-      "karen",
-      "bob",
-      "randomguy",
-      "larry",
-      "mary",
-      "nancy",
-      "oscar",
-    ]),
-  );
+  workers = await getWorkers([
+    "henry",
+    "ivy",
+    "jack",
+    "karen",
+    "bob",
+    "randomguy",
+    "larry",
+    "mary",
+    "nancy",
+    "oscar",
+  ]);
 
   setupTestLifecycle({
     testName,
