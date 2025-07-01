@@ -2,7 +2,6 @@ import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -14,11 +13,7 @@ describe(testName, () => {
   let conversation: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(getFixedNames(1), testName);
-    // Start message streams for bug test
-    workers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
+    workers = await getWorkers(getFixedNames(1));
   });
 
   setupTestLifecycle({

@@ -7,14 +7,13 @@ import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "my-test";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["alice", "bob"], testName);
+  const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({
     testName,
@@ -32,7 +31,6 @@ describe(testName, async () => {
 });
 ```
 
-
 ## Dynamic Stream Control
 
 Workers now support dynamic stream control, allowing you to start and stop specific stream types during runtime:
@@ -40,8 +38,6 @@ Workers now support dynamic stream control, allowing you to start and stop speci
 ### Starting Streams
 
 ```typescript
-import { typeofStream } from "@workers/main";
-
 // Start a message stream
 worker.worker.startStream(typeofStream.Message);
 
@@ -187,7 +183,6 @@ try {
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 ```

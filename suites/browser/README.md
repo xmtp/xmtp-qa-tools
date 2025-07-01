@@ -210,14 +210,14 @@ interface playwrightOptions {
 
 ```typescript
 // Conversation stream monitoring
-const convoStreamBot = await getWorkers(["bob"], testName);
-convoStreamBot.getAll().forEach(worker => {
+const convoStreamBot = await getWorkers(["bob"]);
+convoStreamBot.getAll().forEach((worker) => {
   worker.worker.startStream(typeofStream.Conversation);
 });
 
 // Message stream with GM responses
-const gmBotWorker = await getWorkers([receiver], testName);
-gmBotWorker.getAll().forEach(worker => {
+const gmBotWorker = await getWorkers([receiver]);
+gmBotWorker.getAll().forEach((worker) => {
   worker.worker.startStream(typeofStream.MessageandResponse);
 });
 ```

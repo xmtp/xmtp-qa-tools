@@ -2,7 +2,6 @@ import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { afterAll, describe, expect, it } from "vitest";
 import {
@@ -21,7 +20,6 @@ describe(testName, async () => {
 
   workers = await getWorkers(
     getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
-    testName,
   );
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];

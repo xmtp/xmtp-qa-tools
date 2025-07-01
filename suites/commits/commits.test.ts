@@ -1,7 +1,6 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
-import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -32,8 +31,6 @@ const targetEpoch = 50n; // The target epoch to stop the test (epochs are when p
 const network = process.env.XMTP_ENV; // Network environment setting
 const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/remove operations
 const installationCount = 5; // How many installations to use randomly in the createInstallation operations
-const typeofStreamForTest = typeofStream.None; // Starts a streamAllMessages in each worker
-const typeOfSyncForTest = typeOfSync.None; // Sync all every 5 seconds
 
 describe("commits", () => {
   setupTestLifecycle({
@@ -88,7 +85,6 @@ describe("commits", () => {
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(
       workerNames,
-      "commits",
       network as "local" | "dev" | "production",
     );
     // Note: typeofStreamForTest and typeOfSyncForTest are set to None, so no streams or syncs to start

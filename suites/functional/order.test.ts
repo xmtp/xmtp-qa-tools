@@ -2,7 +2,6 @@ import { getFixedNames, getWorkersWithVersions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -13,14 +12,7 @@ describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
-  workers = await getWorkers(
-    getWorkersWithVersions(getFixedNames(5)),
-    testName,
-  );
-  // Start message streams for order tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);

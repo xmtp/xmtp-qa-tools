@@ -29,7 +29,7 @@ import { getWorkers } from "@workers/manager";
 
 const testName = "my-test";
 
-const workers = await getWorkers(["alice", "bob"], testName);
+const workers = await getWorkers(["alice", "bob"]);
 setupTestLifecycle({ expect, workers, testName });
 
 // Access workers

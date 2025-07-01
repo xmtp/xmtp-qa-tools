@@ -2,7 +2,6 @@ import { formatBytes } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -18,7 +17,7 @@ describe(testName, () => {
 
   it("should generate storage efficiency table for different group sizes", async () => {
     try {
-      const workers = await getWorkers(["bot"], testName, "dev");
+      const workers = await getWorkers(["bot"], "dev");
       // Note: No streams or syncs needed for this test (all were set to None)
       const creator = workers.get("bot");
 

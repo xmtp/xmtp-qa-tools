@@ -1,5 +1,4 @@
 import { getFixedNames } from "@helpers/client";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -12,12 +11,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     const names = getFixedNames(10);
-    workers = await getWorkers(names, testName);
-    // Start message and conversation streams on demand
-    workers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-      worker.worker.startStream(typeofStream.Conversation);
-    });
+    workers = await getWorkers(names);
   });
 
   it("stream: send the stream", async () => {

@@ -21,11 +21,7 @@ The helper modules are designed to be imported and used in test suites:
 
 ```typescript
 import { extractErrorLogs, shouldFilterOutTest } from "@helpers/analyzer";
-import {
-  createSigner,
-  getEncryptionKeyFromHex,
-  loadEnv,
-} from "@helpers/client";
+import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
 import { logError, setupPrettyLogs } from "@helpers/logger";
 import { sendSlackNotification } from "@helpers/notifications";
@@ -46,9 +42,6 @@ const signer = createSigner(WALLET_KEY);
 
 // Generate an encryption key
 const encryptionKey = getEncryptionKeyFromHex(ENCRYPTION_KEY);
-
-// Load environment configuration for tests
-loadEnv(testName);
 
 // Create an XMTP client with specific version
 const clientData = await createClient(
@@ -182,7 +175,7 @@ const logger = createTestLogger({
 });
 
 // Log errors with consistent formatting
-logError(error, testName);
+logError(error);
 
 // Clean log files by removing ANSI codes
 await cleanAllRawLogs();
@@ -410,7 +403,7 @@ To use the helpers in your tests:
 1. **Import the required helpers**:
 
 ```typescript
-import { createSigner, loadEnv } from "@helpers/client";
+import { createSigner } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 ```

@@ -23,13 +23,13 @@ describe(testName, () => {
     expect,
   });
   beforeAll(async () => {
-    const convoStreamBot = await getWorkers([names[0], names[1]], testName);
+    const convoStreamBot = await getWorkers([names[0], names[1]]);
     // Start conversation streams for group event detection
     convoStreamBot.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Conversation);
     });
 
-    const gmBotWorker = await getWorkers([names[2]], testName);
+    const gmBotWorker = await getWorkers([names[2]]);
     // Start message and response streams for gm bot
     gmBotWorker.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.MessageandResponse);

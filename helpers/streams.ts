@@ -1,4 +1,5 @@
-import { sleep } from "@helpers/client";
+import { sleep, streamColdStartTimeout } from "@helpers/client";
+import { typeofStream } from "@workers/main";
 import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
@@ -30,29 +31,6 @@ export async function updateGroupConsent(
     {
       entity: group.id,
       entityType: ConsentEntityType.GroupId,
-      state:
-        getState === ConsentState.Allowed
-          ? ConsentState.Denied
-          : ConsentState.Allowed,
-    },
-  ]);
-}
-/**
- * Create a group consent sender that blocks both the group and a specific member
- */
-export async function updateInboxConsent(
-  worker: Worker,
-  memberInboxId: string,
-): Promise<void> {
-  const getState = await worker.client.preferences.getConsentState(
-    ConsentEntityType.InboxId,
-    memberInboxId,
-  );
-
-  await worker.client.preferences.setConsentStates([
-    {
-      entity: memberInboxId,
-      entityType: ConsentEntityType.InboxId,
       state:
         getState === ConsentState.Allowed
           ? ConsentState.Denied
@@ -173,8 +151,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
+  await sleep(streamColdStartTimeout); // wait for stream to start
   const sentEvents = await options.triggerEvents();
-  await sleep(1000);
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -248,6 +226,9 @@ export async function verifyMessageStream(
   messageTemplate: string = "gm-{i}-{randomSuffix}",
 ): Promise<VerifyStreamResult> {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, count),
@@ -282,6 +263,9 @@ export async function verifyMetadataStream(
   messageTemplate: string = "gm-{i}-{randomSuffix}",
 ): Promise<VerifyStreamResult> {
   const randomSuffix = Math.random().toString(36).substring(2, 15);
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, count),
@@ -314,6 +298,9 @@ export async function verifyMembershipStream(
   receivers: Worker[],
   membersToAdd: string[],
 ): Promise<VerifyStreamResult> {
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectGroupUpdates(group.id, 1),
@@ -341,6 +328,9 @@ export async function verifyGroupConsentStream(
   group: Group,
   receivers: Worker[],
 ): Promise<VerifyStreamResult> {
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.Consent);
+  });
   return collectAndTimeEventsWithStats({
     receivers: receivers.filter((r) => r.client?.inboxId !== group.id),
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
@@ -366,12 +356,27 @@ export async function verifyConsentStream(
   initiator: Worker,
   receiver: Worker,
 ): Promise<VerifyStreamResult> {
+  receiver.worker.startStream(typeofStream.Consent);
   return collectAndTimeEventsWithStats({
-    receivers: [initiator],
+    receivers: [receiver],
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      await updateInboxConsent(initiator, receiver.client.inboxId);
+      const getState = await receiver.client.preferences.getConsentState(
+        ConsentEntityType.InboxId,
+        receiver.client.inboxId,
+      );
+
+      await receiver.client.preferences.setConsentStates([
+        {
+          entity: receiver.client.inboxId,
+          entityType: ConsentEntityType.InboxId,
+          state:
+            getState === ConsentState.Allowed
+              ? ConsentState.Denied
+              : ConsentState.Allowed,
+        },
+      ]);
       return [{ key: "consent", sentAt }];
     },
     getKey: (ev) => (ev as { key?: string }).key ?? "consent",
@@ -390,9 +395,9 @@ export async function verifyConversationStream(
   initiator: Worker,
   receivers: Worker[],
 ): Promise<VerifyStreamResult> {
-  if (!initiator.client || !initiator.worker) {
-    throw new Error(`Initiator ${initiator.name} has no client`);
-  }
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.Conversation);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) =>
@@ -420,6 +425,9 @@ export async function verifyAddMemberStream(
   receivers: Worker[],
   membersToAdd: string[],
 ): Promise<VerifyStreamResult> {
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectAddedMembers(group.id, 1),
@@ -444,6 +452,9 @@ export async function verifyNewConversationStream(
   group: Group,
   receivers: Worker[],
 ): Promise<VerifyStreamResult> {
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.Conversation);
+  });
   const creatorInboxId = (await group.metadata()).creatorInboxId;
   return collectAndTimeEventsWithStats({
     receivers,
@@ -513,6 +524,9 @@ export async function verifyBotMessageStream(
   receivers: Worker[],
   triggerMessage: string,
 ): Promise<VerifyStreamResult> {
+  receivers.forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   return collectAndTimeEventsWithStats({
     receivers,
     startCollectors: (r) => r.worker.collectMessages(group.id, 1),

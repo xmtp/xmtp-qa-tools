@@ -3,7 +3,6 @@ import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -17,11 +16,8 @@ describe(testName, async () => {
   let dm: Dm | undefined;
   let workers: WorkerManager;
 
-  workers = await getWorkers(getFixedNames(10), testName);
-  // Start message streams for stream verification tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers = await getWorkers(getFixedNames(10));
+
   const creator = workers.getCreator();
   console.warn("creator is:", creator.name);
   const creatorClient = creator.client;
@@ -42,7 +38,7 @@ describe(testName, async () => {
 
   it("clientCreate: should measure creating a client", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName);
+      const client = await getWorkers(["randomclient"]);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -51,7 +47,7 @@ describe(testName, async () => {
   });
   it("canMessage: should measure canMessage", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName);
+      const client = await getWorkers(["randomclient"]);
       if (!client) {
         throw new Error("Client not found");
       }

@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -8,16 +7,12 @@ import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "dm-duplicate-chaos";
-loadEnv(testName);
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    {
-      henry: "http://localhost:5556",
-      randomguy: "http://localhost:6556",
-    },
-    testName,
-  );
+  const workers = await getWorkers({
+    henry: "http://localhost:5556",
+    randomguy: "http://localhost:6556",
+  });
   // Start message streams for duplicate prevention test
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
