@@ -9,13 +9,7 @@ import {
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import {
-  installationThreshold,
-  typeOfResponse,
-  typeofStream,
-  typeOfSync,
-  WorkerClient,
-} from "./main";
+import { installationThreshold, WorkerClient } from "./main";
 
 export interface WorkerBase {
   name: string;
@@ -45,9 +39,6 @@ export interface Worker extends WorkerBase {
 export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
   private activeWorkers: WorkerClient[] = [];
-  private typeofStream: typeofStream = typeofStream.Message;
-  private typeOfResponse: typeOfResponse = typeOfResponse.Gm;
-  private typeOfSync: typeOfSync = typeOfSync.None;
   private env: XmtpEnv;
   private keysCache: Record<
     string,
@@ -57,15 +48,7 @@ export class WorkerManager {
   /**
    * Constructor creates an empty manager or populates it with existing workers
    */
-  constructor(
-    typeofStreamType: typeofStream = typeofStream.Message,
-    typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
-    typeOfSyncType: typeOfSync = typeOfSync.None,
-    env: XmtpEnv,
-  ) {
-    this.typeofStream = typeofStreamType;
-    this.typeOfResponse = typeOfResponseType;
-    this.typeOfSync = typeOfSyncType;
+  constructor(testName: string, env: XmtpEnv) {
     this.env = env;
     this.workers = {};
   }
@@ -393,15 +376,7 @@ export class WorkerManager {
     };
 
     // Create and initialize the worker
-    const workerClient = new WorkerClient(
-      workerData,
-      this.typeofStream,
-      this.typeOfResponse,
-      this.typeOfSync,
-      this.env,
-      {},
-      apiUrl,
-    );
+    const workerClient = new WorkerClient(workerData, this.env, {}, apiUrl);
 
     const initializedWorker = await workerClient.initialize();
 
@@ -435,17 +410,10 @@ export class WorkerManager {
  */
 export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string>,
-  typeofStreamType: typeofStream = typeofStream.None,
-  typeOfResponseType: typeOfResponse = typeOfResponse.None,
-  typeOfSyncType: typeOfSync = typeOfSync.None,
+  testName: string,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
-  const manager = new WorkerManager(
-    typeofStreamType,
-    typeOfResponseType,
-    typeOfSyncType,
-    env,
-  );
+  const manager = new WorkerManager(testName, env);
 
   let workerPromises: Promise<Worker>[] = [];
 

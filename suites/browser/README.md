@@ -210,19 +210,16 @@ interface playwrightOptions {
 
 ```typescript
 // Conversation stream monitoring
-const convoStreamBot = await getWorkers(
-  ["bob"],
-  testName,
-  typeofStream.Conversation,
-);
+const convoStreamBot = await getWorkers(["bob"], testName);
+convoStreamBot.getAll().forEach(worker => {
+  worker.worker.startStream(typeofStream.Conversation);
+});
 
 // Message stream with GM responses
-const gmBotWorker = await getWorkers(
-  [receiver],
-  testName,
-  typeofStream.Message,
-  typeOfResponse.Gm,
-);
+const gmBotWorker = await getWorkers([receiver], testName);
+gmBotWorker.getAll().forEach(worker => {
+  worker.worker.startStream(typeofStream.MessageandResponse);
+});
 ```
 
 ## Running Tests

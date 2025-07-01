@@ -2,7 +2,7 @@ import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -19,9 +19,12 @@ describe(testName, async () => {
       user3: "http://localhost:6556",
       user4: "http://localhost:6556",
     },
-    typeofStream.Message,
-    typeOfResponse.Gm,
+    testName,
   );
+  // Start message and response streams for the chaos testing
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.MessageandResponse);
+  });
 
   setupTestLifecycle({ testName, expect });
 

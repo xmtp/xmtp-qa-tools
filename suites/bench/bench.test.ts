@@ -51,10 +51,11 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(
-            getRandomNames(WORKER_COUNT),
-            typeofStream.GroupUpdated,
-          );
+          workers = await getWorkers(getRandomNames(WORKER_COUNT), testName);
+          // Start group updated streams for bench tests
+          workers.getAll().forEach((worker) => {
+            worker.worker.startStream(typeofStream.GroupUpdated);
+          });
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(
@@ -97,7 +98,7 @@ describe(testName, () => {
           );
 
           const zWorkerName = "random" + `${i}-${installation}`;
-          const zWorker = await getWorkers([zWorkerName]);
+          const zWorker = await getWorkers([zWorkerName], testName);
           await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
           const zSyncAllStart = performance.now();
           await zWorker.getCreator().client.conversations.syncAll();

@@ -18,10 +18,11 @@ import {
 const testName = "m_large_conversations";
 
 describe(testName, async () => {
-  let workers = await getWorkers(
-    getFixedNames(m_large_WORKER_COUNT),
-    typeofStream.Conversation,
-  );
+  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT), testName);
+  // Start conversation streams for large conversation tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Conversation);
+  });
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};

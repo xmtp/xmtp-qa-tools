@@ -385,11 +385,12 @@ All tests use the standardized worker framework for consistent test environments
 ```typescript
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
+import { typeofStream } from "@workers/main";
 
 const testName = "my-test";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["alice", "bob"], testName);
+  const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({
     expect,
@@ -400,6 +401,10 @@ describe(testName, async () => {
   it("should test functionality", async () => {
     const alice = workers.get("alice");
     const bob = workers.get("bob");
+
+    // Start streams on demand based on test needs
+    alice.worker.startStream(typeofStream.Message);
+    bob.worker.startStream(typeofStream.MessageandResponse);
 
     // Test implementation
   });
@@ -415,7 +420,7 @@ import { getWorkersWithVersions } from "@helpers/client";
 
 // Support --versions parameter for compatibility testing (e.g., --versions 3)
 const workerDescriptors = getWorkersWithVersions(["alice", "bob"]);
-const workers = await getWorkers(workerDescriptors, testName);
+const workers = await getWorkers(workerDescriptors);
 ```
 
 #### Performance Measurement

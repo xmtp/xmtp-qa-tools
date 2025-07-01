@@ -23,7 +23,11 @@ describe(testName, async () => {
     "oscar",
   ]);
 
-  const workers = await getWorkers(workerDescriptors, typeofStream.Message);
+  const workers = await getWorkers(workerDescriptors, testName);
+  // Start message streams for DM tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
   let convo: Dm;
 
   setupTestLifecycle({

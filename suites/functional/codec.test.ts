@@ -14,8 +14,12 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(
     getWorkersWithVersions(getFixedNames(2)),
-    typeofStream.Message,
+    testName,
   );
+  // Start message streams for codec tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
 
   setupTestLifecycle({
     testName,

@@ -286,7 +286,7 @@ describe("E2E: Installation syncing", () => {
           console.log(
             `installation ${installation.installationId} groups: ${groups.length}, members: ${members.flat().length}, messages: ${messages.flat().length}`,
           );
-          console.log(installation.debugInformation.apiStatistics());
+          // console.log(installation.debugInformation.apiStatistics()); // debugInformation not available
         }),
       );
       console.log("=================================================");

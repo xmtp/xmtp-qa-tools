@@ -14,11 +14,7 @@ import { describe, expect, it } from "vitest";
 const testName = "my-test";
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    getWorkersWithVersions(["alice", "bob"]),
-    testName,
-    typeofStream.Message,
-  );
+  const workers = await getWorkers(["alice", "bob"], testName);
 
   setupTestLifecycle({
     testName,
@@ -34,6 +30,37 @@ describe(testName, async () => {
     }
   });
 });
+```
+
+
+## Dynamic Stream Control
+
+Workers now support dynamic stream control, allowing you to start and stop specific stream types during runtime:
+
+### Starting Streams
+
+```typescript
+import { typeofStream } from "@workers/main";
+
+// Start a message stream
+worker.worker.startStream(typeofStream.Message);
+
+// Start a message stream with automatic responses
+worker.worker.startStream(typeofStream.MessageandResponse);
+
+// Start multiple streams
+worker.worker.startStream(typeofStream.Conversation);
+worker.worker.startStream(typeofStream.Consent);
+```
+
+### Stopping Streams
+
+```typescript
+// Stop all streams
+worker.worker.endStream();
+
+// Stop a specific stream type
+worker.worker.endStream(typeofStream.Message);
 ```
 
 ## Worker Access Patterns

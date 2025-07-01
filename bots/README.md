@@ -39,12 +39,12 @@ The `agents` bot provides AI-powered chat personalities using GPT integration.
 
 ```typescript
 // Initialize multiple agent personalities
-const workersGpt = await getWorkers(
-  ["sam", "tina", "walt"],
-  testName,
-  typeofStream.Message,
-  typeOfResponse.Gpt,
-);
+const workersGpt = await getWorkers(["sam", "tina", "walt"]);
+
+// Start message streams with GPT responses on demand
+workersGpt.getAll().forEach((worker) => {
+  worker.worker.startStream(typeofStream.MessageandResponse);
+});
 ```
 
 **Key features:**
@@ -110,7 +110,7 @@ The `stress` bot performs load testing for XMTP groups and DMs.
 ```typescript
 // Run stress test with specified number of workers
 const stressTest = async (count) => {
-  const workers = await getWorkers(count, testName);
+  const workers = await getWorkers(count);
 
   // Create group with all workers
   const group = await client.conversations.newGroup(

@@ -3,7 +3,7 @@ import { getTime, logError } from "@helpers/logger";
 import { playwright } from "@helpers/playwright";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -23,15 +23,17 @@ describe(testName, () => {
     expect,
   });
   beforeAll(async () => {
-    const convoStreamBot = await getWorkers(
-      [names[0], names[1]],
-      typeofStream.Conversation,
-    );
-    const gmBotWorker = await getWorkers(
-      [names[2]],
-      typeofStream.Message,
-      typeOfResponse.Gm,
-    );
+    const convoStreamBot = await getWorkers([names[0], names[1]], testName);
+    // Start conversation streams for group event detection
+    convoStreamBot.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Conversation);
+    });
+
+    const gmBotWorker = await getWorkers([names[2]], testName);
+    // Start message and response streams for gm bot
+    gmBotWorker.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.MessageandResponse);
+    });
     creator = convoStreamBot.get(names[0]) as Worker;
     xmtpChat = convoStreamBot.get(names[1]) as Worker;
     receiver = gmBotWorker.get(names[2]) as Worker;
