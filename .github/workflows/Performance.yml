@@ -41,6 +41,20 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
+      - name: Send timeout notification
+        if: failure() && steps.run-tests.conclusion == 'failure'
+        run: |
+          node -e "
+          const { sendSlackNotification } = require('./helpers/notifications');
+          sendSlackNotification({
+            testName: '${{ matrix.test }}',
+            label: 'error',
+            errorLogs: new Set(['Workflow timed out after 10 minutes']),
+            env: '${{ matrix.environment }}',
+            jobStatus: 'timeout',
+            channel: 'notify-qa-tools'
+          }).catch(console.error);
+          "
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
