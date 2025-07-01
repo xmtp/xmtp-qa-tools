@@ -409,20 +409,61 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrMap: string[] | Record<string, string>,
+  descriptorsOrMap: string[] | Record<string, string> | number,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
+  options: {
+    useVersions?: boolean;
+    nameMode?: "fixed" | "random";
+  } = {},
 ): Promise<WorkerManager> {
+  const { useVersions = false, nameMode = "fixed" } = options;
   const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
 
-  if (Array.isArray(descriptorsOrMap)) {
-    workerPromises = descriptorsOrMap.map((descriptor) =>
+  // Handle different input types
+  if (typeof descriptorsOrMap === "number") {
+    // Number input - generate worker names based on mode
+    const count = descriptorsOrMap;
+    let names: string[];
+
+    if (nameMode === "random") {
+      names = getRandomNames(count);
+    } else {
+      names = getFixedNames(count);
+    }
+
+    // Apply versioning if requested
+    const descriptors = useVersions ? getWorkersWithVersions(names) : names;
+
+    workerPromises = descriptors.map((descriptor) =>
+      manager.createWorker(descriptor),
+    );
+  } else if (Array.isArray(descriptorsOrMap)) {
+    // Array input - apply versioning if requested
+    const descriptors = useVersions
+      ? getWorkersWithVersions(descriptorsOrMap)
+      : descriptorsOrMap;
+
+    workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
   } else {
-    workerPromises = Object.entries(descriptorsOrMap).map(
-      ([descriptor, apiUrl]) => manager.createWorker(descriptor, apiUrl),
+    // Record input - apply versioning if requested
+    let entries = Object.entries(descriptorsOrMap);
+
+    if (useVersions) {
+      const versionedKeys = getWorkersWithVersions(
+        Object.keys(descriptorsOrMap),
+      );
+      entries = versionedKeys.map((key, index) => [
+        key,
+        Object.values(descriptorsOrMap)[index],
+      ]);
+    }
+
+    workerPromises = entries.map(([descriptor, apiUrl]) =>
+      manager.createWorker(descriptor, apiUrl),
     );
   }
 
@@ -432,6 +473,109 @@ export async function getWorkers(
 
   return manager;
 }
+
+// Helper functions moved inside this file for internal use
+function getFixedNames(count: number): string[] {
+  return [...defaultNames].slice(0, count);
+}
+
+function getRandomNames(count: number): string[] {
+  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+}
+
+function getWorkersWithVersions(workerNames: string[]): string[] {
+  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
+
+  if (!testVersions) {
+    // No versions specified, return names as-is (will use latest version)
+    return workerNames;
+  }
+
+  const sdkVersionOptions = Object.keys(VersionList)
+    .filter((key) => parseInt(key) >= 200)
+    .sort((a, b) => parseInt(b) - parseInt(a));
+
+  const availableVersions = sdkVersionOptions.slice(0, testVersions);
+
+  const descriptors: string[] = [];
+  for (const workerName of workerNames) {
+    // Pick a random version from the specified list
+    const randomVersion =
+      availableVersions[Math.floor(Math.random() * availableVersions.length)];
+    descriptors.push(`${workerName}-a-${randomVersion}`);
+  }
+
+  return descriptors;
+}
+
+// Default worker names
+const defaultNames = [
+  "bob",
+  "alice",
+  "fabri",
+  "elon",
+  "joe",
+  "charlie",
+  "dave",
+  "eve",
+  "frank",
+  "grace",
+  "henry",
+  "ivy",
+  "jack",
+  "karen",
+  "larry",
+  "mary",
+  "nancy",
+  "oscar",
+  "paul",
+  "quinn",
+  "rachel",
+  "steve",
+  "tom",
+  "ursula",
+  "victor",
+  "wendy",
+  "xavier",
+  "yolanda",
+  "zack",
+  "adam",
+  "bella",
+  "carl",
+  "diana",
+  "eric",
+  "fiona",
+  "george",
+  "hannah",
+  "ian",
+  "julia",
+  "keith",
+  "lisa",
+  "mike",
+  "nina",
+  "oliver",
+  "penny",
+  "quentin",
+  "rosa",
+  "sam",
+  "tina",
+  "walt",
+  "uma",
+  "vince",
+  "xena",
+  "yara",
+  "zara",
+  "guada", // max 61
+];
+
+/**
+ * Helper function to get worker names array from a WorkerManager
+ * Always returns names in the same order (sorted by creation order)
+ */
+export function getWorkerNames(workers: WorkerManager): string[] {
+  return workers.getAll().map((worker) => worker.name);
+}
+
 /**
  * Helper function to get the next available folder name
  */

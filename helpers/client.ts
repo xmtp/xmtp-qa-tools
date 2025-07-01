@@ -634,32 +634,17 @@ export const appendToEnv = (key: string, value: string): void => {
   }
 };
 
+// Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
   return [...defaultNames].slice(0, count);
 };
-export async function removeDataFolder(): Promise<void> {
-  const dataPath = path.join(process.cwd(), ".data");
-  if (fs.existsSync(dataPath)) {
-    await fs.promises.rm(dataPath, { recursive: true, force: true });
-  }
-}
-export function getMultiVersion(count: number): string[] {
-  const descriptors: string[] = [];
-  for (const descriptor of getFixedNames(count)) {
-    const randomSdkVersion =
-      sdkVersionOptions[Math.floor(Math.random() * sdkVersionOptions.length)];
-    descriptors.push(`${descriptor}-a-${randomSdkVersion}`);
-  }
 
-  return descriptors;
-}
+// Deprecated: Use getWorkers with count and options instead
+export const getRandomNames = (count: number): string[] => {
+  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+};
 
-/**
- * Creates worker descriptors with versions from TEST_VERSIONS environment variable
- * If TEST_VERSIONS is not set, uses the latest version
- * @param workerNames - Array of worker names to create descriptors for
- * @returns Array of worker descriptors with version suffixes
- */
+// Deprecated: Use getWorkers with useVersions option instead
 export function getWorkersWithVersions(workerNames: string[]): string[] {
   const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
 
@@ -681,9 +666,22 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
   return descriptors;
 }
 
-export const getRandomNames = (count: number): string[] => {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
-};
+export async function removeDataFolder(): Promise<void> {
+  const dataPath = path.join(process.cwd(), ".data");
+  if (fs.existsSync(dataPath)) {
+    await fs.promises.rm(dataPath, { recursive: true, force: true });
+  }
+}
+export function getMultiVersion(count: number): string[] {
+  const descriptors: string[] = [];
+  for (const descriptor of getFixedNames(count)) {
+    const randomSdkVersion =
+      sdkVersionOptions[Math.floor(Math.random() * sdkVersionOptions.length)];
+    descriptors.push(`${descriptor}-a-${randomSdkVersion}`);
+  }
+
+  return descriptors;
+}
 
 // Default worker names
 export const defaultNames = [

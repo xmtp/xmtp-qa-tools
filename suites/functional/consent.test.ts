@@ -1,4 +1,3 @@
-import { getRandomNames, getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -10,7 +9,10 @@ const testName = "consent";
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(getWorkersWithVersions(getRandomNames(2)));
+  workers = await getWorkers(2, undefined, {
+    useVersions: true,
+    nameMode: "random",
+  });
 
   setupTestLifecycle({
     testName,
