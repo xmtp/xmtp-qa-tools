@@ -1,6 +1,6 @@
 ---
-description:
-globs:
+description: 
+globs: 
 alwaysApply: true
 ---
 
@@ -111,22 +111,260 @@ const name = group.name;
 const admins = group.admins;
 ```
 
-## Stream Verification
+## Streams and Stream Verification
+
+### Stream Types Available
 
 ```typescript
-// Verify message delivery
+import { typeofStream } from "@workers/main";
+
+// Available stream types
+typeofStream.Message;           // Message delivery streams
+typeofStream.MessageandResponse; // Message streams with automatic responses
+typeofStream.GroupUpdated;      // Group metadata and membership updates
+typeofStream.Conversation;      // New conversation creation events
+typeofStream.Consent;           // Consent state changes
+```
+
+### Manual Stream Control
+
+Start and stop streams dynamically during test execution:
+
+```typescript
+// Start specific stream types on demand
+workers.getReceiver().worker.startStream(typeofStream.Message);
+workers.getReceiver().worker.startStream(typeofStream.GroupUpdated);
+workers.getReceiver().worker.startStream(typeofStream.Conversation);
+
+// Start streams for multiple workers
+workers.getAllButCreator().forEach(worker => {
+  worker.worker.startStream(typeofStream.Message);
+});
+
+// Stop all streams for a worker
+workers.getReceiver().worker.endStream();
+
+// Stop specific stream type
+workers.getReceiver().worker.endStream(typeofStream.Message);
+```
+
+### Stream Verification Functions
+
+#### Message Streams
+
+```typescript
+// Verify message delivery with custom template
 const verifyResult = await verifyMessageStream(
   conversation,
   [workers.get("bob")], // receivers
-  1, // message count
-  "gm-{i}-{randomSuffix}", // message template
+  10, // message count
+  "test-{i}-{randomSuffix}", // message template
+);
+
+// Check delivery results
+expect(verifyResult.allReceived).toBe(true);
+expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
+expect(verifyResult.averageEventTiming).toBeLessThan(500);
+```
+
+#### Group Metadata Streams
+
+```typescript
+// Verify group metadata updates (name changes)
+const verifyResult = await verifyMetadataStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  3, // number of name updates
+  "GroupName-{i}-{randomSuffix}", // name template
 );
 expect(verifyResult.allReceived).toBe(true);
+```
 
-// Other stream verifications
-await verifyMetadataStream(group, receivers, count);
-await verifyMembershipStream(group, receivers, membersToAdd);
-await verifyConversationStream(initiator, receivers);
+#### Membership Streams
+
+```typescript
+// Verify member addition notifications
+const verifyResult = await verifyMembershipStream(
+  group,
+  workers.getAllButCreator(), // receivers
+  [newMemberInboxId], // members to add
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Conversation Streams
+
+```typescript
+// Verify new conversation creation notifications
+const verifyResult = await verifyConversationStream(
+  workers.getCreator(), // initiator
+  [workers.getReceiver()], // receivers
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Consent Streams
+
+```typescript
+// Verify consent state change notifications
+const verifyResult = await verifyConsentStream(
+  workers.getCreator(), // initiator
+  workers.getReceiver(), // receiver
+);
+expect(verifyResult.allReceived).toBe(true);
+```
+
+#### Bot Response Streams
+
+```typescript
+// Verify bot response timing
+const verifyResult = await verifyBotMessageStream(
+  conversation,
+  [workers.getReceiver()], // receivers
+  "trigger message", // message to trigger bot response
+);
+expect(verifyResult.averageEventTiming).toBeLessThan(1000);
+```
+
+### Stream Result Analysis
+
+All stream verification functions return a `VerifyStreamResult` object:
+
+```typescript
+type VerifyStreamResult = {
+  allReceived: boolean;           // True if all expected events received
+  almostAllReceived: boolean;     // True if ≤2 events missing
+  receiverCount: number;          // Number of receiving workers
+  messages: string;               // Comma-separated received messages
+  eventTimings: string;           // Timing data per receiver
+  averageEventTiming: number;     // Average delivery time in ms
+  receptionPercentage: number;    // Percentage of successfully received events
+  orderPercentage: number;        // Percentage of receivers with correct order
+};
+
+// Example usage
+const result = await verifyMessageStream(conversation, receivers, 5);
+
+console.log(`Reception: ${result.receptionPercentage}%`);
+console.log(`Order: ${result.orderPercentage}%`);
+console.log(`Average timing: ${result.averageEventTiming}ms`);
+
+// Flexible assertions based on requirements
+expect(result.allReceived || result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(90);
+expect(result.averageEventTiming).toBeLessThan(2000);
+```
+
+### Stream Testing Best Practices
+
+#### 1. Start Streams Before Actions
+
+```typescript
+// ✅ Good: Start streams before triggering events
+workers.getReceiver().worker.startStream(typeofStream.Message);
+await conversation.send("Hello");
+
+// ❌ Bad: Start streams after triggering events  
+await conversation.send("Hello");
+workers.getReceiver().worker.startStream(typeofStream.Message);
+```
+
+#### 2. Use Appropriate Stream Types
+
+```typescript
+// For message delivery testing
+worker.worker.startStream(typeofStream.Message);
+
+// For group updates (name, description, membership)
+worker.worker.startStream(typeofStream.GroupUpdated);
+
+// For new conversation notifications
+worker.worker.startStream(typeofStream.Conversation);
+
+// For consent state changes
+worker.worker.startStream(typeofStream.Consent);
+```
+
+#### 3. Handle Stream Cleanup
+
+```typescript
+// Streams are automatically cleaned up by setupTestLifecycle
+// Manual cleanup if needed:
+afterEach(() => {
+  workers.getAll().forEach(worker => {
+    worker.worker.endStream();
+  });
+});
+```
+
+#### 4. Performance-Aware Assertions
+
+```typescript
+// For high-performance requirements
+expect(result.allReceived).toBe(true);
+expect(result.averageEventTiming).toBeLessThan(200);
+
+// For reliability testing with some tolerance
+expect(result.almostAllReceived).toBe(true);
+expect(result.receptionPercentage).toBeGreaterThan(95);
+
+// For large-scale testing with relaxed requirements
+expect(result.receptionPercentage).toBeGreaterThan(80);
+expect(result.orderPercentage).toBeGreaterThan(90);
+```
+
+### Common Stream Testing Patterns
+
+#### Real-time Message Testing
+
+```typescript
+it("should deliver messages in real-time", async () => {
+  try {
+    // Start message streams
+    workers.getReceiver().worker.startStream(typeofStream.Message);
+    
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+    
+    const verifyResult = await verifyMessageStream(
+      dm,
+      [workers.get("bob")],
+      5,
+      "realtime-{i}-{randomSuffix}"
+    );
+    
+    expect(verifyResult.allReceived).toBe(true);
+    expect(verifyResult.averageEventTiming).toBeLessThan(500);
+  } catch (e) {
+    logError(e, expect.getState().currentTestName);
+    throw e;
+  }
+});
+```
+
+#### Group Update Notifications
+
+```typescript
+it("should notify all members of group updates", async () => {
+  try {
+    // Start group update streams
+    workers.getAllButCreator().forEach(worker => {
+      worker.worker.startStream(typeofStream.GroupUpdated);
+    });
+    
+    const group = await workers.createGroupBetweenAll();
+    
+    const verifyResult = await verifyMetadataStream(
+      group,
+      workers.getAllButCreator(),
+      3
+    );
+    
+    expect(verifyResult.allReceived).toBe(true);
+  } catch (e) {
+    logError(e, expect.getState().currentTestName);
+    throw e;
+  }
+});
 ```
 
 ## Available Worker Names
