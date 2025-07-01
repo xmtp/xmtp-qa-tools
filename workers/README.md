@@ -1,175 +1,166 @@
-# 🤖 Workers for Testing
+# XMTP Testing Worker Framework Rules
 
-> Internal testing utilities for simulating multi-user and multi-device scenarios
-
-## 🌟 Overview
-
-Our testing framework provides worker utilities that allow you to easily create predefined workers (like Alice, Bob, etc.) with different installations. This is particularly useful for testing multi-device scenarios or different client configurations within our test suite.
+## Core Testing Pattern
 
 ```typescript
-// Quick example
-const workers = await getWorkers(["alice", "bob"], "my-test");
-const alice = workers.get("alice");
-const bob = workers.get("bob");
+import { getWorkersWithVersions } from "@helpers/client";
+import { logError } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
 
-// Start a conversation
-const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
-await conversation.send("Hello from Alice to Bob");
-```
+const testName = "my-test";
 
-## ✨ Key Features
+describe(testName, async () => {
+  const workers = await getWorkers(
+    getWorkersWithVersions(["alice", "bob"]),
+    testName,
+    typeofStream.Message,
+  );
 
-- **🔑 Identity Management**: Automatic key creation with persistence between test runs
-- **📱 Multi-Device Testing**: Simulate multiple installations (desktop, mobile, etc.) for the same worker
-- **📊 Separate Storage**: Independent database paths for each installation
-- **🔄 Stream Handling**: Built-in support for message, conversation, and consent streams
-- **🤖 GPT Integration**: Optional AI-powered responses for automated testing scenarios
+  setupTestLifecycle({
+    testName,
+    expect,
+  });
 
-## 📋 Usage Examples
-
-### Basic Testing
-
-```typescript
-// Import the getWorkers function
-import { getWorkers } from "./path/to/manager";
-
-// Initialize workers in your test file
-const workers = await getWorkers(["alice", "bob"], testName);
-
-// Access workers by name (default installation "a")
-const alice = workers.get("alice");
-const bob = workers.get("bob");
-
-// Test a simple conversation
-const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
-await conversation.send("Hello Bob!");
-
-// Wait for Bob to receive the message
-await bob.client.conversations.sync();
-const bobConversations = await bob.client.conversations.list();
-```
-
-### Multi-Device Scenarios
-
-```typescript
-// Create primary and secondary installations
-const primaryWorkers = await getWorkers(["alice", "bob"], testName);
-const secondaryWorkers = await getWorkers(
-  ["alice-desktop", "bob-mobile"],
-  testName,
-);
-
-// Access specific installations
-const alicePhone = primaryWorkers.get("alice");
-const aliceDesktop = secondaryWorkers.get("alice", "desktop");
-const bobMobile = secondaryWorkers.get("bob", "mobile");
-
-// Test synchronization across devices
-const conversation = await aliceDesktop.client.conversations.newDm(
-  bobMobile.client.inboxId,
-);
-await conversation.send("Hello from Alice's desktop!");
-
-// Verify message appears on Alice's phone
-await alicePhone.client.conversations.sync();
-const alicePhoneConversations = await alicePhone.client.conversations.list();
-```
-
-### Stream Collection
-
-```typescript
-// Set up worker with message streaming
-const workers = await getWorkers(["alice", "bob"], testName);
-const alice = workers.get("alice");
-const bob = workers.get("bob");
-
-// Start conversation and send message
-const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
-const conversationId = conversation.id;
-await conversation.send("Testing stream collection");
-
-// Collect incoming messages for Bob
-const incomingMessages = await bob.worker.collectMessages(
-  conversationId,
-  "text",
-);
-
-console.log(`Received message: ${incomingMessages[0].message.content}`);
-```
-
-### Using GPT Responses
-
-```typescript
-// Create workers with GPT-powered responses
-const workers = await getWorkers(
-  ["alice", "bob"],
-  testName,
-  typeofStream.Message,
-  typeOfResponse.Gpt,
-);
-const alice = workers.get("alice");
-const bob = workers.get("bob");
-
-// Send message that will trigger GPT response from Bob
-const conversation = await alice.client.conversations.newDm(bob.client.inboxId);
-await conversation.send("Hey bob, what do you think about this feature?");
-
-// Bob will automatically generate and send a response
-// Wait for the response to come back to Alice
-const responses = await alice.worker.collectMessages(
-  conversation.id,
-  "text",
-  1,
-);
-```
-
-### Creating Multiple Workers at Once
-
-```typescript
-// Create 4 workers using default names
-const workers = await getWorkers(4, testName);
-// This will create workers for the first 4 names in defaultNames
-```
-
-## 🧰 Available Methods
-
-| Method                                                        | Description                              |
-| ------------------------------------------------------------- | ---------------------------------------- |
-| `getWorkers(descriptors, testName, streamType?, gptEnabled?)` | Creates and initializes worker instances |
-| `workers.get(name, installationId?)`                          | Retrieves a specific worker              |
-| `workers.getCreator()`                                        | Returns the worker creator               |
-| `workers.getAll()`                                            | Returns all workers                      |
-| `workers.createGroupBetweenAll(groupName, workerNames)`       | Creates a group of workers               |
-| `workers.getLength()`                                         | Returns the total number of workers      |
-| `workers.getRandomWorkers(count)`                             | Gets a random subset of workers          |
-
-## 📚 Available names for workers
-
-The framework comes with 61 predefined worker names that you can use:
-
-```typescript
-import { defaultNames } from "@xmtp/node-sdk";
-
-// First few names from the list:
-// "bob", "alice", "fabri", "bot", "elon", "joe", "charlie"...
-```
-
-> 💡 **Tip**: Access our repository of 600 dummy wallets with inboxIds in the `inboxes.json` file
-
-## 🧹 Cleanup
-
-Always clean up your workers after tests:
-
-```typescript
-afterAll(async () => {
-  await closeEnv(testName, allWorkers);
+  it("should do something", async () => {
+    try {
+      // Test logic here
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  });
 });
 ```
 
-## 🔍 Implementation Details
+## Worker Access Patterns
 
-- Worker instances use Node.js worker threads for parallel processing
-- Keys are stored in `.env` files (except for "random" workers which store keys only in memory)
-- Database paths follow a structured format to avoid conflicts between tests
-- Message streams, conversation streams, and consent streams are supported
-- GPT responses are generated using OpenAI's API if enabled
+```typescript
+// Get specific workers
+const alice = workers.get("alice");
+const bob = workers.get("bob");
+
+// Access worker properties
+alice.client; // XMTP client
+alice.worker; // Worker thread
+alice.name; // "alice"
+alice.address; // Ethereum address
+alice.client.inboxId; // Inbox ID
+
+// Utility methods
+workers.getCreator(); // First worker
+workers.getReceiver(); // Random non-creator
+workers.getAll(); // All workers array
+workers.getAllButCreator(); // All except first
+workers.getRandomWorkers(2); // Random subset
+```
+
+## Conversation Operations
+
+```typescript
+// Create DM by inbox ID
+const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+
+// Create DM by Ethereum address
+const dm2 = await alice.client.conversations.newDmWithIdentifier({
+  identifier: bob.address,
+  identifierKind: IdentifierKind.Ethereum,
+});
+
+// Create group with inbox IDs
+const group = await alice.client.conversations.newGroup([
+  bob.client.inboxId,
+  workers.get("charlie").client.inboxId,
+]);
+
+// Create group between all workers
+const testGroup = await workers.createGroupBetweenAll("My Group");
+
+// Send messages
+await dm.send("Hello DM");
+await group.send("Hello Group");
+```
+
+## Group Operations
+
+```typescript
+// Group metadata
+await group.updateName("New Name");
+await group.updateDescription("New Description");
+
+// Member management
+await group.addMembers([newMemberInboxId]);
+await group.removeMembers([memberInboxId]);
+
+// Admin management
+await group.addAdmin(memberInboxId);
+await group.addSuperAdmin(memberInboxId);
+
+// Get group info
+const members = await group.members();
+const name = group.name;
+const admins = group.admins;
+```
+
+## Stream Verification
+
+```typescript
+// Verify message delivery
+const verifyResult = await verifyMessageStream(
+  conversation,
+  [workers.get("bob")], // receivers
+  1, // message count
+  "gm-{i}-{randomSuffix}", // message template
+);
+expect(verifyResult.allReceived).toBe(true);
+
+// Other stream verifications
+await verifyMetadataStream(group, receivers, count);
+await verifyMembershipStream(group, receivers, membersToAdd);
+await verifyConversationStream(initiator, receivers);
+```
+
+## Available Worker Names
+
+Use predefined names from the 61 available:
+
+```typescript
+["bob", "alice", "fabri", "elon", "joe", "charlie", "dave", "eve",
+ "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary",
+ "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula",
+ "victor", "wendy", "xavier", "yolanda", "zack", ...]
+```
+
+## Error Handling
+
+Always wrap test logic in try-catch:
+
+```typescript
+try {
+  // Test operations
+} catch (e) {
+  logError(e, expect.getState().currentTestName);
+  throw e;
+}
+```
+
+## Test Organization
+
+- Use `getWorkersWithVersions()` for version testing
+- Use `typeofStream.Message` for message streaming
+- Always call `setupTestLifecycle()` for proper cleanup
+- Test file naming: `*.test.ts` in `suites/` directory
+
+## Key Imports
+
+```typescript
+import { logError } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
+import { IdentifierKind } from "@xmtp/node-sdk";
+```
