@@ -25,10 +25,6 @@ describe(testName, async () => {
       "oscar",
     ]),
   );
-  // Start message streams for group tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
   const batchSize = 5;
   const total = 10;
 
@@ -114,6 +110,10 @@ describe(testName, async () => {
 
         const testGroup = await workers.createGroupBetweenAll();
 
+        // Start message streams for group tests
+        workers.getAll().forEach((worker) => {
+          worker.worker.startStream(typeofStream.Message);
+        });
         console.log(`Test group created with ID: ${testGroup.id}`);
 
         const verifyResult = await verifyMessageStream(
