@@ -38,29 +38,6 @@ export async function updateGroupConsent(
     },
   ]);
 }
-/**
- * Create a group consent sender that blocks both the group and a specific member
- */
-export async function updateInboxConsent(
-  worker: Worker,
-  memberInboxId: string,
-): Promise<void> {
-  const getState = await worker.client.preferences.getConsentState(
-    ConsentEntityType.InboxId,
-    memberInboxId,
-  );
-
-  await worker.client.preferences.setConsentStates([
-    {
-      entity: memberInboxId,
-      entityType: ConsentEntityType.InboxId,
-      state:
-        getState === ConsentState.Allowed
-          ? ConsentState.Denied
-          : ConsentState.Allowed,
-    },
-  ]);
-}
 
 // Type guard for sent event with sentAt
 function hasSentAt(obj: unknown): obj is { sentAt: number } {
@@ -175,7 +152,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
     ),
   );
   await sleep(streamColdStartTimeout); // wait for stream to start
+  await sleep(streamColdStartTimeout); // wait for stream to start
   const sentEvents = await options.triggerEvents();
+  await sleep(streamColdStartTimeout); // wait for stream to start
+  await sleep(streamColdStartTimeout); // wait for stream to start
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
@@ -385,7 +365,21 @@ export async function verifyConsentStream(
     startCollectors: (r) => r.worker.collectConsentUpdates(1),
     triggerEvents: async () => {
       const sentAt = Date.now();
-      await updateInboxConsent(initiator, receiver.client.inboxId);
+      const getState = await receiver.client.preferences.getConsentState(
+        ConsentEntityType.InboxId,
+        receiver.client.inboxId,
+      );
+
+      await receiver.client.preferences.setConsentStates([
+        {
+          entity: receiver.client.inboxId,
+          entityType: ConsentEntityType.InboxId,
+          state:
+            getState === ConsentState.Allowed
+              ? ConsentState.Denied
+              : ConsentState.Allowed,
+        },
+      ]);
       return [{ key: "consent", sentAt }];
     },
     getKey: (ev) => (ev as { key?: string }).key ?? "consent",
