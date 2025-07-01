@@ -508,7 +508,7 @@ export async function getWorkers(
 }
 
 // Default worker names
-const defaultNames = [
+export const defaultNames = [
   "bob",
   "alice",
   "fabri",

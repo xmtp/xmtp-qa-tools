@@ -3,7 +3,6 @@ description:
 globs: 
 alwaysApply: true
 ---
-
 # XMTP Testing Worker Framework Rules
 
 ## Core Testing Pattern
@@ -19,12 +18,8 @@ import { describe, expect, it } from "vitest";
 const testName = "my-test";
 
 describe(testName, async () => {
-  // New simplified API - with versioning enabled
-  const workers = await getWorkers(
-    ["alice", "bob"], 
-    undefined, 
-    { useVersions: true }
-  );
+  // Simplified API - versioning enabled by default
+  const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({
     testName,
@@ -42,40 +37,41 @@ describe(testName, async () => {
 });
 ```
 
-## New getWorkers API Options
+## getWorkers API
 
-The `getWorkers` function now has three input modes and optional configuration:
+The `getWorkers` function has three input modes with optional configuration:
 
 ### Input Modes
 
 ```typescript
-// 1. Array of specific worker names (legacy mode, now with optional versioning)
-const workers = await getWorkers(["alice", "bob"], env, { useVersions: true });
+// 1. Number - creates that many workers with random names (default)
+const workers = await getWorkers(5);
 
-// 2. Count with automatic name selection
-const workers = await getWorkers(5, env, { nameMode: 'fixed' }); // Uses first 5 fixed names
-const workers = await getWorkers(5, env, { nameMode: 'random' }); // Uses 5 random names
+// 2. Array of specific worker names
+const workers = await getWorkers(["alice", "bob", "charlie"]);
 
 // 3. Record for API URL mapping (for distributed testing)
 const workers = await getWorkers({
   "alice": "https://api1.example.com",
   "bob": "https://api2.example.com"
-}, env, { useVersions: true });
+});
 ```
 
 ### Options Configuration
 
 ```typescript
 type GetWorkersOptions = {
-  useVersions?: boolean;     // Apply version descriptors (default: false)
-  nameMode?: 'fixed' | 'random'; // Name selection mode for count input (default: 'fixed')
+  env?: XmtpEnv;              // XMTP environment (default: from XMTP_ENV)
+  useVersions?: boolean;      // Apply version descriptors (default: true)
+  randomNames?: boolean;      // Use random names for number input (default: true)
 }
 
 // Examples:
-await getWorkers(3); // 3 workers with fixed names (alice, bob, fabri)
-await getWorkers(3, env, { nameMode: 'random' }); // 3 workers with random names
-await getWorkers(["alice", "bob"], env, { useVersions: true }); // Versioned workers
-await getWorkers(5, env, { useVersions: true, nameMode: 'random' }); // Random versioned workers
+await getWorkers(3);                                    // 3 workers with random names, versioned
+await getWorkers(3, { randomNames: false });            // 3 workers with fixed names (bob, alice, fabri)
+await getWorkers(["alice", "bob"]);                     // Specific names, versioned
+await getWorkers(["alice", "bob"], { useVersions: false }); // Specific names, no versioning
+await getWorkers(5, { env: "production" });            // 5 random workers on production
 ```
 
 ## Worker Access Patterns
@@ -103,29 +99,26 @@ workers.getRandomWorkers(2); // Random subset
 const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
 ```
 
-## Migration from Legacy Patterns
+## Common Usage Patterns
 
-### Before (Deprecated):
+### Simple Testing
 ```typescript
-import { getWorkersWithVersions, getRandomNames, getFixedNames } from "@helpers/client";
-import { getWorkers } from "@workers/manager";
-
-// Old pattern
-const descriptors = getWorkersWithVersions(getRandomNames(3));
-const workers = await getWorkers(descriptors);
-
-// Or
-const names = getFixedNames(5);
-const workers = await getWorkers(names);
+// Most common patterns
+const workers = await getWorkers(5);                    // 5 random workers
+const workers = await getWorkers(["alice", "bob"]);     // Specific workers
 ```
 
-### After (Recommended):
+### Version Testing
 ```typescript
-import { getWorkers, getWorkerNames } from "@workers/manager";
+// Versioning is enabled by default
+const workers = await getWorkers(3);                    // Uses random SDK versions
+const workers = await getWorkers(3, { useVersions: false }); // All latest version
+```
 
-// New pattern - much cleaner
-const workers = await getWorkers(3, undefined, { useVersions: true, nameMode: 'random' });
-const names = getWorkerNames(workers); // When you need the names array
+### Environment-Specific Testing
+```typescript
+const workers = await getWorkers(5, { env: "production" });
+const workers = await getWorkers(["alice"], { env: "local" });
 ```
 
 ## Conversation Operations

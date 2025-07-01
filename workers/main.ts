@@ -757,6 +757,7 @@ export class WorkerClient extends Worker {
           const stream = await this.client.preferences.streamConsent();
 
           // Store stream reference with .end() method if available, otherwise create mock
+          // @ts-expect-error - we don't need to type this
           const streamRef = stream as any;
           this.streamReferences.set(streamType, {
             end:

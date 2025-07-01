@@ -14,10 +14,10 @@ describe(testName, () => {
   let workers: WorkerManager;
 
   it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
-    workers = await getWorkers(
-      ["alice", "bob", "sam", "walt", "tina"],
-      receiverObj.network as "production" | "dev" | "local",
-    );
+    workers = await getWorkers(5, {
+      randonNames: false,
+      env: receiverObj.network as "production" | "dev" | "local",
+    });
     // Start message and response streams for notifications
     workers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.MessageandResponse);

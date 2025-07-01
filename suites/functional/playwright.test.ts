@@ -37,7 +37,7 @@ describe(testName, () => {
     });
     creator = convoStreamBot.get(names[0]) as Worker;
     xmtpChat = convoStreamBot.get(names[1]) as Worker;
-    receiver = gmBotWorker.get(names[2]) as Worker;
+    receiver = gmBotWorker.getCreator();
     console.log(names[1], xmtpChat.inboxId, xmtpChat.name);
     xmtpTester = new playwright({
       headless,

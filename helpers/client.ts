@@ -640,16 +640,6 @@ export async function removeDataFolder(): Promise<void> {
     await fs.promises.rm(dataPath, { recursive: true, force: true });
   }
 }
-export function getMultiVersion(count: number): string[] {
-  const descriptors: string[] = [];
-  for (const descriptor of getFixedNames(count)) {
-    const randomSdkVersion =
-      sdkVersionOptions[Math.floor(Math.random() * sdkVersionOptions.length)];
-    descriptors.push(`${descriptor}-a-${randomSdkVersion}`);
-  }
-
-  return descriptors;
-}
 
 export const browserTimeout = 10000;
 export const streamColdStartTimeout = 1000; // 1 second

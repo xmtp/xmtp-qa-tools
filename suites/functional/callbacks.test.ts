@@ -6,9 +6,7 @@ import { describe, expect, it } from "vitest";
 const testName = "callbacks";
 
 describe(testName, async () => {
-  const workers = await getWorkers(5, {
-    env: "local",
-  });
+  const workers = await getWorkers(5);
 
   const names = workers.getAll().map((w) => w.name);
   setupTestLifecycle({

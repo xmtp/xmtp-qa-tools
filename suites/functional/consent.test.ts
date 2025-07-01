@@ -9,10 +9,7 @@ const testName = "consent";
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(2, undefined, {
-    useVersions: true,
-    nameMode: "random",
-  });
+  workers = await getWorkers(2);
 
   setupTestLifecycle({
     testName,
