@@ -11,7 +11,6 @@ import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
 import {
   installationThreshold,
-  typeOfResponse,
   typeofStream,
   typeOfSync,
   WorkerClient,
@@ -48,7 +47,6 @@ export class WorkerManager {
   private testName: string;
   private activeWorkers: WorkerClient[] = [];
   private typeofStream: typeofStream = typeofStream.Message;
-  private typeOfResponse: typeOfResponse = typeOfResponse.Gm;
   private typeOfSync: typeOfSync = typeOfSync.None;
   private env: XmtpEnv;
   private keysCache: Record<
@@ -62,13 +60,11 @@ export class WorkerManager {
   constructor(
     testName: string,
     typeofStreamType: typeofStream = typeofStream.Message,
-    typeOfResponseType: typeOfResponse = typeOfResponse.Gm,
     typeOfSyncType: typeOfSync = typeOfSync.None,
     env: XmtpEnv,
   ) {
     this.testName = testName;
     this.typeofStream = typeofStreamType;
-    this.typeOfResponse = typeOfResponseType;
     this.typeOfSync = typeOfSyncType;
     this.env = env;
     this.workers = {};
@@ -401,7 +397,6 @@ export class WorkerManager {
     const workerClient = new WorkerClient(
       workerData,
       this.typeofStream,
-      this.typeOfResponse,
       this.typeOfSync,
       this.env,
       {},
@@ -442,14 +437,12 @@ export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string>,
   testName: string,
   typeofStreamType: typeofStream = typeofStream.None,
-  typeOfResponseType: typeOfResponse = typeOfResponse.None,
   typeOfSyncType: typeOfSync = typeOfSync.None,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
   const manager = new WorkerManager(
     testName,
     typeofStreamType,
-    typeOfResponseType,
     typeOfSyncType,
     env,
   );

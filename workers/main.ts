@@ -13,12 +13,6 @@ import path from "node:path";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
-export enum typeOfResponse {
-  Gm = "gm",
-  Gpt = "gpt",
-  None = "none",
-}
-//lets
 export enum typeOfSync {
   SyncAll = "sync_all",
   Sync = "sync_conversation",
@@ -27,6 +21,7 @@ export enum typeOfSync {
 }
 export enum typeofStream {
   Message = "message",
+  MessageandResponse = "message_and_response",
   GroupUpdated = "group_updated",
   Conversation = "conversation",
   Consent = "consent",
@@ -147,7 +142,6 @@ export class WorkerClient extends Worker {
   private encryptionKeyHex: string;
   private typeofStream: typeofStream;
   private typeofSync: typeOfSync;
-  private typeOfResponse: typeOfResponse;
   private folder: string;
   private sdkVersion: string;
   private libXmtpVersion: string;
@@ -164,7 +158,6 @@ export class WorkerClient extends Worker {
   constructor(
     worker: WorkerBase,
     typeofStream: typeofStream,
-    typeOfResponse: typeOfResponse,
     typeofSync: typeOfSync,
     env: XmtpEnv,
     options: WorkerOptions = {},
@@ -176,7 +169,6 @@ export class WorkerClient extends Worker {
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
     this.typeofSync = typeofSync;
-    this.typeOfResponse = typeOfResponse;
     this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
@@ -249,6 +241,9 @@ export class WorkerClient extends Worker {
       switch (streamType) {
         case typeofStream.Message:
           this.initMessageStream(typeofStream.Message);
+          break;
+        case typeofStream.MessageandResponse:
+          this.initMessageStream(typeofStream.MessageandResponse);
           break;
         case typeofStream.GroupUpdated:
           this.initMessageStream(typeofStream.GroupUpdated);
@@ -490,6 +485,9 @@ export class WorkerClient extends Worker {
         case typeofStream.Message:
           this.initMessageStream(typeofStream.Message);
           break;
+        case typeofStream.MessageandResponse:
+          this.initMessageStream(typeofStream.MessageandResponse);
+          break;
         case typeofStream.GroupUpdated:
           this.initMessageStream(typeofStream.GroupUpdated);
           break;
@@ -605,7 +603,7 @@ export class WorkerClient extends Worker {
               // );
 
               // Handle auto-responses if enabled
-              await this.handleResponse(message);
+              await this.handleResponse(message, type);
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
@@ -644,7 +642,10 @@ export class WorkerClient extends Worker {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleResponse(message: DecodedMessage) {
+  private async handleResponse(
+    message: DecodedMessage,
+    streamType: typeofStream,
+  ) {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
@@ -653,10 +654,8 @@ export class WorkerClient extends Worker {
         );
         return;
       }
-      if (this.typeOfResponse === typeOfResponse.None) {
-        // console.warn(
-        //   `[${this.nameId}] Skipping message, typeOfResponse is ${this.typeOfResponse}`,
-        // );
+      // Only respond if this is a MessageandResponse stream
+      if (streamType !== typeofStream.MessageandResponse) {
         return;
       }
 
@@ -878,6 +877,7 @@ export class WorkerClient extends Worker {
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
             [typeofStream.Message]: StreamCollectorType.Message,
+            [typeofStream.MessageandResponse]: StreamCollectorType.Message,
             [typeofStream.GroupUpdated]: StreamCollectorType.GroupUpdated,
             [typeofStream.Conversation]: StreamCollectorType.Conversation,
             [typeofStream.Consent]: StreamCollectorType.Consent,
