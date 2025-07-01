@@ -30,6 +30,12 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Large",
+      uniqueErrorLines: [
+        "FAIL  suites/metrics/large/conversations.test.ts > m_large_conversations > receiveNewConversation-50: should create 50 member group",
+      ],
+    },
+    {
       testName: "Functional",
       uniqueErrorLines: [
         "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
