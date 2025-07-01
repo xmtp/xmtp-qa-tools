@@ -14,7 +14,7 @@ import { describe, expect, it } from "vitest";
 const testName = "my-test";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["alice", "bob"], testName);
+  const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({
     testName,
@@ -31,7 +31,6 @@ describe(testName, async () => {
   });
 });
 ```
-
 
 ## Dynamic Stream Control
 

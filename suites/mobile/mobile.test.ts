@@ -40,7 +40,6 @@ describe(testName, () => {
     try {
       workers = await getWorkers(
         ["bot"],
-        testName,
         receiverObj.network as "local" | "dev" | "production",
       );
       // Note: No streams or syncs needed for this test (all were set to None)

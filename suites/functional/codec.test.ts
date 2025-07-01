@@ -12,10 +12,7 @@ const testName = "codec";
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(
-    getWorkersWithVersions(getFixedNames(2)),
-    testName,
-  );
+  workers = await getWorkers(getWorkersWithVersions(getFixedNames(2)));
   // Start message streams for codec tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

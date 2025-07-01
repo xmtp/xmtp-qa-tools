@@ -18,7 +18,7 @@ import {
 const testName = "m_large_messages";
 
 describe(testName, async () => {
-  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT), testName);
+  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT));
   // Start message streams for large message tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

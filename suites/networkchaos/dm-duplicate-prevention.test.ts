@@ -11,13 +11,10 @@ const testName = "dm-duplicate-chaos";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    {
-      henry: "http://localhost:5556",
-      randomguy: "http://localhost:6556",
-    },
-    testName,
-  );
+  const workers = await getWorkers({
+    henry: "http://localhost:5556",
+    randomguy: "http://localhost:6556",
+  });
   // Start message streams for duplicate prevention test
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

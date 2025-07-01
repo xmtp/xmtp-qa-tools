@@ -21,7 +21,6 @@ describe(testName, async () => {
 
   workers = await getWorkers(
     getFixedNames((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1),
-    testName,
   );
   // Note: No streams needed for this test (was set to None)
   let allWorkers: Worker[];

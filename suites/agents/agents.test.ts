@@ -17,7 +17,7 @@ describe(testName, () => {
   let workers: WorkerManager;
   const env = process.env.XMTP_ENV as "dev" | "production";
   beforeAll(async () => {
-    workers = await getWorkers(getRandomNames(1), testName, env);
+    workers = await getWorkers(getRandomNames(1), env);
     // Start message streams for agent communication
     workers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Message);

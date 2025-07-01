@@ -25,7 +25,7 @@ describe(testName, async () => {
     userDescriptors[user] = `http://localhost:${port}`;
   }
 
-  const workers = await getWorkers(userDescriptors, testName);
+  const workers = await getWorkers(userDescriptors);
   // Start message and response streams for the chaos testing
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.MessageandResponse);

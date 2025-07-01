@@ -18,7 +18,7 @@ import {
 const testName = "m_large_conversations";
 
 describe(testName, async () => {
-  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT), testName);
+  let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT));
   // Start conversation streams for large conversation tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Conversation);

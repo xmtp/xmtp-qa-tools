@@ -14,7 +14,7 @@ describe(testName, async () => {
 
   // Define test workers
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
-  workers = await getWorkers(getWorkersWithVersions(testWorkers), testName);
+  workers = await getWorkers(getWorkersWithVersions(testWorkers));
   // Start message streams for sync tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

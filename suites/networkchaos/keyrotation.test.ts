@@ -24,7 +24,7 @@ describe(testName, async () => {
     userDescriptors[user] = "http://localhost:" + port.toString();
   }
 
-  const workers = await getWorkers(userDescriptors, testName);
+  const workers = await getWorkers(userDescriptors);
   // Start message and response streams for the stress testing
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.MessageandResponse);

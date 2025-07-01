@@ -14,10 +14,7 @@ describe(testName, () => {
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
-    let initialWorkers = await getWorkers(
-      getWorkersWithVersions(names),
-      testName,
-    );
+    let initialWorkers = await getWorkers(getWorkersWithVersions(names));
     // Start message streams for installation tests
     initialWorkers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Message);
@@ -26,10 +23,10 @@ describe(testName, () => {
     expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
     // Create a different installation of alice
-    const secondaryWorkers = await getWorkers(
-      [names[0] + "-desktop", names[1] + "-b"],
-      testName,
-    );
+    const secondaryWorkers = await getWorkers([
+      names[0] + "-desktop",
+      names[1] + "-b",
+    ]);
     // Merge the new workers with the existing ones
     expect(secondaryWorkers.get(names[0], "desktop")?.folder).toBe("desktop");
     expect(secondaryWorkers.get(names[1], "b")?.folder).toBe("b");
@@ -52,7 +49,6 @@ describe(testName, () => {
     // Create charlie only when we need him
     const terciaryWorkers = await getWorkers(
       getWorkersWithVersions([names[2]]),
-      testName,
     );
     // Start message streams for terciary workers
     terciaryWorkers.getAll().forEach((worker) => {
@@ -74,7 +70,7 @@ describe(testName, () => {
     expect(charlieConvs?.length).toBeGreaterThan(0);
 
     // Create a backup installation for charlie
-    const fourthWorkers = await getWorkers([names[2] + "-c"], testName);
+    const fourthWorkers = await getWorkers([names[2] + "-c"]);
     // Backup installation should also be able to access the conversation after syncing
     await fourthWorkers.get(names[2])?.client.conversations.sync();
     const backupConvs = await fourthWorkers
@@ -87,15 +83,12 @@ describe(testName, () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
     // Create initial workers
     const randomString = Math.random().toString(36).substring(2, 15);
-    const workers = await getWorkers(
-      [
-        names[3],
-        names[3] + "-" + randomString,
-        names[4],
-        names[4] + "-" + randomString,
-      ],
-      testName,
-    );
+    const workers = await getWorkers([
+      names[3],
+      names[3] + "-" + randomString,
+      names[4],
+      names[4] + "-" + randomString,
+    ]);
 
     // Count initial installations
     const davidInitialState = await workers

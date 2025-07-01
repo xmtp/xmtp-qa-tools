@@ -23,7 +23,6 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    testName,
   );
   // Start group updated streams for metadata tests
   workers.getAll().forEach((worker) => {

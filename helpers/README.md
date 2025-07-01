@@ -182,7 +182,7 @@ const logger = createTestLogger({
 });
 
 // Log errors with consistent formatting
-logError(error, testName);
+logError(error);
 
 // Clean log files by removing ANSI codes
 await cleanAllRawLogs();

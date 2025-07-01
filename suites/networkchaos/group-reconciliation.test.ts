@@ -12,15 +12,12 @@ const testName = "group-reconciliation";
 loadEnv(testName);
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    {
-      user1: "http://localhost:5556",
-      user2: "http://localhost:6556",
-      user3: "http://localhost:7556",
-      user4: "http://localhost:8556",
-    },
-    testName,
-  );
+  const workers = await getWorkers({
+    user1: "http://localhost:5556",
+    user2: "http://localhost:6556",
+    user3: "http://localhost:7556",
+    user4: "http://localhost:8556",
+  });
   // Start message and response streams for the chaos testing
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.MessageandResponse);

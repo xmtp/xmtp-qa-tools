@@ -10,8 +10,8 @@ import { describe, expect, it } from "vitest";
 const testName = "bug_addmember";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["bob"], testName);
-  const receiverWorkers = await getWorkers(["alice"], testName);
+  const workers = await getWorkers(["bob"]);
+  const receiverWorkers = await getWorkers(["alice"]);
   // Start conversation streams for the receiver
   receiverWorkers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Conversation);

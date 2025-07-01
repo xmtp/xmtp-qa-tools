@@ -11,10 +11,7 @@ const testName = "consent";
 describe(testName, async () => {
   let workers: WorkerManager;
 
-  workers = await getWorkers(
-    getWorkersWithVersions(getFixedNames(5)),
-    testName,
-  );
+  workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
   // Start consent streams for consent tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Consent);

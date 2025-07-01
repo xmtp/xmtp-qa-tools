@@ -13,10 +13,7 @@ describe(testName, async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
-  workers = await getWorkers(
-    getWorkersWithVersions(getFixedNames(5)),
-    testName,
-  );
+  workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
   // Start message streams for order tests
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);

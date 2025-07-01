@@ -14,7 +14,7 @@ describe(testName, () => {
   let conversation: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(getFixedNames(1), testName);
+    workers = await getWorkers(getFixedNames(1));
     // Start message streams for bug test
     workers.getAll().forEach((worker) => {
       worker.worker.startStream(typeofStream.Message);

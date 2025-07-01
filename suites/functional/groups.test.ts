@@ -24,7 +24,6 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    testName,
   );
   // Start message streams for group tests
   workers.getAll().forEach((worker) => {
