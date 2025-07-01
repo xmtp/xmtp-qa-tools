@@ -9,21 +9,21 @@ alwaysApply: true
 ## Core Testing Pattern
 
 ```typescript
-import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 
-import { getWorkers } from "@workers/manager";
+import { getWorkers, getWorkerNames } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "my-test";
 
 describe(testName, async () => {
+  // New simplified API - with versioning enabled
   const workers = await getWorkers(
-    getWorkersWithVersions(["alice", "bob"]),
-    testName,
-    typeofStream.Message,
+    ["alice", "bob"], 
+    undefined, 
+    { useVersions: true }
   );
 
   setupTestLifecycle({
@@ -40,6 +40,42 @@ describe(testName, async () => {
     }
   });
 });
+```
+
+## New getWorkers API Options
+
+The `getWorkers` function now has three input modes and optional configuration:
+
+### Input Modes
+
+```typescript
+// 1. Array of specific worker names (legacy mode, now with optional versioning)
+const workers = await getWorkers(["alice", "bob"], env, { useVersions: true });
+
+// 2. Count with automatic name selection
+const workers = await getWorkers(5, env, { nameMode: 'fixed' }); // Uses first 5 fixed names
+const workers = await getWorkers(5, env, { nameMode: 'random' }); // Uses 5 random names
+
+// 3. Record for API URL mapping (for distributed testing)
+const workers = await getWorkers({
+  "alice": "https://api1.example.com",
+  "bob": "https://api2.example.com"
+}, env, { useVersions: true });
+```
+
+### Options Configuration
+
+```typescript
+type GetWorkersOptions = {
+  useVersions?: boolean;     // Apply version descriptors (default: false)
+  nameMode?: 'fixed' | 'random'; // Name selection mode for count input (default: 'fixed')
+}
+
+// Examples:
+await getWorkers(3); // 3 workers with fixed names (alice, bob, fabri)
+await getWorkers(3, env, { nameMode: 'random' }); // 3 workers with random names
+await getWorkers(["alice", "bob"], env, { useVersions: true }); // Versioned workers
+await getWorkers(5, env, { useVersions: true, nameMode: 'random' }); // Random versioned workers
 ```
 
 ## Worker Access Patterns
@@ -62,6 +98,34 @@ workers.getReceiver(); // Random non-creator
 workers.getAll(); // All workers array
 workers.getAllButCreator(); // All except first
 workers.getRandomWorkers(2); // Random subset
+
+// Get worker names array (useful for logging/debugging)
+const names = getWorkerNames(workers); // ["alice", "bob", "charlie"]
+```
+
+## Migration from Legacy Patterns
+
+### Before (Deprecated):
+```typescript
+import { getWorkersWithVersions, getRandomNames, getFixedNames } from "@helpers/client";
+import { getWorkers } from "@workers/manager";
+
+// Old pattern
+const descriptors = getWorkersWithVersions(getRandomNames(3));
+const workers = await getWorkers(descriptors);
+
+// Or
+const names = getFixedNames(5);
+const workers = await getWorkers(names);
+```
+
+### After (Recommended):
+```typescript
+import { getWorkers, getWorkerNames } from "@workers/manager";
+
+// New pattern - much cleaner
+const workers = await getWorkers(3, undefined, { useVersions: true, nameMode: 'random' });
+const names = getWorkerNames(workers); // When you need the names array
 ```
 
 ## Conversation Operations
@@ -393,7 +457,7 @@ try {
 
 ## Test Organization
 
-- Use `getWorkersWithVersions()` for version testing
+- Use `useVersions: true` option for version testing
 - Use `typeofStream.Message` for message streaming
 - Always call `setupTestLifecycle()` for proper cleanup
 - Test file naming: `*.test.ts` in `suites/` directory
@@ -405,6 +469,6 @@ import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 
-import { getWorkers } from "@workers/manager";
+import { getWorkers, getWorkerNames } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 ```
