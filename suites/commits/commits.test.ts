@@ -24,6 +24,10 @@ const installationCount = process.env.INSTALLATION_COUNT ? parseInt(process.env.
 const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT) : 10;
 const workerPrefix = "random";
 
+const enabledOps = process.env.ENABLED_OPS
+  ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
+  : ["updateName", "sendMessage", "addMember", "removeMember", "createInstallation"];
+
 const workerNames = Array.from({ length: workerCount }, (_, i) => `${workerPrefix}${i + 1}`);
 
 const typeofStreamForTest = typeofStream.Message;
