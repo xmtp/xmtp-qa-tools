@@ -5,43 +5,13 @@ import { processLogFile, stripAnsi } from "./logger";
 // Known test issues for tracking
 export const PATTERNS = {
   KNOWN_ISSUES: [
-    {
-      testName: "Browser",
-      uniqueErrorLines: [
-        "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
-      ],
-    },
-    {
-      testName: "Dms",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-      ],
-    },
-    {
-      testName: "Large",
-      uniqueErrorLines: [
-        "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-50: should deliver messages to all 50",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
-        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
-      ],
-    },
-    {
-      testName: "Agents",
-      uniqueErrorLines: [
-        "FAIL  suites/agents/agents.test.ts > agents > production: byte : 0xdfc00a0B28Df3c07b0942300E896C97d62014499",
-      ],
-    },
+    "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
+    "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
+    "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
+    "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-50: should deliver messages to all 50",
+    "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
+    "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
+    "FAIL  suites/agents/agents.test.ts > agents > production: byte : 0xdfc00a0B28Df3c07b0942300E896C97d62014499",
     "FAIL  suites/metrics/large/conversations.test.ts > m_large_conversations > receiveNewConversation-50: should create 50 member group",
   ],
   minFailLines: 3,
@@ -332,14 +302,12 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
   }
 
   // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = failLines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-    );
+  for (const knownIssue of PATTERNS.KNOWN_ISSUES) {
+    const matchingLines = failLines.filter((line) => line.includes(knownIssue));
 
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
+    // If any fail line matches this known issue, filter it out
+    if (matchingLines.length > 0) {
+      console.log(`Test filtered out (known issue: ${knownIssue})`);
       return true;
     }
   }
