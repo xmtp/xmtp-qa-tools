@@ -221,6 +221,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 ## Tools & utilities
 
+- **Status:** XMTP network status - [see section](https://status.xmtp.org/)
 - **Workflows:** Automated workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/tree/main/.github/workflows)
 - **Logging:** Datadog error logs - [see section](https://app.datadoghq.com/logs?saved-view-id=3577190)
 - **Schedule:** Schedule workflows - [see section](https://github.com/xmtp/xmtp-qa-tools/actions?query=event:schedule)
