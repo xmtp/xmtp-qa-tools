@@ -93,14 +93,14 @@ describe(testName, () => {
       ?.client.preferences.inboxState(true);
     const davidCount = davidInitialState?.installations.length;
     const emmaCount = emmaInitialState?.installations.length;
-    expect(davidCount).toBe(2); // a + mobile
-    expect(emmaCount).toBeGreaterThan(1); // a + tablet
+    expect(davidCount).toBe(2); // a + randomString
+    expect(emmaCount).toBeGreaterThan(1); // a + randomString
 
     // TESTED IN XMTP.CHAT
     // Revoke david's mobile installation by terminating and clearing
     const davidClient = workers.get(names[3])?.client;
     await davidClient?.revokeAllOtherInstallations();
-    await workers.get(names[3], "mobile")?.worker.clearDB();
+    await workers.get(names[3] + randomString)?.worker.clearDB();
     // Count installations after revocation
     const davidFinalState = await davidClient?.preferences.inboxState(true);
     const davidFinalCount = davidFinalState?.installations.length;
