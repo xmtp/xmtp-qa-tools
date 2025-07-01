@@ -25,6 +25,10 @@ const installationCount = process.env.INSTALLATION_COUNT ? parseInt(process.env.
 const workerCount = process.env.WORKER_COUNT ? parseInt(process.env.WORKER_COUNT) : 10;
 const workerPrefix = "random";
 
+const enabledOps = process.env.ENABLED_OPS
+  ? process.env.ENABLED_OPS.split(",").map((s) => s.trim())
+  : ["updateName", "sendMessage", "addMember", "removeMember", "createInstallation"];
+
 const workerNames = Array.from({ length: workerCount }, (_, i) => `${workerPrefix}${i + 1}`);
 
 const typeofStreamForTest = typeofStream.Message;
@@ -169,6 +173,7 @@ describe("commits", () => {
         CHAOS_EGRESS_LATENCY_MS,
         CHAOS_EGRESS_JITTER_MS,
         CHAOS_EGRESS_PACKET_LOSS_PCT,
+        ENABLED_OPS: enabledOps.join(","),
       });
 
       console.log("[partition] Assigning users to XMTP nodes by port:");
@@ -214,13 +219,18 @@ describe("commits", () => {
                 workers.getAll()[Math.floor(Math.random() * workers.getAll().length)];
 
               const ops = await createOperations(randomWorker, group);
-              const operations = [
-                ops.updateName,
-                ops.sendMessage,
-                ops.addMember,
-                ops.removeMember,
-                ops.createInstallation,
-              ];
+
+              const operations: (() => Promise<void>)[] = [];
+
+              if (enabledOps.includes("updateName")) operations.push(ops.updateName);
+              if (enabledOps.includes("sendMessage")) operations.push(ops.sendMessage);
+              if (enabledOps.includes("addMember")) operations.push(ops.addMember);
+              if (enabledOps.includes("removeMember")) operations.push(ops.removeMember);
+              if (enabledOps.includes("createInstallation")) operations.push(ops.createInstallation);
+
+              if (operations.length === 0) {
+                throw new Error("ENABLED_OPS resulted in no available operations. Please check your config.");
+              }
 
               const op = operations[Math.floor(Math.random() * operations.length)];
               try {

@@ -8,26 +8,29 @@ num_runs=10
 rm -f logs/*log # DON'T remove the entire dir as all the cleaned results dirs are here
 rm -rf .data/
 
-echo "Starting test cycle at $(date)"
-for ((i=1; i<=num_runs; i++)); do
-    echo "Restarting multinode docker env..."
-    cd multinode && docker compose down && ./ci.sh && cd ..
-    sleep 10
-    echo "Running test iteration $i of $num_runs"
-    yarn test suites/commits/commits.test.ts  --no-fail --debug
-    exit_code=$?
+tranche_parts=5
+tranche=$((num_runs/tranche_parts))
 
-    # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop
-    echo "Test iteration $i completed with exit code $exit_code"
-done
+for x in {1..$tranche_parts}; {
+  echo "Starting test cycle at $(date)"
+  for ((i=1; i<=tranche; i++)); do
+      echo "Restarting multinode docker env..."
+      cd multinode && docker compose down && ./ci.sh && cd ..
+      sleep 10
+      echo "Running test iteration $i of $num_runs in tranche $tranche_parts"
+      yarn test suites/commits/commits.test.ts  --no-fail --debug
+      exit_code=$?
 
-echo "Cleaning up..."
+      # Continue regardless of test pass/fail - only Ctrl+C (handled by trap) should stop
+      echo "Test iteration $i completed with exit code $exit_code"
+  done
 
-yarn ansi
+  echo "Cleaning up..."
 
-echo "Finished cleaning up"
-fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
-echo "Found $fork_count forks in logs/cleaned"
+  yarn ansi
+  echo "Finished cleaning up"
+  fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
+  echo "Found $fork_count forks in logs/cleaned"
 
 echo "Writing env config to output dir..."
 
