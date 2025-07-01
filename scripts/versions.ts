@@ -2,7 +2,6 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { VersionList } from "@helpers/client";
-import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 
 type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
 const staticConfigs = Object.values(VersionList).map((version) => ({
