@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         test: [functional]
-        environment: [production]
+        environment: [dev, production]
     env:
       LOGGING_LEVEL: "off"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
