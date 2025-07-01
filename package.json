@@ -21,6 +21,8 @@
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
     "gen:installations": "tsx inboxes/gen.ts --create-installations",
+    "test:installations": "tsx inboxes/test-installation-startup.ts",
+    "test:installations-workers": "vitest run inboxes/test-installation-with-workers.test.ts",
     "large": "yarn test suites/metrics/large",
     "lint": "eslint .",
     "local-update": "./inboxes/gen.sh --envs local --installations 2,5 --count 500",
