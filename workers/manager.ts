@@ -48,7 +48,7 @@ export class WorkerManager {
   /**
    * Constructor creates an empty manager or populates it with existing workers
    */
-  constructor(testName: string, env: XmtpEnv) {
+  constructor(env: XmtpEnv) {
     this.env = env;
     this.workers = {};
   }
@@ -410,10 +410,9 @@ export class WorkerManager {
  */
 export async function getWorkers(
   descriptorsOrMap: string[] | Record<string, string>,
-  testName: string,
   env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
 ): Promise<WorkerManager> {
-  const manager = new WorkerManager(testName, env);
+  const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
 

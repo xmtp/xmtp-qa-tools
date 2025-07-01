@@ -1,29 +1,19 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "group-reconciliation";
-loadEnv(testName);
 
 describe(testName, async () => {
-  const workers = await getWorkers(
-    {
-      user1: "http://localhost:5556",
-      user2: "http://localhost:6556",
-      user3: "http://localhost:7556",
-      user4: "http://localhost:8556",
-    },
-    testName,
-  );
-  // Start message and response streams for the chaos testing
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
+  const workers = await getWorkers({
+    user1: "http://localhost:5556",
+    user2: "http://localhost:6556",
+    user3: "http://localhost:7556",
+    user4: "http://localhost:8556",
   });
 
   setupTestLifecycle({ testName, expect });

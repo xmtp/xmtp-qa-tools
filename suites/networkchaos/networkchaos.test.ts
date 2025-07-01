@@ -1,13 +1,10 @@
-import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "networkchaos";
-loadEnv(testName);
 
 describe(testName, async () => {
   const allNodes = [
@@ -25,11 +22,7 @@ describe(testName, async () => {
     userDescriptors[user] = `http://localhost:${port}`;
   }
 
-  const workers = await getWorkers(userDescriptors, testName);
-  // Start message and response streams for the chaos testing
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
-  });
+  const workers = await getWorkers(userDescriptors);
 
   setupTestLifecycle({ testName, expect });
 

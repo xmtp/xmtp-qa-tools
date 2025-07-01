@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,18 +8,13 @@ import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "group-node-blackhole";
-loadEnv(testName);
-
 describe(testName, async () => {
-  const workers = await getWorkers(
-    {
-      user1: "http://localhost:5556",
-      user2: "http://localhost:5556",
-      user3: "http://localhost:6556",
-      user4: "http://localhost:6556",
-    },
-    testName,
-  );
+  const workers = await getWorkers({
+    user1: "http://localhost:5556",
+    user2: "http://localhost:5556",
+    user3: "http://localhost:6556",
+    user4: "http://localhost:6556",
+  });
   // Start message and response streams for the chaos testing
   workers.getAll().forEach((worker) => {
     worker.worker.startStream(typeofStream.MessageandResponse);

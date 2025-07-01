@@ -4,7 +4,6 @@ import { getTime, logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
@@ -51,11 +50,8 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(getRandomNames(WORKER_COUNT), testName);
-          // Start group updated streams for bench tests
-          workers.getAll().forEach((worker) => {
-            worker.worker.startStream(typeofStream.GroupUpdated);
-          });
+          workers = await getWorkers(getRandomNames(WORKER_COUNT));
+
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(
@@ -98,7 +94,7 @@ describe(testName, () => {
           );
 
           const zWorkerName = "random" + `${i}-${installation}`;
-          const zWorker = await getWorkers([zWorkerName], testName);
+          const zWorker = await getWorkers([zWorkerName]);
           await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
           const zSyncAllStart = performance.now();
           await zWorker.getCreator().client.conversations.syncAll();

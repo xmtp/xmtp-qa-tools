@@ -1,6 +1,6 @@
 import fs from "fs";
 import path from "path";
-import { browserTimeout, playwrightBeforeSendTimeout } from "@helpers/client";
+import { browserTimeout, streamColdStartTimeout } from "@helpers/client";
 import type { XmtpEnv } from "@xmtp/node-sdk";
 import {
   chromium,
@@ -141,7 +141,7 @@ export class playwright {
       name: "Type a message...",
     });
     await messageInput.waitFor({ state: "visible" });
-    await this.page.waitForTimeout(playwrightBeforeSendTimeout);
+    await this.page.waitForTimeout(streamColdStartTimeout);
 
     console.debug("Filling message");
     await messageInput.fill(message);

@@ -1,7 +1,6 @@
 import { getWorkersWithVersions, sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -14,11 +13,8 @@ describe(testName, async () => {
 
   // Define test workers
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
-  workers = await getWorkers(getWorkersWithVersions(testWorkers), testName);
-  // Start message streams for sync tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers = await getWorkers(getWorkersWithVersions(testWorkers));
+
   setupTestLifecycle({ testName, expect });
 
   it("should establish test environment by creating group with all participants", async () => {

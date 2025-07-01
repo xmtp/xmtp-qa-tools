@@ -27,7 +27,7 @@ describe(testName, () => {
     const memberCount = 2;
     const name = `sender${randomSuffix}-${memberCount}`;
     const receiverName = `receiver${randomSuffix}-${memberCount}`;
-    const workers = await getWorkers([name, receiverName], testName);
+    const workers = await getWorkers([name, receiverName]);
     // Note: No streams or syncs needed for this test (all were set to None)
     try {
       const sender = workers.get(name);

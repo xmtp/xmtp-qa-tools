@@ -1,6 +1,5 @@
 import { getFixedNames, getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import {
   ContentTypeReaction,
@@ -12,14 +11,7 @@ const testName = "codec";
 
 describe(testName, async () => {
   let workers: WorkerManager;
-  workers = await getWorkers(
-    getWorkersWithVersions(getFixedNames(2)),
-    testName,
-  );
-  // Start message streams for codec tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers = await getWorkers(getWorkersWithVersions(getFixedNames(2)));
 
   setupTestLifecycle({
     testName,

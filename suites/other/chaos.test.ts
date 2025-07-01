@@ -46,10 +46,7 @@ describe(testName, () => {
 
   beforeAll(async () => {
     // Initialize workers
-    workers = await getWorkers(
-      ["bot", ...testConfig.workerNames],
-      testConfig.testName,
-    );
+    workers = await getWorkers(["bot", ...testConfig.workerNames]);
     // Note: typeofStream was None and typeOfResponse was None, so no streams needed
     // Start syncs if needed
     workers.getAll().forEach((worker) => {

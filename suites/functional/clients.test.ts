@@ -1,7 +1,6 @@
 import { getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
@@ -24,12 +23,7 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    testName,
   );
-  // Start message streams for client tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
 
   setupTestLifecycle({
     testName,
@@ -38,7 +32,7 @@ describe(testName, async () => {
 
   it("should measure XMTP client creation performance and initialization", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName);
+      const client = await getWorkers(["randomclient"]);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
