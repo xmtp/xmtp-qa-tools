@@ -19,9 +19,8 @@ describe(testName, () => {
       env: receiverObj.network as "production" | "dev" | "local",
     });
     // Start message and response streams for notifications
-    workers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.MessageandResponse);
-    });
+    workers.startStream(typeofStream.MessageandResponse);
+
     group = await workers.createGroupBetweenAll();
     if (!group) {
       console.error(`Failed to create conversation for alice`);

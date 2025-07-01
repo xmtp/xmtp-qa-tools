@@ -38,7 +38,13 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     // Pick a random version from the specified list
     const randomVersion =
       availableVersions[Math.floor(Math.random() * availableVersions.length)];
-    descriptors.push(`${workerName}-a-${randomVersion}`);
+
+    // If workerName already contains installation ID (has dash), don't add another "-a"
+    if (workerName.includes("-")) {
+      descriptors.push(`${workerName}-${randomVersion}`);
+    } else {
+      descriptors.push(`${workerName}-a-${randomVersion}`);
+    }
   }
 
   return descriptors;
@@ -387,7 +393,30 @@ export class WorkerManager {
   ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
-    const providedInstallId = parts.length > 1 ? parts[1] : undefined;
+
+    // Handle version parsing - version is always the last part if it's a number
+    let sdkVersion = getLatestVersion();
+    let providedInstallId: string | undefined;
+
+    if (parts.length > 1) {
+      const lastPart = parts[parts.length - 1];
+      // Check if last part is a valid SDK version (numeric)
+      if (
+        lastPart &&
+        !isNaN(Number(lastPart)) &&
+        Object.keys(VersionList).includes(lastPart)
+      ) {
+        sdkVersion = lastPart;
+        // Installation ID is everything between baseName and version
+        if (parts.length > 2) {
+          providedInstallId = parts.slice(1, -1).join("-");
+        }
+      } else {
+        // No version specified, everything after baseName is installation ID
+        providedInstallId = parts.slice(1).join("-");
+      }
+    }
+
     // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.debug(`Reusing existing worker for ${descriptor}`);
@@ -396,8 +425,6 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
-
-    const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
     const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys

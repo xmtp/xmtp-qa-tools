@@ -27,14 +27,11 @@ describe(testName, () => {
     const gmBotWorker = await getWorkers(1);
     const names = convoStreamBot.getAll().map((w) => w.name);
     // Start conversation streams for group event detection
-    convoStreamBot.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Conversation);
-    });
+    convoStreamBot.startStream(typeofStream.Conversation);
 
     // Start message and response streams for gm bot
-    gmBotWorker.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.MessageandResponse);
-    });
+    gmBotWorker.startStream(typeofStream.MessageandResponse);
+
     creator = convoStreamBot.get(names[0]) as Worker;
     xmtpChat = convoStreamBot.get(names[1]) as Worker;
     receiver = gmBotWorker.getCreator();

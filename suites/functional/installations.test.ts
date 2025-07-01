@@ -12,12 +12,11 @@ describe(testName, () => {
   });
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
-    const names = ["random1", "random2 ", "random3", "random4", "random5"];
+    const names = ["random1", "random2", "random3", "random4", "random5"];
     let initialWorkers = await getWorkers(names);
     // Start message streams for installation tests
-    initialWorkers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
+    initialWorkers.startStream(typeofStream.Message);
+
     expect(initialWorkers.get(names[0])?.folder).toBe("a");
     expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
@@ -48,9 +47,7 @@ describe(testName, () => {
     // Create charlie only when we need him
     const terciaryWorkers = await getWorkers([names[2]]);
     // Start message streams for terciary workers
-    terciaryWorkers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
+    terciaryWorkers.startStream(typeofStream.Message);
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryWorkers.get(names[0], "desktop");
