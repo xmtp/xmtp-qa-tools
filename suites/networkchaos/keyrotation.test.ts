@@ -24,9 +24,7 @@ describe(testName, async () => {
 
   const workers = await getWorkers(userDescriptors);
   // Start message and response streams for the stress testing
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
-  });
+  workers.startStream(typeofStream.MessageandResponse);
 
   setupTestLifecycle({ testName, expect });
 

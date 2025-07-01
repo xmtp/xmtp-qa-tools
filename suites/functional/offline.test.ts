@@ -14,9 +14,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"]);
   // Start message streams for offline tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+  workers.startStream(typeofStream.Message);
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 

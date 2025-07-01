@@ -9,8 +9,8 @@ const testName = "rate-limited";
 describe(testName, async () => {
   const workers = await getWorkers(8);
   // Start message and response streams for rate limiting test
+  workers.startStream(typeofStream.MessageandResponse);
   workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
     worker.worker.startSync(typeOfSync.Both);
   });
 

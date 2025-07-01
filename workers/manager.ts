@@ -10,7 +10,7 @@ import {
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { installationThreshold, WorkerClient } from "./main";
+import { installationThreshold, WorkerClient, type typeofStream } from "./main";
 
 // Deprecated: Use getWorkers with count and options instead
 export const getFixedNames = (count: number): string[] => {
@@ -266,6 +266,13 @@ export class WorkerManager {
     const creator = this.getCreator();
     return workers.filter((worker) => worker.name !== creator.name);
   }
+
+  startStream(streamType: typeofStream) {
+    for (const worker of this.getAll()) {
+      worker.worker.startStream(streamType);
+    }
+  }
+
   /**
    * Gets all workers as a flat array
    */
