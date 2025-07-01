@@ -16,7 +16,6 @@ describe(testName, () => {
   it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
     workers = await getWorkers(
       ["alice", "bob", "sam", "walt", "tina"],
-      testName,
       typeofStream.Message,
       typeOfResponse.Gm,
       typeOfSync.None,

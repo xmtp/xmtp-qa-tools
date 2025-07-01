@@ -19,7 +19,6 @@ describe(testName, async () => {
       user3: "http://localhost:7556",
       user4: "http://localhost:8556",
     },
-    testName,
     typeofStream.Message,
     typeOfResponse.Gm,
   );

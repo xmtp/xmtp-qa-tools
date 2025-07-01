@@ -15,7 +15,6 @@ describe(testName, async () => {
 
   workers = await getWorkers(
     getWorkersWithVersions(getFixedNames(5)),
-    testName,
     typeofStream.Message,
   );
 

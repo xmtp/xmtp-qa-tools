@@ -9,7 +9,6 @@ const testName = "rate-limited";
 describe(testName, async () => {
   const workers = await getWorkers(
     ["henry", "ivy", "jack", "karen", "larry", "mary", "nancy", "oscar"],
-    testName,
     typeofStream.Message,
     typeOfResponse.Gm,
     typeOfSync.Both,

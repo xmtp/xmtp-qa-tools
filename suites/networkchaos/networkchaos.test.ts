@@ -27,7 +27,6 @@ describe(testName, async () => {
 
   const workers = await getWorkers(
     userDescriptors,
-    testName,
     typeofStream.Message,
     typeOfResponse.Gm,
   );

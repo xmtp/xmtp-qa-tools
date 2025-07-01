@@ -23,7 +23,6 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    testName,
     typeofStream.GroupUpdated,
   );
 

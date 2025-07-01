@@ -16,7 +16,6 @@ describe(testName, async () => {
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
   workers = await getWorkers(
     getWorkersWithVersions(testWorkers),
-    testName,
     typeofStream.Message,
   );
   setupTestLifecycle({ testName, expect });

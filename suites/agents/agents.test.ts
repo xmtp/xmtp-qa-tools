@@ -19,7 +19,6 @@ describe(testName, () => {
   beforeAll(async () => {
     workers = await getWorkers(
       getRandomNames(1),
-      testName,
       typeofStream.Message,
       typeOfResponse.None,
       typeOfSync.None,

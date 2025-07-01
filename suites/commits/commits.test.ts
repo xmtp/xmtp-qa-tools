@@ -89,7 +89,6 @@ describe("commits", () => {
   it("should perform concurrent operations with multiple users across 5 groups", async () => {
     let workers = await getWorkers(
       workerNames,
-      "commits",
       typeofStreamForTest,
       typeOfResponseForTest,
       typeOfSyncForTest,
