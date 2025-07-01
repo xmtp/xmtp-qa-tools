@@ -13,12 +13,6 @@ import path from "node:path";
 import type { WorkerBase } from "./manager";
 
 export const installationThreshold = 5;
-export enum typeOfResponse {
-  Gm = "gm",
-  Gpt = "gpt",
-  None = "none",
-}
-//lets
 export enum typeOfSync {
   SyncAll = "sync_all",
   Sync = "sync_conversation",
@@ -27,6 +21,7 @@ export enum typeOfSync {
 }
 export enum typeofStream {
   Message = "message",
+  MessageandResponse = "message_and_response",
   GroupUpdated = "group_updated",
   Conversation = "conversation",
   Consent = "consent",
@@ -144,9 +139,6 @@ export class WorkerClient extends Worker {
   private nameId: string;
   private walletKey: string;
   private encryptionKeyHex: string;
-  private typeofStream: typeofStream;
-  private typeofSync: typeOfSync;
-  private typeOfResponse: typeOfResponse;
   private folder: string;
   private sdkVersion: string;
   private libXmtpVersion: string;
@@ -155,13 +147,13 @@ export class WorkerClient extends Worker {
   private env: XmtpEnv;
   private apiUrl?: string;
   private activeStreams: boolean = false;
+  private activeStreamTypes: Set<typeofStream> = new Set();
+  private streamControllers: Map<typeofStream, AbortController> = new Map();
+  private streamReferences: Map<typeofStream, { end?: () => void }> = new Map();
   public dbPath!: string;
 
   constructor(
     worker: WorkerBase,
-    typeofStream: typeofStream,
-    typeOfResponse: typeOfResponse,
-    typeofSync: typeOfSync,
     env: XmtpEnv,
     options: WorkerOptions = {},
     apiUrl?: string,
@@ -171,9 +163,6 @@ export class WorkerClient extends Worker {
     };
 
     super(new URL(`data:text/javascript,${workerBootstrap}`), options);
-    this.typeofSync = typeofSync;
-    this.typeOfResponse = typeOfResponse;
-    this.typeofStream = typeofStream;
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
     this.libXmtpVersion = worker.libXmtpVersion;
@@ -199,6 +188,141 @@ export class WorkerClient extends Worker {
    */
   stopStreams(): void {
     this.activeStreams = false;
+    this.activeStreamTypes.clear();
+
+    // End streams using their .end() method if available, otherwise abort
+    for (const [streamType, streamRef] of this.streamReferences.entries()) {
+      if (streamRef.end && typeof streamRef.end === "function") {
+        try {
+          streamRef.end();
+        } catch (error) {
+          console.warn(
+            `[${this.nameId}] Error calling stream.end() for ${streamType}:`,
+            error,
+          );
+        }
+      }
+    }
+    this.streamReferences.clear();
+
+    // Abort all stream controllers as fallback
+    for (const controller of this.streamControllers.values()) {
+      controller.abort();
+    }
+    this.streamControllers.clear();
+  }
+
+  /**
+   * Starts a specific sync type
+   * @param syncType - The type of sync to start
+   * @param interval - The interval in milliseconds to sync
+   */
+  public startSync(syncType: typeOfSync, interval: number = 10000): void {
+    if (syncType === typeOfSync.None) {
+      return;
+    }
+
+    console.debug(`[${this.nameId}] Starting ${syncType} sync`);
+    void (async () => {
+      while (true) {
+        if (syncType === typeOfSync.SyncAll) {
+          await this.client.conversations.syncAll();
+        } else if (syncType === typeOfSync.Sync) {
+          await this.client.conversations.sync();
+        } else if (syncType === typeOfSync.Both) {
+          await this.client.conversations.syncAll();
+          await this.client.conversations.sync();
+        }
+
+        await new Promise((resolve) => setTimeout(resolve, interval));
+      }
+    })();
+  }
+
+  /**
+   * Starts a specific stream type
+   * @param streamType - The type of stream to start
+   */
+  public startStream(streamType: typeofStream): void {
+    if (streamType === typeofStream.None) {
+      return;
+    }
+
+    if (this.activeStreamTypes.has(streamType)) {
+      console.debug(`[${this.nameId}] Stream ${streamType} is already active`);
+      return;
+    }
+
+    this.activeStreamTypes.add(streamType);
+    this.activeStreams = true;
+
+    try {
+      switch (streamType) {
+        case typeofStream.Message:
+          this.initMessageStream(typeofStream.Message);
+          break;
+        case typeofStream.MessageandResponse:
+          this.initMessageStream(typeofStream.MessageandResponse);
+          break;
+        case typeofStream.GroupUpdated:
+          this.initMessageStream(typeofStream.GroupUpdated);
+          break;
+        case typeofStream.Conversation:
+          this.initConversationStream();
+          break;
+        case typeofStream.Consent:
+          this.initConsentStream();
+          break;
+      }
+      console.debug(`[${this.nameId}] Started ${streamType} stream`);
+    } catch (error) {
+      console.error(
+        `[${this.nameId}] Failed to start ${streamType} stream:`,
+        error,
+      );
+      this.activeStreamTypes.delete(streamType);
+      throw error;
+    }
+  }
+
+  /**
+   * Stops streams - all streams if no parameter, or a specific stream type
+   * @param streamType - Optional specific stream type to stop. If not provided, stops all streams
+   */
+  public endStream(streamType?: typeofStream): void {
+    if (streamType) {
+      console.debug(`[${this.nameId}] Stopping ${streamType} stream`);
+      this.activeStreamTypes.delete(streamType);
+
+      // End the stream using its .end() method if available
+      const streamRef = this.streamReferences.get(streamType);
+      if (streamRef?.end && typeof streamRef.end === "function") {
+        try {
+          streamRef.end();
+        } catch (error) {
+          console.warn(
+            `[${this.nameId}] Error calling stream.end() for ${streamType}:`,
+            error,
+          );
+        }
+      }
+      this.streamReferences.delete(streamType);
+
+      // Abort the specific stream controller as fallback
+      const controller = this.streamControllers.get(streamType);
+      if (controller) {
+        controller.abort();
+        this.streamControllers.delete(streamType);
+      }
+
+      // If no streams are active, set activeStreams to false
+      if (this.activeStreamTypes.size === 0) {
+        this.activeStreams = false;
+      }
+    } else {
+      console.debug(`[${this.nameId}] Stopping all streams`);
+      this.stopStreams();
+    }
   }
 
   /**
@@ -323,7 +447,7 @@ export class WorkerClient extends Worker {
     this.client = client as Client;
     this.address = address;
 
-    this.startStream();
+    this.startInitialStream();
     this.startSyncs();
 
     const installationId = this.client.installationId;
@@ -340,64 +464,43 @@ export class WorkerClient extends Worker {
    * Starts a periodic sync of all conversations
    * @param interval - The interval in milliseconds to sync
    */
-  private startSyncs(interval: number = 10000) {
-    if (this.typeofSync !== typeOfSync.None) {
-      //console.debug(`[${this.nameId}] Starting ${this.typeofSync} sync`);
-      void (async () => {
-        while (true) {
-          if (this.typeofSync === typeOfSync.SyncAll) {
-            await this.client.conversations.syncAll();
-          } else if (this.typeofSync === typeOfSync.Sync) {
-            await this.client.conversations.sync();
-          } else if (this.typeofSync === typeOfSync.Both) {
-            await this.client.conversations.syncAll();
-            await this.client.conversations.sync();
-          }
-
-          await new Promise((resolve) => setTimeout(resolve, interval));
-        }
-      })();
-    }
+  private startSyncs() {
+    // No automatic syncs - everything is on-demand now
+    // Use startSync() method to start syncs manually
   }
 
   /**
    * Unified method to start the appropriate stream based on configuration
    */
-  private startStream() {
-    try {
-      switch (this.typeofStream) {
-        case typeofStream.Message:
-          this.initMessageStream(typeofStream.Message);
-          break;
-        case typeofStream.GroupUpdated:
-          this.initMessageStream(typeofStream.GroupUpdated);
-          break;
-        case typeofStream.Conversation:
-          this.initConversationStream();
-          break;
-        case typeofStream.Consent:
-          this.initConsentStream();
-          break;
-        // Add additional stream types as needed
-      }
-    } catch (error) {
-      console.error(
-        `[${this.nameId}] Failed to start ${this.typeofStream} stream:`,
-        error,
-      );
-      throw error;
-    }
+  private startInitialStream() {
+    // No automatic streams - everything is on-demand now
+    // Use startStream() method to start streams manually
   }
 
   /**
    * Initialize message stream for both regular messages and group updates
    */
   private initMessageStream(type: typeofStream) {
-    this.activeStreams = true;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(type, controller);
+
     void (async () => {
-      while (this.activeStreams) {
+      while (this.activeStreamTypes.has(type) && !controller.signal.aborted) {
         try {
           const stream = await this.client.conversations.streamAllMessages();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(type, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(`[${this.nameId}] Mock ending ${type} stream`);
+                controller.abort();
+              }),
+          });
           for await (const message of stream) {
             // console.debug(
             //   `[${this.nameId}] Received message`,
@@ -407,7 +510,8 @@ export class WorkerClient extends Worker {
             //   `[${this.nameId}] Received message`,
             //   JSON.stringify(message?.content, null, 2),
             // );
-            if (!this.activeStreams) break;
+            if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
+              break;
 
             if (
               !message ||
@@ -455,7 +559,8 @@ export class WorkerClient extends Worker {
               (message.contentType?.typeId === "text" ||
                 message.contentType?.typeId === "reaction" ||
                 message.contentType?.typeId === "reply") &&
-              type === typeofStream.Message
+              (type === typeofStream.Message ||
+                type === typeofStream.MessageandResponse)
             ) {
               // Log message details for debugging
               // console.debug(
@@ -463,7 +568,7 @@ export class WorkerClient extends Worker {
               // );
 
               // Handle auto-responses if enabled
-              await this.handleResponse(message);
+              await this.handleResponse(message, type);
 
               // Emit standard message
               if (this.listenerCount("worker_message") > 0) {
@@ -502,7 +607,10 @@ export class WorkerClient extends Worker {
   /**
    * Handle generating and sending GPT responses
    */
-  private async handleResponse(message: DecodedMessage) {
+  private async handleResponse(
+    message: DecodedMessage,
+    streamType: typeofStream,
+  ) {
     try {
       // Filter out messages from the same client
       if (message.senderInboxId === this.client.inboxId) {
@@ -511,10 +619,8 @@ export class WorkerClient extends Worker {
         );
         return;
       }
-      if (this.typeOfResponse === typeOfResponse.None) {
-        // console.warn(
-        //   `[${this.nameId}] Skipping message, typeOfResponse is ${this.typeOfResponse}`,
-        // );
+      // Only respond if this is a MessageandResponse stream
+      if (streamType !== typeofStream.MessageandResponse) {
         return;
       }
 
@@ -565,17 +671,41 @@ export class WorkerClient extends Worker {
    * Initialize conversation stream
    */
   private initConversationStream() {
-    this.activeStreams = true;
+    const streamType = typeofStream.Conversation;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(streamType, controller);
+
     void (async () => {
-      while (this.activeStreams) {
+      while (
+        this.activeStreamTypes.has(streamType) &&
+        !controller.signal.aborted
+      ) {
         try {
           const stream = this.client.conversations.stream();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(streamType, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(
+                  `[${this.nameId}] Mock ending ${streamType} stream`,
+                );
+                controller.abort();
+              }),
+          });
           for await (const conversation of stream) {
             try {
               console.debug(
                 `Received conversation, conversationId: ${conversation?.id}`,
               );
-              if (!this.activeStreams) {
+              if (
+                !this.activeStreamTypes.has(streamType) ||
+                controller.signal.aborted
+              ) {
                 console.debug(`Stopping conversation stream`);
                 break;
               }
@@ -613,11 +743,32 @@ export class WorkerClient extends Worker {
    * Initialize consent stream
    */
   private initConsentStream() {
-    this.activeStreams = true;
+    const streamType = typeofStream.Consent;
+    // Create abort controller for this stream
+    const controller = new AbortController();
+    this.streamControllers.set(streamType, controller);
+
     void (async () => {
-      while (this.activeStreams) {
+      while (
+        this.activeStreamTypes.has(streamType) &&
+        !controller.signal.aborted
+      ) {
         try {
           const stream = await this.client.preferences.streamConsent();
+
+          // Store stream reference with .end() method if available, otherwise create mock
+          const streamRef = stream as any;
+          this.streamReferences.set(streamType, {
+            end:
+              streamRef.end ||
+              (() => {
+                // Mock end function - signals to stop the stream loop
+                console.debug(
+                  `[${this.nameId}] Mock ending ${streamType} stream`,
+                );
+                controller.abort();
+              }),
+          });
 
           for await (const consentUpdate of stream) {
             console.debug(
@@ -691,6 +842,7 @@ export class WorkerClient extends Worker {
         const streamTypeMap: Record<typeofStream, StreamCollectorType | null> =
           {
             [typeofStream.Message]: StreamCollectorType.Message,
+            [typeofStream.MessageandResponse]: StreamCollectorType.Message,
             [typeofStream.GroupUpdated]: StreamCollectorType.GroupUpdated,
             [typeofStream.Conversation]: StreamCollectorType.Conversation,
             [typeofStream.Consent]: StreamCollectorType.Consent,
@@ -1052,7 +1204,7 @@ export class WorkerClient extends Worker {
     this.folder = newFolder; // Update folder reference
 
     // Restart streams and syncs with new installation
-    this.startStream();
+    this.startInitialStream();
     this.startSyncs();
 
     const newInstallationId = this.client.installationId;

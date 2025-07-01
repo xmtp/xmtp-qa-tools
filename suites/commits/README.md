@@ -33,9 +33,8 @@ Stress test XMTP group to produce forks.
 - **network**: `process.env.XMTP_ENV` - Network environment setting
 - **randomInboxIdsCount**: `30` - How many inboxIds to use randomly in the add/remove operations
 - **installationCount**: `5` - How many installations to use randomly in the createInstallation operations
-- **typeofStreamForTest**: `typeofStream.Message` - Starts a streamAllMessages in each worker
-- **typeOfResponseForTest**: `typeOfResponse.Gm` - Replies gm if mentioned
-- **typeOfSyncForTest**: `typeOfSync.Both` - Sync all every 5 seconds
+- **typeofStreamForTest**: `typeofStream.None` - No streams started by default (configured on-demand)
+- **typeOfSyncForTest**: `typeOfSync.None` - No automatic syncing (configured on-demand)
 
 ## Test setup
 

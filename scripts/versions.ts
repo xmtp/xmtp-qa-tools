@@ -2,14 +2,9 @@ import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
 import { VersionList } from "@helpers/client";
-import { Client, Conversation, Dm, Group } from "@xmtp/node-sdk";
 
 type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
-const staticConfigs = Object.values(VersionList).map((version) => ({
-  ...version,
-  sdkPackage: version.sdkPackage,
-  bindingsPackage: version.bindingsPackage,
-}));
+const staticConfigs = Object.values(VersionList);
 /**
  * Auto-discover SDK and bindings packages in node_modules/@xmtp
  */
@@ -82,15 +77,17 @@ function discoverPackages(): VersionConfig[] {
         libXmtpVersion = "unknown";
       }
 
+      // For dynamically discovered packages, we can't import the specific types
+      // so we'll set them to null or use a placeholder
       configs.push({
         sdkPackage,
         bindingsPackage: matchingBindings,
         nodeVersion,
         libXmtpVersion,
-        Client,
-        Conversation,
-        Dm,
-        Group,
+        Client: null as any,
+        Conversation: null as any,
+        Dm: null as any,
+        Group: null as any,
       });
 
       console.log(`${sdkPackage} -> ${matchingBindings}`);

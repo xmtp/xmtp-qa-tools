@@ -23,8 +23,12 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    typeofStream.GroupUpdated,
+    testName,
   );
+  // Start group updated streams for metadata tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
 
   setupTestLifecycle({
     testName,

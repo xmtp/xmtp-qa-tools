@@ -21,7 +21,7 @@ const testName = "streams";
 describe(testName, async () => {
   let group: Group;
   const names = getWorkersWithVersions(getFixedNames(5));
-  let workers = await getWorkers(names);
+  let workers = await getWorkers(names, testName);
 
   // Setup test lifecycle
   setupTestLifecycle({
@@ -31,7 +31,11 @@ describe(testName, async () => {
 
   it("should stream group membership updates when members are added to existing groups", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.GroupUpdated);
+      workers = await getWorkers(names, testName);
+      // Start group updated streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.GroupUpdated);
+      });
       // Initialize workers
       group = await workers.createGroupBetweenAll();
 
@@ -50,7 +54,11 @@ describe(testName, async () => {
 
   it("should stream consent state changes when managing permissions for group members", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.Consent);
+      workers = await getWorkers(names, testName);
+      // Start consent streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Consent);
+      });
 
       const verifyResult = await verifyConsentStream(
         workers.getCreator(),
@@ -66,7 +74,11 @@ describe(testName, async () => {
 
   it("should stream direct messages in real-time between two participants", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.Message);
+      workers = await getWorkers(names, testName);
+      // Start message streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Message);
+      });
       // Create direct message
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();
@@ -90,7 +102,11 @@ describe(testName, async () => {
 
   it("should stream real-time notifications when new members are added to groups", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.Conversation);
+      workers = await getWorkers(names, testName);
+      // Start conversation streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Conversation);
+      });
       const creator = workers.getCreator();
       const receiver = workers.getReceiver();
       // Create group with alice as the creator
@@ -113,7 +129,11 @@ describe(testName, async () => {
 
   it("should stream group messages in real-time across multiple participants", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.Message);
+      workers = await getWorkers(names, testName);
+      // Start message streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Message);
+      });
       const newGroup = await workers.createGroupBetweenAll();
 
       // Verify message delivery
@@ -132,7 +152,11 @@ describe(testName, async () => {
 
   it("should stream group metadata updates when group name or description changes", async () => {
     try {
-      workers = await getWorkers(names, typeofStream.GroupUpdated);
+      workers = await getWorkers(names, testName);
+      // Start group updated streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.GroupUpdated);
+      });
       // Initialize workers
       group = await workers.createGroupBetweenAll();
 
@@ -151,7 +175,11 @@ describe(testName, async () => {
   it("should stream new conversation events when participants are invited to join", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
-      workers = await getWorkers(names, typeofStream.Conversation);
+      workers = await getWorkers(names, testName);
+      // Start conversation streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Conversation);
+      });
 
       // Use the dedicated conversation stream verification helper
       const verifyResult = await verifyConversationStream(
@@ -169,7 +197,11 @@ describe(testName, async () => {
   it("should stream conversation updates when members are dynamically added to existing groups", async () => {
     try {
       // Initialize fresh workers specifically for conversation stream testing
-      workers = await getWorkers(names, typeofStream.Conversation);
+      workers = await getWorkers(names, testName);
+      // Start conversation streams on demand
+      workers.getAll().forEach((worker) => {
+        worker.worker.startStream(typeofStream.Conversation);
+      });
       group = (await workers
         .getCreator()
         .client.conversations.newGroup([])) as Group;

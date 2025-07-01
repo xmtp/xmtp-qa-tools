@@ -2,7 +2,7 @@ import { formatBytes } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -28,12 +28,8 @@ describe(testName, () => {
     const memberCount = 2;
     const name = `sender${randomSuffix}-${memberCount}`;
     const receiverName = `receiver${randomSuffix}-${memberCount}`;
-    const workers = await getWorkers(
-      [name, receiverName],
-      typeofStream.None,
-      typeOfResponse.None,
-      typeOfSync.None,
-    );
+    const workers = await getWorkers([name, receiverName], testName);
+    // Note: No streams or syncs needed for this test (all were set to None)
     try {
       const sender = workers.get(name);
       const receiver = workers.get(receiverName);

@@ -1,5 +1,5 @@
 import { getManualUsers } from "@helpers/client";
-import { typeOfResponse, typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
@@ -16,11 +16,13 @@ describe(testName, () => {
   it(`should create notification test group and add ${receiverObj.name} as super admin`, async () => {
     workers = await getWorkers(
       ["alice", "bob", "sam", "walt", "tina"],
-      typeofStream.Message,
-      typeOfResponse.Gm,
-      typeOfSync.None,
+      testName,
       receiverObj.network as "production" | "dev" | "local",
     );
+    // Start message and response streams for notifications
+    workers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.MessageandResponse);
+    });
     group = await workers.createGroupBetweenAll();
     if (!group) {
       console.error(`Failed to create conversation for alice`);

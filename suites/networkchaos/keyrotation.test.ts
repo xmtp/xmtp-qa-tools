@@ -1,7 +1,7 @@
 import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeOfResponse, typeofStream } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
@@ -24,11 +24,11 @@ describe(testName, async () => {
     userDescriptors[user] = "http://localhost:" + port.toString();
   }
 
-  const workers = await getWorkers(
-    userDescriptors,
-    typeofStream.Message,
-    typeOfResponse.Gm,
-  );
+  const workers = await getWorkers(userDescriptors, testName);
+  // Start message and response streams for the stress testing
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.MessageandResponse);
+  });
 
   setupTestLifecycle({ testName, expect });
 

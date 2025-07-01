@@ -24,8 +24,12 @@ describe(testName, async () => {
       "nancy",
       "oscar",
     ]),
-    typeofStream.Message,
+    testName,
   );
+  // Start message streams for client tests
+  workers.getAll().forEach((worker) => {
+    worker.worker.startStream(typeofStream.Message);
+  });
 
   setupTestLifecycle({
     testName,
@@ -34,7 +38,7 @@ describe(testName, async () => {
 
   it("should measure XMTP client creation performance and initialization", async () => {
     try {
-      const client = await getWorkers(["randomclient"]);
+      const client = await getWorkers(["randomclient"], testName);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
