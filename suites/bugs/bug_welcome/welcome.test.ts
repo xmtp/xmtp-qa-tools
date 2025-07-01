@@ -12,8 +12,12 @@ describe(testName, () => {
 
   beforeAll(async () => {
     const names = getFixedNames(10);
-    workers = await getWorkers(names, testName, typeofStream.Message);
-    await getWorkers(names, testName, typeofStream.Conversation);
+    workers = await getWorkers(names, testName);
+    // Start message and conversation streams on demand
+    workers.getAll().forEach((worker) => {
+      worker.worker.startStream(typeofStream.Message);
+      worker.worker.startStream(typeofStream.Conversation);
+    });
   });
 
   it("stream: send the stream", async () => {
