@@ -1,4 +1,4 @@
-import { sleep } from "@helpers/client";
+import { sleep, streamColdStartTimeout } from "@helpers/client";
 import { typeofStream } from "@workers/main";
 import type { Worker } from "@workers/manager";
 import {
@@ -174,8 +174,8 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       })),
     ),
   );
+  await sleep(streamColdStartTimeout); // wait for stream to start
   const sentEvents = await options.triggerEvents();
-  await sleep(1000);
   const allReceived = await Promise.all(collectPromises);
   const eventTimings: Record<string, Record<number, number>> = {};
   let timingSum = 0;
