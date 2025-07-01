@@ -27,6 +27,7 @@ export const PATTERNS = {
       testName: "Large",
       uniqueErrorLines: [
         "FAIL  suites/metrics/large/messages.test.ts > m_large_messages > receiveGroupMessage-50: should deliver messages to all 50",
+        "FAIL  suites/metrics/large/conversations.test.ts > m_large_conversations > receiveNewConversation-50: should create 50 member group",
       ],
     },
     {
