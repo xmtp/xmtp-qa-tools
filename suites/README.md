@@ -384,7 +384,6 @@ All tests use the standardized worker framework for consistent test environments
 
 ```typescript
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 
 const testName = "my-test";
