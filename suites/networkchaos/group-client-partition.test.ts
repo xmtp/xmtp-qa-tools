@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -9,7 +8,6 @@ import { describe, expect, it } from "vitest";
 import * as iptables from "../../network-stability-utilities/iptables";
 
 const testName = "group-client-partition";
-loadEnv(testName);
 
 describe(testName, async () => {
   const workers = await getWorkers({

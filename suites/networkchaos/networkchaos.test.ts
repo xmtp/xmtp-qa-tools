@@ -1,4 +1,3 @@
-import { loadEnv } from "@helpers/client";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -7,7 +6,6 @@ import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "networkchaos";
-loadEnv(testName);
 
 describe(testName, async () => {
   const allNodes = [
