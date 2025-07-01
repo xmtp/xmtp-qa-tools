@@ -12,8 +12,8 @@ describe(testName, () => {
 
   beforeAll(async () => {
     const names = getFixedNames(10);
-      workers = await getWorkers(names, typeofStream.Message);
-  await getWorkers(names, typeofStream.Conversation);
+    workers = await getWorkers(names, typeofStream.Message);
+    await getWorkers(names, typeofStream.Conversation);
   });
 
   it("stream: send the stream", async () => {

@@ -126,7 +126,7 @@ function generateMessage(options: SlackNotificationOptions): string {
 
 async function postToSlack(message: string, channel?: string): Promise<void> {
   const targetChannel = channel || process.env.SLACK_CHANNEL || "general";
-  
+
   const response = await fetch(URLS.SLACK_API, {
     method: "POST",
     headers: {
@@ -228,11 +228,12 @@ function generateAgentMessage(options: AgentNotificationOptions): string {
   const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
   const region = process.env.GEOLOCATION || "Unknown Region";
 
-  const agentLinks = customLinks || 
+  const agentLinks =
+    customLinks ||
     `*Agent tested:* <https://github.com/xmtp/xmtp-qa-tools/blob/main/suites/agents/agents.json|${agentName}>`;
 
-  const responseTimeInfo = responseTime 
-    ? `*Response Time:* \`${responseTime}ms\`` 
+  const responseTimeInfo = responseTime
+    ? `*Response Time:* \`${responseTime}ms\``
     : "";
 
   const sections = [
@@ -254,10 +255,14 @@ function generateAgentMessage(options: AgentNotificationOptions): string {
   return sections.filter(Boolean).join("\n");
 }
 
-function shouldSkipAgentNotification(options: AgentNotificationOptions): boolean {
+function shouldSkipAgentNotification(
+  options: AgentNotificationOptions,
+): boolean {
   // Skip if no error logs for error notifications
   if (!options.errorLogs || options.errorLogs.size === 0) {
-    console.log("Agent notification skipped (no actual test failures detected)");
+    console.log(
+      "Agent notification skipped (no actual test failures detected)",
+    );
     return true;
   }
 
@@ -309,7 +314,8 @@ export async function sendAgentNotification(
 
   try {
     const message = generateAgentMessage(options);
-    const finalChannel = options.slackChannel || process.env.SLACK_CHANNEL || "#general";
+    const finalChannel =
+      options.slackChannel || process.env.SLACK_CHANNEL || "#general";
     await postToSlack(message, finalChannel);
   } catch (error) {
     console.error("Error sending agent notification:", error);
