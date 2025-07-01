@@ -1,3 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
 # XMTP QA Tools CLI Usage Guide
 
 This repository provides a comprehensive CLI interface for testing XMTP protocol implementations across multiple environments and SDK versions.
@@ -282,6 +288,7 @@ yarn test performance --debug --no-fail                   # Performance testing
 ### Slack Notifications
 
 When using `--debug` flag, test failures automatically send detailed error reports to configured Slack channels with:
+
 - Test name and environment
 - Error patterns and frequency
 - Log excerpts with context

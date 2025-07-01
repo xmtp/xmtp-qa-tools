@@ -1,3 +1,9 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+
 # XMTP Testing Worker Framework Rules
 
 ## Core Testing Pattern
@@ -44,18 +50,18 @@ const alice = workers.get("alice");
 const bob = workers.get("bob");
 
 // Access worker properties
-alice.client;        // XMTP client
-alice.worker;        // Worker thread
-alice.name;          // "alice"
-alice.address;       // Ethereum address
+alice.client; // XMTP client
+alice.worker; // Worker thread
+alice.name; // "alice"
+alice.address; // Ethereum address
 alice.client.inboxId; // Inbox ID
 
 // Utility methods
-workers.getCreator();              // First worker
-workers.getReceiver();             // Random non-creator
-workers.getAll();                  // All workers array
-workers.getAllButCreator();        // All except first
-workers.getRandomWorkers(2);       // Random subset
+workers.getCreator(); // First worker
+workers.getReceiver(); // Random non-creator
+workers.getAll(); // All workers array
+workers.getAllButCreator(); // All except first
+workers.getRandomWorkers(2); // Random subset
 ```
 
 ## Conversation Operations
@@ -73,7 +79,7 @@ const dm2 = await alice.client.conversations.newDmWithIdentifier({
 // Create group with inbox IDs
 const group = await alice.client.conversations.newGroup([
   bob.client.inboxId,
-  workers.get("charlie").client.inboxId
+  workers.get("charlie").client.inboxId,
 ]);
 
 // Create group between all workers
@@ -111,9 +117,9 @@ const admins = group.admins;
 // Verify message delivery
 const verifyResult = await verifyMessageStream(
   conversation,
-  [workers.get("bob")],  // receivers
-  1,                     // message count
-  "gm-{i}-{randomSuffix}" // message template
+  [workers.get("bob")], // receivers
+  1, // message count
+  "gm-{i}-{randomSuffix}", // message template
 );
 expect(verifyResult.allReceived).toBe(true);
 
@@ -126,16 +132,18 @@ await verifyConversationStream(initiator, receivers);
 ## Available Worker Names
 
 Use predefined names from the 61 available:
+
 ```typescript
-["bob", "alice", "fabri", "elon", "joe", "charlie", "dave", "eve", 
- "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary", 
- "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula", 
+["bob", "alice", "fabri", "elon", "joe", "charlie", "dave", "eve",
+ "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary",
+ "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula",
  "victor", "wendy", "xavier", "yolanda", "zack", ...]
 ```
 
 ## Error Handling
 
 Always wrap test logic in try-catch:
+
 ```typescript
 try {
   // Test operations
@@ -155,10 +163,10 @@ try {
 ## Key Imports
 
 ```typescript
-import { getWorkers } from "@workers/manager";
-import { setupTestLifecycle } from "@helpers/vitest";
-import { verifyMessageStream } from "@helpers/streams";
 import { logError } from "@helpers/logger";
+import { verifyMessageStream } from "@helpers/streams";
+import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
+import { getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 ```

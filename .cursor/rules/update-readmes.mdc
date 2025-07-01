@@ -62,9 +62,9 @@ The `production.json` file contains agent configurations with these fields:
 
 ## Key files
 
-- **[production.json](./production.json)** - Configuration file containing agents to test with their addresses, test messages, and supported networks
-- **[agents.test.ts](./agents.test.ts)** - Main test implementation
-- **[GitHub Actions Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)** - Automated test execution configuration
+- **[production.json](mdc:production.json)** - Configuration file containing agents to test with their addresses, test messages, and supported networks
+- **[agents.test.ts](mdc:agents.test.ts)** - Main test implementation
+- **[GitHub Actions Workflow](mdc:https:/github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)** - Automated test execution configuration
 ```
 
 Process each directory thoroughly, analyzing all subdirectories and files to create accurate and helpful documentation. Do not ask for clarification - use your best judgment based on file contents, directory structure, and filename patterns. Be creative in generating useful examples where direct code is not available. Deliver all README updates in a single response.
