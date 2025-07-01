@@ -16,10 +16,6 @@ describe(testName, async () => {
     user3: "http://localhost:6556",
     user4: "http://localhost:6556",
   });
-  // Start message and response streams for the chaos testing
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
-  });
 
   setupTestLifecycle({ testName, expect });
 

@@ -31,10 +31,6 @@ describe(testName, async () => {
 
   it("should stream group membership updates when members are added to existing groups", async () => {
     try {
-      // Start group updated streams on demand
-      workers.getAllButCreator().forEach((worker) => {
-        worker.worker.startStream(typeofStream.GroupUpdated);
-      });
       // Initialize workers
       group = await workers.createGroupBetweenAll();
 

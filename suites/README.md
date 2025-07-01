@@ -402,10 +402,6 @@ describe(testName, async () => {
     const alice = workers.get("alice");
     const bob = workers.get("bob");
 
-    // Start streams on demand based on test needs
-    alice.worker.startStream(typeofStream.Message);
-    bob.worker.startStream(typeofStream.MessageandResponse);
-
     // Test implementation
   });
 });

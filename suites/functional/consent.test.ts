@@ -2,7 +2,6 @@ import { getFixedNames, getWorkersWithVersions } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -12,10 +11,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
-  // Start consent streams for consent tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Consent);
-  });
 
   setupTestLifecycle({
     testName,

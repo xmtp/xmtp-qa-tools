@@ -18,10 +18,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(getFixedNames(10));
-  // Start message streams for stream verification tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
+
   const creator = workers.getCreator();
   console.warn("creator is:", creator.name);
   const creatorClient = creator.client;

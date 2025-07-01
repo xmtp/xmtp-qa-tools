@@ -14,10 +14,6 @@ describe(testName, async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(getWorkersWithVersions(getFixedNames(5)));
-  // Start message streams for order tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.Message);
-  });
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);

@@ -24,10 +24,6 @@ describe(testName, async () => {
   }
 
   const workers = await getWorkers(userDescriptors);
-  // Start message and response streams for the chaos testing
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.MessageandResponse);
-  });
 
   setupTestLifecycle({ testName, expect });
 

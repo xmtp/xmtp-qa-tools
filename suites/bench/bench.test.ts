@@ -52,10 +52,7 @@ describe(testName, () => {
       it(test, async () => {
         try {
           workers = await getWorkers(getRandomNames(WORKER_COUNT));
-          // Start group updated streams for bench tests
-          workers.getAll().forEach((worker) => {
-            worker.worker.startStream(typeofStream.GroupUpdated);
-          });
+
           const newGroup = (await workers
             .getCreator()
             .client.conversations.newGroup(

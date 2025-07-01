@@ -3,7 +3,6 @@ import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { afterAll, describe, expect, it } from "vitest";
@@ -23,10 +22,6 @@ describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   let workers = await getWorkers(getFixedNames(m_large_WORKER_COUNT));
-  // Start group updated streams for membership tests
-  workers.getAll().forEach((worker) => {
-    worker.worker.startStream(typeofStream.GroupUpdated);
-  });
 
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
