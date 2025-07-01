@@ -82,15 +82,17 @@ function discoverPackages(): VersionConfig[] {
         libXmtpVersion = "unknown";
       }
 
+      // For dynamically discovered packages, we can't import the specific types
+      // so we'll set them to null or use a placeholder
       configs.push({
         sdkPackage,
         bindingsPackage: matchingBindings,
         nodeVersion,
         libXmtpVersion,
-        Client,
-        Conversation,
-        Dm,
-        Group,
+        Client: null as any,
+        Conversation: null as any,
+        Dm: null as any,
+        Group: null as any,
       });
 
       console.log(`${sdkPackage} -> ${matchingBindings}`);
