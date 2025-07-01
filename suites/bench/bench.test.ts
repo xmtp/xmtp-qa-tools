@@ -53,7 +53,6 @@ describe(testName, () => {
         try {
           workers = await getWorkers(
             getRandomNames(WORKER_COUNT),
-            testName,
             typeofStream.GroupUpdated,
           );
           const newGroup = (await workers

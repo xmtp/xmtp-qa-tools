@@ -16,7 +16,6 @@ describe(testName, () => {
   beforeAll(async () => {
     workers = await getWorkers(
       getFixedNames(1),
-      testName,
       typeofStream.Message,
     );
   });

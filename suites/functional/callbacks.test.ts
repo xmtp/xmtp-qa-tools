@@ -11,7 +11,6 @@ describe(testName, async () => {
   const names = getRandomNames(5);
   const workers = await getWorkers(
     getWorkersWithVersions(names),
-    testName,
     typeofStream.Message,
   );
 
