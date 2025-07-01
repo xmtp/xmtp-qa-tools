@@ -34,7 +34,7 @@ describe(testName, () => {
       it("should initialize clients and sync conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName], testName);
+          const workers = await getWorkers([randomName]);
           randomWorker = workers.get(randomName) as Worker;
           const newConvo =
             await randomWorker.client.conversations.newDm(receiver);
@@ -51,7 +51,7 @@ describe(testName, () => {
       it("should create new DM and group conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName + "-b"], testName);
+          const workers = await getWorkers([randomName + "-b"]);
           randomWorker = workers.get(randomName, "b") as Worker;
           const sender = randomWorker?.client;
           const newConvo = await sender.conversations.newDm(receiver);
@@ -73,7 +73,7 @@ describe(testName, () => {
       it("should create new DM and group conversations", async () => {
         try {
           console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName + "-c"], testName);
+          const workers = await getWorkers([randomName + "-c"]);
           randomWorker = workers.get(randomName, "c") as Worker;
           const sender = randomWorker?.client;
           const newConvo = await sender.conversations.newDm(receiver);

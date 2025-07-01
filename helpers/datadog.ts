@@ -413,16 +413,20 @@ export function flushMetrics(): Promise<void> {
 export async function sendDatadogLog(
   lines: string[],
   context: Record<string, unknown> = {},
+  options?: { channel?: string },
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
+
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
+    channel: options?.channel || context.channel || "general",
     ...context,
   };
+
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",

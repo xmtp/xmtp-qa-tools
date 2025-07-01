@@ -1,5 +1,5 @@
 import { getManualUsers } from "@helpers/client";
-import { typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";

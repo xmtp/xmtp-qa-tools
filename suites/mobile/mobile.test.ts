@@ -2,7 +2,7 @@ import { getManualUsers } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
-import { typeofStream, typeOfSync } from "@workers/main";
+import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 import { TEST_CONFIGS } from "../../bots/stress/index";

@@ -17,7 +17,6 @@ export interface WorkerBase {
   folder: string;
   walletKey: string;
   encryptionKey: string;
-  testName: string;
   sdkVersion: string;
   libXmtpVersion: string;
 }
@@ -39,7 +38,6 @@ export interface Worker extends WorkerBase {
  */
 export class WorkerManager {
   private workers: Record<string, Record<string, Worker>>;
-  private testName: string;
   private activeWorkers: WorkerClient[] = [];
   private env: XmtpEnv;
   private keysCache: Record<
@@ -372,7 +370,6 @@ export class WorkerManager {
       name: baseName,
       sdk: sdkVersion + "@" + libXmtpVersion,
       folder,
-      testName: this.testName,
       walletKey,
       encryptionKey,
       sdkVersion: sdkVersion,
