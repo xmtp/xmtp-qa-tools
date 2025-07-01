@@ -18,15 +18,9 @@ yarn test bug_stitch
 
 ```typescript
 // 1. Initialize first client
-const workers = await getWorkers(
-  ["ivy-a-202"],
-  testName,
-  typeofStream.Message,
-  false,
-  undefined,
-  env,
-);
+const workers = await getWorkers(["ivy-a-202"], testName, env);
 ivy100 = workers.get("ivy", "a");
+ivy100?.worker.startStream(typeofStream.Message);
 
 // 2. Create DM and send message
 const newConvo = await sender.conversations.newDm(receiver);
@@ -37,15 +31,9 @@ await ivy100?.worker.clearDB();
 await ivy100?.worker.initialize();
 
 // 4. Initialize second client
-const workers = await getWorkers(
-  ["ivy-b-105"],
-  testName,
-  typeofStream.Message,
-  false,
-  undefined,
-  env,
-);
-ivy104 = workers.get("ivy", "b");
+const workers2 = await getWorkers(["ivy-b-105"], testName, env);
+ivy104 = workers2.get("ivy", "b");
+ivy104?.worker.startStream(typeofStream.Message);
 ```
 
 ## Configuration

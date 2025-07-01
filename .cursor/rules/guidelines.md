@@ -90,16 +90,14 @@
    );
    ```
 
-9. **Enable GPT responses when needed**:
+9. **Enable message streams with automated responses**:
 
    ```typescript
-   // CORRECT: Enable GPT responses for automated testing
-   const workers = await getWorkers(
-     ["alice", "bob"],
-     testName,
-     typeofStream.Message,
-     typeOfResponse.Gpt,
-   );
+   // CORRECT: Enable message streams with GPT responses for automated testing
+   const workers = await getWorkers(["alice", "bob"], testName);
+   workers.getAll().forEach(worker => {
+     worker.worker.startStream(typeofStream.MessageandResponse);
+   });
    ```
 
 10. **Use available worker utility methods**:
