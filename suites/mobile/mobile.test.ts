@@ -40,7 +40,6 @@ describe(testName, () => {
     try {
       workers = await getWorkers(
         ["bot"],
-        testName,
         typeofStream.None,
         typeOfResponse.None,
         typeOfSync.None,

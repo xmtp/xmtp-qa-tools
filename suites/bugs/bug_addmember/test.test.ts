@@ -10,10 +10,9 @@ import { describe, expect, it } from "vitest";
 const testName = "bug_addmember";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["bob"], testName);
-  const receiverWorkers = await getWorkers(
-    ["alice"],
-    testName,
+  const workers = await getWorkers(["bob"]);
+      const receiverWorkers = await getWorkers(
+      ["alice"],
     typeofStream.Conversation,
     typeOfResponse.None,
     typeOfSync.None,

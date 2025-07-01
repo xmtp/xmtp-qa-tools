@@ -25,7 +25,6 @@ describe(testName, async () => {
 
   const workers = await getWorkers(
     workerDescriptors,
-    testName,
     typeofStream.Message,
   );
   let convo: Dm;

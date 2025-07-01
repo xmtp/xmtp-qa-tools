@@ -16,7 +16,6 @@ describe(testName, () => {
     const names = ["random1", "random2 ", "random3", "random4", "random5"];
     let initialWorkers = await getWorkers(
       getWorkersWithVersions(names),
-      testName,
       typeofStream.Message,
     );
     expect(initialWorkers.get(names[0])?.folder).toBe("a");
@@ -25,7 +24,6 @@ describe(testName, () => {
     // Create a different installation of alice
     const secondaryWorkers = await getWorkers(
       [names[0] + "-desktop", names[1] + "-b"],
-      testName,
     );
     // Merge the new workers with the existing ones
     expect(secondaryWorkers.get(names[0], "desktop")?.folder).toBe("desktop");
@@ -49,7 +47,6 @@ describe(testName, () => {
     // Create charlie only when we need him
     const terciaryWorkers = await getWorkers(
       getWorkersWithVersions([names[2]]),
-      testName,
       typeofStream.Message,
     );
 
@@ -68,7 +65,7 @@ describe(testName, () => {
     expect(charlieConvs?.length).toBeGreaterThan(0);
 
     // Create a backup installation for charlie
-    const fourthWorkers = await getWorkers([names[2] + "-c"], testName);
+    const fourthWorkers = await getWorkers([names[2] + "-c"]);
     // Backup installation should also be able to access the conversation after syncing
     await fourthWorkers.get(names[2])?.client.conversations.sync();
     const backupConvs = await fourthWorkers
@@ -88,7 +85,6 @@ describe(testName, () => {
         names[4],
         names[4] + "-" + randomString,
       ],
-      testName,
     );
 
     // Count initial installations

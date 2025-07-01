@@ -17,7 +17,7 @@ describe(testName, async () => {
   let dm: Dm | undefined;
   let workers: WorkerManager;
 
-  workers = await getWorkers(getFixedNames(10), testName, typeofStream.Message);
+  workers = await getWorkers(getFixedNames(10), typeofStream.Message);
   const creator = workers.getCreator();
   console.warn("creator is:", creator.name);
   const creatorClient = creator.client;
@@ -38,7 +38,7 @@ describe(testName, async () => {
 
   it("clientCreate: should measure creating a client", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName);
+      const client = await getWorkers(["randomclient"]);
       expect(client).toBeDefined();
     } catch (e) {
       logError(e, expect.getState().currentTestName);
@@ -47,7 +47,7 @@ describe(testName, async () => {
   });
   it("canMessage: should measure canMessage", async () => {
     try {
-      const client = await getWorkers(["randomclient"], testName);
+      const client = await getWorkers(["randomclient"]);
       if (!client) {
         throw new Error("Client not found");
       }
