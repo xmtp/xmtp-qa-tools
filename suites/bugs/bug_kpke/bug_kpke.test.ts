@@ -14,10 +14,7 @@ describe(testName, () => {
   let conversation: Dm;
 
   beforeAll(async () => {
-    workers = await getWorkers(
-      getFixedNames(1),
-      typeofStream.Message,
-    );
+    workers = await getWorkers(getFixedNames(1), typeofStream.Message);
   });
 
   setupTestLifecycle({

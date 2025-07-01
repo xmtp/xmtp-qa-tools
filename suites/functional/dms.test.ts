@@ -23,10 +23,7 @@ describe(testName, async () => {
     "oscar",
   ]);
 
-  const workers = await getWorkers(
-    workerDescriptors,
-    typeofStream.Message,
-  );
+  const workers = await getWorkers(workerDescriptors, typeofStream.Message);
   let convo: Dm;
 
   setupTestLifecycle({
