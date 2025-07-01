@@ -52,7 +52,7 @@ jobs:
             errorLogs: new Set(['Workflow timed out after 10 minutes']),
             env: '${{ matrix.environment }}',
             jobStatus: 'timeout',
-            channel: 'notify-qa-tools'
+            channel: ${{ secrets.SLACK_CHANNEL }}
           }).catch(console.error);
           "
       - name: Upload test artifacts

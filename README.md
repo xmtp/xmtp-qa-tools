@@ -6,13 +6,13 @@ This monorepo contains a comprehensive collection of tools for testing and monit
 
 | Test suite  | Performance                                                                                                                                                                  | Resources                                                                                                                                                                     | Run frequency | Networks         |
 | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------- | ---------------- |
-| Functional  | [![Functional](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml)   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)         | Every 6 hours | `production`     |
-| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)   | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)         | Every 6 hours | `production`     |
+| Functional  | [![Functional](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Functional.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)           | Every 6 hours | `production`     |
+| Regression  | [![Regression](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml)    | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Regression.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/functional)           | Every 6 hours | `production`     |
 | Performance | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Performance.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Performance) | Every 30 min  | `dev,production` |
 | Delivery    | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml)       | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Delivery.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Delivery)       | Every 30 min  | `dev,production` |
 | Groups      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Large.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/metrics/Large)             | Every 2 hours | `production`     |
 | Agents      | [![Performance](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml)           | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Agents.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/agents)                   | Every 30 min  | `production`     |
-| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)            | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/browser)                 | Every 30 min  | `production`     |
+| Browser     | [![Browser](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml/badge.svg)](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml)             | [Workflow](https://github.com/xmtp/xmtp-qa-tools/actions/workflows/Browser.yml) / [Test code](https://github.com/xmtp/xmtp-qa-tools/tree/main/suites/browser)                 | Every 30 min  | `production`     |
 
 ## Architecture
 
@@ -240,7 +240,7 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 - Functional: Core protocol (DMs, groups, streams, sync, consent, codecs, installations)
 - Metrics: Performance benchmarking, delivery reliability, large-scale testing (up to 400 members)
-- Regression: Regression functional testing for the last 3 versions
+- Regression: Backward compatibility testing for the last 3 versions
 - NetworkChaos: Partition tolerance, duplicate prevention, reconciliation, key rotation
 - Browser: Cross-browser compatibility via Playwright automation
 - Agents: Live production bot health monitoring
@@ -252,12 +252,12 @@ _Note: Testing regularly in groups of `40` active members listening to one user 
 
 - Multi-version SDKs: Compatibility testing across versions 0.0.47 → 2.2.0+
 - Stream verification: Message delivery, conversation streams, metadata updates
-- Performance monitoring: Real-time Datadog metrics collection
+- Performance monitoring: Datadog metrics collection
 - Browser automation: Playwright-based web app testing
-- CI automation: CI automation with logging and alerting
-- Smart alerting: Slack notifications with error pattern filtering
+- CI automation: Automated testing with logging and alerting
+- Alerting: Slack notifications with error pattern filtering
 - Log analysis: Automated error detection and deduplication
-- Real-time dashboard: Datadog integration tracking delivery rates, response times, geographic performance
+- Dashboard: Datadog integration tracking delivery rates, response times, geographic performance
 - CLI Tools: Test execution, version management, key generation
 - Slack Bot: AI-powered responses, history fetching, log management
 - Geographic testing: Multi-region performance across US, Europe, Asia, South America
