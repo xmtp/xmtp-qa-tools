@@ -14,7 +14,7 @@ describe("group-client-partition", async () => {
     user4: "http://localhost:6556",
   });
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   const partitionPort = 6556;
 

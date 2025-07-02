@@ -15,7 +15,7 @@ import {
   type WorkerManager,
 } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, it } from "vitest";
 
 export const features = [
   "verifyMessageStream",

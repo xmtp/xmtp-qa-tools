@@ -14,7 +14,7 @@ describe("group-reconciliation", async () => {
     user4: "http://localhost:8556",
   });
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   let group: Group;
 

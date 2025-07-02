@@ -22,7 +22,7 @@ describe("networkchaos", async () => {
 
   const workers = await getWorkers(userDescriptors);
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   it("should survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroupBetweenAll(

@@ -24,7 +24,7 @@ describe("keyrotation-chaos", async () => {
   // Start message and response streams for the stress testing
   workers.startStream(typeofStream.MessageandResponse);
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   it("should handle staggered key rotations and network chaos under load", async () => {
     const group = await workers.createGroupBetweenAll(

@@ -15,7 +15,7 @@ describe("group-partition-delayedreceive", async () => {
   });
   // Start message and response streams for the chaos testing
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

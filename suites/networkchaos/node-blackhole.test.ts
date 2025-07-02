@@ -17,7 +17,7 @@ describe("group-node-blackhole", async () => {
   // Start message and response streams for the chaos testing
   workers.startStream(typeofStream.MessageandResponse);
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

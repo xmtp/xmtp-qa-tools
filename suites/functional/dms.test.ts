@@ -6,6 +6,7 @@ import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 describe("dms", async () => {
+  setupTestLifecycle({});
   const workers = await getWorkers(
     [
       "henry",
@@ -23,8 +24,6 @@ describe("dms", async () => {
   );
 
   let convo: Dm;
-
-  setupTestLifecycle({});
 
   it("newDm: should create a new DM conversation using inbox ID", async () => {
     try {
