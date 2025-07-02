@@ -971,18 +971,23 @@ export class WorkerClient extends Worker {
   collectAddedMembers(
     groupId: string,
     count: number = 1,
-  ): Promise<StreamConversationMessage[]> {
+  ): Promise<StreamGroupUpdateMessage[]> {
     const additionalInfo: Record<string, string | number | boolean> = {
       groupId,
     };
 
-    return this.collectStreamEvents<StreamConversationMessage>({
-      type: typeofStream.Conversation,
+    return this.collectStreamEvents<StreamGroupUpdateMessage>({
+      type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
-        if (msg.type !== StreamCollectorType.Conversation) return false;
+        if (msg.type !== StreamCollectorType.GroupUpdated) return false;
         const streamMsg = msg;
-        const matches = groupId === streamMsg.conversation.id;
-        return matches;
+        const matches = groupId === streamMsg.group.conversationId;
+        // Also check if this group update contains added members
+        const hasAddedMembers = Boolean(
+          streamMsg.group.addedInboxes &&
+            streamMsg.group.addedInboxes.length > 0,
+        );
+        return matches && hasAddedMembers;
       },
       count,
       additionalInfo,
