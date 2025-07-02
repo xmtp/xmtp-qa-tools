@@ -1,6 +1,6 @@
 {
   "name": "xmtp-qa-tools",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -19,6 +19,7 @@
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
+    "datadog": "yarn test suites/datadog",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
@@ -35,14 +36,12 @@
     "run:agent": "./suites/agents/run.sh",
     "run:commits": "./suites/commits/run.sh",
     "script": "yarn cli script",
-    "slack-bot": "tsx slack-bot/index.ts",
-    "start:dev": "yarn ui & yarn slack-bot",
+    "start:dev": "yarn ui",
     "test": "yarn cli test",
     "ui": "vitest --ui --standalone --watch"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.54.0",
-    "@slack/bolt": "^4.4.0",
     "@xmtp/content-type-reaction": "^2.0.2",
     "@xmtp/content-type-reply": "^2.0.2",
     "@xmtp/node-bindings": "1.2.5",

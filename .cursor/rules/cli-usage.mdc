@@ -19,10 +19,14 @@ Before running any tests, you must set up a `.env` file with the following varia
 XMTP_ENV=dev                    # Options: local, dev, production
 LOGGING_LEVEL=off               # Options: off, debug, info, warn, error
 
-# Optional - for Slack notifications and monitoring
+# Optional - for Slack notifications and monitoring  
 SLACK_BOT_TOKEN=xoxb-...        # Slack bot token for notifications
 SLACK_CHANNEL=C...              # Slack channel ID for alerts
-DATADOG_API_KEY=...             # Datadog API key for metrics
+
+# Optional - for Datadog log analysis
+DATADOG_API_KEY=...             # Datadog API key for log retrieval
+DATADOG_APP_KEY=...             # Datadog app key for log retrieval
+ANTHROPIC_API_KEY=...           # Claude AI API key for log analysis
 
 # Optional - for geolocation testing
 GEOLOCATION=us-east-1           # AWS region for testing
@@ -173,6 +177,7 @@ yarn test mobile                      # Cross-platform mobile testing
 yarn test networkchaos                # Network partition tolerance
 yarn test other                       # Security, spam detection, rate limiting
 yarn test commits                     # Git commit-based testing
+yarn test datadog                     # Datadog log analysis and monitoring
 ```
 
 ## Environment-Specific Testing
@@ -229,9 +234,9 @@ yarn ansi                              # Clean raw logs of ANSI escape codes
 
 ```bash
 # Start development monitoring
-yarn start:dev                        # Starts UI + Slack bot
+yarn start:dev                        # Starts UI for development
 yarn ui                               # Vitest UI for interactive testing
-yarn slack-bot                        # Slack integration bot
+yarn datadog                          # Fetch and analyze Datadog logs
 
 # External monitoring
 yarn monitor:yarn                      # Monitor XMTP network health
@@ -265,6 +270,10 @@ XMTP_ENV=production yarn test agents --debug --no-fail
 
 # Performance benchmarking
 XMTP_ENV=production yarn test performance --debug
+
+# Datadog log analysis
+yarn datadog                          # Fetch and analyze latest Datadog logs
+XMTP_ENV=production yarn test suites/datadog --debug
 ```
 
 ### CI/CD Patterns
@@ -285,13 +294,13 @@ yarn test performance --debug --no-fail                   # Performance testing
 - `--debug-verbose`: Saves logs to files AND shows full terminal output
 - Logs saved to: `logs/raw-<testname>-<env>-<timestamp>.log`
 
-### Slack Notifications
+### Notification Systems
 
-When using `--debug` flag, test failures automatically send detailed error reports to configured Slack channels with:
+When using `--debug` flag, test failures can be analyzed through various systems:
 
-- Test name and environment
-- Error patterns and frequency
-- Log excerpts with context
+- Structured logging in the logs/ directory
+- Datadog integration for centralized log analysis  
+- Optional Slack notifications for CI/CD alerts
 
 ### Exit Codes
 
@@ -342,7 +351,7 @@ yarn regression                       # yarn test suites/functional --versions 3
 
 ```bash
 yarn bot                             # yarn cli bot
-yarn slack-bot                       # tsx slack-bot/index.ts
+yarn datadog                         # yarn test suites/datadog
 ```
 
 ### Utility Shortcuts
@@ -359,7 +368,7 @@ yarn build                           # tsc
 
 ```bash
 yarn ui                              # vitest --ui --standalone --watch
-yarn start:dev                      # yarn ui & yarn slack-bot
+yarn start:dev                      # yarn ui
 yarn record                         # npx playwright codegen 'https://xmtp.chat/'
 ```
 
