@@ -1,9 +1,6 @@
 name: Self Test XMTP QA Tools
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "0 */6 * * *" # every 6 hours
   workflow_dispatch:
@@ -42,7 +39,7 @@ jobs:
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          timeout 300s yarn test dms
+          timeout 300s yarn dms
 
       - name: Upload test artifacts
         if: always()
