@@ -3,7 +3,6 @@
 ## Core Testing Pattern
 
 ```typescript
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -15,12 +14,9 @@ describe("my-test", async () => {
   setupTestLifecycle({});
 
   it("should do something", async () => {
-    try {
-      // Test logic here
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    // Test logic here - vitest handles errors automatically
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+    expect(dm).toBeDefined();
   });
 });
 ```
@@ -153,15 +149,14 @@ Use predefined names from the 61 available:
 
 ## Error Handling
 
-Always wrap test logic in try-catch:
+Vitest automatically handles test errors - no manual try-catch needed:
 
 ```typescript
-try {
-  // Test operations
-} catch (e) {
-  logError(e, expect.getState().currentTestName);
-  throw e;
-}
+it("should handle errors automatically", async () => {
+  // Test operations - vitest will catch and report any errors
+  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+  expect(dm).toBeDefined();
+});
 ```
 
 ## Test Organization
@@ -174,7 +169,6 @@ try {
 ## Key Imports
 
 ```typescript
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";

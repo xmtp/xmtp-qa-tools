@@ -23,7 +23,7 @@ The helper modules are designed to be imported and used in test suites:
 import { extractErrorLogs, shouldFilterOutTest } from "@helpers/analyzer";
 import { createSigner, getEncryptionKeyFromHex } from "@helpers/client";
 import { initDataDog, sendPerformanceMetric } from "@helpers/datadog";
-import { logError, setupPrettyLogs } from "@helpers/logger";
+import { getTime, setupPrettyLogs } from "@helpers/logger";
 import { sendSlackNotification } from "@helpers/notifications";
 import {
   verifyConversationStream,
@@ -174,8 +174,8 @@ const logger = createTestLogger({
   verboseLogging: true,
 });
 
-// Log errors with consistent formatting
-logError(error);
+// Get formatted timestamp
+const timestamp = getTime();
 
 // Clean log files by removing ANSI codes
 await cleanAllRawLogs();

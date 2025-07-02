@@ -1,6 +1,5 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
-import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -65,23 +64,18 @@ describe(testName, async () => {
   // Test each agent in DMs
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} DM : ${agent.address}`, async () => {
-      try {
-        const result = await testAgentDMResponse(agent, agent.sendMessage);
+      const result = await testAgentDMResponse(agent, agent.sendMessage);
 
-        sendMetric("response", result.responseTime, {
-          test: testName,
-          metric_type: "agent",
-          metric_subtype: "dm",
-          agent: agent.name,
-          address: agent.address,
-          sdk: workers.getCreator().sdk,
-        });
+      sendMetric("response", result.responseTime, {
+        test: testName,
+        metric_type: "agent",
+        metric_subtype: "dm",
+        agent: agent.name,
+        address: agent.address,
+        sdk: workers.getCreator().sdk,
+      });
 
-        expect(result.responded).toBe(true);
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      expect(result.responded).toBe(true);
     });
   }
 });
