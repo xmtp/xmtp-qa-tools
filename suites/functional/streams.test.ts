@@ -15,9 +15,7 @@ import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "streams";
-
-describe(testName, async () => {
+describe("streams", async () => {
   let group: Group;
   let workers = await getWorkers(5);
 

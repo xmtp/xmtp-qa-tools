@@ -6,9 +6,7 @@ import { type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "dm-duplicate-chaos";
-
-describe(testName, async () => {
+describe("dm-duplicate-chaos", async () => {
   const workers = await getWorkers({
     henry: "http://localhost:5556",
     randomguy: "http://localhost:6556",

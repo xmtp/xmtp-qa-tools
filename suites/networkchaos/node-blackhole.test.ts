@@ -7,8 +7,7 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "group-node-blackhole";
-describe(testName, async () => {
+describe("group-node-blackhole", async () => {
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",

@@ -4,9 +4,7 @@ import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "rate-limited";
-
-describe(testName, async () => {
+describe("rate-limited", async () => {
   const workers = await getWorkers(8);
   // Start message and response streams for rate limiting test
   workers.startStream(typeofStream.MessageandResponse);

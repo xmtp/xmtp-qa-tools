@@ -13,9 +13,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_messages";
-
-describe(testName, async () => {
+describe("m_large_messages", async () => {
   let workers = await getWorkers(m_large_WORKER_COUNT);
 
   let newGroup: Group;

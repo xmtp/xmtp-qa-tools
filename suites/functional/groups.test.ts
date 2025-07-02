@@ -7,9 +7,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "groups";
-
-describe(testName, async () => {
+describe("groups", async () => {
   let workers: WorkerManager;
   workers = await getWorkers([
     "henry",

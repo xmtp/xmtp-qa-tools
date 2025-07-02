@@ -5,9 +5,7 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "keyrotation-chaos";
-
-describe(testName, async () => {
+describe("keyrotation-chaos", async () => {
   const allNodes = [
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),

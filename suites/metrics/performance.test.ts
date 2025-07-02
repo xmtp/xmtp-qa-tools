@@ -6,9 +6,7 @@ import { getWorkers } from "@workers/manager";
 import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "m_performance";
-
-describe(testName, async () => {
+describe("m_performance", async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
   let dm: Dm | undefined;

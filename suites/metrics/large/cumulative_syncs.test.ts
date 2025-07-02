@@ -10,9 +10,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_cumulative_syncs";
-
-describe(testName, async () => {
+describe("m_large_cumulative_syncs", async () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};

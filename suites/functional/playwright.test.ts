@@ -7,9 +7,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "playwright";
-
-describe(testName, () => {
+describe("playwright", () => {
   let groupId: string;
   const headless = true;
   let xmtpTester: playwright;

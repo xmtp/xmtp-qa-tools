@@ -23,9 +23,7 @@ console.log(HELP_TEXT);
 const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
-const testName = "bot-stress";
-
-describe(testName, () => {
+describe("bot-stress", () => {
   let workers: WorkerManager;
   let bot: Worker;
   let globalGroupCounter = 0;

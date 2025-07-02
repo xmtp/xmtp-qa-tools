@@ -2,9 +2,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "bug_welcome";
-
-describe(testName, () => {
+describe("bug_welcome", () => {
   let workers: WorkerManager;
   let group: Group;
 

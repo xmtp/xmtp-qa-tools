@@ -3,9 +3,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "installations";
-
-describe(testName, () => {
+describe("installations", () => {
   setupTestLifecycle({});
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {

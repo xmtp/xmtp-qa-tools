@@ -25,9 +25,7 @@ export const features = [
   "addRandomInstallations",
   "createGroup",
 ];
-const testName = "group";
 const testConfig = {
-  testName: testName,
   groupName: `Group ${getTime()}`,
   epochs: 3,
   manualUsers: getManualUsers([(process.env.XMTP_ENV as string) + "-testing"]),
@@ -38,7 +36,7 @@ const testConfig = {
   freshInstalls: false,
 } as const;
 
-describe(testName, () => {
+describe("chaos", () => {
   let workers: WorkerManager;
   let creator: Worker;
   let allInboxIds: string[] = [];

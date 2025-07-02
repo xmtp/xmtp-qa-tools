@@ -4,9 +4,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "consent";
-
-describe(testName, async () => {
+describe("consent", async () => {
   let workers: WorkerManager;
 
   workers = await getWorkers(2);

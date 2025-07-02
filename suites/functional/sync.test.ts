@@ -5,9 +5,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "sync-comparison";
-
-describe(testName, async () => {
+describe("sync-comparison", async () => {
   let workers: WorkerManager;
   let testGroup: Group;
 
@@ -15,7 +13,7 @@ describe(testName, async () => {
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
   workers = await getWorkers(testWorkers);
 
-  setupTestLifecycle({ expect });
+  setupTestLifecycle({});
 
   it("should establish test environment by creating group with all participants", async () => {
     try {

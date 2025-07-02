@@ -9,9 +9,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "my-test";
-
-describe(testName, async () => {
+describe("my-test", async () => {
   const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({});

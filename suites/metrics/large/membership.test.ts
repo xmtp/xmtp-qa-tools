@@ -13,9 +13,7 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-const testName = "m_large_membership";
-
-describe(testName, async () => {
+describe("m_large_membership", async () => {
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};

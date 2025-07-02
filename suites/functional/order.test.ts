@@ -6,9 +6,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "order";
-
-describe(testName, async () => {
+describe("order", async () => {
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 

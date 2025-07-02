@@ -6,9 +6,7 @@ import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "bug_addmember";
-
-describe(testName, async () => {
+describe("bug_addmember", async () => {
   const workers = await getWorkers(["bob"]);
   const receiverWorkers = await getWorkers(["alice"]);
 

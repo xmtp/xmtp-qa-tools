@@ -1,15 +1,12 @@
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "recovery";
-
 const amountofMessages = 5;
 
-describe(testName, async () => {
+describe("recovery", async () => {
   let group: Group;
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"]);

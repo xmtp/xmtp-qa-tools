@@ -4,9 +4,7 @@ import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "metadata";
-
-describe(testName, async () => {
+describe("metadata", async () => {
   let group: Group;
 
   const workers = await getWorkers([
