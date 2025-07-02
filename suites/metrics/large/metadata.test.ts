@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMetadataStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";

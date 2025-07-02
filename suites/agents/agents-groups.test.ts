@@ -1,6 +1,5 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";

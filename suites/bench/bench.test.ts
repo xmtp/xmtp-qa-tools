@@ -1,5 +1,5 @@
 import fs from "fs";
-import { getTime, logError } from "@helpers/logger";
+import { getTime } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
