@@ -17,10 +17,9 @@ jobs:
     env:
       LOGGING_LEVEL: "off"
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

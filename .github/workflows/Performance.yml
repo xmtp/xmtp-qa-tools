@@ -16,12 +16,11 @@ jobs:
         environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      DATADOG_APP_KEY: ${{ secrets.DATADOG_APP_KEY }}
       XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       BATCH_SIZE: 50
       MAX_GROUP_SIZE: 250
-      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -41,20 +40,11 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
-      - name: Send timeout notification
-        if: failure() && steps.run-tests.conclusion == 'failure'
+      - name: Update historical data
+        if: always()
         run: |
-          node -e "
-          const { sendSlackNotification } = require('./helpers/notifications');
-          sendSlackNotification({
-            testName: '${{ matrix.test }}',
-            label: 'error',
-            errorLogs: new Set(['Workflow timed out after 10 minutes']),
-            env: '${{ matrix.environment }}',
-            jobStatus: 'timeout',
-            channel: ${{ secrets.SLACK_CHANNEL }}
-          }).catch(console.error);
-          "
+          echo "Updating historical test data..."
+          yarn history:analyze --from="$(date -d '1 hour ago' -Iseconds)" --to="$(date -Iseconds)" || echo "Data update failed but continuing..."
       - name: Upload test artifacts
         if: always()
         uses: actions/upload-artifact@v4
