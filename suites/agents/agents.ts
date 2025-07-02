@@ -18,19 +18,8 @@ export interface AgentConfig {
   disabled?: boolean;
   /** Slack channel for notifications */
   slackChannel?: string;
-  /** Group testing configuration */
-  groupTesting?: {
-    /** Whether to test this agent in groups */
-    enabled: boolean;
-    /** Whether the agent responds to untagged messages in groups */
-    respondsToUntagged?: boolean;
-    /** Whether the agent responds to tagged messages in groups */
-    respondsToTagged?: boolean;
-    /** Custom tagged message for group testing (if different from sendMessage) */
-    taggedMessage?: string;
-    /** Custom untagged message for group testing (if different from sendMessage) */
-    untaggedMessage?: string;
-  };
+  /** Whether to test this agent in groups (default: false) */
+  groupTesting?: boolean;
 }
 
 /**

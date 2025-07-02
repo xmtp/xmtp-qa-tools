@@ -14,14 +14,10 @@ describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({
-    testName,
-    expect,
-    workers,
-  });
+  setupTestLifecycle({});
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env) && agent.groupTesting?.enabled;
+    return agent.networks.includes(env) && agent.groupTesting === true;
   });
 
   // Helper function to wait for messages in group
@@ -94,7 +90,7 @@ describe(testName, async () => {
         let initialMessages = await group.messages();
         const initialCount = initialMessages.length;
 
-        // Step 1: Send "hi" message (agent should NOT respond)
+        // Step 1: Send untagged "hi" message (agent should NOT respond)
         await group.send("hi");
         await waitForMessages(group, initialCount + 1, 5000); // Wait 5 seconds
 
@@ -104,8 +100,8 @@ describe(testName, async () => {
         // Should have only our "hi" message, no response from agent
         const noResponseToHi = countAfterHi === initialCount + 1;
 
-        // Step 2: Send tagged message (agent SHOULD respond)
-        const taggedMessage = `@${agent.baseName} hi`;
+        // Step 2: Send tagged message using baseName (agent SHOULD respond)
+        const taggedMessage = `@${agent.baseName} ${agent.sendMessage}`;
         await group.send(taggedMessage);
 
         // Wait longer for tagged response

@@ -7,13 +7,7 @@
     "networks": ["production"],
     "disabled": false,
     "slackChannel": "#flaunchy-alerts",
-    "groupTesting": {
-      "enabled": true,
-      "respondsToUntagged": true,
-      "respondsToTagged": true,
-      "untaggedMessage": "hi",
-      "taggedMessage": "@flaunchy.base.eth hi"
-    }
+    "groupTesting": true
   },
   {
     "name": "mamo",
@@ -26,16 +20,11 @@
   {
     "name": "squabble",
     "baseName": "squabble.base.eth",
-    "address": "0xD60d560c9Ae4ad9b7C252FacE7B664A8d7A426da",
-    "sendMessage": "@squabble.base.eth",
+    "address": "0xaE59E04E2649bC725d5A91AcF13be6EE5E83f04b",
+    "sendMessage": "gm",
     "networks": ["production"],
     "slackChannel": "#squabble-alerts",
-    "groupTesting": {
-      "enabled": true,
-      "respondsToUntagged": false,
-      "respondsToTagged": true,
-      "taggedMessage": "@squabble.base.eth"
-    }
+    "groupTesting": true
   },
   {
     "name": "key-check",
@@ -44,13 +33,7 @@
     "sendMessage": "/kc help",
     "networks": ["dev", "production"],
     "slackChannel": "#key-check-alerts",
-    "groupTesting": {
-      "enabled": true,
-      "respondsToUntagged": true,
-      "respondsToTagged": true,
-      "untaggedMessage": "/kc help",
-      "taggedMessage": "@key-check.base.eth /kc help"
-    }
+    "groupTesting": true
   },
   {
     "name": "csx",
@@ -110,11 +93,6 @@
     "sendMessage": "@tokenbot",
     "networks": ["production"],
     "slackChannel": "#tokenbot-alerts",
-    "groupTesting": {
-      "enabled": true,
-      "respondsToUntagged": false,
-      "respondsToTagged": true,
-      "taggedMessage": "@tokenbot"
-    }
+    "groupTesting": true
   }
 ]
