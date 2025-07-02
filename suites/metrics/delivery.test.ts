@@ -7,15 +7,6 @@ import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
-export async function getWorkersFromGroup(
-  group: Group,
-  workers: WorkerManager,
-): Promise<Worker[]> {
-  await group.sync();
-  const memberIds = (await group.members()).map((m) => m.inboxId);
-  return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
-}
-
 describe(testName, async () => {
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
@@ -39,8 +30,6 @@ describe(testName, async () => {
   });
 
   setupTestLifecycle({
-    testName,
-    expect,
     workers,
   });
 
@@ -260,3 +249,12 @@ describe(testName, async () => {
     }
   });
 });
+
+export async function getWorkersFromGroup(
+  group: Group,
+  workers: WorkerManager,
+): Promise<Worker[]> {
+  await group.sync();
+  const memberIds = (await group.members()).map((m) => m.inboxId);
+  return workers.getAll().filter((w) => memberIds.includes(w.client.inboxId));
+}

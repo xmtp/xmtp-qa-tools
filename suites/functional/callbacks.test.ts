@@ -3,16 +3,11 @@ import { getWorkers } from "@workers/manager";
 import { type DecodedMessage, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "callbacks";
-
-describe(testName, async () => {
+describe("callbacks", async () => {
   const workers = await getWorkers(5);
 
   const names = workers.getAll().map((w) => w.name);
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should receive messages using await async", async () => {
     const sender = workers.get(names[0])!;

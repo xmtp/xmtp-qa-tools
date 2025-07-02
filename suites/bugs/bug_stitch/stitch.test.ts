@@ -20,9 +20,7 @@ const users: {
   },
 };
 
-const testName = "bug_stitch";
-
-describe(testName, () => {
+describe("bug_stitch", () => {
   const randomName =
     defaultNames[Math.floor(Math.random() * defaultNames.length)];
   for (const user of Object.keys(users)) {

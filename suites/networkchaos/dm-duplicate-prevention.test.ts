@@ -6,9 +6,7 @@ import { type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "dm-duplicate-chaos";
-
-describe(testName, async () => {
+describe("dm-duplicate-chaos", async () => {
   const workers = await getWorkers({
     henry: "http://localhost:5556",
     randomguy: "http://localhost:6556",
@@ -16,7 +14,7 @@ describe(testName, async () => {
   // Start message streams for duplicate prevention test
   workers.startStream(typeofStream.Message);
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({});
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
 

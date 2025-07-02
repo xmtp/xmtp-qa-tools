@@ -13,9 +13,7 @@ export const TOTAL = 200;
 export const CHECK_INSTALLATIONS = [2, 5, 10, 15, 20, 25];
 export const MIN_MAX_INSTALLATIONS = [1000, 2000];
 
-const testName = "bench";
-
-describe(testName, () => {
+describe("bench", () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<string, SummaryEntry> = {};
@@ -26,8 +24,6 @@ describe(testName, () => {
   };
 
   setupTestLifecycle({
-    testName,
-    expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;

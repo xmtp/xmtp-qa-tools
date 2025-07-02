@@ -4,9 +4,7 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-const testName = "networkchaos";
-
-describe(testName, async () => {
+describe("networkchaos", async () => {
   const allNodes = [
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),
@@ -24,7 +22,7 @@ describe(testName, async () => {
 
   const workers = await getWorkers(userDescriptors);
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({});
 
   it("should survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroupBetweenAll(

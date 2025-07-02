@@ -6,16 +6,11 @@ import {
 } from "@xmtp/content-type-reaction";
 import { describe, expect, it } from "vitest";
 
-const testName = "codec";
-
-describe(testName, async () => {
+describe("codec", async () => {
   let workers: WorkerManager;
   workers = await getWorkers(2);
 
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should handle codec errors gracefully when sending unsupported content types", async () => {
     try {
