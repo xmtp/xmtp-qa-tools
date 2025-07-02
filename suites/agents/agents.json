@@ -92,7 +92,15 @@
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
     "networks": ["production"],
-    "slackChannel": "#tokenbot-alerts",
     "groupTesting": true
+    "slackChannel": "#tokenbot-alerts"
+  },
+  {
+    "name": "tbachat",
+    "baseName": "tbachat.base.eth",
+    "address": "0x75681fDc873f82030630e1005f611Fa932eE1A14",
+    "sendMessage": "/help",
+    "networks": ["production"],
+    "slackChannel": "#tbachat-alerts"
   }
 ]
