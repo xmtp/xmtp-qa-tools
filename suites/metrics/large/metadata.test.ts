@@ -38,32 +38,27 @@ describe("m_large_metadata", async () => {
     i += m_large_BATCH_SIZE
   ) {
     it(`receiveGroupUpdated-${i}: should create ${i} member group`, async () => {
-      try {
-        const creator = workers.getCreator();
-        newGroup = (await creator.client.conversations.newGroup(
-          getInboxIds(i),
-        )) as Group;
+      const creator = workers.getCreator();
+      newGroup = (await creator.client.conversations.newGroup(
+        getInboxIds(i),
+      )) as Group;
 
-        await newGroup.addMembers(
-          workers.getAllButCreator().map((worker) => worker.inboxId),
-        );
-        const verifyResult = await verifyMetadataStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+      await newGroup.addMembers(
+        workers.getAllButCreator().map((worker) => worker.inboxId),
+      );
+      const verifyResult = await verifyMetadataStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
 
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      // Save metrics
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        groupUpdatedStreamTimeMs: verifyResult.averageEventTiming,
+      };
     });
   }
 

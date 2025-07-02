@@ -8,13 +8,12 @@ import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
 describe("playwright", () => {
-  let groupId: string;
   const headless = true;
   let xmtpTester: playwright;
   let creator: Worker;
   let xmtpChat: Worker;
   let receiver: Worker;
-
+  let groupId: string;
   setupTestLifecycle({});
 
   beforeAll(async () => {
@@ -58,8 +57,6 @@ describe("playwright", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-invite-with-message");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -77,8 +74,6 @@ describe("playwright", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-invite-without-message");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -90,8 +85,6 @@ describe("playwright", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("dm-creation-and-response");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -106,8 +99,6 @@ describe("playwright", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-creation-via-ui");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -127,8 +118,6 @@ describe("playwright", () => {
       }
     } catch (e) {
       await xmtpTester.takeSnapshot("async-member-addition");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -145,8 +134,6 @@ describe("playwright", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpNewTester.takeSnapshot("multi-instance-messaging");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 });

@@ -26,63 +26,43 @@ describe("dms", async () => {
   let convo: Dm;
 
   it("newDm: should create a new DM conversation using inbox ID", async () => {
-    try {
-      convo = (await workers
-        .get("henry")!
-        .client.conversations.newDm(
-          workers.get("randomguy")!.client.inboxId,
-        )) as Dm;
+    convo = (await workers
+      .get("henry")!
+      .client.conversations.newDm(
+        workers.get("randomguy")!.client.inboxId,
+      )) as Dm;
 
-      expect(convo).toBeDefined();
-      expect(convo.id).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(convo).toBeDefined();
+    expect(convo.id).toBeDefined();
   });
 
   it("newDmWithIdentifier should create a new DM conversation using Ethereum address", async () => {
-    try {
-      const dm2 = await workers
-        .get("henry")!
-        .client.conversations.newDmWithIdentifier({
-          identifier: workers.get("randomguy2")!.address,
-          identifierKind: IdentifierKind.Ethereum,
-        });
+    const dm2 = await workers
+      .get("henry")!
+      .client.conversations.newDmWithIdentifier({
+        identifier: workers.get("randomguy2")!.address,
+        identifierKind: IdentifierKind.Ethereum,
+      });
 
-      expect(dm2).toBeDefined();
-      expect(dm2.id).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dm2).toBeDefined();
+    expect(dm2.id).toBeDefined();
   });
   it("should send a message in DM conversation", async () => {
-    try {
-      const message = "gm-" + Math.random().toString(36).substring(2, 15);
+    const message = "gm-" + Math.random().toString(36).substring(2, 15);
 
-      console.log(
-        `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
-      );
+    console.log(
+      `[${workers.get("henry")?.name}] Creating DM with ${workers.get("randomguy")?.name} at ${workers.get("randomguy")?.client.inboxId}`,
+    );
 
-      const dmId = await convo.send(message);
+    const dmId = await convo.send(message);
 
-      expect(dmId).toBeDefined();
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(dmId).toBeDefined();
   });
 
   it("should receive and verify message delivery in DM conversation", async () => {
-    try {
-      const verifyResult = await verifyMessageStream(convo, [
-        workers.get("randomguy")!,
-      ]);
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const verifyResult = await verifyMessageStream(convo, [
+      workers.get("randomguy")!,
+    ]);
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

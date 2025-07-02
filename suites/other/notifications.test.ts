@@ -33,51 +33,41 @@ describe("notifications", () => {
   });
 
   it(`should send DM messages to ${receiverInboxId} for notification testing`, async () => {
-    try {
-      let counter = 0;
-      console.log(`Starting notification test with random delays...`);
-      for (const worker of workers.getAll()) {
-        const client = worker.client;
-        const conversation = await client?.conversations.newDm(receiverInboxId);
-        for (let i = 0; i < 5; i++) {
-          await conversation?.send(`Sending message ${i}-${counter}!`);
-        }
+    let counter = 0;
+    console.log(`Starting notification test with random delays...`);
+    for (const worker of workers.getAll()) {
+      const client = worker.client;
+      const conversation = await client?.conversations.newDm(receiverInboxId);
+      for (let i = 0; i < 5; i++) {
+        await conversation?.send(`Sending message ${i}-${counter}!`);
       }
-    } catch (e: unknown) {
-      console.error("Test error:", e);
-      throw e;
     }
   });
 
   it(`should send group messages to ${receiverObj.inboxId} for notification testing`, async () => {
-    try {
-      let counter = 0;
+    let counter = 0;
 
-      if (!group) {
-        console.error(`Failed to create conversation for alice`);
-        return;
-      }
-      console.log(`Created group ${group.id}`);
+    if (!group) {
+      console.error(`Failed to create conversation for alice`);
+      return;
+    }
+    console.log(`Created group ${group.id}`);
 
-      for (const worker of workers.getAllButCreator()) {
-        const client = worker.client;
-        await client?.conversations.sync();
-        const conversation = await client?.conversations.getConversationById(
-          group.id,
-        );
+    for (const worker of workers.getAllButCreator()) {
+      const client = worker.client;
+      await client?.conversations.sync();
+      const conversation = await client?.conversations.getConversationById(
+        group.id,
+      );
 
-        if (conversation) {
-          for (let i = 0; i < 5; i++) {
-            await conversation.send(
-              `Second message ${i}-${counter}, ${worker.name}!`,
-            );
-          }
+      if (conversation) {
+        for (let i = 0; i < 5; i++) {
+          await conversation.send(
+            `Second message ${i}-${counter}, ${worker.name}!`,
+          );
         }
-        counter++;
       }
-    } catch (e: unknown) {
-      console.error("Test error:", e);
-      throw e;
+      counter++;
     }
   });
 });

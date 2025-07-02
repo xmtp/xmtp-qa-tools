@@ -77,64 +77,59 @@ describe("chaos", () => {
   });
 
   it("should verify message streams, membership changes, metadata updates, and epoch changes across all groups", async () => {
-    try {
-      for (const feature of features) {
-        for (const groupId of allGroups) {
-          console.warn(feature, groupId);
-          const group = (await creator.client.conversations.getConversationById(
-            groupId,
-          )) as Group;
-          await workers.checkForks();
-          switch (feature) {
-            case "createGroup": {
-              const newGroup = (await creator.client.conversations.newGroup(
-                allInboxIds,
-              )) as Group;
-              await newGroup.sync();
-              break;
-            }
-            case "addRandomInstallations":
-              await verifyAddRandomInstallations(workers);
-              break;
-            case "verifyMessageStream":
-              await verifyMessageStream(
-                group,
-                workers.getAllBut("bot"),
-                1,
-                `Message verification from group ${groupId}`,
-              );
-              break;
-
-            case "verifyMembershipStream":
-              await verifyMembershipStream(
-                group,
-                workers.getAllBut("bot"),
-                testConfig.randomInboxIds.slice(0, 1),
-              );
-              break;
-
-            case "verifyMetadataStream":
-              await verifyMetadataStream(
-                group,
-                workers.getAllBut("bot"),
-                1,
-                `${testConfig.groupName} #${groupId} - Updated`,
-              );
-              break;
-
-            case "verifyEpochChange":
-              await verifyEpochChange(workers, group.id, testConfig.epochs);
-              break;
-          }
-
-          console.debug(`Group ${groupId} - Completed: ${feature}`);
-        }
-        workers.checkStatistics();
+    for (const feature of features) {
+      for (const groupId of allGroups) {
+        console.warn(feature, groupId);
+        const group = (await creator.client.conversations.getConversationById(
+          groupId,
+        )) as Group;
         await workers.checkForks();
+        switch (feature) {
+          case "createGroup": {
+            const newGroup = (await creator.client.conversations.newGroup(
+              allInboxIds,
+            )) as Group;
+            await newGroup.sync();
+            break;
+          }
+          case "addRandomInstallations":
+            await verifyAddRandomInstallations(workers);
+            break;
+          case "verifyMessageStream":
+            await verifyMessageStream(
+              group,
+              workers.getAllBut("bot"),
+              1,
+              `Message verification from group ${groupId}`,
+            );
+            break;
+
+          case "verifyMembershipStream":
+            await verifyMembershipStream(
+              group,
+              workers.getAllBut("bot"),
+              testConfig.randomInboxIds.slice(0, 1),
+            );
+            break;
+
+          case "verifyMetadataStream":
+            await verifyMetadataStream(
+              group,
+              workers.getAllBut("bot"),
+              1,
+              `${testConfig.groupName} #${groupId} - Updated`,
+            );
+            break;
+
+          case "verifyEpochChange":
+            await verifyEpochChange(workers, group.id, testConfig.epochs);
+            break;
+        }
+
+        console.debug(`Group ${groupId} - Completed: ${feature}`);
       }
-    } catch (error) {
-      console.error("Error in test:", error);
-      throw error;
+      workers.checkStatistics();
+      await workers.checkForks();
     }
   });
 });

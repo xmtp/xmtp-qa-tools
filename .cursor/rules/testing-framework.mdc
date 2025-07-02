@@ -24,12 +24,9 @@ describe(testName, async () => {
   setupTestLifecycle({});
 
   it("should do something", async () => {
-    try {
+
       // Test logic here
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    
   });
 });
 ```

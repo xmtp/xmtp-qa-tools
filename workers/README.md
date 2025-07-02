@@ -15,12 +15,7 @@ describe("my-test", async () => {
   setupTestLifecycle({});
 
   it("should do something", async () => {
-    try {
-      // Test logic here
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    // Test logic here
   });
 });
 ```
@@ -149,19 +144,6 @@ Use predefined names from the 61 available:
  "frank", "grace", "henry", "ivy", "jack", "karen", "larry", "mary",
  "nancy", "oscar", "paul", "quinn", "rachel", "steve", "tom", "ursula",
  "victor", "wendy", "xavier", "yolanda", "zack", ...]
-```
-
-## Error Handling
-
-Always wrap test logic in try-catch:
-
-```typescript
-try {
-  // Test operations
-} catch (e) {
-  logError(e, expect.getState().currentTestName);
-  throw e;
-}
 ```
 
 ## Test Organization

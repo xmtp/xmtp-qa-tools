@@ -12,16 +12,11 @@ describe("consent", async () => {
   setupTestLifecycle({});
 
   it("should stream consent state changes when users are blocked or unblocked", async () => {
-    try {
-      const verifyResult = await verifyConsentStream(
-        workers.getCreator(),
-        workers.getReceiver(),
-      );
+    const verifyResult = await verifyConsentStream(
+      workers.getCreator(),
+      workers.getReceiver(),
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 });
