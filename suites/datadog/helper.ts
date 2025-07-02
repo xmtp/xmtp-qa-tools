@@ -165,24 +165,6 @@ export function readIssuesData(): string | null {
   }
 }
 
-// Format response for Slack with additional enhancements
-export function formatSlackResponse(response: string): string {
-  // Add some visual separators and emojis for better readability
-  let formatted = response;
-
-  // Add emoji indicators for different types of content
-  formatted = formatted.replace(/\*\*([^*]+)\*\*/g, "*$1*"); // Convert ** to * for Slack bold
-  formatted = formatted.replace(/^(ERROR|FAILED|FAILURE)/gim, "🚨 $1");
-  formatted = formatted.replace(/^(SUCCESS|PASSED|WORKING)/gim, "✅ $1");
-  formatted = formatted.replace(/^(WARNING|WARN)/gim, "⚠️ $1");
-  formatted = formatted.replace(/^(INFO|NOTE)/gim, "ℹ️ $1");
-
-  // Ensure proper spacing around code blocks
-  formatted = formatted.replace(/```([^`]+)```/g, "\n```$1```\n");
-
-  return formatted.trim();
-}
-
 // Datadog Log Processing Class
 export class DatadogLogProcessor {
   private readonly service: string;
