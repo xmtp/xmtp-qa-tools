@@ -47,6 +47,7 @@ echo "Writing env config to output dir..."
   echo "WORKER_COUNT=$WORKER_COUNT"
   echo "RANDOM_INBOX_IDS=$RANDOM_INBOX_IDS"
   echo "TARGET_EPOCH=$TARGET_EPOCH"
+  echo "ENABLED_OPS=$ENABLED_OPS"
   echo "XMTP_ENV=$XMTP_ENV"
 } > "logs/cleaned/env-vars.txt"
 
