@@ -1,13 +1,5 @@
-import { basename } from "path";
-import { fileURLToPath } from "url";
 import type { WorkerManager } from "@workers/manager";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  type ExpectStatic,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 import { loadEnv } from "./client";
 import {
   flushMetrics,
@@ -17,32 +9,18 @@ import {
   type DurationMetricTags,
 } from "./datadog";
 
-/**
- * Extracts test name from the current file path by removing the .test.ts extension
- * @param importMetaUrl - The import.meta.url of the calling file
- * @returns The test name derived from the filename
- */
-export const getTestNameFromFile = (importMetaUrl: string): string => {
-  const filePath = fileURLToPath(importMetaUrl);
-  const fileName = basename(filePath);
-  return fileName.replace(/\.test\.ts$/, "");
-};
-
 export const setupTestLifecycle = ({
-  testName,
-  expect,
   workers,
   getCustomDuration,
   setCustomDuration,
 }: {
-  testName: string;
-  expect: ExpectStatic;
   workers?: WorkerManager;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
   beforeAll(() => {
-    loadEnv(testName);
+    const describeName = getDescribeName();
+    loadEnv(describeName);
   });
   let skipNetworkStats = false;
   let start: number;
@@ -108,4 +86,25 @@ export const setupTestLifecycle = ({
   afterAll(async () => {
     await flushMetrics();
   });
+};
+
+/**
+ * Extracts the describe name from the current test context using stack trace
+ * @param fallbackName - Fallback name to use if extraction fails
+ * @returns The describe name derived from the test file name
+ */
+export const getDescribeName = (): string => {
+  const stack = new Error().stack;
+  const stackLines = stack?.split("\n") || [];
+
+  // Look for a line that contains a .test.ts file
+  const testFileLine = stackLines.find((line) => line.includes(".test.ts"));
+
+  if (testFileLine) {
+    const match = testFileLine.match(/([^/\\]+)\.test\.ts/);
+    if (match) {
+      return match[1];
+    }
+  }
+  return "unknown";
 };

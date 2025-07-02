@@ -7,9 +7,7 @@ import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "browser";
-
-describe(testName, () => {
+describe("browser", () => {
   let groupId: string;
   const headless = false;
   let xmtpTester: playwright;
@@ -17,10 +15,7 @@ describe(testName, () => {
   let xmtpChat: Worker;
   let receiver: Worker;
 
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
   beforeAll(async () => {
     const convoStreamBot = await getWorkers(2);
     const names = convoStreamBot.getAll().map((w) => w.name);

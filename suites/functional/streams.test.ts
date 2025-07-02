@@ -15,17 +15,12 @@ import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "streams";
-
-describe(testName, async () => {
+describe("streams", async () => {
   let group: Group;
   let workers = await getWorkers(5);
 
   // Setup test lifecycle
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should stream group membership updates when members are added to existing groups", async () => {
     try {
