@@ -220,28 +220,30 @@ export async function cleanAllRawLogs(): Promise<void> {
 }
 
 /**
- * Extract error logs from log files with deduplication
+ * Process a single log file line by line using streaming to avoid memory issues
  */
-export function extractErrorLogs(
-  testName: string,
-  limit?: number,
-): Set<string> {
-  if (!fs.existsSync("logs")) {
-    return new Set();
-  }
+async function processLogFileStream(
+  logPath: string,
+  errorLines: string[],
+  seenPatterns: Set<string>,
+): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const stream = fs.createReadStream(logPath, {
+      encoding: "utf8",
+      highWaterMark: 64 * 1024, // 64KB chunks
+    });
 
-  try {
-    const logFiles = fs
-      .readdirSync("logs")
-      .filter((file) => file.endsWith(".log") && file.includes(testName));
+    let buffer = "";
 
-    const errorLines: string[] = [];
-    const seenPatterns = new Set<string>();
+    stream.on("data", (chunk: string | Buffer) => {
+      const chunkStr =
+        typeof chunk === "string" ? chunk : chunk.toString("utf8");
+      buffer += chunkStr;
 
-    for (const logFile of logFiles) {
-      const logPath = path.join("logs", logFile);
-      const content = fs.readFileSync(logPath, "utf-8");
-      const lines = content.split("\n");
+      // Process complete lines from buffer
+      const lines = buffer.split("\n");
+      // Keep the last incomplete line in buffer
+      buffer = lines.pop() || "";
 
       for (const line of lines) {
         if (!PATTERNS.MATCH.some((pattern) => pattern.test(line))) {
@@ -265,6 +267,88 @@ export function extractErrorLogs(
         if (!isDuplicate) {
           errorLines.push(cleanLine);
         }
+      }
+    });
+
+    stream.on("end", () => {
+      // Process any remaining content in buffer
+      if (buffer.trim()) {
+        if (PATTERNS.MATCH.some((pattern) => pattern.test(buffer))) {
+          const { cleanLine, shouldSkip } = processErrorLine(buffer);
+          if (!shouldSkip) {
+            const isDuplicate = PATTERNS.DEDUPE.some((pattern) => {
+              if (cleanLine.includes(pattern)) {
+                if (seenPatterns.has(pattern)) {
+                  return true;
+                }
+                seenPatterns.add(pattern);
+              }
+              return false;
+            });
+
+            if (!isDuplicate) {
+              errorLines.push(cleanLine);
+            }
+          }
+        }
+      }
+      resolve();
+    });
+
+    stream.on("error", (error) => {
+      reject(error);
+    });
+  });
+}
+
+/**
+ * Extract error logs from log files with deduplication
+ */
+export async function extractErrorLogs(
+  testName: string,
+  limit?: number,
+): Promise<Set<string>> {
+  if (!fs.existsSync("logs")) {
+    return new Set();
+  }
+
+  try {
+    const logFiles = fs
+      .readdirSync("logs")
+      .filter((file) => file.endsWith(".log") && file.includes(testName));
+
+    const errorLines: string[] = [];
+    const seenPatterns = new Set<string>();
+
+    // Check file sizes and skip files that are too large
+    const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit per file
+    const processableFiles: string[] = [];
+
+    for (const logFile of logFiles) {
+      const logPath = path.join("logs", logFile);
+      try {
+        const stats = fs.statSync(logPath);
+        if (stats.size > MAX_FILE_SIZE) {
+          console.warn(
+            `Skipping large log file ${logFile} (${Math.round(stats.size / 1024 / 1024)}MB > ${MAX_FILE_SIZE / 1024 / 1024}MB)`,
+          );
+          continue;
+        }
+        processableFiles.push(logFile);
+      } catch (error) {
+        console.warn(`Could not check size of ${logFile}:`, error);
+        continue;
+      }
+    }
+
+    // Process files using streaming
+    for (const logFile of processableFiles) {
+      const logPath = path.join("logs", logFile);
+      try {
+        await processLogFileStream(logPath, errorLines, seenPatterns);
+      } catch (error) {
+        console.error(`Error processing log file ${logFile}:`, error);
+        // Continue with other files instead of failing completely
       }
     }
 

@@ -83,7 +83,7 @@ The `analyzer.ts` module provides log analysis and error detection capabilities 
 
 ```typescript
 // Extract error logs from test output
-const errorLogs = extractErrorLogs(testName, 50);
+const errorLogs = await extractErrorLogs(testName, 50);
 
 // Check if test failures match known issues
 const shouldFilter = shouldFilterOutTest(errorLogs);
