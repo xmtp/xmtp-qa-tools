@@ -18,6 +18,7 @@ describe(testName, async () => {
   setupTestLifecycle({
     testName,
     expect,
+    workers,
   });
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
