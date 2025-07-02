@@ -9,13 +9,11 @@ import { describe, expect, it } from "vitest";
 import { type AgentConfig } from "./agents";
 import productionAgents from "./agents.json";
 
-const testName = "agents";
+const testName = "agents-dms";
 
 describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
-
-  const workers = await getWorkers(1);
-
+  const workers = await getWorkers(["alice"]);
 
   setupTestLifecycle({
     testName,
@@ -26,8 +24,8 @@ describe(testName, async () => {
     return agent.networks.includes(env);
   });
 
-  // Helper function to test agent response
-  async function testAgentResponse(agent: AgentConfig, testMessage: string) {
+  // Helper function to test agent response in DM
+  async function testAgentDMResponse(agent: AgentConfig, testMessage: string) {
     const conversation = await workers
       .getCreator()
       .client.conversations.newDmWithIdentifier({
@@ -67,12 +65,11 @@ describe(testName, async () => {
     return { responded: false, responseTime: streamTimeout };
   }
 
-  // Test each agent
+  // Test each agent in DMs
   for (const agent of filteredAgents) {
-    // DM Test
     it(`${env}: ${agent.name} DM : ${agent.address}`, async () => {
       try {
-        const result = await testAgentResponse(agent, agent.sendMessage);
+        const result = await testAgentDMResponse(agent, agent.sendMessage);
 
         sendMetric("response", result.responseTime, {
           test: testName,
@@ -89,59 +86,5 @@ describe(testName, async () => {
         throw e;
       }
     });
-
-    // Group Tests - only if group testing is enabled for this agent
-    if (agent.groupTesting?.enabled) {
-      // Test untagged messages in groups
-      if (agent.groupTesting.respondsToUntagged) {
-        it(`${env}: ${agent.name} Group Untagged : ${agent.address}`, async () => {
-          try {
-            const untaggedMessage =
-              agent.groupTesting?.untaggedMessage || agent.sendMessage;
-            const result = await testAgentResponse(agent, untaggedMessage);
-
-            sendMetric("response", result.responseTime, {
-              test: testName,
-              metric_type: "agent",
-              metric_subtype: `${agent.name}-group-untagged`,
-              agent: agent.name,
-              address: agent.address,
-              sdk: workers.getCreator().sdk,
-            });
-
-            expect(result.responded).toBe(true);
-          } catch (e) {
-            logError(e, expect.getState().currentTestName);
-            throw e;
-          }
-        });
-      }
-
-      // Test tagged messages in groups
-      if (agent.groupTesting.respondsToTagged) {
-        it(`${env}: ${agent.name} Group Tagged : ${agent.address}`, async () => {
-          try {
-            const taggedMessage =
-              agent.groupTesting?.taggedMessage ||
-              `@${agent.baseName} ${agent.sendMessage}`;
-            const result = await testAgentResponse(agent, taggedMessage);
-
-            sendMetric("response", result.responseTime, {
-              test: testName,
-              metric_type: "agent",
-              metric_subtype: `${agent.name}-group-tagged`,
-              agent: agent.name,
-              address: agent.address,
-              sdk: workers.getCreator().sdk,
-            });
-
-            expect(result.responded).toBe(true);
-          } catch (e) {
-            logError(e, expect.getState().currentTestName);
-            throw e;
-          }
-        });
-      }
-    }
   }
 });
