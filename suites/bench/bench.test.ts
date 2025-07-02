@@ -26,7 +26,6 @@ describe(testName, () => {
   };
 
   setupTestLifecycle({
-    testName,
     expect,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {

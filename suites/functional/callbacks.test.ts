@@ -10,7 +10,6 @@ describe(testName, async () => {
 
   const names = workers.getAll().map((w) => w.name);
   setupTestLifecycle({
-    testName,
     expect,
   });
 

@@ -7,7 +7,6 @@ const testName = "installations";
 
 describe(testName, () => {
   setupTestLifecycle({
-    testName,
     expect,
   });
 

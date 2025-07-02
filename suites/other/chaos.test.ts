@@ -45,7 +45,6 @@ describe(testName, () => {
   let allGroups: string[] = [];
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

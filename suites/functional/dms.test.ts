@@ -27,7 +27,6 @@ describe(testName, async () => {
   let convo: Dm;
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

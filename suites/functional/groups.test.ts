@@ -29,7 +29,6 @@ describe(testName, async () => {
   const groupsBySize: Record<number, Conversation> = {};
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

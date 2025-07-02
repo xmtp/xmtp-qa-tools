@@ -17,7 +17,6 @@ describe(testName, async () => {
   let targetInboxId: string;
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

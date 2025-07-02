@@ -23,7 +23,6 @@ describe(testName, async () => {
 
   // Setup test lifecycle
   setupTestLifecycle({
-    testName,
     expect,
   });
 

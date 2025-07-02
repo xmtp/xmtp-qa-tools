@@ -16,7 +16,6 @@ describe(testName, () => {
   });
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

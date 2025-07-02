@@ -18,7 +18,6 @@ describe(testName, async () => {
   let group: Group;
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

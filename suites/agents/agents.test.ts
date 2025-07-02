@@ -17,7 +17,6 @@ describe(testName, async () => {
   const workers = await getWorkers(1);
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

@@ -18,7 +18,6 @@ describe(testName, () => {
   let receiver: Worker;
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

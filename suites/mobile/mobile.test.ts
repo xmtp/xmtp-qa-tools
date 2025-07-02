@@ -31,7 +31,6 @@ describe(testName, () => {
   let globalGroupCounter = 0;
 
   setupTestLifecycle({
-    testName,
     expect,
   });
 

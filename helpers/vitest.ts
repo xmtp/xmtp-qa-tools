@@ -1,5 +1,3 @@
-import { basename } from "path";
-import { fileURLToPath } from "url";
 import type { WorkerManager } from "@workers/manager";
 import {
   afterAll,
@@ -17,19 +15,7 @@ import {
   type DurationMetricTags,
 } from "./datadog";
 
-/**
- * Extracts test name from the current file path by removing the .test.ts extension
- * @param importMetaUrl - The import.meta.url of the calling file
- * @returns The test name derived from the filename
- */
-export const getTestNameFromFile = (importMetaUrl: string): string => {
-  const filePath = fileURLToPath(importMetaUrl);
-  const fileName = basename(filePath);
-  return fileName.replace(/\.test\.ts$/, "");
-};
-
 export const setupTestLifecycle = ({
-  testName,
   expect,
   workers,
   getCustomDuration,
@@ -42,13 +28,15 @@ export const setupTestLifecycle = ({
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
   beforeAll(() => {
-    loadEnv(testName);
+    const describeName = getDescribeName();
+    loadEnv(describeName);
   });
   let skipNetworkStats = false;
   let start: number;
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
+    console.warn(currentTestName);
     console.time(currentTestName);
     if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });
@@ -108,4 +96,25 @@ export const setupTestLifecycle = ({
   afterAll(async () => {
     await flushMetrics();
   });
+};
+
+/**
+ * Extracts the describe name from the current test context using stack trace
+ * @param fallbackName - Fallback name to use if extraction fails
+ * @returns The describe name derived from the test file name
+ */
+export const getDescribeName = (): string => {
+  const stack = new Error().stack;
+  const stackLines = stack?.split("\n") || [];
+
+  // Look for a line that contains a .test.ts file
+  const testFileLine = stackLines.find((line) => line.includes(".test.ts"));
+
+  if (testFileLine) {
+    const match = testFileLine.match(/([^/\\]+)\.test\.ts/);
+    if (match) {
+      return match[1];
+    }
+  }
+  return "unknown";
 };
