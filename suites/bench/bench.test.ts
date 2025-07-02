@@ -115,7 +115,7 @@ describe("bench", () => {
   });
 });
 
-export interface SummaryEntry {
+interface SummaryEntry {
   groupSize: number;
   installations?: number;
   addMembersTimeMs?: number;

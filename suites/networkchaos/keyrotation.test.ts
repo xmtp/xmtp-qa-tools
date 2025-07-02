@@ -59,11 +59,7 @@ describe("keyrotation-chaos", async () => {
           }
 
           const content = `gm-${sender.name}-${Date.now()}`;
-          try {
-            await convo.send(content);
-          } catch (err) {
-            console.warn(`[sendLoop] send failed for ${sender.name}:`, err);
-          }
+          await convo.send(content);
         }
         await new Promise((r) => setTimeout(r, 1000));
       }
@@ -72,14 +68,10 @@ describe("keyrotation-chaos", async () => {
     const verifyLoop = () => {
       verifyInterval = setInterval(() => {
         void (async () => {
-          try {
-            console.log("[verify] Checking fork and delivery");
-            await workers.checkForks();
-            const res = await verifyMessageStream(group, otherUsers);
-            expect(res.allReceived).toBe(true);
-          } catch (e) {
-            console.warn("[verify] Skipping check due to error:", e);
-          }
+          console.log("[verify] Checking fork and delivery");
+          await workers.checkForks();
+          const res = await verifyMessageStream(group, otherUsers);
+          expect(res.allReceived).toBe(true);
         })();
       }, 30 * 1000);
     };
@@ -90,15 +82,11 @@ describe("keyrotation-chaos", async () => {
           "[key-rotation] Rotating group key by adding and removing a random worker from the group...",
         );
         void (async () => {
-          try {
-            const newMember = workers.getRandomWorker().client.inboxId;
-            await group.removeMembers([newMember]);
-            await group.addMembers([newMember]);
-            const info = await group.debugInfo();
-            console.log("[key-rotation] After rotation, epoch =", info.epoch);
-          } catch (err) {
-            console.error("[key-rotation] error", err);
-          }
+          const newMember = workers.getRandomWorker().client.inboxId;
+          await group.removeMembers([newMember]);
+          await group.addMembers([newMember]);
+          const info = await group.debugInfo();
+          console.log("[key-rotation] After rotation, epoch =", info.epoch);
         })();
       }, 10 * 1000);
     };
@@ -111,15 +99,8 @@ describe("keyrotation-chaos", async () => {
           const jitter = 50 + Math.floor(Math.random() * 150);
           const loss = 2 + Math.random() * 8;
 
-          try {
-            node.addJitter(delay, jitter);
-            if (Math.random() < 0.5) node.addLoss(loss);
-          } catch (err) {
-            console.warn(
-              "[chaos] Error applying netem on " + node.name + ":",
-              err,
-            );
-          }
+          node.addJitter(delay, jitter);
+          if (Math.random() < 0.5) node.addLoss(loss);
 
           if (node !== allNodes[0]) {
             allNodes[0].ping(node);
@@ -137,22 +118,16 @@ describe("keyrotation-chaos", async () => {
       }
     };
 
-    try {
-      verifyLoop();
-      startChaos();
-      keyRotationLoop();
-      await sendLoop();
+    verifyLoop();
+    startChaos();
+    keyRotationLoop();
+    await sendLoop();
 
-      console.log(
-        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
-      );
-      clearChaos();
-      await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
-    } catch (err) {
-      console.error("[test] Error during chaos test:", err);
-      clearChaos();
-      throw err;
-    }
+    console.log(
+      `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
+    );
+    clearChaos();
+    await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
 
     console.log("[final] Validating final group state and message sync");
     await workers.checkForks();

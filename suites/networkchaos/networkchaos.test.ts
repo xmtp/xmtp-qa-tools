@@ -58,14 +58,10 @@ describe("networkchaos", async () => {
     const verifyLoop = () => {
       verifyInterval = setInterval(() => {
         void (async () => {
-          try {
-            console.log("[verify] Checking fork and delivery under chaos");
-            await workers.checkForks();
-            const res = await verifyMessageStream(group, otherUsers);
-            expect(res.allReceived).toBe(true);
-          } catch (e) {
-            console.warn("[verify] Skipping check due to exception:", e);
-          }
+          console.log("[verify] Checking fork and delivery under chaos");
+          await workers.checkForks();
+          const res = await verifyMessageStream(group, otherUsers);
+          expect(res.allReceived).toBe(true);
         })();
       }, 10 * 1000);
     };
@@ -80,12 +76,8 @@ describe("networkchaos", async () => {
           const jitter = Math.floor(Math.random() * 100); // 0�100ms
           const loss = Math.random() * 5; // 0�5% packet loss
 
-          try {
-            node.addJitter(delay, jitter);
-            if (Math.random() < 0.5) node.addLoss(loss);
-          } catch (err) {
-            console.warn(`[chaos] Error applying netem on ${node.name}:`, err);
-          }
+          node.addJitter(delay, jitter);
+          if (Math.random() < 0.5) node.addLoss(loss);
           if (node != allNodes[0]) {
             allNodes[0].ping(node);
           }
@@ -101,20 +93,14 @@ describe("networkchaos", async () => {
       }
     };
 
-    try {
-      verifyLoop();
-      startChaos();
-      await sendLoop();
-      console.log(
-        `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
-      );
-      clearChaos();
-      await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
-    } catch (err) {
-      console.error("[test] Encountered error during chaos:", err);
-      clearChaos();
-      throw err;
-    }
+    verifyLoop();
+    startChaos();
+    await sendLoop();
+    console.log(
+      `[cooldown] Waiting ${stopChaosBeforeEnd / 1000}s before final validation`,
+    );
+    clearChaos();
+    await new Promise((r) => setTimeout(r, stopChaosBeforeEnd));
 
     // Final delivery validation
     console.log("[final] Validating full group state and message sync");

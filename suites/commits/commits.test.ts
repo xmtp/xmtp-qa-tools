@@ -118,11 +118,7 @@ describe("commits", () => {
                     Math.floor(Math.random() * operationList.length)
                   ];
 
-                try {
-                  await randomOperation();
-                } catch (e) {
-                  console.log(`Group ${groupIndex + 1} operation failed:`, e);
-                }
+                await randomOperation();
               })(),
           );
           await Promise.all(parallelOperationsArray);

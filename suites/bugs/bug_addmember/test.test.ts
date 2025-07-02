@@ -17,37 +17,27 @@ describe("bug_addmember", async () => {
   setupTestLifecycle({});
 
   it("should create a group", async () => {
-    try {
-      const allInboxIds = [
-        ...getInboxIds(1),
-        ...getManualUsers(["fabri-xmtpchat"]).map((u) => u.inboxId),
-      ];
-      console.log("All inbox ids", allInboxIds);
-      group = (await creator.client.conversations.newGroup(
-        allInboxIds,
-      )) as Group;
-      console.log("Group created", group.id);
-      await group.send("Debug message");
+    const allInboxIds = [
+      ...getInboxIds(1),
+      ...getManualUsers(["fabri-xmtpchat"]).map((u) => u.inboxId),
+    ];
+    console.log("All inbox ids", allInboxIds);
+    group = (await creator.client.conversations.newGroup(allInboxIds)) as Group;
+    console.log("Group created", group.id);
+    await group.send("Debug message");
 
-      console.log(
-        "Add this member in xmtpchat group t see the conversation stream",
-      );
-      await group.send(receiver.inboxId);
-      console.log(receiver.inboxId);
-      const stream = receiver.client.conversations.stream();
-      for await (const conversation of stream) {
-        try {
-          if (conversation?.id === group.id) {
-            console.log("Conversation", conversation.id);
-            expect(conversation.id).toBe(group.id);
-            break;
-          }
-        } catch (e) {
-          throw e;
-        }
+    console.log(
+      "Add this member in xmtpchat group t see the conversation stream",
+    );
+    await group.send(receiver.inboxId);
+    console.log(receiver.inboxId);
+    const stream = receiver.client.conversations.stream();
+    for await (const conversation of stream) {
+      if (conversation?.id === group.id) {
+        console.log("Conversation", conversation.id);
+        expect(conversation.id).toBe(group.id);
+        break;
       }
-    } catch (e) {
-      throw e;
     }
   });
 });

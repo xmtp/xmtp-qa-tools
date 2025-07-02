@@ -75,81 +75,46 @@ const createChaos = async (
   // create test groups
   await Promise.all(
     Array.from({ length: numGroups }).map(async () => {
-      try {
-        // create the group
-        const group = (await mainClient.conversations.newGroup(
-          testClients.map((c) => c.inboxId),
-        )) as Group;
-        await randomSleep();
-        groups.push(group);
-        // sync all test clients
-        await Promise.all(
-          testClients.map(async (c) => {
-            try {
-              await c.conversations.sync();
-            } catch (e: unknown) {
-              errors.push({
-                error: (e as Error).message,
-                description: "conversations.sync() failed",
-                installationId: c.installationId,
-              });
-            }
-          }),
-        );
-        // get conversation on all test clients
-        const testGroups = await Promise.all(
-          testClients.map(async (c) => {
-            try {
-              return (await c.conversations.getConversationById(group.id)) as
-                | Group
-                | undefined;
-            } catch (e: unknown) {
-              errors.push({
-                error: (e as Error).message,
-                description: `conversations.getConversationById() failed`,
-                installationId: c.installationId,
-                groupId: group.id,
-              });
-              return undefined;
-            }
-          }),
-        );
-        await Promise.all(
-          testGroups.map(async (testGroup, idx) => {
-            // get the conversation on the test client
-            if (!testGroup) {
-              errors.push({
-                error: `group not found`,
-                description: `conversations.getConversationById() returned undefined`,
-                installationId: testClients[idx].installationId,
-                groupId: group.id,
-              });
-              return Promise.resolve();
-            }
-            await Promise.all(
-              Array.from({ length: numMessages }).map(async () => {
-                try {
-                  // await randomSleep(5000);
-                  await testGroup.send("gm");
-                } catch (e: unknown) {
-                  errors.push({
-                    error: (e as Error).message,
-                    description: `conversation.send() failed`,
-                    installationId: testClients[idx].installationId,
-                    groupId: group.id,
-                  });
-                }
-              }),
-            );
-          }),
-        );
-      } catch (e: unknown) {
-        errors.push({
-          error: (e as Error).message,
-          description: `conversations.newGroup() failed`,
-          installationId: mainClient.installationId,
-        });
-      }
+      // create the group
+      const group = (await mainClient.conversations.newGroup(
+        testClients.map((c) => c.inboxId),
+      )) as Group;
+      await randomSleep();
+      groups.push(group);
+      // sync all test clients
+      await Promise.all(
+        testClients.map(async (c) => {
+          await c.conversations.sync();
+        }),
+      );
+      // get conversation on all test clients
+      const testGroups = await Promise.all(
+        testClients.map(async (c) => {
+          return (await c.conversations.getConversationById(group.id)) as
+            | Group
+            | undefined;
+        }),
+      );
+      await Promise.all(
+        testGroups.map(async (testGroup, idx) => {
+          // get the conversation on the test client
+          if (!testGroup) {
+            errors.push({
+              error: `group not found`,
+              description: `conversations.getConversationById() returned undefined`,
+              installationId: testClients[idx].installationId,
+              groupId: group.id,
+            });
+            return Promise.resolve();
+          }
+          await Promise.all(
+            Array.from({ length: numMessages }).map(async () => {
+              // await randomSleep(5000);
+              await testGroup.send("gm");
+            }),
+          );
+        }),
+      );
     }),
   );
   return groups;
@@ -175,19 +140,10 @@ const clientSyncAll = (client: Client, interval: number = 10000) => {
   return async () => {
     // clear the interval
     clearInterval(intervalId);
-    try {
-      // sync one last time
-      const sync = await client.conversations.syncAll();
-      // return the syncs
-      return sync;
-    } catch (e: unknown) {
-      errors.push({
-        error: (e as Error).message,
-        description: `conversations.syncAll() failed`,
-        installationId: client.installationId,
-      });
-      return syncs[syncs.length - 1] ?? BigInt(0);
-    }
+    // sync one last time
+    const sync = await client.conversations.syncAll();
+    // return the syncs
+    return sync;
   };
 };
 

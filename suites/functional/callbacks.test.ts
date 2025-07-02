@@ -22,18 +22,13 @@ describe("callbacks", async () => {
       }, 5000);
 
       void (async () => {
-        try {
-          for await (const message of receiverConversation) {
-            console.log("Stream received message:", message?.content);
-            if (message?.conversationId) {
-              clearTimeout(timeout);
-              resolve(message as DecodedMessage);
-              break;
-            }
+        for await (const message of receiverConversation) {
+          console.log("Stream received message:", message?.content);
+          if (message?.conversationId) {
+            clearTimeout(timeout);
+            resolve(message as DecodedMessage);
+            break;
           }
-        } catch (e) {
-          clearTimeout(timeout);
-          reject(e instanceof Error ? e : new Error(String(e)));
         }
       })();
     });
@@ -94,7 +89,6 @@ describe("callbacks", async () => {
   //     }, 5000);
 
   //     void (async () => {
-  //       try {
   //         for await (const conversation of stream) {
   //           console.log("Stream received conversation:", conversation?.id);
   //           if (conversation?.id) {
@@ -103,10 +97,6 @@ describe("callbacks", async () => {
   //             break;
   //           }
   //         }
-  //       } catch (e) {
-  //         clearTimeout(timeout);
-  //         reject(e instanceof Error ? e : new Error(String(e)));
-  //       }
   //     })();
   //   });
 

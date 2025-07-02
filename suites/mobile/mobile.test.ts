@@ -30,67 +30,58 @@ describe("bot-stress", () => {
   setupTestLifecycle({});
 
   beforeAll(async () => {
-    try {
-      workers = await getWorkers(["bot"], {
-        env: receiverObj.network as "local" | "dev" | "production",
-      });
-      // Note: No streams or syncs needed for this test (all were set to None)
-      bot = workers.get("bot")!;
-    } catch (e) {
-      throw e;
-    }
+    workers = await getWorkers(["bot"], {
+      env: receiverObj.network as "local" | "dev" | "production",
+    });
+    // Note: No streams or syncs needed for this test (all were set to None)
+    bot = workers.get("bot")!;
   });
 
   for (const groupConfig of config) {
     it(`Should create ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`, async () => {
-      try {
+      console.log(
+        `Creating ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`,
+      );
+
+      const totalStart = performance.now();
+
+      for (let i = 0; i < groupConfig.count; i++) {
+        globalGroupCounter++;
+
+        const groupStart = performance.now();
+        const receiverInboxIds = [
+          receiverInboxId,
+          ...getInboxIds(groupConfig.size),
+        ];
+
+        const group = await bot.client.conversations.newGroup(receiverInboxIds);
+        const groupTime = (performance.now() - groupStart) / 1000;
+
         console.log(
-          `Creating ${groupConfig.count} groups of ${groupConfig.size} members with ${groupConfig.messages} messages`,
+          `Group ${globalGroupCounter}/${totalGroups} created in ${groupTime.toFixed(2)}s`,
         );
 
-        const totalStart = performance.now();
-
-        for (let i = 0; i < groupConfig.count; i++) {
-          globalGroupCounter++;
-
-          const groupStart = performance.now();
-          const receiverInboxIds = [
-            receiverInboxId,
-            ...getInboxIds(groupConfig.size),
-          ];
-
-          const group =
-            await bot.client.conversations.newGroup(receiverInboxIds);
-          const groupTime = (performance.now() - groupStart) / 1000;
-
-          console.log(
-            `Group ${globalGroupCounter}/${totalGroups} created in ${groupTime.toFixed(2)}s`,
-          );
-
-          const messageStart = performance.now();
-          const messagePromises = Array.from(
-            { length: groupConfig.messages },
-            (_, j) =>
-              group.send(
-                `Hello from group ${groupConfig.size} with ${receiverInboxIds.length} members! Message ${j + 1}`,
-              ),
-          );
-
-          await Promise.all(messagePromises);
-          const messageTime = (performance.now() - messageStart) / 1000;
-
-          console.log(
-            `${groupConfig.messages} messages sent in ${messageTime.toFixed(2)}s`,
-          );
-        }
-
-        const totalTime = (performance.now() - totalStart) / 1000;
-        console.log(
-          `Total time for ${groupConfig.count} groups: ${totalTime.toFixed(2)}s`,
+        const messageStart = performance.now();
+        const messagePromises = Array.from(
+          { length: groupConfig.messages },
+          (_, j) =>
+            group.send(
+              `Hello from group ${groupConfig.size} with ${receiverInboxIds.length} members! Message ${j + 1}`,
+            ),
         );
-      } catch (e) {
-        throw e;
+
+        await Promise.all(messagePromises);
+        const messageTime = (performance.now() - messageStart) / 1000;
+
+        console.log(
+          `${groupConfig.messages} messages sent in ${messageTime.toFixed(2)}s`,
+        );
       }
+
+      const totalTime = (performance.now() - totalStart) / 1000;
+      console.log(
+        `Total time for ${groupConfig.count} groups: ${totalTime.toFixed(2)}s`,
+      );
     });
   }
 });

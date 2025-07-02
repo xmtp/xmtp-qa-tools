@@ -38,33 +38,29 @@ describe("m_large_messages", async () => {
     i += m_large_BATCH_SIZE
   ) {
     it(`receiveGroupMessage-${i}: should deliver messages to all ${i}`, async () => {
-      try {
-        const creator = workers.getCreator();
-        newGroup = (await creator.client.conversations.newGroup(
-          getInboxIds(i),
-        )) as Group;
-        await newGroup.sync();
-        await newGroup.addMembers(
-          workers.getAllButCreator().map((worker) => worker.client.inboxId),
-        );
+      const creator = workers.getCreator();
+      newGroup = (await creator.client.conversations.newGroup(
+        getInboxIds(i),
+      )) as Group;
+      await newGroup.sync();
+      await newGroup.addMembers(
+        workers.getAllButCreator().map((worker) => worker.client.inboxId),
+      );
 
-        await newGroup.sync();
-        const verifyResult = await verifyMessageStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+      await newGroup.sync();
+      const verifyResult = await verifyMessageStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
 
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          messageStreamTimeMs: verifyResult.averageEventTiming,
-        };
+      // Save metrics
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        messageStreamTimeMs: verifyResult.averageEventTiming,
+      };
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
-      } catch (e) {
-        throw e;
-      }
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
     });
   }
 
