@@ -1,9 +1,8 @@
 import { formatBytes } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 const groupMemberSize = [2];
 const targetSizeMB = 10;

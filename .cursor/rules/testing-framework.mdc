@@ -8,12 +8,12 @@ alwaysApply: true
 ## Core Testing Pattern
 
 ```typescript
-import { logError } from "@helpers/logger";
+
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 
 import { getWorkers, getWorkerNames } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 const testName = "my-test";
 
@@ -452,7 +452,7 @@ try {
 ## Key Imports
 
 ```typescript
-import { logError } from "@helpers/logger";
+
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 

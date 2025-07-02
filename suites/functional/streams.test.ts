@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import {
   verifyAddMemberStream,
   verifyConsentStream,

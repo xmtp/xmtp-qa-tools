@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";

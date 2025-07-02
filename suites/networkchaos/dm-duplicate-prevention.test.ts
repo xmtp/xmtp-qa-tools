@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -97,6 +96,7 @@ describe("dm-duplicate-chaos", async () => {
 
       expect(matching.length).toBe(1); // Validate deduplication held
     } catch (err) {
+      console.error(err);
       node2.clearLatency();
     }
   });

@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
