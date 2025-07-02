@@ -10,8 +10,6 @@
     "workers"
   ],
   "scripts": {
-    "agents-dms": "yarn test suites/agents/agents-dms.test.ts",
-    "agents-groups": "yarn test suites/agents/agents-groups.test.ts",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
@@ -19,7 +17,7 @@
     "claude": "npx @anthropic-ai/claude-code",
     "clean": "rimraf .data/ ||: && rimraf logs/ ||  :",
     "cli": "tsx scripts/cli.ts",
-    "datadog": "yarn test suites/datadog",
+    "dms": "yarn test functional/dms.test.ts",
     "format": "prettier -w .",
     "functional": "yarn test suites/functional",
     "gen": "tsx inboxes/gen.ts",
@@ -36,7 +34,6 @@
     "run:agent": "./suites/agents/run.sh",
     "run:commits": "./suites/commits/run.sh",
     "script": "yarn cli script",
-    "start:dev": "yarn ui",
     "test": "yarn cli test",
     "ui": "vitest --ui --standalone --watch"
   },

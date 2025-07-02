@@ -11,7 +11,7 @@ jobs:
 
     env:
       XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
-      LOGGING_LEVEL: off
+      LOGGING_LEVEL: "error"
       GEOLOCATION: ${{ vars.GEOLOCATION }}
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
@@ -36,40 +36,20 @@ jobs:
           cd qa-tools-test
           yarn install
 
-      - name: Create .env file
-        run: |
-          cd qa-tools-test
-          cat > .env << EOF
-          XMTP_ENV=${{ env.XMTP_ENV }}
-          LOGGING_LEVEL=${{ env.LOGGING_LEVEL }}
-          ${{ env.GEOLOCATION && format('GEOLOCATION={0}', env.GEOLOCATION) || '' }}
-          ${{ env.SLACK_BOT_TOKEN && format('SLACK_BOT_TOKEN={0}', env.SLACK_BOT_TOKEN) || '' }}
-          ${{ env.SLACK_CHANNEL && format('SLACK_CHANNEL={0}', env.SLACK_CHANNEL) || '' }}
-          ${{ env.DATADOG_API_KEY && format('DATADOG_API_KEY={0}', env.DATADOG_API_KEY) || '' }}
-          EOF
-
-      - name: Generate test inboxes
-        run: |
-          cd qa-tools-test
-          yarn gen
-
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          timeout 300s yarn test dms --debug --no-fail
+          timeout 300s yarn dms
 
-      - name: Upload test logs
+      - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: self-test-logs
-          path: qa-tools-test/logs/
-          retention-days: 7
-
-      - name: Upload test output
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: self-test-output
-          path: qa-tools-test/test-output.log
-          retention-days: 7
+          name: artifacts-${{ matrix.environment }}
+          path: |
+            logs/**/*
+            .data/**/*
+            .env
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 90
