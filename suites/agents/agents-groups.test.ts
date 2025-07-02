@@ -17,7 +17,7 @@ describe(testName, async () => {
   setupTestLifecycle({});
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env) && agent.groupTesting === true;
+    return agent.networks.includes(env);
   });
 
   // Helper function to wait for messages in group
@@ -44,9 +44,10 @@ describe(testName, async () => {
     return await g.messages();
   }
 
-  // Test each agent in groups
+  // Test ALL agents in groups (both responding and non-responding)
   for (const agent of filteredAgents) {
-    it(`${env}: ${agent.name} Group Test : ${agent.address}`, async () => {
+    const testType = agent.groupTesting === true ? "Responds" : "No Response";
+    it(`${env}: ${agent.name} Group ${testType} : ${agent.address}`, async () => {
       try {
         // Create a group with the agent
         const group = await workers
@@ -100,7 +101,7 @@ describe(testName, async () => {
         // Should have only our "hi" message, no response from agent
         const noResponseToHi = countAfterHi === initialCount + 1;
 
-        // Step 2: Send tagged message using baseName (agent SHOULD respond)
+        // Step 2: Send tagged message using baseName
         const taggedMessage = `@${agent.baseName} ${agent.sendMessage}`;
         await group.send(taggedMessage);
 
@@ -112,7 +113,7 @@ describe(testName, async () => {
         );
         const countAfterTag = messagesAfterTag.length;
 
-        // Should have our tagged message + agent response
+        // Should have our tagged message + agent response (only if groupTesting: true)
         const respondedToTag = countAfterTag >= countAfterHi + 2;
 
         // Calculate response time for tagged message
@@ -130,6 +131,9 @@ describe(testName, async () => {
             responseTime = responseMessageTime - taggedMessageTime;
           }
         }
+
+        // Determine expected behavior based on groupTesting setting
+        const shouldRespondToTag = agent.groupTesting === true;
 
         // Send metrics
         sendMetric("response", noResponseToHi ? 0 : streamTimeout, {
@@ -151,8 +155,13 @@ describe(testName, async () => {
         });
 
         // Test assertions
-        expect(noResponseToHi).toBe(true); // Should NOT respond to "hi"
-        expect(respondedToTag).toBe(true); // SHOULD respond to tagged message
+        expect(noResponseToHi).toBe(true); // Should NEVER respond to untagged "hi"
+
+        if (shouldRespondToTag) {
+          expect(respondedToTag).toBe(true); // SHOULD respond to tagged message
+        } else {
+          expect(respondedToTag).toBe(false); // Should NOT respond to tagged message
+        }
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;
