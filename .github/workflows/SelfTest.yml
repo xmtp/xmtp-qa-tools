@@ -42,7 +42,7 @@ jobs:
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          timeout 300s yarn test dms --debug --no-fail
+          timeout 300s yarn test dms --debug
 
       - name: Upload test artifacts
         if: always()
