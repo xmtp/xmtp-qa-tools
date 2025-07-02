@@ -5,7 +5,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
-import { type AgentConfig } from "./agents";
+import { type AgentConfig } from "./helper";
 import productionAgents from "./agents.json";
 
 const testName = "agents-groups";
