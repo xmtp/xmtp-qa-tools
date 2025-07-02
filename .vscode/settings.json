@@ -22,5 +22,17 @@
   "files.associations": {
     "*.log": "ansi",
     "log.log": "ansi"
+  },
+  "terminal.integrated.env.linux": {
+    "XMTP_ENV": "dev",
+    "LOGGING_LEVEL": "off"
+  },
+  "terminal.integrated.env.osx": {
+    "XMTP_ENV": "dev", 
+    "LOGGING_LEVEL": "off"
+  },
+  "terminal.integrated.env.windows": {
+    "XMTP_ENV": "dev",
+    "LOGGING_LEVEL": "off"
   }
 }
