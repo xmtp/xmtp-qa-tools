@@ -23,7 +23,7 @@ export type VerifyStreamResult = {
 
 export async function updateGroupConsent(
   client: Client,
-  group: Group,
+  group: Group<any>,
 ): Promise<void> {
   const getState = await group.consentState;
 
@@ -225,7 +225,7 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
  * Specialized function to verify message streams
  */
 export async function verifyMessageStream(
-  group: Conversation,
+  group: Conversation<any>,
   receivers: Worker[],
   count = 1,
   messageTemplate: string = "gm-{i}-{randomSuffix}",
@@ -263,7 +263,7 @@ export async function verifyMessageStream(
  * Specialized function to verify group update streams
  */
 export async function verifyMetadataStream(
-  group: Group,
+  group: Group<any>,
   receivers: Worker[],
   count = 1,
   messageTemplate: string = "gm-{i}-{randomSuffix}",
@@ -300,7 +300,7 @@ export async function verifyMetadataStream(
  * Specialized function to verify group membership streams
  */
 export async function verifyMembershipStream(
-  group: Group,
+  group: Group<any>,
   receivers: Worker[],
   membersToAdd: string[],
 ): Promise<VerifyStreamResult> {
@@ -331,7 +331,7 @@ export async function verifyMembershipStream(
  * Specialized function to verify consent streams
  */
 export async function verifyGroupConsentStream(
-  group: Group,
+  group: Group<any>,
   receivers: Worker[],
 ): Promise<VerifyStreamResult> {
   receivers.forEach((worker) => {
@@ -428,7 +428,7 @@ export async function verifyConversationStream(
 }
 
 export async function verifyAddMemberStream(
-  group: Group,
+  group: Group<any>,
   receivers: Worker[],
   membersToAdd: string[],
 ): Promise<VerifyStreamResult> {
@@ -456,7 +456,7 @@ export async function verifyAddMemberStream(
  * Verifies conversation streaming functionality for group member additions
  */
 export async function verifyNewConversationStream(
-  group: Group,
+  group: Group<any>,
   receivers: Worker[],
 ): Promise<VerifyStreamResult> {
   receivers.forEach((worker) => {
@@ -527,7 +527,7 @@ export function calculateMessageStats(
  * Measures the time it takes for a bot to respond to a trigger message
  */
 export async function verifyBotMessageStream(
-  group: Conversation,
+  group: Conversation<any>,
   receivers: Worker[],
   triggerMessage: string,
 ): Promise<VerifyStreamResult> {

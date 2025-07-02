@@ -291,21 +291,17 @@ export class playwright {
     await page.addInitScript(
       ({ envValue, walletKey, walletEncryptionKey }) => {
         if (walletKey !== "") console.debug("Setting walletKey", walletKey);
-        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_EPHEMERAL_ACCOUNT_KEY", walletKey);
 
         if (walletEncryptionKey !== "") {
           console.debug("Setting walletEncryptionKey", walletEncryptionKey);
-          // @ts-expect-error Window localStorage access in browser context
           window.localStorage.setItem(
             "XMTP_ENCRYPTION_KEY",
             walletEncryptionKey,
           );
         }
 
-        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_NETWORK", envValue);
-        // @ts-expect-error Window localStorage access in browser context
         window.localStorage.setItem("XMTP_USE_EPHEMERAL_ACCOUNT", "true");
       },
       {

@@ -1,11 +1,10 @@
 import { getTime } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import { Page } from "playwright";
+import type { Page } from "playwright";
 import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "browser";
-let page: Page;
 
 describe(testName, async () => {
   setupTestLifecycle({});
@@ -14,34 +13,35 @@ describe(testName, async () => {
   beforeAll(async () => {
     // Set up browser page if needed
     console.log(`Starting browser tests at ${getTime()}`);
+    console.log(`Workers initialized: ${workers.getAll().length}`);
   });
 
-  it("should load XMTP chat interface", async () => {
+  it("should load XMTP chat interface", () => {
     // Test browser loading
     expect(true).toBe(true); // Placeholder test
   });
 
-  it("should connect wallet in browser", async () => {
+  it("should connect wallet in browser", () => {
     // Test wallet connection
     expect(true).toBe(true); // Placeholder test
   });
 
-  it("should send message through browser interface", async () => {
+  it("should send message through browser interface", () => {
     // Test message sending
     expect(true).toBe(true); // Placeholder test
   });
 
-  it("should receive messages in browser", async () => {
+  it("should receive messages in browser", () => {
     // Test message receiving
     expect(true).toBe(true); // Placeholder test
   });
 
-  it("should handle browser reconnection", async () => {
+  it("should handle browser reconnection", () => {
     // Test reconnection scenarios
     expect(true).toBe(true); // Placeholder test
   });
 
-  it("should maintain message history in browser", async () => {
+  it("should maintain message history in browser", () => {
     // Test message persistence
     expect(true).toBe(true); // Placeholder test
   });
