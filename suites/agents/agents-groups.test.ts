@@ -101,56 +101,68 @@ describe(testName, async () => {
         // Should have only our "hi" message, no response from agent
         const noResponseToHi = countAfterHi === initialCount + 1;
 
-        // Step 2: Send tagged message using baseName
-        const taggedMessage = `@${agent.baseName} ${agent.sendMessage}`;
-        await group.send(taggedMessage);
+        // Step 2: Send either slash command or tagged message based on agent type
+        const isSlashCommand = agent.sendMessage.startsWith("/");
+        const testMessage = isSlashCommand
+          ? agent.sendMessage // Use slash command directly
+          : `@${agent.baseName} ${agent.sendMessage}`; // Use tagged message
 
-        // Wait longer for tagged response
-        let messagesAfterTag = await waitForMessages(
+        await group.send(testMessage);
+
+        // Wait longer for response
+        let messagesAfterCommand = await waitForMessages(
           group,
           countAfterHi + 2,
           15000,
         );
-        const countAfterTag = messagesAfterTag.length;
+        const countAfterCommand = messagesAfterCommand.length;
 
-        // Should have our tagged message + agent response (only if groupTesting: true)
-        const respondedToTag = countAfterTag >= countAfterHi + 2;
+        // Should have our command message + agent response (only if groupTesting: true)
+        const respondedToCommand = countAfterCommand >= countAfterHi + 2;
 
-        // Calculate response time for tagged message
+        // Calculate response time for command message
         let responseTime = streamTimeout;
-        if (respondedToTag && messagesAfterTag.length >= 2) {
-          const taggedMsg = messagesAfterTag[messagesAfterTag.length - 2] as {
+        if (respondedToCommand && messagesAfterCommand.length >= 2) {
+          const commandMsg = messagesAfterCommand[
+            messagesAfterCommand.length - 2
+          ] as {
             sentAt?: number;
           };
-          const responseMsg = messagesAfterTag[messagesAfterTag.length - 1] as {
+          const responseMsg = messagesAfterCommand[
+            messagesAfterCommand.length - 1
+          ] as {
             sentAt?: number;
           };
-          const taggedMessageTime = Number(taggedMsg?.sentAt) || 0;
+          const commandMessageTime = Number(commandMsg?.sentAt) || 0;
           const responseMessageTime = Number(responseMsg?.sentAt) || 0;
-          if (taggedMessageTime && responseMessageTime) {
-            responseTime = responseMessageTime - taggedMessageTime;
+          if (commandMessageTime && responseMessageTime) {
+            responseTime = responseMessageTime - commandMessageTime;
           }
         }
 
         // Determine expected behavior based on groupTesting setting
-        const shouldRespondToTag = agent.groupTesting === true;
+        const shouldRespondToCommand = agent.groupTesting === true;
 
-        sendMetric("response", respondedToTag ? responseTime : streamTimeout, {
-          test: testName,
-          metric_type: "agent",
-          metric_subtype: "group",
-          agent: agent.name,
-          address: agent.address,
-          sdk: workers.getCreator().sdk,
-        });
+        sendMetric(
+          "response",
+          respondedToCommand ? responseTime : streamTimeout,
+          {
+            test: testName,
+            metric_type: "agent",
+            metric_subtype: "group",
+            agent: agent.name,
+            address: agent.address,
+            sdk: workers.getCreator().sdk,
+          },
+        );
 
         // Test assertions
         expect(noResponseToHi).toBe(true); // Should NEVER respond to untagged "hi"
 
-        if (shouldRespondToTag) {
-          expect(respondedToTag).toBe(true); // SHOULD respond to tagged message
+        if (shouldRespondToCommand) {
+          expect(respondedToCommand).toBe(true); // SHOULD respond to command/tagged message
         } else {
-          expect(respondedToTag).toBe(false); // Should NOT respond to tagged message
+          expect(respondedToCommand).toBe(false); // Should NOT respond to command/tagged message
         }
       } catch (e) {
         logError(e, expect.getState().currentTestName);
