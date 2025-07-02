@@ -1,4 +1,3 @@
-import { getFixedNames } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
@@ -24,7 +23,7 @@ describe(testName, async () => {
   console.debug(
     `[${testName}] Amount of messages: ${amountofMessages}, Receivers: ${receiverAmount}`,
   );
-  let workers = await getWorkers(getFixedNames(receiverAmount));
+  let workers = await getWorkers(receiverAmount);
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);

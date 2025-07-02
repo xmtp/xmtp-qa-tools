@@ -634,116 +634,12 @@ export const appendToEnv = (key: string, value: string): void => {
   }
 };
 
-export const getFixedNames = (count: number): string[] => {
-  return [...defaultNames].slice(0, count);
-};
 export async function removeDataFolder(): Promise<void> {
   const dataPath = path.join(process.cwd(), ".data");
   if (fs.existsSync(dataPath)) {
     await fs.promises.rm(dataPath, { recursive: true, force: true });
   }
 }
-export function getMultiVersion(count: number): string[] {
-  const descriptors: string[] = [];
-  for (const descriptor of getFixedNames(count)) {
-    const randomSdkVersion =
-      sdkVersionOptions[Math.floor(Math.random() * sdkVersionOptions.length)];
-    descriptors.push(`${descriptor}-a-${randomSdkVersion}`);
-  }
-
-  return descriptors;
-}
-
-/**
- * Creates worker descriptors with versions from TEST_VERSIONS environment variable
- * If TEST_VERSIONS is not set, uses the latest version
- * @param workerNames - Array of worker names to create descriptors for
- * @returns Array of worker descriptors with version suffixes
- */
-export function getWorkersWithVersions(workerNames: string[]): string[] {
-  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
-
-  if (!testVersions) {
-    // No versions specified, return names as-is (will use latest version)
-    return workerNames;
-  }
-
-  const availableVersions = sdkVersionOptions.slice(0, testVersions);
-
-  const descriptors: string[] = [];
-  for (const workerName of workerNames) {
-    // Pick a random version from the specified list
-    const randomVersion =
-      availableVersions[Math.floor(Math.random() * availableVersions.length)];
-    descriptors.push(`${workerName}-a-${randomVersion}`);
-  }
-
-  return descriptors;
-}
-
-export const getRandomNames = (count: number): string[] => {
-  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
-};
-
-// Default worker names
-export const defaultNames = [
-  "bob",
-  "alice",
-  "fabri",
-  "elon",
-  "joe",
-  "charlie",
-  "dave",
-  "eve",
-  "frank",
-  "grace",
-  "henry",
-  "ivy",
-  "jack",
-  "karen",
-  "larry",
-  "mary",
-  "nancy",
-  "oscar",
-  "paul",
-  "quinn",
-  "rachel",
-  "steve",
-  "tom",
-  "ursula",
-  "victor",
-  "wendy",
-  "xavier",
-  "yolanda",
-  "zack",
-  "adam",
-  "bella",
-  "carl",
-  "diana",
-  "eric",
-  "fiona",
-  "george",
-  "hannah",
-  "ian",
-  "julia",
-  "keith",
-  "lisa",
-  "mike",
-  "nina",
-  "oliver",
-  "penny",
-  "quentin",
-  "rosa",
-  "sam",
-  "tina",
-  "walt",
-  "uma",
-  "vince",
-  "xena",
-  "yara",
-  "zara",
-  "guada", // max 61
-];
 
 export const browserTimeout = 10000;
 export const streamColdStartTimeout = 1000; // 1 second

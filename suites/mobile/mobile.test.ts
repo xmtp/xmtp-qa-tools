@@ -37,10 +37,9 @@ describe(testName, () => {
 
   beforeAll(async () => {
     try {
-      workers = await getWorkers(
-        ["bot"],
-        receiverObj.network as "local" | "dev" | "production",
-      );
+      workers = await getWorkers(["bot"], {
+        env: receiverObj.network as "local" | "dev" | "production",
+      });
       // Note: No streams or syncs needed for this test (all were set to None)
       bot = workers.get("bot")!;
     } catch (e) {

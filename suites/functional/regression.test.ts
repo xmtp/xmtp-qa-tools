@@ -14,7 +14,9 @@ describe(testName, () => {
   for (const version of versions) {
     it(`downgrade to ${version}`, async () => {
       try {
-        workers = await getWorkers(["bob-" + "a" + "-" + version]);
+        workers = await getWorkers(["bob-" + "a" + "-" + version], {
+          useVersions: false,
+        });
 
         const bob = workers.get("bob");
         console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
@@ -30,7 +32,9 @@ describe(testName, () => {
   for (const version of versions.reverse()) {
     it(`upgrade to ${version}`, async () => {
       try {
-        workers = await getWorkers(["alice-" + "a" + "-" + version]);
+        workers = await getWorkers(["alice-" + "a" + "-" + version], {
+          useVersions: false,
+        });
 
         const alice = workers.get("alice");
         console.log("Upgraded to ", "sdk:" + String(alice?.sdk));

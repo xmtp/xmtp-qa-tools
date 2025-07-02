@@ -1,5 +1,4 @@
 import fs from "fs";
-import { getRandomNames } from "@helpers/client";
 import { getTime, logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
@@ -50,7 +49,7 @@ describe(testName, () => {
       console.log(test);
       it(test, async () => {
         try {
-          workers = await getWorkers(getRandomNames(WORKER_COUNT));
+          workers = await getWorkers(WORKER_COUNT);
 
           const newGroup = (await workers
             .getCreator()

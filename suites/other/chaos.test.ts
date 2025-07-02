@@ -1,4 +1,4 @@
-import { appendToEnv, getFixedNames, getManualUsers } from "@helpers/client";
+import { appendToEnv, getManualUsers } from "@helpers/client";
 import { getTime } from "@helpers/logger";
 import {
   verifyMembershipStream,
@@ -8,7 +8,12 @@ import {
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIdsWithRandomInstallations } from "@inboxes/utils";
 import { typeofStream, typeOfSync } from "@workers/main";
-import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
+import {
+  defaultNames,
+  getWorkers,
+  type Worker,
+  type WorkerManager,
+} from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
@@ -29,7 +34,7 @@ const testConfig = {
   randomInboxIds: getRandomInboxIdsWithRandomInstallations(60),
   typeofStream: typeofStream.None,
   typeOfSync: typeOfSync.Both,
-  workerNames: getFixedNames(40),
+  workerNames: defaultNames.slice(0, 40),
   freshInstalls: false,
 } as const;
 

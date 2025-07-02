@@ -79,6 +79,7 @@ function discoverPackages(): VersionConfig[] {
 
       // For dynamically discovered packages, we can't import the specific types
       // so we'll set them to null or use a placeholder
+
       configs.push({
         sdkPackage,
         bindingsPackage: matchingBindings,

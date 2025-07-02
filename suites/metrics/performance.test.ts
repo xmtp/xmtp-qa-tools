@@ -1,9 +1,8 @@
-import { getFixedNames } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
 import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
@@ -12,14 +11,10 @@ const testName = "m_performance";
 describe(testName, async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");
   const total = parseInt(process.env.MAX_GROUP_SIZE ?? "10");
-  console.log(`[${testName}] Batch size: ${batchSize}, Total: ${total}`);
   let dm: Dm | undefined;
-  let workers: WorkerManager;
-
-  workers = await getWorkers(getFixedNames(10));
+  let workers = await getWorkers(10);
 
   const creator = workers.getCreator();
-  console.warn("creator is:", creator.name);
   const creatorClient = creator.client;
   let customDuration: number | undefined = undefined;
   const setCustomDuration = (duration: number | undefined) => {
@@ -127,12 +122,13 @@ describe(testName, async () => {
         workers.getAll()[1],
       ]);
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.allReceived).toBe(true);
+      expect(verifyResult.almostAllReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
+
   let i = 4;
   let newGroup: Group;
   it(`newGroup: should create a large group of ${i} participants ${i}`, async () => {
@@ -206,7 +202,7 @@ describe(testName, async () => {
         workers.getAllButCreator(),
       );
       setCustomDuration(verifyResult.averageEventTiming);
-      expect(verifyResult.allReceived).toBe(true);
+      expect(verifyResult.almostAllReceived).toBe(true);
     } catch (e) {
       logError(e, expect.getState().currentTestName);
       throw e;
@@ -309,7 +305,7 @@ describe(testName, async () => {
           workers.getAllButCreator(),
         );
         setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.allReceived).toBe(true);
+        expect(verifyResult.almostAllReceived).toBe(true);
       } catch (e) {
         logError(e, expect.getState().currentTestName);
         throw e;

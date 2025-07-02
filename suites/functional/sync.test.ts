@@ -1,4 +1,4 @@
-import { getWorkersWithVersions, sleep } from "@helpers/client";
+import { sleep } from "@helpers/client";
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -13,7 +13,7 @@ describe(testName, async () => {
 
   // Define test workers
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
-  workers = await getWorkers(getWorkersWithVersions(testWorkers));
+  workers = await getWorkers(testWorkers);
 
   setupTestLifecycle({ testName, expect });
 

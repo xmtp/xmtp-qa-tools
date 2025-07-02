@@ -1,4 +1,4 @@
-import { getRandomNames, streamTimeout } from "@helpers/client";
+import { streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { logError } from "@helpers/logger";
 import { verifyBotMessageStream } from "@helpers/streams";
@@ -13,7 +13,9 @@ const testName = "agents";
 
 describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
-  const workers = await getWorkers(getRandomNames(3), env);
+
+  const workers = await getWorkers(1);
+
 
   setupTestLifecycle({
     testName,

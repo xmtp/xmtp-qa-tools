@@ -1,4 +1,3 @@
-import { getWorkersWithVersions } from "@helpers/client";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
@@ -13,12 +12,11 @@ describe(testName, () => {
   });
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
-    const names = ["random1", "random2 ", "random3", "random4", "random5"];
-    let initialWorkers = await getWorkers(getWorkersWithVersions(names));
+    const names = ["random1", "random2", "random3", "random4", "random5"];
+    let initialWorkers = await getWorkers(names);
     // Start message streams for installation tests
-    initialWorkers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
+    initialWorkers.startStream(typeofStream.Message);
+
     expect(initialWorkers.get(names[0])?.folder).toBe("a");
     expect(initialWorkers.get(names[1])?.folder).toBe("a");
 
@@ -47,13 +45,9 @@ describe(testName, () => {
       secondaryWorkers.get(names[1], "b")?.dbPath,
     );
     // Create charlie only when we need him
-    const terciaryWorkers = await getWorkers(
-      getWorkersWithVersions([names[2]]),
-    );
+    const terciaryWorkers = await getWorkers([names[2]]);
     // Start message streams for terciary workers
-    terciaryWorkers.getAll().forEach((worker) => {
-      worker.worker.startStream(typeofStream.Message);
-    });
+    terciaryWorkers.startStream(typeofStream.Message);
 
     // Send a message from alice's desktop to charlie
     const aliceDesktop = secondaryWorkers.get(names[0], "desktop");
@@ -99,14 +93,14 @@ describe(testName, () => {
       ?.client.preferences.inboxState(true);
     const davidCount = davidInitialState?.installations.length;
     const emmaCount = emmaInitialState?.installations.length;
-    expect(davidCount).toBe(2); // a + mobile
-    expect(emmaCount).toBeGreaterThan(1); // a + tablet
+    expect(davidCount).toBe(2); // a + randomString
+    expect(emmaCount).toBeGreaterThan(1); // a + randomString
 
     // TESTED IN XMTP.CHAT
     // Revoke david's mobile installation by terminating and clearing
     const davidClient = workers.get(names[3])?.client;
     await davidClient?.revokeAllOtherInstallations();
-    await workers.get(names[3], "mobile")?.worker.clearDB();
+    await workers.get(names[3] + randomString)?.worker.clearDB();
     // Count installations after revocation
     const davidFinalState = await davidClient?.preferences.inboxState(true);
     const davidFinalCount = davidFinalState?.installations.length;

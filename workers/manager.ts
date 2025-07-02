@@ -4,13 +4,51 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
+  sdkVersionOptions,
   sleep,
   VersionList,
 } from "@helpers/client";
 import { type Client, type Group, type XmtpEnv } from "@xmtp/node-sdk";
 import { generatePrivateKey, privateKeyToAccount } from "viem/accounts";
-import { installationThreshold, WorkerClient } from "./main";
+import { installationThreshold, WorkerClient, type typeofStream } from "./main";
 
+// Deprecated: Use getWorkers with count and options instead
+export const getFixedNames = (count: number): string[] => {
+  return [...defaultNames].slice(0, count);
+};
+
+// Deprecated: Use getWorkers with count and options instead
+export const getRandomNames = (count: number): string[] => {
+  return [...defaultNames].sort(() => Math.random() - 0.5).slice(0, count);
+};
+
+// Deprecated: Use getWorkers with useVersions option instead
+export function getWorkersWithVersions(workerNames: string[]): string[] {
+  const testVersions = parseInt(process.env.TEST_VERSIONS ?? "1");
+
+  if (!testVersions) {
+    // No versions specified, return names as-is (will use latest version)
+    return workerNames;
+  }
+
+  const availableVersions = sdkVersionOptions.slice(0, testVersions);
+
+  const descriptors: string[] = [];
+  for (const workerName of workerNames) {
+    // Pick a random version from the specified list
+    const randomVersion =
+      availableVersions[Math.floor(Math.random() * availableVersions.length)];
+
+    // If workerName already contains installation ID (has dash), don't add another "-a"
+    if (workerName.includes("-")) {
+      descriptors.push(`${workerName}-${randomVersion}`);
+    } else {
+      descriptors.push(`${workerName}-a-${randomVersion}`);
+    }
+  }
+
+  return descriptors;
+}
 export interface WorkerBase {
   name: string;
   sdk: string;
@@ -234,6 +272,13 @@ export class WorkerManager {
     const creator = this.getCreator();
     return workers.filter((worker) => worker.name !== creator.name);
   }
+
+  startStream(streamType: typeofStream) {
+    for (const worker of this.getAll()) {
+      worker.worker.startStream(streamType);
+    }
+  }
+
   /**
    * Gets all workers as a flat array
    */
@@ -348,7 +393,30 @@ export class WorkerManager {
   ): Promise<Worker> {
     const parts = descriptor.split("-");
     const baseName = parts[0];
-    const providedInstallId = parts.length > 1 ? parts[1] : undefined;
+
+    // Handle version parsing - version is always the last part if it's a number
+    let sdkVersion = getLatestVersion();
+    let providedInstallId: string | undefined;
+
+    if (parts.length > 1) {
+      const lastPart = parts[parts.length - 1];
+      // Check if last part is a valid SDK version (numeric)
+      if (
+        lastPart &&
+        !isNaN(Number(lastPart)) &&
+        Object.keys(VersionList).includes(lastPart)
+      ) {
+        sdkVersion = lastPart;
+        // Installation ID is everything between baseName and version
+        if (parts.length > 2) {
+          providedInstallId = parts.slice(1, -1).join("-");
+        }
+      } else {
+        // No version specified, everything after baseName is installation ID
+        providedInstallId = parts.slice(1).join("-");
+      }
+    }
+
     // Check if the worker already exists in our internal storage
     if (providedInstallId && this.workers[baseName]?.[providedInstallId]) {
       console.debug(`Reusing existing worker for ${descriptor}`);
@@ -357,8 +425,6 @@ export class WorkerManager {
 
     // Determine folder/installation ID
     const folder = providedInstallId || getNextFolderName();
-
-    const sdkVersion = parts.length > 2 ? parts[2] : getLatestVersion();
     const libXmtpVersion = getLibxmtpVersion(sdkVersion);
 
     // Get or generate keys
@@ -409,20 +475,62 @@ export class WorkerManager {
  * Factory function to create a WorkerManager with initialized workers
  */
 export async function getWorkers(
-  descriptorsOrMap: string[] | Record<string, string>,
-  env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv,
+  descriptorsOrMap: string[] | Record<string, string> | number,
+  options: {
+    env?: XmtpEnv;
+    useVersions?: boolean;
+    randomNames?: boolean;
+  } = {},
 ): Promise<WorkerManager> {
+  const { useVersions = true, randomNames = true } = options;
+  const env = options.env || (process.env.XMTP_ENV as XmtpEnv);
   const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
 
-  if (Array.isArray(descriptorsOrMap)) {
-    workerPromises = descriptorsOrMap.map((descriptor) =>
+  // Handle different input types
+  if (typeof descriptorsOrMap === "number") {
+    // Number input - generate worker names based on mode
+    const count = descriptorsOrMap;
+    let names: string[];
+
+    if (randomNames) {
+      names = getRandomNames(count);
+    } else {
+      names = getFixedNames(count);
+    }
+
+    // Apply versioning if requested
+    const descriptors = useVersions ? getWorkersWithVersions(names) : names;
+
+    workerPromises = descriptors.map((descriptor) =>
+      manager.createWorker(descriptor),
+    );
+  } else if (Array.isArray(descriptorsOrMap)) {
+    // Array input - apply versioning if requested
+    const descriptors = useVersions
+      ? getWorkersWithVersions(descriptorsOrMap)
+      : descriptorsOrMap;
+
+    workerPromises = descriptors.map((descriptor) =>
       manager.createWorker(descriptor),
     );
   } else {
-    workerPromises = Object.entries(descriptorsOrMap).map(
-      ([descriptor, apiUrl]) => manager.createWorker(descriptor, apiUrl),
+    // Record input - apply versioning if requested
+    let entries = Object.entries(descriptorsOrMap);
+
+    if (useVersions) {
+      const versionedKeys = getWorkersWithVersions(
+        Object.keys(descriptorsOrMap),
+      );
+      entries = versionedKeys.map((key, index) => [
+        key,
+        Object.values(descriptorsOrMap)[index],
+      ]);
+    }
+
+    workerPromises = entries.map(([descriptor, apiUrl]) =>
+      manager.createWorker(descriptor, apiUrl),
     );
   }
 
@@ -432,6 +540,75 @@ export async function getWorkers(
 
   return manager;
 }
+
+// Default worker names
+export const defaultNames = [
+  "bob",
+  "alice",
+  "fabri",
+  "elon",
+  "joe",
+  "charlie",
+  "dave",
+  "eve",
+  "frank",
+  "grace",
+  "henry",
+  "ivy",
+  "jack",
+  "karen",
+  "larry",
+  "mary",
+  "nancy",
+  "oscar",
+  "paul",
+  "quinn",
+  "rachel",
+  "steve",
+  "tom",
+  "ursula",
+  "victor",
+  "wendy",
+  "xavier",
+  "yolanda",
+  "zack",
+  "adam",
+  "bella",
+  "carl",
+  "diana",
+  "eric",
+  "fiona",
+  "george",
+  "hannah",
+  "ian",
+  "julia",
+  "keith",
+  "lisa",
+  "mike",
+  "nina",
+  "oliver",
+  "penny",
+  "quentin",
+  "rosa",
+  "sam",
+  "tina",
+  "walt",
+  "uma",
+  "vince",
+  "xena",
+  "yara",
+  "zara",
+  "guada", // max 61
+];
+
+/**
+ * Helper function to get worker names array from a WorkerManager
+ * Always returns names in the same order (sorted by creation order)
+ */
+export function getWorkerNames(workers: WorkerManager): string[] {
+  return workers.getAll().map((worker) => worker.name);
+}
+
 /**
  * Helper function to get the next available folder name
  */
