@@ -10,6 +10,8 @@
     "workers"
   ],
   "scripts": {
+    "agents-dms": "yarn test suites/agents/agents-dms.test.ts",
+    "agents-groups": "yarn test suites/agents/agents-groups.test.ts",
     "ansi": "tsx -e \"(async () => { const { cleanAllRawLogs } = await import('./helpers/analyzer.js'); await cleanAllRawLogs(); })();\"",
     "bench": "yarn test suites/bench/bench.test.ts",
     "bot": "yarn cli bot",
