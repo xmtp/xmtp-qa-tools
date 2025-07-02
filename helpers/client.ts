@@ -456,22 +456,23 @@ export function getDataPath(): string {
 export function getEnvPath(): string {
   let envPath = path.join(".env");
 
-  if (!fs.existsSync(envPath)) {
-    fs.mkdirSync(path.dirname(envPath), { recursive: true });
-    if (!fs.existsSync(envPath)) {
-      fs.writeFileSync(envPath, `#XMTP\nLOGGING_LEVEL="off"\nXMTP_ENV="dev"\n`);
-      console.debug(`Created default .env file at ${envPath}`);
-    }
+  // Only set CURRENT_ENV_PATH if the file exists
+  if (fs.existsSync(envPath)) {
+    process.env.CURRENT_ENV_PATH = envPath;
   }
-  process.env.CURRENT_ENV_PATH = envPath;
   return envPath;
 }
 /**
- * Loads environment variables from the specified test's .env file
+ * Loads environment variables from the specified test's .env file if it exists
  */
 export function loadEnv(testName: string) {
   const envPath = getEnvPath();
-  dotenv.config({ path: envPath });
+
+  // Only load .env file if it exists, otherwise use defaults from process.env
+  if (fs.existsSync(envPath)) {
+    dotenv.config({ path: envPath });
+  }
+
   setupPrettyLogs(testName);
   addFileLogging(testName);
   initDataDog();
