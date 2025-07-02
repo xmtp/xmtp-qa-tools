@@ -11,7 +11,7 @@ const testName = "agents-groups";
 
 describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
-  const workers = await getWorkers(["alice", "bob"]);
+  const workers = await getWorkers(["alice", "bob"], { env });
 
   setupTestLifecycle({});
 
