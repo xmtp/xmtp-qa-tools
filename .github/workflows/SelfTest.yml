@@ -39,11 +39,6 @@ jobs:
           cd qa-tools-test
           yarn install
 
-      - name: Generate test inboxes
-        run: |
-          cd qa-tools-test
-          yarn gen
-
       - name: Run DM tests
         run: |
           cd qa-tools-test
