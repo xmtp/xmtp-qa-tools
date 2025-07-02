@@ -439,13 +439,18 @@ export async function verifyAddMemberStream(
     receivers,
     startCollectors: (r) => r.worker.collectAddedMembers(group.id, 1),
     triggerEvents: async () => {
+      const sent: { inboxId: string; sentAt: number }[] = [];
       const sentAt = Date.now();
       await group.addMembers(membersToAdd);
-      return [{ id: "conversation", sentAt }];
+      // Return the actual member data that was added
+      for (const member of membersToAdd) {
+        sent.push({ inboxId: member, sentAt });
+      }
+      return sent;
     },
-    getKey: (ev) => (ev as { id?: string }).id ?? "conversation",
-    getMessage: (ev) => (ev as { id?: string }).id ?? "conversation",
-    statsLabel: "conversation:",
+    getKey: extractAddedInboxes,
+    getMessage: extractAddedInboxes,
+    statsLabel: "member-add:",
     count: 1,
     messageTemplate: "",
     participantsForStats: receivers,
