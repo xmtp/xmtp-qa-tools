@@ -16,34 +16,24 @@ describe("bug_kpke", () => {
   setupTestLifecycle({});
 
   it("should send message to specific address", async () => {
-    try {
-      console.log("syncing all");
-      await workers.getCreator().client.conversations.syncAll();
-      const targetAddress = "0x6461bf53ddb33b525c84bf60d6bb31fa10828474";
-      conversation = (await workers
-        .getCreator()
-        .client.conversations.newDmWithIdentifier({
-          identifier: targetAddress,
-          identifierKind: IdentifierKind.Ethereum,
-        })) as Dm;
-      console.log("syncing all");
-      await workers.getCreator().client.conversations.syncAll();
-      await verifyMessageStream(conversation, [workers.getCreator()], 1);
-      console.log("syncing all");
-      await workers.getCreator().client.conversations.syncAll();
-      console.log("Sending message");
-      await verifyMessageStream(
-        conversation,
-        [workers.getCreator()],
-        1,
-        "GANG",
-      );
-      console.log("syncing all");
-      await workers.getCreator().client.conversations.syncAll();
-      console.log("done");
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    console.log("syncing all");
+    await workers.getCreator().client.conversations.syncAll();
+    const targetAddress = "0x6461bf53ddb33b525c84bf60d6bb31fa10828474";
+    conversation = (await workers
+      .getCreator()
+      .client.conversations.newDmWithIdentifier({
+        identifier: targetAddress,
+        identifierKind: IdentifierKind.Ethereum,
+      })) as Dm;
+    console.log("syncing all");
+    await workers.getCreator().client.conversations.syncAll();
+    await verifyMessageStream(conversation, [workers.getCreator()], 1);
+    console.log("syncing all");
+    await workers.getCreator().client.conversations.syncAll();
+    console.log("Sending message");
+    await verifyMessageStream(conversation, [workers.getCreator()], 1, "GANG");
+    console.log("syncing all");
+    await workers.getCreator().client.conversations.syncAll();
+    console.log("done");
   });
 });

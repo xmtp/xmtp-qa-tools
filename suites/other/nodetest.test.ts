@@ -75,7 +75,6 @@ const createChaos = async (
   // create test groups
   await Promise.all(
     Array.from({ length: numGroups }).map(async () => {
-      try {
         // create the group
         const group = (await mainClient.conversations.newGroup(
           testClients.map((c) => c.inboxId),

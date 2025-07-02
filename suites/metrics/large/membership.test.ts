@@ -39,27 +39,22 @@ describe("m_large_membership", async () => {
     i += m_large_BATCH_SIZE
   ) {
     it(`receiveMembershipUpdate-${i}: should add members to ${i} member group`, async () => {
-      try {
-        // Initialize workers
-        newGroup = await workers.createGroupBetweenAll();
-        const verifyResult = await verifyMembershipStream(
-          newGroup,
-          workers.getAllButCreator(),
-          getInboxIds(1),
-        );
+      // Initialize workers
+      newGroup = await workers.createGroupBetweenAll();
+      const verifyResult = await verifyMembershipStream(
+        newGroup,
+        workers.getAllButCreator(),
+        getInboxIds(1),
+      );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
 
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          addMembersTimeMs: verifyResult.averageEventTiming,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      // Save metrics
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        addMembersTimeMs: verifyResult.averageEventTiming,
+      };
     });
   }
 
