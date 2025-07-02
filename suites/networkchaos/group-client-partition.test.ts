@@ -16,7 +16,7 @@ describe(testName, async () => {
     user4: "http://localhost:6556",
   });
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   const partitionPort = 6556;
 

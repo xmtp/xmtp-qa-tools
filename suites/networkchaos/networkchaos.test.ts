@@ -24,7 +24,7 @@ describe(testName, async () => {
 
   const workers = await getWorkers(userDescriptors);
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   it("should survive sustained latency + jitter + packet loss under group message load", async () => {
     const group = await workers.createGroupBetweenAll(

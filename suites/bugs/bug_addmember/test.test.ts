@@ -17,9 +17,7 @@ describe(testName, async () => {
 
   let group: Group;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should create a group", async () => {
     try {

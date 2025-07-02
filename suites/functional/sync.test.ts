@@ -15,7 +15,7 @@ describe(testName, async () => {
   const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
   workers = await getWorkers(testWorkers);
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   it("should establish test environment by creating group with all participants", async () => {
     try {

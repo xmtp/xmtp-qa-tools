@@ -14,9 +14,7 @@ const testName = "my-test";
 describe(testName, async () => {
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should do something", async () => {
     try {
@@ -172,7 +170,7 @@ try {
 
 - Use `getWorkersWithVersions()` for version testing
 - Use `typeofStream.Message` for message streaming
-- Always call `setupTestLifecycle()` for proper cleanup
+- Always call `setupTestLifecycle({})` for proper cleanup
 - Test file naming: `*.test.ts` in `suites/` directory
 
 ## Key Imports

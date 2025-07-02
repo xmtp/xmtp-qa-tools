@@ -16,9 +16,7 @@ describe(testName, async () => {
 
   let targetInboxId: string;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
     try {

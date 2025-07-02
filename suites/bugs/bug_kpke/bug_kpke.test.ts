@@ -15,9 +15,7 @@ describe(testName, () => {
     workers = await getWorkers(1);
   });
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should send message to specific address", async () => {
     try {

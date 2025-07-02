@@ -19,7 +19,7 @@ const targetSizeMB = 5;
 const testName = "storage";
 
 describe(testName, () => {
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     const results: StorageMetrics[] = [];

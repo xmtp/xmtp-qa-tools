@@ -17,7 +17,7 @@ describe(testName, async () => {
   });
   // Start message and response streams for the chaos testing
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

@@ -16,7 +16,7 @@ describe(testName, async () => {
   // Start message streams for duplicate prevention test
   workers.startStream(typeofStream.Message);
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   const node2 = new DockerContainer("multinode-node2-1"); // Henry
 

@@ -12,9 +12,7 @@ describe(testName, async () => {
   let workers: WorkerManager;
   workers = await getWorkers(2);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should handle codec errors gracefully when sending unsupported content types", async () => {
     try {

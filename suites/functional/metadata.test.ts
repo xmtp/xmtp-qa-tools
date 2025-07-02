@@ -21,9 +21,7 @@ describe(testName, async () => {
     "oscar",
   ]);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   beforeAll(async () => {
     group = (await workers

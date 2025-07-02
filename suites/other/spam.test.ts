@@ -13,7 +13,7 @@ const spamInboxIds = [
 const testName = "spam";
 
 describe(testName, () => {
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     try {

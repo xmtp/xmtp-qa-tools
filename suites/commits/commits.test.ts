@@ -33,10 +33,7 @@ const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/
 const installationCount = 5; // How many installations to use randomly in the createInstallation operations
 
 describe("commits", () => {
-  setupTestLifecycle({
-    testName: "commits",
-    expect,
-  });
+  setupTestLifecycle({});
 
   const createOperations = async (worker: Worker, group: Group) => {
     // This syncs all and can contribute to the fork

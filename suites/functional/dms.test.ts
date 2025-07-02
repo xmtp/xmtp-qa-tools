@@ -26,9 +26,7 @@ describe(testName, async () => {
 
   let convo: Dm;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("newDm: should create a new DM conversation using inbox ID", async () => {
     try {

@@ -30,9 +30,7 @@ describe(testName, () => {
   let bot: Worker;
   let globalGroupCounter = 0;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   beforeAll(async () => {
     try {

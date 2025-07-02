@@ -39,7 +39,6 @@ describe(testName, async () => {
   });
 
   setupTestLifecycle({
-    expect,
     workers,
   });
 

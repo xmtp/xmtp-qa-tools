@@ -9,9 +9,7 @@ describe(testName, async () => {
   const workers = await getWorkers(5);
 
   const names = workers.getAll().map((w) => w.name);
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should receive messages using await async", async () => {
     const sender = workers.get(names[0])!;

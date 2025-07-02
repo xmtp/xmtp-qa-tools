@@ -44,9 +44,7 @@ describe(testName, () => {
   let allInboxIds: string[] = [];
   let allGroups: string[] = [];
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   beforeAll(async () => {
     // Initialize workers

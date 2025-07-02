@@ -22,9 +22,7 @@ describe(testName, async () => {
     "oscar",
   ]);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should measure XMTP client creation performance and initialization", async () => {
     try {

@@ -17,9 +17,7 @@ describe(testName, async () => {
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
     try {

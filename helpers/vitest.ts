@@ -1,11 +1,5 @@
 import type { WorkerManager } from "@workers/manager";
-import {
-  afterAll,
-  afterEach,
-  beforeAll,
-  beforeEach,
-  type ExpectStatic,
-} from "vitest";
+import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
 import { loadEnv } from "./client";
 import {
   flushMetrics,
@@ -16,13 +10,10 @@ import {
 } from "./datadog";
 
 export const setupTestLifecycle = ({
-  expect,
   workers,
   getCustomDuration,
   setCustomDuration,
 }: {
-  testName: string;
-  expect: ExpectStatic;
   workers?: WorkerManager;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
@@ -36,7 +27,6 @@ export const setupTestLifecycle = ({
   beforeEach(() => {
     start = performance.now();
     const currentTestName = expect.getState().currentTestName;
-    console.warn(currentTestName);
     console.time(currentTestName);
     if (setCustomDuration) setCustomDuration(undefined); // Reset before each test if available
   });

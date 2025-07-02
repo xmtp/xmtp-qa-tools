@@ -22,9 +22,7 @@ describe(testName, async () => {
   let workers = await getWorkers(5);
 
   // Setup test lifecycle
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should stream group membership updates when members are added to existing groups", async () => {
     try {

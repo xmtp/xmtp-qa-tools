@@ -16,9 +16,7 @@ describe(testName, async () => {
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should recover all missed messages after client reconnection following offline period", async () => {
     try {

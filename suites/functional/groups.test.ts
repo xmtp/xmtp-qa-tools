@@ -28,9 +28,7 @@ describe(testName, async () => {
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`should create a group with ${i} participants`, async () => {

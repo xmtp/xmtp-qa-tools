@@ -16,7 +16,7 @@ describe(testName, async () => {
     user4: "http://localhost:8556",
   });
 
-  setupTestLifecycle({ testName, expect });
+  setupTestLifecycle({ expect });
 
   let group: Group;
 

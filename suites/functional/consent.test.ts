@@ -11,9 +11,7 @@ describe(testName, async () => {
 
   workers = await getWorkers(2);
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should stream consent state changes when users are blocked or unblocked", async () => {
     try {

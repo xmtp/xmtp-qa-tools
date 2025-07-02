@@ -17,9 +17,7 @@ describe(testName, () => {
   let xmtpChat: Worker;
   let receiver: Worker;
 
-  setupTestLifecycle({
-    expect,
-  });
+  setupTestLifecycle({});
 
   beforeAll(async () => {
     const convoStreamBot = await getWorkers(2);
