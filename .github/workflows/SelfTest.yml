@@ -30,7 +30,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "20"
-          # Disable built-in cache since we're working with cloned repo
 
       - name: Install dependencies
         run: |
@@ -40,20 +39,14 @@ jobs:
       - name: Create .env file
         run: |
           cd qa-tools-test
-          echo "XMTP_ENV=${{ env.XMTP_ENV }}" >> .env
-          echo "LOGGING_LEVEL=${{ env.LOGGING_LEVEL }}" >> .env
-          if [ -n "${{ env.GEOLOCATION }}" ]; then
-            echo "GEOLOCATION=${{ env.GEOLOCATION }}" >> .env
-          fi
-          if [ -n "${{ env.SLACK_BOT_TOKEN }}" ]; then
-            echo "SLACK_BOT_TOKEN=${{ env.SLACK_BOT_TOKEN }}" >> .env
-          fi
-          if [ -n "${{ env.SLACK_CHANNEL }}" ]; then
-            echo "SLACK_CHANNEL=${{ env.SLACK_CHANNEL }}" >> .env
-          fi
-          if [ -n "${{ env.DATADOG_API_KEY }}" ]; then
-            echo "DATADOG_API_KEY=${{ env.DATADOG_API_KEY }}" >> .env
-          fi
+          cat > .env << EOF
+          XMTP_ENV=${{ env.XMTP_ENV }}
+          LOGGING_LEVEL=${{ env.LOGGING_LEVEL }}
+          ${{ env.GEOLOCATION && format('GEOLOCATION={0}', env.GEOLOCATION) || '' }}
+          ${{ env.SLACK_BOT_TOKEN && format('SLACK_BOT_TOKEN={0}', env.SLACK_BOT_TOKEN) || '' }}
+          ${{ env.SLACK_CHANNEL && format('SLACK_CHANNEL={0}', env.SLACK_CHANNEL) || '' }}
+          ${{ env.DATADOG_API_KEY && format('DATADOG_API_KEY={0}', env.DATADOG_API_KEY) || '' }}
+          EOF
 
       - name: Generate test inboxes
         run: |
@@ -63,17 +56,7 @@ jobs:
       - name: Run DM tests
         run: |
           cd qa-tools-test
-          timeout 300s yarn test dms --debug --no-fail | tee test-output.log
-
-          # Check if tests completed successfully
-          if grep -q "PASS" test-output.log || grep -q "✓" test-output.log; then
-            echo "Success: DM tests completed"
-            exit 0
-          else
-            echo "Warning: Tests may have failed or timed out"
-            # With --no-fail flag, we still exit 0 for monitoring purposes
-            exit 0
-          fi
+          timeout 300s yarn test dms --debug --no-fail
 
       - name: Upload test logs
         if: always()
