@@ -3,11 +3,10 @@
 ## Core Testing Pattern
 
 ```typescript
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("my-test", async () => {
   const workers = await getWorkers(["alice", "bob"]);
@@ -156,7 +155,6 @@ Use predefined names from the 61 available:
 ## Key Imports
 
 ```typescript
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";

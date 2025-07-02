@@ -1,8 +1,7 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("rate-limited", async () => {
   const workers = await getWorkers(8);

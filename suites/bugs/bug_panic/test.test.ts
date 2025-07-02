@@ -1,5 +1,5 @@
 import { getWorkers } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("bug_panic", () => {
   it("newGroupByInboxIds: should measure creating a group with inbox ids", async () => {

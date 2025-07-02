@@ -1,11 +1,10 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("groups", async () => {
   let workers: WorkerManager;

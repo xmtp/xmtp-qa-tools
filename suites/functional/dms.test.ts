@@ -1,9 +1,8 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("dms", async () => {
   setupTestLifecycle({});

@@ -1,9 +1,8 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { type Dm } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 describe("dm-duplicate-chaos", async () => {

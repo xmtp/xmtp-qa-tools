@@ -1,10 +1,9 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { Client, IdentifierKind, type Dm, type Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("m_performance", async () => {
   const batchSize = parseInt(process.env.BATCH_SIZE ?? "5");

@@ -1,11 +1,11 @@
 import fs from "fs";
-import { getTime, logError } from "@helpers/logger";
+import { getTime } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { afterAll, describe, expect, it } from "vitest";
+import { afterAll, describe, it } from "vitest";
 
 export const WORKER_COUNT = 3;
 export const BATCH_SIZE = 10;

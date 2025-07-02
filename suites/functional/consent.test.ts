@@ -1,8 +1,7 @@
-import { logError } from "@helpers/logger";
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 describe("consent", async () => {
   let workers: WorkerManager;

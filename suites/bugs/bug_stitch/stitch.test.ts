@@ -1,6 +1,5 @@
-import { logError } from "@helpers/logger";
 import { defaultNames, getWorkers, type Worker } from "@workers/manager";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 const users: {
   [key: string]: {

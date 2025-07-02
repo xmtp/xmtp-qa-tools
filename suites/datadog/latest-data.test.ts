@@ -1,6 +1,5 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 import { askClaude, processDatadogLogs, readIssuesData } from "./helper";
 
 const testName = "datadog-latest";

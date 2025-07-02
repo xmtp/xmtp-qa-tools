@@ -1,9 +1,8 @@
 import { getManualUsers } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
-import { beforeAll, describe, expect, it } from "vitest";
+import { beforeAll, describe, it } from "vitest";
 import { TEST_CONFIGS } from "../../bots/stress/index";
 
 const config = TEST_CONFIGS.medium;
