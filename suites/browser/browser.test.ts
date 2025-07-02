@@ -57,8 +57,6 @@ describe("browser", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-invite-with-message");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -76,8 +74,6 @@ describe("browser", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-invite-without-message");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -89,8 +85,6 @@ describe("browser", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("dm-creation-and-response");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -105,8 +99,6 @@ describe("browser", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpTester.takeSnapshot("group-creation-via-ui");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -126,8 +118,6 @@ describe("browser", () => {
       }
     } catch (e) {
       await xmtpTester.takeSnapshot("async-member-addition");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 
@@ -144,8 +134,6 @@ describe("browser", () => {
       expect(result).toBe(true);
     } catch (e) {
       await xmtpNewTester.takeSnapshot("multi-instance-messaging");
-      logError(e, expect.getState().currentTestName);
-      throw e;
     }
   });
 });

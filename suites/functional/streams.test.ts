@@ -22,149 +22,104 @@ describe("streams", async () => {
   setupTestLifecycle({});
 
   it("membership stream", async () => {
-    try {
-      // Initialize workers
-      group = await workers.createGroupBetweenAll();
+    // Initialize workers
+    group = await workers.createGroupBetweenAll();
 
-      const verifyResult = await verifyMembershipStream(
-        group,
-        workers.getAllButCreator(),
-        getInboxIds(1),
-      );
+    const verifyResult = await verifyMembershipStream(
+      group,
+      workers.getAllButCreator(),
+      getInboxIds(1),
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("consent stream", async () => {
-    try {
-      const verifyResult = await verifyConsentStream(
-        workers.getCreator(),
-        workers.getReceiver(),
-      );
+    const verifyResult = await verifyConsentStream(
+      workers.getCreator(),
+      workers.getReceiver(),
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("dm stream", async () => {
-    try {
-      // Create direct message
-      const creator = workers.getCreator();
-      const receiver = workers.getReceiver();
-      const newDm = await creator.client.conversations.newDm(
-        receiver.client.inboxId,
-      );
+    // Create direct message
+    const creator = workers.getCreator();
+    const receiver = workers.getReceiver();
+    const newDm = await creator.client.conversations.newDm(
+      receiver.client.inboxId,
+    );
 
-      // Verify message delivery
-      const verifyResult = await verifyMessageStream(
-        newDm as Dm,
-        [receiver],
-        10,
-      );
+    // Verify message delivery
+    const verifyResult = await verifyMessageStream(newDm as Dm, [receiver], 10);
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("add member stream", async () => {
-    try {
-      const creator = workers.getCreator();
-      const receiver = workers.getReceiver();
-      // Create group with alice as the creator
-      group = (await creator.client.conversations.newGroup([
-        receiver.client.inboxId,
-      ])) as Group;
-      console.log("Group created", group.id);
+    const creator = workers.getCreator();
+    const receiver = workers.getReceiver();
+    // Create group with alice as the creator
+    group = (await creator.client.conversations.newGroup([
+      receiver.client.inboxId,
+    ])) as Group;
+    console.log("Group created", group.id);
 
-      const addMembers = getInboxIds(1);
-      const verifyResult = await verifyAddMemberStream(
-        group,
-        [receiver],
-        addMembers,
-      );
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const addMembers = getInboxIds(1);
+    const verifyResult = await verifyAddMemberStream(
+      group,
+      [receiver],
+      addMembers,
+    );
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("message stream", async () => {
-    try {
-      const newGroup = await workers.createGroupBetweenAll();
+    const newGroup = await workers.createGroupBetweenAll();
 
-      // Verify message delivery
-      const verifyResult = await verifyMessageStream(
-        newGroup,
-        workers.getAllButCreator(),
-        10,
-      );
+    // Verify message delivery
+    const verifyResult = await verifyMessageStream(
+      newGroup,
+      workers.getAllButCreator(),
+      10,
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("metadata stream", async () => {
-    try {
-      // Initialize workers
-      group = await workers.createGroupBetweenAll();
+    // Initialize workers
+    group = await workers.createGroupBetweenAll();
 
-      const verifyResult = await verifyMetadataStream(
-        group,
-        workers.getAllButCreator(),
-      );
+    const verifyResult = await verifyMetadataStream(
+      group,
+      workers.getAllButCreator(),
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("conversation stream", async () => {
-    try {
-      // Use the dedicated conversation stream verification helper
-      const verifyResult = await verifyConversationStream(
-        workers.getCreator(),
-        [workers.getReceiver()],
-      );
+    // Use the dedicated conversation stream verification helper
+    const verifyResult = await verifyConversationStream(workers.getCreator(), [
+      workers.getReceiver(),
+    ]);
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 
   it("new conversation stream", async () => {
-    try {
-      group = (await workers
-        .getCreator()
-        .client.conversations.newGroup([])) as Group;
+    group = (await workers
+      .getCreator()
+      .client.conversations.newGroup([])) as Group;
 
-      // Use the dedicated conversation stream verification helper with 80% success threshold
-      const verifyResult = await verifyNewConversationStream(
-        group,
-        workers.getAllButCreator(),
-      );
+    // Use the dedicated conversation stream verification helper with 80% success threshold
+    const verifyResult = await verifyNewConversationStream(
+      group,
+      workers.getAllButCreator(),
+    );
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(verifyResult.allReceived).toBe(true);
   });
 });

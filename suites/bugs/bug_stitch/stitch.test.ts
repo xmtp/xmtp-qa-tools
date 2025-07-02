@@ -29,37 +29,27 @@ describe("bug_stitch", () => {
       const receiver = users[user].inboxId;
 
       it("should initialize clients and sync conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName]);
-          randomWorker = workers.get(randomName) as Worker;
-          const newConvo =
-            await randomWorker.client.conversations.newDm(receiver);
+        console.log(`Setting up test for ${user}`);
+        const workers = await getWorkers([randomName]);
+        randomWorker = workers.get(randomName) as Worker;
+        const newConvo =
+          await randomWorker.client.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log("sending message");
+        const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
 
       it("should create new DM and group conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName + "-b"]);
-          randomWorker = workers.get(randomName, "b") as Worker;
-          const sender = randomWorker?.client;
-          const newConvo = await sender.conversations.newDm(receiver);
+        console.log(`Setting up test for ${user}`);
+        const workers = await getWorkers([randomName + "-b"]);
+        randomWorker = workers.get(randomName, "b") as Worker;
+        const sender = randomWorker?.client;
+        const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log("sending message");
+        const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
       it("terminate and restart", async () => {
         // Simulate termination and restart
@@ -68,20 +58,15 @@ describe("bug_stitch", () => {
         await randomWorker?.worker?.initialize();
       });
       it("should create new DM and group conversations", async () => {
-        try {
-          console.log(`Setting up test for ${user}`);
-          const workers = await getWorkers([randomName + "-c"]);
-          randomWorker = workers.get(randomName, "c") as Worker;
-          const sender = randomWorker?.client;
-          const newConvo = await sender.conversations.newDm(receiver);
+        console.log(`Setting up test for ${user}`);
+        const workers = await getWorkers([randomName + "-c"]);
+        randomWorker = workers.get(randomName, "c") as Worker;
+        const sender = randomWorker?.client;
+        const newConvo = await sender.conversations.newDm(receiver);
 
-          console.log("sending message");
-          const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
-          await newConvo?.send(message);
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
-        }
+        console.log("sending message");
+        const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
+        await newConvo?.send(message);
       });
     });
   }

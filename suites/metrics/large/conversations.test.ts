@@ -39,29 +39,24 @@ describe("m_large_conversations", async () => {
     i += m_large_BATCH_SIZE
   ) {
     it(`receiveNewConversation-${i}: should create ${i} member group`, async () => {
-      try {
-        const creator = workers.getCreator();
-        newGroup = (await creator.client.conversations.newGroup(
-          getInboxIds(i),
-        )) as Group;
-        // Use the dedicated conversation stream verification helper
-        const verifyResult = await verifyNewConversationStream(
-          newGroup,
-          workers.getAllButCreator(),
-        );
+      const creator = workers.getCreator();
+      newGroup = (await creator.client.conversations.newGroup(
+        getInboxIds(i),
+      )) as Group;
+      // Use the dedicated conversation stream verification helper
+      const verifyResult = await verifyNewConversationStream(
+        newGroup,
+        workers.getAllButCreator(),
+      );
 
-        setCustomDuration(verifyResult.averageEventTiming);
-        expect(verifyResult.almostAllReceived).toBe(true);
+      setCustomDuration(verifyResult.averageEventTiming);
+      expect(verifyResult.almostAllReceived).toBe(true);
 
-        // Save metrics
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          conversationStreamTimeMs: verifyResult.averageEventTiming,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      // Save metrics
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        conversationStreamTimeMs: verifyResult.averageEventTiming,
+      };
     });
   }
 

@@ -15,40 +15,34 @@ describe("spam", () => {
   setupTestLifecycle({});
 
   it("should generate storage efficiency table for different group sizes", async () => {
-    try {
-      const workers = await getWorkers(1);
-      // Note: No streams or syncs needed for this test (all were set to None)
-      const creator = workers.get("bot");
+    const workers = await getWorkers(1);
+    // Note: No streams or syncs needed for this test (all were set to None)
+    const creator = workers.get("bot");
 
-      for (const memberCount of groupMemberSize) {
-        console.time(`Testing ${memberCount}-member groups...`);
-        console.log(`\n🔄 Testing ${memberCount}-member groups...`);
+    for (const memberCount of groupMemberSize) {
+      console.time(`Testing ${memberCount}-member groups...`);
+      console.log(`\n🔄 Testing ${memberCount}-member groups...`);
 
-        const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
-        let groupCount = 0;
-        let installationSize = await creator?.worker.getSQLiteFileSizes();
+      const memberInboxIds = getRandomInboxIds(memberCount - 2); // -1 because creator is included
+      let groupCount = 0;
+      let installationSize = await creator?.worker.getSQLiteFileSizes();
 
-        while (
-          installationSize?.dbFile &&
-          installationSize.dbFile < targetSizeMB * 1024 * 1024
-        ) {
-          const allInboxIds = [...memberInboxIds, ...spamInboxIds];
-          const group =
-            await creator?.client.conversations.newGroup(allInboxIds);
-          await group?.send("hi");
-          groupCount++;
-          installationSize = await creator?.worker.getSQLiteFileSizes();
-          console.debug(
-            `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
-              installationSize?.dbFile ?? 0,
-            )}`,
-          );
-        }
-        console.timeEnd(`Testing ${memberCount}-member groups...`);
+      while (
+        installationSize?.dbFile &&
+        installationSize.dbFile < targetSizeMB * 1024 * 1024
+      ) {
+        const allInboxIds = [...memberInboxIds, ...spamInboxIds];
+        const group = await creator?.client.conversations.newGroup(allInboxIds);
+        await group?.send("hi");
+        groupCount++;
+        installationSize = await creator?.worker.getSQLiteFileSizes();
+        console.debug(
+          `  Created ${groupCount} groups of ${memberCount} members with total size: ${formatBytes(
+            installationSize?.dbFile ?? 0,
+          )}`,
+        );
       }
-    } catch (e) {
-      logError(e, expect.getState().currentTestName || "unknown test");
-      throw e;
+      console.timeEnd(`Testing ${memberCount}-member groups...`);
     }
   });
 });

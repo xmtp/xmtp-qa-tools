@@ -39,54 +39,39 @@ describe("m_large_cumulative_syncs", async () => {
     i += m_large_BATCH_SIZE
   ) {
     it(`newGroup-${i}: should create ${i} member group and add all worker members`, async () => {
-      try {
-        const createTime = performance.now();
-        const creator = workers.getCreator();
-        console.log("Creator name: ", creator.name);
-        const newGroup = await creator.client.conversations.newGroup(
-          getInboxIds(i),
-        );
-        await newGroup.addMembers(allWorkers.map((worker) => worker.inboxId));
-        const createTimeMs = performance.now() - createTime;
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          createTimeMs,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const createTime = performance.now();
+      const creator = workers.getCreator();
+      console.log("Creator name: ", creator.name);
+      const newGroup = await creator.client.conversations.newGroup(
+        getInboxIds(i),
+      );
+      await newGroup.addMembers(allWorkers.map((worker) => worker.inboxId));
+      const createTimeMs = performance.now() - createTime;
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        createTimeMs,
+      };
     });
 
     it(`syncAll-${i}: should measure cumulative syncAll performance impact on ${i}-member group with growing conversation history`, async () => {
-      try {
-        const syncAllStart = performance.now();
-        await allWorkers[run].client.conversations.syncAll();
-        const cumulativeSyncAllTimeMs = performance.now() - syncAllStart;
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          cumulativeSyncAllTimeMs,
-        };
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const syncAllStart = performance.now();
+      await allWorkers[run].client.conversations.syncAll();
+      const cumulativeSyncAllTimeMs = performance.now() - syncAllStart;
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        cumulativeSyncAllTimeMs,
+      };
     });
 
     it(`sync-${i}: should measure cumulative sync performance impact on ${i}-member group using different worker with accumulated data`, async () => {
-      try {
-        const syncStart = performance.now();
-        await allWorkers[run + 1].client.conversations.sync();
-        const cumulativeSyncTimeMs = performance.now() - syncStart;
-        summaryMap[i] = {
-          ...(summaryMap[i] ?? { groupSize: i }),
-          cumulativeSyncTimeMs,
-        };
-        run += 2;
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      const syncStart = performance.now();
+      await allWorkers[run + 1].client.conversations.sync();
+      const cumulativeSyncTimeMs = performance.now() - syncStart;
+      summaryMap[i] = {
+        ...(summaryMap[i] ?? { groupSize: i }),
+        cumulativeSyncTimeMs,
+      };
+      run += 2;
     });
   }
 

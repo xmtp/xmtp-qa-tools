@@ -12,38 +12,28 @@ describe("regression", () => {
 
   for (const version of versions) {
     it(`downgrade to ${version}`, async () => {
-      try {
-        workers = await getWorkers(["bob-" + "a" + "-" + version], {
-          useVersions: false,
-        });
+      workers = await getWorkers(["bob-" + "a" + "-" + version], {
+        useVersions: false,
+      });
 
-        const bob = workers.get("bob");
-        console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
-        let convo = await bob?.client.conversations.newDm(receiverInboxId);
+      const bob = workers.get("bob");
+      console.log("Downgraded to ", "sdk:" + String(bob?.sdk));
+      let convo = await bob?.client.conversations.newDm(receiverInboxId);
 
-        expect(convo?.id).toBeDefined();
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      expect(convo?.id).toBeDefined();
     });
   }
   for (const version of versions.reverse()) {
     it(`upgrade to ${version}`, async () => {
-      try {
-        workers = await getWorkers(["alice-" + "a" + "-" + version], {
-          useVersions: false,
-        });
+      workers = await getWorkers(["alice-" + "a" + "-" + version], {
+        useVersions: false,
+      });
 
-        const alice = workers.get("alice");
-        console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
-        let convo = await alice?.client.conversations.newDm(receiverInboxId);
+      const alice = workers.get("alice");
+      console.log("Upgraded to ", "sdk:" + String(alice?.sdk));
+      let convo = await alice?.client.conversations.newDm(receiverInboxId);
 
-        expect(convo?.id).toBeDefined();
-      } catch (e) {
-        logError(e, expect.getState().currentTestName);
-        throw e;
-      }
+      expect(convo?.id).toBeDefined();
     });
   }
 });
