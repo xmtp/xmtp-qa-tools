@@ -5,9 +5,7 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, expect, it } from "vitest";
 
-const testName = "bug_kpke";
-
-describe(testName, () => {
+describe("bug_kpke", () => {
   let workers: WorkerManager;
   let conversation: Dm;
 
@@ -15,10 +13,7 @@ describe(testName, () => {
     workers = await getWorkers(1);
   });
 
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should send message to specific address", async () => {
     try {

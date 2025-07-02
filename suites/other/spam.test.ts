@@ -10,10 +10,9 @@ const targetSizeMB = 10;
 const spamInboxIds = [
   "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
 ];
-const testName = "spam";
 
-describe(testName, () => {
-  setupTestLifecycle({ testName, expect });
+describe("spam", () => {
+  setupTestLifecycle({});
 
   it("should generate storage efficiency table for different group sizes", async () => {
     try {

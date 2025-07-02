@@ -3,7 +3,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { describe, expect, it } from "vitest";
+import { describe, it } from "vitest";
 
 // Count of groups to create
 const groupCount = 5;
@@ -33,10 +33,7 @@ const randomInboxIdsCount = 30; // How many inboxIds to use randomly in the add/
 const installationCount = 5; // How many installations to use randomly in the createInstallation operations
 
 describe("commits", () => {
-  setupTestLifecycle({
-    testName: "commits",
-    expect,
-  });
+  setupTestLifecycle({});
 
   const createOperations = async (worker: Worker, group: Group) => {
     // This syncs all and can contribute to the fork

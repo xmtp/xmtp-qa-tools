@@ -4,12 +4,10 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Conversation, Group } from "@xmtp/node-sdk";
 import { describe, it } from "vitest";
 
-const testName = "notifications";
-
 const receiverObj = getManualUsers(["fabri-convos-dev"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
-describe(testName, () => {
+describe("notifications", () => {
   let group: Conversation;
   let workers: WorkerManager;
 

@@ -1,25 +1,19 @@
 import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { typeofStream } from "@workers/main";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-const testName = "recovery";
-
 const amountofMessages = 5;
 
-describe(testName, async () => {
+describe("recovery", async () => {
   let group: Group;
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"]);
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
 
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should recover all missed messages after client reconnection following offline period", async () => {
     try {

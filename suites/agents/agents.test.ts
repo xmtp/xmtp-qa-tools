@@ -15,11 +15,9 @@ describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
   const workers = await getWorkers(["alice"]);
 
-  setupTestLifecycle({
-    testName,
-    expect,
-    workers,
-  });
+
+  setupTestLifecycle({});
+
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env);

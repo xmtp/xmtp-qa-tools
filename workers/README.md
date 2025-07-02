@@ -9,15 +9,10 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "my-test";
-
-describe(testName, async () => {
+describe("my-test", async () => {
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({
-    testName,
-    expect,
-  });
+  setupTestLifecycle({});
 
   it("should do something", async () => {
     try {
@@ -173,7 +168,7 @@ try {
 
 - Use `getWorkersWithVersions()` for version testing
 - Use `typeofStream.Message` for message streaming
-- Always call `setupTestLifecycle()` for proper cleanup
+- Always call `setupTestLifecycle({})` for proper cleanup
 - Test file naming: `*.test.ts` in `suites/` directory
 
 ## Key Imports

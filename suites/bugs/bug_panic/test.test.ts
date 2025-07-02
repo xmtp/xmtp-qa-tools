@@ -1,9 +1,7 @@
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "bug_panic";
-
-describe(testName, () => {
+describe("bug_panic", () => {
   it("newGroupByInboxIds: should measure creating a group with inbox ids", async () => {
     const workers = await getWorkers(50);
     const workerArray = workers.getAll();

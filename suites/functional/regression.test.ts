@@ -4,8 +4,7 @@ import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-const testName = "regression";
-describe(testName, () => {
+describe("regression", () => {
   let workers: WorkerManager;
   //limit to 2 versions for testing
   const versions = sdkVersionOptions.slice(0, 3);
