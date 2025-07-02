@@ -6,7 +6,8 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "disabled": false,
-    "slackChannel": "#flaunchy-alerts"
+    "slackChannel": "#flaunchy-alerts",
+    "groupTesting": true
   },
   {
     "name": "mamo",
@@ -19,10 +20,11 @@
   {
     "name": "squabble",
     "baseName": "squabble.base.eth",
-    "address": "0xD60d560c9Ae4ad9b7C252FacE7B664A8d7A426da",
-    "sendMessage": "@squabble.base.eth",
+    "address": "0xaE59E04E2649bC725d5A91AcF13be6EE5E83f04b",
+    "sendMessage": "gm",
     "networks": ["production"],
-    "slackChannel": "#squabble-alerts"
+    "slackChannel": "#squabble-alerts",
+    "groupTesting": true
   },
   {
     "name": "key-check",
@@ -30,7 +32,8 @@
     "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
     "sendMessage": "/kc help",
     "networks": ["dev", "production"],
-    "slackChannel": "#key-check-alerts"
+    "slackChannel": "#key-check-alerts",
+    "groupTesting": true
   },
   {
     "name": "csx",
@@ -89,6 +92,7 @@
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
     "networks": ["production"],
+    "groupTesting": true,
     "slackChannel": "#tokenbot-alerts"
   },
   {
