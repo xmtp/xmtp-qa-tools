@@ -440,3 +440,159 @@ expect(result.allReceived).toBe(true);
 ```
 
 The helpers are designed to work together seamlessly, providing a comprehensive testing framework for XMTP applications.
+
+# Helper Functions Documentation
+
+This directory contains utility functions to assist with testing XMTP features.
+
+## Automatic Error Logging
+
+To eliminate the need for manual try-catch blocks in every test, we provide several approaches for automatic error logging:
+
+### 1. Using `withErrorLogging` Wrapper
+
+The `withErrorLogging` function automatically wraps your test logic with error handling:
+
+```typescript
+import { logError, withErrorLogging } from "@helpers/logger";
+import { setupTestLifecycle } from "@helpers/vitest";
+import { getWorkers } from "@workers/manager";
+import { describe, expect, it } from "vitest";
+
+const testName = "my-test";
+
+describe(testName, async () => {
+  const workers = await getWorkers(["alice", "bob"]);
+  setupTestLifecycle({});
+
+  // Instead of manual try-catch:
+  it(
+    "should do something",
+    withErrorLogging(async () => {
+      // Your test logic here - no try-catch needed!
+      const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+      await dm.send("Hello");
+      expect(dm).toBeDefined();
+    }),
+  );
+
+  // For tests with multiple steps:
+  it(
+    "complex test",
+    withErrorLogging(async () => {
+      // All errors automatically logged
+      const group = await workers.createGroupBetweenAll();
+      await group.send("Message 1");
+      await group.updateName("New Name");
+      expect(group.name).toBe("New Name");
+    }),
+  );
+});
+```
+
+### 2. Manual Error Logging (Legacy)
+
+If you prefer explicit control or need to handle specific errors differently:
+
+```typescript
+it("should do something", async () => {
+  try {
+    // Test logic here
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+    expect(dm).toBeDefined();
+  } catch (e) {
+    logError(e, expect.getState().currentTestName);
+    throw e;
+  }
+});
+```
+
+## Key Benefits of `withErrorLogging`
+
+1. **No Boilerplate**: Eliminates repetitive try-catch blocks
+2. **Consistent Error Handling**: Ensures all errors are logged uniformly
+3. **Test Name Context**: Automatically includes test name in error logs
+4. **Clean Test Code**: Focus on test logic, not error handling infrastructure
+
+## Migration Guide
+
+### Before (Manual):
+
+```typescript
+it("test name", async () => {
+  try {
+    // test logic
+  } catch (e) {
+    logError(e, expect.getState().currentTestName);
+    throw e;
+  }
+});
+```
+
+### After (Automatic):
+
+```typescript
+it(
+  "test name",
+  withErrorLogging(async () => {
+    // test logic
+  }),
+);
+```
+
+## Available Helper Functions
+
+### Logger Functions
+
+```typescript
+import { logError, withErrorLogging } from "@helpers/logger";
+
+// Manual error logging
+logError(error, testName);
+
+// Automatic error logging wrapper
+const testFunction = withErrorLogging(async () => {
+  // Your test logic
+});
+```
+
+### Stream Verification Functions
+
+```typescript
+import { verifyMessageStream } from "@helpers/streams";
+
+// Message delivery verification
+const result = await verifyMessageStream(
+  conversation,
+  [receiverWorker],
+  messageCount,
+  messageTemplate,
+);
+```
+
+### Test Lifecycle Management
+
+```typescript
+import { setupTestLifecycle } from "@helpers/vitest";
+
+// Set up proper test cleanup and lifecycle management
+setupTestLifecycle({});
+```
+
+## Best Practices
+
+1. **Use `withErrorLogging` for new tests** - eliminates boilerplate
+2. **Keep manual try-catch for specific error handling** - when you need custom error logic
+3. **Always call `setupTestLifecycle({})`** - ensures proper cleanup
+4. **Use consistent imports** - follow the patterns in existing test files
+
+## Error Handling Integration
+
+The `withErrorLogging` wrapper integrates seamlessly with:
+
+- Stream verification functions
+- Worker management
+- Test lifecycle management
+- Existing error reporting and Slack notifications
+
+This approach maintains all existing functionality while dramatically reducing code repetition.

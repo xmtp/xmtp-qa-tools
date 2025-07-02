@@ -8,7 +8,7 @@ alwaysApply: true
 ## Core Testing Pattern
 
 ```typescript
-import { logError } from "@helpers/logger";
+import { withErrorLogging } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 
@@ -23,7 +23,16 @@ describe(testName, async () => {
 
   setupTestLifecycle({});
 
-  it("should do something", async () => {
+  // Recommended: Use withErrorLogging wrapper (eliminates try-catch boilerplate)
+  it("should do something", withErrorLogging(async () => {
+    // Test logic here - errors automatically logged
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+    await dm.send("Hello");
+    expect(dm).toBeDefined();
+  }));
+
+  // Alternative: Manual error handling (for specific error handling needs)
+  it("manual error handling", async () => {
     try {
       // Test logic here
     } catch (e) {

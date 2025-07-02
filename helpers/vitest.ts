@@ -8,6 +8,23 @@ import {
   sendMetric,
   type DurationMetricTags,
 } from "./datadog";
+import { logError } from "./logger";
+
+/**
+ * Wrapper for test functions that automatically handles error logging
+ */
+export const withErrorLogging = <T extends unknown[]>(
+  testFn: (...args: T) => Promise<void> | void,
+) => {
+  return async (...args: T) => {
+    try {
+      await testFn(...args);
+    } catch (e) {
+      logError(e, expect.getState().currentTestName);
+      throw e;
+    }
+  };
+};
 
 export const setupTestLifecycle = ({
   workers,
