@@ -135,20 +135,10 @@ describe(testName, async () => {
         // Determine expected behavior based on groupTesting setting
         const shouldRespondToTag = agent.groupTesting === true;
 
-        // Send metrics
-        sendMetric("response", noResponseToHi ? 0 : streamTimeout, {
-          test: testName,
-          metric_type: "agent",
-          metric_subtype: `${agent.name}-group-untagged`,
-          agent: agent.name,
-          address: agent.address,
-          sdk: workers.getCreator().sdk,
-        });
-
         sendMetric("response", respondedToTag ? responseTime : streamTimeout, {
           test: testName,
           metric_type: "agent",
-          metric_subtype: `${agent.name}-group-tagged`,
+          metric_subtype: "group",
           agent: agent.name,
           address: agent.address,
           sdk: workers.getCreator().sdk,

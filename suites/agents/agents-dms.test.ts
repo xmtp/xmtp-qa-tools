@@ -9,7 +9,7 @@ import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents-dms";
+const testName = "agents";
 
 describe(testName, async () => {
   const env = process.env.XMTP_ENV as "dev" | "production";
@@ -71,7 +71,7 @@ describe(testName, async () => {
         sendMetric("response", result.responseTime, {
           test: testName,
           metric_type: "agent",
-          metric_subtype: `${agent.name}-dm`,
+          metric_subtype: "dm",
           agent: agent.name,
           address: agent.address,
           sdk: workers.getCreator().sdk,
