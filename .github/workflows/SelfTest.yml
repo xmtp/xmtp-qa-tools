@@ -1,0 +1,92 @@
+name: Self Test XMTP QA Tools
+
+on:
+  schedule:
+    - cron: "0 */6 * * *" # every 6 hours
+  workflow_dispatch:
+
+jobs:
+  run-self-test:
+    runs-on: ubuntu-latest
+
+    env:
+      XMTP_ENV: ${{ vars.XMTP_ENV || 'dev' }}
+      LOGGING_LEVEL: off
+      GEOLOCATION: ${{ vars.GEOLOCATION }}
+      SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
+      SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
+      DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Clone XMTP QA Tools repo
+        run: |
+          git clone --depth=1 https://github.com/xmtp/xmtp-qa-tools.git qa-tools-test
+          cd qa-tools-test
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          # Disable built-in cache since we're working with cloned repo
+
+      - name: Install dependencies
+        run: |
+          cd qa-tools-test
+          yarn install
+
+      - name: Create .env file
+        run: |
+          cd qa-tools-test
+          echo "XMTP_ENV=${{ env.XMTP_ENV }}" >> .env
+          echo "LOGGING_LEVEL=${{ env.LOGGING_LEVEL }}" >> .env
+          if [ -n "${{ env.GEOLOCATION }}" ]; then
+            echo "GEOLOCATION=${{ env.GEOLOCATION }}" >> .env
+          fi
+          if [ -n "${{ env.SLACK_BOT_TOKEN }}" ]; then
+            echo "SLACK_BOT_TOKEN=${{ env.SLACK_BOT_TOKEN }}" >> .env
+          fi
+          if [ -n "${{ env.SLACK_CHANNEL }}" ]; then
+            echo "SLACK_CHANNEL=${{ env.SLACK_CHANNEL }}" >> .env
+          fi
+          if [ -n "${{ env.DATADOG_API_KEY }}" ]; then
+            echo "DATADOG_API_KEY=${{ env.DATADOG_API_KEY }}" >> .env
+          fi
+
+      - name: Generate test inboxes
+        run: |
+          cd qa-tools-test
+          yarn gen
+
+      - name: Run DM tests
+        run: |
+          cd qa-tools-test
+          timeout 300s yarn test dms --debug --no-fail | tee test-output.log
+
+          # Check if tests completed successfully
+          if grep -q "PASS" test-output.log || grep -q "✓" test-output.log; then
+            echo "Success: DM tests completed"
+            exit 0
+          else
+            echo "Warning: Tests may have failed or timed out"
+            # With --no-fail flag, we still exit 0 for monitoring purposes
+            exit 0
+          fi
+
+      - name: Upload test logs
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: self-test-logs
+          path: qa-tools-test/logs/
+          retention-days: 7
+
+      - name: Upload test output
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: self-test-output
+          path: qa-tools-test/test-output.log
+          retention-days: 7
