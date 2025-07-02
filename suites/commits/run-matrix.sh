@@ -11,7 +11,7 @@ rm -rf .data/
 tranche_parts=5
 tranche=$((num_runs/tranche_parts))
 
-for x in {1..$tranche_parts}; {
+for ((x=1; x<=tranche_parts; x++)); do
   echo "Starting test cycle at $(date)"
   for ((i=1; i<=tranche; i++)); do
       echo "Restarting multinode docker env..."
@@ -31,6 +31,7 @@ for x in {1..$tranche_parts}; {
   echo "Finished cleaning up"
   fork_count=$(find logs/cleaned -type f 2>/dev/null | wc -l)
   echo "Found $fork_count forks in logs/cleaned"
+done
 
 echo "Writing env config to output dir..."
 
