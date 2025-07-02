@@ -1,6 +1,9 @@
 name: Self Test XMTP QA Tools
 
 on:
+  pull_request:
+    branches:
+      - main
   schedule:
     - cron: "0 */6 * * *" # every 6 hours
   workflow_dispatch:
