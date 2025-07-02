@@ -1,5 +1,4 @@
 import { getManualUsers } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
@@ -44,12 +43,10 @@ describe("bug_addmember", async () => {
             break;
           }
         } catch (e) {
-          logError(e, expect.getState().currentTestName);
           throw e;
         }
       }
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
@@ -115,7 +114,6 @@ describe("group-node-blackhole", async () => {
       expect(postCheck.allReceived).toBe(true);
       expect(postCheck.orderPercentage).toBe(100);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

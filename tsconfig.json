@@ -6,7 +6,7 @@
     "declaration": true,
     "declarationMap": true,
     "forceConsistentCasingInFileNames": true,
-    "lib": ["ESNext"],
+    "lib": ["ESNext", "DOM"],
     "module": "ESNext",
     "baseUrl": ".",
     "moduleResolution": "Bundler",

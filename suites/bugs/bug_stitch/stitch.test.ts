@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { defaultNames, getWorkers, type Worker } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
@@ -40,7 +39,6 @@ describe("bug_stitch", () => {
           const message = "message 1/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -57,7 +55,6 @@ describe("bug_stitch", () => {
           const message = "message 2/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });
@@ -79,7 +76,6 @@ describe("bug_stitch", () => {
           const message = "message 3/3\n" + "convoId: " + String(newConvo.id);
           await newConvo?.send(message);
         } catch (e) {
-          logError(e, expect.getState().currentTestName);
           throw e;
         }
       });

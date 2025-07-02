@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker } from "@workers/manager";
@@ -66,7 +65,6 @@ describe("m_large_syncs", async () => {
           createTimeMs,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -81,7 +79,6 @@ describe("m_large_syncs", async () => {
           singleSyncAllTimeMs,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -97,7 +94,6 @@ describe("m_large_syncs", async () => {
         };
         run += 2;
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

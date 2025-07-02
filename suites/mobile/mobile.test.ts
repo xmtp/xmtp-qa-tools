@@ -1,5 +1,4 @@
 import { getManualUsers } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -38,7 +37,6 @@ describe("bot-stress", () => {
       // Note: No streams or syncs needed for this test (all were set to None)
       bot = workers.get("bot")!;
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -91,7 +89,6 @@ describe("bot-stress", () => {
           `Total time for ${groupConfig.count} groups: ${totalTime.toFixed(2)}s`,
         );
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

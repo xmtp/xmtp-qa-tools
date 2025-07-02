@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyNewConversationStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -59,7 +58,6 @@ describe("m_large_conversations", async () => {
           conversationStreamTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

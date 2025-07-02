@@ -8,7 +8,6 @@ alwaysApply: true
 ## Core Testing Pattern
 
 ```typescript
-import { withErrorLogging } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 
@@ -23,22 +22,11 @@ describe(testName, async () => {
 
   setupTestLifecycle({});
 
-  // Recommended: Use withErrorLogging wrapper (eliminates try-catch boilerplate)
-  it("should do something", withErrorLogging(async () => {
-    // Test logic here - errors automatically logged
+  it("should do something", async () => {
+    // Test logic here - vitest handles errors automatically
     const dm = await alice.client.conversations.newDm(bob.client.inboxId);
     await dm.send("Hello");
     expect(dm).toBeDefined();
-  }));
-
-  // Alternative: Manual error handling (for specific error handling needs)
-  it("manual error handling", async () => {
-    try {
-      // Test logic here
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
   });
 });
 ```
@@ -382,25 +370,20 @@ expect(result.orderPercentage).toBeGreaterThan(90);
 
 ```typescript
 it("should deliver messages in real-time", async () => {
-  try {
-    // Start message streams
-    workers.getReceiver().worker.startStream(typeofStream.Message);
-    
-    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
-    
-    const verifyResult = await verifyMessageStream(
-      dm,
-      [workers.get("bob")],
-      5,
-      "realtime-{i}-{randomSuffix}"
-    );
-    
-    expect(verifyResult.allReceived).toBe(true);
-    expect(verifyResult.averageEventTiming).toBeLessThan(500);
-  } catch (e) {
-    logError(e, expect.getState().currentTestName);
-    throw e;
-  }
+  // Start message streams
+  workers.getReceiver().worker.startStream(typeofStream.Message);
+  
+  const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+  
+  const verifyResult = await verifyMessageStream(
+    dm,
+    [workers.get("bob")],
+    5,
+    "realtime-{i}-{randomSuffix}"
+  );
+  
+  expect(verifyResult.allReceived).toBe(true);
+  expect(verifyResult.averageEventTiming).toBeLessThan(500);
 });
 ```
 
@@ -408,25 +391,20 @@ it("should deliver messages in real-time", async () => {
 
 ```typescript
 it("should notify all members of group updates", async () => {
-  try {
-    // Start group update streams
-    workers.getAllButCreator().forEach(worker => {
-      worker.worker.startStream(typeofStream.GroupUpdated);
-    });
-    
-    const group = await workers.createGroupBetweenAll();
-    
-    const verifyResult = await verifyMetadataStream(
-      group,
-      workers.getAllButCreator(),
-      3
-    );
-    
-    expect(verifyResult.allReceived).toBe(true);
-  } catch (e) {
-    logError(e, expect.getState().currentTestName);
-    throw e;
-  }
+  // Start group update streams
+  workers.getAllButCreator().forEach(worker => {
+    worker.worker.startStream(typeofStream.GroupUpdated);
+  });
+  
+  const group = await workers.createGroupBetweenAll();
+  
+  const verifyResult = await verifyMetadataStream(
+    group,
+    workers.getAllButCreator(),
+    3
+  );
+  
+  expect(verifyResult.allReceived).toBe(true);
 });
 ```
 
@@ -441,19 +419,6 @@ Use predefined names from the 61 available:
  "victor", "wendy", "xavier", "yolanda", "zack", ...]
 ```
 
-## Error Handling
-
-Always wrap test logic in try-catch:
-
-```typescript
-try {
-  // Test operations
-} catch (e) {
-  logError(e, expect.getState().currentTestName);
-  throw e;
-}
-```
-
 ## Test Organization
 
 - Use `useVersions: true` option for version testing
@@ -464,7 +429,6 @@ try {
 ## Key Imports
 
 ```typescript
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 

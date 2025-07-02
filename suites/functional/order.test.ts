@@ -1,5 +1,4 @@
 import { sleep } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -58,7 +57,6 @@ describe("order", async () => {
       expect(stats.receptionPercentage).toBeGreaterThan(95);
       expect(stats.orderPercentage).toBeGreaterThan(95);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -74,7 +72,6 @@ describe("order", async () => {
       expect(verifyResult.receptionPercentage).toBeGreaterThan(95);
       expect(verifyResult.orderPercentage).toBeGreaterThan(95);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

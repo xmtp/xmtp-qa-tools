@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -194,7 +193,6 @@ describe("group-reconciliation", async () => {
       );
       expect(verifyFinal.allReceived).toBe(true);
     } catch (err) {
-      logError(err, expect.getState().currentTestName);
       throw err;
     }
   });

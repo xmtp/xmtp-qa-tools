@@ -1,183 +1,147 @@
 import { sleep } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type WorkerManager } from "@workers/manager";
-import { type Group } from "@xmtp/node-sdk";
+import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-describe("sync-comparison", async () => {
-  let workers: WorkerManager;
-  let testGroup: Group;
-
-  // Define test workers
-  const testWorkers = ["henry", "ivy", "jack", "karen", "larry"];
-  workers = await getWorkers(testWorkers);
-
+describe("sync", async () => {
+  const workers = await getWorkers(["alice", "bob", "charlie"]);
   setupTestLifecycle({});
 
-  it("should establish test environment by creating group with all participants", async () => {
-    try {
-      // Create a group with all test workers
-      const memberInboxIds = testWorkers
-        .filter((name) => name !== "henry") // Exclude creator from the members list
-        .map((name) => workers.get(name)!.client.inboxId);
+  it("should sync conversations after creation", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
 
-      console.log(
-        "Creating test group with",
-        memberInboxIds.length,
-        "participants",
-      );
-      testGroup = (await workers
-        .get("henry")!
-        .client.conversations.newGroup(memberInboxIds, {
-          groupName: "Sync Test Group",
-          groupDescription: "Group for testing sync methods",
-        })) as Group;
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
 
-      console.log("Group created", testGroup.id);
-      expect(testGroup.id).toBeDefined();
+    // Sync conversations on both clients
+    await alice.client.conversations.sync();
+    await bob.client.conversations.sync();
 
-      // Verify group creation
-      await testGroup.sync();
-      const members = await testGroup.members();
-      expect(members.length).toBe(testWorkers.length);
+    const aliceConversations = await alice.client.conversations.list();
+    const bobConversations = await bob.client.conversations.list();
 
-      // Allow time for message to propagate to all members
-      await sleep(1000);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(aliceConversations.length).toBeGreaterThan(0);
+    expect(bobConversations.length).toBeGreaterThan(0);
+
+    // Both should have the same conversation
+    const aliceConvo = aliceConversations.find((c) => c.id === dm.id);
+    const bobConvo = bobConversations.find((c) => c.id === dm.id);
+
+    expect(aliceConvo).toBeDefined();
+    expect(bobConvo).toBeDefined();
   });
 
-  it("should send baseline message to group for synchronization performance testing", async () => {
-    try {
-      // Sync Ivy's conversations first to ensure the group is visible
-      const ivyClient = workers.get("ivy")!.client;
-      await ivyClient.conversations.sync();
+  it("should sync messages after sending", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
 
-      const groupForIvy = (await ivyClient.conversations.getConversationById(
-        testGroup.id,
-      )) as Group;
-      expect(groupForIvy).toBeDefined();
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
 
-      // Ensure the group is properly synced
-      await groupForIvy.sync();
+    // Send message from alice
+    await dm.send("Hello Bob!");
 
-      const testMessage = `Test message at ${new Date().toISOString()}`;
-      await groupForIvy.send(testMessage);
-      console.log("Test message sent to group:", testMessage);
+    // Bob needs to sync to see the message
+    await bob.client.conversations.sync();
+    const bobDm = await bob.client.conversations.getConversationById(dm.id);
+    await bobDm?.sync();
 
-      // Allow time for message to propagate to all members
-      await sleep(1000);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const messages = await bobDm?.messages();
+    expect(messages?.length).toBeGreaterThan(0);
+
+    const lastMessage = messages?.[messages.length - 1];
+    expect(lastMessage?.content).toBe("Hello Bob!");
   });
 
-  it("should measure performance impact of client-level conversations.sync() operation", async () => {
-    try {
-      const jackClient = workers.get("jack")!.client;
+  it("should sync group membership changes", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
+    const charlie = workers.get("charlie")!;
 
-      // Measure time to sync all conversations
-      const syncStartTime = performance.now();
-      await jackClient.conversations.sync();
-      const syncEndTime = performance.now();
-      const syncTime = syncEndTime - syncStartTime;
+    // Alice creates group with Bob
+    const group = await alice.client.conversations.newGroup([
+      bob.client.inboxId,
+    ]);
 
-      console.log(`Time to sync all conversations: ${syncTime}ms`);
+    // Add Charlie to the group
+    await group.addMembers([charlie.client.inboxId]);
 
-      // Verify we can retrieve the group
-      const group = await jackClient.conversations.getConversationById(
-        testGroup.id,
-      );
-      expect(group).toBeDefined();
+    // Sync all clients
+    await alice.client.conversations.sync();
+    await bob.client.conversations.sync();
+    await charlie.client.conversations.sync();
 
-      // Ensure the group is fully synced
-      await group!.sync();
+    await group.sync();
 
-      // Retrieve messages after sync
-      const messages = await group!.messages();
-      console.log(
-        `Retrieved ${messages.length} messages after client.conversations.sync()`,
-      );
-      expect(messages.length).toBeGreaterThan(0);
+    // Verify all members can see the group
+    const aliceGroups = await alice.client.conversations.listGroups();
+    const bobGroups = await bob.client.conversations.listGroups();
+    const charlieGroups = await charlie.client.conversations.listGroups();
 
-      return { syncTime, messageCount: messages.length };
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    expect(aliceGroups.some((g) => g.id === group.id)).toBe(true);
+    expect(bobGroups.some((g) => g.id === group.id)).toBe(true);
+    expect(charlieGroups.some((g) => g.id === group.id)).toBe(true);
+
+    // Verify member count
+    const members = await group.members();
+    expect(members.length).toBe(3); // Alice, Bob, Charlie
   });
 
-  it("should measure performance impact of individual conversation.sync() operation", async () => {
-    try {
-      const karenClient = workers.get("karen")!.client;
+  it("should handle delayed sync gracefully", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
 
-      // First do a more thorough client sync to make sure we have the conversation
-      await karenClient.conversations.sync();
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
 
-      // Get the group conversation
-      const group = await karenClient.conversations.getConversationById(
-        testGroup.id,
-      );
-      expect(group).toBeDefined();
+    // Send multiple messages quickly
+    await dm.send("Message 1");
+    await dm.send("Message 2");
+    await dm.send("Message 3");
 
-      // Measure time to sync just this conversation
-      const syncStartTime = performance.now();
-      await group!.sync();
-      const syncEndTime = performance.now();
-      const syncTime = syncEndTime - syncStartTime;
+    // Wait a bit before syncing
+    await sleep(2000);
 
-      console.log(`Time to sync single conversation: ${syncTime}ms`);
+    // Now sync and verify all messages are received
+    await bob.client.conversations.sync();
+    const bobDm = await bob.client.conversations.getConversationById(dm.id);
+    await bobDm?.sync();
 
-      // Retrieve messages after sync
-      const messages = await group!.messages();
-      console.log(
-        `Retrieved ${messages.length} messages after conversation.sync()`,
-      );
-      expect(messages.length).toBeGreaterThan(0);
+    const messages = await bobDm?.messages();
+    expect(messages?.length).toBeGreaterThanOrEqual(3);
 
-      return { syncTime, messageCount: messages.length };
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const messageContents = messages?.map((m) => m.content) || [];
+    expect(messageContents).toContain("Message 1");
+    expect(messageContents).toContain("Message 2");
+    expect(messageContents).toContain("Message 3");
   });
 
-  it("should measure message retrieval performance without explicit synchronization", async () => {
-    try {
-      const larryClient = workers.get("larry")!.client;
+  it("should maintain sync state across client restarts", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
 
-      // Do an initial sync to ensure we have the conversation
-      await larryClient.conversations.sync();
+    // Create conversation and send message
+    const dm = await alice.client.conversations.newDm(bob.client.inboxId);
+    await dm.send("Persistent message");
 
-      // Get the group conversation without any additional sync
-      const startTime = performance.now();
-      const group = await larryClient.conversations.getConversationById(
-        testGroup.id,
-      );
-      expect(group).toBeDefined();
+    // Sync bob's client
+    await bob.client.conversations.sync();
+    const bobDm = await bob.client.conversations.getConversationById(dm.id);
+    await bobDm?.sync();
 
-      // Try to retrieve messages without any sync
-      const messages = await group!.messages();
-      const endTime = performance.now();
-      const retrievalTime = endTime - startTime;
+    // Verify message is there
+    const messages = await bobDm?.messages();
+    expect(messages?.some((m) => m.content === "Persistent message")).toBe(
+      true,
+    );
 
-      console.log(
-        `Time to retrieve messages without explicit sync: ${retrievalTime}ms`,
-      );
-      console.log(
-        `Retrieved ${messages.length} messages without explicit sync`,
-      );
+    // Simulate restart by creating new conversation reference
+    const refreshedDm = await bob.client.conversations.getConversationById(
+      dm.id,
+    );
+    await refreshedDm?.sync();
 
-      // We don't expect messages here, but the API call should at least not fail
-
-      return { retrievalTime, messageCount: messages.length };
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    const refreshedMessages = await refreshedDm?.messages();
+    expect(
+      refreshedMessages?.some((m) => m.content === "Persistent message"),
+    ).toBe(true);
   });
 });

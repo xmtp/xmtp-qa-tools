@@ -1,5 +1,4 @@
 import { sdkVersionOptions } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { describe, expect, it } from "vitest";
@@ -23,7 +22,6 @@ describe("regression", () => {
 
         expect(convo?.id).toBeDefined();
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -41,7 +39,6 @@ describe("regression", () => {
 
         expect(convo?.id).toBeDefined();
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

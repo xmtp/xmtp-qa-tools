@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses, getInboxIds } from "@inboxes/utils";
@@ -32,7 +31,6 @@ describe("m_performance", async () => {
       const client = await getWorkers(["randomclient"]);
       expect(client).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -58,7 +56,6 @@ describe("m_performance", async () => {
       );
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -67,7 +64,6 @@ describe("m_performance", async () => {
       const inboxState = await creatorClient.preferences.inboxState(true);
       expect(inboxState.installations.length).toBeGreaterThan(0);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -79,7 +75,6 @@ describe("m_performance", async () => {
       expect(dm).toBeDefined();
       expect(dm.id).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -93,7 +88,6 @@ describe("m_performance", async () => {
       expect(dm2).toBeDefined();
       expect(dm2.id).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -107,7 +101,6 @@ describe("m_performance", async () => {
 
       expect(dmId).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -120,7 +113,6 @@ describe("m_performance", async () => {
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -137,7 +129,6 @@ describe("m_performance", async () => {
       console.log("New group created", newGroup.id);
       expect(newGroup.id).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -153,7 +144,6 @@ describe("m_performance", async () => {
         );
       expect(newGroupByIdentifier.id).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -163,7 +153,6 @@ describe("m_performance", async () => {
       const members = await newGroup.members();
       expect(members.length).toBe(members.length);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -175,7 +164,6 @@ describe("m_performance", async () => {
       const name = newGroup.name;
       expect(name).toBe(newName);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -187,7 +175,6 @@ describe("m_performance", async () => {
       await newGroup.send(groupMessage);
       expect(groupMessage).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -200,7 +187,6 @@ describe("m_performance", async () => {
       setCustomDuration(verifyResult.averageEventTiming);
       expect(verifyResult.almostAllReceived).toBe(true);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -208,7 +194,6 @@ describe("m_performance", async () => {
     try {
       await newGroup.addMembers([workers.getAll()[2].inboxId]);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -224,7 +209,6 @@ describe("m_performance", async () => {
       const members = await newGroup.members();
       expect(members.length).toBe(previousMembers.length - 1);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -240,7 +224,6 @@ describe("m_performance", async () => {
         ])) as Group;
         expect(newGroup.id).toBeDefined();
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -256,7 +239,6 @@ describe("m_performance", async () => {
           );
         expect(newGroupByIdentifier.id).toBeDefined();
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -266,7 +248,6 @@ describe("m_performance", async () => {
         const members = await newGroup.members();
         expect(members.length).toBe(members.length);
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -278,7 +259,6 @@ describe("m_performance", async () => {
         const name = newGroup.name;
         expect(name).toBe(newName);
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -290,7 +270,6 @@ describe("m_performance", async () => {
         await newGroup.send(groupMessage);
         expect(groupMessage).toBeDefined();
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -303,7 +282,6 @@ describe("m_performance", async () => {
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -319,7 +297,6 @@ describe("m_performance", async () => {
         const members = await newGroup.members();
         expect(members.length).toBe(previousMembers.length - 1);
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

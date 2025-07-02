@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
@@ -136,7 +135,6 @@ describe("group-partition-delayedreceive", async () => {
       expect(verifyFinal.allReceived).toBe(true);
       await workers.checkForks();
     } catch (err) {
-      logError(err, expect.getState().currentTestName);
       throw err;
     }
   });

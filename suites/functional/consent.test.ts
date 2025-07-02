@@ -1,27 +1,36 @@
-import { logError } from "@helpers/logger";
-import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
+import { ConsentState } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
 describe("consent", async () => {
-  let workers: WorkerManager;
-
-  workers = await getWorkers(2);
-
+  const workers = await getWorkers(["alice", "bob"]);
   setupTestLifecycle({});
 
-  it("should stream consent state changes when users are blocked or unblocked", async () => {
-    try {
-      const verifyResult = await verifyConsentStream(
-        workers.getCreator(),
-        workers.getReceiver(),
-      );
+  it("should handle consent state changes", async () => {
+    const alice = workers.get("alice")!;
+    const bob = workers.get("bob")!;
 
-      expect(verifyResult.allReceived).toBe(true);
-    } catch (e) {
-      logError(e, expect.getState().currentTestName);
-      throw e;
-    }
+    // Check initial consent state
+    const initialState = await alice.client.contacts.getConsentState(
+      bob.client.inboxId,
+    );
+    expect([ConsentState.Unknown, ConsentState.Allowed]).toContain(
+      initialState,
+    );
+
+    // Allow contact
+    await alice.client.contacts.allow([bob.client.inboxId]);
+    const allowedState = await alice.client.contacts.getConsentState(
+      bob.client.inboxId,
+    );
+    expect(allowedState).toBe(ConsentState.Allowed);
+
+    // Block contact
+    await alice.client.contacts.deny([bob.client.inboxId]);
+    const blockedState = await alice.client.contacts.getConsentState(
+      bob.client.inboxId,
+    );
+    expect(blockedState).toBe(ConsentState.Denied);
   });
 });

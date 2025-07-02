@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
@@ -27,7 +26,6 @@ describe("clients", async () => {
       const client = await getWorkers(["randomclient"]);
       expect(client).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -44,7 +42,6 @@ describe("clients", async () => {
       expect(client.installationId).toBeDefined();
       expect(inboxId).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -57,7 +54,6 @@ describe("clients", async () => {
       );
       expect(dm.id).toBeDefined();
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -80,7 +76,6 @@ describe("clients", async () => {
       expect(staticCanMessage.get(randomAddress.toLowerCase())).toBe(true);
       expect(canMessage.get(randomAddress.toLowerCase())).toBe(true);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -112,7 +107,6 @@ describe("clients", async () => {
         `Valid installations: ${validInstallations}, Invalid installations: ${invalidInstallations}`,
       );
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
@@ -126,7 +120,6 @@ describe("clients", async () => {
       console.log(inboxState[0].inboxId);
       expect(inboxState[0].inboxId).toBe(bobInboxId);
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

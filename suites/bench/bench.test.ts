@@ -1,5 +1,5 @@
 import fs from "fs";
-import { getTime, logError } from "@helpers/logger";
+import { getTime } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxByInstallationCount } from "@inboxes/utils";
@@ -44,72 +44,67 @@ describe("bench", () => {
       const test = `${i}-${installation}: should create a new conversation of ${i} members with ${installation} installations`;
       console.log(test);
       it(test, async () => {
-        try {
-          workers = await getWorkers(WORKER_COUNT);
+        workers = await getWorkers(WORKER_COUNT);
 
-          const newGroup = (await workers
-            .getCreator()
-            .client.conversations.newGroup(
-              workers.getAllButCreator().map((w) => w.client.inboxId),
-            )) as Group;
+        const newGroup = (await workers
+          .getCreator()
+          .client.conversations.newGroup(
+            workers.getAllButCreator().map((w) => w.client.inboxId),
+          )) as Group;
 
-          const inboxes = getInboxByInstallationCount(installation, i);
-          const allInboxIds = [
-            ...inboxes
-              .slice(0, i - workers.getAllButCreator().length - 1)
-              .map((inbox) => inbox.inboxId),
-          ];
-          // Add members in batches of 10
-          const batchSize = 10;
-          for (let j = 0; j < allInboxIds.length; j += batchSize) {
-            const batch = allInboxIds.slice(j, j + batchSize);
-            await newGroup.addMembers(batch);
-            console.log(
-              `${j} of ${allInboxIds.length} - Added ${batch.length} members`,
-            );
-          }
-          await newGroup.sync();
-          const members = await newGroup.members();
-
-          const memberToAdd = inboxes[inboxes.length - 1].inboxId;
-          const verifyResult = await verifyMembershipStream(
-            newGroup,
-            workers.getAllButCreator(),
-            [memberToAdd],
+        const inboxes = getInboxByInstallationCount(installation, i);
+        const allInboxIds = [
+          ...inboxes
+            .slice(0, i - workers.getAllButCreator().length - 1)
+            .map((inbox) => inbox.inboxId),
+        ];
+        // Add members in batches of 10
+        const batchSize = 10;
+        for (let j = 0; j < allInboxIds.length; j += batchSize) {
+          const batch = allInboxIds.slice(j, j + batchSize);
+          await newGroup.addMembers(batch);
+          console.log(
+            `${j} of ${allInboxIds.length} - Added ${batch.length} members`,
           );
-          setCustomDuration(verifyResult.averageEventTiming);
-          expect(verifyResult.receiverCount).toBeGreaterThan(0);
-
-          let totalGroupInstallations = 0;
-          for (const member of members) {
-            totalGroupInstallations += member.installationIds.length;
-          }
-          console.warn(
-            `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id} total installations: ${totalGroupInstallations}`,
-          );
-
-          const zWorkerName = "random" + `${i}-${installation}`;
-          const zWorker = await getWorkers([zWorkerName]);
-          await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
-          const zSyncAllStart = performance.now();
-          await zWorker.getCreator().client.conversations.syncAll();
-          const zSyncAllTimeMs = performance.now() - zSyncAllStart;
-          console.warn(`SyncAll time: ${zSyncAllTimeMs}ms for ${zWorkerName}`);
-
-          const summaryKey = `${i}-${installation}`;
-          summaryMap[summaryKey] = {
-            ...(summaryMap[summaryKey] ?? {
-              groupSize: i,
-              installations: installation,
-              totalGroupInstallations,
-              addMembersTimeMs: verifyResult.averageEventTiming,
-              zSyncAllTimeMs,
-            }),
-          };
-        } catch (e) {
-          logError(e, expect.getState().currentTestName);
-          throw e;
         }
+        await newGroup.sync();
+        const members = await newGroup.members();
+
+        const memberToAdd = inboxes[inboxes.length - 1].inboxId;
+        const verifyResult = await verifyMembershipStream(
+          newGroup,
+          workers.getAllButCreator(),
+          [memberToAdd],
+        );
+        setCustomDuration(verifyResult.averageEventTiming);
+        expect(verifyResult.receiverCount).toBeGreaterThan(0);
+
+        let totalGroupInstallations = 0;
+        for (const member of members) {
+          totalGroupInstallations += member.installationIds.length;
+        }
+        console.warn(
+          `Group created with ${members.length} members (${installation} installations) in batch ${i} - ID: ${newGroup.id} total installations: ${totalGroupInstallations}`,
+        );
+
+        const zWorkerName = "random" + `${i}-${installation}`;
+        const zWorker = await getWorkers([zWorkerName]);
+        await newGroup.addMembers([zWorker.getCreator().client.inboxId]);
+        const zSyncAllStart = performance.now();
+        await zWorker.getCreator().client.conversations.syncAll();
+        const zSyncAllTimeMs = performance.now() - zSyncAllStart;
+        console.warn(`SyncAll time: ${zSyncAllTimeMs}ms for ${zWorkerName}`);
+
+        const summaryKey = `${i}-${installation}`;
+        summaryMap[summaryKey] = {
+          ...(summaryMap[summaryKey] ?? {
+            groupSize: i,
+            installations: installation,
+            totalGroupInstallations,
+            addMembersTimeMs: verifyResult.averageEventTiming,
+            zSyncAllTimeMs,
+          }),
+        };
       });
     }
   }

@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMembershipStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -57,7 +56,6 @@ describe("m_large_membership", async () => {
           addMembersTimeMs: verifyResult.averageEventTiming,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
@@ -42,7 +41,6 @@ describe("bug_kpke", () => {
       await workers.getCreator().client.conversations.syncAll();
       console.log("done");
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });

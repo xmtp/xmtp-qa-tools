@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";
@@ -53,7 +52,6 @@ describe("m_large_cumulative_syncs", async () => {
           createTimeMs,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -68,7 +66,6 @@ describe("m_large_cumulative_syncs", async () => {
           cumulativeSyncAllTimeMs,
         };
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });
@@ -84,7 +81,6 @@ describe("m_large_cumulative_syncs", async () => {
         };
         run += 2;
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

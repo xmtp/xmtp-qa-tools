@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
@@ -64,7 +63,6 @@ describe("m_large_messages", async () => {
         setCustomDuration(verifyResult.averageEventTiming);
         expect(verifyResult.almostAllReceived).toBe(true);
       } catch (e) {
-        logError(e, expect.getState().currentTestName);
         throw e;
       }
     });

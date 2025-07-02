@@ -1,5 +1,4 @@
 import { formatBytes } from "@helpers/client";
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getRandomInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
@@ -109,7 +108,6 @@ describe("storage", () => {
       output += "\n\n" + "=".repeat(80);
       console.log(output);
     } catch (e) {
-      logError(e, expect.getState().currentTestName || "unknown test");
       throw e;
     }
   });

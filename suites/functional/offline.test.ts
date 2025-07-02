@@ -1,4 +1,3 @@
-import { logError } from "@helpers/logger";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
@@ -69,7 +68,6 @@ describe("recovery", async () => {
         expect(recoveredMessages).toContain(msg);
       }
     } catch (e) {
-      logError(e, expect.getState().currentTestName);
       throw e;
     }
   });
