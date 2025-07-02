@@ -326,7 +326,7 @@ export const regressionClient = async (
   env: XmtpEnv,
   apiURL?: string,
 ): Promise<unknown> => {
-  const loggingLevel = process.env.LOGGING_LEVEL as LogLevel;
+  const loggingLevel = (process.env.LOGGING_LEVEL || "error") as LogLevel;
   const versionStr = String(sdkVersion);
   const versionInt = parseInt(versionStr);
   const apiUrl = apiURL;

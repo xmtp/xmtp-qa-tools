@@ -13,7 +13,7 @@ import productionAgents from "./agents.json";
 const testName = "agents";
 
 describe(testName, async () => {
-  const env = process.env.XMTP_ENV as "dev" | "production";
+  const env = (process.env.XMTP_ENV as "dev" | "production") || "dev";
   const workers = await getWorkers(1);
 
   setupTestLifecycle({});

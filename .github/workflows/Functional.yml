@@ -5,10 +5,6 @@ on:
   schedule:
     - cron: "0 */6 * * *" # Runs every 6 hours at 00:00, 06:00, 12:00, 18:00 UTC
   workflow_dispatch:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
 
 jobs:
   test:
@@ -19,19 +15,10 @@ jobs:
         test: [functional]
         environment: [dev, production]
     env:
-      # MAIN
-      LOGGING_LEVEL: "error"
-      XMTP_ENV: ${{ matrix.environment }}
-      LOG_LEVEL: ""
-      # TESTS
-      WORKER_COUNT: 5
-      BATCH_SIZE: 5
-      MAX_GROUP_SIZE: 10
-      DELIVERY_AMOUNT: 10
-      DELIVERY_RECEIVERS: 4
-      # OPTIONAL
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
+      XMTP_ENV: ${{ matrix.environment }}
       GEOLOCATION: ${{ vars.GEOLOCATION }}
+      DELIVERY_AMOUNT: 100
       SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
@@ -61,6 +48,7 @@ jobs:
           path: |
             logs/**/*
             .data/**/*
+            .env
           if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 90

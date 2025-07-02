@@ -32,7 +32,7 @@ export interface ClientOptions extends SkillOptions {
 export const DEFAULT_CORE_OPTIONS: ClientOptions = {
   walletKey: (process.env.WALLET_KEY ?? generatePrivateKey()) as `0x${string}`,
   dbEncryptionKey: process.env.ENCRYPTION_KEY ?? generateEncryptionKeyHex(),
-  loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
+  loggingLevel: (process.env.LOGGING_LEVEL || "error") as LogLevel,
   networks: ["dev"],
   ...DEFAULT_SKILL_OPTIONS,
 };

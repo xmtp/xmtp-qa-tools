@@ -14,7 +14,7 @@ const dbEncryptionKey = getEncryptionKeyFromHex(
   process.env.ENCRYPTION_KEY as string,
 );
 
-const env: XmtpEnv = process.env.XMTP_ENV as XmtpEnv;
+const env: XmtpEnv = (process.env.XMTP_ENV as XmtpEnv) || "dev";
 
 async function main() {
   console.log(`Creating client on the '${env}' network...`);
@@ -23,7 +23,7 @@ async function main() {
     dbEncryptionKey,
     env,
     dbPath: getDbPath(env + "-" + signerIdentifier),
-    loggingLevel: process.env.LOGGING_LEVEL as LogLevel,
+    loggingLevel: (process.env.LOGGING_LEVEL || "error") as LogLevel,
   });
   logAgentDetails(client);
 

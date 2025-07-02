@@ -483,7 +483,7 @@ export async function getWorkers(
   } = {},
 ): Promise<WorkerManager> {
   const { useVersions = true, randomNames = true } = options;
-  const env = options.env || (process.env.XMTP_ENV as XmtpEnv);
+  const env = options.env || (process.env.XMTP_ENV as XmtpEnv) || "dev";
   const manager = new WorkerManager(env);
 
   let workerPromises: Promise<Worker>[] = [];
