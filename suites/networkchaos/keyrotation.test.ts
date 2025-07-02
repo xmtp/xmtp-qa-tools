@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
 describe("keyrotation-chaos", async () => {

@@ -1,7 +1,7 @@
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("consent", async () => {
   let workers: WorkerManager;

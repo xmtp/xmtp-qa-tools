@@ -13,7 +13,7 @@ import {
   type Signer,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const CHAOS_GROUPS = 20;
 const CHAOS_MESSAGES = 20;

@@ -3,7 +3,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("bug_addmember", async () => {
   const workers = await getWorkers(["bob"]);

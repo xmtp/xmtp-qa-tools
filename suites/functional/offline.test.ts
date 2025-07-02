@@ -1,7 +1,7 @@
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 const amountofMessages = 5;
 

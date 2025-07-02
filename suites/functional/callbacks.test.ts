@@ -1,7 +1,7 @@
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { type DecodedMessage, type Dm } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("callbacks", async () => {
   const workers = await getWorkers(5);

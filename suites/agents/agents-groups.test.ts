@@ -3,7 +3,7 @@ import { sendMetric } from "@helpers/datadog";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import { IdentifierKind } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 

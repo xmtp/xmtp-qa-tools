@@ -11,7 +11,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("streams", async () => {
   let group: Group;

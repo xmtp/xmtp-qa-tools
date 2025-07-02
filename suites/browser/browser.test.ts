@@ -5,7 +5,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds, getRandomInboxIds } from "@inboxes/utils";
 import { typeofStream } from "@workers/main";
 import { getWorkers, type Worker } from "@workers/manager";
-import { beforeAll, describe, it } from "vitest";
+import { beforeAll, describe, expect, it } from "vitest";
 
 describe("browser", () => {
   let groupId: string;

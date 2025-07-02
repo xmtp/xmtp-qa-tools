@@ -1,7 +1,7 @@
 import { sdkVersionOptions } from "@helpers/client";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers, type WorkerManager } from "@workers/manager";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("regression", () => {
   let workers: WorkerManager;

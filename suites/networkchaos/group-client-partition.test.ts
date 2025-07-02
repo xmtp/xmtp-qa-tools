@@ -2,7 +2,7 @@ import { verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 import * as iptables from "../../network-stability-utilities/iptables";
 
 describe("group-client-partition", async () => {

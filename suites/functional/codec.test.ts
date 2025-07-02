@@ -4,7 +4,7 @@ import {
   ContentTypeReaction,
   type Reaction,
 } from "@xmtp/content-type-reaction";
-import { describe, it } from "vitest";
+import { describe, expect, it } from "vitest";
 
 describe("codec", async () => {
   let workers: WorkerManager;

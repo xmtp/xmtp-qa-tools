@@ -3,7 +3,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 import { getInboxIds } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
-import { afterAll, describe, it } from "vitest";
+import { afterAll, describe, expect, it } from "vitest";
 import {
   m_large_BATCH_SIZE,
   m_large_TOTAL,
