@@ -1,5 +1,5 @@
-import { sleep, streamColdStartTimeout } from "@helpers/client";
-import { streamTimeout, typeofStream } from "@workers/main";
+import { sleep, streamColdStartTimeout, streamTimeout } from "@helpers/client";
+import { typeofStream } from "@workers/main";
 import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
