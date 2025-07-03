@@ -21,6 +21,15 @@ describe(testName, async () => {
     return agent.networks.includes(env) && agent.shouldRespondOnTagged;
   });
 
+  // Handle case where no agents are configured for the current environment
+  if (filteredAgents.length === 0) {
+    it(`${env}: No agents configured for this environment`, () => {
+      console.log(`No agents found for environment: ${env}`);
+      expect(true).toBe(true); // Pass the test
+    });
+    return;
+  }
+
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} should not respond to untagged "hi" : ${agent.address}`, async () => {
       console.debug("sending message to agent", agent.name, agent.address);
