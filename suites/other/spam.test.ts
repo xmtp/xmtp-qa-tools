@@ -12,9 +12,7 @@ const spamInboxIds = [
 
 const testName = "spam";
 describe("spam", () => {
-  setupTestLifecycle({
-    testName,
-  });
+  setupTestLifecycle({ testName });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     const workers = await getWorkers(1);

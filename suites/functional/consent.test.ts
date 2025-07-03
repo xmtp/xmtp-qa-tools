@@ -5,11 +5,8 @@ import { describe, expect, it } from "vitest";
 
 const testName = "consent";
 describe(testName, async () => {
-  let workers: WorkerManager;
-
-  workers = await getWorkers(2);
-
   setupTestLifecycle({ testName });
+  let workers = await getWorkers(2);
 
   it("should stream consent state changes when users are blocked or unblocked", async () => {
     const verifyResult = await verifyConsentStream(

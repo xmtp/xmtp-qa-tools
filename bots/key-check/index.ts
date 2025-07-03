@@ -236,5 +236,6 @@ await initializeClient(processMessage, [
     networks: ["dev", "production"],
     welcomeMessage: "Send /kc help",
     commandPrefix: "/kc",
+    acceptGroups: true,
   },
 ]);
