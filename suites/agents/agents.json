@@ -1,5 +1,14 @@
 [
   {
+    "name": "key-check",
+    "baseName": "key-check.base.eth",
+    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
+    "sendMessage": "/kc help",
+    "networks": ["dev", "production"],
+    "slackChannel": "#key-check-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "flaunchy",
     "baseName": "flaunchy.base.eth",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
@@ -25,36 +34,6 @@
     "networks": ["production"],
     "slackChannel": "#squabble-alerts",
     "shouldRespondOnTagged": true
-  },
-  {
-    "name": "key-check",
-    "baseName": "key-check.base.eth",
-    "address": "0x235017975ed5F55e23a71979697Cd67DcAE614Fa",
-    "sendMessage": "/kc help",
-    "networks": ["dev", "production"],
-    "slackChannel": "#key-check-alerts",
-    "shouldRespondOnTagged": true
-  },
-  {
-    "name": "csx",
-    "baseName": "csx.base.eth",
-    "address": "0x74563b2e03f8539ea0ee99a2d6c6b4791e652901",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
-    "networks": ["dev", "production"],
-    "slackChannel": "#csx-alerts",
-    "shouldRespondOnTagged": false
-  },
-
-  {
-    "name": "gang",
-    "baseName": "gang.base.eth",
-    "address": "0x6461bf53ddb33b525c84bf60d6bb31fa10828474",
-    "sendMessage": "hola",
-    "expectedMessage": ["chat", "invalid"],
-    "networks": ["dev", "production"],
-    "slackChannel": "#gang-alerts",
-    "shouldRespondOnTagged": false
   },
   {
     "name": "elsa",

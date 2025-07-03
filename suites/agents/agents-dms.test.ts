@@ -3,7 +3,11 @@ import { sendMetric } from "@helpers/datadog";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind, type Dm, type XmtpEnv } from "@xmtp/node-sdk";
+import {
+  IdentifierKind,
+  type Conversation,
+  type XmtpEnv,
+} from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
@@ -12,59 +16,31 @@ const testName = "agents";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   const env = process.env.XMTP_ENV as XmtpEnv;
-  const workers = await getWorkers(["alice"]);
+  const workers = await getWorkers(["randomguy"]);
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env);
   });
 
-  // Helper function to test agent response in DM
-  async function testAgentDMResponse(agent: AgentConfig, testMessage: string) {
-    const conversation = await workers
-      .getCreator()
-      .client.conversations.newDmWithIdentifier({
-        identifier: agent.address,
-        identifierKind: IdentifierKind.Ethereum,
-      });
-    await conversation.sync();
-
-    let retries = 3;
-    let result;
-
-    while (retries > 0) {
-      const messagesBefore = await conversation.messages();
-      const countBefore = messagesBefore.length;
-
-      result = await verifyBotMessageStream(
-        conversation as Dm,
-        [workers.getCreator()],
-        testMessage,
-      );
-
-      if (result?.allReceived) {
-        return { responded: true, responseTime: result.averageEventTiming };
-      }
-
-      await conversation.sync();
-      const messagesAfter = await conversation.messages();
-      if (messagesAfter.length === countBefore + 2) {
-        return {
-          responded: true,
-          responseTime: result?.averageEventTiming || 0,
-        };
-      }
-      retries--;
-    }
-
-    return { responded: false, responseTime: streamTimeout };
-  }
-
   // Test each agent in DMs
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} DM : ${agent.address}`, async () => {
-      const result = await testAgentDMResponse(agent, agent.sendMessage);
+      console.debug("sending message to agent", agent.name, agent.address);
+      const conversation = await workers
+        .getCreator()
+        .client.conversations.newDmWithIdentifier({
+          identifier: agent.address,
+          identifierKind: IdentifierKind.Ethereum,
+        });
 
-      sendMetric("response", result.responseTime, {
+      const result = await verifyBotMessageStream(
+        conversation as Conversation,
+        [workers.getCreator()],
+        agent.sendMessage,
+        3, // maxRetries
+      );
+
+      sendMetric("response", result.averageEventTiming || streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
@@ -73,7 +49,7 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       });
 
-      expect(result.responded).toBe(true);
+      expect(result.allReceived).toBe(true);
     });
   }
 });

@@ -1,5 +1,5 @@
 import { sleep, streamColdStartTimeout } from "@helpers/client";
-import { typeofStream } from "@workers/main";
+import { streamTimeout, typeofStream } from "@workers/main";
 import type { Worker } from "@workers/manager";
 import {
   ConsentEntityType,
@@ -530,30 +530,70 @@ export function calculateMessageStats(
 /**
  * Specialized function to verify bot response streams
  * Measures the time it takes for a bot to respond to a trigger message
+ * Includes retry logic and fallback message count validation
  */
 export async function verifyBotMessageStream(
   group: Conversation,
   receivers: Worker[],
   triggerMessage: string,
+  maxRetries: number = 3,
 ): Promise<VerifyStreamResult> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
 
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sentAt = Date.now();
-      await group.send(triggerMessage);
-      // For bot responses, we use a fixed key since any response counts
-      return [{ key: "bot-response", sentAt }];
-    },
-    getKey: () => "bot-response", // Fixed key for both sent and received
-    getMessage: extractContent,
-    statsLabel: "bot-response:",
-    count: 1,
-    messageTemplate: "",
-    participantsForStats: receivers,
-  });
+  let attempts = 0;
+  let result: VerifyStreamResult | undefined;
+
+  while (attempts < maxRetries) {
+    const messagesBefore = await group.messages();
+    const countBefore = messagesBefore.length;
+
+    result = await collectAndTimeEventsWithStats({
+      receivers,
+      startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+      triggerEvents: async () => {
+        const sentAt = Date.now();
+        await group.send(triggerMessage);
+        return [{ key: "bot-response", sentAt }];
+      },
+      getKey: () => "bot-response",
+      getMessage: extractContent,
+      statsLabel: "bot-response:",
+      count: 1,
+      messageTemplate: "",
+      participantsForStats: receivers,
+    });
+
+    if (result.allReceived) {
+      return result;
+    }
+
+    // Fallback: check message count increase (original message + bot response)
+    await group.sync();
+    const messagesAfter = await group.messages();
+    if (messagesAfter.length === countBefore + 2) {
+      return {
+        ...result,
+        allReceived: true,
+        almostAllReceived: true,
+      };
+    }
+
+    attempts++;
+  }
+
+  // If we get here, all retries failed
+  return (
+    result || {
+      allReceived: false,
+      almostAllReceived: false,
+      receiverCount: receivers.length,
+      messages: "",
+      eventTimings: "",
+      averageEventTiming: streamTimeout,
+      receptionPercentage: 0,
+      orderPercentage: 0,
+    }
+  );
 }
