@@ -22,6 +22,15 @@ describe(testName, async () => {
     return agent.networks.includes(env);
   });
 
+  // Handle case where no agents are configured for the current environment
+  if (filteredAgents.length === 0) {
+    it(`${env}: No agents configured for this environment`, () => {
+      console.log(`No agents found for environment: ${env}`);
+      expect(true).toBe(true); // Pass the test
+    });
+    return;
+  }
+
   // Test each agent in DMs
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} DM : ${agent.address}`, async () => {
