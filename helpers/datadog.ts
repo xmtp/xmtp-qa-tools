@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
+import { extractFailLines, PATTERNS, shouldFilterOutTest } from "./analyzer";
 
 interface MetricData {
   values: number[];
@@ -402,6 +403,30 @@ export async function sendDatadogLog(
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
+  const jobStatus = context.jobStatus || "failed";
+
+  if (jobStatus === "success") {
+    console.log(`Slack notification skipped (status: ${jobStatus})`);
+    return;
+  }
+
+  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
+  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
+    console.log(`Slack notification skipped (branch: ${branchName})`);
+    return;
+  }
+
+  if (lines && shouldFilterOutTest(new Set(lines))) {
+    return;
+  }
+
+  if (lines && lines.length > 0) {
+    const failLines = extractFailLines(new Set(lines));
+    if (failLines.length > 0) {
+      context.failLines = failLines.length;
+    }
+  }
+
   const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
   const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
   const environment = process.env.ENVIRONMENT || process.env.XMTP_ENV;
@@ -410,6 +435,7 @@ export async function sendDatadogLog(
 
   const logPayload = {
     message: lines.join("\n"),
+    failLines: context.failLines,
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
