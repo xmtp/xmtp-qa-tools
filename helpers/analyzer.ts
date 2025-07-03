@@ -360,7 +360,7 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
   const failLines = extractFailLines(errorLogs);
 
   if (failLines.length === 0) {
-    return false; // Don't show if tests don't fail
+    return true; // Don't show if tests don't fail
   }
 
   // Check each configured filter
@@ -372,11 +372,11 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
     // If all fail lines match this filter's unique error lines, filter it out
     if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
       console.log(`Test filtered out (${filter.testName} test failure)`);
-      return false;
+      return true;
     }
   }
 
-  return true;
+  return false;
 }
 
 export async function sendSlackNotification(options: {
