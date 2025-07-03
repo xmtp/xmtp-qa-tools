@@ -393,7 +393,7 @@ async function runVitestTest(
             await sendDatadogLog(Array.from(errorLogs), {
               channel: process.env.SLACK_CHANNEL,
               test: testName,
-              env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
+              env: process.env.XMTP_ENV,
               region: process.env.GEOLOCATION,
               sdk: "latest",
             });

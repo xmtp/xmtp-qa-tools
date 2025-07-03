@@ -332,7 +332,7 @@ export async function sendDatadogLog(
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: workflowRunUrl,
-    environment: process.env.ENVIRONMENT || process.env.XMTP_ENV,
+    environment: process.env.XMTP_ENV,
     region: process.env.GEOLOCATION as string,
     ...context,
   };

@@ -390,17 +390,13 @@ export async function sendSlackNotification(options: {
   const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const targetChannel = options.channel || process.env.SLACK_CHANNEL;
-  const testName = options.testName
-    ? options.testName[0].toUpperCase() + options.testName.slice(1) + " - "
-    : "";
 
   const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const sections = [
-    `*${testName}*: ⚠️ - ${tagMessage}`,
-    `*Environment*: ${process.env.ENVIRONMENT || process.env.XMTP_ENV}`,
-    `*Region*: ${process.env.GEOLOCATION}`,
+    `*${options.testName} ⚠️*: ${tagMessage}`,
+    `*Env*: \`${process.env.XMTP_ENV}\` *Region*: \`${process.env.GEOLOCATION}\``,
     `*Test URL*: <${workflowRunUrl} | ${workflowRunUrl}>`,
     `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
   ];
