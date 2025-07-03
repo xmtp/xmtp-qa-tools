@@ -1,5 +1,6 @@
 import fs from "fs";
 import path from "path";
+import fetch from "node-fetch";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
@@ -340,8 +341,20 @@ export function sanitizeLogs(logs: string): string {
  * Check if test should be filtered out based on known issues
  */
 export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
+  const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
+  if (jobStatus === "success") {
+    console.log(`Slack notification skipped (status: ${jobStatus})`);
+    return true;
+  }
+
+  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
+  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
+    console.log(`Slack notification skipped (branch: ${branchName})`);
+    return true;
+  }
+
   if (!errorLogs || errorLogs.size === 0) {
-    return false;
+    return true;
   }
 
   const failLines = extractFailLines(errorLogs);
@@ -364,4 +377,53 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
   }
 
   return false;
+}
+
+export async function sendSlackNotification(options: {
+  testName: string;
+  errorLogs: Set<string>;
+  channel?: string;
+}): Promise<void> {
+  if (shouldFilterOutTest(options.errorLogs)) {
+    return;
+  }
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+
+  const targetChannel = options.channel || process.env.SLACK_CHANNEL;
+
+  const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
+  const tagMessage = shouldTagFabri ? " <@fabri>" : "";
+
+  const sections = [
+    `*${options.testName} ⚠️* ${tagMessage} | \`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\` | <${workflowRunUrl}|View Run>`,
+    `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
+  ];
+
+  const message = sections.filter(Boolean).join("\n");
+  const response = await fetch("https://slack.com/api/chat.postMessage", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.SLACK_BOT_TOKEN}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      channel: targetChannel,
+      text: message,
+      mrkdwn: true,
+    }),
+  });
+
+  const data = (await response.json()) as {
+    ok: boolean;
+    [key: string]: unknown;
+  };
+
+  if (data && data.ok) {
+    console.log(`✅ Slack notification sent successfully to ${targetChannel}!`);
+  } else {
+    console.error("❌ Failed to send Slack notification. Response:", data);
+  }
 }

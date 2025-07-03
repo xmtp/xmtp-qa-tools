@@ -1,10 +1,10 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { extractErrorLogs } from "@helpers/analyzer";
+import { extractErrorLogs, sendSlackNotification } from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
-import { sendSlackNotification } from "@helpers/notifications";
 import "dotenv/config";
+import { sendDatadogLog } from "@helpers/datadog";
 
 interface RetryOptions {
   maxAttempts: number;
@@ -390,6 +390,13 @@ async function runVitestTest(
         if (options.explicitLogFlag) {
           const errorLogs = extractErrorLogs(logger.logFileName, 20);
           if (errorLogs.size > 0) {
+            await sendDatadogLog(Array.from(errorLogs), {
+              channel: process.env.SLACK_CHANNEL,
+              test: testName,
+              env: process.env.XMTP_ENV,
+              region: process.env.GEOLOCATION,
+              sdk: "latest",
+            });
             await sendSlackNotification({
               testName,
               errorLogs,

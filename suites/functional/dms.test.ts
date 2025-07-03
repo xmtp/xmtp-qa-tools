@@ -65,4 +65,8 @@ describe(testName, async () => {
     ]);
     expect(verifyResult.allReceived).toBe(true);
   });
+
+  it("fail on purpose", () => {
+    throw new Error("fail on purpose");
+  });
 });
