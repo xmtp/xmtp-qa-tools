@@ -95,9 +95,6 @@ yarn install
 # Set up environment variables in .env file
 cp .env.example .env
 # Edit .env with your tokens
-
-# Start the bot
-yarn ts-node scripts/slack-bot.ts
 ```
 
 ### Interacting with the Bot
@@ -133,7 +130,6 @@ yarn ts-node scripts/slack-bot.ts
 
 ### File Structure
 
-- `scripts/slack-bot.ts` - Main bot implementation
 - `helpers/datadog.ts` - DataDog integration utilities
 - `helpers/logger.ts` - Logging utilities
 
