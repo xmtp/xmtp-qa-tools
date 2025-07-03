@@ -18,6 +18,13 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Agents-untagged",
+      uniqueErrorLines: [
+        "FAIL  suites/agents/agents-untagged.test.ts [ suites/agents/agents-untagged.test.ts ]",
+        "FAIL  suites/agents/agents-untagged.test.ts > agents-untagged",
+      ],
+    },
+    {
       testName: "Agents-tagged",
       uniqueErrorLines: [
         "FAIL  suites/agents/agents-tagged.test.ts [ suites/agents/agents-tagged.test.ts ]",
