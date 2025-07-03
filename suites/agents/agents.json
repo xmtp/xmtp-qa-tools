@@ -6,7 +6,7 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "slackChannel": "#flaunchy-alerts",
-    "groupTesting": false
+    "shouldRespondOnTagged": true
   },
   {
     "name": "mamo",
@@ -15,7 +15,7 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "slackChannel": "#mamo-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "squabble",
@@ -24,7 +24,7 @@
     "sendMessage": "@squabble.base.eth",
     "networks": ["production"],
     "slackChannel": "#squabble-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "key-check",
@@ -33,7 +33,7 @@
     "sendMessage": "/kc help",
     "networks": ["dev", "production"],
     "slackChannel": "#key-check-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "csx",
@@ -43,7 +43,7 @@
     "expectedMessage": ["chat", "invalid"],
     "networks": ["dev", "production"],
     "slackChannel": "#csx-alerts",
-    "groupTesting": false
+    "shouldRespondOnTagged": false
   },
 
   {
@@ -54,7 +54,7 @@
     "expectedMessage": ["chat", "invalid"],
     "networks": ["dev", "production"],
     "slackChannel": "#gang-alerts",
-    "groupTesting": false
+    "shouldRespondOnTagged": false
   },
   {
     "name": "elsa",
@@ -63,7 +63,7 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "slackChannel": "#elsa-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "byte",
@@ -72,7 +72,7 @@
     "sendMessage": "hi",
     "networks": ["production"],
     "slackChannel": "#byte-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "gm",
@@ -81,7 +81,7 @@
     "sendMessage": "hola",
     "networks": ["production"],
     "slackChannel": "#gm-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "bankr",
@@ -90,7 +90,7 @@
     "sendMessage": "hey there how are you?",
     "networks": ["production"],
     "slackChannel": "#bankr-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   },
   {
     "name": "tokenbot",
@@ -98,8 +98,8 @@
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
     "networks": ["production"],
-    "groupTesting": true,
-    "slackChannel": "#tokenbot-alerts"
+    "slackChannel": "#tokenbot-alerts",
+    "shouldRespondOnTagged": true
   },
   {
     "name": "tbachat",
@@ -108,6 +108,6 @@
     "sendMessage": "/help",
     "networks": ["production"],
     "slackChannel": "#tbachat-alerts",
-    "groupTesting": true
+    "shouldRespondOnTagged": true
   }
 ]
