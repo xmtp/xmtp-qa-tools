@@ -329,6 +329,12 @@ export async function sendDatadogLog(
   }
 
   const failLines = lines ? extractFailLines(new Set(lines)) : [];
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+
+  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+
   const logPayload = {
     message: lines.join("\n"),
     failLines: failLines.length > 0 ? failLines.length : undefined,
@@ -336,10 +342,11 @@ export async function sendDatadogLog(
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
     channel: context.channel || "general",
-    repository: process.env.GITHUB_REPOSITORY || "Unknown Repository",
-    workflowName: process.env.GITHUB_WORKFLOW || "Unknown Workflow",
+    repository: process.env.GITHUB_REPOSITORY as string,
+    workflowName: process.env.GITHUB_WORKFLOW as string,
+    workflowRunUrl: workflowRunUrl,
     environment: process.env.ENVIRONMENT || process.env.XMTP_ENV,
-    region: process.env.GEOLOCATION || "Unknown Region",
+    region: process.env.GEOLOCATION as string,
     ...context,
   };
 
