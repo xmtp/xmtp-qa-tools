@@ -1,6 +1,6 @@
 import { streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
-import { verifyMessageStream } from "@helpers/streams";
+import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
 import {
@@ -59,51 +59,44 @@ describe(testName, async () => {
   }
 
   for (const agent of filteredAgents) {
-    it(`${env}: ${agent.name} group behavior test : ${agent.address}`, async () => {
+    it(`${env}: ${agent.name} should not respond to untagged "hi" : ${agent.address}`, async () => {
       const group = await createGroupWithAgent(agent);
 
-      // Test 1: Send untagged "hi" - agent should NOT respond
-      const hiResult = await verifyMessageStream(
+      const hiResult = await verifyBotMessageStream(
         group as Conversation,
         [workers.getReceiver()],
-        1,
-        "hi",
+        agent.sendMessage,
       );
 
-      const noResponseToHi =
-        hiResult.receiverCount === 1 &&
-        hiResult.messages.split(",").length === 1;
-
-      // Test 2: Send tagged/command message - agent should respond
-      const isSlashCommand = agent.sendMessage.startsWith("/");
-      const testMessage = isSlashCommand
-        ? agent.sendMessage
-        : `@${agent.baseName} ${agent.sendMessage}`;
-
-      const commandResult = await verifyMessageStream(
-        group as Conversation,
-        [workers.getReceiver()],
-        1,
-        testMessage,
-      );
-
-      const respondedToCommand = commandResult.messages.split(",").length >= 2;
-      const responseTime = respondedToCommand
-        ? commandResult.averageEventTiming
-        : streamTimeout;
-
-      sendMetric("response", responseTime, {
-        test: testName,
-        metric_type: "agent",
-        metric_subtype: "group",
-        agent: agent.name,
-        address: agent.address,
-        sdk: workers.getCreator().sdk,
-      });
-
-      // Assertions
-      expect(noResponseToHi).toBe(true); // Should NEVER respond to untagged "hi"
-      expect(respondedToCommand).toBe(true); // SHOULD respond to command/tagged message
+      expect(hiResult.allReceived).toBe(false);
     });
+
+    if (agent.shouldRespondOnTagged) {
+      it(`${env}: ${agent.name} should respond to tagged/command message : ${agent.address}`, async () => {
+        const group = await createGroupWithAgent(agent);
+
+        const isSlashCommand = agent.sendMessage.startsWith("/");
+        const testMessage = isSlashCommand
+          ? agent.sendMessage
+          : `@${agent.baseName} ${agent.sendMessage}`;
+
+        const commandResult = await verifyBotMessageStream(
+          group as Conversation,
+          [workers.getReceiver()],
+          testMessage,
+        );
+
+        sendMetric("response", commandResult.averageEventTiming, {
+          test: testName,
+          metric_type: "agent",
+          metric_subtype: "group",
+          agent: agent.name,
+          address: agent.address,
+          sdk: workers.getCreator().sdk,
+        });
+
+        expect(commandResult.allReceived).toBe(true);
+      });
+    }
   }
 });

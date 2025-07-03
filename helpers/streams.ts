@@ -542,14 +542,24 @@ export async function verifyBotMessageStream(
 
   return collectAndTimeEventsWithStats({
     receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+    startCollectors: async (r) => {
+      // Collect messages until we get 1 bot response (excluding our trigger message)
+      const allMessages = await r.worker.collectMessages(group.id, 1);
+      // Filter out messages that match the trigger message content (shouldn't be any since we're the sender)
+      return allMessages.filter((msg) => {
+        const content = extractContent(msg);
+        const senderInboxId = (msg as any).message?.senderInboxId;
+        // Exclude messages from ourselves (the trigger sender)
+        return senderInboxId !== r.client.inboxId && content !== triggerMessage;
+      });
+    },
     triggerEvents: async () => {
       const sentAt = Date.now();
       await group.send(triggerMessage);
-      // For bot responses, we use a fixed key since any response counts
+      // We expect to receive a bot response, not the trigger message
       return [{ key: "bot-response", sentAt }];
     },
-    getKey: () => "bot-response", // Fixed key for both sent and received
+    getKey: () => "bot-response", // All collected messages should be bot responses
     getMessage: extractContent,
     statsLabel: "bot-response:",
     count: 1,
