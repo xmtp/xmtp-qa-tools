@@ -382,6 +382,7 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
 export async function sendSlackNotification(options: {
   testName: string;
   errorLogs: Set<string>;
+  workflowRunUrl?: string;
   channel?: string;
 }): Promise<void> {
   const targetChannel = options.channel || process.env.SLACK_CHANNEL;
@@ -397,6 +398,7 @@ export async function sendSlackNotification(options: {
 
   const sections = [
     `*${testName}*: ⚠️ - ${tagMessage}`,
+    `*Workflow Run URL*: <${options.testName} | ${options.workflowRunUrl}>`,
     `Logs:\n\`\`\`${logs}\`\`\``,
   ];
 
