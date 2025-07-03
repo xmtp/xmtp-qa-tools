@@ -1,5 +1,3 @@
-import { streamTimeout } from "@helpers/client";
-import { sendMetric } from "@helpers/datadog";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";

@@ -40,7 +40,7 @@ describe(testName, async () => {
         3, // maxRetries
       );
 
-      sendMetric("response", result.averageEventTiming || streamTimeout, {
+      sendMetric("response", result?.averageEventTiming || streamTimeout, {
         test: testName,
         metric_type: "agent",
         metric_subtype: "dm",
@@ -49,7 +49,7 @@ describe(testName, async () => {
         sdk: workers.getCreator().sdk,
       });
 
-      expect(result.allReceived).toBe(true);
+      expect(result?.allReceived).toBe(true);
     });
   }
 });
