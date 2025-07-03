@@ -462,6 +462,13 @@ export function getEnvPath(): string {
   }
   return envPath;
 }
+export function getLatestSdkVersion(): string {
+  const sdkVersion = sdkVersionOptions[0];
+  const libXmtpVersion =
+    VersionList[sdkVersion as unknown as keyof typeof VersionList]
+      .libXmtpVersion;
+  return sdkVersion + "@" + libXmtpVersion;
+}
 /**
  * Loads environment variables from the specified test's .env file if it exists
  */

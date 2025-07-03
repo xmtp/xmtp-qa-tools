@@ -5,7 +5,7 @@ import { askClaude, processDatadogLogs, readIssuesData } from "./helper";
 const testName = "datadog-latest";
 
 describe(testName, () => {
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   it("should fetch latest Datadog logs from the last hour", async () => {
     // Get data from the last hour only

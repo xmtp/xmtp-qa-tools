@@ -7,6 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 const testName = "m_delivery";
 describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const amountofMessages = parseInt(process.env.DELIVERY_AMOUNT ?? "10");
   const receiverAmount = parseInt(process.env.DELIVERY_RECEIVERS ?? "4");
 
@@ -21,10 +22,6 @@ describe(testName, async () => {
   beforeAll(async () => {
     console.debug("creating group");
     group = await workers.createGroupBetweenAll();
-  });
-
-  setupTestLifecycle({
-    workers,
   });
 
   it("verifyMessageStream: should verify message delivery and order accuracy using message streams", async () => {

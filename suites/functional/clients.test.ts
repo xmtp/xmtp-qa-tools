@@ -3,7 +3,9 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { Client, IdentifierKind, type Identifier } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("clients", async () => {
+const testName = "clients";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   let workers: WorkerManager;
 
   workers = await getWorkers([
@@ -18,8 +20,6 @@ describe("clients", async () => {
     "nancy",
     "oscar",
   ]);
-
-  setupTestLifecycle({});
 
   it("should measure XMTP client creation performance and initialization", async () => {
     const client = await getWorkers(["randomclient"]);

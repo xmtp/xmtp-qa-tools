@@ -5,7 +5,8 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-describe("group-partition-delayedreceive", async () => {
+const testName = "group-partition-delayedreceive";
+describe(testName, async () => {
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",
@@ -14,7 +15,7 @@ describe("group-partition-delayedreceive", async () => {
   });
   // Start message and response streams for the chaos testing
 
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

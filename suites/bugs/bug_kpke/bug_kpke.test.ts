@@ -4,15 +4,15 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { beforeAll, describe, it } from "vitest";
 
-describe("bug_kpke", () => {
+const testName = "bug_kpke";
+describe(testName, () => {
+  setupTestLifecycle({ testName });
   let workers: WorkerManager;
   let conversation: Dm;
 
   beforeAll(async () => {
     workers = await getWorkers(1);
   });
-
-  setupTestLifecycle({});
 
   it("should send message to specific address", async () => {
     console.log("syncing all");

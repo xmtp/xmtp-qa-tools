@@ -11,7 +11,7 @@ import { describe, it } from "vitest";
 describe("my-test", async () => {
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   it("should do something", async () => {
     // Test logic here
@@ -149,7 +149,7 @@ Use predefined names from the 61 available:
 
 - Use `getWorkersWithVersions()` for version testing
 - Use `typeofStream.Message` for message streaming
-- Always call `setupTestLifecycle({})` for proper cleanup
+- Always call `setupTestLifecycle({testName})` for proper cleanup
 - Test file naming: `*.test.ts` in `suites/` directory
 
 ## Key Imports

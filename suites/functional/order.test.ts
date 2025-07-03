@@ -5,7 +5,9 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("order", async () => {
+const testName = "order";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const amount = 5; // Number of messages to collect per receiver
   let workers: WorkerManager;
 
@@ -13,8 +15,6 @@ describe("order", async () => {
 
   let group: Group;
   const randomSuffix = Math.random().toString(36).substring(2, 15);
-
-  setupTestLifecycle({});
 
   it("should verify message ordering accuracy when receiving messages via pull synchronization", async () => {
     group = await workers.createGroupBetweenAll();

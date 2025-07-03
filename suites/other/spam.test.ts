@@ -10,8 +10,11 @@ const spamInboxIds = [
   "c10e8c13c833f1826e98fb0185403c2c4d5737cc432d575468613abf9adae26b",
 ];
 
+const testName = "spam";
 describe("spam", () => {
-  setupTestLifecycle({});
+  setupTestLifecycle({
+    testName,
+  });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     const workers = await getWorkers(1);
