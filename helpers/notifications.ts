@@ -109,8 +109,8 @@ function generateMessage(options: SlackNotificationOptions): string {
   const region = process.env.GEOLOCATION || "Unknown Region";
 
   const sections = [
-    `*Test Failure ❌*${tagMessage}`,
-    `*Test:* <${URLS.GITHUB_ACTIONS}/${repository}/actions/workflows/${workflowName}.yml|${testName}>`,
+    `*${testName}*: ⚠️ - ${tagMessage}`,
+    `*Workflow URL:* <${URLS.GITHUB_ACTIONS}/${repository}/actions/workflows/${workflowName}.yml|${testName}>`,
     `*Environment:* \`${environment}\``,
     `*General dashboard:* <${URLS.DATADOG_DASHBOARD}|View>`,
     `*Geolocation:* \`${region}\``,
