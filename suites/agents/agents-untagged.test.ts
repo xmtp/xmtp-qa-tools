@@ -10,7 +10,7 @@ import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents-groups";
+const testName = "agents-untagged";
 
 describe(testName, async () => {
   setupTestLifecycle({ testName });

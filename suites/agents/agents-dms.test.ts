@@ -12,7 +12,7 @@ import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
-const testName = "agents";
+const testName = "agents-dms";
 describe(testName, async () => {
   setupTestLifecycle({ testName });
   const env = process.env.XMTP_ENV as XmtpEnv;
