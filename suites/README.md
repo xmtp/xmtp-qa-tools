@@ -389,9 +389,8 @@ import { getWorkers } from "@workers/manager";
 const testName = "my-test";
 
 describe(testName, async () => {
-  const workers = await getWorkers(["alice", "bob"]);
-
   setupTestLifecycle({ testName });
+  const workers = await getWorkers(["alice", "bob"]);
 
   it("should test functionality", async () => {
     const alice = workers.get("alice");

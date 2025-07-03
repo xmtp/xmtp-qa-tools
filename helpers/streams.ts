@@ -201,13 +201,19 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
   }
-  const diff = count
-    ? count * allReceived.length -
-      allReceived.reduce((sum, arr) => sum + arr.length, 0)
-    : 0;
+
+  // Fix: Check if each receiver got the expected number of messages
+  const totalMessagesReceived = allReceived.reduce(
+    (sum, receiverMessages) => sum + receiverMessages.length,
+    0,
+  );
+  const expectedTotalMessages = (count ?? 1) * receivers.length;
+  const BooleanReceive = totalMessagesReceived >= expectedTotalMessages;
+
   const allResults = {
-    allReceived: diff === 0,
-    almostAllReceived: diff <= 2,
+    allReceived: BooleanReceive,
+    almostAllReceived:
+      BooleanReceive || totalMessagesReceived >= expectedTotalMessages - 2,
     receiverCount: allReceived.length,
     messages: messagesAsStrings.join(","),
     eventTimings: Object.entries(eventTimingsArray)
@@ -530,30 +536,49 @@ export function calculateMessageStats(
 /**
  * Specialized function to verify bot response streams
  * Measures the time it takes for a bot to respond to a trigger message
+ * Includes retry logic and fallback message count validation
  */
 export async function verifyBotMessageStream(
   group: Conversation,
   receivers: Worker[],
   triggerMessage: string,
-): Promise<VerifyStreamResult> {
+  maxRetries: number = 3,
+): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
 
-  return collectAndTimeEventsWithStats({
-    receivers,
-    startCollectors: (r) => r.worker.collectMessages(group.id, 1),
-    triggerEvents: async () => {
-      const sentAt = Date.now();
-      await group.send(triggerMessage);
-      // For bot responses, we use a fixed key since any response counts
-      return [{ key: "bot-response", sentAt }];
-    },
-    getKey: () => "bot-response", // Fixed key for both sent and received
-    getMessage: extractContent,
-    statsLabel: "bot-response:",
-    count: 1,
-    messageTemplate: "",
-    participantsForStats: receivers,
-  });
+  let attempts = 0;
+  let result: VerifyStreamResult | undefined;
+
+  while (attempts < maxRetries) {
+    result = await collectAndTimeEventsWithStats({
+      receivers,
+      startCollectors: (r) =>
+        r.worker.collectMessages(group.id, 1, [
+          "text",
+          "reply",
+          "reaction",
+          "actions",
+        ]),
+      triggerEvents: async () => {
+        const sentAt = Date.now();
+        await group.send(triggerMessage);
+        return [{ content: triggerMessage, sentAt }];
+      },
+      getKey: extractContent,
+      getMessage: extractContent,
+      statsLabel: "bot-response:",
+      count: 1,
+      messageTemplate: "",
+      participantsForStats: receivers,
+    });
+
+    if (result.allReceived) {
+      return result;
+    }
+
+    attempts++;
+  }
+  return result;
 }

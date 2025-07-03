@@ -7,14 +7,13 @@ import * as iptables from "../../network-stability-utilities/iptables";
 
 const testName = "group-client-partition";
 describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",
     user3: "http://localhost:6556",
     user4: "http://localhost:6556",
   });
-
-  setupTestLifecycle({ testName });
 
   const partitionPort = 6556;
 

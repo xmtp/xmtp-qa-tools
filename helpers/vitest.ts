@@ -43,7 +43,6 @@ export const setupTestLifecycle = ({
     const { testNameExtracted, operationType, operationName, members } =
       parseTestName(testName);
 
-    console.warn("sdk", sdk || getLatestSdkVersion());
     const values: DurationMetricTags = {
       metric_type: "operation",
       metric_subtype: operationType,
