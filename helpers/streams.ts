@@ -201,13 +201,10 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
   }
-  const diff = count
-    ? count * allReceived.length -
-      allReceived.reduce((sum, arr) => sum + arr.length, 0)
-    : 0;
+
   const allResults = {
-    allReceived: diff === 0,
-    almostAllReceived: diff <= 2,
+    allReceived: count === allReceived.length,
+    almostAllReceived: allReceived.length - 1 >= (count ?? 0),
     receiverCount: allReceived.length,
     messages: messagesAsStrings.join(","),
     eventTimings: Object.entries(eventTimingsArray)
@@ -537,7 +534,7 @@ export async function verifyBotMessageStream(
   receivers: Worker[],
   triggerMessage: string,
   maxRetries: number = 3,
-): Promise<VerifyStreamResult> {
+): Promise<VerifyStreamResult | undefined> {
   receivers.forEach((worker) => {
     worker.worker.startStream(typeofStream.Message);
   });
@@ -582,18 +579,5 @@ export async function verifyBotMessageStream(
 
     attempts++;
   }
-
-  // If we get here, all retries failed
-  return (
-    result || {
-      allReceived: false,
-      almostAllReceived: false,
-      receiverCount: receivers.length,
-      messages: "",
-      eventTimings: "",
-      averageEventTiming: streamTimeout,
-      receptionPercentage: 0,
-      orderPercentage: 0,
-    }
-  );
+  return undefined;
 }

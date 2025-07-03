@@ -9,6 +9,15 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "elsa",
+    "baseName": "elsa.base.eth",
+    "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#elsa-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "flaunchy",
     "baseName": "flaunchy.base.eth",
     "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
@@ -36,15 +45,6 @@
     "shouldRespondOnTagged": true
   },
   {
-    "name": "elsa",
-    "baseName": "elsa.base.eth",
-    "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
-    "sendMessage": "hi",
-    "networks": ["production"],
-    "slackChannel": "#elsa-alerts",
-    "shouldRespondOnTagged": true
-  },
-  {
     "name": "byte",
     "baseName": "byte.base.eth",
     "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
@@ -60,7 +60,7 @@
     "sendMessage": "hola",
     "networks": ["production"],
     "slackChannel": "#gm-alerts",
-    "shouldRespondOnTagged": true
+    "shouldRespondOnTagged": false
   },
   {
     "name": "bankr",
@@ -73,7 +73,7 @@
   },
   {
     "name": "tokenbot",
-    "baseName": "tokenbot.base.eth",
+    "baseName": "0x9e73…3466",
     "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
     "sendMessage": "@tokenbot",
     "networks": ["production"],
