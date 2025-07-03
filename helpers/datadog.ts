@@ -354,7 +354,6 @@ export async function getNetworkStats(
     const result = await execAsync(curlCommand);
     stdout = result.stdout;
   } catch (error: unknown) {
-    // Even if curl returns an error, we might still have useful stdout
     if (error instanceof Error && "stdout" in error) {
       stdout = error.stdout as string;
       console.warn(
@@ -365,32 +364,19 @@ export async function getNetworkStats(
       throw error; // rethrow if no stdout is available
     }
   }
-
-  // Parse the JSON response
   const stats = JSON.parse(stdout.trim()) as NetworkStats;
-
-  // Handle the case where Server Call time is 0
   if (stats["Server Call"] === 0) {
     console.warn(
       `Network request to ${endpoint} returned Server Call time of 0.`,
     );
-
-    // Use a reasonable estimate
     stats["Server Call"] = stats["TLS Handshake"] + 0.1;
   }
-
-  // Calculate processing time
   stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
-
-  // Ensure processing time is not negative
-  if (stats["Processing"] < 0) {
-    stats["Processing"] = 0;
-  }
+  if (stats["Processing"] < 0) stats["Processing"] = 0;
 
   return stats;
 }
 
-// Reporting and summary
 /**
  * Flush all metrics and generate summary report
  */
@@ -400,7 +386,6 @@ export function flushMetrics(): Promise<void> {
       resolve();
       return;
     }
-
     void metrics.flush().then(() => {
       resolve();
     });
@@ -418,12 +403,22 @@ export async function sendDatadogLog(
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
+  const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
+  const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
+  const environment = process.env.ENVIRONMENT || process.env.XMTP_ENV;
+  const region = process.env.GEOLOCATION || "Unknown Region";
+  const channel = options?.channel || context.channel || "general";
+
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
-    channel: options?.channel || context.channel || "general",
+    channel,
+    repository,
+    workflowName,
+    environment,
+    region,
     ...context,
   };
 
