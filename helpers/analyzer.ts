@@ -43,10 +43,17 @@ export const PATTERNS = {
       ],
     },
     {
-      testName: "Functional",
+      testName: "Agents-tagged",
       uniqueErrorLines: [
-        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
-        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
+        "FAIL  suites/agents/agents-tagged.test.ts [ suites/agents/agents-tagged.test.ts ]",
+        "FAIL  suites/agents/agents-tagged.test.ts > agents-tagged",
+      ],
+    },
+    {
+      testName: "Agents-untagged",
+      uniqueErrorLines: [
+        "FAIL  suites/agents/agents-untagged.test.ts [ suites/agents/agents-untagged.test.ts ]",
+        "FAIL  suites/agents/agents-untagged.test.ts > agents-untagged",
       ],
     },
     {
