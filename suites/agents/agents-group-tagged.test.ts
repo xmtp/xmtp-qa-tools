@@ -13,10 +13,9 @@ import { type AgentConfig } from "./helper";
 const testName = "agents-groups";
 
 describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["randomguy"]);
-
-  setupTestLifecycle({ testName });
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env) && agent.shouldRespondOnTagged;

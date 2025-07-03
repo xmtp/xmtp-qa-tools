@@ -8,6 +8,7 @@ import { DockerContainer } from "../../network-stability-utilities/container";
 
 const testName = "group-node-blackhole";
 describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",
@@ -16,8 +17,6 @@ describe(testName, async () => {
   });
   // Start message and response streams for the chaos testing
   workers.startStream(typeofStream.MessageandResponse);
-
-  setupTestLifecycle({ testName });
 
   const node1 = new DockerContainer("multinode-node1-1");
   const node2 = new DockerContainer("multinode-node2-1");

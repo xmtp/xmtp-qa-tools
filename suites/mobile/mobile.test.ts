@@ -24,11 +24,10 @@ const receiverInboxId = receiverObj.inboxId;
 
 const testName = "bot-stress";
 describe(testName, () => {
+  setupTestLifecycle({ testName });
   let workers: WorkerManager;
   let bot: Worker;
   let globalGroupCounter = 0;
-
-  setupTestLifecycle({ testName });
 
   beforeAll(async () => {
     workers = await getWorkers(["bot"], {

@@ -201,10 +201,19 @@ async function collectAndTimeEventsWithStats<TSent, TReceived>(options: {
       .map(([, v]) => v);
     eventTimingsArray[name] = arr;
   }
-  const BooleanReceive = count === allReceived.length;
+
+  // Fix: Check if each receiver got the expected number of messages
+  const totalMessagesReceived = allReceived.reduce(
+    (sum, receiverMessages) => sum + receiverMessages.length,
+    0,
+  );
+  const expectedTotalMessages = (count ?? 1) * receivers.length;
+  const BooleanReceive = totalMessagesReceived >= expectedTotalMessages;
+
   const allResults = {
     allReceived: BooleanReceive,
-    almostAllReceived: BooleanReceive || allReceived.length - 1 >= (count ?? 0),
+    almostAllReceived:
+      BooleanReceive || totalMessagesReceived >= expectedTotalMessages - 2,
     receiverCount: allReceived.length,
     messages: messagesAsStrings.join(","),
     eventTimings: Object.entries(eventTimingsArray)
@@ -543,18 +552,15 @@ export async function verifyBotMessageStream(
   let result: VerifyStreamResult | undefined;
 
   while (attempts < maxRetries) {
-    const messagesBefore = await group.messages();
-    const countBefore = messagesBefore.length;
-
     result = await collectAndTimeEventsWithStats({
       receivers,
       startCollectors: (r) => r.worker.collectMessages(group.id, 1),
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage);
-        return [{ key: "bot-response", sentAt }];
+        return [{ content: triggerMessage, sentAt }];
       },
-      getKey: () => "bot-response",
+      getKey: extractContent,
       getMessage: extractContent,
       statsLabel: "bot-response:",
       count: 1,
@@ -566,18 +572,7 @@ export async function verifyBotMessageStream(
       return result;
     }
 
-    // Fallback: check message count increase (original message + bot response)
-    await group.sync();
-    const messagesAfter = await group.messages();
-    if (messagesAfter.length === countBefore + 2) {
-      return {
-        ...result,
-        allReceived: true,
-        almostAllReceived: true,
-      };
-    }
-
     attempts++;
   }
-  return undefined;
+  return result;
 }
