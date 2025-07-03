@@ -19,7 +19,7 @@ describe(testName, async () => {
   setupTestLifecycle({ testName });
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
-    return agent.networks.includes(env);
+    return agent.networks.includes(env) && agent.shouldRespondOnTagged;
   });
 
   for (const agent of filteredAgents) {
@@ -40,7 +40,7 @@ describe(testName, async () => {
         "hi",
         1,
       );
-      expect(result?.allReceived).toBe(agent.shouldRespondOnTagged);
+      expect(result?.allReceived).toBe(false);
     });
   }
 });
