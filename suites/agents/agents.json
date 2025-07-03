@@ -9,6 +9,15 @@
     "shouldRespondOnTagged": true
   },
   {
+    "name": "tbachat",
+    "baseName": "tbachat.base.eth",
+    "address": "0x75681fDc873f82030630e1005f611Fa932eE1A14",
+    "sendMessage": "/help",
+    "networks": ["production"],
+    "slackChannel": "#tbachat-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
     "name": "elsa",
     "baseName": "elsa.base.eth",
     "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
@@ -78,15 +87,6 @@
     "sendMessage": "@tokenbot",
     "networks": ["production"],
     "slackChannel": "#tokenbot-alerts",
-    "shouldRespondOnTagged": true
-  },
-  {
-    "name": "tbachat",
-    "baseName": "tbachat.base.eth",
-    "address": "0x75681fDc873f82030630e1005f611Fa932eE1A14",
-    "sendMessage": "/help",
-    "networks": ["production"],
-    "slackChannel": "#tbachat-alerts",
     "shouldRespondOnTagged": true
   }
 ]
