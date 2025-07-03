@@ -40,17 +40,6 @@ interface DatadogLogsResponse {
   };
 }
 
-export interface TestFailure {
-  testName: string | null;
-  environment: string | null;
-  geolocation: string | null;
-  timestamp: string | null;
-  workflowUrl: string | null;
-  dashboardUrl: string | null;
-  customLinks: string | null;
-  errorLogs: string[];
-}
-
 export interface DatadogLogOptions {
   timeRange?: {
     from?: string;

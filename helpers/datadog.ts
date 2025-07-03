@@ -2,7 +2,9 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
+import { shouldFilterOutTest } from "./analyzer";
 
+// Consolidated interfaces
 interface MetricData {
   values: number[];
   members?: string;
@@ -17,56 +19,38 @@ interface ParsedTestName {
   members: string;
 }
 
-// Metric type interfaces
-interface BaseMetricTags {
+// Simplified metric tags interface - consolidates all previous metric tag types
+export interface MetricTags {
   metric_type: "agent" | "operation" | "network" | "delivery" | "response";
   metric_subtype?: string;
   env?: string;
   region?: string;
-  sdk: string;
+  sdk?: string;
   operation?: string;
-  test: string;
+  test?: string;
   country_iso_code?: string;
+  installations?: string;
+  members?: string;
+  message_id?: string;
+  conversation_type?: "dm" | "group";
+  delivery_status?: "sent" | "received" | "failed";
+  network_phase?:
+    | "dns_lookup"
+    | "tcp_connection"
+    | "tls_handshake"
+    | "server_call"
+    | "processing";
+  agent?: string;
+  address?: string;
 }
 
-export interface DurationMetricTags extends BaseMetricTags {
+// Legacy interface exports for backward compatibility
+export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
   installations: string;
   members: string;
-}
-
-interface NetworkMetricTags extends BaseMetricTags {
-  metric_type: "network";
-  metric_subtype:
-    | "dns_lookup"
-    | "tcp_connection"
-    | "tls_handshake"
-    | "server_call"
-    | "processing";
-  operation: string;
-  network_phase:
-    | "dns_lookup"
-    | "tcp_connection"
-    | "tls_handshake"
-    | "server_call"
-    | "processing";
-}
-
-interface DeliveryMetricTags extends BaseMetricTags {
-  metric_type: "delivery";
-  message_id?: string;
-  conversation_type: "dm" | "group";
-  delivery_status: "sent" | "received" | "failed";
-  members?: string;
-}
-
-interface ResponseMetricTags extends BaseMetricTags {
-  metric_type: "agent";
-  metric_subtype: string;
-  agent?: string;
-  address?: string;
 }
 
 interface NetworkStats {
@@ -83,75 +67,51 @@ export const GEO_TO_COUNTRY_CODE = {
   europe: "FR",
   asia: "JP",
   "south-america": "BR",
-};
-// Global state with proper initialization
+} as const;
+
+// Global state
 const state = {
   isInitialized: false,
   collectedMetrics: {} as Record<string, MetricData>,
 };
 
-/**
- * Calculate average of numeric values
- */
-export function calculateAverage(values: number[]): number {
-  if (values.length === 0) return 0;
-  return values.reduce((sum, val) => sum + val, 0) / values.length;
+const execAsync = promisify(exec);
+
+// Utility functions
+export const calculateAverage = (values: number[]): number =>
+  values.length === 0
+    ? 0
+    : values.reduce((sum, val) => sum + val, 0) / values.length;
+
+// Tag enrichment helper
+function enrichTags(tags: MetricTags): MetricTags {
+  return {
+    ...tags,
+    env: tags.env || process.env.XMTP_ENV,
+    region: tags.region || process.env.GEOLOCATION,
+    country_iso_code:
+      tags.country_iso_code ||
+      GEO_TO_COUNTRY_CODE[
+        process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
+      ],
+  };
 }
 
-/**
- * Group metrics by operation name and member count
- */
-export function groupMetricsByOperation(
-  metrics: [string, MetricData][],
-): Map<
-  string,
-  { operationName: string; members: string; operationData: MetricData }
-> {
-  const groups = new Map();
-
-  for (const [operation, data] of metrics) {
-    // Use the operation parsing logic from parseTestName for consistency
-    const parts = operation.split(":");
-    const operationPart = parts[0];
-    const dashMatch = operationPart.match(/^([a-zA-Z]+)-(\d+)$/);
-
-    const operationName = dashMatch ? dashMatch[1] : operationPart;
-    const memberCount = dashMatch ? dashMatch[2] : data.members || "-";
-    const groupKey = `${operationName}-${memberCount}`;
-
-    if (!groups.has(groupKey)) {
-      groups.set(groupKey, {
-        operationName,
-        members: memberCount,
-        operationData: null,
-      });
-    }
-
-    groups.get(groupKey).operationData = data;
-  }
-
-  return groups as Map<
-    string,
-    { operationName: string; members: string; operationData: MetricData }
-  >;
+// Operation key generator
+function getOperationKey(tags: MetricTags, metricName: string): string {
+  const memberCount = tags.members || "";
+  return tags.operation
+    ? `${tags.operation}${memberCount ? `-${memberCount}` : ""}`
+    : metricName;
 }
 
-// DataDog integration
-/**
- * Initialize DataDog metrics reporting
- */
+// DataDog initialization
 export function initDataDog(): boolean {
   if (!process.env.DATADOG_API_KEY) return false;
-  if (state.isInitialized) {
-    return true;
-  }
+  if (state.isInitialized) return true;
 
   try {
-    const initConfig = {
-      apiKey: process.env.DATADOG_API_KEY,
-    };
-
-    metrics.init(initConfig);
+    metrics.init({ apiKey: process.env.DATADOG_API_KEY });
     state.isInitialized = true;
     return true;
   } catch (error) {
@@ -160,16 +120,7 @@ export function initDataDog(): boolean {
   }
 }
 
-// Union type for all metric tag types
-type MetricTags =
-  | DurationMetricTags
-  | DeliveryMetricTags
-  | ResponseMetricTags
-  | NetworkMetricTags;
-
-/**
- * Send a metric to DataDog and collect for summary
- */
+// Core metric sending function
 export function sendMetric(
   metricName: string,
   metricValue: number,
@@ -178,61 +129,40 @@ export function sendMetric(
   if (!state.isInitialized) return;
 
   try {
-    // Auto-populate environment fields if not provided
-    const enrichedTags: MetricTags = {
-      ...tags,
-      env: tags.env || (process.env.XMTP_ENV as string),
-      region: tags.region || (process.env.GEOLOCATION as string),
-      country_iso_code:
-        tags.country_iso_code ||
-        GEO_TO_COUNTRY_CODE[
-          process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
-        ],
-    };
-
+    const enrichedTags = enrichTags(tags);
     const fullMetricName = `xmtp.sdk.${metricName}`;
-    const allTags = Object.entries(enrichedTags).map(
-      ([key, value]) => `${key}:${String(value)}`,
-    );
+    const operationKey = getOperationKey(enrichedTags, metricName);
 
-    // Create a distinctive operation key that properly includes member count
-    // Format: operation_name-member_count (e.g., "createGroup-10")
-    const memberCount =
-      "members" in enrichedTags ? enrichedTags.members || "" : "";
-    const operationKey =
-      "operation" in enrichedTags && enrichedTags.operation
-        ? `${enrichedTags.operation}${memberCount ? `-${memberCount}` : ""}`
-        : metricName;
-
+    // Collect metrics for summary
     if (!state.collectedMetrics[operationKey]) {
       state.collectedMetrics[operationKey] = {
         values: [],
-        members: memberCount,
+        members: enrichedTags.members,
       };
     }
-
     state.collectedMetrics[operationKey].values.push(metricValue);
 
+    // Format tags for DataDog
+    const formattedTags = Object.entries(enrichedTags)
+      .map(([key, value]) => `${key}:${String(value || "").trim()}`)
+      .filter((tag) => !tag.endsWith(":"));
+
+    // Debug logging (exclude network metrics to reduce noise)
     if (enrichedTags.metric_type !== "network") {
       console.debug(
         JSON.stringify(
           {
             metricName: fullMetricName,
             metricValue: Math.round(metricValue),
-            tags: allTags,
+            tags: formattedTags,
           },
           null,
           2,
         ),
       );
     }
-    // Trim whitespace from all tag values
-    const trimmedTags = allTags.map((tag) => {
-      const [key, value] = tag.split(":");
-      return `${key}:${value?.trim() || ""}`;
-    });
 
-    metrics.gauge(fullMetricName, Math.round(metricValue), trimmedTags);
+    metrics.gauge(fullMetricName, Math.round(metricValue), formattedTags);
   } catch (error) {
     console.error(
       `❌ Error sending metric '${metricName}':`,
@@ -241,160 +171,140 @@ export function sendMetric(
   }
 }
 
-/**
- * Send a typed duration metric for performance measurements
- */
+// Backward compatibility functions - simplified wrappers
 export function sendDurationMetric(
   metricValue: number,
   tags: DurationMetricTags,
 ): void {
-  const enhancedTags: DurationMetricTags = {
-    ...tags,
-    env: tags.env || (process.env.XMTP_ENV as string),
-    region: tags.region || (process.env.GEOLOCATION as string),
-  };
-
-  sendMetric("duration", metricValue, enhancedTags);
+  sendMetric("duration", metricValue, tags);
 }
 
-/**
- * Send a typed delivery metric for message delivery tracking
- */
 export function sendDeliveryMetric(
   metricValue: number,
-  tags: DeliveryMetricTags,
+  tags: MetricTags,
 ): void {
-  const enhancedTags: DeliveryMetricTags = {
-    ...tags,
-    metric_type: "delivery",
-    env: tags.env || (process.env.XMTP_ENV as string),
-    region: tags.region || (process.env.GEOLOCATION as string),
-  };
-
-  sendMetric("delivery", metricValue, enhancedTags);
+  sendMetric("delivery", metricValue, { ...tags, metric_type: "delivery" });
 }
 
-/**
- * Send a typed response metric for API/network response measurements
- */
 export function sendResponseMetric(
   metricValue: number,
-  tags: ResponseMetricTags,
+  tags: MetricTags,
 ): void {
-  const enhancedTags: ResponseMetricTags = {
-    ...tags,
-    metric_type: "agent",
-    env: tags.env || (process.env.XMTP_ENV as string),
-    region: tags.region || (process.env.GEOLOCATION as string),
-  };
-
-  sendMetric("response", metricValue, enhancedTags);
+  sendMetric("response", metricValue, { ...tags, metric_type: "agent" });
 }
 
-/**
- * Extract operation details from test name
- */
-export function parseTestName(testName: string): ParsedTestName {
-  const metricNameParts = testName.split(":")[0];
-  const metricName = metricNameParts.replaceAll(" > ", ".");
-  const metricDescription = testName.split(":")[1] || "";
-  const operationParts = metricName.split(".");
-  let testNameExtracted = operationParts[0];
+// Grouping function - optimized
+export function groupMetricsByOperation(
+  metrics: [string, MetricData][],
+): Map<
+  string,
+  { operationName: string; members: string; operationData: MetricData }
+> {
+  const groups = new Map<
+    string,
+    { operationName: string; members: string; operationData: MetricData }
+  >();
 
+  for (const [operation, data] of metrics) {
+    const operationPart = operation.split(":")[0];
+    const match = operationPart.match(/^([a-zA-Z]+)-?(\d+)?$/);
+
+    const operationName = match?.[1] || operationPart;
+    const memberCount = match?.[2] || data.members || "-";
+    const groupKey = `${operationName}-${memberCount}`;
+
+    groups.set(groupKey, {
+      operationName,
+      members: memberCount,
+      operationData: data,
+    });
+  }
+
+  return groups;
+}
+
+// Test name parsing - simplified
+export function parseTestName(testName: string): ParsedTestName {
+  const [metricNameParts, metricDescription = ""] = testName.split(":");
+  const metricName = metricNameParts.replaceAll(" > ", ".");
+  const operationParts = metricName.split(".");
+
+  let testNameExtracted = operationParts[0];
   if (testNameExtracted.includes("m_large")) {
     testNameExtracted = "m_large";
   }
 
-  // Extract operation name and member count
   let operationName = "";
   let members = "";
 
   if (operationParts[1]) {
-    // Check formats: "operation-10" and "operation10"
-    const dashMatch = operationParts[1].match(/^([a-zA-Z]+)-(\d+)$/);
-    const noSeparatorMatch = operationParts[1].match(/^([a-zA-Z]+)(\d+)$/);
-
-    if (dashMatch) {
-      operationName = dashMatch[1];
-      members = dashMatch[2];
-    } else if (noSeparatorMatch) {
-      operationName = noSeparatorMatch[1];
-      members = noSeparatorMatch[2];
+    const match = operationParts[1].match(/^([a-zA-Z]+)-?(\d+)?$/);
+    if (match) {
+      [, operationName, members = ""] = match;
     } else {
       operationName = operationParts[1];
     }
   }
 
-  const operationType = parseInt(members) > 5 ? "group" : "core";
-
   return {
     metricName,
     metricDescription,
     testNameExtracted,
-    operationType,
+    operationType: parseInt(members) > 5 ? "group" : "core",
     operationName,
     members,
   };
 }
 
-// Network performance
-const execAsync = promisify(exec);
-
-/**
- * Measure network performance to an endpoint
- */
+// Network statistics - streamlined
 export async function getNetworkStats(
   endpoint = "https://grpc.dev.xmtp.network:443",
 ): Promise<NetworkStats> {
   const curlCommand = `curl -s -w "\\n{\\"DNS Lookup\\": %{time_namelookup}, \\"TCP Connection\\": %{time_connect}, \\"TLS Handshake\\": %{time_appconnect}, \\"Server Call\\": %{time_starttransfer}}" -o /dev/null --max-time 10 ${endpoint}`;
 
-  let stdout: string;
-
   try {
-    const result = await execAsync(curlCommand);
-    stdout = result.stdout;
-  } catch (error: unknown) {
-    if (error instanceof Error && "stdout" in error) {
-      stdout = error.stdout as string;
+    const { stdout } = await execAsync(curlCommand);
+    const stats = JSON.parse(stdout.trim()) as NetworkStats;
+
+    // Fix zero server call time
+    if (stats["Server Call"] === 0) {
       console.warn(
-        `⚠️ Curl command returned error code ${String(error)}, but stdout is available.`,
+        `Network request to ${endpoint} returned Server Call time of 0.`,
       );
-    } else {
-      console.error(`❌ Curl command failed without stdout:`, error);
-      throw error; // rethrow if no stdout is available
+      stats["Server Call"] = stats["TLS Handshake"] + 0.1;
     }
-  }
-  const stats = JSON.parse(stdout.trim()) as NetworkStats;
-  if (stats["Server Call"] === 0) {
-    console.warn(
-      `Network request to ${endpoint} returned Server Call time of 0.`,
+
+    stats["Processing"] = Math.max(
+      0,
+      stats["Server Call"] - stats["TLS Handshake"],
     );
-    stats["Server Call"] = stats["TLS Handshake"] + 0.1;
-  }
-  stats["Processing"] = stats["Server Call"] - stats["TLS Handshake"];
-  if (stats["Processing"] < 0) stats["Processing"] = 0;
-
-  return stats;
-}
-
-/**
- * Flush all metrics and generate summary report
- */
-export function flushMetrics(): Promise<void> {
-  return new Promise<void>((resolve) => {
-    if (!state.isInitialized) {
-      resolve();
-      return;
+    return stats;
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "stdout" in error &&
+      typeof error.stdout === "string"
+    ) {
+      console.warn(`⚠️ Curl command returned error but stdout available.`);
+      const stats = JSON.parse(error.stdout.trim()) as NetworkStats;
+      stats["Processing"] = Math.max(
+        0,
+        stats["Server Call"] - stats["TLS Handshake"],
+      );
+      return stats;
     }
-    void metrics.flush().then(() => {
-      resolve();
-    });
-  });
+    console.error(`❌ Curl command failed:`, error);
+    throw error;
+  }
 }
 
-/**
- * Send a log line to Datadog Logs Intake API
- */
+// Utility functions
+export function flushMetrics(): Promise<void> {
+  return state.isInitialized ? metrics.flush() : Promise.resolve();
+}
+
+// Datadog log sending - optimized
 export async function sendDatadogLog(
   lines: string[],
   context: Record<string, unknown> = {},
@@ -402,22 +312,26 @@ export async function sendDatadogLog(
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
-  const repository = process.env.GITHUB_REPOSITORY || "Unknown Repository";
-  const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
-  const environment = process.env.ENVIRONMENT || process.env.XMTP_ENV;
-  const region = process.env.GEOLOCATION || "Unknown Region";
-  const channel = context.channel || "general";
+  if (shouldFilterOutTest(new Set(lines))) {
+    return;
+  }
+
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
-    channel,
-    repository,
-    workflowName,
-    environment,
-    region,
+    channel: context.channel || "general",
+    repository: process.env.GITHUB_REPOSITORY as string,
+    workflowName: process.env.GITHUB_WORKFLOW as string,
+    workflowRunUrl: workflowRunUrl,
+    environment: process.env.XMTP_ENV,
+    region: process.env.GEOLOCATION as string,
     ...context,
   };
 

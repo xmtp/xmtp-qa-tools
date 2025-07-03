@@ -4,16 +4,15 @@ This directory contains utility modules that power the XMTP testing framework. T
 
 ## Quick reference
 
-| Module               | Purpose                          | Key Features                                         |
-| -------------------- | -------------------------------- | ---------------------------------------------------- |
-| **client.ts**        | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
-| **analyzer.ts**      | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
-| **notifications.ts** | Test failure notifications       | Slack alerts, error reporting, filtering             |
-| **logger.ts**        | Logging utilities                | File logging, ANSI stripping, pretty console output  |
-| **vitest.ts**        | Test lifecycle management        | Test setup, performance metrics, cleanup             |
-| **playwright.ts**    | Browser automation               | UI testing, group creation, message verification     |
-| **datadog.ts**       | Metrics and monitoring           | Performance tracking, network stats, reporting       |
-| **streams.ts**       | Message streaming utilities      | Stream verification, message delivery testing        |
+| Module            | Purpose                          | Key Features                                         |
+| ----------------- | -------------------------------- | ---------------------------------------------------- |
+| **client.ts**     | XMTP client creation             | Signers, encryption keys, SDK versioning, DB paths   |
+| **analyzer.ts**   | Log analysis and error detection | Error pattern matching, log filtering, deduplication |
+| **logger.ts**     | Logging utilities                | File logging, ANSI stripping, pretty console output  |
+| **vitest.ts**     | Test lifecycle management        | Test setup, performance metrics, cleanup             |
+| **playwright.ts** | Browser automation               | UI testing, group creation, message verification     |
+| **datadog.ts**    | Metrics and monitoring           | Performance tracking, network stats, reporting       |
+| **streams.ts**    | Message streaming utilities      | Stream verification, message delivery testing        |
 
 ## Usage
 
@@ -118,41 +117,6 @@ export const PATTERNS = {
   ],
   DEDUPE: ["sync worker error", "sqlcipher_mlock", "Collector timed out"],
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
-};
-```
-
-## 📢 Notifications Module (`notifications.ts`)
-
-The `notifications.ts` module handles test failure notifications through Slack integration.
-
-```typescript
-// Send a Slack notification for test failures
-await sendSlackNotification({
-  testName: "functional-tests",
-  label: "error",
-  errorLogs: extractedLogs,
-  jobStatus: "failed",
-  env: "dev",
-  failedTestsCount: 3,
-  totalTestsCount: 10,
-});
-```
-
-**Key features:**
-
-- **Slack integration**: Sends formatted notifications to Slack channels
-- **Smart filtering**: Avoids spam by filtering known issues and branch restrictions
-- **Rich formatting**: Includes links to dashboards, logs, and test runs
-- **Error context**: Provides relevant error logs and failure details
-
-**Configuration:**
-
-```typescript
-const URLS = {
-  DATADOG_DASHBOARD: "https://app.datadoghq.com/dashboard/...",
-  DATADOG_LOGS: "https://app.datadoghq.com/logs?saved-view-id=...",
-  SLACK_API: "https://slack.com/api/chat.postMessage",
-  GITHUB_ACTIONS: "https://github.com",
 };
 ```
 
