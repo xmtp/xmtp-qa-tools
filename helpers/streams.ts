@@ -552,6 +552,8 @@ export async function verifyBotMessageStream(
   let result: VerifyStreamResult | undefined;
 
   while (attempts < maxRetries) {
+    const sessionId = `bot-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+
     result = await collectAndTimeEventsWithStats({
       receivers,
       startCollectors: (r) =>
@@ -564,9 +566,9 @@ export async function verifyBotMessageStream(
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage);
-        return [{ content: triggerMessage, sentAt }];
+        return [{ sessionId, sentAt }];
       },
-      getKey: extractContent,
+      getKey: () => sessionId, // Use consistent sessionId for both sent and received
       getMessage: extractContent,
       statsLabel: "bot-response:",
       count: 1,
