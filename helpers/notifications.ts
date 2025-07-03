@@ -1,33 +1,18 @@
 import { PATTERNS } from "@helpers/analyzer";
 import fetch from "node-fetch";
-import {
-  extractFailLines,
-  sanitizeLogs,
-  shouldFilterOutTest,
-} from "./analyzer";
-import { sendDatadogLog } from "./datadog";
+import { sanitizeLogs } from "./analyzer";
 
 export interface SlackNotificationOptions {
   testName: string;
   label?: "error" | "warning" | "info";
   errorLogs?: Set<string>;
   customLinks?: string;
+  failLines?: number;
   jobStatus?: string;
   env?: string;
   failedTestsCount?: number;
   totalTestsCount?: number;
   channel?: string;
-}
-
-export interface AgentNotificationOptions {
-  agentName: string;
-  agentAddress: string;
-  errorLogs?: Set<string>;
-  testName: string;
-  env?: string;
-  slackChannel?: string;
-  responseTime?: number;
-  customLinks?: string;
 }
 
 export async function sendSlackNotification(
@@ -42,12 +27,12 @@ export async function sendSlackNotification(
   const errorLogsArr = Array.from(options.errorLogs || []);
   const logs = sanitizeLogs(errorLogsArr.join("\n"));
 
-  const failLines = extractFailLines(options.errorLogs || new Set());
-  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
+  const shouldTagFabri = options.failLines >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const sections = [
     `*${testName}*: ⚠️ - ${tagMessage}`,
+    `URL: ${options.customLinks}`,
     `Logs:\n\`\`\`${logs}\`\`\``,
   ];
 
