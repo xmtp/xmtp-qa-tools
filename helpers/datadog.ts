@@ -200,7 +200,10 @@ export function groupMetricsByOperation(
   string,
   { operationName: string; members: string; operationData: MetricData }
 > {
-  const groups = new Map();
+  const groups = new Map<
+    string,
+    { operationName: string; members: string; operationData: MetricData }
+  >();
 
   for (const [operation, data] of metrics) {
     const operationPart = operation.split(":")[0];
@@ -276,8 +279,13 @@ export async function getNetworkStats(
       stats["Server Call"] - stats["TLS Handshake"],
     );
     return stats;
-  } catch (error: any) {
-    if (error.stdout) {
+  } catch (error: unknown) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "stdout" in error &&
+      typeof error.stdout === "string"
+    ) {
       console.warn(`⚠️ Curl command returned error but stdout available.`);
       const stats = JSON.parse(error.stdout.trim()) as NetworkStats;
       stats["Processing"] = Math.max(
