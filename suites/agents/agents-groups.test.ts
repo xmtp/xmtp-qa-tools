@@ -2,7 +2,7 @@ import { streamTimeout } from "@helpers/client";
 import { sendMetric } from "@helpers/datadog";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers } from "@workers/manager";
-import { IdentifierKind } from "@xmtp/node-sdk";
+import { IdentifierKind, type XmtpEnv } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
@@ -10,8 +10,8 @@ import { type AgentConfig } from "./helper";
 const testName = "agents-groups";
 
 describe(testName, async () => {
-  const env = process.env.XMTP_ENV as "dev" | "production";
-  const workers = await getWorkers(["alice", "bob"], { env });
+  const env = process.env.XMTP_ENV as XmtpEnv;
+  const workers = await getWorkers(["alice", "bob"]);
 
   setupTestLifecycle({});
 

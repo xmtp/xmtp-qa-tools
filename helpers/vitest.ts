@@ -20,6 +20,7 @@ export const setupTestLifecycle = ({
 }) => {
   beforeAll(() => {
     const describeName = getDescribeName();
+    console.debug("describeName", describeName);
     loadEnv(describeName);
   });
   let skipNetworkStats = false;
