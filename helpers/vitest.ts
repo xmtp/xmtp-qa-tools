@@ -1,6 +1,5 @@
-import type { WorkerManager } from "@workers/manager";
 import { afterAll, afterEach, beforeAll, beforeEach, expect } from "vitest";
-import { loadEnv } from "./client";
+import { getLatestSdkVersion, loadEnv } from "./client";
 import {
   flushMetrics,
   getNetworkStats,
@@ -10,18 +9,18 @@ import {
 } from "./datadog";
 
 export const setupTestLifecycle = ({
-  workers,
+  testName,
+  sdk,
   getCustomDuration,
   setCustomDuration,
 }: {
-  workers?: WorkerManager;
+  testName: string;
+  sdk?: string;
   getCustomDuration?: () => number | undefined;
   setCustomDuration?: (v: number | undefined) => void;
 }) => {
   beforeAll(() => {
-    const describeName = getDescribeName();
-    console.debug("describeName", describeName);
-    loadEnv(describeName);
+    loadEnv(testName);
   });
   let skipNetworkStats = false;
   let start: number;
@@ -44,12 +43,13 @@ export const setupTestLifecycle = ({
     const { testNameExtracted, operationType, operationName, members } =
       parseTestName(testName);
 
+    console.warn("sdk", sdk || getLatestSdkVersion());
     const values: DurationMetricTags = {
       metric_type: "operation",
       metric_subtype: operationType,
       operation: operationName,
       test: testNameExtracted,
-      sdk: workers?.getCreator()?.sdk || "unknown",
+      sdk: sdk || getLatestSdkVersion(),
       installations: members,
       members,
     };
@@ -73,7 +73,7 @@ export const setupTestLifecycle = ({
         sendMetric("duration", Math.round(statValue * 1000), {
           metric_type: "network",
           metric_subtype: networkPhase,
-          sdk: workers?.getCreator()?.sdk || "unknown",
+          sdk: sdk || getLatestSdkVersion(),
           operation: operationName,
           test: testNameExtracted,
           network_phase: networkPhase,
@@ -87,25 +87,4 @@ export const setupTestLifecycle = ({
   afterAll(async () => {
     await flushMetrics();
   });
-};
-
-/**
- * Extracts the describe name from the current test context using stack trace
- * @param fallbackName - Fallback name to use if extraction fails
- * @returns The describe name derived from the test file name
- */
-export const getDescribeName = (): string => {
-  const stack = new Error().stack;
-  const stackLines = stack?.split("\n") || [];
-
-  // Look for a line that contains a .test.ts file
-  const testFileLine = stackLines.find((line) => line.includes(".test.ts"));
-
-  if (testFileLine) {
-    const match = testFileLine.match(/([^/\\]+)\.test\.ts/);
-    if (match) {
-      return match[1];
-    }
-  }
-  return "unknown";
 };

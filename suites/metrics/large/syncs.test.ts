@@ -9,7 +9,8 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-describe("m_large_syncs", async () => {
+const testName = "m_large_syncs";
+describe(testName, async () => {
   const summaryMap: Record<number, SummaryEntry> = {};
 
   let workers = await getWorkers((m_large_TOTAL / m_large_BATCH_SIZE) * 2 + 1, {
@@ -26,7 +27,7 @@ describe("m_large_syncs", async () => {
   };
 
   setupTestLifecycle({
-    workers,
+    testName,
     getCustomDuration: () => customDuration,
     setCustomDuration,
   });

@@ -5,7 +5,9 @@ import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-describe("keyrotation-chaos", async () => {
+const testName = "keyrotation-chaos";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const allNodes = [
     new DockerContainer("multinode-node1-1"),
     new DockerContainer("multinode-node2-1"),
@@ -23,8 +25,6 @@ describe("keyrotation-chaos", async () => {
   const workers = await getWorkers(userDescriptors);
   // Start message and response streams for the stress testing
   workers.startStream(typeofStream.MessageandResponse);
-
-  setupTestLifecycle({});
 
   it("should handle staggered key rotations and network chaos under load", async () => {
     const group = await workers.createGroupBetweenAll(

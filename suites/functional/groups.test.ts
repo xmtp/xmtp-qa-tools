@@ -6,7 +6,9 @@ import { getWorkers, type WorkerManager } from "@workers/manager";
 import { type Conversation, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("groups", async () => {
+const testName = "groups";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   let workers: WorkerManager;
   workers = await getWorkers([
     "henry",
@@ -24,8 +26,6 @@ describe("groups", async () => {
 
   // Create a mapping to store group conversations by size
   const groupsBySize: Record<number, Conversation> = {};
-
-  setupTestLifecycle({});
 
   for (let i = batchSize; i <= total; i += batchSize) {
     it(`should create a group with ${i} participants`, async () => {

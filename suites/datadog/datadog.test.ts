@@ -5,7 +5,7 @@ import { askClaude, processDatadogLogs, readIssuesData } from "./helper";
 const testName = "datadog";
 
 describe(testName, () => {
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   it("should fetch latest Datadog logs", async () => {
     const result = await processDatadogLogs();

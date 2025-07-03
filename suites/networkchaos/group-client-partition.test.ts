@@ -5,7 +5,8 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import * as iptables from "../../network-stability-utilities/iptables";
 
-describe("group-client-partition", async () => {
+const testName = "group-client-partition";
+describe(testName, async () => {
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:5556",
@@ -13,7 +14,7 @@ describe("group-client-partition", async () => {
     user4: "http://localhost:6556",
   });
 
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   const partitionPort = 6556;
 

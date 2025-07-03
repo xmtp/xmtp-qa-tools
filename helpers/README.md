@@ -412,10 +412,7 @@ import { setupTestLifecycle } from "@helpers/vitest";
 
 ```typescript
 describe("My Test Suite", () => {
-  setupTestLifecycle({
-    testName: "my-test-suite",
-    expect,
-  });
+  setupTestLifecycle({ testName });
 
   // Your tests here
 });

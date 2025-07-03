@@ -391,10 +391,7 @@ const testName = "my-test";
 describe(testName, async () => {
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({
-    workers,
-    testName,
-  });
+  setupTestLifecycle({ testName });
 
   it("should test functionality", async () => {
     const alice = workers.get("alice");

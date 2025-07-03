@@ -36,13 +36,13 @@ const testConfig = {
   freshInstalls: false,
 } as const;
 
-describe("chaos", () => {
+const testName = "chaos";
+describe(testName, () => {
+  setupTestLifecycle({ testName });
   let workers: WorkerManager;
   let creator: Worker;
   let allInboxIds: string[] = [];
   let allGroups: string[] = [];
-
-  setupTestLifecycle({});
 
   beforeAll(async () => {
     // Initialize workers

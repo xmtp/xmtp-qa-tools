@@ -22,12 +22,13 @@ console.log(HELP_TEXT);
 const receiverObj = getManualUsers(["fabri-convos-oneoff"])[0];
 const receiverInboxId = receiverObj.inboxId;
 
-describe("bot-stress", () => {
+const testName = "bot-stress";
+describe(testName, () => {
   let workers: WorkerManager;
   let bot: Worker;
   let globalGroupCounter = 0;
 
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   beforeAll(async () => {
     workers = await getWorkers(["bot"], {
