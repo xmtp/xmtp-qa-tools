@@ -1,6 +1,6 @@
 import { verifyConsentStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
-import { getWorkers, type WorkerManager } from "@workers/manager";
+import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
 const testName = "consent";
