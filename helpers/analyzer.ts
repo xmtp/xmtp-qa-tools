@@ -382,9 +382,13 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
 export async function sendSlackNotification(options: {
   testName: string;
   errorLogs: Set<string>;
-  workflowRunUrl?: string;
   channel?: string;
 }): Promise<void> {
+  const serverUrl = process.env.GITHUB_SERVER_URL;
+  const repository = process.env.GITHUB_REPOSITORY;
+  const runId = process.env.GITHUB_RUN_ID;
+  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+
   const targetChannel = options.channel || process.env.SLACK_CHANNEL;
   const testName = options.testName
     ? options.testName[0].toUpperCase() + options.testName.slice(1) + " - "
@@ -395,7 +399,9 @@ export async function sendSlackNotification(options: {
 
   const sections = [
     `*${testName}*: ⚠️ - ${tagMessage}`,
-    `*Workflow Run URL*: <${options.workflowRunUrl} | ${options.workflowRunUrl}>`,
+    `*Environment*: ${process.env.ENVIRONMENT || process.env.XMTP_ENV}`,
+    `*Region*: ${process.env.GEOLOCATION}`,
+    `*Test URL*: <${workflowRunUrl} | ${workflowRunUrl}>`,
     `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
   ];
 

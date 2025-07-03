@@ -320,7 +320,6 @@ export async function sendDatadogLog(
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
-
   const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
   const logPayload = {
