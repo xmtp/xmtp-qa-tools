@@ -395,8 +395,7 @@ export async function sendSlackNotification(options: {
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const sections = [
-    `*${options.testName} ⚠️* ${tagMessage}`,
-    `*Env*: \`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\` | <${workflowRunUrl}|View Run>`,
+    `*${options.testName} ⚠️* ${tagMessage} | \`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\` | <${workflowRunUrl}|View Run>`,
     `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
   ];
 
