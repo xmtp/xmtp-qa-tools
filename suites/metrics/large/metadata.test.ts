@@ -12,7 +12,8 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-describe("m_large_metadata", async () => {
+const testName = "m_large_metadata";
+describe(testName, async () => {
   let workers = await getWorkers(m_large_WORKER_COUNT);
 
   let newGroup: Group;
@@ -25,7 +26,7 @@ describe("m_large_metadata", async () => {
   };
 
   setupTestLifecycle({
-    workers,
+    testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;

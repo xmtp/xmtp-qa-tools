@@ -4,8 +4,9 @@ import { getWorkers } from "@workers/manager";
 import { IdentifierKind, type Dm } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("dms", async () => {
-  setupTestLifecycle({});
+const testName = "dms";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers(
     [
       "henry",

@@ -9,7 +9,8 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-describe("m_large_cumulative_syncs", async () => {
+const testName = "m_large_cumulative_syncs";
+describe(testName, async () => {
   let workers: WorkerManager;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -26,7 +27,7 @@ describe("m_large_cumulative_syncs", async () => {
   };
 
   setupTestLifecycle({
-    workers,
+    testName,
     getCustomDuration: () => customDuration,
     setCustomDuration,
   });

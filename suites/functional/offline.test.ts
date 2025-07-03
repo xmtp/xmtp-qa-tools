@@ -5,14 +5,14 @@ import { describe, expect, it } from "vitest";
 
 const amountofMessages = 5;
 
-describe("recovery", async () => {
+const testName = "recovery";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   let group: Group;
   let workers: WorkerManager;
   workers = await getWorkers(["random1", "random2", "random3"]);
 
   const randomSuffix = Math.random().toString(36).substring(2, 10);
-
-  setupTestLifecycle({});
 
   it("should recover all missed messages after client reconnection following offline period", async () => {
     group = await workers.createGroupBetweenAll();

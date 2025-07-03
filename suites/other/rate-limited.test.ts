@@ -3,7 +3,9 @@ import { typeofStream, typeOfSync } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-describe("rate-limited", async () => {
+const testName = "rate-limited";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers(8);
   // Start message and response streams for rate limiting test
   workers.startStream(typeofStream.MessageandResponse);
@@ -12,8 +14,6 @@ describe("rate-limited", async () => {
   });
 
   let targetInboxId: string;
-
-  setupTestLifecycle({});
 
   it("should send high-volume parallel messages from multiple worker threads to test rate limiting", async () => {
     // Use ivy as the target that everyone will message

@@ -5,7 +5,9 @@ import { getWorkers } from "@workers/manager";
 import { type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("bug_addmember", async () => {
+const testName = "bug_addmember";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers(["bob"]);
   const receiverWorkers = await getWorkers(["alice"]);
 
@@ -13,8 +15,6 @@ describe("bug_addmember", async () => {
   let receiver = receiverWorkers.get("alice")!;
 
   let group: Group;
-
-  setupTestLifecycle({});
 
   it("should create a group", async () => {
     const allInboxIds = [

@@ -3,8 +3,9 @@ import { typeofStream } from "@workers/main";
 import { getWorkers } from "@workers/manager";
 import { describe, expect, it } from "vitest";
 
-describe("installations", () => {
-  setupTestLifecycle({});
+const testName = "installations";
+describe(testName, () => {
+  setupTestLifecycle({ testName });
 
   it("should manage multiple device installations with shared identity and separate storage", async () => {
     const names = ["random1", "random2", "random3", "random4", "random5"];

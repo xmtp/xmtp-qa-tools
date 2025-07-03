@@ -16,8 +16,9 @@ interface StorageMetrics {
 const memberCounts = [2, 10, 50, 100, 150, 200];
 const targetSizeMB = 5;
 
-describe("storage", () => {
-  setupTestLifecycle({});
+const testName = "storage";
+describe(testName, () => {
+  setupTestLifecycle({ testName });
 
   it("should generate storage efficiency table for different group sizes", async () => {
     const results: StorageMetrics[] = [];

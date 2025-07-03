@@ -13,12 +13,13 @@ import { getWorkers } from "@workers/manager";
 import { type Dm, type Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 
-describe("streams", async () => {
+const testName = "streams";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   let group: Group;
   let workers = await getWorkers(5);
 
   // Setup test lifecycle
-  setupTestLifecycle({});
 
   it("membership stream", async () => {
     // Initialize workers

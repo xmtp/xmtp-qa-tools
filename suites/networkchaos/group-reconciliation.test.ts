@@ -5,15 +5,15 @@ import type { Group } from "@xmtp/node-sdk";
 import { describe, expect, it } from "vitest";
 import { DockerContainer } from "../../network-stability-utilities/container";
 
-describe("group-reconciliation", async () => {
+const testName = "group-reconciliation";
+describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const workers = await getWorkers({
     user1: "http://localhost:5556",
     user2: "http://localhost:6556",
     user3: "http://localhost:7556",
     user4: "http://localhost:8556",
   });
-
-  setupTestLifecycle({});
 
   let group: Group;
 

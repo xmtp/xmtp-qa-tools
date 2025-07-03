@@ -13,7 +13,7 @@ describe(testName, async () => {
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["alice", "bob"]);
 
-  setupTestLifecycle({});
+  setupTestLifecycle({ testName });
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env);

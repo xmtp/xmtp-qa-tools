@@ -9,12 +9,10 @@ import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
 
 const testName = "agents";
-
 describe(testName, async () => {
+  setupTestLifecycle({ testName });
   const env = process.env.XMTP_ENV as XmtpEnv;
   const workers = await getWorkers(["alice"]);
-
-  setupTestLifecycle({});
 
   const filteredAgents = (productionAgents as AgentConfig[]).filter((agent) => {
     return agent.networks.includes(env);

@@ -12,7 +12,8 @@ import {
   type SummaryEntry,
 } from "./helpers";
 
-describe("m_large_membership", async () => {
+const testName = "m_large_membership";
+describe(testName, async () => {
   let newGroup: Group;
 
   const summaryMap: Record<number, SummaryEntry> = {};
@@ -25,7 +26,7 @@ describe("m_large_membership", async () => {
   };
 
   setupTestLifecycle({
-    workers,
+    testName,
     getCustomDuration: () => customDuration,
     setCustomDuration: (v) => {
       customDuration = v;
