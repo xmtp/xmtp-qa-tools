@@ -24,6 +24,7 @@ export const PATTERNS = {
         "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
       ],
     },
+
     {
       testName: "Functional",
       uniqueErrorLines: [
@@ -34,7 +35,7 @@ export const PATTERNS = {
     {
       testName: "Agents-dms",
       uniqueErrorLines: [
-        "FAIL  suites/agents/agents.test.ts > agents > production: tokenbot : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+        "FAIL  suites/agents/agents-dms.test.ts > agents-dms > production: tokenbot DM : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
       ],
     },
     {
@@ -398,7 +399,9 @@ export async function sendSlackNotification(options: {
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const sections = [
-    `*${options.testName} ⚠️* ${tagMessage} | \`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\` | <${workflowRunUrl}|View Run>`,
+    `*${options.testName} ⚠️* ${tagMessage}`,
+    `\`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\``,
+    `<${workflowRunUrl}|View Run>`,
     `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
   ];
 
