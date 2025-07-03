@@ -25,7 +25,11 @@ describe(testName, async () => {
   // Test each agent in DMs
   for (const agent of filteredAgents) {
     it(`${env}: ${agent.name} DM : ${agent.address}`, async () => {
-      console.debug("sending message to agent", agent.name, agent.address);
+      console.debug(
+        `sending ${agent.sendMessage} to agent`,
+        agent.name,
+        agent.address,
+      );
       const conversation = await workers
         .getCreator()
         .client.conversations.newDmWithIdentifier({

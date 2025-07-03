@@ -502,14 +502,10 @@ export class WorkerClient extends Worker {
               }),
           });
           for await (const message of stream) {
-            // console.debug(
-            //   `[${this.nameId}] Received message`,
-            //   JSON.stringify(message, null, 2),
-            // );
-            // console.debug(
-            //   `[${this.nameId}] Received message`,
-            //   JSON.stringify(message?.content, null, 2),
-            // );
+            console.debug(
+              `[${this.nameId}] Received message`,
+              JSON.stringify(message, null, 2),
+            );
             if (!this.activeStreamTypes.has(type) || controller.signal.aborted)
               break;
 
@@ -554,13 +550,9 @@ export class WorkerClient extends Worker {
                 });
               }
               continue;
-            }
-            if (
-              (message.contentType?.typeId === "text" ||
-                message.contentType?.typeId === "reaction" ||
-                message.contentType?.typeId === "reply") &&
-              (type === typeofStream.Message ||
-                type === typeofStream.MessageandResponse)
+            } else if (
+              type === typeofStream.Message ||
+              type === typeofStream.MessageandResponse
             ) {
               // Log message details for debugging
               // console.debug(
@@ -815,7 +807,6 @@ export class WorkerClient extends Worker {
     type: typeofStream;
     filterFn?: (msg: StreamMessage) => boolean;
     count: number;
-    additionalInfo?: Record<string, string | number | boolean>;
   }): Promise<T[]> {
     const { type, filterFn, count } = options;
 
@@ -903,7 +894,7 @@ export class WorkerClient extends Worker {
   collectMessages(
     groupId: string,
     count: number,
-    type: string[] = ["text"],
+    types: string[] = ["text"],
   ): Promise<StreamTextMessage[]> {
     // console.debug(
     //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
@@ -923,15 +914,11 @@ export class WorkerClient extends Worker {
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
-        const typeIsText = type.includes(contentType?.typeId ?? "");
+        const typeIsText = types.includes(contentType?.typeId as string);
         const shouldAccept = idsMatch && typeIsText;
         return shouldAccept;
       },
       count,
-      additionalInfo: {
-        collector: "collectMessages",
-        expectedGroupId: groupId,
-      }, // Pass groupId for better logging
     });
   }
   /**
@@ -959,7 +946,6 @@ export class WorkerClient extends Worker {
         return matches;
       },
       count,
-      additionalInfo: { groupId },
     });
   }
 
@@ -967,10 +953,6 @@ export class WorkerClient extends Worker {
     groupId: string,
     count: number = 1,
   ): Promise<StreamGroupUpdateMessage[]> {
-    const additionalInfo: Record<string, string | number | boolean> = {
-      groupId,
-    };
-
     return this.collectStreamEvents<StreamGroupUpdateMessage>({
       type: typeofStream.GroupUpdated,
       filterFn: (msg) => {
@@ -985,7 +967,6 @@ export class WorkerClient extends Worker {
         return matches && hasAddedMembers;
       },
       count,
-      additionalInfo,
     });
   }
   /**
@@ -996,14 +977,6 @@ export class WorkerClient extends Worker {
     count: number = 1,
     conversationId?: string,
   ): Promise<StreamConversationMessage[]> {
-    const additionalInfo: Record<string, string | number | boolean> = {
-      fromPeerAddress,
-    };
-
-    if (conversationId) {
-      additionalInfo.conversationId = conversationId;
-    }
-
     return this.collectStreamEvents<StreamConversationMessage>({
       type: typeofStream.Conversation,
       filterFn: conversationId
@@ -1013,7 +986,6 @@ export class WorkerClient extends Worker {
           }
         : undefined,
       count,
-      additionalInfo,
     });
   }
 
