@@ -554,7 +554,13 @@ export async function verifyBotMessageStream(
   while (attempts < maxRetries) {
     result = await collectAndTimeEventsWithStats({
       receivers,
-      startCollectors: (r) => r.worker.collectMessages(group.id, 1),
+      startCollectors: (r) =>
+        r.worker.collectMessages(group.id, 1, [
+          "text",
+          "reply",
+          "reaction",
+          "actions",
+        ]),
       triggerEvents: async () => {
         const sentAt = Date.now();
         await group.send(triggerMessage);

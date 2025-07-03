@@ -903,6 +903,7 @@ export class WorkerClient extends Worker {
   collectMessages(
     groupId: string,
     count: number,
+    type: string[] = ["text"],
   ): Promise<StreamTextMessage[]> {
     // console.debug(
     //   `[${this.nameId}] Starting collectMessages for conversationId: ${groupId}, expecting ${count} messages`,
@@ -922,13 +923,8 @@ export class WorkerClient extends Worker {
         const conversationId = streamMsg.message.conversationId;
         const contentType = streamMsg.message.contentType;
         const idsMatch = groupId === conversationId;
-        const typeIsText =
-          contentType?.typeId === "text" ||
-          contentType?.typeId === "reply" ||
-          contentType?.typeId === "reaction";
-
+        const typeIsText = type.includes(contentType?.typeId ?? "");
         const shouldAccept = idsMatch && typeIsText;
-
         return shouldAccept;
       },
       count,
@@ -938,7 +934,6 @@ export class WorkerClient extends Worker {
       }, // Pass groupId for better logging
     });
   }
-
   /**
    * Collect group update messages for a specific group
    */
