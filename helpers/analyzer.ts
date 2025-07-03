@@ -13,12 +13,6 @@ export const PATTERNS = {
       ],
     },
     {
-      testName: "Dms",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/dms.test.ts > dms > fail on purpose",
-      ],
-    },
-    {
       testName: "Functional",
       uniqueErrorLines: [
         "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
