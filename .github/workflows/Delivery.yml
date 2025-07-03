@@ -40,15 +40,24 @@ jobs:
         run: yarn
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
-      - name: Upload test artifacts
+      - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.environment }}
+          name: logs-env-${{ matrix.environment }}-${{ matrix.test }}
           path: |
             logs/**/*
-            .data/**/*
             .env
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 90
+      - name: Upload installation databases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-db-${{ matrix.environment }}-${{ matrix.test }}
+          path: |
+            .data/**/*
           if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 90

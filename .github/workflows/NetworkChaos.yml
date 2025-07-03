@@ -69,15 +69,25 @@ jobs:
             npx vitest run $FILE
           fi
 
-      - name: Upload Test Artifacts
+      - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: chaos-artifacts-${{ matrix.test_file }}
+          name: logs-env-chaos-${{ matrix.test_file }}
           path: |
             logs/**/*
-            .data/**/*
             .env
+          if-no-files-found: ignore
+          overwrite: true
+          include-hidden-files: true
+          retention-days: 30
+      - name: Upload installation databases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-db-chaos-${{ matrix.test_file }}
+          path: |
+            .data/**/*
           if-no-files-found: ignore
           overwrite: true
           include-hidden-files: true
