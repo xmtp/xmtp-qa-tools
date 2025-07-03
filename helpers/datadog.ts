@@ -2,6 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
+import { shouldFilterOutTest } from "./analyzer";
 
 // Consolidated interfaces
 interface MetricData {
@@ -310,6 +311,10 @@ export async function sendDatadogLog(
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
+
+  if (shouldFilterOutTest(new Set(lines))) {
+    return;
+  }
 
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;

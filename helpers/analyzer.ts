@@ -384,6 +384,9 @@ export async function sendSlackNotification(options: {
   errorLogs: Set<string>;
   channel?: string;
 }): Promise<void> {
+  if (shouldFilterOutTest(options.errorLogs)) {
+    return;
+  }
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
