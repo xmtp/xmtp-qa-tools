@@ -7,5 +7,77 @@
     "networks": ["production"],
     "slackChannel": "#tbachat-alerts",
     "shouldRespondOnTagged": true
+  },
+  {
+    "name": "elsa",
+    "baseName": "elsa.base.eth",
+    "address": "0xe15aa1ba585aea8a4639331ce5f9aec86f8c4541",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#elsa-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "flaunchy",
+    "baseName": "flaunchy.base.eth",
+    "address": "0x557463B158F70e4E269bB7BCcF6C587e3BC878F4",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#flaunchy-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "mamo",
+    "baseName": "mamo.base.eth",
+    "address": "0x99B10779557cc52c6E3a97C9A6C3446f021290cc",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#mamo-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "squabble",
+    "baseName": "squabble.base.eth",
+    "address": "0xD60d560c9Ae4ad9b7C252FacE7B664A8d7A426da",
+    "sendMessage": "@squabble.base.eth",
+    "networks": ["production"],
+    "slackChannel": "#squabble-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "byte",
+    "baseName": "byte.base.eth",
+    "address": "0xdfc00a0B28Df3c07b0942300E896C97d62014499",
+    "sendMessage": "hi",
+    "networks": ["production"],
+    "slackChannel": "#byte-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "gm",
+    "baseName": "gm.base.eth",
+    "address": "0x194c31cae1418d5256e8c58e0d08aee1046c6ed0",
+    "sendMessage": "hola",
+    "networks": ["production"],
+    "slackChannel": "#gm-alerts",
+    "shouldRespondOnTagged": false
+  },
+  {
+    "name": "bankr",
+    "baseName": "bankr.base.eth",
+    "address": "0x7f1c0d2955f873fc91f1728c19b2ed7be7a9684d",
+    "sendMessage": "hey there how are you?",
+    "networks": ["production"],
+    "slackChannel": "#bankr-alerts",
+    "shouldRespondOnTagged": true
+  },
+  {
+    "name": "tokenbot",
+    "baseName": "0x9e73…3466",
+    "address": "0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+    "sendMessage": "@tokenbot",
+    "networks": ["production"],
+    "slackChannel": "#tokenbot-alerts",
+    "shouldRespondOnTagged": true
   }
 ]

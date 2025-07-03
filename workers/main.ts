@@ -551,6 +551,7 @@ export class WorkerClient extends Worker {
               }
               continue;
             } else if (
+              //Check
               type === typeofStream.Message ||
               type === typeofStream.MessageandResponse
             ) {
