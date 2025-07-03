@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
-import { extractFailLines, PATTERNS, shouldFilterOutTest } from "./analyzer";
+import { extractFailLines, shouldFilterOutTest } from "./analyzer";
 
 interface MetricData {
   values: number[];

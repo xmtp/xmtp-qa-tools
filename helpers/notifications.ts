@@ -2,24 +2,12 @@ import { PATTERNS } from "@helpers/analyzer";
 import fetch from "node-fetch";
 import { sanitizeLogs } from "./analyzer";
 
-export interface SlackNotificationOptions {
+export async function sendSlackNotification(options: {
   testName: string;
-  label?: "error" | "warning" | "info";
-  errorLogs?: Set<string>;
-  customLinks?: string;
-  failLines?: number;
-  jobStatus?: string;
-  env?: string;
-  failedTestsCount?: number;
-  totalTestsCount?: number;
+  errorLogs: Set<string>;
   channel?: string;
-}
-
-export async function sendSlackNotification(
-  options: SlackNotificationOptions,
-  channel?: string,
-): Promise<void> {
-  const targetChannel = channel || process.env.SLACK_CHANNEL || "general";
+}): Promise<void> {
+  const targetChannel = options.channel || process.env.SLACK_CHANNEL;
   const testName = options.testName
     ? options.testName[0].toUpperCase() + options.testName.slice(1) + " - "
     : "";
@@ -27,12 +15,11 @@ export async function sendSlackNotification(
   const errorLogsArr = Array.from(options.errorLogs || []);
   const logs = sanitizeLogs(errorLogsArr.join("\n"));
 
-  const shouldTagFabri = options.failLines >= PATTERNS.minFailLines;
+  const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
 
   const sections = [
     `*${testName}*: ⚠️ - ${tagMessage}`,
-    `URL: ${options.customLinks}`,
     `Logs:\n\`\`\`${logs}\`\`\``,
   ];
 
