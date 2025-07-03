@@ -398,7 +398,6 @@ export function flushMetrics(): Promise<void> {
 export async function sendDatadogLog(
   lines: string[],
   context: Record<string, unknown> = {},
-  options?: { channel?: string },
 ): Promise<void> {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
@@ -407,7 +406,7 @@ export async function sendDatadogLog(
   const workflowName = process.env.GITHUB_WORKFLOW || "Unknown Workflow";
   const environment = process.env.ENVIRONMENT || process.env.XMTP_ENV;
   const region = process.env.GEOLOCATION || "Unknown Region";
-  const channel = options?.channel || context.channel || "general";
+  const channel = context.channel || "general";
 
   const logPayload = {
     message: lines.join("\n"),

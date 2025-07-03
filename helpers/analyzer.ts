@@ -18,22 +18,10 @@ export const PATTERNS = {
       ],
     },
     {
-      testName: "Functional",
+      testName: "Agents-tagged",
       uniqueErrorLines: [
-        "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
-        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
-      ],
-    },
-    {
-      testName: "Agents",
-      uniqueErrorLines: [
-        "FAIL  suites/agents/agents.test.ts > agents > production: tokenbot : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+        "FAIL  suites/agents/agents-tagged.test.ts [ suites/agents/agents-tagged.test.ts ]",
+        "FAIL  suites/agents/agents-tagged.test.ts > agents-tagged",
       ],
     },
   ],

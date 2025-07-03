@@ -117,17 +117,14 @@ export async function sendSlackNotification(
 
   if (options.errorLogs && options.errorLogs.size > 0) {
     const failLines = extractFailLines(options.errorLogs);
-    await sendDatadogLog(
-      Array.from(options.errorLogs),
-      {
-        test: options.testName,
-        failLines: Array.from(failLines).length,
-        env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
-        region: process.env.GEOLOCATION,
-        sdk: "latest",
-      },
-      { channel: options.channel },
-    );
+    await sendDatadogLog(Array.from(options.errorLogs), {
+      channel: options.channel,
+      test: options.testName,
+      failLines: Array.from(failLines).length,
+      env: process.env.ENVIRONMENT || process.env.XMTP_ENV,
+      region: process.env.GEOLOCATION,
+      sdk: "latest",
+    });
   }
 
   // Check if test should be filtered out
