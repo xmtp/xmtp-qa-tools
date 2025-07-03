@@ -312,19 +312,7 @@ export async function sendDatadogLog(
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
-  const jobStatus = context.jobStatus || "failed";
-  if (jobStatus === "success") {
-    console.log(`Slack notification skipped (status: ${jobStatus})`);
-    return;
-  }
-
-  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
-  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
-    console.log(`Slack notification skipped (branch: ${branchName})`);
-    return;
-  }
-
-  if (lines && (shouldFilterOutTest(new Set(lines)) || lines.length === 0)) {
+  if (shouldFilterOutTest(new Set(lines))) {
     return;
   }
 

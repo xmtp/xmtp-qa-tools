@@ -341,14 +341,26 @@ export function sanitizeLogs(logs: string): string {
  * Check if test should be filtered out based on known issues
  */
 export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
+  const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
+  if (jobStatus === "success") {
+    console.log(`Slack notification skipped (status: ${jobStatus})`);
+    return true;
+  }
+
+  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
+  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
+    console.log(`Slack notification skipped (branch: ${branchName})`);
+    return true;
+  }
+
   if (!errorLogs || errorLogs.size === 0) {
-    return false;
+    return true;
   }
 
   const failLines = extractFailLines(errorLogs);
 
   if (failLines.length === 0) {
-    return true; // Don't show if tests don't fail
+    return false; // Don't show if tests don't fail
   }
 
   // Check each configured filter
@@ -360,11 +372,11 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
     // If all fail lines match this filter's unique error lines, filter it out
     if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
       console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
+      return false;
     }
   }
 
-  return false;
+  return true;
 }
 
 export async function sendSlackNotification(options: {
