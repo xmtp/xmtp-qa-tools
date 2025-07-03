@@ -2,9 +2,6 @@ name: Agents
 description: "should verify performance of the library in the production network"
 
 on:
-  pull_request:
-    branches:
-      - main
   schedule:
     - cron: "*/15 * * * *" # Runs every 15 minutes
   workflow_dispatch:
@@ -15,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        test: [dms]
+        test: [agents-dms, agents-tagged, agents-untagged]
         environment: [dev, production]
     env:
       DATADOG_API_KEY: ${{ secrets.DATADOG_API_KEY }}
