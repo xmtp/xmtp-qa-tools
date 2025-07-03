@@ -41,15 +41,24 @@ jobs:
           cd qa-tools-test
           timeout 300s yarn dms
 
-      - name: Upload test artifacts
+      - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: artifacts-${{ matrix.environment }}
+          name: logs-env-selftest
           path: |
-            logs/**/*
-            .data/**/*
-            .env
+            qa-tools-test/logs/**/*
+            qa-tools-test/.env
+          if-no-files-found: ignore
+          include-hidden-files: true
+          retention-days: 90
+      - name: Upload installation databases
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: install-db-selftest
+          path: |
+            qa-tools-test/.data/**/*
           if-no-files-found: ignore
           include-hidden-files: true
           retention-days: 90
