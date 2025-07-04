@@ -2,7 +2,7 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
-import { extractFailLines, shouldFilterOutTest } from "./analyzer";
+import { shouldFilterOutTest } from "./analyzer";
 
 // Consolidated interfaces
 interface MetricData {
@@ -312,7 +312,7 @@ export async function sendDatadogLog(
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
-  if (shouldFilterOutTest(new Set(lines))) {
+  if (shouldFilterOutTest(new Set(lines), context.failLines as string[])) {
     return;
   }
 
@@ -327,7 +327,7 @@ export async function sendDatadogLog(
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
     channel: context.channel || "general",
-    failLines: extractFailLines(new Set(lines)),
+    failLines: context.failLines as string[],
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: workflowRunUrl,
