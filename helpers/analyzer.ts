@@ -1,43 +1,12 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
+import knownIssues from "./known_issues.json";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
 export const PATTERNS = {
-  KNOWN_ISSUES: [
-    {
-      testName: "Browser",
-      uniqueErrorLines: [
-        "FAIL  suites/browser/browser.test.ts > browser > conversation stream for new member",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/callbacks.test.ts > callbacks > should receive conversation with async",
-        "FAIL  suites/functional/playwright.test.ts > playwright > newGroup and message stream",
-      ],
-    },
-    {
-      testName: "Agents-tagged",
-      uniqueErrorLines: [
-        "FAIL  suites/agents/agents-tagged.test.ts > agents-tagged > production: tokenbot should respond to tagged/command message : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-      ],
-    },
-    {
-      testName: "Agents-dms",
-      uniqueErrorLines: [
-        "FAIL  suites/agents/agents-dms.test.ts > agents-dms > production: tokenbot DM : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
-      ],
-    },
-    {
-      testName: "Functional",
-      uniqueErrorLines: [
-        "FAIL  suites/functional/playwright.test.ts > playwright > conversation stream for new member",
-      ],
-    },
-  ],
+  KNOWN_ISSUES: knownIssues,
   minFailLines: 3,
   minumumLineLength: 40,
   maxLineLength: 150,
