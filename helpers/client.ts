@@ -18,41 +18,41 @@ import {
   Conversation as Conversation47,
   Dm as Dm47,
   Group as Group47,
-} from "@xmtp/node-sdk-47";
+} from "@xmtp/node-sdk-0.0.47";
+import {
+  Client as ClientMls,
+  Conversation as ConversationMls,
+} from "@xmtp/node-sdk-0.4.1";
 import {
   Client as Client105,
   Conversation as Conversation105,
   Dm as Dm105,
   Group as Group105,
-} from "@xmtp/node-sdk-105";
+} from "@xmtp/node-sdk-1.0.5";
 import {
   Client as Client209,
   Conversation as Conversation209,
   Dm as Dm209,
   Group as Group209,
-} from "@xmtp/node-sdk-209";
+} from "@xmtp/node-sdk-2.0.9";
 import {
   Client as Client210,
   Conversation as Conversation210,
   Dm as Dm210,
   Group as Group210,
-} from "@xmtp/node-sdk-210";
+} from "@xmtp/node-sdk-2.1.0";
 import {
   Client as Client220,
   Conversation as Conversation220,
   Dm as Dm220,
   Group as Group220,
-} from "@xmtp/node-sdk-220";
+} from "@xmtp/node-sdk-2.2.1";
 import {
   Client as Client300,
   Conversation as Conversation300,
   Dm as Dm300,
   Group as Group300,
-} from "@xmtp/node-sdk-300";
-import {
-  Client as ClientMls,
-  Conversation as ConversationMls,
-} from "@xmtp/node-sdk-mls";
+} from "@xmtp/node-sdk-3.0.1";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -353,7 +353,6 @@ export const regressionClient = async (
     throw new Error("Invalid version");
   } else if (sdkVersion === "0.0.47") {
     const signer = createSigner47(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -363,7 +362,6 @@ export const regressionClient = async (
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (sdkVersion === "1.0.5") {
     const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -371,9 +369,8 @@ export const regressionClient = async (
       apiUrl,
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else if (["2.0.9", "2.1.0", "2.2.0", "3.0.1"].includes(sdkVersion)) {
+  } else {
     const signer = createSigner(walletKey);
-    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, {
       dbEncryptionKey,
       dbPath,
@@ -383,9 +380,6 @@ export const regressionClient = async (
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  } else {
-    console.debug("Invalid version" + sdkVersion);
-    throw new Error("Invalid version" + sdkVersion);
   }
 
   if (libXmtpVersion !== libXmtpVersionAfterClient) {
