@@ -56,7 +56,7 @@ await logAgentDetails(client);
 
 **Key features:**
 
-- **Multi-version SDK support**: Works with SDK versions 0.0.13, 0.0.47, 1.0.5, 2.0.9, 2.1.0, 2.2.1, and 3.0.1
+- **Multi-version SDK support**: Works with SDK versions
 - **Signer creation**: Compatible signers for different SDK versions
 - **Database management**: Automatic database path creation and management
 - **Environment configuration**: Loading and validating environment variables
@@ -66,51 +66,7 @@ await logAgentDetails(client);
 
 ```typescript
 export const VersionList = [
-  {
-    Client: Client13,
-    Conversation: Conversation13,
-    Dm: Conversation13,
-    Group: Conversation13,
-    nodeVersion: "0.0.13",
-    bindingsPackage: "0.0.9",
-    libXmtpVersion: "0.0.9",
-  },
-  {
-    Client: Client47,
-    Conversation: Conversation47,
-    Dm: Dm47,
-    Group: Group47,
-    nodeVersion: "0.0.47",
-    bindingsPackage: "0.4.1",
-    libXmtpVersion: "6bd613d",
-  },
-  {
-    Client: Client105,
-    Conversation: Conversation105,
-    Dm: Dm105,
-    Group: Group105,
-    nodeVersion: "1.0.5",
-    bindingsPackage: "1.1.3",
-    libXmtpVersion: "6eb1ce4",
-  },
-  {
-    Client: Client209,
-    Conversation: Conversation209,
-    Dm: Dm209,
-    Group: Group209,
-    nodeVersion: "2.0.9",
-    bindingsPackage: "1.1.8",
-    libXmtpVersion: "bfadb76",
-  },
-  {
-    Client: Client210,
-    Conversation: Conversation210,
-    Dm: Dm210,
-    Group: Group210,
-    nodeVersion: "2.1.0",
-    bindingsPackage: "1.2.0",
-    libXmtpVersion: "7b9b4d0",
-  },
+  ...,
   {
     Client: Client220,
     Conversation: Conversation220,
