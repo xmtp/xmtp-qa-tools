@@ -31,6 +31,22 @@ export const PATTERNS = {
   MATCH: [/ERROR/, /forked/, /FAIL/, /QA_ERROR/],
 } as const;
 
+export function hasKnownPattern(failLines: string[]): boolean | undefined {
+  // Check each configured filter
+  for (const filter of PATTERNS.KNOWN_ISSUES) {
+    const matchingLines = failLines.filter((line) =>
+      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
+    );
+
+    // If all fail lines match this filter's unique error lines, filter it out
+    if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
+      console.log(`Test filtered out (${filter.testName} test failure)`);
+      return true;
+    }
+  }
+  return false;
+}
+
 /**
  * Process error line for deduplication and cleaning
  */
@@ -326,22 +342,6 @@ export async function logUpload(logFileName: string, testName: string) {
   }
 }
 
-export function hasKnownPattern(failLines: string[]): boolean | undefined {
-  // Check each configured filter
-  for (const filter of PATTERNS.KNOWN_ISSUES) {
-    const matchingLines = failLines.filter((line) =>
-      filter.uniqueErrorLines.some((errorLine) => line.includes(errorLine)),
-    );
-
-    // If all fail lines match this filter's unique error lines, filter it out
-    if (matchingLines.length > 0 && matchingLines.length === failLines.length) {
-      console.log(`Test filtered out (${filter.testName} test failure)`);
-      return true;
-    }
-  }
-  return false;
-}
-
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
@@ -351,8 +351,8 @@ export async function sendSlackNotification(
     console.warn("No Slack channel found, skipping");
     return;
   }
-  const hasKnownPattern = hasKnownPattern(failLines);
-  if (hasKnownPattern) {
+  const hasKnownPatternCheck = hasKnownPattern(failLines);
+  if (hasKnownPatternCheck) {
     console.warn("Known pattern found, skipping");
     return;
   }
@@ -390,7 +390,9 @@ export async function sendSlackNotification(
   };
 
   if (data && data.ok) {
-    console.log(`✅ Slack notification sent successfully to ${targetChannel}!`);
+    console.log(
+      `✅ Slack notification sent successfully to ${process.env.SLACK_CHANNEL}!`,
+    );
   } else {
     console.error("❌ Failed to send Slack notification. Response:", data);
   }

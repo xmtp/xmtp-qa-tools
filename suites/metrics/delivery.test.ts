@@ -1,8 +1,4 @@
-import {
-  sendMetric,
-  type DeliveryMetricTags,
-  type OrderMetricTags,
-} from "@helpers/datadog";
+import { sendMetric, type DeliveryMetricTags } from "@helpers/datadog";
 import { calculateMessageStats, verifyMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getWorkers, type Worker, type WorkerManager } from "@workers/manager";

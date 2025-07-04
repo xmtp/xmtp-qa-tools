@@ -6,6 +6,7 @@ import {
   parseTestName,
   sendMetric,
   type DurationMetricTags,
+  type NetworkMetricTags,
 } from "./datadog";
 
 export const setupTestLifecycle = ({
@@ -69,14 +70,14 @@ export const setupTestLifecycle = ({
           | "server_call"
           | "processing";
 
-        sendMetric("duration", Math.round(statValue * 1000), {
+        const networkMetricTags: NetworkMetricTags = {
           metric_type: "network",
           metric_subtype: networkPhase,
           sdk: sdk || getLatestSdkVersion(),
           operation: operationName,
           test: testNameExtracted,
-          network_phase: networkPhase,
-        });
+        };
+        sendMetric("duration", Math.round(statValue * 1000), networkMetricTags);
       }
     }
 
