@@ -339,12 +339,11 @@ export async function sendSlackNotification(options: {
 
   const targetChannel = options.channel || process.env.SLACK_CHANNEL;
 
-  const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
-  const tagMessage = shouldTagFabri ? " <@fabri>" : "";
-  const icon = shouldTagFabri ? "🚨" : "⚠️";
+  const shouldTagFabri = options.failLines.length >= PATTERNS.minFailLines;
+  const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
 
   const sections = [
-    `*Test*: ${options.testName} ${icon} ${tagMessage}`,
+    `*Test*: ${options.testName} ${tagMessage}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     `<${workflowRunUrl}|View Run>`,
     `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
