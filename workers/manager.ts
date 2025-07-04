@@ -404,7 +404,7 @@ export class WorkerManager {
       if (
         lastPart &&
         !isNaN(Number(lastPart)) &&
-        Object.keys(VersionList).includes(lastPart)
+        VersionList.some(v => v.sdkVersion === parseInt(lastPart))
       ) {
         sdkVersion = lastPart;
         // Installation ID is everything between baseName and version
@@ -634,25 +634,22 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 export function getLatestVersion(): string {
-  const versions = Object.keys(VersionList);
-  const latestVersion = versions.pop();
-  if (!latestVersion) {
+  if (VersionList.length === 0) {
     // Fallback to a known good version if VersionList is somehow empty
     return "300";
   }
-  return latestVersion;
+  const latestVersion = VersionList.reduce((latest, current) => 
+    current.sdkVersion > latest.sdkVersion ? current : latest
+  );
+  return latestVersion.sdkVersion.toString();
 }
 
 export function getNodeSdkVersion(sdkVersion: string): string {
-  return (
-    VersionList[Number(sdkVersion) as keyof typeof VersionList]?.nodeVersion ||
-    "unknown"
-  );
+  const versionConfig = VersionList.find(v => v.sdkVersion === Number(sdkVersion));
+  return versionConfig?.nodeVersion || "unknown";
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
-  return (
-    VersionList[Number(sdkVersion) as keyof typeof VersionList]
-      ?.libXmtpVersion || "unknown"
-  );
+  const versionConfig = VersionList.find(v => v.sdkVersion === Number(sdkVersion));
+  return versionConfig?.libXmtpVersion || "unknown";
 }

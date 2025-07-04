@@ -65,8 +65,9 @@ import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
 // SDK version mappings
-export const VersionList = {
-  30: {
+export const VersionList = [
+  {
+    sdkVersion: 30,
     Client: ClientMls,
     Conversation: ConversationMls,
     Dm: ConversationMls,
@@ -76,7 +77,8 @@ export const VersionList = {
     nodeVersion: "0.0.13",
     libXmtpVersion: "0.0.9",
   },
-  47: {
+  {
+    sdkVersion: 47,
     Client: Client47,
     Conversation: Conversation47,
     Dm: Dm47,
@@ -86,7 +88,8 @@ export const VersionList = {
     nodeVersion: "0.0.47",
     libXmtpVersion: "6bd613d",
   },
-  105: {
+  {
+    sdkVersion: 105,
     Client: Client105,
     Conversation: Conversation105,
     Dm: Dm105,
@@ -96,7 +99,8 @@ export const VersionList = {
     nodeVersion: "1.0.5",
     libXmtpVersion: "6eb1ce4",
   },
-  209: {
+  {
+    sdkVersion: 209,
     Client: Client209,
     Conversation: Conversation209,
     Dm: Dm209,
@@ -106,7 +110,8 @@ export const VersionList = {
     nodeVersion: "2.0.9",
     libXmtpVersion: "bfadb76",
   },
-  210: {
+  {
+    sdkVersion: 210,
     Client: Client210,
     Conversation: Conversation210,
     Dm: Dm210,
@@ -116,7 +121,8 @@ export const VersionList = {
     nodeVersion: "2.1.0",
     libXmtpVersion: "7b9b4d0",
   },
-  220: {
+  {
+    sdkVersion: 220,
     Client: Client220,
     Conversation: Conversation220,
     Dm: Dm220,
@@ -126,7 +132,8 @@ export const VersionList = {
     nodeVersion: "2.2.0",
     libXmtpVersion: "d0f0b67",
   },
-  300: {
+  {
+    sdkVersion: 300,
     Client: Client300,
     Conversation: Conversation300,
     Dm: Dm300,
@@ -136,7 +143,7 @@ export const VersionList = {
     nodeVersion: "3.0.1",
     libXmtpVersion: "dc3e8c8",
   },
-};
+];
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -291,8 +298,11 @@ export async function createClient(
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
   // Use type assertion to access the static version property
-  const libXmtpVersion =
-    VersionList[sdkVersion as keyof typeof VersionList].libXmtpVersion;
+  const versionConfig = VersionList.find(v => v.sdkVersion === sdkVersion);
+  if (!versionConfig) {
+    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
+  }
+  const libXmtpVersion = versionConfig.libXmtpVersion;
 
   const account = privateKeyToAccount(walletKey);
   const address = account.address;
@@ -336,8 +346,11 @@ export const regressionClient = async (
     );
   }
 
-  const ClientClass =
-    VersionList[versionInt as keyof typeof VersionList].Client;
+  const versionConfig = VersionList.find(v => v.sdkVersion === versionInt);
+  if (!versionConfig) {
+    throw new Error(`SDK version ${versionInt} not found in VersionList`);
+  }
+  const ClientClass = versionConfig.Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
   if (versionInt === 30) {
@@ -464,9 +477,11 @@ export function getEnvPath(): string {
 }
 export function getLatestSdkVersion(): string {
   const sdkVersion = sdkVersionOptions[0];
-  const libXmtpVersion =
-    VersionList[sdkVersion as unknown as keyof typeof VersionList]
-      .libXmtpVersion;
+  const versionConfig = VersionList.find(v => v.sdkVersion === parseInt(sdkVersion));
+  if (!versionConfig) {
+    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
+  }
+  const libXmtpVersion = versionConfig.libXmtpVersion;
   return sdkVersion + "@" + libXmtpVersion;
 }
 /**
@@ -500,9 +515,10 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 
-export const sdkVersionOptions = Object.keys(VersionList)
-  .filter((key) => parseInt(key) >= 200)
-  .sort((a, b) => parseInt(b) - parseInt(a));
+export const sdkVersionOptions = VersionList
+  .filter((config) => config.sdkVersion >= 200)
+  .sort((a, b) => b.sdkVersion - a.sdkVersion)
+  .map((config) => config.sdkVersion.toString());
 
 /**
  * Creates random installations for a worker

@@ -3,8 +3,8 @@ import fs from "fs";
 import path from "path";
 import { VersionList } from "@helpers/client";
 
-type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
-const staticConfigs = Object.values(VersionList);
+type VersionConfig = (typeof VersionList)[number];
+const staticConfigs = VersionList;
 /**
  * Auto-discover SDK and bindings packages in node_modules/@xmtp
  */
