@@ -21,7 +21,13 @@ interface ParsedTestName {
 
 // Simplified metric tags interface - consolidates all previous metric tag types
 export interface MetricTags {
-  metric_type: "agent" | "operation" | "network" | "delivery" | "response";
+  metric_type:
+    | "agent"
+    | "operation"
+    | "network"
+    | "delivery"
+    | "response"
+    | "error";
   metric_subtype?: string;
   env?: string;
   region?: string;
@@ -53,11 +59,14 @@ export interface DurationMetricTags extends MetricTags {
   members: string;
 }
 interface LogPayload extends MetricTags {
+  metric_type: "error";
+  metric_subtype: "test";
   message: string;
   level: string;
   service: string;
   source: string;
   test: string;
+  workflowRunUrl: string;
 }
 interface NetworkStats {
   "DNS Lookup": number;
@@ -264,19 +273,15 @@ export async function sendDatadogLog(
   test: string,
   failLines: string[],
 ): Promise<void> {
-  const logPayload = {
+  const logPayload: LogPayload = {
+    metric_type: "error",
+    metric_subtype: "test",
     message: Array.from(errorLogs).join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
     test,
-    failLines: failLines.length,
-    repository: process.env.GITHUB_REPOSITORY as string,
-    workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-    env: process.env.XMTP_ENV,
-    region: process.env.GEOLOCATION as string,
-    sdk: getLatestSdkVersion(),
   };
 
   try {
