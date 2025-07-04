@@ -289,22 +289,24 @@ export function shouldFilterOutTest(
 ): boolean {
   const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
   if (jobStatus === "success") {
-    console.log(`Slack notification skipped (status: ${jobStatus})`);
+    console.warn(`Slack notification skipped (status: ${jobStatus})`);
     return true;
   }
 
   const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
   if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
-    console.log(`Slack notification skipped (branch: ${branchName})`);
+    console.warn(`Slack notification skipped (branch: ${branchName})`);
     return true;
   }
 
   if (!errorLogs || errorLogs.size === 0) {
+    console.warn("No error logs, skipping");
     return true;
   }
 
-  if (failLines.length === 0) {
-    return true; // Don't show if tests don't fail
+  if (Array.isArray(failLines) && failLines.length === 0) {
+    console.warn("No failLines logs, skipping");
+    return true;
   }
 
   return false;

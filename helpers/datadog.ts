@@ -316,11 +316,11 @@ export async function sendDatadogLog(
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
     test,
-    failLines: Array.isArray(failLines) ? failLines.length : 0,
+    failLines: failLines.length,
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-    environment: process.env.XMTP_ENV,
+    env: process.env.XMTP_ENV,
     region: process.env.GEOLOCATION as string,
     sdk: getLatestSdkVersion(),
   };
