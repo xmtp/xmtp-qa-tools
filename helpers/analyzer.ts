@@ -283,7 +283,10 @@ export function sanitizeLogs(logs: string): string {
 /**
  * Check if test should be filtered out based on known issues
  */
-export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
+export function shouldFilterOutTest(
+  errorLogs: Set<string>,
+  failLines: string[],
+): boolean {
   const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
   if (jobStatus === "success") {
     console.log(`Slack notification skipped (status: ${jobStatus})`);
@@ -299,8 +302,6 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
   if (!errorLogs || errorLogs.size === 0) {
     return true;
   }
-
-  const failLines = extractFailLines(errorLogs);
 
   if (failLines.length === 0) {
     return true; // Don't show if tests don't fail
@@ -325,9 +326,10 @@ export function shouldFilterOutTest(errorLogs: Set<string>): boolean {
 export async function sendSlackNotification(options: {
   testName: string;
   errorLogs: Set<string>;
+  failLines: string[];
   channel?: string;
 }): Promise<void> {
-  if (shouldFilterOutTest(options.errorLogs)) {
+  if (shouldFilterOutTest(options.errorLogs, options.failLines)) {
     return;
   }
   const serverUrl = process.env.GITHUB_SERVER_URL;
@@ -343,9 +345,9 @@ export async function sendSlackNotification(options: {
 
   const sections = [
     `*Test*: ${options.testName} ${icon} ${tagMessage}`,
-    `\`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\``,
+    `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     `<${workflowRunUrl}|View Run>`,
-    `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
+    `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
   ];
 
   const message = sections.filter(Boolean).join("\n");

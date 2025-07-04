@@ -1,7 +1,11 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { extractErrorLogs, sendSlackNotification } from "@helpers/analyzer";
+import {
+  extractErrorLogs,
+  extractFailLines,
+  sendSlackNotification,
+} from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
 import { sendDatadogLog } from "@helpers/datadog";
@@ -390,9 +394,11 @@ async function runVitestTest(
         if (options.explicitLogFlag) {
           const errorLogs = extractErrorLogs(logger.logFileName, 20);
           if (errorLogs.size > 0) {
+            const failLines = extractFailLines(errorLogs);
             await sendDatadogLog(Array.from(errorLogs), {
               channel: process.env.SLACK_CHANNEL,
               test: testName,
+              failLines,
               env: process.env.XMTP_ENV,
               region: process.env.GEOLOCATION,
               sdk: "latest",
@@ -400,6 +406,7 @@ async function runVitestTest(
             await sendSlackNotification({
               testName,
               errorLogs,
+              failLines,
             });
           }
         }
