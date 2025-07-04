@@ -7,7 +7,6 @@ import {
   type Conversation,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
-import { getAddress } from "viem";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
