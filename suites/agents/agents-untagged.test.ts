@@ -1,3 +1,5 @@
+import { streamTimeout } from "@helpers/client";
+import { sendMetric } from "@helpers/datadog";
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
 import { getAddresses } from "@inboxes/utils";
@@ -53,6 +55,16 @@ describe(testName, async () => {
         "hi",
         1,
       );
+
+      sendMetric("response", result?.averageEventTiming || streamTimeout, {
+        test: testName,
+        metric_type: "agent",
+        metric_subtype: "dm",
+        agent: agent.name,
+        address: agent.address,
+        sdk: workers.getCreator().sdk,
+      });
+
       expect(result?.allReceived).toBe(false);
     });
   }

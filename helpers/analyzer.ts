@@ -307,6 +307,10 @@ export function shouldFilterOutTest(
     return true; // Don't show if tests don't fail
   }
 
+  return false;
+}
+
+export function filterKnownPatterns(failLines: string[]): boolean | undefined {
   // Check each configured filter
   for (const filter of PATTERNS.KNOWN_ISSUES) {
     const matchingLines = failLines.filter((line) =>
@@ -319,15 +323,18 @@ export function shouldFilterOutTest(
       return true;
     }
   }
-
   return false;
 }
-
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
   failLines: string[],
 ): Promise<void> {
+  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
+  const filteredOut = filterKnownPatterns(failLines);
+  if (filteredOut) return;
+  if (!shouldTagFabri) return;
+
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
@@ -335,7 +342,6 @@ export async function sendSlackNotification(
 
   const targetChannel = process.env.SLACK_CHANNEL;
 
-  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
 
   const sections = [
