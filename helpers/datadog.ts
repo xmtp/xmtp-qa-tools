@@ -52,7 +52,13 @@ export interface DurationMetricTags extends MetricTags {
   installations: string;
   members: string;
 }
-
+interface LogPayload extends MetricTags {
+  message: string;
+  level: string;
+  service: string;
+  source: string;
+  test: string;
+}
 interface NetworkStats {
   "DNS Lookup": number;
   "TCP Connection": number;
@@ -171,58 +177,6 @@ export function sendMetric(
   }
 }
 
-// Backward compatibility functions - simplified wrappers
-export function sendDurationMetric(
-  metricValue: number,
-  tags: DurationMetricTags,
-): void {
-  sendMetric("duration", metricValue, tags);
-}
-
-export function sendDeliveryMetric(
-  metricValue: number,
-  tags: MetricTags,
-): void {
-  sendMetric("delivery", metricValue, { ...tags, metric_type: "delivery" });
-}
-
-export function sendResponseMetric(
-  metricValue: number,
-  tags: MetricTags,
-): void {
-  sendMetric("response", metricValue, { ...tags, metric_type: "agent" });
-}
-
-// Grouping function - optimized
-export function groupMetricsByOperation(
-  metrics: [string, MetricData][],
-): Map<
-  string,
-  { operationName: string; members: string; operationData: MetricData }
-> {
-  const groups = new Map<
-    string,
-    { operationName: string; members: string; operationData: MetricData }
-  >();
-
-  for (const [operation, data] of metrics) {
-    const operationPart = operation.split(":")[0];
-    const match = operationPart.match(/^([a-zA-Z]+)-?(\d+)?$/);
-
-    const operationName = match?.[1] || operationPart;
-    const memberCount = match?.[2] || data.members || "-";
-    const groupKey = `${operationName}-${memberCount}`;
-
-    groups.set(groupKey, {
-      operationName,
-      members: memberCount,
-      operationData: data,
-    });
-  }
-
-  return groups;
-}
-
 // Test name parsing - simplified
 export function parseTestName(testName: string): ParsedTestName {
   const [metricNameParts, metricDescription = ""] = testName.split(":");
@@ -326,6 +280,8 @@ export async function sendDatadogLog(
   };
 
   try {
+    sendMetric("error_log", failLines.length, logPayload);
+
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",
       headers: {
