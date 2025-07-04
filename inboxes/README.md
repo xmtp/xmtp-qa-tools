@@ -58,6 +58,9 @@ yarn gen --count 500 --installations 10 --envs local
 
 # Multiple environments
 yarn gen --count 200 --installations 5 --envs local,dev,production
+
+# Generate installations with content
+yarn gen:installations
 ```
 
 ### Batch Generation with gen.sh
