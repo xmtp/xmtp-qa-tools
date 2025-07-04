@@ -316,11 +316,6 @@ export async function sendDatadogLog(
     return;
   }
 
-  const serverUrl = process.env.GITHUB_SERVER_URL;
-  const repository = process.env.GITHUB_REPOSITORY;
-  const runId = process.env.GITHUB_RUN_ID;
-  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
   const logPayload = {
     message: lines.join("\n"),
     level: "error",
@@ -330,7 +325,7 @@ export async function sendDatadogLog(
     failLines: (context.failLines as string[]).length,
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
-    workflowRunUrl: workflowRunUrl,
+    workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
     environment: process.env.XMTP_ENV,
     region: process.env.GEOLOCATION as string,
     ...context,
