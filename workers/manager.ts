@@ -402,18 +402,7 @@ export class WorkerManager {
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version
-      if (
-        lastPart &&
-        [
-          "0.0.13",
-          "0.0.47",
-          "1.0.5",
-          "2.0.9",
-          "2.1.0",
-          "2.2.0",
-          "3.0.1",
-        ].includes(lastPart)
-      ) {
+      if (lastPart && nodeVersionOptions().includes(lastPart)) {
         sdkVersion = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
