@@ -4,6 +4,7 @@ import path from "path";
 import {
   extractErrorLogs,
   extractFailLines,
+  logUpload,
   sendSlackNotification,
   shouldFilterOutTest,
 } from "@helpers/analyzer";
@@ -391,20 +392,7 @@ async function runVitestTest(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        if (options.explicitLogFlag) {
-          const apiKey = process.env.DATADOG_API_KEY;
-          if (!apiKey) return;
-
-          const errorLogs = extractErrorLogs(logger.logFileName, 20);
-
-          if (errorLogs.size > 0) {
-            const failLines = extractFailLines(errorLogs);
-            if (shouldFilterOutTest(errorLogs, failLines)) {
-              await sendDatadogLog(errorLogs, testName, failLines);
-              await sendSlackNotification(errorLogs, testName, failLines);
-            }
-          }
-        }
+        if (options.explicitLogFlag) await logUpload(logger.logFileName);
 
         logger.close();
 

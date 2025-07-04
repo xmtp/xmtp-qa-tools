@@ -324,7 +324,7 @@ export async function sendDatadogLog(
     region: process.env.GEOLOCATION as string,
     sdk: getLatestSdkVersion(),
   };
-
+  console.debug(logPayload);
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",

@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
+import { sendDatadogLog } from "./datadog";
 import knownIssues from "./known_issues.json";
 import { processLogFile, stripAnsi } from "./logger";
 
@@ -10,6 +11,7 @@ export const PATTERNS = {
   minFailLines: 3,
   minumumLineLength: 40,
   maxLineLength: 150,
+  maxErrorLogs: 20,
 
   DEDUPE: [
     "sqlcipher_mlock",
@@ -192,10 +194,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Extract error logs from log files with deduplication
  */
-export function extractErrorLogs(
-  testName: string,
-  limit?: number,
-): Set<string> {
+export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
@@ -238,9 +237,7 @@ export function extractErrorLogs(
       }
     }
 
-    console.log(
-      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
-    );
+    console.log(`Found ${errorLines.length} error lines`);
 
     // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
@@ -252,9 +249,9 @@ export function extractErrorLogs(
         return new Set();
       }
     }
-
+    const limit = PATTERNS.maxErrorLogs;
     if (errorLines.length > 0) {
-      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
+      const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
       console.log(resultSet);
       return resultSet;
@@ -311,7 +308,22 @@ export function shouldFilterOutTest(
 
   return false;
 }
+export async function logUpload(logFileName: string,testName  :string) {
+  const apiKey = process.env.DATADOG_API_KEY;
+  if (!apiKey) return;
 
+  const errorLogs = extractErrorLogs(logFileName);
+
+  if (errorLogs.size > 0) {
+    const failLines = extractFailLines(errorLogs);
+    const shouldUploadLogs = !shouldFilterOutTest(errorLogs, failLines);
+    console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
+    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, failLines);
+    const shouldSendNotification = failLines.length >= PATTERNS.minFailLines;
+    if (shouldSendNotification)
+      await sendSlackNotification(errorLogs, testName, failLines);
+    
+}
 export function filterKnownPatterns(failLines: string[]): boolean | undefined {
   // Check each configured filter
   for (const filter of PATTERNS.KNOWN_ISSUES) {
@@ -332,24 +344,21 @@ export async function sendSlackNotification(
   test: string,
   failLines: string[],
 ): Promise<void> {
-  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
-  const filteredOut = filterKnownPatterns(failLines);
-  if (filteredOut) return;
-  if (!shouldTagFabri) return;
-
+  if (!process.env.SLACK_CHANNEL) {
+    console.warn("No Slack channel found, skipping");
+    return;
+  }
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
-  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
-
-  const targetChannel = process.env.SLACK_CHANNEL;
-
-  const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
+  const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
+  
+  const tagMessage = "<@fabri>"
 
   const sections = [
     `*Test*: ${test} ${tagMessage}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
-    `<${workflowRunUrl}|View Run>`,
+    `${workflowRunUrl}`,
     `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
@@ -361,7 +370,7 @@ export async function sendSlackNotification(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: targetChannel,
+      channel: process.env.SLACK_CHANNEL,
       text: message,
       mrkdwn: true,
     }),
