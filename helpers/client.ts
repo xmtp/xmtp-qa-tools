@@ -344,7 +344,6 @@ export const regressionClient = async (
   const versionConfig = getVersionConfig(sdkVersion);
   const ClientClass = versionConfig.Client;
   let client = null;
-  let libXmtpVersionAfterClient = "unknown";
 
   if (sdkVersion === "0.0.13") {
     throw new Error("Invalid version");
@@ -358,7 +357,6 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (sdkVersion === "1.0.5") {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
@@ -368,7 +366,6 @@ export const regressionClient = async (
       loggingLevel,
       apiUrl,
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
     const signer = createSigner(walletKey);
     // @ts-expect-error: SDK version compatibility - signer interface differs across versions
@@ -380,13 +377,6 @@ export const regressionClient = async (
       apiUrl,
       codecs: [new ReactionCodec(), new ReplyCodec()],
     });
-    libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
-  }
-
-  if (libXmtpVersion !== libXmtpVersionAfterClient) {
-    console.debug(
-      `libXmtpVersion mismatch: ${libXmtpVersionAfterClient} !== ${libXmtpVersion}`,
-    );
   }
 
   if (!client) {
@@ -396,8 +386,7 @@ export const regressionClient = async (
   return client;
 };
 
-// @ts-expect-error: SDK version compatibility issues
-export const getLibXmtpVersion = (client: typeof ClientClass) => {
+export const getLibXmtpVersion = (client: any) => {
   try {
     const version = client.version;
     if (!version || typeof version !== "string") return "unknown";
