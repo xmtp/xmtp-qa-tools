@@ -339,7 +339,7 @@ export async function sendSlackNotification(options: {
 
   const targetChannel = options.channel || process.env.SLACK_CHANNEL;
 
-  const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
+  const shouldTagFabri = options.failLines.length >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
   const icon = shouldTagFabri ? "🚨" : "⚠️";
 
