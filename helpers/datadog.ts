@@ -304,14 +304,98 @@ export function flushMetrics(): Promise<void> {
   return state.isInitialized ? metrics.flush() : Promise.resolve();
 }
 
-// Datadog log sending - optimized
+// Datadog error metrics sending - optimized for better control
 export async function sendDatadogLog(
   errorLogs: Set<string>,
   test: string,
   failLines: string[],
 ): Promise<void> {
+  if (!state.isInitialized) return;
+
+  try {
+    const errorLogsArray = Array.from(errorLogs);
+    const tags: MetricTags = {
+      metric_type: "agent",
+      metric_subtype: "test_failure",
+      test,
+      env: process.env.XMTP_ENV,
+      region: process.env.GEOLOCATION,
+    };
+
+    // Send error count metric
+    sendMetric("test.error_count", errorLogsArray.length, tags);
+    
+    // Send fail lines count metric
+    sendMetric("test.fail_lines_count", failLines.length, tags);
+    
+    // Send test failure indicator (1 = failed, 0 = passed)
+    sendMetric("test.failure_indicator", errorLogsArray.length > 0 ? 1 : 0, tags);
+    
+    // Send error rate metric (errors per fail line)
+    const errorRate = failLines.length > 0 ? errorLogsArray.length / failLines.length : 0;
+    sendMetric("test.error_rate", errorRate, tags);
+
+    // Categorize errors by type for better insights
+    const errorCategories = categorizeErrors(errorLogsArray);
+    for (const [category, count] of Object.entries(errorCategories)) {
+      sendMetric("test.error_by_category", count, {
+        ...tags,
+        metric_subtype: category,
+      });
+    }
+
+    // Optional: Still send to logs for detailed debugging (can be disabled)
+    if (process.env.DATADOG_SEND_LOGS === "true") {
+      await sendToDatadogLogs(errorLogsArray, test, failLines);
+    }
+
+  } catch (err) {
+    console.error("Failed to send error metrics to Datadog:", err);
+  }
+}
+
+// Helper function to categorize errors for better metrics
+function categorizeErrors(errorLogs: string[]): Record<string, number> {
+  const categories: Record<string, number> = {
+    timeout: 0,
+    connection: 0,
+    validation: 0,
+    parsing: 0,
+    authentication: 0,
+    network: 0,
+    unknown: 0,
+  };
+
+  for (const log of errorLogs) {
+    const logLower = log.toLowerCase();
+    if (logLower.includes("timeout") || logLower.includes("timed out")) {
+      categories.timeout++;
+    } else if (logLower.includes("connection") || logLower.includes("connect")) {
+      categories.connection++;
+    } else if (logLower.includes("validation") || logLower.includes("invalid")) {
+      categories.validation++;
+    } else if (logLower.includes("parse") || logLower.includes("parsing")) {
+      categories.parsing++;
+    } else if (logLower.includes("auth") || logLower.includes("unauthorized")) {
+      categories.authentication++;
+    } else if (logLower.includes("network") || logLower.includes("dns")) {
+      categories.network++;
+    } else {
+      categories.unknown++;
+    }
+  }
+
+  return categories;
+}
+
+// Original log sending function (optional, for detailed debugging)
+async function sendToDatadogLogs(
+  errorLogs: string[],
+  test: string,
+  failLines: string[],
+): Promise<void> {
   const logPayload = {
-    message: Array.from(errorLogs).join("\n"),
+    message: errorLogs.join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
