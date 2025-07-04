@@ -4,7 +4,8 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  sdkVersionOptions,
+  getVersionConfig,
+  nodeVersionOptions,
   sleep,
   VersionList,
 } from "@helpers/client";
@@ -31,7 +32,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = sdkVersionOptions.slice(0, testVersions);
+  const availableVersions = nodeVersionOptions().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {
@@ -400,12 +401,8 @@ export class WorkerManager {
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
-      // Check if last part is a valid SDK version (numeric)
-      if (
-        lastPart &&
-        !isNaN(Number(lastPart)) &&
-        Object.keys(VersionList).includes(lastPart)
-      ) {
+      // Check if last part is a valid SDK version
+      if (lastPart && nodeVersionOptions().includes(lastPart)) {
         sdkVersion = lastPart;
         // Installation ID is everything between baseName and version
         if (parts.length > 2) {
@@ -433,7 +430,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: sdkVersion + "@" + libXmtpVersion,
+      sdk: sdkVersion + "-" + libXmtpVersion,
       folder,
       walletKey,
       encryptionKey,
@@ -634,25 +631,28 @@ export function getDataSubFolderCount() {
   return fs.readdirSync(`${preBasePath}/.data`).length;
 }
 export function getLatestVersion(): string {
-  const versions = Object.keys(VersionList);
-  const latestVersion = versions.pop();
-  if (!latestVersion) {
+  if (VersionList.length === 0) {
     // Fallback to a known good version if VersionList is somehow empty
-    return "300";
+    return "3.0.1";
   }
-  return latestVersion;
+  // Return the latest version (last in array)
+  return "3.0.1";
 }
 
 export function getNodeSdkVersion(sdkVersion: string): string {
-  return (
-    VersionList[Number(sdkVersion) as keyof typeof VersionList]?.nodeVersion ||
-    "unknown"
-  );
+  try {
+    const versionConfig = getVersionConfig(sdkVersion);
+    return versionConfig.nodeVersion;
+  } catch {
+    return "unknown";
+  }
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
-  return (
-    VersionList[Number(sdkVersion) as keyof typeof VersionList]
-      ?.libXmtpVersion || "unknown"
-  );
+  try {
+    const versionConfig = getVersionConfig(sdkVersion);
+    return versionConfig.libXmtpVersion;
+  } catch {
+    return "unknown";
+  }
 }
