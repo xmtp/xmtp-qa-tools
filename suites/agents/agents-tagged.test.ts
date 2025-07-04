@@ -1,5 +1,6 @@
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getAddresses } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
@@ -47,6 +48,10 @@ describe(testName, async () => {
         .client.conversations.newGroupWithIdentifiers([
           {
             identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          },
+          {
+            identifier: getAddresses(1)[0],
             identifierKind: IdentifierKind.Ethereum,
           },
         ]);

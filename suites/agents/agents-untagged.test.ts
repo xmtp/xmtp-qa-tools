@@ -1,11 +1,13 @@
 import { verifyBotMessageStream } from "@helpers/streams";
 import { setupTestLifecycle } from "@helpers/vitest";
+import { getAddresses } from "@inboxes/utils";
 import { getWorkers } from "@workers/manager";
 import {
   IdentifierKind,
   type Conversation,
   type XmtpEnv,
 } from "@xmtp/node-sdk";
+import { getAddress } from "viem";
 import { describe, expect, it } from "vitest";
 import productionAgents from "./agents.json";
 import { type AgentConfig } from "./helper";
@@ -38,6 +40,10 @@ describe(testName, async () => {
         .client.conversations.newGroupWithIdentifiers([
           {
             identifier: agent.address,
+            identifierKind: IdentifierKind.Ethereum,
+          },
+          {
+            identifier: getAddresses(1)[0],
             identifierKind: IdentifierKind.Ethereum,
           },
         ]);
