@@ -441,7 +441,7 @@ export class WorkerManager {
     // Create the base worker data
     const workerData: WorkerBase = {
       name: baseName,
-      sdk: sdkVersion + "@" + libXmtpVersion,
+      sdk: sdkVersion + "-" + libXmtpVersion,
       folder,
       walletKey,
       encryptionKey,

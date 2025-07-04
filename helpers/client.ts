@@ -71,9 +71,8 @@ export const VersionList = [
     Conversation: Conversation13,
     Dm: Conversation13,
     Group: Conversation13,
-    sdkPackage: "node-sdk-mls",
-    bindingsPackage: "node-bindings-mls",
     nodeVersion: "0.0.13",
+    bindingsPackage: "0.0.9",
     libXmtpVersion: "0.0.9",
   },
   {
@@ -81,9 +80,8 @@ export const VersionList = [
     Conversation: Conversation47,
     Dm: Dm47,
     Group: Group47,
-    sdkPackage: "node-sdk-47",
-    bindingsPackage: "node-bindings-41",
     nodeVersion: "0.0.47",
+    bindingsPackage: "0.4.1",
     libXmtpVersion: "6bd613d",
   },
   {
@@ -91,9 +89,8 @@ export const VersionList = [
     Conversation: Conversation105,
     Dm: Dm105,
     Group: Group105,
-    sdkPackage: "node-sdk-105",
-    bindingsPackage: "node-bindings-113",
     nodeVersion: "1.0.5",
+    bindingsPackage: "1.1.3",
     libXmtpVersion: "6eb1ce4",
   },
   {
@@ -101,9 +98,8 @@ export const VersionList = [
     Conversation: Conversation209,
     Dm: Dm209,
     Group: Group209,
-    sdkPackage: "node-sdk-209",
-    bindingsPackage: "node-bindings-118",
     nodeVersion: "2.0.9",
+    bindingsPackage: "1.1.8",
     libXmtpVersion: "bfadb76",
   },
   {
@@ -111,9 +107,8 @@ export const VersionList = [
     Conversation: Conversation210,
     Dm: Dm210,
     Group: Group210,
-    sdkPackage: "node-sdk-210",
-    bindingsPackage: "node-bindings-120",
     nodeVersion: "2.1.0",
+    bindingsPackage: "1.2.0",
     libXmtpVersion: "7b9b4d0",
   },
   {
@@ -121,9 +116,8 @@ export const VersionList = [
     Conversation: Conversation220,
     Dm: Dm220,
     Group: Group220,
-    sdkPackage: "node-sdk-220",
-    bindingsPackage: "node-bindings-122",
-    nodeVersion: "2.2.0",
+    nodeVersion: "2.2.1",
+    bindingsPackage: "1.2.2",
     libXmtpVersion: "d0f0b67",
   },
   {
@@ -131,9 +125,8 @@ export const VersionList = [
     Conversation: Conversation300,
     Dm: Dm300,
     Group: Group300,
-    sdkPackage: "node-sdk-300",
-    bindingsPackage: "node-bindings-125",
     nodeVersion: "3.0.1",
+    bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
   },
 ];
@@ -405,7 +398,7 @@ export const getLibXmtpVersion = (client: typeof ClientClass) => {
     const version = client.version;
     if (!version || typeof version !== "string") return "unknown";
 
-    const parts = version.split("@");
+    const parts = version.split("-");
     if (parts.length <= 1) return "unknown";
 
     const spaceParts = parts[1].split(" ");
@@ -473,7 +466,7 @@ export function getLatestSdkVersion(): string {
   const sdkVersion = sdkVersionOptions[0];
   const versionConfig = getVersionConfig(sdkVersion);
   const libXmtpVersion = versionConfig.libXmtpVersion;
-  return sdkVersion + "@" + libXmtpVersion;
+  return sdkVersion + "-" + libXmtpVersion;
 }
 /**
  * Loads environment variables from the specified test's .env file if it exists
