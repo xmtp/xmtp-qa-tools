@@ -323,30 +323,26 @@ export function shouldFilterOutTest(
   return false;
 }
 
-export async function sendSlackNotification(options: {
-  testName: string;
-  errorLogs: Set<string>;
-  failLines: string[];
-  channel?: string;
-}): Promise<void> {
-  if (shouldFilterOutTest(options.errorLogs, options.failLines)) {
-    return;
-  }
+export async function sendSlackNotification(
+  errorLogs: Set<string>,
+  test: string,
+  failLines: string[],
+): Promise<void> {
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
   const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
 
-  const targetChannel = options.channel || process.env.SLACK_CHANNEL;
+  const targetChannel = process.env.SLACK_CHANNEL;
 
-  const shouldTagFabri = options.failLines.length >= PATTERNS.minFailLines;
+  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
 
   const sections = [
-    `*Test*: ${options.testName} ${tagMessage}`,
+    `*Test*: ${test} ${tagMessage}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     `<${workflowRunUrl}|View Run>`,
-    `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
+    `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
   const message = sections.filter(Boolean).join("\n");

@@ -3,6 +3,7 @@ import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
 import { shouldFilterOutTest } from "./analyzer";
+import { getLatestSdkVersion } from "./client";
 
 // Consolidated interfaces
 interface MetricData {
@@ -306,29 +307,23 @@ export function flushMetrics(): Promise<void> {
 
 // Datadog log sending - optimized
 export async function sendDatadogLog(
-  lines: string[],
-  context: Record<string, unknown> = {},
+  errorLogs: Set<string>,
+  test: string,
+  failLines: string[],
 ): Promise<void> {
-  const apiKey = process.env.DATADOG_API_KEY;
-  if (!apiKey) return;
-
-  if (shouldFilterOutTest(new Set(lines), context.failLines as string[])) {
-    return;
-  }
-
   const logPayload = {
-    message: lines.join("\n"),
+    message: Array.from(errorLogs).join("\n"),
     level: "error",
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
-    channel: context.channel || "general",
-    failLines: Array.isArray(context.failLines) ? context.failLines.length : 0,
+    test,
+    failLines: Array.isArray(failLines) ? failLines.length : 0,
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
     environment: process.env.XMTP_ENV,
     region: process.env.GEOLOCATION as string,
-    ...context,
+    sdk: getLatestSdkVersion(),
   };
 
   try {
