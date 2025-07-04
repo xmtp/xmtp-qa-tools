@@ -401,7 +401,7 @@ async function runVitestTest(
             const failLines = extractFailLines(errorLogs);
             if (shouldFilterOutTest(errorLogs, failLines)) {
               await sendDatadogLog(errorLogs, testName, failLines);
-              //await sendSlackNotification(errorLogs, testName, failLines);
+              await sendSlackNotification(errorLogs, testName, failLines);
             }
           }
         }
