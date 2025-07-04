@@ -1,16 +1,9 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import {
-  extractErrorLogs,
-  extractFailLines,
-  logUpload,
-  sendSlackNotification,
-  shouldFilterOutTest,
-} from "@helpers/analyzer";
+import { logUpload } from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
-import { sendDatadogLog } from "@helpers/datadog";
 
 interface RetryOptions {
   maxAttempts: number;
@@ -392,7 +385,8 @@ async function runVitestTest(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        if (options.explicitLogFlag) await logUpload(logger.logFileName);
+        if (options.explicitLogFlag)
+          await logUpload(logger.logFileName, testName);
 
         logger.close();
 

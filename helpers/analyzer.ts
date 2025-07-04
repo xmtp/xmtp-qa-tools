@@ -308,7 +308,7 @@ export function shouldFilterOutTest(
 
   return false;
 }
-export async function logUpload(logFileName: string,testName  :string) {
+export async function logUpload(logFileName: string, testName: string) {
   const apiKey = process.env.DATADOG_API_KEY;
   if (!apiKey) return;
 
@@ -321,10 +321,11 @@ export async function logUpload(logFileName: string,testName  :string) {
     if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, failLines);
     const shouldSendNotification = failLines.length >= PATTERNS.minFailLines;
     if (shouldSendNotification)
-      await sendSlackNotification(errorLogs, testName, failLines);
-    
+      await sendSlackNotification(errorLogs, testName);
+  }
 }
-export function filterKnownPatterns(failLines: string[]): boolean | undefined {
+
+export function hasKnownPattern(failLines: string[]): boolean | undefined {
   // Check each configured filter
   for (const filter of PATTERNS.KNOWN_ISSUES) {
     const matchingLines = failLines.filter((line) =>
@@ -339,6 +340,7 @@ export function filterKnownPatterns(failLines: string[]): boolean | undefined {
   }
   return false;
 }
+
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
@@ -348,17 +350,22 @@ export async function sendSlackNotification(
     console.warn("No Slack channel found, skipping");
     return;
   }
+  const hasKnownPattern = hasKnownPattern(failLines);
+  if (hasKnownPattern) {
+    console.warn("Known pattern found, skipping");
+    return;
+  }
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
   const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
-  
-  const tagMessage = "<@fabri>"
+
+  const tagMessage = "<@fabri>";
 
   const sections = [
     `*Test*: ${test} ${tagMessage}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
-    `${workflowRunUrl}`,
+    workflowRunUrl,
     `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
