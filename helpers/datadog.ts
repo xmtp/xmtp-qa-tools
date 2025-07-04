@@ -1,8 +1,6 @@
 import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
-import fetch from "node-fetch";
-import { getLatestSdkVersion } from "./client";
 
 // Consolidated interfaces
 interface MetricData {
@@ -20,32 +18,33 @@ interface ParsedTestName {
 }
 
 // Simplified metric tags interface - consolidates all previous metric tag types
-export interface MetricTags {
-  metric_type:
-    | "agent"
-    | "operation"
-    | "network"
-    | "delivery"
-    | "response"
-    | "error";
-  metric_subtype?: string;
+interface MetricTags {
+  metric_type: string;
+  metric_subtype: string;
   env?: string;
   region?: string;
   sdk?: string;
   operation?: string;
   test?: string;
   country_iso_code?: string;
-  installations?: string;
   members?: string;
-  message_id?: string;
-  conversation_type?: "dm" | "group";
-  delivery_status?: "sent" | "received" | "failed";
-  network_phase?:
+}
+export interface DeliveryMetricTags extends MetricTags {
+  metric_type: "delivery" | "order";
+  metric_subtype: "stream" | "poll" | "recovery";
+  conversation_type: "dm" | "group";
+}
+export interface NetworkMetricTags extends MetricTags {
+  metric_type: "network";
+  metric_subtype:
     | "dns_lookup"
     | "tcp_connection"
     | "tls_handshake"
     | "server_call"
     | "processing";
+}
+
+export interface ResponseMetricTags extends MetricTags {
   agent?: string;
   address?: string;
 }
@@ -55,16 +54,16 @@ export interface DurationMetricTags extends MetricTags {
   metric_type: "operation";
   metric_subtype: "group" | "core";
   operation: string;
-  installations: string;
-  members: string;
+  installations?: string;
+  members?: string;
 }
 interface LogPayload extends MetricTags {
   metric_type: "error";
   metric_subtype: "test";
   message: string;
   level: string;
-  service: string;
-  source: string;
+  error_count: number;
+  fail_lines: number;
   test: string;
   workflowRunUrl: string;
 }
@@ -141,8 +140,6 @@ export function sendMetric(
   metricValue: number,
   tags: MetricTags,
 ): void {
-  if (!state.isInitialized) return;
-
   try {
     const enrichedTags = enrichTags(tags);
     const fullMetricName = `xmtp.sdk.${metricName}`;
@@ -268,34 +265,29 @@ export function flushMetrics(): Promise<void> {
 }
 
 // Datadog log sending - optimized
-export async function sendDatadogLog(
+export function sendDatadogLog(
   errorLogs: Set<string>,
   test: string,
   failLines: string[],
-): Promise<void> {
+): void {
   const logPayload: LogPayload = {
     metric_type: "error",
     metric_subtype: "test",
+    error_count: Array.from(errorLogs).length,
+    fail_lines: failLines.length,
     message: Array.from(errorLogs).join("\n"),
     level: "error",
-    service: "xmtp-qa-tools",
-    source: "xmtp-qa-tools",
     test,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
   };
 
-  try {
-    sendMetric("error_log", failLines.length, logPayload);
-
-    await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "DD-API-KEY": process.env.DATADOG_API_KEY as string,
-      },
-      body: JSON.stringify(logPayload),
-    });
-  } catch (err) {
-    console.error("Failed to send log to Datadog:", err);
-  }
+  // await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
+  //   method: "POST",
+  //   headers: {
+  //     "Content-Type": "application/json",
+  //     "DD-API-KEY": process.env.DATADOG_API_KEY as string,
+  //   },
+  //   body: JSON.stringify(logPayload),
+  // });
+  sendMetric("log", failLines.length, logPayload);
 }

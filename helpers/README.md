@@ -262,7 +262,7 @@ const networkStats = await getNetworkStats("https://grpc.dev.xmtp.network:443");
 await flushMetrics();
 
 // Send logs to Datadog
-await sendDatadogLog(["Error line 1", "Error line 2"], {
+sendDatadogLog(["Error line 1", "Error line 2"], {
   test: testName,
   env: "dev",
 });
