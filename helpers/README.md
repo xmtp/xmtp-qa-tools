@@ -56,7 +56,7 @@ await logAgentDetails(client);
 
 **Key features:**
 
-- **Multi-version SDK support**: Works with SDK versions 47, 100, 105, 209, 210, 220, and MLS
+- **Multi-version SDK support**: Works with SDK versions
 - **Signer creation**: Compatible signers for different SDK versions
 - **Database management**: Automatic database path creation and management
 - **Environment configuration**: Loading and validating environment variables
@@ -65,15 +65,27 @@ await logAgentDetails(client);
 **SDK Version Mappings:**
 
 ```typescript
-export const VersionList = {
-  47: { Client: Client47, sdkVersion: "0.0.47", libXmtpVersion: "6bd613d" },
-  100: { Client: Client100, sdkVersion: "1.0.0", libXmtpVersion: "c205eec" },
-  105: { Client: Client105, sdkVersion: "1.0.5", libXmtpVersion: "6eb1ce4" },
-  209: { Client: Client209, sdkVersion: "2.0.9", libXmtpVersion: "bfadb76" },
-  210: { Client: Client210, sdkVersion: "2.1.0", libXmtpVersion: "7b9b4d0" },
-  220: { Client: Client220, sdkVersion: "2.2.0", libXmtpVersion: "d0f0b67" },
-  // ... and more
-};
+export const VersionList = [
+  ...,
+  {
+    Client: Client220,
+    Conversation: Conversation220,
+    Dm: Dm220,
+    Group: Group220,
+    nodeVersion: "2.2.1",
+    bindingsPackage: "1.2.2",
+    libXmtpVersion: "d0f0b67",
+  },
+  {
+    Client: Client300,
+    Conversation: Conversation300,
+    Dm: Dm300,
+    Group: Group300,
+    nodeVersion: "3.0.1",
+    bindingsPackage: "1.2.5",
+    libXmtpVersion: "dc3e8c8",
+  },
+];
 ```
 
 ## 🔍 Analyzer Module (`analyzer.ts`)

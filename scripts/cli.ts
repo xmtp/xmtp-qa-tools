@@ -114,7 +114,7 @@ function showUsageAndExit(): never {
     "  yarn cli test functional --no-fail        # Uses retry mode",
   );
   console.error(
-    "  yarn cli test functional --versions 3 # Uses random workers with versions 209, 210, and 220",
+    "  yarn cli test functional --versions 3 # Uses random workers with versions 2.0.9, 2.1.0, and 2.2.0",
   );
   process.exit(1);
 }

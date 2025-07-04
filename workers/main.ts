@@ -166,7 +166,7 @@ export class WorkerClient extends Worker {
     this.name = worker.name;
     this.sdkVersion = worker.sdkVersion;
     this.libXmtpVersion = worker.libXmtpVersion;
-    this.sdk = worker.sdkVersion + "@" + worker.libXmtpVersion;
+    this.sdk = worker.sdkVersion + "-" + worker.libXmtpVersion;
     this.folder = worker.folder;
     this.env = env;
     this.apiUrl = apiUrl;
@@ -436,7 +436,7 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      Number(this.sdkVersion),
+      this.sdkVersion,
       this.name,
       this.folder,
       this.env,
@@ -1163,7 +1163,7 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      Number(this.sdkVersion),
+      this.sdkVersion,
       this.name,
       newFolder,
       this.env,

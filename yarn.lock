@@ -1442,125 +1442,75 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/mls-client-bindings-node@npm:^0.0.9, @xmtp/node-bindings-mls@npm:@xmtp/mls-client-bindings-node@0.0.9":
+"@xmtp/mls-client-bindings-node@npm:^0.0.9, @xmtp/node-bindings-0.0.9@npm:@xmtp/mls-client-bindings-node@0.0.9":
   version: 0.0.9
   resolution: "@xmtp/mls-client-bindings-node@npm:0.0.9"
   checksum: 10/ca13010b542be6671c48115e38e8888bc725007bdfddd1fd3d7ee300ef0318e64cdca48cbe32f9240b2c8f5a9904f943b360af09abd7ce5cdeda3a3b62c6e7d2
   languageName: node
   linkType: hard
 
-"@xmtp/node-bindings-100@npm:@xmtp/node-bindings@1.0.0":
-  version: 1.0.0
-  resolution: "@xmtp/node-bindings@npm:1.0.0"
-  checksum: 10/8bf91003ea3859f1c535f871013d13eb1096728f51e3c81471eb5ad9a27de65a19a9817eb8efbd56e257c07076af94771845643211764ff028103e202779f6ce
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-113@npm:@xmtp/node-bindings@1.1.3":
-  version: 1.1.3
-  resolution: "@xmtp/node-bindings@npm:1.1.3"
-  checksum: 10/729473bbb36fcc0da5a700aad65e2ef2441639591ae091a35c605d1294dfac7c7201b0504706d78bc8cabcd7f6473245ed0018c65e92d78e8eaf3b741b87c6fd
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-118@npm:@xmtp/node-bindings@1.1.8, @xmtp/node-bindings@npm:1.1.8":
-  version: 1.1.8
-  resolution: "@xmtp/node-bindings@npm:1.1.8"
-  checksum: 10/24e4bbbaaeb7717b74fc6984823d571805547bedff04092ad0a13b144142ca700ce8d664fa6a2790cf9c62117b5a8cf7c2b6299dd69c285e06368a08d4d115c2
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-120@npm:@xmtp/node-bindings@1.2.0, @xmtp/node-bindings@npm:1.2.0, @xmtp/node-bindings@npm:^1.1.3":
-  version: 1.2.0
-  resolution: "@xmtp/node-bindings@npm:1.2.0"
-  checksum: 10/cbdd074a464695d38d3001055eeaf41009b4bff9be3e720e413e5dd87f0da2b9a4f40bee77da273506599074edb4ab3ba21221a34e3de37afa6e4ce84464b88e
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-122@npm:@xmtp/node-bindings@1.2.2, @xmtp/node-bindings@npm:1.2.2":
-  version: 1.2.2
-  resolution: "@xmtp/node-bindings@npm:1.2.2"
-  checksum: 10/5870d1bfa629c86ce6d6e61f6804cb2dad992dd75d541f90584cd92ef5a31073c6178986b2ec90efaac3c966d5ea6d9a9131201ff08cfe1cfd1ef9baeecaa004
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-125@npm:@xmtp/node-bindings@1.2.5, @xmtp/node-bindings@npm:1.2.5":
-  version: 1.2.5
-  resolution: "@xmtp/node-bindings@npm:1.2.5"
-  checksum: 10/1c638a4675ad73e7b3c19217fe5ae107464203f707ca89c4f1bc816f593b6e13f63171753e30d969efe742659c960d22c81da611450012aeafb20156760e60ef
-  languageName: node
-  linkType: hard
-
-"@xmtp/node-bindings-41@npm:@xmtp/node-bindings@0.0.41, @xmtp/node-bindings@npm:^0.0.41":
+"@xmtp/node-bindings-0.4.1@npm:@xmtp/node-bindings@0.0.41, @xmtp/node-bindings@npm:^0.0.41":
   version: 0.0.41
   resolution: "@xmtp/node-bindings@npm:0.0.41"
   checksum: 10/809347d36de2b4f205fe46cc3869b1eab7595107fd14b0535457732745d14851121d1e7b0f22a0845deb32e48dfca29a7ad36a12bf9fc5c46b445a308a589c10
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-105@npm:@xmtp/node-sdk@1.0.5":
-  version: 1.0.5
-  resolution: "@xmtp/node-sdk@npm:1.0.5"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.1"
-    "@xmtp/content-type-primitives": "npm:^2.0.1"
-    "@xmtp/content-type-text": "npm:^2.0.1"
-    "@xmtp/node-bindings": "npm:^1.1.3"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/87218dff16686d9afe3431b186d6f2ba7d898501a39ebd02cf6305aba8fe3dfa4aaeeba07e79c07345cbd37f449c354069ae90d0e07d42bc95a60fc602a2742e
+"@xmtp/node-bindings-1.0.0@npm:@xmtp/node-bindings@1.0.0":
+  version: 1.0.0
+  resolution: "@xmtp/node-bindings@npm:1.0.0"
+  checksum: 10/8bf91003ea3859f1c535f871013d13eb1096728f51e3c81471eb5ad9a27de65a19a9817eb8efbd56e257c07076af94771845643211764ff028103e202779f6ce
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-209@npm:@xmtp/node-sdk@2.0.9":
-  version: 2.0.9
-  resolution: "@xmtp/node-sdk@npm:2.0.9"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.1.8"
-    "@xmtp/proto": "npm:^3.78.0"
-  checksum: 10/419015c51bc6f6ec42ee5587cc15fd69a69a31d842febb314915fcc09e1e1ebc760a3c5053c419dc8f5d8e3433747a0ddfaa1250555c05428490921f9b0b5552
+"@xmtp/node-bindings-1.1.3@npm:@xmtp/node-bindings@1.1.3":
+  version: 1.1.3
+  resolution: "@xmtp/node-bindings@npm:1.1.3"
+  checksum: 10/729473bbb36fcc0da5a700aad65e2ef2441639591ae091a35c605d1294dfac7c7201b0504706d78bc8cabcd7f6473245ed0018c65e92d78e8eaf3b741b87c6fd
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-210@npm:@xmtp/node-sdk@2.1.0":
-  version: 2.1.0
-  resolution: "@xmtp/node-sdk@npm:2.1.0"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.0"
-  checksum: 10/9994e639a18f89ee1ed9d8c3af6737d249b1ee88138152cdc4e630b043f17474ede48de758e43713df6bac0f7d33a0bceff8c3ec9969dad682017bef72ecbf8e
+"@xmtp/node-bindings-1.1.8@npm:@xmtp/node-bindings@1.1.8, @xmtp/node-bindings@npm:1.1.8":
+  version: 1.1.8
+  resolution: "@xmtp/node-bindings@npm:1.1.8"
+  checksum: 10/24e4bbbaaeb7717b74fc6984823d571805547bedff04092ad0a13b144142ca700ce8d664fa6a2790cf9c62117b5a8cf7c2b6299dd69c285e06368a08d4d115c2
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-220@npm:@xmtp/node-sdk@2.2.1":
-  version: 2.2.1
-  resolution: "@xmtp/node-sdk@npm:2.2.1"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.2"
-  checksum: 10/fe5a08fb679f7adbd1c31d3d14611f24231b4c50490f1ed5fe6c3b40fcd3654545deae58b5c29cb3e66b9b87787534131110903b3208b998c10f0251cfdb6cc2
+"@xmtp/node-bindings-1.2.0@npm:@xmtp/node-bindings@1.2.0, @xmtp/node-bindings@npm:1.2.0, @xmtp/node-bindings@npm:^1.1.3":
+  version: 1.2.0
+  resolution: "@xmtp/node-bindings@npm:1.2.0"
+  checksum: 10/cbdd074a464695d38d3001055eeaf41009b4bff9be3e720e413e5dd87f0da2b9a4f40bee77da273506599074edb4ab3ba21221a34e3de37afa6e4ce84464b88e
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-300@npm:@xmtp/node-sdk@3.0.1, @xmtp/node-sdk@npm:3.0.1":
-  version: 3.0.1
-  resolution: "@xmtp/node-sdk@npm:3.0.1"
-  dependencies:
-    "@xmtp/content-type-group-updated": "npm:^2.0.2"
-    "@xmtp/content-type-primitives": "npm:^2.0.2"
-    "@xmtp/content-type-text": "npm:^2.0.2"
-    "@xmtp/node-bindings": "npm:1.2.5"
-  checksum: 10/abefcc4578406e9665a3b1ef7030316d7ac1e63ef080af37ce28591f7d4d1a5e15ad7ab2a41eaf3d9a1a2f97299dd0a2af9bdc47272fe26c912e1e8326c11bb2
+"@xmtp/node-bindings-1.2.2@npm:@xmtp/node-bindings@1.2.2, @xmtp/node-bindings@npm:1.2.2":
+  version: 1.2.2
+  resolution: "@xmtp/node-bindings@npm:1.2.2"
+  checksum: 10/5870d1bfa629c86ce6d6e61f6804cb2dad992dd75d541f90584cd92ef5a31073c6178986b2ec90efaac3c966d5ea6d9a9131201ff08cfe1cfd1ef9baeecaa004
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-47@npm:@xmtp/node-sdk@0.0.47":
+"@xmtp/node-bindings-1.2.5@npm:@xmtp/node-bindings@1.2.5, @xmtp/node-bindings@npm:1.2.5":
+  version: 1.2.5
+  resolution: "@xmtp/node-bindings@npm:1.2.5"
+  checksum: 10/1c638a4675ad73e7b3c19217fe5ae107464203f707ca89c4f1bc816f593b6e13f63171753e30d969efe742659c960d22c81da611450012aeafb20156760e60ef
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-0.0.13@npm:@xmtp/mls-client@0.0.13":
+  version: 0.0.13
+  resolution: "@xmtp/mls-client@npm:0.0.13"
+  dependencies:
+    "@xmtp/content-type-primitives": "npm:^1.0.1"
+    "@xmtp/content-type-text": "npm:^1.0.0"
+    "@xmtp/mls-client-bindings-node": "npm:^0.0.9"
+    "@xmtp/proto": "npm:^3.62.1"
+  checksum: 10/0a90c0261abc9a021499b5c9d422c528f07f444b66df44b0b26aa10e49068f0f8f3ce23f1de5488b6f293b82d1857ae2beeff82d384a6760d55efe6c00290baa
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-0.0.47@npm:@xmtp/node-sdk@0.0.47":
   version: 0.0.47
   resolution: "@xmtp/node-sdk@npm:0.0.47"
   dependencies:
@@ -1573,15 +1523,65 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@xmtp/node-sdk-mls@npm:@xmtp/mls-client@0.0.13":
-  version: 0.0.13
-  resolution: "@xmtp/mls-client@npm:0.0.13"
+"@xmtp/node-sdk-1.0.5@npm:@xmtp/node-sdk@1.0.5":
+  version: 1.0.5
+  resolution: "@xmtp/node-sdk@npm:1.0.5"
   dependencies:
-    "@xmtp/content-type-primitives": "npm:^1.0.1"
-    "@xmtp/content-type-text": "npm:^1.0.0"
-    "@xmtp/mls-client-bindings-node": "npm:^0.0.9"
-    "@xmtp/proto": "npm:^3.62.1"
-  checksum: 10/0a90c0261abc9a021499b5c9d422c528f07f444b66df44b0b26aa10e49068f0f8f3ce23f1de5488b6f293b82d1857ae2beeff82d384a6760d55efe6c00290baa
+    "@xmtp/content-type-group-updated": "npm:^2.0.1"
+    "@xmtp/content-type-primitives": "npm:^2.0.1"
+    "@xmtp/content-type-text": "npm:^2.0.1"
+    "@xmtp/node-bindings": "npm:^1.1.3"
+    "@xmtp/proto": "npm:^3.78.0"
+  checksum: 10/87218dff16686d9afe3431b186d6f2ba7d898501a39ebd02cf6305aba8fe3dfa4aaeeba07e79c07345cbd37f449c354069ae90d0e07d42bc95a60fc602a2742e
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-2.0.9@npm:@xmtp/node-sdk@2.0.9":
+  version: 2.0.9
+  resolution: "@xmtp/node-sdk@npm:2.0.9"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.1.8"
+    "@xmtp/proto": "npm:^3.78.0"
+  checksum: 10/419015c51bc6f6ec42ee5587cc15fd69a69a31d842febb314915fcc09e1e1ebc760a3c5053c419dc8f5d8e3433747a0ddfaa1250555c05428490921f9b0b5552
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-2.1.0@npm:@xmtp/node-sdk@2.1.0":
+  version: 2.1.0
+  resolution: "@xmtp/node-sdk@npm:2.1.0"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.2.0"
+  checksum: 10/9994e639a18f89ee1ed9d8c3af6737d249b1ee88138152cdc4e630b043f17474ede48de758e43713df6bac0f7d33a0bceff8c3ec9969dad682017bef72ecbf8e
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-2.2.1@npm:@xmtp/node-sdk@2.2.1":
+  version: 2.2.1
+  resolution: "@xmtp/node-sdk@npm:2.2.1"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.2.2"
+  checksum: 10/fe5a08fb679f7adbd1c31d3d14611f24231b4c50490f1ed5fe6c3b40fcd3654545deae58b5c29cb3e66b9b87787534131110903b3208b998c10f0251cfdb6cc2
+  languageName: node
+  linkType: hard
+
+"@xmtp/node-sdk-3.0.1@npm:@xmtp/node-sdk@3.0.1, @xmtp/node-sdk@npm:3.0.1":
+  version: 3.0.1
+  resolution: "@xmtp/node-sdk@npm:3.0.1"
+  dependencies:
+    "@xmtp/content-type-group-updated": "npm:^2.0.2"
+    "@xmtp/content-type-primitives": "npm:^2.0.2"
+    "@xmtp/content-type-text": "npm:^2.0.2"
+    "@xmtp/node-bindings": "npm:1.2.5"
+  checksum: 10/abefcc4578406e9665a3b1ef7030316d7ac1e63ef080af37ce28591f7d4d1a5e15ad7ab2a41eaf3d9a1a2f97299dd0a2af9bdc47272fe26c912e1e8326c11bb2
   languageName: node
   linkType: hard
 
@@ -4688,22 +4688,22 @@ __metadata:
     "@xmtp/content-type-reaction": "npm:^2.0.2"
     "@xmtp/content-type-reply": "npm:^2.0.2"
     "@xmtp/node-bindings": "npm:1.2.5"
-    "@xmtp/node-bindings-100": "npm:@xmtp/node-bindings@1.0.0"
-    "@xmtp/node-bindings-113": "npm:@xmtp/node-bindings@1.1.3"
-    "@xmtp/node-bindings-118": "npm:@xmtp/node-bindings@1.1.8"
-    "@xmtp/node-bindings-120": "npm:@xmtp/node-bindings@1.2.0"
-    "@xmtp/node-bindings-122": "npm:@xmtp/node-bindings@1.2.2"
-    "@xmtp/node-bindings-125": "npm:@xmtp/node-bindings@1.2.5"
-    "@xmtp/node-bindings-41": "npm:@xmtp/node-bindings@0.0.41"
-    "@xmtp/node-bindings-mls": "npm:@xmtp/mls-client-bindings-node@0.0.9"
+    "@xmtp/node-bindings-0.0.9": "npm:@xmtp/mls-client-bindings-node@0.0.9"
+    "@xmtp/node-bindings-0.4.1": "npm:@xmtp/node-bindings@0.0.41"
+    "@xmtp/node-bindings-1.0.0": "npm:@xmtp/node-bindings@1.0.0"
+    "@xmtp/node-bindings-1.1.3": "npm:@xmtp/node-bindings@1.1.3"
+    "@xmtp/node-bindings-1.1.8": "npm:@xmtp/node-bindings@1.1.8"
+    "@xmtp/node-bindings-1.2.0": "npm:@xmtp/node-bindings@1.2.0"
+    "@xmtp/node-bindings-1.2.2": "npm:@xmtp/node-bindings@1.2.2"
+    "@xmtp/node-bindings-1.2.5": "npm:@xmtp/node-bindings@1.2.5"
     "@xmtp/node-sdk": "npm:3.0.1"
-    "@xmtp/node-sdk-105": "npm:@xmtp/node-sdk@1.0.5"
-    "@xmtp/node-sdk-209": "npm:@xmtp/node-sdk@2.0.9"
-    "@xmtp/node-sdk-210": "npm:@xmtp/node-sdk@2.1.0"
-    "@xmtp/node-sdk-220": "npm:@xmtp/node-sdk@2.2.1"
-    "@xmtp/node-sdk-300": "npm:@xmtp/node-sdk@3.0.1"
-    "@xmtp/node-sdk-47": "npm:@xmtp/node-sdk@0.0.47"
-    "@xmtp/node-sdk-mls": "npm:@xmtp/mls-client@0.0.13"
+    "@xmtp/node-sdk-0.0.13": "npm:@xmtp/mls-client@0.0.13"
+    "@xmtp/node-sdk-0.0.47": "npm:@xmtp/node-sdk@0.0.47"
+    "@xmtp/node-sdk-1.0.5": "npm:@xmtp/node-sdk@1.0.5"
+    "@xmtp/node-sdk-2.0.9": "npm:@xmtp/node-sdk@2.0.9"
+    "@xmtp/node-sdk-2.1.0": "npm:@xmtp/node-sdk@2.1.0"
+    "@xmtp/node-sdk-2.2.1": "npm:@xmtp/node-sdk@2.2.1"
+    "@xmtp/node-sdk-3.0.1": "npm:@xmtp/node-sdk@3.0.1"
     axios: "npm:^1.8.2"
     datadog-metrics: "npm:^0.12.1"
     dotenv: "npm:^16.5.0"

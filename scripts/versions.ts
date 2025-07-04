@@ -1,10 +1,10 @@
 import { execSync } from "child_process";
-import fs from "fs";
-import path from "path";
+import * as fs from "node:fs";
+import * as path from "node:path";
 import { VersionList } from "@helpers/client";
 
-type VersionConfig = (typeof VersionList)[keyof typeof VersionList];
-const staticConfigs = Object.values(VersionList);
+type VersionConfig = (typeof VersionList)[number];
+const staticConfigs = VersionList;
 /**
  * Auto-discover SDK and bindings packages in node_modules/@xmtp
  */
@@ -22,24 +22,23 @@ function discoverPackages(): VersionConfig[] {
   const entries = fs.readdirSync(xmtpDir);
 
   // Find SDK packages with a version suffix
-  const sdkPackages = entries.filter(
-    (entry) => entry.startsWith("node-sdk-") && entry !== "node-sdk-100", // Skip ones we already have in static config
+  const nodeVersions = entries.filter(
+    (entry) => entry.startsWith("node-sdk-") && entry !== "node-sdk", // Skip ones we already have in static config
   );
 
   // Find bindings packages with a version suffix
   const bindingsPackages = entries.filter(
-    (entry) =>
-      entry.startsWith("node-bindings-") && entry !== "node-bindings-100", // Skip ones we already have in static config
+    (entry) => entry.startsWith("node-bindings-") && entry !== "node-bindings", // Skip ones we already have in static config
   );
 
   console.log(
-    `Found ${sdkPackages.length} SDK packages and ${bindingsPackages.length} bindings packages`,
+    `Found ${nodeVersions.length} SDK packages and ${bindingsPackages.length} bindings packages`,
   );
 
   // Try to match SDK packages with bindings packages
-  for (const sdkPackage of sdkPackages) {
+  for (const nodeVersion of nodeVersions) {
     // Extract version suffix (e.g., "101" from "node-sdk-101")
-    const versionSuffix = sdkPackage.replace("node-sdk-", "");
+    const versionSuffix = nodeVersion.replace("node-sdk-", "");
 
     // Look for a corresponding bindings package
     const matchingBindings = bindingsPackages.find(
@@ -52,13 +51,13 @@ function discoverPackages(): VersionConfig[] {
       let libXmtpVersion = "";
 
       try {
-        const sdkPackageJson = JSON.parse(
+        const nodeVersionJson = JSON.parse(
           fs.readFileSync(
-            path.join(xmtpDir, sdkPackage, "package.json"),
+            path.join(xmtpDir, nodeVersion, "package.json"),
             "utf8",
           ),
         );
-        nodeVersion = sdkPackageJson.version || "";
+        nodeVersion = nodeVersionJson.version || "";
       } catch (error: unknown) {
         console.error(error);
         nodeVersion = "unknown";
@@ -81,19 +80,16 @@ function discoverPackages(): VersionConfig[] {
       // so we'll set them to null or use a placeholder
 
       configs.push({
-        sdkPackage,
-        bindingsPackage: matchingBindings,
-        nodeVersion,
-        libXmtpVersion,
         Client: null as any,
         Conversation: null as any,
         Dm: null as any,
         Group: null as any,
+        bindingsPackage: matchingBindings,
+        nodeVersion,
+        libXmtpVersion,
       });
 
-      console.log(`${sdkPackage} -> ${matchingBindings}`);
-    } else {
-      console.log(`${sdkPackage} -> no matching bindings`);
+      console.log(`${nodeVersion} -> ${matchingBindings}`);
     }
   }
 
@@ -115,12 +111,16 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
   console.log("Creating bindings symlinks...");
 
   for (const config of configs) {
-    const sdkDir = path.join(xmtpDir, config.sdkPackage);
-    const bindingsDir = path.join(xmtpDir, config.bindingsPackage);
+    if (!config.bindingsPackage) continue;
+    const sdkDir = path.join(xmtpDir, `node-sdk-${config.nodeVersion}`);
+    const bindingsDir = path.join(
+      xmtpDir,
+      `node-bindings-${config.bindingsPackage}`,
+    );
 
     // Verify that the SDK and bindings packages exist
     if (!fs.existsSync(sdkDir)) {
-      console.error(`SDK package ${config.sdkPackage} not found`);
+      console.error(`SDK package ${config.nodeVersion} not found`);
       continue;
     }
 
@@ -152,7 +152,7 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
       );
 
       fs.symlinkSync(relativeBindingsPath, symlinkTarget);
-      console.log(`Linked: ${config.sdkPackage} -> ${config.bindingsPackage}`);
+      console.log(`Linked: ${config.nodeVersion} -> ${config.bindingsPackage}`);
 
       // Verify the version.json file is accessible
       const versionJsonPath = path.join(symlinkTarget, "dist", "version.json");
@@ -162,7 +162,7 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
             fs.readFileSync(versionJsonPath, "utf8"),
           );
           console.log(
-            `${config.sdkPackage} -> ${config.bindingsPackage} (${versionData.version})`,
+            `${config.nodeVersion} -> ${config.bindingsPackage} (${versionData.version})`,
           );
         } catch (error: unknown) {
           console.error(error);
@@ -171,7 +171,7 @@ function createBindingsSymlinks(configs: VersionConfig[]) {
       }
     } catch (error: unknown) {
       console.error(
-        `Error linking ${config.sdkPackage}: ${error instanceof Error ? error.message : String(error)}`,
+        `Error linking ${config.nodeVersion}: ${error instanceof Error ? error.message : String(error)}`,
       );
     }
   }
@@ -187,7 +187,7 @@ function verifyVersions(configs: VersionConfig[]) {
   console.log("\nVerifying SDK versions...");
 
   for (const config of configs) {
-    const sdkDir = path.join(xmtpDir, config.sdkPackage);
+    const sdkDir = path.join(xmtpDir, config.nodeVersion);
 
     // Check if the SDK package imports from bindings directly
     const sdkIndexPath = path.join(sdkDir, "dist", "index.js");
@@ -197,7 +197,7 @@ function verifyVersions(configs: VersionConfig[]) {
 
         // Check if it imports version.json from node-bindings
         if (sdkContent.includes("@xmtp/node-bindings/version.json")) {
-          console.log(`${config.sdkPackage} -> ${config.bindingsPackage}`);
+          console.log(`${config.nodeVersion} -> ${config.bindingsPackage}`);
         }
       } catch (error: unknown) {
         console.error(error);

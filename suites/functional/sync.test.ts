@@ -117,9 +117,6 @@ describe(testName, async () => {
 
     // Retrieve messages after sync
     const messages = await group!.messages();
-    console.log(
-      `Retrieved ${messages.length} messages after conversation.sync()`,
-    );
     expect(messages.length).toBeGreaterThan(0);
 
     return { syncTime, messageCount: messages.length };
