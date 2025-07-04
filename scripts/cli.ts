@@ -5,6 +5,7 @@ import {
   extractErrorLogs,
   extractFailLines,
   sendSlackNotification,
+  shouldFilterOutTest,
 } from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
@@ -391,22 +392,17 @@ async function runVitestTest(
         );
 
         if (options.explicitLogFlag) {
+          const apiKey = process.env.DATADOG_API_KEY;
+          if (!apiKey) return;
+
           const errorLogs = extractErrorLogs(logger.logFileName, 20);
+
           if (errorLogs.size > 0) {
             const failLines = extractFailLines(errorLogs);
-            await sendDatadogLog(Array.from(errorLogs), {
-              channel: process.env.SLACK_CHANNEL,
-              test: testName,
-              failLines,
-              env: process.env.XMTP_ENV,
-              region: process.env.GEOLOCATION,
-              sdk: "latest",
-            });
-            await sendSlackNotification({
-              testName,
-              errorLogs,
-              failLines,
-            });
+            if (shouldFilterOutTest(errorLogs, failLines)) {
+              await sendDatadogLog(errorLogs, testName, failLines);
+              await sendSlackNotification(errorLogs, testName, failLines);
+            }
           }
         }
 
