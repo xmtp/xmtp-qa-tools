@@ -90,8 +90,6 @@ function discoverPackages(): VersionConfig[] {
       });
 
       console.log(`${nodeVersion} -> ${matchingBindings}`);
-    } else {
-      console.log(`${nodeVersion} -> no matching bindings`);
     }
   }
 
