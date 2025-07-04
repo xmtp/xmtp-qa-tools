@@ -393,7 +393,7 @@ async function runVitestTest(
         if (options.explicitLogFlag) {
           const errorLogs = extractErrorLogs(logger.logFileName, 20);
           if (errorLogs.size > 0) {
-            const failLines = extractFailLines(errorLogs);
+            const failLines = errorLogs;
             await sendDatadogLog(Array.from(errorLogs), {
               channel: process.env.SLACK_CHANNEL,
               test: testName,
