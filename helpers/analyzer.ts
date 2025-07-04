@@ -339,9 +339,10 @@ export async function sendSlackNotification(options: {
 
   const shouldTagFabri = options.errorLogs.size >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? " <@fabri>" : "";
+  const icon = shouldTagFabri ? "🚨" : "⚠️";
 
   const sections = [
-    `*${options.testName} ⚠️* ${tagMessage}`,
+    `*Test*: ${options.testName} ${icon} ${tagMessage}`,
     `\`${process.env.XMTP_ENV}\` | \`${process.env.GEOLOCATION}\``,
     `<${workflowRunUrl}|View Run>`,
     `Logs:\n\`\`\`${sanitizeLogs(Array.from(options.errorLogs).join("\n"))}\`\`\``,
