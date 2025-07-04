@@ -1,6 +1,7 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
+import { sendDatadogLog } from "./datadog";
 import knownIssues from "./known_issues.json";
 import { processLogFile, stripAnsi } from "./logger";
 
@@ -10,6 +11,7 @@ export const PATTERNS = {
   minFailLines: 3,
   minumumLineLength: 40,
   maxLineLength: 150,
+  maxErrorLogs: 20,
 
   DEDUPE: [
     "sqlcipher_mlock",
@@ -192,10 +194,7 @@ export async function cleanAllRawLogs(): Promise<void> {
 /**
  * Extract error logs from log files with deduplication
  */
-export function extractErrorLogs(
-  testName: string,
-  limit?: number,
-): Set<string> {
+export function extractErrorLogs(testName: string): Set<string> {
   if (!fs.existsSync("logs")) {
     return new Set();
   }
@@ -238,9 +237,7 @@ export function extractErrorLogs(
       }
     }
 
-    console.log(
-      `Found ${errorLines.length} error lines${limit ? `, limiting to ${limit}` : ""}`,
-    );
+    console.log(`Found ${errorLines.length} error lines`);
 
     // Return empty set if only one error and it's a known pattern
     if (errorLines.length === 1) {
@@ -252,9 +249,9 @@ export function extractErrorLogs(
         return new Set();
       }
     }
-
+    const limit = PATTERNS.maxErrorLogs;
     if (errorLines.length > 0) {
-      const limitedErrors = limit ? errorLines.slice(-limit) : errorLines;
+      const limitedErrors = errorLines.slice(-limit);
       const resultSet = new Set(limitedErrors);
       console.log(resultSet);
       return resultSet;
@@ -289,28 +286,47 @@ export function shouldFilterOutTest(
 ): boolean {
   const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
   if (jobStatus === "success") {
-    console.log(`Slack notification skipped (status: ${jobStatus})`);
+    console.warn(`Slack notification skipped (status: ${jobStatus})`);
     return true;
   }
 
   const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
   if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
-    console.log(`Slack notification skipped (branch: ${branchName})`);
+    console.warn(`Slack notification skipped (branch: ${branchName})`);
     return true;
   }
 
   if (!errorLogs || errorLogs.size === 0) {
+    console.warn("No error logs, skipping");
     return true;
   }
 
-  if (failLines.length === 0) {
-    return true; // Don't show if tests don't fail
+  if (Array.isArray(failLines) && failLines.length === 0) {
+    console.warn("No failLines logs, skipping");
+    return true;
   }
 
   return false;
 }
+export async function logUpload(logFileName: string, testName: string) {
+  const apiKey = process.env.DATADOG_API_KEY;
+  if (!apiKey) return;
 
-export function filterKnownPatterns(failLines: string[]): boolean | undefined {
+  const errorLogs = extractErrorLogs(logFileName);
+
+  if (errorLogs.size > 0) {
+    const failLines = extractFailLines(errorLogs);
+    const shouldUploadLogs = !shouldFilterOutTest(errorLogs, failLines);
+    console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
+    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, failLines);
+    const shouldSendNotification = failLines.length >= PATTERNS.minFailLines;
+    console.log(`shouldSendNotification: ${shouldSendNotification}`);
+    if (shouldSendNotification)
+      await sendSlackNotification(errorLogs, testName, failLines);
+  }
+}
+
+export function hasKnownPattern(failLines: string[]): boolean | undefined {
   // Check each configured filter
   for (const filter of PATTERNS.KNOWN_ISSUES) {
     const matchingLines = failLines.filter((line) =>
@@ -325,29 +341,32 @@ export function filterKnownPatterns(failLines: string[]): boolean | undefined {
   }
   return false;
 }
+
 export async function sendSlackNotification(
   errorLogs: Set<string>,
   test: string,
   failLines: string[],
 ): Promise<void> {
-  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
-  const filteredOut = filterKnownPatterns(failLines);
-  if (filteredOut) return;
-  if (!shouldTagFabri) return;
-
+  if (!process.env.SLACK_CHANNEL) {
+    console.warn("No Slack channel found, skipping");
+    return;
+  }
+  const hasKnownPattern = hasKnownPattern(failLines);
+  if (hasKnownPattern) {
+    console.warn("Known pattern found, skipping");
+    return;
+  }
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
   const runId = process.env.GITHUB_RUN_ID;
-  const workflowRunUrl = `${serverUrl}/${repository}/actions/runs/${runId}`;
+  const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
-  const targetChannel = process.env.SLACK_CHANNEL;
-
-  const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
+  const tagMessage = "<@fabri>";
 
   const sections = [
     `*Test*: ${test} ${tagMessage}`,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
-    `<${workflowRunUrl}|View Run>`,
+    workflowRunUrl,
     `*Logs*:\n\`\`\`${sanitizeLogs(Array.from(errorLogs).join("\n"))}\`\`\``,
   ];
 
@@ -359,7 +378,7 @@ export async function sendSlackNotification(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      channel: targetChannel,
+      channel: process.env.SLACK_CHANNEL,
       text: message,
       mrkdwn: true,
     }),
