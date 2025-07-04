@@ -327,7 +327,7 @@ export async function sendDatadogLog(
     service: "xmtp-qa-tools",
     source: "xmtp-qa-tools",
     channel: context.channel || "general",
-    failLines: context.failLines as string[],
+    failLines: (context.failLines as string[]).length,
     repository: process.env.GITHUB_REPOSITORY as string,
     workflowName: process.env.GITHUB_WORKFLOW as string,
     workflowRunUrl: workflowRunUrl,
