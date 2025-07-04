@@ -320,8 +320,9 @@ export async function logUpload(logFileName: string, testName: string) {
     console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
     if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, failLines);
     const shouldSendNotification = failLines.length >= PATTERNS.minFailLines;
+    console.log(`shouldSendNotification: ${shouldSendNotification}`);
     if (shouldSendNotification)
-      await sendSlackNotification(errorLogs, testName);
+      await sendSlackNotification(errorLogs, testName, failLines);
   }
 }
 
