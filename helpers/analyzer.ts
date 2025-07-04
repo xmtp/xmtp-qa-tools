@@ -330,10 +330,10 @@ export async function sendSlackNotification(
   test: string,
   failLines: string[],
 ): Promise<void> {
+  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
   const filteredOut = filterKnownPatterns(failLines);
-  if (filteredOut) {
-    return;
-  }
+  if (filteredOut) return;
+  if (!shouldTagFabri) return;
 
   const serverUrl = process.env.GITHUB_SERVER_URL;
   const repository = process.env.GITHUB_REPOSITORY;
@@ -342,7 +342,6 @@ export async function sendSlackNotification(
 
   const targetChannel = process.env.SLACK_CHANNEL;
 
-  const shouldTagFabri = failLines.length >= PATTERNS.minFailLines;
   const tagMessage = shouldTagFabri ? "🚨 <@fabri>" : "⚠️";
 
   const sections = [
