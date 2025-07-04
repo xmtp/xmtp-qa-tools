@@ -30,7 +30,9 @@ function showUsageAndExit(): never {
 function runBot(botName: string, args: string[]): void {
   const botFilePath = path.join("bots", botName, "index.ts");
   const botArgs = args.join(" ");
-  console.log(`Starting bot: ${botName}${botArgs ? ` with args: ${botArgs}` : ""}`);
+  console.log(
+    `Starting bot: ${botName}${botArgs ? ` with args: ${botArgs}` : ""}`,
+  );
   execSync(`tsx --watch ${botFilePath} ${botArgs}`, {
     stdio: "inherit",
   });
@@ -39,7 +41,9 @@ function runBot(botName: string, args: string[]): void {
 function runScript(scriptName: string, args: string[]): void {
   const scriptFilePath = path.join("scripts", `${scriptName}.ts`);
   const scriptArgs = args.join(" ");
-  console.log(`Running script: ${scriptName}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`);
+  console.log(
+    `Running script: ${scriptName}${scriptArgs ? ` with args: ${scriptArgs}` : ""}`,
+  );
   execSync(`tsx ${scriptFilePath} ${scriptArgs}`, {
     stdio: "inherit",
   });
@@ -90,12 +94,12 @@ function buildTestCommand(testName: string, vitestArgs: string[]): string {
     const packageJson = JSON.parse(packageJsonContent) as {
       scripts?: Record<string, string>;
     };
-    
+
     if (packageJson.scripts?.[testName]) {
       return `yarn ${testName} ${vitestArgsString}`.trim();
     }
-  } catch (error) {
-    console.warn("Could not read package.json:", error);
+  } catch {
+    console.warn("Could not read package.json");
   }
 
   // Default to direct vitest execution
@@ -129,7 +133,7 @@ function runTest(options: SimpleTestOptions): void {
       stdio: "inherit",
     });
     console.log("✅ Tests completed successfully!");
-  } catch (error) {
+  } catch {
     console.error("❌ Tests failed!");
     process.exit(1);
   }
