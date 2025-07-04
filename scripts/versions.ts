@@ -81,14 +81,14 @@ function discoverPackages(): VersionConfig[] {
       // so we'll set them to null or use a placeholder
 
       configs.push({
-        sdkPackage,
-        bindingsPackage: matchingBindings,
-        nodeVersion,
-        libXmtpVersion,
         Client: null as any,
         Conversation: null as any,
         Dm: null as any,
         Group: null as any,
+        sdkPackage,
+        bindingsPackage: matchingBindings,
+        nodeVersion,
+        libXmtpVersion,
       });
 
       console.log(`${sdkPackage} -> ${matchingBindings}`);

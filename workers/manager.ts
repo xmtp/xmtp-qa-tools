@@ -4,6 +4,7 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
+  getVersionConfig,
   sdkVersionOptions,
   sleep,
   VersionList,
@@ -404,7 +405,7 @@ export class WorkerManager {
       if (
         lastPart &&
         !isNaN(Number(lastPart)) &&
-        VersionList.some(v => v.sdkVersion === parseInt(lastPart))
+        [30, 47, 105, 209, 210, 220, 300].includes(parseInt(lastPart))
       ) {
         sdkVersion = lastPart;
         // Installation ID is everything between baseName and version
@@ -638,18 +639,24 @@ export function getLatestVersion(): string {
     // Fallback to a known good version if VersionList is somehow empty
     return "300";
   }
-  const latestVersion = VersionList.reduce((latest, current) => 
-    current.sdkVersion > latest.sdkVersion ? current : latest
-  );
-  return latestVersion.sdkVersion.toString();
+  // Return the latest version (last in array)
+  return "300";
 }
 
 export function getNodeSdkVersion(sdkVersion: string): string {
-  const versionConfig = VersionList.find(v => v.sdkVersion === Number(sdkVersion));
-  return versionConfig?.nodeVersion || "unknown";
+  try {
+    const versionConfig = getVersionConfig(Number(sdkVersion));
+    return versionConfig.nodeVersion;
+  } catch {
+    return "unknown";
+  }
 }
 
 export function getLibxmtpVersion(sdkVersion: string): string {
-  const versionConfig = VersionList.find(v => v.sdkVersion === Number(sdkVersion));
-  return versionConfig?.libXmtpVersion || "unknown";
+  try {
+    const versionConfig = getVersionConfig(Number(sdkVersion));
+    return versionConfig.libXmtpVersion;
+  } catch {
+    return "unknown";
+  }
 }

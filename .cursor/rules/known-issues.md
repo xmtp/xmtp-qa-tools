@@ -1,6 +1,6 @@
 ---
 description: How to add known issue patterns to reduce notification noise
-globs: 
+globs:
 alwaysApply: false
 ---
 
@@ -24,12 +24,14 @@ Add entries for specific test failures that are known issues:
 ```
 
 **Guidelines:**
+
 - Use the actual test suite name (e.g., "agents-tagged", "Functional", "Browser")
 - Copy the exact FAIL line from logs, including the full path and specific error
 - Multiple related failures can be grouped under the same testName
 - For bot failures, group by the test suite, not individual bots
 
 **Example:**
+
 ```json
 {
   "testName": "Agents-tagged",
@@ -48,10 +50,11 @@ Add to the DEDUPE array for recurring log noise that appears frequently:
 DEDUPE: [
   // ... existing patterns
   "new recurring error pattern",
-]
+];
 ```
 
 **Guidelines:**
+
 - Only add if the pattern appears very frequently and clutters logs
 - Use partial strings that uniquely identify the error type
 - Don't add specific test failures here - those go in known_issues.json

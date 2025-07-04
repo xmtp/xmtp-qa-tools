@@ -67,7 +67,6 @@ import { addFileLogging, setupPrettyLogs } from "./logger";
 // SDK version mappings
 export const VersionList = [
   {
-    sdkVersion: 30,
     Client: ClientMls,
     Conversation: ConversationMls,
     Dm: ConversationMls,
@@ -78,7 +77,6 @@ export const VersionList = [
     libXmtpVersion: "0.0.9",
   },
   {
-    sdkVersion: 47,
     Client: Client47,
     Conversation: Conversation47,
     Dm: Dm47,
@@ -89,7 +87,6 @@ export const VersionList = [
     libXmtpVersion: "6bd613d",
   },
   {
-    sdkVersion: 105,
     Client: Client105,
     Conversation: Conversation105,
     Dm: Dm105,
@@ -100,7 +97,6 @@ export const VersionList = [
     libXmtpVersion: "6eb1ce4",
   },
   {
-    sdkVersion: 209,
     Client: Client209,
     Conversation: Conversation209,
     Dm: Dm209,
@@ -111,7 +107,6 @@ export const VersionList = [
     libXmtpVersion: "bfadb76",
   },
   {
-    sdkVersion: 210,
     Client: Client210,
     Conversation: Conversation210,
     Dm: Dm210,
@@ -122,7 +117,6 @@ export const VersionList = [
     libXmtpVersion: "7b9b4d0",
   },
   {
-    sdkVersion: 220,
     Client: Client220,
     Conversation: Conversation220,
     Dm: Dm220,
@@ -133,7 +127,6 @@ export const VersionList = [
     libXmtpVersion: "d0f0b67",
   },
   {
-    sdkVersion: 300,
     Client: Client300,
     Conversation: Conversation300,
     Dm: Dm300,
@@ -144,6 +137,26 @@ export const VersionList = [
     libXmtpVersion: "dc3e8c8",
   },
 ];
+
+// Helper function to map integer SDK versions to VersionList entries
+export function getVersionConfig(sdkVersion: number) {
+  const versionMap: Record<number, number> = {
+    30: 0, // "0.0.13"
+    47: 1, // "0.0.47"
+    105: 2, // "1.0.5"
+    209: 3, // "2.0.9"
+    210: 4, // "2.1.0"
+    220: 5, // "2.2.0"
+    300: 6, // "3.0.1"
+  };
+
+  const index = versionMap[sdkVersion];
+  if (index === undefined) {
+    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
+  }
+
+  return VersionList[index];
+}
 
 export type GroupMetadataContent = {
   metadataFieldChanges: Array<{
@@ -297,11 +310,8 @@ export async function createClient(
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-  // Use type assertion to access the static version property
-  const versionConfig = VersionList.find(v => v.sdkVersion === sdkVersion);
-  if (!versionConfig) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
+  // Map integer SDK version to VersionList entry
+  const versionConfig = getVersionConfig(sdkVersion);
   const libXmtpVersion = versionConfig.libXmtpVersion;
 
   const account = privateKeyToAccount(walletKey);
@@ -346,10 +356,7 @@ export const regressionClient = async (
     );
   }
 
-  const versionConfig = VersionList.find(v => v.sdkVersion === versionInt);
-  if (!versionConfig) {
-    throw new Error(`SDK version ${versionInt} not found in VersionList`);
-  }
+  const versionConfig = getVersionConfig(versionInt);
   const ClientClass = versionConfig.Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
@@ -477,10 +484,7 @@ export function getEnvPath(): string {
 }
 export function getLatestSdkVersion(): string {
   const sdkVersion = sdkVersionOptions[0];
-  const versionConfig = VersionList.find(v => v.sdkVersion === parseInt(sdkVersion));
-  if (!versionConfig) {
-    throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
-  }
+  const versionConfig = getVersionConfig(parseInt(sdkVersion));
   const libXmtpVersion = versionConfig.libXmtpVersion;
   return sdkVersion + "@" + libXmtpVersion;
 }
@@ -515,10 +519,9 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 
-export const sdkVersionOptions = VersionList
-  .filter((config) => config.sdkVersion >= 200)
-  .sort((a, b) => b.sdkVersion - a.sdkVersion)
-  .map((config) => config.sdkVersion.toString());
+export const sdkVersionOptions = [300, 220, 210, 209].map((version) =>
+  version.toString(),
+);
 
 /**
  * Creates random installations for a worker
