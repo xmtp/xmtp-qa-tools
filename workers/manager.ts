@@ -4,7 +4,6 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
-  getNumericVersion,
   getVersionConfig,
   sdkVersionOptions,
   sleep,
@@ -402,11 +401,9 @@ export class WorkerManager {
 
     if (parts.length > 1) {
       const lastPart = parts[parts.length - 1];
-      // Check if last part is a valid SDK version (numeric)
+      // Check if last part is a valid SDK version
       if (
-        (lastPart &&
-          !isNaN(Number(lastPart)) &&
-          [30, 47, 105, 209, 210, 220, 300].includes(parseInt(lastPart))) ||
+        lastPart &&
         [
           "0.0.13",
           "0.0.47",

@@ -1163,7 +1163,7 @@ export class WorkerClient extends Worker {
     const { client, dbPath, address } = await createClient(
       this.walletKey as `0x${string}`,
       this.encryptionKeyHex,
-      Number(this.sdkVersion),
+      this.sdkVersion,
       this.name,
       newFolder,
       this.env,
