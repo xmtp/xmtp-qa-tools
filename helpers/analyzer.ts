@@ -20,6 +20,12 @@ export const PATTERNS = {
       ],
     },
     {
+      testName: "Agents-tagged",
+      uniqueErrorLines: [
+        "FAIL  suites/agents/agents-tagged.test.ts > agents-tagged > production: tokenbot should respond to tagged/command message : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
+      ],
+    },
+    {
       testName: "Agents-dms",
       uniqueErrorLines: [
         "FAIL  suites/agents/agents-dms.test.ts > agents-dms > production: tokenbot DM : 0x9E73e4126bb22f79f89b6281352d01dd3d203466",
