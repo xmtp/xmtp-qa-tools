@@ -14,15 +14,15 @@ import {
   type XmtpEnv,
 } from "@xmtp/node-sdk";
 import {
+  Client as Client13,
+  Conversation as Conversation13,
+} from "@xmtp/node-sdk-0.0.13";
+import {
   Client as Client47,
   Conversation as Conversation47,
   Dm as Dm47,
   Group as Group47,
 } from "@xmtp/node-sdk-0.0.47";
-import {
-  Client as ClientMls,
-  Conversation as ConversationMls,
-} from "@xmtp/node-sdk-0.4.1";
 import {
   Client as Client105,
   Conversation as Conversation105,
@@ -67,10 +67,10 @@ import { addFileLogging, setupPrettyLogs } from "./logger";
 // SDK version mappings
 export const VersionList = [
   {
-    Client: ClientMls,
-    Conversation: ConversationMls,
-    Dm: ConversationMls,
-    Group: ConversationMls,
+    Client: Client13,
+    Conversation: Conversation13,
+    Dm: Conversation13,
+    Group: Conversation13,
     sdkPackage: "node-sdk-mls",
     bindingsPackage: "node-bindings-mls",
     nodeVersion: "0.0.13",
@@ -353,6 +353,8 @@ export const regressionClient = async (
     throw new Error("Invalid version");
   } else if (sdkVersion === "0.0.47") {
     const signer = createSigner47(walletKey);
+
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -362,6 +364,7 @@ export const regressionClient = async (
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else if (sdkVersion === "1.0.5") {
     const signer = createSigner(walletKey);
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, dbEncryptionKey, {
       dbPath,
       env,
@@ -371,6 +374,7 @@ export const regressionClient = async (
     libXmtpVersionAfterClient = getLibXmtpVersion(ClientClass);
   } else {
     const signer = createSigner(walletKey);
+    // @ts-expect-error: SDK version compatibility - signer interface differs across versions
     client = await ClientClass.create(signer, {
       dbEncryptionKey,
       dbPath,

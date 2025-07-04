@@ -2,7 +2,6 @@ import { exec } from "child_process";
 import { promisify } from "util";
 import metrics from "datadog-metrics";
 import fetch from "node-fetch";
-import { shouldFilterOutTest } from "./analyzer";
 import { getLatestSdkVersion } from "./client";
 
 // Consolidated interfaces
