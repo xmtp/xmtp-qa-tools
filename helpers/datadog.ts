@@ -331,7 +331,7 @@ export async function sendDatadogLog(
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "DD-API-KEY": apiKey,
+        "DD-API-KEY": process.env.DATADOG_API_KEY as string,
       },
       body: JSON.stringify(logPayload),
     });
