@@ -17,7 +17,7 @@ let debugMode = false;
 const DEFAULT_COUNT = 200;
 const DEFAULT_ENVS: XmtpEnv[] = ["local"];
 const DEFAULT_INSTALLATIONS = 2;
-const DEFAULT_INSTALLATIONS_COUNT = 10;
+const DEFAULT_INSTALLATIONS_COUNT = 2;
 const DEFAULT_GROUPS_PER_INSTALLATION = 200;
 const DEFAULT_CONVERSATIONS_PER_GROUP = 200;
 // =========================
@@ -402,10 +402,10 @@ async function createGroupsAndConversations(
     try {
       const groupSize = Math.floor(Math.random() * 4) + 2;
       const randomInboxes = allInboxes
-        .filter(inbox => inbox.inboxId !== client.inboxId)
+        .filter((inbox) => inbox.inboxId !== client.inboxId)
         .sort(() => 0.5 - Math.random())
         .slice(0, groupSize - 1)
-        .map(inbox => inbox.inboxId);
+        .map((inbox) => inbox.inboxId);
 
       const group = await client.conversations.newGroup(randomInboxes, {
         groupName: `Test Group ${i + 1}`,
@@ -446,8 +446,10 @@ async function generateInstallationsWithContent({
   conversationsPerGroup?: number;
 }) {
   if (env === "local") loadEnv("installation-generation");
-  
-  console.log(`\n🚀 Generating ${count} installations with ${groupsPerInstallation} groups, ${conversationsPerGroup} conversations each`);
+
+  console.log(
+    `\n🚀 Generating ${count} installations with ${groupsPerInstallation} groups, ${conversationsPerGroup} conversations each`,
+  );
 
   if (!fs.existsSync(INSTALLATIONS_DIR)) {
     fs.mkdirSync(INSTALLATIONS_DIR, { recursive: true });
@@ -456,7 +458,7 @@ async function generateInstallationsWithContent({
   // Load existing inboxes for group members
   const inboxFiles = ["5.json", "25.json", "20.json", "15.json", "10.json"];
   let allInboxes: InboxData[] = [];
-  
+
   for (const file of inboxFiles) {
     const inboxes = readJson(`${INBOXES_DIR}/${file}`);
     if (inboxes && inboxes.length > 0) {
@@ -464,9 +466,11 @@ async function generateInstallationsWithContent({
       break;
     }
   }
-  
+
   if (allInboxes.length < 10) {
-    console.error("❌ Not enough existing inboxes found. Please run 'yarn gen --count 100' first.");
+    console.error(
+      "❌ Not enough existing inboxes found. Please run 'yarn gen --count 100' first.",
+    );
     return;
   }
 
@@ -481,19 +485,20 @@ async function generateInstallationsWithContent({
       const accountAddress = identifier.identifier;
       const dbEncryptionKey = generateEncryptionKeyHex();
       const dbPath = `${INSTALLATIONS_DIR}/installation-${i + 1}-${env}`;
-      
+
       const client = await Client.create(signer, {
         dbEncryptionKey: getEncryptionKeyFromHex(dbEncryptionKey),
         dbPath,
         env,
       });
 
-      const { groupsCreated, conversationsCreated } = await createGroupsAndConversations(
-        client,
-        groupsPerInstallation,
-        conversationsPerGroup,
-        allInboxes
-      );
+      const { groupsCreated, conversationsCreated } =
+        await createGroupsAndConversations(
+          client,
+          groupsPerInstallation,
+          conversationsPerGroup,
+          allInboxes,
+        );
 
       installations.push({
         accountAddress,
@@ -508,7 +513,9 @@ async function generateInstallationsWithContent({
       });
 
       progress.update();
-      debugLog(`✅ Installation ${i + 1}: ${groupsCreated} groups, ${conversationsCreated} conversations`);
+      debugLog(
+        `✅ Installation ${i + 1}: ${groupsCreated} groups, ${conversationsCreated} conversations`,
+      );
     } catch (error) {
       console.error(`❌ Failed to create installation ${i + 1}:`, error);
       progress.update();
@@ -520,16 +527,22 @@ async function generateInstallationsWithContent({
   const installationsFile = `${INSTALLATIONS_DIR}/installations-${env}.json`;
   writeJson(installationsFile, installations);
 
-  const totalGroups = installations.reduce((sum, inst) => sum + inst.groupsCreated, 0);
-  const totalConversations = installations.reduce((sum, inst) => sum + inst.conversationsCreated, 0);
+  const totalGroups = installations.reduce(
+    (sum, inst) => sum + inst.groupsCreated,
+    0,
+  );
+  const totalConversations = installations.reduce(
+    (sum, inst) => sum + inst.conversationsCreated,
+    0,
+  );
 
-  console.log(`\n✅ Created ${installations.length} installations with ${totalGroups} groups and ${totalConversations} conversations`);
+  console.log(
+    `\n✅ Created ${installations.length} installations with ${totalGroups} groups and ${totalConversations} conversations`,
+  );
   console.log(`📁 Files saved to: ${INSTALLATIONS_DIR}/`);
 
   return installations;
 }
-
-
 
 async function main() {
   const args = process.argv.slice(2);
@@ -537,14 +550,14 @@ async function main() {
     showHelp();
     return;
   }
-  
+
   let count: number | undefined = undefined,
     envs: XmtpEnv[] | undefined = undefined,
     installations: number | undefined = undefined,
     createInstallations: number | undefined = undefined,
     groupsPerInstallation: number | undefined = undefined,
     conversationsPerGroup: number | undefined = undefined;
-    
+
   args.forEach((arg, i) => {
     if (arg === "--count") count = parseInt(args[i + 1], 10);
     if (arg === "--envs")
@@ -552,21 +565,30 @@ async function main() {
         .split(",")
         .map((e) => e.trim().toLowerCase()) as XmtpEnv[];
     if (arg === "--installations") installations = parseInt(args[i + 1], 10);
-    if (arg === "--create-installations") createInstallations = parseInt(args[i + 1], 10);
-    if (arg === "--groups-per-installation") groupsPerInstallation = parseInt(args[i + 1], 10);
-    if (arg === "--conversations-per-group") conversationsPerGroup = parseInt(args[i + 1], 10);
+    if (arg === "--create-installations")
+      createInstallations = parseInt(args[i + 1], 10);
+    if (arg === "--groups-per-installation")
+      groupsPerInstallation = parseInt(args[i + 1], 10);
+    if (arg === "--conversations-per-group")
+      conversationsPerGroup = parseInt(args[i + 1], 10);
     if (arg === "--debug") debugMode = true;
   });
 
   // If --create-installations is specified, run the new functionality
-  if (createInstallations !== undefined || args.includes("--create-installations")) {
+  if (
+    createInstallations !== undefined ||
+    args.includes("--create-installations")
+  ) {
     const env = envs?.[0] || "local";
-    const installationCount = createInstallations || DEFAULT_INSTALLATIONS_COUNT;
+    const installationCount =
+      createInstallations || DEFAULT_INSTALLATIONS_COUNT;
     await generateInstallationsWithContent({
       count: installationCount,
       env,
-      groupsPerInstallation: groupsPerInstallation || DEFAULT_GROUPS_PER_INSTALLATION,
-      conversationsPerGroup: conversationsPerGroup || DEFAULT_CONVERSATIONS_PER_GROUP,
+      groupsPerInstallation:
+        groupsPerInstallation || DEFAULT_GROUPS_PER_INSTALLATION,
+      conversationsPerGroup:
+        conversationsPerGroup || DEFAULT_CONVERSATIONS_PER_GROUP,
     });
     return;
   }
