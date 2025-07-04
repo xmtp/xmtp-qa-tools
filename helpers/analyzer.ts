@@ -23,8 +23,6 @@ export const PATTERNS = {
     "xmtp_mls::groups::key_package_cleaner_worker",
     "xmtp_mls::groups::mls_sync",
     "xmtp_mls::groups::welcome_sync",
-    "sync worker error generic storage error: Record not found inbox_id",
-    "[randomguy-300] Collector timed out",
   ],
 
   // Patterns to match error log lines
