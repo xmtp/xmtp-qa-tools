@@ -138,24 +138,63 @@ export const VersionList = [
   },
 ];
 
-// Helper function to map integer SDK versions to VersionList entries
-export function getVersionConfig(sdkVersion: number) {
-  const versionMap: Record<number, number> = {
-    30: 0, // "0.0.13"
-    47: 1, // "0.0.47"
-    105: 2, // "1.0.5"
-    209: 3, // "2.0.9"
-    210: 4, // "2.1.0"
-    220: 5, // "2.2.0"
-    300: 6, // "3.0.1"
+// Helper function to convert version strings to numeric versions
+export function getNumericVersion(sdkVersion: number | string): number {
+  const versionToNumericMap: Record<string, number> = {
+    "0.0.13": 30,
+    "0.0.47": 47,
+    "1.0.5": 105,
+    "2.0.9": 209,
+    "2.1.0": 210,
+    "2.2.0": 220,
+    "3.0.1": 300,
   };
 
-  const index = versionMap[sdkVersion];
+  const versionStr = String(sdkVersion);
+
+  // If it's already a numeric version, return it
+  if (!isNaN(Number(versionStr)) && !versionStr.includes(".")) {
+    return Number(versionStr);
+  }
+
+  // If it's a version string like "3.0.1", convert it
+  const numericVersion = versionToNumericMap[versionStr];
+  if (numericVersion !== undefined) {
+    return numericVersion;
+  }
+
+  throw new Error(`SDK version ${sdkVersion} not found in version mapping`);
+}
+
+// Helper function to map integer SDK versions to VersionList entries
+export function getVersionConfig(sdkVersion: number | string) {
+  const versionMap: Record<string, number> = {
+    "30": 0, // "0.0.13"
+    "47": 1, // "0.0.47"
+    "105": 2, // "1.0.5"
+    "209": 3, // "2.0.9"
+    "210": 4, // "2.1.0"
+    "220": 5, // "2.2.0"
+    "300": 6, // "3.0.1"
+    "0.0.13": 0,
+    "0.0.47": 1,
+    "1.0.5": 2,
+    "2.0.9": 3,
+    "2.1.0": 4,
+    "2.2.0": 5,
+    "3.0.1": 6,
+  };
+
+  const index = versionMap[sdkVersion.toString()];
   if (index === undefined) {
     throw new Error(`SDK version ${sdkVersion} not found in VersionList`);
   }
 
-  return VersionList[index];
+  const config = VersionList[index];
+  return {
+    ...config,
+    sdkVersion: getNumericVersion(sdkVersion), // Add numeric version for backward compatibility
+  };
 }
 
 export type GroupMetadataContent = {
@@ -296,7 +335,7 @@ export const getDbPath = (description: string = "xmtp") => {
 export async function createClient(
   walletKey: `0x${string}`,
   encryptionKeyHex: string,
-  sdkVersion: number,
+  sdkVersion: number | string,
   name: string,
   folder: string,
   env: XmtpEnv,
@@ -310,7 +349,7 @@ export async function createClient(
 }> {
   const encryptionKey = getEncryptionKeyFromHex(encryptionKeyHex);
 
-  // Map integer SDK version to VersionList entry
+  // Map SDK version to VersionList entry
   const versionConfig = getVersionConfig(sdkVersion);
   const libXmtpVersion = versionConfig.libXmtpVersion;
 
@@ -348,7 +387,8 @@ export const regressionClient = async (
 ): Promise<unknown> => {
   const loggingLevel = (process.env.LOGGING_LEVEL || "error") as LogLevel;
   const versionStr = String(sdkVersion);
-  const versionInt = parseInt(versionStr);
+  // Convert version strings like "3.0.1" to numeric versions like 300
+  const versionInt = getNumericVersion(sdkVersion);
   const apiUrl = apiURL;
   if (apiUrl) {
     console.log(
@@ -356,7 +396,7 @@ export const regressionClient = async (
     );
   }
 
-  const versionConfig = getVersionConfig(versionInt);
+  const versionConfig = getVersionConfig(sdkVersion);
   const ClientClass = versionConfig.Client;
   let client = null;
   let libXmtpVersionAfterClient = "unknown";
@@ -484,7 +524,7 @@ export function getEnvPath(): string {
 }
 export function getLatestSdkVersion(): string {
   const sdkVersion = sdkVersionOptions[0];
-  const versionConfig = getVersionConfig(parseInt(sdkVersion));
+  const versionConfig = getVersionConfig(sdkVersion);
   const libXmtpVersion = versionConfig.libXmtpVersion;
   return sdkVersion + "@" + libXmtpVersion;
 }
@@ -519,9 +559,7 @@ export interface LogInfo {
   [key: symbol]: string | undefined;
 }
 
-export const sdkVersionOptions = [300, 220, 210, 209].map((version) =>
-  version.toString(),
-);
+export const sdkVersionOptions = ["3.0.1", "2.2.0", "2.1.0", "2.0.9"];
 
 /**
  * Creates random installations for a worker

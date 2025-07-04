@@ -4,6 +4,7 @@ import path from "path";
 import {
   formatBytes,
   generateEncryptionKeyHex,
+  getNumericVersion,
   getVersionConfig,
   sdkVersionOptions,
   sleep,
@@ -403,9 +404,18 @@ export class WorkerManager {
       const lastPart = parts[parts.length - 1];
       // Check if last part is a valid SDK version (numeric)
       if (
-        lastPart &&
-        !isNaN(Number(lastPart)) &&
-        [30, 47, 105, 209, 210, 220, 300].includes(parseInt(lastPart))
+        (lastPart &&
+          !isNaN(Number(lastPart)) &&
+          [30, 47, 105, 209, 210, 220, 300].includes(parseInt(lastPart))) ||
+        [
+          "0.0.13",
+          "0.0.47",
+          "1.0.5",
+          "2.0.9",
+          "2.1.0",
+          "2.2.0",
+          "3.0.1",
+        ].includes(lastPart)
       ) {
         sdkVersion = lastPart;
         // Installation ID is everything between baseName and version
@@ -637,15 +647,15 @@ export function getDataSubFolderCount() {
 export function getLatestVersion(): string {
   if (VersionList.length === 0) {
     // Fallback to a known good version if VersionList is somehow empty
-    return "300";
+    return "3.0.1";
   }
   // Return the latest version (last in array)
-  return "300";
+  return "3.0.1";
 }
 
 export function getNodeSdkVersion(sdkVersion: string): string {
   try {
-    const versionConfig = getVersionConfig(Number(sdkVersion));
+    const versionConfig = getVersionConfig(sdkVersion);
     return versionConfig.nodeVersion;
   } catch {
     return "unknown";
@@ -654,7 +664,7 @@ export function getNodeSdkVersion(sdkVersion: string): string {
 
 export function getLibxmtpVersion(sdkVersion: string): string {
   try {
-    const versionConfig = getVersionConfig(Number(sdkVersion));
+    const versionConfig = getVersionConfig(sdkVersion);
     return versionConfig.libXmtpVersion;
   } catch {
     return "unknown";
