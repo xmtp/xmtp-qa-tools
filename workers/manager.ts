@@ -5,7 +5,7 @@ import {
   formatBytes,
   generateEncryptionKeyHex,
   getVersionConfig,
-  sdkVersionOptions,
+  nodeVersionOptions,
   sleep,
   VersionList,
 } from "@helpers/client";
@@ -32,7 +32,7 @@ export function getWorkersWithVersions(workerNames: string[]): string[] {
     return workerNames;
   }
 
-  const availableVersions = sdkVersionOptions.slice(0, testVersions);
+  const availableVersions = nodeVersionOptions().slice(0, testVersions);
 
   const descriptors: string[] = [];
   for (const workerName of workerNames) {

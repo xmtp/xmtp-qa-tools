@@ -64,6 +64,10 @@ import { sepolia } from "viem/chains";
 import { initDataDog } from "./datadog";
 import { addFileLogging, setupPrettyLogs } from "./logger";
 
+export function nodeVersionOptions() {
+  return VersionList.map((v) => v.nodeVersion).reverse();
+}
+
 // SDK version mappings
 export const VersionList = [
   {
@@ -463,7 +467,7 @@ export function getEnvPath(): string {
   return envPath;
 }
 export function getLatestSdkVersion(): string {
-  const sdkVersion = sdkVersionOptions[0];
+  const sdkVersion = nodeVersionOptions()[0];
   const versionConfig = getVersionConfig(sdkVersion);
   const libXmtpVersion = versionConfig.libXmtpVersion;
   return sdkVersion + "-" + libXmtpVersion;
@@ -498,8 +502,6 @@ export interface LogInfo {
   message: string;
   [key: symbol]: string | undefined;
 }
-
-export const sdkVersionOptions = ["3.0.1", "2.2.0", "2.1.0", "2.0.9"];
 
 /**
  * Creates random installations for a worker
