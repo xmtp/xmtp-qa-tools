@@ -1,15 +1,9 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import {
-  extractErrorLogs,
-  extractFailLines,
-  sendSlackNotification,
-  shouldFilterOutTest,
-} from "@helpers/analyzer";
+import { logUpload } from "@helpers/analyzer";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
-import { sendDatadogLog } from "@helpers/datadog";
 
 interface RetryOptions {
   maxAttempts: number;
@@ -391,20 +385,8 @@ async function runVitestTest(
           `\n❌ Test suite "${testName}" failed after ${options.maxAttempts} attempts.`,
         );
 
-        if (options.explicitLogFlag) {
-          const apiKey = process.env.DATADOG_API_KEY;
-          if (!apiKey) return;
-
-          const errorLogs = extractErrorLogs(logger.logFileName, 20);
-
-          if (errorLogs.size > 0) {
-            const failLines = extractFailLines(errorLogs);
-            if (shouldFilterOutTest(errorLogs, failLines)) {
-              await sendDatadogLog(errorLogs, testName, failLines);
-              await sendSlackNotification(errorLogs, testName, failLines);
-            }
-          }
-        }
+        if (options.explicitLogFlag)
+          await logUpload(logger.logFileName, testName);
 
         logger.close();
 
