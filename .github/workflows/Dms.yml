@@ -30,6 +30,9 @@ jobs:
       - name: Run tests
         run: yarn test ${{ matrix.test }}
 
+      - name: Run tests
+        run: yarn test ${{ matrix.test }} --debug --no-fail
+
       - name: Cleanup and upload artifacts
         if: always()
         uses: ./.github/actions/xmtp-test-cleanup
