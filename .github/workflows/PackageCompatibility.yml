@@ -100,3 +100,7 @@ jobs:
           else
             ${{ matrix.package-manager }} run build
           fi
+
+      - name: Send Slack notification on failure
+        if: failure() || cancelled()
+        run: yarn notify-failure "PackageCompatibility"
