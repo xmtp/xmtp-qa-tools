@@ -1,20 +1,13 @@
 name: "XMTP Test Setup"
 description: "Sets up Node.js environment with caching and installs dependencies for XMTP tests"
 
-inputs:
-  node-version-file:
-    description: "Path to .node-version file"
-    required: false
-    default: ".node-version"
-
 runs:
   using: "composite"
   steps:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version-file: ${{ inputs.node-version-file }}
-        # Disable built-in cache to use shared cache belows
+        node-version-file: ".node-version"
 
     - name: Cache dependencies
       uses: actions/cache@v4
