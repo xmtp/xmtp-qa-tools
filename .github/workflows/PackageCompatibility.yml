@@ -103,4 +103,4 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn notify-failure "PackageCompatibility"
+        run: yarn workflow-failure "PackageCompatibility"

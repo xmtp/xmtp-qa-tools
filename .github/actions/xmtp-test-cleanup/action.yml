@@ -17,7 +17,7 @@ runs:
   using: "composite"
   steps:
     - name: Send Slack notification on failure
-      run: yarn notify-failure "${{ inputs.test-name }}"
+      run: yarn workflow-failure "${{ inputs.test-name }}"
       shell: bash
 
     - name: Upload logs and environment
