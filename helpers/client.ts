@@ -53,6 +53,13 @@ import {
   Dm as Dm300,
   Group as Group300,
 } from "@xmtp/node-sdk-3.0.1";
+// TODO: Uncomment when @xmtp/node-sdk@3.0.2 is published
+// import {
+//   Client as Client302,
+//   Conversation as Conversation302,
+//   Dm as Dm302,
+//   Group as Group302,
+// } from "@xmtp/node-sdk-3.0.2";
 import dotenv from "dotenv";
 import { fromString, toString } from "uint8arrays";
 import { createWalletClient, http, toBytes } from "viem";
@@ -133,6 +140,16 @@ export const VersionList = [
     bindingsPackage: "1.2.5",
     libXmtpVersion: "dc3e8c8",
   },
+  // TODO: Uncomment when @xmtp/node-sdk@3.0.2 is published
+  // {
+  //   Client: Client302,
+  //   Conversation: Conversation302,
+  //   Dm: Dm302,
+  //   Group: Group302,
+  //   nodeVersion: "3.0.2",
+  //   bindingsPackage: "1.2.5", // Update this with the correct version when available
+  //   libXmtpVersion: "PLACEHOLDER", // Update this with the correct commit hash when available
+  // },
 ];
 
 // Helper function to get version config from VersionList
