@@ -322,7 +322,7 @@ export async function sendDatadogLog(
         process.env.GEOLOCATION as keyof typeof GEO_TO_COUNTRY_CODE
       ],
   };
-  console.debug(logPayload);
+  //console.debug(logPayload);
   try {
     await fetch("https://http-intake.logs.datadoghq.com/v1/input", {
       method: "POST",
