@@ -44,7 +44,10 @@ jobs:
         if: failure() || cancelled()
         run: |
           STATUS="${{ job.status == 'cancelled' && 'timed out' || 'failed' }}"
-          yarn notify "${{ matrix.test }}" "${{ matrix.environment }}" "${{ github.workflow }}" "$STATUS"
+          tsx -e "
+          import { sendSlackNotification } from './helpers/analyzer.js';
+          await sendSlackNotification('${{ matrix.test }}', '${{ matrix.environment }}', '${{ github.workflow }}', '$STATUS');
+          "
       - name: Upload logs and environment
         if: always()
         uses: actions/upload-artifact@v4
