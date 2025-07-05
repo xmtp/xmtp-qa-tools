@@ -66,7 +66,25 @@ describe(testName, async () => {
     expect(verifyResult.allReceived).toBe(true);
   });
 
-  it("fail on purpose", () => {
+  it("fail on purpose1", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose2", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose3", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose4", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose5", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose6", () => {
+    throw new Error("fail on purpose");
+  });
+  it("fail on purpose7", () => {
     throw new Error("fail on purpose");
   });
 });

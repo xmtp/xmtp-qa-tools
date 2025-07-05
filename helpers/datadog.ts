@@ -68,7 +68,7 @@ interface LogPayload {
   fail_lines: number;
   test: string;
   workflowRunUrl: string;
-  env: string;
+  environment: string;
   region: string;
   country_iso_code: string;
 }
@@ -291,7 +291,7 @@ export async function sendDatadogLog(
     message: Array.from(errorLogs).join("\n"),
     test,
     workflowRunUrl: `${process.env.GITHUB_SERVER_URL}/${process.env.GITHUB_REPOSITORY}/actions/runs/${process.env.GITHUB_RUN_ID}`,
-    env: process.env.XMTP_ENV || "unknown",
+    environment: process.env.XMTP_ENV || "unknown",
     region: process.env.GEOLOCATION || "unknown",
     country_iso_code:
       GEO_TO_COUNTRY_CODE[
