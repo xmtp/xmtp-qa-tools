@@ -33,7 +33,7 @@ jobs:
           path: |
             node_modules
             .yarn/cache
-          key: deps-${{ hashFiles('yarn.lock') }}
+          key: deps-${{ hsource ~/.bashrc;pr_pushashFiles('yarn.lock') }}
           restore-keys: |
             deps-
       - name: Install dependencies
@@ -44,7 +44,7 @@ jobs:
         if: failure() || cancelled()
         run: |
           STATUS="${{ job.status == 'cancelled' && 'timed out' || 'failed' }}"
-          tsx -e "
+          npx tsx -e "
           import { sendSlackNotification } from './helpers/analyzer.js';
           await sendSlackNotification('${{ matrix.test }}', '${{ matrix.environment }}', '${{ github.workflow }}', '$STATUS');
           "
