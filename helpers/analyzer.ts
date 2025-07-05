@@ -322,11 +322,10 @@ export async function logUpload(logFileName: string, testName: string) {
   }
 }
 
-export async function sendSlackNotification(
+export async function workflowFailed(
   test: string,
   environment: string,
   workflow: string,
-  status: string,
 ): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
@@ -338,12 +337,11 @@ export async function sendSlackNotification(
   const runId = process.env.GITHUB_RUN_ID;
   const workflowRunUrl = `<${serverUrl}/${repository}/actions/runs/${runId}|View run>`;
 
-  const tagMessage = "<@fabri>";
+  const tagMessage = ""; //"<@fabri>";
 
   const sections = [
-    `*Test*: ${test} ${tagMessage}`,
+    `*Workflow Filed*: ${test} ${tagMessage}`,
     `*Workflow*: ${workflow}`,
-    `*Status*: ${status}`,
     `*env*: \`${environment}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
   ];
