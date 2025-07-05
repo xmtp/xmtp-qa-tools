@@ -1,5 +1,5 @@
-name: Agents
-description: "should verify performance of the library in the production network"
+name: Dms
+description: "dms"
 
 on:
   pull_request:
@@ -39,7 +39,7 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test ${{ matrix.test }} --debug --no-fail
+        run: yarn test ${{ matrix.test }}
       - name: Send Slack notification on failure
         if: failure() || cancelled()
         run: |
