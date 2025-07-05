@@ -43,25 +43,11 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn notify-failure "SelfTest"
-      - name: Upload logs and environment
+        run: yarn workflow-failure "SelfTest"
+
+      - name: Cleanup and upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/xmtp-test-cleanup
         with:
-          name: logs-env-selftest
-          path: |
-            qa-tools-test/logs/**/*
-            qa-tools-test/.env
-          if-no-files-found: ignore
-          include-hidden-files: true
-          retention-days: 90
-      - name: Upload installation databases
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: install-db-selftest
-          path: |
-            qa-tools-test/.data/**/*
-          if-no-files-found: ignore
-          include-hidden-files: true
-          retention-days: 90
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}

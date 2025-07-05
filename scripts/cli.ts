@@ -1,7 +1,7 @@
 import { execSync, spawn } from "child_process";
 import fs from "fs";
 import path from "path";
-import { logUpload } from "@helpers/analyzer";
+import { sendDatadogLog } from "@helpers/datadog";
 import { createTestLogger } from "@helpers/logger";
 import "dotenv/config";
 
@@ -386,7 +386,7 @@ async function runVitestTest(
         );
 
         if (options.explicitLogFlag)
-          await logUpload(logger.logFileName, testName);
+          await sendDatadogLog(logger.logFileName, testName);
 
         logger.close();
 

@@ -40,7 +40,7 @@ jobs:
 
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn notify-failure "AgentExamplesRepo"
+        run: yarn workflow-failure "AgentExamplesRepo"
 
       - name: Run agent
         run: |

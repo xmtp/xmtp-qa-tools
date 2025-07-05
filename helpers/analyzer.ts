@@ -1,7 +1,6 @@
 import fs from "fs";
 import path from "path";
 import fetch from "node-fetch";
-import { sendDatadogLog } from "./datadog";
 import { processLogFile, stripAnsi } from "./logger";
 
 // Known test issues for tracking
@@ -283,54 +282,14 @@ export function sanitizeLogs(logs: string): string {
   return logs.replaceAll(/```/g, "'''");
 }
 
-/**
- * Check if test should be filtered out based on known issues
- */
-export function shouldFilterOutTest(
-  errorLogs: Set<string>,
-  fail_lines: string[],
-): boolean {
-  const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
-  if (jobStatus === "success") {
-    console.warn(`Slack notification skipped (status: ${jobStatus})`);
-    return true;
-  }
-
-  const branchName = (process.env.GITHUB_REF || "").replace("refs/heads/", "");
-  if (branchName !== "main" && process.env.GITHUB_ACTIONS) {
-    console.warn(`Slack notification skipped (branch: ${branchName})`);
-    return true;
-  }
-
-  if (!errorLogs || errorLogs.size === 0) {
-    console.warn("No error logs, skipping");
-    return true;
-  }
-
-  if (Array.isArray(fail_lines) && fail_lines.length === 0) {
-    console.warn("No fail_lines logs, skipping");
-    return true;
-  }
-
-  return false;
-}
-export async function logUpload(logFileName: string, testName: string) {
-  const apiKey = process.env.DATADOG_API_KEY;
-  if (!apiKey) return;
-
-  const errorLogs = extractErrorLogs(logFileName);
-
-  if (errorLogs.size > 0) {
-    const fail_lines = extractfail_lines(errorLogs);
-    const shouldUploadLogs = !shouldFilterOutTest(errorLogs, fail_lines);
-    console.debug(`shouldUploadLogs: ${shouldUploadLogs}`);
-    if (shouldUploadLogs) await sendDatadogLog(errorLogs, testName, fail_lines);
-  }
-}
-
 export async function workflowFailed(workflowName: string): Promise<void> {
   if (!process.env.SLACK_CHANNEL) {
     console.warn("No Slack channel found, skipping");
+    return;
+  }
+  const jobStatus = process.env.GITHUB_JOB_STATUS || "failed";
+  if (jobStatus === "success") {
+    console.warn(`Slack notification skipped (status: ${jobStatus})`);
     return;
   }
 
@@ -341,6 +300,7 @@ export async function workflowFailed(workflowName: string): Promise<void> {
 
   const sections = [
     `*Workflow*: ${workflowName} FAILED ❌ <@fabri>`,
+    `*Timestamp*: \`${new Date().toISOString()}\``,
     `*env*: \`${process.env.XMTP_ENV}\` | *region*: \`${process.env.GEOLOCATION}\``,
     workflowRunUrl,
   ];

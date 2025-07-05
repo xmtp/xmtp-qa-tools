@@ -23,44 +23,19 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-          # Disable built-in cache to use shared cache below
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/cache
-          key: deps-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            deps-
-      - name: Install dependencies
-        run: yarn
+      - name: Setup test environment
+        uses: ./.github/actions/xmtp-test-setup
+
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
+
       - name: Send Slack notification on failure
         if: failure() || cancelled()
-        run: yarn notify-failure "${{ matrix.test }}"
-      - name: Upload logs and environment
+        run: yarn workflow-failure "${{ matrix.test }}"
+
+      - name: Cleanup and upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/xmtp-test-cleanup
         with:
-          name: logs-env-${{ matrix.environment }}-${{ matrix.test }}
-          path: |
-            logs/**/*
-            .env
-          if-no-files-found: ignore
-          include-hidden-files: true
-          retention-days: 90
-      - name: Upload installation databases
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: install-db-${{ matrix.environment }}-${{ matrix.test }}
-          path: |
-            .data/**/*
-          if-no-files-found: ignore
-          include-hidden-files: true
-          retention-days: 90
+          test-name: ${{ matrix.test }}
+          environment: ${{ matrix.environment }}

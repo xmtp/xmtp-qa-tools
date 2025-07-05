@@ -23,47 +23,24 @@ jobs:
       SLACK_CHANNEL: ${{ secrets.SLACK_CHANNEL }}
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: ".node-version"
-      - name: Cache dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            node_modules
-            .yarn/cache
-          key: deps-${{ hashFiles('yarn.lock') }}
-          restore-keys: |
-            deps-
-      - name: Install dependencies
-        run: yarn
+      - name: Setup test environment
+        uses: ./.github/actions/xmtp-test-setup
+
       - name: Run versions
         run: yarn script versions
+
       - name: Run tests
         run: yarn test ${{ matrix.test }} --no-fail --debug
-      - name: Send Slack notification on failure
-        if: failure() || cancelled()
-        run: yarn notify-failure "Regression"
-      - name: Upload logs and environment
+
+      - name: Cleanup and upload artifacts
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: ./.github/actions/xmtp-test-cleanup
         with:
-          name: logs-env-${{ matrix.environment }}-${{ matrix.test }}
+          name: logs-env-chaos-${{ matrix.test_file }}
           path: |
             logs/**/*
             .env
           if-no-files-found: ignore
           overwrite: true
           include-hidden-files: true
-          retention-days: 90
-      - name: Upload installation databases
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: install-db-${{ matrix.environment }}-${{ matrix.test }}
-          path: |
-            .data/**/*
-          if-no-files-found: ignore
-          overwrite: true
-          include-hidden-files: true
-          retention-days: 90
+          retention-days: 30
