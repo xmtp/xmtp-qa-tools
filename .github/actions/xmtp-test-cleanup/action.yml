@@ -8,10 +8,6 @@ inputs:
   environment:
     description: "Test environment (dev, production, etc.)"
     required: true
-  enable-notifications:
-    description: "Whether to send Slack notifications on failure"
-    required: false
-    default: "true"
   retention-days:
     description: "Number of days to retain artifacts"
     required: false
